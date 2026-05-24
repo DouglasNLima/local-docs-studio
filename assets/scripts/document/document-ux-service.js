@@ -1,0 +1,507 @@
+import { storageKeys } from '../state/config.js';
+import { cssEscape, slugify } from '../utils/format.js';
+
+const SEARCH_IGNORE_SELECTOR = [
+  '.code-block-header',
+  '.table-block-header',
+  '.diagram-toolbar',
+  '.diagram-error-actions',
+  'button',
+  'script',
+  'style',
+  'svg',
+].join(',');
+
+export function createDocumentUxService({ state, dom, callbacks = {} }) {
+  const {
+    preview,
+    outlineToggleButton,
+    outlinePanel,
+    outlineLinks,
+    previewFindToggleButton,
+    previewFindPanel,
+    previewFindInput,
+    previewFindCount,
+    previewFindPrevButton,
+    previewFindNextButton,
+    previewFindClearButton,
+    documentReviewToggleButton,
+    documentReviewPanel,
+    documentReviewSummary,
+    documentReviewMetrics,
+    documentReviewAlerts,
+  } = dom;
+  const {
+    getBacklinks,
+    openBacklink,
+  } = callbacks;
+
+  const searchState = {
+    matches: [],
+    activeIndex: -1,
+  };
+  let outlineItems = [];
+  let scrollFrame = 0;
+  let outlineClickLockTarget = '';
+  let outlineClickLockTimer = 0;
+
+  function installDocumentUxHandlers() {
+    outlineToggleButton.addEventListener('click', toggleOutline);
+    outlineLinks.addEventListener('click', handleOutlineClick);
+    preview.addEventListener('scroll', scheduleActiveOutlineUpdate, { passive: true });
+
+    previewFindToggleButton.addEventListener('click', togglePreviewFind);
+    previewFindInput.addEventListener('input', () => applyPreviewSearch(previewFindInput.value));
+    previewFindInput.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        if (event.shiftKey) goToSearchMatch(-1);
+        else goToSearchMatch(1);
+      }
+      if (event.key === 'Escape') {
+        closePreviewFind();
+      }
+    });
+    previewFindPrevButton.addEventListener('click', () => goToSearchMatch(-1));
+    previewFindNextButton.addEventListener('click', () => goToSearchMatch(1));
+    previewFindClearButton.addEventListener('click', closePreviewFind);
+
+    documentReviewToggleButton.addEventListener('click', toggleDocumentReview);
+    documentReviewAlerts.addEventListener('click', handleReviewTargetClick);
+  }
+
+  function updateDocumentUx() {
+    clearPreviewSearch({ clearInput: false });
+    updatePreviewOutline();
+    updateDocumentReview();
+  }
+
+  function toggleOutline() {
+    state.outlineOpen = !state.outlineOpen;
+    localStorage.setItem(storageKeys.outline, String(state.outlineOpen));
+    updatePreviewOutline();
+  }
+
+  function updatePreviewOutline() {
+    clearOutlineClickLock();
+    outlineToggleButton.setAttribute('aria-pressed', String(state.outlineOpen));
+    outlineItems = collectOutlineItems();
+    outlineLinks.innerHTML = '';
+
+    if (!state.outlineOpen || !outlineItems.length) {
+      outlinePanel.hidden = true;
+      return;
+    }
+
+    outlineItems.forEach((item) => {
+      const link = document.createElement('a');
+      link.href = `#${item.id}`;
+      link.dataset.outlineTarget = item.id;
+      link.dataset.outlineLevel = String(item.level);
+      link.className = `outline-level-${item.level}`;
+      link.textContent = item.text;
+      outlineLinks.appendChild(link);
+    });
+
+    outlinePanel.hidden = false;
+    updateActiveOutlineLink();
+  }
+
+  function collectOutlineItems() {
+    const usedIds = new Set();
+    return [...getContentRoot().querySelectorAll('h1, h2, h3, h4')].map((heading, index) => {
+      const level = Number(heading.tagName.slice(1));
+      const text = heading.textContent.trim() || `Section ${index + 1}`;
+      const base = slugify(text) || `section-${index + 1}`;
+      let id = base;
+      let suffix = 2;
+      while (usedIds.has(id)) {
+        id = `${base}-${suffix}`;
+        suffix += 1;
+      }
+      usedIds.add(id);
+      heading.id = id;
+      return { id, level, text, heading };
+    });
+  }
+
+  function handleOutlineClick(event) {
+    const link = event.target.closest('[data-outline-target]');
+    if (!link) return;
+    event.preventDefault();
+    const target = preview.querySelector(`#${cssEscape(link.dataset.outlineTarget)}`);
+    lockActiveOutlineLink(link.dataset.outlineTarget);
+    scrollPreviewTarget(target);
+    setActiveOutlineLink(link.dataset.outlineTarget);
+  }
+
+  function scheduleActiveOutlineUpdate() {
+    if (outlineClickLockTarget) return;
+    if (scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      updateActiveOutlineLink();
+    });
+  }
+
+  function updateActiveOutlineLink() {
+    if (!state.outlineOpen || !outlineItems.length) return;
+    const previewTop = preview.getBoundingClientRect().top;
+    const threshold = previewTop + 96;
+    let active = outlineItems[0];
+
+    outlineItems.forEach((item) => {
+      if (item.heading.getBoundingClientRect().top <= threshold) {
+        active = item;
+      }
+    });
+
+    setActiveOutlineLink(active?.id);
+  }
+
+  function setActiveOutlineLink(id) {
+    outlineLinks.querySelectorAll('[data-outline-target]').forEach((link) => {
+      link.classList.toggle('active', link.dataset.outlineTarget === id);
+    });
+  }
+
+  function lockActiveOutlineLink(id) {
+    outlineClickLockTarget = id;
+    window.clearTimeout(outlineClickLockTimer);
+    outlineClickLockTimer = window.setTimeout(() => {
+      const lockedTarget = outlineClickLockTarget;
+      outlineClickLockTarget = '';
+      setActiveOutlineLink(lockedTarget);
+    }, 450);
+  }
+
+  function clearOutlineClickLock() {
+    outlineClickLockTarget = '';
+    window.clearTimeout(outlineClickLockTimer);
+    outlineClickLockTimer = 0;
+  }
+
+  function togglePreviewFind() {
+    const shouldOpen = previewFindPanel.hidden;
+    previewFindPanel.hidden = !shouldOpen;
+    previewFindToggleButton.setAttribute('aria-pressed', String(shouldOpen));
+    if (shouldOpen) {
+      previewFindInput.focus();
+      previewFindInput.select();
+      applyPreviewSearch(previewFindInput.value);
+    } else {
+      clearPreviewSearch({ clearInput: true });
+    }
+  }
+
+  function closePreviewFind() {
+    previewFindPanel.hidden = true;
+    previewFindToggleButton.setAttribute('aria-pressed', 'false');
+    clearPreviewSearch({ clearInput: true });
+  }
+
+  function applyPreviewSearch(query) {
+    clearSearchHighlights();
+    searchState.matches = [];
+    searchState.activeIndex = -1;
+
+    const needle = String(query || '').trim().toLowerCase();
+    if (!needle) {
+      updateFindCount();
+      return;
+    }
+
+    const textNodes = collectSearchableTextNodes();
+    textNodes.forEach((node) => highlightTextNode(node, needle));
+    searchState.matches = [...preview.querySelectorAll('mark.preview-search-hit')];
+    searchState.activeIndex = searchState.matches.length ? 0 : -1;
+    updateSearchActiveMatch(true);
+  }
+
+  function collectSearchableTextNodes() {
+    const nodes = [];
+    const walker = document.createTreeWalker(getContentRoot(), NodeFilter.SHOW_TEXT, {
+      acceptNode: (node) => {
+        if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+        const parent = node.parentElement;
+        if (!parent || parent.closest(SEARCH_IGNORE_SELECTOR)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+
+    while (walker.nextNode()) {
+      nodes.push(walker.currentNode);
+    }
+    return nodes;
+  }
+
+  function highlightTextNode(node, needle) {
+    const text = node.textContent;
+    const lower = text.toLowerCase();
+    const fragment = document.createDocumentFragment();
+    let cursor = 0;
+    let matchIndex = lower.indexOf(needle);
+
+    while (matchIndex !== -1) {
+      if (matchIndex > cursor) {
+        fragment.appendChild(document.createTextNode(text.slice(cursor, matchIndex)));
+      }
+      const mark = document.createElement('mark');
+      mark.className = 'preview-search-hit';
+      mark.textContent = text.slice(matchIndex, matchIndex + needle.length);
+      fragment.appendChild(mark);
+      cursor = matchIndex + needle.length;
+      matchIndex = lower.indexOf(needle, cursor);
+    }
+
+    if (cursor < text.length) {
+      fragment.appendChild(document.createTextNode(text.slice(cursor)));
+    }
+    node.replaceWith(fragment);
+  }
+
+  function goToSearchMatch(step) {
+    if (!searchState.matches.length) return;
+    searchState.activeIndex = (searchState.activeIndex + step + searchState.matches.length) % searchState.matches.length;
+    updateSearchActiveMatch(true);
+  }
+
+  function updateSearchActiveMatch(shouldScroll = false) {
+    searchState.matches.forEach((match, index) => {
+      match.classList.toggle('active', index === searchState.activeIndex);
+    });
+    updateFindCount();
+    if (shouldScroll && searchState.activeIndex >= 0) {
+      scrollPreviewTarget(searchState.matches[searchState.activeIndex]);
+    }
+  }
+
+  function updateFindCount() {
+    const total = searchState.matches.length;
+    previewFindCount.textContent = total && searchState.activeIndex >= 0 ? `${searchState.activeIndex + 1}/${total}` : `0/${total}`;
+    previewFindPrevButton.disabled = total < 2;
+    previewFindNextButton.disabled = total < 2;
+  }
+
+  function clearPreviewSearch({ clearInput = true } = {}) {
+    clearSearchHighlights();
+    searchState.matches = [];
+    searchState.activeIndex = -1;
+    if (clearInput) previewFindInput.value = '';
+    updateFindCount();
+  }
+
+  function clearSearchHighlights() {
+    preview.querySelectorAll('mark.preview-search-hit').forEach((mark) => {
+      mark.replaceWith(document.createTextNode(mark.textContent));
+    });
+    getContentRoot().normalize();
+  }
+
+  function toggleDocumentReview() {
+    state.documentReviewOpen = !state.documentReviewOpen;
+    localStorage.setItem(storageKeys.documentReviewOpen, String(state.documentReviewOpen));
+    updateDocumentReview();
+  }
+
+  function updateDocumentReview() {
+    documentReviewToggleButton.setAttribute('aria-pressed', String(state.documentReviewOpen));
+    documentReviewPanel.hidden = !state.documentReviewOpen;
+
+    const review = buildDocumentReview();
+    documentReviewSummary.textContent = `${review.wordCount} words · ${review.readingMinutes} min read · ${review.alerts.length} note${review.alerts.length === 1 ? '' : 's'}`;
+
+    documentReviewMetrics.innerHTML = '';
+    review.metrics.forEach((metric) => {
+      const item = document.createElement('span');
+      item.className = 'document-review-metric';
+      item.textContent = `${metric.label}: ${metric.value}`;
+      documentReviewMetrics.appendChild(item);
+    });
+
+    documentReviewAlerts.innerHTML = '';
+    if (!review.alerts.length) {
+      const item = document.createElement('div');
+      item.className = 'document-review-note ok';
+      item.textContent = 'No review notes. Document looks ready.';
+      documentReviewAlerts.appendChild(item);
+    } else {
+      review.alerts.forEach((alert) => {
+        const item = alert.targetId ? document.createElement('button') : document.createElement('div');
+        item.className = `document-review-note ${alert.tone}`;
+        item.textContent = alert.message;
+        if (alert.targetId) {
+          item.type = 'button';
+          item.dataset.reviewTarget = alert.targetId;
+        }
+        documentReviewAlerts.appendChild(item);
+      });
+    }
+    updateBacklinks();
+  }
+
+  function buildDocumentReview() {
+    const root = getContentRoot();
+    const text = getReviewText(root);
+    const words = text.match(/[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*/gu) ?? [];
+    const headings = [...root.querySelectorAll('h1, h2, h3, h4')];
+    const h1s = headings.filter((heading) => heading.tagName.toLowerCase() === 'h1');
+    const links = [...root.querySelectorAll('a[href]')];
+    const externalLinks = links.filter((link) => /^(https?:)?\/\//i.test(link.getAttribute('href') || ''));
+    const tables = root.querySelectorAll('table').length;
+    const codeBlocks = root.querySelectorAll('.code-block').length
+      + [...root.querySelectorAll('pre code')].filter((code) => !code.closest('.code-block')).length;
+    const diagrams = root.querySelectorAll('.diagram-frame').length || state.lastRenderResult.diagramTotal || 0;
+    const diagramErrors = root.querySelectorAll('.mermaid-error, .diagram-error').length || state.lastRenderResult.diagramErrors || 0;
+    const wordCount = words.length;
+    const readingMinutes = wordCount ? Math.max(1, Math.ceil(wordCount / 220)) : 0;
+    const alerts = [];
+
+    if (!wordCount && !diagrams) {
+      alerts.push({ message: 'Document is empty.', tone: 'warning' });
+    }
+
+    if (wordCount && !h1s.length) {
+      alerts.push({ message: 'Missing H1 title.', tone: 'warning', targetId: headings[0]?.id || '' });
+    }
+
+    const headingJump = findHeadingJump(headings);
+    if (headingJump) {
+      alerts.push({
+        message: `Heading level jumps from H${headingJump.previousLevel} to H${headingJump.level}.`,
+        tone: 'warning',
+        targetId: headingJump.id,
+      });
+    }
+
+    if (diagramErrors) {
+      const target = root.querySelector('.mermaid-error, .diagram-error');
+      alerts.push({
+        message: `${diagramErrors} Mermaid diagram error${diagramErrors === 1 ? '' : 's'} found.`,
+        tone: 'danger',
+        targetId: ensureElementId(target?.closest('.diagram-frame') || target, 'diagram-error'),
+      });
+    }
+
+    if (externalLinks.length) {
+      alerts.push({
+        message: `${externalLinks.length} external link${externalLinks.length === 1 ? '' : 's'} present.`,
+        tone: 'info',
+        targetId: ensureElementId(externalLinks[0], 'external-link'),
+      });
+    }
+
+    if (state.files.length > 1 && state.dirtyPaths.size) {
+      alerts.push({
+        message: `${state.dirtyPaths.size} file${state.dirtyPaths.size === 1 ? '' : 's'} edited in memory.`,
+        tone: 'info',
+      });
+    }
+
+    return {
+      wordCount,
+      readingMinutes,
+      alerts,
+      metrics: [
+        { label: 'Headings', value: headings.length },
+        { label: 'Links', value: links.length },
+        { label: 'Tables', value: tables },
+        { label: 'Code', value: codeBlocks },
+        { label: 'Diagrams', value: diagrams },
+      ],
+    };
+  }
+
+  function getReviewText(root) {
+    const clone = root.cloneNode(true);
+    clone.querySelectorAll(`${SEARCH_IGNORE_SELECTOR}, .preview-search-hit`).forEach((element) => {
+      element.remove();
+    });
+    return clone.textContent.replace(/\s+/g, ' ').trim();
+  }
+
+  function findHeadingJump(headings) {
+    let previousLevel = 0;
+    for (const heading of headings) {
+      const level = Number(heading.tagName.slice(1));
+      if (previousLevel && level > previousLevel + 1) {
+        return { id: heading.id, level, previousLevel };
+      }
+      previousLevel = level;
+    }
+    return null;
+  }
+
+  function handleReviewTargetClick(event) {
+    const backlink = event.target.closest('[data-backlink-path]');
+    if (backlink) {
+      openBacklink?.(backlink.dataset.backlinkPath, Number(backlink.dataset.backlinkLine || '1'));
+      return;
+    }
+
+    const item = event.target.closest('[data-review-target]');
+    if (!item) return;
+    scrollPreviewTarget(preview.querySelector(`#${cssEscape(item.dataset.reviewTarget)}`));
+  }
+
+  async function updateBacklinks() {
+    if (!getBacklinks || !state.documentReviewOpen || !state.activePath) return;
+    const marker = document.createElement('div');
+    marker.className = 'document-review-links';
+    marker.textContent = 'Loading backlinks...';
+    documentReviewAlerts.appendChild(marker);
+
+    const backlinks = await getBacklinks();
+    if (!marker.isConnected) return;
+    marker.innerHTML = '';
+    const title = document.createElement('strong');
+    title.textContent = `Backlinks (${backlinks.length})`;
+    marker.appendChild(title);
+    if (!backlinks.length) {
+      const empty = document.createElement('span');
+      empty.textContent = 'No loaded files link here.';
+      marker.appendChild(empty);
+      return;
+    }
+
+    backlinks.slice(0, 12).forEach((link) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'document-review-note info';
+      button.dataset.backlinkPath = link.path;
+      button.dataset.backlinkLine = String(link.line);
+      button.textContent = `${link.path}:${link.line} -> ${link.label || link.target}`;
+      marker.appendChild(button);
+    });
+  }
+
+  function ensureElementId(element, prefix) {
+    if (!element) return '';
+    if (element.id) return element.id;
+    let index = 1;
+    let id = `${prefix}-${index}`;
+    while (preview.querySelector(`#${cssEscape(id)}`)) {
+      index += 1;
+      id = `${prefix}-${index}`;
+    }
+    element.id = id;
+    return id;
+  }
+
+  function scrollPreviewTarget(target) {
+    if (!target) return;
+    target.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  }
+
+  function getContentRoot() {
+    return preview.querySelector('.docs-site-content') || preview;
+  }
+
+  return {
+    installDocumentUxHandlers,
+    toggleOutline,
+    updateDocumentUx,
+    updatePreviewOutline,
+    clearPreviewSearch,
+  };
+}

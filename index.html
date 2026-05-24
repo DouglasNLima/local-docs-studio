@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'none'" />
+  <meta name="theme-color" content="#111318" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="data:,">
+  <title>Local Docs Studio</title>
+  <link rel="stylesheet" href="./assets/vendor/katex-0.16.25.min.css" />
+  <link rel="stylesheet" href="./assets/styles/app.css" />
+</head>
+<body>
+  <main class="app layout-split" id="app">
+    <header class="topbar">
+      <div class="brand" aria-label="Application">
+        <div class="brand-mark">LD</div>
+        <div>
+          <h1>Local Docs Studio</h1>
+          <small>Local Markdown, Mermaid, and docs export studio</small>
+        </div>
+      </div>
+
+      <div class="toolbar-group primary-actions" aria-label="File actions">
+        <button id="openFileButton" class="primary" type="button">Open file</button>
+        <input id="fileInput" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain" />
+        <button id="openFolderButton" class="primary" type="button">Open folder</button>
+        <button id="saveButton" type="button" disabled>Save</button>
+        <input id="folderInput" type="file" webkitdirectory directory multiple />
+        <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+        <details class="menu">
+          <summary>File</summary>
+          <div class="menu-panel">
+            <div class="menu-heading">Open</div>
+            <button type="button" data-menu-action="openFile">Open file</button>
+            <button type="button" data-menu-action="openFolder">Open folder</button>
+            <div class="menu-note">Local files stay in this browser until you save, copy, export, or import new content.</div>
+            <hr>
+            <div class="menu-heading">Import</div>
+            <button type="button" data-menu-action="importZip">Import ZIP</button>
+            <div class="menu-note">ZIP import creates editable virtual Markdown and Mermaid documents from bundles or generic docs folders.</div>
+            <hr>
+            <div class="menu-heading">Save</div>
+            <button type="button" data-menu-action="save">Save changes</button>
+            <hr>
+            <div class="menu-heading">Recent</div>
+            <div class="menu-note">Recent files and folders are available when the browser can persist local file permissions.</div>
+            <div class="recent-list" id="recentList">Recent files appear here after you open them.</div>
+          </div>
+        </details>
+        <details class="menu">
+          <summary>Edit</summary>
+          <div class="menu-panel">
+            <div class="menu-heading">Search</div>
+            <button type="button" data-edit-action="quickSwitch">Quick switcher</button>
+            <button type="button" data-edit-action="workspaceSearch">Search workspace</button>
+            <button type="button" data-edit-action="findEditor">Find in editor</button>
+            <button type="button" data-edit-action="replaceEditor">Find and replace</button>
+            <hr>
+            <div class="menu-heading">Paste Special</div>
+            <button type="button" data-edit-action="pasteTable">Paste as table</button>
+            <button type="button" data-edit-action="pasteText">Paste as text</button>
+            <button type="button" data-edit-action="pasteCode">Paste as code block</button>
+            <button type="button" data-edit-action="pasteQuote">Paste as quote</button>
+            <button type="button" data-edit-action="pasteHtmlMarkdown">Paste HTML as Markdown</button>
+            <button type="button" data-edit-action="pasteList">Paste as list</button>
+            <button type="button" data-edit-action="pasteChecklist">Paste as checklist</button>
+            <button type="button" data-edit-action="pasteNumberedList">Paste as numbered list</button>
+            <button type="button" data-edit-action="pasteMermaid">Paste as Mermaid block</button>
+            <div class="menu-note">Spreadsheet tables paste as Markdown automatically when the clipboard includes HTML table or tab-separated data.</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="toolbar-group workflow-actions" aria-label="Render and create actions">
+        <button id="renderButton" type="button">Render</button>
+        <details class="menu">
+          <summary>Examples</summary>
+          <div class="menu-panel">
+            <div class="menu-heading">Try a starter</div>
+            <button id="sampleButton" type="button">Markdown + Mermaid sample</button>
+            <button type="button" data-example="readme">README / docs</button>
+            <button type="button" data-example="architecture">Architecture diagram</button>
+            <button type="button" data-example="brief">Project brief</button>
+            <div class="menu-note">Examples load as editable Markdown and do not call a network or AI service.</div>
+          </div>
+        </details>
+        <details class="menu align-right" id="createMenu">
+          <summary>Create</summary>
+          <div class="menu-panel create-tools">
+            <div class="menu-note">Generate editable Markdown from local templates. No network calls or AI required.</div>
+            <div class="menu-heading">Templates</div>
+            <div class="menu-heading">Project Docs</div>
+            <div class="create-grid">
+              <button type="button" data-create-template="project.readme">README</button>
+              <button type="button" data-create-template="project.architecture">Architecture</button>
+              <button type="button" data-create-template="project.adr">ADR</button>
+              <button type="button" data-create-template="project.runbook">Runbook</button>
+              <button type="button" data-create-template="project.api">API Notes</button>
+              <button type="button" data-create-template="project.onboarding">Onboarding</button>
+              <button type="button" data-create-template="project.docsIndex">Docs Pack</button>
+            </div>
+            <hr>
+            <div class="menu-heading">Release Notes</div>
+            <div class="create-grid">
+              <button type="button" data-create-template="release.customer">Customer Notes</button>
+              <button type="button" data-create-template="release.changelog">Changelog</button>
+              <button type="button" data-create-template="release.sprint">Sprint Summary</button>
+              <button type="button" data-create-template="release.migration">Migration Notes</button>
+            </div>
+            <hr>
+            <div class="menu-heading">Requirements</div>
+            <div class="create-grid">
+              <button type="button" data-create-template="requirements.prd">PRD</button>
+              <button type="button" data-create-template="requirements.featureBrief">Feature Brief</button>
+              <button type="button" data-create-template="requirements.storySet">User Stories</button>
+              <button type="button" data-create-template="requirements.devopsConclusion">DevOps Closure</button>
+              <button type="button" data-create-template="requirements.acceptance">Acceptance</button>
+              <button type="button" data-create-template="requirements.gherkin">Gherkin</button>
+              <button type="button" data-create-template="requirements.journey">Journey Map</button>
+            </div>
+            <hr>
+            <div class="menu-heading">Snippets</div>
+            <div class="menu-note">Insert into the active Markdown file at the cursor.</div>
+            <div class="menu-heading">Project Docs</div>
+            <div class="create-grid">
+              <button type="button" data-create-snippet="project.install">Install</button>
+              <button type="button" data-create-snippet="project.usage">Usage</button>
+              <button type="button" data-create-snippet="project.supportMatrix">Support Matrix</button>
+              <button type="button" data-create-snippet="project.roadmap">Roadmap</button>
+              <button type="button" data-create-snippet="project.architectureBlock">Architecture Block</button>
+            </div>
+            <div class="menu-heading">Release Notes</div>
+            <div class="create-grid">
+              <button type="button" data-create-snippet="release.added">Added</button>
+              <button type="button" data-create-snippet="release.changed">Changed</button>
+              <button type="button" data-create-snippet="release.fixed">Fixed</button>
+              <button type="button" data-create-snippet="release.deprecated">Deprecated</button>
+              <button type="button" data-create-snippet="release.security">Security</button>
+              <button type="button" data-create-snippet="release.breaking">Breaking</button>
+              <button type="button" data-create-snippet="release.knownIssues">Known Issues</button>
+            </div>
+            <div class="menu-heading">Requirements</div>
+            <div class="create-grid">
+              <button type="button" data-create-snippet="requirements.persona">Persona</button>
+              <button type="button" data-create-snippet="requirements.problem">Problem</button>
+              <button type="button" data-create-snippet="requirements.nonGoals">Non-goals</button>
+              <button type="button" data-create-snippet="requirements.metrics">Metrics</button>
+              <button type="button" data-create-snippet="requirements.risks">Risks</button>
+              <button type="button" data-create-snippet="requirements.openQuestions">Open Questions</button>
+              <button type="button" data-create-snippet="requirements.flow">User Flow</button>
+            </div>
+          </div>
+        </details>
+        <details class="menu">
+          <summary>Studio</summary>
+          <div class="menu-panel studio-tools">
+            <div class="menu-heading">Mode</div>
+            <button id="studioToggleButton" type="button" aria-pressed="false">Open Mermaid Studio</button>
+            <div class="menu-note">Start from a Mermaid template or insert a snippet at the cursor.</div>
+            <hr>
+            <div class="menu-heading">Templates</div>
+            <div class="studio-grid" aria-label="Mermaid templates">
+              <button type="button" data-studio-template="flowchart">Flowchart</button>
+              <button type="button" data-studio-template="sequence">Sequence</button>
+              <button type="button" data-studio-template="gantt">Gantt</button>
+              <button type="button" data-studio-template="class">Class</button>
+              <button type="button" data-studio-template="state">State</button>
+              <button type="button" data-studio-template="er">ERD</button>
+              <button type="button" data-studio-template="journey">Journey</button>
+              <button type="button" data-studio-template="mindmap">Mindmap</button>
+              <button type="button" data-studio-template="pie">Pie</button>
+              <button type="button" data-studio-template="timeline">Timeline</button>
+            </div>
+            <hr>
+            <div class="menu-heading">Snippets</div>
+            <div class="studio-grid" aria-label="Mermaid snippets">
+              <button type="button" data-studio-snippet="subgraph">Subgraph</button>
+              <button type="button" data-studio-snippet="decision">Decision</button>
+              <button type="button" data-studio-snippet="sequenceNote">Seq note</button>
+              <button type="button" data-studio-snippet="style">Style</button>
+              <button type="button" data-studio-snippet="classDef">Class def</button>
+              <button type="button" data-studio-snippet="linkStyle">Link style</button>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <div class="toolbar-group utility-actions" aria-label="Export and view actions">
+        <details class="menu align-right">
+          <summary>Export</summary>
+          <div class="menu-panel export-menu">
+            <div class="menu-heading">Documents</div>
+            <button id="downloadButton" type="button">Export HTML</button>
+            <button id="exportWordButton" type="button" title="Export a Word-compatible .docx document">Export Word</button>
+            <button id="exportPdfButton" type="button">Export PDF</button>
+            <div class="menu-note">HTML and Word download files. PDF opens the browser print dialog with a clean print view.</div>
+            <hr>
+            <div class="menu-heading">Bundles</div>
+            <button id="exportMarkdownBundleButton" type="button">Export Markdown Bundle</button>
+            <label class="menu-check">
+              <input id="devopsMarkdownExportToggle" type="checkbox" />
+              <span>Azure DevOps Mermaid syntax</span>
+            </label>
+            <button id="exportDocsButton" type="button">Export Docs Site</button>
+            <div class="menu-note">Bundles keep editable Markdown and assets. Docs Site creates a GitHub Pages-ready static site.</div>
+            <hr>
+            <div class="menu-heading">Diagrams</div>
+            <button id="exportSvgButton" type="button">Export SVG</button>
+            <button id="exportPngButton" type="button">Export PNG</button>
+            <button id="copyMermaidButton" type="button">Copy Mermaid</button>
+            <hr>
+            <div class="menu-heading">Clipboard</div>
+            <button id="copyHtmlButton" type="button">Copy HTML</button>
+            <button id="copyTextButton" type="button">Copy text</button>
+            <div class="menu-note">Every export runs a fresh render check and reports diagram confidence before finishing.</div>
+          </div>
+        </details>
+        <details class="menu align-right">
+          <summary>View</summary>
+          <div class="menu-panel">
+            <div class="menu-heading">Theme</div>
+            <button id="themeToggleButton" type="button" aria-pressed="false">Light mode</button>
+            <hr>
+            <div class="menu-heading">Docs preview</div>
+            <button id="docsPreviewButton" type="button" aria-pressed="false">Docs site preview</button>
+            <hr>
+            <div class="menu-heading">Layout</div>
+            <div class="layout-mode-control" id="layoutModeControl" aria-label="Editor layout">
+              <button type="button" data-layout-mode="editor">Editor</button>
+              <button type="button" data-layout-mode="split">Split</button>
+              <button type="button" data-layout-mode="preview">Preview</button>
+            </div>
+            <hr>
+            <div class="menu-heading">Preview tools</div>
+            <button type="button" data-view-action="maximizePreview">Maximize preview</button>
+            <button type="button" data-view-action="toggleOutline">Toggle outline</button>
+            <div class="menu-note">Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximized preview.</div>
+          </div>
+        </details>
+        <details class="menu align-right">
+          <summary>Help</summary>
+          <div class="menu-panel">
+            <div class="menu-heading">Shortcuts</div>
+            <dl class="shortcut-list">
+              <div><dt>Save</dt><dd>Ctrl/Cmd+S</dd></div>
+              <div><dt>Undo / redo</dt><dd>Ctrl/Cmd+Z / Y</dd></div>
+              <div><dt>Bold / italic / link</dt><dd>Ctrl/Cmd+B / I / K</dd></div>
+              <div><dt>Render</dt><dd>Ctrl/Cmd+Enter</dd></div>
+              <div><dt>Mermaid snippets</dt><dd>Ctrl/Cmd+Space</dd></div>
+              <div><dt>Quick switch</dt><dd>Ctrl/Cmd+P</dd></div>
+              <div><dt>Workspace search</dt><dd>Ctrl/Cmd+Shift+F</dd></div>
+              <div><dt>Find / replace</dt><dd>Ctrl/Cmd+F / H</dd></div>
+              <div><dt>Focus mode</dt><dd>Ctrl+F11 / Esc</dd></div>
+              <div><dt>Max preview</dt><dd>Escape restores</dd></div>
+            </dl>
+            <hr>
+            <div class="menu-heading">Documentation</div>
+            <button type="button" data-menu-action="openToolGuide">Open feature guide</button>
+            <div class="menu-note">Loads the local Markdown guide in read-only mode so you can browse the tool without changing source files.</div>
+            <hr>
+            <div class="menu-heading">Workflow tips</div>
+            <div class="help-tips">
+              <div><strong>Import ZIP</strong><span>Open app bundles or generic Markdown docs as editable virtual files.</span></div>
+              <div><strong>Export PDF</strong><span>Use the browser print dialog and choose Save as PDF.</span></div>
+              <div><strong>Markdown Bundle</strong><span>Round-trip editable docs and image assets in one ZIP.</span></div>
+              <div><strong>Sync scroll</strong><span>Keep Editor and Preview aligned in Split layout; also syncs word selections best-effort.</span></div>
+              <div><strong>Drag images</strong><span>Dropped images become exportable session assets linked from Markdown.</span></div>
+            </div>
+            <div class="menu-note">Files stay in your browser unless you export, save, copy, or import a new set.</div>
+          </div>
+        </details>
+        <button id="focusModeButton" type="button" title="Focus Mode (Ctrl+F11)" aria-label="Enter Focus Mode" aria-pressed="false">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+      </div>
+
+    </header>
+
+    <section class="shell" id="shell">
+      <aside class="sidebar" aria-label="File browser">
+        <div class="sidebar-rail" aria-hidden="true">
+          <button class="sidebar-rail-btn" id="sidebarExpandBtn" type="button" title="Expand file browser" aria-label="Expand file browser">
+            <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+            <span class="sidebar-rail-count" id="railFileCount"></span>
+          </button>
+        </div>
+        <div class="sidebar-header">
+          <div class="sidebar-title">
+            <strong>Files</strong>
+            <span class="file-count" id="fileCount">0</span>
+          </div>
+          <span class="badge" id="folderBadge">No folder</span>
+          <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" title="Collapse sidebar" aria-label="Collapse sidebar">
+            <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+          </button>
+        </div>
+        <div class="search-wrap">
+          <input id="fileSearch" type="search" placeholder="Filter files" aria-label="Filter files" autocomplete="off" />
+        </div>
+        <nav class="file-list" id="fileList" aria-label="Markdown and Mermaid files">
+          <div class="empty-state">
+            <strong>No documents loaded</strong>
+            <p>Open a file or folder, or create a new Markdown document from a local template.</p>
+            <div class="empty-actions">
+              <button type="button" data-sidebar-action="openFile">Open file</button>
+              <button type="button" data-sidebar-action="openFolder">Open folder</button>
+              <button type="button" data-sidebar-action="create">Create document</button>
+            </div>
+          </div>
+        </nav>
+      </aside>
+
+      <div
+        class="splitter sidebar-splitter"
+        id="sidebarSplitter"
+        role="separator"
+        tabindex="0"
+        aria-label="Resize file browser"
+        aria-orientation="vertical"></div>
+
+      <section class="workspace" id="workspace">
+        <section class="pane input-pane">
+          <div class="pane-title editor-pane-title">
+            <div class="file-tab" aria-label="Active document">
+              <span class="file-tab-icon" aria-hidden="true">MD</span>
+              <span class="active-file-label" id="activeFileLabel">sample.md</span>
+            </div>
+            <div class="pane-title-main pane-title-context">
+              <span>Input</span>
+            </div>
+            <button id="inputMaximizeButton" type="button" aria-pressed="false">Maximize</button>
+          </div>
+          <div class="editor-toolbar" id="editorToolbar" aria-label="Markdown formatting tools">
+            <div class="toolbar-section" aria-label="Text formatting">
+              <button class="format-bold" type="button" data-command="bold" title="Bold" aria-label="Bold">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h6.2a4 4 0 0 1 0 8H7z"/><path d="M7 13h7.2a4 4 0 0 1 0 8H7z"/><path d="M7 5v16"/></svg>
+              </button>
+              <button class="format-italic" type="button" data-command="italic" title="Italic" aria-label="Italic">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5h8"/><path d="M6 19h8"/><path d="M14 5 10 19"/></svg>
+              </button>
+              <button type="button" data-command="strikethrough" title="Strikethrough" aria-label="Strikethrough">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6h10"/><path d="M7 18h10"/><path d="M9 12h6"/><path d="M12 6l-2 12"/><path d="M14 6l-2 12"/><path d="M4 12h16"/></svg>
+              </button>
+              <button type="button" data-command="heading" title="Heading" aria-label="Heading">
+                <span class="toolbar-glyph">H1</span>
+              </button>
+            </div>
+            <div class="toolbar-section" aria-label="Document structure">
+              <button type="button" data-command="bulletList" title="Bullet list" aria-label="Bullet list">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11"/><path d="M9 12h11"/><path d="M9 18h11"/><path d="M4 6h.01"/><path d="M4 12h.01"/><path d="M4 18h.01"/></svg>
+              </button>
+              <button type="button" data-command="numberedList" title="Numbered list" aria-label="Numbered list">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10"/><path d="M10 12h10"/><path d="M10 18h10"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M4 14h2l-2 4h2"/></svg>
+              </button>
+              <button type="button" data-command="taskList" title="Checklist item" aria-label="Checklist item">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="4" height="4" rx="1"/><rect x="4" y="15" width="4" height="4" rx="1"/><path d="M11 7h9"/><path d="M11 17h9"/></svg>
+              </button>
+              <button type="button" data-command="taskListDone" title="Completed checklist item" aria-label="Completed checklist item">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="4" height="4" rx="1"/><rect x="4" y="15" width="4" height="4" rx="1"/><path d="m5 7 1 1 2-3"/><path d="m5 17 1 1 2-3"/><path d="M11 7h9"/><path d="M11 17h9"/></svg>
+              </button>
+              <button type="button" data-command="quote" title="Quote" aria-label="Quote">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h7"/><path d="M4 12h7"/><path d="M4 17h7"/><path d="M15 7h5"/><path d="M15 12h5"/><path d="M15 17h5"/></svg>
+              </button>
+            </div>
+            <div class="toolbar-section" aria-label="Insert content">
+              <button type="button" data-command="link" title="Link" aria-label="Link">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
+              </button>
+              <button type="button" data-command="image" title="Image" aria-label="Image">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="10" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 5"/></svg>
+              </button>
+              <button type="button" data-command="inlineCode" title="Inline code" aria-label="Inline code">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18-6-6 6-6"/><path d="m15 6 6 6-6 6"/></svg>
+              </button>
+              <button type="button" data-command="codeBlock" title="Code block" aria-label="Code block">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="m10 13-2 2 2 2"/><path d="m14 13 2 2-2 2"/></svg>
+              </button>
+              <button type="button" data-command="horizontalRule" title="Horizontal rule" aria-label="Horizontal rule">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16"/></svg>
+              </button>
+            </div>
+            <div class="toolbar-section" aria-label="Diagrams and tables">
+              <button class="wide" type="button" data-command="mermaidBlock" title="Mermaid block" aria-label="Mermaid block">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h5v5H4z"/><path d="M15 4h5v5h-5z"/><path d="M15 15h5v5h-5z"/><path d="M9 9.5h3.5a3 3 0 0 0 3-3V6"/><path d="M9 9.5h3.5a3 3 0 0 1 3 3V17"/></svg>
+                <span class="toolbar-glyph toolbar-glyph-small">MMD</span>
+              </button>
+              <button class="wide" type="button" data-command="table" title="Table" aria-label="Table">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M9 4v16"/><path d="M15 4v16"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="editor-shell" id="editorShell">
+            <div class="editor-line-numbers" id="editorLineNumbers" aria-hidden="true">1</div>
+            <pre class="editor-syntax-layer" id="editorSyntaxLayer" aria-hidden="true"></pre>
+            <textarea id="editor" spellcheck="false" aria-label="Markdown or Mermaid source"></textarea>
+            <div class="mermaid-autocomplete" id="mermaidAutocomplete" role="listbox" aria-label="Mermaid autocomplete suggestions" hidden></div>
+          </div>
+        </section>
+
+        <div
+          class="splitter workspace-splitter"
+          id="workspaceSplitter"
+          role="separator"
+          tabindex="0"
+          aria-label="Resize input and preview panes"
+          aria-orientation="vertical"></div>
+
+        <section class="pane preview-pane">
+          <div class="pane-title preview-pane-title">
+            <div class="pane-title-main">
+              <span>Preview</span>
+              <span class="badge" id="diagramCount">0 diagrams</span>
+            </div>
+            <div class="preview-control-groups">
+              <div class="document-controls" aria-label="Document preview controls">
+                <label class="scroll-sync-toggle" title="Synchronize editor and preview scrolling">
+                  <input id="scrollSyncToggle" type="checkbox" checked />
+                  <span>Sync scroll</span>
+                </label>
+                <button id="previewFindToggleButton" type="button" aria-pressed="false">Find</button>
+                <button id="documentReviewToggleButton" type="button" aria-pressed="false">Review</button>
+                <button id="outlineToggleButton" type="button" aria-pressed="false">Outline</button>
+              </div>
+              <div class="zoom-controls" aria-label="Diagram zoom controls">
+                <button id="zoomOutButton" type="button" aria-label="Reduce diagram zoom">−</button>
+                <output class="zoom-value" id="zoomValue" aria-live="polite">100%</output>
+                <button id="zoomInButton" type="button" aria-label="Increase diagram zoom">+</button>
+                <button id="fitZoomButton" type="button">Fit</button>
+                <button id="resetZoomButton" type="button">Reset</button>
+                <button id="previewMaximizeButton" type="button" aria-pressed="false">Maximize</button>
+              </div>
+            </div>
+          </div>
+          <div class="export-trust" id="exportTrust" hidden></div>
+          <section class="preview-find-panel" id="previewFindPanel" aria-label="Find in preview" hidden>
+            <label for="previewFindInput">Find in preview</label>
+            <input id="previewFindInput" type="search" autocomplete="off" placeholder="Search rendered text" />
+            <output id="previewFindCount" aria-live="polite">0/0</output>
+            <button id="previewFindPrevButton" type="button" aria-label="Previous preview search result">Previous</button>
+            <button id="previewFindNextButton" type="button" aria-label="Next preview search result">Next</button>
+            <button id="previewFindClearButton" type="button" aria-label="Close preview search">Close</button>
+          </section>
+          <nav class="outline-panel" id="outlinePanel" aria-label="Document outline" hidden>
+            <span class="outline-title">Outline</span>
+            <div class="outline-links" id="outlineLinks"></div>
+          </nav>
+          <section class="document-review-panel" id="documentReviewPanel" aria-label="Document review" hidden>
+            <div class="document-review-head">
+              <strong>Document review</strong>
+              <span id="documentReviewSummary">No document rendered.</span>
+            </div>
+            <div class="document-review-metrics" id="documentReviewMetrics"></div>
+            <div class="document-review-alerts" id="documentReviewAlerts"></div>
+          </section>
+          <article class="preview" id="preview" aria-label="Rendered preview"></article>
+        </section>
+      </section>
+    </section>
+    <div class="statusbar">
+      <div class="status" id="status" role="status" aria-live="polite">Ready</div>
+      <button class="focus-mode-exit" id="focusModeExitButton" type="button" title="Exit Focus Mode (Esc / Ctrl+F11)" aria-label="Exit Focus Mode" hidden>
+        <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>
+        <span>Exit focus</span>
+      </button>
+    </div>
+  </main>
+
+  <dialog class="template-dialog" id="templateDialog" aria-labelledby="templateDialogTitle" aria-describedby="templateDialogDescription">
+    <form class="template-dialog-card" id="templateDialogForm">
+      <div class="template-dialog-top">
+        <span class="template-dialog-kicker" id="templateDialogMode">Local template</span>
+        <button class="template-dialog-close" type="button" data-template-dialog-cancel aria-label="Close template setup">X</button>
+      </div>
+      <h2 id="templateDialogTitle">Create document</h2>
+      <p id="templateDialogDescription">Set the starting details. You can edit everything after the document is created.</p>
+      <div class="template-dialog-fields" id="templateDialogFields"></div>
+      <div class="template-dialog-actions">
+        <button type="button" data-template-dialog-cancel>Cancel</button>
+        <button class="primary" type="submit" id="templateDialogSubmit">Create document</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog recovery-dialog" id="recoveryDialog" aria-labelledby="recoveryDialogTitle" aria-describedby="recoverySummary">
+    <form class="utility-dialog-card" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Local recovery</span>
+        <button class="template-dialog-close" type="button" data-recovery-keep-saved aria-label="Keep saved version">X</button>
+      </div>
+      <h2 id="recoveryDialogTitle">Recover local draft?</h2>
+      <p id="recoverySummary">A local draft is available.</p>
+      <div class="diff-grid" aria-label="Saved file and local draft comparison">
+        <section>
+          <strong>Saved file</strong>
+          <div class="diff-column" id="recoveryDiffSaved"></div>
+        </section>
+        <section>
+          <strong>Local draft</strong>
+          <div class="diff-column" id="recoveryDiffDraft"></div>
+        </section>
+      </div>
+      <div class="template-dialog-actions">
+        <button type="button" id="recoveryDeleteDraftButton">Delete draft</button>
+        <button type="button" id="recoveryRestoreDraftButton">Restore draft</button>
+        <button class="primary" type="button" id="recoveryKeepSavedButton">Keep saved</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog loss-dialog" id="lossProtectionDialog" aria-labelledby="lossProtectionTitle" aria-describedby="lossProtectionSummary">
+    <form class="utility-dialog-card compact" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Save protection</span>
+      </div>
+      <h2 id="lossProtectionTitle">Large deletion detected</h2>
+      <p id="lossProtectionSummary">This save removes a large part of the last saved document.</p>
+      <div class="template-dialog-actions">
+        <button type="button" id="lossProtectionCancelButton">Cancel</button>
+        <button type="button" id="lossProtectionUndoButton">Undo deletion</button>
+        <button class="primary" type="button" id="lossProtectionSaveAnywayButton">Save anyway</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog workspace-search-dialog" id="workspaceSearchDialog" aria-labelledby="workspaceSearchTitle">
+    <form class="utility-dialog-card search-card" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker" id="workspaceSearchTitle">Workspace search</span>
+        <button class="template-dialog-close" type="button" id="workspaceSearchCloseButton" aria-label="Close workspace search">X</button>
+      </div>
+      <div class="dialog-toolbar">
+        <div class="layout-mode-control" aria-label="Search mode">
+          <button type="button" id="workspaceSearchModeFiles" aria-pressed="true">Files</button>
+          <button type="button" id="workspaceSearchModeContent" aria-pressed="false">Content</button>
+        </div>
+        <label class="menu-check"><input id="workspaceSearchRegexToggle" type="checkbox" /><span>Regex</span></label>
+        <label class="menu-check"><input id="workspaceSearchCaseToggle" type="checkbox" /><span>Case</span></label>
+      </div>
+      <input class="dialog-search-input" id="workspaceSearchInput" type="search" autocomplete="off" placeholder="Jump to file" />
+      <output class="dialog-count" id="workspaceSearchCount" aria-live="polite"></output>
+      <div class="workspace-search-results" id="workspaceSearchResults"></div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog find-replace-dialog" id="findReplaceDialog" aria-labelledby="findReplaceTitle">
+    <form class="utility-dialog-card compact" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker" id="findReplaceTitle">Find in editor</span>
+        <button class="template-dialog-close" type="button" id="findReplaceCloseButton" aria-label="Close find and replace">X</button>
+      </div>
+      <div class="find-replace-grid">
+        <input id="findReplaceFindInput" type="search" autocomplete="off" placeholder="Find" aria-label="Find text" />
+        <input id="findReplaceReplaceInput" type="text" autocomplete="off" placeholder="Replace" aria-label="Replacement text" hidden />
+      </div>
+      <div class="dialog-toolbar">
+        <label class="menu-check"><input id="findReplaceRegexToggle" type="checkbox" /><span>Regex</span></label>
+        <label class="menu-check"><input id="findReplaceCaseToggle" type="checkbox" /><span>Case</span></label>
+        <output class="dialog-count" id="findReplaceCount" aria-live="polite">0/0</output>
+      </div>
+      <div class="template-dialog-actions">
+        <button type="button" id="findReplacePrevButton">Previous</button>
+        <button type="button" id="findReplaceNextButton">Next</button>
+        <button type="button" id="findReplaceCurrentButton" hidden>Replace</button>
+        <button class="primary" type="button" id="findReplaceAllButton" hidden>Replace all</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog table-editor-dialog" id="tableEditorDialog" aria-labelledby="tableEditorTitle" aria-describedby="tableEditorSummary">
+    <form class="utility-dialog-card table-card" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Markdown table</span>
+        <button class="template-dialog-close" type="button" data-table-editor-cancel aria-label="Close table editor">X</button>
+      </div>
+      <h2 id="tableEditorTitle">Edit table</h2>
+      <p id="tableEditorSummary">Creating a table.</p>
+      <div class="dialog-toolbar table-editor-actions" aria-label="Table controls">
+        <button type="button" id="tableEditorAddRowButton" title="Add row" aria-label="Add row">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M12 17v4"/><path d="M10 19h4"/></svg>
+        </button>
+        <button type="button" id="tableEditorAddColumnButton" title="Add column" aria-label="Add column">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h14v14H4z"/><path d="M9 5v14"/><path d="M14 5v14"/><path d="M20 10v8"/><path d="M16 14h8"/></svg>
+        </button>
+        <button type="button" id="tableEditorRemoveRowButton" title="Remove selected row" aria-label="Remove selected row">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M8 12h8"/></svg>
+        </button>
+        <button type="button" id="tableEditorRemoveColumnButton" title="Remove selected column" aria-label="Remove selected column">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M9 5v14"/><path d="M14 5v14"/><path d="M11 12h6"/></svg>
+        </button>
+        <button type="button" id="tableEditorMoveRowUpButton" title="Move row up" aria-label="Move row up">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="m12 8-3 3"/><path d="m12 8 3 3"/></svg>
+        </button>
+        <button type="button" id="tableEditorMoveRowDownButton" title="Move row down" aria-label="Move row down">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="m12 17-3-3"/><path d="m12 17 3-3"/></svg>
+        </button>
+        <button type="button" id="tableEditorMoveColumnLeftButton" title="Move column left" aria-label="Move column left">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M9 5v14"/><path d="M14 5v14"/><path d="m8 12 3-3"/><path d="m8 12 3 3"/></svg>
+        </button>
+        <button type="button" id="tableEditorMoveColumnRightButton" title="Move column right" aria-label="Move column right">
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M9 5v14"/><path d="M14 5v14"/><path d="m16 12-3-3"/><path d="m16 12-3 3"/></svg>
+        </button>
+      </div>
+      <div class="table-editor-grid" id="tableEditorGrid"></div>
+      <div class="template-dialog-actions">
+        <button type="button" id="tableEditorCancelButton">Cancel</button>
+        <button class="primary" type="button" id="tableEditorApplyButton">Apply table</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script type="module" src="./assets/scripts/main.js"></script>
+</body>
+</html>
+
