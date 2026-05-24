@@ -12,6 +12,10 @@ function fixturePath(name) {
   return path.join(root, 'tests', 'fixtures', name);
 }
 
+function normaliseLineEndings(value) {
+  return String(value).replace(/\r\n?/g, '\n');
+}
+
 async function openFixture(page, name) {
   await page.goto('/');
   await page.locator('#fileInput').setInputFiles(fixturePath(name));
@@ -1303,7 +1307,7 @@ test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', 
 
   const defaultBundlePath = await clickExportDownload(page, 'Export Markdown Bundle');
   const defaultEntries = await readZipEntries(defaultBundlePath);
-  const defaultMarkdown = getZipText(defaultEntries, 'mixed.md');
+  const defaultMarkdown = normaliseLineEndings(getZipText(defaultEntries, 'mixed.md'));
   expect(defaultMarkdown).toContain('```mermaid\nflowchart TD');
   expect(defaultMarkdown).not.toContain('::: mermaid');
 
@@ -1311,7 +1315,7 @@ test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', 
   await page.locator('#devopsMarkdownExportToggle').check();
   const devopsBundlePath = await clickExportDownload(page, 'Export Markdown Bundle');
   const devopsEntries = await readZipEntries(devopsBundlePath);
-  const devopsMarkdown = getZipText(devopsEntries, 'mixed.md');
+  const devopsMarkdown = normaliseLineEndings(getZipText(devopsEntries, 'mixed.md'));
   expect(devopsMarkdown).toContain('::: mermaid\ngraph TD');
   expect(devopsMarkdown).toContain('\n:::');
   expect(devopsMarkdown).not.toContain('```mermaid');
