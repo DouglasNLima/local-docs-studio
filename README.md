@@ -33,6 +33,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Markdown Bundle ZIP export for editable docs plus image assets, with an optional Azure DevOps Mermaid syntax checkbox.
 - ZIP import for app bundles and generic Markdown/Mermaid documentation ZIPs.
 - Folder-to-docs-site export as a GitHub Pages-ready ZIP.
+- Optional Markdown front matter for Docs Site titles, descriptions, ordering, tags, draft badges, and navigation groups.
 - Document UX in the preview with hierarchical outline, rendered-text search, and non-blocking document review notes.
 - Mermaid Diagram Studio with templates, snippets, source copy, SVG export, and PNG export.
 - Local Content Studios for README/project docs, release notes, and requirements/user stories.
@@ -91,6 +92,19 @@ The Export menu includes document-level diagram actions:
 Open a folder of Markdown and Mermaid files, toggle **Docs site** to preview the folder as a navigable documentation site, then choose **Export Docs Site** from the Export menu.
 
 Docs Site Builder 2.0 opens a custom export dialogue for the site title, short description, and initial theme. The exported site includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
+
+Markdown files can start with front matter to control Docs Site metadata without rendering that block as document content:
+
+```markdown
+---
+title: API Guide
+description: Internal API docs
+order: 20
+tags: [api, auth]
+draft: false
+navGroup: Guides
+---
+```
 
 The generated ZIP contains:
 

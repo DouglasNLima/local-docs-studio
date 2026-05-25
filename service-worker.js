@@ -31,6 +31,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/utils/devops-markdown.js',
   './assets/scripts/utils/files.js',
   './assets/scripts/utils/format.js',
+  './assets/scripts/utils/front-matter.js',
   './assets/scripts/utils/html-markdown.js',
   './assets/scripts/utils/idb.js',
   './assets/scripts/utils/markdown-table.js',

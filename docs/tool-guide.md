@@ -65,6 +65,7 @@ flowchart LR
 - **Word** creates a `.docx` with rendered diagrams and compatible content.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
 - **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
+- Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
 - **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets; PDF import is planned as a future text-only converter.
 - **SVG/PNG** exports the current Mermaid diagram.

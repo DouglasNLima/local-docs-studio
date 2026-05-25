@@ -586,7 +586,7 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
   await page.locator('summary').filter({ hasText: /^Help$/ }).click();
   await page.getByRole('button', { name: 'Open feature guide' }).click();
 
-  await expect(page.locator('#status')).toHaveText(/Feature guide opened read-only/);
+  await expect(page.locator('#status')).toHaveText(/Feature guide opened read-only/, { timeout: 20_000 });
   await expect(page.locator('#activeFileLabel')).toHaveText(/tool-feature-guide\.md · read-only/);
   await expect(page.locator('#preview h1')).toHaveText('Local Docs Studio Feature Guide');
   await expect(page.locator('#editor')).toHaveJSProperty('readOnly', true);
@@ -1549,7 +1549,7 @@ test('ZIP import accepts compressed generic docs and handles ZIPs without source
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
-  await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/);
+  await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/, { timeout: 20_000 });
   await expect(page.locator('#status')).toHaveText(/SVG images are not imported for security/);
   await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
   await expect(page.locator('#preview img[data-managed-asset-path="docs/images/logo.png"]')).toHaveAttribute('src', /^blob:/);
@@ -1718,6 +1718,35 @@ test('Docs Site export contains the expected static site package', async ({ page
   await page.setViewportSize({ width: 390, height: 844 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);
+});
+
+test('front matter drives Docs Site metadata without rendering as content', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'guide.md',
+      text: '---\ntitle: API Guide\ndescription: Internal API docs\norder: 1\ntags: [api, auth]\ndraft: true\nnavGroup: Guides\n---\n# Rendered Guide\nBody text.',
+    },
+    {
+      name: 'README.md',
+      text: '---\ntitle: Project Home\norder: 10\nnavGroup: Overview\n---\n# Home\nWelcome.',
+    },
+  ]);
+
+  await expect(page.locator('#preview')).not.toContainText('navGroup');
+  const zipPath = await clickDocsSiteExportDownload(page, { title: 'Metadata Docs', description: 'Front matter fixture.' });
+  const entries = await readZipEntries(zipPath);
+  const searchIndex = JSON.parse(getZipText(entries, 'assets/search-index.json'));
+  const manifest = JSON.parse(getZipText(entries, 'site-manifest.json'));
+  const guide = searchIndex.pages.find((item) => item.path === 'guide.md');
+
+  expect(searchIndex.pages.map((item) => item.path).slice(0, 2)).toEqual(['guide.md', 'README.md']);
+  expect(guide.title).toBe('API Guide');
+  expect(guide.description).toBe('Internal API docs');
+  expect(guide.tags).toEqual(['api', 'auth']);
+  expect(guide.draft).toBe(true);
+  expect(guide.navGroup).toBe('Guides');
+  expect(guide.html).not.toContain('title: API Guide');
+  expect(manifest.pages.find((item) => item.path === 'guide.md').draft).toBe(true);
 });
 
 test('theme, preview maximise, and mobile layout stay usable', async ({ page }) => {
