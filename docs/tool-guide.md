@@ -29,7 +29,7 @@ Right-click in the editor or rendered preview to open context actions for the cu
 
 Rendered tables include a Copy button that places tab-separated text on the clipboard so it can be pasted directly into Excel or another spreadsheet.
 
-Tables copied from Excel or another spreadsheet paste back into the editor as Markdown tables when the clipboard includes HTML table data or tab-separated text. Use **Edit > Paste Special** to force paste as a table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block.
+Formatted content copied from rich editors pastes back into the editor as Markdown when the clipboard includes HTML. Tables copied from Excel or another spreadsheet paste as Markdown tables when the clipboard includes HTML table data or tab-separated text. Use **Edit > Paste Special** to force paste as a table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block.
 
 ```markdown
 ## Example Section

@@ -897,7 +897,7 @@ test('writer shortcut is disabled while input maximise handles focused writing',
   await expect(page.locator('.preview-pane')).toBeVisible();
 });
 
-test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain text alone', async ({ page }) => {
+test('paste auto-converts formatted HTML and spreadsheet tables while leaving plain text alone', async ({ page }) => {
   await page.goto('/');
 
   await setEditorValueAndSelection(page, 'Intro', 5, 5);
@@ -913,6 +913,15 @@ test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain te
   });
   await expect(page.locator('#editor')).toHaveValue('| Area | Status |\n| --- | --- |\n| Preview | Ready |');
   await expect(page.locator('#preview table')).toHaveCount(1, { timeout: 20_000 });
+
+  await setEditorValueAndSelection(page, '');
+  await pasteIntoEditor(page, {
+    html: '<h2>Title</h2><p>Hello <strong>world</strong> <a href="https://example.com">link</a></p><ul><li>One</li><li>Two</li></ul>',
+    text: 'Title\nHello world link\nOne\nTwo',
+  });
+  await expect(page.locator('#editor')).toHaveValue('## Title\n\nHello **world** [link](https://example.com)\n\n- One\n- Two');
+  await expect(page.locator('#status')).toHaveText(/HTML pasted as Markdown/);
+  await expect(page.locator('#preview h2')).toHaveText('Title', { timeout: 20_000 });
 
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, { text: 'Just normal text\nwith words.' });
