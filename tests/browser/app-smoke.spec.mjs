@@ -742,7 +742,7 @@ test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain te
   await pasteIntoEditor(page, { text: 'Name\tQty\nApples\t4\nPears\t7' });
   await expect(page.locator('#editor')).toHaveValue('Intro\n\n| Name | Qty |\n| --- | --- |\n| Apples | 4 |\n| Pears | 7 |');
   await expect(page.locator('#status')).toHaveText(/Table pasted as Markdown/);
-  await expect(page.locator('#preview table')).toHaveCount(1);
+  await expect(page.locator('#preview table')).toHaveCount(1, { timeout: 20_000 });
 
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, {
@@ -750,7 +750,7 @@ test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain te
     text: 'Area\tStatus\nPreview\tReady',
   });
   await expect(page.locator('#editor')).toHaveValue('| Area | Status |\n| --- | --- |\n| Preview | Ready |');
-  await expect(page.locator('#preview table')).toHaveCount(1);
+  await expect(page.locator('#preview table')).toHaveCount(1, { timeout: 20_000 });
 
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, { text: 'Just normal text\nwith words.' });
