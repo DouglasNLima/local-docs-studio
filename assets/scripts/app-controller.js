@@ -441,6 +441,7 @@ export function createAppController() {
       setExportTrust,
     } = exportTools;
     const {
+      newMarkdownDocument,
       openFile,
       openFolder,
       importZip,
@@ -655,6 +656,7 @@ export function createAppController() {
 
       document.querySelectorAll('[data-menu-action]').forEach((button) => {
         button.addEventListener('click', async () => {
+          if (button.dataset.menuAction === 'newMarkdown') await newMarkdownDocument();
           if (button.dataset.menuAction === 'openFile') await openFile();
           if (button.dataset.menuAction === 'openFolder') await openFolder();
           if (button.dataset.menuAction === 'importZip') importZip();

@@ -496,8 +496,9 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await expect(page.locator('[data-menu-action="newMarkdown"]')).toBeVisible();
   await expect(page.locator('[data-menu-action="openFile"]')).toBeVisible();
-  await expect(page.locator('details.menu[open] .menu-heading')).toContainText(['Open', 'Import', 'Save', 'Recent']);
+  await expect(page.locator('details.menu[open] .menu-heading')).toContainText(['New', 'Open', 'Import', 'Save', 'Recent']);
   const fileMenuClickable = await page.locator('details.menu[open]').evaluate((menu) => {
     const button = menu.querySelector('[data-menu-action="openFile"]');
     const rect = button.getBoundingClientRect();
@@ -560,6 +561,23 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   expect(createPanelBox.x).toBeGreaterThanOrEqual(0);
   expect(createPanelBox.x + createPanelBox.width).toBeLessThanOrEqual(createViewportSize.width + 1);
   expect(createPanelBox.width).toBeGreaterThan(expectedCommonWidth + 120);
+});
+
+test('File menu starts a blank Markdown document', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'New blank Markdown document' }).click();
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('untitled.md');
+  await expect(page.locator('#folderBadge')).toHaveText('Blank document');
+  await expect(page.locator('#fileCount')).toHaveText('1');
+  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText('Blank Markdown document ready.');
+
+  await page.locator('#editor').fill('# Fresh start\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in memory');
+  await expect(page.locator('#saveButton')).toBeEnabled();
 });
 
 test('Help menu opens the feature guide as read-only Markdown', async ({ page }) => {

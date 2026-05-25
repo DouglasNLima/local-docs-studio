@@ -118,6 +118,19 @@ export function createFileService({
       documentInput.click();
     }
 
+    async function newMarkdownDocument() {
+      if (!confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+
+      const name = 'untitled.md';
+      await setLibraryFromRecords([{
+        name,
+        path: name,
+        file: new File([''], name, { type: 'text/markdown' }),
+      }], 'Blank document');
+      editor.focus({ preventScroll: true });
+      setStatus('Blank Markdown document ready.', 'ok');
+    }
+
     async function collectDirectoryRecords(directoryHandle, prefix = '') {
       const records = [];
 
@@ -748,6 +761,7 @@ export function createFileService({
     }
 
     return {
+      newMarkdownDocument,
       openFile,
       openFolder,
       importZip,
