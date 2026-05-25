@@ -692,6 +692,7 @@ export function createAppController() {
           if (button.dataset.viewAction === 'maximizePreview') togglePreviewMaximized();
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
           if (button.dataset.viewAction === 'openDocsMap') await openDocsMap();
+          if (button.dataset.viewAction === 'manageAssets') await openAssetLibrary();
           closeOpenMenus();
         });
       });
@@ -1234,6 +1235,158 @@ export function createAppController() {
       updateSaveButton();
       await renderPreview();
       setStatus('Docs map opened as a read-only virtual document.', 'ok');
+    }
+
+    async function openAssetLibrary() {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'utility-dialog asset-library-dialog';
+      dialog.setAttribute('aria-labelledby', 'assetLibraryTitle');
+      document.body.appendChild(dialog);
+
+      const close = () => {
+        dialog.close();
+        dialog.remove();
+      };
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        close();
+      });
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || event.target.closest('[data-asset-close]')) {
+          close();
+        }
+      });
+      dialog.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-asset-action]');
+        if (!button) return;
+        const path = button.dataset.assetPath || '';
+        if (button.dataset.assetAction === 'rename') {
+          const input = button.closest('.asset-library-item')?.querySelector('[data-asset-input]');
+          await renameManagedAsset(path, input?.value || '');
+          await renderAssetLibrary(dialog);
+        }
+        if (button.dataset.assetAction === 'remove') {
+          await removeManagedAsset(path);
+          await renderAssetLibrary(dialog);
+        }
+      });
+
+      await renderAssetLibrary(dialog);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    async function renderAssetLibrary(dialog) {
+      const usage = await getManagedAssetUsage();
+      const assets = [...state.managedAssets.values()].sort((left, right) => left.path.localeCompare(right.path));
+      const rows = assets.map((asset) => {
+        const count = usage.get(asset.path)?.length || 0;
+        const size = formatBytes(asset.size ?? 0);
+        const src = asset.objectUrl || asset.dataUrl || '';
+        return `<div class="asset-library-item">
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(asset.alt || asset.name || 'Asset preview')}">
+          <div class="asset-library-main">
+            <strong>${escapeHtml(asset.name || asset.path)}</strong>
+            <span>${escapeHtml(asset.mimeType || 'image')} · ${escapeHtml(size)} · ${count} use${count === 1 ? '' : 's'}</span>
+            <input value="${escapeHtml(asset.path)}" data-asset-input="${escapeHtml(asset.path)}" aria-label="Asset path for ${escapeHtml(asset.name || asset.path)}">
+          </div>
+          <div class="asset-library-actions">
+            <button type="button" data-asset-action="rename" data-asset-path="${escapeHtml(asset.path)}">Rename</button>
+            <button type="button" data-asset-action="remove" data-asset-path="${escapeHtml(asset.path)}"${count ? ' disabled' : ''}>Remove</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      dialog.innerHTML = `<form class="utility-dialog-card asset-library-card" method="dialog">
+        <div class="utility-dialog-top">
+          <span class="template-dialog-kicker">Session assets</span>
+          <button class="template-dialog-close" type="button" data-asset-close aria-label="Close asset library">X</button>
+        </div>
+        <h2 id="assetLibraryTitle">Managed assets</h2>
+        <p>Review image assets imported into this browser session. Rename updates loaded Markdown references; remove is available for unused assets.</p>
+        <div class="asset-library-list">${rows || '<div class="workspace-search-empty">No managed assets in this session.</div>'}</div>
+        <div class="template-dialog-actions">
+          <button class="primary" type="button" data-asset-close>Done</button>
+        </div>
+      </form>`;
+    }
+
+    async function getManagedAssetUsage() {
+      const usage = new Map([...state.managedAssets.keys()].map((path) => [path, []]));
+      if (!usage.size) return usage;
+      for (const record of getDocumentationRecords()) {
+        const source = await readRecordText(record);
+        collectImageReferences(source, record.path).forEach((path) => {
+          if (usage.has(path)) usage.get(path).push(record.path);
+        });
+      }
+      return usage;
+    }
+
+    async function renameManagedAsset(oldPath, requestedPath) {
+      const asset = state.managedAssets.get(oldPath);
+      const newPath = normaliseManagedAssetPath(requestedPath);
+      if (!asset || !newPath || newPath === oldPath) return;
+      if (state.managedAssets.has(newPath)) {
+        setStatus('Another managed asset already uses that path.', 'warning');
+        return;
+      }
+      if (!/\.(png|jpe?g|gif|webp)$/i.test(newPath)) {
+        setStatus('Managed image assets must keep a PNG, JPEG, GIF, or WebP extension.', 'warning');
+        return;
+      }
+
+      state.managedAssets.delete(oldPath);
+      asset.path = newPath;
+      asset.name = newPath.split('/').pop() || asset.name;
+      state.managedAssets.set(newPath, asset);
+      await replaceAssetReferences(oldPath, newPath);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Renamed asset to ${newPath}.`, 'ok');
+    }
+
+    async function removeManagedAsset(path) {
+      const usage = await getManagedAssetUsage();
+      if ((usage.get(path)?.length || 0) > 0) {
+        setStatus('Only unused managed assets can be removed.', 'warning');
+        return;
+      }
+      const asset = state.managedAssets.get(path);
+      if (asset?.objectUrl) URL.revokeObjectURL(asset.objectUrl);
+      state.managedAssets.delete(path);
+      await renderPreview();
+      setStatus(`Removed unused asset ${path}.`, 'ok');
+    }
+
+    async function replaceAssetReferences(oldPath, newPath) {
+      for (const record of getDocumentationRecords()) {
+        if (record.readOnly) continue;
+        const source = await readRecordText(record);
+        if (!source.includes(oldPath)) continue;
+        const next = source.split(oldPath).join(newPath);
+        state.fileCache.set(record.path, next);
+        state.dirtyPaths.add(record.path);
+        if (record.path === state.activePath) {
+          editor.value = next;
+        }
+      }
+    }
+
+    function normaliseManagedAssetPath(path) {
+      const normalised = normalisePath(String(path || '').trim())
+        .replace(/^\/+/, '')
+        .replace(/^\.\/+/, '');
+      return normalised || '';
+    }
+
+    function formatBytes(size) {
+      const value = Number(size) || 0;
+      if (value >= 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+      if (value >= 1024) return `${Math.round(value / 1024)} KB`;
+      return `${value} B`;
     }
 
     async function buildDocsMapMarkdown(records) {

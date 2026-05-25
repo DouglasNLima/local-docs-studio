@@ -1448,6 +1448,28 @@ test('dropped image assets render and travel through HTML, Word, and Docs Site e
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('assets/images/tiny-image.png'))).toBe(true);
 });
 
+test('asset manager previews and renames managed image references', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+  await page.locator('#editor').focus();
+  await page.locator('#editor').evaluate((editor) => {
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  });
+  await dropTinyPngOnEditor(page);
+  await expect(page.locator('#editor')).toHaveValue(/assets\/images\/tiny-image\.png/);
+
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  await page.getByRole('button', { name: 'Manage assets' }).click();
+  await expect(page.getByRole('heading', { name: 'Managed assets' })).toBeVisible();
+  await expect(page.locator('.asset-library-item img')).toBeVisible();
+  await expect(page.locator('[data-asset-action="remove"]')).toBeDisabled();
+
+  await page.locator('.asset-library-main input').fill('assets/images/renamed-image.png');
+  await page.getByRole('button', { name: 'Rename' }).click();
+  await expect(page.locator('#status')).toHaveText(/Renamed asset/);
+  await expect(page.locator('#editor')).toHaveValue(/assets\/images\/renamed-image\.png/);
+  await expect(page.locator('#preview img[data-managed-asset-path="assets/images/renamed-image.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
 test('clipboard image paste creates the same managed assets as drag and drop', async ({ page }) => {
   await openFixture(page, 'plain.md');
   await page.locator('#editor').focus();

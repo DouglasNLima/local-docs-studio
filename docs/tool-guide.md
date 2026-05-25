@@ -92,6 +92,8 @@ Drag images onto the editor to insert Markdown links like:
 
 The Markdown file stores the link. Exports include the image data or image files depending on the export type. PNG, JPEG, GIF, and WebP image files are supported; user-supplied SVG images are skipped for security.
 
+Use **View > Manage assets** to preview session images, rename paths across editable Markdown files, and remove unused assets.
+
 ## Privacy
 
 The app runs in the browser. Files stay local unless you save, export, copy, or import a new bundle. There is no backend or account system.
