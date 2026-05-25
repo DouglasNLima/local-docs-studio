@@ -522,7 +522,7 @@ test('custom context menu exposes preview-specific copy and export actions', asy
   await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('Area\tStatus\nPreview\tReady\nExport\tVerified');
 });
 
-test('visual refresh screenshot artifacts cover key shell states', async ({ page }, testInfo) => {
+test('visual refresh screenshot artefacts cover key shell states', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/');
   await page.evaluate(() => {
@@ -574,7 +574,7 @@ test('visual refresh screenshot artifacts cover key shell states', async ({ page
   await attachViewportScreenshot(page, testInfo, 'phase-9-mobile-sample-dark');
 });
 
-test('editor toolbar icon buttons keep markdown command behavior', async ({ page }) => {
+test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(15);
   await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(4);
@@ -706,7 +706,7 @@ test('local draft recovery and large deletion protection guard browser-local edi
   await expect(page.locator('#editor')).toHaveValue(/This paragraph should survive local recovery/);
 });
 
-test('writer shortcut is disabled while input maximize handles focused writing', async ({ page }) => {
+test('writer shortcut is disabled while input maximise handles focused writing', async ({ page }) => {
   await page.goto('/');
   await loadSample(page);
   await page.evaluate(() => {
@@ -841,7 +841,7 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
   await expect(page.locator('.preview-pane')).toBeHidden();
   await page.locator('#inputMaximizeButton').click();
   await expect(page.locator('#app')).not.toHaveClass(/input-maximized/);
-  await expect(page.locator('#inputMaximizeButton')).toHaveText('Maximize');
+  await expect(page.locator('#inputMaximizeButton')).toHaveText('Maximise');
 
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.locator('#layoutModeControl [data-layout-mode="preview"]').click();
@@ -1480,7 +1480,7 @@ test('Docs Site export contains the expected static site package', async ({ page
   expect(overflow).toBe(false);
 });
 
-test('theme, preview maximize, and mobile layout stay usable', async ({ page }) => {
+test('theme, preview maximise, and mobile layout stay usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await loadSample(page);

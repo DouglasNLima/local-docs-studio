@@ -76,7 +76,7 @@ flowchart TB
     A[File picker] --> B[Markdown editor]
     B --> C[Marked parser]
     B --> D[Mermaid renderer]
-    C --> E[Sanitized preview]
+    C --> E[Sanitised preview]
     D --> E
     E --> F[HTML export]
     E --> G[Word export]
@@ -335,7 +335,7 @@ flowchart LR
 ## Development
 
 - Keep changes small and reviewed.
-- Update tests when behavior changes.
+- Update tests when behaviour changes.
 - Document operational assumptions.
 
 ## Support
@@ -914,7 +914,7 @@ Date: ${meta.date}
 
 ## Outcome
 
-Summarize what was completed and why the story or task is ready for review.
+Summarise what was completed and why the story or task is ready for review.
 
 ## Implementation Details
 
@@ -1076,7 +1076,7 @@ npm run dev
 `,
       roadmap: `## Roadmap
 
-- Now: Stabilize the core workflow.
+- Now: Stabilise the core workflow.
 - Next: Improve documentation and onboarding.
 - Later: Add optional automation around repeated tasks.
 `,
@@ -1099,7 +1099,7 @@ flowchart TB
 `,
       changed: `## Changed
 
-- Changed behavior: TBD
+- Changed behaviour: TBD
 `,
       fixed: `## Fixed
 

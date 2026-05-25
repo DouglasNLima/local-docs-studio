@@ -24,11 +24,11 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Local folder browser with filtering and dirty-file markers.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
 - Lightweight Mermaid autocomplete and pre-render validation for `.mmd`, `.mermaid`, and fenced Mermaid blocks.
-- Editor/Split/Preview layout modes, light/dark theme toggle, preview maximize, diagram zoom, and optional outline.
+- Editor/Split/Preview layout modes, light/dark theme toggle, preview maximisation, diagram zoom, and optional outline.
 - Preview follow for editor selections, enabled by default and toggleable from the preview header.
 - Drag-and-drop PNG, JPEG, GIF, and WebP image insertion as session assets that are included in HTML, Word, and Docs Site exports.
 - HTML export, Word `.docx` export, copy HTML, and copy rendered text.
-- PDF export through the browser print dialog with a clean print stylesheet.
+- PDF export through the browser print dialogue with a clean print stylesheet.
 - Markdown Bundle ZIP export for editable docs plus image assets, with an optional Azure DevOps Mermaid syntax checkbox.
 - ZIP import for app bundles and generic Markdown/Mermaid documentation ZIPs.
 - Folder-to-docs-site export as a GitHub Pages-ready ZIP.
@@ -50,12 +50,12 @@ These tools are app-only. HTML, Word, and Docs Site exports are regenerated from
 
 ## Editor UX
 
-The editor stays buildless and native, using a `textarea` with a synchronized line-number gutter instead of a heavy IDE component.
+The editor stays buildless and native, using a `textarea` with a synchronised line-number gutter instead of a heavy IDE component.
 
 - **Layout** in the View menu switches between Editor, Split, and Preview modes. The choice is saved locally.
 - **Follow selection** in the preview header highlights matching preview text for short editor selections and scrolls that match into view in Split mode. It is best-effort, can be turned off per browser, and the editor and preview still remember their own scroll positions across renders and file switches.
 - **Mermaid autocomplete** appears with `Ctrl/Cmd+Space` in Mermaid files or Mermaid fenced blocks, and can also open from Mermaid-like line prefixes. Use arrow keys, `Enter` or `Tab` to insert a snippet, and `Escape` to close it.
-- **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localized error with copy/jump actions while the rest of the Markdown continues rendering.
+- **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localised error with copy/jump actions while the rest of the Markdown continues rendering.
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts spreadsheet tables when the clipboard provides HTML table or tab-separated text; plain text stays plain.
 - **Image drag-and-drop** on the editor inserts Markdown such as `![diagram](assets/images/diagram.png)`. The Markdown file save-back writes the link text only; the image binaries live in the browser session and are embedded or bundled when you export. User-supplied SVG images are blocked as assets for security; rendered Mermaid diagrams can still be exported as SVG.
 
@@ -89,7 +89,7 @@ The Export menu includes document-level diagram actions:
 
 Open a folder of Markdown and Mermaid files, toggle **Docs site** to preview the folder as a navigable documentation site, then choose **Export Docs Site** from the Export menu.
 
-Docs Site Builder 2.0 opens a custom export dialog for the site title, short description, and initial theme. The exported site includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
+Docs Site Builder 2.0 opens a custom export dialogue for the site title, short description, and initial theme. The exported site includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
 
 The generated ZIP contains:
 
@@ -104,7 +104,7 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 
 ## Advanced Import And Export
 
-- **Export PDF** prepares a clean print view and opens the browser print dialog. Choose **Save as PDF** in the browser to create the file.
+- **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
 - **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `local-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
 - ZIP import does not convert rendered HTML back into Markdown. If a Docs Site ZIP only contains static HTML plus deployment notes, only editable Markdown/Mermaid files found in that ZIP are imported.
@@ -144,7 +144,7 @@ npm test
 ```
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
-- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, Markdown bundle import/export, export packages, theme, maximize, and mobile layout.
+- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, Markdown bundle import/export, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 
 ## Browser Support
@@ -158,7 +158,7 @@ Firefox and Safari can still open files through fallback file pickers and export
 - Browser security rules mean folder access and recent local handles require user permission.
 - Word export converts rendered Mermaid diagrams to images where possible. Very large or unusual SVG diagrams may fall back to SVG packaging.
 - Dragged image binaries are session assets. Save-back updates Markdown links, while HTML, Word, and Docs Site exports carry the actual image data. User SVG image files are not imported; use PNG, JPEG, GIF, or WebP for image assets.
-- PDF export depends on the browser print dialog; the app prepares the print document but does not create raw PDF bytes itself.
+- PDF export depends on the browser print dialogue; the app prepares the print document but does not create raw PDF bytes itself.
 - ZIP import supports ordinary stored/deflated ZIP entries. Password-protected or encrypted ZIP files are not supported.
 - Runtime dependencies are pinned under `assets/vendor/`; no CDN fetch is required for normal app loading after publication.
 - GitHub Pages hosting is static; there is no server-side file storage or account sync.
@@ -173,11 +173,11 @@ Repository settings:
 2. Set **Source** to **GitHub Actions**.
 3. Keep Actions permissions enabled for Pages deployment.
 
-Deployment behavior:
+Deployment behaviour:
 
 - Pull requests run the full test suite but do not publish.
 - Pushes to the default branch publish only after `npm test` passes.
-- The Pages artifact contains `index.html`, the legacy redirect, manifest, service worker, icon, `assets/`, and `docs/`.
+- The Pages artefact contains `index.html`, the legacy redirect, manifest, service worker, icon, `assets/`, and `docs/`.
 - The public URL should open the app at `/`; older links to `/md-mmd-renderer-v5.html` redirect to `/index.html`.
 
 For a manual branch-based fallback, commit `index.html`, `md-mmd-renderer-v5.html`, `assets/`, `docs/`, `manifest.webmanifest`, `service-worker.js`, and `icon.svg`, then configure Pages to serve that branch directly. The GitHub Actions workflow remains the safer default because it blocks deployment when exports or browser smoke tests fail.

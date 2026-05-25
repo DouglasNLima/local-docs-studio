@@ -119,7 +119,7 @@ for (const icon of manifest.icons) {
 const workflow = readFileSync(toRootPath('.github/workflows/pages.yml'), 'utf8');
 if (!workflow.includes('actions/deploy-pages@v4')) fail('Pages workflow must deploy with actions/deploy-pages@v4');
 if (!workflow.includes('npm test')) fail('Pages workflow must run npm test before deploy');
-if (!workflow.includes('pages-artifact')) fail('Pages workflow must upload the static Pages artifact');
+if (!workflow.includes('pages-artifact')) fail('Pages workflow must upload the static Pages artefact');
 if (/^permissions:/m.test(workflow)) fail('Pages workflow permissions must be scoped per job');
 if (!/test:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?steps:/m.test(workflow)) fail('Test job must have contents: read permission only');
 if (!/deploy:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?pages: write[\s\S]*?id-token: write[\s\S]*?environment:/m.test(workflow)) fail('Deploy job must scope Pages and id-token write permissions');
