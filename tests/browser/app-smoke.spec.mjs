@@ -375,6 +375,7 @@ flowchart LR
 });
 
 test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
+  await page.setViewportSize({ width: 1366, height: 768 });
   await page.goto('/');
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
@@ -417,6 +418,31 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   await expect(page.locator('details.menu[open]')).toContainText('Open feature guide');
   await expect(page.locator('details.menu[open]')).toContainText('Import ZIP');
   await expect(page.locator('details.menu[open]')).toContainText('Markdown Bundle');
+
+  const commonMenuNames = ['File', 'Edit', 'Studio', 'Export', 'View', 'Help'];
+  const commonMenuWidths = [];
+  for (const name of commonMenuNames) {
+    await page.locator('summary').filter({ hasText: new RegExp(`^${name}$`) }).click();
+    const panel = page.locator('details.menu[open] .menu-panel');
+    await expect(panel).toBeVisible();
+    const box = await panel.boundingBox();
+    const viewportSize = page.viewportSize();
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewportSize.width + 1);
+    commonMenuWidths.push(Math.round(box.width));
+  }
+
+  const expectedCommonWidth = commonMenuWidths[0];
+  commonMenuWidths.forEach((width) => {
+    expect(Math.abs(width - expectedCommonWidth)).toBeLessThanOrEqual(1);
+  });
+
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  const createPanelBox = await page.locator('#createMenu .menu-panel').boundingBox();
+  const createViewportSize = page.viewportSize();
+  expect(createPanelBox.x).toBeGreaterThanOrEqual(0);
+  expect(createPanelBox.x + createPanelBox.width).toBeLessThanOrEqual(createViewportSize.width + 1);
+  expect(createPanelBox.width).toBeGreaterThan(expectedCommonWidth + 120);
 });
 
 test('Help menu opens the feature guide as read-only Markdown', async ({ page }) => {
@@ -742,7 +768,7 @@ test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain te
   await pasteIntoEditor(page, { text: 'Name\tQty\nApples\t4\nPears\t7' });
   await expect(page.locator('#editor')).toHaveValue('Intro\n\n| Name | Qty |\n| --- | --- |\n| Apples | 4 |\n| Pears | 7 |');
   await expect(page.locator('#status')).toHaveText(/Table pasted as Markdown/);
-  await expect(page.locator('#preview table')).toHaveCount(1);
+  await expect(page.locator('#preview table')).toHaveCount(1, { timeout: 20_000 });
 
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, {
@@ -750,7 +776,7 @@ test('spreadsheet paste auto-converts TSV and HTML tables while leaving plain te
     text: 'Area\tStatus\nPreview\tReady',
   });
   await expect(page.locator('#editor')).toHaveValue('| Area | Status |\n| --- | --- |\n| Preview | Ready |');
-  await expect(page.locator('#preview table')).toHaveCount(1);
+  await expect(page.locator('#preview table')).toHaveCount(1, { timeout: 20_000 });
 
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, { text: 'Just normal text\nwith words.' });

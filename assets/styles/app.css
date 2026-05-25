@@ -2221,6 +2221,20 @@
   --shadow: 0 18px 44px rgba(0, 0, 0, .34);
   --panel-shadow: 0 10px 30px rgba(0, 0, 0, .24);
   --focus-ring: 0 0 0 3px rgba(56, 189, 248, .18);
+  --menu-width: 22rem;
+  --menu-wide-width: 34rem;
+  --menu-bg: #121a2a;
+  --menu-bg-strong: #0f1726;
+  --menu-border: rgba(120, 145, 179, .24);
+  --menu-border-strong: rgba(148, 177, 214, .36);
+  --menu-item-bg: rgba(42, 55, 84, .72);
+  --menu-item-hover: rgba(58, 77, 116, .88);
+  --menu-item-border: rgba(166, 185, 216, .14);
+  --menu-muted: #adc0d5;
+  --menu-heading: #c7d8ec;
+  --menu-trigger-bg: rgba(25, 36, 56, .64);
+  --menu-trigger-hover: rgba(35, 50, 77, .84);
+  --menu-shadow: 0 18px 44px rgba(0, 0, 0, .42), 0 0 0 1px rgba(148, 177, 214, .04);
 }
 
 :root[data-theme="light"] {
@@ -2260,6 +2274,20 @@
   --shadow: 0 18px 38px rgba(22, 28, 39, .14);
   --panel-shadow: 0 8px 24px rgba(22, 28, 39, .10);
   --focus-ring: 0 0 0 3px rgba(2, 132, 199, .16);
+  --menu-width: 22rem;
+  --menu-wide-width: 34rem;
+  --menu-bg: #f4f8fd;
+  --menu-bg-strong: #edf4fb;
+  --menu-border: rgba(83, 112, 152, .22);
+  --menu-border-strong: rgba(2, 132, 199, .28);
+  --menu-item-bg: rgba(255, 255, 255, .82);
+  --menu-item-hover: #e5eef8;
+  --menu-item-border: rgba(83, 112, 152, .16);
+  --menu-muted: #52647a;
+  --menu-heading: #2f455f;
+  --menu-trigger-bg: rgba(226, 238, 249, .75);
+  --menu-trigger-hover: rgba(211, 228, 244, .95);
+  --menu-shadow: 0 18px 38px rgba(22, 38, 65, .16), 0 0 0 1px rgba(83, 112, 152, .05);
 }
 
 html,
@@ -2403,22 +2431,56 @@ label.file-button.primary,
 }
 
 .menu[open] > summary {
-  border-color: var(--accent-border);
-  background: var(--button-bg-hover);
+  border-color: var(--menu-border-strong);
+  background: var(--menu-trigger-hover);
   color: var(--text);
   box-shadow: var(--focus-ring);
 }
 
 .menu-panel {
   gap: .28rem;
+  width: min(var(--menu-width), calc(100vw - 2rem));
+  min-width: min(var(--menu-width), calc(100vw - 2rem));
+  max-width: min(var(--menu-width), calc(100vw - 2rem));
+  max-height: min(78vh, 42rem);
   padding: .6rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--menu-border);
   border-radius: 12px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  background: linear-gradient(180deg, var(--menu-bg), var(--menu-bg-strong));
+  box-shadow: var(--menu-shadow);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  scrollbar-color: var(--menu-border-strong) transparent;
   animation: menuFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menu-panel.create-tools {
+  width: min(var(--menu-wide-width), calc(100vw - 2rem));
+  min-width: min(var(--menu-wide-width), calc(100vw - 2rem));
+  max-width: min(var(--menu-wide-width), calc(100vw - 2rem));
+}
+
+.menu-panel.studio-tools,
+.menu-panel.export-menu {
+  width: min(var(--menu-width), calc(100vw - 2rem));
+  min-width: min(var(--menu-width), calc(100vw - 2rem));
+  max-width: min(var(--menu-width), calc(100vw - 2rem));
+}
+
+.menu-panel::-webkit-scrollbar {
+  width: .7rem;
+  height: .7rem;
+}
+
+.menu-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.menu-panel::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--menu-border-strong);
+  background-clip: padding-box;
 }
 
 @keyframes menuFadeIn {
@@ -2433,22 +2495,43 @@ label.file-button.primary,
 }
 
 .menu-panel button {
+  border-color: var(--menu-item-border);
   border-radius: 8px;
+  background: var(--menu-item-bg);
+  color: var(--text);
   min-height: 2.2rem;
   font-family: Inter, sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
   transition: all 0.15s ease;
 }
 
-.menu-panel button:hover {
-  background: var(--button-bg-hover);
+.menu-panel button:hover,
+.menu-panel button:focus-visible {
+  border-color: var(--menu-border-strong);
+  background: var(--menu-item-hover);
   color: var(--text);
+}
+
+.menu-panel hr {
+  background: var(--menu-border);
+}
+
+.menu-panel .menu-check {
+  border-color: var(--menu-item-border);
+  border-radius: 8px;
+  background: rgba(13, 20, 34, .28);
+  color: var(--menu-heading);
+}
+
+:root[data-theme="light"] .menu-panel .menu-check {
+  background: rgba(255, 255, 255, .58);
 }
 
 .menu-heading {
   margin: .48rem .25rem .08rem;
-  color: var(--muted);
+  color: var(--menu-heading);
   font-family: Outfit, sans-serif;
   font-size: .72rem;
   font-weight: 700;
@@ -2458,13 +2541,13 @@ label.file-button.primary,
 .menu-note,
 .shortcut-list,
 .recent-list {
-  color: var(--muted);
+  color: var(--menu-muted);
 }
 
 .help-tips div,
 :root[data-theme="light"] .help-tips div {
   border-radius: 8px;
-  background: var(--surface-strong);
+  background: var(--menu-item-bg);
 }
 
 .shell {
@@ -3670,9 +3753,11 @@ label.file-button.primary,
 }
 
 .topbar-menubar .menu > summary {
+  justify-content: center;
+  min-width: 4.65rem;
   min-height: 2rem;
-  padding: .35rem .56rem;
-  border-color: transparent;
+  padding: .35rem .62rem;
+  border-color: rgba(148, 177, 214, .08);
   border-radius: 8px;
   background: transparent;
   color: var(--muted-strong);
@@ -3682,8 +3767,8 @@ label.file-button.primary,
 .topbar-menubar .menu > summary:hover,
 .topbar-menubar .menu > summary:focus-visible,
 .topbar-menubar .menu[open] > summary {
-  border-color: var(--border-soft);
-  background: var(--button-bg);
+  border-color: var(--menu-border-strong);
+  background: var(--menu-trigger-bg);
   color: var(--text);
 }
 
