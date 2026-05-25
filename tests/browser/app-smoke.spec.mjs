@@ -19,13 +19,25 @@ function normaliseLineEndings(value) {
 async function openFixture(page, name) {
   await page.goto('/');
   await page.locator('#fileInput').setInputFiles(fixturePath(name));
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 }
 
 async function loadSample(page) {
-  await page.locator('summary').filter({ hasText: /^Examples$/ }).click();
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await page.getByRole('button', { name: 'Markdown + Mermaid sample' }).click();
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+}
+
+async function renderPreviewFromViewMenu(page) {
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  await page.getByRole('button', { name: 'Render preview' }).click();
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+}
+
+async function renderPreviewWithShortcut(page) {
+  await page.locator('#editor').focus();
+  await page.keyboard.press(process.platform === 'darwin' ? 'Meta+Enter' : 'Control+Enter');
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 }
 
 async function dropTinyPngOnEditor(page) {
@@ -305,7 +317,7 @@ test('editor syntax highlighting and math rendering work without a build step', 
   expect(editorLayerMatch.sameFont).toBe(true);
   expect(editorLayerMatch.samePadding).toBe(true);
 
-  await page.locator('#renderButton').click();
+  await renderPreviewFromViewMenu(page);
   await expect(page.locator('#preview .math-inline')).toContainText('E=mc');
   await expect(page.locator('#preview .math-inline .katex')).toBeVisible();
   await expect(page.locator('#preview .math-block .katex')).toBeVisible();
@@ -335,7 +347,7 @@ flowchart LR
   A[Start]
   click A "javascript:window.__auditXss=5"
 \`\`\``);
-  await page.locator('#renderButton').click();
+  await renderPreviewWithShortcut(page);
   await expect(page.locator('#status')).toHaveText(/Rendered/);
 
   const result = await page.locator('#preview').evaluate((preview) => ({
@@ -368,6 +380,13 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await expect(page.locator('[data-menu-action="openFile"]')).toBeVisible();
   await expect(page.locator('details.menu[open] .menu-heading')).toContainText(['Open', 'Import', 'Save', 'Recent']);
+  const fileMenuClickable = await page.locator('details.menu[open]').evaluate((menu) => {
+    const button = menu.querySelector('[data-menu-action="openFile"]');
+    const rect = button.getBoundingClientRect();
+    const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    return button === target || button.contains(target);
+  });
+  expect(fileMenuClickable).toBe(true);
   await page.keyboard.press('Escape');
   await expect(page.locator('summary').filter({ hasText: /^File$/ }).locator('..')).not.toHaveAttribute('open', '');
 
@@ -379,10 +398,19 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
 
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await expect(page.locator('details.menu[open]')).toContainText('Preview tools');
+  await expect(page.locator('details.menu[open]')).toContainText('Render preview');
   const viewPanelBox = await page.locator('details.menu[open] .menu-panel').boundingBox();
   const viewport = page.viewportSize();
   expect(viewPanelBox.x).toBeGreaterThanOrEqual(0);
   expect(viewPanelBox.x + viewPanelBox.width).toBeLessThanOrEqual(viewport.width + 1);
+
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await expect(page.locator('details.menu[open]')).toContainText('Starters');
+  await expect(page.getByRole('button', { name: 'Markdown + Mermaid sample' })).toBeVisible();
+  await expect(page.locator('summary').filter({ hasText: /^Examples$/ })).toHaveCount(0);
+  await expect(page.locator('#openFileButton')).toHaveCount(0);
+  await expect(page.locator('#openFolderButton')).toHaveCount(0);
+  await expect(page.locator('#renderButton')).toHaveCount(0);
 
   await page.locator('summary').filter({ hasText: /^Help$/ }).click();
   await expect(page.locator('details.menu[open]')).toContainText('Mermaid snippets');
@@ -645,7 +673,7 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   await page.locator('#preview a.wikilink').click();
   await expect(page.locator('#activeFileLabel')).toContainText('second.md');
 
-  await page.getByRole('button', { name: 'Review' }).click();
+  await page.getByRole('button', { name: 'Document review' }).click();
   await expect(page.locator('.document-review-links')).toContainText('Backlinks (1)');
   await expect(page.locator('.document-review-links')).toContainText('index.md:2');
 
@@ -983,8 +1011,7 @@ test('selection sync highlights editor selections in preview and respects the sy
     'Mermaid appears again after the table.',
   ].join('\n');
   await setEditorValueAndSelection(page, repeatedSource, 0, 0);
-  await page.locator('#renderButton').click();
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await renderPreviewWithShortcut(page);
   await page.locator('#editor').evaluate((editor, target) => {
     const start = editor.value.indexOf(target);
     editor.focus();
@@ -1003,8 +1030,7 @@ test('selection sync highlights editor selections in preview and respects the sy
     '```',
   ].join('\n');
   await setEditorValueAndSelection(page, fenceSource, 0, 0);
-  await page.locator('#renderButton').click();
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await renderPreviewWithShortcut(page);
   await page.locator('#editor').evaluate((editor, target) => {
     const start = editor.value.indexOf(target);
     editor.focus();
@@ -1460,7 +1486,7 @@ test('theme, preview maximize, and mobile layout stay usable', async ({ page }) 
 
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.getByRole('button', { name: /Switch to/ }).click();
-  await page.getByRole('button', { name: 'Maximize preview' }).click();
+  await page.locator('[data-view-action="maximizePreview"]').click();
   await page.locator('#previewFindToggleButton').click();
   await page.locator('#documentReviewToggleButton').click();
   await page.locator('#outlineToggleButton').click();

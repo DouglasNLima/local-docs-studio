@@ -22,13 +22,11 @@
         </div>
       </div>
 
-      <div class="toolbar-group primary-actions" aria-label="File actions">
-        <button id="openFileButton" class="primary" type="button">Open file</button>
-        <input id="fileInput" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain" />
-        <button id="openFolderButton" class="primary" type="button">Open folder</button>
-        <button id="saveButton" type="button" disabled>Save</button>
-        <input id="folderInput" type="file" webkitdirectory directory multiple />
-        <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+      <input id="fileInput" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain" />
+      <input id="folderInput" type="file" webkitdirectory directory multiple />
+      <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+
+      <nav class="topbar-menubar toolbar-group" aria-label="Application menus">
         <details class="menu">
           <summary>File</summary>
           <div class="menu-panel">
@@ -71,25 +69,19 @@
             <div class="menu-note">Spreadsheet tables paste as Markdown automatically when the clipboard includes HTML table or tab-separated data.</div>
           </div>
         </details>
-      </div>
-
-      <div class="toolbar-group workflow-actions" aria-label="Render and create actions">
-        <button id="renderButton" type="button">Render</button>
-        <details class="menu">
-          <summary>Examples</summary>
-          <div class="menu-panel">
-            <div class="menu-heading">Try a starter</div>
-            <button id="sampleButton" type="button">Markdown + Mermaid sample</button>
-            <button type="button" data-example="readme">README / docs</button>
-            <button type="button" data-example="architecture">Architecture diagram</button>
-            <button type="button" data-example="brief">Project brief</button>
-            <div class="menu-note">Examples load as editable Markdown and do not call a network or AI service.</div>
-          </div>
-        </details>
         <details class="menu align-right" id="createMenu">
           <summary>Create</summary>
           <div class="menu-panel create-tools">
-            <div class="menu-note">Generate editable Markdown from local templates. No network calls or AI required.</div>
+            <div class="menu-note">Generate editable Markdown from local templates or load a local starter. No network calls or AI required.</div>
+            <div class="menu-heading">Starters</div>
+            <div class="create-grid">
+              <button id="sampleButton" type="button">Markdown + Mermaid sample</button>
+              <button type="button" data-example="readme">README / docs</button>
+              <button type="button" data-example="architecture">Architecture diagram</button>
+              <button type="button" data-example="brief">Project brief</button>
+            </div>
+            <div class="menu-note">Starters load as editable Markdown and do not call a network or AI service.</div>
+            <hr>
             <div class="menu-heading">Templates</div>
             <div class="menu-heading">Project Docs</div>
             <div class="create-grid">
@@ -185,9 +177,6 @@
             </div>
           </div>
         </details>
-      </div>
-
-      <div class="toolbar-group utility-actions" aria-label="Export and view actions">
         <details class="menu align-right">
           <summary>Export</summary>
           <div class="menu-panel export-menu">
@@ -234,9 +223,10 @@
             </div>
             <hr>
             <div class="menu-heading">Preview tools</div>
+            <button type="button" data-view-action="renderPreview">Render preview</button>
             <button type="button" data-view-action="maximizePreview">Maximize preview</button>
             <button type="button" data-view-action="toggleOutline">Toggle outline</button>
-            <div class="menu-note">Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximized preview.</div>
+            <div class="menu-note">Render also runs with Ctrl/Cmd+Enter. Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximized preview.</div>
           </div>
         </details>
         <details class="menu align-right">
@@ -271,7 +261,14 @@
             <div class="menu-note">Files stay in your browser unless you export, save, copy, or import a new set.</div>
           </div>
         </details>
-        <button id="focusModeButton" type="button" title="Focus Mode (Ctrl+F11)" aria-label="Enter Focus Mode" aria-pressed="false">
+      </nav>
+
+      <div class="topbar-utilities" aria-label="Quick actions">
+        <button id="saveButton" class="icon-button topbar-save-button" type="button" title="Save changes (Ctrl/Cmd+S)" aria-label="Save changes" disabled>
+          <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>
+          <span class="visually-hidden">Save</span>
+        </button>
+        <button id="focusModeButton" class="icon-button icon-toggle" type="button" title="Focus Mode (Ctrl+F11)" aria-label="Enter Focus Mode" aria-pressed="false">
           <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
         </button>
       </div>
@@ -415,21 +412,40 @@
             </div>
             <div class="preview-control-groups">
               <div class="document-controls" aria-label="Document preview controls">
-                <label class="scroll-sync-toggle" title="Synchronize editor and preview scrolling">
-                  <input id="scrollSyncToggle" type="checkbox" checked />
-                  <span>Sync scroll</span>
+                <label class="scroll-sync-toggle icon-toggle" title="Synchronize editor and preview scrolling">
+                  <input id="scrollSyncToggle" type="checkbox" checked aria-label="Sync scroll" />
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11"/><path d="M8 17h11"/><path d="m5 7-2 2 2 2"/><path d="m5 17-2-2 2-2"/><path d="M16 3l3 4-3 4"/><path d="M16 13l3 4-3 4"/></svg>
+                  <span class="visually-hidden">Sync scroll</span>
                 </label>
-                <button id="previewFindToggleButton" type="button" aria-pressed="false">Find</button>
-                <button id="documentReviewToggleButton" type="button" aria-pressed="false">Review</button>
-                <button id="outlineToggleButton" type="button" aria-pressed="false">Outline</button>
+                <button id="previewFindToggleButton" class="icon-button icon-toggle" type="button" title="Find in preview" aria-label="Find in preview" aria-pressed="false">
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                  <span class="visually-hidden">Find</span>
+                </button>
+                <button id="documentReviewToggleButton" class="icon-button icon-toggle" type="button" title="Document review" aria-label="Document review" aria-pressed="false">
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11 12 14 20 6"/><path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg>
+                  <span class="visually-hidden">Review</span>
+                </button>
+                <button id="outlineToggleButton" class="icon-button icon-toggle" type="button" title="Document outline" aria-label="Document outline" aria-pressed="false">
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></svg>
+                  <span class="visually-hidden">Outline</span>
+                </button>
               </div>
               <div class="zoom-controls" aria-label="Diagram zoom controls">
-                <button id="zoomOutButton" type="button" aria-label="Reduce diagram zoom">−</button>
+                <button id="zoomOutButton" class="icon-button" type="button" title="Reduce diagram zoom" aria-label="Reduce diagram zoom">−</button>
                 <output class="zoom-value" id="zoomValue" aria-live="polite">100%</output>
-                <button id="zoomInButton" type="button" aria-label="Increase diagram zoom">+</button>
-                <button id="fitZoomButton" type="button">Fit</button>
-                <button id="resetZoomButton" type="button">Reset</button>
-                <button id="previewMaximizeButton" type="button" aria-pressed="false">Maximize</button>
+                <button id="zoomInButton" class="icon-button" type="button" title="Increase diagram zoom" aria-label="Increase diagram zoom">+</button>
+                <button id="fitZoomButton" class="icon-button" type="button" title="Fit diagrams to width" aria-label="Fit diagrams to width">
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V5a2 2 0 0 1 2-2h3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M8 12h8"/></svg>
+                  <span class="visually-hidden">Fit</span>
+                </button>
+                <button id="resetZoomButton" class="icon-button" type="button" title="Reset diagram zoom" aria-label="Reset diagram zoom">
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg>
+                  <span class="visually-hidden">Reset</span>
+                </button>
+                <button id="previewMaximizeButton" class="icon-button icon-toggle" type="button" title="Maximize preview" aria-label="Maximize preview" aria-pressed="false">
+                  <svg class="toolbar-icon maximize-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                  <span class="visually-hidden">Maximize</span>
+                </button>
               </div>
             </div>
           </div>
