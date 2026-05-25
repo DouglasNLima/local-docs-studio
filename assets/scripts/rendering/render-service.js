@@ -5,6 +5,7 @@ import { countMarkdownMermaidBlocks, normaliseDevOpsMermaidBlocks } from '../uti
 import { sanitizeMermaidSvg, sanitizeRenderedHtml } from '../utils/security.js';
 import { createWikilinkExtension } from '../utils/wikilinks.js';
 import { createMathExtensions } from '../utils/math.js';
+import { parseFrontMatter, stripFrontMatter } from '../utils/front-matter.js';
 
 const MERMAID_MODULE_PATH = '../../vendor/mermaid-11.15.0.esm.min.js';
 const MARKED_MODULE_PATH = '../../vendor/marked-16.4.2.esm.js';
@@ -261,11 +262,12 @@ export function createRenderingService({
     }
 
     async function buildMarkdownHtml(source) {
-      const cleaned = normaliseDevOpsMermaidBlocks(stripLeadingFrontMatter(source));
+      const parsed = parseFrontMatter(source);
+      const cleaned = normaliseDevOpsMermaidBlocks(parsed.body);
       await preloadHighlightForSource(cleaned);
       const marked = await loadMarked();
       const tokens = marked.lexer(cleaned);
-      assignLineNumbers(tokens, cleaned);
+      assignLineNumbers(tokens, cleaned, parsed.lineOffset);
       return marked.parser(tokens);
     }
 
@@ -299,7 +301,7 @@ export function createRenderingService({
       return languages;
     }
 
-    function assignLineNumbers(tokens, source) {
+    function assignLineNumbers(tokens, source, lineOffset = 0) {
       let offset = 0;
 
       function walk(tokenList) {
@@ -308,7 +310,7 @@ export function createRenderingService({
             const index = source.indexOf(token.raw, offset);
             if (index !== -1) {
               const linesBefore = source.slice(0, index).split('\n').length - 1;
-              token.line = linesBefore;
+              token.line = linesBefore + lineOffset;
               offset = index + token.raw.length;
             }
           }
@@ -593,14 +595,7 @@ export function createRenderingService({
     }
 
     function getMermaidProbe(source) {
-      return stripLeadingFrontMatter(source).trimStart();
-    }
-
-    function stripLeadingFrontMatter(source) {
-      const frontMatter = String(source).match(/^---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/);
-
-      if (!frontMatter) return source;
-      return String(source).slice(frontMatter[0].length);
+      return stripFrontMatter(source).trimStart();
     }
 
     function prepareDiagramFrames() {

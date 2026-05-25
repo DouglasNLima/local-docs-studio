@@ -86,6 +86,8 @@
   "./assets/vendor/mammoth-1.12.0.browser.min.js",
   "./assets/vendor/marked-16.4.2.esm.js",
   "./assets/vendor/mermaid-11.15.0.esm.min.js",
+  "./assets/vendor/pdfjs-5.7.284.js",
+  "./assets/vendor/pdfjs-5.7.284.worker.js",
   "./assets/vendor/fonts/KaTeX_AMS-Regular.ttf",
   "./assets/vendor/fonts/KaTeX_AMS-Regular.woff",
   "./assets/vendor/fonts/KaTeX_AMS-Regular.woff2",

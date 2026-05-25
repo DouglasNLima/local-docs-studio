@@ -4072,6 +4072,116 @@ label.file-button.primary,
   font-size: .86rem;
 }
 
+.asset-library-dialog {
+  width: min(92vw, 62rem);
+}
+
+.asset-library-card {
+  width: 100%;
+}
+
+.asset-library-list {
+  display: grid;
+  gap: .75rem;
+  max-height: min(58vh, 34rem);
+  overflow: auto;
+  padding-right: .2rem;
+}
+
+.asset-library-item {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr) auto;
+  gap: .75rem;
+  align-items: center;
+  padding: .75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: .75rem;
+  background: var(--surface-soft);
+}
+
+.asset-library-item img {
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: contain;
+  border: 1px solid var(--border-soft);
+  border-radius: .55rem;
+  background: var(--preview-bg);
+}
+
+.asset-library-main {
+  display: grid;
+  gap: .32rem;
+  min-width: 0;
+}
+
+.asset-library-main strong,
+.asset-library-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.asset-library-main span {
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.asset-library-main input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: .55rem;
+  padding: .45rem .55rem;
+  background: var(--editor-bg);
+  color: var(--text);
+  font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+.asset-library-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: .45rem;
+}
+
+.snapshot-list {
+  display: grid;
+  gap: .75rem;
+  max-height: min(58vh, 34rem);
+  overflow: auto;
+}
+
+.snapshot-item {
+  display: grid;
+  gap: .65rem;
+  padding: .75rem;
+  border: 1px solid var(--border-soft);
+  border-radius: .75rem;
+  background: var(--surface-soft);
+}
+
+.snapshot-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.snapshot-item-head span {
+  color: var(--muted);
+  font-size: .84rem;
+}
+
+.snapshot-diff {
+  max-height: 18rem;
+  overflow: auto;
+  border: 1px solid var(--border-soft);
+  border-radius: .55rem;
+  background: var(--editor-bg);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .82rem;
+}
+
 .diff-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
