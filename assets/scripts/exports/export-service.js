@@ -630,7 +630,7 @@ export function createExportService({
               <button class="template-dialog-close" type="button" data-docs-dialog-cancel aria-label="Close docs site setup">X</button>
             </div>
             <h2 id="docsSiteDialogTitle">Export Docs Site</h2>
-            <p id="docsSiteDialogDescription">Configure the static GitHub Pages bundle. The export stays browser-only and uses an organized ZIP.</p>
+            <p id="docsSiteDialogDescription">Configure the static GitHub Pages bundle. The export stays browser-only and uses an organised ZIP.</p>
             <div class="template-dialog-fields">
               <div class="template-field">
                 <label for="docs-site-title">Site title</label>
@@ -1472,7 +1472,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
       const managedImages = images.filter((image) => image.kind === 'managed');
       const wordImageDetails = [];
       if (diagramImages.length) {
-        wordImageDetails.push(`${diagramImages.filter((image) => image.mimeType === 'image/png').length}/${diagramImages.length} diagram${diagramImages.length === 1 ? '' : 's'} rasterized for Word`);
+        wordImageDetails.push(`${diagramImages.filter((image) => image.mimeType === 'image/png').length}/${diagramImages.length} diagram${diagramImages.length === 1 ? '' : 's'} rasterised for Word`);
       }
       if (managedImages.length) {
         wordImageDetails.push(`${managedImages.length} image asset${managedImages.length === 1 ? '' : 's'} embedded`);

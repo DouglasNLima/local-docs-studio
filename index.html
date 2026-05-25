@@ -184,7 +184,7 @@
             <button id="downloadButton" type="button">Export HTML</button>
             <button id="exportWordButton" type="button" title="Export a Word-compatible .docx document">Export Word</button>
             <button id="exportPdfButton" type="button">Export PDF</button>
-            <div class="menu-note">HTML and Word download files. PDF opens the browser print dialog with a clean print view.</div>
+            <div class="menu-note">HTML and Word download files. PDF opens the browser print dialogue with a clean print view.</div>
             <hr>
             <div class="menu-heading">Bundles</div>
             <button id="exportMarkdownBundleButton" type="button">Export Markdown Bundle</button>
@@ -224,9 +224,9 @@
             <hr>
             <div class="menu-heading">Preview tools</div>
             <button type="button" data-view-action="renderPreview">Render preview</button>
-            <button type="button" data-view-action="maximizePreview">Maximize preview</button>
+            <button type="button" data-view-action="maximizePreview">Maximise preview</button>
             <button type="button" data-view-action="toggleOutline">Toggle outline</button>
-            <div class="menu-note">Render also runs with Ctrl/Cmd+Enter. Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximized preview.</div>
+            <div class="menu-note">Render also runs with Ctrl/Cmd+Enter. Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximised preview.</div>
           </div>
         </details>
         <details class="menu align-right">
@@ -253,9 +253,9 @@
             <div class="menu-heading">Workflow tips</div>
             <div class="help-tips">
               <div><strong>Import ZIP</strong><span>Open app bundles or generic Markdown docs as editable virtual files.</span></div>
-              <div><strong>Export PDF</strong><span>Use the browser print dialog and choose Save as PDF.</span></div>
+              <div><strong>Export PDF</strong><span>Use the browser print dialogue and choose Save as PDF.</span></div>
               <div><strong>Markdown Bundle</strong><span>Round-trip editable docs and image assets in one ZIP.</span></div>
-              <div><strong>Sync scroll</strong><span>Keep Editor and Preview aligned in Split layout; also syncs word selections best-effort.</span></div>
+              <div><strong>Follow selection</strong><span>Highlight selected editor text in Preview and scroll the match into view in Split layout.</span></div>
               <div><strong>Drag images</strong><span>Dropped images become exportable session assets linked from Markdown.</span></div>
             </div>
             <div class="menu-note">Files stay in your browser unless you export, save, copy, or import a new set.</div>
@@ -327,7 +327,7 @@
             <div class="pane-title-main pane-title-context">
               <span>Input</span>
             </div>
-            <button id="inputMaximizeButton" type="button" aria-pressed="false">Maximize</button>
+            <button id="inputMaximizeButton" type="button" aria-pressed="false">Maximise</button>
           </div>
           <div class="editor-toolbar" id="editorToolbar" aria-label="Markdown formatting tools">
             <div class="toolbar-section" aria-label="Text formatting">
@@ -412,10 +412,10 @@
             </div>
             <div class="preview-control-groups">
               <div class="document-controls" aria-label="Document preview controls">
-                <label class="scroll-sync-toggle icon-toggle" title="Synchronize editor and preview scrolling">
-                  <input id="scrollSyncToggle" type="checkbox" checked aria-label="Sync scroll" />
+                <label class="scroll-sync-toggle icon-toggle" title="Follow editor selection in preview">
+                  <input id="scrollSyncToggle" type="checkbox" checked aria-label="Follow editor selection" />
                   <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11"/><path d="M8 17h11"/><path d="m5 7-2 2 2 2"/><path d="m5 17-2-2 2-2"/><path d="M16 3l3 4-3 4"/><path d="M16 13l3 4-3 4"/></svg>
-                  <span class="visually-hidden">Sync scroll</span>
+                  <span class="visually-hidden">Follow editor selection</span>
                 </label>
                 <button id="previewFindToggleButton" class="icon-button icon-toggle" type="button" title="Find in preview" aria-label="Find in preview" aria-pressed="false">
                   <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
@@ -442,9 +442,9 @@
                   <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v6h6"/></svg>
                   <span class="visually-hidden">Reset</span>
                 </button>
-                <button id="previewMaximizeButton" class="icon-button icon-toggle" type="button" title="Maximize preview" aria-label="Maximize preview" aria-pressed="false">
+                <button id="previewMaximizeButton" class="icon-button icon-toggle" type="button" title="Maximise preview" aria-label="Maximise preview" aria-pressed="false">
                   <svg class="toolbar-icon maximize-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-                  <span class="visually-hidden">Maximize</span>
+                  <span class="visually-hidden">Maximise</span>
                 </button>
               </div>
             </div>

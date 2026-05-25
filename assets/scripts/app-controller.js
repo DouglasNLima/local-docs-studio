@@ -1754,9 +1754,9 @@ export function createAppController() {
 
       if (shouldMaximize) toggleInputMaximized(false);
       app.classList.toggle('preview-maximized', shouldMaximize);
-      const label = shouldMaximize ? 'Restore split preview' : 'Maximize preview';
+      const label = shouldMaximize ? 'Restore split preview' : 'Maximise preview';
       const text = previewMaximizeButton.querySelector('.visually-hidden');
-      if (text) text.textContent = shouldMaximize ? 'Restore' : 'Maximize';
+      if (text) text.textContent = shouldMaximize ? 'Restore' : 'Maximise';
       previewMaximizeButton.setAttribute('aria-pressed', String(shouldMaximize));
       previewMaximizeButton.setAttribute('aria-label', label);
       previewMaximizeButton.title = label;
@@ -1771,9 +1771,9 @@ export function createAppController() {
 
       if (shouldMaximize) togglePreviewMaximized(false);
       app.classList.toggle('input-maximized', shouldMaximize);
-      inputMaximizeButton.textContent = shouldMaximize ? 'Restore' : 'Maximize';
+      inputMaximizeButton.textContent = shouldMaximize ? 'Restore' : 'Maximise';
       inputMaximizeButton.setAttribute('aria-pressed', String(shouldMaximize));
-      inputMaximizeButton.setAttribute('aria-label', shouldMaximize ? 'Restore split input' : 'Maximize input');
+      inputMaximizeButton.setAttribute('aria-label', shouldMaximize ? 'Restore split input' : 'Maximise input');
       updateEditorChrome();
     }
 
