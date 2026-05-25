@@ -115,13 +115,7 @@ export function resolvePasteReplacement(payload, mode = pasteModes.auto) {
   }
 
   if (mode === pasteModes.htmlMarkdown) {
-    const text = htmlToMarkdown(payload?.html || '');
-    return text ? {
-      text,
-      block: true,
-      status: 'HTML pasted as Markdown.',
-      statusType: 'ok',
-    } : null;
+    return resolveHtmlMarkdown(payload);
   }
 
   if ([pasteModes.list, pasteModes.checklist, pasteModes.numberedList].includes(mode)) {
@@ -148,7 +142,7 @@ export function resolvePasteReplacement(payload, mode = pasteModes.auto) {
 
   if (mode === pasteModes.table || mode === pasteModes.auto) {
     const table = resolveTableRows(payload, { allowCsv: mode === pasteModes.table });
-    if (!table) return null;
+    if (!table) return mode === pasteModes.auto ? resolveHtmlMarkdown(payload) : null;
 
     return {
       text: formatMarkdownTable(table.rows),
@@ -159,6 +153,16 @@ export function resolvePasteReplacement(payload, mode = pasteModes.auto) {
   }
 
   return null;
+}
+
+function resolveHtmlMarkdown(payload) {
+  const text = htmlToMarkdown(payload?.html || '');
+  return text ? {
+    text,
+    block: true,
+    status: 'HTML pasted as Markdown.',
+    statusType: 'ok',
+  } : null;
 }
 
 function resolveTableRows(payload, { allowCsv = false } = {}) {
