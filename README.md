@@ -25,7 +25,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
 - Lightweight Mermaid autocomplete and pre-render validation for `.mmd`, `.mermaid`, and fenced Mermaid blocks.
 - Editor/Split/Preview layout modes, light/dark theme toggle, preview maximize, diagram zoom, and optional outline.
-- Editor/Preview scroll sync, enabled by default and toggleable from the preview header.
+- Preview follow for editor selections, enabled by default and toggleable from the preview header.
 - Drag-and-drop PNG, JPEG, GIF, and WebP image insertion as session assets that are included in HTML, Word, and Docs Site exports.
 - HTML export, Word `.docx` export, copy HTML, and copy rendered text.
 - PDF export through the browser print dialog with a clean print stylesheet.
@@ -53,7 +53,7 @@ These tools are app-only. HTML, Word, and Docs Site exports are regenerated from
 The editor stays buildless and native, using a `textarea` with a synchronized line-number gutter instead of a heavy IDE component.
 
 - **Layout** in the View menu switches between Editor, Split, and Preview modes. The choice is saved locally.
-- **Sync scroll** in the preview header keeps Editor and Preview aligned in Split mode. It uses headings and code/diagram blocks as anchors, with percentage sync as a fallback, and can be turned off per browser. The same toggle also enables best-effort selection sync for words and short text snippets.
+- **Follow selection** in the preview header highlights matching preview text for short editor selections and scrolls that match into view in Split mode. It is best-effort, can be turned off per browser, and the editor and preview still remember their own scroll positions across renders and file switches.
 - **Mermaid autocomplete** appears with `Ctrl/Cmd+Space` in Mermaid files or Mermaid fenced blocks, and can also open from Mermaid-like line prefixes. Use arrow keys, `Enter` or `Tab` to insert a snippet, and `Escape` to close it.
 - **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localized error with copy/jump actions while the rest of the Markdown continues rendering.
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts spreadsheet tables when the clipboard provides HTML table or tab-separated text; plain text stays plain.

@@ -20,7 +20,7 @@ The editor keeps the app lightweight while still covering daily documentation wo
 | Undo and redo | Ctrl/Cmd+Z and Ctrl/Cmd+Y |
 | Mermaid snippets | Ctrl/Cmd+Space in Mermaid context |
 | Layout modes | View menu: Editor, Split, Preview |
-| Sync scroll and selection | Preview header checkbox |
+| Follow editor selection | Preview header checkbox |
 
 Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, and tables.
 
@@ -44,7 +44,7 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Find in preview.
 - Document review metrics and non-blocking quality notes.
 - Preview maximize and diagram zoom controls.
-- Sync scroll and best-effort word selection between editor and preview while using Split layout.
+- Follow short editor selections into the preview while using Split layout.
 
 ## Mermaid Diagrams
 

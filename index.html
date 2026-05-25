@@ -255,7 +255,7 @@
               <div><strong>Import ZIP</strong><span>Open app bundles or generic Markdown docs as editable virtual files.</span></div>
               <div><strong>Export PDF</strong><span>Use the browser print dialog and choose Save as PDF.</span></div>
               <div><strong>Markdown Bundle</strong><span>Round-trip editable docs and image assets in one ZIP.</span></div>
-              <div><strong>Sync scroll</strong><span>Keep Editor and Preview aligned in Split layout; also syncs word selections best-effort.</span></div>
+              <div><strong>Follow selection</strong><span>Highlight selected editor text in Preview and scroll the match into view in Split layout.</span></div>
               <div><strong>Drag images</strong><span>Dropped images become exportable session assets linked from Markdown.</span></div>
             </div>
             <div class="menu-note">Files stay in your browser unless you export, save, copy, or import a new set.</div>
@@ -412,10 +412,10 @@
             </div>
             <div class="preview-control-groups">
               <div class="document-controls" aria-label="Document preview controls">
-                <label class="scroll-sync-toggle icon-toggle" title="Synchronize editor and preview scrolling">
-                  <input id="scrollSyncToggle" type="checkbox" checked aria-label="Sync scroll" />
+                <label class="scroll-sync-toggle icon-toggle" title="Follow editor selection in preview">
+                  <input id="scrollSyncToggle" type="checkbox" checked aria-label="Follow editor selection" />
                   <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 7h11"/><path d="M8 17h11"/><path d="m5 7-2 2 2 2"/><path d="m5 17-2-2 2-2"/><path d="M16 3l3 4-3 4"/><path d="M16 13l3 4-3 4"/></svg>
-                  <span class="visually-hidden">Sync scroll</span>
+                  <span class="visually-hidden">Follow editor selection</span>
                 </label>
                 <button id="previewFindToggleButton" class="icon-button icon-toggle" type="button" title="Find in preview" aria-label="Find in preview" aria-pressed="false">
                   <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>

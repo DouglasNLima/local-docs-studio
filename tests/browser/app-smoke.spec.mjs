@@ -980,8 +980,9 @@ test('Azure DevOps Mermaid blocks render in preview, autocomplete, and Docs Site
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-diagram-action="exportSvg"'))).toBe(true);
 });
 
-test('selection sync highlights editor selections in preview and respects the sync toggle', async ({ page }) => {
+test('selection follow highlights editor selections in preview and respects the toggle', async ({ page }) => {
   await openFixture(page, 'document-ux.md');
+  await expect(page.locator('#scrollSyncToggle')).toHaveAttribute('aria-label', 'Follow editor selection');
 
   await page.locator('#editor').evaluate((editor, target) => {
     const start = editor.value.indexOf(target);
