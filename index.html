@@ -25,6 +25,7 @@
       <input id="fileInput" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain" />
       <input id="folderInput" type="file" webkitdirectory directory multiple />
       <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
+      <input id="documentInput" type="file" accept=".docx,.html,.htm,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html" multiple />
 
       <nav class="topbar-menubar toolbar-group" aria-label="Application menus">
         <details class="menu">
@@ -37,7 +38,8 @@
             <hr>
             <div class="menu-heading">Import</div>
             <button type="button" data-menu-action="importZip">Import ZIP</button>
-            <div class="menu-note">ZIP import creates editable virtual Markdown and Mermaid documents from bundles or generic docs folders.</div>
+            <button type="button" data-menu-action="importDocument">Import document</button>
+            <div class="menu-note">ZIP import opens Markdown/Mermaid bundles. Document import converts DOCX and HTML into editable Markdown.</div>
             <hr>
             <div class="menu-heading">Save</div>
             <button type="button" data-menu-action="save">Save changes</button>
@@ -253,6 +255,7 @@
             <div class="menu-heading">Workflow tips</div>
             <div class="help-tips">
               <div><strong>Import ZIP</strong><span>Open app bundles or generic Markdown docs as editable virtual files.</span></div>
+              <div><strong>Import document</strong><span>Convert DOCX or HTML into clean editable Markdown with supported images.</span></div>
               <div><strong>Export PDF</strong><span>Use the browser print dialogue and choose Save as PDF.</span></div>
               <div><strong>Markdown Bundle</strong><span>Round-trip editable docs and image assets in one ZIP.</span></div>
               <div><strong>Follow selection</strong><span>Highlight selected editor text in Preview and scroll the match into view in Split layout.</span></div>

@@ -101,26 +101,67 @@ export function createExportService({
       }
     }
 
+    function downloadTableCsv(button) {
+      const block = button.closest('.table-block');
+      const table = block?.querySelector('table') || button.closest('table');
+      const text = tableToCsv(table);
+      if (!text) {
+        setStatus('No table data found to download.', 'warning');
+        return false;
+      }
+
+      downloadBlob(new Blob([text], { type: 'text/csv;charset=utf-8' }), getTableExportName(block));
+      setStatus('Table CSV downloaded.', 'ok');
+      closeOpenMenus();
+      return true;
+    }
+
     function tableToTsv(table) {
       if (!table) return '';
-      return [...table.querySelectorAll('tr')]
-        .map((row) => [...row.children]
-          .filter((cell) => ['td', 'th'].includes(cell.tagName.toLowerCase()))
-          .map((cell) => formatTsvCell(cell.textContent || ''))
-          .join('\t'))
+      return tableToRows(table)
+        .map((row) => row.map(formatTsvCell).join('\t'))
         .filter((row) => row.length)
         .join('\n');
     }
 
-    function formatTsvCell(value) {
-      const text = String(value || '')
+    function tableToCsv(table) {
+      if (!table) return '';
+      return tableToRows(table)
+        .map((row) => row.map(formatCsvCell).join(','))
+        .filter((row) => row.length)
+        .join('\r\n');
+    }
+
+    function tableToRows(table) {
+      return [...table.querySelectorAll('tr')]
+        .map((row) => [...row.children]
+          .filter((cell) => ['td', 'th'].includes(cell.tagName.toLowerCase()))
+          .map((cell) => normaliseTableCellText(cell.textContent || '')));
+    }
+
+    function normaliseTableCellText(value) {
+      return String(value || '')
         .replace(/\u00a0/g, ' ')
         .replace(/\r\n?/g, '\n')
         .replace(/[ \t]+\n/g, '\n')
         .replace(/\n[ \t]+/g, '\n')
         .trim();
+    }
 
+    function formatTsvCell(value) {
+      const text = normaliseTableCellText(value);
       return /["\t\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+    }
+
+    function formatCsvCell(value) {
+      const text = normaliseTableCellText(value);
+      return /[",\n]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+    }
+
+    function getTableExportName(block) {
+      const index = Number(block?.dataset.tableIndex || '1');
+      const stem = block?.dataset.tableFileStem || getExportFileStem();
+      return `${sanitiseFileName(stem) || 'rendered-document'}-table-${Number.isFinite(index) ? index : 1}.csv`;
     }
 
     function getDiagramFrameFromAction(button) {
@@ -708,12 +749,13 @@ export function createExportService({
         : await buildMarkdownHtml(source);
       const container = document.createElement('article');
       container.innerHTML = sanitizeRenderedHtml(dirtyHtml);
-      prepareTableBlocksIn(container);
+      const fileStem = sanitiseFileName(record.name.replace(/\.[^.]+$/, '')) || `page-${index + 1}`;
+      prepareTableBlocksIn(container, fileStem);
 
       const diagrams = [...container.querySelectorAll('.mermaid')];
       const renderId = ++state.renderId;
       const diagramResult = await renderMermaidDiagrams(diagrams, renderId);
-      prepareDiagramFramesIn(container, false, sanitiseFileName(record.name.replace(/\.[^.]+$/, '')) || `page-${index + 1}`);
+      prepareDiagramFramesIn(container, false, fileStem);
       container.querySelectorAll('.diagram-error-actions').forEach((actions) => actions.remove());
       rewriteManagedAssetImageSources(container, record.path);
 
@@ -1872,9 +1914,10 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
       return `.table-block { overflow: hidden; margin: 1rem 0; border: 1px solid #d5dce8; border-radius: .85rem; background: #fff; }
     .table-block-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-width: 0; padding: .48rem .62rem; border-bottom: 1px solid #d5dce8; background: #eef4fb; }
     .table-block-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-    .table-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #0284c7; outline: none; }
-    .table-copy-button:disabled { cursor: default; opacity: .72; }
+    .table-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
+    .table-action-button, .table-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
+    .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #0284c7; outline: none; }
+    .table-action-button:disabled, .table-copy-button:disabled { cursor: default; opacity: .72; }
     .table-block table { width: 100%; margin: 0; border-collapse: collapse; }`;
     }
 
@@ -1899,30 +1942,86 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
         fallbackCopy(text);
       }
 
-      function formatCell(value) {
-        var text = String(value || '')
+      function downloadText(text, fileName) {
+        var blob = new Blob([text], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      }
+
+      function normaliseCell(value) {
+        return String(value || '')
           .replace(/\\u00a0/g, ' ')
           .replace(/\\r\\n?/g, '\\n')
           .replace(/[ \\t]+\\n/g, '\\n')
           .replace(/\\n[ \\t]+/g, '\\n')
           .trim();
+      }
+
+      function formatTsvCell(value) {
+        var text = normaliseCell(value);
         return /["\\t\\n]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
+      }
+
+      function formatCsvCell(value) {
+        var text = normaliseCell(value);
+        return /[",\\n]/.test(text) ? '"' + text.replaceAll('"', '""') + '"' : text;
+      }
+
+      function tableToRows(table) {
+        return Array.from(table.querySelectorAll('tr')).map(function (row) {
+          return Array.from(row.children)
+            .filter(function (cell) { return /^(td|th)$/i.test(cell.tagName); })
+            .map(function (cell) { return normaliseCell(cell.textContent || ''); });
+        });
       }
 
       function tableToTsv(table) {
         if (!table) return '';
-        return Array.from(table.querySelectorAll('tr')).map(function (row) {
-          return Array.from(row.children)
-            .filter(function (cell) { return /^(td|th)$/i.test(cell.tagName); })
-            .map(function (cell) { return formatCell(cell.textContent || ''); })
-            .join('\\t');
+        return tableToRows(table).map(function (row) {
+          return row.map(formatTsvCell).join('\\t');
         }).filter(Boolean).join('\\n');
       }
 
+      function tableToCsv(table) {
+        if (!table) return '';
+        return tableToRows(table).map(function (row) {
+          return row.map(formatCsvCell).join(',');
+        }).filter(Boolean).join('\\r\\n');
+      }
+
+      function sanitiseFileName(value) {
+        var text = String(value || 'rendered-document').replace(/[\\u0000-\\u001f]+/g, '-');
+        '<>:"/\\\\|?*'.split('').forEach(function (char) {
+          text = text.split(char).join('-');
+        });
+        return text.replace(/\\s+/g, ' ').trim().replace(/[. ]+$/g, '') || 'rendered-document';
+      }
+
+      function getTableFileName(button) {
+        var block = button.closest('.table-block');
+        var index = Number(block && block.dataset.tableIndex || '1');
+        var stem = block && block.dataset.tableFileStem || document.title || 'rendered-document';
+        return sanitiseFileName(stem) + '-table-' + (Number.isFinite(index) ? index : 1) + '.csv';
+      }
+
       document.addEventListener('click', async function (event) {
-        var button = event.target.closest('[data-table-action="copy"]');
+        var button = event.target.closest('[data-table-action]');
         if (!button) return;
-        var table = button.closest('.table-block')?.querySelector('table') || button.closest('table');
+        var block = button.closest('.table-block');
+        var table = block ? block.querySelector('table') : button.closest('table');
+        var action = button.dataset.tableAction;
+        if (action === 'downloadCsv') {
+          var csv = tableToCsv(table);
+          if (csv) downloadText(csv, getTableFileName(button));
+          return;
+        }
+        if (action !== 'copy') return;
         var text = tableToTsv(table);
         if (!text) return;
         var previous = button.textContent || 'Copy';
@@ -2680,6 +2779,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       copyToClipboard,
       copyCodeBlock,
       copyTableBlock,
+      downloadTableCsv,
       getDiagramFrameFromAction,
       copyDiagramSource,
       exportDiagramFrameSvg,

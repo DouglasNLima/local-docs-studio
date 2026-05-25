@@ -1,4 +1,4 @@
-const CACHE_NAME = 'local-docs-studio-v43';
+const CACHE_NAME = 'local-docs-studio-v44';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -18,6 +18,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/editor/table-editor-service.js',
   './assets/scripts/editor/typewriter-service.js',
   './assets/scripts/editor/workspace-search-service.js',
+  './assets/scripts/files/document-import-service.js',
   './assets/scripts/exports/export-service.js',
   './assets/scripts/files/file-service.js',
   './assets/scripts/rendering/render-service.js',
@@ -30,6 +31,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/utils/devops-markdown.js',
   './assets/scripts/utils/files.js',
   './assets/scripts/utils/format.js',
+  './assets/scripts/utils/html-markdown.js',
   './assets/scripts/utils/idb.js',
   './assets/scripts/utils/markdown-table.js',
   './assets/scripts/utils/math.js',

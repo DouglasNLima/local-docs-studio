@@ -83,6 +83,7 @@
   "./assets/vendor/dompurify-3.4.5.es.js",
   "./assets/vendor/fflate-0.8.2.browser.js",
   "./assets/vendor/highlight-11.11.1.esm.js",
+  "./assets/vendor/mammoth-1.12.0.browser.min.js",
   "./assets/vendor/marked-16.4.2.esm.js",
   "./assets/vendor/mermaid-11.15.0.esm.min.js",
   "./assets/vendor/fonts/KaTeX_AMS-Regular.ttf",

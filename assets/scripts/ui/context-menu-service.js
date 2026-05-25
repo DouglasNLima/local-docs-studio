@@ -11,6 +11,7 @@ export function createContextMenuService({
     copyRenderedHtml,
     copyRenderedText,
     copyTableBlock,
+    downloadTableCsv,
     copyToClipboard,
     executeMarkdownCommand,
     exportDiagramFramePng,
@@ -118,6 +119,7 @@ export function createContextMenuService({
     const frame = getDiagramFrame(target);
     const codeCopyButton = target.closest('.code-block')?.querySelector('[data-code-action="copy"]');
     const tableCopyButton = target.closest('.table-block')?.querySelector('[data-table-action="copy"]');
+    const tableCsvButton = target.closest('.table-block')?.querySelector('[data-table-action="downloadCsv"]');
     const renderedSvg = frame?.querySelector('.mermaid svg, svg');
     const diagramSource = frame?.dataset.diagramSource || frame?.querySelector('.mermaid')?.dataset.source || '';
 
@@ -137,7 +139,8 @@ export function createContextMenuService({
       frame ? separator() : null,
       codeCopyButton ? item('preview-copy-code', 'Copy code block', () => copyCodeBlock(codeCopyButton)) : null,
       tableCopyButton ? item('preview-copy-table', 'Copy table for Excel', () => copyTableBlock(tableCopyButton)) : null,
-      (codeCopyButton || tableCopyButton) ? separator() : null,
+      tableCsvButton ? item('preview-download-table-csv', 'Download table as CSV', () => downloadTableCsv(tableCsvButton)) : null,
+      (codeCopyButton || tableCopyButton || tableCsvButton) ? separator() : null,
       item('preview-copy-text', 'Copy rendered text', () => copyRenderedText()),
       item('preview-copy-html', 'Copy rendered HTML', () => copyRenderedHtml()),
     ]);
