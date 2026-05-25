@@ -34,13 +34,10 @@ export function createAppController() {
       editorToolbar,
       preview,
       status,
-      openFileButton,
       fileInput,
       folderInput,
       zipInput,
-      openFolderButton,
       saveButton,
-      renderButton,
       sampleButton,
       downloadButton,
       exportWordButton,
@@ -588,7 +585,6 @@ export function createAppController() {
     registerServiceWorker();
 
     function installEventHandlers() {
-      renderButton.addEventListener('click', renderPreview);
       sampleButton.addEventListener('click', () => loadExample('sample'));
       downloadButton.addEventListener('click', exportPreviewHtml);
       exportWordButton.addEventListener('click', exportPreviewWord);
@@ -611,8 +607,6 @@ export function createAppController() {
       themeToggleButton.addEventListener('click', toggleTheme);
       docsPreviewButton.addEventListener('click', toggleDocsPreview);
       studioToggleButton.addEventListener('click', toggleStudioMode);
-      openFileButton.addEventListener('click', openFile);
-      openFolderButton.addEventListener('click', openFolder);
       saveButton.addEventListener('click', saveActiveFile);
       focusModeButton?.addEventListener('click', () => toggleFocusMode());
       focusModeExitButton?.addEventListener('click', () => {
@@ -684,6 +678,7 @@ export function createAppController() {
 
       document.querySelectorAll('[data-view-action]').forEach((button) => {
         button.addEventListener('click', () => {
+          if (button.dataset.viewAction === 'renderPreview') renderPreview();
           if (button.dataset.viewAction === 'maximizePreview') togglePreviewMaximized();
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
           closeOpenMenus();
@@ -1759,9 +1754,12 @@ export function createAppController() {
 
       if (shouldMaximize) toggleInputMaximized(false);
       app.classList.toggle('preview-maximized', shouldMaximize);
-      previewMaximizeButton.textContent = shouldMaximize ? 'Restore' : 'Maximize';
+      const label = shouldMaximize ? 'Restore split preview' : 'Maximize preview';
+      const text = previewMaximizeButton.querySelector('.visually-hidden');
+      if (text) text.textContent = shouldMaximize ? 'Restore' : 'Maximize';
       previewMaximizeButton.setAttribute('aria-pressed', String(shouldMaximize));
-      previewMaximizeButton.setAttribute('aria-label', shouldMaximize ? 'Restore split preview' : 'Maximize preview');
+      previewMaximizeButton.setAttribute('aria-label', label);
+      previewMaximizeButton.title = label;
       applyDiagramZoom();
     }
 
