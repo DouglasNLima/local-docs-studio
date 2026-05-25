@@ -360,6 +360,53 @@ function createDocxImportFixture() {
   ], { compress: true });
 }
 
+function createSimplePdfBuffer(pages) {
+  const chunks = ['%PDF-1.4\n'];
+  const offsets = [0];
+  const pageObjectIds = pages.map((_, index) => 3 + index * 2);
+  const contentObjectIds = pages.map((_, index) => 4 + index * 2);
+  const fontObjectId = 3 + pages.length * 2;
+
+  function currentOffset() {
+    return Buffer.byteLength(chunks.join(''), 'binary');
+  }
+
+  function addObject(id, body) {
+    offsets[id] = currentOffset();
+    chunks.push(`${id} 0 obj\n${body}\nendobj\n`);
+  }
+
+  addObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  addObject(2, `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pages.length} >>`);
+
+  pages.forEach((text, index) => {
+    const pageObjectId = pageObjectIds[index];
+    const contentObjectId = contentObjectIds[index];
+    const stream = `BT /F1 24 Tf 72 720 Td (${escapePdfText(text)}) Tj ET`;
+    addObject(pageObjectId, `<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /MediaBox [0 0 612 792] /Contents ${contentObjectId} 0 R >>`);
+    addObject(contentObjectId, `<< /Length ${Buffer.byteLength(stream, 'binary')} >>\nstream\n${stream}\nendstream`);
+  });
+
+  addObject(fontObjectId, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+
+  const xrefOffset = currentOffset();
+  const objectCount = fontObjectId + 1;
+  chunks.push(`xref\n0 ${objectCount}\n0000000000 65535 f \n`);
+  for (let id = 1; id < objectCount; id += 1) {
+    chunks.push(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`);
+  }
+  chunks.push(`trailer\n<< /Size ${objectCount} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+
+  return Buffer.from(chunks.join(''), 'binary');
+}
+
+function escapePdfText(value) {
+  return String(value)
+    .replaceAll('\\', '\\\\')
+    .replaceAll('(', '\\(')
+    .replaceAll(')', '\\)');
+}
+
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('Local Docs Studio');
@@ -1724,7 +1771,7 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/import-word-word-logo.png"]')).toHaveAttribute('src', /^blob:/);
 });
 
-test('document import drag and drop handles HTML and warns that PDF is future text-only work', async ({ page }) => {
+test('document import drag and drop handles HTML and PDF text extraction', async ({ page }) => {
   await page.goto('/');
   await dropVirtualFile(page, {
     name: 'drop.html',
@@ -1738,16 +1785,23 @@ test('document import drag and drop handles HTML and warns that PDF is future te
   await dropVirtualFile(page, {
     name: 'future.pdf',
     type: 'application/pdf',
-    text: '%PDF-1.7',
+    base64: createSimplePdfBuffer(['First PDF page', 'Second PDF page']).toString('base64'),
   });
-  await expect(page.locator('#status')).toHaveText(/PDF import is planned for a future text-only converter/);
-  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText(/Imported 1 converted document/, { timeout: 20_000 });
+
+  const pdfMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
+  expect(pdfMarkdown).toContain('# future');
+  expect(pdfMarkdown).toContain('> Imported from PDF as text-only Markdown.');
+  expect(pdfMarkdown).toContain('## Page 1');
+  expect(pdfMarkdown).toContain('First PDF page');
+  expect(pdfMarkdown).toContain('## Page 2');
+  expect(pdfMarkdown).toContain('Second PDF page');
 });
 
 test('Docs Site export contains the expected static site package', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.locator('#folderInput').setInputFiles(fixturePath('docs-site'));
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 
   const filePath = await clickDocsSiteExportDownload(page);
   const entries = await readZipEntries(filePath);

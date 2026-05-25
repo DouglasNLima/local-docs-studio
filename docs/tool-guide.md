@@ -7,7 +7,7 @@ Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-
 - Open a single `.md`, `.markdown`, `.mmd`, or `.mermaid` file.
 - Open a folder to browse multiple documents from the sidebar.
 - Import a Markdown Bundle or generic ZIP from the File menu.
-- Import a DOCX or HTML document from the File menu to convert it into editable Markdown.
+- Import a DOCX, HTML, or PDF document from the File menu to convert it into editable Markdown.
 - Save edits back to supported local files, or download a Markdown copy when the browser cannot write directly.
 
 ## Markdown Editor
@@ -69,7 +69,7 @@ flowchart LR
 - **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
 - Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
-- **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets; PDF import is planned as a future text-only converter.
+- **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
 

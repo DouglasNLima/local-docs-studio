@@ -1,5 +1,5 @@
 import { decodeZipText, readZipEntriesFromFile } from '../utils/zip.js';
-import { convertDocumentFiles, isImportableDocumentFile, isPdfFile } from './document-import-service.js';
+import { convertDocumentFiles, isImportableDocumentFile } from './document-import-service.js';
 
 const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   'local-docs-studio-bundle.json',
@@ -409,14 +409,9 @@ export function createFileService({
       if (!sourceFiles.length) return;
 
       const documentFiles = sourceFiles.filter(isImportableDocumentFile);
-      const pdfCount = sourceFiles.filter(isPdfFile).length;
 
       if (!documentFiles.length) {
-        if (pdfCount) {
-          setStatus('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.', 'warning');
-          return;
-        }
-        setStatus('Choose a .docx, .html, or .htm file to import as Markdown.', 'warning');
+        setStatus('Choose a .docx, .html, .htm, or .pdf file to import as Markdown.', 'warning');
         return;
       }
 
@@ -428,9 +423,6 @@ export function createFileService({
       try {
         setStatus(`Converting ${documentFiles.length} document${documentFiles.length === 1 ? '' : 's'} to Markdown...`);
         const imported = await convertDocumentFiles(documentFiles);
-        if (pdfCount) {
-          imported.warnings.push('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.');
-        }
 
         if (!imported.records.length) {
           setStatus(imported.warnings[0] || 'No documents could be converted to Markdown.', 'warning');

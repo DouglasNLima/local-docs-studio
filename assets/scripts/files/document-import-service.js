@@ -3,10 +3,13 @@ import { normalisePath } from '../utils/files.js';
 import { sanitiseFileName, slugFromText } from '../utils/format.js';
 
 const MAMMOTH_MODULE_PATH = '../../vendor/mammoth-1.12.0.browser.min.js';
+const PDFJS_MODULE_PATH = '../../vendor/pdfjs-5.7.284.js';
+const PDFJS_WORKER_PATH = '../../vendor/pdfjs-5.7.284.worker.js';
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 const MARKDOWN_MIME = 'text/markdown;charset=utf-8';
 
 let mammothPromise = null;
+let pdfjsPromise = null;
 
 export async function convertDocumentFiles(files) {
   const selectedFiles = [...(files || [])].filter(isImportableDocumentFile);
@@ -50,7 +53,7 @@ export async function convertDocumentFiles(files) {
 }
 
 export function isImportableDocumentFile(file) {
-  return isDocxFile(file) || isHtmlFile(file);
+  return isDocxFile(file) || isHtmlFile(file) || isPdfFile(file);
 }
 
 export function isPdfFile(file) {
@@ -68,6 +71,7 @@ function isHtmlFile(file) {
 async function convertDocumentFile(file, context) {
   if (isDocxFile(file)) return await convertDocxFile(file, context);
   if (isHtmlFile(file)) return await convertHtmlFile(file, context);
+  if (isPdfFile(file)) return await convertPdfFile(file, context);
   throw new Error('Unsupported document format.');
 }
 
@@ -83,6 +87,47 @@ async function convertDocxFile(file, context) {
 
 async function convertHtmlFile(file, context) {
   return convertHtmlSource(file, await file.text(), context);
+}
+
+async function convertPdfFile(file, context) {
+  const pdfjs = await loadPdfJs();
+  const loadingTask = pdfjs.getDocument({
+    data: new Uint8Array(await file.arrayBuffer()),
+    disableFontFace: true,
+    useSystemFonts: true,
+  });
+  let pdf = null;
+
+  try {
+    pdf = await loadingTask.promise;
+    const pages = [];
+    let extractedCharacters = 0;
+
+    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
+      const page = await pdf.getPage(pageNumber);
+      const content = await page.getTextContent();
+      const pageText = extractPdfPageText(content);
+      extractedCharacters += pageText.length;
+      pages.push(`## Page ${pageNumber}\n\n${pageText || '_No extractable text on this page._'}`);
+    }
+
+    if (!extractedCharacters) {
+      context.warnings.push(`${file.name}: no extractable text found in the PDF.`);
+    }
+
+    const markdown = [
+      `# ${sanitiseFileName(getFileStem(file.name)) || 'Imported PDF'}`,
+      '',
+      '> Imported from PDF as text-only Markdown. Layout, images, and OCR are not preserved.',
+      '',
+      pages.join('\n\n'),
+    ].join('\n').replace(/\n{3,}/g, '\n\n').trimEnd() + '\n';
+
+    return { markdown };
+  } finally {
+    if (pdf?.destroy) await pdf.destroy();
+    else await loadingTask.destroy?.();
+  }
 }
 
 function convertHtmlSource(file, html, context) {
@@ -103,6 +148,17 @@ async function loadMammoth() {
     });
   }
   return await mammothPromise;
+}
+
+async function loadPdfJs() {
+  if (!pdfjsPromise) {
+    pdfjsPromise = import(PDFJS_MODULE_PATH).then((pdfjs) => {
+      if (!pdfjs?.getDocument) throw new Error('PDF converter failed to load.');
+      pdfjs.GlobalWorkerOptions.workerSrc = new URL(PDFJS_WORKER_PATH, import.meta.url).href;
+      return pdfjs;
+    });
+  }
+  return await pdfjsPromise;
 }
 
 function collectMammothMessages(file, messages, warnings) {
@@ -214,16 +270,59 @@ function makeUniquePath(path, usedPaths) {
   return candidate;
 }
 
+function extractPdfPageText(content) {
+  const lines = [];
+
+  for (const item of content?.items || []) {
+    const text = normaliseInlinePdfText(item?.str);
+    if (!text) continue;
+
+    const y = Number(item?.transform?.[5]);
+    const x = Number(item?.transform?.[4]);
+    const existing = Number.isFinite(y)
+      ? lines.find((line) => Math.abs(line.y - y) <= 2)
+      : null;
+    const line = existing || {
+      y: Number.isFinite(y) ? y : -lines.length,
+      parts: [],
+    };
+    line.parts.push({
+      x: Number.isFinite(x) ? x : line.parts.length,
+      text,
+    });
+    if (!existing) lines.push(line);
+  }
+
+  return lines
+    .sort((a, b) => b.y - a.y)
+    .map((line) => line.parts
+      .sort((a, b) => a.x - b.x)
+      .map((part) => part.text)
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim())
+    .filter(Boolean)
+    .join('\n\n');
+}
+
+function normaliseInlinePdfText(value) {
+  return String(value || '')
+    .replace(/\u0000/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function getFileStem(fileName) {
   return String(fileName || 'imported-document')
     .split(/[\\/]/)
     .pop()
-    .replace(/\.(docx|html?)$/i, '') || 'imported-document';
+    .replace(/\.(docx|html?|pdf)$/i, '') || 'imported-document';
 }
 
 function getSourceFormat(file) {
   if (isDocxFile(file)) return 'DOCX';
   if (isHtmlFile(file)) return 'HTML';
+  if (isPdfFile(file)) return 'PDF';
   return 'Document';
 }
 

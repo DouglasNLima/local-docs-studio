@@ -7,7 +7,7 @@ import { createFindReplaceService } from './editor/find-replace-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
 import { createWorkspaceSearchService } from './editor/workspace-search-service.js';
-import { isImportableDocumentFile, isPdfFile } from './files/document-import-service.js';
+import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createRenderingService } from './rendering/render-service.js';
@@ -996,14 +996,8 @@ export function createAppController() {
         }
 
         const documentFiles = files.filter(isImportableDocumentFile);
-        const pdfFiles = files.filter(isPdfFile);
         if (documentFiles.length) {
-          await importDocumentFiles([...documentFiles, ...pdfFiles]);
-          return;
-        }
-
-        if (pdfFiles.length) {
-          setStatus('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.', 'warning');
+          await importDocumentFiles(documentFiles);
           return;
         }
 
