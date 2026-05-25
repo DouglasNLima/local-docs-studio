@@ -893,6 +893,29 @@ test('local draft recovery and large deletion protection guard browser-local edi
   await expect(page.locator('#editor')).toHaveValue(/This paragraph should survive local recovery/);
 });
 
+test('manual local snapshots can be created, compared, restored, and deleted', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Create snapshot' }).click();
+  await expect(page.locator('#status')).toHaveText(/Snapshot created/);
+
+  await setEditorValueAndSelection(page, '# Changed\n\nTemporary edit.\n');
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Manage snapshots' }).click();
+  await expect(page.getByRole('heading', { name: /Snapshots for plain\.md/ })).toBeVisible();
+  await page.getByText('Compare with current document').click();
+  await expect(page.locator('.snapshot-diff')).toContainText('Publishing Fixture');
+  await page.getByRole('button', { name: 'Restore' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture/);
+  await expect(page.locator('#status')).toHaveText(/Restored snapshot/);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Manage snapshots' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await expect(page.locator('.snapshot-list')).toContainText('No snapshots');
+});
+
 test('writer shortcut is disabled while input maximise handles focused writing', async ({ page }) => {
   await page.goto('/');
   await loadSample(page);

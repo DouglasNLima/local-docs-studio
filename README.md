@@ -24,6 +24,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Standalone `.mmd` and `.mermaid` diagram rendering.
 - Local folder browser with filtering and dirty-file markers.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
+- Manual browser-local snapshots for comparing, restoring, and deleting explicit document versions.
 - Lightweight Mermaid autocomplete and pre-render validation for `.mmd`, `.mermaid`, and fenced Mermaid blocks.
 - Editor/Split/Preview layout modes, light/dark theme toggle, preview maximisation, diagram zoom, and optional outline.
 - Preview follow for editor selections, enabled by default and toggleable from the preview header.
@@ -64,6 +65,7 @@ The editor stays buildless and native, using a `textarea` with a synchronised li
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts formatted HTML into Markdown and keeps spreadsheet tables as Markdown tables when the clipboard provides HTML table or tab-separated text; plain text stays plain, and **Paste as text** forces unformatted text.
 - **Image drag-and-drop** on the editor inserts Markdown such as `![diagram](assets/images/diagram.png)`. The Markdown file save-back writes the link text only; the image binaries live in the browser session and are embedded or bundled when you export. User-supplied SVG images are blocked as assets for security; rendered Mermaid diagrams can still be exported as SVG.
 - **Manage assets** in the View menu shows session images, usage counts, rename controls that update editable Markdown references, and removal for unused assets.
+- **Create snapshot** and **Manage snapshots** in the File menu store explicit browser-local document versions separately from automatic draft recovery.
 
 ## Local Content Studios
 

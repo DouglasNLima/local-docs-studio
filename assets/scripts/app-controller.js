@@ -21,6 +21,11 @@ import { compareRecords, getFolderNameFromFileList, isSupportedFile, normalisePa
 import { escapeHtml, readStoredNumber, sanitiseFileName, slugFromText, todayIso } from './utils/format.js';
 import { collectMarkdownRelativeTargets, collectWikilinkTargets, findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
 import { getLineInfoAtIndex } from './utils/search.js';
+import { idbRequest, idbTransactionDone, openObjectStoreDb } from './utils/idb.js';
+
+const SNAPSHOT_DB_NAME = 'local-docs-studio-snapshots';
+const SNAPSHOT_DB_VERSION = 1;
+const SNAPSHOT_STORE = 'snapshots';
 
 export function createAppController() {
     const {
@@ -151,6 +156,7 @@ export function createAppController() {
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
+    let snapshotDbPromise = null;
 
     const state = createInitialState({ readStoredNumber });
     let openTableEditor = () => {};
@@ -663,6 +669,8 @@ export function createAppController() {
           if (button.dataset.menuAction === 'importZip') importZip();
           if (button.dataset.menuAction === 'importDocument') importDocument();
           if (button.dataset.menuAction === 'save') await saveActiveFile();
+          if (button.dataset.menuAction === 'createSnapshot') await createActiveSnapshot();
+          if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
           closeOpenMenus();
         });
@@ -1116,6 +1124,194 @@ export function createAppController() {
         state.savedContentCache.set(record.path, text);
       }
       return text;
+    }
+
+    async function createActiveSnapshot() {
+      const record = getActiveRecord();
+      if (!record || !state.activePath) {
+        setStatus('Open a Markdown document before creating a snapshot.', 'warning');
+        return;
+      }
+      if (record.readOnly) {
+        setStatus('Read-only documents cannot create snapshots.', 'warning');
+        return;
+      }
+
+      const snapshot = {
+        id: `${getSnapshotWorkspaceKey()}::${state.activePath}::${Date.now()}`,
+        workspaceKey: getSnapshotWorkspaceKey(),
+        path: state.activePath,
+        name: record.name,
+        text: editor.value,
+        createdAt: Date.now(),
+      };
+      const db = await getSnapshotDb();
+      if (!db) return;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readwrite');
+      transaction.objectStore(SNAPSHOT_STORE).put(snapshot);
+      await idbTransactionDone(transaction);
+      setStatus(`Snapshot created for ${record.name}.`, 'ok');
+    }
+
+    async function openSnapshotManager() {
+      const record = getActiveRecord();
+      if (!record || !state.activePath) {
+        setStatus('Open a document before managing snapshots.', 'warning');
+        return;
+      }
+
+      const dialog = document.createElement('dialog');
+      dialog.className = 'utility-dialog snapshot-dialog';
+      dialog.setAttribute('aria-labelledby', 'snapshotDialogTitle');
+      document.body.appendChild(dialog);
+
+      const close = () => {
+        dialog.close();
+        dialog.remove();
+      };
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        close();
+      });
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || event.target.closest('[data-snapshot-close]')) {
+          close();
+        }
+      });
+      dialog.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-snapshot-action]');
+        if (!button) return;
+        const id = button.dataset.snapshotId || '';
+        if (button.dataset.snapshotAction === 'restore') {
+          const snapshot = await getSnapshot(id);
+          if (snapshot) {
+            await restoreSnapshot(snapshot);
+            close();
+          }
+        }
+        if (button.dataset.snapshotAction === 'delete') {
+          await deleteSnapshot(id);
+          await renderSnapshotManager(dialog);
+        }
+      });
+
+      await renderSnapshotManager(dialog);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    async function renderSnapshotManager(dialog) {
+      const snapshots = await listActiveSnapshots();
+      const rows = snapshots.map((snapshot) => {
+        const created = new Date(snapshot.createdAt).toLocaleString();
+        return `<section class="snapshot-item">
+          <div class="snapshot-item-head">
+            <strong>${escapeHtml(snapshot.name || snapshot.path)}</strong>
+            <span>${escapeHtml(created)}</span>
+          </div>
+          <details>
+            <summary>Compare with current document</summary>
+            <div class="snapshot-diff">${renderSnapshotDiff(snapshot.text, editor.value)}</div>
+          </details>
+          <div class="asset-library-actions">
+            <button type="button" data-snapshot-action="delete" data-snapshot-id="${escapeHtml(snapshot.id)}">Delete</button>
+            <button class="primary" type="button" data-snapshot-action="restore" data-snapshot-id="${escapeHtml(snapshot.id)}">Restore</button>
+          </div>
+        </section>`;
+      }).join('');
+
+      dialog.innerHTML = `<form class="utility-dialog-card snapshot-card" method="dialog">
+        <div class="utility-dialog-top">
+          <span class="template-dialog-kicker">Local snapshots</span>
+          <button class="template-dialog-close" type="button" data-snapshot-close aria-label="Close snapshots">X</button>
+        </div>
+        <h2 id="snapshotDialogTitle">Snapshots for ${escapeHtml(state.activePath)}</h2>
+        <p>Snapshots are explicit browser-local versions. They are separate from automatic draft recovery.</p>
+        <div class="snapshot-list">${rows || '<div class="workspace-search-empty">No snapshots for this document yet.</div>'}</div>
+        <div class="template-dialog-actions">
+          <button class="primary" type="button" data-snapshot-close>Done</button>
+        </div>
+      </form>`;
+    }
+
+    async function restoreSnapshot(snapshot) {
+      if (isActiveReadOnly()) {
+        setStatus('Read-only documents cannot restore snapshots.', 'warning');
+        return;
+      }
+      editor.value = snapshot.text || '';
+      state.fileCache.set(state.activePath, editor.value);
+      state.dirtyPaths.add(state.activePath);
+      resetEditorHistory();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Restored snapshot from ${new Date(snapshot.createdAt).toLocaleString()}.`, 'warning');
+    }
+
+    async function listActiveSnapshots() {
+      const db = await getSnapshotDb();
+      if (!db || !state.activePath) return [];
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readonly');
+      const store = transaction.objectStore(SNAPSHOT_STORE);
+      const snapshots = await idbRequest(store.getAll());
+      return snapshots
+        .filter((snapshot) => snapshot.workspaceKey === getSnapshotWorkspaceKey() && snapshot.path === state.activePath)
+        .sort((left, right) => right.createdAt - left.createdAt);
+    }
+
+    async function getSnapshot(id) {
+      const db = await getSnapshotDb();
+      if (!db) return null;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readonly');
+      return await idbRequest(transaction.objectStore(SNAPSHOT_STORE).get(id));
+    }
+
+    async function deleteSnapshot(id) {
+      const db = await getSnapshotDb();
+      if (!db) return;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readwrite');
+      transaction.objectStore(SNAPSHOT_STORE).delete(id);
+      await idbTransactionDone(transaction);
+      setStatus('Snapshot deleted.', 'ok');
+    }
+
+    async function getSnapshotDb() {
+      if (!snapshotDbPromise) {
+        snapshotDbPromise = openObjectStoreDb(SNAPSHOT_DB_NAME, SNAPSHOT_DB_VERSION, [{
+          name: SNAPSHOT_STORE,
+          keyPath: 'id',
+          indexes: [
+            { name: 'workspaceKey', keyPath: 'workspaceKey' },
+            { name: 'path', keyPath: 'path' },
+          ],
+        }]).catch((error) => {
+          console.warn('Snapshot store unavailable.', error);
+          setStatus('Local snapshots are unavailable in this browser.', 'warning');
+          return null;
+        });
+      }
+      return await snapshotDbPromise;
+    }
+
+    function getSnapshotWorkspaceKey() {
+      return state.draftWorkspaceKey || `${state.folderName || 'workspace'}::${state.files.map((file) => file.path).sort().join('|')}`;
+    }
+
+    function renderSnapshotDiff(snapshotText, currentText) {
+      const snapshotLines = String(snapshotText || '').split('\n');
+      const currentLines = String(currentText || '').split('\n');
+      const total = Math.max(snapshotLines.length, currentLines.length);
+      const rows = [];
+      for (let index = 0; index < Math.min(total, 80); index += 1) {
+        const before = snapshotLines[index] ?? '';
+        const after = currentLines[index] ?? '';
+        const changed = before !== after;
+        rows.push(`<div class="diff-line ${changed ? 'diff-saved' : ''}"><span>${index + 1}</span><code>${escapeHtml(before || ' ')}</code></div>`);
+      }
+      if (total > 80) rows.push('<div class="diff-line"><span>...</span><code>Diff preview truncated.</code></div>');
+      return rows.join('');
     }
 
     function markWorkspaceCleanContent(path, content) {

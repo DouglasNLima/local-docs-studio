@@ -22,6 +22,7 @@ The editor keeps the app lightweight while still covering daily documentation wo
 | Mermaid snippets | Ctrl/Cmd+Space in Mermaid context |
 | Layout modes | View menu: Editor, Split, Preview |
 | Follow editor selection | Preview header checkbox |
+| Manual snapshots | File menu: Create snapshot / Manage snapshots |
 
 Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, and tables.
 
