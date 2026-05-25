@@ -1174,6 +1174,14 @@
       text-transform: uppercase;
     }
 
+    .table-action-group {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: .35rem;
+    }
+
+    .table-action-button,
     .table-copy-button {
       flex: 0 0 auto;
       min-width: 4rem;

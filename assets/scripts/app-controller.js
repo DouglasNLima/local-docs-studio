@@ -7,6 +7,7 @@ import { createFindReplaceService } from './editor/find-replace-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
 import { createWorkspaceSearchService } from './editor/workspace-search-service.js';
+import { isImportableDocumentFile, isPdfFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createRenderingService } from './rendering/render-service.js';
@@ -37,6 +38,7 @@ export function createAppController() {
       fileInput,
       folderInput,
       zipInput,
+      documentInput,
       saveButton,
       sampleButton,
       downloadButton,
@@ -421,6 +423,7 @@ export function createAppController() {
       copyToClipboard,
       copyCodeBlock,
       copyTableBlock,
+      downloadTableCsv,
       getDiagramFrameFromAction,
       copyDiagramSource,
       exportDiagramFrameSvg,
@@ -438,10 +441,13 @@ export function createAppController() {
       setExportTrust,
     } = exportTools;
     const {
+      newMarkdownDocument,
       openFile,
       openFolder,
       importZip,
       importZipFile,
+      importDocument,
+      importDocumentFiles,
       collectDirectoryRecords,
       initRecentHandles,
       supportsRecentHandles,
@@ -456,7 +462,7 @@ export function createAppController() {
       ensureWritePermission,
     } = createFileService({
       state,
-      dom: { fileInput, folderInput, zipInput, recentList, fileSearch, editor, preview },
+      dom: { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview },
       callbacks: {
         confirmDiscardUnsaved,
         clearFocusedModes,
@@ -530,6 +536,7 @@ export function createAppController() {
         copyRenderedHtml,
         copyRenderedText,
         copyTableBlock,
+        downloadTableCsv,
         copyToClipboard,
         executeMarkdownCommand,
         exportDiagramFramePng,
@@ -649,9 +656,11 @@ export function createAppController() {
 
       document.querySelectorAll('[data-menu-action]').forEach((button) => {
         button.addEventListener('click', async () => {
+          if (button.dataset.menuAction === 'newMarkdown') await newMarkdownDocument();
           if (button.dataset.menuAction === 'openFile') await openFile();
           if (button.dataset.menuAction === 'openFolder') await openFolder();
           if (button.dataset.menuAction === 'importZip') importZip();
+          if (button.dataset.menuAction === 'importDocument') importDocument();
           if (button.dataset.menuAction === 'save') await saveActiveFile();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
           closeOpenMenus();
@@ -835,6 +844,11 @@ export function createAppController() {
         await importZipFile(file);
       });
 
+      documentInput.addEventListener('change', async () => {
+        const files = [...(documentInput.files ?? [])];
+        await importDocumentFiles(files);
+      });
+
       fileSearch.addEventListener('input', renderFileList);
 
       fileList.addEventListener('click', async (event) => {
@@ -934,6 +948,18 @@ export function createAppController() {
         if (zipFiles.length) {
           if (!confirmDiscardUnsaved('Import this ZIP and discard unsaved edits?')) return;
           await importZipFile(zipFiles[0]);
+          return;
+        }
+
+        const documentFiles = files.filter(isImportableDocumentFile);
+        const pdfFiles = files.filter(isPdfFile);
+        if (documentFiles.length) {
+          await importDocumentFiles([...documentFiles, ...pdfFiles]);
+          return;
+        }
+
+        if (pdfFiles.length) {
+          setStatus('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.', 'warning');
           return;
         }
 
@@ -1857,9 +1883,14 @@ export function createAppController() {
         return;
       }
 
-      const tableAction = event.target.closest('[data-table-action="copy"]');
+      const tableAction = event.target.closest('[data-table-action]');
       if (tableAction) {
-        await copyTableBlock(tableAction);
+        if (tableAction.dataset.tableAction === 'copy') {
+          await copyTableBlock(tableAction);
+        }
+        if (tableAction.dataset.tableAction === 'downloadCsv') {
+          downloadTableCsv(tableAction);
+        }
         return;
       }
 

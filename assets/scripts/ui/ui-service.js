@@ -126,9 +126,14 @@ export function createUiService({
     function updateSaveButton() {
       const record = state.files.find((item) => item.path === state.activePath);
       const isDirty = state.activePath && state.dirtyPaths.has(state.activePath);
-      saveButton.disabled = !record || !isDirty || Boolean(record?.readOnly);
+      const canSaveConvertedCopy = Boolean(record?.converted && !record?.handle);
+      saveButton.disabled = !record || (!isDirty && !canSaveConvertedCopy) || Boolean(record?.readOnly);
       if (record?.readOnly) {
         saveButton.title = 'Read-only guide documents cannot be saved.';
+        return;
+      }
+      if (canSaveConvertedCopy) {
+        saveButton.title = 'Save or download the converted Markdown copy';
         return;
       }
       saveButton.title = record?.handle
@@ -137,7 +142,7 @@ export function createUiService({
     }
 
     function hasUnsavedChanges() {
-      return state.dirtyPaths.size > 0;
+      return state.dirtyPaths.size > 0 || state.files.some((file) => file.converted && !file.handle);
     }
 
     function confirmDiscardUnsaved(message) {

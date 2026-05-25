@@ -1,4 +1,5 @@
 import { decodeZipText, readZipEntriesFromFile } from '../utils/zip.js';
+import { convertDocumentFiles, isImportableDocumentFile, isPdfFile } from './document-import-service.js';
 
 const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   'local-docs-studio-bundle.json',
@@ -12,7 +13,7 @@ export function createFileService({
   callbacks,
   helpers,
 }) {
-  const { fileInput, folderInput, zipInput, recentList, fileSearch, editor, preview } = dom;
+  const { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview } = dom;
   const {
     confirmDiscardUnsaved,
     clearFocusedModes,
@@ -111,6 +112,23 @@ export function createFileService({
     function importZip() {
       if (!confirmDiscardUnsaved('Import this ZIP and discard unsaved edits?')) return;
       zipInput.click();
+    }
+
+    function importDocument() {
+      documentInput.click();
+    }
+
+    async function newMarkdownDocument() {
+      if (!confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+
+      const name = 'untitled.md';
+      await setLibraryFromRecords([{
+        name,
+        path: name,
+        file: new File([''], name, { type: 'text/markdown' }),
+      }], 'Blank document');
+      editor.focus({ preventScroll: true });
+      setStatus('Blank Markdown document ready.', 'ok');
     }
 
     async function collectDirectoryRecords(directoryHandle, prefix = '') {
@@ -386,6 +404,90 @@ export function createFileService({
       }
     }
 
+    async function importDocumentFiles(files) {
+      const sourceFiles = [...(files || [])];
+      if (!sourceFiles.length) return;
+
+      const documentFiles = sourceFiles.filter(isImportableDocumentFile);
+      const pdfCount = sourceFiles.filter(isPdfFile).length;
+
+      if (!documentFiles.length) {
+        if (pdfCount) {
+          setStatus('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.', 'warning');
+          return;
+        }
+        setStatus('Choose a .docx, .html, or .htm file to import as Markdown.', 'warning');
+        return;
+      }
+
+      const confirmMessage = documentFiles.length === 1
+        ? 'Import this document as Markdown and discard unsaved edits?'
+        : 'Import these documents as Markdown and discard unsaved edits?';
+      if (!confirmDiscardUnsaved(confirmMessage)) return;
+
+      try {
+        setStatus(`Converting ${documentFiles.length} document${documentFiles.length === 1 ? '' : 's'} to Markdown...`);
+        const imported = await convertDocumentFiles(documentFiles);
+        if (pdfCount) {
+          imported.warnings.push('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.');
+        }
+
+        if (!imported.records.length) {
+          setStatus(imported.warnings[0] || 'No documents could be converted to Markdown.', 'warning');
+          return;
+        }
+
+        await setConvertedDocumentLibrary(imported);
+      } catch (error) {
+        setStatus('Document import failed.', 'danger');
+        console.error(error);
+      } finally {
+        if (documentInput) documentInput.value = '';
+      }
+    }
+
+    async function setConvertedDocumentLibrary(imported) {
+      clearFocusedModes();
+      clearManagedAssets?.();
+      state.files = imported.records.sort(compareRecords);
+      state.activePath = '';
+      state.fileName = '';
+      state.folderName = imported.records.length === 1 ? 'Imported document' : 'Imported documents';
+      state.fileCache.clear();
+      state.savedContentCache?.clear();
+      state.dirtyPaths.clear();
+      afterLibraryLoaded?.();
+      clearScrollPositions?.();
+      fileSearch.value = '';
+      resetActiveScrollPosition?.('');
+      imported.records.forEach((record) => {
+        const text = imported.textByPath.get(record.path) || '';
+        state.fileCache.set(record.path, text);
+        state.savedContentCache?.set(record.path, text);
+      });
+      imported.assets.forEach((asset) => {
+        state.managedAssets.set(asset.path, asset);
+      });
+
+      renderFileList();
+      syncEditorReadOnly?.();
+      updateSaveButton();
+      setExportTrust('', '');
+      await selectFile(state.files[0].path);
+
+      const warningText = imported.warnings.length
+        ? ` ${imported.warnings.slice(0, 2).join(' ')}`
+        : '';
+      const assetText = imported.assets.length
+        ? ` and ${imported.assets.length} image asset${imported.assets.length === 1 ? '' : 's'}`
+        : '';
+      const statusType = imported.warnings.length ? 'warning' : 'ok';
+      const persistenceText = 'Use Save changes or Export Markdown Bundle to persist the converted Markdown.';
+
+      setExportTrust(`${imported.records.length} converted document${imported.records.length === 1 ? '' : 's'} loaded${assetText}. ${persistenceText}${warningText}`, statusType);
+      setStatus(`Imported ${imported.records.length} converted document${imported.records.length === 1 ? '' : 's'}${assetText}. ${persistenceText}${warningText}`, statusType);
+    }
+
     function buildZipImport(file, entries) {
       const records = [];
       const textByPath = new Map();
@@ -580,6 +682,7 @@ export function createFileService({
           await writable.write(content);
           await writable.close();
           record.file = await record.handle.getFile();
+          record.converted = false;
           state.fileCache.set(record.path, content);
           state.dirtyPaths.delete(record.path);
           renderFileList();
@@ -611,6 +714,7 @@ export function createFileService({
           record.name = handle.name || record.name;
           record.path = normalisePath(handle.name || record.path || record.name);
           record.file = await handle.getFile();
+          record.converted = false;
           state.fileName = record.name;
           state.activePath = record.path;
           state.fileCache.delete(oldPath);
@@ -627,6 +731,7 @@ export function createFileService({
         }
 
         downloadBlob(new Blob([content], { type: 'text/markdown;charset=utf-8' }), record.name || getMarkdownExportName());
+        record.converted = false;
         renderFileList();
         updateActiveFileLabel();
         updateSaveButton();
@@ -656,10 +761,13 @@ export function createFileService({
     }
 
     return {
+      newMarkdownDocument,
       openFile,
       openFolder,
       importZip,
       importZipFile,
+      importDocument,
+      importDocumentFiles,
       collectDirectoryRecords,
       initRecentHandles,
       supportsRecentHandles,

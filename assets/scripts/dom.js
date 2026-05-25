@@ -13,6 +13,7 @@ export const domIds = {
   fileInput: 'fileInput',
   folderInput: 'folderInput',
   zipInput: 'zipInput',
+  documentInput: 'documentInput',
   saveButton: 'saveButton',
   sampleButton: 'sampleButton',
   downloadButton: 'downloadButton',

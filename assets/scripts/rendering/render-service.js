@@ -607,13 +607,14 @@ export function createRenderingService({
       prepareDiagramFramesIn(preview, true, getExportFileStem());
     }
 
-    function prepareTableBlocksIn(root) {
+    function prepareTableBlocksIn(root, fileStem = getExportFileStem()) {
       const contentRoot = root.querySelector?.('.docs-site-content') || root;
       const tables = [...contentRoot.querySelectorAll('table')].filter((table) => !table.closest('.table-block'));
       tables.forEach((table, index) => {
         const wrapper = document.createElement('figure');
         wrapper.className = 'table-block';
         wrapper.dataset.tableIndex = String(index + 1);
+        wrapper.dataset.tableFileStem = fileStem || getExportFileStem();
 
         const header = document.createElement('figcaption');
         header.className = 'table-block-header';
@@ -622,14 +623,25 @@ export function createRenderingService({
         title.className = 'table-block-title';
         title.textContent = `Table ${index + 1}`;
 
+        const actions = document.createElement('div');
+        actions.className = 'table-action-group';
+
         const copy = document.createElement('button');
         copy.type = 'button';
-        copy.className = 'table-copy-button';
+        copy.className = 'table-action-button table-copy-button';
         copy.dataset.tableAction = 'copy';
         copy.setAttribute('aria-label', `Copy table ${index + 1} for Excel`);
         copy.textContent = 'Copy';
 
-        header.append(title, copy);
+        const csv = document.createElement('button');
+        csv.type = 'button';
+        csv.className = 'table-action-button';
+        csv.dataset.tableAction = 'downloadCsv';
+        csv.setAttribute('aria-label', `Download table ${index + 1} as CSV`);
+        csv.textContent = 'CSV';
+
+        actions.append(copy, csv);
+        header.append(title, actions);
         table.parentNode.insertBefore(wrapper, table);
         wrapper.append(header, table);
       });

@@ -82,6 +82,22 @@ async function dropTinySvgOnEditor(page) {
   }, tinySvg);
 }
 
+async function dropVirtualFile(page, { name, type, text = '', base64 = '' }) {
+  await page.evaluate((payload) => {
+    const bytes = payload.base64
+      ? Uint8Array.from(atob(payload.base64), (char) => char.charCodeAt(0))
+      : payload.text;
+    const file = new File([bytes], payload.name, { type: payload.type });
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    window.dispatchEvent(new DragEvent('drop', {
+      bubbles: true,
+      cancelable: true,
+      dataTransfer: transfer,
+    }));
+  }, { name, type, text, base64 });
+}
+
 async function attachViewportScreenshot(page, testInfo, name) {
   const screenshotPath = testInfo.outputPath(`${name}.png`);
   await page.screenshot({ animations: 'disabled', fullPage: false, path: screenshotPath });
@@ -254,6 +270,96 @@ async function writeZipEntriesToDirectory(entries, directory) {
   }
 }
 
+function createDocxImportFixture() {
+  return createZipBuffer([
+    {
+      name: '[Content_Types].xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>
+</Types>`,
+    },
+    {
+      name: '_rels/.rels',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`,
+    },
+    {
+      name: 'word/_rels/document.xml.rels',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdImage1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/tiny.png"/>
+</Relationships>`,
+    },
+    {
+      name: 'word/styles.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:styleId="Heading1">
+    <w:name w:val="heading 1"/>
+    <w:basedOn w:val="Normal"/>
+    <w:qFormat/>
+  </w:style>
+</w:styles>`,
+    },
+    {
+      name: 'word/numbering.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:abstractNum w:abstractNumId="0">
+    <w:lvl w:ilvl="0">
+      <w:start w:val="1"/>
+      <w:numFmt w:val="bullet"/>
+      <w:lvlText w:val="*"/>
+      <w:pPr><w:ind w:left="720" w:hanging="360"/></w:pPr>
+    </w:lvl>
+  </w:abstractNum>
+  <w:num w:numId="1"><w:abstractNumId w:val="0"/></w:num>
+</w:numbering>`,
+    },
+    {
+      name: 'word/document.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document
+  xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+  xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
+  xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"
+  xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"
+  xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:body>
+    <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Imported Word</w:t></w:r></w:p>
+    <w:p><w:r><w:t xml:space="preserve">Hello </w:t></w:r><w:r><w:rPr><w:b/></w:rPr><w:t>bold</w:t></w:r><w:r><w:t xml:space="preserve"> body</w:t></w:r></w:p>
+    <w:p><w:pPr><w:numPr><w:ilvl w:val="0"/><w:numId w:val="1"/></w:numPr></w:pPr><w:r><w:t>First item</w:t></w:r></w:p>
+    <w:tbl>
+      <w:tr><w:tc><w:p><w:r><w:t>Area</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Status</w:t></w:r></w:p></w:tc></w:tr>
+      <w:tr><w:tc><w:p><w:r><w:t>Import</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Ready</w:t></w:r></w:p></w:tc></w:tr>
+    </w:tbl>
+    <w:p><w:r><w:drawing><wp:inline>
+      <wp:extent cx="9525" cy="9525"/><wp:docPr id="1" name="Tiny image" descr="Word logo"/>
+      <a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic>
+        <pic:nvPicPr><pic:cNvPr id="0" name="tiny.png"/><pic:cNvPicPr/></pic:nvPicPr>
+        <pic:blipFill><a:blip r:embed="rIdImage1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>
+        <pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="9525" cy="9525"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>
+      </pic:pic></a:graphicData></a:graphic>
+    </wp:inline></w:drawing></w:r></w:p>
+    <w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>
+  </w:body>
+</w:document>`,
+    },
+    {
+      name: 'word/media/tiny.png',
+      data: Buffer.from(tinyPngBase64, 'base64'),
+    },
+  ], { compress: true });
+}
+
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('Local Docs Studio');
@@ -279,6 +385,7 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   await expect(page.locator('.diagram-frame svg')).toContainText('Export type');
   await expect(page.locator('[data-code-action="copy"]')).toHaveCount(1);
   await expect(page.locator('[data-table-action="copy"]')).toHaveCount(1);
+  await expect(page.locator('[data-table-action="downloadCsv"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="copySource"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportSvg"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportPng"]')).toHaveCount(1);
@@ -298,6 +405,16 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   await page.locator('[data-table-action="copy"]').click();
   await expect.poll(() => page.evaluate(() => window.__copiedTableText)).toBe('Area\tStatus\nPreview\tReady\nExport\tVerified');
   await expect(page.locator('#status')).toHaveText(/Table copied for Excel/);
+
+  const [csvDownload] = await Promise.all([
+    page.waitForEvent('download'),
+    page.locator('[data-table-action="downloadCsv"]').click(),
+  ]);
+  expect(await csvDownload.failure()).toBeNull();
+  expect(csvDownload.suggestedFilename()).toBe('mixed-table-1.csv');
+  const csvPath = await csvDownload.path();
+  expect(await readFile(csvPath, 'utf8')).toBe('Area,Status\r\nPreview,Ready\r\nExport,Verified');
+  await expect(page.locator('#status')).toHaveText(/Table CSV downloaded/);
 });
 
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
@@ -379,8 +496,9 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await expect(page.locator('[data-menu-action="newMarkdown"]')).toBeVisible();
   await expect(page.locator('[data-menu-action="openFile"]')).toBeVisible();
-  await expect(page.locator('details.menu[open] .menu-heading')).toContainText(['Open', 'Import', 'Save', 'Recent']);
+  await expect(page.locator('details.menu[open] .menu-heading')).toContainText(['New', 'Open', 'Import', 'Save', 'Recent']);
   const fileMenuClickable = await page.locator('details.menu[open]').evaluate((menu) => {
     const button = menu.querySelector('[data-menu-action="openFile"]');
     const rect = button.getBoundingClientRect();
@@ -443,6 +561,23 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   expect(createPanelBox.x).toBeGreaterThanOrEqual(0);
   expect(createPanelBox.x + createPanelBox.width).toBeLessThanOrEqual(createViewportSize.width + 1);
   expect(createPanelBox.width).toBeGreaterThan(expectedCommonWidth + 120);
+});
+
+test('File menu starts a blank Markdown document', async ({ page }) => {
+  await page.goto('/');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'New blank Markdown document' }).click();
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('untitled.md');
+  await expect(page.locator('#folderBadge')).toHaveText('Blank document');
+  await expect(page.locator('#fileCount')).toHaveText('1');
+  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText('Blank Markdown document ready.');
+
+  await page.locator('#editor').fill('# Fresh start\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in memory');
+  await expect(page.locator('#saveButton')).toBeEnabled();
 });
 
 test('Help menu opens the feature guide as read-only Markdown', async ({ page }) => {
@@ -544,6 +679,7 @@ test('custom context menu exposes preview-specific copy and export actions', asy
 
   await dispatchContextMenu(page.locator('#preview table td').first());
   await expect(menu.locator('[data-context-menu-action="preview-copy-table"]')).toBeVisible();
+  await expect(menu.locator('[data-context-menu-action="preview-download-table-csv"]')).toBeVisible();
   await menu.locator('[data-context-menu-action="preview-copy-table"]').click();
   await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('Area\tStatus\nPreview\tReady\nExport\tVerified');
 });
@@ -1202,9 +1338,11 @@ test('HTML export is standalone and keeps interactive preview actions', async ({
   expect(html).toContain('Export Fixture');
   expect(html).toContain('data-code-action="copy"');
   expect(html).toContain('data-table-action="copy"');
+  expect(html).toContain('data-table-action="downloadCsv"');
   expect(html).toContain('data-diagram-action="copySource"');
   expect(html).toContain('data-diagram-action="exportSvg"');
   expect(html).toContain('function fallbackCopy');
+  expect(html).toContain('function downloadText');
   const scriptNonces = [...html.matchAll(/<script nonce="([^"]+)">/g)].map((match) => match[1]);
   expect(scriptNonces).toHaveLength(3);
   expect(new Set(scriptNonces).size).toBe(1);
@@ -1420,6 +1558,71 @@ test('ZIP import accepts compressed generic docs and handles ZIPs without source
   await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
 });
 
+test('document import converts HTML and DOCX into editable Markdown', async ({ page }, testInfo) => {
+  const htmlPath = testInfo.outputPath('import-html.html');
+  await writeFile(htmlPath, `<!doctype html>
+<html><body>
+  <script>window.__bad = true;</script>
+  <h1>Imported HTML</h1>
+  <p>Hello <strong>safe</strong> <a href="javascript:alert(1)">bad link</a> <a href="https://example.com">good</a></p>
+  <ul><li>First</li><li>Second</li></ul>
+  <table><tr><th>Feature</th><th>Status</th></tr><tr><td>HTML</td><td>Ready</td></tr></table>
+  <pre><code class="language-js">const value = 1;</code></pre>
+  <img alt="HTML logo" src="data:image/png;base64,${tinyPngBase64}">
+  <img alt="Bad SVG" src="data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9ImFsZXJ0KDEpIj48L3N2Zz4=">
+</body></html>`);
+
+  await page.goto('/');
+  await page.locator('#documentInput').setInputFiles(htmlPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/);
+  await expect(page.locator('#saveButton')).toBeEnabled();
+
+  const htmlMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
+  expect(htmlMarkdown).toContain('# Imported HTML');
+  expect(htmlMarkdown).toContain('Hello **safe** bad link [good](https://example.com)');
+  expect(htmlMarkdown).toContain('- First\n- Second');
+  expect(htmlMarkdown).toContain('| Feature | Status |');
+  expect(htmlMarkdown).toContain('```js\nconst value = 1;\n```');
+  expect(htmlMarkdown).toContain('![HTML logo](assets/images/import-html-html-logo.png)');
+  expect(htmlMarkdown).not.toContain('javascript:');
+  expect(htmlMarkdown).not.toContain('data:image/svg');
+  await expect(page.locator('#preview img[data-managed-asset-path="assets/images/import-html-html-logo.png"]')).toHaveAttribute('src', /^blob:/);
+
+  const docxPath = testInfo.outputPath('import-word.docx');
+  await writeFile(docxPath, createDocxImportFixture());
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.locator('#documentInput').setInputFiles(docxPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/, { timeout: 20_000 });
+
+  const wordMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
+  expect(wordMarkdown).toContain('# Imported Word');
+  expect(wordMarkdown).toContain('Hello **bold** body');
+  expect(wordMarkdown).toContain('First item');
+  expect(wordMarkdown).toContain('| Area | Status |');
+  expect(wordMarkdown).toContain('![Word logo](assets/images/import-word-word-logo.png)');
+  await expect(page.locator('#preview img[data-managed-asset-path="assets/images/import-word-word-logo.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
+test('document import drag and drop handles HTML and warns that PDF is future text-only work', async ({ page }) => {
+  await page.goto('/');
+  await dropVirtualFile(page, {
+    name: 'drop.html',
+    type: 'text/html',
+    text: '<h1>Dropped HTML</h1><p>Converted by drag and drop.</p>',
+  });
+  await expect(page.locator('#status')).toHaveText(/Imported 1 converted document/);
+  await expect(page.locator('#editor')).toHaveValue(/# Dropped HTML/);
+
+  await page.goto('/');
+  await dropVirtualFile(page, {
+    name: 'future.pdf',
+    type: 'application/pdf',
+    text: '%PDF-1.7',
+  });
+  await expect(page.locator('#status')).toHaveText(/PDF import is planned for a future text-only converter/);
+  await expect(page.locator('#editor')).toHaveValue('');
+});
+
 test('Docs Site export contains the expected static site package', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.locator('#folderInput').setInputFiles(fixturePath('docs-site'));
@@ -1464,6 +1667,7 @@ test('Docs Site export contains the expected static site package', async ({ page
   expect(script).toContain('renderSearchResults');
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-code-action="copy"'))).toBe(true);
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-table-action="copy"'))).toBe(true);
+  expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-table-action="downloadCsv"'))).toBe(true);
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('exportPng'))).toBe(true);
   expect(html).not.toContain('preview-search-hit');
   expect(html).not.toContain('selection-sync-hit');
@@ -1492,6 +1696,7 @@ test('Docs Site export contains the expected static site package', async ({ page
   await expect(page.locator('#content')).toContainText('release ready');
   await expect(page.locator('[data-code-action="copy"]')).toHaveCount(1);
   await expect(page.locator('[data-table-action="copy"]')).toHaveCount(1);
+  await expect(page.locator('[data-table-action="downloadCsv"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportPng"]')).toHaveCount(1);
 
   await page.locator('#searchInput').fill('SVG');

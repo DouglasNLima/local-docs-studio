@@ -5,7 +5,7 @@ A local-first Markdown, Mermaid, and documentation studio that runs entirely in 
 ## Use The App
 
 1. Open `index.html` through GitHub Pages or a local static server.
-2. Choose **Open file** for one document or **Open folder** for a folder of Markdown and Mermaid files.
+2. Choose **Open file** for one document, **Open folder** for a folder of Markdown and Mermaid files, or **Import document** to convert DOCX/HTML into Markdown.
 3. Edit in the Markdown toolbar or type directly in the editor.
 4. Use **Render** to refresh the preview, then export or copy the rendered output.
 
@@ -20,6 +20,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Syntax-highlighted code blocks with one-click copy buttons.
 - Rendered tables with one-click copy as Excel-friendly TSV.
 - Excel/spreadsheet paste support that converts HTML table or TSV clipboard data into Markdown tables, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
+- DOCX and HTML import that converts documents into clean editable Markdown with supported embedded images as exportable session assets.
 - Standalone `.mmd` and `.mermaid` diagram rendering.
 - Local folder browser with filtering and dirty-file markers.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
@@ -107,6 +108,7 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
 - **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `local-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
+- **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is planned for a future text-only converter.
 - ZIP import does not convert rendered HTML back into Markdown. If a Docs Site ZIP only contains static HTML plus deployment notes, only editable Markdown/Mermaid files found in that ZIP are imported.
 
 ## Project Structure
@@ -122,11 +124,11 @@ The app is static and buildless. GitHub Pages can serve it directly without npm,
 - `assets/scripts/state/config.js` owns app constants and initial state.
 - `assets/scripts/document/document-ux-service.js` owns preview outline, search, active section tracking, and document review notes.
 - `assets/scripts/editor/editor-service.js` owns editor history, undo/redo, line numbers, Mermaid autocomplete, and Markdown formatting actions.
-- `assets/scripts/files/file-service.js` owns open/save, ZIP import, local folder records, and recent file handles.
+- `assets/scripts/files/file-service.js` owns open/save, document and ZIP import, local folder records, and recent file handles.
 - `assets/scripts/rendering/render-service.js` owns Markdown, Highlight.js, Mermaid rendering, diagram frames, and zoom.
 - `assets/scripts/exports/export-service.js` owns HTML, Word, PDF print, Markdown Bundle, Docs Site, SVG/PNG, clipboard, and export confidence flows.
 - `assets/scripts/ui/ui-service.js` owns file-list UI, empty states, save/status controls, menus, theme, and resizers.
-- `assets/scripts/utils/` contains shared browser, binary, file, formatting, and ZIP helpers.
+- `assets/scripts/utils/` contains shared browser, binary, file, formatting, HTML-to-Markdown, and ZIP helpers.
 - `assets/vendor/` contains pinned browser runtime libraries served locally for GitHub Pages and offline use.
 - `assets/scripts/registries/content.js` stores local examples, templates, and snippets.
 - `docs/tool-guide.md` is the built-in read-only feature guide opened from the Help menu.
@@ -158,6 +160,7 @@ Firefox and Safari can still open files through fallback file pickers and export
 - Browser security rules mean folder access and recent local handles require user permission.
 - Word export converts rendered Mermaid diagrams to images where possible. Very large or unusual SVG diagrams may fall back to SVG packaging.
 - Dragged image binaries are session assets. Save-back updates Markdown links, while HTML, Word, and Docs Site exports carry the actual image data. User SVG image files are not imported; use PNG, JPEG, GIF, or WebP for image assets.
+- Converted DOCX/HTML files are virtual Markdown documents. Use Save changes or Export Markdown Bundle to persist the converted Markdown and any managed image assets.
 - PDF export depends on the browser print dialogue; the app prepares the print document but does not create raw PDF bytes itself.
 - ZIP import supports ordinary stored/deflated ZIP entries. Password-protected or encrypted ZIP files are not supported.
 - Runtime dependencies are pinned under `assets/vendor/`; no CDN fetch is required for normal app loading after publication.
