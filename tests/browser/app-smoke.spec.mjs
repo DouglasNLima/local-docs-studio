@@ -916,6 +916,48 @@ test('manual local snapshots can be created, compared, restored, and deleted', a
   await expect(page.locator('.snapshot-list')).toContainText('No snapshots');
 });
 
+test('local templates, snippets, and export profiles persist in the browser', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+  await page.evaluate(() => {
+    window.confirm = () => true;
+    window.__promptValues = ['Fixture Template', 'Fixture Snippet', 'DevOps Profile'];
+    window.prompt = () => window.__promptValues.shift() || '';
+  });
+
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await page.getByRole('button', { name: 'Save document as template' }).click();
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await expect(page.getByRole('button', { name: 'Fixture Template' })).toBeVisible();
+
+  const selectedText = 'Publishing Fixture';
+  await page.locator('#editor').evaluate((editor, text) => {
+    const start = editor.value.indexOf(text);
+    editor.focus();
+    editor.setSelectionRange(start, start + text.length);
+  }, selectedText);
+  await page.getByRole('button', { name: 'Save selection as snippet' }).click();
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await expect(page.getByRole('button', { name: 'Fixture Snippet' })).toBeVisible();
+
+  await setEditorValueAndSelection(page, '# Changed\n');
+  await page.getByRole('button', { name: 'Fixture Template' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture/);
+  await page.locator('#editor').evaluate((editor) => {
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  });
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await page.getByRole('button', { name: 'Fixture Snippet' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture[\s\S]*Publishing Fixture/);
+
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#devopsMarkdownExportToggle').check();
+  await page.getByRole('button', { name: 'Save export profile' }).click();
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#devopsMarkdownExportToggle').uncheck();
+  await page.getByRole('button', { name: 'Apply export profile' }).click();
+  await expect(page.locator('#devopsMarkdownExportToggle')).toBeChecked();
+});
+
 test('writer shortcut is disabled while input maximise handles focused writing', async ({ page }) => {
   await page.goto('/');
   await loadSample(page);

@@ -150,6 +150,18 @@
               <button type="button" data-create-snippet="requirements.openQuestions">Open Questions</button>
               <button type="button" data-create-snippet="requirements.flow">User Flow</button>
             </div>
+            <hr>
+            <div class="menu-heading">Local Library</div>
+            <div class="create-grid">
+              <button type="button" data-local-library-action="saveTemplate">Save document as template</button>
+              <button type="button" data-local-library-action="saveSnippet">Save selection as snippet</button>
+              <button type="button" data-local-library-action="exportLibrary">Export library JSON</button>
+              <button type="button" data-local-library-action="importLibrary">Import library JSON</button>
+            </div>
+            <div class="menu-heading">My Templates</div>
+            <div class="create-grid" id="localTemplateList"></div>
+            <div class="menu-heading">My Snippets</div>
+            <div class="create-grid" id="localSnippetList"></div>
           </div>
         </details>
         <details class="menu">
@@ -211,6 +223,10 @@
             <button id="copyHtmlButton" type="button">Copy HTML</button>
             <button id="copyTextButton" type="button">Copy text</button>
             <div class="menu-note">Every export runs a fresh render check and reports diagram confidence before finishing.</div>
+            <hr>
+            <div class="menu-heading">Profiles</div>
+            <button type="button" data-export-profile-action="save">Save export profile</button>
+            <button type="button" data-export-profile-action="apply">Apply export profile</button>
           </div>
         </details>
         <details class="menu align-right">

@@ -26,6 +26,7 @@ import { idbRequest, idbTransactionDone, openObjectStoreDb } from './utils/idb.j
 const SNAPSHOT_DB_NAME = 'local-docs-studio-snapshots';
 const SNAPSHOT_DB_VERSION = 1;
 const SNAPSHOT_STORE = 'snapshots';
+const LOCAL_LIBRARY_KEY = 'md-mmd-renderer.localLibrary';
 
 export function createAppController() {
     const {
@@ -593,6 +594,7 @@ export function createAppController() {
     installSelectionSyncHandlers();
     installContextMenuHandlers();
     installEventHandlers();
+    renderLocalLibrary();
     initialiseWelcome();
     localStorage.removeItem(storageKeys.typewriterMode);
     initRecentHandles();
@@ -653,6 +655,29 @@ export function createAppController() {
         button.addEventListener('click', () => insertGeneratorSnippet(button.dataset.createSnippet));
       });
 
+      document.querySelectorAll('[data-local-library-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          if (button.dataset.localLibraryAction === 'saveTemplate') saveCurrentDocumentAsLocalTemplate();
+          if (button.dataset.localLibraryAction === 'saveSnippet') saveSelectionAsLocalSnippet();
+          if (button.dataset.localLibraryAction === 'exportLibrary') exportLocalLibrary();
+          if (button.dataset.localLibraryAction === 'importLibrary') await importLocalLibrary();
+          closeOpenMenus();
+        });
+      });
+
+      createMenu.addEventListener('click', async (event) => {
+        const templateButton = event.target.closest('[data-local-template-id]');
+        if (templateButton) {
+          await loadLocalTemplate(templateButton.dataset.localTemplateId);
+          closeOpenMenus();
+        }
+        const snippetButton = event.target.closest('[data-local-snippet-id]');
+        if (snippetButton) {
+          insertLocalSnippet(snippetButton.dataset.localSnippetId);
+          closeOpenMenus();
+        }
+      });
+
       document.querySelectorAll('[data-studio-template]').forEach((button) => {
         button.addEventListener('click', () => loadStudioTemplate(button.dataset.studioTemplate));
       });
@@ -701,6 +726,14 @@ export function createAppController() {
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
           if (button.dataset.viewAction === 'openDocsMap') await openDocsMap();
           if (button.dataset.viewAction === 'manageAssets') await openAssetLibrary();
+          closeOpenMenus();
+        });
+      });
+
+      document.querySelectorAll('[data-export-profile-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (button.dataset.exportProfileAction === 'save') saveExportProfile();
+          if (button.dataset.exportProfileAction === 'apply') applyExportProfile();
           closeOpenMenus();
         });
       });
@@ -2145,6 +2178,214 @@ ${unresolvedRows}
       }
 
       resolve?.(value);
+    }
+
+    function saveCurrentDocumentAsLocalTemplate() {
+      if (!state.activePath || !editor.value.trim()) {
+        setStatus('Open or write a document before saving a local template.', 'warning');
+        return;
+      }
+      const label = window.prompt('Template name', getExportTitle() || state.fileName.replace(/\.[^.]+$/, '') || 'Local template');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.templates.unshift({
+        id: createLocalLibraryId('template'),
+        label: label.trim(),
+        name: `${slugFromText(label) || 'local-template'}.md`,
+        content: editor.value,
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      renderLocalLibrary();
+      setStatus(`Saved local template "${label.trim()}".`, 'ok');
+    }
+
+    function saveSelectionAsLocalSnippet() {
+      const selection = getEditorSelection();
+      const text = editor.value.slice(selection.start, selection.end).trim();
+      if (!text) {
+        setStatus('Select Markdown before saving a local snippet.', 'warning');
+        return;
+      }
+      const label = window.prompt('Snippet name', text.split(/\r?\n/)[0].slice(0, 40) || 'Local snippet');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.snippets.unshift({
+        id: createLocalLibraryId('snippet'),
+        label: label.trim(),
+        content: text,
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      renderLocalLibrary();
+      setStatus(`Saved local snippet "${label.trim()}".`, 'ok');
+    }
+
+    async function loadLocalTemplate(id) {
+      const template = readLocalLibrary().templates.find((item) => item.id === id);
+      if (!template) {
+        setStatus('Local template not found.', 'warning');
+        return;
+      }
+      if (!confirmDiscardUnsaved(`Load ${template.label} and discard unsaved edits?`)) return;
+      clearGeneratorMode();
+      clearManagedAssets();
+      clearScrollPositions();
+      clearWorkspaceContentCaches();
+      const name = template.name || `${slugFromText(template.label) || 'local-template'}.md`;
+      state.files = [{ name, path: name, file: new File([template.content], name, { type: 'text/markdown' }) }];
+      state.folderName = 'Local Library';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, template.content);
+      markWorkspaceCleanContent(name, template.content);
+      editor.value = template.content;
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Loaded local template "${template.label}".`, 'ok');
+    }
+
+    function insertLocalSnippet(id) {
+      const snippet = readLocalLibrary().snippets.find((item) => item.id === id);
+      if (!snippet) {
+        setStatus('Local snippet not found.', 'warning');
+        return;
+      }
+      if (isActiveReadOnly()) {
+        setStatus('This document is read-only. Open or create a Markdown file before inserting snippets.', 'warning');
+        return;
+      }
+      if (!state.activePath) {
+        setGeneratedDocument({
+          label: 'Local Notes',
+          mode: 'Local Library',
+          name: () => 'local-notes.md',
+          content: () => '# Local Notes\n',
+        }, { label: 'Local Library', folderName: 'Local Library' }, {});
+        editor.setSelectionRange(editor.value.length, editor.value.length);
+      }
+      const selection = getEditorSelection();
+      const prefix = selection.start > 0 && editor.value[selection.start - 1] !== '\n' ? '\n\n' : '';
+      const suffix = selection.end < editor.value.length && editor.value[selection.end] !== '\n' ? '\n\n' : '';
+      const replacement = `${prefix}${snippet.content}${suffix}`;
+      replaceEditorRange(selection.start, selection.end, replacement, selection.start + prefix.length, selection.start + prefix.length + snippet.content.length);
+      setStatus(`Inserted local snippet "${snippet.label}".`, 'ok');
+    }
+
+    function saveExportProfile() {
+      const label = window.prompt('Export profile name', state.folderName || 'Local export profile');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.profiles.unshift({
+        id: createLocalLibraryId('profile'),
+        label: label.trim(),
+        devopsMarkdownExport: Boolean(state.devopsMarkdownExport),
+        docsSite: {
+          title: state.folderName || getExportTitle() || 'Docs site',
+          description: `Static documentation bundle with ${Math.max(state.files.length, 1)} page${state.files.length === 1 ? '' : 's'}.`,
+          theme: 'system',
+        },
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      setStatus(`Saved export profile "${label.trim()}".`, 'ok');
+    }
+
+    function applyExportProfile() {
+      const profile = readLocalLibrary().profiles[0];
+      if (!profile) {
+        setStatus('No local export profiles saved yet.', 'warning');
+        return;
+      }
+      state.devopsMarkdownExport = Boolean(profile.devopsMarkdownExport);
+      localStorage.setItem(storageKeys.devopsMarkdownExport, String(state.devopsMarkdownExport));
+      restoreDevOpsMarkdownExport();
+      state.exportProfileDefaults = profile;
+      setStatus(`Applied export profile "${profile.label}".`, 'ok');
+    }
+
+    function exportLocalLibrary() {
+      const library = readLocalLibrary();
+      const payload = {
+        formatVersion: 'local-docs-studio-library-1.0',
+        exportedAt: new Date().toISOString(),
+        ...library,
+      };
+      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), 'local-docs-studio-library.json');
+      setStatus('Local library exported as JSON.', 'ok');
+    }
+
+    function importLocalLibrary() {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        input.addEventListener('change', async () => {
+          const file = input.files?.[0];
+          if (!file) {
+            resolve();
+            return;
+          }
+          try {
+            const imported = JSON.parse(await file.text());
+            const library = normaliseLocalLibrary(imported);
+            writeLocalLibrary(library);
+            renderLocalLibrary();
+            setStatus('Local library imported from JSON.', 'ok');
+          } catch (error) {
+            setStatus('Could not import local library JSON.', 'danger');
+            console.error(error);
+          }
+          resolve();
+        });
+        input.click();
+      });
+    }
+
+    function renderLocalLibrary() {
+      const library = readLocalLibrary();
+      const templateList = document.getElementById('localTemplateList');
+      const snippetList = document.getElementById('localSnippetList');
+      if (templateList) {
+        templateList.innerHTML = library.templates.length
+          ? library.templates.slice(0, 12).map((item) => `<button type="button" data-local-template-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>`).join('')
+          : '<span class="menu-note">No local templates yet.</span>';
+      }
+      if (snippetList) {
+        snippetList.innerHTML = library.snippets.length
+          ? library.snippets.slice(0, 12).map((item) => `<button type="button" data-local-snippet-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>`).join('')
+          : '<span class="menu-note">No local snippets yet.</span>';
+      }
+    }
+
+    function readLocalLibrary() {
+      try {
+        return normaliseLocalLibrary(JSON.parse(localStorage.getItem(LOCAL_LIBRARY_KEY) || '{}'));
+      } catch {
+        return normaliseLocalLibrary({});
+      }
+    }
+
+    function writeLocalLibrary(library) {
+      localStorage.setItem(LOCAL_LIBRARY_KEY, JSON.stringify(normaliseLocalLibrary(library)));
+    }
+
+    function normaliseLocalLibrary(value) {
+      const source = value && typeof value === 'object' ? value : {};
+      return {
+        templates: Array.isArray(source.templates) ? source.templates.filter((item) => item?.content && item?.label) : [],
+        snippets: Array.isArray(source.snippets) ? source.snippets.filter((item) => item?.content && item?.label) : [],
+        profiles: Array.isArray(source.profiles) ? source.profiles.filter((item) => item?.label) : [],
+      };
+    }
+
+    function createLocalLibraryId(prefix) {
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     }
 
     function setGeneratedDocument(template, group, metadata) {

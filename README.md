@@ -39,6 +39,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Document UX in the preview with hierarchical outline, rendered-text search, non-blocking document review notes, workspace link/asset audits, and a generated docs map.
 - Mermaid Diagram Studio with templates, snippets, source copy, SVG export, and PNG export.
 - Local Content Studios for README/project docs, release notes, and requirements/user stories.
+- Browser-local templates, snippets, and export profiles with JSON import/export.
 - Built-in read-only feature guide available from the Help menu.
 - Optional PWA/offline shell for repeat use.
 
@@ -76,6 +77,8 @@ Use **Create** to generate editable Markdown from local templates. The studios a
 - **Requirements** creates PRDs, feature briefs, user story sets, acceptance criteria, Gherkin scenarios, and journey maps.
 
 Each studio also includes snippets you can insert at the cursor. Generated files behave like normal Markdown files, so you can edit, save, export to HTML or Word, and include them in a Docs Site ZIP.
+
+The Create menu also includes a browser-local library. Save the current document as a reusable template, save the current selection as a snippet, export/import the library as JSON, and reload those local entries without a backend.
 
 ## Mermaid Diagram Studio
 
@@ -127,6 +130,7 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
 - **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `local-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
+- **Export profiles** save local export defaults such as the Azure DevOps Mermaid option and Docs Site defaults, then reapply them from the Export menu.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
 - **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is planned for a future text-only converter.
 - ZIP import does not convert rendered HTML back into Markdown. If a Docs Site ZIP only contains static HTML plus deployment notes, only editable Markdown/Mermaid files found in that ZIP are imported.

@@ -596,10 +596,11 @@ export function createExportService({
 
       try {
         closeOpenMenus();
+        const profileDefaults = state.exportProfileDefaults?.docsSite || {};
         const defaults = {
-          title: state.folderName || getExportTitle() || 'Docs site',
-          description: `Static documentation bundle with ${records.length} page${records.length === 1 ? '' : 's'}.`,
-          theme: 'system',
+          title: profileDefaults.title || state.folderName || getExportTitle() || 'Docs site',
+          description: profileDefaults.description || `Static documentation bundle with ${records.length} page${records.length === 1 ? '' : 's'}.`,
+          theme: profileDefaults.theme || 'system',
         };
         const options = await promptDocsSiteOptions(defaults);
         if (!options) {
@@ -687,9 +688,9 @@ export function createExportService({
               <div class="template-field">
                 <label for="docs-site-theme">Initial theme</label>
                 <select id="docs-site-theme" name="theme">
-                  <option value="system" selected>System</option>
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
+                  <option value="system"${defaults.theme === 'system' ? ' selected' : ''}>System</option>
+                  <option value="light"${defaults.theme === 'light' ? ' selected' : ''}>Light</option>
+                  <option value="dark"${defaults.theme === 'dark' ? ' selected' : ''}>Dark</option>
                 </select>
                 <small>The exported site includes its own Light/Dark/System switcher.</small>
               </div>

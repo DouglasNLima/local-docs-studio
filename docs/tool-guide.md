@@ -83,6 +83,8 @@ Use Create for local templates:
 
 Use Studio for Mermaid-focused templates and snippets.
 
+The Create menu can also save your current document as a local template, save selected Markdown as a local snippet, and import or export that local library as JSON. Export profiles in the Export menu remember browser-local export defaults.
+
 ## Images
 
 Drag images onto the editor to insert Markdown links like:
