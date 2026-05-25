@@ -18,7 +18,19 @@ function normaliseLineEndings(value) {
 
 async function openFixture(page, name) {
   await page.goto('/');
-  await page.locator('#fileInput').setInputFiles(fixturePath(name));
+  const fileInput = page.locator('#fileInput');
+  const status = page.locator('#status');
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    await fileInput.setInputFiles(fixturePath(name));
+    try {
+      await expect.poll(async () => await status.textContent(), { timeout: 5_000 }).not.toBe('Ready');
+      break;
+    } catch (error) {
+      if (attempt === 2) throw error;
+    }
+  }
+
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 }
 
