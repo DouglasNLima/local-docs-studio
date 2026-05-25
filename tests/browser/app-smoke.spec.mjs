@@ -836,8 +836,8 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   await expect(page.locator('#activeFileLabel')).toContainText('second.md');
 
   await page.getByRole('button', { name: 'Document review' }).click();
-  await expect(page.locator('.document-review-links')).toContainText('Backlinks (1)');
-  await expect(page.locator('.document-review-links')).toContainText('index.md:2');
+  await expect(page.locator('.document-review-links').first()).toContainText('Backlinks (1)');
+  await expect(page.locator('.document-review-links').first()).toContainText('index.md:2');
 
   const docsPath = await clickDocsSiteExportDownload(page, { title: 'Wiki Docs', description: 'Wikilink export check.' });
   const entries = await readZipEntries(docsPath);
@@ -845,6 +845,31 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   const indexPage = searchIndex.pages.find((item) => item.path === 'index.md');
   expect(indexPage.html).not.toContain('data-wikilink-target');
   expect(indexPage.html).toContain('href="#second"');
+});
+
+test('document audit flags broken references and docs map opens as read-only markdown', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'index.md',
+      text: '# Home\n\n[[Missing Page]]\n\n[Missing link](missing.md)\n\n[Second](second.md)\n\n![Missing image](assets/images/missing.png)\n',
+    },
+    { name: 'second.md', text: '# Second\n\nBack to [Home](index.md).\n' },
+    { name: 'orphan.md', text: '# Orphan\n\nNo incoming links yet.\n' },
+  ]);
+
+  await page.locator('#documentReviewToggleButton').click();
+  await expect(page.locator('#documentReviewAlerts')).toContainText('unresolved wikilink');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('relative document link');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('local image reference');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Workspace audit');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('page without backlinks');
+
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  await page.getByRole('button', { name: 'Open docs map' }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText(/docs-map\.md · read-only/);
+  await expect(page.locator('#editor')).toHaveValue(/## Unresolved Links/);
+  await expect(page.locator('#preview')).toContainText('Documentation Map', { timeout: 20_000 });
+  await expect(page.locator('#preview .diagram-frame')).toHaveCount(1, { timeout: 20_000 });
 });
 
 test('local draft recovery and large deletion protection guard browser-local edits', async ({ page }) => {

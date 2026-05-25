@@ -19,7 +19,7 @@ import { createSelectionSyncService } from './document/selection-sync-service.js
 import { downloadBlob, registerServiceWorker } from './utils/browser.js';
 import { compareRecords, getFolderNameFromFileList, isSupportedFile, normalisePath, uniqueByPath } from './utils/files.js';
 import { escapeHtml, readStoredNumber, sanitiseFileName, slugFromText, todayIso } from './utils/format.js';
-import { findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
+import { collectMarkdownRelativeTargets, collectWikilinkTargets, findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
 import { getLineInfoAtIndex } from './utils/search.js';
 
 export function createAppController() {
@@ -326,6 +326,7 @@ export function createAppController() {
       },
       callbacks: {
         getBacklinks,
+        getWorkspaceAudit,
         openBacklink,
       },
     });
@@ -686,10 +687,11 @@ export function createAppController() {
       });
 
       document.querySelectorAll('[data-view-action]').forEach((button) => {
-        button.addEventListener('click', () => {
-          if (button.dataset.viewAction === 'renderPreview') renderPreview();
+        button.addEventListener('click', async () => {
+          if (button.dataset.viewAction === 'renderPreview') await renderPreview();
           if (button.dataset.viewAction === 'maximizePreview') togglePreviewMaximized();
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
+          if (button.dataset.viewAction === 'openDocsMap') await openDocsMap();
           closeOpenMenus();
         });
       });
@@ -1161,6 +1163,177 @@ export function createAppController() {
         });
       }
       return backlinks;
+    }
+
+    async function getWorkspaceAudit() {
+      const records = getDocumentationRecords();
+      const incoming = new Map(records.map((record) => [record.path, 0]));
+      const referencedAssets = new Set();
+      let brokenLinkCount = 0;
+
+      for (const record of records) {
+        const source = await readRecordText(record);
+        collectImageReferences(source, record.path).forEach((path) => referencedAssets.add(path));
+        collectDocumentationLinks(source).forEach((link) => {
+          if (isAssetTarget(link.target)) return;
+          const target = resolveWikilinkTarget(link.target, records, record.path);
+          if (target?.path && incoming.has(target.path)) {
+            incoming.set(target.path, incoming.get(target.path) + 1);
+          } else {
+            brokenLinkCount += 1;
+          }
+        });
+      }
+
+      const orphanAssetCount = [...state.managedAssets.keys()].filter((path) => !referencedAssets.has(path)).length;
+      const unlinkedPageCount = records
+        .filter((record) => !/(^|\/)(readme|index)\.(md|markdown)$/i.test(record.path))
+        .filter((record) => (incoming.get(record.path) || 0) === 0)
+        .length;
+
+      return { brokenLinkCount, orphanAssetCount, unlinkedPageCount };
+    }
+
+    async function openDocsMap() {
+      const records = getDocumentationRecords();
+      if (!records.length) {
+        setStatus('Open Markdown or Mermaid files before building a docs map.', 'warning');
+        return;
+      }
+
+      if (state.activePath) {
+        state.fileCache.set(state.activePath, editor.value);
+      }
+
+      const content = await buildDocsMapMarkdown(records);
+      const name = 'docs-map.md';
+      const existing = state.files.find((record) => record.path === name);
+      const record = existing || {
+        name,
+        path: name,
+        readOnly: true,
+        generatedMap: true,
+      };
+      record.file = new File([content], name, { type: 'text/markdown' });
+      record.readOnly = true;
+      record.generatedMap = true;
+      if (!existing) state.files.push(record);
+
+      state.folderName = state.folderName || 'Documentation';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, content);
+      state.savedContentCache.set(name, content);
+      state.dirtyPaths.delete(name);
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      editor.value = content;
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus('Docs map opened as a read-only virtual document.', 'ok');
+    }
+
+    async function buildDocsMapMarkdown(records) {
+      const nodeByPath = new Map(records.map((record, index) => [record.path, `doc${index + 1}`]));
+      const links = [];
+      const unresolved = [];
+
+      for (const record of records) {
+        const source = await readRecordText(record);
+        collectDocumentationLinks(source).forEach((link) => {
+          if (isAssetTarget(link.target)) return;
+          const target = resolveWikilinkTarget(link.target, records, record.path);
+          if (target?.path) {
+            links.push({ from: record.path, to: target.path, label: link.kind });
+          } else {
+            unresolved.push({ from: record.path, target: link.target, label: link.label || link.target });
+          }
+        });
+      }
+
+      const diagramLines = [
+        'flowchart LR',
+        ...records.map((record) => `  ${nodeByPath.get(record.path)}["${escapeMermaidLabel(record.path)}"]`),
+        ...links.map((link) => `  ${nodeByPath.get(link.from)} --> ${nodeByPath.get(link.to)}`),
+      ];
+      const linkRows = links.length
+        ? links.map((link) => `| ${escapeTableCell(link.from)} | ${escapeTableCell(link.to)} | ${escapeTableCell(link.label)} |`).join('\n')
+        : '| No links found |  |  |';
+      const unresolvedRows = unresolved.length
+        ? unresolved.map((link) => `| ${escapeTableCell(link.from)} | ${escapeTableCell(link.target)} | ${escapeTableCell(link.label)} |`).join('\n')
+        : '| None |  |  |';
+
+      return `# Documentation Map
+
+Generated from ${records.length} loaded document${records.length === 1 ? '' : 's'}.
+
+\`\`\`mermaid
+${diagramLines.join('\n')}
+\`\`\`
+
+## Links
+
+| From | To | Type |
+|---|---|---|
+${linkRows}
+
+## Unresolved Links
+
+| From | Target | Label |
+|---|---|---|
+${unresolvedRows}
+`;
+    }
+
+    function getDocumentationRecords() {
+      return state.files.filter((record) => isSupportedFile(record.name) && !record.generatedMap);
+    }
+
+    function collectDocumentationLinks(source) {
+      return [
+        ...collectWikilinkTargets(source),
+        ...collectMarkdownRelativeTargets(source).filter((link) => String(source || '')[Math.max(0, link.index - 1)] !== '!'),
+      ];
+    }
+
+    function collectImageReferences(source, fromPath) {
+      const paths = [];
+      String(source || '').replace(/!\[[^\]\n]*\]\(([^)\n]+)\)/g, (raw, href) => {
+        const target = String(href || '').split(/[?#]/)[0].trim();
+        if (target && !/^(https?:|data:|blob:)/i.test(target)) {
+          paths.push(normaliseRelativePath(target, fromPath));
+        }
+        return raw;
+      });
+      return paths;
+    }
+
+    function normaliseRelativePath(target, fromPath) {
+      const activeDir = fromPath.includes('/') ? fromPath.slice(0, fromPath.lastIndexOf('/') + 1) : '';
+      const raw = target.startsWith('/') ? target.slice(1) : `${activeDir}${target}`;
+      const parts = raw.replace(/\\/g, '/').split('/');
+      const stack = [];
+      parts.forEach((part) => {
+        if (!part || part === '.') return;
+        if (part === '..') stack.pop();
+        else stack.push(part);
+      });
+      return stack.join('/');
+    }
+
+    function isAssetTarget(target) {
+      return /\.(png|jpe?g|gif|webp|svg|pdf|zip)$/i.test(String(target || '').split(/[?#]/)[0]);
+    }
+
+    function escapeMermaidLabel(value) {
+      return String(value || '').replaceAll('"', '\\"');
+    }
+
+    function escapeTableCell(value) {
+      return String(value || '').replaceAll('|', '\\|').replace(/\r?\n/g, ' ');
     }
 
     async function openBacklink(path, line = 1) {

@@ -44,6 +44,7 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Outline navigation from headings.
 - Find in preview.
 - Document review metrics and non-blocking quality notes.
+- Workspace link/asset audit notes and a View menu docs map for loaded files.
 - Preview maximisation and diagram zoom controls.
 - Follow short editor selections into the preview while using Split layout.
 
