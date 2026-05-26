@@ -14,6 +14,7 @@ import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
+import { analyzeMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
 import { createSelectionSyncService } from './document/selection-sync-service.js';
 import { downloadBlob, registerServiceWorker } from './utils/browser.js';
@@ -334,7 +335,9 @@ export function createAppController() {
       callbacks: {
         getBacklinks,
         getWorkspaceAudit,
+        getGovernanceAudit,
         openBacklink,
+        openGovernanceIssue,
       },
     });
     const {
@@ -1418,6 +1421,18 @@ export function createAppController() {
       return { brokenLinkCount, orphanAssetCount, unlinkedPageCount };
     }
 
+    async function getGovernanceAudit() {
+      const records = [];
+      for (const record of getDocumentationRecords()) {
+        records.push({
+          name: record.name,
+          path: record.path,
+          text: await readRecordText(record),
+        });
+      }
+      return analyzeMarkdownGovernance({ records, activePath: state.activePath });
+    }
+
     async function openDocsMap() {
       const records = getDocumentationRecords();
       if (!records.length) {
@@ -1715,6 +1730,12 @@ ${unresolvedRows}
     async function openBacklink(path, line = 1) {
       await selectFile(path);
       focusEditorAtLine(line, 1, 1);
+    }
+
+    async function openGovernanceIssue(path, line = 1, column = 1, length = 1) {
+      await selectFile(path);
+      focusEditorAtLine(line, column, length);
+      setStatus(`Opened governance issue at ${path}:${line}.`, 'info');
     }
 
     function isActiveReadOnly() {

@@ -36,7 +36,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - ZIP import for app bundles and generic Markdown/Mermaid documentation ZIPs.
 - Folder-to-docs-site export as a GitHub Pages-ready ZIP.
 - Optional Markdown front matter for Docs Site titles, descriptions, ordering, tags, draft badges, and navigation groups.
-- Document UX in the preview with hierarchical outline, rendered-text search, non-blocking document review notes, workspace link/asset audits, and a generated docs map.
+- Document UX in the preview with hierarchical outline, rendered-text search, non-blocking document review notes, Markdown governance linting, workspace link/asset audits, and a generated docs map.
 - Mermaid Diagram Studio with templates, snippets, source copy, SVG export, and PNG export.
 - Local Content Studios for README/project docs, release notes, and requirements/user stories.
 - Browser-local templates, snippets, and export profiles with JSON import/export.
@@ -50,6 +50,7 @@ The preview pane includes document-focused review tools that do not change expor
 - **Outline** builds a navigable table of contents from rendered headings and highlights the active section while you scroll.
 - **Find** searches rendered document text, highlights matches, and skips interactive UI text such as code/table-copy and diagram-export buttons.
 - **Review** shows word count, reading time, content counts, and soft notes such as missing H1 titles, heading-level jumps, Mermaid errors, external links, and dirty files.
+- **Governance** scans the active document and loaded workspace for heading hierarchy jumps, broken internal links and wikilinks, missing image alt text, inconsistent Markdown tables, US spellings with British English suggestions, and TODO/FIXME release markers.
 - **Workspace audit** adds notes for unresolved wikilinks, missing relative document links, unmanaged local images, orphaned managed assets, and pages without backlinks.
 - **Docs map** in the View menu opens a read-only virtual Markdown document with a Mermaid graph plus link and unresolved-link tables.
 

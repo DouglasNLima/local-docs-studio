@@ -895,8 +895,8 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   await expect(page.locator('#activeFileLabel')).toContainText('second.md');
 
   await page.getByRole('button', { name: 'Document review' }).click();
-  await expect(page.locator('.document-review-links').first()).toContainText('Backlinks (1)');
-  await expect(page.locator('.document-review-links').first()).toContainText('index.md:2');
+  const backlinkAudit = page.locator('.document-review-links').filter({ hasText: 'Backlinks (1)' });
+  await expect(backlinkAudit).toContainText('index.md:2');
 
   const docsPath = await clickDocsSiteExportDownload(page, { title: 'Wiki Docs', description: 'Wikilink export check.' });
   const entries = await readZipEntries(docsPath);
@@ -929,6 +929,72 @@ test('document audit flags broken references and docs map opens as read-only mar
   await expect(page.locator('#editor')).toHaveValue(/## Unresolved Links/);
   await expect(page.locator('#preview')).toContainText('Documentation Map', { timeout: 20_000 });
   await expect(page.locator('#preview .diagram-frame')).toHaveCount(1, { timeout: 20_000 });
+});
+
+test('Markdown governance flags lint issues, navigates to source, and stays out of exports', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'README.md',
+      text: `# Governance Home
+
+### Skipped Heading
+
+![](assets/logo.png)
+
+[Missing guide](missing.md)
+
+[[Ghost Page]]
+
+| Feature | Value |
+| -- | --- |
+| One | Two | Three |
+
+The color choice is organized for release.
+
+TODO: finish the checklist before release.
+
+\`\`\`js
+// TODO: this code marker is ignored.
+const color = 'blue';
+\`\`\`
+
+[Guide](guide.md)
+`,
+    },
+    {
+      name: 'guide.md',
+      text: `# Guide
+
+FIXME: replace this note.
+
+The favorite center text should be reviewed.
+`,
+    },
+  ]);
+
+  await page.locator('#documentReviewToggleButton').click();
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Governance');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Heading hierarchy');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Internal links');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Alt text');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Tables');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('British English');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('TODO/FIXME');
+  await expect(page.locator('#documentReviewSummary')).toContainText(/notes/);
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Governance:');
+
+  const guideIssue = page.locator('[data-governance-path="guide.md"]').filter({ hasText: 'FIXME marker' });
+  await expect(guideIssue).toBeVisible();
+  await guideIssue.click();
+  await expect(page.locator('#activeFileLabel')).toContainText('guide.md');
+  await expect.poll(() => page.locator('#editor').evaluate((editor) => editor.value.slice(editor.selectionStart, editor.selectionEnd))).toBe('FIXME');
+  await expect(page.locator('#status')).toHaveText(/Opened governance issue at guide\.md:3/);
+
+  const htmlPath = await clickExportDownload(page, 'Export HTML');
+  const html = await readFile(htmlPath, 'utf8');
+  expect(html).not.toContain('Markdown governance');
+  expect(html).not.toContain('data-governance-path');
+  expect(html).not.toContain('TODO/FIXME');
 });
 
 test('local draft recovery and large deletion protection guard browser-local edits', async ({ page }) => {

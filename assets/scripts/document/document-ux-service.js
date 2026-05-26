@@ -35,7 +35,9 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   const {
     getBacklinks,
     getWorkspaceAudit,
+    getGovernanceAudit,
     openBacklink,
+    openGovernanceIssue,
   } = callbacks;
 
   const searchState = {
@@ -46,6 +48,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   let scrollFrame = 0;
   let outlineClickLockTarget = '';
   let outlineClickLockTimer = 0;
+  let governanceRunId = 0;
 
   function installDocumentUxHandlers() {
     outlineToggleButton.addEventListener('click', toggleOutline);
@@ -311,14 +314,11 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     documentReviewPanel.hidden = !state.documentReviewOpen;
 
     const review = buildDocumentReview();
-    documentReviewSummary.textContent = `${review.wordCount} words · ${review.readingMinutes} min read · ${review.alerts.length} note${review.alerts.length === 1 ? '' : 's'}`;
+    updateReviewSummary(review);
 
     documentReviewMetrics.innerHTML = '';
     review.metrics.forEach((metric) => {
-      const item = document.createElement('span');
-      item.className = 'document-review-metric';
-      item.textContent = `${metric.label}: ${metric.value}`;
-      documentReviewMetrics.appendChild(item);
+      appendReviewMetric(metric.label, metric.value);
     });
 
     documentReviewAlerts.innerHTML = '';
@@ -339,8 +339,22 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
         documentReviewAlerts.appendChild(item);
       });
     }
+    updateGovernanceAudit(review);
     updateBacklinks();
     updateWorkspaceAudit();
+  }
+
+  function updateReviewSummary(review, governanceSummary = null) {
+    const governanceCount = governanceSummary?.issueCount || 0;
+    const noteCount = review.alerts.length + governanceCount;
+    documentReviewSummary.textContent = `${review.wordCount} words · ${review.readingMinutes} min read · ${noteCount} note${noteCount === 1 ? '' : 's'}`;
+  }
+
+  function appendReviewMetric(label, value) {
+    const item = document.createElement('span');
+    item.className = 'document-review-metric';
+    item.textContent = `${label}: ${value}`;
+    documentReviewMetrics.appendChild(item);
   }
 
   function buildDocumentReview() {
@@ -486,6 +500,17 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function handleReviewTargetClick(event) {
+    const governance = event.target.closest('[data-governance-path]');
+    if (governance) {
+      openGovernanceIssue?.(
+        governance.dataset.governancePath,
+        Number(governance.dataset.governanceLine || '1'),
+        Number(governance.dataset.governanceColumn || '1'),
+        Number(governance.dataset.governanceLength || '1'),
+      );
+      return;
+    }
+
     const backlink = event.target.closest('[data-backlink-path]');
     if (backlink) {
       openBacklink?.(backlink.dataset.backlinkPath, Number(backlink.dataset.backlinkLine || '1'));
@@ -520,6 +545,78 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       .replace(/^\.\/+/, '')
       .replace(/\/\.\//g, '/')
       .replace(/[^/]+\/\.\.\//g, '');
+  }
+
+  async function updateGovernanceAudit(review) {
+    if (!getGovernanceAudit || !state.documentReviewOpen) return;
+    const runId = ++governanceRunId;
+    const marker = document.createElement('div');
+    marker.className = 'document-review-links document-governance-audit';
+    marker.textContent = 'Checking Markdown governance...';
+    documentReviewAlerts.appendChild(marker);
+
+    const audit = await getGovernanceAudit();
+    if (!marker.isConnected || runId !== governanceRunId || !state.documentReviewOpen) return;
+
+    const issues = audit?.issues || [];
+    const summary = audit?.summary || {
+      fileCount: 0,
+      issueCount: issues.length,
+      warningCount: issues.filter((issue) => issue.severity !== 'info').length,
+      infoCount: issues.filter((issue) => issue.severity === 'info').length,
+      activeIssueCount: issues.filter((issue) => issue.path === state.activePath).length,
+      workspaceIssueCount: issues.filter((issue) => issue.path !== state.activePath).length,
+      ruleCounts: [],
+    };
+
+    updateReviewSummary(review, summary);
+    appendReviewMetric('Governance', summary.issueCount);
+    appendReviewMetric('Warnings', summary.warningCount);
+    appendReviewMetric('Suggestions', summary.infoCount);
+
+    marker.innerHTML = '';
+    const title = document.createElement('strong');
+    title.textContent = `Governance (${summary.issueCount})`;
+    marker.appendChild(title);
+
+    const scope = document.createElement('span');
+    scope.textContent = `Scanned ${summary.fileCount} file${summary.fileCount === 1 ? '' : 's'}: ${summary.activeIssueCount} here, ${summary.workspaceIssueCount} elsewhere.`;
+    marker.appendChild(scope);
+
+    if (!issues.length) {
+      const ok = document.createElement('span');
+      ok.textContent = 'No Markdown governance issues found.';
+      marker.appendChild(ok);
+      return;
+    }
+
+    const groups = document.createElement('div');
+    groups.className = 'document-governance-groups';
+    summary.ruleCounts.forEach((group) => {
+      const item = document.createElement('span');
+      item.className = 'document-review-metric';
+      item.textContent = `${group.label}: ${group.count}`;
+      groups.appendChild(item);
+    });
+    marker.appendChild(groups);
+
+    issues.slice(0, 12).forEach((issue) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `document-review-note ${issue.severity === 'info' ? 'info' : 'warning'}`;
+      button.dataset.governancePath = issue.path;
+      button.dataset.governanceLine = String(issue.line);
+      button.dataset.governanceColumn = String(issue.column);
+      button.dataset.governanceLength = String(issue.length || 1);
+      button.textContent = `${issue.path}:${issue.line} ${issue.message}${issue.suggestion ? ` ${issue.suggestion}` : ''}`;
+      marker.appendChild(button);
+    });
+
+    if (issues.length > 12) {
+      const remaining = document.createElement('span');
+      remaining.textContent = `${issues.length - 12} more issue${issues.length - 12 === 1 ? '' : 's'} in the loaded workspace.`;
+      marker.appendChild(remaining);
+    }
   }
 
   async function updateBacklinks() {

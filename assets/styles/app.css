@@ -4316,6 +4316,12 @@ label.file-button.primary,
   font-size: .86rem;
 }
 
+.document-governance-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+
 .app.typewriter-mode .sidebar,
 .app.typewriter-mode .sidebar-splitter,
 .app.typewriter-mode .preview-pane,
