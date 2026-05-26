@@ -14,6 +14,6 @@ Lens Docs Studio uses the Lens family accent `#FF883E` for restrained brand mome
 
 ## Compatibility Boundary
 
-This identity phase does not add Lens-specific import, export, bundle detection, metadata handling, direct links, or integration with other Lens tools. Existing browser-local persistence keys stay unchanged so saved user preferences, drafts, snapshots, recent handles, and local library data remain available after the rename.
+Lens Docs Studio supports optional Lens artefact bundle metadata during ZIP import, but that compatibility does not change the product identity. The main shell, tagline, manifest description, welcome state, and README introduction remain generic for local Markdown, Mermaid, and documentation workflows.
 
-Lens Docs Studio may later support Lens-generated artefact bundles, but that future capability must be designed as a separate feature with explicit compatibility, privacy, and test coverage.
+Artefact bundle metadata is passive, untrusted, session-only context. It must not add direct links or integrations to other Lens tools, call external services, persist new browser-local keys, infer evidence levels, or convert candidate findings into confirmed findings. Existing browser-local persistence keys stay unchanged so saved user preferences, drafts, snapshots, recent handles, and local library data remain available after the rename.

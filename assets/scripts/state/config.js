@@ -59,6 +59,7 @@ export function createInitialState({ readStoredNumber }) {
     typewriterMode: false,
     managedAssets: new Map(),
     managedAssetCounter: 0,
+    artifactBundle: null,
     recentEntries: [],
     scrollPositions: new Map(),
     mermaidRenderChain: Promise.resolve(),

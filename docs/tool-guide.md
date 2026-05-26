@@ -70,6 +70,7 @@ flowchart LR
 - **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
 - Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
+- ZIPs may optionally include `lens-artifact-bundle.json` metadata. When present, the app still imports the Markdown and Mermaid files normally, opens a safe declared entry document, and shows a small artefact bundle summary from the ZIP.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
@@ -101,3 +102,5 @@ Use **View > Manage assets** to preview session images, rename paths across edit
 ## Privacy
 
 The app runs in the browser. Files stay local unless you save, export, copy, or import a new bundle. There is no backend or account system.
+
+Optional artefact bundle metadata is session-only and untrusted. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings.

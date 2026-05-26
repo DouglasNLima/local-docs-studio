@@ -1,5 +1,9 @@
 import { decodeZipText, readZipEntriesFromFile } from '../utils/zip.js';
 import { convertDocumentFiles, isImportableDocumentFile } from './document-import-service.js';
+import {
+  LENS_ARTIFACT_BUNDLE_MANIFEST_NAME,
+  parseLensArtifactBundleManifest,
+} from './lens-artifact-bundle-service.js';
 
 const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   'lens-docs-studio-bundle.json',
@@ -311,6 +315,7 @@ export function createFileService({
       state.activePath = '';
       state.fileName = '';
       state.folderName = folderName;
+      state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
@@ -364,6 +369,7 @@ export function createFileService({
         state.activePath = '';
         state.fileName = '';
         state.folderName = imported.folderName;
+        state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
         state.savedContentCache?.clear();
         imported.records.forEach((record) => {
@@ -384,7 +390,8 @@ export function createFileService({
         syncEditorReadOnly?.();
         updateSaveButton();
         setExportTrust('', '');
-        await selectFile(imported.records[0].path);
+        const selectedPath = imported.artifactBundle?.entryDocument || imported.records[0].path;
+        await selectFile(selectedPath);
 
         const assetText = imported.assets.length
           ? ` and ${imported.assets.length} image asset${imported.assets.length === 1 ? '' : 's'}`
@@ -392,11 +399,18 @@ export function createFileService({
         const skippedSvgText = imported.skippedSvgAssets
           ? ' SVG images are not imported for security; use PNG, JPEG, GIF, or WebP.'
           : '';
-        const sourceText = imported.bundle ? 'Markdown bundle' : 'ZIP';
+        const sourceText = imported.artifactBundle ? 'artefact bundle' : imported.bundle ? 'Markdown bundle' : 'ZIP';
         const docsSiteText = imported.docsSiteZip && !imported.bundle
           ? ' Rendered Docs Site HTML was not converted back to Markdown.'
           : '';
-        setStatus(`Imported ${imported.records.length} document${imported.records.length === 1 ? '' : 's'}${assetText} from ${sourceText}.${docsSiteText}${skippedSvgText}`, imported.docsSiteZip && !imported.bundle || imported.skippedSvgAssets ? 'warning' : 'ok');
+        const artifactEntryText = imported.artifactBundle?.entryDocument
+          ? ` Opened ${imported.artifactBundle.entryDocument}.`
+          : '';
+        const artifactWarningText = imported.artifactWarnings.length
+          ? ` ${imported.artifactWarnings.slice(0, 2).join(' ')}`
+          : '';
+        const statusTone = imported.docsSiteZip && !imported.bundle || imported.skippedSvgAssets || imported.artifactWarnings.length ? 'warning' : 'ok';
+        setStatus(`Imported ${imported.records.length} document${imported.records.length === 1 ? '' : 's'}${assetText} from ${sourceText}.${artifactEntryText}${docsSiteText}${skippedSvgText}${artifactWarningText}`, statusTone);
       } catch (error) {
         setStatus('ZIP import failed.', 'danger');
         console.error(error);
@@ -446,6 +460,7 @@ export function createFileService({
       state.activePath = '';
       state.fileName = '';
       state.folderName = imported.records.length === 1 ? 'Imported document' : 'Imported documents';
+      state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
@@ -486,6 +501,7 @@ export function createFileService({
       const textByPath = new Map();
       const assets = [];
       let bundle = null;
+      let artifactManifestBytes = null;
       let docsSiteZip = false;
       let skippedSvgAssets = 0;
 
@@ -499,6 +515,11 @@ export function createFileService({
 
         if (MARKDOWN_BUNDLE_MANIFEST_NAMES.has(path)) {
           bundle = parseBundleManifest(bytes);
+          continue;
+        }
+
+        if (path === LENS_ARTIFACT_BUNDLE_MANIFEST_NAME) {
+          artifactManifestBytes = bytes;
           continue;
         }
 
@@ -525,15 +546,42 @@ export function createFileService({
       }
 
       const uniqueRecords = uniqueByPath(records).sort(compareRecords);
+      const artifactResult = artifactManifestBytes
+        ? parseLensArtifactBundleManifest(artifactManifestBytes, uniqueRecords)
+        : { bundle: null, warnings: [] };
+      const sortedRecords = artifactResult.bundle
+        ? sortRecordsByArtifactBundle(uniqueRecords, artifactResult.bundle)
+        : uniqueRecords;
       return {
         bundle,
+        artifactBundle: artifactResult.bundle,
+        artifactWarnings: artifactResult.warnings,
         docsSiteZip,
-        records: uniqueRecords,
+        records: sortedRecords,
         textByPath,
         assets: dedupeAssetsByPath(assets),
         skippedSvgAssets,
-        folderName: bundle?.title || file.name.replace(/\.zip$/i, '') || 'Imported ZIP',
+        folderName: artifactResult.bundle?.title || bundle?.title || file.name.replace(/\.zip$/i, '') || 'Imported ZIP',
       };
+    }
+
+    function sortRecordsByArtifactBundle(records, artifactBundle) {
+      return [...records].sort((left, right) => {
+        const leftMeta = artifactBundle.recordMetadataByPath.get(left.path);
+        const rightMeta = artifactBundle.recordMetadataByPath.get(right.path);
+        const leftRank = getArtifactSortRank(leftMeta);
+        const rightRank = getArtifactSortRank(rightMeta);
+        if (leftRank !== rightRank) return leftRank - rightRank;
+        if (leftRank === 0 && leftMeta.order !== rightMeta.order) {
+          return leftMeta.order - rightMeta.order;
+        }
+        return compareRecords(left, right);
+      });
+    }
+
+    function getArtifactSortRank(metadata) {
+      if (!metadata) return 2;
+      return Number.isFinite(metadata.order) ? 0 : 1;
     }
 
     function parseBundleManifest(bytes) {

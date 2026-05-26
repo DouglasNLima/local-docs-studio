@@ -14,6 +14,7 @@ export function createUiService({
     fileSearch,
     fileCount,
     folderBadge,
+    artifactBundleSummary,
     activeFileLabel,
     saveButton,
     createMenu,
@@ -37,6 +38,7 @@ export function createUiService({
       fileCount.textContent = String(state.files.length);
       if (railFileCount) railFileCount.textContent = state.files.length > 0 ? String(state.files.length) : '';
       folderBadge.textContent = state.folderName || 'No folder';
+      renderArtifactBundleSummary();
       fileList.innerHTML = '';
 
       if (!state.files.length) {
@@ -92,6 +94,75 @@ export function createUiService({
         }
 
         fileList.appendChild(button);
+      });
+    }
+
+    function renderArtifactBundleSummary() {
+      if (!artifactBundleSummary) return;
+      const bundle = state.artifactBundle;
+      artifactBundleSummary.replaceChildren();
+      artifactBundleSummary.hidden = !bundle;
+      if (!bundle) return;
+
+      const titleText = bundle.title || bundle.sourceTool || 'Artefact bundle';
+      const header = document.createElement('div');
+      header.className = 'artifact-bundle-head';
+      const title = document.createElement('strong');
+      title.className = 'artifact-bundle-title';
+      title.textContent = titleText;
+      const note = document.createElement('span');
+      note.textContent = 'Artefact bundle metadata loaded.';
+      header.append(title, note);
+      artifactBundleSummary.appendChild(header);
+
+      if (bundle.summary) {
+        const summary = document.createElement('p');
+        summary.className = 'artifact-bundle-copy';
+        summary.textContent = bundle.summary;
+        artifactBundleSummary.appendChild(summary);
+      }
+
+      const metadata = [
+        bundle.sourceTool ? ['Source', [bundle.sourceTool, bundle.sourceToolVersion].filter(Boolean).join(' ')] : null,
+        bundle.generatedAtUtc ? ['Generated UTC', bundle.generatedAtUtc] : null,
+        bundle.entryDocument ? ['Entry', bundle.entryDocument] : null,
+        ['Documents', String(bundle.documents?.length ?? 0)],
+        ['Diagrams', String(bundle.diagrams?.length ?? 0)],
+        ['Warnings', String(bundle.manifestWarnings?.length ?? 0)],
+      ].filter(Boolean);
+
+      const list = document.createElement('dl');
+      list.className = 'artifact-bundle-meta';
+      metadata.forEach(([label, value]) => {
+        const term = document.createElement('dt');
+        term.textContent = label;
+        const detail = document.createElement('dd');
+        detail.textContent = value;
+        list.append(term, detail);
+      });
+      artifactBundleSummary.appendChild(list);
+
+      if (bundle.evidenceLevels?.length) {
+        const chips = document.createElement('div');
+        chips.className = 'artifact-bundle-chips';
+        bundle.evidenceLevels.forEach((level) => {
+          const chip = document.createElement('span');
+          chip.className = 'artifact-bundle-chip';
+          chip.textContent = level;
+          chips.appendChild(chip);
+        });
+        artifactBundleSummary.appendChild(chips);
+      }
+
+      const warningTexts = [
+        ...(bundle.metadataWarnings ?? []).map((warning) => `Manifest warning: ${warning}`),
+        ...(bundle.manifestWarnings ?? []).slice(0, 2).map((warning) => `Bundle warning: ${warning.message || warning.code || 'metadata warning'}`),
+      ];
+      warningTexts.slice(0, 4).forEach((warningText) => {
+        const warning = document.createElement('p');
+        warning.className = 'artifact-bundle-warning';
+        warning.textContent = warningText;
+        artifactBundleSummary.appendChild(warning);
       });
     }
 

@@ -71,6 +71,7 @@ export function createAppController() {
       fileSearch,
       fileCount,
       folderBadge,
+      artifactBundleSummary,
       activeFileLabel,
       diagramCount,
       zoomOutButton,
@@ -221,6 +222,7 @@ export function createAppController() {
         fileSearch,
         fileCount,
         folderBadge,
+        artifactBundleSummary,
         activeFileLabel,
         saveButton,
         createMenu,
@@ -1353,6 +1355,7 @@ export function createAppController() {
       state.fileCache.clear();
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
+      state.artifactBundle = null;
     }
 
     function focusEditorAtLine(line, column = 1, length = 1) {

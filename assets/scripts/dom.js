@@ -39,6 +39,7 @@ export const domIds = {
   fileSearch: 'fileSearch',
   fileCount: 'fileCount',
   folderBadge: 'folderBadge',
+  artifactBundleSummary: 'artifactBundleSummary',
   activeFileLabel: 'activeFileLabel',
   diagramCount: 'diagramCount',
   zoomOutButton: 'zoomOutButton',

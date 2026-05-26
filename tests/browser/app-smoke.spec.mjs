@@ -133,6 +133,12 @@ async function clickExportDownload(page, buttonName) {
   return download.path();
 }
 
+async function writeZipFixture(testInfo, name, files) {
+  const zipPath = testInfo.outputPath(name);
+  await writeFile(zipPath, createZipBuffer(files, { compress: true }));
+  return zipPath;
+}
+
 async function clickDocsSiteExportDownload(page, { title = 'Publishing Docs', description = 'Docs Site Builder 2.0 export fixture.' } = {}) {
   const button = page.getByRole('button', { name: 'Export Docs Site' });
   if (!(await button.isVisible())) {
@@ -1805,6 +1811,198 @@ test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', 
   await expect(page.locator('#exportTrust')).toHaveText(/Azure DevOps Mermaid syntax applied/);
 });
 
+test('Lens artefact bundle import opens the declared entry and shows safe reader metadata', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'valid-lens-artefact-bundle.zip', [
+    {
+      name: 'README.md',
+      data: '# Security Lens Evidence Pack\n\nThis pack opens on the declared entry document.',
+    },
+    {
+      name: 'findings/security-summary.md',
+      data: '# Security Summary\n\nCandidate finding remains candidate.',
+    },
+    {
+      name: 'diagrams/security-overview.mmd',
+      data: 'flowchart LR\n  A[Static evidence] --> B[Candidate finding]',
+    },
+    {
+      name: 'lens-artifact-bundle.json',
+      data: JSON.stringify({
+        formatVersion: 'lens-artifact-bundle-1.0',
+        sourceTool: 'Security Lens',
+        sourceToolVersion: '1.0.0',
+        generatedAtUtc: '2026-05-26T00:00:00.000Z',
+        entryDocument: 'README.md',
+        title: 'Security Lens Evidence Pack',
+        summary: 'Optional short description.',
+        evidenceLevels: ['static evidence', 'candidate finding'],
+        documents: [
+          { path: 'findings/security-summary.md', title: 'Security Summary', kind: 'finding summary', evidenceLevel: 'candidate finding', order: 20 },
+          { path: 'README.md', title: 'Overview', kind: 'summary', evidenceLevel: 'static evidence', order: 10 },
+        ],
+        diagrams: [
+          { path: 'diagrams/security-overview.mmd', title: 'Security Overview', kind: 'mermaid', evidenceLevel: 'static evidence', order: 30 },
+        ],
+        warnings: [
+          { code: 'CONNECTED_METADATA_UNAVAILABLE', message: 'Connected metadata was unavailable during export.', evidenceLevel: 'blocked/unavailable evidence' },
+        ],
+      }),
+    },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 3 documents from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await expect(page.locator('#editor')).toHaveValue(/declared entry document/);
+  await expect(page.locator('#preview h1')).toHaveText('Security Lens Evidence Pack');
+
+  const summary = page.locator('#artifactBundleSummary');
+  await expect(summary).toBeVisible();
+  await expect(summary).toContainText('Security Lens Evidence Pack');
+  await expect(summary).toContainText('Security Lens 1.0.0');
+  await expect(summary).toContainText('2026-05-26T00:00:00.000Z');
+  await expect(summary).toContainText('README.md');
+  await expect(summary).toContainText('2');
+  await expect(summary).toContainText('1');
+  await expect(summary).toContainText('static evidence');
+  await expect(summary).toContainText('candidate finding');
+  await expect(summary).toContainText('Bundle warning: Connected metadata was unavailable during export.');
+
+  await expect(page.locator('#fileList .file-item').nth(0)).toHaveAttribute('data-path', 'README.md');
+  await expect(page.locator('#fileList .file-item').nth(1)).toHaveAttribute('data-path', 'findings/security-summary.md');
+  await expect(page.locator('#fileList .file-item').nth(2)).toHaveAttribute('data-path', 'diagrams/security-overview.mmd');
+  expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
+
+  await page.locator('[data-path="diagrams/security-overview.mmd"]').click();
+  await expect(page.locator('#editor')).toHaveValue(/flowchart LR/);
+  expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
+  await expect(page.locator('.diagram-frame svg')).toHaveCount(1);
+});
+
+test('invalid Lens artefact bundle manifest falls back to safe ZIP import', async ({ page }, testInfo) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  const zipPath = await writeZipFixture(testInfo, 'invalid-lens-artefact-bundle.zip', [
+    { name: 'README.md', data: '# Safe Import\n\nThe document still imports.' },
+    { name: 'lens-artifact-bundle.json', data: '{"formatVersion":' },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 document from ZIP\. Artefact bundle manifest could not be read\./, { timeout: 20_000 });
+  await expect(page.locator('#artifactBundleSummary')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue(/document still imports/);
+  expect(pageErrors).toEqual([]);
+});
+
+test('Lens artefact bundle missing entry document keeps fallback selection and warns', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'missing-entry-lens-artefact-bundle.zip', [
+    { name: 'README.md', data: '# Fallback Entry\n\nExisting first document opened.' },
+    {
+      name: 'lens-artifact-bundle.json',
+      data: JSON.stringify({
+        formatVersion: 'lens-artifact-bundle-1.0',
+        title: 'Missing Entry Pack',
+        entryDocument: 'missing.md',
+        documents: [{ path: 'README.md', title: 'Fallback', kind: 'summary', order: 10 }],
+      }),
+    },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/entry document was not found/, { timeout: 20_000 });
+  await expect(page.locator('#editor')).toHaveValue(/Existing first document opened/);
+  await expect(page.locator('#artifactBundleSummary')).toContainText('Manifest warning: entry document was not found.');
+});
+
+test('Lens artefact bundle ignores unsafe metadata paths without exposing them', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'unsafe-paths-lens-artefact-bundle.zip', [
+    { name: 'README.md', data: '# Safe Path\n\nOnly the imported safe document is active.' },
+    {
+      name: 'lens-artifact-bundle.json',
+      data: JSON.stringify({
+        formatVersion: 'lens-artifact-bundle-1.0',
+        title: 'Unsafe Path Pack',
+        entryDocument: '../secrets.md',
+        documents: [
+          { path: '../secrets.md', title: 'Traversal', order: 1 },
+          { path: '/absolute.md', title: 'Absolute', order: 2 },
+          { path: 'C:\\secrets.md', title: 'Drive', order: 3 },
+          { path: 'https://example.com/file.md', title: 'URL', order: 4 },
+          { path: 'README.md', title: 'Safe', order: 10 },
+        ],
+      }),
+    },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/entry document path was ignored/, { timeout: 20_000 });
+  await expect(page.locator('#fileList .file-item')).toHaveCount(1);
+  await expect(page.locator('#editor')).toHaveValue(/Only the imported safe document/);
+  await expect(page.locator('body')).not.toContainText('../secrets.md');
+  await expect(page.locator('body')).not.toContainText('/absolute.md');
+  await expect(page.locator('body')).not.toContainText('C:\\secrets.md');
+  await expect(page.locator('body')).not.toContainText('https://example.com/file.md');
+});
+
+test('Lens artefact bundle preserves candidate evidence wording', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'candidate-lens-artefact-bundle.zip', [
+    { name: 'README.md', data: '# Candidate Evidence\n\nCandidate wording remains unchanged.' },
+    {
+      name: 'lens-artifact-bundle.json',
+      data: JSON.stringify({
+        formatVersion: 'lens-artifact-bundle-1.0',
+        title: 'Candidate Evidence Pack',
+        entryDocument: 'README.md',
+        evidenceLevels: ['candidate finding'],
+        documents: [{ path: 'README.md', title: 'Candidate', evidenceLevel: 'candidate finding', order: 10 }],
+      }),
+    },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  const summary = page.locator('#artifactBundleSummary');
+  await expect(summary).toContainText('candidate finding', { timeout: 20_000 });
+  await expect(summary).not.toContainText('confirmed finding');
+});
+
+test('Lens artefact bundle metadata does not trigger external fetches', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'no-fetch-lens-artefact-bundle.zip', [
+    { name: 'README.md', data: '# No Fetch\n\nManifest URLs are inert metadata.' },
+    {
+      name: 'lens-artifact-bundle.json',
+      data: JSON.stringify({
+        formatVersion: 'lens-artifact-bundle-1.0',
+        title: 'No Fetch Pack',
+        sourceTool: 'https://example.com/tool',
+        entryDocument: 'README.md',
+        documents: [
+          { path: 'README.md', title: 'Safe', order: 10 },
+          { path: 'https://example.com/file.md', title: 'Remote', order: 20 },
+        ],
+      }),
+    },
+  ]);
+
+  await page.goto('/');
+  await page.evaluate(() => {
+    const calls = [];
+    const originalFetch = window.fetch.bind(window);
+    window.__lensArtifactFetchCalls = calls;
+    window.fetch = (...args) => {
+      calls.push(String(args[0]?.url || args[0]));
+      return originalFetch(...args);
+    };
+  });
+
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 document from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__lensArtifactFetchCalls)).toEqual([]);
+});
+
 test('ZIP import accepts compressed generic docs and handles ZIPs without sources', async ({ page }, testInfo) => {
   const zipPath = testInfo.outputPath('generic-docs.zip');
   await writeFile(zipPath, createZipBuffer([
@@ -1833,6 +2031,7 @@ test('ZIP import accepts compressed generic docs and handles ZIPs without source
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/, { timeout: 20_000 });
+  await expect(page.locator('#artifactBundleSummary')).toBeHidden();
   await expect(page.locator('#status')).toHaveText(/SVG images are not imported for security/);
   await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
   await expect(page.locator('#preview img[data-managed-asset-path="docs/images/logo.png"]')).toHaveAttribute('src', /^blob:/);

@@ -568,7 +568,7 @@
       min-width: 0;
       min-height: 0;
       display: grid;
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto auto auto 1fr;
       border-right: 1px solid var(--border-soft);
       background: var(--sidebar-bg);
       backdrop-filter: blur(12px);
@@ -2630,6 +2630,81 @@ label.file-button.primary,
   font-weight: 600;
 }
 
+.artifact-bundle-summary {
+  display: grid;
+  gap: .55rem;
+  margin: .65rem .72rem .05rem;
+  padding: .72rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface) 82%, var(--surface-soft) 18%);
+  color: var(--muted-strong);
+  font-size: .76rem;
+}
+
+.artifact-bundle-summary[hidden] {
+  display: none;
+}
+
+.artifact-bundle-head {
+  display: grid;
+  gap: .18rem;
+}
+
+.artifact-bundle-title {
+  color: var(--text);
+  font-size: .86rem;
+  font-weight: 750;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.artifact-bundle-copy,
+.artifact-bundle-warning {
+  margin: 0;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.artifact-bundle-meta {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, auto) minmax(0, 1fr);
+  gap: .28rem .45rem;
+  margin: 0;
+}
+
+.artifact-bundle-meta dt {
+  color: var(--muted);
+}
+
+.artifact-bundle-meta dd {
+  margin: 0;
+  color: var(--muted-strong);
+  overflow-wrap: anywhere;
+}
+
+.artifact-bundle-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .32rem;
+}
+
+.artifact-bundle-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.35rem;
+  padding: .12rem .45rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--button-bg);
+  color: var(--muted-strong);
+  line-height: 1.1;
+}
+
+.artifact-bundle-warning {
+  color: var(--warning);
+}
+
 .search-wrap {
   padding: .7rem .72rem;
   border-bottom: 1px solid var(--border-soft);
@@ -3569,7 +3644,7 @@ label.file-button.primary,
 
 /* ── Sidebar: icon-rail collapse ─────────────────────────── */
 .sidebar {
-  grid-template-rows: 0 auto auto 1fr; /* rail hidden by default */
+  grid-template-rows: 0 auto auto auto 1fr; /* rail hidden by default */
   transition: width .22s cubic-bezier(.4,0,.2,1);
   overflow: hidden;
 }
@@ -3681,6 +3756,7 @@ label.file-button.primary,
 }
 
 .shell.sidebar-collapsed .sidebar-header,
+.shell.sidebar-collapsed .artifact-bundle-summary,
 .shell.sidebar-collapsed .search-wrap,
 .shell.sidebar-collapsed .file-list {
   display: none;
