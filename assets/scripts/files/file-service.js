@@ -2,6 +2,7 @@ import { decodeZipText, readZipEntriesFromFile } from '../utils/zip.js';
 import { convertDocumentFiles, isImportableDocumentFile } from './document-import-service.js';
 
 const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
+  'lens-docs-studio-bundle.json',
   'local-docs-studio-bundle.json',
   // Keep accepting bundles exported before the app was renamed.
   'md-mmd-renderer-bundle.json',

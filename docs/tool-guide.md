@@ -1,4 +1,4 @@
-# Local Docs Studio Feature Guide
+# Lens Docs Studio Feature Guide
 
 Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-site features. It opens in read-only mode from the Help menu, so it is safe to browse while keeping your own files untouched.
 

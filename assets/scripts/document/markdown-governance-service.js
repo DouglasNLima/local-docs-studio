@@ -55,7 +55,7 @@ const severityWeight = {
   info: 2,
 };
 
-export function analyzeMarkdownGovernance({ records = [], activePath = '' } = {}) {
+export function analyseMarkdownGovernance({ records = [], activePath = '' } = {}) {
   const documentRecords = records
     .filter((record) => record?.path)
     .map((record) => ({

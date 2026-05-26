@@ -1,6 +1,8 @@
-# Local Docs Studio
+# Lens Docs Studio
 
-A local-first Markdown, Mermaid, and documentation studio that runs entirely in the browser and can be published from GitHub Pages. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the browser supports it, and export clean docs packages without a backend.
+Local Markdown, Mermaid, and documentation studio.
+
+Lens Docs Studio is a local-first documentation workspace that runs entirely in the browser and can be published from GitHub Pages. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the browser supports it, and export clean documentation packages without a backend.
 
 ## Use The App
 
@@ -130,7 +132,7 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 ## Advanced Import And Export
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
-- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `local-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
+- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Export profiles** save local export defaults such as the Azure DevOps Mermaid option and Docs Site defaults, then reapply them from the Export menu.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
@@ -140,12 +142,14 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 
 The app is static and buildless. GitHub Pages can serve it directly without npm, a backend, or a bundler.
 
+The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for primary actions, selected states, focus states, and brand moments while keeping the product generic for local Markdown, Mermaid, and documentation workflows.
+
 - `index.html` is the public app shell.
 - `md-mmd-renderer-v5.html` is a compatibility redirect for older links from the original app name.
 - `assets/styles/app.css` contains the app UI styles.
 - `assets/scripts/main.js` boots the ESM app controller.
 - `assets/scripts/app-controller.js` composes the app services and coordinates UI/event flow.
-- `assets/scripts/dom.js` centralizes DOM element lookup.
+- `assets/scripts/dom.js` centralises DOM element lookup.
 - `assets/scripts/state/config.js` owns app constants and initial state.
 - `assets/scripts/document/document-ux-service.js` owns preview outline, search, active section tracking, and document review notes.
 - `assets/scripts/editor/editor-service.js` owns editor history, undo/redo, line numbers, Mermaid autocomplete, and Markdown formatting actions.
