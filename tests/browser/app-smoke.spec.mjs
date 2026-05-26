@@ -489,6 +489,26 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   await expect(page.locator('#status')).toHaveText(/Table CSV downloaded/);
 });
 
+test('Mermaid labels with HTML line breaks render without SVG parser errors', async ({ page }) => {
+  await page.goto('/');
+  await setEditorValueAndSelection(page, `\`\`\`mermaid
+flowchart TD
+  A[Parent Flow or Power App] --> B[Prepare Function Request<br/>sourceType + sourceId + maxGeneration]
+  B --> C[Call Azure Function<br>POST /api/tih/validate]
+\`\`\``);
+
+  await renderPreviewWithShortcut(page);
+
+  const frame = page.locator('.diagram-frame');
+  await expect(frame.locator('svg')).toHaveCount(1);
+  await expect(page.locator('.diagram-error')).toHaveCount(0);
+  await expect(frame.locator('parsererror')).toHaveCount(0);
+  await expect(frame).not.toContainText('Opening and ending tag mismatch');
+  await expect(frame.locator('svg')).toContainText('Prepare Function Request');
+  await expect(frame.locator('svg')).toContainText('sourceType + sourceId + maxGeneration');
+  await expect(frame.locator('svg')).toContainText('POST /api/tih/validate');
+});
+
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
   await page.goto('/');
   await setEditorValueAndSelection(page, '# Formula\n\nInline $E=mc^2$ and block:\n\n$$\n\\frac{a_1}{b^2}\n$$\n\n```js\nconst value = 1;\n```');

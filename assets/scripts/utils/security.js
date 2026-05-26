@@ -47,7 +47,7 @@ export function sanitizeRenderedHtml(dirtyHtml) {
 }
 
 export function sanitizeMermaidSvg(svg) {
-  const cleanSvg = DOMPurify.sanitize(replaceForeignObjectLabels(svg), {
+  const cleanSvg = DOMPurify.sanitize(replaceForeignObjectLabels(normaliseSvgVoidElements(svg)), {
     USE_PROFILES: { svg: true, svgFilters: true },
     FORBID_TAGS: ['foreignObject', 'script'],
   });
@@ -64,11 +64,21 @@ export function sanitizeMermaidSvg(svg) {
   return template.innerHTML;
 }
 
+function normaliseSvgVoidElements(svg) {
+  return String(svg || '').replace(
+    /<(br|hr|img|input|meta|link|area|base|col|embed|param|source|track|wbr)\b([^<>]*)>/gi,
+    (match, tagName, attributes = '') => {
+      if (/\/\s*$/.test(attributes)) return match;
+      return `<${tagName}${attributes} />`;
+    }
+  );
+}
+
 function replaceForeignObjectLabels(svg) {
   const document = new DOMParser().parseFromString(svg, 'image/svg+xml');
   document.querySelectorAll('foreignObject').forEach((foreignObject) => {
-    const text = foreignObject.textContent.replace(/\s+/g, ' ').trim();
-    if (!text) {
+    const lines = getForeignObjectTextLines(foreignObject);
+    if (!lines.length) {
       foreignObject.remove();
       return;
     }
@@ -80,16 +90,43 @@ function replaceForeignObjectLabels(svg) {
     const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 
     svgText.setAttribute('x', String(x + width / 2));
-    svgText.setAttribute('y', String(y + height / 2));
     svgText.setAttribute('text-anchor', 'middle');
     svgText.setAttribute('dominant-baseline', 'middle');
     svgText.setAttribute('font-size', '16');
     svgText.setAttribute('fill', '#333333');
-    svgText.textContent = text;
+
+    const lineHeight = 18;
+    svgText.setAttribute('y', String(y + height / 2 - ((lines.length - 1) * lineHeight) / 2));
+
+    lines.forEach((line, index) => {
+      const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspan.setAttribute('x', String(x + width / 2));
+      if (index > 0) tspan.setAttribute('dy', String(lineHeight));
+      tspan.textContent = line;
+      svgText.appendChild(tspan);
+    });
+
     foreignObject.replaceWith(svgText);
   });
 
   return new XMLSerializer().serializeToString(document.documentElement);
+}
+
+function getForeignObjectTextLines(foreignObject) {
+  const clone = foreignObject.cloneNode(true);
+  clone.querySelectorAll('br').forEach((breakElement) => {
+    breakElement.replaceWith(clone.ownerDocument.createTextNode('\n'));
+  });
+
+  const lines = clone.textContent
+    .split(/\n+/)
+    .map((line) => line.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
+
+  if (lines.length) return lines;
+
+  const fallbackText = foreignObject.textContent.replace(/\s+/g, ' ').trim();
+  return fallbackText ? [fallbackText] : [];
 }
 
 export function buildCspMeta(policy) {
