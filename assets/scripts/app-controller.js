@@ -14,6 +14,7 @@ import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
+import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
 import { createSelectionSyncService } from './document/selection-sync-service.js';
 import { downloadBlob, registerServiceWorker } from './utils/browser.js';
@@ -334,7 +335,9 @@ export function createAppController() {
       callbacks: {
         getBacklinks,
         getWorkspaceAudit,
+        getGovernanceAudit,
         openBacklink,
+        openGovernanceIssue,
       },
     });
     const {
@@ -1418,6 +1421,18 @@ export function createAppController() {
       return { brokenLinkCount, orphanAssetCount, unlinkedPageCount };
     }
 
+    async function getGovernanceAudit() {
+      const records = [];
+      for (const record of getDocumentationRecords()) {
+        records.push({
+          name: record.name,
+          path: record.path,
+          text: await readRecordText(record),
+        });
+      }
+      return analyseMarkdownGovernance({ records, activePath: state.activePath });
+    }
+
     async function openDocsMap() {
       const records = getDocumentationRecords();
       if (!records.length) {
@@ -1717,6 +1732,12 @@ ${unresolvedRows}
       focusEditorAtLine(line, 1, 1);
     }
 
+    async function openGovernanceIssue(path, line = 1, column = 1, length = 1) {
+      await selectFile(path);
+      focusEditorAtLine(line, column, length);
+      setStatus(`Opened governance issue at ${path}:${line}.`, 'info');
+    }
+
     function isActiveReadOnly() {
       return Boolean(getActiveRecord()?.readOnly);
     }
@@ -1924,7 +1945,7 @@ ${unresolvedRows}
         <section class="welcome-state" aria-label="Welcome">
           <p class="welcome-kicker">Browser-only Markdown and Mermaid</p>
           <h2>Start with a file, a folder, or a ready-made document.</h2>
-          <p>Preview Markdown and Mermaid side by side, then export with render checks when the document is ready.</p>
+          <p>Open files, create documents, preview Markdown and Mermaid, and export clean documentation packages when the work is ready.</p>
           <div class="welcome-choice-grid">
             <div class="welcome-choice">
               <strong>Open local work</strong>
@@ -2306,11 +2327,11 @@ ${unresolvedRows}
     function exportLocalLibrary() {
       const library = readLocalLibrary();
       const payload = {
-        formatVersion: 'local-docs-studio-library-1.0',
+        formatVersion: 'lens-docs-studio-library-1.0',
         exportedAt: new Date().toISOString(),
         ...library,
       };
-      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), 'local-docs-studio-library.json');
+      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), 'lens-docs-studio-library.json');
       setStatus('Local library exported as JSON.', 'ok');
     }
 

@@ -1,4 +1,4 @@
-name: Publish Local Docs Studio
+name: Publish Lens Docs Studio
 
 on:
   push:

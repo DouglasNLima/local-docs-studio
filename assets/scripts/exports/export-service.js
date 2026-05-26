@@ -15,8 +15,8 @@ import {
   sanitizeRenderedHtml,
 } from '../utils/security.js';
 
-const APP_NAME = 'Local Docs Studio';
-const MARKDOWN_BUNDLE_MANIFEST_NAME = 'local-docs-studio-bundle.json';
+const APP_NAME = 'Lens Docs Studio';
+const MARKDOWN_BUNDLE_MANIFEST_NAME = 'lens-docs-studio-bundle.json';
 
 export function createExportService({
   state,
@@ -1160,8 +1160,8 @@ export function createExportService({
   --border: #d5dce8;
   --text: #0f172a;
   --muted: #64748b;
-  --accent: #0369a1;
-  --accent-soft: #dbeafe;
+  --accent: #D95F16;
+  --accent-soft: #FFF1E8;
   --code: #f1f5f9;
   --danger: #be123c;
   --shadow: 0 18px 48px rgba(15, 23, 42, .08);
@@ -1175,8 +1175,8 @@ export function createExportService({
   --border: #24364f;
   --text: #e5eefb;
   --muted: #9aa8bc;
-  --accent: #38bdf8;
-  --accent-soft: #12324a;
+  --accent: #FF883E;
+  --accent-soft: #3A261C;
   --code: #08111f;
   --danger: #fb7185;
   --shadow: 0 18px 48px rgba(0, 0, 0, .28);
@@ -1824,7 +1824,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     th, td { border: 1px solid #d5dce8; padding: .58rem .72rem; text-align: left; }
     th { background: #e2e8f0; }
     img { max-width: 100%; height: auto; border-radius: .7rem; }
-    blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid #38bdf8; color: #475569; }
+    blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid #FF883E; color: #475569; }
     ${buildCodeBlockSupportCss()}
     ${buildTableActionSupportCss()}
     ${buildDiagramActionSupportCss()}
@@ -1863,14 +1863,14 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     h3 { font-size: 16pt; }
     h4 { font-size: 13pt; }
     p, li, blockquote, table, pre, figure { break-inside: avoid; }
-    a { color: #0369a1; }
+    a { color: #D95F16; }
     img { max-width: 100%; height: auto; }
     pre { overflow: visible; white-space: pre-wrap; word-break: break-word; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 9.5pt; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #d5dce8; padding: 5pt 7pt; text-align: left; }
     th { background: #eef2f7; }
-    blockquote { margin-inline: 0; padding-left: 12pt; border-left: 3pt solid #38bdf8; color: #475569; }
+    blockquote { margin-inline: 0; padding-left: 12pt; border-left: 3pt solid #FF883E; color: #475569; }
     .code-block { margin: 12pt 0; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     .code-block pre { margin: 0; border: 0; background: transparent; }
     .diagram-frame { overflow: visible; margin: 12pt 0; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #ffffff; break-inside: avoid; }
@@ -1903,7 +1903,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .code-block-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-width: 0; padding: .48rem .62rem; border-bottom: 1px solid #d5dce8; background: #eef4fb; }
     .code-block-language { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .code-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .code-copy-button:hover, .code-copy-button:focus-visible { border-color: #0284c7; outline: none; }
+    .code-copy-button:hover, .code-copy-button:focus-visible { border-color: #FF883E; outline: none; }
     .code-copy-button:disabled { cursor: default; opacity: .72; }
     .code-block pre { overflow: auto; margin: 0; padding: 1rem; border: 0; border-radius: 0; background: transparent; }
     .code-block code { display: block; min-width: max-content; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: .9rem; line-height: 1.58; white-space: pre; }
@@ -1966,7 +1966,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .table-block-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .table-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
     .table-action-button, .table-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #0284c7; outline: none; }
+    .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #FF883E; outline: none; }
     .table-action-button:disabled, .table-copy-button:disabled { cursor: default; opacity: .72; }
     .table-block table { width: 100%; margin: 0; border-collapse: collapse; }`;
     }
@@ -2096,7 +2096,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .diagram-toolbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .diagram-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
     .diagram-action-button { min-width: 3.2rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .55rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .diagram-action-button:hover, .diagram-action-button:focus-visible { border-color: #0284c7; outline: none; }
+    .diagram-action-button:hover, .diagram-action-button:focus-visible { border-color: #FF883E; outline: none; }
     .diagram-action-button:disabled { cursor: default; opacity: .72; }
     @media (max-width: 640px) { .diagram-toolbar { align-items: stretch; } .diagram-action-group { width: 100%; } .diagram-action-button { flex: 1 1 0; } }`;
     }
@@ -2693,13 +2693,13 @@ ${buildWordBodyXml(root, imageRelationships)}
     h3 { font-size: 14pt; }
     h4 { font-size: 12pt; }
     p { margin: 0 0 8pt; }
-    a { color: #0369a1; text-decoration: underline; }
+    a { color: #D95F16; text-decoration: underline; }
     pre { white-space: pre-wrap; word-wrap: break-word; margin: 10pt 0; padding: 9pt; border: 1pt solid #d5dce8; background: #f8fafc; font-family: Consolas, Courier New, monospace; font-size: 9.5pt; }
     code { font-family: Consolas, Courier New, monospace; font-size: 9.5pt; }
     table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
     th, td { border: 1pt solid #d5dce8; padding: 5pt 6pt; text-align: left; vertical-align: top; }
     th { background: #e2e8f0; color: #0f172a; font-weight: bold; }
-    blockquote { margin: 8pt 0; padding: 4pt 0 4pt 10pt; border-left: 3pt solid #38bdf8; color: #475569; }
+    blockquote { margin: 8pt 0; padding: 4pt 0 4pt 10pt; border-left: 3pt solid #FF883E; color: #475569; }
     ul, ol { margin-top: 0; margin-bottom: 8pt; }
     .diagram-frame { margin: 12pt 0; padding: 9pt; border: 1pt solid #d5dce8; background: #ffffff; }
     .diagram-image { display: block; max-width: 100%; height: auto; }

@@ -4,7 +4,13 @@ Guidance for coding agents working in this repository.
 
 ## Project Overview
 
-This is Local Docs Studio, a buildless, browser-only Markdown, Mermaid, and documentation export studio. It must remain compatible with publication on GitHub Pages and should run directly from GitHub Pages or from a local static server, without a backend or production build step.
+This is Lens Docs Studio, a buildless, browser-only Markdown, Mermaid, and documentation studio. It must remain compatible with publication on GitHub Pages and should run directly from GitHub Pages or from a local static server, without a backend or production build step.
+
+The product remains a generic local documentation studio. Do not position it as a Power Platform Lens-only tool. Use the generic tagline: Local Markdown, Mermaid, and documentation studio.
+
+The Lens visual identity uses `#FF883E` as a restrained brand accent for primary actions, selected indicators, active states, focus states, and compact brand moments. Prefer neutral surfaces (`#FAFAFA`, `#F8F9FB`, `#F3F4F6`, `#EDEDED`) and high-contrast text. Avoid broad orange panels, saturated backgrounds, or noisy command surfaces.
+
+Use British English for first-party UI, docs, comments, test names, logs, generated copy, examples, templates, and snippets where wording is not an immutable external/API term.
 
 The app supports Markdown editing and preview, Mermaid rendering, ZIP import/export, Word/HTML/PDF-oriented exports, docs-site export, local file/folder workflows, document outline/search/review helpers, and a PWA/offline shell.
 
@@ -18,11 +24,11 @@ The app supports Markdown editing and preview, Mermaid rendering, ZIP import/exp
 - `assets/scripts/dom.js`: DOM lookup and element references.
 - `assets/scripts/state/config.js`: constants and initial state.
 - `assets/scripts/document/`: preview document UX, outline, search, selection, and scroll sync.
-- `assets/scripts/editor/`: editor behavior, history, formatting actions, autocomplete, and paste handling.
+- `assets/scripts/editor/`: editor behaviour, history, formatting actions, autocomplete, and paste handling.
 - `assets/scripts/files/`: open/save, ZIP import, folder records, and recent handles.
 - `assets/scripts/rendering/`: Markdown, Highlight.js, Mermaid, diagram frames, and zoom.
 - `assets/scripts/exports/`: HTML, Word, PDF print, Markdown Bundle, Docs Site, SVG/PNG, clipboard, and export flows.
-- `assets/scripts/ui/`: menus, file list, theme, layout, status, resizers, and general UI behavior.
+- `assets/scripts/ui/`: menus, file list, theme, layout, status, resizers, and general UI behaviour.
 - `assets/scripts/utils/`: shared browser, binary, file, formatting, DevOps Markdown, and ZIP helpers.
 - `assets/scripts/registries/content.js`: examples, templates, snippets, and local content studios.
 - `docs/tool-guide.md`: built-in read-only feature guide opened from Help.
@@ -30,7 +36,7 @@ The app supports Markdown editing and preview, Mermaid rendering, ZIP import/exp
 - `tests/browser/app-smoke.spec.mjs`: Playwright smoke/regression coverage.
 - `tests/fixtures/`: Markdown, Mermaid, docs-site, and ZIP-related fixtures.
 
-Generated artifacts such as `node_modules/`, `test-results/`, `playwright-report/`, and local logs are ignored and should not be edited as source.
+Generated artefacts such as `node_modules/`, `test-results/`, `playwright-report/`, and local logs are ignored and should not be edited as source.
 
 ## Development Commands
 
@@ -80,25 +86,25 @@ The Playwright config starts the same server automatically and uses `http://127.
 - Use native ESM modules and relative imports.
 - Treat GitHub Pages compatibility as a project requirement. Changes must continue to work when the repository is served as static files from GitHub Pages.
 - Keep local asset references relative where the app, manifest, service worker, and static checks expect relative paths.
-- Preserve the current service-oriented structure. Add behavior to the owning service instead of growing `index.html` or `app-controller.js` unnecessarily.
+- Preserve the current service-oriented structure. Add behaviour to the owning service instead of growing `index.html` or `app-controller.js` unnecessarily.
 - Keep UI styles in `assets/styles/app.css`; avoid inline styles except for dynamic values that genuinely need runtime calculation.
 - Prefer existing utilities in `assets/scripts/utils/` before adding new helpers.
-- Keep browser-only behavior defensive. File System Access API, clipboard APIs, downloads, and print flows need fallbacks or clear status messages when browser support is limited.
+- Keep browser-only behaviour defensive. File System Access API, clipboard APIs, downloads, and print flows need fallbacks or clear status messages when browser support is limited.
 - Keep exports clean. App-only review/search/outline UI should not leak into generated HTML, Word, Docs Site, or Markdown Bundle output unless intentionally added.
-- Keep CDN/offline behavior in sync. When adding local modules or cacheable static assets, update `service-worker.js` so `npm run test:static` continues to pass.
-- Preserve legacy entry behavior in `md-mmd-renderer-v5.html`.
+- Keep CDN/offline behaviour in sync. When adding local modules or cacheable static assets, update `service-worker.js` so `npm run test:static` continues to pass.
+- Preserve legacy entry behaviour in `md-mmd-renderer-v5.html`.
 
 ## Testing Guidance
 
 Before handing off meaningful changes, run the narrowest useful check:
 
 - For module/import/service worker/shell changes, run `npm run test:static`.
-- For UI behavior, rendering, import/export, layout, clipboard, menu, theme, or browser workflow changes, run `npm run test:browser`.
+- For UI behaviour, rendering, import/export, layout, clipboard, menu, theme, or browser workflow changes, run `npm run test:browser`.
 - For broad changes, run `npm test`.
 
 Browser tests include Chromium and Microsoft Edge projects. Edge must be installed locally for the `edge` project; CI on `windows-latest` is expected to have it available.
 
-If you add new user-visible behavior, prefer extending `tests/browser/app-smoke.spec.mjs` with a focused smoke/regression test and use fixtures under `tests/fixtures/` when possible.
+If you add new user-visible behaviour, prefer extending `tests/browser/app-smoke.spec.mjs` with a focused smoke/regression test and use fixtures under `tests/fixtures/` when possible.
 
 ## Important Maintenance Notes
 

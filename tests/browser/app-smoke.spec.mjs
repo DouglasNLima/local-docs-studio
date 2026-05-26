@@ -421,11 +421,18 @@ function escapePdfText(value) {
 
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Local Docs Studio');
+  await expect(page).toHaveTitle('Lens Docs Studio');
   await expect(page.locator('#app')).toBeVisible();
+  await expect(page.locator('.brand h1')).toHaveText('Lens Docs Studio');
+  await expect(page.locator('.brand small')).toHaveText('Local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('.brand-mark')).not.toHaveText('LD');
+  await expect(page.locator('body')).not.toContainText('Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
   await expect(page.locator('script[type="module"][src$="/assets/scripts/main.js"]')).toHaveCount(1);
   await expect(page.locator('link[rel="stylesheet"][href$="/assets/styles/app.css"]')).toHaveCount(1);
+
+  const brandColour = await page.locator('.brand-mark').evaluate((element) => getComputedStyle(element).color);
+  expect(brandColour).toBe('rgb(255, 136, 62)');
 });
 
 test('legacy renderer URL redirects to the app', async ({ page }) => {
@@ -647,7 +654,7 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
 
   await expect(page.locator('#status')).toHaveText(/Feature guide opened read-only/, { timeout: 20_000 });
   await expect(page.locator('#activeFileLabel')).toHaveText(/tool-feature-guide\.md · read-only/);
-  await expect(page.locator('#preview h1')).toHaveText('Local Docs Studio Feature Guide');
+  await expect(page.locator('#preview h1')).toHaveText('Lens Docs Studio Feature Guide');
   await expect(page.locator('#editor')).toHaveJSProperty('readOnly', true);
   await expect(page.locator('#saveButton')).toBeDisabled();
   await expect(page.locator('#editorToolbar [data-command="bold"]')).toBeDisabled();
@@ -895,8 +902,8 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   await expect(page.locator('#activeFileLabel')).toContainText('second.md');
 
   await page.getByRole('button', { name: 'Document review' }).click();
-  await expect(page.locator('.document-review-links').first()).toContainText('Backlinks (1)');
-  await expect(page.locator('.document-review-links').first()).toContainText('index.md:2');
+  const backlinkAudit = page.locator('.document-review-links').filter({ hasText: 'Backlinks (1)' });
+  await expect(backlinkAudit).toContainText('index.md:2');
 
   const docsPath = await clickDocsSiteExportDownload(page, { title: 'Wiki Docs', description: 'Wikilink export check.' });
   const entries = await readZipEntries(docsPath);
@@ -929,6 +936,72 @@ test('document audit flags broken references and docs map opens as read-only mar
   await expect(page.locator('#editor')).toHaveValue(/## Unresolved Links/);
   await expect(page.locator('#preview')).toContainText('Documentation Map', { timeout: 20_000 });
   await expect(page.locator('#preview .diagram-frame')).toHaveCount(1, { timeout: 20_000 });
+});
+
+test('Markdown governance flags lint issues, navigates to source, and stays out of exports', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'README.md',
+      text: `# Governance Home
+
+### Skipped Heading
+
+![](assets/logo.png)
+
+[Missing guide](missing.md)
+
+[[Ghost Page]]
+
+| Feature | Value |
+| -- | --- |
+| One | Two | Three |
+
+The color choice is organized for release.
+
+TODO: finish the checklist before release.
+
+\`\`\`js
+// TODO: this code marker is ignored.
+const color = 'blue';
+\`\`\`
+
+[Guide](guide.md)
+`,
+    },
+    {
+      name: 'guide.md',
+      text: `# Guide
+
+FIXME: replace this note.
+
+The favorite center text should be reviewed.
+`,
+    },
+  ]);
+
+  await page.locator('#documentReviewToggleButton').click();
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Governance');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Heading hierarchy');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Internal links');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Alt text');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Tables');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('British English');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('TODO/FIXME');
+  await expect(page.locator('#documentReviewSummary')).toContainText(/notes/);
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Governance:');
+
+  const guideIssue = page.locator('[data-governance-path="guide.md"]').filter({ hasText: 'FIXME marker' });
+  await expect(guideIssue).toBeVisible();
+  await guideIssue.click();
+  await expect(page.locator('#activeFileLabel')).toContainText('guide.md');
+  await expect.poll(() => page.locator('#editor').evaluate((editor) => editor.value.slice(editor.selectionStart, editor.selectionEnd))).toBe('FIXME');
+  await expect(page.locator('#status')).toHaveText(/Opened governance issue at guide\.md:3/);
+
+  const htmlPath = await clickExportDownload(page, 'Export HTML');
+  const html = await readFile(htmlPath, 'utf8');
+  expect(html).not.toContain('Markdown governance');
+  expect(html).not.toContain('data-governance-path');
+  expect(html).not.toContain('TODO/FIXME');
 });
 
 test('local draft recovery and large deletion protection guard browser-local edits', async ({ page }) => {
@@ -1657,9 +1730,10 @@ test('Markdown Bundle export round-trips edited docs and image assets', async ({
 
   const bundlePath = await clickExportDownload(page, 'Export Markdown Bundle');
   const entries = await readZipEntries(bundlePath);
-  const manifest = JSON.parse(getZipText(entries, 'local-docs-studio-bundle.json'));
+  const manifest = JSON.parse(getZipText(entries, 'lens-docs-studio-bundle.json'));
 
   expect(manifest.formatVersion).toBe('markdown-bundle-1.0');
+  expect(manifest.generator).toBe('Lens Docs Studio');
   expect(manifest.documentCount).toBe(1);
   expect(manifest.assetCount).toBe(1);
   expect(manifest.documents[0].dirty).toBe(true);
@@ -1671,6 +1745,44 @@ test('Markdown Bundle export round-trips edited docs and image assets', async ({
   await expect(page.locator('#status')).toHaveText(/Imported 1 document and 1 image asset from Markdown bundle/);
   await expect(page.locator('#editor')).toHaveValue(/Bundle Edited/);
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/tiny-image.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
+test('Markdown Bundle import accepts current and legacy manifest names', async ({ page }, testInfo) => {
+  const manifestNames = [
+    'lens-docs-studio-bundle.json',
+    'local-docs-studio-bundle.json',
+    'md-mmd-renderer-bundle.json',
+  ];
+
+  await page.goto('/');
+
+  for (const manifestName of manifestNames) {
+    const zipPath = testInfo.outputPath(`${manifestName}.zip`);
+    await writeFile(zipPath, createZipBuffer([
+      {
+        name: 'README.md',
+        data: `# Bundle ${manifestName}\n\nImported through ${manifestName}.`,
+      },
+      {
+        name: manifestName,
+        data: JSON.stringify({
+          formatVersion: 'markdown-bundle-1.0',
+          generator: manifestName.startsWith('lens') ? 'Lens Docs Studio' : 'Local Docs Studio',
+          title: `Bundle ${manifestName}`,
+          exportedAt: '2026-05-26T00:00:00.000Z',
+          documentCount: 1,
+          assetCount: 0,
+          documents: [{ path: 'README.md', name: 'README.md', dirty: false, bytes: 0 }],
+          assets: [],
+        }),
+      },
+    ], { compress: true }));
+
+    await page.locator('#zipInput').setInputFiles(zipPath);
+    await expect(page.locator('#status')).toHaveText(/Imported 1 document from Markdown bundle/, { timeout: 20_000 });
+    await expect(page.locator('#folderBadge')).toHaveText(`Bundle ${manifestName}`);
+    await expect(page.locator('#editor')).toHaveValue(new RegExp(`Imported through ${manifestName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+  }
 });
 
 test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', async ({ page }) => {

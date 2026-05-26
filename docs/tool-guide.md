@@ -1,4 +1,4 @@
-# Local Docs Studio Feature Guide
+# Lens Docs Studio Feature Guide
 
 Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-site features. It opens in read-only mode from the Help menu, so it is safe to browse while keeping your own files untouched.
 
@@ -45,6 +45,7 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Outline navigation from headings.
 - Find in preview.
 - Document review metrics and non-blocking quality notes.
+- Markdown governance checks for heading hierarchy, internal links, alt text, tables, British English terms, and TODO/FIXME markers.
 - Workspace link/asset audit notes and a View menu docs map for loaded files.
 - Preview maximisation and diagram zoom controls.
 - Follow short editor selections into the preview while using Split layout.
