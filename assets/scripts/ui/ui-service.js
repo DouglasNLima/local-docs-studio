@@ -1,10 +1,12 @@
 import { storageKeys } from '../state/config.js';
+import { createArtifactBundleReader } from './artifact-bundle-reader.js';
 import { getFileExtensionLabel } from '../utils/files.js';
 import { clamp, readStoredNumber } from '../utils/format.js';
 
 export function createUiService({
   state,
   dom,
+  callbacks = {},
 }) {
   const {
     app,
@@ -14,6 +16,7 @@ export function createUiService({
     fileSearch,
     fileCount,
     folderBadge,
+    artifactBundleSummary,
     activeFileLabel,
     saveButton,
     createMenu,
@@ -29,6 +32,15 @@ export function createUiService({
     sidebarExpandBtn,
     railFileCount,
   } = dom;
+  const {
+    openArtifactPath,
+  } = callbacks;
+
+  const artifactBundleReader = createArtifactBundleReader({
+    container: artifactBundleSummary,
+    state,
+    onOpenPath: openArtifactPath,
+  });
 
     function renderFileList() {
       const term = fileSearch.value.trim().toLowerCase();
@@ -37,6 +49,7 @@ export function createUiService({
       fileCount.textContent = String(state.files.length);
       if (railFileCount) railFileCount.textContent = state.files.length > 0 ? String(state.files.length) : '';
       folderBadge.textContent = state.folderName || 'No folder';
+      artifactBundleReader.render();
       fileList.innerHTML = '';
 
       if (!state.files.length) {

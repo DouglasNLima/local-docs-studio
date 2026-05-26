@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v47';
+const CACHE_NAME = 'lens-docs-studio-v49';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -20,11 +20,14 @@ const LOCAL_ASSETS = [
   './assets/scripts/editor/typewriter-service.js',
   './assets/scripts/editor/workspace-search-service.js',
   './assets/scripts/files/document-import-service.js',
+  './assets/scripts/files/lens-artifact-bundle-service.js',
+  './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
   './assets/scripts/files/file-service.js',
   './assets/scripts/rendering/render-service.js',
   './assets/scripts/registries/content.js',
   './assets/scripts/state/config.js',
+  './assets/scripts/ui/artifact-bundle-reader.js',
   './assets/scripts/ui/context-menu-service.js',
   './assets/scripts/ui/ui-service.js',
   './assets/scripts/utils/binary.js',

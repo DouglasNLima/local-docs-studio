@@ -10,6 +10,7 @@ import { createWorkspaceSearchService } from './editor/workspace-search-service.
 import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
+import { createExportProfileService } from './exports/export-profile-service.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createUiService } from './ui/ui-service.js';
@@ -52,8 +53,11 @@ export function createAppController() {
       exportWordButton,
       exportPdfButton,
       exportMarkdownBundleButton,
+      exportArtifactReviewPackButton,
       devopsMarkdownExportToggle,
       exportDocsButton,
+      builtInExportProfiles,
+      activeExportProfileLabel,
       exportSvgButton,
       exportPngButton,
       copyMermaidButton,
@@ -71,6 +75,7 @@ export function createAppController() {
       fileSearch,
       fileCount,
       folderBadge,
+      artifactBundleSummary,
       activeFileLabel,
       diagramCount,
       zoomOutButton,
@@ -162,6 +167,8 @@ export function createAppController() {
 
     const state = createInitialState({ readStoredNumber });
     let openTableEditor = () => {};
+    let openArtifactReaderPath = async () => {};
+    let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
     const {
       recordEditorHistoryInput,
       resetEditorHistory,
@@ -221,6 +228,7 @@ export function createAppController() {
         fileSearch,
         fileCount,
         folderBadge,
+        artifactBundleSummary,
         activeFileLabel,
         saveButton,
         createMenu,
@@ -235,6 +243,9 @@ export function createAppController() {
         sidebarCollapseBtn,
         sidebarExpandBtn,
         railFileCount,
+      },
+      callbacks: {
+        openArtifactPath: (path) => openArtifactReaderPath(path),
       },
     });
     const draftTools = createDraftService({
@@ -426,6 +437,7 @@ export function createAppController() {
         getExportName,
         getWordExportName,
         getDocTitleFromPath,
+        getEffectiveDevopsMarkdownExport: () => getEffectiveDevopsMarkdownExport(),
         closeOpenMenus,
         setStatus,
       },
@@ -443,6 +455,7 @@ export function createAppController() {
       exportPreviewWord,
       exportPreviewPdf,
       exportMarkdownBundle,
+      exportArtifactReviewPack,
       copyRenderedHtml,
       copyRenderedText,
       copyCurrentMermaidSource,
@@ -451,6 +464,20 @@ export function createAppController() {
       exportDocsSite,
       setExportTrust,
     } = exportTools;
+    const exportProfileTools = createExportProfileService({
+      state,
+      dom: {
+        builtInExportProfileList: builtInExportProfiles,
+        activeExportProfileLabel,
+        devopsMarkdownExportToggle,
+        exportArtifactReviewPackButton,
+      },
+      callbacks: {
+        getExportTitle,
+        setStatus,
+      },
+    });
+    getEffectiveDevopsMarkdownExport = exportProfileTools.getEffectiveDevopsMarkdownExport;
     const {
       newMarkdownDocument,
       openFile,
@@ -495,7 +522,10 @@ export function createAppController() {
         renderPreview,
         setStatus,
         getMarkdownExportName,
-        afterLibraryLoaded: draftTools.updateWorkspaceDraftKey,
+        afterLibraryLoaded: () => {
+          draftTools.updateWorkspaceDraftKey();
+          exportProfileTools.resetSessionProfile();
+        },
         afterActiveFileLoaded: draftTools.afterActiveFileLoaded,
         beforeSaveActiveFile: draftTools.beforeSaveActiveFile,
         afterSaveActiveFile: draftTools.afterSaveActiveFile,
@@ -510,6 +540,7 @@ export function createAppController() {
         uniqueByPath,
       },
     });
+    openArtifactReaderPath = selectFile;
     const workspaceSearchTools = createWorkspaceSearchService({
       state,
       dom: {
@@ -589,6 +620,8 @@ export function createAppController() {
     draftTools.initDraftStore();
     draftTools.installDraftHandlers();
     installEditorEnhancements();
+    exportProfileTools.installBuiltInProfileHandlers();
+    exportProfileTools.renderBuiltInProfiles();
     findReplaceTools.installFindReplaceHandlers();
     tableEditorTools.installTableEditorHandlers();
     workspaceSearchTools.installWorkspaceSearchHandlers();
@@ -613,9 +646,15 @@ export function createAppController() {
           await draftTools.clearWorkspaceDrafts();
         }
       });
+      exportArtifactReviewPackButton?.addEventListener('click', async () => {
+        if (await exportArtifactReviewPack()) {
+          await draftTools.clearWorkspaceDrafts();
+        }
+      });
       devopsMarkdownExportToggle?.addEventListener('change', () => {
         state.devopsMarkdownExport = devopsMarkdownExportToggle.checked;
         localStorage.setItem(storageKeys.devopsMarkdownExport, String(state.devopsMarkdownExport));
+        exportProfileTools.handlePersistedDevopsToggleChange();
       });
       exportDocsButton.addEventListener('click', exportDocsSite);
       exportSvgButton.addEventListener('click', exportCurrentDiagramSvg);
@@ -1353,6 +1392,8 @@ export function createAppController() {
       state.fileCache.clear();
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
+      state.artifactBundle = null;
+      exportProfileTools.resetSessionProfile();
     }
 
     function focusEditorAtLine(line, column = 1, length = 1) {
@@ -2299,7 +2340,7 @@ ${unresolvedRows}
       library.profiles.unshift({
         id: createLocalLibraryId('profile'),
         label: label.trim(),
-        devopsMarkdownExport: Boolean(state.devopsMarkdownExport),
+        devopsMarkdownExport: Boolean(getEffectiveDevopsMarkdownExport()),
         docsSite: {
           title: state.folderName || getExportTitle() || 'Docs site',
           description: `Static documentation bundle with ${Math.max(state.files.length, 1)} page${state.files.length === 1 ? '' : 's'}.`,
@@ -2319,8 +2360,7 @@ ${unresolvedRows}
       }
       state.devopsMarkdownExport = Boolean(profile.devopsMarkdownExport);
       localStorage.setItem(storageKeys.devopsMarkdownExport, String(state.devopsMarkdownExport));
-      restoreDevOpsMarkdownExport();
-      state.exportProfileDefaults = profile;
+      exportProfileTools.applySavedLocalProfile(profile);
       setStatus(`Applied export profile "${profile.label}".`, 'ok');
     }
 
@@ -2595,9 +2635,7 @@ ${unresolvedRows}
     }
 
     function restoreDevOpsMarkdownExport() {
-      if (devopsMarkdownExportToggle) {
-        devopsMarkdownExportToggle.checked = state.devopsMarkdownExport;
-      }
+      exportProfileTools.restoreEffectiveDevopsToggle();
     }
 
     function toggleStudioMode(force) {

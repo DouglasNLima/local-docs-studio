@@ -6,7 +6,10 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const productName = 'Lens Docs Studio';
 const productTagline = 'Local Markdown, Mermaid, and documentation studio';
-const forbiddenShellPhrase = 'Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.';
+const forbiddenShellPhrases = [
+  'Power Platform Lens family',
+  'Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family',
+];
 
 function fail(message) {
   throw new Error(message);
@@ -97,7 +100,9 @@ if (!index.includes('Content-Security-Policy')) fail('index.html must define a C
 if (!index.includes(`<title>${productName}</title>`)) fail('index.html must use the Lens Docs Studio browser title');
 if (!index.includes(`<h1>${productName}</h1>`)) fail('index.html must show the Lens Docs Studio product name');
 if (!index.includes(`<small>${productTagline}</small>`)) fail('index.html must show the generic product tagline');
-if (index.includes(forbiddenShellPhrase)) fail('index.html must not use Power Platform Lens-only positioning');
+for (const phrase of forbiddenShellPhrases) {
+  if (index.includes(phrase)) fail('index.html must not use Power Platform Lens-only positioning');
+}
 if (index.includes('Local Docs Studio') || index.includes('Local Markdown, Mermaid, and docs export studio')) fail('index.html still contains old product identity copy');
 
 const localReferencePattern = /\b(?:href|src)=["'](\.\/[^"']+)["']/g;
@@ -136,6 +141,7 @@ const firstPartyCopyFiles = [
   'README.md',
   'docs/tool-guide.md',
   'docs/architecture/lens-docs-studio-identity.md',
+  'docs/architecture/lens-artifact-bundle-contract.md',
   'index.html',
   'manifest.webmanifest',
   'md-mmd-renderer-v5.html',
@@ -144,9 +150,48 @@ const americanEnglishPattern = /\b(artifact|artifacts|behavior|behaviors|center|
 for (const copyFile of firstPartyCopyFiles) {
   const source = readFileSync(toRootPath(copyFile), 'utf8')
     .replace(/theme-color/g, '')
+    .replace(/lens-artifact-bundle[\w.-]*/gi, '')
+    .replace(/artifactBundleSummary/g, '')
+    .replace(/artifact-bundle-[a-z0-9-]*/gi, '')
     .replace(/#[\da-f]{3,8}/gi, '');
   const match = source.match(americanEnglishPattern);
   if (match) fail(`${copyFile} contains American English spelling: ${match[0]}`);
+}
+
+const lensBundleContract = readFileSync(toRootPath('docs/architecture/lens-artifact-bundle-contract.md'), 'utf8');
+const readme = readFileSync(toRootPath('README.md'), 'utf8');
+if (!lensBundleContract.includes('lens-artifact-bundle.json')) fail('Lens artefact bundle contract must document lens-artifact-bundle.json');
+if (!lensBundleContract.includes('candidate finding')) fail('Lens artefact bundle contract must document candidate finding evidence');
+if (!lensBundleContract.includes('Reader Panel')) fail('Lens artefact bundle contract must document the reader panel');
+if (!lensBundleContract.includes('Built-in export profiles are session-only presets')) fail('Lens artefact bundle contract must document session-only export profiles');
+if (!lensBundleContract.includes('Docs Site export may use safe artefact metadata')) fail('Lens artefact bundle contract must document Docs Site artefact metadata');
+if (!lensBundleContract.includes('Generic Markdown Bundle export must not include `lens-artifact-bundle.json`')) fail('Lens artefact bundle contract must document generic bundle boundaries');
+if (!lensBundleContract.includes('confirmed finding')) fail('Lens artefact bundle contract must document confirmed finding wording rules');
+if (!readme.includes('Optional Lens Artefact Bundles') || !readme.includes('lens-artifact-bundle.json')) {
+  fail('README.md must document optional Lens artefact bundle ZIP support');
+}
+if (!readme.includes('Built-in export profiles') || !readme.includes('Export artefact review pack')) {
+  fail('README.md must document built-in profiles and artefact review export');
+}
+
+const lensArtifactBundleService = readFileSync(toRootPath('assets/scripts/files/lens-artifact-bundle-service.js'), 'utf8');
+for (const forbiddenRuntime of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'localStorage', 'indexedDB', 'openObjectStoreDb']) {
+  if (lensArtifactBundleService.includes(forbiddenRuntime)) {
+    fail(`Lens artefact bundle service must not use ${forbiddenRuntime}`);
+  }
+}
+
+const artifactReaderModule = readFileSync(toRootPath('assets/scripts/ui/artifact-bundle-reader.js'), 'utf8');
+const exportProfileModule = readFileSync(toRootPath('assets/scripts/exports/export-profile-service.js'), 'utf8');
+for (const [moduleName, source] of [
+  ['artefact reader', artifactReaderModule],
+  ['export profile', exportProfileModule],
+]) {
+  for (const forbiddenRuntime of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'indexedDB', 'openObjectStoreDb', 'https://', 'http://']) {
+    if (source.includes(forbiddenRuntime)) {
+      fail(`${moduleName} module must not add external service integration via ${forbiddenRuntime}`);
+    }
+  }
 }
 
 const workflow = readFileSync(toRootPath('.github/workflows/pages.yml'), 'utf8');
@@ -157,7 +202,6 @@ if (/^permissions:/m.test(workflow)) fail('Pages workflow permissions must be sc
 if (!/test:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?steps:/m.test(workflow)) fail('Test job must have contents: read permission only');
 if (!/deploy:[\s\S]*?permissions:[\s\S]*?contents: read[\s\S]*?pages: write[\s\S]*?id-token: write[\s\S]*?environment:/m.test(workflow)) fail('Deploy job must scope Pages and id-token write permissions');
 
-const readme = readFileSync(toRootPath('README.md'), 'utf8');
 for (const requiredText of ['Publish To GitHub Pages', 'npm ci', 'npm test', 'GitHub Actions', 'Export PDF', 'Export Markdown Bundle', 'Import ZIP']) {
   if (!readme.includes(requiredText)) fail(`README.md is missing publication guidance: ${requiredText}`);
 }
