@@ -5,10 +5,12 @@ Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-
 ## Open And Edit
 
 - Open a single `.md`, `.markdown`, `.mmd`, or `.mermaid` file.
-- Open a folder to browse multiple documents from the sidebar.
+- Open a folder to browse a workspace from the sidebar.
+- Switch the sidebar between flat list and folder tree views when folder hierarchy matters.
+- Add files to the current workspace or create a new Markdown file inside a writable workspace folder.
 - Import a Markdown Bundle or generic ZIP from the File menu.
 - Import a DOCX, HTML, or PDF document from the File menu to convert it into editable Markdown.
-- Save edits back to supported local files, or download a Markdown copy when the browser cannot write directly.
+- Save edits back to supported local files, use Save as for a new destination, or refresh the active file when it changes outside the app.
 
 ## Markdown Editor
 
@@ -20,7 +22,7 @@ The editor keeps the app lightweight while still covering daily documentation wo
 | Render | Ctrl/Cmd+Enter |
 | Undo and redo | Ctrl/Cmd+Z and Ctrl/Cmd+Y |
 | Mermaid snippets | Ctrl/Cmd+Space in Mermaid context |
-| Layout modes | View menu: Editor, Split, Preview |
+| Layout modes | Topbar icons: Editor, Split, Preview |
 | Follow editor selection | Preview header checkbox |
 | Manual snapshots | File menu: Create snapshot / Manage snapshots |
 
@@ -73,6 +75,7 @@ flowchart LR
 - **Export artefact review pack** is available only after importing a valid artefact bundle. It exports editable Markdown and managed images with a rebuilt safe `lens-artifact-bundle.json`; ordinary Markdown Bundle export does not include artefact metadata.
 - Built-in export profiles are session-only. The Azure DevOps Wiki Markdown profile uses a session override and does not persist the DevOps Mermaid preference unless you use the existing toggle or saved local profile flow.
 - ZIPs may optionally include `lens-artifact-bundle.json` metadata. When present, the app still imports the Markdown and Mermaid files normally, opens a safe declared entry document, and shows a collapsible artefact reader panel with safe navigation, evidence chips, warnings, and local filters.
+- Artefact bundle round-trip checks use source fixtures for valid, rich, invalid, unsafe, front matter, and generic ZIP cases so ordinary documentation import stays certified alongside the optional reader flow.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
@@ -106,3 +109,5 @@ Use **View > Manage assets** to preview session images, rename paths across edit
 The app runs in the browser. Files stay local unless you save, export, copy, or import a new bundle. There is no backend or account system.
 
 Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.
+
+Future compatible producers should follow `docs/integration/lens-artifact-bundle-producer-guide.md`. Release candidates should follow `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.

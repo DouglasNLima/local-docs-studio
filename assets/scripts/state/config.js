@@ -1,4 +1,7 @@
 export const supportedFilePattern = /\.(md|markdown|mmd|mermaid)$/i;
+export const APP_VERSION = '0.1.0';
+export const APP_BUILD = '53';
+export const APP_BROWSER_TITLE = `Lens Docs Studio v${APP_VERSION} (build ${APP_BUILD})`;
 
 export const storageKeys = {
   sidebarWidth: 'md-mmd-renderer.sidebarWidth',
@@ -15,6 +18,7 @@ export const storageKeys = {
   devopsMarkdownExport: 'md-mmd-renderer.devopsMarkdownExport',
   focusMode: 'md-mmd-renderer.focusMode',
   sidebarCollapsed: 'md-mmd-renderer.sidebarCollapsed',
+  fileBrowserView: 'md-mmd-renderer.fileBrowserView',
   typewriterMode: 'md-mmd-renderer.typewriterMode',
   workspaceSearchOptions: 'md-mmd-renderer.workspaceSearchOptions',
   draftStoreVersion: 'md-mmd-renderer.draftStoreVersion',
@@ -36,11 +40,14 @@ export function createInitialState({ readStoredNumber }) {
     activePath: '',
     fileName: '',
     folderName: '',
+    workspaceDirectoryHandle: null,
+    workspaceKind: '',
     renderId: 0,
     debounceId: 0,
     fileCache: new Map(),
     savedContentCache: new Map(),
     dirtyPaths: new Set(),
+    externalChangePaths: new Set(),
     deletionOverridePaths: new Set(),
     draftWorkspaceKey: '',
     diagramZoom: readStoredNumber(storageKeys.diagramZoom, 1),
@@ -56,6 +63,8 @@ export function createInitialState({ readStoredNumber }) {
     devopsMarkdownExport: localStorage.getItem(storageKeys.devopsMarkdownExport) === 'true',
     focusMode: localStorage.getItem(storageKeys.focusMode) === 'true',
     sidebarCollapsed: localStorage.getItem(storageKeys.sidebarCollapsed) === 'true',
+    fileBrowserView: localStorage.getItem(storageKeys.fileBrowserView) === 'tree' ? 'tree' : 'list',
+    collapsedTreeFolders: new Set(),
     typewriterMode: false,
     managedAssets: new Map(),
     managedAssetCounter: 0,

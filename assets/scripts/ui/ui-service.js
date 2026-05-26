@@ -1,4 +1,4 @@
-import { storageKeys } from '../state/config.js';
+import { APP_BROWSER_TITLE, APP_BUILD, APP_VERSION, storageKeys } from '../state/config.js';
 import { createArtifactBundleReader } from './artifact-bundle-reader.js';
 import { getFileExtensionLabel } from '../utils/files.js';
 import { clamp, readStoredNumber } from '../utils/format.js';
@@ -14,11 +14,19 @@ export function createUiService({
     workspace,
     fileList,
     fileSearch,
+    fileViewListButton,
+    fileViewTreeButton,
+    treeExpandButton,
+    treeCollapseButton,
+    treeRevealButton,
     fileCount,
     folderBadge,
     artifactBundleSummary,
     activeFileLabel,
     saveButton,
+    saveAsButton,
+    refreshFileButton,
+    appVersionBadge,
     createMenu,
     layoutModeControl,
     sidebarSplitter,
@@ -42,6 +50,9 @@ export function createUiService({
     onOpenPath: openArtifactPath,
   });
 
+    document.title = APP_BROWSER_TITLE;
+    if (appVersionBadge) appVersionBadge.textContent = `v${APP_VERSION} (build ${APP_BUILD})`;
+
     function renderFileList() {
       const term = fileSearch.value.trim().toLowerCase();
       const visibleFiles = state.files.filter((file) => file.path.toLowerCase().includes(term));
@@ -50,6 +61,7 @@ export function createUiService({
       if (railFileCount) railFileCount.textContent = state.files.length > 0 ? String(state.files.length) : '';
       folderBadge.textContent = state.folderName || 'No folder';
       artifactBundleReader.render();
+      updateFileBrowserControls();
       fileList.innerHTML = '';
 
       if (!state.files.length) {
@@ -62,50 +74,182 @@ export function createUiService({
         return;
       }
 
+      if (state.fileBrowserView === 'tree') {
+        renderFileTree(visibleFiles, term);
+        return;
+      }
+
       visibleFiles.forEach((file) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `file-item${file.path === state.activePath ? ' active' : ''}`;
-        button.dataset.path = file.path;
-        button.title = file.path;
-
-        const icon = document.createElement('span');
-        icon.className = 'file-icon';
-        icon.textContent = getFileExtensionLabel(file.name);
-
-        const textWrap = document.createElement('span');
-        textWrap.className = 'file-text';
-
-        const name = document.createElement('span');
-        name.className = 'file-name';
-        name.textContent = file.name;
-
-        const path = document.createElement('span');
-        path.className = 'file-path';
-        path.textContent = file.path;
-
-        textWrap.append(name, path);
-        button.append(icon, textWrap);
-
-        if (state.dirtyPaths.has(file.path)) {
-          const dirty = document.createElement('span');
-          dirty.className = 'dirty-dot';
-          dirty.title = 'Edited in memory';
-          button.appendChild(dirty);
-        } else if (file.readOnly) {
-          const readOnly = document.createElement('span');
-          readOnly.className = 'read-only-dot';
-          readOnly.title = 'Read-only document';
-          readOnly.textContent = 'RO';
-          button.appendChild(readOnly);
-        } else {
-          const spacer = document.createElement('span');
-          spacer.setAttribute('aria-hidden', 'true');
-          button.appendChild(spacer);
-        }
-
-        fileList.appendChild(button);
+        fileList.appendChild(createFileItem(file));
       });
+    }
+
+    function renderFileTree(records, term) {
+      const tree = buildFileTree(records);
+      const container = document.createElement('div');
+      container.className = 'file-tree';
+      container.setAttribute('role', 'tree');
+      container.setAttribute('aria-label', 'Workspace folder tree');
+
+      tree.files.forEach((file) => {
+        container.appendChild(createFileItem(file, { treeDepth: 0, pathLabel: 'Workspace root' }));
+      });
+      renderTreeFolders(container, [...tree.folders.values()], 0, Boolean(term));
+
+      fileList.appendChild(container);
+    }
+
+    function renderTreeFolders(container, folders, depth, forceExpanded) {
+      folders
+        .sort((left, right) => left.path.localeCompare(right.path, undefined, { sensitivity: 'base' }))
+        .forEach((folder) => {
+          const expanded = forceExpanded || !state.collapsedTreeFolders.has(folder.path);
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'tree-folder';
+          button.dataset.treeFolder = folder.path;
+          button.style.setProperty('--tree-depth', String(depth));
+          button.setAttribute('aria-expanded', String(expanded));
+          button.title = folder.path;
+
+          const twisty = document.createElement('span');
+          twisty.className = 'tree-folder-twisty';
+          twisty.setAttribute('aria-hidden', 'true');
+          twisty.innerHTML = expanded
+            ? '<svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>'
+            : '<svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+
+          const icon = document.createElement('span');
+          icon.className = 'tree-folder-icon';
+          icon.setAttribute('aria-hidden', 'true');
+          icon.innerHTML = '<svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h6l2 2h10v12H3z"/></svg>';
+
+          const textWrap = document.createElement('span');
+          textWrap.className = 'file-text';
+
+          const name = document.createElement('span');
+          name.className = 'file-name';
+          name.textContent = folder.name;
+
+          const meta = document.createElement('span');
+          meta.className = 'file-path';
+          const fileCountText = countTreeFiles(folder);
+          meta.textContent = `${folder.path} · ${fileCountText} file${fileCountText === 1 ? '' : 's'}`;
+
+          textWrap.append(name, meta);
+          button.append(twisty, icon, textWrap);
+          container.appendChild(button);
+
+          if (!expanded) return;
+          folder.files
+            .sort(compareFileRecords)
+            .forEach((file) => {
+              const parentPath = file.path.split('/').slice(0, -1).join('/') || 'Workspace root';
+              container.appendChild(createFileItem(file, { treeDepth: depth + 1, pathLabel: parentPath }));
+            });
+          renderTreeFolders(container, [...folder.folders.values()], depth + 1, forceExpanded);
+        });
+    }
+
+    function createFileItem(file, options = {}) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `file-item${file.path === state.activePath ? ' active' : ''}${options.treeDepth !== undefined ? ' tree-file-item' : ''}`;
+      button.dataset.path = file.path;
+      button.title = file.path;
+      if (options.treeDepth !== undefined) {
+        button.style.setProperty('--tree-depth', String(options.treeDepth));
+      }
+
+      const icon = document.createElement('span');
+      icon.className = 'file-icon';
+      icon.textContent = getFileExtensionLabel(file.name);
+
+      const textWrap = document.createElement('span');
+      textWrap.className = 'file-text';
+
+      const name = document.createElement('span');
+      name.className = 'file-name';
+      name.textContent = file.name;
+
+      const path = document.createElement('span');
+      path.className = 'file-path';
+      path.textContent = options.pathLabel || file.path;
+
+      textWrap.append(name, path);
+      button.append(icon, textWrap);
+      appendFileStateMarker(button, file);
+      return button;
+    }
+
+    function appendFileStateMarker(button, file) {
+      if (state.externalChangePaths.has(file.path)) {
+        const external = document.createElement('span');
+        external.className = 'external-change-dot';
+        external.title = state.dirtyPaths.has(file.path)
+          ? 'Edited in memory and changed outside the app'
+          : 'Changed outside the app';
+        button.appendChild(external);
+        return;
+      }
+      if (state.dirtyPaths.has(file.path)) {
+        const dirty = document.createElement('span');
+        dirty.className = 'dirty-dot';
+        dirty.title = 'Edited in memory';
+        button.appendChild(dirty);
+        return;
+      }
+      if (file.readOnly) {
+        const readOnly = document.createElement('span');
+        readOnly.className = 'read-only-dot';
+        readOnly.title = 'Read-only document';
+        readOnly.textContent = 'RO';
+        button.appendChild(readOnly);
+        return;
+      }
+      const spacer = document.createElement('span');
+      spacer.setAttribute('aria-hidden', 'true');
+      button.appendChild(spacer);
+    }
+
+    function buildFileTree(records) {
+      const root = createTreeNode('', '');
+      records.forEach((record) => {
+        const parts = String(record.path || record.name).split('/').filter(Boolean);
+        const fileName = parts.pop() || record.name;
+        let node = root;
+        parts.forEach((part) => {
+          const folderPath = node.path ? `${node.path}/${part}` : part;
+          if (!node.folders.has(part)) {
+            node.folders.set(part, createTreeNode(part, folderPath));
+          }
+          node = node.folders.get(part);
+        });
+        node.files.push({ ...record, name: record.name || fileName });
+      });
+      root.files.sort(compareFileRecords);
+      return root;
+    }
+
+    function createTreeNode(name, path) {
+      return {
+        name,
+        path,
+        folders: new Map(),
+        files: [],
+      };
+    }
+
+    function countTreeFiles(folder) {
+      let total = folder.files.length;
+      folder.folders.forEach((child) => {
+        total += countTreeFiles(child);
+      });
+      return total;
+    }
+
+    function compareFileRecords(left, right) {
+      return left.path.localeCompare(right.path, undefined, { sensitivity: 'base' });
     }
 
     function createEmptyState(message) {
@@ -124,7 +268,8 @@ export function createUiService({
         <div class="empty-actions">
           <button type="button" data-sidebar-action="openFile">Open file</button>
           <button type="button" data-sidebar-action="openFolder">Open folder</button>
-          <button type="button" data-sidebar-action="create">Create document</button>
+          <button type="button" data-sidebar-action="newFile">New file</button>
+          <button type="button" data-sidebar-action="addFile">Add file</button>
         </div>`;
       return element;
     }
@@ -132,30 +277,41 @@ export function createUiService({
     function updateActiveFileLabel() {
       const record = state.files.find((item) => item.path === state.activePath);
       const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in memory' : '';
+      const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ' · changed outside the app' : '';
       const readOnly = record?.readOnly ? ' · read-only' : '';
-      activeFileLabel.textContent = state.activePath ? `${state.activePath}${dirty}${readOnly}` : 'No file selected';
+      activeFileLabel.textContent = state.activePath ? `${state.activePath}${dirty}${external}${readOnly}` : 'No file selected';
     }
 
     function updateSaveButton() {
       const record = state.files.find((item) => item.path === state.activePath);
-      const isDirty = state.activePath && state.dirtyPaths.has(state.activePath);
       const canSaveConvertedCopy = Boolean(record?.converted && !record?.handle);
-      saveButton.disabled = !record || (!isDirty && !canSaveConvertedCopy) || Boolean(record?.readOnly);
+      const disabled = !record || Boolean(record?.readOnly);
+      saveButton.disabled = disabled;
+      if (saveAsButton) saveAsButton.disabled = disabled;
+      if (refreshFileButton) refreshFileButton.disabled = !record || !record.handle;
       if (record?.readOnly) {
         saveButton.title = 'Read-only guide documents cannot be saved.';
+        if (saveAsButton) saveAsButton.title = 'Read-only guide documents cannot be saved.';
+        if (refreshFileButton) refreshFileButton.title = record.handle ? 'Refresh active file' : 'No linked local file to refresh';
         return;
       }
       if (canSaveConvertedCopy) {
         saveButton.title = 'Save or download the converted Markdown copy';
+        if (saveAsButton) saveAsButton.title = 'Save the converted Markdown copy as another file';
+        if (refreshFileButton) refreshFileButton.title = 'Converted documents have no linked local source to refresh';
         return;
       }
       saveButton.title = record?.handle
         ? 'Save changes back to the opened file'
         : 'Save changes using your browser file picker';
+      if (saveAsButton) saveAsButton.title = 'Save a copy using your browser file picker';
+      if (refreshFileButton) refreshFileButton.title = record?.handle
+        ? 'Read the linked local file again'
+        : 'No linked local file to refresh';
     }
 
     function hasUnsavedChanges() {
-      return state.dirtyPaths.size > 0 || state.files.some((file) => file.converted && !file.handle);
+      return state.dirtyPaths.size > 0 || state.files.some((file) => (file.converted || file.needsSave) && !file.handle);
     }
 
     function confirmDiscardUnsaved(message) {
@@ -173,6 +329,83 @@ export function createUiService({
       closeOpenMenus();
       createMenu.open = true;
       createMenu.querySelector('summary')?.focus();
+    }
+
+    function setFileBrowserView(view) {
+      const next = view === 'tree' ? 'tree' : 'list';
+      state.fileBrowserView = next;
+      localStorage.setItem(storageKeys.fileBrowserView, next);
+      renderFileList();
+    }
+
+    function toggleTreeFolder(path) {
+      if (!path) return;
+      if (state.collapsedTreeFolders.has(path)) {
+        state.collapsedTreeFolders.delete(path);
+      } else {
+        state.collapsedTreeFolders.add(path);
+      }
+      renderFileList();
+    }
+
+    function expandTreeFolders() {
+      state.collapsedTreeFolders.clear();
+      setFileBrowserView('tree');
+    }
+
+    function collapseTreeFolders() {
+      state.collapsedTreeFolders = new Set(getAllTreeFolderPaths());
+      setFileBrowserView('tree');
+    }
+
+    function revealActiveFileInTree() {
+      if (!state.activePath) return;
+      state.fileBrowserView = 'tree';
+      localStorage.setItem(storageKeys.fileBrowserView, 'tree');
+      const term = fileSearch.value.trim().toLowerCase();
+      if (term && !state.activePath.toLowerCase().includes(term)) {
+        fileSearch.value = '';
+      }
+      getAncestorFolderPaths(state.activePath).forEach((path) => {
+        state.collapsedTreeFolders.delete(path);
+      });
+      renderFileList();
+      window.requestAnimationFrame(() => {
+        const activeButton = findFileButton(state.activePath);
+        activeButton?.focus({ preventScroll: true });
+        activeButton?.scrollIntoView({ block: 'nearest' });
+      });
+    }
+
+    function updateFileBrowserControls() {
+      const isTree = state.fileBrowserView === 'tree';
+      fileViewListButton?.classList.toggle('active', !isTree);
+      fileViewTreeButton?.classList.toggle('active', isTree);
+      fileViewListButton?.setAttribute('aria-pressed', String(!isTree));
+      fileViewTreeButton?.setAttribute('aria-pressed', String(isTree));
+      [treeExpandButton, treeCollapseButton, treeRevealButton].forEach((button) => {
+        if (!button) return;
+        button.disabled = !isTree || !state.files.length;
+      });
+      if (treeRevealButton) treeRevealButton.disabled = !isTree || !state.activePath;
+    }
+
+    function getAllTreeFolderPaths() {
+      const paths = new Set();
+      state.files.forEach((file) => {
+        getAncestorFolderPaths(file.path).forEach((path) => paths.add(path));
+      });
+      return [...paths];
+    }
+
+    function getAncestorFolderPaths(path) {
+      const parts = String(path || '').split('/').filter(Boolean);
+      parts.pop();
+      return parts.map((_, index) => parts.slice(0, index + 1).join('/'));
+    }
+
+    function findFileButton(path) {
+      return [...fileList.querySelectorAll('[data-path]')].find((button) => button.dataset.path === path);
     }
 
     function installResizers() {
@@ -253,11 +486,13 @@ export function createUiService({
     function applyTheme(theme) {
       document.documentElement.dataset.theme = theme;
       const isLight = theme === 'light';
+      const label = isLight ? 'Switch to dark mode' : 'Switch to light mode';
       document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isLight ? '#f3f4f6' : '#111318');
-      themeToggleButton.textContent = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+      const hiddenLabel = themeToggleButton.querySelector('.visually-hidden');
+      if (hiddenLabel) hiddenLabel.textContent = label;
       themeToggleButton.setAttribute('aria-pressed', String(isLight));
-      themeToggleButton.setAttribute('aria-label', isLight ? 'Switch to dark mode' : 'Switch to light mode');
-      themeToggleButton.title = isLight ? 'Switch to dark mode' : 'Switch to light mode';
+      themeToggleButton.setAttribute('aria-label', label);
+      themeToggleButton.title = label;
     }
 
     function restoreLayoutPreferences() {
@@ -363,6 +598,11 @@ export function createUiService({
       confirmDiscardUnsaved,
       closeOpenMenus,
       openCreateMenu,
+      setFileBrowserView,
+      toggleTreeFolder,
+      expandTreeFolders,
+      collapseTreeFolders,
+      revealActiveFileInTree,
       installResizers,
       restoreThemePreference,
       toggleTheme,

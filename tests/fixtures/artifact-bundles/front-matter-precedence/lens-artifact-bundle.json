@@ -1,0 +1,35 @@
+{
+  "formatVersion": "lens-artifact-bundle-1.0",
+  "title": "Docs Artefact Pack",
+  "sourceTool": "Security Lens",
+  "sourceToolVersion": "3.0.0",
+  "generatedAtUtc": "2026-05-26T00:00:00.000Z",
+  "entryDocument": "README.md",
+  "evidenceLevels": [
+    "candidate finding"
+  ],
+  "documents": [
+    {
+      "path": "README.md",
+      "title": "Manifest Home",
+      "kind": "summary",
+      "evidenceLevel": "candidate finding",
+      "order": 1
+    },
+    {
+      "path": "findings/security-summary.md",
+      "title": "Manifest Finding",
+      "kind": "finding",
+      "evidenceLevel": "candidate finding",
+      "order": 2
+    },
+    {
+      "path": "../unsafe.md",
+      "title": "Unsafe Export",
+      "kind": "summary",
+      "evidenceLevel": "candidate finding",
+      "order": 3
+    }
+  ]
+}
+

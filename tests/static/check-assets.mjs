@@ -6,6 +6,9 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const productName = 'Lens Docs Studio';
 const productTagline = 'Local Markdown, Mermaid, and documentation studio';
+const productVersion = '0.1.0';
+const productBuild = '53';
+const productBrowserTitle = `${productName} v${productVersion} (build ${productBuild})`;
 const forbiddenShellPhrases = [
   'Power Platform Lens family',
   'Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family',
@@ -97,9 +100,10 @@ if (!index.includes('./assets/styles/app.css')) fail('index.html does not load a
 if (!index.includes('./assets/scripts/main.js')) fail('index.html does not load main.js');
 if (!index.includes('./manifest.webmanifest')) fail('index.html does not load manifest.webmanifest');
 if (!index.includes('Content-Security-Policy')) fail('index.html must define a Content-Security-Policy meta tag');
-if (!index.includes(`<title>${productName}</title>`)) fail('index.html must use the Lens Docs Studio browser title');
+if (!index.includes(`<title>${productBrowserTitle}</title>`)) fail('index.html must include the Lens Docs Studio browser title with version and build');
 if (!index.includes(`<h1>${productName}</h1>`)) fail('index.html must show the Lens Docs Studio product name');
 if (!index.includes(`<small>${productTagline}</small>`)) fail('index.html must show the generic product tagline');
+if (!index.includes(`v${productVersion} (build ${productBuild})`)) fail('index.html must expose the app version and build in the shell');
 for (const phrase of forbiddenShellPhrases) {
   if (index.includes(phrase)) fail('index.html must not use Power Platform Lens-only positioning');
 }
@@ -140,6 +144,8 @@ const firstPartyCopyFiles = [
   'AGENTS.md',
   'README.md',
   'docs/tool-guide.md',
+  'docs/integration/lens-artifact-bundle-producer-guide.md',
+  'docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md',
   'docs/architecture/lens-docs-studio-identity.md',
   'docs/architecture/lens-artifact-bundle-contract.md',
   'index.html',
@@ -151,6 +157,8 @@ for (const copyFile of firstPartyCopyFiles) {
   const source = readFileSync(toRootPath(copyFile), 'utf8')
     .replace(/theme-color/g, '')
     .replace(/lens-artifact-bundle[\w.-]*/gi, '')
+    .replace(/artifact-bundles?/gi, '')
+    .replace(/artifactBundle/g, '')
     .replace(/artifactBundleSummary/g, '')
     .replace(/artifact-bundle-[a-z0-9-]*/gi, '')
     .replace(/#[\da-f]{3,8}/gi, '');
@@ -160,18 +168,60 @@ for (const copyFile of firstPartyCopyFiles) {
 
 const lensBundleContract = readFileSync(toRootPath('docs/architecture/lens-artifact-bundle-contract.md'), 'utf8');
 const readme = readFileSync(toRootPath('README.md'), 'utf8');
+const toolGuide = readFileSync(toRootPath('docs/tool-guide.md'), 'utf8');
+const producerGuidePath = 'docs/integration/lens-artifact-bundle-producer-guide.md';
+const manualSmokePath = 'docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md';
+if (!existsSync(toRootPath(producerGuidePath))) fail('Producer guide must exist');
+if (!existsSync(toRootPath(manualSmokePath))) fail('Manual smoke checklist must exist');
+const producerGuide = readFileSync(toRootPath(producerGuidePath), 'utf8');
+const manualSmoke = readFileSync(toRootPath(manualSmokePath), 'utf8');
 if (!lensBundleContract.includes('lens-artifact-bundle.json')) fail('Lens artefact bundle contract must document lens-artifact-bundle.json');
+if (!lensBundleContract.includes('lens-artifact-bundle-1.0')) fail('Lens artefact bundle contract must keep the 1.0 contract version');
 if (!lensBundleContract.includes('candidate finding')) fail('Lens artefact bundle contract must document candidate finding evidence');
 if (!lensBundleContract.includes('Reader Panel')) fail('Lens artefact bundle contract must document the reader panel');
 if (!lensBundleContract.includes('Built-in export profiles are session-only presets')) fail('Lens artefact bundle contract must document session-only export profiles');
 if (!lensBundleContract.includes('Docs Site export may use safe artefact metadata')) fail('Lens artefact bundle contract must document Docs Site artefact metadata');
 if (!lensBundleContract.includes('Generic Markdown Bundle export must not include `lens-artifact-bundle.json`')) fail('Lens artefact bundle contract must document generic bundle boundaries');
 if (!lensBundleContract.includes('confirmed finding')) fail('Lens artefact bundle contract must document confirmed finding wording rules');
+if (!lensBundleContract.includes('Round-trip certification')) fail('Lens artefact bundle contract must document round-trip certification');
+if (!lensBundleContract.includes('explicit artefact review pack export')) fail('Lens artefact bundle contract must document explicit review pack export');
 if (!readme.includes('Optional Lens Artefact Bundles') || !readme.includes('lens-artifact-bundle.json')) {
   fail('README.md must document optional Lens artefact bundle ZIP support');
 }
 if (!readme.includes('Built-in export profiles') || !readme.includes('Export artefact review pack')) {
   fail('README.md must document built-in profiles and artefact review export');
+}
+for (const requiredPath of [producerGuidePath, manualSmokePath, 'tests/fixtures/artifact-bundles/']) {
+  if (!readme.includes(requiredPath) && !toolGuide.includes(requiredPath) && !lensBundleContract.includes(requiredPath)) {
+    fail(`New artefact certification guidance is not discoverable: ${requiredPath}`);
+  }
+}
+for (const requiredLabel of [
+  'static evidence',
+  'connected metadata evidence',
+  'runtime evidence',
+  'manual evidence',
+  'candidate finding',
+  'confirmed finding',
+  'blocked/unavailable evidence',
+]) {
+  if (!producerGuide.includes(requiredLabel)) fail(`Producer guide is missing evidence label: ${requiredLabel}`);
+}
+for (const requiredSmokeText of [
+  'generic ZIP',
+  'Markdown Bundle',
+  'valid rich artefact bundle',
+  'artefact review pack',
+  'external service calls',
+  'no new artefact metadata',
+]) {
+  if (!manualSmoke.includes(requiredSmokeText)) fail(`Manual smoke checklist is missing: ${requiredSmokeText}`);
+}
+
+const packageJson = JSON.parse(readFileSync(toRootPath('package.json'), 'utf8'));
+if (packageJson.version !== productVersion) fail('package.json version must match the published app version');
+if (Object.keys(packageJson.scripts || {}).some((scriptName) => /^build($|:)/.test(scriptName))) {
+  fail('package.json must not add a production build command');
 }
 
 const lensArtifactBundleService = readFileSync(toRootPath('assets/scripts/files/lens-artifact-bundle-service.js'), 'utf8');

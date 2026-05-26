@@ -48,6 +48,9 @@ export function createAppController() {
       zipInput,
       documentInput,
       saveButton,
+      saveAsButton,
+      refreshFileButton,
+      appVersionBadge,
       sampleButton,
       downloadButton,
       exportWordButton,
@@ -73,6 +76,11 @@ export function createAppController() {
       fileList,
       recentList,
       fileSearch,
+      fileViewListButton,
+      fileViewTreeButton,
+      treeExpandButton,
+      treeCollapseButton,
+      treeRevealButton,
       fileCount,
       folderBadge,
       artifactBundleSummary,
@@ -218,6 +226,11 @@ export function createAppController() {
       restoreFocusMode,
       toggleSidebarCollapsed,
       restoreSidebarCollapsed,
+      setFileBrowserView,
+      toggleTreeFolder,
+      expandTreeFolders,
+      collapseTreeFolders,
+      revealActiveFileInTree,
     } = createUiService({
       state,
       dom: {
@@ -226,11 +239,19 @@ export function createAppController() {
         workspace,
         fileList,
         fileSearch,
+        fileViewListButton,
+        fileViewTreeButton,
+        treeExpandButton,
+        treeCollapseButton,
+        treeRevealButton,
         fileCount,
         folderBadge,
         artifactBundleSummary,
         activeFileLabel,
         saveButton,
+        saveAsButton,
+        refreshFileButton,
+        appVersionBadge,
         createMenu,
         layoutModeControl,
         sidebarSplitter,
@@ -480,6 +501,8 @@ export function createAppController() {
     getEffectiveDevopsMarkdownExport = exportProfileTools.getEffectiveDevopsMarkdownExport;
     const {
       newMarkdownDocument,
+      addFilesToWorkspace,
+      addFilesFromInput,
       openFile,
       openFolder,
       importZip,
@@ -497,6 +520,9 @@ export function createAppController() {
       setLibraryFromRecords,
       selectFile,
       saveActiveFile,
+      saveActiveFileAs,
+      refreshActiveFile,
+      checkForExternalUpdates,
       ensureWritePermission,
     } = createFileService({
       state,
@@ -666,6 +692,13 @@ export function createAppController() {
       docsPreviewButton.addEventListener('click', toggleDocsPreview);
       studioToggleButton.addEventListener('click', toggleStudioMode);
       saveButton.addEventListener('click', saveActiveFile);
+      saveAsButton?.addEventListener('click', saveActiveFileAs);
+      refreshFileButton?.addEventListener('click', refreshActiveFile);
+      fileViewListButton?.addEventListener('click', () => setFileBrowserView('list'));
+      fileViewTreeButton?.addEventListener('click', () => setFileBrowserView('tree'));
+      treeExpandButton?.addEventListener('click', expandTreeFolders);
+      treeCollapseButton?.addEventListener('click', collapseTreeFolders);
+      treeRevealButton?.addEventListener('click', revealActiveFileInTree);
       focusModeButton?.addEventListener('click', () => toggleFocusMode());
       focusModeExitButton?.addEventListener('click', () => {
         toggleFocusMode(false);
@@ -733,9 +766,12 @@ export function createAppController() {
           if (button.dataset.menuAction === 'newMarkdown') await newMarkdownDocument();
           if (button.dataset.menuAction === 'openFile') await openFile();
           if (button.dataset.menuAction === 'openFolder') await openFolder();
+          if (button.dataset.menuAction === 'addFile') await addFilesToWorkspace();
           if (button.dataset.menuAction === 'importZip') importZip();
           if (button.dataset.menuAction === 'importDocument') importDocument();
           if (button.dataset.menuAction === 'save') await saveActiveFile();
+          if (button.dataset.menuAction === 'saveAs') await saveActiveFileAs();
+          if (button.dataset.menuAction === 'refreshFile') await refreshActiveFile();
           if (button.dataset.menuAction === 'createSnapshot') await createActiveSnapshot();
           if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
@@ -903,9 +939,17 @@ export function createAppController() {
       });
 
       fileInput.addEventListener('change', async () => {
-        const file = fileInput.files?.[0];
-        if (!file) return;
-        await setLibraryFromRecords([{ name: file.name, path: file.name, file }], 'Single file');
+        const mode = fileInput.dataset.mode || 'open';
+        const files = [...(fileInput.files ?? [])];
+        if (!files.length) return;
+        if (mode === 'add') {
+          await addFilesFromInput(files);
+        } else {
+          const file = files[0];
+          await setLibraryFromRecords([{ name: file.name, path: file.name, file }], 'Single file', { workspaceKind: 'file' });
+        }
+        fileInput.dataset.mode = 'open';
+        fileInput.multiple = false;
         fileInput.value = '';
       });
 
@@ -920,7 +964,7 @@ export function createAppController() {
             file,
           }));
 
-        await setLibraryFromRecords(records, folderName);
+        await setLibraryFromRecords(records, folderName, { workspaceKind: 'folder-fallback' });
         folderInput.value = '';
       });
 
@@ -938,12 +982,21 @@ export function createAppController() {
       fileSearch.addEventListener('input', renderFileList);
 
       fileList.addEventListener('click', async (event) => {
+        const treeFolder = event.target.closest('[data-tree-folder]');
+        if (treeFolder) {
+          event.stopPropagation();
+          toggleTreeFolder(treeFolder.dataset.treeFolder);
+          return;
+        }
+
         const actionButton = event.target.closest('[data-sidebar-action]');
         if (actionButton) {
           event.stopPropagation();
           const action = actionButton.dataset.sidebarAction;
           if (action === 'openFile') await openFile();
           if (action === 'openFolder') await openFolder();
+          if (action === 'newFile') await newMarkdownDocument();
+          if (action === 'addFile') await addFilesToWorkspace();
           if (action === 'create') openCreateMenu();
           return;
         }
@@ -961,6 +1014,12 @@ export function createAppController() {
       previewMaximizeButton.addEventListener('click', togglePreviewMaximized);
       preview.addEventListener('click', handlePreviewClick);
       recentList.addEventListener('click', handleRecentClick);
+      window.addEventListener('focus', () => {
+        void checkForExternalUpdates();
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) void checkForExternalUpdates();
+      });
 
       window.addEventListener('keydown', (event) => {
         const isShortcut = event.ctrlKey || event.metaKey;
@@ -1392,6 +1451,9 @@ export function createAppController() {
       state.fileCache.clear();
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
+      state.externalChangePaths?.clear();
+      state.workspaceDirectoryHandle = null;
+      state.workspaceKind = '';
       state.artifactBundle = null;
       exportProfileTools.resetSessionProfile();
     }

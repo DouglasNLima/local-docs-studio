@@ -79,7 +79,7 @@ export function createFileService({
             return;
           }
 
-          await setLibraryFromRecords([{ name: file.name, path: file.name, file, handle }], 'Single file');
+          await setLibraryFromRecords([{ name: file.name, path: file.name, file, handle }], 'Single file', { workspaceKind: 'file' });
           await addRecentEntry({ type: 'file', name: file.name, handle });
           return;
         }
@@ -88,6 +88,8 @@ export function createFileService({
         setStatus('File picker failed. Using the browser fallback...', 'warning');
       }
 
+      fileInput.dataset.mode = 'open';
+      fileInput.multiple = false;
       fileInput.click();
     }
 
@@ -102,7 +104,10 @@ export function createFileService({
           });
           setStatus('Reading folder...');
           const records = await collectDirectoryRecords(directoryHandle);
-          await setLibraryFromRecords(records, directoryHandle.name || 'Selected folder');
+          await setLibraryFromRecords(records, directoryHandle.name || 'Selected folder', {
+            directoryHandle,
+            workspaceKind: 'folder',
+          });
           await addRecentEntry({ type: 'folder', name: directoryHandle.name || 'Selected folder', handle: directoryHandle });
           return;
         }
@@ -124,14 +129,26 @@ export function createFileService({
     }
 
     async function newMarkdownDocument() {
-      if (!confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+      if (state.workspaceDirectoryHandle) {
+        await createFileInWorkspace();
+        return;
+      }
 
-      const name = 'untitled.md';
-      await setLibraryFromRecords([{
+      if (!state.files.length && !confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+
+      const name = getAvailableUntitledPath();
+      const record = {
         name,
         path: name,
         file: new File([''], name, { type: 'text/markdown' }),
-      }], 'Blank document');
+        needsSave: true,
+      };
+
+      if (state.files.length) {
+        await addRecordsToWorkspace([record], { folderName: state.folderName || 'Workspace' });
+      } else {
+        await setLibraryFromRecords([record], 'Blank document', { workspaceKind: 'virtual' });
+      }
       editor.focus({ preventScroll: true });
       setStatus('Blank Markdown document ready.', 'ok');
     }
@@ -248,12 +265,15 @@ export function createFileService({
 
         if (entry.type === 'file') {
           const file = await entry.handle.getFile();
-          await setLibraryFromRecords([{ name: file.name, path: file.name, file, handle: entry.handle }], 'Recent file');
+          await setLibraryFromRecords([{ name: file.name, path: file.name, file, handle: entry.handle }], 'Recent file', { workspaceKind: 'file' });
           await addRecentEntry({ type: 'file', name: file.name, handle: entry.handle });
         } else {
           setStatus('Reading recent folder...');
           const records = await collectDirectoryRecords(entry.handle);
-          await setLibraryFromRecords(records, entry.name);
+          await setLibraryFromRecords(records, entry.name, {
+            directoryHandle: entry.handle,
+            workspaceKind: 'folder',
+          });
           await addRecentEntry({ type: 'folder', name: entry.name, handle: entry.handle });
         }
 
@@ -304,21 +324,25 @@ export function createFileService({
       });
     }
 
-    async function setLibraryFromRecords(records, folderName) {
+    async function setLibraryFromRecords(records, folderName, options = {}) {
       clearFocusedModes();
       clearManagedAssets?.();
       const uniqueRecords = uniqueByPath(records)
         .filter((record) => isSupportedFile(record.name))
+        .map(prepareRecord)
         .sort(compareRecords);
 
       state.files = uniqueRecords;
       state.activePath = '';
       state.fileName = '';
       state.folderName = folderName;
+      state.workspaceDirectoryHandle = options.directoryHandle || null;
+      state.workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
       state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
+      state.externalChangePaths?.clear();
       afterLibraryLoaded?.();
       clearScrollPositions?.();
       fileSearch.value = '';
@@ -365,10 +389,12 @@ export function createFileService({
 
         clearFocusedModes();
         clearManagedAssets?.();
-        state.files = imported.records;
+        state.files = imported.records.map(prepareRecord);
         state.activePath = '';
         state.fileName = '';
         state.folderName = imported.folderName;
+        state.workspaceDirectoryHandle = null;
+        state.workspaceKind = imported.artifactBundle ? 'artefact-bundle' : imported.bundle ? 'bundle' : 'zip';
         state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
         state.savedContentCache?.clear();
@@ -378,6 +404,7 @@ export function createFileService({
           state.savedContentCache?.set(record.path, text);
         });
         state.dirtyPaths.clear();
+        state.externalChangePaths?.clear();
         afterLibraryLoaded?.();
         clearScrollPositions?.();
         fileSearch.value = '';
@@ -456,14 +483,17 @@ export function createFileService({
     async function setConvertedDocumentLibrary(imported) {
       clearFocusedModes();
       clearManagedAssets?.();
-      state.files = imported.records.sort(compareRecords);
+      state.files = imported.records.map(prepareRecord).sort(compareRecords);
       state.activePath = '';
       state.fileName = '';
       state.folderName = imported.records.length === 1 ? 'Imported document' : 'Imported documents';
+      state.workspaceDirectoryHandle = null;
+      state.workspaceKind = 'converted';
       state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
+      state.externalChangePaths?.clear();
       afterLibraryLoaded?.();
       clearScrollPositions?.();
       fileSearch.value = '';
@@ -655,21 +685,21 @@ export function createFileService({
       const record = state.files.find((item) => item.path === path);
       if (!record) return;
       rememberScrollPosition?.();
-      if (path !== state.activePath && state.activePath && state.dirtyPaths.has(state.activePath)) {
-        const current = state.files.find((item) => item.path === state.activePath);
-        const name = current?.name ?? 'the current file';
-        if (!window.confirm(`${name} has unsaved edits. Switch files and discard those edits?`)) return;
-        state.dirtyPaths.delete(state.activePath);
-      }
 
       try {
+        if (record.handle) {
+          const externalDecision = await handleExternalChange(record, { reason: 'select' });
+          if (externalDecision === 'cancel') return;
+        }
+
         state.activePath = record.path;
         state.fileName = record.name;
 
         if (!state.fileCache.has(record.path)) {
-          const file = record.file ?? await record.handle.getFile();
+          const { file, text } = await readRecordSource(record);
           record.file = file;
-          state.fileCache.set(record.path, await file.text());
+          updateRecordFingerprint(record, file);
+          state.fileCache.set(record.path, text);
         }
 
         editor.value = state.fileCache.get(record.path) ?? '';
@@ -711,79 +741,449 @@ export function createFileService({
         return;
       }
 
+      if (record.handle) {
+        const externalDecision = await handleExternalChange(record, { reason: 'save' });
+        if (externalDecision === 'reloaded') return;
+      }
+
       const content = editor.value;
       if (beforeSaveActiveFile && !await beforeSaveActiveFile(record, content)) {
         return;
       }
 
       try {
-        if (record.handle && await ensureWritePermission(record.handle)) {
-          setStatus(`Saving ${record.name}...`);
-          const writable = await record.handle.createWritable();
-          await writable.write(content);
-          await writable.close();
-          record.file = await record.handle.getFile();
-          record.converted = false;
-          state.fileCache.set(record.path, content);
-          state.dirtyPaths.delete(record.path);
-          renderFileList();
-          updateActiveFileLabel();
-          updateSaveButton();
-          setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
-          await afterSaveActiveFile?.(record, content);
+        if (record.handle) {
+          if (!await ensureWritePermission(record.handle)) {
+            setStatus('Browser permission is needed to save back to the opened file.', 'warning');
+            updateSaveButton();
+            return;
+          }
+          await saveRecordToHandle(record, record.handle, content);
           await addRecentEntry({ type: 'file', name: record.name, handle: record.handle });
           return;
         }
 
-        if ('showSaveFilePicker' in window) {
-          const oldPath = record.path;
-          const handle = await window.showSaveFilePicker({
-            suggestedName: record.name || getMarkdownExportName(),
-            types: [{
-              description: 'Markdown and Mermaid files',
-              accept: {
-                'text/markdown': ['.md', '.markdown'],
-                'text/plain': ['.mmd', '.mermaid', '.txt'],
-              },
-            }],
-          });
-
-          const writable = await handle.createWritable();
-          await writable.write(content);
-          await writable.close();
-          record.handle = handle;
-          record.name = handle.name || record.name;
-          record.path = normalisePath(handle.name || record.path || record.name);
-          record.file = await handle.getFile();
-          record.converted = false;
-          state.fileName = record.name;
-          state.activePath = record.path;
-          state.fileCache.delete(oldPath);
-          state.fileCache.set(record.path, content);
-          state.dirtyPaths.delete(oldPath);
-          state.dirtyPaths.delete(record.path);
-          renderFileList();
-          updateActiveFileLabel();
-          updateSaveButton();
-          setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
-          await afterSaveActiveFile?.(record, content, oldPath);
-          await addRecentEntry({ type: 'file', name: record.name, handle });
-          return;
-        }
-
-        downloadBlob(new Blob([content], { type: 'text/markdown;charset=utf-8' }), record.name || getMarkdownExportName());
-        record.converted = false;
-        renderFileList();
-        updateActiveFileLabel();
-        updateSaveButton();
-        setStatus(state.managedAssets?.size
-          ? 'Downloaded Markdown copy. Image binaries are included in exports, not this Markdown file.'
-          : 'Browser cannot write to this file directly; downloaded a copy.', 'warning');
+        await saveActiveFileAs();
       } catch (error) {
         if (error?.name === 'AbortError') return;
         setStatus('Save failed.', 'danger');
         console.error(error);
       }
+    }
+
+    async function saveActiveFileAs() {
+      const record = state.files.find((item) => item.path === state.activePath);
+      if (!record) {
+        setStatus('No file selected.', 'warning');
+        return false;
+      }
+
+      if (record.readOnly) {
+        setStatus('This guide is read-only. Open or create a Markdown file to save changes.', 'warning');
+        updateSaveButton();
+        return false;
+      }
+
+      const content = editor.value;
+      try {
+        if ('showSaveFilePicker' in window) {
+          const oldPath = record.path;
+          const handle = await window.showSaveFilePicker({
+            suggestedName: record.name || getMarkdownExportName(),
+            types: getMarkdownPickerTypes(),
+          });
+
+          await saveRecordToHandle(record, handle, content, { oldPath, replaceHandle: true });
+          await addRecentEntry({ type: 'file', name: record.name, handle });
+          return true;
+        }
+
+        downloadBlob(new Blob([content], { type: 'text/markdown;charset=utf-8' }), record.name || getMarkdownExportName());
+        record.converted = false;
+        record.needsSave = false;
+        renderFileList();
+        updateActiveFileLabel();
+        updateSaveButton();
+        setStatus(state.managedAssets?.size
+          ? 'Downloaded Markdown copy. Image binaries are included in exports, not this Markdown file.'
+          : 'Browser cannot write to files directly; downloaded a Markdown copy.', 'warning');
+        return true;
+      } catch (error) {
+        if (error?.name === 'AbortError') return false;
+        setStatus('Save as failed.', 'danger');
+        console.error(error);
+        return false;
+      }
+    }
+
+    async function saveRecordToHandle(record, handle, content, options = {}) {
+      const oldPath = options.oldPath || record.path;
+      setStatus(`Saving ${record.name}...`);
+      const writable = await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+
+      const file = await handle.getFile();
+      if (options.replaceHandle) {
+        record.handle = handle;
+        record.name = handle.name || record.name;
+        record.path = getUniqueRecordPath(normalisePath(handle.name || record.path || record.name), record);
+        state.files.sort(compareRecords);
+      }
+
+      record.file = file;
+      record.converted = false;
+      record.needsSave = false;
+      updateRecordFingerprint(record, file);
+      state.fileName = record.name;
+      state.activePath = record.path;
+      if (oldPath && oldPath !== record.path) {
+        state.fileCache.delete(oldPath);
+        state.dirtyPaths.delete(oldPath);
+        state.externalChangePaths?.delete(oldPath);
+      }
+      state.fileCache.set(record.path, content);
+      state.dirtyPaths.delete(record.path);
+      state.externalChangePaths?.delete(record.path);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content, oldPath);
+    }
+
+    async function addFilesToWorkspace() {
+      try {
+        if ('showOpenFilePicker' in window) {
+          const handles = await window.showOpenFilePicker({
+            id: 'md-mmd-renderer-add-files',
+            multiple: true,
+            types: getMarkdownPickerTypes(),
+          });
+          const records = [];
+          for (const handle of handles || []) {
+            const file = await handle.getFile();
+            if (!isSupportedFile(file.name)) continue;
+            records.push({ name: file.name, path: file.name, file, handle });
+          }
+          await addRecordsToWorkspace(records, { folderName: state.folderName || 'Workspace' });
+          return;
+        }
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+        setStatus('File picker failed. Using the browser fallback...', 'warning');
+      }
+
+      fileInput.dataset.mode = 'add';
+      fileInput.multiple = true;
+      fileInput.click();
+    }
+
+    async function addFilesFromInput(files) {
+      const records = [...(files || [])]
+        .filter((file) => isSupportedFile(file.name))
+        .map((file) => ({
+          name: file.name,
+          path: normalisePath(file.webkitRelativePath || file.name),
+          file,
+        }));
+      await addRecordsToWorkspace(records, { folderName: state.folderName || 'Added files' });
+    }
+
+    async function addRecordsToWorkspace(records, options = {}) {
+      const prepared = records
+        .filter((record) => isSupportedFile(record.name))
+        .map(prepareRecord);
+
+      if (!prepared.length) {
+        setStatus('No supported Markdown or Mermaid files were selected.', 'warning');
+        return;
+      }
+
+      const added = [];
+      prepared.forEach((record) => {
+        record.path = getUniqueRecordPath(record.path, record);
+        record.name = record.name || record.path.split('/').pop() || record.path;
+        state.files.push(record);
+        added.push(record);
+      });
+
+      state.files = uniqueByPath(state.files).sort(compareRecords);
+      state.folderName = options.folderName || state.folderName || 'Workspace';
+      state.workspaceKind = state.workspaceKind || 'virtual';
+      state.artifactBundle = null;
+      fileSearch.value = '';
+      afterLibraryLoaded?.();
+      renderFileList();
+      syncEditorReadOnly?.();
+      updateSaveButton();
+      setExportTrust('', '');
+      await selectFile(options.selectPath || added[added.length - 1].path);
+      setStatus(`${added.length} file${added.length === 1 ? '' : 's'} added to the workspace.`, 'ok');
+    }
+
+    async function createFileInWorkspace() {
+      const suggestedPath = getAvailableUntitledPath();
+      const rawPath = window.prompt('New file path', suggestedPath);
+      if (!rawPath) return;
+
+      const path = sanitiseWorkspaceFilePath(rawPath);
+      if (!path) {
+        setStatus('Use a relative .md, .markdown, .mmd, or .mermaid path inside the workspace.', 'warning');
+        return;
+      }
+
+      const existing = state.files.find((record) => record.path.toLowerCase() === path.toLowerCase());
+      if (existing) {
+        await selectFile(existing.path);
+        setStatus(`${existing.path} is already in the workspace.`, 'warning');
+        return;
+      }
+
+      try {
+        if (!await ensureDirectoryWritePermission(state.workspaceDirectoryHandle)) {
+          setStatus('Browser permission is needed to create files in this workspace.', 'warning');
+          return;
+        }
+
+        const handle = await getWorkspaceFileHandle(path, { create: true });
+        const file = await handle.getFile();
+        const text = await file.text();
+        const name = path.split('/').pop() || path;
+        const record = prepareRecord({ name, path, handle, file });
+        state.fileCache.set(path, text);
+        state.savedContentCache?.set(path, text);
+        await addRecordsToWorkspace([record], {
+          folderName: state.folderName || state.workspaceDirectoryHandle.name || 'Workspace',
+          selectPath: path,
+        });
+        setStatus(`${path} added to the workspace.`, 'ok');
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+        setStatus('Could not create the file in this workspace.', 'danger');
+        console.error(error);
+      }
+    }
+
+    async function refreshActiveFile() {
+      const record = state.files.find((item) => item.path === state.activePath);
+      if (!record) {
+        setStatus('No file selected.', 'warning');
+        return;
+      }
+      if (!record.handle) {
+        setStatus('This document has no linked local file to refresh.', 'warning');
+        return;
+      }
+      if (state.dirtyPaths.has(record.path) && !window.confirm(`${record.name} has in-memory edits. Reload the local file and discard those edits?`)) {
+        return;
+      }
+
+      await reloadRecordFromHandle(record, { status: `${record.name} refreshed from the local file.` });
+    }
+
+    async function checkForExternalUpdates() {
+      if (!state.files.some((record) => record.handle)) return;
+      const active = state.files.find((record) => record.path === state.activePath);
+      if (active?.handle) {
+        await handleExternalChange(active, { reason: 'focus' });
+      }
+
+      let changed = 0;
+      for (const record of state.files) {
+        if (!record.handle || record.path === state.activePath) continue;
+        try {
+          const file = await record.handle.getFile();
+          if (hasFingerprintChanged(record, file)) {
+            state.externalChangePaths?.add(record.path);
+            changed += 1;
+          }
+        } catch {
+          // A missing or permission-blocked file is reported when the user opens or saves it.
+        }
+      }
+      if (changed) {
+        renderFileList();
+        updateActiveFileLabel();
+        setStatus(`${changed} workspace file${changed === 1 ? '' : 's'} changed outside the app. Open a marked file to review it.`, 'warning');
+      }
+    }
+
+    async function handleExternalChange(record, { reason } = {}) {
+      if (!record?.handle) return 'none';
+      let file;
+      try {
+        file = await record.handle.getFile();
+      } catch {
+        state.externalChangePaths?.add(record.path);
+        renderFileList();
+        updateActiveFileLabel();
+        setStatus(`Could not check ${record.name}. Browser permission may be needed.`, 'warning');
+        return 'unavailable';
+      }
+
+      if (!record.fingerprint) {
+        record.file = file;
+        updateRecordFingerprint(record, file);
+        return 'none';
+      }
+
+      if (!hasFingerprintChanged(record, file)) {
+        state.externalChangePaths?.delete(record.path);
+        return 'none';
+      }
+
+      const alreadyMarked = state.externalChangePaths?.has(record.path);
+      state.externalChangePaths?.add(record.path);
+      if (reason === 'focus' && alreadyMarked) return 'marked';
+
+      const dirty = state.dirtyPaths.has(record.path);
+      const reload = window.confirm(dirty
+        ? `${record.name} changed outside the app. Reload the local file and discard your in-memory edits? Choose Cancel to keep your local edits.`
+        : `${record.name} changed outside the app. Reload the latest version?`);
+
+      if (reload) {
+        await reloadRecordFromFile(record, file, { status: `${record.name} reloaded from the local file.` });
+        return 'reloaded';
+      }
+
+      renderFileList();
+      updateActiveFileLabel();
+      setStatus(`${record.name} changed outside the app. Keeping the in-memory version for now.`, 'warning');
+      return 'kept';
+    }
+
+    async function reloadRecordFromHandle(record, options = {}) {
+      const file = await record.handle.getFile();
+      await reloadRecordFromFile(record, file, options);
+    }
+
+    async function reloadRecordFromFile(record, file, options = {}) {
+      const text = await file.text();
+      record.file = file;
+      record.converted = false;
+      record.needsSave = false;
+      updateRecordFingerprint(record, file);
+      state.fileCache.set(record.path, text);
+      state.savedContentCache?.set(record.path, text);
+      state.dirtyPaths.delete(record.path);
+      state.externalChangePaths?.delete(record.path);
+      if (record.path === state.activePath) {
+        editor.value = text;
+        editor.scrollTop = 0;
+        preview.scrollTop = 0;
+        resetEditorHistory();
+        syncEditorReadOnly?.();
+        updateEditorChrome?.();
+        await afterSaveActiveFile?.(record, text);
+        await renderPreview();
+        restoreScrollPosition?.(record.path);
+      }
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      setStatus(options.status || `${record.name} refreshed.`, 'ok');
+    }
+
+    async function readRecordSource(record) {
+      const file = record.handle ? await record.handle.getFile() : record.file;
+      if (!file) return { file: null, text: '' };
+      return { file, text: await file.text() };
+    }
+
+    function prepareRecord(record) {
+      const path = normalisePath(record.path || record.name || 'untitled.md');
+      const name = record.name || path.split('/').pop() || path;
+      const prepared = {
+        ...record,
+        name,
+        path,
+        needsSave: Boolean(record.needsSave),
+      };
+      if (prepared.file) updateRecordFingerprint(prepared, prepared.file);
+      return prepared;
+    }
+
+    function updateRecordFingerprint(record, file) {
+      record.fingerprint = getFileFingerprint(file);
+      record.lastModified = file?.lastModified || 0;
+      record.size = file?.size || 0;
+    }
+
+    function getFileFingerprint(file) {
+      if (!file) return null;
+      return {
+        lastModified: file.lastModified || 0,
+        size: file.size || 0,
+      };
+    }
+
+    function hasFingerprintChanged(record, file) {
+      const current = getFileFingerprint(file);
+      const previous = record.fingerprint;
+      return Boolean(previous && current && (previous.lastModified !== current.lastModified || previous.size !== current.size));
+    }
+
+    function getMarkdownPickerTypes() {
+      return [{
+        description: 'Markdown and Mermaid files',
+        accept: {
+          'text/markdown': ['.md', '.markdown'],
+          'text/plain': ['.mmd', '.mermaid', '.txt'],
+        },
+      }];
+    }
+
+    function getAvailableUntitledPath() {
+      const existing = new Set(state.files.map((record) => record.path.toLowerCase()));
+      const candidates = ['untitled.md'];
+      for (let index = 2; index < 1000; index += 1) {
+        candidates.push(`untitled-${index}.md`);
+      }
+      return candidates.find((path) => !existing.has(path.toLowerCase())) || `untitled-${Date.now()}.md`;
+    }
+
+    function getUniqueRecordPath(path, currentRecord) {
+      const cleanPath = normalisePath(path || currentRecord?.name || 'untitled.md');
+      const existing = new Set(state.files
+        .filter((record) => record !== currentRecord)
+        .map((record) => record.path.toLowerCase()));
+      if (!existing.has(cleanPath.toLowerCase())) return cleanPath;
+
+      const extensionMatch = cleanPath.match(/(\.[^./]+)$/);
+      const extension = extensionMatch?.[1] || '';
+      const stem = extension ? cleanPath.slice(0, -extension.length) : cleanPath;
+      for (let index = 2; index < 1000; index += 1) {
+        const candidate = `${stem}-${index}${extension}`;
+        if (!existing.has(candidate.toLowerCase())) return candidate;
+      }
+      return `${stem}-${Date.now()}${extension}`;
+    }
+
+    function sanitiseWorkspaceFilePath(value) {
+      const path = normalisePath(String(value || '').trim());
+      if (!path || path.startsWith('/') || /^[a-z]:/i.test(path)) return '';
+      const parts = path.split('/').filter(Boolean);
+      if (!parts.length || parts.some((part) => part === '.' || part === '..')) return '';
+      const cleanPath = parts.join('/');
+      return isSupportedFile(cleanPath) ? cleanPath : '';
+    }
+
+    async function getWorkspaceFileHandle(path, options = {}) {
+      const parts = path.split('/').filter(Boolean);
+      const fileName = parts.pop();
+      let directory = state.workspaceDirectoryHandle;
+      for (const part of parts) {
+        directory = await directory.getDirectoryHandle(part, { create: Boolean(options.create) });
+      }
+      return await directory.getFileHandle(fileName, { create: Boolean(options.create) });
+    }
+
+    async function ensureDirectoryWritePermission(handle) {
+      if (!handle || typeof handle.queryPermission !== 'function' || typeof handle.requestPermission !== 'function') return true;
+      const options = { mode: 'readwrite' };
+      if (await handle.queryPermission(options) === 'granted') return true;
+      return await handle.requestPermission(options) === 'granted';
     }
 
     function buildSaveStatus(name) {
@@ -803,6 +1203,8 @@ export function createFileService({
 
     return {
       newMarkdownDocument,
+      addFilesToWorkspace,
+      addFilesFromInput,
       openFile,
       openFolder,
       importZip,
@@ -820,6 +1222,9 @@ export function createFileService({
       setLibraryFromRecords,
       selectFile,
       saveActiveFile,
+      saveActiveFileAs,
+      refreshActiveFile,
+      checkForExternalUpdates,
       ensureWritePermission,
     };
 }

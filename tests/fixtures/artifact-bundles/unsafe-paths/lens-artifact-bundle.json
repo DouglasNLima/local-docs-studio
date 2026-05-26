@@ -1,0 +1,61 @@
+{
+  "formatVersion": "lens-artifact-bundle-1.0",
+  "title": "Unsafe Path Pack",
+  "entryDocument": "../secrets.md",
+  "evidenceLevels": [
+    "static evidence",
+    "candidate finding"
+  ],
+  "documents": [
+    {
+      "path": "../secrets.md",
+      "title": "Traversal",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 1
+    },
+    {
+      "path": "/absolute.md",
+      "title": "Absolute",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 2
+    },
+    {
+      "path": "C:\\secrets.md",
+      "title": "Drive",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 3
+    },
+    {
+      "path": "https://example.com/file.md",
+      "title": "Remote",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 4
+    },
+    {
+      "path": "bad\u0001path.md",
+      "title": "Control",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 5
+    },
+    {
+      "path": "README.md",
+      "title": "Safe Home",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 10
+    },
+    {
+      "path": "safe/visible.md",
+      "title": "Safe Visible",
+      "kind": "documentation",
+      "evidenceLevel": "candidate finding",
+      "order": 20
+    }
+  ]
+}
+
