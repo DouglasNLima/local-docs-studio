@@ -122,6 +122,90 @@ export function normaliseOptionalPath(value) {
   return path;
 }
 
+export function getArtifactMetadataForPath(bundle, path) {
+  if (!bundle?.recordMetadataByPath || !path) return null;
+  return bundle.recordMetadataByPath.get(path) || null;
+}
+
+export function hasCandidateFindings(bundle) {
+  if (!bundle) return false;
+  return [
+    ...(bundle.evidenceLevels || []),
+    ...(bundle.documents || []).map((entry) => entry.evidenceLevel),
+    ...(bundle.diagrams || []).map((entry) => entry.evidenceLevel),
+    ...(bundle.manifestWarnings || []).map((warning) => warning.evidenceLevel),
+  ].includes('candidate finding');
+}
+
+export function buildSafeArtifactBundleExportMetadata(bundle) {
+  if (!bundle) return null;
+  const metadata = {
+    title: safeExportText(bundle.title),
+    sourceTool: safeExportText(bundle.sourceTool),
+    sourceToolVersion: safeExportText(bundle.sourceToolVersion),
+    generatedAtUtc: bundle.generatedAtUtc || '',
+    entryDocument: bundle.entryDocument || '',
+    evidenceLevels: [...(bundle.evidenceLevels || [])],
+    notes: ['Evidence labels are displayed as supplied by the bundle.'],
+  };
+  if (hasCandidateFindings(bundle)) {
+    metadata.notes.push('Candidate findings remain candidate findings.');
+    metadata.candidateFindings = true;
+  }
+
+  return removeEmptyArtifactMetadata(metadata);
+}
+
+export function buildSafeArtifactReviewManifest({ bundle, records = [], reviewedWith = 'Lens Docs Studio' } = {}) {
+  if (!bundle) return null;
+  const exportedPathSet = new Set(records.map((record) => record.path));
+  const documents = [];
+  const diagrams = [];
+
+  records.forEach((record, index) => {
+    const path = normaliseOptionalPath(record.path);
+    if (!path || !exportedPathSet.has(path)) return;
+    const source = getArtifactMetadataForPath(bundle, path);
+    const entry = {
+      path,
+      title: safeExportText(source?.title),
+      kind: safeExportText(source?.kind),
+      evidenceLevel: normaliseEvidenceLabel(source?.evidenceLevel),
+      order: Number.isFinite(source?.order) ? source.order : index + 1,
+    };
+    removeEmptyEntryFields(entry);
+    if (source?.type === 'diagram' || /\.(mmd|mermaid)$/i.test(path)) {
+      diagrams.push(entry);
+    } else {
+      documents.push(entry);
+    }
+  });
+
+  const manifest = {
+    formatVersion: LENS_ARTIFACT_BUNDLE_FORMAT_VERSION,
+    reviewedWith,
+    sourceTool: safeExportText(bundle.sourceTool),
+    sourceToolVersion: safeExportText(bundle.sourceToolVersion),
+    generatedAtUtc: bundle.generatedAtUtc || undefined,
+    entryDocument: bundle.entryDocument && exportedPathSet.has(bundle.entryDocument) ? bundle.entryDocument : undefined,
+    title: safeExportText(bundle.title),
+    evidenceLevels: [...(bundle.evidenceLevels || [])],
+    documents,
+    diagrams,
+    warnings: (bundle.manifestWarnings || []).map((warning) => {
+      const safeWarning = {
+        code: safeExportText(warning.code),
+        message: safeExportText(warning.message, maxSummaryTextLength),
+        evidenceLevel: normaliseEvidenceLabel(warning.evidenceLevel),
+      };
+      removeEmptyEntryFields(safeWarning);
+      return safeWarning;
+    }).filter((warning) => Object.keys(warning).length).slice(0, 20),
+  };
+
+  return removeEmptyArtifactMetadata(manifest);
+}
+
 function normaliseManifestEntries(entries, importedPathSet, kind, metadataWarnings) {
   if (entries === undefined) return [];
   if (!Array.isArray(entries)) {
@@ -219,6 +303,12 @@ function normaliseDisplayText(value, maxLength = maxDisplayTextLength) {
     .slice(0, maxLength);
 }
 
+function safeExportText(value, maxLength = maxDisplayTextLength) {
+  const text = normaliseDisplayText(value, maxLength);
+  if (!text || /^[a-z][a-z0-9+.-]*:/i.test(text)) return '';
+  return text;
+}
+
 function normaliseOrder(value) {
   const order = Number(value);
   return Number.isFinite(order) ? order : null;
@@ -236,4 +326,27 @@ function dedupeEntriesByPath(entries) {
 
 function uniqueWarnings(warnings) {
   return [...new Set(warnings)].slice(0, 8);
+}
+
+function removeEmptyEntryFields(entry) {
+  Object.keys(entry).forEach((key) => {
+    if (entry[key] === '' || entry[key] === null || entry[key] === undefined) {
+      delete entry[key];
+    }
+  });
+  return entry;
+}
+
+function removeEmptyArtifactMetadata(metadata) {
+  Object.keys(metadata).forEach((key) => {
+    const value = metadata[key];
+    if (value === '' || value === null || value === undefined) {
+      delete metadata[key];
+      return;
+    }
+    if (Array.isArray(value) && !value.length) {
+      delete metadata[key];
+    }
+  });
+  return metadata;
 }

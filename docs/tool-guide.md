@@ -68,9 +68,11 @@ flowchart LR
 - **Word** creates a `.docx` with rendered diagrams and compatible content.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
 - **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
-- Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group.
+- Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group. With a loaded artefact bundle, safe metadata can fill missing title, order, evidence, and navigation hints; front matter remains highest priority.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
-- ZIPs may optionally include `lens-artifact-bundle.json` metadata. When present, the app still imports the Markdown and Mermaid files normally, opens a safe declared entry document, and shows a small artefact bundle summary from the ZIP.
+- **Export artefact review pack** is available only after importing a valid artefact bundle. It exports editable Markdown and managed images with a rebuilt safe `lens-artifact-bundle.json`; ordinary Markdown Bundle export does not include artefact metadata.
+- Built-in export profiles are session-only. The Azure DevOps Wiki Markdown profile uses a session override and does not persist the DevOps Mermaid preference unless you use the existing toggle or saved local profile flow.
+- ZIPs may optionally include `lens-artifact-bundle.json` metadata. When present, the app still imports the Markdown and Mermaid files normally, opens a safe declared entry document, and shows a collapsible artefact reader panel with safe navigation, evidence chips, warnings, and local filters.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
@@ -85,7 +87,7 @@ Use Create for local templates:
 
 Use Studio for Mermaid-focused templates and snippets.
 
-The Create menu can also save your current document as a local template, save selected Markdown as a local snippet, and import or export that local library as JSON. Export profiles in the Export menu remember browser-local export defaults.
+The Create menu can also save your current document as a local template, save selected Markdown as a local snippet, and import or export that local library as JSON. Saved export profiles in the Export menu remember browser-local export defaults through the existing local library key.
 
 ## Images
 
@@ -103,4 +105,4 @@ Use **View > Manage assets** to preview session images, rename paths across edit
 
 The app runs in the browser. Files stay local unless you save, export, copy, or import a new bundle. There is no backend or account system.
 
-Optional artefact bundle metadata is session-only and untrusted. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings.
+Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.

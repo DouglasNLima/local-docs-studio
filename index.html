@@ -207,12 +207,17 @@
             <hr>
             <div class="menu-heading">Bundles</div>
             <button id="exportMarkdownBundleButton" type="button">Export Markdown Bundle</button>
+            <button id="exportArtifactReviewPackButton" type="button" disabled title="Artefact review pack requires an imported artefact bundle.">Export artefact review pack</button>
             <label class="menu-check">
               <input id="devopsMarkdownExportToggle" type="checkbox" />
               <span>Azure DevOps Mermaid syntax</span>
             </label>
             <button id="exportDocsButton" type="button">Export Docs Site</button>
             <div class="menu-note">Bundles keep editable Markdown and assets. Docs Site creates a GitHub Pages-ready static site.</div>
+            <hr>
+            <div class="menu-heading">Built-in profiles</div>
+            <div id="activeExportProfileLabel" class="menu-note">Active built-in profile: None</div>
+            <div id="builtInExportProfiles" class="export-profile-presets" aria-label="Built-in export profiles"></div>
             <hr>
             <div class="menu-heading">Diagrams</div>
             <button id="exportSvgButton" type="button">Export SVG</button>

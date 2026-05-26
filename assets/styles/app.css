@@ -486,6 +486,47 @@
       min-width: min(20rem, calc(100vw - 2rem));
     }
 
+    .export-profile-presets {
+      display: grid;
+      gap: .35rem;
+      min-width: 0;
+    }
+
+    .export-profile-preset {
+      display: grid;
+      gap: .14rem;
+      min-width: 0;
+      min-height: 2.65rem;
+      padding: .5rem .58rem;
+      text-align: left;
+      white-space: normal;
+    }
+
+    .export-profile-preset[aria-pressed="true"] {
+      border-color: var(--accent-border);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .export-profile-preset:disabled {
+      opacity: .58;
+      cursor: not-allowed;
+    }
+
+    .export-profile-preset-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: inherit;
+      font-weight: 750;
+    }
+
+    .export-profile-preset-description {
+      color: var(--muted);
+      font-size: .74rem;
+      line-height: 1.3;
+    }
+
     .menu-heading {
       margin: .38rem .25rem .08rem;
       color: var(--muted-strong);
@@ -2647,8 +2688,16 @@ label.file-button.primary,
 }
 
 .artifact-bundle-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: .6rem;
+}
+
+.artifact-bundle-head-copy {
   display: grid;
   gap: .18rem;
+  min-width: 0;
 }
 
 .artifact-bundle-title {
@@ -2659,8 +2708,33 @@ label.file-button.primary,
   overflow-wrap: anywhere;
 }
 
+.artifact-bundle-toggle,
+.artifact-bundle-clear {
+  flex: 0 0 auto;
+  min-height: 1.8rem;
+  padding: .22rem .5rem;
+  border-radius: 999px;
+  font-size: .72rem;
+}
+
+.artifact-bundle-toggle[aria-expanded="true"] {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.artifact-bundle-details {
+  display: grid;
+  gap: .6rem;
+}
+
+.artifact-bundle-details[hidden] {
+  display: none;
+}
+
 .artifact-bundle-copy,
-.artifact-bundle-warning {
+.artifact-bundle-warning,
+.artifact-bundle-muted {
   margin: 0;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -2701,8 +2775,130 @@ label.file-button.primary,
   line-height: 1.1;
 }
 
+.artifact-bundle-filter-buttons button[aria-pressed="true"],
+.artifact-bundle-chip {
+  border-color: var(--accent-border);
+}
+
 .artifact-bundle-warning {
   color: var(--warning);
+}
+
+.artifact-bundle-muted {
+  color: var(--muted);
+}
+
+.artifact-bundle-notes,
+.artifact-bundle-warnings,
+.artifact-bundle-filters,
+.artifact-bundle-nav {
+  display: grid;
+  gap: .45rem;
+  min-width: 0;
+}
+
+.artifact-bundle-warnings h3,
+.artifact-bundle-filters h3,
+.artifact-bundle-nav h3,
+.artifact-bundle-nav-group h4 {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.artifact-bundle-warnings ul {
+  display: grid;
+  gap: .25rem;
+  margin: 0;
+  padding-left: 1rem;
+  color: var(--warning);
+}
+
+.artifact-bundle-filter-group {
+  display: grid;
+  gap: .28rem;
+}
+
+.artifact-bundle-filter-group > span,
+.artifact-bundle-search span {
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 750;
+}
+
+.artifact-bundle-filter-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .28rem;
+}
+
+.artifact-bundle-filter-buttons button {
+  min-height: 1.7rem;
+  padding: .16rem .42rem;
+  border-radius: 999px;
+  font-size: .7rem;
+}
+
+.artifact-bundle-filter-buttons button[aria-pressed="true"] {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.artifact-bundle-search {
+  display: grid;
+  gap: .28rem;
+}
+
+.artifact-bundle-search input {
+  width: 100%;
+  padding: .42rem .5rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--editor-bg);
+  color: var(--text);
+  font: inherit;
+}
+
+.artifact-bundle-nav-group {
+  display: grid;
+  gap: .3rem;
+}
+
+.artifact-bundle-item {
+  display: grid;
+  gap: .16rem;
+  width: 100%;
+  min-width: 0;
+  min-height: 2.45rem;
+  padding: .45rem .5rem;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.artifact-bundle-item.active {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.artifact-bundle-item-title,
+.artifact-bundle-item-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.artifact-bundle-item-title {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.artifact-bundle-item-meta {
+  color: var(--muted);
+  font-size: .7rem;
 }
 
 .search-wrap {

@@ -162,14 +162,35 @@ const lensBundleContract = readFileSync(toRootPath('docs/architecture/lens-artif
 const readme = readFileSync(toRootPath('README.md'), 'utf8');
 if (!lensBundleContract.includes('lens-artifact-bundle.json')) fail('Lens artefact bundle contract must document lens-artifact-bundle.json');
 if (!lensBundleContract.includes('candidate finding')) fail('Lens artefact bundle contract must document candidate finding evidence');
+if (!lensBundleContract.includes('Reader Panel')) fail('Lens artefact bundle contract must document the reader panel');
+if (!lensBundleContract.includes('Built-in export profiles are session-only presets')) fail('Lens artefact bundle contract must document session-only export profiles');
+if (!lensBundleContract.includes('Docs Site export may use safe artefact metadata')) fail('Lens artefact bundle contract must document Docs Site artefact metadata');
+if (!lensBundleContract.includes('Generic Markdown Bundle export must not include `lens-artifact-bundle.json`')) fail('Lens artefact bundle contract must document generic bundle boundaries');
+if (!lensBundleContract.includes('confirmed finding')) fail('Lens artefact bundle contract must document confirmed finding wording rules');
 if (!readme.includes('Optional Lens Artefact Bundles') || !readme.includes('lens-artifact-bundle.json')) {
   fail('README.md must document optional Lens artefact bundle ZIP support');
+}
+if (!readme.includes('Built-in export profiles') || !readme.includes('Export artefact review pack')) {
+  fail('README.md must document built-in profiles and artefact review export');
 }
 
 const lensArtifactBundleService = readFileSync(toRootPath('assets/scripts/files/lens-artifact-bundle-service.js'), 'utf8');
 for (const forbiddenRuntime of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'localStorage', 'indexedDB', 'openObjectStoreDb']) {
   if (lensArtifactBundleService.includes(forbiddenRuntime)) {
     fail(`Lens artefact bundle service must not use ${forbiddenRuntime}`);
+  }
+}
+
+const artifactReaderModule = readFileSync(toRootPath('assets/scripts/ui/artifact-bundle-reader.js'), 'utf8');
+const exportProfileModule = readFileSync(toRootPath('assets/scripts/exports/export-profile-service.js'), 'utf8');
+for (const [moduleName, source] of [
+  ['artefact reader', artifactReaderModule],
+  ['export profile', exportProfileModule],
+]) {
+  for (const forbiddenRuntime of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'indexedDB', 'openObjectStoreDb', 'https://', 'http://']) {
+    if (source.includes(forbiddenRuntime)) {
+      fail(`${moduleName} module must not add external service integration via ${forbiddenRuntime}`);
+    }
   }
 }
 

@@ -14,7 +14,7 @@ Use British English for first-party UI, docs, comments, test names, logs, genera
 
 The app supports Markdown editing and preview, Mermaid rendering, ZIP import/export, Word/HTML/PDF-oriented exports, docs-site export, local file/folder workflows, document outline/search/review helpers, and a PWA/offline shell.
 
-Optional Lens artefact bundle support is ZIP-import context only. Keep it optional, treat `lens-artifact-bundle.json` metadata as untrusted, never infer evidence levels, never convert candidate findings into confirmed findings, and preserve generic Markdown/Mermaid workflows.
+Optional Lens artefact bundle support is ZIP-import context only unless the user explicitly exports an artefact review pack. Keep it optional, treat `lens-artifact-bundle.json` metadata as untrusted, never infer evidence levels, never convert candidate findings into confirmed findings, and preserve generic Markdown/Mermaid workflows.
 
 ## Repository Layout
 
@@ -30,6 +30,8 @@ Optional Lens artefact bundle support is ZIP-import context only. Keep it option
 - `assets/scripts/files/`: open/save, ZIP import, folder records, and recent handles.
 - `assets/scripts/rendering/`: Markdown, Highlight.js, Mermaid, diagram frames, and zoom.
 - `assets/scripts/exports/`: HTML, Word, PDF print, Markdown Bundle, Docs Site, SVG/PNG, clipboard, and export flows.
+- `assets/scripts/exports/export-profile-service.js`: session-only built-in export profile presets.
+- `assets/scripts/ui/artifact-bundle-reader.js`: optional artefact reader panel rendering and local filters.
 - `assets/scripts/ui/`: menus, file list, theme, layout, status, resizers, and general UI behaviour.
 - `assets/scripts/utils/`: shared browser, binary, file, formatting, DevOps Markdown, and ZIP helpers.
 - `assets/scripts/registries/content.js`: examples, templates, snippets, and local content studios.
@@ -94,6 +96,8 @@ The Playwright config starts the same server automatically and uses `http://127.
 - Keep browser-only behaviour defensive. File System Access API, clipboard APIs, downloads, and print flows need fallbacks or clear status messages when browser support is limited.
 - Keep exports clean. App-only review/search/outline UI should not leak into generated HTML, Word, Docs Site, or Markdown Bundle output unless intentionally added.
 - Keep Lens artefact support passive. Do not add direct links or integrations to other Lens tools, and do not call external services from artefact bundle metadata.
+- Keep built-in export profiles session-only. Applying the Azure DevOps Wiki Markdown preset must use a session override and must not write the existing DevOps preference key unless the user explicitly uses the persisted toggle or saved local profile flow.
+- Keep generic Markdown Bundle export free of `lens-artifact-bundle.json`. Include a rebuilt safe artefact manifest only through the explicit artefact review pack export path.
 - Keep CDN/offline behaviour in sync. When adding local modules or cacheable static assets, update `service-worker.js` so `npm run test:static` continues to pass.
 - Preserve legacy entry behaviour in `md-mmd-renderer-v5.html`.
 

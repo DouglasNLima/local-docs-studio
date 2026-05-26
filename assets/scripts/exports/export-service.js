@@ -7,6 +7,12 @@ import { formatMarkdownForDevOpsBundle } from '../utils/devops-markdown.js';
 import { resolveWikilinkTarget, stripAppWikilinkActions } from '../utils/wikilinks.js';
 import { parseFrontMatter } from '../utils/front-matter.js';
 import {
+  LENS_ARTIFACT_BUNDLE_MANIFEST_NAME,
+  buildSafeArtifactBundleExportMetadata,
+  buildSafeArtifactReviewManifest,
+  getArtifactMetadataForPath,
+} from '../files/lens-artifact-bundle-service.js';
+import {
   buildCspMeta,
   buildDocsSiteCsp,
   buildPrintExportCsp,
@@ -38,6 +44,7 @@ export function createExportService({
     getExportName,
     getWordExportName,
     getDocTitleFromPath,
+    getEffectiveDevopsMarkdownExport = () => state.devopsMarkdownExport,
     closeOpenMenus,
     setStatus,
   } = callbacks;
@@ -307,6 +314,18 @@ export function createExportService({
     }
 
     async function exportMarkdownBundle() {
+      return exportMarkdownBundleInternal({ includeArtifactReviewManifest: false });
+    }
+
+    async function exportArtifactReviewPack() {
+      if (!state.artifactBundle) {
+        setStatus('Import an artefact bundle before exporting an artefact review pack.', 'warning');
+        return false;
+      }
+      return exportMarkdownBundleInternal({ includeArtifactReviewManifest: true });
+    }
+
+    async function exportMarkdownBundleInternal({ includeArtifactReviewManifest = false } = {}) {
       const records = state.files.filter((record) => isSupportedFile(record.name));
       if (!records.length) {
         setStatus('Open Markdown or Mermaid files before exporting a bundle.', 'warning');
@@ -314,14 +333,15 @@ export function createExportService({
       }
 
       try {
-        setStatus(`Building Markdown bundle from ${records.length} document${records.length === 1 ? '' : 's'}...`);
+        setStatus(`Building ${includeArtifactReviewManifest ? 'artefact review pack' : 'Markdown bundle'} from ${records.length} document${records.length === 1 ? '' : 's'}...`);
         const documents = [];
         const zipEntries = [];
+        const useDevopsMarkdown = Boolean(getEffectiveDevopsMarkdownExport());
 
         for (const record of records) {
           const path = normaliseBundlePath(record.path || record.name);
           const sourceText = await readRecordText(record);
-          const text = state.devopsMarkdownExport
+          const text = useDevopsMarkdown
             ? formatMarkdownForDevOpsBundle(sourceText, path)
             : sourceText;
           documents.push({
@@ -335,20 +355,29 @@ export function createExportService({
 
         const assetEntries = buildManagedAssetZipEntries();
         const manifest = buildMarkdownBundleManifest(documents, assetEntries);
-        const zip = createZipBlob([
+        const reviewManifest = includeArtifactReviewManifest
+          ? buildSafeArtifactReviewManifest({ bundle: state.artifactBundle, records, reviewedWith: APP_NAME })
+          : null;
+        const zipEntriesForDownload = [
           ...zipEntries,
           ...assetEntries,
           { name: MARKDOWN_BUNDLE_MANIFEST_NAME, data: JSON.stringify(manifest, null, 2) },
-        ], 'application/zip');
+        ];
+        if (reviewManifest) {
+          zipEntriesForDownload.push({ name: LENS_ARTIFACT_BUNDLE_MANIFEST_NAME, data: JSON.stringify(reviewManifest, null, 2) });
+        }
+        const zip = createZipBlob(zipEntriesForDownload, 'application/zip');
 
-        downloadBlob(zip, `${sanitiseFileName(manifest.title) || 'markdown-docs'}-markdown-bundle.zip`);
-        const devOpsSuffix = state.devopsMarkdownExport ? ' Azure DevOps Mermaid syntax applied.' : '';
-        setExportTrust(`Markdown bundle ready: ${documents.length} document${documents.length === 1 ? '' : 's'} and ${assetEntries.length} asset${assetEntries.length === 1 ? '' : 's'}.${devOpsSuffix}`, 'ok');
-        setStatus('Markdown bundle exported.', 'ok');
+        const fileSuffix = includeArtifactReviewManifest ? 'artefact-review-pack' : 'markdown-bundle';
+        downloadBlob(zip, `${sanitiseFileName(manifest.title) || 'markdown-docs'}-${fileSuffix}.zip`);
+        const devOpsSuffix = useDevopsMarkdown ? ' Azure DevOps Mermaid syntax applied.' : '';
+        const reviewSuffix = reviewManifest ? ' Safe artefact metadata included.' : '';
+        setExportTrust(`${includeArtifactReviewManifest ? 'Artefact review pack' : 'Markdown bundle'} ready: ${documents.length} document${documents.length === 1 ? '' : 's'} and ${assetEntries.length} asset${assetEntries.length === 1 ? '' : 's'}.${devOpsSuffix}${reviewSuffix}`, 'ok');
+        setStatus(includeArtifactReviewManifest ? 'Artefact review pack exported with safe artefact metadata.' : 'Markdown bundle exported.', 'ok');
         closeOpenMenus();
         return true;
       } catch (error) {
-        setStatus('Markdown bundle export failed.', 'danger');
+        setStatus(includeArtifactReviewManifest ? 'Artefact review pack export failed.' : 'Markdown bundle export failed.', 'danger');
         console.error(error);
         return false;
       }
@@ -624,7 +653,8 @@ export function createExportService({
         const { pages, homePage } = buildDocsSitePages(sourcePages, options);
         rewriteDocsSiteWikilinks(pages);
         const generatedAt = new Date().toISOString();
-        const searchIndex = buildDocsSiteSearchIndex({ title: options.title, description: options.description, theme: options.theme, pages, homePage });
+        const artifactBundleMetadata = buildSafeArtifactBundleExportMetadata(state.artifactBundle);
+        const searchIndex = buildDocsSiteSearchIndex({ title: options.title, description: options.description, theme: options.theme, pages, homePage, artifactBundleMetadata });
         const manifestObject = buildDocsSiteManifest({
           title: options.title,
           description: options.description,
@@ -635,6 +665,7 @@ export function createExportService({
           homePage,
           diagramTotal,
           diagramErrors,
+          artifactBundleMetadata,
         });
         const manifest = JSON.stringify(manifestObject, null, 2);
 
@@ -764,7 +795,9 @@ export function createExportService({
       rewriteManagedAssetImageSources(container, record.path);
 
       const metadata = frontMatter.metadata;
-      const title = metadata.title || extractDocumentTitle(container, record);
+      const artifactMetadata = getArtifactMetadataForPath(state.artifactBundle, record.path);
+      const artifactNavGroup = getArtifactNavGroup(artifactMetadata, record);
+      const title = metadata.title || artifactMetadata?.title || extractDocumentTitle(container, record);
       const id = makeUniqueDocId(record.path, index, usedIds);
       const headings = decorateDocsSiteHeadings(container);
       const searchSections = extractDocsSiteSearchSections(container, headings, title, record.path);
@@ -777,10 +810,12 @@ export function createExportService({
         html: container.innerHTML,
         metadata,
         description: metadata.description || '',
-        order: metadata.order,
+        order: Number.isFinite(metadata.order) ? metadata.order : artifactMetadata?.order,
         tags: metadata.tags || [],
         draft: Boolean(metadata.draft),
-        navGroup: metadata.navGroup || '',
+        navGroup: metadata.navGroup || artifactNavGroup,
+        artifactKind: artifactMetadata?.kind || '',
+        evidenceLevel: artifactMetadata?.evidenceLevel || '',
         headings,
         searchSections,
         diagramTotal: diagrams.length,
@@ -1035,6 +1070,19 @@ export function createExportService({
         || String(left.path || '').localeCompare(String(right.path || ''));
     }
 
+    function getArtifactNavGroup(metadata, record) {
+      if (!metadata) return '';
+      const kind = String(metadata.kind || '').toLowerCase();
+      const path = String(record?.path || metadata.path || '').toLowerCase();
+      if (metadata.type === 'diagram' || /\b(diagram|mermaid|mmd)\b/.test(kind) || /\.(mmd|mermaid)$/.test(path)) return 'Diagrams';
+      if (/\bfinding/.test(kind) || /(^|\/)findings?\//.test(path)) return 'Findings';
+      if (/\badr\b|architecture decision/.test(kind) || /(^|\/)adrs?\//.test(path) || /adr-\d+/i.test(path)) return 'ADRs';
+      if (/release/.test(kind) || /release[- ]?notes/.test(path)) return 'Release notes';
+      if (/summary|overview/.test(kind) || /(^|\/)(readme|index)\.(md|markdown)$/i.test(path)) return 'Summary';
+      if (/doc|guide|runbook|manual/.test(kind) || /(^|\/)docs?\//.test(path)) return 'Documentation';
+      return 'Other';
+    }
+
     function makeUniqueGeneratedPageId(base, usedIds) {
       let id = base;
       let suffix = 2;
@@ -1045,8 +1093,8 @@ export function createExportService({
       return id;
     }
 
-    function buildDocsSiteSearchIndex({ title, description, theme, pages, homePage }) {
-      return {
+    function buildDocsSiteSearchIndex({ title, description, theme, pages, homePage, artifactBundleMetadata }) {
+      const index = {
         formatVersion: 'docs-site-2.0',
         title,
         description,
@@ -1058,9 +1106,12 @@ export function createExportService({
           path: page.path,
           html: page.html,
           description: page.description || '',
+          order: Number.isFinite(page.order) ? page.order : null,
           tags: page.tags || [],
           draft: Boolean(page.draft),
           navGroup: page.navGroup || '',
+          artifactKind: page.artifactKind || '',
+          evidenceLevel: page.evidenceLevel || '',
           headings: page.headings,
           diagramTotal: page.diagramTotal,
           diagramErrors: page.diagramErrors,
@@ -1074,13 +1125,15 @@ export function createExportService({
           headingId: section.headingId,
           headingText: section.headingText,
           level: section.level,
-          text: normaliseDocsSiteText(`${section.text} ${page.description || ''} ${(page.tags || []).join(' ')} ${page.navGroup || ''}`),
+          text: normaliseDocsSiteText(`${section.text} ${page.description || ''} ${(page.tags || []).join(' ')} ${page.navGroup || ''} ${page.evidenceLevel || ''} ${page.artifactKind || ''}`),
         }))),
       };
+      if (artifactBundleMetadata) index.artifactBundle = artifactBundleMetadata;
+      return index;
     }
 
-    function buildDocsSiteManifest({ title, description, theme, generatedAt, sourcePages, pages, homePage, diagramTotal, diagramErrors }) {
-      return {
+    function buildDocsSiteManifest({ title, description, theme, generatedAt, sourcePages, pages, homePage, diagramTotal, diagramErrors, artifactBundleMetadata }) {
+      const manifest = {
         formatVersion: 'docs-site-2.0',
         title,
         description,
@@ -1096,7 +1149,7 @@ export function createExportService({
           'assets/docs-site.js',
           'assets/search-index.json',
         ],
-        pages: pages.map(({ id, title: pageTitle, path, description: pageDescription, order, tags, draft, navGroup, headings, diagramTotal: pageDiagrams, diagramErrors: pageErrors, generatedHome }) => ({
+        pages: pages.map(({ id, title: pageTitle, path, description: pageDescription, order, tags, draft, navGroup, artifactKind, evidenceLevel, headings, diagramTotal: pageDiagrams, diagramErrors: pageErrors, generatedHome }) => ({
           id,
           title: pageTitle,
           path,
@@ -1105,12 +1158,16 @@ export function createExportService({
           tags: tags || [],
           draft: Boolean(draft),
           navGroup: navGroup || '',
+          artifactKind: artifactKind || '',
+          evidenceLevel: evidenceLevel || '',
           headings: headings.map(({ id: headingId, text, level }) => ({ id: headingId, text, level })),
           diagrams: pageDiagrams,
           diagramErrors: pageErrors,
           generatedHome: Boolean(generatedHome),
         })),
       };
+      if (artifactBundleMetadata) manifest.artifactBundle = artifactBundleMetadata;
+      return manifest;
     }
 
     function buildDocsSiteIndexHtml(title, description, theme) {
@@ -1136,6 +1193,7 @@ export function createExportService({
         <label for="searchInput">Search docs</label>
         <input id="searchInput" type="search" placeholder="Search pages, headings, and text" aria-label="Search docs">
       </div>
+      <section class="artifact-notes" id="artifactNotes" hidden></section>
       <nav id="nav" aria-label="Docs navigation"></nav>
       <section class="search-results" id="searchResults" aria-label="Search results" hidden></section>
     </aside>
@@ -1195,6 +1253,9 @@ button, input { font: inherit; }
 .search { display: grid; gap: .35rem; padding: .8rem 1rem; border-bottom: 1px solid var(--border); }
 .search label { color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 input { width: 100%; border: 1px solid var(--border); border-radius: 999px; padding: .62rem .78rem; color: var(--text); background: var(--bg); }
+.artifact-notes { display: grid; gap: .38rem; padding: .75rem 1rem; border-bottom: 1px solid var(--border); color: var(--muted); font-size: .82rem; }
+.artifact-notes[hidden] { display: none; }
+.artifact-notes strong { color: var(--text); font-size: .84rem; }
 nav, .search-results { overflow: auto; padding: .7rem; }
 .nav-page, .nav-heading, .search-result { display: block; width: 100%; border: 0; text-align: left; text-decoration: none; cursor: pointer; }
 .nav-page { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: .56rem .65rem; border-radius: .65rem; color: var(--muted); background: transparent; }
@@ -1268,6 +1329,7 @@ th { background: var(--surface-soft); }
   const searchResults = document.getElementById('searchResults');
   const content = document.getElementById('content');
   const docMeta = document.getElementById('docMeta');
+  const artifactNotes = document.getElementById('artifactNotes');
   let data = null;
   let pages = [];
   let byId = new Map();
@@ -1288,6 +1350,7 @@ th { background: var(--surface-soft); }
       pathMap = buildPathMap(pages);
       siteTitle.textContent = data.title || 'Docs site';
       siteDescription.textContent = data.description || pages.length + ' page' + (pages.length === 1 ? '' : 's');
+      renderArtifactNotes();
       applyTheme(themePreference);
       renderNav();
       installEvents();
@@ -1381,6 +1444,24 @@ th { background: var(--surface-soft); }
     }).join('') || '<div class="empty">No pages exported.</div>';
   }
 
+  function renderArtifactNotes() {
+    if (!artifactNotes) return;
+    var bundle = data && data.artifactBundle;
+    if (!bundle) {
+      artifactNotes.hidden = true;
+      artifactNotes.textContent = '';
+      return;
+    }
+    var parts = [];
+    if (bundle.title) parts.push('<strong>' + escapeHtml(bundle.title) + '</strong>');
+    if (bundle.sourceTool) parts.push('<span>' + escapeHtml([bundle.sourceTool, bundle.sourceToolVersion].filter(Boolean).join(' ')) + '</span>');
+    (bundle.notes || []).forEach(function (note) {
+      parts.push('<span>' + escapeHtml(note) + '</span>');
+    });
+    artifactNotes.innerHTML = parts.join('');
+    artifactNotes.hidden = !parts.length;
+  }
+
   function renderHeadingNav(page) {
     return (page.headings || []).map((heading) => {
       const active = heading.id === currentHeadingId ? ' active' : '';
@@ -1458,6 +1539,8 @@ th { background: var(--surface-soft); }
       page.path,
       page.description || '',
       page.navGroup || '',
+      page.artifactKind || '',
+      page.evidenceLevel || '',
       page.draft ? 'Draft' : '',
       ...(page.tags || []).map((tag) => '#' + tag),
       page.diagramErrors ? page.diagramErrors + ' diagram error' + (page.diagramErrors === 1 ? '' : 's') : '',
@@ -2838,6 +2921,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       exportPreviewWord,
       exportPreviewPdf,
       exportMarkdownBundle,
+      exportArtifactReviewPack,
       copyRenderedHtml,
       copyRenderedText,
       copyCurrentMermaidSource,
