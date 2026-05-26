@@ -101,6 +101,14 @@ Docs Site export may use safe artefact metadata as display-only hints when a bun
 
 Generic Markdown Bundle export must not include `lens-artifact-bundle.json`. Artefact review bundle export is explicit through the artefact review pack action. That action may rebuild a safe normalised `lens-artifact-bundle.json` from current imported records and safe session metadata, including `reviewedWith: "Lens Docs Studio"`. It must not claim evidence validation, create findings, change candidate findings to confirmed findings, or persist metadata after export.
 
+The explicit artefact review pack export is the only Lens Docs Studio export path that writes a rebuilt `lens-artifact-bundle.json`. Docs Site export may include safe optional `artifactBundle` metadata in `site-manifest.json` and `assets/search-index.json`, but it remains display-only metadata for a static site.
+
+## Fixture Catalogue And Round-Trip Certification
+
+The source-controlled fixture catalogue under `tests/fixtures/artifact-bundles/` contains deterministic source files for valid basic, valid rich, invalid manifest, unsafe paths, front matter precedence, and generic ZIP control cases. Browser tests build ZIPs from those files instead of committing generated ZIP artefacts.
+
+Round-trip certification proves that a rich artefact bundle can be imported, navigated through the reader, exported through the explicit artefact review pack export, re-imported, and still keep only safe current records. It also proves ordinary Markdown Bundle export stays free of `lens-artifact-bundle.json`, legacy Markdown Bundle manifest names remain accepted, and Markdown/Mermaid records remain editable.
+
 ## Path And Privacy Rules
 
 Manifest paths are ZIP-relative only. Readers must reject absolute paths, drive roots, path traversal, empty paths, control characters, and URL-like schemes. Metadata may only link to Markdown/Mermaid records actually imported from the ZIP, and raw local paths must not be exposed.

@@ -1,0 +1,4 @@
+# Rendered Finding
+
+Candidate content.
+

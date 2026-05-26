@@ -1,0 +1,39 @@
+{
+  "formatVersion": "lens-artifact-bundle-1.0",
+  "sourceTool": "Security Lens",
+  "sourceToolVersion": "1.0.0",
+  "generatedAtUtc": "2026-05-26T00:00:00.000Z",
+  "entryDocument": "README.md",
+  "title": "Basic Artefact Bundle",
+  "summary": "Minimal valid bundle used for import certification.",
+  "evidenceLevels": [
+    "static evidence",
+    "candidate finding"
+  ],
+  "documents": [
+    {
+      "path": "README.md",
+      "title": "Basic Overview",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 10
+    },
+    {
+      "path": "findings/basic-finding.md",
+      "title": "Basic Finding",
+      "kind": "finding",
+      "evidenceLevel": "candidate finding",
+      "order": 20
+    }
+  ],
+  "diagrams": [
+    {
+      "path": "diagrams/basic-flow.mmd",
+      "title": "Basic Flow",
+      "kind": "mermaid",
+      "evidenceLevel": "static evidence",
+      "order": 30
+    }
+  ]
+}
+

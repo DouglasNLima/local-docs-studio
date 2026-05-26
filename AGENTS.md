@@ -36,9 +36,11 @@ Optional Lens artefact bundle support is ZIP-import context only unless the user
 - `assets/scripts/utils/`: shared browser, binary, file, formatting, DevOps Markdown, and ZIP helpers.
 - `assets/scripts/registries/content.js`: examples, templates, snippets, and local content studios.
 - `docs/tool-guide.md`: built-in read-only feature guide opened from Help.
+- `docs/integration/lens-artifact-bundle-producer-guide.md`: documentation-only guide for future compatible ZIP producers.
+- `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`: release candidate smoke checklist for the artefact bundle flow.
 - `tests/static/check-assets.mjs`: static integrity checks for modules, imports, service worker cache, shell, manifest, workflow, and README guidance.
 - `tests/browser/app-smoke.spec.mjs`: Playwright smoke/regression coverage.
-- `tests/fixtures/`: Markdown, Mermaid, docs-site, and ZIP-related fixtures.
+- `tests/fixtures/`: Markdown, Mermaid, docs-site, source artefact bundle catalogue, and ZIP-related fixtures.
 
 Generated artefacts such as `node_modules/`, `test-results/`, `playwright-report/`, and local logs are ignored and should not be edited as source.
 
@@ -98,6 +100,7 @@ The Playwright config starts the same server automatically and uses `http://127.
 - Keep Lens artefact support passive. Do not add direct links or integrations to other Lens tools, and do not call external services from artefact bundle metadata.
 - Keep built-in export profiles session-only. Applying the Azure DevOps Wiki Markdown preset must use a session override and must not write the existing DevOps preference key unless the user explicitly uses the persisted toggle or saved local profile flow.
 - Keep generic Markdown Bundle export free of `lens-artifact-bundle.json`. Include a rebuilt safe artefact manifest only through the explicit artefact review pack export path.
+- Keep Docs Site artefact metadata optional and display-only. Markdown front matter stays ahead of safe artefact metadata.
 - Keep CDN/offline behaviour in sync. When adding local modules or cacheable static assets, update `service-worker.js` so `npm run test:static` continues to pass.
 - Preserve legacy entry behaviour in `md-mmd-renderer-v5.html`.
 
@@ -113,6 +116,8 @@ Browser tests include Chromium and Microsoft Edge projects. Edge must be install
 
 If you add new user-visible behaviour, prefer extending `tests/browser/app-smoke.spec.mjs` with a focused smoke/regression test and use fixtures under `tests/fixtures/` when possible.
 
+Artefact bundle certification fixtures live under `tests/fixtures/artifact-bundles/` as source Markdown, Mermaid, JSON, and small assets. Browser tests build deterministic ZIPs from those files; do not commit generated ZIPs unless a future test convention explicitly requires them.
+
 ## Important Maintenance Notes
 
 - `tests/static/check-assets.mjs` verifies that every module in `assets/scripts/` is cached by the service worker. New modules usually require a `service-worker.js` cache update.
@@ -120,6 +125,7 @@ If you add new user-visible behaviour, prefer extending `tests/browser/app-smoke
 - `manifest.webmanifest` should keep `start_url` and `scope` as `./` for GitHub Pages hosting.
 - GitHub Pages deployment should stay fully static. Do not depend on server routes, server-side APIs, environment variables, filesystem writes, or runtime build output.
 - `README.md` is part of the static validation surface. Keep development, export, import, and publishing guidance accurate when those workflows change.
+- Keep `docs/integration/lens-artifact-bundle-producer-guide.md`, `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`, and the artefact bundle contract aligned when the optional manifest contract changes.
 - Generated Docs Site ZIP contents under `test-results/` are test outputs, not source templates.
 - The app intentionally has no production build command. Do not add one just to run or publish the existing app.
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v49';
+const CACHE_NAME = 'lens-docs-studio-v53';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -56,7 +56,7 @@ self.addEventListener('install', (event) => {
     const assets = [...LOCAL_ASSETS, ...await readVendorAssets()];
     await Promise.all(assets.map(async (url) => {
       try {
-        await cache.add(new Request(url, { mode: 'same-origin' }));
+        await cache.add(new Request(url, { mode: 'same-origin', cache: 'reload' }));
       } catch {
         // The app still works online if an optional cached asset is unavailable during install.
       }

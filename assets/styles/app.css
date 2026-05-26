@@ -609,7 +609,7 @@
       min-width: 0;
       min-height: 0;
       display: grid;
-      grid-template-rows: auto auto auto 1fr;
+      grid-template-rows: auto auto auto auto 1fr;
       border-right: 1px solid var(--border-soft);
       background: var(--sidebar-bg);
       backdrop-filter: blur(12px);
@@ -876,6 +876,7 @@
     }
 
     .preview-maximized .workspace {
+      grid-column: 1;
       grid-template-columns: minmax(0, 1fr);
     }
 
@@ -891,6 +892,7 @@
     }
 
     .input-maximized .workspace {
+      grid-column: 1;
       grid-template-columns: minmax(0, 1fr);
     }
 
@@ -997,6 +999,7 @@
       position: relative;
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
+      --editor-scrollbar-width: 0px;
       min-width: 0;
       min-height: 0;
       overflow: hidden;
@@ -1064,7 +1067,7 @@
       grid-row: 1;
       min-width: 0;
       min-height: 0;
-      width: 100%;
+      width: calc(100% - var(--editor-scrollbar-width, 0px));
       height: 100%;
       margin: 0;
       overflow: hidden;
@@ -1077,6 +1080,12 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       pointer-events: none;
+    }
+
+    .editor-syntax-layer .hljs-emphasis,
+    .editor-syntax-layer .hljs-strong {
+      font-style: inherit;
+      font-weight: inherit;
     }
 
     .mermaid-autocomplete {
@@ -2636,6 +2645,18 @@ label.file-button.primary,
   background: var(--bg);
 }
 
+.shell > .sidebar {
+  grid-column: 1;
+}
+
+.shell > .sidebar-splitter {
+  grid-column: 2;
+}
+
+.shell > .workspace {
+  grid-column: 3;
+}
+
 .sidebar {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius);
@@ -2906,6 +2927,40 @@ label.file-button.primary,
   border-bottom: 1px solid var(--border-soft);
 }
 
+.file-browser-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .45rem;
+  min-width: 0;
+  padding: .52rem .72rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-strong) 82%, transparent);
+}
+
+.file-view-toggle,
+.tree-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: .18rem;
+  min-width: 0;
+}
+
+.file-view-toggle {
+  padding: .12rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  background: var(--button-bg);
+}
+
+.file-browser-controls .icon-button {
+  width: 1.85rem;
+  min-width: 1.85rem;
+  height: 1.85rem;
+  min-height: 1.85rem;
+  border-radius: 7px;
+}
+
 .search-wrap input {
   font-family: Inter, sans-serif;
   font-size: 0.85rem;
@@ -2924,6 +2979,11 @@ label.file-button.primary,
 
 .file-list {
   padding: .55rem;
+}
+
+.file-tree {
+  display: grid;
+  gap: .12rem;
 }
 
 .file-item {
@@ -2975,6 +3035,64 @@ label.file-button.primary,
   font-size: .72rem;
 }
 
+.tree-folder,
+.tree-file-item {
+  padding-left: calc(.55rem + (var(--tree-depth, 0) * .9rem));
+}
+
+.tree-folder {
+  width: 100%;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: .4rem;
+  margin: .12rem 0;
+  padding-top: .45rem;
+  padding-right: .55rem;
+  padding-bottom: .45rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted-strong);
+  text-align: left;
+}
+
+.tree-folder:hover,
+.tree-folder:focus-visible {
+  border-color: var(--border-soft);
+  background: var(--button-bg-hover);
+  color: var(--text);
+  outline: none;
+}
+
+.tree-folder-twisty {
+  display: inline-grid;
+  place-items: center;
+  width: .9rem;
+  color: var(--muted);
+}
+
+.tree-folder-twisty .toolbar-icon {
+  width: .85rem;
+  height: .85rem;
+}
+
+.tree-folder-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 6px;
+  background: var(--surface-soft);
+  color: var(--muted-strong);
+}
+
+.tree-folder-icon .toolbar-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 .read-only-dot {
   display: inline-grid;
   place-items: center;
@@ -3019,6 +3137,9 @@ label.file-button.primary,
 
 .workspace {
   gap: .5rem;
+  width: 100%;
+  justify-self: stretch;
+  align-self: stretch;
 }
 
 .pane {
@@ -3194,14 +3315,16 @@ label.file-button.primary,
 .editor-toolbar {
   gap: .42rem;
   padding: .44rem .6rem;
-  flex-wrap: wrap;
-  overflow-x: hidden;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
   border-bottom: 1px solid var(--border-soft);
   background: var(--toolbar-bg);
 }
 
 .toolbar-section {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   gap: .22rem;
@@ -3840,13 +3963,20 @@ label.file-button.primary,
 
 /* ── Sidebar: icon-rail collapse ─────────────────────────── */
 .sidebar {
-  grid-template-rows: 0 auto auto auto 1fr; /* rail hidden by default */
+  grid-template-rows: auto auto auto auto minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "artifact"
+    "controls"
+    "search"
+    "files";
   transition: width .22s cubic-bezier(.4,0,.2,1);
   overflow: hidden;
 }
 
 /* Rail: the narrow strip shown when sidebar is collapsed */
 .sidebar-rail {
+  grid-area: rail;
   display: none;
   flex-direction: column;
   align-items: center;
@@ -3858,6 +3988,9 @@ label.file-button.primary,
 
 /* Collapse toggle button (in sidebar header) */
 .sidebar-collapse-btn {
+  grid-area: collapse;
+  justify-self: end;
+  align-self: center;
   display: inline-grid;
   place-items: center;
   width: 1.7rem;
@@ -3866,7 +3999,7 @@ label.file-button.primary,
   min-height: 1.7rem;
   padding: 0;
   border-radius: 6px;
-  margin-left: auto;
+  margin-left: 0;
   flex: 0 0 auto;
   color: var(--muted);
   transition: all .15s ease;
@@ -3879,23 +4012,70 @@ label.file-button.primary,
   background: var(--button-bg-hover);
 }
 
-/* Sidebar-header flex row — fits the new collapse button */
 .sidebar-header {
-  display: flex;
+  grid-area: head;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "title folder collapse";
   align-items: center;
   gap: .5rem;
+}
+
+.sidebar-title {
+  grid-area: title;
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sidebar-title strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-count {
+  flex: 0 0 auto;
+}
+
+#folderBadge {
+  grid-area: folder;
+  justify-self: start;
+  align-self: center;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.artifact-bundle-summary {
+  grid-area: artifact;
+}
+
+.file-browser-controls {
+  grid-area: controls;
+}
+
+.search-wrap {
+  grid-area: search;
+}
+
+.file-list {
+  grid-area: files;
+  min-height: 0;
 }
 
 /* Rail button (the expand icon shown when collapsed) */
 .sidebar-rail-btn {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 2.25rem;
   min-width: 2.25rem;
-  height: 2.25rem;
-  min-height: 2.25rem;
+  height: 3rem;
+  min-height: 3rem;
+  gap: .18rem;
   padding: 0;
   border-radius: 8px;
   color: var(--muted-strong);
@@ -3912,19 +4092,21 @@ label.file-button.primary,
 
 /* File count badge on the rail button */
 .sidebar-rail-count {
-  position: absolute;
-  top: .12rem;
-  right: .12rem;
-  min-width: .95rem;
-  height: .95rem;
-  padding: 0 .18rem;
+  position: static;
+  min-width: 1.25rem;
+  max-width: 1.9rem;
+  height: 1rem;
+  padding: 0 .24rem;
   border-radius: 999px;
   background: var(--accent);
   color: #fff;
-  font-size: .54rem;
+  font-size: .56rem;
   font-weight: 800;
-  line-height: .95rem;
+  line-height: 1rem;
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
   pointer-events: none;
   display: none;
 }
@@ -3945,6 +4127,8 @@ label.file-button.primary,
 .shell.sidebar-collapsed .sidebar {
   min-width: 0;
   width: 3rem;
+  grid-template-rows: minmax(0, 1fr);
+  grid-template-areas: "rail";
 }
 
 .shell.sidebar-collapsed .sidebar-rail {
@@ -3953,6 +4137,7 @@ label.file-button.primary,
 
 .shell.sidebar-collapsed .sidebar-header,
 .shell.sidebar-collapsed .artifact-bundle-summary,
+.shell.sidebar-collapsed .file-browser-controls,
 .shell.sidebar-collapsed .search-wrap,
 .shell.sidebar-collapsed .file-list {
   display: none;
@@ -4090,6 +4275,42 @@ label.file-button.primary,
   min-width: 0;
 }
 
+.version-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: .12rem;
+  color: var(--muted);
+  font-family: Inter, sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.topbar-layout-control {
+  display: inline-flex;
+  grid-template-columns: none;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: .12rem;
+  padding: .12rem;
+  border-radius: 8px;
+  background: var(--button-bg);
+}
+
+.topbar-layout-control button,
+.topbar-layout-control .icon-button {
+  width: 1.9rem;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  min-height: 1.9rem;
+  padding: 0;
+  border-radius: 7px;
+  font-size: inherit;
+}
+
 .icon-button,
 .scroll-sync-toggle {
   position: relative;
@@ -4132,6 +4353,15 @@ label.file-button.primary,
   border-color: var(--accent-border);
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.external-change-dot {
+  width: .62rem;
+  height: .62rem;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255, 136, 62, .14);
 }
 
 #focusModeButton {
@@ -4239,7 +4469,7 @@ label.file-button.primary,
 
   .topbar .brand {
     width: auto;
-    max-width: calc(100% - 4.6rem);
+    max-width: calc(100% - 13.5rem);
   }
 
   .brand h1 {
@@ -4250,6 +4480,9 @@ label.file-button.primary,
 
   .topbar-menubar {
     width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: .12rem;
   }
 
   .topbar-menubar .menu > summary {
@@ -4263,6 +4496,49 @@ label.file-button.primary,
     min-width: 1.95rem;
     height: 1.95rem;
     min-height: 1.95rem;
+  }
+
+  .topbar-layout-control {
+    gap: .08rem;
+    padding: .08rem;
+  }
+
+  .topbar-layout-control button,
+  .topbar-layout-control .icon-button {
+    width: 1.82rem;
+    min-width: 1.82rem;
+    height: 1.82rem;
+    min-height: 1.82rem;
+  }
+
+  .version-badge {
+    display: none;
+  }
+
+  .menu-panel {
+    position: fixed;
+    left: .55rem;
+    right: .55rem;
+    top: 5.6rem;
+    width: auto;
+    max-width: none;
+    max-height: calc(100dvh - 6.2rem);
+    overflow: auto;
+  }
+
+  .create-grid,
+  .studio-grid,
+  .export-profile-presets {
+    grid-template-columns: 1fr;
+  }
+
+  .file-browser-controls {
+    flex-wrap: wrap;
+    padding-inline: .6rem;
+  }
+
+  .tree-actions {
+    margin-left: auto;
   }
 
   .preview-control-groups {
@@ -4635,6 +4911,7 @@ label.file-button.primary,
 }
 
 .app.typewriter-mode .workspace {
+  grid-column: 1;
   grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   width: 100%;

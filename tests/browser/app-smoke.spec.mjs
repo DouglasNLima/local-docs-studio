@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createArtifactBundleFixtureZip } from './helpers/fixtures.mjs';
 import { createZipBuffer, getZipText, readZipEntries } from './helpers/zip.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -139,6 +140,23 @@ async function writeZipFixture(testInfo, name, files) {
   return zipPath;
 }
 
+async function writeArtifactBundleFixtureZip(testInfo, fixtureName, name = `${fixtureName}.zip`) {
+  const zipPath = testInfo.outputPath(name);
+  await writeFile(zipPath, await createArtifactBundleFixtureZip(fixtureName));
+  return zipPath;
+}
+
+async function tabUntilFocused(page, selector, maxTabs = 40) {
+  await page.locator('body').click({ position: { x: 4, y: 4 } });
+  for (let index = 0; index < maxTabs; index += 1) {
+    await page.keyboard.press('Tab');
+    if (await page.evaluate((targetSelector) => document.activeElement?.matches(targetSelector), selector)) {
+      return;
+    }
+  }
+  throw new Error(`Focused element matching ${selector} was not reached with Tab.`);
+}
+
 async function clickDocsSiteExportDownload(page, { title = 'Publishing Docs', description = 'Docs Site Builder 2.0 export fixture.' } = {}) {
   const button = page.getByRole('button', { name: 'Export Docs Site' });
   if (!(await button.isVisible())) {
@@ -260,6 +278,99 @@ async function loadVirtualWorkspace(page, files) {
     }));
   }, files);
   await expect(page.locator('#status')).toHaveText(/Rendered/);
+}
+
+async function installMockFileSystemAccess(page) {
+  await page.addInitScript(() => {
+    function createFileHandle(name, text = '') {
+      return {
+        kind: 'file',
+        name,
+        permission: 'granted',
+        _text: text,
+        _lastModified: Date.now(),
+        async getFile() {
+          return new File([this._text], this.name, {
+            type: this.name.endsWith('.mmd') || this.name.endsWith('.mermaid') ? 'text/plain' : 'text/markdown',
+            lastModified: this._lastModified,
+          });
+        },
+        async createWritable() {
+          const handle = this;
+          let nextText = '';
+          return {
+            async write(value) {
+              nextText += typeof value === 'string' ? value : await new Response(value).text();
+            },
+            async close() {
+              handle._text = nextText;
+              handle._lastModified += 1000;
+            },
+          };
+        },
+        async queryPermission() {
+          return this.permission;
+        },
+        async requestPermission() {
+          return this.permission;
+        },
+      };
+    }
+
+    function createDirectoryHandle(name) {
+      const files = new Map();
+      const directories = new Map();
+      return {
+        kind: 'directory',
+        name,
+        permission: 'granted',
+        files,
+        directories,
+        async *entries() {
+          for (const entry of files.entries()) yield entry;
+          for (const entry of directories.entries()) yield entry;
+        },
+        async getFileHandle(fileName, options = {}) {
+          if (!files.has(fileName)) {
+            if (!options.create) throw new DOMException('Not found', 'NotFoundError');
+            files.set(fileName, createFileHandle(fileName, ''));
+          }
+          return files.get(fileName);
+        },
+        async getDirectoryHandle(directoryName, options = {}) {
+          if (!directories.has(directoryName)) {
+            if (!options.create) throw new DOMException('Not found', 'NotFoundError');
+            directories.set(directoryName, createDirectoryHandle(directoryName));
+          }
+          return directories.get(directoryName);
+        },
+        async queryPermission() {
+          return this.permission;
+        },
+        async requestPermission() {
+          return this.permission;
+        },
+      };
+    }
+
+    const fileHandle = createFileHandle('opened.md', '# Opened\n');
+    const addedHandle = createFileHandle('added.md', '# Added\n');
+    const directoryHandle = createDirectoryHandle('Project Docs');
+    window.__mockFs = {
+      fileHandle,
+      addedHandle,
+      directoryHandle,
+      openPickerQueue: [[fileHandle]],
+      savePickerCalls: 0,
+      createFileHandle,
+    };
+    window.showOpenFilePicker = async () => window.__mockFs.openPickerQueue.shift() || [window.__mockFs.fileHandle];
+    window.showSaveFilePicker = async () => {
+      window.__mockFs.savePickerCalls += 1;
+      return createFileHandle('saved-as.md', '');
+    };
+    window.showDirectoryPicker = async () => window.__mockFs.directoryHandle;
+  });
 }
 
 async function dispatchContextMenu(locator, point = { x: 16, y: 16 }) {
@@ -495,6 +606,8 @@ test('Mermaid labels with HTML line breaks render without SVG parser errors', as
 flowchart TD
   A[Parent Flow or Power App] --> B[Prepare Function Request<br/>sourceType + sourceId + maxGeneration]
   B --> C[Call Azure Function<br>POST /api/tih/validate]
+  C --> D[Load Sire and Dam Ancestry Recursively]
+  D --> E[Update<br/>tek_hsi_pedigreejson<br/>tek_hsi_traditionalirishhorse]
 \`\`\``);
 
   await renderPreviewWithShortcut(page);
@@ -504,9 +617,40 @@ flowchart TD
   await expect(page.locator('.diagram-error')).toHaveCount(0);
   await expect(frame.locator('parsererror')).toHaveCount(0);
   await expect(frame).not.toContainText('Opening and ending tag mismatch');
-  await expect(frame.locator('svg')).toContainText('Prepare Function Request');
-  await expect(frame.locator('svg')).toContainText('sourceType + sourceId + maxGeneration');
+  await expect(frame.locator('svg')).toContainText('Prepare Function');
+  await expect(frame.locator('svg')).toContainText('Request');
+  await expect(frame.locator('svg')).toContainText('sourceType +');
+  await expect(frame.locator('svg')).toContainText('maxGeneration');
   await expect(frame.locator('svg')).toContainText('POST /api/tih/validate');
+  await expect(frame.locator('svg')).toContainText('Ancestry');
+  await expect(frame.locator('svg')).toContainText('tek_hsi_traditionalirishhorse');
+
+  const longWordLines = await frame.locator('svg').evaluate((svg) => {
+    return [...svg.querySelectorAll('text tspan')]
+      .map((tspan) => tspan.textContent?.trim())
+      .filter((text) => text?.startsWith('tek_hsi_'));
+  });
+  expect(longWordLines).toContain('tek_hsi_pedigreejson');
+  expect(longWordLines).toContain('tek_hsi_traditionalirishhorse');
+
+  const overflowingLabels = await frame.locator('svg').evaluate((svg) => {
+    const tolerance = 2;
+    return [...svg.querySelectorAll('g.node')].flatMap((node) => {
+      const shape = node.querySelector('rect, polygon, path, circle, ellipse');
+      const text = node.querySelector('text');
+      if (!shape || !text) return [];
+
+      const shapeBox = shape.getBoundingClientRect();
+      const textBox = text.getBoundingClientRect();
+      const overflows = textBox.left < shapeBox.left - tolerance
+        || textBox.top < shapeBox.top - tolerance
+        || textBox.right > shapeBox.right + tolerance
+        || textBox.bottom > shapeBox.bottom + tolerance;
+
+      return overflows ? [text.textContent] : [];
+    });
+  });
+  expect(overflowingLabels).toEqual([]);
 });
 
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
@@ -532,6 +676,52 @@ test('editor syntax highlighting and math rendering work without a build step', 
   await expect(page.locator('#preview .math-block .katex')).toBeVisible();
   await expect(page.locator('#preview .math-block')).toContainText('a');
   await expect(page.locator('#preview .math-block')).toContainText('b');
+});
+
+test('editor syntax layer stays aligned with native selection metrics', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/');
+  const longLine = 'N -->|pedigreeUpdateRequest| Q[Update tek_pedigreeupdaterequests<br/>tek_pedigreejson<br/>tek_traditionalirishhorse]';
+  const source = [
+    '# Selection Alignment',
+    '',
+    '**Bold marker** and _italic marker_ keep editor metrics stable.',
+    '',
+    '```mermaid',
+    'flowchart TD',
+    ...Array.from({ length: 80 }, (_, index) => `  ${index % 2 ? longLine : 'A[Parent Flow or Power App] --> B[Child Pedigree Flow]'}`),
+    '```',
+  ].join('\n');
+
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('#editorSyntaxLayer .hljs-strong')).toHaveCount(1);
+  await expect(page.locator('#editorSyntaxLayer .hljs-emphasis')).toHaveCount(1);
+
+  const metrics = await page.locator('#editor').evaluate((editor) => {
+    const layer = document.querySelector('#editorSyntaxLayer');
+    const shell = document.querySelector('#editorShell');
+    const strong = layer.querySelector('.hljs-strong');
+    const emphasis = layer.querySelector('.hljs-emphasis');
+    const layerStyle = getComputedStyle(layer);
+    return {
+      editorClientWidth: editor.clientWidth,
+      editorScrollHeight: editor.scrollHeight,
+      editorClientHeight: editor.clientHeight,
+      layerWidth: layer.getBoundingClientRect().width,
+      shellScrollbarWidth: Number(shell.dataset.editorScrollbarWidth || '0'),
+      actualScrollbarWidth: editor.offsetWidth - editor.clientWidth,
+      layerFontWeight: layerStyle.fontWeight,
+      strongFontWeight: getComputedStyle(strong).fontWeight,
+      layerFontStyle: layerStyle.fontStyle,
+      emphasisFontStyle: getComputedStyle(emphasis).fontStyle,
+    };
+  });
+
+  expect(metrics.editorScrollHeight).toBeGreaterThan(metrics.editorClientHeight);
+  expect(Math.abs(metrics.layerWidth - metrics.editorClientWidth)).toBeLessThanOrEqual(1);
+  expect(metrics.shellScrollbarWidth).toBe(metrics.actualScrollbarWidth);
+  expect(metrics.strongFontWeight).toBe(metrics.layerFontWeight);
+  expect(metrics.emphasisFontStyle).toBe(metrics.layerFontStyle);
 });
 
 test('rendering sanitizes hostile Markdown and Mermaid output', async ({ page }) => {
@@ -659,17 +849,172 @@ test('File menu starts a blank Markdown document', async ({ page }) => {
   await page.goto('/');
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.getByRole('button', { name: 'New blank Markdown document' }).click();
+  await page.getByRole('button', { name: 'New Markdown file' }).click();
 
   await expect(page.locator('#activeFileLabel')).toHaveText('untitled.md');
   await expect(page.locator('#folderBadge')).toHaveText('Blank document');
   await expect(page.locator('#fileCount')).toHaveText('1');
   await expect(page.locator('#editor')).toHaveValue('');
   await expect(page.locator('#status')).toHaveText('Blank Markdown document ready.');
+  await expect(page.locator('#saveButton')).toBeEnabled();
 
   await page.locator('#editor').fill('# Fresh start\n');
   await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in memory');
   await expect(page.locator('#saveButton')).toBeEnabled();
+});
+
+test('File System Access save writes back to the opened file without Save as', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.goto('/');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('opened.md');
+
+  await page.locator('#editor').fill('# Updated\n');
+  await page.locator('#saveButton').click();
+
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  const result = await page.evaluate(() => ({
+    text: window.__mockFs.fileHandle._text,
+    savePickerCalls: window.__mockFs.savePickerCalls,
+  }));
+  expect(result.text).toBe('# Updated\n');
+  expect(result.savePickerCalls).toBe(0);
+});
+
+test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.goto('/');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+
+  page.once('dialog', (dialog) => dialog.accept('notes.md'));
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'New Markdown file' }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('notes.md');
+  await expect(page.locator('#fileCount')).toHaveText('1');
+
+  await page.locator('#editor').fill('# Notes\n');
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/notes\.md saved/);
+  await expect.poll(async () => await page.evaluate(() => window.__mockFs.directoryHandle.files.get('notes.md')._text)).toBe('# Notes\n');
+
+  await page.evaluate(() => {
+    window.__mockFs.openPickerQueue = [[window.__mockFs.addedHandle]];
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Add file to workspace' }).click();
+  await expect(page.locator('#fileCount')).toHaveText('2');
+  await expect(page.locator('#activeFileLabel')).toHaveText('added.md');
+
+  await page.evaluate(() => {
+    window.confirm = () => true;
+    window.__mockFs.addedHandle._text = '# Changed outside\n';
+    window.__mockFs.addedHandle._lastModified += 1000;
+  });
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#editor')).toHaveValue('# Changed outside\n');
+
+  await page.evaluate(() => {
+    window.__confirmCount = 0;
+    window.confirm = () => {
+      window.__confirmCount += 1;
+      return true;
+    };
+    window.__mockFs.addedHandle._text = '# Focus reload\n';
+    window.__mockFs.addedHandle._lastModified += 1000;
+    window.dispatchEvent(new Event('focus'));
+  });
+  await expect(page.locator('#editor')).toHaveValue('# Focus reload\n');
+  await expect.poll(async () => await page.evaluate(() => window.__confirmCount)).toBe(1);
+});
+
+test('file browser tree view shows workspace folder hierarchy', async ({ page }, testInfo) => {
+  const zipPath = await writeZipFixture(testInfo, 'tree-workspace.zip', [
+    { name: 'README.md', data: '# Home\n' },
+    { name: 'docs/intro.md', data: '# Intro\n' },
+    { name: 'docs/guide/setup.md', data: '# Setup\n' },
+    { name: 'adr/decision.md', data: '# Decision\n' },
+  ]);
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 4 documents from ZIP/, { timeout: 20_000 });
+  const headerMetrics = await page.evaluate(() => {
+    const count = document.querySelector('#fileCount').getBoundingClientRect();
+    const badge = document.querySelector('#folderBadge').getBoundingClientRect();
+    return {
+      countCentre: count.top + count.height / 2,
+      badgeCentre: badge.top + badge.height / 2,
+      countRight: count.right,
+      badgeLeft: badge.left,
+    };
+  });
+  expect(Math.abs(headerMetrics.countCentre - headerMetrics.badgeCentre)).toBeLessThan(4);
+  expect(headerMetrics.badgeLeft).toBeGreaterThan(headerMetrics.countRight);
+
+  await page.locator('#fileViewTreeButton').click();
+  await expect(page.locator('#fileViewTreeButton')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#fileList .file-tree')).toBeVisible();
+  await expect(page.locator('#fileList [data-tree-folder="docs"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-tree-folder="docs/guide"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-path="docs/guide/setup.md"]')).toBeVisible();
+
+  await page.locator('#fileList [data-path="docs/guide/setup.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('docs/guide/setup.md');
+
+  await page.locator('#treeCollapseButton').click();
+  await expect(page.locator('#fileList [data-tree-folder="docs"]')).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.locator('#fileList [data-path="docs/guide/setup.md"]')).toBeHidden();
+
+  await page.locator('#treeRevealButton').click();
+  await expect(page.locator('#fileList [data-tree-folder="docs"]')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#fileList [data-tree-folder="docs/guide"]')).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.locator('#fileList [data-path="docs/guide/setup.md"]')).toBeVisible();
+
+  await page.locator('#fileSearch').fill('setup');
+  await expect(page.locator('#fileList [data-tree-folder="docs"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-tree-folder="docs/guide"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveCount(0);
+
+  await page.locator('#fileViewListButton').click();
+  await expect(page.locator('#fileViewListButton')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#fileList .file-tree')).toHaveCount(0);
+  await expect(page.locator('#fileList [data-path="docs/guide/setup.md"]')).toBeVisible();
+});
+
+test('collapsed sidebar keeps the split workspace stretched', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 820 });
+  await page.goto('/');
+  await page.evaluate(() => {
+    localStorage.setItem('md-mmd-renderer.sidebarCollapsed', 'true');
+    localStorage.setItem('md-mmd-renderer.editorLayout', 'split');
+    localStorage.setItem('md-mmd-renderer.editorWidth', '356');
+  });
+  await page.reload();
+
+  await expect(page.locator('#shell')).toHaveClass(/sidebar-collapsed/);
+  const metrics = await page.evaluate(() => {
+    const shell = document.querySelector('#shell').getBoundingClientRect();
+    const workspace = document.querySelector('.workspace').getBoundingClientRect();
+    const editorToolbar = document.querySelector('#editorToolbar').getBoundingClientRect();
+    return {
+      overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+      shellRight: shell.right,
+      shellWidth: shell.width,
+      workspaceRight: workspace.right,
+      workspaceWidth: workspace.width,
+      toolbarHeight: editorToolbar.height,
+    };
+  });
+
+  expect(metrics.overflow).toBe(false);
+  expect(metrics.workspaceWidth).toBeGreaterThan(metrics.shellWidth * 0.85);
+  expect(metrics.workspaceRight).toBeGreaterThan(metrics.shellRight - 16);
+  expect(metrics.toolbarHeight).toBeLessThan(64);
 });
 
 test('Help menu opens the feature guide as read-only Markdown', async ({ page }) => {
@@ -1045,7 +1390,7 @@ test('local draft recovery and large deletion protection guard browser-local edi
   await expect(page.locator('#editor')).toHaveValue(/Recovered browser-local draft/);
 
   await setEditorValueAndSelection(page, '# Draft\n', 8, 8);
-  await page.getByRole('button', { name: 'Save' }).click();
+  await page.locator('#saveButton').click();
   await expect(page.getByRole('heading', { name: 'Large deletion detected' })).toBeVisible();
   await page.getByRole('button', { name: 'Undo deletion' }).click();
   await expect(page.locator('#editor')).toHaveValue(/This paragraph should survive local recovery/);
@@ -1126,6 +1471,7 @@ test('built-in export profiles are session-only and do not persist DevOps settin
   await expect(page.getByRole('button', { name: /GitHub Pages docs site/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /Azure DevOps Wiki markdown/ })).toBeVisible();
   await expect(page.locator('#builtInExportProfiles').getByRole('button', { name: /Artefact review pack/ })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Export artefact review pack' })).toBeDisabled();
 
   await page.getByRole('button', { name: /GitHub Pages docs site/ }).click();
   await expect(page.locator('#activeExportProfileLabel')).toContainText('GitHub Pages docs site');
@@ -1867,106 +2213,95 @@ test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', 
   await expect(page.locator('#exportTrust')).toHaveText(/Azure DevOps Mermaid syntax applied/);
 });
 
-test('Lens artefact bundle import opens the declared entry and shows safe reader metadata', async ({ page }, testInfo) => {
-  const zipPath = await writeZipFixture(testInfo, 'valid-lens-artefact-bundle.zip', [
-    {
-      name: 'README.md',
-      data: '# Security Lens Evidence Pack\n\nThis pack opens on the declared entry document.',
-    },
-    {
-      name: 'findings/security-summary.md',
-      data: '# Security Summary\n\nCandidate finding remains candidate.',
-    },
-    {
-      name: 'diagrams/security-overview.mmd',
-      data: 'flowchart LR\n  A[Static evidence] --> B[Candidate finding]',
-    },
-    {
-      name: 'docs/adr-001.md',
-      data: '# ADR 001\n\nDecision context.',
-    },
-    {
-      name: 'lens-artifact-bundle.json',
-      data: JSON.stringify({
-        formatVersion: 'lens-artifact-bundle-1.0',
-        sourceTool: 'Security Lens',
-        sourceToolVersion: '1.0.0',
-        generatedAtUtc: '2026-05-26T00:00:00.000Z',
-        entryDocument: 'README.md',
-        title: 'Security Lens Evidence Pack',
-        summary: 'Optional short description.',
-        evidenceLevels: ['static evidence', 'candidate finding'],
-        documents: [
-          { path: 'findings/security-summary.md', title: 'Security Summary', kind: 'finding summary', evidenceLevel: 'candidate finding', order: 20 },
-          { path: 'README.md', title: 'Overview', kind: 'summary', evidenceLevel: 'static evidence', order: 10 },
-          { path: 'docs/adr-001.md', title: 'ADR Decision', kind: 'adr', evidenceLevel: 'static evidence', order: 25 },
-          { path: '../unsafe.md', title: 'Unsafe Path', kind: 'summary', evidenceLevel: 'static evidence', order: 1 },
-        ],
-        diagrams: [
-          { path: 'diagrams/security-overview.mmd', title: 'Security Overview', kind: 'mermaid', evidenceLevel: 'static evidence', order: 30 },
-        ],
-        warnings: [
-          { code: 'CONNECTED_METADATA_UNAVAILABLE', message: 'Connected metadata was unavailable during export.', evidenceLevel: 'blocked/unavailable evidence' },
-        ],
-      }),
-    },
-  ]);
+test('fixture-based valid basic artefact bundle import opens editable records', async ({ page }, testInfo) => {
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-basic');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
-  await expect(page.locator('#status')).toHaveText(/Imported 4 documents from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Imported 3 documents from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
   await expect(page.locator('#editor')).toHaveValue(/declared entry document/);
-  await expect(page.locator('#preview h1')).toHaveText('Security Lens Evidence Pack');
+  await expect(page.locator('#preview h1')).toHaveText('Basic Artefact Bundle');
+  expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
+
+  const summary = page.locator('#artifactBundleSummary');
+  await expect(summary).toBeVisible();
+  await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
+  await expect(summary).toContainText('Basic Artefact Bundle');
+  await expect(summary).toContainText('Basic Finding');
+  await expect(summary).toContainText('Basic Flow');
+  await expect(summary).toContainText('candidate finding');
+
+  await summary.getByRole('button', { name: /Basic Flow/ }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('diagrams/basic-flow.mmd');
+  await expect(page.locator('#editor')).toHaveValue(/flowchart LR/);
+  await expect(page.locator('.diagram-frame svg')).toHaveCount(1);
+});
+
+test('fixture-based valid rich artefact bundle import shows safe reader metadata', async ({ page }, testInfo) => {
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await expect(page.locator('#editor')).toHaveValue(/rich bundle exercises/);
+  await expect(page.locator('#preview h1')).toHaveText('Rich Artefact Bundle');
 
   const summary = page.locator('#artifactBundleSummary');
   await expect(summary).toBeVisible();
   await expect(summary.getByRole('button', { name: 'Expand artefact bundle reader' })).toHaveAttribute('aria-expanded', 'false');
   await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
   await expect(summary.getByRole('button', { name: 'Collapse artefact bundle reader' })).toHaveAttribute('aria-expanded', 'true');
-  await expect(summary).toContainText('Security Lens Evidence Pack');
-  await expect(summary).toContainText('Security Lens 1.0.0');
-  await expect(summary).toContainText('2026-05-26T00:00:00.000Z');
+  await expect(summary).toContainText('Rich Artefact Bundle');
+  await expect(summary).toContainText('Security Lens 4.2.0');
+  await expect(summary).toContainText('2026-05-26T12:34:56.000Z');
   await expect(summary).toContainText('README.md');
-  await expect(summary).toContainText('3');
+  await expect(summary).toContainText('7');
   await expect(summary).toContainText('1');
   await expect(summary).toContainText('static evidence');
+  await expect(summary).toContainText('connected metadata evidence');
+  await expect(summary).toContainText('runtime evidence');
+  await expect(summary).toContainText('manual evidence');
   await expect(summary).toContainText('candidate finding');
+  await expect(summary).toContainText('confirmed finding');
+  await expect(summary).toContainText('blocked/unavailable evidence');
   await expect(summary).toContainText('Evidence labels are displayed as supplied by the bundle.');
   await expect(summary).toContainText('Candidate findings remain candidate findings.');
   await expect(summary).toContainText('Bundle warning: Connected metadata was unavailable during export.');
-  await expect(summary).not.toContainText('../unsafe.md');
+  await expect(summary).toContainText('Manual evidence requires reviewer confirmation outside Lens Docs Studio.');
+  await expect(summary).not.toContainText('https://example.com/unsafe.md');
   const storageKeysBeforeFilters = await page.evaluate(() => Object.keys(localStorage).sort());
 
   await expect(page.locator('#fileList .file-item').nth(0)).toHaveAttribute('data-path', 'README.md');
-  await expect(page.locator('#fileList .file-item').nth(1)).toHaveAttribute('data-path', 'findings/security-summary.md');
-  await expect(page.locator('#fileList .file-item').nth(2)).toHaveAttribute('data-path', 'docs/adr-001.md');
-  await expect(page.locator('#fileList .file-item').nth(3)).toHaveAttribute('data-path', 'diagrams/security-overview.mmd');
+  await expect(page.locator('#fileList .file-item').nth(1)).toHaveAttribute('data-path', 'summary/executive-summary.md');
+  await expect(page.locator('#fileList .file-item').nth(2)).toHaveAttribute('data-path', 'findings/candidate-risk.md');
+  await expect(page.locator('#fileList .file-item').nth(3)).toHaveAttribute('data-path', 'findings/confirmed-control.md');
   expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
 
-  await summary.getByRole('button', { name: /Security Summary/ }).click();
-  await expect(page.locator('#activeFileLabel')).toContainText('findings/security-summary.md');
-  await expect(page.locator('#editor')).toHaveValue(/Candidate finding remains candidate/);
+  await summary.getByRole('button', { name: /Candidate Risk/ }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('findings/candidate-risk.md');
+  await expect(page.locator('#editor')).toHaveValue(/candidate finding and must remain candidate/);
 
   await summary.locator('[data-artifact-evidence-filter="candidate finding"]').click();
-  await expect(summary.getByRole('button', { name: /Security Summary/ })).toBeVisible();
-  await expect(summary.getByRole('button', { name: /ADR Decision/ })).toHaveCount(0);
+  await expect(summary.getByRole('button', { name: /Candidate Risk/ })).toBeVisible();
+  await expect(summary.getByRole('button', { name: /Confirmed Control/ })).toHaveCount(0);
   await summary.locator('[data-artifact-evidence-filter=""]').click();
 
   await summary.locator('[data-artifact-kind-filter="ADRs"]').click();
-  await expect(summary.getByRole('button', { name: /ADR Decision/ })).toBeVisible();
-  await expect(summary.getByRole('button', { name: /Security Summary/ })).toHaveCount(0);
+  await expect(summary.getByRole('button', { name: /ADR 001/ })).toBeVisible();
+  await expect(summary.getByRole('button', { name: /Candidate Risk/ })).toHaveCount(0);
   await summary.locator('[data-artifact-kind-filter=""]').click();
 
   await summary.getByLabel('Search artefact metadata').fill('adr-001');
-  await expect(summary.getByRole('button', { name: /ADR Decision/ })).toBeVisible();
-  await expect(summary.getByRole('button', { name: /Security Overview/ })).toHaveCount(0);
+  await expect(summary.getByRole('button', { name: /ADR 001/ })).toBeVisible();
+  await expect(summary.getByRole('button', { name: /Trigger Timeline/ })).toHaveCount(0);
   await summary.getByRole('button', { name: 'Clear filters' }).click();
-  await expect(summary.getByRole('button', { name: /Security Overview/ })).toBeVisible();
-  await expect(page.locator('#fileList .file-item')).toHaveCount(4);
+  await expect(summary.getByRole('button', { name: /Trigger Timeline/ })).toBeVisible();
+  await expect(page.locator('#fileList .file-item')).toHaveCount(8);
   await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(storageKeysBeforeFilters);
 
-  await summary.getByRole('button', { name: /Security Overview/ }).click();
-  await expect(page.locator('#editor')).toHaveValue(/flowchart LR/);
+  await summary.getByRole('button', { name: /Trigger Timeline/ }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('diagrams/trigger-timeline.mmd');
+  await expect(page.locator('#editor')).toHaveValue(/flowchart TD/);
   expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
   await expect(page.locator('.diagram-frame svg')).toHaveCount(1);
 
@@ -1974,19 +2309,66 @@ test('Lens artefact bundle import opens the declared entry and shows safe reader
   await expect(summary.getByRole('button', { name: 'Expand artefact bundle reader' })).toHaveAttribute('aria-expanded', 'false');
 });
 
-test('invalid Lens artefact bundle manifest falls back to safe ZIP import', async ({ page }, testInfo) => {
-  const pageErrors = [];
-  page.on('pageerror', (error) => pageErrors.push(error.message));
-  const zipPath = await writeZipFixture(testInfo, 'invalid-lens-artefact-bundle.zip', [
-    { name: 'README.md', data: '# Safe Import\n\nThe document still imports.' },
-    { name: 'lens-artifact-bundle.json', data: '{"formatVersion":' },
-  ]);
+test('artefact reader keyboard controls are accessible and filters stay local', async ({ page }, testInfo) => {
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
+  const basicZipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-basic', 'valid-basic-reset.zip');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
-  await expect(page.locator('#status')).toHaveText(/Imported 1 document from ZIP\. Artefact bundle manifest could not be read\./, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
+  const initialStorageKeys = await page.evaluate(() => Object.keys(localStorage).sort());
+
+  const summary = page.locator('#artifactBundleSummary');
+  await tabUntilFocused(page, '#artifactBundleSummary .artifact-bundle-toggle');
+  await page.keyboard.press('Enter');
+  await expect(summary.getByRole('button', { name: 'Collapse artefact bundle reader' })).toHaveAttribute('aria-expanded', 'true');
+
+  await summary.locator('.artifact-bundle-toggle').focus();
+  await page.keyboard.press('Space');
+  await expect(summary.getByRole('button', { name: 'Expand artefact bundle reader' })).toHaveAttribute('aria-expanded', 'false');
+
+  await summary.locator('.artifact-bundle-toggle').focus();
+  await page.keyboard.press('Enter');
+  await expect(summary.getByRole('button', { name: 'Collapse artefact bundle reader' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(summary.getByLabel('Search artefact metadata')).toBeVisible();
+
+  await tabUntilFocused(page, '#artifactBundleSummary [data-artifact-evidence-filter="candidate finding"]');
+  await expect(summary.locator('[data-artifact-evidence-filter="candidate finding"]')).toHaveAttribute('aria-pressed', 'false');
+  await page.keyboard.press('Enter');
+  await expect(summary.locator('[data-artifact-evidence-filter="candidate finding"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(summary.getByRole('button', { name: /Candidate Risk/ })).toBeVisible();
+  await expect(summary.getByRole('button', { name: /Confirmed Control/ })).toHaveCount(0);
+  await expect(page.locator('#fileList .file-item')).toHaveCount(8);
+
+  await tabUntilFocused(page, '#artifactBundleSummary [data-artifact-open-path="findings/candidate-risk.md"]');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#activeFileLabel')).toContainText('findings/candidate-risk.md');
+  await expect(page.locator('#editor')).toHaveValue(/candidate finding and must remain candidate/);
+
+  await page.locator('#zipInput').setInputFiles(basicZipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 3 documents from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
+  await expect(summary.getByLabel('Search artefact metadata')).toHaveValue('');
+  await expect(summary.locator('[data-artifact-evidence-filter=""]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#fileList .file-item')).toHaveCount(3);
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(initialStorageKeys);
+
+  await page.reload();
   await expect(page.locator('#artifactBundleSummary')).toBeHidden();
-  await expect(page.locator('#editor')).toHaveValue(/document still imports/);
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(initialStorageKeys);
+});
+
+test('invalid Lens artefact bundle manifest falls back to safe ZIP import', async ({ page }, testInfo) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'invalid-manifest');
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 2 documents from ZIP\. Artefact bundle manifest could not be read\./, { timeout: 20_000 });
+  await expect(page.locator('#artifactBundleSummary')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue(/safe source import continues/);
+  await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
 
@@ -2014,34 +2396,33 @@ test('Lens artefact bundle missing entry document keeps fallback selection and w
 });
 
 test('Lens artefact bundle ignores unsafe metadata paths without exposing them', async ({ page }, testInfo) => {
-  const zipPath = await writeZipFixture(testInfo, 'unsafe-paths-lens-artefact-bundle.zip', [
-    { name: 'README.md', data: '# Safe Path\n\nOnly the imported safe document is active.' },
-    {
-      name: 'lens-artifact-bundle.json',
-      data: JSON.stringify({
-        formatVersion: 'lens-artifact-bundle-1.0',
-        title: 'Unsafe Path Pack',
-        entryDocument: '../secrets.md',
-        documents: [
-          { path: '../secrets.md', title: 'Traversal', order: 1 },
-          { path: '/absolute.md', title: 'Absolute', order: 2 },
-          { path: 'C:\\secrets.md', title: 'Drive', order: 3 },
-          { path: 'https://example.com/file.md', title: 'URL', order: 4 },
-          { path: 'README.md', title: 'Safe', order: 10 },
-        ],
-      }),
-    },
-  ]);
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'unsafe-paths');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/entry document path was ignored/, { timeout: 20_000 });
-  await expect(page.locator('#fileList .file-item')).toHaveCount(1);
-  await expect(page.locator('#editor')).toHaveValue(/Only the imported safe document/);
+  await expect(page.locator('#fileList .file-item')).toHaveCount(2);
+  await expect(page.locator('#editor')).toHaveValue(/Only safe imported documents/);
+  const summary = page.locator('#artifactBundleSummary');
+  await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
+  await expect(summary).toContainText('Safe Home');
+  await expect(summary).toContainText('Safe Visible');
   await expect(page.locator('body')).not.toContainText('../secrets.md');
   await expect(page.locator('body')).not.toContainText('/absolute.md');
   await expect(page.locator('body')).not.toContainText('C:\\secrets.md');
   await expect(page.locator('body')).not.toContainText('https://example.com/file.md');
+  await expect(page.locator('body')).not.toContainText('bad');
+
+  const reviewPath = await clickExportDownload(page, 'Export artefact review pack');
+  const reviewEntries = await readZipEntries(reviewPath);
+  const exportedManifestText = getZipText(reviewEntries, 'lens-artifact-bundle.json');
+  expect(exportedManifestText).toContain('Safe Home');
+  expect(exportedManifestText).toContain('Safe Visible');
+  expect(exportedManifestText).not.toContain('../secrets.md');
+  expect(exportedManifestText).not.toContain('/absolute.md');
+  expect(exportedManifestText).not.toContain('C:\\\\secrets.md');
+  expect(exportedManifestText).not.toContain('https://example.com/file.md');
+  expect(exportedManifestText).not.toContain('bad\\u0001path.md');
 });
 
 test('Lens artefact bundle preserves candidate evidence wording', async ({ page }, testInfo) => {
@@ -2101,84 +2482,112 @@ test('Lens artefact bundle metadata does not trigger external fetches', async ({
   await expect.poll(() => page.evaluate(() => window.__lensArtifactFetchCalls)).toEqual([]);
 });
 
-test('artefact review pack export is explicit and rebuilds safe metadata', async ({ page }, testInfo) => {
-  const zipPath = await writeZipFixture(testInfo, 'review-export-lens-artefact-bundle.zip', [
-    { name: 'README.md', data: '# Review Export\n\nCandidate finding remains candidate.' },
-    { name: 'findings/security-summary.md', data: '# Candidate Finding\n\nCandidate wording.' },
-    {
-      name: 'lens-artifact-bundle.json',
-      data: JSON.stringify({
-        formatVersion: 'lens-artifact-bundle-1.0',
-        title: 'Review Export Pack',
-        sourceTool: 'Security Lens',
-        sourceToolVersion: '2.0.0',
-        generatedAtUtc: '2026-05-26T00:00:00.000Z',
-        entryDocument: 'README.md',
-        evidenceLevels: ['candidate finding'],
-        documents: [
-          { path: 'README.md', title: 'Review Home', kind: 'summary', evidenceLevel: 'candidate finding', order: 1 },
-          { path: 'findings/security-summary.md', title: 'Candidate Summary', kind: 'finding', evidenceLevel: 'candidate finding', order: 2 },
-          { path: 'https://example.com/unsafe.md', title: 'Unsafe Remote', kind: 'summary', evidenceLevel: 'candidate finding', order: 3 },
-        ],
-      }),
-    },
-  ]);
+test('artefact review pack export is explicit and round-trips safe rich metadata', async ({ page }, testInfo) => {
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
-  await expect(page.locator('#status')).toHaveText(/Imported 2 documents from artefact bundle/, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
+
+  const summary = page.locator('#artifactBundleSummary');
+  await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
+  await summary.getByLabel('Search artefact metadata').fill('candidate');
+  await expect(summary.getByRole('button', { name: /Candidate Risk/ })).toBeVisible();
+  await summary.getByRole('button', { name: /Candidate Risk/ }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('findings/candidate-risk.md');
 
   await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  const storageKeysBeforeProfile = await page.evaluate(() => Object.keys(localStorage).sort());
   await expect(page.getByRole('button', { name: 'Export artefact review pack' })).toBeEnabled();
   await page.locator('#builtInExportProfiles').getByRole('button', { name: /Artefact review pack/ }).click();
   await expect(page.locator('#activeExportProfileLabel')).toContainText('Artefact review pack');
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).sort())).toEqual(storageKeysBeforeProfile);
 
   const genericPath = await clickExportDownload(page, 'Export Markdown Bundle');
   const genericEntries = await readZipEntries(genericPath);
+  expect(genericEntries.has('lens-docs-studio-bundle.json')).toBe(true);
   expect(genericEntries.has('lens-artifact-bundle.json')).toBe(false);
 
   const reviewPath = await clickExportDownload(page, 'Export artefact review pack');
   const reviewEntries = await readZipEntries(reviewPath);
   const reviewManifest = JSON.parse(getZipText(reviewEntries, 'lens-artifact-bundle.json'));
   expect(reviewManifest.reviewedWith).toBe('Lens Docs Studio');
-  expect(reviewManifest.documents.map((item) => item.path).sort()).toEqual(['README.md', 'findings/security-summary.md']);
+  expect(reviewManifest.sourceTool).toBe('Security Lens');
+  expect(reviewManifest.sourceToolVersion).toBe('4.2.0');
+  expect(reviewManifest.generatedAtUtc).toBe('2026-05-26T12:34:56.000Z');
+  expect(reviewManifest.entryDocument).toBe('README.md');
+  expect(reviewManifest.evidenceLevels).toEqual([
+    'static evidence',
+    'connected metadata evidence',
+    'runtime evidence',
+    'manual evidence',
+    'candidate finding',
+    'confirmed finding',
+    'blocked/unavailable evidence',
+  ]);
+  expect(reviewManifest.documents.map((item) => item.path).sort()).toEqual([
+    'README.md',
+    'adr/adr-001.md',
+    'docs/runbook.md',
+    'findings/candidate-risk.md',
+    'findings/confirmed-control.md',
+    'release-notes/v1.md',
+    'summary/executive-summary.md',
+  ]);
+  expect(reviewManifest.diagrams.map((item) => item.path)).toEqual(['diagrams/trigger-timeline.mmd']);
   expect(JSON.stringify(reviewManifest)).toContain('candidate finding');
+  expect(JSON.stringify(reviewManifest)).toContain('confirmed finding');
   expect(JSON.stringify(reviewManifest)).not.toContain('https://example.com/unsafe.md');
+  expect(JSON.stringify(reviewManifest)).not.toContain('Unsafe Remote');
   expect(reviewEntries.has('lens-docs-studio-bundle.json')).toBe(true);
+  expect(reviewEntries.has('assets/tiny.png')).toBe(true);
   await expect(page.locator('#exportTrust')).toHaveText(/Safe artefact metadata included/);
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.locator('#zipInput').setInputFiles(reviewPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
+  await expect(page.locator('#editor')).toHaveValue(/rich bundle exercises/);
+  await expect(page.locator('#artifactBundleSummary')).toContainText('Rich Artefact Bundle');
+  await page.locator('#artifactBundleSummary').getByRole('button', { name: 'Expand artefact bundle reader' }).click();
+  await expect(page.locator('#artifactBundleSummary')).toContainText('candidate finding');
+  await expect(page.locator('#artifactBundleSummary')).toContainText('confirmed finding');
+  await page.locator('#artifactBundleSummary').getByRole('button', { name: /Trigger Timeline/ }).click();
+  await expect(page.locator('#editor')).toHaveValue(/flowchart TD/);
+  expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
+});
+
+test('ordinary Markdown Bundle export stays free of artefact manifests after artefact import', async ({ page }, testInfo) => {
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
+
+  await page.goto('/');
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
+
+  const bundlePath = await clickExportDownload(page, 'Export Markdown Bundle');
+  const entries = await readZipEntries(bundlePath);
+  expect(entries.has('lens-docs-studio-bundle.json')).toBe(true);
+  expect(entries.has('lens-artifact-bundle.json')).toBe(false);
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.locator('#zipInput').setInputFiles(bundlePath);
+  await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from Markdown bundle/, { timeout: 20_000 });
+  await expect(page.locator('#artifactBundleSummary')).toBeHidden();
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#editor')).toHaveValue(/rich bundle exercises/);
+  expect(await page.locator('#editor').evaluate((editor) => editor.readOnly)).toBe(false);
+  await page.locator('#fileList [data-path="diagrams/trigger-timeline.mmd"]').click();
+  await expect(page.locator('#editor')).toHaveValue(/flowchart TD/);
 });
 
 test('ZIP import accepts compressed generic docs and handles ZIPs without sources', async ({ page }, testInfo) => {
-  const zipPath = testInfo.outputPath('generic-docs.zip');
-  await writeFile(zipPath, createZipBuffer([
-    {
-      name: 'docs/README.md',
-      data: '# Imported Docs\n\n![Logo](images/logo.png)\n\n::: mermaid\nsequenceDiagram\n    Christie->>Josh: Hello Josh, how are you?\n    Josh-->>Christie: Great!\n    Christie->>Josh: See you later!\n:::',
-    },
-    {
-      name: 'docs/story.mmd',
-      data: 'flowchart LR\n  C[Zip] --> D[Mermaid]',
-    },
-    {
-      name: 'docs/images/logo.png',
-      data: Buffer.from(tinyPngBase64, 'base64'),
-    },
-    {
-      name: 'docs/images/blocked.svg',
-      data: tinySvg,
-    },
-    {
-      name: '__MACOSX/._ignored',
-      data: 'ignored',
-    },
-  ], { compress: true }));
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'generic-zip', 'generic-docs.zip');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/, { timeout: 20_000 });
   await expect(page.locator('#artifactBundleSummary')).toBeHidden();
   await expect(page.locator('#status')).toHaveText(/SVG images are not imported for security/);
-  await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
+  await expect(page.locator('#editor')).toHaveValue(/Generic ZIP Import/);
   await expect(page.locator('#preview img[data-managed-asset-path="docs/images/logo.png"]')).toHaveAttribute('src', /^blob:/);
   await expect(page.locator('#preview img[data-managed-asset-path="docs/images/blocked.svg"]')).toHaveCount(0);
   await expect(page.locator('.diagram-frame svg')).toHaveCount(1);
@@ -2191,7 +2600,7 @@ test('ZIP import accepts compressed generic docs and handles ZIPs without source
 
   await page.locator('#zipInput').setInputFiles(noDocsPath);
   await expect(page.locator('#status')).toHaveText(/No editable Markdown or Mermaid source files/);
-  await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
+  await expect(page.locator('#editor')).toHaveValue(/Generic ZIP Import/);
 });
 
 test('document import converts HTML and DOCX into editable Markdown', async ({ page }, testInfo) => {
@@ -2386,33 +2795,7 @@ test('front matter drives Docs Site metadata without rendering as content', asyn
 });
 
 test('Docs Site export uses safe artefact metadata as display-only fallback', async ({ page }, testInfo) => {
-  const zipPath = await writeZipFixture(testInfo, 'docs-site-lens-artefact-bundle.zip', [
-    {
-      name: 'README.md',
-      data: '---\ntitle: Front Matter Home\norder: 99\nnavGroup: Front Matter\n---\n# Rendered Home\nHome content.',
-    },
-    {
-      name: 'findings/security-summary.md',
-      data: '# Rendered Finding\nCandidate content.',
-    },
-    {
-      name: 'lens-artifact-bundle.json',
-      data: JSON.stringify({
-        formatVersion: 'lens-artifact-bundle-1.0',
-        title: 'Docs Artefact Pack',
-        sourceTool: 'Security Lens',
-        sourceToolVersion: '3.0.0',
-        generatedAtUtc: '2026-05-26T00:00:00.000Z',
-        entryDocument: 'README.md',
-        evidenceLevels: ['candidate finding'],
-        documents: [
-          { path: 'README.md', title: 'Manifest Home', kind: 'summary', evidenceLevel: 'candidate finding', order: 1 },
-          { path: 'findings/security-summary.md', title: 'Manifest Finding', kind: 'finding', evidenceLevel: 'candidate finding', order: 2 },
-          { path: '../unsafe.md', title: 'Unsafe Export', kind: 'summary', evidenceLevel: 'candidate finding', order: 3 },
-        ],
-      }),
-    },
-  ]);
+  const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'front-matter-precedence');
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
@@ -2423,6 +2806,10 @@ test('Docs Site export uses safe artefact metadata as display-only fallback', as
     description: 'Artefact metadata export fixture.',
   });
   const entries = await readZipEntries(docsPath);
+  const html = getZipText(entries, 'index.html');
+  const searchIndexText = getZipText(entries, 'assets/search-index.json');
+  const manifestText = getZipText(entries, 'site-manifest.json');
+  const readme = getZipText(entries, 'README.md');
   const manifest = JSON.parse(getZipText(entries, 'site-manifest.json'));
   const searchIndex = JSON.parse(getZipText(entries, 'assets/search-index.json'));
   const homePage = searchIndex.pages.find((item) => item.path === 'README.md');
@@ -2432,15 +2819,27 @@ test('Docs Site export uses safe artefact metadata as display-only fallback', as
   expect(manifest.artifactBundle.sourceTool).toBe('Security Lens');
   expect(manifest.artifactBundle.notes).toContain('Evidence labels are displayed as supplied by the bundle.');
   expect(manifest.artifactBundle.notes).toContain('Candidate findings remain candidate findings.');
+  expect(searchIndex.artifactBundle.title).toBe('Docs Artefact Pack');
+  expect(searchIndex.artifactBundle.sourceToolVersion).toBe('3.0.0');
   expect(homePage.title).toBe('Front Matter Home');
   expect(homePage.order).toBe(99);
   expect(homePage.navGroup).toBe('Front Matter');
   expect(findingPage.title).toBe('Manifest Finding');
   expect(findingPage.order).toBe(2);
   expect(findingPage.navGroup).toBe('Findings');
+  expect(findingPage.artifactKind).toBe('finding');
   expect(findingPage.evidenceLevel).toBe('candidate finding');
-  expect(JSON.stringify(manifest)).not.toContain('../unsafe.md');
-  expect(JSON.stringify(searchIndex)).not.toContain('../unsafe.md');
+  expect(manifest.pages.find((item) => item.path === 'findings/security-summary.md').artifactKind).toBe('finding');
+  expect(manifest.pages.find((item) => item.path === 'findings/security-summary.md').evidenceLevel).toBe('candidate finding');
+  expect(searchIndex.entries.some((entry) => entry.text.includes('candidate finding'))).toBe(true);
+  expect(searchIndex.entries.some((entry) => entry.text.includes('finding'))).toBe(true);
+  [html, searchIndexText, manifestText, readme].forEach((content) => {
+    expect(content).not.toContain('../unsafe.md');
+    expect(content).not.toContain('Unsafe Export');
+    expect(content).not.toContain('http://');
+    expect(content).not.toContain('https://');
+    expect(content).not.toContain('<script src="http');
+  });
 
   const outputDirectory = testInfo.outputPath('artefact-docs-site-export');
   await writeZipEntriesToDirectory(entries, outputDirectory);
@@ -2457,8 +2856,8 @@ test('theme, preview maximise, and mobile layout stay usable', async ({ page }) 
   await page.goto('/');
   await loadSample(page);
 
+  await page.locator('#themeToggleButton').click();
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
-  await page.getByRole('button', { name: /Switch to/ }).click();
   await page.locator('[data-view-action="maximizePreview"]').click();
   await page.locator('#previewFindToggleButton').click();
   await page.locator('#documentReviewToggleButton').click();

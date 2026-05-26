@@ -12,7 +12,7 @@ export function downloadBlob(blob, fileName) {
 export function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return;
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js').catch((error) => {
+    navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).catch((error) => {
       console.warn('Service worker registration failed.', error);
     });
   });

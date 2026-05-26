@@ -1,0 +1,98 @@
+{
+  "formatVersion": "lens-artifact-bundle-1.0",
+  "sourceTool": "Security Lens",
+  "sourceToolVersion": "4.2.0",
+  "generatedAtUtc": "2026-05-26T12:34:56.000Z",
+  "entryDocument": "README.md",
+  "title": "Rich Artefact Bundle",
+  "summary": "A rich source-controlled fixture for round-trip certification.",
+  "evidenceLevels": [
+    "static evidence",
+    "connected metadata evidence",
+    "runtime evidence",
+    "manual evidence",
+    "candidate finding",
+    "confirmed finding",
+    "blocked/unavailable evidence"
+  ],
+  "documents": [
+    {
+      "path": "README.md",
+      "title": "Rich Overview",
+      "kind": "summary",
+      "evidenceLevel": "static evidence",
+      "order": 10
+    },
+    {
+      "path": "summary/executive-summary.md",
+      "title": "Executive Summary",
+      "kind": "summary",
+      "evidenceLevel": "connected metadata evidence",
+      "order": 20
+    },
+    {
+      "path": "findings/candidate-risk.md",
+      "title": "Candidate Risk",
+      "kind": "finding",
+      "evidenceLevel": "candidate finding",
+      "order": 30
+    },
+    {
+      "path": "findings/confirmed-control.md",
+      "title": "Confirmed Control",
+      "kind": "finding",
+      "evidenceLevel": "confirmed finding",
+      "order": 40
+    },
+    {
+      "path": "adr/adr-001.md",
+      "title": "ADR 001",
+      "kind": "adr",
+      "evidenceLevel": "static evidence",
+      "order": 50
+    },
+    {
+      "path": "release-notes/v1.md",
+      "title": "Release Notes",
+      "kind": "release notes",
+      "evidenceLevel": "runtime evidence",
+      "order": 60
+    },
+    {
+      "path": "docs/runbook.md",
+      "title": "Operations Runbook",
+      "kind": "runbook",
+      "evidenceLevel": "manual evidence",
+      "order": 70
+    },
+    {
+      "path": "https://example.com/unsafe.md",
+      "title": "Unsafe Remote",
+      "kind": "summary",
+      "evidenceLevel": "candidate finding",
+      "order": 80
+    }
+  ],
+  "diagrams": [
+    {
+      "path": "diagrams/trigger-timeline.mmd",
+      "title": "Trigger Timeline",
+      "kind": "mermaid",
+      "evidenceLevel": "static evidence",
+      "order": 45
+    }
+  ],
+  "warnings": [
+    {
+      "code": "CONNECTED_METADATA_UNAVAILABLE",
+      "message": "Connected metadata was unavailable during export.",
+      "evidenceLevel": "blocked/unavailable evidence"
+    },
+    {
+      "code": "MANUAL_REVIEW_REQUIRED",
+      "message": "Manual evidence requires reviewer confirmation outside Lens Docs Studio.",
+      "evidenceLevel": "manual evidence"
+    }
+  ]
+}
+

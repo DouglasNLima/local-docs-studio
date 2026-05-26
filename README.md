@@ -7,7 +7,7 @@ Lens Docs Studio is a local-first documentation workspace that runs entirely in 
 ## Use The App
 
 1. Open `index.html` through GitHub Pages or a local static server.
-2. Choose **Open file** for one document, **Open folder** for a folder of Markdown and Mermaid files, or **Import document** to convert DOCX, HTML, or PDF into Markdown.
+2. Choose **Open file** for one document, **Open folder** for a workspace folder of Markdown and Mermaid files, or **Import document** to convert DOCX, HTML, or PDF into Markdown.
 3. Edit in the Markdown toolbar or type directly in the editor.
 4. Use **Render** to refresh the preview, then export or copy the rendered output.
 
@@ -24,11 +24,11 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Formatted clipboard paste that converts HTML content into Markdown, with spreadsheet table support for HTML table or TSV clipboard data, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
 - DOCX, HTML, and text-only PDF import that converts documents into clean editable Markdown with supported embedded images as exportable session assets where available.
 - Standalone `.mmd` and `.mermaid` diagram rendering.
-- Local folder browser with filtering and dirty-file markers.
+- Local workspace browser with flat list or folder tree views, filtering, dirty-file markers, external-change markers, and add/new-file actions.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
 - Manual browser-local snapshots for comparing, restoring, and deleting explicit document versions.
 - Lightweight Mermaid autocomplete and pre-render validation for `.mmd`, `.mermaid`, and fenced Mermaid blocks.
-- Editor/Split/Preview layout modes, light/dark theme toggle, preview maximisation, diagram zoom, and optional outline.
+- Topbar Editor/Split/Preview layout buttons, light/dark theme toggle, preview maximisation, diagram zoom, and optional outline.
 - Preview follow for editor selections, enabled by default and toggleable from the preview header.
 - Drag-and-drop PNG, JPEG, GIF, and WebP image insertion as session assets that are included in HTML, Word, and Docs Site exports.
 - Managed asset library for previewing session images, renaming Markdown references, and removing unused image assets.
@@ -62,7 +62,10 @@ These tools are app-only. HTML, Word, and Docs Site exports are regenerated from
 
 The editor stays buildless and native, using a `textarea` with a synchronised line-number gutter instead of a heavy IDE component.
 
-- **Layout** in the View menu switches between Editor, Split, and Preview modes. The choice is saved locally.
+- The topbar layout buttons switch between Editor, Split, and Preview modes. The choice is saved locally.
+- **Save** writes back to an opened local file when the browser grants file access. **Save as** chooses a new destination, and **Refresh active file** reloads the linked local file after confirmation when local edits would be discarded.
+- When a workspace folder is opened with browser file-system access, **New Markdown file** creates the file inside that folder. **Add file to workspace** keeps the current workspace loaded while adding more Markdown or Mermaid files.
+- The file browser can switch between a flat list and a folder tree. Tree view keeps the loaded workspace hierarchy visible and includes expand, collapse, and reveal-active controls.
 - **Follow selection** in the preview header highlights matching preview text for short editor selections and scrolls that match into view in Split mode. It is best-effort, can be turned off per browser, and the editor and preview still remember their own scroll positions across renders and file switches.
 - **Mermaid autocomplete** appears with `Ctrl/Cmd+Space` in Mermaid files or Mermaid fenced blocks, and can also open from Mermaid-like line prefixes. Use arrow keys, `Enter` or `Tab` to insert a snippet, and `Escape` to close it.
 - **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localised error with copy/jump actions while the rest of the Markdown continues rendering.
@@ -149,7 +152,9 @@ Docs Site export may use safe artefact metadata as display-only page title, orde
 
 The metadata is treated as untrusted context. Evidence labels are displayed as supplied by the bundle; candidate findings remain candidate findings, and Lens Docs Studio does not validate, confirm, upgrade, downgrade, infer, or analyse findings. Invalid, unsupported, oversized, or unsafe manifest metadata never blocks safe Markdown/Mermaid import.
 
-The manifest is ZIP-import only, session-only, and browser-local unless the user explicitly exports an artefact review pack. It does not add direct Lens integrations, external service calls, telemetry, accounts, cloud sync, or new persistence keys. See `docs/architecture/lens-artifact-bundle-contract.md` for the versioned contract.
+The manifest is ZIP-import only, session-only, and browser-local unless the user explicitly exports an artefact review pack. It does not add direct Lens integrations, external service calls, telemetry, accounts, cloud sync, or new persistence keys. Round-trip certification covers valid, rich, invalid, unsafe, front matter precedence, and generic ZIP fixtures under `tests/fixtures/artifact-bundles/`.
+
+For the versioned contract see `docs/architecture/lens-artifact-bundle-contract.md`. Future producers should use `docs/integration/lens-artifact-bundle-producer-guide.md`; release candidates should use `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.
 
 ## Project Structure
 
@@ -176,6 +181,9 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `assets/vendor/` contains pinned browser runtime libraries served locally for GitHub Pages and offline use.
 - `assets/scripts/registries/content.js` stores local examples, templates, and snippets.
 - `docs/tool-guide.md` is the built-in read-only feature guide opened from the Help menu.
+- `docs/integration/lens-artifact-bundle-producer-guide.md` documents how compatible tools can create safe optional artefact bundle ZIPs.
+- `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md` captures the release candidate smoke checklist for the artefact bundle flow.
+- `tests/fixtures/artifact-bundles/` contains source-controlled Markdown, Mermaid, JSON, and asset fixtures used to build deterministic ZIPs during browser tests.
 
 Rendered HTML, Docs Site, and Word exports remain standalone outputs with their own embedded styles/scripts where needed.
 
@@ -190,7 +198,7 @@ npm test
 ```
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
-- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, export packages, theme, maximisation, and mobile layout.
+- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 
 ## Browser Support
