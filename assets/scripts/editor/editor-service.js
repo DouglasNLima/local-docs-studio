@@ -99,6 +99,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     let editorHighlightPromise = null;
     let editorHighlight = null;
     let syntaxHighlightFrame = 0;
+    let editorResizeObserver = null;
 
     function installEditorEnhancements() {
       if (editorShell && editorSyntaxLayer) {
@@ -108,6 +109,10 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       editor.addEventListener('scroll', syncLineNumbers);
       editor.addEventListener('scroll', syncSyntaxLayer);
       window.addEventListener('resize', updateEditorChrome);
+      if ('ResizeObserver' in window) {
+        editorResizeObserver = new ResizeObserver(updateEditorChrome);
+        editorResizeObserver.observe(editor);
+      }
       mermaidAutocomplete?.addEventListener('mousedown', (event) => {
         event.preventDefault();
       });
@@ -120,6 +125,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     }
 
     function updateEditorChrome() {
+      updateEditorScrollbarMetrics();
       updateLineNumbers();
       syncLineNumbers();
       syncSyntaxLayer();
@@ -127,6 +133,16 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       if (autocompleteState.open) {
         renderMermaidAutocomplete();
       }
+    }
+
+    function updateEditorScrollbarMetrics() {
+      if (!editorShell) return;
+      const scrollbarWidth = Math.max(0, editor.offsetWidth - editor.clientWidth);
+      const current = editorShell.dataset.editorScrollbarWidth || '';
+      const next = String(scrollbarWidth);
+      if (current === next) return;
+      editorShell.dataset.editorScrollbarWidth = next;
+      editorShell.style.setProperty('--editor-scrollbar-width', `${scrollbarWidth}px`);
     }
 
     function updateLineNumbers() {

@@ -77,8 +77,8 @@ function normaliseSvgVoidElements(svg) {
 function replaceForeignObjectLabels(svg) {
   const document = new DOMParser().parseFromString(svg, 'image/svg+xml');
   document.querySelectorAll('foreignObject').forEach((foreignObject) => {
-    const lines = getForeignObjectTextLines(foreignObject);
-    if (!lines.length) {
+    const sourceLines = getForeignObjectTextLines(foreignObject);
+    if (!sourceLines.length) {
       foreignObject.remove();
       return;
     }
@@ -87,15 +87,14 @@ function replaceForeignObjectLabels(svg) {
     const y = parseFloat(foreignObject.getAttribute('y')) || 0;
     const width = parseFloat(foreignObject.getAttribute('width')) || 1;
     const height = parseFloat(foreignObject.getAttribute('height')) || 1;
+    const { lines, fontSize, lineHeight } = fitForeignObjectTextLines(sourceLines, width, height);
     const svgText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
 
     svgText.setAttribute('x', String(x + width / 2));
     svgText.setAttribute('text-anchor', 'middle');
     svgText.setAttribute('dominant-baseline', 'middle');
-    svgText.setAttribute('font-size', '16');
+    svgText.setAttribute('font-size', String(fontSize));
     svgText.setAttribute('fill', '#333333');
-
-    const lineHeight = 18;
     svgText.setAttribute('y', String(y + height / 2 - ((lines.length - 1) * lineHeight) / 2));
 
     lines.forEach((line, index) => {
@@ -110,6 +109,76 @@ function replaceForeignObjectLabels(svg) {
   });
 
   return new XMLSerializer().serializeToString(document.documentElement);
+}
+
+function fitForeignObjectTextLines(sourceLines, width, height) {
+  const availableWidth = Math.max(width - 10, 24);
+  const availableHeight = Math.max(height, 12);
+  let fontSize = 16;
+  let lines = [];
+  let lineHeight = getLineHeight(fontSize);
+
+  while (fontSize >= 7) {
+    lines = wrapTextLines(sourceLines, availableWidth, fontSize);
+    lineHeight = getLineHeight(fontSize);
+    if (getMaxSvgLineWidth(lines, fontSize) <= availableWidth + 2 && lines.length * lineHeight <= availableHeight + 2) {
+      return { lines, fontSize, lineHeight };
+    }
+    fontSize -= 1;
+  }
+
+  lines = wrapTextLines(sourceLines, availableWidth, 7);
+  lineHeight = Math.max(7, Math.min(getLineHeight(7), availableHeight / Math.max(lines.length, 1)));
+  return {
+    lines,
+    fontSize: Math.max(6, Math.min(7, lineHeight * .86)),
+    lineHeight,
+  };
+}
+
+function wrapTextLines(sourceLines, maxWidth, fontSize) {
+  return sourceLines.flatMap((line) => wrapTextLine(line, maxWidth, fontSize));
+}
+
+function wrapTextLine(line, maxWidth, fontSize) {
+  const words = String(line).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = '';
+
+  words.forEach((word) => {
+    const next = current ? `${current} ${word}` : word;
+    if (!current || measureSvgText(next, fontSize) <= maxWidth) {
+      current = next;
+      return;
+    }
+
+    lines.push(current);
+    current = word;
+  });
+
+  if (current) lines.push(current);
+  return lines.length ? lines : [''];
+}
+
+function getMaxSvgLineWidth(lines, fontSize) {
+  return lines.reduce((max, line) => Math.max(max, measureSvgText(line, fontSize)), 0);
+}
+
+function measureSvgText(text, fontSize) {
+  return [...String(text)].reduce((sum, char) => sum + getSvgCharWidth(char, fontSize), 0);
+}
+
+function getSvgCharWidth(char, fontSize) {
+  if (/\s/.test(char)) return fontSize * .32;
+  if (/[A-Z]/.test(char)) return fontSize * .66;
+  if (/[il.,'`:;]/.test(char)) return fontSize * .28;
+  if (/[mwMW@#%&]/.test(char)) return fontSize * .82;
+  if (/[-_/\\|()[\]{}+]/.test(char)) return fontSize * .38;
+  return fontSize * .56;
+}
+
+function getLineHeight(fontSize) {
+  return fontSize * 1.18;
 }
 
 function getForeignObjectTextLines(foreignObject) {

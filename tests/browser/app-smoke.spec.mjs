@@ -495,6 +495,8 @@ test('Mermaid labels with HTML line breaks render without SVG parser errors', as
 flowchart TD
   A[Parent Flow or Power App] --> B[Prepare Function Request<br/>sourceType + sourceId + maxGeneration]
   B --> C[Call Azure Function<br>POST /api/tih/validate]
+  C --> D[Load Sire and Dam Ancestry Recursively]
+  D --> E[Update<br/>tek_hsi_pedigreejson<br/>tek_hsi_traditionalirishhorse]
 \`\`\``);
 
   await renderPreviewWithShortcut(page);
@@ -504,9 +506,40 @@ flowchart TD
   await expect(page.locator('.diagram-error')).toHaveCount(0);
   await expect(frame.locator('parsererror')).toHaveCount(0);
   await expect(frame).not.toContainText('Opening and ending tag mismatch');
-  await expect(frame.locator('svg')).toContainText('Prepare Function Request');
-  await expect(frame.locator('svg')).toContainText('sourceType + sourceId + maxGeneration');
+  await expect(frame.locator('svg')).toContainText('Prepare Function');
+  await expect(frame.locator('svg')).toContainText('Request');
+  await expect(frame.locator('svg')).toContainText('sourceType +');
+  await expect(frame.locator('svg')).toContainText('maxGeneration');
   await expect(frame.locator('svg')).toContainText('POST /api/tih/validate');
+  await expect(frame.locator('svg')).toContainText('Ancestry');
+  await expect(frame.locator('svg')).toContainText('tek_hsi_traditionalirishhorse');
+
+  const longWordLines = await frame.locator('svg').evaluate((svg) => {
+    return [...svg.querySelectorAll('text tspan')]
+      .map((tspan) => tspan.textContent?.trim())
+      .filter((text) => text?.startsWith('tek_hsi_'));
+  });
+  expect(longWordLines).toContain('tek_hsi_pedigreejson');
+  expect(longWordLines).toContain('tek_hsi_traditionalirishhorse');
+
+  const overflowingLabels = await frame.locator('svg').evaluate((svg) => {
+    const tolerance = 2;
+    return [...svg.querySelectorAll('g.node')].flatMap((node) => {
+      const shape = node.querySelector('rect, polygon, path, circle, ellipse');
+      const text = node.querySelector('text');
+      if (!shape || !text) return [];
+
+      const shapeBox = shape.getBoundingClientRect();
+      const textBox = text.getBoundingClientRect();
+      const overflows = textBox.left < shapeBox.left - tolerance
+        || textBox.top < shapeBox.top - tolerance
+        || textBox.right > shapeBox.right + tolerance
+        || textBox.bottom > shapeBox.bottom + tolerance;
+
+      return overflows ? [text.textContent] : [];
+    });
+  });
+  expect(overflowingLabels).toEqual([]);
 });
 
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
@@ -532,6 +565,52 @@ test('editor syntax highlighting and math rendering work without a build step', 
   await expect(page.locator('#preview .math-block .katex')).toBeVisible();
   await expect(page.locator('#preview .math-block')).toContainText('a');
   await expect(page.locator('#preview .math-block')).toContainText('b');
+});
+
+test('editor syntax layer stays aligned with native selection metrics', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.goto('/');
+  const longLine = 'N -->|pedigreeUpdateRequest| Q[Update tek_pedigreeupdaterequests<br/>tek_pedigreejson<br/>tek_traditionalirishhorse]';
+  const source = [
+    '# Selection Alignment',
+    '',
+    '**Bold marker** and _italic marker_ keep editor metrics stable.',
+    '',
+    '```mermaid',
+    'flowchart TD',
+    ...Array.from({ length: 80 }, (_, index) => `  ${index % 2 ? longLine : 'A[Parent Flow or Power App] --> B[Child Pedigree Flow]'}`),
+    '```',
+  ].join('\n');
+
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('#editorSyntaxLayer .hljs-strong')).toHaveCount(1);
+  await expect(page.locator('#editorSyntaxLayer .hljs-emphasis')).toHaveCount(1);
+
+  const metrics = await page.locator('#editor').evaluate((editor) => {
+    const layer = document.querySelector('#editorSyntaxLayer');
+    const shell = document.querySelector('#editorShell');
+    const strong = layer.querySelector('.hljs-strong');
+    const emphasis = layer.querySelector('.hljs-emphasis');
+    const layerStyle = getComputedStyle(layer);
+    return {
+      editorClientWidth: editor.clientWidth,
+      editorScrollHeight: editor.scrollHeight,
+      editorClientHeight: editor.clientHeight,
+      layerWidth: layer.getBoundingClientRect().width,
+      shellScrollbarWidth: Number(shell.dataset.editorScrollbarWidth || '0'),
+      actualScrollbarWidth: editor.offsetWidth - editor.clientWidth,
+      layerFontWeight: layerStyle.fontWeight,
+      strongFontWeight: getComputedStyle(strong).fontWeight,
+      layerFontStyle: layerStyle.fontStyle,
+      emphasisFontStyle: getComputedStyle(emphasis).fontStyle,
+    };
+  });
+
+  expect(metrics.editorScrollHeight).toBeGreaterThan(metrics.editorClientHeight);
+  expect(Math.abs(metrics.layerWidth - metrics.editorClientWidth)).toBeLessThanOrEqual(1);
+  expect(metrics.shellScrollbarWidth).toBe(metrics.actualScrollbarWidth);
+  expect(metrics.strongFontWeight).toBe(metrics.layerFontWeight);
+  expect(metrics.emphasisFontStyle).toBe(metrics.layerFontStyle);
 });
 
 test('rendering sanitizes hostile Markdown and Mermaid output', async ({ page }) => {

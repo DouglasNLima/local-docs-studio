@@ -997,6 +997,7 @@
       position: relative;
       display: grid;
       grid-template-columns: auto minmax(0, 1fr);
+      --editor-scrollbar-width: 0px;
       min-width: 0;
       min-height: 0;
       overflow: hidden;
@@ -1064,7 +1065,7 @@
       grid-row: 1;
       min-width: 0;
       min-height: 0;
-      width: 100%;
+      width: calc(100% - var(--editor-scrollbar-width, 0px));
       height: 100%;
       margin: 0;
       overflow: hidden;
@@ -1077,6 +1078,12 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       pointer-events: none;
+    }
+
+    .editor-syntax-layer .hljs-emphasis,
+    .editor-syntax-layer .hljs-strong {
+      font-style: inherit;
+      font-weight: inherit;
     }
 
     .mermaid-autocomplete {
