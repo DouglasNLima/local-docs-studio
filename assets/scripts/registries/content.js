@@ -100,7 +100,7 @@ flowchart TB
 
 ## Goal
 
-Create a reliable local docs studio that exports clean Markdown and Mermaid documents without a backend.
+Create a reliable local documentation studio that exports clean Markdown and Mermaid documents without a backend.
 
 ## Audience
 
@@ -274,12 +274,12 @@ B -->|No| D[Revise]
 `,
       sequenceNote: `Note over User,App: Add context here
 `,
-      style: `style A fill:#e0f2fe,stroke:#0284c7,stroke-width:2px
+      style: `style A fill:#FFF1E8,stroke:#FF883E,stroke-width:2px
 `,
-      classDef: `classDef important fill:#fef3c7,stroke:#d97706,color:#111827
+      classDef: `classDef important fill:#FFF1E8,stroke:#FF883E,color:#111827
 class A important
 `,
-      linkStyle: `linkStyle 0 stroke:#0284c7,stroke-width:2px
+      linkStyle: `linkStyle 0 stroke:#FF883E,stroke-width:2px
 `,
     };
 

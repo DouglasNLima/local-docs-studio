@@ -69,13 +69,13 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         label: 'classDef',
         detail: 'Flowchart style class',
         triggers: ['class', 'classdef'],
-        insert: 'classDef primary fill:#dbeafe,stroke:#0284c7,color:#0f172a',
+        insert: 'classDef primary fill:#FFF1E8,stroke:#FF883E,color:#111827',
       },
       {
         label: 'style node',
         detail: 'Style a node',
         triggers: ['style'],
-        insert: 'style A fill:#dbeafe,stroke:#0284c7,color:#0f172a',
+        insert: 'style A fill:#FFF1E8,stroke:#FF883E,color:#111827',
       },
       {
         label: 'stateDiagram-v2',

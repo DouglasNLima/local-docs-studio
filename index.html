@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111318" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="data:,">
-  <title>Local Docs Studio</title>
+  <title>Lens Docs Studio</title>
   <link rel="stylesheet" href="./assets/vendor/katex-0.16.25.min.css" />
   <link rel="stylesheet" href="./assets/styles/app.css" />
 </head>
@@ -15,17 +15,17 @@
   <main class="app layout-split" id="app">
     <header class="topbar">
       <div class="brand" aria-label="Application">
-        <div class="brand-mark">LD</div>
+        <div class="brand-mark" aria-hidden="true"><span class="brand-mark-page"></span></div>
         <div>
-          <h1>Local Docs Studio</h1>
-          <small>Local Markdown, Mermaid, and docs export studio</small>
+          <h1>Lens Docs Studio</h1>
+          <small>Local Markdown, Mermaid, and documentation studio</small>
         </div>
       </div>
 
       <input id="fileInput" type="file" accept=".md,.markdown,.mmd,.mermaid,text/markdown,text/plain" />
       <input id="folderInput" type="file" webkitdirectory directory multiple />
       <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
-      <input id="documentInput" type="file" accept=".docx,.html,.htm,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html" multiple />
+      <input id="documentInput" type="file" accept=".docx,.html,.htm,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html,application/pdf" multiple />
 
       <nav class="topbar-menubar toolbar-group" aria-label="Application menus">
         <details class="menu">
@@ -46,6 +46,8 @@
             <hr>
             <div class="menu-heading">Save</div>
             <button type="button" data-menu-action="save">Save changes</button>
+            <button type="button" data-menu-action="createSnapshot">Create snapshot</button>
+            <button type="button" data-menu-action="manageSnapshots">Manage snapshots</button>
             <hr>
             <div class="menu-heading">Recent</div>
             <div class="menu-note">Recent files and folders are available when the browser can persist local file permissions.</div>
@@ -148,6 +150,18 @@
               <button type="button" data-create-snippet="requirements.openQuestions">Open Questions</button>
               <button type="button" data-create-snippet="requirements.flow">User Flow</button>
             </div>
+            <hr>
+            <div class="menu-heading">Local Library</div>
+            <div class="create-grid">
+              <button type="button" data-local-library-action="saveTemplate">Save document as template</button>
+              <button type="button" data-local-library-action="saveSnippet">Save selection as snippet</button>
+              <button type="button" data-local-library-action="exportLibrary">Export library JSON</button>
+              <button type="button" data-local-library-action="importLibrary">Import library JSON</button>
+            </div>
+            <div class="menu-heading">My Templates</div>
+            <div class="create-grid" id="localTemplateList"></div>
+            <div class="menu-heading">My Snippets</div>
+            <div class="create-grid" id="localSnippetList"></div>
           </div>
         </details>
         <details class="menu">
@@ -209,6 +223,10 @@
             <button id="copyHtmlButton" type="button">Copy HTML</button>
             <button id="copyTextButton" type="button">Copy text</button>
             <div class="menu-note">Every export runs a fresh render check and reports diagram confidence before finishing.</div>
+            <hr>
+            <div class="menu-heading">Profiles</div>
+            <button type="button" data-export-profile-action="save">Save export profile</button>
+            <button type="button" data-export-profile-action="apply">Apply export profile</button>
           </div>
         </details>
         <details class="menu align-right">
@@ -231,6 +249,8 @@
             <button type="button" data-view-action="renderPreview">Render preview</button>
             <button type="button" data-view-action="maximizePreview">Maximise preview</button>
             <button type="button" data-view-action="toggleOutline">Toggle outline</button>
+            <button type="button" data-view-action="openDocsMap">Open docs map</button>
+            <button type="button" data-view-action="manageAssets">Manage assets</button>
             <div class="menu-note">Render also runs with Ctrl/Cmd+Enter. Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximised preview.</div>
           </div>
         </details>
@@ -258,7 +278,7 @@
             <div class="menu-heading">Workflow tips</div>
             <div class="help-tips">
               <div><strong>Import ZIP</strong><span>Open app bundles or generic Markdown docs as editable virtual files.</span></div>
-              <div><strong>Import document</strong><span>Convert DOCX or HTML into clean editable Markdown with supported images.</span></div>
+              <div><strong>Import document</strong><span>Convert DOCX, HTML, or PDF into clean editable Markdown with supported images where available.</span></div>
               <div><strong>Export PDF</strong><span>Use the browser print dialogue and choose Save as PDF.</span></div>
               <div><strong>Markdown Bundle</strong><span>Round-trip editable docs and image assets in one ZIP.</span></div>
               <div><strong>Follow selection</strong><span>Highlight selected editor text in Preview and scroll the match into view in Split layout.</span></div>

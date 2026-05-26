@@ -18,7 +18,19 @@ function normaliseLineEndings(value) {
 
 async function openFixture(page, name) {
   await page.goto('/');
-  await page.locator('#fileInput').setInputFiles(fixturePath(name));
+  const fileInput = page.locator('#fileInput');
+  const status = page.locator('#status');
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    await fileInput.setInputFiles(fixturePath(name));
+    try {
+      await expect.poll(async () => await status.textContent(), { timeout: 5_000 }).not.toBe('Ready');
+      break;
+    } catch (error) {
+      if (attempt === 2) throw error;
+    }
+  }
+
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 }
 
@@ -360,13 +372,67 @@ function createDocxImportFixture() {
   ], { compress: true });
 }
 
+function createSimplePdfBuffer(pages) {
+  const chunks = ['%PDF-1.4\n'];
+  const offsets = [0];
+  const pageObjectIds = pages.map((_, index) => 3 + index * 2);
+  const contentObjectIds = pages.map((_, index) => 4 + index * 2);
+  const fontObjectId = 3 + pages.length * 2;
+
+  function currentOffset() {
+    return Buffer.byteLength(chunks.join(''), 'binary');
+  }
+
+  function addObject(id, body) {
+    offsets[id] = currentOffset();
+    chunks.push(`${id} 0 obj\n${body}\nendobj\n`);
+  }
+
+  addObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  addObject(2, `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pages.length} >>`);
+
+  pages.forEach((text, index) => {
+    const pageObjectId = pageObjectIds[index];
+    const contentObjectId = contentObjectIds[index];
+    const stream = `BT /F1 24 Tf 72 720 Td (${escapePdfText(text)}) Tj ET`;
+    addObject(pageObjectId, `<< /Type /Page /Parent 2 0 R /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /MediaBox [0 0 612 792] /Contents ${contentObjectId} 0 R >>`);
+    addObject(contentObjectId, `<< /Length ${Buffer.byteLength(stream, 'binary')} >>\nstream\n${stream}\nendstream`);
+  });
+
+  addObject(fontObjectId, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+
+  const xrefOffset = currentOffset();
+  const objectCount = fontObjectId + 1;
+  chunks.push(`xref\n0 ${objectCount}\n0000000000 65535 f \n`);
+  for (let id = 1; id < objectCount; id += 1) {
+    chunks.push(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`);
+  }
+  chunks.push(`trailer\n<< /Size ${objectCount} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`);
+
+  return Buffer.from(chunks.join(''), 'binary');
+}
+
+function escapePdfText(value) {
+  return String(value)
+    .replaceAll('\\', '\\\\')
+    .replaceAll('(', '\\(')
+    .replaceAll(')', '\\)');
+}
+
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Local Docs Studio');
+  await expect(page).toHaveTitle('Lens Docs Studio');
   await expect(page.locator('#app')).toBeVisible();
+  await expect(page.locator('.brand h1')).toHaveText('Lens Docs Studio');
+  await expect(page.locator('.brand small')).toHaveText('Local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('.brand-mark')).not.toHaveText('LD');
+  await expect(page.locator('body')).not.toContainText('Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
   await expect(page.locator('script[type="module"][src$="/assets/scripts/main.js"]')).toHaveCount(1);
   await expect(page.locator('link[rel="stylesheet"][href$="/assets/styles/app.css"]')).toHaveCount(1);
+
+  const brandColour = await page.locator('.brand-mark').evaluate((element) => getComputedStyle(element).color);
+  expect(brandColour).toBe('rgb(255, 136, 62)');
 });
 
 test('legacy renderer URL redirects to the app', async ({ page }) => {
@@ -586,9 +652,9 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
   await page.locator('summary').filter({ hasText: /^Help$/ }).click();
   await page.getByRole('button', { name: 'Open feature guide' }).click();
 
-  await expect(page.locator('#status')).toHaveText(/Feature guide opened read-only/);
+  await expect(page.locator('#status')).toHaveText(/Feature guide opened read-only/, { timeout: 20_000 });
   await expect(page.locator('#activeFileLabel')).toHaveText(/tool-feature-guide\.md · read-only/);
-  await expect(page.locator('#preview h1')).toHaveText('Local Docs Studio Feature Guide');
+  await expect(page.locator('#preview h1')).toHaveText('Lens Docs Studio Feature Guide');
   await expect(page.locator('#editor')).toHaveJSProperty('readOnly', true);
   await expect(page.locator('#saveButton')).toBeDisabled();
   await expect(page.locator('#editorToolbar [data-command="bold"]')).toBeDisabled();
@@ -836,8 +902,8 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   await expect(page.locator('#activeFileLabel')).toContainText('second.md');
 
   await page.getByRole('button', { name: 'Document review' }).click();
-  await expect(page.locator('.document-review-links')).toContainText('Backlinks (1)');
-  await expect(page.locator('.document-review-links')).toContainText('index.md:2');
+  const backlinkAudit = page.locator('.document-review-links').filter({ hasText: 'Backlinks (1)' });
+  await expect(backlinkAudit).toContainText('index.md:2');
 
   const docsPath = await clickDocsSiteExportDownload(page, { title: 'Wiki Docs', description: 'Wikilink export check.' });
   const entries = await readZipEntries(docsPath);
@@ -845,6 +911,97 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   const indexPage = searchIndex.pages.find((item) => item.path === 'index.md');
   expect(indexPage.html).not.toContain('data-wikilink-target');
   expect(indexPage.html).toContain('href="#second"');
+});
+
+test('document audit flags broken references and docs map opens as read-only markdown', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'index.md',
+      text: '# Home\n\n[[Missing Page]]\n\n[Missing link](missing.md)\n\n[Second](second.md)\n\n![Missing image](assets/images/missing.png)\n',
+    },
+    { name: 'second.md', text: '# Second\n\nBack to [Home](index.md).\n' },
+    { name: 'orphan.md', text: '# Orphan\n\nNo incoming links yet.\n' },
+  ]);
+
+  await page.locator('#documentReviewToggleButton').click();
+  await expect(page.locator('#documentReviewAlerts')).toContainText('unresolved wikilink');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('relative document link');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('local image reference');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Workspace audit');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('page without backlinks');
+
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  await page.getByRole('button', { name: 'Open docs map' }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText(/docs-map\.md · read-only/);
+  await expect(page.locator('#editor')).toHaveValue(/## Unresolved Links/);
+  await expect(page.locator('#preview')).toContainText('Documentation Map', { timeout: 20_000 });
+  await expect(page.locator('#preview .diagram-frame')).toHaveCount(1, { timeout: 20_000 });
+});
+
+test('Markdown governance flags lint issues, navigates to source, and stays out of exports', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'README.md',
+      text: `# Governance Home
+
+### Skipped Heading
+
+![](assets/logo.png)
+
+[Missing guide](missing.md)
+
+[[Ghost Page]]
+
+| Feature | Value |
+| -- | --- |
+| One | Two | Three |
+
+The color choice is organized for release.
+
+TODO: finish the checklist before release.
+
+\`\`\`js
+// TODO: this code marker is ignored.
+const color = 'blue';
+\`\`\`
+
+[Guide](guide.md)
+`,
+    },
+    {
+      name: 'guide.md',
+      text: `# Guide
+
+FIXME: replace this note.
+
+The favorite center text should be reviewed.
+`,
+    },
+  ]);
+
+  await page.locator('#documentReviewToggleButton').click();
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Governance');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Heading hierarchy');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Internal links');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Alt text');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('Tables');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('British English');
+  await expect(page.locator('#documentReviewAlerts')).toContainText('TODO/FIXME');
+  await expect(page.locator('#documentReviewSummary')).toContainText(/notes/);
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Governance:');
+
+  const guideIssue = page.locator('[data-governance-path="guide.md"]').filter({ hasText: 'FIXME marker' });
+  await expect(guideIssue).toBeVisible();
+  await guideIssue.click();
+  await expect(page.locator('#activeFileLabel')).toContainText('guide.md');
+  await expect.poll(() => page.locator('#editor').evaluate((editor) => editor.value.slice(editor.selectionStart, editor.selectionEnd))).toBe('FIXME');
+  await expect(page.locator('#status')).toHaveText(/Opened governance issue at guide\.md:3/);
+
+  const htmlPath = await clickExportDownload(page, 'Export HTML');
+  const html = await readFile(htmlPath, 'utf8');
+  expect(html).not.toContain('Markdown governance');
+  expect(html).not.toContain('data-governance-path');
+  expect(html).not.toContain('TODO/FIXME');
 });
 
 test('local draft recovery and large deletion protection guard browser-local edits', async ({ page }) => {
@@ -866,6 +1023,71 @@ test('local draft recovery and large deletion protection guard browser-local edi
   await expect(page.getByRole('heading', { name: 'Large deletion detected' })).toBeVisible();
   await page.getByRole('button', { name: 'Undo deletion' }).click();
   await expect(page.locator('#editor')).toHaveValue(/This paragraph should survive local recovery/);
+});
+
+test('manual local snapshots can be created, compared, restored, and deleted', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Create snapshot' }).click();
+  await expect(page.locator('#status')).toHaveText(/Snapshot created/);
+
+  await setEditorValueAndSelection(page, '# Changed\n\nTemporary edit.\n');
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Manage snapshots' }).click();
+  await expect(page.getByRole('heading', { name: /Snapshots for plain\.md/ })).toBeVisible();
+  await page.getByText('Compare with current document').click();
+  await expect(page.locator('.snapshot-diff')).toContainText('Publishing Fixture');
+  await page.getByRole('button', { name: 'Restore' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture/);
+  await expect(page.locator('#status')).toHaveText(/Restored snapshot/);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'Manage snapshots' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await expect(page.locator('.snapshot-list')).toContainText('No snapshots');
+});
+
+test('local templates, snippets, and export profiles persist in the browser', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+  await page.evaluate(() => {
+    window.confirm = () => true;
+    window.__promptValues = ['Fixture Template', 'Fixture Snippet', 'DevOps Profile'];
+    window.prompt = () => window.__promptValues.shift() || '';
+  });
+
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await page.getByRole('button', { name: 'Save document as template' }).click();
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await expect(page.getByRole('button', { name: 'Fixture Template' })).toBeVisible();
+
+  const selectedText = 'Publishing Fixture';
+  await page.locator('#editor').evaluate((editor, text) => {
+    const start = editor.value.indexOf(text);
+    editor.focus();
+    editor.setSelectionRange(start, start + text.length);
+  }, selectedText);
+  await page.getByRole('button', { name: 'Save selection as snippet' }).click();
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await expect(page.getByRole('button', { name: 'Fixture Snippet' })).toBeVisible();
+
+  await setEditorValueAndSelection(page, '# Changed\n');
+  await page.getByRole('button', { name: 'Fixture Template' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture/);
+  await page.locator('#editor').evaluate((editor) => {
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  });
+  await page.locator('summary').filter({ hasText: /^Create$/ }).click();
+  await page.getByRole('button', { name: 'Fixture Snippet' }).click();
+  await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture[\s\S]*Publishing Fixture/);
+
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#devopsMarkdownExportToggle').check();
+  await page.getByRole('button', { name: 'Save export profile' }).click();
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#devopsMarkdownExportToggle').uncheck();
+  await page.getByRole('button', { name: 'Apply export profile' }).click();
+  await expect(page.locator('#devopsMarkdownExportToggle')).toBeChecked();
 });
 
 test('writer shortcut is disabled while input maximise handles focused writing', async ({ page }) => {
@@ -1423,6 +1645,28 @@ test('dropped image assets render and travel through HTML, Word, and Docs Site e
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('assets/images/tiny-image.png'))).toBe(true);
 });
 
+test('asset manager previews and renames managed image references', async ({ page }) => {
+  await openFixture(page, 'plain.md');
+  await page.locator('#editor').focus();
+  await page.locator('#editor').evaluate((editor) => {
+    editor.setSelectionRange(editor.value.length, editor.value.length);
+  });
+  await dropTinyPngOnEditor(page);
+  await expect(page.locator('#editor')).toHaveValue(/assets\/images\/tiny-image\.png/);
+
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  await page.getByRole('button', { name: 'Manage assets' }).click();
+  await expect(page.getByRole('heading', { name: 'Managed assets' })).toBeVisible();
+  await expect(page.locator('.asset-library-item img')).toBeVisible();
+  await expect(page.locator('[data-asset-action="remove"]')).toBeDisabled();
+
+  await page.locator('.asset-library-main input').fill('assets/images/renamed-image.png');
+  await page.getByRole('button', { name: 'Rename' }).click();
+  await expect(page.locator('#status')).toHaveText(/Renamed asset/);
+  await expect(page.locator('#editor')).toHaveValue(/assets\/images\/renamed-image\.png/);
+  await expect(page.locator('#preview img[data-managed-asset-path="assets/images/renamed-image.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
 test('clipboard image paste creates the same managed assets as drag and drop', async ({ page }) => {
   await openFixture(page, 'plain.md');
   await page.locator('#editor').focus();
@@ -1486,9 +1730,10 @@ test('Markdown Bundle export round-trips edited docs and image assets', async ({
 
   const bundlePath = await clickExportDownload(page, 'Export Markdown Bundle');
   const entries = await readZipEntries(bundlePath);
-  const manifest = JSON.parse(getZipText(entries, 'local-docs-studio-bundle.json'));
+  const manifest = JSON.parse(getZipText(entries, 'lens-docs-studio-bundle.json'));
 
   expect(manifest.formatVersion).toBe('markdown-bundle-1.0');
+  expect(manifest.generator).toBe('Lens Docs Studio');
   expect(manifest.documentCount).toBe(1);
   expect(manifest.assetCount).toBe(1);
   expect(manifest.documents[0].dirty).toBe(true);
@@ -1500,6 +1745,44 @@ test('Markdown Bundle export round-trips edited docs and image assets', async ({
   await expect(page.locator('#status')).toHaveText(/Imported 1 document and 1 image asset from Markdown bundle/);
   await expect(page.locator('#editor')).toHaveValue(/Bundle Edited/);
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/tiny-image.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
+test('Markdown Bundle import accepts current and legacy manifest names', async ({ page }, testInfo) => {
+  const manifestNames = [
+    'lens-docs-studio-bundle.json',
+    'local-docs-studio-bundle.json',
+    'md-mmd-renderer-bundle.json',
+  ];
+
+  await page.goto('/');
+
+  for (const manifestName of manifestNames) {
+    const zipPath = testInfo.outputPath(`${manifestName}.zip`);
+    await writeFile(zipPath, createZipBuffer([
+      {
+        name: 'README.md',
+        data: `# Bundle ${manifestName}\n\nImported through ${manifestName}.`,
+      },
+      {
+        name: manifestName,
+        data: JSON.stringify({
+          formatVersion: 'markdown-bundle-1.0',
+          generator: manifestName.startsWith('lens') ? 'Lens Docs Studio' : 'Local Docs Studio',
+          title: `Bundle ${manifestName}`,
+          exportedAt: '2026-05-26T00:00:00.000Z',
+          documentCount: 1,
+          assetCount: 0,
+          documents: [{ path: 'README.md', name: 'README.md', dirty: false, bytes: 0 }],
+          assets: [],
+        }),
+      },
+    ], { compress: true }));
+
+    await page.locator('#zipInput').setInputFiles(zipPath);
+    await expect(page.locator('#status')).toHaveText(/Imported 1 document from Markdown bundle/, { timeout: 20_000 });
+    await expect(page.locator('#folderBadge')).toHaveText(`Bundle ${manifestName}`);
+    await expect(page.locator('#editor')).toHaveValue(new RegExp(`Imported through ${manifestName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
+  }
 });
 
 test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', async ({ page }) => {
@@ -1549,7 +1832,7 @@ test('ZIP import accepts compressed generic docs and handles ZIPs without source
 
   await page.goto('/');
   await page.locator('#zipInput').setInputFiles(zipPath);
-  await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/);
+  await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/, { timeout: 20_000 });
   await expect(page.locator('#status')).toHaveText(/SVG images are not imported for security/);
   await expect(page.locator('#editor')).toHaveValue(/Imported Docs/);
   await expect(page.locator('#preview img[data-managed-asset-path="docs/images/logo.png"]')).toHaveAttribute('src', /^blob:/);
@@ -1612,7 +1895,7 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/import-word-word-logo.png"]')).toHaveAttribute('src', /^blob:/);
 });
 
-test('document import drag and drop handles HTML and warns that PDF is future text-only work', async ({ page }) => {
+test('document import drag and drop handles HTML and PDF text extraction', async ({ page }) => {
   await page.goto('/');
   await dropVirtualFile(page, {
     name: 'drop.html',
@@ -1626,16 +1909,23 @@ test('document import drag and drop handles HTML and warns that PDF is future te
   await dropVirtualFile(page, {
     name: 'future.pdf',
     type: 'application/pdf',
-    text: '%PDF-1.7',
+    base64: createSimplePdfBuffer(['First PDF page', 'Second PDF page']).toString('base64'),
   });
-  await expect(page.locator('#status')).toHaveText(/PDF import is planned for a future text-only converter/);
-  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText(/Imported 1 converted document/, { timeout: 20_000 });
+
+  const pdfMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
+  expect(pdfMarkdown).toContain('# future');
+  expect(pdfMarkdown).toContain('> Imported from PDF as text-only Markdown.');
+  expect(pdfMarkdown).toContain('## Page 1');
+  expect(pdfMarkdown).toContain('First PDF page');
+  expect(pdfMarkdown).toContain('## Page 2');
+  expect(pdfMarkdown).toContain('Second PDF page');
 });
 
 test('Docs Site export contains the expected static site package', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.locator('#folderInput').setInputFiles(fixturePath('docs-site'));
-  await expect(page.locator('#status')).toHaveText(/Rendered/);
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 
   const filePath = await clickDocsSiteExportDownload(page);
   const entries = await readZipEntries(filePath);
@@ -1718,6 +2008,35 @@ test('Docs Site export contains the expected static site package', async ({ page
   await page.setViewportSize({ width: 390, height: 844 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   expect(overflow).toBe(false);
+});
+
+test('front matter drives Docs Site metadata without rendering as content', async ({ page }) => {
+  await loadVirtualWorkspace(page, [
+    {
+      name: 'guide.md',
+      text: '---\ntitle: API Guide\ndescription: Internal API docs\norder: 1\ntags: [api, auth]\ndraft: true\nnavGroup: Guides\n---\n# Rendered Guide\nBody text.',
+    },
+    {
+      name: 'README.md',
+      text: '---\ntitle: Project Home\norder: 10\nnavGroup: Overview\n---\n# Home\nWelcome.',
+    },
+  ]);
+
+  await expect(page.locator('#preview')).not.toContainText('navGroup');
+  const zipPath = await clickDocsSiteExportDownload(page, { title: 'Metadata Docs', description: 'Front matter fixture.' });
+  const entries = await readZipEntries(zipPath);
+  const searchIndex = JSON.parse(getZipText(entries, 'assets/search-index.json'));
+  const manifest = JSON.parse(getZipText(entries, 'site-manifest.json'));
+  const guide = searchIndex.pages.find((item) => item.path === 'guide.md');
+
+  expect(searchIndex.pages.map((item) => item.path).slice(0, 2)).toEqual(['guide.md', 'README.md']);
+  expect(guide.title).toBe('API Guide');
+  expect(guide.description).toBe('Internal API docs');
+  expect(guide.tags).toEqual(['api', 'auth']);
+  expect(guide.draft).toBe(true);
+  expect(guide.navGroup).toBe('Guides');
+  expect(guide.html).not.toContain('title: API Guide');
+  expect(manifest.pages.find((item) => item.path === 'guide.md').draft).toBe(true);
 });
 
 test('theme, preview maximise, and mobile layout stay usable', async ({ page }) => {

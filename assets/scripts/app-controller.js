@@ -7,20 +7,27 @@ import { createFindReplaceService } from './editor/find-replace-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
 import { createWorkspaceSearchService } from './editor/workspace-search-service.js';
-import { isImportableDocumentFile, isPdfFile } from './files/document-import-service.js';
+import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
+import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
 import { createSelectionSyncService } from './document/selection-sync-service.js';
 import { downloadBlob, registerServiceWorker } from './utils/browser.js';
 import { compareRecords, getFolderNameFromFileList, isSupportedFile, normalisePath, uniqueByPath } from './utils/files.js';
 import { escapeHtml, readStoredNumber, sanitiseFileName, slugFromText, todayIso } from './utils/format.js';
-import { findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
+import { collectMarkdownRelativeTargets, collectWikilinkTargets, findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
 import { getLineInfoAtIndex } from './utils/search.js';
+import { idbRequest, idbTransactionDone, openObjectStoreDb } from './utils/idb.js';
+
+const SNAPSHOT_DB_NAME = 'local-docs-studio-snapshots';
+const SNAPSHOT_DB_VERSION = 1;
+const SNAPSHOT_STORE = 'snapshots';
+const LOCAL_LIBRARY_KEY = 'md-mmd-renderer.localLibrary';
 
 export function createAppController() {
     const {
@@ -151,6 +158,7 @@ export function createAppController() {
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
+    let snapshotDbPromise = null;
 
     const state = createInitialState({ readStoredNumber });
     let openTableEditor = () => {};
@@ -326,7 +334,10 @@ export function createAppController() {
       },
       callbacks: {
         getBacklinks,
+        getWorkspaceAudit,
+        getGovernanceAudit,
         openBacklink,
+        openGovernanceIssue,
       },
     });
     const {
@@ -586,6 +597,7 @@ export function createAppController() {
     installSelectionSyncHandlers();
     installContextMenuHandlers();
     installEventHandlers();
+    renderLocalLibrary();
     initialiseWelcome();
     localStorage.removeItem(storageKeys.typewriterMode);
     initRecentHandles();
@@ -646,6 +658,29 @@ export function createAppController() {
         button.addEventListener('click', () => insertGeneratorSnippet(button.dataset.createSnippet));
       });
 
+      document.querySelectorAll('[data-local-library-action]').forEach((button) => {
+        button.addEventListener('click', async () => {
+          if (button.dataset.localLibraryAction === 'saveTemplate') saveCurrentDocumentAsLocalTemplate();
+          if (button.dataset.localLibraryAction === 'saveSnippet') saveSelectionAsLocalSnippet();
+          if (button.dataset.localLibraryAction === 'exportLibrary') exportLocalLibrary();
+          if (button.dataset.localLibraryAction === 'importLibrary') await importLocalLibrary();
+          closeOpenMenus();
+        });
+      });
+
+      createMenu.addEventListener('click', async (event) => {
+        const templateButton = event.target.closest('[data-local-template-id]');
+        if (templateButton) {
+          await loadLocalTemplate(templateButton.dataset.localTemplateId);
+          closeOpenMenus();
+        }
+        const snippetButton = event.target.closest('[data-local-snippet-id]');
+        if (snippetButton) {
+          insertLocalSnippet(snippetButton.dataset.localSnippetId);
+          closeOpenMenus();
+        }
+      });
+
       document.querySelectorAll('[data-studio-template]').forEach((button) => {
         button.addEventListener('click', () => loadStudioTemplate(button.dataset.studioTemplate));
       });
@@ -662,6 +697,8 @@ export function createAppController() {
           if (button.dataset.menuAction === 'importZip') importZip();
           if (button.dataset.menuAction === 'importDocument') importDocument();
           if (button.dataset.menuAction === 'save') await saveActiveFile();
+          if (button.dataset.menuAction === 'createSnapshot') await createActiveSnapshot();
+          if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
           closeOpenMenus();
         });
@@ -686,10 +723,20 @@ export function createAppController() {
       });
 
       document.querySelectorAll('[data-view-action]').forEach((button) => {
-        button.addEventListener('click', () => {
-          if (button.dataset.viewAction === 'renderPreview') renderPreview();
+        button.addEventListener('click', async () => {
+          if (button.dataset.viewAction === 'renderPreview') await renderPreview();
           if (button.dataset.viewAction === 'maximizePreview') togglePreviewMaximized();
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
+          if (button.dataset.viewAction === 'openDocsMap') await openDocsMap();
+          if (button.dataset.viewAction === 'manageAssets') await openAssetLibrary();
+          closeOpenMenus();
+        });
+      });
+
+      document.querySelectorAll('[data-export-profile-action]').forEach((button) => {
+        button.addEventListener('click', () => {
+          if (button.dataset.exportProfileAction === 'save') saveExportProfile();
+          if (button.dataset.exportProfileAction === 'apply') applyExportProfile();
           closeOpenMenus();
         });
       });
@@ -952,14 +999,8 @@ export function createAppController() {
         }
 
         const documentFiles = files.filter(isImportableDocumentFile);
-        const pdfFiles = files.filter(isPdfFile);
         if (documentFiles.length) {
-          await importDocumentFiles([...documentFiles, ...pdfFiles]);
-          return;
-        }
-
-        if (pdfFiles.length) {
-          setStatus('PDF import is planned for a future text-only converter. Import DOCX or HTML for now.', 'warning');
+          await importDocumentFiles(documentFiles);
           return;
         }
 
@@ -1115,6 +1156,194 @@ export function createAppController() {
       return text;
     }
 
+    async function createActiveSnapshot() {
+      const record = getActiveRecord();
+      if (!record || !state.activePath) {
+        setStatus('Open a Markdown document before creating a snapshot.', 'warning');
+        return;
+      }
+      if (record.readOnly) {
+        setStatus('Read-only documents cannot create snapshots.', 'warning');
+        return;
+      }
+
+      const snapshot = {
+        id: `${getSnapshotWorkspaceKey()}::${state.activePath}::${Date.now()}`,
+        workspaceKey: getSnapshotWorkspaceKey(),
+        path: state.activePath,
+        name: record.name,
+        text: editor.value,
+        createdAt: Date.now(),
+      };
+      const db = await getSnapshotDb();
+      if (!db) return;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readwrite');
+      transaction.objectStore(SNAPSHOT_STORE).put(snapshot);
+      await idbTransactionDone(transaction);
+      setStatus(`Snapshot created for ${record.name}.`, 'ok');
+    }
+
+    async function openSnapshotManager() {
+      const record = getActiveRecord();
+      if (!record || !state.activePath) {
+        setStatus('Open a document before managing snapshots.', 'warning');
+        return;
+      }
+
+      const dialog = document.createElement('dialog');
+      dialog.className = 'utility-dialog snapshot-dialog';
+      dialog.setAttribute('aria-labelledby', 'snapshotDialogTitle');
+      document.body.appendChild(dialog);
+
+      const close = () => {
+        dialog.close();
+        dialog.remove();
+      };
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        close();
+      });
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || event.target.closest('[data-snapshot-close]')) {
+          close();
+        }
+      });
+      dialog.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-snapshot-action]');
+        if (!button) return;
+        const id = button.dataset.snapshotId || '';
+        if (button.dataset.snapshotAction === 'restore') {
+          const snapshot = await getSnapshot(id);
+          if (snapshot) {
+            await restoreSnapshot(snapshot);
+            close();
+          }
+        }
+        if (button.dataset.snapshotAction === 'delete') {
+          await deleteSnapshot(id);
+          await renderSnapshotManager(dialog);
+        }
+      });
+
+      await renderSnapshotManager(dialog);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    async function renderSnapshotManager(dialog) {
+      const snapshots = await listActiveSnapshots();
+      const rows = snapshots.map((snapshot) => {
+        const created = new Date(snapshot.createdAt).toLocaleString();
+        return `<section class="snapshot-item">
+          <div class="snapshot-item-head">
+            <strong>${escapeHtml(snapshot.name || snapshot.path)}</strong>
+            <span>${escapeHtml(created)}</span>
+          </div>
+          <details>
+            <summary>Compare with current document</summary>
+            <div class="snapshot-diff">${renderSnapshotDiff(snapshot.text, editor.value)}</div>
+          </details>
+          <div class="asset-library-actions">
+            <button type="button" data-snapshot-action="delete" data-snapshot-id="${escapeHtml(snapshot.id)}">Delete</button>
+            <button class="primary" type="button" data-snapshot-action="restore" data-snapshot-id="${escapeHtml(snapshot.id)}">Restore</button>
+          </div>
+        </section>`;
+      }).join('');
+
+      dialog.innerHTML = `<form class="utility-dialog-card snapshot-card" method="dialog">
+        <div class="utility-dialog-top">
+          <span class="template-dialog-kicker">Local snapshots</span>
+          <button class="template-dialog-close" type="button" data-snapshot-close aria-label="Close snapshots">X</button>
+        </div>
+        <h2 id="snapshotDialogTitle">Snapshots for ${escapeHtml(state.activePath)}</h2>
+        <p>Snapshots are explicit browser-local versions. They are separate from automatic draft recovery.</p>
+        <div class="snapshot-list">${rows || '<div class="workspace-search-empty">No snapshots for this document yet.</div>'}</div>
+        <div class="template-dialog-actions">
+          <button class="primary" type="button" data-snapshot-close>Done</button>
+        </div>
+      </form>`;
+    }
+
+    async function restoreSnapshot(snapshot) {
+      if (isActiveReadOnly()) {
+        setStatus('Read-only documents cannot restore snapshots.', 'warning');
+        return;
+      }
+      editor.value = snapshot.text || '';
+      state.fileCache.set(state.activePath, editor.value);
+      state.dirtyPaths.add(state.activePath);
+      resetEditorHistory();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Restored snapshot from ${new Date(snapshot.createdAt).toLocaleString()}.`, 'warning');
+    }
+
+    async function listActiveSnapshots() {
+      const db = await getSnapshotDb();
+      if (!db || !state.activePath) return [];
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readonly');
+      const store = transaction.objectStore(SNAPSHOT_STORE);
+      const snapshots = await idbRequest(store.getAll());
+      return snapshots
+        .filter((snapshot) => snapshot.workspaceKey === getSnapshotWorkspaceKey() && snapshot.path === state.activePath)
+        .sort((left, right) => right.createdAt - left.createdAt);
+    }
+
+    async function getSnapshot(id) {
+      const db = await getSnapshotDb();
+      if (!db) return null;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readonly');
+      return await idbRequest(transaction.objectStore(SNAPSHOT_STORE).get(id));
+    }
+
+    async function deleteSnapshot(id) {
+      const db = await getSnapshotDb();
+      if (!db) return;
+      const transaction = db.transaction(SNAPSHOT_STORE, 'readwrite');
+      transaction.objectStore(SNAPSHOT_STORE).delete(id);
+      await idbTransactionDone(transaction);
+      setStatus('Snapshot deleted.', 'ok');
+    }
+
+    async function getSnapshotDb() {
+      if (!snapshotDbPromise) {
+        snapshotDbPromise = openObjectStoreDb(SNAPSHOT_DB_NAME, SNAPSHOT_DB_VERSION, [{
+          name: SNAPSHOT_STORE,
+          keyPath: 'id',
+          indexes: [
+            { name: 'workspaceKey', keyPath: 'workspaceKey' },
+            { name: 'path', keyPath: 'path' },
+          ],
+        }]).catch((error) => {
+          console.warn('Snapshot store unavailable.', error);
+          setStatus('Local snapshots are unavailable in this browser.', 'warning');
+          return null;
+        });
+      }
+      return await snapshotDbPromise;
+    }
+
+    function getSnapshotWorkspaceKey() {
+      return state.draftWorkspaceKey || `${state.folderName || 'workspace'}::${state.files.map((file) => file.path).sort().join('|')}`;
+    }
+
+    function renderSnapshotDiff(snapshotText, currentText) {
+      const snapshotLines = String(snapshotText || '').split('\n');
+      const currentLines = String(currentText || '').split('\n');
+      const total = Math.max(snapshotLines.length, currentLines.length);
+      const rows = [];
+      for (let index = 0; index < Math.min(total, 80); index += 1) {
+        const before = snapshotLines[index] ?? '';
+        const after = currentLines[index] ?? '';
+        const changed = before !== after;
+        rows.push(`<div class="diff-line ${changed ? 'diff-saved' : ''}"><span>${index + 1}</span><code>${escapeHtml(before || ' ')}</code></div>`);
+      }
+      if (total > 80) rows.push('<div class="diff-line"><span>...</span><code>Diff preview truncated.</code></div>');
+      return rows.join('');
+    }
+
     function markWorkspaceCleanContent(path, content) {
       state.savedContentCache.set(path, content);
       draftTools.updateWorkspaceDraftKey();
@@ -1163,9 +1392,350 @@ export function createAppController() {
       return backlinks;
     }
 
+    async function getWorkspaceAudit() {
+      const records = getDocumentationRecords();
+      const incoming = new Map(records.map((record) => [record.path, 0]));
+      const referencedAssets = new Set();
+      let brokenLinkCount = 0;
+
+      for (const record of records) {
+        const source = await readRecordText(record);
+        collectImageReferences(source, record.path).forEach((path) => referencedAssets.add(path));
+        collectDocumentationLinks(source).forEach((link) => {
+          if (isAssetTarget(link.target)) return;
+          const target = resolveWikilinkTarget(link.target, records, record.path);
+          if (target?.path && incoming.has(target.path)) {
+            incoming.set(target.path, incoming.get(target.path) + 1);
+          } else {
+            brokenLinkCount += 1;
+          }
+        });
+      }
+
+      const orphanAssetCount = [...state.managedAssets.keys()].filter((path) => !referencedAssets.has(path)).length;
+      const unlinkedPageCount = records
+        .filter((record) => !/(^|\/)(readme|index)\.(md|markdown)$/i.test(record.path))
+        .filter((record) => (incoming.get(record.path) || 0) === 0)
+        .length;
+
+      return { brokenLinkCount, orphanAssetCount, unlinkedPageCount };
+    }
+
+    async function getGovernanceAudit() {
+      const records = [];
+      for (const record of getDocumentationRecords()) {
+        records.push({
+          name: record.name,
+          path: record.path,
+          text: await readRecordText(record),
+        });
+      }
+      return analyseMarkdownGovernance({ records, activePath: state.activePath });
+    }
+
+    async function openDocsMap() {
+      const records = getDocumentationRecords();
+      if (!records.length) {
+        setStatus('Open Markdown or Mermaid files before building a docs map.', 'warning');
+        return;
+      }
+
+      if (state.activePath) {
+        state.fileCache.set(state.activePath, editor.value);
+      }
+
+      const content = await buildDocsMapMarkdown(records);
+      const name = 'docs-map.md';
+      const existing = state.files.find((record) => record.path === name);
+      const record = existing || {
+        name,
+        path: name,
+        readOnly: true,
+        generatedMap: true,
+      };
+      record.file = new File([content], name, { type: 'text/markdown' });
+      record.readOnly = true;
+      record.generatedMap = true;
+      if (!existing) state.files.push(record);
+
+      state.folderName = state.folderName || 'Documentation';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, content);
+      state.savedContentCache.set(name, content);
+      state.dirtyPaths.delete(name);
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      editor.value = content;
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus('Docs map opened as a read-only virtual document.', 'ok');
+    }
+
+    async function openAssetLibrary() {
+      const dialog = document.createElement('dialog');
+      dialog.className = 'utility-dialog asset-library-dialog';
+      dialog.setAttribute('aria-labelledby', 'assetLibraryTitle');
+      document.body.appendChild(dialog);
+
+      const close = () => {
+        dialog.close();
+        dialog.remove();
+      };
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        close();
+      });
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || event.target.closest('[data-asset-close]')) {
+          close();
+        }
+      });
+      dialog.addEventListener('click', async (event) => {
+        const button = event.target.closest('[data-asset-action]');
+        if (!button) return;
+        const path = button.dataset.assetPath || '';
+        if (button.dataset.assetAction === 'rename') {
+          const input = button.closest('.asset-library-item')?.querySelector('[data-asset-input]');
+          await renameManagedAsset(path, input?.value || '');
+          await renderAssetLibrary(dialog);
+        }
+        if (button.dataset.assetAction === 'remove') {
+          await removeManagedAsset(path);
+          await renderAssetLibrary(dialog);
+        }
+      });
+
+      await renderAssetLibrary(dialog);
+      if (typeof dialog.showModal === 'function') dialog.showModal();
+      else dialog.setAttribute('open', '');
+    }
+
+    async function renderAssetLibrary(dialog) {
+      const usage = await getManagedAssetUsage();
+      const assets = [...state.managedAssets.values()].sort((left, right) => left.path.localeCompare(right.path));
+      const rows = assets.map((asset) => {
+        const count = usage.get(asset.path)?.length || 0;
+        const size = formatBytes(asset.size ?? 0);
+        const src = asset.objectUrl || asset.dataUrl || '';
+        return `<div class="asset-library-item">
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(asset.alt || asset.name || 'Asset preview')}">
+          <div class="asset-library-main">
+            <strong>${escapeHtml(asset.name || asset.path)}</strong>
+            <span>${escapeHtml(asset.mimeType || 'image')} · ${escapeHtml(size)} · ${count} use${count === 1 ? '' : 's'}</span>
+            <input value="${escapeHtml(asset.path)}" data-asset-input="${escapeHtml(asset.path)}" aria-label="Asset path for ${escapeHtml(asset.name || asset.path)}">
+          </div>
+          <div class="asset-library-actions">
+            <button type="button" data-asset-action="rename" data-asset-path="${escapeHtml(asset.path)}">Rename</button>
+            <button type="button" data-asset-action="remove" data-asset-path="${escapeHtml(asset.path)}"${count ? ' disabled' : ''}>Remove</button>
+          </div>
+        </div>`;
+      }).join('');
+
+      dialog.innerHTML = `<form class="utility-dialog-card asset-library-card" method="dialog">
+        <div class="utility-dialog-top">
+          <span class="template-dialog-kicker">Session assets</span>
+          <button class="template-dialog-close" type="button" data-asset-close aria-label="Close asset library">X</button>
+        </div>
+        <h2 id="assetLibraryTitle">Managed assets</h2>
+        <p>Review image assets imported into this browser session. Rename updates loaded Markdown references; remove is available for unused assets.</p>
+        <div class="asset-library-list">${rows || '<div class="workspace-search-empty">No managed assets in this session.</div>'}</div>
+        <div class="template-dialog-actions">
+          <button class="primary" type="button" data-asset-close>Done</button>
+        </div>
+      </form>`;
+    }
+
+    async function getManagedAssetUsage() {
+      const usage = new Map([...state.managedAssets.keys()].map((path) => [path, []]));
+      if (!usage.size) return usage;
+      for (const record of getDocumentationRecords()) {
+        const source = await readRecordText(record);
+        collectImageReferences(source, record.path).forEach((path) => {
+          if (usage.has(path)) usage.get(path).push(record.path);
+        });
+      }
+      return usage;
+    }
+
+    async function renameManagedAsset(oldPath, requestedPath) {
+      const asset = state.managedAssets.get(oldPath);
+      const newPath = normaliseManagedAssetPath(requestedPath);
+      if (!asset || !newPath || newPath === oldPath) return;
+      if (state.managedAssets.has(newPath)) {
+        setStatus('Another managed asset already uses that path.', 'warning');
+        return;
+      }
+      if (!/\.(png|jpe?g|gif|webp)$/i.test(newPath)) {
+        setStatus('Managed image assets must keep a PNG, JPEG, GIF, or WebP extension.', 'warning');
+        return;
+      }
+
+      state.managedAssets.delete(oldPath);
+      asset.path = newPath;
+      asset.name = newPath.split('/').pop() || asset.name;
+      state.managedAssets.set(newPath, asset);
+      await replaceAssetReferences(oldPath, newPath);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Renamed asset to ${newPath}.`, 'ok');
+    }
+
+    async function removeManagedAsset(path) {
+      const usage = await getManagedAssetUsage();
+      if ((usage.get(path)?.length || 0) > 0) {
+        setStatus('Only unused managed assets can be removed.', 'warning');
+        return;
+      }
+      const asset = state.managedAssets.get(path);
+      if (asset?.objectUrl) URL.revokeObjectURL(asset.objectUrl);
+      state.managedAssets.delete(path);
+      await renderPreview();
+      setStatus(`Removed unused asset ${path}.`, 'ok');
+    }
+
+    async function replaceAssetReferences(oldPath, newPath) {
+      for (const record of getDocumentationRecords()) {
+        if (record.readOnly) continue;
+        const source = await readRecordText(record);
+        if (!source.includes(oldPath)) continue;
+        const next = source.split(oldPath).join(newPath);
+        state.fileCache.set(record.path, next);
+        state.dirtyPaths.add(record.path);
+        if (record.path === state.activePath) {
+          editor.value = next;
+        }
+      }
+    }
+
+    function normaliseManagedAssetPath(path) {
+      const normalised = normalisePath(String(path || '').trim())
+        .replace(/^\/+/, '')
+        .replace(/^\.\/+/, '');
+      return normalised || '';
+    }
+
+    function formatBytes(size) {
+      const value = Number(size) || 0;
+      if (value >= 1024 * 1024) return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+      if (value >= 1024) return `${Math.round(value / 1024)} KB`;
+      return `${value} B`;
+    }
+
+    async function buildDocsMapMarkdown(records) {
+      const nodeByPath = new Map(records.map((record, index) => [record.path, `doc${index + 1}`]));
+      const links = [];
+      const unresolved = [];
+
+      for (const record of records) {
+        const source = await readRecordText(record);
+        collectDocumentationLinks(source).forEach((link) => {
+          if (isAssetTarget(link.target)) return;
+          const target = resolveWikilinkTarget(link.target, records, record.path);
+          if (target?.path) {
+            links.push({ from: record.path, to: target.path, label: link.kind });
+          } else {
+            unresolved.push({ from: record.path, target: link.target, label: link.label || link.target });
+          }
+        });
+      }
+
+      const diagramLines = [
+        'flowchart LR',
+        ...records.map((record) => `  ${nodeByPath.get(record.path)}["${escapeMermaidLabel(record.path)}"]`),
+        ...links.map((link) => `  ${nodeByPath.get(link.from)} --> ${nodeByPath.get(link.to)}`),
+      ];
+      const linkRows = links.length
+        ? links.map((link) => `| ${escapeTableCell(link.from)} | ${escapeTableCell(link.to)} | ${escapeTableCell(link.label)} |`).join('\n')
+        : '| No links found |  |  |';
+      const unresolvedRows = unresolved.length
+        ? unresolved.map((link) => `| ${escapeTableCell(link.from)} | ${escapeTableCell(link.target)} | ${escapeTableCell(link.label)} |`).join('\n')
+        : '| None |  |  |';
+
+      return `# Documentation Map
+
+Generated from ${records.length} loaded document${records.length === 1 ? '' : 's'}.
+
+\`\`\`mermaid
+${diagramLines.join('\n')}
+\`\`\`
+
+## Links
+
+| From | To | Type |
+|---|---|---|
+${linkRows}
+
+## Unresolved Links
+
+| From | Target | Label |
+|---|---|---|
+${unresolvedRows}
+`;
+    }
+
+    function getDocumentationRecords() {
+      return state.files.filter((record) => isSupportedFile(record.name) && !record.generatedMap);
+    }
+
+    function collectDocumentationLinks(source) {
+      return [
+        ...collectWikilinkTargets(source),
+        ...collectMarkdownRelativeTargets(source).filter((link) => String(source || '')[Math.max(0, link.index - 1)] !== '!'),
+      ];
+    }
+
+    function collectImageReferences(source, fromPath) {
+      const paths = [];
+      String(source || '').replace(/!\[[^\]\n]*\]\(([^)\n]+)\)/g, (raw, href) => {
+        const target = String(href || '').split(/[?#]/)[0].trim();
+        if (target && !/^(https?:|data:|blob:)/i.test(target)) {
+          paths.push(normaliseRelativePath(target, fromPath));
+        }
+        return raw;
+      });
+      return paths;
+    }
+
+    function normaliseRelativePath(target, fromPath) {
+      const activeDir = fromPath.includes('/') ? fromPath.slice(0, fromPath.lastIndexOf('/') + 1) : '';
+      const raw = target.startsWith('/') ? target.slice(1) : `${activeDir}${target}`;
+      const parts = raw.replace(/\\/g, '/').split('/');
+      const stack = [];
+      parts.forEach((part) => {
+        if (!part || part === '.') return;
+        if (part === '..') stack.pop();
+        else stack.push(part);
+      });
+      return stack.join('/');
+    }
+
+    function isAssetTarget(target) {
+      return /\.(png|jpe?g|gif|webp|svg|pdf|zip)$/i.test(String(target || '').split(/[?#]/)[0]);
+    }
+
+    function escapeMermaidLabel(value) {
+      return String(value || '').replaceAll('"', '\\"');
+    }
+
+    function escapeTableCell(value) {
+      return String(value || '').replaceAll('|', '\\|').replace(/\r?\n/g, ' ');
+    }
+
     async function openBacklink(path, line = 1) {
       await selectFile(path);
       focusEditorAtLine(line, 1, 1);
+    }
+
+    async function openGovernanceIssue(path, line = 1, column = 1, length = 1) {
+      await selectFile(path);
+      focusEditorAtLine(line, column, length);
+      setStatus(`Opened governance issue at ${path}:${line}.`, 'info');
     }
 
     function isActiveReadOnly() {
@@ -1375,7 +1945,7 @@ export function createAppController() {
         <section class="welcome-state" aria-label="Welcome">
           <p class="welcome-kicker">Browser-only Markdown and Mermaid</p>
           <h2>Start with a file, a folder, or a ready-made document.</h2>
-          <p>Preview Markdown and Mermaid side by side, then export with render checks when the document is ready.</p>
+          <p>Open files, create documents, preview Markdown and Mermaid, and export clean documentation packages when the work is ready.</p>
           <div class="welcome-choice-grid">
             <div class="welcome-choice">
               <strong>Open local work</strong>
@@ -1623,6 +2193,214 @@ export function createAppController() {
       }
 
       resolve?.(value);
+    }
+
+    function saveCurrentDocumentAsLocalTemplate() {
+      if (!state.activePath || !editor.value.trim()) {
+        setStatus('Open or write a document before saving a local template.', 'warning');
+        return;
+      }
+      const label = window.prompt('Template name', getExportTitle() || state.fileName.replace(/\.[^.]+$/, '') || 'Local template');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.templates.unshift({
+        id: createLocalLibraryId('template'),
+        label: label.trim(),
+        name: `${slugFromText(label) || 'local-template'}.md`,
+        content: editor.value,
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      renderLocalLibrary();
+      setStatus(`Saved local template "${label.trim()}".`, 'ok');
+    }
+
+    function saveSelectionAsLocalSnippet() {
+      const selection = getEditorSelection();
+      const text = editor.value.slice(selection.start, selection.end).trim();
+      if (!text) {
+        setStatus('Select Markdown before saving a local snippet.', 'warning');
+        return;
+      }
+      const label = window.prompt('Snippet name', text.split(/\r?\n/)[0].slice(0, 40) || 'Local snippet');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.snippets.unshift({
+        id: createLocalLibraryId('snippet'),
+        label: label.trim(),
+        content: text,
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      renderLocalLibrary();
+      setStatus(`Saved local snippet "${label.trim()}".`, 'ok');
+    }
+
+    async function loadLocalTemplate(id) {
+      const template = readLocalLibrary().templates.find((item) => item.id === id);
+      if (!template) {
+        setStatus('Local template not found.', 'warning');
+        return;
+      }
+      if (!confirmDiscardUnsaved(`Load ${template.label} and discard unsaved edits?`)) return;
+      clearGeneratorMode();
+      clearManagedAssets();
+      clearScrollPositions();
+      clearWorkspaceContentCaches();
+      const name = template.name || `${slugFromText(template.label) || 'local-template'}.md`;
+      state.files = [{ name, path: name, file: new File([template.content], name, { type: 'text/markdown' }) }];
+      state.folderName = 'Local Library';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, template.content);
+      markWorkspaceCleanContent(name, template.content);
+      editor.value = template.content;
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus(`Loaded local template "${template.label}".`, 'ok');
+    }
+
+    function insertLocalSnippet(id) {
+      const snippet = readLocalLibrary().snippets.find((item) => item.id === id);
+      if (!snippet) {
+        setStatus('Local snippet not found.', 'warning');
+        return;
+      }
+      if (isActiveReadOnly()) {
+        setStatus('This document is read-only. Open or create a Markdown file before inserting snippets.', 'warning');
+        return;
+      }
+      if (!state.activePath) {
+        setGeneratedDocument({
+          label: 'Local Notes',
+          mode: 'Local Library',
+          name: () => 'local-notes.md',
+          content: () => '# Local Notes\n',
+        }, { label: 'Local Library', folderName: 'Local Library' }, {});
+        editor.setSelectionRange(editor.value.length, editor.value.length);
+      }
+      const selection = getEditorSelection();
+      const prefix = selection.start > 0 && editor.value[selection.start - 1] !== '\n' ? '\n\n' : '';
+      const suffix = selection.end < editor.value.length && editor.value[selection.end] !== '\n' ? '\n\n' : '';
+      const replacement = `${prefix}${snippet.content}${suffix}`;
+      replaceEditorRange(selection.start, selection.end, replacement, selection.start + prefix.length, selection.start + prefix.length + snippet.content.length);
+      setStatus(`Inserted local snippet "${snippet.label}".`, 'ok');
+    }
+
+    function saveExportProfile() {
+      const label = window.prompt('Export profile name', state.folderName || 'Local export profile');
+      if (!label) return;
+      const library = readLocalLibrary();
+      library.profiles.unshift({
+        id: createLocalLibraryId('profile'),
+        label: label.trim(),
+        devopsMarkdownExport: Boolean(state.devopsMarkdownExport),
+        docsSite: {
+          title: state.folderName || getExportTitle() || 'Docs site',
+          description: `Static documentation bundle with ${Math.max(state.files.length, 1)} page${state.files.length === 1 ? '' : 's'}.`,
+          theme: 'system',
+        },
+        createdAt: Date.now(),
+      });
+      writeLocalLibrary(library);
+      setStatus(`Saved export profile "${label.trim()}".`, 'ok');
+    }
+
+    function applyExportProfile() {
+      const profile = readLocalLibrary().profiles[0];
+      if (!profile) {
+        setStatus('No local export profiles saved yet.', 'warning');
+        return;
+      }
+      state.devopsMarkdownExport = Boolean(profile.devopsMarkdownExport);
+      localStorage.setItem(storageKeys.devopsMarkdownExport, String(state.devopsMarkdownExport));
+      restoreDevOpsMarkdownExport();
+      state.exportProfileDefaults = profile;
+      setStatus(`Applied export profile "${profile.label}".`, 'ok');
+    }
+
+    function exportLocalLibrary() {
+      const library = readLocalLibrary();
+      const payload = {
+        formatVersion: 'lens-docs-studio-library-1.0',
+        exportedAt: new Date().toISOString(),
+        ...library,
+      };
+      downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }), 'lens-docs-studio-library.json');
+      setStatus('Local library exported as JSON.', 'ok');
+    }
+
+    function importLocalLibrary() {
+      return new Promise((resolve) => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        input.addEventListener('change', async () => {
+          const file = input.files?.[0];
+          if (!file) {
+            resolve();
+            return;
+          }
+          try {
+            const imported = JSON.parse(await file.text());
+            const library = normaliseLocalLibrary(imported);
+            writeLocalLibrary(library);
+            renderLocalLibrary();
+            setStatus('Local library imported from JSON.', 'ok');
+          } catch (error) {
+            setStatus('Could not import local library JSON.', 'danger');
+            console.error(error);
+          }
+          resolve();
+        });
+        input.click();
+      });
+    }
+
+    function renderLocalLibrary() {
+      const library = readLocalLibrary();
+      const templateList = document.getElementById('localTemplateList');
+      const snippetList = document.getElementById('localSnippetList');
+      if (templateList) {
+        templateList.innerHTML = library.templates.length
+          ? library.templates.slice(0, 12).map((item) => `<button type="button" data-local-template-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>`).join('')
+          : '<span class="menu-note">No local templates yet.</span>';
+      }
+      if (snippetList) {
+        snippetList.innerHTML = library.snippets.length
+          ? library.snippets.slice(0, 12).map((item) => `<button type="button" data-local-snippet-id="${escapeHtml(item.id)}">${escapeHtml(item.label)}</button>`).join('')
+          : '<span class="menu-note">No local snippets yet.</span>';
+      }
+    }
+
+    function readLocalLibrary() {
+      try {
+        return normaliseLocalLibrary(JSON.parse(localStorage.getItem(LOCAL_LIBRARY_KEY) || '{}'));
+      } catch {
+        return normaliseLocalLibrary({});
+      }
+    }
+
+    function writeLocalLibrary(library) {
+      localStorage.setItem(LOCAL_LIBRARY_KEY, JSON.stringify(normaliseLocalLibrary(library)));
+    }
+
+    function normaliseLocalLibrary(value) {
+      const source = value && typeof value === 'object' ? value : {};
+      return {
+        templates: Array.isArray(source.templates) ? source.templates.filter((item) => item?.content && item?.label) : [],
+        snippets: Array.isArray(source.snippets) ? source.snippets.filter((item) => item?.content && item?.label) : [],
+        profiles: Array.isArray(source.profiles) ? source.profiles.filter((item) => item?.label) : [],
+      };
+    }
+
+    function createLocalLibraryId(prefix) {
+      return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
     }
 
     function setGeneratedDocument(template, group, metadata) {

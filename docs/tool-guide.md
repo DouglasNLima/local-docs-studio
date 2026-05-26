@@ -1,4 +1,4 @@
-# Local Docs Studio Feature Guide
+# Lens Docs Studio Feature Guide
 
 Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-site features. It opens in read-only mode from the Help menu, so it is safe to browse while keeping your own files untouched.
 
@@ -7,7 +7,7 @@ Use this guide as a quick tour of the local Markdown, Mermaid, export, and docs-
 - Open a single `.md`, `.markdown`, `.mmd`, or `.mermaid` file.
 - Open a folder to browse multiple documents from the sidebar.
 - Import a Markdown Bundle or generic ZIP from the File menu.
-- Import a DOCX or HTML document from the File menu to convert it into editable Markdown.
+- Import a DOCX, HTML, or PDF document from the File menu to convert it into editable Markdown.
 - Save edits back to supported local files, or download a Markdown copy when the browser cannot write directly.
 
 ## Markdown Editor
@@ -22,6 +22,7 @@ The editor keeps the app lightweight while still covering daily documentation wo
 | Mermaid snippets | Ctrl/Cmd+Space in Mermaid context |
 | Layout modes | View menu: Editor, Split, Preview |
 | Follow editor selection | Preview header checkbox |
+| Manual snapshots | File menu: Create snapshot / Manage snapshots |
 
 Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, and tables.
 
@@ -44,6 +45,8 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Outline navigation from headings.
 - Find in preview.
 - Document review metrics and non-blocking quality notes.
+- Markdown governance checks for heading hierarchy, internal links, alt text, tables, British English terms, and TODO/FIXME markers.
+- Workspace link/asset audit notes and a View menu docs map for loaded files.
 - Preview maximisation and diagram zoom controls.
 - Follow short editor selections into the preview while using Split layout.
 
@@ -65,8 +68,9 @@ flowchart LR
 - **Word** creates a `.docx` with rendered diagrams and compatible content.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
 - **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
+- Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
-- **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets; PDF import is planned as a future text-only converter.
+- **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
 
@@ -80,6 +84,8 @@ Use Create for local templates:
 
 Use Studio for Mermaid-focused templates and snippets.
 
+The Create menu can also save your current document as a local template, save selected Markdown as a local snippet, and import or export that local library as JSON. Export profiles in the Export menu remember browser-local export defaults.
+
 ## Images
 
 Drag images onto the editor to insert Markdown links like:
@@ -89,6 +95,8 @@ Drag images onto the editor to insert Markdown links like:
 ```
 
 The Markdown file stores the link. Exports include the image data or image files depending on the export type. PNG, JPEG, GIF, and WebP image files are supported; user-supplied SVG images are skipped for security.
+
+Use **View > Manage assets** to preview session images, rename paths across editable Markdown files, and remove unused assets.
 
 ## Privacy
 

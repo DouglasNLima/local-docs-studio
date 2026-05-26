@@ -1,12 +1,12 @@
 {
-  "name": "Local Docs Studio",
-  "short_name": "Docs Studio",
-  "description": "Edit, preview, review, and export Markdown and Mermaid docs locally.",
+  "name": "Lens Docs Studio",
+  "short_name": "Lens Docs",
+  "description": "Local Markdown, Mermaid, and documentation studio.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#08111f",
-  "theme_color": "#08111f",
+  "background_color": "#FAFAFA",
+  "theme_color": "#FF883E",
   "categories": ["productivity", "utilities"],
   "icons": [
     {

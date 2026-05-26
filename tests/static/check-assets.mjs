@@ -4,6 +4,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const productName = 'Lens Docs Studio';
+const productTagline = 'Local Markdown, Mermaid, and documentation studio';
+const forbiddenShellPhrase = 'Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.';
 
 function fail(message) {
   throw new Error(message);
@@ -91,6 +94,11 @@ if (!index.includes('./assets/styles/app.css')) fail('index.html does not load a
 if (!index.includes('./assets/scripts/main.js')) fail('index.html does not load main.js');
 if (!index.includes('./manifest.webmanifest')) fail('index.html does not load manifest.webmanifest');
 if (!index.includes('Content-Security-Policy')) fail('index.html must define a Content-Security-Policy meta tag');
+if (!index.includes(`<title>${productName}</title>`)) fail('index.html must use the Lens Docs Studio browser title');
+if (!index.includes(`<h1>${productName}</h1>`)) fail('index.html must show the Lens Docs Studio product name');
+if (!index.includes(`<small>${productTagline}</small>`)) fail('index.html must show the generic product tagline');
+if (index.includes(forbiddenShellPhrase)) fail('index.html must not use Power Platform Lens-only positioning');
+if (index.includes('Local Docs Studio') || index.includes('Local Markdown, Mermaid, and docs export studio')) fail('index.html still contains old product identity copy');
 
 const localReferencePattern = /\b(?:href|src)=["'](\.\/[^"']+)["']/g;
 for (const match of index.matchAll(localReferencePattern)) {
@@ -102,8 +110,12 @@ for (const match of index.matchAll(localReferencePattern)) {
 
 const legacy = readFileSync(toRootPath('md-mmd-renderer-v5.html'), 'utf8');
 if (!legacy.includes('url=./index.html')) fail('Legacy renderer page does not redirect to index.html');
+if (!legacy.includes(`Open ${productName}`)) fail('Legacy renderer page should link to the renamed app');
 
 const manifest = JSON.parse(readFileSync(toRootPath('manifest.webmanifest'), 'utf8'));
+if (manifest.name !== productName) fail('manifest.webmanifest name must be Lens Docs Studio');
+if (manifest.short_name !== 'Lens Docs') fail('manifest.webmanifest short_name must be Lens Docs');
+if (manifest.description !== `${productTagline}.`) fail('manifest.webmanifest description must stay generic');
 if (manifest.start_url !== './') fail('manifest.webmanifest start_url must stay GitHub Pages relative');
 if (manifest.scope !== './') fail('manifest.webmanifest scope must stay GitHub Pages relative');
 if (manifest.display !== 'standalone') fail('manifest.webmanifest display should be standalone');
@@ -114,6 +126,27 @@ for (const icon of manifest.icons) {
   if (!existsSync(iconPath) || !statSync(iconPath).isFile()) {
     fail(`Manifest icon does not exist: ${icon.src}`);
   }
+}
+
+const appCss = readFileSync(toRootPath('assets/styles/app.css'), 'utf8');
+if (!appCss.includes('#FF883E')) fail('app.css must include the Lens accent #FF883E');
+
+const firstPartyCopyFiles = [
+  'AGENTS.md',
+  'README.md',
+  'docs/tool-guide.md',
+  'docs/architecture/lens-docs-studio-identity.md',
+  'index.html',
+  'manifest.webmanifest',
+  'md-mmd-renderer-v5.html',
+];
+const americanEnglishPattern = /\b(artifact|artifacts|behavior|behaviors|center|centered|centralize|centralized|centralizes|centralizing|color|colors|customize|customized|customizing|favorite|favorites|gray|localization|neighbor|neighbors|organize|organized|organizing|prioritize|prioritized|prioritizing|specialize|specialized|specializing)\b/i;
+for (const copyFile of firstPartyCopyFiles) {
+  const source = readFileSync(toRootPath(copyFile), 'utf8')
+    .replace(/theme-color/g, '')
+    .replace(/#[\da-f]{3,8}/gi, '');
+  const match = source.match(americanEnglishPattern);
+  if (match) fail(`${copyFile} contains American English spelling: ${match[0]}`);
 }
 
 const workflow = readFileSync(toRootPath('.github/workflows/pages.yml'), 'utf8');

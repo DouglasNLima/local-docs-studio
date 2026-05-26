@@ -1,11 +1,13 @@
-# Local Docs Studio
+# Lens Docs Studio
 
-A local-first Markdown, Mermaid, and documentation studio that runs entirely in the browser and can be published from GitHub Pages. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the browser supports it, and export clean docs packages without a backend.
+Local Markdown, Mermaid, and documentation studio.
+
+Lens Docs Studio is a local-first documentation workspace that runs entirely in the browser and can be published from GitHub Pages. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the browser supports it, and export clean documentation packages without a backend.
 
 ## Use The App
 
 1. Open `index.html` through GitHub Pages or a local static server.
-2. Choose **Open file** for one document, **Open folder** for a folder of Markdown and Mermaid files, or **Import document** to convert DOCX/HTML into Markdown.
+2. Choose **Open file** for one document, **Open folder** for a folder of Markdown and Mermaid files, or **Import document** to convert DOCX, HTML, or PDF into Markdown.
 3. Edit in the Markdown toolbar or type directly in the editor.
 4. Use **Render** to refresh the preview, then export or copy the rendered output.
 
@@ -20,22 +22,26 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Syntax-highlighted code blocks with one-click copy buttons.
 - Rendered tables with one-click copy as Excel-friendly TSV.
 - Formatted clipboard paste that converts HTML content into Markdown, with spreadsheet table support for HTML table or TSV clipboard data, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
-- DOCX and HTML import that converts documents into clean editable Markdown with supported embedded images as exportable session assets.
+- DOCX, HTML, and text-only PDF import that converts documents into clean editable Markdown with supported embedded images as exportable session assets where available.
 - Standalone `.mmd` and `.mermaid` diagram rendering.
 - Local folder browser with filtering and dirty-file markers.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
+- Manual browser-local snapshots for comparing, restoring, and deleting explicit document versions.
 - Lightweight Mermaid autocomplete and pre-render validation for `.mmd`, `.mermaid`, and fenced Mermaid blocks.
 - Editor/Split/Preview layout modes, light/dark theme toggle, preview maximisation, diagram zoom, and optional outline.
 - Preview follow for editor selections, enabled by default and toggleable from the preview header.
 - Drag-and-drop PNG, JPEG, GIF, and WebP image insertion as session assets that are included in HTML, Word, and Docs Site exports.
+- Managed asset library for previewing session images, renaming Markdown references, and removing unused image assets.
 - HTML export, Word `.docx` export, copy HTML, and copy rendered text.
 - PDF export through the browser print dialogue with a clean print stylesheet.
 - Markdown Bundle ZIP export for editable docs plus image assets, with an optional Azure DevOps Mermaid syntax checkbox.
 - ZIP import for app bundles and generic Markdown/Mermaid documentation ZIPs.
 - Folder-to-docs-site export as a GitHub Pages-ready ZIP.
-- Document UX in the preview with hierarchical outline, rendered-text search, and non-blocking document review notes.
+- Optional Markdown front matter for Docs Site titles, descriptions, ordering, tags, draft badges, and navigation groups.
+- Document UX in the preview with hierarchical outline, rendered-text search, non-blocking document review notes, Markdown governance linting, workspace link/asset audits, and a generated docs map.
 - Mermaid Diagram Studio with templates, snippets, source copy, SVG export, and PNG export.
 - Local Content Studios for README/project docs, release notes, and requirements/user stories.
+- Browser-local templates, snippets, and export profiles with JSON import/export.
 - Built-in read-only feature guide available from the Help menu.
 - Optional PWA/offline shell for repeat use.
 
@@ -46,6 +52,9 @@ The preview pane includes document-focused review tools that do not change expor
 - **Outline** builds a navigable table of contents from rendered headings and highlights the active section while you scroll.
 - **Find** searches rendered document text, highlights matches, and skips interactive UI text such as code/table-copy and diagram-export buttons.
 - **Review** shows word count, reading time, content counts, and soft notes such as missing H1 titles, heading-level jumps, Mermaid errors, external links, and dirty files.
+- **Governance** scans the active document and loaded workspace for heading hierarchy jumps, broken internal links and wikilinks, missing image alt text, inconsistent Markdown tables, US spellings with British English suggestions, and TODO/FIXME release markers.
+- **Workspace audit** adds notes for unresolved wikilinks, missing relative document links, unmanaged local images, orphaned managed assets, and pages without backlinks.
+- **Docs map** in the View menu opens a read-only virtual Markdown document with a Mermaid graph plus link and unresolved-link tables.
 
 These tools are app-only. HTML, Word, and Docs Site exports are regenerated from a clean render and do not include search marks or review UI.
 
@@ -59,6 +68,8 @@ The editor stays buildless and native, using a `textarea` with a synchronised li
 - **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localised error with copy/jump actions while the rest of the Markdown continues rendering.
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts formatted HTML into Markdown and keeps spreadsheet tables as Markdown tables when the clipboard provides HTML table or tab-separated text; plain text stays plain, and **Paste as text** forces unformatted text.
 - **Image drag-and-drop** on the editor inserts Markdown such as `![diagram](assets/images/diagram.png)`. The Markdown file save-back writes the link text only; the image binaries live in the browser session and are embedded or bundled when you export. User-supplied SVG images are blocked as assets for security; rendered Mermaid diagrams can still be exported as SVG.
+- **Manage assets** in the View menu shows session images, usage counts, rename controls that update editable Markdown references, and removal for unused assets.
+- **Create snapshot** and **Manage snapshots** in the File menu store explicit browser-local document versions separately from automatic draft recovery.
 
 ## Local Content Studios
 
@@ -69,6 +80,8 @@ Use **Create** to generate editable Markdown from local templates. The studios a
 - **Requirements** creates PRDs, feature briefs, user story sets, acceptance criteria, Gherkin scenarios, and journey maps.
 
 Each studio also includes snippets you can insert at the cursor. Generated files behave like normal Markdown files, so you can edit, save, export to HTML or Word, and include them in a Docs Site ZIP.
+
+The Create menu also includes a browser-local library. Save the current document as a reusable template, save the current selection as a snippet, export/import the library as JSON, and reload those local entries without a backend.
 
 ## Mermaid Diagram Studio
 
@@ -92,6 +105,19 @@ Open a folder of Markdown and Mermaid files, toggle **Docs site** to preview the
 
 Docs Site Builder 2.0 opens a custom export dialogue for the site title, short description, and initial theme. The exported site includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
 
+Markdown files can start with front matter to control Docs Site metadata without rendering that block as document content:
+
+```markdown
+---
+title: API Guide
+description: Internal API docs
+order: 20
+tags: [api, auth]
+draft: false
+navGroup: Guides
+---
+```
+
 The generated ZIP contains:
 
 - `index.html` as the static site entry point.
@@ -106,21 +132,24 @@ Upload the ZIP contents to GitHub Pages or any static web host, keeping the `ass
 ## Advanced Import And Export
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
-- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `local-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
+- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
+- **Export profiles** save local export defaults such as the Azure DevOps Mermaid option and Docs Site defaults, then reapply them from the Export menu.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
-- **Import document** converts `.docx`, `.html`, and `.htm` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is planned for a future text-only converter.
+- **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - ZIP import does not convert rendered HTML back into Markdown. If a Docs Site ZIP only contains static HTML plus deployment notes, only editable Markdown/Mermaid files found in that ZIP are imported.
 
 ## Project Structure
 
 The app is static and buildless. GitHub Pages can serve it directly without npm, a backend, or a bundler.
 
+The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for primary actions, selected states, focus states, and brand moments while keeping the product generic for local Markdown, Mermaid, and documentation workflows.
+
 - `index.html` is the public app shell.
 - `md-mmd-renderer-v5.html` is a compatibility redirect for older links from the original app name.
 - `assets/styles/app.css` contains the app UI styles.
 - `assets/scripts/main.js` boots the ESM app controller.
 - `assets/scripts/app-controller.js` composes the app services and coordinates UI/event flow.
-- `assets/scripts/dom.js` centralizes DOM element lookup.
+- `assets/scripts/dom.js` centralises DOM element lookup.
 - `assets/scripts/state/config.js` owns app constants and initial state.
 - `assets/scripts/document/document-ux-service.js` owns preview outline, search, active section tracking, and document review notes.
 - `assets/scripts/editor/editor-service.js` owns editor history, undo/redo, line numbers, Mermaid autocomplete, and Markdown formatting actions.
@@ -146,7 +175,7 @@ npm test
 ```
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
-- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, Markdown bundle import/export, export packages, theme, maximisation, and mobile layout.
+- `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 
 ## Browser Support
@@ -160,7 +189,8 @@ Firefox and Safari can still open files through fallback file pickers and export
 - Browser security rules mean folder access and recent local handles require user permission.
 - Word export converts rendered Mermaid diagrams to images where possible. Very large or unusual SVG diagrams may fall back to SVG packaging.
 - Dragged image binaries are session assets. Save-back updates Markdown links, while HTML, Word, and Docs Site exports carry the actual image data. User SVG image files are not imported; use PNG, JPEG, GIF, or WebP for image assets.
-- Converted DOCX/HTML files are virtual Markdown documents. Use Save changes or Export Markdown Bundle to persist the converted Markdown and any managed image assets.
+- Converted DOCX/HTML/PDF files are virtual Markdown documents. Use Save changes or Export Markdown Bundle to persist the converted Markdown and any managed image assets.
+- PDF import extracts text only. It does not perform OCR, import images, or preserve visual layout.
 - PDF export depends on the browser print dialogue; the app prepares the print document but does not create raw PDF bytes itself.
 - ZIP import supports ordinary stored/deflated ZIP entries. Password-protected or encrypted ZIP files are not supported.
 - Runtime dependencies are pinned under `assets/vendor/`; no CDN fetch is required for normal app loading after publication.

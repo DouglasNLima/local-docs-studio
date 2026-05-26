@@ -1,5 +1,6 @@
 import { storageKeys } from '../state/config.js';
 import { cssEscape, slugify } from '../utils/format.js';
+import { resolveWikilinkTarget } from '../utils/wikilinks.js';
 
 const SEARCH_IGNORE_SELECTOR = [
   '.code-block-header',
@@ -33,7 +34,10 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   } = dom;
   const {
     getBacklinks,
+    getWorkspaceAudit,
+    getGovernanceAudit,
     openBacklink,
+    openGovernanceIssue,
   } = callbacks;
 
   const searchState = {
@@ -44,6 +48,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   let scrollFrame = 0;
   let outlineClickLockTarget = '';
   let outlineClickLockTimer = 0;
+  let governanceRunId = 0;
 
   function installDocumentUxHandlers() {
     outlineToggleButton.addEventListener('click', toggleOutline);
@@ -309,14 +314,11 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     documentReviewPanel.hidden = !state.documentReviewOpen;
 
     const review = buildDocumentReview();
-    documentReviewSummary.textContent = `${review.wordCount} words · ${review.readingMinutes} min read · ${review.alerts.length} note${review.alerts.length === 1 ? '' : 's'}`;
+    updateReviewSummary(review);
 
     documentReviewMetrics.innerHTML = '';
     review.metrics.forEach((metric) => {
-      const item = document.createElement('span');
-      item.className = 'document-review-metric';
-      item.textContent = `${metric.label}: ${metric.value}`;
-      documentReviewMetrics.appendChild(item);
+      appendReviewMetric(metric.label, metric.value);
     });
 
     documentReviewAlerts.innerHTML = '';
@@ -337,7 +339,22 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
         documentReviewAlerts.appendChild(item);
       });
     }
+    updateGovernanceAudit(review);
     updateBacklinks();
+    updateWorkspaceAudit();
+  }
+
+  function updateReviewSummary(review, governanceSummary = null) {
+    const governanceCount = governanceSummary?.issueCount || 0;
+    const noteCount = review.alerts.length + governanceCount;
+    documentReviewSummary.textContent = `${review.wordCount} words · ${review.readingMinutes} min read · ${noteCount} note${noteCount === 1 ? '' : 's'}`;
+  }
+
+  function appendReviewMetric(label, value) {
+    const item = document.createElement('span');
+    item.className = 'document-review-metric';
+    item.textContent = `${label}: ${value}`;
+    documentReviewMetrics.appendChild(item);
   }
 
   function buildDocumentReview() {
@@ -348,6 +365,10 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     const h1s = headings.filter((heading) => heading.tagName.toLowerCase() === 'h1');
     const links = [...root.querySelectorAll('a[href]')];
     const externalLinks = links.filter((link) => /^(https?:)?\/\//i.test(link.getAttribute('href') || ''));
+    const unresolvedWikilinks = [...root.querySelectorAll('[data-wikilink-target]')]
+      .filter((link) => !resolveWikilinkTarget(link.dataset.wikilinkTarget || '', state.files, state.activePath));
+    const brokenRelativeLinks = links.filter((link) => isBrokenRelativeDocumentLink(link));
+    const missingImages = [...root.querySelectorAll('img[src]')].filter((image) => isMissingManagedImage(image));
     const tables = root.querySelectorAll('table').length;
     const codeBlocks = root.querySelectorAll('.code-block').length
       + [...root.querySelectorAll('pre code')].filter((code) => !code.closest('.code-block')).length;
@@ -374,6 +395,15 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       });
     }
 
+    const duplicateHeading = findDuplicateHeading(headings);
+    if (duplicateHeading) {
+      alerts.push({
+        message: `Duplicate heading "${duplicateHeading.text}" found.`,
+        tone: 'info',
+        targetId: duplicateHeading.id,
+      });
+    }
+
     if (diagramErrors) {
       const target = root.querySelector('.mermaid-error, .diagram-error');
       alerts.push({
@@ -391,6 +421,30 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       });
     }
 
+    if (unresolvedWikilinks.length) {
+      alerts.push({
+        message: `${unresolvedWikilinks.length} unresolved wikilink${unresolvedWikilinks.length === 1 ? '' : 's'} found.`,
+        tone: 'warning',
+        targetId: ensureElementId(unresolvedWikilinks[0], 'broken-wikilink'),
+      });
+    }
+
+    if (brokenRelativeLinks.length) {
+      alerts.push({
+        message: `${brokenRelativeLinks.length} relative document link${brokenRelativeLinks.length === 1 ? '' : 's'} do not match loaded files.`,
+        tone: 'warning',
+        targetId: ensureElementId(brokenRelativeLinks[0], 'broken-link'),
+      });
+    }
+
+    if (missingImages.length) {
+      alerts.push({
+        message: `${missingImages.length} local image reference${missingImages.length === 1 ? '' : 's'} are not managed session assets.`,
+        tone: 'warning',
+        targetId: ensureElementId(missingImages[0], 'missing-image'),
+      });
+    }
+
     if (state.files.length > 1 && state.dirtyPaths.size) {
       alerts.push({
         message: `${state.dirtyPaths.size} file${state.dirtyPaths.size === 1 ? '' : 's'} edited in memory.`,
@@ -405,6 +459,8 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       metrics: [
         { label: 'Headings', value: headings.length },
         { label: 'Links', value: links.length },
+        { label: 'Broken links', value: unresolvedWikilinks.length + brokenRelativeLinks.length },
+        { label: 'Images', value: root.querySelectorAll('img').length },
         { label: 'Tables', value: tables },
         { label: 'Code', value: codeBlocks },
         { label: 'Diagrams', value: diagrams },
@@ -432,7 +488,29 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     return null;
   }
 
+  function findDuplicateHeading(headings) {
+    const seen = new Set();
+    for (const heading of headings) {
+      const text = heading.textContent.trim().toLowerCase();
+      if (!text) continue;
+      if (seen.has(text)) return { id: heading.id, text: heading.textContent.trim() };
+      seen.add(text);
+    }
+    return null;
+  }
+
   function handleReviewTargetClick(event) {
+    const governance = event.target.closest('[data-governance-path]');
+    if (governance) {
+      openGovernanceIssue?.(
+        governance.dataset.governancePath,
+        Number(governance.dataset.governanceLine || '1'),
+        Number(governance.dataset.governanceColumn || '1'),
+        Number(governance.dataset.governanceLength || '1'),
+      );
+      return;
+    }
+
     const backlink = event.target.closest('[data-backlink-path]');
     if (backlink) {
       openBacklink?.(backlink.dataset.backlinkPath, Number(backlink.dataset.backlinkLine || '1'));
@@ -442,6 +520,103 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     const item = event.target.closest('[data-review-target]');
     if (!item) return;
     scrollPreviewTarget(preview.querySelector(`#${cssEscape(item.dataset.reviewTarget)}`));
+  }
+
+  function isBrokenRelativeDocumentLink(link) {
+    if (link.dataset.wikilinkTarget) return false;
+    const href = link.getAttribute('href') || '';
+    if (!href || href.startsWith('#') || /^(https?:|mailto:|blob:|data:)/i.test(href)) return false;
+    const target = href.split(/[?#]/)[0];
+    if (!target || /\.(png|jpe?g|gif|webp|svg|pdf|zip)$/i.test(target)) return false;
+    return !resolveWikilinkTarget(target, state.files, state.activePath);
+  }
+
+  function isMissingManagedImage(image) {
+    const src = image.getAttribute('src') || '';
+    if (!src || /^(https?:|blob:|data:)/i.test(src)) return false;
+    const path = normaliseRelativeAssetPath(src);
+    return !state.managedAssets?.has(path);
+  }
+
+  function normaliseRelativeAssetPath(value) {
+    const activeDir = state.activePath.includes('/') ? state.activePath.slice(0, state.activePath.lastIndexOf('/') + 1) : '';
+    return String(`${activeDir}${value}`)
+      .replace(/\\/g, '/')
+      .replace(/^\.\/+/, '')
+      .replace(/\/\.\//g, '/')
+      .replace(/[^/]+\/\.\.\//g, '');
+  }
+
+  async function updateGovernanceAudit(review) {
+    if (!getGovernanceAudit || !state.documentReviewOpen) return;
+    const runId = ++governanceRunId;
+    const marker = document.createElement('div');
+    marker.className = 'document-review-links document-governance-audit';
+    marker.textContent = 'Checking Markdown governance...';
+    documentReviewAlerts.appendChild(marker);
+
+    const audit = await getGovernanceAudit();
+    if (!marker.isConnected || runId !== governanceRunId || !state.documentReviewOpen) return;
+
+    const issues = audit?.issues || [];
+    const summary = audit?.summary || {
+      fileCount: 0,
+      issueCount: issues.length,
+      warningCount: issues.filter((issue) => issue.severity !== 'info').length,
+      infoCount: issues.filter((issue) => issue.severity === 'info').length,
+      activeIssueCount: issues.filter((issue) => issue.path === state.activePath).length,
+      workspaceIssueCount: issues.filter((issue) => issue.path !== state.activePath).length,
+      ruleCounts: [],
+    };
+
+    updateReviewSummary(review, summary);
+    appendReviewMetric('Governance', summary.issueCount);
+    appendReviewMetric('Warnings', summary.warningCount);
+    appendReviewMetric('Suggestions', summary.infoCount);
+
+    marker.innerHTML = '';
+    const title = document.createElement('strong');
+    title.textContent = `Governance (${summary.issueCount})`;
+    marker.appendChild(title);
+
+    const scope = document.createElement('span');
+    scope.textContent = `Scanned ${summary.fileCount} file${summary.fileCount === 1 ? '' : 's'}: ${summary.activeIssueCount} here, ${summary.workspaceIssueCount} elsewhere.`;
+    marker.appendChild(scope);
+
+    if (!issues.length) {
+      const ok = document.createElement('span');
+      ok.textContent = 'No Markdown governance issues found.';
+      marker.appendChild(ok);
+      return;
+    }
+
+    const groups = document.createElement('div');
+    groups.className = 'document-governance-groups';
+    summary.ruleCounts.forEach((group) => {
+      const item = document.createElement('span');
+      item.className = 'document-review-metric';
+      item.textContent = `${group.label}: ${group.count}`;
+      groups.appendChild(item);
+    });
+    marker.appendChild(groups);
+
+    issues.slice(0, 12).forEach((issue) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `document-review-note ${issue.severity === 'info' ? 'info' : 'warning'}`;
+      button.dataset.governancePath = issue.path;
+      button.dataset.governanceLine = String(issue.line);
+      button.dataset.governanceColumn = String(issue.column);
+      button.dataset.governanceLength = String(issue.length || 1);
+      button.textContent = `${issue.path}:${issue.line} ${issue.message}${issue.suggestion ? ` ${issue.suggestion}` : ''}`;
+      marker.appendChild(button);
+    });
+
+    if (issues.length > 12) {
+      const remaining = document.createElement('span');
+      remaining.textContent = `${issues.length - 12} more issue${issues.length - 12 === 1 ? '' : 's'} in the loaded workspace.`;
+      marker.appendChild(remaining);
+    }
   }
 
   async function updateBacklinks() {
@@ -472,6 +647,41 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       button.dataset.backlinkLine = String(link.line);
       button.textContent = `${link.path}:${link.line} -> ${link.label || link.target}`;
       marker.appendChild(button);
+    });
+  }
+
+  async function updateWorkspaceAudit() {
+    if (!getWorkspaceAudit || !state.documentReviewOpen) return;
+    const marker = document.createElement('div');
+    marker.className = 'document-review-links';
+    marker.textContent = 'Checking workspace links...';
+    documentReviewAlerts.appendChild(marker);
+
+    const audit = await getWorkspaceAudit();
+    if (!marker.isConnected) return;
+    marker.innerHTML = '';
+    const title = document.createElement('strong');
+    title.textContent = 'Workspace audit';
+    marker.appendChild(title);
+
+    const notes = [
+      audit.brokenLinkCount ? `${audit.brokenLinkCount} broken workspace link${audit.brokenLinkCount === 1 ? '' : 's'}.` : '',
+      audit.orphanAssetCount ? `${audit.orphanAssetCount} managed asset${audit.orphanAssetCount === 1 ? '' : 's'} not referenced by loaded Markdown.` : '',
+      audit.unlinkedPageCount ? `${audit.unlinkedPageCount} page${audit.unlinkedPageCount === 1 ? '' : 's'} without backlinks.` : '',
+    ].filter(Boolean);
+
+    if (!notes.length) {
+      const ok = document.createElement('span');
+      ok.textContent = 'No workspace-level link or asset issues found.';
+      marker.appendChild(ok);
+      return;
+    }
+
+    notes.forEach((note) => {
+      const item = document.createElement('div');
+      item.className = 'document-review-note warning';
+      item.textContent = note;
+      marker.appendChild(item);
     });
   }
 

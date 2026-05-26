@@ -5,6 +5,7 @@ import { escapeHtml, escapeXml, sanitiseFileName, slugify } from '../utils/forma
 import { createZipBlob, wrapBase64 } from '../utils/zip.js';
 import { formatMarkdownForDevOpsBundle } from '../utils/devops-markdown.js';
 import { resolveWikilinkTarget, stripAppWikilinkActions } from '../utils/wikilinks.js';
+import { parseFrontMatter } from '../utils/front-matter.js';
 import {
   buildCspMeta,
   buildDocsSiteCsp,
@@ -14,8 +15,8 @@ import {
   sanitizeRenderedHtml,
 } from '../utils/security.js';
 
-const APP_NAME = 'Local Docs Studio';
-const MARKDOWN_BUNDLE_MANIFEST_NAME = 'local-docs-studio-bundle.json';
+const APP_NAME = 'Lens Docs Studio';
+const MARKDOWN_BUNDLE_MANIFEST_NAME = 'lens-docs-studio-bundle.json';
 
 export function createExportService({
   state,
@@ -595,10 +596,11 @@ export function createExportService({
 
       try {
         closeOpenMenus();
+        const profileDefaults = state.exportProfileDefaults?.docsSite || {};
         const defaults = {
-          title: state.folderName || getExportTitle() || 'Docs site',
-          description: `Static documentation bundle with ${records.length} page${records.length === 1 ? '' : 's'}.`,
-          theme: 'system',
+          title: profileDefaults.title || state.folderName || getExportTitle() || 'Docs site',
+          description: profileDefaults.description || `Static documentation bundle with ${records.length} page${records.length === 1 ? '' : 's'}.`,
+          theme: profileDefaults.theme || 'system',
         };
         const options = await promptDocsSiteOptions(defaults);
         if (!options) {
@@ -686,9 +688,9 @@ export function createExportService({
               <div class="template-field">
                 <label for="docs-site-theme">Initial theme</label>
                 <select id="docs-site-theme" name="theme">
-                  <option value="system" selected>System</option>
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
+                  <option value="system"${defaults.theme === 'system' ? ' selected' : ''}>System</option>
+                  <option value="light"${defaults.theme === 'light' ? ' selected' : ''}>Light</option>
+                  <option value="dark"${defaults.theme === 'dark' ? ' selected' : ''}>Dark</option>
                 </select>
                 <small>The exported site includes its own Light/Dark/System switcher.</small>
               </div>
@@ -743,10 +745,12 @@ export function createExportService({
 
     async function renderRecordForDocsSite(record, index, usedIds) {
       const source = await readRecordText(record);
-      const selectedMode = resolveModeFor(source, record.name);
+      const frontMatter = parseFrontMatter(source);
+      const sourceBody = frontMatter.body;
+      const selectedMode = resolveModeFor(sourceBody, record.name);
       const dirtyHtml = selectedMode === 'mermaid'
-        ? buildMermaidOnlyHtml(source)
-        : await buildMarkdownHtml(source);
+        ? buildMermaidOnlyHtml(sourceBody)
+        : await buildMarkdownHtml(sourceBody);
       const container = document.createElement('article');
       container.innerHTML = sanitizeRenderedHtml(dirtyHtml);
       const fileStem = sanitiseFileName(record.name.replace(/\.[^.]+$/, '')) || `page-${index + 1}`;
@@ -759,7 +763,8 @@ export function createExportService({
       container.querySelectorAll('.diagram-error-actions').forEach((actions) => actions.remove());
       rewriteManagedAssetImageSources(container, record.path);
 
-      const title = extractDocumentTitle(container, record);
+      const metadata = frontMatter.metadata;
+      const title = metadata.title || extractDocumentTitle(container, record);
       const id = makeUniqueDocId(record.path, index, usedIds);
       const headings = decorateDocsSiteHeadings(container);
       const searchSections = extractDocsSiteSearchSections(container, headings, title, record.path);
@@ -770,6 +775,12 @@ export function createExportService({
         path: record.path,
         sourceName: record.name,
         html: container.innerHTML,
+        metadata,
+        description: metadata.description || '',
+        order: metadata.order,
+        tags: metadata.tags || [],
+        draft: Boolean(metadata.draft),
+        navGroup: metadata.navGroup || '',
         headings,
         searchSections,
         diagramTotal: diagrams.length,
@@ -957,10 +968,11 @@ export function createExportService({
     }
 
     function buildDocsSitePages(sourcePages, options) {
-      const homeCandidate = sourcePages.find((page) => /(^|\/)(readme|index)\.(md|markdown)$/i.test(page.path));
+      const orderedSourcePages = [...sourcePages].sort(compareDocsSitePages);
+      const homeCandidate = orderedSourcePages.find((page) => /(^|\/)(readme|index)\.(md|markdown)$/i.test(page.path));
       if (homeCandidate) {
         return {
-          pages: sourcePages,
+          pages: orderedSourcePages,
           homePage: {
             id: homeCandidate.id,
             title: homeCandidate.title,
@@ -970,11 +982,11 @@ export function createExportService({
         };
       }
 
-      const sourcePageCards = sourcePages.map((page) => `<a class="home-card" href="#${escapeHtml(page.id)}" data-page-id="${escapeHtml(page.id)}">
-        <strong>${escapeHtml(page.title)}</strong>
-        <span>${escapeHtml(page.path)}</span>
+      const sourcePageCards = orderedSourcePages.map((page) => `<a class="home-card" href="#${escapeHtml(page.id)}" data-page-id="${escapeHtml(page.id)}">
+        <strong>${escapeHtml(page.title)}${page.draft ? ' <span class="draft-badge">Draft</span>' : ''}</strong>
+        <span>${escapeHtml(page.description || page.path)}</span>
       </a>`).join('');
-      const homeId = makeUniqueGeneratedPageId('home', new Set(sourcePages.map((page) => page.id)));
+      const homeId = makeUniqueGeneratedPageId('home', new Set(orderedSourcePages.map((page) => page.id)));
       const generatedHome = {
         id: homeId,
         title: options.title,
@@ -985,8 +997,8 @@ export function createExportService({
           <h1 id="overview" tabindex="-1">${escapeHtml(options.title)}</h1>
           <p>${escapeHtml(options.description || 'Browse the exported Markdown and Mermaid documentation.')}</p>
           <div class="docs-home-stats">
-            <span><strong>${sourcePages.length}</strong> page${sourcePages.length === 1 ? '' : 's'}</span>
-            <span><strong>${sourcePages.reduce((sum, page) => sum + page.diagramTotal, 0)}</strong> diagram${sourcePages.reduce((sum, page) => sum + page.diagramTotal, 0) === 1 ? '' : 's'}</span>
+            <span><strong>${orderedSourcePages.length}</strong> page${orderedSourcePages.length === 1 ? '' : 's'}</span>
+            <span><strong>${orderedSourcePages.reduce((sum, page) => sum + page.diagramTotal, 0)}</strong> diagram${orderedSourcePages.reduce((sum, page) => sum + page.diagramTotal, 0) === 1 ? '' : 's'}</span>
           </div>
           <div class="home-card-grid">${sourcePageCards}</div>
         </section>`,
@@ -996,7 +1008,7 @@ export function createExportService({
           headingText: options.title,
           level: 1,
           path: 'Home',
-          text: normaliseDocsSiteText(`${options.title} ${options.description} ${sourcePages.map((page) => `${page.title} ${page.path}`).join(' ')}`),
+          text: normaliseDocsSiteText(`${options.title} ${options.description} ${orderedSourcePages.map((page) => `${page.title} ${page.path} ${page.tags?.join(' ') || ''}`).join(' ')}`),
         }],
         diagramTotal: 0,
         diagramErrors: 0,
@@ -1004,7 +1016,7 @@ export function createExportService({
       };
 
       return {
-        pages: [generatedHome, ...sourcePages],
+        pages: [generatedHome, ...orderedSourcePages],
         homePage: {
           id: generatedHome.id,
           title: generatedHome.title,
@@ -1012,6 +1024,15 @@ export function createExportService({
           generated: true,
         },
       };
+    }
+
+    function compareDocsSitePages(left, right) {
+      const leftOrder = Number.isFinite(left.order) ? left.order : Number.POSITIVE_INFINITY;
+      const rightOrder = Number.isFinite(right.order) ? right.order : Number.POSITIVE_INFINITY;
+      return leftOrder - rightOrder
+        || String(left.navGroup || '').localeCompare(String(right.navGroup || ''))
+        || String(left.title || '').localeCompare(String(right.title || ''))
+        || String(left.path || '').localeCompare(String(right.path || ''));
     }
 
     function makeUniqueGeneratedPageId(base, usedIds) {
@@ -1036,6 +1057,10 @@ export function createExportService({
           title: page.title,
           path: page.path,
           html: page.html,
+          description: page.description || '',
+          tags: page.tags || [],
+          draft: Boolean(page.draft),
+          navGroup: page.navGroup || '',
           headings: page.headings,
           diagramTotal: page.diagramTotal,
           diagramErrors: page.diagramErrors,
@@ -1049,7 +1074,7 @@ export function createExportService({
           headingId: section.headingId,
           headingText: section.headingText,
           level: section.level,
-          text: section.text,
+          text: normaliseDocsSiteText(`${section.text} ${page.description || ''} ${(page.tags || []).join(' ')} ${page.navGroup || ''}`),
         }))),
       };
     }
@@ -1071,10 +1096,15 @@ export function createExportService({
           'assets/docs-site.js',
           'assets/search-index.json',
         ],
-        pages: pages.map(({ id, title: pageTitle, path, headings, diagramTotal: pageDiagrams, diagramErrors: pageErrors, generatedHome }) => ({
+        pages: pages.map(({ id, title: pageTitle, path, description: pageDescription, order, tags, draft, navGroup, headings, diagramTotal: pageDiagrams, diagramErrors: pageErrors, generatedHome }) => ({
           id,
           title: pageTitle,
           path,
+          description: pageDescription || '',
+          order: Number.isFinite(order) ? order : null,
+          tags: tags || [],
+          draft: Boolean(draft),
+          navGroup: navGroup || '',
           headings: headings.map(({ id: headingId, text, level }) => ({ id: headingId, text, level })),
           diagrams: pageDiagrams,
           diagramErrors: pageErrors,
@@ -1130,8 +1160,8 @@ export function createExportService({
   --border: #d5dce8;
   --text: #0f172a;
   --muted: #64748b;
-  --accent: #0369a1;
-  --accent-soft: #dbeafe;
+  --accent: #D95F16;
+  --accent-soft: #FFF1E8;
   --code: #f1f5f9;
   --danger: #be123c;
   --shadow: 0 18px 48px rgba(15, 23, 42, .08);
@@ -1145,8 +1175,8 @@ export function createExportService({
   --border: #24364f;
   --text: #e5eefb;
   --muted: #9aa8bc;
-  --accent: #38bdf8;
-  --accent-soft: #12324a;
+  --accent: #FF883E;
+  --accent-soft: #3A261C;
   --code: #08111f;
   --danger: #fb7185;
   --shadow: 0 18px 48px rgba(0, 0, 0, .28);
@@ -1168,6 +1198,7 @@ input { width: 100%; border: 1px solid var(--border); border-radius: 999px; padd
 nav, .search-results { overflow: auto; padding: .7rem; }
 .nav-page, .nav-heading, .search-result { display: block; width: 100%; border: 0; text-align: left; text-decoration: none; cursor: pointer; }
 .nav-page { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: .56rem .65rem; border-radius: .65rem; color: var(--muted); background: transparent; }
+.nav-section-label { display: block; padding: .7rem .65rem .25rem; color: var(--muted); font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 .nav-page:hover, .nav-page:focus-visible, .nav-heading:hover, .nav-heading:focus-visible, .search-result:hover, .search-result:focus-visible { color: var(--text); background: var(--surface-soft); outline: none; }
 .nav-page.active { color: var(--text); background: var(--accent-soft); }
 .nav-heading { margin-top: .12rem; padding: .32rem .6rem; border-radius: .55rem; color: var(--muted); background: transparent; font-size: .86rem; }
@@ -1182,7 +1213,9 @@ nav, .search-results { overflow: auto; padding: .7rem; }
 .search-result mark { border-radius: .25rem; background: #fde68a; color: #111827; padding: 0 .12rem; }
 main { min-width: 0; padding: clamp(1rem, 3vw, 2.5rem); }
 .doc-shell { max-width: 76rem; margin: 0 auto; }
-.doc-meta { margin-bottom: 1rem; color: var(--muted); font-size: .9rem; }
+.doc-meta { display: flex; flex-wrap: wrap; gap: .45rem; margin-bottom: 1rem; color: var(--muted); font-size: .9rem; }
+.doc-meta span, .draft-badge { display: inline-flex; align-items: center; min-height: 1.45rem; border: 1px solid var(--border); border-radius: 999px; padding: .16rem .5rem; background: var(--surface-soft); }
+.draft-badge { color: var(--danger); font-size: .72rem; font-weight: 800; text-transform: uppercase; }
 article { padding: clamp(1rem, 3vw, 2.5rem); border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow); }
 article :first-child { margin-top: 0; }
 article :last-child { margin-bottom: 0; }
@@ -1336,10 +1369,15 @@ th { background: var(--surface-soft); }
   }
 
   function renderNav() {
+    let lastGroup = null;
     nav.innerHTML = pages.map((page) => {
+      const group = page.navGroup || '';
+      const groupLabel = group && group !== lastGroup ? '<span class="nav-section-label">' + escapeHtml(group) + '</span>' : '';
+      lastGroup = group;
       const pageActive = page.id === currentId ? ' active' : '';
       const headings = page.id === currentId ? renderHeadingNav(page) : '';
-      return '<div class="nav-group"><a class="nav-page' + pageActive + '" href="#' + page.id + '" data-page-id="' + page.id + '" title="' + escapeHtml(page.path) + '">' + escapeHtml(page.title) + '</a>' + headings + '</div>';
+      const draft = page.draft ? ' <span class="draft-badge">Draft</span>' : '';
+      return groupLabel + '<div class="nav-group"><a class="nav-page' + pageActive + '" href="#' + page.id + '" data-page-id="' + page.id + '" title="' + escapeHtml(page.path) + '">' + escapeHtml(page.title) + draft + '</a>' + headings + '</div>';
     }).join('') || '<div class="empty">No pages exported.</div>';
   }
 
@@ -1403,7 +1441,7 @@ th { background: var(--surface-soft); }
     currentId = page.id;
     currentHeadingId = headingId;
     document.title = page.title + ' - ' + data.title;
-    docMeta.textContent = page.path + (page.diagramErrors ? ' - ' + page.diagramErrors + ' diagram error' + (page.diagramErrors === 1 ? '' : 's') : '');
+    docMeta.innerHTML = renderDocMeta(page);
     content.innerHTML = page.html || '<p>No content.</p>';
     decorateContentLinks();
     renderNav();
@@ -1413,6 +1451,18 @@ th { background: var(--surface-soft); }
       (target || content).scrollIntoView({ block: 'start' });
       target?.focus?.({ preventScroll: true });
     });
+  }
+
+  function renderDocMeta(page) {
+    const items = [
+      page.path,
+      page.description || '',
+      page.navGroup || '',
+      page.draft ? 'Draft' : '',
+      ...(page.tags || []).map((tag) => '#' + tag),
+      page.diagramErrors ? page.diagramErrors + ' diagram error' + (page.diagramErrors === 1 ? '' : 's') : '',
+    ].filter(Boolean);
+    return items.map((item) => '<span>' + escapeHtml(item) + '</span>').join('');
   }
 
   function decorateContentLinks() {
@@ -1774,7 +1824,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     th, td { border: 1px solid #d5dce8; padding: .58rem .72rem; text-align: left; }
     th { background: #e2e8f0; }
     img { max-width: 100%; height: auto; border-radius: .7rem; }
-    blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid #38bdf8; color: #475569; }
+    blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid #FF883E; color: #475569; }
     ${buildCodeBlockSupportCss()}
     ${buildTableActionSupportCss()}
     ${buildDiagramActionSupportCss()}
@@ -1813,14 +1863,14 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     h3 { font-size: 16pt; }
     h4 { font-size: 13pt; }
     p, li, blockquote, table, pre, figure { break-inside: avoid; }
-    a { color: #0369a1; }
+    a { color: #D95F16; }
     img { max-width: 100%; height: auto; }
     pre { overflow: visible; white-space: pre-wrap; word-break: break-word; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 9.5pt; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #d5dce8; padding: 5pt 7pt; text-align: left; }
     th { background: #eef2f7; }
-    blockquote { margin-inline: 0; padding-left: 12pt; border-left: 3pt solid #38bdf8; color: #475569; }
+    blockquote { margin-inline: 0; padding-left: 12pt; border-left: 3pt solid #FF883E; color: #475569; }
     .code-block { margin: 12pt 0; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     .code-block pre { margin: 0; border: 0; background: transparent; }
     .diagram-frame { overflow: visible; margin: 12pt 0; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #ffffff; break-inside: avoid; }
@@ -1853,7 +1903,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .code-block-header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; min-width: 0; padding: .48rem .62rem; border-bottom: 1px solid #d5dce8; background: #eef4fb; }
     .code-block-language { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .code-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .code-copy-button:hover, .code-copy-button:focus-visible { border-color: #0284c7; outline: none; }
+    .code-copy-button:hover, .code-copy-button:focus-visible { border-color: #FF883E; outline: none; }
     .code-copy-button:disabled { cursor: default; opacity: .72; }
     .code-block pre { overflow: auto; margin: 0; padding: 1rem; border: 0; border-radius: 0; background: transparent; }
     .code-block code { display: block; min-width: max-content; color: #0f172a; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: .9rem; line-height: 1.58; white-space: pre; }
@@ -1916,7 +1966,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .table-block-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .table-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
     .table-action-button, .table-copy-button { flex: 0 0 auto; min-width: 4rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .58rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #0284c7; outline: none; }
+    .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #FF883E; outline: none; }
     .table-action-button:disabled, .table-copy-button:disabled { cursor: default; opacity: .72; }
     .table-block table { width: 100%; margin: 0; border-collapse: collapse; }`;
     }
@@ -2046,7 +2096,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .diagram-toolbar-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #475569; font-size: .76rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
     .diagram-action-group { display: flex; flex: 0 0 auto; align-items: center; gap: .35rem; }
     .diagram-action-button { min-width: 3.2rem; border: 1px solid #cbd5e1; border-radius: .58rem; background: #fff; color: #0f172a; padding: .34rem .55rem; cursor: pointer; font: inherit; font-size: .76rem; line-height: 1; }
-    .diagram-action-button:hover, .diagram-action-button:focus-visible { border-color: #0284c7; outline: none; }
+    .diagram-action-button:hover, .diagram-action-button:focus-visible { border-color: #FF883E; outline: none; }
     .diagram-action-button:disabled { cursor: default; opacity: .72; }
     @media (max-width: 640px) { .diagram-toolbar { align-items: stretch; } .diagram-action-group { width: 100%; } .diagram-action-button { flex: 1 1 0; } }`;
     }
@@ -2643,13 +2693,13 @@ ${buildWordBodyXml(root, imageRelationships)}
     h3 { font-size: 14pt; }
     h4 { font-size: 12pt; }
     p { margin: 0 0 8pt; }
-    a { color: #0369a1; text-decoration: underline; }
+    a { color: #D95F16; text-decoration: underline; }
     pre { white-space: pre-wrap; word-wrap: break-word; margin: 10pt 0; padding: 9pt; border: 1pt solid #d5dce8; background: #f8fafc; font-family: Consolas, Courier New, monospace; font-size: 9.5pt; }
     code { font-family: Consolas, Courier New, monospace; font-size: 9.5pt; }
     table { width: 100%; border-collapse: collapse; margin: 10pt 0; }
     th, td { border: 1pt solid #d5dce8; padding: 5pt 6pt; text-align: left; vertical-align: top; }
     th { background: #e2e8f0; color: #0f172a; font-weight: bold; }
-    blockquote { margin: 8pt 0; padding: 4pt 0 4pt 10pt; border-left: 3pt solid #38bdf8; color: #475569; }
+    blockquote { margin: 8pt 0; padding: 4pt 0 4pt 10pt; border-left: 3pt solid #FF883E; color: #475569; }
     ul, ol { margin-top: 0; margin-bottom: 8pt; }
     .diagram-frame { margin: 12pt 0; padding: 9pt; border: 1pt solid #d5dce8; background: #ffffff; }
     .diagram-image { display: block; max-width: 100%; height: auto; }
