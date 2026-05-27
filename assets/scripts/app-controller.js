@@ -15,6 +15,7 @@ import { createExportService } from './exports/export-service.js';
 import { createExportProfileService } from './exports/export-profile-service.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
+import { createDialogService } from './ui/dialog-service.js';
 import { createUiService } from './ui/ui-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
@@ -119,6 +120,15 @@ export function createAppController() {
       templateDialogDescription,
       templateDialogFields,
       templateDialogSubmit,
+      appDialog,
+      appDialogForm,
+      appDialogKicker,
+      appDialogTitle,
+      appDialogMessage,
+      appDialogFields,
+      appDialogCloseButton,
+      appDialogCancelButton,
+      appDialogConfirmButton,
       focusModeButton,
       focusModeExitButton,
       sidebarCollapseBtn,
@@ -199,6 +209,20 @@ export function createAppController() {
     let openInsertHelper = () => {};
     let openArtifactReaderPath = async () => {};
     let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
+    const dialogTools = createDialogService({
+      dom: {
+        appDialog,
+        appDialogForm,
+        appDialogKicker,
+        appDialogTitle,
+        appDialogMessage,
+        appDialogFields,
+        appDialogCloseButton,
+        appDialogCancelButton,
+        appDialogConfirmButton,
+      },
+    });
+    const { confirm: confirmDialog, prompt: promptDialog } = dialogTools;
     const {
       recordEditorHistoryInput,
       resetEditorHistory,
@@ -291,6 +315,7 @@ export function createAppController() {
       },
       callbacks: {
         openArtifactPath: (path) => openArtifactReaderPath(path),
+        confirm: confirmDialog,
       },
     });
     const draftTools = createDraftService({
@@ -317,6 +342,7 @@ export function createAppController() {
         updateSaveButton,
         resetEditorHistory,
         renderPreview: () => renderPreview(),
+        confirmAction: confirmDialog,
       },
     });
     const findReplaceTools = createFindReplaceService({
@@ -534,6 +560,7 @@ export function createAppController() {
       copyDiagramSource,
       exportDiagramFrameSvg,
       exportDiagramFramePng,
+      copyDiagramFramePng,
       exportPreviewHtml,
       exportPreviewWord,
       exportPreviewPdf,
@@ -617,6 +644,8 @@ export function createAppController() {
         afterActiveFileLoaded: draftTools.afterActiveFileLoaded,
         beforeSaveActiveFile: draftTools.beforeSaveActiveFile,
         afterSaveActiveFile: draftTools.afterSaveActiveFile,
+        promptForText: promptDialog,
+        confirmAction: confirmDialog,
       },
       helpers: {
         compareRecords,
@@ -668,6 +697,7 @@ export function createAppController() {
         copyTableBlock,
         downloadTableCsv,
         copyToClipboard,
+        copyDiagramFramePng,
         executeMarkdownCommand,
         exportDiagramFramePng,
         exportDiagramFrameSvg,
@@ -704,6 +734,7 @@ export function createAppController() {
     restoreDevOpsMarkdownExport();
     updateDocsPreviewButton();
     updateStudioMode();
+    dialogTools.installDialogHandlers();
     installResizers();
     draftTools.initDraftStore();
     draftTools.installDraftHandlers();
@@ -797,8 +828,8 @@ export function createAppController() {
 
       document.querySelectorAll('[data-local-library-action]').forEach((button) => {
         button.addEventListener('click', async () => {
-          if (button.dataset.localLibraryAction === 'saveTemplate') saveCurrentDocumentAsLocalTemplate();
-          if (button.dataset.localLibraryAction === 'saveSnippet') saveSelectionAsLocalSnippet();
+          if (button.dataset.localLibraryAction === 'saveTemplate') await saveCurrentDocumentAsLocalTemplate();
+          if (button.dataset.localLibraryAction === 'saveSnippet') await saveSelectionAsLocalSnippet();
           if (button.dataset.localLibraryAction === 'exportLibrary') exportLocalLibrary();
           if (button.dataset.localLibraryAction === 'importLibrary') await importLocalLibrary();
           closeOpenMenus();
@@ -819,7 +850,7 @@ export function createAppController() {
       });
 
       document.querySelectorAll('[data-studio-template]').forEach((button) => {
-        button.addEventListener('click', () => loadStudioTemplate(button.dataset.studioTemplate));
+        button.addEventListener('click', async () => loadStudioTemplate(button.dataset.studioTemplate));
       });
 
       document.querySelectorAll('[data-studio-snippet]').forEach((button) => {
@@ -832,7 +863,7 @@ export function createAppController() {
           if (button.dataset.menuAction === 'openFile') await openFile();
           if (button.dataset.menuAction === 'openFolder') await openFolder();
           if (button.dataset.menuAction === 'addFile') await addFilesToWorkspace();
-          if (button.dataset.menuAction === 'importZip') importZip();
+          if (button.dataset.menuAction === 'importZip') await importZip();
           if (button.dataset.menuAction === 'importDocument') importDocument();
           if (button.dataset.menuAction === 'save') await saveActiveFile();
           if (button.dataset.menuAction === 'saveAs') await saveActiveFileAs();
@@ -874,8 +905,8 @@ export function createAppController() {
       });
 
       document.querySelectorAll('[data-export-profile-action]').forEach((button) => {
-        button.addEventListener('click', () => {
-          if (button.dataset.exportProfileAction === 'save') saveExportProfile();
+        button.addEventListener('click', async () => {
+          if (button.dataset.exportProfileAction === 'save') await saveExportProfile();
           if (button.dataset.exportProfileAction === 'apply') applyExportProfile();
           closeOpenMenus();
         });
@@ -1156,7 +1187,6 @@ export function createAppController() {
         const files = [...(event.dataTransfer?.files ?? [])];
         const zipFiles = files.filter(isZipFile);
         if (zipFiles.length) {
-          if (!confirmDiscardUnsaved('Import this ZIP and discard unsaved edits?')) return;
           await importZipFile(zipFiles[0]);
           return;
         }
@@ -1193,7 +1223,7 @@ export function createAppController() {
           return;
         }
 
-        if (!confirmDiscardUnsaved('Open dropped files and discard unsaved edits?')) return;
+        if (!await confirmDiscardUnsaved('Open dropped files and discard unsaved edits?')) return;
 
         await setLibraryFromRecords(dropped, dropped.length === 1 ? 'Dropped file' : 'Dropped files');
       });
@@ -1519,6 +1549,7 @@ export function createAppController() {
       state.externalChangePaths?.clear();
       state.workspaceDirectoryHandle = null;
       state.workspaceKind = '';
+      state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
       exportProfileTools.resetSessionProfile();
     }
@@ -1530,8 +1561,42 @@ export function createAppController() {
       const end = Math.min(editor.value.length, start + Math.max(1, Number(length) || 1));
       editor.focus();
       editor.setSelectionRange(start, end);
-      const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 22;
-      editor.scrollTop = Math.max(0, (targetLine - 1) * lineHeight - editor.clientHeight * 0.32);
+      scrollEditorToIndex(start, 0.32);
+    }
+
+    function scrollEditorToIndex(index, viewportRatio = 0.25) {
+      const target = Math.max(0, Math.min(Number(index) || 0, editor.value.length));
+      const style = getComputedStyle(editor);
+      const mirror = document.createElement('div');
+      const marker = document.createElement('span');
+
+      mirror.style.position = 'absolute';
+      mirror.style.visibility = 'hidden';
+      mirror.style.pointerEvents = 'none';
+      mirror.style.left = '-9999px';
+      mirror.style.top = '0';
+      mirror.style.boxSizing = style.boxSizing;
+      mirror.style.width = `${editor.clientWidth}px`;
+      mirror.style.minHeight = '0';
+      mirror.style.padding = style.padding;
+      mirror.style.border = '0';
+      mirror.style.font = style.font;
+      mirror.style.letterSpacing = style.letterSpacing;
+      mirror.style.lineHeight = style.lineHeight;
+      mirror.style.tabSize = style.tabSize;
+      mirror.style.whiteSpace = style.whiteSpace;
+      mirror.style.overflowWrap = style.overflowWrap;
+      mirror.style.wordBreak = style.wordBreak;
+      mirror.style.overflow = 'hidden';
+
+      marker.textContent = '\u200b';
+      mirror.append(document.createTextNode(editor.value.slice(0, target)), marker);
+      document.body.appendChild(mirror);
+      const markerTop = marker.offsetTop;
+      mirror.remove();
+
+      editor.scrollTop = Math.max(0, markerTop - editor.clientHeight * viewportRatio);
+      editor.dispatchEvent(new Event('scroll'));
     }
 
     async function getBacklinks() {
@@ -2141,7 +2206,7 @@ ${unresolvedRows}
     }
 
     async function loadExample(key) {
-      if (!confirmDiscardUnsaved('Load this example and discard unsaved edits?')) return;
+      if (!await confirmDiscardUnsaved('Load this example and discard unsaved edits?')) return;
 
       if (key === 'sample') {
         initialiseSample();
@@ -2156,7 +2221,7 @@ ${unresolvedRows}
     }
 
     async function openToolGuide() {
-      if (!confirmDiscardUnsaved('Open the feature guide and discard unsaved edits?')) return;
+      if (!await confirmDiscardUnsaved('Open the feature guide and discard unsaved edits?')) return;
 
       try {
         setStatus('Opening feature guide...');
@@ -2198,10 +2263,10 @@ ${unresolvedRows}
       }
     }
 
-    function loadStudioTemplate(key) {
+    async function loadStudioTemplate(key) {
       const template = studioTemplates[key];
       if (!template) return;
-      if (!confirmDiscardUnsaved(`Load the ${template.label} template and discard unsaved edits?`)) return;
+      if (!await confirmDiscardUnsaved(`Load the ${template.label} template and discard unsaved edits?`)) return;
       state.studioMode = true;
       localStorage.setItem(storageKeys.studioMode, 'true');
       clearGeneratorMode();
@@ -2268,7 +2333,7 @@ ${unresolvedRows}
       }
 
       const { group, value: template } = resolved;
-      if (!confirmDiscardUnsaved(`Create ${template.label} and discard unsaved edits?`)) return;
+      if (!await confirmDiscardUnsaved(`Create ${template.label} and discard unsaved edits?`)) return;
 
       closeOpenMenus();
       const metadata = await promptTemplateMetadata(template, group);
@@ -2363,12 +2428,20 @@ ${unresolvedRows}
       resolve?.(value);
     }
 
-    function saveCurrentDocumentAsLocalTemplate() {
+    async function saveCurrentDocumentAsLocalTemplate() {
       if (!state.activePath || !editor.value.trim()) {
         setStatus('Open or write a document before saving a local template.', 'warning');
         return;
       }
-      const label = window.prompt('Template name', getExportTitle() || state.fileName.replace(/\.[^.]+$/, '') || 'Local template');
+      const label = await promptDialog({
+        title: 'Save document as template',
+        message: 'Name this browser-local template.',
+        kicker: 'Local template',
+        label: 'Template name',
+        value: getExportTitle() || state.fileName.replace(/\.[^.]+$/, '') || 'Local template',
+        confirmLabel: 'Save template',
+        validate: (value) => value.trim() ? '' : 'Enter a template name.',
+      });
       if (!label) return;
       const library = readLocalLibrary();
       library.templates.unshift({
@@ -2383,14 +2456,22 @@ ${unresolvedRows}
       setStatus(`Saved local template "${label.trim()}".`, 'ok');
     }
 
-    function saveSelectionAsLocalSnippet() {
+    async function saveSelectionAsLocalSnippet() {
       const selection = getEditorSelection();
       const text = editor.value.slice(selection.start, selection.end).trim();
       if (!text) {
         setStatus('Select Markdown before saving a local snippet.', 'warning');
         return;
       }
-      const label = window.prompt('Snippet name', text.split(/\r?\n/)[0].slice(0, 40) || 'Local snippet');
+      const label = await promptDialog({
+        title: 'Save selection as snippet',
+        message: 'Name this browser-local snippet.',
+        kicker: 'Local snippet',
+        label: 'Snippet name',
+        value: text.split(/\r?\n/)[0].slice(0, 40) || 'Local snippet',
+        confirmLabel: 'Save snippet',
+        validate: (value) => value.trim() ? '' : 'Enter a snippet name.',
+      });
       if (!label) return;
       const library = readLocalLibrary();
       library.snippets.unshift({
@@ -2410,7 +2491,7 @@ ${unresolvedRows}
         setStatus('Local template not found.', 'warning');
         return;
       }
-      if (!confirmDiscardUnsaved(`Load ${template.label} and discard unsaved edits?`)) return;
+      if (!await confirmDiscardUnsaved(`Load ${template.label} and discard unsaved edits?`)) return;
       clearGeneratorMode();
       clearManagedAssets();
       clearScrollPositions();
@@ -2460,8 +2541,16 @@ ${unresolvedRows}
       setStatus(`Inserted local snippet "${snippet.label}".`, 'ok');
     }
 
-    function saveExportProfile() {
-      const label = window.prompt('Export profile name', state.folderName || 'Local export profile');
+    async function saveExportProfile() {
+      const label = await promptDialog({
+        title: 'Save export profile',
+        message: 'Name this browser-local export profile.',
+        kicker: 'Export profile',
+        label: 'Profile name',
+        value: state.folderName || 'Local export profile',
+        confirmLabel: 'Save profile',
+        validate: (value) => value.trim() ? '' : 'Enter an export profile name.',
+      });
       if (!label) return;
       const library = readLocalLibrary();
       library.profiles.unshift({
@@ -2856,6 +2945,11 @@ ${unresolvedRows}
         return;
       }
 
+      if (action === 'copyPng') {
+        await copyDiagramFramePng(getDiagramFrameFromAction(diagramAction), diagramAction);
+        return;
+      }
+
       const diagram = diagramAction.closest('.mermaid') || diagramAction.closest('.diagram-frame')?.querySelector('.mermaid');
       const error = diagram?.querySelector('.diagram-error pre')?.textContent ?? '';
       if (action === 'copyError') {
@@ -2878,9 +2972,7 @@ ${unresolvedRows}
       editor.focus();
       if (index === -1) return;
       editor.setSelectionRange(index, index + source.length);
-      const line = editor.value.slice(0, index).split('\n').length - 1;
-      const lineHeight = parseFloat(getComputedStyle(editor).lineHeight) || 22;
-      editor.scrollTop = Math.max(0, line * lineHeight - editor.clientHeight * .25);
+      scrollEditorToIndex(index, 0.25);
     }
 
     function getExportTitle() {

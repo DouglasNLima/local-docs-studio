@@ -44,6 +44,8 @@ export function createFileService({
     afterActiveFileLoaded,
     beforeSaveActiveFile,
     afterSaveActiveFile,
+    promptForText,
+    confirmAction,
   } = callbacks;
   const {
     compareRecords,
@@ -56,7 +58,7 @@ export function createFileService({
   } = helpers;
 
     async function openFile() {
-      if (!confirmDiscardUnsaved('Open a file and discard unsaved edits?')) return;
+      if (!await confirmDiscardUnsaved('Open a file and discard unsaved edits?')) return;
 
       try {
         if ('showOpenFilePicker' in window) {
@@ -94,7 +96,7 @@ export function createFileService({
     }
 
     async function openFolder() {
-      if (!confirmDiscardUnsaved('Open a folder and discard unsaved edits?')) return;
+      if (!await confirmDiscardUnsaved('Open a folder and discard unsaved edits?')) return;
 
       try {
         if ('showDirectoryPicker' in window) {
@@ -119,8 +121,7 @@ export function createFileService({
       folderInput.click();
     }
 
-    function importZip() {
-      if (!confirmDiscardUnsaved('Import this ZIP and discard unsaved edits?')) return;
+    async function importZip() {
       zipInput.click();
     }
 
@@ -129,26 +130,56 @@ export function createFileService({
     }
 
     async function newMarkdownDocument() {
-      if (state.workspaceDirectoryHandle) {
-        await createFileInWorkspace();
+      if (!state.files.length && !await confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+
+      const suggestedPath = getAvailableUntitledPath(getNewFileDirectory());
+      const rawPath = await promptForText({
+        title: 'New Markdown file',
+        message: 'Create a Markdown or Mermaid file in the current workspace.',
+        kicker: 'New file',
+        label: 'File path',
+        value: suggestedPath,
+        hint: 'Use a relative .md, .markdown, .mmd, or .mermaid path.',
+        confirmLabel: 'Create file',
+        validate: (value) => {
+          const path = sanitiseWorkspaceFilePath(value);
+          if (!path) return 'Use a relative .md, .markdown, .mmd, or .mermaid path inside the workspace.';
+          const existing = state.files.find((record) => record.path.toLowerCase() === path.toLowerCase());
+          return existing ? `${existing.path} is already in the workspace.` : '';
+        },
+      });
+      if (!rawPath) return;
+
+      const name = sanitiseWorkspaceFilePath(rawPath);
+      if (!name) {
+        setStatus('Use a relative .md, .markdown, .mmd, or .mermaid path inside the workspace.', 'warning');
         return;
       }
 
-      if (!state.files.length && !confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+      const existing = state.files.find((record) => record.path.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        await selectFile(existing.path);
+        setStatus(`${existing.path} is already in the workspace.`, 'warning');
+        return;
+      }
 
-      const name = getAvailableUntitledPath();
+      if (state.workspaceDirectoryHandle) {
+        await createFileInWorkspace(name);
+        return;
+      }
+
+      const fileName = name.split('/').pop() || name;
       const record = {
-        name,
+        name: fileName,
         path: name,
-        file: new File([''], name, { type: 'text/markdown' }),
+        file: new File([''], fileName, { type: getMimeTypeForPath(name) }),
         needsSave: true,
       };
 
-      if (state.files.length) {
-        await addRecordsToWorkspace([record], { folderName: state.folderName || 'Workspace' });
-      } else {
-        await setLibraryFromRecords([record], 'Blank document', { workspaceKind: 'virtual' });
-      }
+      await addRecordsToWorkspace([record], {
+        folderName: state.folderName || (state.files.length ? 'Workspace' : 'Blank document'),
+        selectPath: name,
+      });
       editor.focus({ preventScroll: true });
       setStatus('Blank Markdown document ready.', 'ok');
     }
@@ -255,7 +286,7 @@ export function createFileService({
 
       const entry = state.recentEntries.find((item) => item.key === button.dataset.recentKey);
       if (!entry?.handle) return;
-      if (!confirmDiscardUnsaved('Open this recent item and discard unsaved edits?')) return;
+      if (!await confirmDiscardUnsaved('Open this recent item and discard unsaved edits?')) return;
 
       try {
         if (!await ensureReadPermission(entry.handle)) {
@@ -338,6 +369,7 @@ export function createFileService({
       state.folderName = folderName;
       state.workspaceDirectoryHandle = options.directoryHandle || null;
       state.workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
+      state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
@@ -376,6 +408,8 @@ export function createFileService({
       if (!file) return;
 
       try {
+        if (!await confirmDiscardUnsaved('Import this ZIP and discard unsaved edits?')) return;
+
         setStatus(`Reading ${file.name}...`);
         const entries = await readZipEntriesFromFile(file);
         const imported = buildZipImport(file, entries);
@@ -460,7 +494,7 @@ export function createFileService({
       const confirmMessage = documentFiles.length === 1
         ? 'Import this document as Markdown and discard unsaved edits?'
         : 'Import these documents as Markdown and discard unsaved edits?';
-      if (!confirmDiscardUnsaved(confirmMessage)) return;
+      if (!await confirmDiscardUnsaved(confirmMessage)) return;
 
       try {
         setStatus(`Converting ${documentFiles.length} document${documentFiles.length === 1 ? '' : 's'} to Markdown...`);
@@ -925,12 +959,7 @@ export function createFileService({
       setStatus(`${added.length} file${added.length === 1 ? '' : 's'} added to the workspace.`, 'ok');
     }
 
-    async function createFileInWorkspace() {
-      const suggestedPath = getAvailableUntitledPath();
-      const rawPath = window.prompt('New file path', suggestedPath);
-      if (!rawPath) return;
-
-      const path = sanitiseWorkspaceFilePath(rawPath);
+    async function createFileInWorkspace(path) {
       if (!path) {
         setStatus('Use a relative .md, .markdown, .mmd, or .mermaid path inside the workspace.', 'warning');
         return;
@@ -978,7 +1007,12 @@ export function createFileService({
         setStatus('This document has no linked local file to refresh.', 'warning');
         return;
       }
-      if (state.dirtyPaths.has(record.path) && !window.confirm(`${record.name} has in-memory edits. Reload the local file and discard those edits?`)) {
+      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has in-memory edits. Reload the local file and discard those edits?`, {
+        title: 'Reload local file?',
+        kicker: 'Refresh file',
+        confirmLabel: 'Reload file',
+        danger: true,
+      })) {
         return;
       }
 
@@ -1041,9 +1075,14 @@ export function createFileService({
       if (reason === 'focus' && alreadyMarked) return 'marked';
 
       const dirty = state.dirtyPaths.has(record.path);
-      const reload = window.confirm(dirty
+      const reload = await confirmAction(dirty
         ? `${record.name} changed outside the app. Reload the local file and discard your in-memory edits? Choose Cancel to keep your local edits.`
-        : `${record.name} changed outside the app. Reload the latest version?`);
+        : `${record.name} changed outside the app. Reload the latest version?`, {
+        title: 'External change detected',
+        kicker: 'Local file changed',
+        confirmLabel: dirty ? 'Reload and discard edits' : 'Reload latest',
+        danger: dirty,
+      });
 
       if (reload) {
         await reloadRecordFromFile(record, file, { status: `${record.name} reloaded from the local file.` });
@@ -1137,13 +1176,34 @@ export function createFileService({
       }];
     }
 
-    function getAvailableUntitledPath() {
+    function getAvailableUntitledPath(directory = '') {
+      const prefix = sanitiseWorkspaceFolderPath(directory);
       const existing = new Set(state.files.map((record) => record.path.toLowerCase()));
-      const candidates = ['untitled.md'];
+      const candidates = [`${prefix ? `${prefix}/` : ''}untitled.md`];
       for (let index = 2; index < 1000; index += 1) {
-        candidates.push(`untitled-${index}.md`);
+        candidates.push(`${prefix ? `${prefix}/` : ''}untitled-${index}.md`);
       }
-      return candidates.find((path) => !existing.has(path.toLowerCase())) || `untitled-${Date.now()}.md`;
+      return candidates.find((path) => !existing.has(path.toLowerCase())) || `${prefix ? `${prefix}/` : ''}untitled-${Date.now()}.md`;
+    }
+
+    function getNewFileDirectory() {
+      const selected = sanitiseWorkspaceFolderPath(state.selectedTreeFolderPath);
+      if (selected && getWorkspaceFolderPaths().includes(selected)) return selected;
+      const activeDirectory = sanitiseWorkspaceFolderPath(state.activePath.split('/').slice(0, -1).join('/'));
+      if (activeDirectory) return activeDirectory;
+      return '';
+    }
+
+    function getWorkspaceFolderPaths() {
+      const paths = new Set();
+      state.files.forEach((record) => {
+        const parts = String(record.path || '').split('/').filter(Boolean);
+        parts.pop();
+        parts.forEach((_, index) => {
+          paths.add(parts.slice(0, index + 1).join('/'));
+        });
+      });
+      return [...paths];
     }
 
     function getUniqueRecordPath(path, currentRecord) {
@@ -1170,6 +1230,18 @@ export function createFileService({
       if (!parts.length || parts.some((part) => part === '.' || part === '..')) return '';
       const cleanPath = parts.join('/');
       return isSupportedFile(cleanPath) ? cleanPath : '';
+    }
+
+    function sanitiseWorkspaceFolderPath(value) {
+      const path = normalisePath(String(value || '').trim());
+      if (!path || path.startsWith('/') || /^[a-z]:/i.test(path)) return '';
+      const parts = path.split('/').filter(Boolean);
+      if (parts.some((part) => part === '.' || part === '..')) return '';
+      return parts.join('/');
+    }
+
+    function getMimeTypeForPath(path) {
+      return /\.(mmd|mermaid)$/i.test(path) ? 'text/plain' : 'text/markdown';
     }
 
     async function getWorkspaceFileHandle(path, options = {}) {

@@ -8,6 +8,8 @@ import { createMathExtensions } from '../utils/math.js';
 import { parseFrontMatter, stripFrontMatter } from '../utils/front-matter.js';
 
 const MERMAID_MODULE_PATH = '../../vendor/mermaid-11.15.0.esm.min.js';
+const MERMAID_IMPORT_RETRIES = 2;
+const MERMAID_IMPORT_RETRY_DELAY_MS = 120;
 const MARKED_MODULE_PATH = '../../vendor/marked-16.4.2.esm.js';
 const HIGHLIGHT_MODULE_PATH = '../../vendor/highlight-11.11.1.esm.js';
 const KATEX_MODULE_PATH = '../../vendor/chunks/mermaid.esm.min/katex-K3KEBU37.js';
@@ -177,10 +179,31 @@ export function createRenderingService({
   }
 
   async function loadMermaid() {
+    if (mermaid) return mermaid;
+
     if (!mermaidPromise) {
-      mermaidPromise = import(MERMAID_MODULE_PATH).then((module) => {
-        mermaid = module.default;
-        mermaid.initialize({
+      mermaidPromise = importMermaidWithRetry()
+        .catch((error) => {
+          mermaidPromise = null;
+          throw error;
+        });
+    }
+
+    return mermaidPromise;
+  }
+
+  async function importMermaidWithRetry() {
+    let lastError = null;
+
+    for (let attempt = 0; attempt <= MERMAID_IMPORT_RETRIES; attempt += 1) {
+      try {
+        const modulePath = attempt
+          ? `${MERMAID_MODULE_PATH}?retry=${Date.now()}-${attempt}`
+          : MERMAID_MODULE_PATH;
+        const module = await import(modulePath);
+        const loadedMermaid = module.default;
+
+        loadedMermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
           theme: 'default',
@@ -188,11 +211,21 @@ export function createRenderingService({
             htmlLabels: false,
           },
         });
+        mermaid = loadedMermaid;
         return mermaid;
-      });
+      } catch (error) {
+        lastError = error;
+        if (attempt < MERMAID_IMPORT_RETRIES) {
+          await delay(MERMAID_IMPORT_RETRY_DELAY_MS * (attempt + 1));
+        }
+      }
     }
 
-    return mermaidPromise;
+    throw lastError;
+  }
+
+  function delay(milliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
   }
 
     async function renderPreview() {
@@ -702,7 +735,8 @@ export function createRenderingService({
       actions.append(
         createDiagramActionButton('copySource', 'Copy', `Copy Mermaid source for diagram ${index}`),
         createDiagramActionButton('exportSvg', 'SVG', `Export diagram ${index} as SVG`),
-        createDiagramActionButton('exportPng', 'PNG', `Export diagram ${index} as PNG`)
+        createDiagramActionButton('exportPng', 'PNG', `Export diagram ${index} as PNG`),
+        createDiagramActionButton('copyPng', 'Copy PNG', `Copy diagram ${index} as a PNG image`)
       );
 
       toolbar.append(title, actions);

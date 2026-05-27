@@ -28,6 +28,7 @@ export function createDraftService({ state, dom, callbacks }) {
     updateSaveButton,
     resetEditorHistory,
     renderPreview,
+    confirmAction = () => Promise.resolve(true),
   } = callbacks;
 
   let dbPromise = null;
@@ -221,9 +222,11 @@ export function createDraftService({ state, dom, callbacks }) {
 
   function showRecoveryDialog(record, savedText, draftText) {
     if (!recoveryDialog?.showModal) {
-      return Promise.resolve(window.confirm(`A local draft exists for ${record.name}. Restore it?`)
-        ? { action: 'restore' }
-        : { action: 'keep' });
+      return confirmAction(`A local draft exists for ${record.name}. Restore it?`, {
+        title: 'Recover local draft?',
+        kicker: 'Local recovery',
+        confirmLabel: 'Restore draft',
+      }).then((approved) => approved ? { action: 'restore' } : { action: 'keep' });
     }
 
     recoverySummary.textContent = `${record.path} has a newer browser-local draft. Compare it with the saved file before choosing.`;
@@ -243,7 +246,12 @@ export function createDraftService({ state, dom, callbacks }) {
 
   function showLossProtectionDialog(record, { deleted, percent }) {
     if (!lossProtectionDialog?.showModal) {
-      return Promise.resolve(window.confirm(`${record.name} lost ${deleted} characters (${percent}%). Save anyway?`));
+      return confirmAction(`${record.name} lost ${deleted} characters (${percent}%). Save anyway?`, {
+        title: 'Large deletion detected',
+        kicker: 'Save protection',
+        confirmLabel: 'Save anyway',
+        danger: true,
+      });
     }
     lossProtectionSummary.textContent = `${record.path} is ${deleted} characters shorter than the last saved version (${percent}% removed).`;
     lossProtectionDialog.showModal();

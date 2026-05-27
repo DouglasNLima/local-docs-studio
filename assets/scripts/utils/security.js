@@ -122,13 +122,13 @@ function replaceForeignObjectLabels(svg) {
 }
 
 function fitForeignObjectTextLines(sourceLines, width, height) {
-  const availableWidth = Math.max(width - 10, 24);
-  const availableHeight = Math.max(height, 12);
-  let fontSize = 16;
+  const availableWidth = Math.max(width - 8, 28);
+  const availableHeight = Math.max(height, 14);
+  let fontSize = 17;
   let lines = [];
   let lineHeight = getLineHeight(fontSize);
 
-  while (fontSize >= 7) {
+  while (fontSize >= 9) {
     lines = wrapTextLines(sourceLines, availableWidth, fontSize);
     lineHeight = getLineHeight(fontSize);
     if (getMaxSvgLineWidth(lines, fontSize) <= availableWidth + 2 && lines.length * lineHeight <= availableHeight + 2) {
@@ -137,11 +137,11 @@ function fitForeignObjectTextLines(sourceLines, width, height) {
     fontSize -= 1;
   }
 
-  lines = wrapTextLines(sourceLines, availableWidth, 7);
-  lineHeight = Math.max(7, Math.min(getLineHeight(7), availableHeight / Math.max(lines.length, 1)));
+  lines = wrapTextLines(sourceLines, availableWidth, 9);
+  lineHeight = Math.max(7, Math.min(getLineHeight(9), availableHeight / Math.max(lines.length, 1)));
   return {
     lines,
-    fontSize: Math.max(6, Math.min(7, lineHeight * .86)),
+    fontSize: Math.max(7, Math.min(9, lineHeight * .9)),
     lineHeight,
   };
 }
@@ -157,17 +157,42 @@ function wrapTextLine(line, maxWidth, fontSize) {
 
   words.forEach((word) => {
     const next = current ? `${current} ${word}` : word;
-    if (!current || measureSvgText(next, fontSize) <= maxWidth) {
+    if (measureSvgText(next, fontSize) <= maxWidth) {
       current = next;
       return;
     }
 
-    lines.push(current);
-    current = word;
+    if (current) lines.push(current);
+    const wordLines = breakLongWord(word, maxWidth, fontSize);
+    if (wordLines.length > 1) {
+      lines.push(...wordLines.slice(0, -1));
+      current = wordLines[wordLines.length - 1];
+    } else {
+      current = word;
+    }
   });
 
   if (current) lines.push(current);
   return lines.length ? lines : [''];
+}
+
+function breakLongWord(word, maxWidth, fontSize) {
+  const text = String(word || '');
+  if (measureSvgText(text, fontSize) <= maxWidth) return [text];
+
+  const chunks = [];
+  let current = '';
+  [...text].forEach((char) => {
+    const next = `${current}${char}`;
+    if (!current || measureSvgText(next, fontSize) <= maxWidth) {
+      current = next;
+      return;
+    }
+    chunks.push(current);
+    current = char;
+  });
+  if (current) chunks.push(current);
+  return chunks.length ? chunks : [text];
 }
 
 function getMaxSvgLineWidth(lines, fontSize) {

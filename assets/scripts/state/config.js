@@ -1,6 +1,6 @@
 export const supportedFilePattern = /\.(md|markdown|mmd|mermaid)$/i;
 export const APP_VERSION = '0.1.0';
-export const APP_BUILD = '53';
+export const APP_BUILD = '55';
 export const APP_BROWSER_TITLE = `Lens Docs Studio v${APP_VERSION} (build ${APP_BUILD})`;
 
 export const storageKeys = {
@@ -42,6 +42,7 @@ export function createInitialState({ readStoredNumber }) {
     folderName: '',
     workspaceDirectoryHandle: null,
     workspaceKind: '',
+    selectedTreeFolderPath: '',
     renderId: 0,
     debounceId: 0,
     fileCache: new Map(),

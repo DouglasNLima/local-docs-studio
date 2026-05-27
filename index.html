@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111318" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="data:,">
-  <title>Lens Docs Studio v0.1.0 (build 53)</title>
+  <title>Lens Docs Studio v0.1.0 (build 55)</title>
   <link rel="stylesheet" href="./assets/vendor/katex-0.16.25.min.css" />
   <link rel="stylesheet" href="./assets/styles/app.css" />
 </head>
@@ -19,7 +19,7 @@
         <div>
           <h1>Lens Docs Studio</h1>
           <small>Local Markdown, Mermaid, and documentation studio</small>
-          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 53)</span>
+          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 55)</span>
         </div>
       </div>
 
@@ -600,6 +600,22 @@
       <div class="template-dialog-actions">
         <button type="button" data-template-dialog-cancel>Cancel</button>
         <button class="primary" type="submit" id="templateDialogSubmit">Create document</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog app-dialog" id="appDialog" aria-labelledby="appDialogTitle" aria-describedby="appDialogMessage">
+    <form class="utility-dialog-card compact" id="appDialogForm">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker" id="appDialogKicker">Confirm</span>
+        <button class="template-dialog-close" type="button" id="appDialogCloseButton" data-app-dialog-cancel aria-label="Close dialog">X</button>
+      </div>
+      <h2 id="appDialogTitle">Confirm action</h2>
+      <p id="appDialogMessage">Continue?</p>
+      <div class="template-dialog-fields" id="appDialogFields"></div>
+      <div class="template-dialog-actions">
+        <button type="button" id="appDialogCancelButton" data-app-dialog-cancel>Cancel</button>
+        <button class="primary" type="submit" id="appDialogConfirmButton">Continue</button>
       </div>
     </form>
   </dialog>

@@ -248,6 +248,45 @@ export function createExportService({
       }
     }
 
+    async function copyDiagramFramePng(frame, button = null) {
+      const svg = getRenderedSvgFromFrame(frame);
+      if (!svg) {
+        setStatus('No rendered Mermaid SVG found for this diagram.', 'warning');
+        return false;
+      }
+      if (!navigator.clipboard?.write || !window.ClipboardItem) {
+        setStatus('This browser cannot copy PNG images to the clipboard.', 'warning');
+        return false;
+      }
+
+      const previousText = button?.textContent;
+      try {
+        const size = getSvgBaseSize(svg);
+        const dataUrl = await svgToPngDataUrl(svg, size.width, size.height);
+        const blob = dataUrlToBlob(dataUrl);
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'image/png': blob,
+          }),
+        ]);
+        if (button) {
+          button.textContent = 'Copied';
+          button.disabled = true;
+          window.setTimeout(() => {
+            button.textContent = previousText || 'Copy PNG';
+            button.disabled = false;
+          }, 1300);
+        }
+        setExportTrust('PNG copied from the selected rendered Mermaid diagram.', 'ok');
+        setStatus('PNG diagram copied.', 'ok');
+        return true;
+      } catch (error) {
+        setStatus('Could not copy PNG diagram.', 'danger');
+        console.error(error);
+        return false;
+      }
+    }
+
     function getDiagramExportName(frame, extension) {
       const index = Number(frame?.dataset.diagramIndex || '1');
       const total = Number(frame?.dataset.diagramTotal || '1');
@@ -672,6 +711,7 @@ export function createExportService({
         const zip = createZipBlob([
           { name: 'index.html', data: buildDocsSiteIndexHtml(options.title, options.description, options.theme) },
           { name: 'assets/docs-site.css', data: buildDocsSiteCss() },
+          { name: 'assets/docs-site-data.js', data: buildDocsSiteDataScript(searchIndex) },
           { name: 'assets/docs-site.js', data: buildDocsSiteScript() },
           { name: 'assets/search-index.json', data: JSON.stringify(searchIndex, null, 2) },
           { name: 'site-manifest.json', data: manifest },
@@ -1204,9 +1244,17 @@ export function createExportService({
       </div>
     </main>
   </div>
+  <script src="./assets/docs-site-data.js"></scr${'ipt'}>
   <script src="./assets/docs-site.js"></scr${'ipt'}>
 </body>
 </html>`;
+    }
+
+    function buildDocsSiteDataScript(searchIndex) {
+      const json = JSON.stringify(searchIndex, null, 2)
+        .replace(/\u2028/g, '\\u2028')
+        .replace(/\u2029/g, '\\u2029');
+      return `window.__LENS_DOCS_SITE_DATA__ = ${json};\n`;
     }
 
     function buildDocsSiteCss() {
@@ -1344,9 +1392,7 @@ th { background: var(--surface-soft); }
 
   async function init() {
     try {
-      const response = await fetch('./assets/search-index.json', { cache: 'no-cache' });
-      if (!response.ok) throw new Error('Could not load search index.');
-      data = await response.json();
+      data = await loadSiteData();
       pages = data.pages || [];
       byId = new Map(pages.map((page) => [page.id, page]));
       pathMap = buildPathMap(pages);
@@ -1359,9 +1405,18 @@ th { background: var(--surface-soft); }
       const initial = parseHash(location.hash);
       showPage(initial.pageId || data.homePageId || pages[0]?.id, initial.headingId, false);
     } catch (error) {
-      content.innerHTML = '<p class="empty">Could not load this docs site. Serve the exported folder from GitHub Pages or another static web server.</p>';
+      content.innerHTML = '<p class="empty">Could not load this docs site. Keep index.html beside its assets folder, or serve the exported folder from GitHub Pages or another static web server.</p>';
       console.error(error);
     }
+  }
+
+  async function loadSiteData() {
+    if (window.__LENS_DOCS_SITE_DATA__ && typeof window.__LENS_DOCS_SITE_DATA__ === 'object') {
+      return window.__LENS_DOCS_SITE_DATA__;
+    }
+    const response = await fetch('./assets/search-index.json', { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Could not load search index.');
+    return await response.json();
   }
 
   function installEvents() {
@@ -1624,18 +1679,20 @@ This folder was exported by ${APP_NAME} as a static docs site.
 - ${manifest.diagramErrors} diagram error${manifest.diagramErrors === 1 ? '' : 's'}
 - Light, Dark, and System theme support
 - Static full-text search from \`assets/search-index.json\`
+- Can be opened directly from \`index.html\` without a local web server
 
 ## Files
 
 - \`index.html\` is the site entry point.
 - \`assets/docs-site.css\` contains the exported site theme and layout.
+- \`assets/docs-site-data.js\` lets the site run when opened directly from disk.
 - \`assets/docs-site.js\` contains navigation, theme switching, search, code/table copy, and diagram actions.
 - \`assets/search-index.json\` contains rendered pages and the local search index.
 - \`site-manifest.json\` contains export metadata and page stats.
 
-## Deploy
+## Open Or Deploy
 
-Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the folder structure intact so \`index.html\` can load files from \`assets/\`.
+Open \`index.html\` directly from this folder for a local copy, or upload the contents of this ZIP to GitHub Pages or any static web host. Keep the folder structure intact so \`index.html\` can load files from \`assets/\`.
 `;
     }
 
@@ -2380,7 +2437,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
         var button = event.target.closest('[data-diagram-action]');
         if (!button) return;
         var action = button.dataset.diagramAction;
-        if (action !== 'copySource' && action !== 'exportSvg' && action !== 'exportPng') return;
+        if (action !== 'copySource' && action !== 'exportSvg' && action !== 'exportPng' && action !== 'copyPng') return;
         var frame = button.closest('.diagram-frame');
         var svg = frame && frame.querySelector('.mermaid svg, svg');
         if (!frame) return;
@@ -2406,6 +2463,19 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
 
         try {
           var dataUrl = await svgToPngDataUrl(svg, size.width, size.height);
+          if (action === 'copyPng') {
+            if (!navigator.clipboard || !navigator.clipboard.write || !window.ClipboardItem) {
+              setTemporaryText(button, 'Unsupported');
+              return;
+            }
+            await navigator.clipboard.write([
+              new ClipboardItem({
+                'image/png': dataUrlToBlob(dataUrl)
+              })
+            ]);
+            setTemporaryText(button, 'Copied');
+            return;
+          }
           downloadBlob(dataUrlToBlob(dataUrl), getDiagramExportName(frame, 'png'));
         } catch {
           setTemporaryText(button, 'Failed');
@@ -2999,6 +3069,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       copyDiagramSource,
       exportDiagramFrameSvg,
       exportDiagramFramePng,
+      copyDiagramFramePng,
       exportPreviewHtml,
       exportPreviewWord,
       exportPreviewPdf,
