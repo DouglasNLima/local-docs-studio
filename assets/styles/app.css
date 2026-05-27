@@ -2657,6 +2657,12 @@ label.file-button.primary,
   grid-column: 3;
 }
 
+.preview-maximized .shell > .workspace,
+.input-maximized .shell > .workspace,
+.app.typewriter-mode .shell > .workspace {
+  grid-column: 1;
+}
+
 .sidebar {
   border: 1px solid var(--border-soft);
   border-radius: var(--radius);
@@ -3315,12 +3321,18 @@ label.file-button.primary,
 .editor-toolbar {
   gap: .42rem;
   padding: .44rem .6rem;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  flex-wrap: wrap;
+  overflow-x: hidden;
+  overflow-y: visible;
   scrollbar-width: thin;
   border-bottom: 1px solid var(--border-soft);
   background: var(--toolbar-bg);
+}
+
+.shell.sidebar-collapsed .editor-toolbar {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .toolbar-section {

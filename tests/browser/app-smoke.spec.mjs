@@ -538,10 +538,11 @@ function escapePdfText(value) {
 
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Lens Docs Studio');
+  await expect(page).toHaveTitle(/^Lens Docs Studio v0\.1\.0 \(build \d+\)$/);
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.brand h1')).toHaveText('Lens Docs Studio');
   await expect(page.locator('.brand small')).toHaveText('Local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('#appVersionBadge')).toHaveText(/^v0\.1\.0 \(build \d+\)$/);
   await expect(page.locator('.brand-mark')).not.toHaveText('LD');
   await expect(page.locator('body')).not.toContainText('Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
