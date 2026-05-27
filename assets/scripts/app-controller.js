@@ -661,6 +661,7 @@ export function createAppController() {
     localStorage.removeItem(storageKeys.typewriterMode);
     initRecentHandles();
     registerServiceWorker();
+    document.documentElement.dataset.appReady = 'true';
 
     function installEventHandlers() {
       sampleButton.addEventListener('click', () => loadExample('sample'));
