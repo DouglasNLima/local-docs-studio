@@ -15,6 +15,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/editor/draft-service.js',
   './assets/scripts/editor/editor-service.js',
   './assets/scripts/editor/find-replace-service.js',
+  './assets/scripts/editor/insert-helper-service.js',
   './assets/scripts/editor/paste-service.js',
   './assets/scripts/editor/progress-bar-editor-service.js',
   './assets/scripts/editor/table-editor-service.js',

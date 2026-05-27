@@ -1291,6 +1291,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Libe
 ${buildCodeBlockSupportCss()}
 ${buildTableActionSupportCss()}
 ${buildProgressBarSupportCss()}
+${buildInsertHelperSupportCss()}
 ${buildDiagramActionSupportCss()}
 blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid var(--accent); color: var(--muted); }
 table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
@@ -1912,6 +1913,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     ${buildCodeBlockSupportCss()}
     ${buildTableActionSupportCss()}
     ${buildProgressBarSupportCss()}
+    ${buildInsertHelperSupportCss()}
     ${buildDiagramActionSupportCss()}
     .diagram-frame { overflow: auto; margin: 1rem 0; padding: 1rem; border: 1px solid #d5dce8; border-radius: .9rem; background: #fff; }
     .mermaid { display: block; width: max-content; max-width: none; margin: 0; }
@@ -1959,6 +1961,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .code-block { margin: 12pt 0; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     .code-block pre { margin: 0; border: 0; background: transparent; }
     ${buildProgressBarPrintCss()}
+    ${buildInsertHelperSupportCss()}
     .diagram-frame { overflow: visible; margin: 12pt 0; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #ffffff; break-inside: avoid; }
     .mermaid { display: block; width: max-content; max-width: 100%; margin: 0; }
     .mermaid svg, svg { max-width: 100% !important; height: auto !important; transform: none !important; }
@@ -2077,6 +2080,22 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
       return `${buildProgressBarSupportCss()}
     figure[data-progress-bar] { break-inside: avoid; box-shadow: none; }
     figure[data-progress-bar] progress { height: 8pt; }`;
+    }
+
+    function buildInsertHelperSupportCss() {
+      return `[data-status-badge] { --status-badge-colour: #64748B; --status-badge-soft: #E2E8F0; display: inline-flex; align-items: center; min-height: 1.45rem; margin: 0 .08rem; border: 1px solid #cbd5e1; border-radius: 999px; padding: .12rem .52rem; background: var(--status-badge-soft); color: var(--status-badge-colour); font-size: .78em; font-weight: 800; line-height: 1.2; vertical-align: middle; }
+    [data-status-badge][data-status-kind="ready"] { --status-badge-colour: #16A34A; --status-badge-soft: #DCFCE7; border-color: #86EFAC; }
+    [data-status-badge][data-status-kind="blocked"], [data-status-badge][data-status-kind="deprecated"] { --status-badge-colour: #DC2626; --status-badge-soft: #FEE2E2; border-color: #FCA5A5; }
+    [data-status-badge][data-status-kind="beta"], [data-status-badge][data-status-kind="review"] { --status-badge-colour: #2563EB; --status-badge-soft: #DBEAFE; border-color: #93C5FD; }
+    details[data-details-block] { margin: 1rem 0; border: 1px solid var(--border, #d5dce8); border-radius: .85rem; background: var(--surface-soft, #f8fafc); }
+    details[data-details-block] summary { padding: .72rem .85rem; color: var(--muted, #475569); font-weight: 780; cursor: pointer; }
+    details[data-details-block] > :not(summary) { margin: 0 .85rem .85rem; }
+    figure[data-image-figure] { display: grid; gap: .45rem; margin: 1rem 0; }
+    figure[data-image-figure] img { margin: 0; }
+    figure[data-image-figure] figcaption { color: var(--muted, #64748b); font-size: .88rem; text-align: center; }
+    [data-shortcut] { display: inline-flex; align-items: center; gap: .28rem; white-space: nowrap; }
+    kbd { display: inline-flex; align-items: center; min-height: 1.45rem; border: 1px solid var(--border, #d5dce8); border-bottom-width: 2px; border-radius: .42rem; padding: .08rem .38rem; background: var(--surface-soft, #f8fafc); color: var(--muted, #475569); font: .82em/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    [data-doc-anchor] { scroll-margin-top: 1rem; }`;
     }
 
     function buildTableActionScript() {
@@ -2548,6 +2567,14 @@ ${buildWordBodyXml(root, imageRelationships)}
         return [buildWordParagraph(collectWordInlineRuns(node, { italic: true, color: '475569' }), { indentLeft: 360, after: 160 })];
       }
 
+      if (tagName === 'details') {
+        return wordBlocksFromChildren(node, context);
+      }
+
+      if (tagName === 'summary') {
+        return [buildWordParagraph(collectWordInlineRuns(node, { bold: true, color: '475569' }), { after: 100, keepNext: true })];
+      }
+
       if (tagName === 'ul' || tagName === 'ol') {
         return [...node.children]
           .filter((child) => child.tagName?.toLowerCase() === 'li')
@@ -2701,7 +2728,7 @@ ${buildWordBodyXml(root, imageRelationships)}
         const nextOptions = { ...options };
         if (['strong', 'b'].includes(tagName)) nextOptions.bold = true;
         if (['em', 'i'].includes(tagName)) nextOptions.italic = true;
-        if (tagName === 'code') nextOptions.code = true;
+        if (tagName === 'code' || tagName === 'kbd') nextOptions.code = true;
         if (tagName === 'a') {
           nextOptions.color = '0369A1';
           nextOptions.underline = true;
@@ -2835,6 +2862,9 @@ ${buildWordBodyXml(root, imageRelationships)}
     th, td { border: 1pt solid #d5dce8; padding: 5pt 6pt; text-align: left; vertical-align: top; }
     th { background: #e2e8f0; color: #0f172a; font-weight: bold; }
     blockquote { margin: 8pt 0; padding: 4pt 0 4pt 10pt; border-left: 3pt solid #FF883E; color: #475569; }
+    [data-status-badge] { display: inline-block; border: 1pt solid #cbd5e1; border-radius: 8pt; padding: 1pt 5pt; background: #f8fafc; font-size: 9pt; font-weight: bold; }
+    kbd { border: 1pt solid #d5dce8; padding: 1pt 4pt; background: #f8fafc; font-family: Consolas, Courier New, monospace; font-size: 9.5pt; }
+    details[data-details-block] { margin: 8pt 0; padding: 6pt; border: 1pt solid #d5dce8; background: #f8fafc; }
     ul, ol { margin-top: 0; margin-bottom: 8pt; }
     .diagram-frame { margin: 12pt 0; padding: 9pt; border: 1pt solid #d5dce8; background: #ffffff; }
     .diagram-image { display: block; max-width: 100%; height: auto; }

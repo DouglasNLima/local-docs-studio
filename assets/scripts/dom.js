@@ -146,6 +146,14 @@ export const domIds = {
   progressBarColourOptions: 'progressBarColourOptions',
   progressBarApplyButton: 'progressBarApplyButton',
   progressBarCancelButton: 'progressBarCancelButton',
+  insertHelperDialog: 'insertHelperDialog',
+  insertHelperForm: 'insertHelperForm',
+  insertHelperKicker: 'insertHelperKicker',
+  insertHelperTitle: 'insertHelperTitle',
+  insertHelperSummary: 'insertHelperSummary',
+  insertHelperFields: 'insertHelperFields',
+  insertHelperApplyButton: 'insertHelperApplyButton',
+  insertHelperCancelButton: 'insertHelperCancelButton',
 };
 
 export function getDomElements(root = document) {

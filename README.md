@@ -22,6 +22,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Syntax-highlighted code blocks with one-click copy buttons.
 - Rendered tables with one-click copy as Excel-friendly TSV.
 - Semantic progress bars inserted from the editor toolbar with preset colours.
+- Toolbar helpers for emoji, callouts, status badges, details blocks, image figures, keyboard shortcuts, and anchors.
 - Formatted clipboard paste that converts HTML content into Markdown, with spreadsheet table support for HTML table or TSV clipboard data, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
 - DOCX, HTML, and text-only PDF import that converts documents into clean editable Markdown with supported embedded images as exportable session assets where available.
 - Standalone `.mmd` and `.mermaid` diagram rendering.
@@ -71,6 +72,7 @@ The editor stays buildless and native, using a `textarea` with a synchronised li
 - **Mermaid autocomplete** appears with `Ctrl/Cmd+Space` in Mermaid files or Mermaid fenced blocks, and can also open from Mermaid-like line prefixes. Use arrow keys, `Enter` or `Tab` to insert a snippet, and `Escape` to close it.
 - **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localised error with copy/jump actions while the rest of the Markdown continues rendering.
 - **Progress bar** in the editor toolbar opens a small dialogue for text, percentage, and preset colour, then inserts semantic HTML that renders in the preview and exports.
+- **Rich insert helpers** add emoji, callouts, status badges, collapsible details, captioned image figures, keyboard shortcuts, and anchors from compact dialogues.
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts formatted HTML into Markdown and keeps spreadsheet tables as Markdown tables when the clipboard provides HTML table or tab-separated text; plain text stays plain, and **Paste as text** forces unformatted text.
 - **Image drag-and-drop** on the editor inserts Markdown such as `![diagram](assets/images/diagram.png)`. The Markdown file save-back writes the link text only; the image binaries live in the browser session and are embedded or bundled when you export. User-supplied SVG images are blocked as assets for security; rendered Mermaid diagrams can still be exported as SVG.
 - **Manage assets** in the View menu shows session images, usage counts, rename controls that update editable Markdown references, and removal for unused assets.

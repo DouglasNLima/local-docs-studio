@@ -469,6 +469,29 @@
                 <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M8 12h6"/></svg>
               </button>
             </div>
+            <div class="toolbar-section" aria-label="Rich inserts">
+              <button type="button" data-command="emoji" title="Emoji" aria-label="Emoji">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></svg>
+              </button>
+              <button type="button" data-command="callout" title="Callout" aria-label="Callout">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v12H7l-3 3z"/><path d="M8 9h8"/><path d="M8 13h5"/></svg>
+              </button>
+              <button type="button" data-command="statusBadge" title="Status badge" aria-label="Status badge">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="7" width="16" height="10" rx="5"/><path d="M8 12h8"/></svg>
+              </button>
+              <button type="button" data-command="detailsBlock" title="Details block" aria-label="Details block">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 9 4 4 4-4"/><path d="M5 5h14"/><path d="M5 19h14"/></svg>
+              </button>
+              <button type="button" data-command="imageFigure" title="Image figure" aria-label="Image figure">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="m5 15 4-4 3 3 2-2 5 5"/><path d="M7 20h10"/></svg>
+              </button>
+              <button type="button" data-command="keyboardShortcut" title="Keyboard shortcut" aria-label="Keyboard shortcut">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01"/><path d="M11 10h.01"/><path d="M15 10h.01"/><path d="M7 14h10"/></svg>
+              </button>
+              <button type="button" data-command="anchor" title="Anchor" aria-label="Anchor">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14"/><circle cx="12" cy="7" r="3"/><path d="M6 13c0 4 3 7 6 7s6-3 6-7"/><path d="M9 13h6"/></svg>
+              </button>
+            </div>
           </div>
           <div class="editor-shell" id="editorShell">
             <div class="editor-line-numbers" id="editorLineNumbers" aria-hidden="true">1</div>
@@ -737,6 +760,22 @@
       <div class="template-dialog-actions">
         <button type="button" id="progressBarCancelButton">Cancel</button>
         <button class="primary" type="button" id="progressBarApplyButton">Apply progress bar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog insert-helper-dialog" id="insertHelperDialog" aria-labelledby="insertHelperTitle" aria-describedby="insertHelperSummary">
+    <form class="utility-dialog-card compact insert-helper-card" id="insertHelperForm" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker" id="insertHelperKicker">Insert</span>
+        <button class="template-dialog-close" type="button" data-insert-helper-cancel aria-label="Close insert helper">X</button>
+      </div>
+      <h2 id="insertHelperTitle">Insert content</h2>
+      <p id="insertHelperSummary">Choose the content to insert.</p>
+      <div class="template-dialog-fields insert-helper-fields" id="insertHelperFields"></div>
+      <div class="template-dialog-actions">
+        <button type="button" id="insertHelperCancelButton">Cancel</button>
+        <button class="primary" type="button" id="insertHelperApplyButton">Insert</button>
       </div>
     </form>
   </dialog>

@@ -580,6 +580,13 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         progressBar: () => {
           commandHandlers.progressBar?.();
         },
+        emoji: () => commandHandlers.insertHelper?.('emoji'),
+        callout: () => commandHandlers.insertHelper?.('callout'),
+        statusBadge: () => commandHandlers.insertHelper?.('statusBadge'),
+        detailsBlock: () => commandHandlers.insertHelper?.('detailsBlock'),
+        imageFigure: () => commandHandlers.insertHelper?.('imageFigure'),
+        keyboardShortcut: () => commandHandlers.insertHelper?.('keyboardShortcut'),
+        anchor: () => commandHandlers.insertHelper?.('anchor'),
       };
 
       commands[command]?.();

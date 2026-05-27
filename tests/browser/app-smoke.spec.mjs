@@ -1178,8 +1178,8 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
 
 test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(16);
-  await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(4);
+  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(23);
+  await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(5);
 
   const cases = [
     { command: 'bold', value: 'alpha', expected: '**alpha**' },
@@ -1304,6 +1304,79 @@ test('progress bar toolbar edits an existing generated progress bar', async ({ p
   await expect(progressBlock.locator('[data-progress-value]')).toHaveText('80%');
   await expect(progressBlock.locator('progress')).toHaveAttribute('value', '80');
   await expect(progressBlock.locator('progress')).toHaveAttribute('max', '100');
+});
+
+test('rich insert toolbar helpers create emoji, callouts, badges, details, figures, shortcuts, and anchors', async ({ page }) => {
+  await page.goto('/');
+
+  async function openHelper(command) {
+    await setEditorValueAndSelection(page, '');
+    await page.locator(`[data-command="${command}"]`).click();
+    await expect(page.locator('#insertHelperDialog')).toBeVisible();
+  }
+
+  await openHelper('emoji');
+  await page.getByRole('button', { name: 'Launch' }).click();
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('🚀');
+
+  await openHelper('callout');
+  await page.locator('#calloutTypeInput').selectOption('WARNING');
+  await page.locator('#calloutTitleInput').fill('Deployment note');
+  await page.locator('#calloutBodyInput').fill('Confirm production readiness.');
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('> [!WARNING]\n> **Deployment note**\n>\n> Confirm production readiness.');
+
+  await openHelper('statusBadge');
+  await page.locator('#statusBadgeTextInput').fill('Blocked by API');
+  await page.getByRole('button', { name: 'Blocked badge' }).click();
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('<span data-status-badge data-status-kind="blocked" aria-label="Status: Blocked by API">Blocked by API</span>');
+
+  await openHelper('detailsBlock');
+  await page.locator('#detailsSummaryInput').fill('Release evidence');
+  await page.locator('#detailsBodyInput').fill('Screenshots and logs are attached.');
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('<details data-details-block>\n  <summary>Release evidence</summary>\n\nScreenshots and logs are attached.\n</details>');
+
+  await openHelper('imageFigure');
+  await page.locator('#imageFigureSrcInput').fill('assets/images/roadmap.png');
+  await page.locator('#imageFigureAltInput').fill('Roadmap diagram');
+  await page.locator('#imageFigureCaptionInput').fill('Quarterly delivery roadmap');
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('<figure data-image-figure>\n  <img src="assets/images/roadmap.png" alt="Roadmap diagram">\n  <figcaption>Quarterly delivery roadmap</figcaption>\n</figure>');
+
+  await openHelper('keyboardShortcut');
+  await page.locator('#shortcutKeysInput').fill('Ctrl+Shift+P');
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('<span data-shortcut aria-label="Keyboard shortcut Ctrl Shift P"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></span>');
+
+  await openHelper('anchor');
+  await page.locator('#anchorIdInput').fill('release-ready');
+  await page.locator('#anchorTextInput').fill('Release ready');
+  await page.locator('#insertHelperApplyButton').click();
+  await expect(page.locator('#editor')).toHaveValue('<span id="release-ready" data-doc-anchor>Release ready</span>');
+
+  await setEditorValueAndSelection(page, [
+    '<span data-status-badge data-status-kind="ready" aria-label="Status: Ready">Ready</span>',
+    '<details data-details-block>',
+    '  <summary>Release evidence</summary>',
+    '',
+    'Screenshots and logs are attached.',
+    '</details>',
+    '<figure data-image-figure>',
+    '  <img src="assets/images/roadmap.png" alt="Roadmap diagram">',
+    '  <figcaption>Quarterly delivery roadmap</figcaption>',
+    '</figure>',
+    '<span data-shortcut aria-label="Keyboard shortcut Ctrl Shift P"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd></span>',
+    '<span id="release-ready" data-doc-anchor>Release ready</span>',
+  ].join('\n'));
+  await renderPreviewWithShortcut(page);
+  await expect(page.locator('#preview [data-status-badge]')).toHaveAttribute('data-status-kind', 'ready');
+  await expect(page.locator('#preview details[data-details-block] summary')).toHaveText('Release evidence');
+  await expect(page.locator('#preview figure[data-image-figure] figcaption')).toHaveText('Quarterly delivery roadmap');
+  await expect(page.locator('#preview [data-shortcut] kbd')).toHaveCount(3);
+  await expect(page.locator('#preview [data-doc-anchor]')).toHaveAttribute('id', 'release-ready');
 });
 
 test('quick switcher, workspace content search, and editor find/replace work together', async ({ page }) => {
