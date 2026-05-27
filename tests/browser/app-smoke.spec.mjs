@@ -1850,7 +1850,8 @@ test('paste preserves full Markdown documents when clipboard HTML contains table
 });
 
 test('Paste Special inserts table, text, code block, and supports next-paste fallback', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
 
   await setEditorValueAndSelection(page, '');
   await mockClipboardRead(page, { text: 'Feature,Status\nPaste,Ready' });
@@ -1879,7 +1880,8 @@ test('Paste Special inserts table, text, code block, and supports next-paste fal
 });
 
 test('Paste Special supports quote, HTML Markdown, lists, checklist, numbered list, and Mermaid', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
 
   await setEditorValueAndSelection(page, '');
   await mockClipboardRead(page, { text: 'Alpha\n\nBeta' });
