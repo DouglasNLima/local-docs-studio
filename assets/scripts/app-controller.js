@@ -4,7 +4,9 @@ import { createInitialState, storageKeys } from './state/config.js';
 import { createEditorService } from './editor/editor-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
+import { createInsertHelperService } from './editor/insert-helper-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
+import { createProgressBarEditorService } from './editor/progress-bar-editor-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
 import { createWorkspaceSearchService } from './editor/workspace-search-service.js';
 import { isImportableDocumentFile } from './files/document-import-service.js';
@@ -168,6 +170,24 @@ export function createAppController() {
       tableEditorMoveRowDownButton,
       tableEditorMoveColumnLeftButton,
       tableEditorMoveColumnRightButton,
+      progressBarEditorDialog,
+      progressBarEditorForm,
+      progressBarEditorSummary,
+      progressBarLabelInput,
+      progressBarPercentInput,
+      progressBarPercentRange,
+      progressBarPercentOutput,
+      progressBarColourOptions,
+      progressBarApplyButton,
+      progressBarCancelButton,
+      insertHelperDialog,
+      insertHelperForm,
+      insertHelperKicker,
+      insertHelperTitle,
+      insertHelperSummary,
+      insertHelperFields,
+      insertHelperApplyButton,
+      insertHelperCancelButton,
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
@@ -175,6 +195,8 @@ export function createAppController() {
 
     const state = createInitialState({ readStoredNumber });
     let openTableEditor = () => {};
+    let openProgressBarEditor = () => {};
+    let openInsertHelper = () => {};
     let openArtifactReaderPath = async () => {};
     let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
     const {
@@ -203,6 +225,8 @@ export function createAppController() {
       callbacks: {
         commandHandlers: {
           table: () => openTableEditor(),
+          progressBar: () => openProgressBarEditor(),
+          insertHelper: (type) => openInsertHelper(type),
         },
         getAutocompleteFiles: () => state.files,
       },
@@ -340,6 +364,44 @@ export function createAppController() {
       },
     });
     openTableEditor = tableEditorTools.openTableEditor;
+    const progressBarEditorTools = createProgressBarEditorService({
+      editor,
+      dom: {
+        progressBarEditorDialog,
+        progressBarEditorForm,
+        progressBarEditorSummary,
+        progressBarLabelInput,
+        progressBarPercentInput,
+        progressBarPercentRange,
+        progressBarPercentOutput,
+        progressBarColourOptions,
+        progressBarApplyButton,
+        progressBarCancelButton,
+      },
+      callbacks: {
+        replaceEditorRange,
+        setStatus,
+      },
+    });
+    openProgressBarEditor = progressBarEditorTools.openProgressBarEditor;
+    const insertHelperTools = createInsertHelperService({
+      editor,
+      dom: {
+        insertHelperDialog,
+        insertHelperForm,
+        insertHelperKicker,
+        insertHelperTitle,
+        insertHelperSummary,
+        insertHelperFields,
+        insertHelperApplyButton,
+        insertHelperCancelButton,
+      },
+      callbacks: {
+        replaceEditorRange,
+        setStatus,
+      },
+    });
+    openInsertHelper = insertHelperTools.openInsertHelper;
     const {
       installDocumentUxHandlers,
       toggleOutline,
@@ -650,6 +712,8 @@ export function createAppController() {
     exportProfileTools.renderBuiltInProfiles();
     findReplaceTools.installFindReplaceHandlers();
     tableEditorTools.installTableEditorHandlers();
+    progressBarEditorTools.installProgressBarEditorHandlers();
+    insertHelperTools.installInsertHelperHandlers();
     workspaceSearchTools.installWorkspaceSearchHandlers();
     installDocumentUxHandlers();
     installScrollSyncHandlers();

@@ -26,7 +26,7 @@ The editor keeps the app lightweight while still covering daily documentation wo
 | Follow editor selection | Preview header checkbox |
 | Manual snapshots | File menu: Create snapshot / Manage snapshots |
 
-Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, and tables.
+Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, tables, semantic progress bars with preset colours, emoji, callouts, status badges, details blocks, image figures, keyboard shortcuts, and anchors.
 
 Right-click in the editor or rendered preview to open context actions for the current selection, code block, table, or diagram.
 

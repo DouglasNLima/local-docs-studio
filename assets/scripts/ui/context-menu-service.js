@@ -112,6 +112,15 @@ export function createContextMenuService({
       commandItem('editor-code-block', 'Code block', 'codeBlock', disableMutation),
       commandItem('editor-mermaid-block', 'Mermaid block', 'mermaidBlock', disableMutation),
       commandItem('editor-table', 'Table', 'table', disableMutation),
+      commandItem('editor-progress-bar', 'Progress bar', 'progressBar', disableMutation),
+      separator(),
+      commandItem('editor-emoji', 'Emoji', 'emoji', disableMutation),
+      commandItem('editor-callout', 'Callout', 'callout', disableMutation),
+      commandItem('editor-status-badge', 'Status badge', 'statusBadge', disableMutation),
+      commandItem('editor-details-block', 'Details block', 'detailsBlock', disableMutation),
+      commandItem('editor-image-figure', 'Image figure', 'imageFigure', disableMutation),
+      commandItem('editor-keyboard-shortcut', 'Keyboard shortcut', 'keyboardShortcut', disableMutation),
+      commandItem('editor-anchor', 'Anchor', 'anchor', disableMutation),
     ]);
   }
 
