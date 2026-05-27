@@ -52,9 +52,13 @@ async function waitForAppReady(page) {
   }
 }
 
-async function openFixture(page, name) {
+async function gotoApp(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
+}
+
+async function openFixture(page, name) {
+  await gotoApp(page);
   const fileInput = page.locator('#fileInput');
   const fileName = path.basename(name);
 
@@ -322,7 +326,7 @@ async function clickEditAction(page, name) {
 }
 
 async function loadVirtualWorkspace(page, files) {
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate((items) => {
     window.confirm = () => true;
     const transfer = new DataTransfer();
@@ -596,7 +600,7 @@ function escapePdfText(value) {
 }
 
 test('root loads the buildless app shell', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await expect(page).toHaveTitle(/^Lens Docs Studio v0\.1\.0 \(build \d+\)$/);
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.brand h1')).toHaveText('Lens Docs Studio');
@@ -692,7 +696,7 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
 });
 
 test('Mermaid labels with HTML line breaks render without SVG parser errors', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await setEditorValueAndSelection(page, `\`\`\`mermaid
 flowchart TD
   A[Parent Flow or Power App] --> B[Prepare Function Request<br/>sourceType + sourceId + maxGeneration]
@@ -754,7 +758,7 @@ flowchart TD
 });
 
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await setEditorValueAndSelection(page, '# Formula\n\nInline $E=mc^2$ and block:\n\n$$\n\\frac{a_1}{b^2}\n$$\n\n```js\nconst value = 1;\n```');
   await expect(page.locator('#editorSyntaxLayer .hljs-section, #editorSyntaxLayer .hljs-code')).not.toHaveCount(0);
   const editorLayerMatch = await page.locator('#editor').evaluate((editor) => {
@@ -780,7 +784,7 @@ test('editor syntax highlighting and math rendering work without a build step', 
 
 test('editor syntax layer stays aligned with native selection metrics', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
-  await page.goto('/');
+  await gotoApp(page);
   const longLine = 'N -->|pedigreeUpdateRequest| Q[Update tek_pedigreeupdaterequests<br/>tek_pedigreejson<br/>tek_traditionalirishhorse]';
   const source = [
     '# Selection Alignment',
@@ -825,7 +829,7 @@ test('editor syntax layer stays aligned with native selection metrics', async ({
 });
 
 test('rendering sanitizes hostile Markdown and Mermaid output', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate(() => {
     window.__auditXss = 0;
   });
@@ -875,7 +879,7 @@ flowchart LR
 
 test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto('/');
+  await gotoApp(page);
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await expect(page.locator('[data-menu-action="newMarkdown"]')).toBeVisible();
@@ -946,7 +950,7 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
 });
 
 test('File menu starts a blank Markdown document', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   page.on('dialog', (dialog) => {
     throw new Error(`Unexpected native dialog: ${dialog.message()}`);
   });
@@ -971,7 +975,7 @@ test('File menu starts a blank Markdown document', async ({ page }) => {
 
 test('File System Access save writes back to the opened file without Save as', async ({ page }) => {
   await installMockFileSystemAccess(page);
-  await page.goto('/');
+  await gotoApp(page);
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
@@ -991,7 +995,7 @@ test('File System Access save writes back to the opened file without Save as', a
 
 test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
   await installMockFileSystemAccess(page);
-  await page.goto('/');
+  await gotoApp(page);
   page.on('dialog', (dialog) => {
     throw new Error(`Unexpected native dialog: ${dialog.message()}`);
   });
@@ -1053,7 +1057,7 @@ test('file browser tree view shows workspace folder hierarchy', async ({ page },
     { name: 'adr/decision.md', data: '# Decision\n' },
   ]);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 4 documents from ZIP/, { timeout: 20_000 });
   const headerMetrics = await page.evaluate(() => {
@@ -1101,7 +1105,7 @@ test('file browser tree view shows workspace folder hierarchy', async ({ page },
 
 test('collapsed sidebar keeps the split workspace stretched', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 820 });
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate(() => {
     localStorage.setItem('md-mmd-renderer.sidebarCollapsed', 'true');
     localStorage.setItem('md-mmd-renderer.editorLayout', 'split');
@@ -1131,7 +1135,7 @@ test('collapsed sidebar keeps the split workspace stretched', async ({ page }) =
 });
 
 test('Help menu opens the feature guide as read-only Markdown', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
 
   await page.locator('summary').filter({ hasText: /^Help$/ }).click();
   await page.getByRole('button', { name: 'Open feature guide' }).click();
@@ -1155,7 +1159,7 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
 });
 
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   const menu = page.locator('.context-menu');
 
   await setEditorValueAndSelection(page, 'alpha');
@@ -1237,7 +1241,7 @@ test('custom context menu exposes preview-specific copy and export actions', asy
 
 test('visual refresh screenshot artefacts cover key shell states', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate(() => {
     localStorage.setItem('md-mmd-renderer.theme', 'dark');
   });
@@ -1252,7 +1256,7 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
   await expect(page.locator('#downloadButton')).toBeVisible();
   await attachViewportScreenshot(page, testInfo, 'phase-9-export-menu-dark');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await expect(page.locator('[data-create-template="requirements.devopsConclusion"]')).toBeVisible();
   const createMenuBox = await page.locator('#createMenu .menu-panel').boundingBox();
@@ -1260,35 +1264,35 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
   expect(createMenuBox.x).toBeGreaterThanOrEqual(0);
   expect(createMenuBox.x + createMenuBox.width).toBeLessThanOrEqual(createViewport.width + 1);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await page.locator('[data-create-template="project.architecture"]').click();
   await expect(page.getByRole('heading', { name: 'Create Architecture Overview' })).toBeVisible();
   await attachViewportScreenshot(page, testInfo, 'phase-9-template-dialog-dark');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate(() => {
     localStorage.setItem('md-mmd-renderer.theme', 'light');
   });
-  await page.goto('/');
+  await gotoApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await loadSample(page);
   await attachViewportScreenshot(page, testInfo, 'phase-9-sample-light');
-  await page.goto('/');
+  await gotoApp(page);
   await attachViewportScreenshot(page, testInfo, 'phase-9-empty-light');
 
   await page.evaluate(() => {
     localStorage.setItem('md-mmd-renderer.theme', 'dark');
   });
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await gotoApp(page);
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await loadSample(page);
   await attachViewportScreenshot(page, testInfo, 'phase-9-mobile-sample-dark');
 });
 
 test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(23);
   await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(5);
 
@@ -1321,7 +1325,7 @@ test('editor toolbar icon buttons keep markdown command behaviour', async ({ pag
 });
 
 test('table toolbar opens a visual editor for new and existing Markdown tables', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await setEditorValueAndSelection(page, '');
   await page.locator('[data-command="table"]').click();
   await expect(page.getByRole('heading', { name: 'Edit table' })).toBeVisible();
@@ -1350,7 +1354,7 @@ test('table toolbar opens a visual editor for new and existing Markdown tables',
 });
 
 test('progress bar toolbar inserts semantic HTML with a preset colour', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await setEditorValueAndSelection(page, 'Deployment readiness');
   await page.locator('[data-command="progressBar"]').click();
   await expect(page.getByRole('heading', { name: 'Edit progress bar' })).toBeVisible();
@@ -1380,7 +1384,7 @@ test('progress bar toolbar inserts semantic HTML with a preset colour', async ({
 });
 
 test('progress bar toolbar edits an existing generated progress bar', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   const source = `<figure data-progress-bar data-progress-colour="green" aria-label="Initial progress">
   <figcaption>
     <span data-progress-label>Initial</span>
@@ -1418,7 +1422,7 @@ test('progress bar toolbar edits an existing generated progress bar', async ({ p
 });
 
 test('rich insert toolbar helpers create emoji, callouts, badges, details, figures, shortcuts, and anchors', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
 
   async function openHelper(command) {
     await setEditorValueAndSelection(page, '');
@@ -1632,7 +1636,7 @@ The favorite center text should be reviewed.
 
 test('local draft recovery and large deletion protection guard browser-local edits', async ({ page }) => {
   const file = { name: 'draft.md', mimeType: 'text/markdown', buffer: Buffer.from('# Draft\nThis paragraph should survive local recovery because it is long enough to trigger the deletion guard when most of it disappears.\n') };
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#fileInput').setInputFiles(file);
   await expect(page.locator('#status')).toHaveText(/Rendered/);
   await setEditorValueAndSelection(page, '# Draft\nRecovered browser-local draft.\n');
@@ -1756,7 +1760,7 @@ test('built-in export profiles are session-only and do not persist DevOps settin
 });
 
 test('writer shortcut is disabled while input maximise handles focused writing', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await loadSample(page);
   await page.evaluate(() => {
     localStorage.setItem('md-mmd-renderer.typewriterMode', 'true');
@@ -1785,7 +1789,7 @@ test('writer shortcut is disabled while input maximise handles focused writing',
 });
 
 test('paste auto-converts formatted HTML and spreadsheet tables while leaving plain text alone', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
 
   await setEditorValueAndSelection(page, 'Intro', 5, 5);
   await pasteIntoEditor(page, { text: 'Name\tQty\nApples\t4\nPears\t7' });
@@ -1816,7 +1820,7 @@ test('paste auto-converts formatted HTML and spreadsheet tables while leaving pl
 });
 
 test('paste preserves full Markdown documents when clipboard HTML contains tables', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   const markdown = [
     '# Imported Story',
     '',
@@ -1850,8 +1854,7 @@ test('paste preserves full Markdown documents when clipboard HTML contains table
 });
 
 test('Paste Special inserts table, text, code block, and supports next-paste fallback', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await waitForAppReady(page);
+  await gotoApp(page);
 
   await setEditorValueAndSelection(page, '');
   await mockClipboardRead(page, { text: 'Feature,Status\nPaste,Ready' });
@@ -1880,8 +1883,7 @@ test('Paste Special inserts table, text, code block, and supports next-paste fal
 });
 
 test('Paste Special supports quote, HTML Markdown, lists, checklist, numbered list, and Mermaid', async ({ page }) => {
-  await page.goto('/', { waitUntil: 'domcontentloaded' });
-  await waitForAppReady(page);
+  await gotoApp(page);
 
   await setEditorValueAndSelection(page, '');
   await mockClipboardRead(page, { text: 'Alpha\n\nBeta' });
@@ -1957,7 +1959,7 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
 });
 
 test('focus mode exposes a visible exit button and keeps Escape fallback', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
 
   await expect(page.locator('#focusModeExitButton')).toBeHidden();
   await expect(page.locator('#focusModeButton')).toHaveAttribute('title', 'Focus Mode (Ctrl+F11)');
@@ -2003,7 +2005,7 @@ test('focus mode exposes a visible exit button and keeps Escape fallback', async
 
 test('preview toolbar wraps without overlapping in a narrow preview pane', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 768 });
-  await page.goto('/');
+  await gotoApp(page);
   await loadSample(page);
 
   await page.evaluate(() => {
@@ -2150,7 +2152,7 @@ test('selection follow highlights editor selections in preview and respects the 
 
 
 test('broken mermaid fixture shows error actions without export actions', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   const source = [
     '# Broken Mermaid Fixture',
     '',
@@ -2482,7 +2484,7 @@ test('Markdown Bundle import accepts current and legacy manifest names', async (
     'md-mmd-renderer-bundle.json',
   ];
 
-  await page.goto('/');
+  await gotoApp(page);
 
   for (const manifestName of manifestNames) {
     const zipPath = testInfo.outputPath(`${manifestName}.zip`);
@@ -2536,7 +2538,7 @@ test('Markdown Bundle DevOps option converts Mermaid fences only when enabled', 
 test('fixture-based valid basic artefact bundle import opens editable records', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-basic');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 3 documents from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
   await expect(page.locator('#editor')).toHaveValue(/declared entry document/);
@@ -2560,7 +2562,7 @@ test('fixture-based valid basic artefact bundle import opens editable records', 
 test('fixture-based valid rich artefact bundle import shows safe reader metadata', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
   await expect(page.locator('#editor')).toHaveValue(/rich bundle exercises/);
@@ -2633,7 +2635,7 @@ test('artefact reader keyboard controls are accessible and filters stay local', 
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
   const basicZipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-basic', 'valid-basic-reset.zip');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
   const initialStorageKeys = await page.evaluate(() => Object.keys(localStorage).sort());
@@ -2683,7 +2685,7 @@ test('invalid Lens artefact bundle manifest falls back to safe ZIP import', asyn
   page.on('pageerror', (error) => pageErrors.push(error.message));
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'invalid-manifest');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 2 documents from ZIP\. Artefact bundle manifest could not be read\./, { timeout: 20_000 });
   await expect(page.locator('#artifactBundleSummary')).toBeHidden();
@@ -2706,7 +2708,7 @@ test('Lens artefact bundle missing entry document keeps fallback selection and w
     },
   ]);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/entry document was not found/, { timeout: 20_000 });
   await expect(page.locator('#editor')).toHaveValue(/Existing first document opened/);
@@ -2718,7 +2720,7 @@ test('Lens artefact bundle missing entry document keeps fallback selection and w
 test('Lens artefact bundle ignores unsafe metadata paths without exposing them', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'unsafe-paths');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/entry document path was ignored/, { timeout: 20_000 });
   await expect(page.locator('#fileList .file-item')).toHaveCount(2);
@@ -2760,7 +2762,7 @@ test('Lens artefact bundle preserves candidate evidence wording', async ({ page 
     },
   ]);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   const summary = page.locator('#artifactBundleSummary');
   await summary.getByRole('button', { name: 'Expand artefact bundle reader' }).click();
@@ -2786,7 +2788,7 @@ test('Lens artefact bundle metadata does not trigger external fetches', async ({
     },
   ]);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.evaluate(() => {
     const calls = [];
     const originalFetch = window.fetch.bind(window);
@@ -2805,7 +2807,7 @@ test('Lens artefact bundle metadata does not trigger external fetches', async ({
 test('artefact review pack export is explicit and round-trips safe rich metadata', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
 
@@ -2879,7 +2881,7 @@ test('artefact review pack export is explicit and round-trips safe rich metadata
 test('ordinary Markdown Bundle export stays free of artefact manifests after artefact import', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'valid-rich');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle/, { timeout: 20_000 });
 
@@ -2902,7 +2904,7 @@ test('ordinary Markdown Bundle export stays free of artefact manifests after art
 test('ZIP import accepts compressed generic docs and handles ZIPs without sources', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'generic-zip', 'generic-docs.zip');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 2 documents and 1 image asset from ZIP/, { timeout: 20_000 });
   await expect(page.locator('#artifactBundleSummary')).toBeHidden();
@@ -2937,7 +2939,7 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
   <img alt="Bad SVG" src="data:image/svg+xml;base64,PHN2ZyBvbmxvYWQ9ImFsZXJ0KDEpIj48L3N2Zz4=">
 </body></html>`);
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#documentInput').setInputFiles(htmlPath);
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/);
   await expect(page.locator('#saveButton')).toBeEnabled();
@@ -2969,7 +2971,7 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
 });
 
 test('document import drag and drop handles HTML and PDF text extraction', async ({ page }) => {
-  await page.goto('/');
+  await gotoApp(page);
   await dropVirtualFile(page, {
     name: 'drop.html',
     type: 'text/html',
@@ -2978,7 +2980,7 @@ test('document import drag and drop handles HTML and PDF text extraction', async
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document/);
   await expect(page.locator('#editor')).toHaveValue(/# Dropped HTML/);
 
-  await page.goto('/');
+  await gotoApp(page);
   await dropVirtualFile(page, {
     name: 'future.pdf',
     type: 'application/pdf',
@@ -2996,7 +2998,7 @@ test('document import drag and drop handles HTML and PDF text extraction', async
 });
 
 test('Docs Site export contains the expected static site package', async ({ page }, testInfo) => {
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#folderInput').setInputFiles(fixturePath('docs-site'));
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
 
@@ -3132,7 +3134,7 @@ test('front matter drives Docs Site metadata without rendering as content', asyn
 test('Docs Site export uses safe artefact metadata as display-only fallback', async ({ page }, testInfo) => {
   const zipPath = await writeArtifactBundleFixtureZip(testInfo, 'front-matter-precedence');
 
-  await page.goto('/');
+  await gotoApp(page);
   await page.locator('#zipInput').setInputFiles(zipPath);
   await expect(page.locator('#status')).toHaveText(/Imported 2 documents from artefact bundle/, { timeout: 20_000 });
 
@@ -3189,7 +3191,7 @@ test('Docs Site export uses safe artefact metadata as display-only fallback', as
 
 test('theme, preview maximise, and mobile layout stay usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await gotoApp(page);
   await loadSample(page);
 
   await page.locator('#themeToggleButton').click();
