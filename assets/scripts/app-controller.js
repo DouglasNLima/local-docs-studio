@@ -5,6 +5,7 @@ import { createEditorService } from './editor/editor-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
+import { createProgressBarEditorService } from './editor/progress-bar-editor-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
 import { createWorkspaceSearchService } from './editor/workspace-search-service.js';
 import { isImportableDocumentFile } from './files/document-import-service.js';
@@ -168,6 +169,16 @@ export function createAppController() {
       tableEditorMoveRowDownButton,
       tableEditorMoveColumnLeftButton,
       tableEditorMoveColumnRightButton,
+      progressBarEditorDialog,
+      progressBarEditorForm,
+      progressBarEditorSummary,
+      progressBarLabelInput,
+      progressBarPercentInput,
+      progressBarPercentRange,
+      progressBarPercentOutput,
+      progressBarColourOptions,
+      progressBarApplyButton,
+      progressBarCancelButton,
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
@@ -175,6 +186,7 @@ export function createAppController() {
 
     const state = createInitialState({ readStoredNumber });
     let openTableEditor = () => {};
+    let openProgressBarEditor = () => {};
     let openArtifactReaderPath = async () => {};
     let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
     const {
@@ -203,6 +215,7 @@ export function createAppController() {
       callbacks: {
         commandHandlers: {
           table: () => openTableEditor(),
+          progressBar: () => openProgressBarEditor(),
         },
         getAutocompleteFiles: () => state.files,
       },
@@ -340,6 +353,26 @@ export function createAppController() {
       },
     });
     openTableEditor = tableEditorTools.openTableEditor;
+    const progressBarEditorTools = createProgressBarEditorService({
+      editor,
+      dom: {
+        progressBarEditorDialog,
+        progressBarEditorForm,
+        progressBarEditorSummary,
+        progressBarLabelInput,
+        progressBarPercentInput,
+        progressBarPercentRange,
+        progressBarPercentOutput,
+        progressBarColourOptions,
+        progressBarApplyButton,
+        progressBarCancelButton,
+      },
+      callbacks: {
+        replaceEditorRange,
+        setStatus,
+      },
+    });
+    openProgressBarEditor = progressBarEditorTools.openProgressBarEditor;
     const {
       installDocumentUxHandlers,
       toggleOutline,
@@ -650,6 +683,7 @@ export function createAppController() {
     exportProfileTools.renderBuiltInProfiles();
     findReplaceTools.installFindReplaceHandlers();
     tableEditorTools.installTableEditorHandlers();
+    progressBarEditorTools.installProgressBarEditorHandlers();
     workspaceSearchTools.installWorkspaceSearchHandlers();
     installDocumentUxHandlers();
     installScrollSyncHandlers();

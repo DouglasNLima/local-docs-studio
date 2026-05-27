@@ -1178,7 +1178,7 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
 
 test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(15);
+  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(16);
   await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(4);
 
   const cases = [
@@ -1236,6 +1236,74 @@ test('table toolbar opens a visual editor for new and existing Markdown tables',
   await page.locator('#tableEditorGrid input').nth(1).fill('State');
   await page.getByRole('button', { name: 'Apply table' }).click();
   await expect(page.locator('#editor')).toHaveValue(/State/);
+});
+
+test('progress bar toolbar inserts semantic HTML with a preset colour', async ({ page }) => {
+  await page.goto('/');
+  await setEditorValueAndSelection(page, 'Deployment readiness');
+  await page.locator('[data-command="progressBar"]').click();
+  await expect(page.getByRole('heading', { name: 'Edit progress bar' })).toBeVisible();
+  await expect(page.locator('#progressBarEditorDialog .utility-dialog-card')).toBeInViewport();
+  await expect(page.locator('#progressBarLabelInput')).toHaveValue('Deployment readiness');
+
+  await page.locator('#progressBarPercentInput').fill('65');
+  await page.getByRole('button', { name: 'Blue progress colour' }).click();
+  await page.getByRole('button', { name: 'Apply progress bar' }).click();
+
+  const expected = `<figure data-progress-bar data-progress-colour="blue" aria-label="Deployment readiness progress">
+  <figcaption>
+    <span data-progress-label>Deployment readiness</span>
+    <span data-progress-value>65%</span>
+  </figcaption>
+  <progress max="100" value="65">65%</progress>
+</figure>`;
+  await expect(page.locator('#editor')).toHaveValue(expected);
+
+  await renderPreviewWithShortcut(page);
+  const progressBlock = page.locator('#preview figure[data-progress-bar]');
+  await expect(progressBlock).toHaveAttribute('data-progress-colour', 'blue');
+  await expect(progressBlock.locator('[data-progress-label]')).toHaveText('Deployment readiness');
+  await expect(progressBlock.locator('[data-progress-value]')).toHaveText('65%');
+  await expect(progressBlock.locator('progress')).toHaveAttribute('value', '65');
+  await expect(progressBlock.locator('progress')).toHaveAttribute('max', '100');
+});
+
+test('progress bar toolbar edits an existing generated progress bar', async ({ page }) => {
+  await page.goto('/');
+  const source = `<figure data-progress-bar data-progress-colour="green" aria-label="Initial progress">
+  <figcaption>
+    <span data-progress-label>Initial</span>
+    <span data-progress-value>25%</span>
+  </figcaption>
+  <progress max="100" value="25">25%</progress>
+</figure>`;
+  const cursor = source.indexOf('25%');
+  await setEditorValueAndSelection(page, source, cursor, cursor);
+
+  await page.locator('[data-command="progressBar"]').click();
+  await expect(page.locator('#progressBarEditorSummary')).toHaveText('Editing an existing progress bar.');
+  await expect(page.locator('#progressBarLabelInput')).toHaveValue('Initial');
+  await expect(page.locator('#progressBarPercentInput')).toHaveValue('25');
+  await page.locator('#progressBarLabelInput').fill('Migration complete');
+  await page.locator('#progressBarPercentInput').fill('80');
+  await page.getByRole('button', { name: 'Red progress colour' }).click();
+  await page.getByRole('button', { name: 'Apply progress bar' }).click();
+
+  await expect(page.locator('#editor')).toHaveValue(`<figure data-progress-bar data-progress-colour="red" aria-label="Migration complete progress">
+  <figcaption>
+    <span data-progress-label>Migration complete</span>
+    <span data-progress-value>80%</span>
+  </figcaption>
+  <progress max="100" value="80">80%</progress>
+</figure>`);
+
+  await renderPreviewWithShortcut(page);
+  const progressBlock = page.locator('#preview figure[data-progress-bar]');
+  await expect(progressBlock).toHaveAttribute('data-progress-colour', 'red');
+  await expect(progressBlock.locator('[data-progress-label]')).toHaveText('Migration complete');
+  await expect(progressBlock.locator('[data-progress-value]')).toHaveText('80%');
+  await expect(progressBlock.locator('progress')).toHaveAttribute('value', '80');
+  await expect(progressBlock.locator('progress')).toHaveAttribute('max', '100');
 });
 
 test('quick switcher, workspace content search, and editor find/replace work together', async ({ page }) => {

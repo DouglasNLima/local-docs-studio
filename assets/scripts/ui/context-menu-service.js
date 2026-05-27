@@ -112,6 +112,7 @@ export function createContextMenuService({
       commandItem('editor-code-block', 'Code block', 'codeBlock', disableMutation),
       commandItem('editor-mermaid-block', 'Mermaid block', 'mermaidBlock', disableMutation),
       commandItem('editor-table', 'Table', 'table', disableMutation),
+      commandItem('editor-progress-bar', 'Progress bar', 'progressBar', disableMutation),
     ]);
   }
 

@@ -577,6 +577,9 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
           }
           insertTable();
         },
+        progressBar: () => {
+          commandHandlers.progressBar?.();
+        },
       };
 
       commands[command]?.();

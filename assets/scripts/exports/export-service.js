@@ -1290,6 +1290,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Libe
 :not(pre) > code { padding: .12rem .32rem; border: 1px solid var(--border); border-radius: .4rem; background: var(--code); }
 ${buildCodeBlockSupportCss()}
 ${buildTableActionSupportCss()}
+${buildProgressBarSupportCss()}
 ${buildDiagramActionSupportCss()}
 blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid var(--accent); color: var(--muted); }
 table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
@@ -1910,6 +1911,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     blockquote { margin-inline: 0; padding-left: 1rem; border-left: .25rem solid #FF883E; color: #475569; }
     ${buildCodeBlockSupportCss()}
     ${buildTableActionSupportCss()}
+    ${buildProgressBarSupportCss()}
     ${buildDiagramActionSupportCss()}
     .diagram-frame { overflow: auto; margin: 1rem 0; padding: 1rem; border: 1px solid #d5dce8; border-radius: .9rem; background: #fff; }
     .mermaid { display: block; width: max-content; max-width: none; margin: 0; }
@@ -1956,6 +1958,7 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     blockquote { margin-inline: 0; padding-left: 12pt; border-left: 3pt solid #FF883E; color: #475569; }
     .code-block { margin: 12pt 0; border: 1px solid #d5dce8; border-radius: 6pt; background: #f8fafc; }
     .code-block pre { margin: 0; border: 0; background: transparent; }
+    ${buildProgressBarPrintCss()}
     .diagram-frame { overflow: visible; margin: 12pt 0; padding: 10pt; border: 1px solid #d5dce8; border-radius: 6pt; background: #ffffff; break-inside: avoid; }
     .mermaid { display: block; width: max-content; max-width: 100%; margin: 0; }
     .mermaid svg, svg { max-width: 100% !important; height: auto !important; transform: none !important; }
@@ -2052,6 +2055,28 @@ Upload the contents of this ZIP to GitHub Pages or any static web host. Keep the
     .table-action-button:hover, .table-action-button:focus-visible, .table-copy-button:hover, .table-copy-button:focus-visible { border-color: #FF883E; outline: none; }
     .table-action-button:disabled, .table-copy-button:disabled { cursor: default; opacity: .72; }
     .table-block table { width: 100%; margin: 0; border-collapse: collapse; }`;
+    }
+
+    function buildProgressBarSupportCss() {
+      return `figure[data-progress-bar] { --progress-bar-colour: #FF883E; --progress-bar-soft: #FFF1E8; display: grid; gap: .55rem; margin: 1rem 0; padding: .82rem .9rem; border: 1px solid var(--border, #d5dce8); border-radius: .85rem; background: var(--surface-soft, #f8fafc); }
+    figure[data-progress-bar][data-progress-colour="green"] { --progress-bar-colour: #16A34A; --progress-bar-soft: #DCFCE7; }
+    figure[data-progress-bar][data-progress-colour="blue"] { --progress-bar-colour: #2563EB; --progress-bar-soft: #DBEAFE; }
+    figure[data-progress-bar][data-progress-colour="amber"] { --progress-bar-colour: #D97706; --progress-bar-soft: #FEF3C7; }
+    figure[data-progress-bar][data-progress-colour="red"] { --progress-bar-colour: #DC2626; --progress-bar-soft: #FEE2E2; }
+    figure[data-progress-bar][data-progress-colour="neutral"] { --progress-bar-colour: #64748B; --progress-bar-soft: #E2E8F0; }
+    figure[data-progress-bar] figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; color: var(--muted, #475569); font-size: .9rem; font-weight: 750; }
+    figure[data-progress-bar] [data-progress-label] { min-width: 0; overflow-wrap: anywhere; }
+    figure[data-progress-bar] [data-progress-value] { flex: 0 0 auto; color: var(--progress-bar-colour); font-variant-numeric: tabular-nums; }
+    figure[data-progress-bar] progress { width: 100%; height: .72rem; overflow: hidden; border: 0; border-radius: 999px; background: var(--progress-bar-soft); appearance: none; }
+    figure[data-progress-bar] progress::-webkit-progress-bar { border-radius: 999px; background: var(--progress-bar-soft); }
+    figure[data-progress-bar] progress::-webkit-progress-value { border-radius: 999px; background: var(--progress-bar-colour); }
+    figure[data-progress-bar] progress::-moz-progress-bar { border-radius: 999px; background: var(--progress-bar-colour); }`;
+    }
+
+    function buildProgressBarPrintCss() {
+      return `${buildProgressBarSupportCss()}
+    figure[data-progress-bar] { break-inside: avoid; box-shadow: none; }
+    figure[data-progress-bar] progress { height: 8pt; }`;
     }
 
     function buildTableActionScript() {
@@ -2494,6 +2519,10 @@ ${buildWordBodyXml(root, imageRelationships)}
         return [buildWordCodeBlock(node)];
       }
 
+      if (tagName === 'figure' && node.hasAttribute('data-progress-bar')) {
+        return [buildWordProgressBar(node)];
+      }
+
       if (/^h[1-6]$/.test(tagName)) {
         const level = Number(tagName.slice(1));
         const sizes = { 1: 48, 2: 36, 3: 28, 4: 24, 5: 22, 6: 20 };
@@ -2565,6 +2594,29 @@ ${buildWordBodyXml(root, imageRelationships)}
       const code = block.querySelector('pre code');
       const runs = code ? collectWordCodeRuns(code) : [];
       return buildWordParagraph(runs.length ? runs : [buildWordTextRun('', { code: true })], { code: true, after: 180 });
+    }
+
+    function buildWordProgressBar(figure) {
+      const label = figure.querySelector('[data-progress-label]')?.textContent.trim() || 'Progress';
+      const value = figure.querySelector('[data-progress-value]')?.textContent.trim()
+        || `${figure.querySelector('progress')?.getAttribute('value') || '0'}%`;
+      const colour = getProgressWordColour(figure.dataset.progressColour);
+      return buildWordParagraph([
+        buildWordTextRun(`${label}: `, { bold: true }),
+        buildWordTextRun(value, { bold: true, color: colour }),
+      ], { after: 160 });
+    }
+
+    function getProgressWordColour(colour) {
+      const colours = {
+        accent: 'D95F16',
+        green: '16A34A',
+        blue: '2563EB',
+        amber: 'D97706',
+        red: 'DC2626',
+        neutral: '64748B',
+      };
+      return colours[colour] || colours.accent;
     }
 
     function collectWordCodeRuns(node, options = {}) {

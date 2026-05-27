@@ -136,6 +136,16 @@ export const domIds = {
   tableEditorMoveRowDownButton: 'tableEditorMoveRowDownButton',
   tableEditorMoveColumnLeftButton: 'tableEditorMoveColumnLeftButton',
   tableEditorMoveColumnRightButton: 'tableEditorMoveColumnRightButton',
+  progressBarEditorDialog: 'progressBarEditorDialog',
+  progressBarEditorForm: 'progressBarEditorForm',
+  progressBarEditorSummary: 'progressBarEditorSummary',
+  progressBarLabelInput: 'progressBarLabelInput',
+  progressBarPercentInput: 'progressBarPercentInput',
+  progressBarPercentRange: 'progressBarPercentRange',
+  progressBarPercentOutput: 'progressBarPercentOutput',
+  progressBarColourOptions: 'progressBarColourOptions',
+  progressBarApplyButton: 'progressBarApplyButton',
+  progressBarCancelButton: 'progressBarCancelButton',
 };
 
 export function getDomElements(root = document) {
