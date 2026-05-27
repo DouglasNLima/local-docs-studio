@@ -708,6 +708,9 @@ export function createFileService({
         resetEditorHistory();
         syncEditorReadOnly?.();
         updateEditorChrome?.();
+        renderFileList();
+        updateActiveFileLabel();
+        updateSaveButton();
         const recovered = await afterActiveFileLoaded?.(record, editor.value);
         if (recovered?.content !== undefined && recovered.content !== editor.value) {
           editor.value = recovered.content;
@@ -715,10 +718,10 @@ export function createFileService({
           if (recovered.dirty) state.dirtyPaths.add(record.path);
           resetEditorHistory();
           updateEditorChrome?.();
+          renderFileList();
+          updateActiveFileLabel();
+          updateSaveButton();
         }
-        renderFileList();
-        updateActiveFileLabel();
-        updateSaveButton();
         await renderPreview();
         restoreScrollPosition?.(record.path);
       } catch (error) {

@@ -19,13 +19,15 @@ function normaliseLineEndings(value) {
 
 async function openFixture(page, name) {
   await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
   const fileInput = page.locator('#fileInput');
-  const status = page.locator('#status');
+  const fileName = path.basename(name);
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
+    await fileInput.setInputFiles([]);
     await fileInput.setInputFiles(fixturePath(name));
     try {
-      await expect.poll(async () => await status.textContent(), { timeout: 5_000 }).not.toBe('Ready');
+      await expect(page.locator('#activeFileLabel')).toContainText(fileName, { timeout: 5_000 });
       break;
     } catch (error) {
       if (attempt === 2) throw error;
@@ -538,10 +540,11 @@ function escapePdfText(value) {
 
 test('root loads the buildless app shell', async ({ page }) => {
   await page.goto('/');
-  await expect(page).toHaveTitle('Lens Docs Studio');
+  await expect(page).toHaveTitle(/^Lens Docs Studio v0\.1\.0 \(build \d+\)$/);
   await expect(page.locator('#app')).toBeVisible();
   await expect(page.locator('.brand h1')).toHaveText('Lens Docs Studio');
   await expect(page.locator('.brand small')).toHaveText('Local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('#appVersionBadge')).toHaveText(/^v0\.1\.0 \(build \d+\)$/);
   await expect(page.locator('.brand-mark')).not.toHaveText('LD');
   await expect(page.locator('body')).not.toContainText('Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
