@@ -17,9 +17,44 @@ function normaliseLineEndings(value) {
   return String(value).replace(/\r\n?/g, '\n');
 }
 
+async function waitForAppReady(page) {
+  const diagnostics = [];
+  const recordConsole = (message) => {
+    if (['error', 'warning'].includes(message.type())) {
+      diagnostics.push(`${message.type()}: ${message.text()}`);
+    }
+  };
+  const recordPageError = (error) => {
+    diagnostics.push(`pageerror: ${error.message}`);
+  };
+
+  page.on('console', recordConsole);
+  page.on('pageerror', recordPageError);
+
+  try {
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+        return;
+      } catch (error) {
+        if (attempt === 2) {
+          const details = diagnostics.length
+            ? `\nApp bootstrap diagnostics:\n${diagnostics.join('\n')}`
+            : '';
+          throw new Error(`${error.message}${details}`);
+        }
+        await page.reload({ waitUntil: 'domcontentloaded' });
+      }
+    }
+  } finally {
+    page.off('console', recordConsole);
+    page.off('pageerror', recordPageError);
+  }
+}
+
 async function openFixture(page, name) {
-  await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
   const fileInput = page.locator('#fileInput');
   const fileName = path.basename(name);
 
