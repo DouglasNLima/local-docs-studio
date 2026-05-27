@@ -3254,6 +3254,12 @@ label.file-button.primary,
   outline: none;
 }
 
+.tree-folder.selected {
+  border-color: rgba(255, 136, 62, .45);
+  background: rgba(255, 136, 62, .12);
+  color: var(--text);
+}
+
 .tree-folder-twisty {
   display: inline-grid;
   place-items: center;
@@ -4778,6 +4784,30 @@ label.file-button.primary,
 .utility-dialog-card.compact {
   max-width: 34rem;
   margin: auto;
+}
+
+.app-dialog h2 {
+  margin: 0;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.app-dialog p {
+  margin: -.25rem 0 0;
+  color: var(--muted-strong);
+  font-size: .92rem;
+  line-height: 1.5;
+}
+
+.dialog-error-message {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.template-dialog-actions .danger {
+  border-color: rgba(251, 113, 133, .55);
+  background: rgba(251, 113, 133, .14);
+  color: var(--danger);
 }
 
 .utility-dialog-top,

@@ -13,6 +13,7 @@ export function createContextMenuService({
     copyTableBlock,
     downloadTableCsv,
     copyToClipboard,
+    copyDiagramFramePng,
     executeMarkdownCommand,
     exportDiagramFramePng,
     exportDiagramFrameSvg,
@@ -140,6 +141,9 @@ export function createContextMenuService({
         disabled: !renderedSvg,
       }) : null,
       frame ? item('preview-export-diagram-png', 'Export diagram as PNG', () => exportDiagramFramePng(frame), {
+        disabled: !renderedSvg,
+      }) : null,
+      frame ? item('preview-copy-diagram-png', 'Copy diagram PNG', () => copyDiagramFramePng(frame), {
         disabled: !renderedSvg,
       }) : null,
       frame ? item('preview-jump-diagram-source', 'Jump to source', () => focusEditorAtSource(diagramSource), {

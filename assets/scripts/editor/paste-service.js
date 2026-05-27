@@ -140,9 +140,31 @@ export function resolvePasteReplacement(payload, mode = pasteModes.auto) {
     } : null;
   }
 
-  if (mode === pasteModes.table || mode === pasteModes.auto) {
-    const table = resolveTableRows(payload, { allowCsv: mode === pasteModes.table });
-    if (!table) return mode === pasteModes.auto ? resolveHtmlMarkdown(payload) : null;
+  if (mode === pasteModes.auto) {
+    const plainText = getPlainTextFromPayload(payload);
+    if (isMarkdownLikePlainText(plainText)) {
+      return {
+        text: plainText,
+        block: false,
+        status: 'Plain text pasted.',
+        statusType: 'ok',
+      };
+    }
+
+    const table = resolveTableRows(payload, { singleHtmlTableOnly: true });
+    if (!table) return resolveHtmlMarkdown(payload);
+
+    return {
+      text: formatMarkdownTable(table.rows),
+      block: true,
+      status: table.flattened ? tableMessages.flattened : tableMessages.ok,
+      statusType: table.flattened ? 'warning' : 'ok',
+    };
+  }
+
+  if (mode === pasteModes.table) {
+    const table = resolveTableRows(payload, { allowCsv: true });
+    if (!table) return null;
 
     return {
       text: formatMarkdownTable(table.rows),
@@ -165,8 +187,9 @@ function resolveHtmlMarkdown(payload) {
   } : null;
 }
 
-function resolveTableRows(payload, { allowCsv = false } = {}) {
-  const htmlTable = parseHtmlTable(payload?.html || '');
+function resolveTableRows(payload, { allowCsv = false, singleHtmlTableOnly = false } = {}) {
+  const html = payload?.html || '';
+  const htmlTable = (!singleHtmlTableOnly || isSingleTableHtml(html)) ? parseHtmlTable(html) : null;
   if (htmlTable) return htmlTable;
 
   const text = normaliseLineEndings(payload?.text || '').replace(/\n+$/, '');
@@ -183,6 +206,34 @@ function resolveTableRows(payload, { allowCsv = false } = {}) {
   }
 
   return null;
+}
+
+function isMarkdownLikePlainText(value) {
+  const text = normaliseLineEndings(value || '').trim();
+  if (!text) return false;
+  return [
+    /^```[\w-]*\s*\n[\s\S]*\n```$/m,
+    /^:::\s*mermaid\s*\n[\s\S]*\n:::$/mi,
+    /^#{1,6}\s+\S/m,
+    /^\|.+\|\n\|[\s:|.-]+\|/m,
+    /^[-*+]\s+\S/m,
+    /^\d+[.)]\s+\S/m,
+    /!\[[^\]\n]*\]\([^)]+\)/m,
+    /\[[^\]\n]+\]\([^)]+\)/m,
+  ].some((pattern) => pattern.test(text));
+}
+
+function isSingleTableHtml(value) {
+  const html = String(value || '');
+  if (!/<table[\s>]/i.test(html)) return false;
+
+  const document = new DOMParser().parseFromString(html, 'text/html');
+  const tables = [...document.body.querySelectorAll('table')];
+  if (tables.length !== 1) return false;
+
+  const clone = document.body.cloneNode(true);
+  clone.querySelector('table')?.remove();
+  return !clone.textContent.replace(/\u00a0/g, ' ').trim();
 }
 
 function parseDelimitedRows(source, delimiter) {

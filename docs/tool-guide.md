@@ -69,7 +69,7 @@ flowchart LR
 - **HTML** creates a standalone rendered document.
 - **Word** creates a `.docx` with rendered diagrams and compatible content.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
-- **Docs Site** builds a static GitHub Pages-friendly ZIP with theme, navigation, and search.
+- **Docs Site** builds a static ZIP with theme, navigation, and search that can open directly from `index.html` or be hosted on GitHub Pages.
 - Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group. With a loaded artefact bundle, safe metadata can fill missing title, order, evidence, and navigation hints; front matter remains highest priority.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
 - **Export artefact review pack** is available only after importing a valid artefact bundle. It exports editable Markdown and managed images with a rebuilt safe `lens-artifact-bundle.json`; ordinary Markdown Bundle export does not include artefact metadata.

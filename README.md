@@ -110,7 +110,7 @@ The Export menu includes document-level diagram actions:
 
 Open a folder of Markdown and Mermaid files, toggle **Docs site** to preview the folder as a navigable documentation site, then choose **Export Docs Site** from the Export menu.
 
-Docs Site Builder 2.0 opens a custom export dialogue for the site title, short description, and initial theme. The exported site includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
+Docs Site Builder 2.0 opens a custom export dialogue for the site title, short description, and initial theme. The exported site can be opened directly from its `index.html` file or hosted on GitHub Pages, and includes Light, Dark, and System theme switching, heading navigation for each page, and static full-text search across page titles, paths, headings, body text, and code blocks. If the folder contains `README.md` or `index.md`, that document becomes the home page; otherwise the export creates a compact generated home page with bundle stats and page cards.
 
 Markdown files can start with front matter to control Docs Site metadata without rendering that block as document content:
 
@@ -129,12 +129,13 @@ The generated ZIP contains:
 
 - `index.html` as the static site entry point.
 - `assets/docs-site.css` with the exported site layout and themes.
+- `assets/docs-site-data.js` so the site works when opened from disk without a local server.
 - `assets/docs-site.js` with navigation, theme switching, search, code/table-copy, and Mermaid diagram actions.
 - `assets/search-index.json` with rendered pages and the local search index.
 - `site-manifest.json` with format version, home page, page, heading, and diagram export stats.
 - `README.md` with deployment notes.
 
-Upload the ZIP contents to GitHub Pages or any static web host, keeping the `assets/` folder beside `index.html`.
+Open `index.html` directly from the extracted folder, or upload the ZIP contents to GitHub Pages or any static web host, keeping the `assets/` folder beside `index.html`.
 
 ## Advanced Import And Export
 

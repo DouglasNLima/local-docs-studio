@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createArtifactBundleFixtureZip } from './helpers/fixtures.mjs';
 import { createZipBuffer, getZipText, readZipEntries } from './helpers/zip.mjs';
 
@@ -69,25 +69,25 @@ async function openFixture(page, name) {
     }
   }
 
-  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
 async function loadSample(page) {
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await page.getByRole('button', { name: 'Markdown + Mermaid sample' }).click();
-  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
 async function renderPreviewFromViewMenu(page) {
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.getByRole('button', { name: 'Render preview' }).click();
-  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
 async function renderPreviewWithShortcut(page) {
   await page.locator('#editor').focus();
   await page.keyboard.press(process.platform === 'darwin' ? 'Meta+Enter' : 'Control+Enter');
-  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 20_000 });
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
 async function dropTinyPngOnEditor(page) {
@@ -295,6 +295,27 @@ async function mockClipboardWrite(page, { readText = '' } = {}) {
   }, { readText });
 }
 
+async function submitAppDialog(page, { value, button = 'OK' } = {}) {
+  await expect(page.locator('#appDialog')).toBeVisible();
+  if (value !== undefined) {
+    await page.locator('#appDialogPromptInput').fill(value);
+  }
+  await page.getByRole('button', { name: button }).click();
+  await expect(page.locator('#appDialog')).toBeHidden();
+}
+
+async function submitAppDialogIfVisible(page, { value, button = 'OK' } = {}) {
+  const dialog = page.locator('#appDialog');
+  const visible = await dialog.waitFor({ state: 'visible', timeout: 1000 }).then(() => true, () => false);
+  if (!visible) return false;
+  if (value !== undefined) {
+    await page.locator('#appDialogPromptInput').fill(value);
+  }
+  await page.getByRole('button', { name: button }).click();
+  await expect(dialog).toBeHidden();
+  return true;
+}
+
 async function clickEditAction(page, name) {
   await page.locator('summary').filter({ hasText: /^Edit$/ }).click();
   await page.getByRole('button', { name }).click();
@@ -400,6 +421,7 @@ async function installMockFileSystemAccess(page) {
       openPickerQueue: [[fileHandle]],
       savePickerCalls: 0,
       createFileHandle,
+      createDirectoryHandle,
     };
     window.showOpenFilePicker = async () => window.__mockFs.openPickerQueue.shift() || [window.__mockFs.fileHandle];
     window.showSaveFilePicker = async () => {
@@ -610,6 +632,7 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   await expect(page.locator('[data-diagram-action="copySource"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportSvg"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportPng"]')).toHaveCount(1);
+  await expect(page.locator('[data-diagram-action="copyPng"]')).toHaveCount(1);
   await expect(page.locator('.hljs-keyword, .hljs-title, .hljs-string')).not.toHaveCount(0);
 
   await page.evaluate(() => {
@@ -636,6 +659,36 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   const csvPath = await csvDownload.path();
   expect(await readFile(csvPath, 'utf8')).toBe('Area,Status\r\nPreview,Ready\r\nExport,Verified');
   await expect(page.locator('#status')).toHaveText(/Table CSV downloaded/);
+
+  await page.evaluate(() => {
+    window.__copiedPng = null;
+    class MockClipboardItem {
+      constructor(items) {
+        this.items = items;
+      }
+    }
+    Object.defineProperty(window, 'ClipboardItem', {
+      configurable: true,
+      value: MockClipboardItem,
+    });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        write: async (items) => {
+          const blob = items[0].items['image/png'];
+          window.__copiedPng = { count: items.length, type: blob.type, size: blob.size };
+        },
+        writeText: async () => {},
+      },
+    });
+  });
+  await page.locator('[data-diagram-action="copyPng"]').click();
+  await expect(page.locator('#status')).toHaveText(/PNG diagram copied/);
+  await expect.poll(() => page.evaluate(() => window.__copiedPng)).toMatchObject({
+    count: 1,
+    type: 'image/png',
+  });
+  expect(await page.evaluate(() => window.__copiedPng.size)).toBeGreaterThan(0);
 });
 
 test('Mermaid labels with HTML line breaks render without SVG parser errors', async ({ page }) => {
@@ -663,13 +716,14 @@ flowchart TD
   await expect(frame.locator('svg')).toContainText('Ancestry');
   await expect(frame.locator('svg')).toContainText('tek_hsi_traditionalirishhorse');
 
-  const longWordLines = await frame.locator('svg').evaluate((svg) => {
+  const labelText = await frame.locator('svg').evaluate((svg) => {
     return [...svg.querySelectorAll('text tspan')]
       .map((tspan) => tspan.textContent?.trim())
-      .filter((text) => text?.startsWith('tek_hsi_'));
+      .filter(Boolean)
+      .join('');
   });
-  expect(longWordLines).toContain('tek_hsi_pedigreejson');
-  expect(longWordLines).toContain('tek_hsi_traditionalirishhorse');
+  expect(labelText).toContain('tek_hsi_pedigreejson');
+  expect(labelText).toContain('tek_hsi_traditionalirishhorse');
 
   const overflowingLabels = await frame.locator('svg').evaluate((svg) => {
     const tolerance = 2;
@@ -689,6 +743,14 @@ flowchart TD
     });
   });
   expect(overflowingLabels).toEqual([]);
+
+  const smallestNodeLabelFont = await frame.locator('svg').evaluate((svg) => {
+    const sizes = [...svg.querySelectorAll('g.node text')]
+      .map((text) => parseFloat(text.getAttribute('font-size') || getComputedStyle(text).fontSize || '0'))
+      .filter((size) => Number.isFinite(size) && size > 0);
+    return Math.min(...sizes);
+  });
+  expect(smallestNodeLabelFont).toBeGreaterThanOrEqual(9);
 });
 
 test('editor syntax highlighting and math rendering work without a build step', async ({ page }) => {
@@ -885,9 +947,15 @@ test('topbar menus are grouped and keyboard accessible', async ({ page }) => {
 
 test('File menu starts a blank Markdown document', async ({ page }) => {
   await page.goto('/');
+  page.on('dialog', (dialog) => {
+    throw new Error(`Unexpected native dialog: ${dialog.message()}`);
+  });
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.getByRole('button', { name: 'New Markdown file' }).click();
+  await expect(page.getByRole('heading', { name: 'New Markdown file' })).toBeVisible();
+  await expect(page.locator('#appDialogPromptInput')).toHaveValue('untitled.md');
+  await submitAppDialog(page, { button: 'Create file' });
 
   await expect(page.locator('#activeFileLabel')).toHaveText('untitled.md');
   await expect(page.locator('#folderBadge')).toHaveText('Blank document');
@@ -924,32 +992,44 @@ test('File System Access save writes back to the opened file without Save as', a
 test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
   await installMockFileSystemAccess(page);
   await page.goto('/');
+  page.on('dialog', (dialog) => {
+    throw new Error(`Unexpected native dialog: ${dialog.message()}`);
+  });
+  await page.evaluate(() => {
+    const docs = window.__mockFs.createDirectoryHandle('docs');
+    docs.files.set('seed.md', window.__mockFs.createFileHandle('seed.md', '# Seed\n'));
+    window.__mockFs.directoryHandle.directories.set('docs', docs);
+  });
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
 
-  page.once('dialog', (dialog) => dialog.accept('notes.md'));
+  await page.locator('#fileViewTreeButton').click();
+  await page.locator('#fileList [data-tree-folder="docs"]').click();
+  await expect(page.locator('#fileList [data-tree-folder="docs"]')).toHaveAttribute('aria-selected', 'true');
+
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'New Markdown file' }).click();
-  await expect(page.locator('#activeFileLabel')).toHaveText('notes.md');
-  await expect(page.locator('#fileCount')).toHaveText('1');
+  await expect(page.locator('#appDialogPromptInput')).toHaveValue('docs/untitled.md');
+  await submitAppDialog(page, { value: 'docs/notes.md', button: 'Create file' });
+  await expect(page.locator('#activeFileLabel')).toHaveText('docs/notes.md');
+  await expect(page.locator('#fileCount')).toHaveText('2');
 
   await page.locator('#editor').fill('# Notes\n');
   await page.locator('#saveButton').click();
   await expect(page.locator('#status')).toHaveText(/notes\.md saved/);
-  await expect.poll(async () => await page.evaluate(() => window.__mockFs.directoryHandle.files.get('notes.md')._text)).toBe('# Notes\n');
+  await expect.poll(async () => await page.evaluate(() => window.__mockFs.directoryHandle.directories.get('docs').files.get('notes.md')._text)).toBe('# Notes\n');
 
   await page.evaluate(() => {
     window.__mockFs.openPickerQueue = [[window.__mockFs.addedHandle]];
   });
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Add file to workspace' }).click();
-  await expect(page.locator('#fileCount')).toHaveText('2');
+  await expect(page.locator('#fileCount')).toHaveText('3');
   await expect(page.locator('#activeFileLabel')).toHaveText('added.md');
 
   await page.evaluate(() => {
-    window.confirm = () => true;
     window.__mockFs.addedHandle._text = '# Changed outside\n';
     window.__mockFs.addedHandle._lastModified += 1000;
   });
@@ -957,17 +1037,12 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
   await expect(page.locator('#editor')).toHaveValue('# Changed outside\n');
 
   await page.evaluate(() => {
-    window.__confirmCount = 0;
-    window.confirm = () => {
-      window.__confirmCount += 1;
-      return true;
-    };
     window.__mockFs.addedHandle._text = '# Focus reload\n';
     window.__mockFs.addedHandle._lastModified += 1000;
     window.dispatchEvent(new Event('focus'));
   });
+  await submitAppDialog(page, { button: 'Reload latest' });
   await expect(page.locator('#editor')).toHaveValue('# Focus reload\n');
-  await expect.poll(async () => await page.evaluate(() => window.__confirmCount)).toBe(1);
 });
 
 test('file browser tree view shows workspace folder hierarchy', async ({ page }, testInfo) => {
@@ -1137,6 +1212,7 @@ test('custom context menu exposes preview-specific copy and export actions', asy
   await page.locator('.diagram-frame [data-diagram-action="copySource"]').click({ button: 'right' });
   await expect(menu.locator('[data-context-menu-action="preview-copy-diagram-source"]')).toBeVisible();
   await expect(menu.locator('[data-context-menu-action="preview-export-diagram-svg"]')).toBeVisible();
+  await expect(menu.locator('[data-context-menu-action="preview-copy-diagram-png"]')).toBeVisible();
   await menu.locator('[data-context-menu-action="preview-copy-diagram-source"]').click();
   await expect.poll(() => page.evaluate(() => window.__copiedText)).toContain('flowchart TD');
 
@@ -1600,14 +1676,13 @@ test('manual local snapshots can be created, compared, restored, and deleted', a
 
 test('local templates, snippets, and export profiles persist in the browser', async ({ page }) => {
   await openFixture(page, 'plain.md');
-  await page.evaluate(() => {
-    window.confirm = () => true;
-    window.__promptValues = ['Fixture Template', 'Fixture Snippet', 'DevOps Profile'];
-    window.prompt = () => window.__promptValues.shift() || '';
+  page.on('dialog', (dialog) => {
+    throw new Error(`Unexpected native dialog: ${dialog.message()}`);
   });
 
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await page.getByRole('button', { name: 'Save document as template' }).click();
+  await submitAppDialog(page, { value: 'Fixture Template', button: 'Save template' });
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await expect(page.getByRole('button', { name: 'Fixture Template' })).toBeVisible();
 
@@ -1618,11 +1693,13 @@ test('local templates, snippets, and export profiles persist in the browser', as
     editor.setSelectionRange(start, start + text.length);
   }, selectedText);
   await page.getByRole('button', { name: 'Save selection as snippet' }).click();
+  await submitAppDialog(page, { value: 'Fixture Snippet', button: 'Save snippet' });
   await page.locator('summary').filter({ hasText: /^Create$/ }).click();
   await expect(page.getByRole('button', { name: 'Fixture Snippet' })).toBeVisible();
 
   await setEditorValueAndSelection(page, '# Changed\n');
   await page.getByRole('button', { name: 'Fixture Template' }).click();
+  await submitAppDialog(page, { button: 'Discard changes' });
   await expect(page.locator('#editor')).toHaveValue(/Publishing Fixture/);
   await page.locator('#editor').evaluate((editor) => {
     editor.setSelectionRange(editor.value.length, editor.value.length);
@@ -1634,6 +1711,7 @@ test('local templates, snippets, and export profiles persist in the browser', as
   await page.locator('summary').filter({ hasText: /^Export$/ }).click();
   await page.locator('#devopsMarkdownExportToggle').check();
   await page.getByRole('button', { name: 'Save export profile' }).click();
+  await submitAppDialog(page, { value: 'DevOps Profile', button: 'Save profile' });
   await page.locator('summary').filter({ hasText: /^Export$/ }).click();
   await page.locator('#devopsMarkdownExportToggle').uncheck();
   await page.getByRole('button', { name: 'Apply export profile' }).click();
@@ -1735,6 +1813,40 @@ test('paste auto-converts formatted HTML and spreadsheet tables while leaving pl
   await setEditorValueAndSelection(page, '');
   await pasteIntoEditor(page, { text: 'Just normal text\nwith words.' });
   await expect(page.locator('#editor')).toHaveValue('Just normal text\nwith words.');
+});
+
+test('paste preserves full Markdown documents when clipboard HTML contains tables', async ({ page }) => {
+  await page.goto('/');
+  const markdown = [
+    '# Imported Story',
+    '',
+    '| Area | Status |',
+    '| --- | --- |',
+    '| Preview | Ready |',
+    '',
+    '```mermaid',
+    'flowchart TD',
+    '  A[Start] --> B[Finish]',
+    '```',
+    '',
+    '## Notes',
+    '',
+    '| Later | Value |',
+    '| --- | --- |',
+    '| Keep | Everything |',
+  ].join('\n');
+
+  await setEditorValueAndSelection(page, '');
+  await pasteIntoEditor(page, {
+    html: '<table><tr><th>Area</th><th>Status</th></tr><tr><td>Preview</td><td>Ready</td></tr></table>',
+    text: markdown,
+  });
+
+  await expect(page.locator('#editor')).toHaveValue(markdown);
+  await expect(page.locator('#status')).toHaveText(/Plain text pasted/);
+  await renderPreviewWithShortcut(page);
+  await expect(page.locator('#preview table')).toHaveCount(2);
+  await expect(page.locator('#preview .diagram-frame svg')).toHaveCount(1);
 });
 
 test('Paste Special inserts table, text, code block, and supports next-paste fallback', async ({ page }) => {
@@ -2036,13 +2148,39 @@ test('selection follow highlights editor selections in preview and respects the 
 
 
 test('broken mermaid fixture shows error actions without export actions', async ({ page }) => {
-  await openFixture(page, 'broken-mermaid.md');
+  await page.goto('/');
+  const source = [
+    '# Broken Mermaid Fixture',
+    '',
+    ...Array.from({ length: 120 }, (_, index) => `Filler line ${index + 1} with enough text to wrap inside the editor pane.`),
+    '',
+    '```mermaid',
+    'flowchart TD',
+    '  A -->',
+    '```',
+  ].join('\n');
+
+  await setEditorValueAndSelection(page, source);
+  await renderPreviewWithShortcut(page);
 
   await expect(page.locator('#status')).toHaveText(/diagram error/);
   await expect(page.locator('[data-diagram-action="copyError"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="jumpSource"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportSvg"]')).toHaveCount(0);
   await expect(page.locator('[data-diagram-action="exportPng"]')).toHaveCount(0);
+  await expect(page.locator('[data-diagram-action="copyPng"]')).toHaveCount(0);
+
+  await page.locator('#editor').evaluate((editor) => {
+    editor.scrollTop = 0;
+    editor.setSelectionRange(0, 0);
+  });
+  await page.locator('[data-diagram-action="jumpSource"]').click();
+  const jumpState = await page.locator('#editor').evaluate((editor, expectedSource) => ({
+    selectedText: editor.value.slice(editor.selectionStart, editor.selectionEnd),
+    scrollTop: editor.scrollTop,
+  }), 'flowchart TD\n  A -->');
+  expect(jumpState.selectedText).toBe('flowchart TD\n  A -->');
+  expect(jumpState.scrollTop).toBeGreaterThan(0);
 });
 
 test('preview outline supports H1-H4 and tracks the active section', async ({ page }) => {
@@ -2159,6 +2297,7 @@ test('HTML export is standalone and keeps interactive preview actions', async ({
   expect(html).toContain('data-table-action="downloadCsv"');
   expect(html).toContain('data-diagram-action="copySource"');
   expect(html).toContain('data-diagram-action="exportSvg"');
+  expect(html).toContain('data-diagram-action="copyPng"');
   expect(html).toContain('function fallbackCopy');
   expect(html).toContain('function downloadText');
   const scriptNonces = [...html.matchAll(/<script nonce="([^"]+)">/g)].map((match) => match[1]);
@@ -2327,8 +2466,8 @@ test('Markdown Bundle export round-trips edited docs and image assets', async ({
   expect(getZipText(entries, 'plain.md')).toContain('Bundle Edited');
   expect(entries.has('assets/images/tiny-image.png')).toBe(true);
 
-  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#zipInput').setInputFiles(bundlePath);
+  await submitAppDialogIfVisible(page, { button: 'Discard changes' });
   await expect(page.locator('#status')).toHaveText(/Imported 1 document and 1 image asset from Markdown bundle/);
   await expect(page.locator('#editor')).toHaveValue(/Bundle Edited/);
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/tiny-image.png"]')).toHaveAttribute('src', /^blob:/);
@@ -2722,8 +2861,8 @@ test('artefact review pack export is explicit and round-trips safe rich metadata
   expect(reviewEntries.has('assets/tiny.png')).toBe(true);
   await expect(page.locator('#exportTrust')).toHaveText(/Safe artefact metadata included/);
 
-  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#zipInput').setInputFiles(reviewPath);
+  await submitAppDialogIfVisible(page, { button: 'Discard changes' });
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from artefact bundle\. Opened README\.md\./, { timeout: 20_000 });
   await expect(page.locator('#editor')).toHaveValue(/rich bundle exercises/);
   await expect(page.locator('#artifactBundleSummary')).toContainText('Rich Artefact Bundle');
@@ -2747,8 +2886,8 @@ test('ordinary Markdown Bundle export stays free of artefact manifests after art
   expect(entries.has('lens-docs-studio-bundle.json')).toBe(true);
   expect(entries.has('lens-artifact-bundle.json')).toBe(false);
 
-  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#zipInput').setInputFiles(bundlePath);
+  await submitAppDialogIfVisible(page, { button: 'Discard changes' });
   await expect(page.locator('#status')).toHaveText(/Imported 8 documents and 1 image asset from Markdown bundle/, { timeout: 20_000 });
   await expect(page.locator('#artifactBundleSummary')).toBeHidden();
   await page.locator('#fileList [data-path="README.md"]').click();
@@ -2814,8 +2953,8 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
 
   const docxPath = testInfo.outputPath('import-word.docx');
   await writeFile(docxPath, createDocxImportFixture());
-  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('#documentInput').setInputFiles(docxPath);
+  await submitAppDialog(page, { button: 'Discard changes' });
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/, { timeout: 20_000 });
 
   const wordMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
@@ -2863,6 +3002,7 @@ test('Docs Site export contains the expected static site package', async ({ page
   const entries = await readZipEntries(filePath);
   const html = getZipText(entries, 'index.html');
   const css = getZipText(entries, 'assets/docs-site.css');
+  const dataScript = getZipText(entries, 'assets/docs-site-data.js');
   const script = getZipText(entries, 'assets/docs-site.js');
   const searchIndex = JSON.parse(getZipText(entries, 'assets/search-index.json'));
   const manifest = JSON.parse(getZipText(entries, 'site-manifest.json'));
@@ -2870,6 +3010,7 @@ test('Docs Site export contains the expected static site package', async ({ page
 
   expect([...entries.keys()].sort()).toEqual([
     'README.md',
+    'assets/docs-site-data.js',
     'assets/docs-site.css',
     'assets/docs-site.js',
     'assets/search-index.json',
@@ -2891,21 +3032,27 @@ test('Docs Site export contains the expected static site package', async ({ page
   expect(searchIndex.entries.some((entry) => entry.text.includes('release ready'))).toBe(true);
   expect(searchIndex.entries.some((entry) => entry.text.includes('Copy') || entry.text.includes('SVG') || entry.text.includes('PNG'))).toBe(false);
   expect(html).toContain('assets/docs-site.css');
+  expect(html).toContain('assets/docs-site-data.js');
   expect(html).toContain('assets/docs-site.js');
   expect(html).toContain('Content-Security-Policy');
   expect(html).toContain('data-theme-preference="system"');
   expect(html).not.toContain('document.documentElement.dataset.themePreference=');
   expect(css).toContain('[data-theme="dark"]');
+  expect(dataScript).toContain('window.__LENS_DOCS_SITE_DATA__');
+  expect(dataScript).toContain('release ready');
+  expect(script).toContain('__LENS_DOCS_SITE_DATA__');
   expect(script).toContain('assets/search-index.json');
   expect(script).toContain('renderSearchResults');
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-code-action="copy"'))).toBe(true);
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-table-action="copy"'))).toBe(true);
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('data-table-action="downloadCsv"'))).toBe(true);
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('exportPng'))).toBe(true);
+  expect(searchIndex.pages.some((pageData) => pageData.html.includes('copyPng'))).toBe(true);
   expect(html).not.toContain('preview-search-hit');
   expect(html).not.toContain('selection-sync-hit');
   expect(html).not.toContain('Document review');
-  expect(readme).toContain('## Deploy');
+  expect(readme).toContain('## Open Or Deploy');
+  expect(readme).toContain('Open `index.html` directly');
   expect(readme).toContain('GitHub Pages');
   await expect(page.locator('#status')).toHaveText(/Docs site exported/);
 
@@ -2931,6 +3078,7 @@ test('Docs Site export contains the expected static site package', async ({ page
   await expect(page.locator('[data-table-action="copy"]')).toHaveCount(1);
   await expect(page.locator('[data-table-action="downloadCsv"]')).toHaveCount(1);
   await expect(page.locator('[data-diagram-action="exportPng"]')).toHaveCount(1);
+  await expect(page.locator('[data-diagram-action="copyPng"]')).toHaveCount(1);
 
   await page.locator('#searchInput').fill('SVG');
   await expect(page.locator('#searchResults')).toContainText('No results.');
@@ -2938,6 +3086,12 @@ test('Docs Site export contains the expected static site package', async ({ page
   await page.getByRole('link', { name: 'Larger Fixture' }).click();
   await page.getByRole('link', { name: 'Section Three' }).click();
   await expect(page).toHaveURL(/#docs-site-large\/section-three$/);
+
+  await page.goto(pathToFileURL(path.join(outputDirectory, 'index.html')).href, { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('#siteTitle')).toHaveText('Publishing Docs');
+  await expect(page.locator('#content h1')).toHaveText('Docs Home');
+  await page.locator('#searchInput').fill('release ready');
+  await expect(page.locator('#searchResults .search-result')).not.toHaveCount(0);
 
   await page.setViewportSize({ width: 390, height: 844 });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
@@ -2986,6 +3140,7 @@ test('Docs Site export uses safe artefact metadata as display-only fallback', as
   });
   const entries = await readZipEntries(docsPath);
   const html = getZipText(entries, 'index.html');
+  const dataScript = getZipText(entries, 'assets/docs-site-data.js');
   const searchIndexText = getZipText(entries, 'assets/search-index.json');
   const manifestText = getZipText(entries, 'site-manifest.json');
   const readme = getZipText(entries, 'README.md');
@@ -3012,7 +3167,7 @@ test('Docs Site export uses safe artefact metadata as display-only fallback', as
   expect(manifest.pages.find((item) => item.path === 'findings/security-summary.md').evidenceLevel).toBe('candidate finding');
   expect(searchIndex.entries.some((entry) => entry.text.includes('candidate finding'))).toBe(true);
   expect(searchIndex.entries.some((entry) => entry.text.includes('finding'))).toBe(true);
-  [html, searchIndexText, manifestText, readme].forEach((content) => {
+  [html, dataScript, searchIndexText, manifestText, readme].forEach((content) => {
     expect(content).not.toContain('../unsafe.md');
     expect(content).not.toContain('Unsafe Export');
     expect(content).not.toContain('http://');

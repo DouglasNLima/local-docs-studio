@@ -42,6 +42,7 @@ export function createUiService({
   } = dom;
   const {
     openArtifactPath,
+    confirm = () => Promise.resolve(true),
   } = callbacks;
 
   const artifactBundleReader = createArtifactBundleReader({
@@ -106,10 +107,12 @@ export function createUiService({
           const expanded = forceExpanded || !state.collapsedTreeFolders.has(folder.path);
           const button = document.createElement('button');
           button.type = 'button';
-          button.className = 'tree-folder';
+          const selected = folder.path === state.selectedTreeFolderPath;
+          button.className = `tree-folder${selected ? ' selected' : ''}`;
           button.dataset.treeFolder = folder.path;
           button.style.setProperty('--tree-depth', String(depth));
           button.setAttribute('aria-expanded', String(expanded));
+          button.setAttribute('aria-selected', String(selected));
           button.title = folder.path;
 
           const twisty = document.createElement('span');
@@ -314,9 +317,14 @@ export function createUiService({
       return state.dirtyPaths.size > 0 || state.files.some((file) => (file.converted || file.needsSave) && !file.handle);
     }
 
-    function confirmDiscardUnsaved(message) {
+    async function confirmDiscardUnsaved(message) {
       if (!hasUnsavedChanges()) return true;
-      return window.confirm(message);
+      return await confirm(message, {
+        title: 'Discard unsaved changes?',
+        kicker: 'Unsaved changes',
+        confirmLabel: 'Discard changes',
+        danger: true,
+      });
     }
 
     function closeOpenMenus() {
@@ -340,6 +348,7 @@ export function createUiService({
 
     function toggleTreeFolder(path) {
       if (!path) return;
+      state.selectedTreeFolderPath = path;
       if (state.collapsedTreeFolders.has(path)) {
         state.collapsedTreeFolders.delete(path);
       } else {

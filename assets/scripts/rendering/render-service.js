@@ -702,7 +702,8 @@ export function createRenderingService({
       actions.append(
         createDiagramActionButton('copySource', 'Copy', `Copy Mermaid source for diagram ${index}`),
         createDiagramActionButton('exportSvg', 'SVG', `Export diagram ${index} as SVG`),
-        createDiagramActionButton('exportPng', 'PNG', `Export diagram ${index} as PNG`)
+        createDiagramActionButton('exportPng', 'PNG', `Export diagram ${index} as PNG`),
+        createDiagramActionButton('copyPng', 'Copy PNG', `Copy diagram ${index} as a PNG image`)
       );
 
       toolbar.append(title, actions);
