@@ -1069,7 +1069,7 @@
 
     .editor-shell textarea {
       position: relative;
-      z-index: 2;
+      z-index: 3;
       grid-column: 2;
       grid-row: 1;
       min-width: 0;
@@ -1089,7 +1089,7 @@
     }
 
     .editor-syntax-layer {
-      z-index: 1;
+      z-index: 2;
       grid-column: 2;
       grid-row: 1;
       min-width: 0;
@@ -1107,6 +1107,38 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       pointer-events: none;
+    }
+
+    .editor-find-layer {
+      z-index: 1;
+      grid-column: 2;
+      grid-row: 1;
+      min-width: 0;
+      min-height: 0;
+      width: calc(100% - var(--editor-scrollbar-width, 0px));
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 1rem;
+      border: 0;
+      background: transparent;
+      color: transparent;
+      font: 14px/1.58 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      tab-size: 2;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      pointer-events: none;
+    }
+
+    .editor-find-hit {
+      border-radius: .2rem;
+      background: rgba(255, 136, 62, .22);
+      color: transparent;
+    }
+
+    .editor-find-hit.active {
+      background: rgba(255, 136, 62, .46);
+      box-shadow: 0 0 0 1px rgba(255, 136, 62, .55);
     }
 
     .editor-syntax-layer .hljs-emphasis,
@@ -3679,7 +3711,8 @@ label.file-button.primary,
   caret-color: var(--accent);
 }
 
-.editor-shell.syntax-highlight-enabled .editor-syntax-layer {
+.editor-shell.syntax-highlight-enabled .editor-syntax-layer,
+.editor-shell .editor-find-layer {
   padding: .85rem 1rem;
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }

@@ -21,6 +21,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     editorFindPrevButton,
     editorFindNextButton,
     editorFindClearButton,
+    editorFindLayer,
   } = dom;
   const {
     closeOpenMenus,
@@ -56,6 +57,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     editorFindNextButton?.addEventListener('click', () => goToEditorMatch(1));
     editorFindClearButton?.addEventListener('click', closeEditorFind);
     editor.addEventListener('input', refreshEditorFind);
+    editor.addEventListener('scroll', syncEditorFindLayer);
     document.addEventListener('keydown', handleEditorFindGlobalKeydown, true);
   }
 
@@ -116,6 +118,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     editorFindState.matches = [];
     editorFindState.activeIndex = -1;
     updateEditorFindCount();
+    renderEditorFindLayer();
     editor.focus();
   }
 
@@ -239,6 +242,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     if (!editorFindState.matches.length) {
       editorFindState.activeIndex = -1;
       updateEditorFindCount();
+      renderEditorFindLayer();
       return;
     }
 
@@ -258,11 +262,48 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     const match = editorFindState.matches[editorFindState.activeIndex];
     if (!match) {
       updateEditorFindCount();
+      renderEditorFindLayer();
       return;
     }
-    editor.focus();
     editor.setSelectionRange(match.index, match.index + match.length);
+    renderEditorFindLayer();
+    syncEditorFindLayer();
     updateEditorFindCount();
+  }
+
+  function renderEditorFindLayer() {
+    if (!editorFindLayer) return;
+    if (!editorFindPanel || editorFindPanel.hidden || !editorFindState.matches.length) {
+      editorFindLayer.textContent = '';
+      return;
+    }
+
+    const source = editor.value;
+    let cursor = 0;
+    editorFindLayer.innerHTML = editorFindState.matches.map((match, index) => {
+      const start = Math.max(cursor, match.index);
+      const end = Math.max(start, match.index + match.length);
+      const before = escapeHtml(source.slice(cursor, start));
+      const label = index === editorFindState.activeIndex ? 'editor-find-hit active' : 'editor-find-hit';
+      const hit = `<mark class="${label}">${escapeHtml(source.slice(start, end))}</mark>`;
+      cursor = end;
+      return `${before}${hit}`;
+    }).join('') + escapeHtml(source.slice(cursor)) + (source.endsWith('\n') ? '\n' : '');
+    syncEditorFindLayer();
+  }
+
+  function syncEditorFindLayer() {
+    if (!editorFindLayer) return;
+    editorFindLayer.scrollTop = editor.scrollTop;
+    editorFindLayer.scrollLeft = editor.scrollLeft;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function buildReplacement(match) {

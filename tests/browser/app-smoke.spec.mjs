@@ -2030,13 +2030,22 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
 
 test('editor find icon opens inline search with keyboard navigation', async ({ page }) => {
   await gotoApp(page);
-  await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.', 0, 0);
+  await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.\n\n[Source only](editor-only-target)', 0, 0);
+  await renderPreviewWithShortcut(page);
 
   await page.keyboard.press('Control+F');
   await expect(page.locator('#editorFindPanel')).toBeVisible();
   await expect(page.locator('#findReplaceDialog')).toBeHidden();
-  await page.locator('#editorFindInput').fill('review');
+  const beforeTypingSearch = await page.locator('#editor').inputValue();
+  await page.keyboard.type('review');
+  await expect(page.locator('#editorFindInput')).toHaveValue('review');
+  await expect(page.locator('#editorFindInput')).toBeFocused();
+  await expect(page.locator('#editor')).toHaveValue(beforeTypingSearch);
   await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(3);
+  await expect(page.locator('#editorFindLayer .editor-find-hit.active')).toHaveCount(1);
+  await expect(page.locator('mark.selection-sync-hit')).toHaveCount(0);
+  await expect(page.locator('mark.preview-search-hit')).toHaveCount(0);
 
   const beforeEnter = await page.locator('#editor').inputValue();
   await page.keyboard.press('Enter');
@@ -2052,6 +2061,13 @@ test('editor find icon opens inline search with keyboard navigation', async ({ p
 
   await page.keyboard.press('Control+F');
   await expect(page.locator('#editorFindPanel')).toBeVisible();
+  await page.locator('#editorFindInput').fill('editor-only-target');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/1');
+  await expect.poll(() => page.locator('#editor').evaluate((editor) => editor.value.slice(editor.selectionStart, editor.selectionEnd))).toBe('editor-only-target');
+  await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(1);
+  await expect(page.locator('#editorFindLayer .editor-find-hit.active')).toHaveText('editor-only-target');
+  await expect(page.locator('mark.selection-sync-hit')).toHaveCount(0);
+  await expect(page.locator('mark.preview-search-hit')).toHaveCount(0);
   await page.locator('#editorFindInput').fill('review');
   await expect(page.locator('#editorFindCount')).toHaveText('1/3');
   await page.locator('#editorFindNextButton').click();
@@ -2068,6 +2084,7 @@ test('editor find icon opens inline search with keyboard navigation', async ({ p
   await page.locator('#editorFindClearButton').click();
   await expect(page.locator('#editorFindPanel')).toBeHidden();
   await expect(page.locator('#editorFindToggleButton')).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(0);
 });
 
 test('focus mode exposes a visible exit button and keeps Escape fallback', async ({ page }) => {

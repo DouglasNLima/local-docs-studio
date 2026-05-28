@@ -73,6 +73,7 @@ export const domIds = {
   editorFindPrevButton: 'editorFindPrevButton',
   editorFindNextButton: 'editorFindNextButton',
   editorFindClearButton: 'editorFindClearButton',
+  editorFindLayer: 'editorFindLayer',
   documentReviewToggleButton: 'documentReviewToggleButton',
   documentReviewPanel: 'documentReviewPanel',
   documentReviewSummary: 'documentReviewSummary',

@@ -18,6 +18,7 @@ export function createSelectionSyncService({ state, dom }) {
     editor,
     preview,
     scrollSyncToggle,
+    editorFindPanel,
   } = dom;
 
   let selectionTimer = 0;
@@ -76,6 +77,7 @@ export function createSelectionSyncService({ state, dom }) {
   function isSelectionSyncActive() {
     if (!state.scrollSyncEnabled) return false;
     if (state.editorLayout !== 'split') return false;
+    if (editorFindPanel && !editorFindPanel.hidden) return false;
     if (app.classList.contains('preview-maximized')) return false;
     if (!editor.clientHeight || !preview.clientHeight) return false;
     return true;

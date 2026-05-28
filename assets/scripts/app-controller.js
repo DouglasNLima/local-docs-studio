@@ -109,6 +109,7 @@ export function createAppController() {
       editorFindPrevButton,
       editorFindNextButton,
       editorFindClearButton,
+      editorFindLayer,
       documentReviewToggleButton,
       documentReviewPanel,
       documentReviewSummary,
@@ -375,6 +376,7 @@ export function createAppController() {
         editorFindPrevButton,
         editorFindNextButton,
         editorFindClearButton,
+        editorFindLayer,
       },
       callbacks: {
         closeOpenMenus,
@@ -490,6 +492,7 @@ export function createAppController() {
         editor,
         preview,
         scrollSyncToggle,
+        editorFindPanel,
       },
     });
     const {
