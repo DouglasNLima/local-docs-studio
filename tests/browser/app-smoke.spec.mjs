@@ -1366,6 +1366,14 @@ test('editor toolbar icon buttons keep markdown command behaviour', async ({ pag
     await expect(page.locator('#editor')).toHaveValue(testCase.expected);
   }
 
+  await setEditorValueAndSelection(page, 'sample', 6, 6);
+  await page.locator('[data-command="bold"]').click();
+  await expect(page.locator('#editor')).toHaveValue('sample **bold text**');
+
+  await setEditorValueAndSelection(page, 'sample', 6, 6);
+  await page.locator('[data-command="italic"]').click();
+  await expect(page.locator('#editor')).toHaveValue('sample *italic text*');
+
   const toolbarOverflow = await page.locator('#editorToolbar').evaluate((toolbar) => toolbar.scrollWidth > toolbar.clientWidth + 1);
   expect(toolbarOverflow).toBe(false);
 });
@@ -2030,6 +2038,22 @@ test('editor find icon opens inline search with keyboard navigation', async ({ p
   await page.locator('#editorFindInput').fill('review');
   await expect(page.locator('#editorFindCount')).toHaveText('1/3');
 
+  const beforeEnter = await page.locator('#editor').inputValue();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('2/3');
+  await expect(page.locator('#editor')).toHaveValue(beforeEnter);
+
+  await page.keyboard.press('Shift+Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await expect(page.locator('#editor')).toHaveValue(beforeEnter);
+
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#editorFindPanel')).toBeHidden();
+
+  await page.keyboard.press('Control+F');
+  await expect(page.locator('#editorFindPanel')).toBeVisible();
+  await page.locator('#editorFindInput').fill('review');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
   await page.locator('#editorFindNextButton').click();
   await expect(page.locator('#editorFindCount')).toHaveText('2/3');
   await page.locator('#editorFindPrevButton').click();

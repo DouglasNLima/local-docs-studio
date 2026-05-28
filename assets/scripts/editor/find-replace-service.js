@@ -56,6 +56,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     editorFindNextButton?.addEventListener('click', () => goToEditorMatch(1));
     editorFindClearButton?.addEventListener('click', closeEditorFind);
     editor.addEventListener('input', refreshEditorFind);
+    document.addEventListener('keydown', handleEditorFindGlobalKeydown, true);
   }
 
   function openFindReplace({ replace = false } = {}) {
@@ -205,10 +206,28 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
   function handleEditorFindKeydown(event) {
     if (event.key === 'Escape') {
       closeEditorFind(event);
+      event.stopPropagation();
       return;
     }
     if (event.key === 'Enter') {
       event.preventDefault();
+      event.stopPropagation();
+      goToEditorMatch(event.shiftKey ? -1 : 1);
+    }
+  }
+
+  function handleEditorFindGlobalKeydown(event) {
+    if (!editorFindPanel || editorFindPanel.hidden) return;
+    const target = event.target;
+    if (target !== editor && !editorFindPanel.contains(target)) return;
+    if (event.key === 'Escape') {
+      closeEditorFind(event);
+      event.stopPropagation();
+      return;
+    }
+    if (event.key === 'Enter' && !event.isComposing) {
+      event.preventDefault();
+      event.stopPropagation();
       goToEditorMatch(event.shiftKey ? -1 : 1);
     }
   }

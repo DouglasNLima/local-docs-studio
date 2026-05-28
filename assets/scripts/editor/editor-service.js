@@ -594,7 +594,8 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
 
     function toggleInlineWrap(prefix, suffix, placeholder) {
       const selection = getEditorSelection();
-      const selected = selection.text || placeholder;
+      const hasSelection = Boolean(selection.text);
+      const selected = hasSelection ? selection.text : placeholder;
       const hasWrap = selection.text.startsWith(prefix) && selection.text.endsWith(suffix);
 
       if (selection.text && hasWrap) {
@@ -603,8 +604,12 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         return;
       }
 
-      const replacement = `${prefix}${selected}${suffix}`;
-      const innerStart = selection.start + prefix.length;
+      const before = editor.value[selection.start - 1] || '';
+      const after = editor.value[selection.end] || '';
+      const leadingSpace = !hasSelection && before && !/\s/.test(before) ? ' ' : '';
+      const trailingSpace = !hasSelection && after && !/\s/.test(after) ? ' ' : '';
+      const replacement = `${leadingSpace}${prefix}${selected}${suffix}${trailingSpace}`;
+      const innerStart = selection.start + leadingSpace.length + prefix.length;
       const innerEnd = innerStart + selected.length;
       replaceEditorRange(selection.start, selection.end, replacement, innerStart, innerEnd);
     }
