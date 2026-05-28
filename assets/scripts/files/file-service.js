@@ -789,6 +789,7 @@ export function createFileService({
       }
 
       try {
+        await flushPendingRenderBeforeSave();
         if (record.handle) {
           if (!await ensureWritePermission(record.handle)) {
             setStatus('Browser permission is needed to save back to the opened file.', 'warning');
@@ -806,6 +807,13 @@ export function createFileService({
         setStatus('Save failed.', 'danger');
         console.error(error);
       }
+    }
+
+    async function flushPendingRenderBeforeSave() {
+      if (!state.debounceId) return;
+      window.clearTimeout(state.debounceId);
+      state.debounceId = 0;
+      await renderPreview();
     }
 
     async function saveActiveFileAs() {

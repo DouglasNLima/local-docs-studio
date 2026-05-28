@@ -469,6 +469,271 @@ export function createExportService({
       }
     }
 
+    async function copyMarkdownWithImages() {
+      const renderResult = await renderPreview();
+      if (!renderResult?.ok && !renderResult?.cancelled) {
+        setStatus('Copy skipped because rendering failed.', 'danger');
+        return false;
+      }
+      if (renderResult?.cancelled) return false;
+
+      const source = editor.value;
+      const selectionStart = editor.selectionStart;
+      const selectionEnd = editor.selectionEnd;
+      const hasSelection = selectionEnd > selectionStart;
+      const scope = {
+        start: hasSelection ? selectionStart : 0,
+        end: hasSelection ? selectionEnd : source.length,
+      };
+      const scopedSource = source.slice(scope.start, scope.end);
+
+      if (!scopedSource.trim()) {
+        setStatus('No Markdown source found to copy.', 'warning');
+        return false;
+      }
+
+      try {
+        const result = await buildMarkdownWithClipboardImages(source, scope);
+        const html = await buildClipboardMarkdownHtml(result.markdown);
+        if (navigator.clipboard?.write && window.ClipboardItem) {
+          await navigator.clipboard.write([
+            new ClipboardItem({
+              'text/plain': new Blob([result.markdown], { type: 'text/plain' }),
+              'text/html': new Blob([html], { type: 'text/html' }),
+            }),
+          ]);
+        } else {
+          await navigator.clipboard.writeText(result.markdown);
+        }
+
+        const diagramText = result.convertedDiagrams
+          ? `${result.convertedDiagrams} Mermaid diagram${result.convertedDiagrams === 1 ? '' : 's'} converted to image${result.convertedDiagrams === 1 ? '' : 's'}`
+          : 'no complete Mermaid diagrams converted';
+        const assetText = result.convertedAssets
+          ? `${result.convertedAssets} managed image${result.convertedAssets === 1 ? '' : 's'} embedded`
+          : '';
+        const skippedText = result.skippedBlocks || result.partialBlocks
+          ? ` ${result.skippedBlocks + result.partialBlocks} Mermaid block${result.skippedBlocks + result.partialBlocks === 1 ? '' : 's'} left as source.`
+          : '';
+        const detailText = [diagramText, assetText].filter(Boolean).join(', ');
+        const tone = result.skippedBlocks || result.partialBlocks ? 'warning' : 'ok';
+        setExportTrust(`Clipboard Markdown ready: ${detailText}.${skippedText}`, tone);
+        setStatus(`Markdown with images copied (${detailText}).${skippedText}`, tone);
+        closeOpenMenus();
+        return true;
+      } catch (error) {
+        setStatus('Copy Markdown with images failed.', 'danger');
+        console.error(error);
+        return false;
+      }
+    }
+
+    async function buildMarkdownWithClipboardImages(source, scope) {
+      const blocks = collectMermaidSourceBlocks(source);
+      const selectedBlocks = blocks.filter((block) => block.start >= scope.start && block.end <= scope.end);
+      const partialBlocks = blocks.filter((block) => rangesOverlap(block.start, block.end, scope.start, scope.end)
+        && !(block.start >= scope.start && block.end <= scope.end)).length;
+      const liveFrames = [...preview.querySelectorAll('.diagram-frame')];
+      const replacements = [];
+      let convertedDiagrams = 0;
+      let skippedBlocks = 0;
+
+      for (const block of selectedBlocks) {
+        const frame = liveFrames[block.diagramIndex];
+        const svg = frame?.querySelector('svg');
+        if (!svg) {
+          skippedBlocks += 1;
+          continue;
+        }
+
+        try {
+          const size = getSvgBaseSize(svg);
+          const dataUrl = await svgToPngDataUrl(svg, size.width, size.height);
+          convertedDiagrams += 1;
+          replacements.push({
+            start: block.start - scope.start,
+            end: block.end - scope.start,
+            text: `![Mermaid diagram ${block.diagramIndex + 1}](${dataUrl})`,
+          });
+        } catch {
+          skippedBlocks += 1;
+        }
+      }
+
+      let markdown = source.slice(scope.start, scope.end);
+      replacements.sort((a, b) => b.start - a.start).forEach((replacement) => {
+        markdown = `${markdown.slice(0, replacement.start)}${replacement.text}${markdown.slice(replacement.end)}`;
+      });
+
+      const imageResult = embedManagedAssetMarkdownImages(markdown);
+      return {
+        markdown: imageResult.markdown,
+        convertedDiagrams,
+        convertedAssets: imageResult.convertedAssets,
+        skippedBlocks,
+        partialBlocks,
+      };
+    }
+
+    async function buildClipboardMarkdownHtml(markdown) {
+      const body = sanitizeRenderedHtml(await buildMarkdownHtml(markdown));
+      return `<article>${body}</article>`;
+    }
+
+    function collectMermaidSourceBlocks(source) {
+      const text = String(source || '');
+      if (!text.trim()) return [];
+      if (resolveModeFor(text, state.fileName) === 'mermaid') {
+        return [{ start: 0, end: text.length, diagramIndex: 0, kind: 'standalone' }];
+      }
+
+      const lines = getSourceLines(text);
+      const blocks = [];
+      let codeFence = null;
+      let diagramIndex = 0;
+
+      for (let index = 0; index < lines.length; index += 1) {
+        const line = lines[index];
+
+        if (codeFence) {
+          if (isFenceClose(line.text, codeFence)) {
+            codeFence = null;
+          }
+          continue;
+        }
+
+        const fence = readFenceOpen(line.text);
+        if (fence) {
+          if (!isMermaidFenceLanguage(fence.language)) {
+            codeFence = fence;
+            continue;
+          }
+
+          const closeIndex = findFenceCloseIndex(lines, index + 1, fence);
+          if (closeIndex === -1) {
+            codeFence = fence;
+            continue;
+          }
+
+          blocks.push({
+            start: line.start,
+            end: lines[closeIndex].end,
+            diagramIndex,
+            kind: 'fence',
+          });
+          diagramIndex += 1;
+          index = closeIndex;
+          continue;
+        }
+
+        if (!isDevOpsMermaidOpen(line.text)) continue;
+
+        const closeIndex = findDevOpsMermaidCloseIndex(lines, index + 1);
+        if (closeIndex === -1) continue;
+        blocks.push({
+          start: line.start,
+          end: lines[closeIndex].end,
+          diagramIndex,
+          kind: 'devops',
+        });
+        diagramIndex += 1;
+        index = closeIndex;
+      }
+
+      return blocks;
+    }
+
+    function getSourceLines(source) {
+      const text = String(source || '');
+      if (!text) return [];
+
+      const lines = [];
+      let start = 0;
+      while (start < text.length) {
+        const nextBreak = text.slice(start).search(/\r\n|\n|\r/);
+        if (nextBreak === -1) {
+          lines.push({ text: text.slice(start), start, end: text.length });
+          break;
+        }
+
+        const end = start + nextBreak;
+        const eol = text.slice(end, end + 2) === '\r\n' ? '\r\n' : text[end];
+        lines.push({ text: text.slice(start, end), start, end });
+        start = end + eol.length;
+      }
+
+      return lines;
+    }
+
+    function findFenceCloseIndex(lines, startIndex, fence) {
+      for (let index = startIndex; index < lines.length; index += 1) {
+        if (isFenceClose(lines[index].text, fence)) return index;
+      }
+      return -1;
+    }
+
+    function findDevOpsMermaidCloseIndex(lines, startIndex) {
+      for (let index = startIndex; index < lines.length; index += 1) {
+        if (isDevOpsBlockClose(lines[index].text)) return index;
+      }
+      return -1;
+    }
+
+    function readFenceOpen(line) {
+      const match = String(line ?? '').match(/^[ \t]{0,3}(`{3,}|~{3,})[ \t]*([^`~\s]*)?/);
+      if (!match) return null;
+      return {
+        marker: match[1],
+        char: match[1][0],
+        length: match[1].length,
+        language: String(match[2] || '').toLowerCase(),
+      };
+    }
+
+    function isFenceClose(line, fence) {
+      if (!fence) return false;
+      const pattern = fence.char === '`'
+        ? new RegExp(`^[ \\t]{0,3}\`{${fence.length},}[ \\t]*$`)
+        : new RegExp(`^[ \\t]{0,3}~{${fence.length},}[ \\t]*$`);
+      return pattern.test(line);
+    }
+
+    function isMermaidFenceLanguage(language) {
+      return ['mermaid', 'mmd'].includes(String(language || '').toLowerCase());
+    }
+
+    function isDevOpsMermaidOpen(line) {
+      return /^[ \t]*:::[ \t]*mermaid[ \t]*$/i.test(line);
+    }
+
+    function isDevOpsBlockClose(line) {
+      return /^[ \t]*:::[ \t]*$/.test(line);
+    }
+
+    function rangesOverlap(start, end, otherStart, otherEnd) {
+      return start < otherEnd && end > otherStart;
+    }
+
+    function embedManagedAssetMarkdownImages(markdown) {
+      let convertedAssets = 0;
+      const rewritten = String(markdown || '').replace(/!\[([^\]\n]*)\]\(([^)\s]+)(\s+["'][^"']*["'])?\)/g, (raw, alt, href, title = '') => {
+        const asset = getManagedAssetForMarkdownHref(href);
+        if (!asset) return raw;
+        convertedAssets += 1;
+        return `![${alt}](${getManagedAssetDataUrl(asset)}${title})`;
+      });
+
+      return { markdown: rewritten, convertedAssets };
+    }
+
+    function getManagedAssetForMarkdownHref(href) {
+      if (!state.managedAssets?.size) return null;
+      const value = String(href || '').trim();
+      if (!value || /^(?:https?:|data:|blob:|#)/i.test(value)) return null;
+      const path = resolveManagedAssetPath(value, state.activePath);
+      return path ? state.managedAssets.get(path) || null : null;
+    }
+
     function getRenderedPlainText() {
       const clone = clonePreviewForPlainText();
       const container = document.createElement('div');
@@ -3076,6 +3341,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       exportMarkdownBundle,
       exportArtifactReviewPack,
       copyRenderedHtml,
+      copyMarkdownWithImages,
       copyRenderedText,
       copyCurrentMermaidSource,
       exportCurrentDiagramSvg,

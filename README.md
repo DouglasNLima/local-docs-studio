@@ -24,6 +24,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 - Semantic progress bars inserted from the editor toolbar with preset colours.
 - Toolbar helpers for emoji, callouts, status badges, details blocks, image figures, keyboard shortcuts, and anchors.
 - Formatted clipboard paste that converts HTML content into Markdown, with spreadsheet table support for HTML table or TSV clipboard data, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
+- Editor copy support for Markdown with rendered Mermaid diagrams embedded as pasteable image data for work item fields that do not render Mermaid source.
 - DOCX, HTML, and text-only PDF import that converts documents into clean editable Markdown with supported embedded images as exportable session assets where available.
 - Standalone `.mmd` and `.mermaid` diagram rendering.
 - Local workspace browser with flat list or folder tree views, filtering, dirty-file markers, external-change markers, and add/new-file actions.
@@ -105,6 +106,7 @@ The Export menu includes document-level diagram actions:
 - **Export SVG** for the current rendered Mermaid diagram.
 - **Export PNG** for a raster image version.
 - **Copy Mermaid** for the current standalone diagram source or first Mermaid block.
+- **Copy Markdown with images** from the Edit menu or Editor context menu to copy Markdown while replacing complete Mermaid blocks with inline PNG image references.
 
 ## Docs Site Builder
 

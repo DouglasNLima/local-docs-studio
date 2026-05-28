@@ -319,7 +319,7 @@
       gap: .18rem;
       min-width: 13rem;
       max-width: min(18rem, calc(100vw - 1rem));
-      max-height: min(80vh, 32rem);
+      max-height: min(60vh, 26rem);
       overflow: auto;
       padding: .35rem;
       border: 1px solid var(--border-soft);
@@ -843,7 +843,7 @@
     }
 
     .input-pane {
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto auto auto minmax(0, 1fr);
     }
 
     .preview-pane {
@@ -914,6 +914,33 @@
       gap: .55rem;
       min-width: 0;
       font-weight: 700;
+    }
+
+    .editor-title-controls {
+      display: inline-flex;
+      align-items: center;
+      gap: .28rem;
+      flex: 0 0 auto;
+    }
+
+    .editor-find-panel {
+      grid-row: 2;
+    }
+
+    .editor-toolbar {
+      grid-row: 3;
+    }
+
+    .editor-shell {
+      grid-row: 4;
+    }
+
+    .editor-find-panel[hidden] + .editor-toolbar {
+      grid-row: 2;
+    }
+
+    .editor-find-panel[hidden] ~ .editor-shell {
+      grid-row: 3 / 5;
     }
 
     .preview-control-groups {
@@ -1042,7 +1069,7 @@
 
     .editor-shell textarea {
       position: relative;
-      z-index: 2;
+      z-index: 3;
       grid-column: 2;
       grid-row: 1;
       min-width: 0;
@@ -1062,7 +1089,7 @@
     }
 
     .editor-syntax-layer {
-      z-index: 1;
+      z-index: 2;
       grid-column: 2;
       grid-row: 1;
       min-width: 0;
@@ -1080,6 +1107,38 @@
       white-space: pre-wrap;
       overflow-wrap: break-word;
       pointer-events: none;
+    }
+
+    .editor-find-layer {
+      z-index: 1;
+      grid-column: 2;
+      grid-row: 1;
+      min-width: 0;
+      min-height: 0;
+      width: calc(100% - var(--editor-scrollbar-width, 0px));
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      padding: 1rem;
+      border: 0;
+      background: transparent;
+      color: transparent;
+      font: 14px/1.58 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      tab-size: 2;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
+      pointer-events: none;
+    }
+
+    .editor-find-hit {
+      border-radius: .2rem;
+      background: rgba(255, 136, 62, .22);
+      color: transparent;
+    }
+
+    .editor-find-hit.active {
+      background: rgba(255, 136, 62, .46);
+      box-shadow: 0 0 0 1px rgba(255, 136, 62, .55);
     }
 
     .editor-syntax-layer .hljs-emphasis,
@@ -1726,6 +1785,7 @@
     .outline-links a[data-outline-level="3"] { margin-left: .7rem; }
     .outline-links a[data-outline-level="4"] { margin-left: 1.05rem; }
 
+    .editor-find-panel,
     .preview-find-panel,
     .document-review-panel {
       border-bottom: 1px solid var(--border-soft);
@@ -1734,9 +1794,11 @@
       font-size: .82rem;
     }
 
+    .editor-find-panel[hidden],
     .preview-find-panel[hidden],
     .document-review-panel[hidden] { display: none; }
 
+    .editor-find-panel,
     .preview-find-panel {
       display: flex;
       flex-wrap: wrap;
@@ -1745,11 +1807,13 @@
       padding: .55rem .85rem;
     }
 
+    .editor-find-panel label,
     .preview-find-panel label {
       font-weight: 800;
       white-space: nowrap;
     }
 
+    .editor-find-panel input,
     .preview-find-panel input {
       flex: 1 1 14rem;
       min-width: 0;
@@ -1764,12 +1828,14 @@
       font: inherit;
     }
 
+    .editor-find-panel input:focus,
     .preview-find-panel input:focus {
       border-color: var(--accent);
       outline: none;
       box-shadow: 0 0 0 3px rgba(255, 136, 62, .14);
     }
 
+    .editor-find-panel output,
     .preview-find-panel output {
       flex: 0 0 auto;
       min-width: 3.2rem;
@@ -1777,6 +1843,7 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .editor-find-panel button,
     .preview-find-panel button {
       flex: 0 0 auto;
       padding: .42rem .62rem;
@@ -2429,9 +2496,11 @@
         width: 100%;
         justify-content: flex-start;
       }
+      .editor-find-panel,
       .preview-find-panel {
         grid-template-columns: 1fr;
       }
+      .editor-find-panel output,
       .preview-find-panel output {
         text-align: left;
       }
@@ -3642,7 +3711,8 @@ label.file-button.primary,
   caret-color: var(--accent);
 }
 
-.editor-shell.syntax-highlight-enabled .editor-syntax-layer {
+.editor-shell.syntax-highlight-enabled .editor-syntax-layer,
+.editor-shell .editor-find-layer {
   padding: .85rem 1rem;
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }
@@ -3671,6 +3741,7 @@ label.file-button.primary,
 
 .export-trust,
 .outline-panel,
+.editor-find-panel,
 .preview-find-panel,
 .document-review-panel {
   border-bottom: 1px solid var(--border-soft);

@@ -14,6 +14,14 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     findReplaceCurrentButton,
     findReplaceAllButton,
     findReplaceCloseButton,
+    editorFindToggleButton,
+    editorFindPanel,
+    editorFindInput,
+    editorFindCount,
+    editorFindPrevButton,
+    editorFindNextButton,
+    editorFindClearButton,
+    editorFindLayer,
   } = dom;
   const {
     closeOpenMenus,
@@ -22,6 +30,10 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
   } = callbacks;
 
   const state = {
+    matches: [],
+    activeIndex: -1,
+  };
+  const editorFindState = {
     matches: [],
     activeIndex: -1,
   };
@@ -38,10 +50,26 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     findReplaceNextButton?.addEventListener('click', () => goToMatch(1));
     findReplaceCurrentButton?.addEventListener('click', replaceCurrent);
     findReplaceAllButton?.addEventListener('click', replaceAll);
+    editorFindToggleButton?.addEventListener('click', toggleEditorFind);
+    editorFindInput?.addEventListener('input', refreshEditorFind);
+    editorFindInput?.addEventListener('keydown', handleEditorFindKeydown);
+    editorFindPrevButton?.addEventListener('click', () => goToEditorMatch(-1));
+    editorFindNextButton?.addEventListener('click', () => goToEditorMatch(1));
+    editorFindClearButton?.addEventListener('click', closeEditorFind);
+    editor.addEventListener('input', refreshEditorFind);
+    editor.addEventListener('scroll', syncEditorFindLayer);
+    document.addEventListener('keydown', handleEditorFindGlobalKeydown, true);
   }
 
   function openFindReplace({ replace = false } = {}) {
+    if (!replace) {
+      openEditorFind();
+      return;
+    }
     if (!findReplaceDialog) return;
+    if (editorFindPanel && !editorFindPanel.hidden) {
+      closeEditorFind();
+    }
     closeOpenMenus?.();
     findReplaceDialog.classList.toggle('replace-open', replace);
     findReplaceTitle.textContent = replace ? 'Find and replace' : 'Find in editor';
@@ -56,6 +84,42 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     findReplaceFindInput.focus();
     findReplaceFindInput.select();
     refreshMatches();
+  }
+
+  function toggleEditorFind() {
+    if (!editorFindPanel) return;
+    if (editorFindPanel.hidden) {
+      openEditorFind();
+    } else {
+      closeEditorFind();
+    }
+  }
+
+  function openEditorFind() {
+    if (!editorFindPanel) return;
+    closeOpenMenus?.();
+    editorFindPanel.hidden = false;
+    editorFindToggleButton?.setAttribute('aria-pressed', 'true');
+    const selected = editor.value.slice(editor.selectionStart, editor.selectionEnd);
+    if (selected && !selected.includes('\n')) {
+      editorFindInput.value = selected;
+    }
+    editorFindInput.focus();
+    editorFindInput.select();
+    refreshEditorFind();
+  }
+
+  function closeEditorFind(event) {
+    event?.preventDefault?.();
+    if (!editorFindPanel) return;
+    editorFindPanel.hidden = true;
+    editorFindToggleButton?.setAttribute('aria-pressed', 'false');
+    editorFindInput.value = '';
+    editorFindState.matches = [];
+    editorFindState.activeIndex = -1;
+    updateEditorFindCount();
+    renderEditorFindLayer();
+    editor.focus();
   }
 
   function closeFindReplace(event) {
@@ -142,6 +206,106 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     }
   }
 
+  function handleEditorFindKeydown(event) {
+    if (event.key === 'Escape') {
+      closeEditorFind(event);
+      event.stopPropagation();
+      return;
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      event.stopPropagation();
+      goToEditorMatch(event.shiftKey ? -1 : 1);
+    }
+  }
+
+  function handleEditorFindGlobalKeydown(event) {
+    if (!editorFindPanel || editorFindPanel.hidden) return;
+    const target = event.target;
+    if (target !== editor && !editorFindPanel.contains(target)) return;
+    if (event.key === 'Escape') {
+      closeEditorFind(event);
+      event.stopPropagation();
+      return;
+    }
+    if (event.key === 'Enter' && !event.isComposing) {
+      event.preventDefault();
+      event.stopPropagation();
+      goToEditorMatch(event.shiftKey ? -1 : 1);
+    }
+  }
+
+  function refreshEditorFind() {
+    if (!editorFindPanel || editorFindPanel.hidden) return;
+    const query = editorFindInput.value;
+    editorFindState.matches = findTextMatches(editor.value, query);
+    if (!editorFindState.matches.length) {
+      editorFindState.activeIndex = -1;
+      updateEditorFindCount();
+      renderEditorFindLayer();
+      return;
+    }
+
+    const selectionStart = editor.selectionStart;
+    const nextIndex = editorFindState.matches.findIndex((match) => match.index + match.length >= selectionStart);
+    editorFindState.activeIndex = nextIndex === -1 ? 0 : nextIndex;
+    selectActiveEditorMatch();
+  }
+
+  function goToEditorMatch(step) {
+    if (!editorFindState.matches.length) return;
+    editorFindState.activeIndex = (editorFindState.activeIndex + step + editorFindState.matches.length) % editorFindState.matches.length;
+    selectActiveEditorMatch();
+  }
+
+  function selectActiveEditorMatch() {
+    const match = editorFindState.matches[editorFindState.activeIndex];
+    if (!match) {
+      updateEditorFindCount();
+      renderEditorFindLayer();
+      return;
+    }
+    editor.setSelectionRange(match.index, match.index + match.length);
+    renderEditorFindLayer();
+    syncEditorFindLayer();
+    updateEditorFindCount();
+  }
+
+  function renderEditorFindLayer() {
+    if (!editorFindLayer) return;
+    if (!editorFindPanel || editorFindPanel.hidden || !editorFindState.matches.length) {
+      editorFindLayer.textContent = '';
+      return;
+    }
+
+    const source = editor.value;
+    let cursor = 0;
+    editorFindLayer.innerHTML = editorFindState.matches.map((match, index) => {
+      const start = Math.max(cursor, match.index);
+      const end = Math.max(start, match.index + match.length);
+      const before = escapeHtml(source.slice(cursor, start));
+      const label = index === editorFindState.activeIndex ? 'editor-find-hit active' : 'editor-find-hit';
+      const hit = `<mark class="${label}">${escapeHtml(source.slice(start, end))}</mark>`;
+      cursor = end;
+      return `${before}${hit}`;
+    }).join('') + escapeHtml(source.slice(cursor)) + (source.endsWith('\n') ? '\n' : '');
+    syncEditorFindLayer();
+  }
+
+  function syncEditorFindLayer() {
+    if (!editorFindLayer) return;
+    editorFindLayer.scrollTop = editor.scrollTop;
+    editorFindLayer.scrollLeft = editor.scrollLeft;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function buildReplacement(match) {
     const replacement = findReplaceReplaceInput.value;
     if (!findReplaceRegexToggle.checked) return replacement;
@@ -168,10 +332,21 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     findReplaceAllButton.disabled = total < 1;
   }
 
+  function updateEditorFindCount() {
+    if (!editorFindCount) return;
+    const total = editorFindState.matches.length;
+    editorFindCount.textContent = total && editorFindState.activeIndex >= 0 ? `${editorFindState.activeIndex + 1}/${total}` : `0/${total}`;
+    if (editorFindPrevButton) editorFindPrevButton.disabled = total < 2;
+    if (editorFindNextButton) editorFindNextButton.disabled = total < 2;
+  }
+
   return {
     installFindReplaceHandlers,
     openFindReplace,
+    openEditorFind,
+    closeEditorFind,
     closeFindReplace,
     refreshMatches,
+    refreshEditorFind,
   };
 }

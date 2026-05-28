@@ -8,6 +8,7 @@ export function createContextMenuService({
     closeOpenMenus,
     copyCodeBlock,
     copyDiagramSource,
+    copyMarkdownWithImages,
     copyRenderedHtml,
     copyRenderedText,
     copyTableBlock,
@@ -97,6 +98,9 @@ export function createContextMenuService({
       }),
       separator(),
       item('editor-copy', 'Copy', copyEditorSelection, { disabled: !hasSelection }),
+      item('editor-copy-markdown-images', 'Copy Markdown with images', () => copyMarkdownWithImages(), {
+        disabled: !editor.value.trim(),
+      }),
       item('editor-cut', 'Cut', cutEditorSelection, { disabled: disableMutation || !hasSelection }),
       item('editor-paste-text', 'Paste as text', pasteEditorText, { disabled: disableMutation }),
       separator(),

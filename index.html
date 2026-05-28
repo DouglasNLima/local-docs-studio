@@ -67,6 +67,9 @@
             <button type="button" data-edit-action="findEditor">Find in editor</button>
             <button type="button" data-edit-action="replaceEditor">Find and replace</button>
             <hr>
+            <div class="menu-heading">Copy</div>
+            <button type="button" data-edit-action="copyMarkdownWithImages">Copy Markdown with images</button>
+            <hr>
             <div class="menu-heading">Paste Special</div>
             <button type="button" data-edit-action="pasteTable">Paste as table</button>
             <button type="button" data-edit-action="pasteText">Paste as text</button>
@@ -80,7 +83,7 @@
             <div class="menu-note">Spreadsheet tables paste as Markdown automatically when the clipboard includes HTML table or tab-separated data.</div>
           </div>
         </details>
-        <details class="menu align-right" id="createMenu">
+        <details class="menu" id="createMenu">
           <summary>Create</summary>
           <div class="menu-panel create-tools">
             <div class="menu-note">Generate editable Markdown from local templates or load a local starter. No network calls or AI required.</div>
@@ -406,8 +409,25 @@
             <div class="pane-title-main pane-title-context">
               <span>Input</span>
             </div>
-            <button id="inputMaximizeButton" type="button" aria-pressed="false">Maximise</button>
+            <div class="editor-title-controls" aria-label="Editor controls">
+              <button id="editorFindToggleButton" class="icon-button icon-toggle" type="button" title="Find in editor" aria-label="Find in editor" aria-pressed="false">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+                <span class="visually-hidden">Find</span>
+              </button>
+              <button id="inputMaximizeButton" class="icon-button icon-toggle" type="button" title="Maximise editor" aria-label="Maximise editor" aria-pressed="false">
+                <svg class="toolbar-icon maximize-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                <span class="visually-hidden">Maximise</span>
+              </button>
+            </div>
           </div>
+          <section class="editor-find-panel" id="editorFindPanel" aria-label="Find in editor" hidden>
+            <label for="editorFindInput">Find in editor</label>
+            <input id="editorFindInput" type="search" autocomplete="off" placeholder="Search source text" />
+            <output id="editorFindCount" aria-live="polite">0/0</output>
+            <button id="editorFindPrevButton" type="button" aria-label="Previous editor search result">Previous</button>
+            <button id="editorFindNextButton" type="button" aria-label="Next editor search result">Next</button>
+            <button id="editorFindClearButton" type="button" aria-label="Close editor search">Close</button>
+          </section>
           <div class="editor-toolbar" id="editorToolbar" aria-label="Markdown formatting tools">
             <div class="toolbar-section" aria-label="Text formatting">
               <button class="format-bold" type="button" data-command="bold" title="Bold" aria-label="Bold">
@@ -496,6 +516,7 @@
           <div class="editor-shell" id="editorShell">
             <div class="editor-line-numbers" id="editorLineNumbers" aria-hidden="true">1</div>
             <pre class="editor-syntax-layer" id="editorSyntaxLayer" aria-hidden="true"></pre>
+            <pre class="editor-find-layer" id="editorFindLayer" aria-hidden="true"></pre>
             <textarea id="editor" spellcheck="false" aria-label="Markdown or Mermaid source"></textarea>
             <div class="mermaid-autocomplete" id="mermaidAutocomplete" role="listbox" aria-label="Mermaid autocomplete suggestions" hidden></div>
           </div>
