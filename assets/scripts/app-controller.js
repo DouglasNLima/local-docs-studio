@@ -102,6 +102,13 @@ export function createAppController() {
       previewFindPrevButton,
       previewFindNextButton,
       previewFindClearButton,
+      editorFindToggleButton,
+      editorFindPanel,
+      editorFindInput,
+      editorFindCount,
+      editorFindPrevButton,
+      editorFindNextButton,
+      editorFindClearButton,
       documentReviewToggleButton,
       documentReviewPanel,
       documentReviewSummary,
@@ -361,6 +368,13 @@ export function createAppController() {
         findReplaceCurrentButton,
         findReplaceAllButton,
         findReplaceCloseButton,
+        editorFindToggleButton,
+        editorFindPanel,
+        editorFindInput,
+        editorFindCount,
+        editorFindPrevButton,
+        editorFindNextButton,
+        editorFindClearButton,
       },
       callbacks: {
         closeOpenMenus,
@@ -568,6 +582,7 @@ export function createAppController() {
       exportMarkdownBundle,
       exportArtifactReviewPack,
       copyRenderedHtml,
+      copyMarkdownWithImages,
       copyRenderedText,
       copyCurrentMermaidSource,
       exportCurrentDiagramSvg,
@@ -694,6 +709,7 @@ export function createAppController() {
         copyCodeBlock,
         copyDiagramSource,
         copyRenderedHtml,
+        copyMarkdownWithImages,
         copyRenderedText,
         copyTableBlock,
         downloadTableCsv,
@@ -880,8 +896,9 @@ export function createAppController() {
         button.addEventListener('click', async () => {
           if (button.dataset.editAction === 'quickSwitch') workspaceSearchTools.openWorkspaceSearch('files');
           if (button.dataset.editAction === 'workspaceSearch') workspaceSearchTools.openWorkspaceSearch('content');
-          if (button.dataset.editAction === 'findEditor') findReplaceTools.openFindReplace({ replace: false });
+          if (button.dataset.editAction === 'findEditor') findReplaceTools.openEditorFind();
           if (button.dataset.editAction === 'replaceEditor') findReplaceTools.openFindReplace({ replace: true });
+          if (button.dataset.editAction === 'copyMarkdownWithImages') await copyMarkdownWithImages();
           if (button.dataset.editAction === 'pasteTable') await handlePasteSpecialAction(pasteModes.table);
           if (button.dataset.editAction === 'pasteText') await handlePasteSpecialAction(pasteModes.text);
           if (button.dataset.editAction === 'pasteCode') await handlePasteSpecialAction(pasteModes.code);
@@ -988,7 +1005,7 @@ export function createAppController() {
         const key = event.key.toLowerCase();
         if (key === 'f' && !event.shiftKey) {
           event.preventDefault();
-          findReplaceTools.openFindReplace({ replace: false });
+          findReplaceTools.openEditorFind();
           return;
         }
 
@@ -1137,7 +1154,7 @@ export function createAppController() {
         }
         if (isShortcut && key === 'f' && document.activeElement !== editor) {
           event.preventDefault();
-          findReplaceTools.openFindReplace({ replace: false });
+          findReplaceTools.openEditorFind();
           return;
         }
         if (isShortcut && key === 'h' && document.activeElement !== editor) {
@@ -2855,9 +2872,12 @@ ${unresolvedRows}
 
       if (shouldMaximize) togglePreviewMaximized(false);
       app.classList.toggle('input-maximized', shouldMaximize);
-      inputMaximizeButton.textContent = shouldMaximize ? 'Restore' : 'Maximise';
+      const label = shouldMaximize ? 'Restore split editor' : 'Maximise editor';
+      const text = inputMaximizeButton.querySelector('.visually-hidden');
+      if (text) text.textContent = shouldMaximize ? 'Restore' : 'Maximise';
       inputMaximizeButton.setAttribute('aria-pressed', String(shouldMaximize));
-      inputMaximizeButton.setAttribute('aria-label', shouldMaximize ? 'Restore split input' : 'Maximise input');
+      inputMaximizeButton.setAttribute('aria-label', label);
+      inputMaximizeButton.title = label;
       updateEditorChrome();
     }
 

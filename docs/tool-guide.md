@@ -79,6 +79,7 @@ flowchart LR
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - **SVG/PNG** exports the current Mermaid diagram.
 - **Copy HTML** and **Copy text** support quick sharing without downloads.
+- **Copy Markdown with images** is available from the Edit menu and Editor context menu. It copies Markdown while replacing complete Mermaid blocks with inline PNG image references for destinations that do not render Mermaid source.
 
 ## Create And Studio Tools
 

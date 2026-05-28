@@ -287,12 +287,33 @@ async function mockClipboardRead(page, { text = '', html = '', reject = false } 
 async function mockClipboardWrite(page, { readText = '' } = {}) {
   await page.evaluate((payload) => {
     window.__copiedText = '';
+    window.__copiedHtml = '';
+    window.__clipboardWriteTypes = [];
+    class MockClipboardItem {
+      constructor(items) {
+        this.items = items;
+      }
+    }
+    Object.defineProperty(window, 'ClipboardItem', {
+      configurable: true,
+      value: MockClipboardItem,
+    });
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: {
         readText: async () => payload.readText,
         writeText: async (text) => {
           window.__copiedText = text;
+        },
+        write: async (items) => {
+          const item = items[0];
+          window.__clipboardWriteTypes = Object.keys(item.items || {});
+          if (item.items?.['text/plain']) {
+            window.__copiedText = await item.items['text/plain'].text();
+          }
+          if (item.items?.['text/html']) {
+            window.__copiedHtml = await item.items['text/html'].text();
+          }
         },
       },
     });
@@ -1207,6 +1228,31 @@ test('custom context menu handles editor actions and preserves native fallbacks'
   await expect(menu.locator('[data-context-menu-action="editor-paste-text"]')).toBeDisabled();
 });
 
+test('editor context menu copies Markdown with Mermaid diagrams as clipboard images', async ({ page }) => {
+  await openFixture(page, 'mixed.md');
+  await mockClipboardWrite(page);
+  const menu = page.locator('.context-menu');
+
+  await page.locator('#editor').evaluate((editor) => {
+    editor.focus();
+    editor.setSelectionRange(0, 0);
+  });
+  await dispatchContextMenu(page.locator('#editor'), { x: 24, y: 20 });
+  await expect(menu.locator('[data-context-menu-action="editor-copy-markdown-images"]')).toBeVisible();
+  await menu.locator('[data-context-menu-action="editor-copy-markdown-images"]').click();
+
+  await expect(page.locator('#status')).toHaveText(/Markdown with images copied/, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
+  const copiedMarkdown = await page.evaluate(() => window.__copiedText);
+  const copiedHtml = await page.evaluate(() => window.__copiedHtml);
+  expect(copiedMarkdown).toContain('![Mermaid diagram 1](data:image/png;base64,');
+  expect(copiedMarkdown).not.toContain('```mermaid');
+  expect(copiedMarkdown).not.toContain('flowchart TD');
+  expect(copiedMarkdown).toContain("const message = 'release ready';");
+  expect(copiedHtml).toContain('<img');
+  expect(copiedHtml).toContain('data:image/png;base64,');
+});
+
 test('custom context menu exposes preview-specific copy and export actions', async ({ page }) => {
   await openFixture(page, 'mixed.md');
   await mockClipboardWrite(page);
@@ -1322,6 +1368,20 @@ test('editor toolbar icon buttons keep markdown command behaviour', async ({ pag
 
   const toolbarOverflow = await page.locator('#editorToolbar').evaluate((toolbar) => toolbar.scrollWidth > toolbar.clientWidth + 1);
   expect(toolbarOverflow).toBe(false);
+});
+
+test('emoji picker search includes expanded documentation emojis', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.locator('[data-command="emoji"]').click();
+  await expect(page.locator('#insertHelperDialog')).toBeVisible();
+  await page.locator('#emojiSearchInput').fill('security');
+  await expect(page.getByRole('button', { name: 'Security' })).toBeVisible();
+  await page.getByRole('button', { name: 'Security' }).click();
+  await page.getByRole('button', { name: 'Insert emoji' }).click();
+
+  await expect(page.locator('#editor')).toHaveValue('🛡️');
+  await expect(page.locator('#status')).toHaveText(/Emoji inserted/);
 });
 
 test('table toolbar opens a visual editor for new and existing Markdown tables', async ({ page }) => {
@@ -1933,11 +1993,13 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
 
   await page.locator('#inputMaximizeButton').click();
   await expect(page.locator('#app')).toHaveClass(/input-maximized/);
-  await expect(page.locator('#inputMaximizeButton')).toHaveText('Restore');
+  await expect(page.locator('#inputMaximizeButton')).toHaveAttribute('aria-label', 'Restore split editor');
+  await expect(page.locator('#inputMaximizeButton')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.preview-pane')).toBeHidden();
   await page.locator('#inputMaximizeButton').click();
   await expect(page.locator('#app')).not.toHaveClass(/input-maximized/);
-  await expect(page.locator('#inputMaximizeButton')).toHaveText('Maximise');
+  await expect(page.locator('#inputMaximizeButton')).toHaveAttribute('aria-label', 'Maximise editor');
+  await expect(page.locator('#inputMaximizeButton')).toHaveAttribute('aria-pressed', 'false');
 
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.locator('#layoutModeControl [data-layout-mode="preview"]').click();
@@ -1956,6 +2018,32 @@ test('editor line numbers, Mermaid autocomplete, and layout modes work', async (
   await page.keyboard.press('Enter');
   await expect(page.locator('#editor')).toHaveValue(/flowchart TD/);
   await expect(page.locator('#mermaidAutocomplete')).toBeHidden();
+});
+
+test('editor find icon opens inline search with keyboard navigation', async ({ page }) => {
+  await gotoApp(page);
+  await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.', 0, 0);
+
+  await page.keyboard.press('Control+F');
+  await expect(page.locator('#editorFindPanel')).toBeVisible();
+  await expect(page.locator('#findReplaceDialog')).toBeHidden();
+  await page.locator('#editorFindInput').fill('review');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+
+  await page.locator('#editorFindNextButton').click();
+  await expect(page.locator('#editorFindCount')).toHaveText('2/3');
+  await page.locator('#editorFindPrevButton').click();
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await page.locator('#editorFindInput').focus();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#editorFindPanel')).toBeHidden();
+
+  await page.locator('#editorFindToggleButton').click();
+  await expect(page.locator('#editorFindPanel')).toBeVisible();
+  await expect(page.locator('#editorFindToggleButton')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('#editorFindClearButton').click();
+  await expect(page.locator('#editorFindPanel')).toBeHidden();
+  await expect(page.locator('#editorFindToggleButton')).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('focus mode exposes a visible exit button and keeps Escape fallback', async ({ page }) => {
