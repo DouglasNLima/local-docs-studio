@@ -272,6 +272,7 @@ export function createAppController() {
       confirmDiscardUnsaved,
       closeOpenMenus,
       openCreateMenu,
+      syncMobileMenuLayout,
       installResizers,
       restoreThemePreference,
       toggleTheme,
@@ -327,6 +328,11 @@ export function createAppController() {
         confirm: confirmDialog,
       },
     });
+
+    function syncOpenMobileMenuLayout() {
+      syncMobileMenuLayout(document.querySelector('details.menu[open]'));
+    }
+
     const draftTools = createDraftService({
       state,
       dom: {
@@ -954,7 +960,11 @@ export function createAppController() {
         });
 
         menu.addEventListener('toggle', () => {
-          if (!menu.open) return;
+          if (!menu.open) {
+            syncMobileMenuLayout();
+            return;
+          }
+          syncMobileMenuLayout(menu);
           document.querySelectorAll('details.menu[open]').forEach((other) => {
             if (other !== menu) other.removeAttribute('open');
           });
@@ -965,6 +975,8 @@ export function createAppController() {
         if (event.target.closest('details.menu')) return;
         closeOpenMenus();
       });
+      window.addEventListener('resize', syncOpenMobileMenuLayout);
+      window.visualViewport?.addEventListener('resize', syncOpenMobileMenuLayout);
 
       editor.addEventListener('paste', handleEditorPaste);
 
