@@ -201,6 +201,7 @@ export function createAppController() {
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
+    let pasteStatusRestoreTimeout = 0;
     let snapshotDbPromise = null;
 
     const state = createInitialState({ readStoredNumber });
@@ -895,7 +896,10 @@ export function createAppController() {
 
       document.querySelectorAll('[data-view-action]').forEach((button) => {
         button.addEventListener('click', async () => {
-          if (button.dataset.viewAction === 'renderPreview') await renderPreview();
+          if (button.dataset.viewAction === 'renderPreview') {
+            clearPasteStatusRestore();
+            await renderPreview();
+          }
           if (button.dataset.viewAction === 'maximizePreview') togglePreviewMaximized();
           if (button.dataset.viewAction === 'toggleOutline') toggleOutline();
           if (button.dataset.viewAction === 'openDocsMap') await openDocsMap();
@@ -1024,6 +1028,7 @@ export function createAppController() {
 
         if (key === 'enter') {
           event.preventDefault();
+          clearPasteStatusRestore();
           renderPreview();
           return;
         }
@@ -1264,6 +1269,7 @@ export function createAppController() {
 
     async function handlePasteSpecialAction(mode) {
       closeOpenMenus();
+      clearPasteStatusRestore();
 
       if (isActiveReadOnly()) {
         setStatus('This guide is read-only. Open or create a Markdown file to edit.', 'warning');
@@ -1279,7 +1285,9 @@ export function createAppController() {
       } catch (error) {
         pendingSpecialPasteMode = mode;
         editor.focus();
-        setStatus(`Clipboard access blocked. Press Ctrl/Cmd+V to ${getPasteInstruction(mode)}.`, 'warning');
+        const message = `Clipboard access blocked. Press Ctrl/Cmd+V to ${getPasteInstruction(mode)}.`;
+        setStatus(message, 'warning');
+        schedulePasteStatusRestore(message, 'warning');
       }
     }
 
@@ -1299,11 +1307,27 @@ export function createAppController() {
 
       replaceEditorRange(selection.start, selection.end, markdown, cursor, cursor);
       setStatus(replacement.status, replacement.statusType);
-      window.setTimeout(() => {
+      schedulePasteStatusRestore(replacement.status, replacement.statusType);
+    }
+
+    function schedulePasteStatusRestore(text, statusType, retries = 6) {
+      clearPasteStatusRestore();
+      pasteStatusRestoreTimeout = window.setTimeout(() => {
+        pasteStatusRestoreTimeout = 0;
         if (status.textContent === 'Rendered') {
-          setStatus(replacement.status, replacement.statusType);
+          setStatus(text, statusType);
+          return;
+        }
+        if (status.textContent === 'Rendering...' && retries > 0) {
+          schedulePasteStatusRestore(text, statusType, retries - 1);
         }
       }, 350);
+    }
+
+    function clearPasteStatusRestore() {
+      if (!pasteStatusRestoreTimeout) return;
+      window.clearTimeout(pasteStatusRestoreTimeout);
+      pasteStatusRestoreTimeout = 0;
     }
 
     function getPasteFailureMessage(mode) {

@@ -98,19 +98,29 @@ export function createDraftService({ state, dom, callbacks }) {
 
   function scheduleDraftSave() {
     if (!state.activePath) return;
+    const path = state.activePath;
     window.clearTimeout(saveTimer);
-    saveTimer = window.setTimeout(() => saveActiveDraft(), SAVE_DEBOUNCE_MS);
+    saveTimer = window.setTimeout(() => saveDraftForPath(path), SAVE_DEBOUNCE_MS);
   }
 
   async function saveActiveDraft() {
-    const record = state.files.find((item) => item.path === state.activePath);
+    await saveDraftForPath(state.activePath);
+  }
+
+  async function saveDraftForPath(path) {
+    const record = state.files.find((item) => item.path === path);
     if (!record || record.readOnly) return;
     const saved = state.savedContentCache.get(record.path);
-    if (typeof saved === 'string' && saved === editor.value) {
+    const content = (state.fileCache.has(record.path)
+      ? state.fileCache.get(record.path)
+      : record.path === state.activePath
+        ? editor.value
+        : '') ?? '';
+    if (typeof saved === 'string' && saved === content) {
       await deleteDraft(record.path);
       return;
     }
-    await putDraft(record.path, editor.value, saved ?? '');
+    await putDraft(record.path, content, saved ?? '');
   }
 
   async function afterActiveFileLoaded(record, content) {
