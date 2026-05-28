@@ -82,6 +82,48 @@ async function loadSample(page) {
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
+async function expectMobileMenuPanelUsable(page, menuName) {
+  await page.locator('summary').filter({ hasText: new RegExp(`^${menuName}$`) }).click();
+  const panel = page.locator('details.menu[open] .menu-panel');
+  await expect(panel).toBeVisible();
+
+  const metrics = await panel.evaluate((element) => {
+    const panelRect = element.getBoundingClientRect();
+    const topbarRect = document.querySelector('.topbar')?.getBoundingClientRect();
+    const firstButton = element.querySelector('button:not(:disabled)') || element.querySelector('button');
+    const buttonRect = firstButton?.getBoundingClientRect();
+    const target = buttonRect
+      ? document.elementFromPoint(buttonRect.left + buttonRect.width / 2, buttonRect.top + buttonRect.height / 2)
+      : null;
+
+    return {
+      panel: {
+        x: panelRect.x,
+        y: panelRect.y,
+        right: panelRect.right,
+        bottom: panelRect.bottom,
+        width: panelRect.width,
+        height: panelRect.height,
+        clientHeight: element.clientHeight,
+        scrollHeight: element.scrollHeight,
+      },
+      topbarBottom: topbarRect?.bottom ?? 0,
+      firstButtonClickable: Boolean(firstButton && (target === firstButton || firstButton.contains(target))),
+      horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+    };
+  });
+  const viewport = page.viewportSize();
+
+  expect(metrics.panel.x).toBeGreaterThanOrEqual(0);
+  expect(metrics.panel.y).toBeGreaterThanOrEqual(metrics.topbarBottom - 1);
+  expect(metrics.panel.right).toBeLessThanOrEqual(viewport.width + 1);
+  expect(metrics.panel.bottom).toBeLessThanOrEqual(viewport.height + 1);
+  expect(metrics.panel.height).toBeGreaterThan(160);
+  expect(metrics.panel.clientHeight).toBeGreaterThan(120);
+  expect(metrics.firstButtonClickable).toBe(true);
+  expect(metrics.horizontalOverflow).toBe(false);
+}
+
 async function renderPreviewFromViewMenu(page) {
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.getByRole('button', { name: 'Render preview' }).click();
@@ -3331,7 +3373,17 @@ test('theme, preview maximise, and mobile layout stay usable', async ({ page }) 
   await page.locator('#outlineToggleButton').click();
 
   await expect(page.locator('#app')).toHaveClass(/preview-maximized/);
-  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
-  expect(overflow).toBe(false);
+  await expectMobileMenuPanelUsable(page, 'Export');
+});
+
+test('mobile topbar menus open as fixed usable panels', async ({ page }) => {
+  for (const width of [390, 680, 740, 768]) {
+    await page.setViewportSize({ width, height: 844 });
+    await gotoApp(page);
+
+    for (const menuName of ['File', 'Create', 'Export', 'View']) {
+      await expectMobileMenuPanelUsable(page, menuName);
+      await page.keyboard.press('Escape');
+    }
+  }
 });

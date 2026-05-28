@@ -50,6 +50,7 @@ export function createUiService({
     state,
     onOpenPath: openArtifactPath,
   });
+  const mobileMenuQuery = '(max-width: 768px)';
 
     document.title = APP_BROWSER_TITLE;
     if (appVersionBadge) appVersionBadge.textContent = `v${APP_VERSION} (build ${APP_BUILD})`;
@@ -331,12 +332,35 @@ export function createUiService({
       document.querySelectorAll('details.menu[open]').forEach((menu) => {
         menu.removeAttribute('open');
       });
+      syncMobileMenuLayout();
     }
 
     function openCreateMenu() {
       closeOpenMenus();
       createMenu.open = true;
+      syncMobileMenuLayout(createMenu);
       createMenu.querySelector('summary')?.focus();
+    }
+
+    function syncMobileMenuLayout(menu) {
+      const root = document.documentElement;
+      const usesMobileMenu = window.matchMedia
+        ? window.matchMedia(mobileMenuQuery).matches
+        : window.innerWidth <= 768;
+
+      if (!usesMobileMenu) {
+        root.style.removeProperty('--mobile-menu-top');
+        return;
+      }
+
+      const topbar = document.querySelector('.topbar');
+      const topbarBottom = topbar?.getBoundingClientRect().bottom ?? 0;
+      root.style.setProperty('--mobile-menu-top', `${Math.max(56, Math.ceil(topbarBottom + 8))}px`);
+
+      if (menu?.open) {
+        const panel = menu.querySelector('.menu-panel');
+        if (panel) panel.scrollLeft = 0;
+      }
     }
 
     function setFileBrowserView(view) {
@@ -607,6 +631,7 @@ export function createUiService({
       confirmDiscardUnsaved,
       closeOpenMenus,
       openCreateMenu,
+      syncMobileMenuLayout,
       setFileBrowserView,
       toggleTreeFolder,
       expandTreeFolders,
