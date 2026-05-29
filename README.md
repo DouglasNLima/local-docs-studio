@@ -172,6 +172,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `index.html` is the public app shell.
 - `md-mmd-renderer-v5.html` is a compatibility redirect for older links from the original app name.
 - `assets/styles/app.css` contains the app UI styles.
+- `docs/architecture/lens-docs-studio-ui-definitions.md` exports the reusable UI definitions and token CSS for carrying the Lens Docs Studio look and feel into another app.
 - `assets/scripts/main.js` boots the ESM app controller.
 - `assets/scripts/app-controller.js` composes the app services and coordinates UI/event flow.
 - `assets/scripts/dom.js` centralises DOM element lookup.

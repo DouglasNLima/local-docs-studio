@@ -1,0 +1,557 @@
+/*
+  Lens Docs Studio UI token export
+  Source: assets/styles/app.css, effective build 55 visual refresh.
+
+  This file is a portable reference for another app. It is not loaded by
+  Lens Docs Studio at runtime. Copy the tokens first, then adopt the
+  component recipes that fit your shell.
+*/
+
+:root {
+  color-scheme: dark;
+
+  /* Core colour system */
+  --lens-bg: #111318;
+  --lens-surface: #181A20;
+  --lens-surface-strong: #202329;
+  --lens-surface-soft: #2B2F37;
+  --lens-surface-softer: #3A404A;
+  --lens-topbar-bg: rgba(17, 19, 24, 0.88);
+  --lens-sidebar-bg: rgba(24, 26, 32, 0.72);
+  --lens-pane-bg: #181A20;
+  --lens-pane-title-bg: #202329;
+  --lens-editor-bg: #15171C;
+  --lens-toolbar-bg: #181A20;
+  --lens-preview-bg: #111318;
+  --lens-control-bg: #242830;
+  --lens-control-bg-hover: #303640;
+  --lens-inline-code-bg: #242830;
+  --lens-table-header-bg: #202329;
+  --lens-border: #3F4652;
+  --lens-border-soft: rgba(173, 184, 201, 0.12);
+  --lens-text: #eef2f7;
+  --lens-text-muted: #9da8b8;
+  --lens-text-muted-strong: #c7d0dc;
+  --lens-accent: #FF883E;
+  --lens-accent-strong: #E66F22;
+  --lens-accent-soft: rgba(255, 136, 62, 0.12);
+  --lens-accent-border: rgba(255, 136, 62, 0.36);
+  --lens-secondary-accent: #FCA46B;
+  --lens-danger: #f87171;
+  --lens-ok: #4ade80;
+  --lens-warning: #fbbf24;
+  --lens-code-bg: #090b10;
+
+  /* Menu-specific surfaces */
+  --lens-menu-bg: #121a2a;
+  --lens-menu-bg-strong: #0f1726;
+  --lens-menu-border: rgba(120, 145, 179, .24);
+  --lens-menu-border-strong: rgba(255, 136, 62, .34);
+  --lens-menu-item-bg: rgba(42, 55, 84, .72);
+  --lens-menu-item-hover: rgba(58, 77, 116, .88);
+  --lens-menu-item-border: rgba(166, 185, 216, .14);
+  --lens-menu-muted: #adc0d5;
+  --lens-menu-heading: #c7d8ec;
+  --lens-menu-trigger-bg: rgba(25, 36, 56, .64);
+  --lens-menu-trigger-hover: rgba(35, 50, 77, .84);
+
+  /* Typography */
+  --lens-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --lens-font-display: Outfit, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --lens-font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+
+  /* Shape, elevation, and motion */
+  --lens-radius-panel: 12px;
+  --lens-radius-control: 8px;
+  --lens-radius-small: 6px;
+  --lens-radius-pill: 999px;
+  --lens-shadow: 0 18px 44px rgba(0, 0, 0, .34);
+  --lens-panel-shadow: 0 10px 30px rgba(0, 0, 0, .24);
+  --lens-menu-shadow: 0 18px 44px rgba(0, 0, 0, .42), 0 0 0 1px rgba(148, 177, 214, .04);
+  --lens-focus-ring: 0 0 0 3px rgba(255, 136, 62, .20);
+  --lens-transition-fast: 150ms ease;
+  --lens-transition-standard: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout constants */
+  --lens-sidebar-width: 292px;
+  --lens-sidebar-collapsed-width: 3rem;
+  --lens-splitter-size: 8px;
+  --lens-editor-width: 50%;
+  --lens-topbar-height: 2.75rem;
+  --lens-statusbar-height: 1.65rem;
+  --lens-menu-width: 22rem;
+  --lens-menu-wide-width: 34rem;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --lens-bg: #FAFAFA;
+  --lens-surface: #ffffff;
+  --lens-surface-strong: #F8F9FB;
+  --lens-surface-soft: #F3F4F6;
+  --lens-surface-softer: #EDEDED;
+  --lens-topbar-bg: rgba(255, 255, 255, 0.85);
+  --lens-sidebar-bg: rgba(248, 250, 252, 0.75);
+  --lens-pane-bg: #ffffff;
+  --lens-pane-title-bg: #F8F9FB;
+  --lens-editor-bg: #ffffff;
+  --lens-toolbar-bg: #F8F9FB;
+  --lens-preview-bg: #ffffff;
+  --lens-control-bg: #F3F4F6;
+  --lens-control-bg-hover: #EDEDED;
+  --lens-inline-code-bg: #F3F4F6;
+  --lens-table-header-bg: #F8F9FB;
+  --lens-border: #D1D5DB;
+  --lens-border-soft: rgba(100, 116, 139, 0.12);
+  --lens-text: #0f172a;
+  --lens-text-muted: #64748b;
+  --lens-text-muted-strong: #334155;
+  --lens-accent: #FF883E;
+  --lens-accent-strong: #D95F16;
+  --lens-accent-soft: rgba(255, 136, 62, 0.10);
+  --lens-accent-border: rgba(255, 136, 62, 0.30);
+  --lens-secondary-accent: #9A4C1E;
+  --lens-danger: #dc2626;
+  --lens-ok: #16a34a;
+  --lens-warning: #d97706;
+  --lens-code-bg: #f1f5f9;
+  --lens-menu-bg: #f4f8fd;
+  --lens-menu-bg-strong: #edf4fb;
+  --lens-menu-border: rgba(83, 112, 152, .22);
+  --lens-menu-border-strong: rgba(255, 136, 62, .30);
+  --lens-menu-item-bg: rgba(255, 255, 255, .82);
+  --lens-menu-item-hover: #e5eef8;
+  --lens-menu-item-border: rgba(83, 112, 152, .16);
+  --lens-menu-muted: #52647a;
+  --lens-menu-heading: #2f455f;
+  --lens-menu-trigger-bg: rgba(226, 238, 249, .75);
+  --lens-menu-trigger-hover: rgba(211, 228, 244, .95);
+  --lens-shadow: 0 18px 38px rgba(22, 28, 39, .14);
+  --lens-panel-shadow: 0 8px 24px rgba(22, 28, 39, .10);
+  --lens-menu-shadow: 0 18px 38px rgba(22, 38, 65, .16), 0 0 0 1px rgba(83, 112, 152, .05);
+  --lens-focus-ring: 0 0 0 3px rgba(255, 136, 62, .18);
+}
+
+/* Optional compatibility aliases matching the current app CSS names. */
+:root {
+  --bg: var(--lens-bg);
+  --surface: var(--lens-surface);
+  --surface-strong: var(--lens-surface-strong);
+  --surface-soft: var(--lens-surface-soft);
+  --surface-softer: var(--lens-surface-softer);
+  --topbar-bg: var(--lens-topbar-bg);
+  --sidebar-bg: var(--lens-sidebar-bg);
+  --pane-bg: var(--lens-pane-bg);
+  --pane-title-bg: var(--lens-pane-title-bg);
+  --editor-bg: var(--lens-editor-bg);
+  --toolbar-bg: var(--lens-toolbar-bg);
+  --preview-bg: var(--lens-preview-bg);
+  --button-bg: var(--lens-control-bg);
+  --button-bg-hover: var(--lens-control-bg-hover);
+  --inline-code-bg: var(--lens-inline-code-bg);
+  --table-header-bg: var(--lens-table-header-bg);
+  --border: var(--lens-border);
+  --border-soft: var(--lens-border-soft);
+  --text: var(--lens-text);
+  --muted: var(--lens-text-muted);
+  --muted-strong: var(--lens-text-muted-strong);
+  --accent: var(--lens-accent);
+  --accent-strong: var(--lens-accent-strong);
+  --accent-soft: var(--lens-accent-soft);
+  --accent-border: var(--lens-accent-border);
+  --secondary-accent: var(--lens-secondary-accent);
+  --danger: var(--lens-danger);
+  --ok: var(--lens-ok);
+  --warning: var(--lens-warning);
+  --code: var(--lens-code-bg);
+  --radius: var(--lens-radius-panel);
+  --shadow: var(--lens-shadow);
+  --panel-shadow: var(--lens-panel-shadow);
+  --focus-ring: var(--lens-focus-ring);
+  --sidebar-width: var(--lens-sidebar-width);
+  --splitter-size: var(--lens-splitter-size);
+  --editor-width: var(--lens-editor-width);
+  --menu-width: var(--lens-menu-width);
+  --menu-wide-width: var(--lens-menu-wide-width);
+  --menu-bg: var(--lens-menu-bg);
+  --menu-bg-strong: var(--lens-menu-bg-strong);
+  --menu-border: var(--lens-menu-border);
+  --menu-border-strong: var(--lens-menu-border-strong);
+  --menu-item-bg: var(--lens-menu-item-bg);
+  --menu-item-hover: var(--lens-menu-item-hover);
+  --menu-item-border: var(--lens-menu-item-border);
+  --menu-muted: var(--lens-menu-muted);
+  --menu-heading: var(--lens-menu-heading);
+  --menu-trigger-bg: var(--lens-menu-trigger-bg);
+  --menu-trigger-hover: var(--lens-menu-trigger-hover);
+  --menu-shadow: var(--lens-menu-shadow);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: var(--lens-bg);
+  color: var(--lens-text);
+  font-family: var(--lens-font-body);
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+.lens-app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+  background: var(--lens-bg);
+  color: var(--lens-text);
+}
+
+.lens-topbar {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: var(--lens-topbar-height);
+  min-width: 0;
+  padding: .38rem .7rem;
+  border-bottom: 1px solid var(--lens-border-soft);
+  background: var(--lens-topbar-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+.lens-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: .62rem;
+  min-width: 0;
+}
+
+.lens-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 1.8rem;
+  height: 1.8rem;
+  border: 1px solid var(--lens-accent-border);
+  border-radius: var(--lens-radius-control);
+  background: linear-gradient(180deg, rgba(255, 136, 62, .18), rgba(255, 136, 62, .07));
+  color: var(--lens-accent);
+}
+
+.lens-brand-title {
+  margin: 0;
+  color: var(--lens-text);
+  font-family: var(--lens-font-display);
+  font-size: .92rem;
+  font-weight: 780;
+  letter-spacing: 0;
+  line-height: 1.1;
+}
+
+.lens-button,
+.lens-menu-trigger {
+  min-height: 2.2rem;
+  border: 1px solid var(--lens-border-soft);
+  border-radius: var(--lens-radius-control);
+  background: var(--lens-control-bg);
+  color: var(--lens-text);
+  padding: .5rem .72rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--lens-transition-fast), border-color var(--lens-transition-fast), color var(--lens-transition-fast), transform var(--lens-transition-fast), box-shadow var(--lens-transition-fast);
+}
+
+.lens-button:hover,
+.lens-button:focus-visible,
+.lens-menu-trigger:hover,
+.lens-menu-trigger:focus-visible {
+  border-color: var(--lens-accent-border);
+  background: var(--lens-control-bg-hover);
+  box-shadow: var(--lens-focus-ring);
+  outline: none;
+}
+
+.lens-button:active,
+.lens-menu-trigger:active {
+  transform: translateY(1px);
+}
+
+.lens-button[disabled],
+.lens-button:disabled {
+  cursor: not-allowed;
+  opacity: .46;
+  transform: none;
+}
+
+.lens-button-primary {
+  border-color: rgba(255, 136, 62, .55);
+  background: linear-gradient(180deg, #FF9B5C, var(--lens-accent-strong));
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(255, 136, 62, .24), inset 0 1px 0 rgba(255, 255, 255, .20);
+}
+
+.lens-icon-button,
+.lens-icon-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  min-height: 2rem;
+  padding: 0;
+  border-radius: var(--lens-radius-control);
+}
+
+.lens-icon-toggle[aria-pressed="true"] {
+  border-color: var(--lens-accent-border);
+  background: var(--lens-accent-soft);
+  color: var(--lens-accent);
+}
+
+.lens-shell {
+  display: grid;
+  grid-template-columns: minmax(14rem, var(--lens-sidebar-width)) var(--lens-splitter-size) minmax(0, 1fr);
+  gap: .5rem;
+  min-height: 0;
+  padding: .55rem;
+  background: var(--lens-bg);
+}
+
+.lens-sidebar,
+.lens-pane,
+.lens-card,
+.lens-dialogue-card {
+  border: 1px solid var(--lens-border-soft);
+  border-radius: var(--lens-radius-panel);
+  background: var(--lens-surface);
+  box-shadow: var(--lens-panel-shadow);
+  overflow: hidden;
+}
+
+.lens-sidebar {
+  background: var(--lens-sidebar-bg);
+  backdrop-filter: blur(16px);
+}
+
+.lens-workspace {
+  display: grid;
+  grid-template-columns: minmax(18rem, var(--lens-editor-width)) var(--lens-splitter-size) minmax(18rem, 1fr);
+  gap: .5rem;
+  min-width: 0;
+  min-height: 0;
+}
+
+.lens-pane {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  background: var(--lens-pane-bg);
+}
+
+.lens-pane-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  min-height: 2.55rem;
+  min-width: 0;
+  padding: .42rem .75rem;
+  border-bottom: 1px solid var(--lens-border-soft);
+  background: var(--lens-pane-title-bg);
+  color: var(--lens-text-muted-strong);
+  font-family: var(--lens-font-display);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.lens-menu-panel {
+  display: grid;
+  gap: .28rem;
+  width: min(var(--lens-menu-width), calc(100vw - 2rem));
+  min-width: min(var(--lens-menu-width), calc(100vw - 2rem));
+  max-width: min(var(--lens-menu-width), calc(100vw - 2rem));
+  max-height: min(78vh, 42rem);
+  overflow: auto;
+  padding: .6rem;
+  border: 1px solid var(--lens-menu-border);
+  border-radius: var(--lens-radius-panel);
+  background: linear-gradient(180deg, var(--lens-menu-bg), var(--lens-menu-bg-strong));
+  color: var(--lens-text);
+  box-shadow: var(--lens-menu-shadow);
+}
+
+.lens-menu-panel-wide {
+  width: min(var(--lens-menu-wide-width), calc(100vw - 2rem));
+  min-width: min(var(--lens-menu-wide-width), calc(100vw - 2rem));
+  max-width: min(var(--lens-menu-wide-width), calc(100vw - 2rem));
+}
+
+.lens-menu-heading {
+  margin: .48rem .25rem .08rem;
+  color: var(--lens-menu-heading);
+  font-family: var(--lens-font-display);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lens-menu-note {
+  color: var(--lens-menu-muted);
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+.lens-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .42rem;
+  padding: .36rem .55rem;
+  border-bottom: 1px solid var(--lens-border-soft);
+  background: var(--lens-toolbar-bg);
+}
+
+.lens-toolbar-section,
+.lens-segmented-control {
+  display: inline-flex;
+  align-items: center;
+  gap: .22rem;
+  padding: .18rem;
+  border: 1px solid var(--lens-border-soft);
+  border-radius: var(--lens-radius-control);
+  background: rgba(0, 0, 0, .14);
+}
+
+:root[data-theme="light"] .lens-toolbar-section,
+:root[data-theme="light"] .lens-segmented-control {
+  background: rgba(255, 255, 255, .75);
+}
+
+.lens-editor {
+  min-width: 0;
+  min-height: 0;
+  padding: .85rem 1rem;
+  border: 0;
+  outline: 0;
+  background: var(--lens-editor-bg);
+  color: var(--lens-text);
+  caret-color: var(--lens-accent);
+  font: 14px/1.58 var(--lens-font-mono);
+  tab-size: 2;
+  resize: none;
+}
+
+.lens-editor::selection {
+  background: rgba(255, 136, 62, .30);
+}
+
+.lens-preview {
+  overflow: auto;
+  padding: 1.5rem;
+  background: var(--lens-preview-bg);
+  color: var(--lens-text);
+  font-family: var(--lens-font-body);
+  line-height: 1.65;
+}
+
+.lens-preview h1,
+.lens-preview h2,
+.lens-preview h3,
+.lens-preview h4 {
+  color: var(--lens-text);
+  font-family: var(--lens-font-display);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.lens-preview h1 {
+  font-size: 2.15rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+}
+
+.lens-preview a {
+  color: var(--lens-accent);
+}
+
+.lens-preview code {
+  font-family: var(--lens-font-mono);
+  font-size: .92em;
+}
+
+.lens-preview :not(pre) > code {
+  padding: .12rem .32rem;
+  border: 1px solid var(--lens-border-soft);
+  border-radius: .45rem;
+  background: var(--lens-inline-code-bg);
+}
+
+.lens-preview blockquote {
+  margin: 1rem 0;
+  padding: .5rem 1rem;
+  border-left: 4px solid var(--lens-accent);
+  border-radius: 0 var(--lens-radius-control) var(--lens-radius-control) 0;
+  background: var(--lens-accent-soft);
+  color: var(--lens-text-muted-strong);
+}
+
+.lens-statusbar {
+  display: flex;
+  align-items: center;
+  height: var(--lens-statusbar-height);
+  min-height: var(--lens-statusbar-height);
+  padding: 0 .9rem;
+  border-top: 1px solid var(--lens-border-soft);
+  background: var(--lens-surface-strong);
+  color: var(--lens-text-muted);
+  font-size: .74rem;
+}
+
+@media (max-width: 1080px) {
+  .lens-topbar {
+    flex-wrap: wrap;
+  }
+
+  .lens-shell,
+  .lens-workspace {
+    display: block;
+  }
+
+  .lens-sidebar,
+  .lens-pane + .lens-pane {
+    margin-top: .5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .lens-topbar {
+    gap: .34rem;
+    padding: .35rem .5rem;
+    backdrop-filter: none;
+  }
+
+  .lens-menu-panel {
+    position: fixed;
+    left: .55rem;
+    right: .55rem;
+    top: var(--mobile-menu-top, 6rem);
+    bottom: .75rem;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    max-height: none;
+    z-index: 1000;
+  }
+
+  .lens-preview {
+    padding: 1rem;
+  }
+}
