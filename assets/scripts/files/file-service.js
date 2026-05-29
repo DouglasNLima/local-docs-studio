@@ -497,7 +497,8 @@ export function createFileService({
       if (!await confirmDiscardUnsaved(confirmMessage)) return;
 
       try {
-        setStatus(`Converting ${documentFiles.length} document${documentFiles.length === 1 ? '' : 's'} to Markdown...`);
+        setStatus(`Converting ${documentFiles.length} document${documentFiles.length === 1 ? '' : 's'} to Markdown...`, 'busy');
+        await waitForNextFrame();
         const imported = await convertDocumentFiles(documentFiles);
 
         if (!imported.records.length) {
@@ -558,6 +559,16 @@ export function createFileService({
 
       setExportTrust(`${imported.records.length} converted document${imported.records.length === 1 ? '' : 's'} loaded${assetText}. ${persistenceText}${warningText}`, statusType);
       setStatus(`Imported ${imported.records.length} converted document${imported.records.length === 1 ? '' : 's'}${assetText}. ${persistenceText}${warningText}`, statusType);
+    }
+
+    function waitForNextFrame() {
+      return new Promise((resolve) => {
+        if (typeof requestAnimationFrame === 'function') {
+          requestAnimationFrame(() => resolve());
+          return;
+        }
+        setTimeout(resolve, 0);
+      });
     }
 
     function buildZipImport(file, entries) {

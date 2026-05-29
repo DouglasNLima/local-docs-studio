@@ -621,6 +621,11 @@ export function createUiService({
     function setStatus(message, tone = '') {
       status.className = `status${tone ? ` ${tone}` : ''}`;
       status.textContent = message;
+      if (tone === 'busy') {
+        status.setAttribute('aria-busy', 'true');
+      } else {
+        status.removeAttribute('aria-busy');
+      }
     }
 
     return {
