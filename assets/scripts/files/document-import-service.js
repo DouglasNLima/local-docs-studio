@@ -1,8 +1,10 @@
 import { htmlToMarkdown } from '../utils/html-markdown.js';
 import { normalisePath } from '../utils/files.js';
 import { sanitiseFileName, slugFromText } from '../utils/format.js';
+import { base64ToUint8Array } from '../utils/binary.js';
 
 const MAMMOTH_MODULE_PATH = '../../vendor/mammoth-1.12.0.browser.min.js';
+const DOCX_WORKER_PATH = './document-import-worker.js';
 const PDFJS_MODULE_PATH = '../../vendor/pdfjs-5.7.284.js';
 const PDFJS_WORKER_PATH = '../../vendor/pdfjs-5.7.284.worker.js';
 const DOCX_MIME = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
@@ -76,9 +78,81 @@ async function convertDocumentFile(file, context) {
 }
 
 async function convertDocxFile(file, context) {
+  const arrayBuffer = await file.arrayBuffer();
+  try {
+    return await convertDocxFileWithWorker(file, arrayBuffer, context);
+  } catch (error) {
+    console.warn('Word import worker unavailable; using the main thread converter.', error);
+    return await convertDocxFileOnMainThread(file, await file.arrayBuffer(), context);
+  }
+}
+
+async function convertDocxFileWithWorker(file, arrayBuffer, context) {
+  if (typeof Worker === 'undefined') throw new Error('Document import workers are not supported.');
+
+  const worker = new Worker(new URL(DOCX_WORKER_PATH, import.meta.url), { type: 'module' });
+  const requestId = createRequestId();
+
+  return await new Promise((resolve, reject) => {
+    const cleanup = () => {
+      worker.removeEventListener('message', handleMessage);
+      worker.removeEventListener('error', handleError);
+      worker.terminate();
+    };
+
+    const handleMessage = (event) => {
+      const data = event.data || {};
+      if (data.id !== requestId) return;
+      cleanup();
+
+      if (!data.ok) {
+        reject(new Error(data.error || 'Word converter failed in the worker.'));
+        return;
+      }
+
+      try {
+        resolve(finishWorkerDocxConversion(file, data, context));
+      } catch (error) {
+        reject(error);
+      }
+    };
+
+    const handleError = (event) => {
+      cleanup();
+      reject(new Error(event.message || 'Word import worker failed.'));
+    };
+
+    worker.addEventListener('message', handleMessage);
+    worker.addEventListener('error', handleError);
+    worker.postMessage({
+      id: requestId,
+      fileName: file.name,
+      arrayBuffer,
+      usedAssetPaths: [...context.usedAssetPaths],
+    }, [arrayBuffer]);
+  });
+}
+
+function finishWorkerDocxConversion(file, data, context) {
+  collectMammothMessages(file, data.messages || [], context.warnings);
+  (data.warnings || []).forEach((warning) => {
+    if (warning) context.warnings.push(String(warning));
+  });
+
+  (data.assets || []).forEach((assetInfo) => {
+    const asset = createManagedAssetFromWorkerAsset(assetInfo);
+    if (!asset) return;
+    context.assets.push(asset);
+    context.usedAssetPaths.add(asset.path.toLowerCase());
+  });
+
+  return convertHtmlSource(file, data.html || '', context);
+}
+
+async function convertDocxFileOnMainThread(file, arrayBuffer, context) {
   const mammoth = await loadMammoth();
   const result = await mammoth.convertToHtml({
-    arrayBuffer: await file.arrayBuffer(),
+    arrayBuffer,
   });
 
   collectMammothMessages(file, result?.messages || [], context.warnings);
@@ -244,6 +318,28 @@ function createManagedAssetFromDataImage({
   };
 }
 
+function createManagedAssetFromWorkerAsset(assetInfo) {
+  const path = normalisePath(String(assetInfo?.path || ''));
+  const base64 = String(assetInfo?.base64 || '').replace(/\s+/g, '');
+  const mimeType = normaliseImageMimeType(assetInfo?.mimeType);
+  if (!path || !base64 || !mimeType || !/^[a-z0-9+/]+={0,2}$/i.test(base64)) return null;
+
+  const bytes = base64ToUint8Array(base64);
+  const blob = new Blob([bytes], { type: mimeType });
+  const name = path.split('/').pop() || `image.${getImageExtension(mimeType)}`;
+
+  return {
+    path,
+    name,
+    alt: String(assetInfo?.alt || '').trim() || 'Image',
+    mimeType,
+    base64,
+    dataUrl: `data:${mimeType};base64,${base64}`,
+    objectUrl: URL.createObjectURL(blob),
+    size: bytes.byteLength,
+  };
+}
+
 function makeUniqueMarkdownPath(fileName, usedPaths) {
   const stem = sanitiseFileName(getFileStem(fileName)) || 'imported-document';
   return makeUniquePath(`${stem}.md`, usedPaths);
@@ -326,6 +422,11 @@ function getSourceFormat(file) {
   return 'Document';
 }
 
+function normaliseImageMimeType(mimeType) {
+  const value = String(mimeType || '').toLowerCase().replace('image/jpg', 'image/jpeg');
+  return /^image\/(?:png|jpeg|gif|webp)$/.test(value) ? value : '';
+}
+
 function getImageExtension(mimeType) {
   if (/webp$/i.test(mimeType)) return 'webp';
   if (/gif$/i.test(mimeType)) return 'gif';
@@ -333,13 +434,10 @@ function getImageExtension(mimeType) {
   return 'png';
 }
 
-function base64ToUint8Array(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-  for (let index = 0; index < binary.length; index += 1) {
-    bytes[index] = binary.charCodeAt(index);
-  }
-  return bytes;
+function createRequestId() {
+  return typeof globalThis.crypto?.randomUUID === 'function'
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
 function fallbackMarkdown(fileName) {

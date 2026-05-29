@@ -3128,9 +3128,25 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
 
   const docxPath = testInfo.outputPath('import-word.docx');
   await writeFile(docxPath, createDocxImportFixture());
+  let releaseWorker;
+  let resolveWorkerRequested;
+  const workerGate = new Promise((resolve) => { releaseWorker = resolve; });
+  const workerRequested = new Promise((resolve) => { resolveWorkerRequested = resolve; });
+  await page.route('**/assets/scripts/files/document-import-worker.js', async (route) => {
+    resolveWorkerRequested();
+    await workerGate;
+    await route.continue();
+  });
+
   await page.locator('#documentInput').setInputFiles(docxPath);
   await submitAppDialog(page, { button: 'Discard changes' });
+  await workerRequested;
+  await expect(page.locator('#status')).toHaveText(/Converting 1 document to Markdown/);
+  await expect(page.locator('#status')).toHaveClass(/busy/);
+  await expect(page.locator('#status')).toHaveAttribute('aria-busy', 'true');
+  releaseWorker();
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/, { timeout: 20_000 });
+  await expect(page.locator('#status')).not.toHaveAttribute('aria-busy', 'true');
 
   const wordMarkdown = normaliseLineEndings(await page.locator('#editor').inputValue());
   expect(wordMarkdown).toContain('# Imported Word');
@@ -3139,6 +3155,33 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
   expect(wordMarkdown).toContain('| Area | Status |');
   expect(wordMarkdown).toContain('![Word logo](assets/images/import-word-word-logo.png)');
   await expect(page.locator('#preview img[data-managed-asset-path="assets/images/import-word-word-logo.png"]')).toHaveAttribute('src', /^blob:/);
+});
+
+test('wide preview images fit without horizontal scrolling', async ({ page }) => {
+  await gotoApp(page);
+  await setEditorValueAndSelection(page, [
+    '# Wide Screenshot',
+    '',
+    `<img alt="wide screenshot" src="data:image/png;base64,${tinyPngBase64}" width="2400" height="120">`,
+  ].join('\n'));
+  await renderPreviewWithShortcut(page);
+
+  const metrics = await page.locator('#preview').evaluate((preview) => {
+    const image = preview.querySelector('img[alt="wide screenshot"]');
+    const imageRect = image.getBoundingClientRect();
+    const style = getComputedStyle(preview);
+    const contentWidth = preview.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+
+    return {
+      contentWidth,
+      imageWidth: imageRect.width,
+      scrollWidth: preview.scrollWidth,
+      clientWidth: preview.clientWidth,
+    };
+  });
+
+  expect(metrics.imageWidth).toBeLessThanOrEqual(metrics.contentWidth + 1);
+  expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
 });
 
 test('document import drag and drop handles HTML and PDF text extraction', async ({ page }) => {

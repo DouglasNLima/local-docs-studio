@@ -2056,6 +2056,11 @@
 
     .preview a { color: var(--accent); }
 
+    .preview img {
+      max-width: 100%;
+      height: auto;
+    }
+
     .preview pre:not(.mermaid) {
       overflow: auto;
       padding: 1rem;
@@ -4143,6 +4148,34 @@ label.file-button.primary,
 .statusbar .status.ok    { color: var(--ok); }
 .statusbar .status.danger  { color: var(--danger); }
 .statusbar .status.warning { color: var(--warning); }
+
+.statusbar .status.busy {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  color: var(--accent);
+}
+
+.statusbar .status.busy::before {
+  content: "";
+  width: .72rem;
+  height: .72rem;
+  flex: 0 0 auto;
+  border: 2px solid rgba(255, 136, 62, .24);
+  border-top-color: var(--accent);
+  border-radius: 999px;
+  animation: status-busy-spin .75s linear infinite;
+}
+
+@keyframes status-busy-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statusbar .status.busy::before {
+    animation: none;
+  }
+}
 
 .focus-mode-exit {
   display: none;

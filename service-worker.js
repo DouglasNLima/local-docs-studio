@@ -22,6 +22,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/editor/typewriter-service.js',
   './assets/scripts/editor/workspace-search-service.js',
   './assets/scripts/files/document-import-service.js',
+  './assets/scripts/files/document-import-worker.js',
   './assets/scripts/files/lens-artifact-bundle-service.js',
   './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
