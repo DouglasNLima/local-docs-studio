@@ -1,4 +1,4 @@
-import { mermaidStarters, storageKeys } from '../state/config.js';
+import { mermaidStarters, mermaidThemeOptions, normaliseMermaidTheme, storageKeys } from '../state/config.js';
 import { getCodeLanguage, isMermaidLanguage, isSupportedFile } from '../utils/files.js';
 import { clamp, escapeHtml, roundToStep } from '../utils/format.js';
 import { countMarkdownMermaidBlocks, normaliseDevOpsMermaidBlocks } from '../utils/devops-markdown.js';
@@ -23,6 +23,7 @@ export function createRenderingService({
     editor,
     preview,
     diagramCount,
+    mermaidThemeSelect,
     zoomOutButton,
     zoomInButton,
     fitZoomButton,
@@ -204,12 +205,7 @@ export function createRenderingService({
         const loadedMermaid = module.default;
 
         loadedMermaid.initialize({
-          startOnLoad: false,
-          securityLevel: 'strict',
-          theme: 'default',
-          flowchart: {
-            htmlLabels: false,
-          },
+          ...buildMermaidConfig(),
         });
         mermaid = loadedMermaid;
         return mermaid;
@@ -226,6 +222,59 @@ export function createRenderingService({
 
   function delay(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+
+  function buildMermaidConfig() {
+    const preference = normaliseMermaidTheme(state.mermaidTheme);
+    const appTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+    const effectiveTheme = preference === 'auto'
+      ? appTheme === 'dark' ? 'dark' : 'default'
+      : preference === 'lens' ? 'base' : preference;
+
+    return {
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: effectiveTheme,
+      ...(preference === 'lens' ? { themeVariables: buildLensMermaidThemeVariables() } : {}),
+      flowchart: {
+        htmlLabels: false,
+      },
+    };
+  }
+
+  function buildLensMermaidThemeVariables() {
+    return {
+      background: '#FAFAFA',
+      mainBkg: '#FFFFFF',
+      secondBkg: '#F8F9FB',
+      tertiaryColor: '#F3F4F6',
+      primaryColor: '#FFF3EC',
+      primaryTextColor: '#111827',
+      primaryBorderColor: '#FF883E',
+      secondaryColor: '#F8F9FB',
+      secondaryTextColor: '#111827',
+      secondaryBorderColor: '#CBD5E1',
+      tertiaryTextColor: '#111827',
+      tertiaryBorderColor: '#D1D5DB',
+      lineColor: '#4B5563',
+      textColor: '#111827',
+      edgeLabelBackground: '#FFFFFF',
+      clusterBkg: '#F8F9FB',
+      clusterBorder: '#CBD5E1',
+      noteBkgColor: '#FFF7ED',
+      noteTextColor: '#111827',
+      noteBorderColor: '#FDBA74',
+      fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif',
+    };
+  }
+
+  async function runMermaidTask(task) {
+    const mermaidTask = state.mermaidRenderChain
+      .catch(() => undefined)
+      .then(task);
+
+    state.mermaidRenderChain = mermaidTask.catch(() => undefined);
+    return mermaidTask;
   }
 
     async function renderPreview() {
@@ -519,12 +568,10 @@ export function createRenderingService({
 
     async function renderMermaidSvg(id, source) {
       const renderer = await loadMermaid();
-      const renderTask = state.mermaidRenderChain
-        .catch(() => undefined)
-        .then(() => renderer.render(id, source));
-
-      state.mermaidRenderChain = renderTask.catch(() => undefined);
-      return renderTask;
+      return runMermaidTask(() => {
+        renderer.initialize(buildMermaidConfig());
+        return renderer.render(id, source);
+      });
     }
 
     async function validateMermaidSource(source) {
@@ -533,14 +580,17 @@ export function createRenderingService({
         return { ok: true };
       }
 
-      try {
-        const result = await parser.parse(source, { suppressErrors: false });
-        return result === false
-          ? { ok: false, error: new Error('Mermaid validation failed.') }
-          : { ok: true };
-      } catch (error) {
-        return { ok: false, error };
-      }
+      return runMermaidTask(async () => {
+        try {
+          parser.initialize(buildMermaidConfig());
+          const result = await parser.parse(source, { suppressErrors: false });
+          return result === false
+            ? { ok: false, error: new Error('Mermaid validation failed.') }
+            : { ok: true };
+        } catch (error) {
+          return { ok: false, error };
+        }
+      });
     }
 
     function renderDiagramError(diagram, error, source = '') {
@@ -752,6 +802,37 @@ export function createRenderingService({
       return button;
     }
 
+    function restoreMermaidThemePreference() {
+      state.mermaidTheme = normaliseMermaidTheme(state.mermaidTheme);
+      syncMermaidThemeControl();
+    }
+
+    async function setMermaidTheme(value) {
+      const next = normaliseMermaidTheme(value);
+      state.mermaidTheme = next;
+      localStorage.setItem(storageKeys.mermaidTheme, next);
+      syncMermaidThemeControl();
+      return renderPreview();
+    }
+
+    function syncMermaidThemeControl() {
+      if (!mermaidThemeSelect) return;
+
+      if (!mermaidThemeSelect.options.length) {
+        mermaidThemeOptions.forEach((option) => {
+          mermaidThemeSelect.append(new Option(option.label, option.value));
+        });
+      }
+
+      mermaidThemeSelect.value = normaliseMermaidTheme(state.mermaidTheme);
+      const activeOption = mermaidThemeOptions.find((option) => option.value === mermaidThemeSelect.value);
+      mermaidThemeSelect.title = `Diagram theme: ${activeOption?.label || 'Auto'}`;
+    }
+
+    function shouldRerenderForAppThemeChange() {
+      return normaliseMermaidTheme(state.mermaidTheme) === 'auto';
+    }
+
     function getSvgBaseSize(svg) {
       const viewBox = svg.getAttribute('viewBox');
       if (viewBox) {
@@ -836,6 +917,9 @@ export function createRenderingService({
       applyDiagramZoom,
       fitDiagramsToWidth,
       updateDiagramControls,
+      restoreMermaidThemePreference,
+      setMermaidTheme,
+      shouldRerenderForAppThemeChange,
       resolveMode,
       resolveModeFor,
     };

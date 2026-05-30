@@ -4728,6 +4728,17 @@ label.file-button.primary,
   font-size: .78rem;
 }
 
+.diagram-theme-select {
+  flex: 0 0 auto;
+  width: 7.4rem;
+  height: 2rem;
+  min-height: 2rem;
+  padding: 0 1.8rem 0 .55rem;
+  border-radius: 7px;
+  font-size: .78rem;
+  font-weight: 650;
+}
+
 #zoomOutButton,
 #zoomInButton {
   font-size: 1.05rem;

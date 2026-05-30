@@ -18,7 +18,7 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 
 - Markdown preview powered by Marked and DOMPurify.
 - Mermaid diagrams inside fenced `mermaid` or `mmd` code blocks, plus Azure DevOps `::: mermaid` wiki blocks.
-- Per-diagram Mermaid actions for copying source and exporting SVG or PNG.
+- Per-diagram Mermaid actions for copying source and exporting SVG or PNG, with a persisted diagram theme selector.
 - Syntax-highlighted code blocks with one-click copy buttons.
 - Rendered tables with one-click copy as Excel-friendly TSV.
 - Semantic progress bars inserted from the editor toolbar with preset colours.
@@ -108,6 +108,8 @@ The Export menu includes document-level diagram actions:
 - **Copy Mermaid** for the current standalone diagram source or first Mermaid block.
 - **Copy Markdown with images** from the Edit menu or Editor context menu to copy Markdown while replacing complete Mermaid blocks with inline PNG image references.
 
+Use the **Diagram theme** selector in the preview header to choose Auto, Lens, Default, Neutral, Forest, or Dark. Auto follows the app light/dark theme; explicit choices keep rendered diagrams fixed. SVG, PNG, Word, PDF, copy-as-image, and Docs Site exports use the currently rendered Mermaid theme.
+
 ## Docs Site Builder
 
 Open a folder of Markdown and Mermaid files, toggle **Docs site** to preview the folder as a navigable documentation site, then choose **Export Docs Site** from the Export menu.
@@ -172,6 +174,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `index.html` is the public app shell.
 - `md-mmd-renderer-v5.html` is a compatibility redirect for older links from the original app name.
 - `assets/styles/app.css` contains the app UI styles.
+- `docs/architecture/lens-docs-studio-ui-definitions.md` exports the reusable UI definitions and token CSS for carrying the Lens Docs Studio look and feel into another app.
 - `assets/scripts/main.js` boots the ESM app controller.
 - `assets/scripts/app-controller.js` composes the app services and coordinates UI/event flow.
 - `assets/scripts/dom.js` centralises DOM element lookup.

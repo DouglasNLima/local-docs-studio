@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111318" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="data:,">
-  <title>Lens Docs Studio v0.1.0 (build 55)</title>
+  <title>Lens Docs Studio v0.1.0 (build 56)</title>
   <link rel="stylesheet" href="./assets/vendor/katex-0.16.25.min.css" />
   <link rel="stylesheet" href="./assets/styles/app.css" />
 </head>
@@ -19,7 +19,7 @@
         <div>
           <h1>Lens Docs Studio</h1>
           <small>Local Markdown, Mermaid, and documentation studio</small>
-          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 55)</span>
+          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 56)</span>
         </div>
       </div>
 
@@ -557,6 +557,15 @@
                 </button>
               </div>
               <div class="zoom-controls" aria-label="Diagram zoom controls">
+                <label class="visually-hidden" for="mermaidThemeSelect">Diagram theme</label>
+                <select id="mermaidThemeSelect" class="diagram-theme-select" aria-label="Diagram theme" title="Diagram theme">
+                  <option value="auto">Auto</option>
+                  <option value="lens">Lens</option>
+                  <option value="default">Default</option>
+                  <option value="neutral">Neutral</option>
+                  <option value="forest">Forest</option>
+                  <option value="dark">Dark</option>
+                </select>
                 <button id="zoomOutButton" class="icon-button" type="button" title="Reduce diagram zoom" aria-label="Reduce diagram zoom">−</button>
                 <output class="zoom-value" id="zoomValue" aria-live="polite">100%</output>
                 <button id="zoomInButton" class="icon-button" type="button" title="Increase diagram zoom" aria-label="Increase diagram zoom">+</button>

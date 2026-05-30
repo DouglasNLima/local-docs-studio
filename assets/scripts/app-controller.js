@@ -89,6 +89,7 @@ export function createAppController() {
       artifactBundleSummary,
       activeFileLabel,
       diagramCount,
+      mermaidThemeSelect,
       zoomOutButton,
       zoomInButton,
       fitZoomButton,
@@ -526,6 +527,9 @@ export function createAppController() {
       applyDiagramZoom,
       fitDiagramsToWidth,
       updateDiagramControls,
+      restoreMermaidThemePreference,
+      setMermaidTheme,
+      shouldRerenderForAppThemeChange,
       resolveMode,
       resolveModeFor,
     } = createRenderingService({
@@ -534,6 +538,7 @@ export function createAppController() {
         editor,
         preview,
         diagramCount,
+        mermaidThemeSelect,
         zoomOutButton,
         zoomInButton,
         fitZoomButton,
@@ -753,6 +758,7 @@ export function createAppController() {
     } = createContentRegistries({ slugFromText, todayIso });
 
     restoreThemePreference();
+    restoreMermaidThemePreference();
     restoreLayoutPreferences();
     restoreEditorLayout();
     restoreFocusMode();
@@ -810,7 +816,7 @@ export function createAppController() {
       copyMermaidButton.addEventListener('click', copyCurrentMermaidSource);
       copyHtmlButton.addEventListener('click', copyRenderedHtml);
       copyTextButton.addEventListener('click', copyRenderedText);
-      themeToggleButton.addEventListener('click', toggleTheme);
+      themeToggleButton.addEventListener('click', handleThemeToggle);
       docsPreviewButton.addEventListener('click', toggleDocsPreview);
       studioToggleButton.addEventListener('click', toggleStudioMode);
       saveButton.addEventListener('click', saveActiveFile);
@@ -1143,6 +1149,9 @@ export function createAppController() {
       zoomInButton.addEventListener('click', () => setDiagramZoom(state.diagramZoom + .1));
       resetZoomButton.addEventListener('click', () => setDiagramZoom(1));
       fitZoomButton.addEventListener('click', fitDiagramsToWidth);
+      mermaidThemeSelect?.addEventListener('change', () => {
+        void setMermaidTheme(mermaidThemeSelect.value);
+      });
       inputMaximizeButton?.addEventListener('click', () => toggleInputMaximized());
       previewMaximizeButton.addEventListener('click', togglePreviewMaximized);
       preview.addEventListener('click', handlePreviewClick);
@@ -2901,6 +2910,13 @@ ${unresolvedRows}
       localStorage.setItem(storageKeys.docsPreview, String(state.docsPreview));
       updateDocsPreviewButton();
       renderPreview();
+    }
+
+    function handleThemeToggle() {
+      toggleTheme();
+      if (shouldRerenderForAppThemeChange()) {
+        renderPreview();
+      }
     }
 
     function updateDocsPreviewButton() {
