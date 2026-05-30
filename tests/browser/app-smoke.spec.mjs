@@ -758,6 +758,58 @@ test('fixture renders markdown, mermaid, code copy, and diagram actions', async 
   expect(await page.evaluate(() => window.__copiedPng.size)).toBeGreaterThan(0);
 });
 
+test('Mermaid diagram theme selector persists and falls back safely', async ({ page }) => {
+  await gotoApp(page);
+  await expect(page.locator('#mermaidThemeSelect')).toHaveValue('auto');
+
+  await page.evaluate(() => {
+    localStorage.setItem('md-mmd-renderer.mermaidTheme', 'unknown-theme');
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#mermaidThemeSelect')).toHaveValue('auto');
+
+  await page.locator('#mermaidThemeSelect').selectOption('forest');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('md-mmd-renderer.mermaidTheme'))).toBe('forest');
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#mermaidThemeSelect')).toHaveValue('forest');
+});
+
+test('Mermaid Auto theme follows the app theme and explicit choices stay fixed', async ({ page }) => {
+  await gotoApp(page);
+  await page.evaluate(() => {
+    localStorage.setItem('md-mmd-renderer.theme', 'light');
+    localStorage.setItem('md-mmd-renderer.mermaidTheme', 'auto');
+  });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await loadSample(page);
+
+  const firstDiagramFill = () => page.locator('.diagram-frame svg').evaluate((svg) => {
+    const node = svg.querySelector('.node rect, .node polygon, .node circle, .node path');
+    return node?.getAttribute('fill') || (node ? getComputedStyle(node).fill : '');
+  });
+
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('#mermaidThemeSelect')).toHaveValue('auto');
+  const lightFill = await firstDiagramFill();
+
+  await page.locator('#themeToggleButton').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect.poll(firstDiagramFill).not.toBe(lightFill);
+
+  await page.locator('#mermaidThemeSelect').selectOption('lens');
+  await expect.poll(() => page.locator('.diagram-frame svg').evaluate((svg) => /#FF883E/i.test(svg.outerHTML))).toBe(true);
+  const lensFill = await firstDiagramFill();
+
+  await page.locator('#themeToggleButton').click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect.poll(firstDiagramFill).toBe(lensFill);
+  await expect(page.locator('#mermaidThemeSelect')).toHaveValue('lens');
+});
+
 test('Mermaid labels with HTML line breaks render without SVG parser errors', async ({ page }) => {
   await gotoApp(page);
   await setEditorValueAndSelection(page, `\`\`\`mermaid

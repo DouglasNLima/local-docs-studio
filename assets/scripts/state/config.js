@@ -1,12 +1,13 @@
 export const supportedFilePattern = /\.(md|markdown|mmd|mermaid)$/i;
 export const APP_VERSION = '0.1.0';
-export const APP_BUILD = '55';
+export const APP_BUILD = '56';
 export const APP_BROWSER_TITLE = `Lens Docs Studio v${APP_VERSION} (build ${APP_BUILD})`;
 
 export const storageKeys = {
   sidebarWidth: 'md-mmd-renderer.sidebarWidth',
   editorWidth: 'md-mmd-renderer.editorWidth',
   diagramZoom: 'md-mmd-renderer.diagramZoom',
+  mermaidTheme: 'md-mmd-renderer.mermaidTheme',
   theme: 'md-mmd-renderer.theme',
   outline: 'md-mmd-renderer.outline',
   scrollSync: 'md-mmd-renderer.scrollSync',
@@ -34,6 +35,19 @@ export const mermaidStarters = [
   'kanban', 'architecture-beta', 'radar-beta', 'treemap-beta',
 ];
 
+export const mermaidThemeOptions = [
+  { value: 'auto', label: 'Auto' },
+  { value: 'lens', label: 'Lens' },
+  { value: 'default', label: 'Default' },
+  { value: 'neutral', label: 'Neutral' },
+  { value: 'forest', label: 'Forest' },
+  { value: 'dark', label: 'Dark' },
+];
+
+export function normaliseMermaidTheme(value) {
+  return mermaidThemeOptions.some((option) => option.value === value) ? value : 'auto';
+}
+
 export function createInitialState({ readStoredNumber }) {
   return {
     files: [],
@@ -52,6 +66,7 @@ export function createInitialState({ readStoredNumber }) {
     deletionOverridePaths: new Set(),
     draftWorkspaceKey: '',
     diagramZoom: readStoredNumber(storageKeys.diagramZoom, 1),
+    mermaidTheme: normaliseMermaidTheme(localStorage.getItem(storageKeys.mermaidTheme)),
     diagramTotal: 0,
     lastRenderResult: { ok: false, diagramErrors: 0, diagramTotal: 0 },
     outlineOpen: localStorage.getItem(storageKeys.outline) === 'true',

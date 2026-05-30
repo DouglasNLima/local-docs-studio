@@ -506,7 +506,9 @@ export function createUiService({
     function restoreThemePreference() {
       const stored = localStorage.getItem(storageKeys.theme);
       const preferred = window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-      applyTheme(stored === 'light' || stored === 'dark' ? stored : preferred);
+      const theme = stored === 'light' || stored === 'dark' ? stored : preferred;
+      applyTheme(theme);
+      return theme;
     }
 
     function toggleTheme() {
@@ -514,6 +516,7 @@ export function createUiService({
       const next = current === 'light' ? 'dark' : 'light';
       applyTheme(next);
       localStorage.setItem(storageKeys.theme, next);
+      return next;
     }
 
     function applyTheme(theme) {

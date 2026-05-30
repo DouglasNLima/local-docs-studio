@@ -53,6 +53,7 @@ export const domIds = {
   artifactBundleSummary: 'artifactBundleSummary',
   activeFileLabel: 'activeFileLabel',
   diagramCount: 'diagramCount',
+  mermaidThemeSelect: 'mermaidThemeSelect',
   zoomOutButton: 'zoomOutButton',
   zoomInButton: 'zoomInButton',
   fitZoomButton: 'fitZoomButton',

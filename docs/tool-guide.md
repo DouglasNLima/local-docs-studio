@@ -49,12 +49,14 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Document review metrics and non-blocking quality notes.
 - Markdown governance checks for heading hierarchy, internal links, alt text, tables, British English terms, and TODO/FIXME markers.
 - Workspace link/asset audit notes and a View menu docs map for loaded files.
-- Preview maximisation and diagram zoom controls.
+- Preview maximisation, diagram theme selection, and diagram zoom controls.
 - Follow short editor selections into the preview while using Split layout.
 
 ## Mermaid Diagrams
 
 Mermaid blocks render as diagrams with per-diagram actions for Copy, SVG, and PNG. Fenced `mermaid` blocks and Azure DevOps `::: mermaid` wiki blocks both render. Broken diagrams show a friendly error with copy and jump-to-source actions.
+
+Use the preview header's diagram theme selector for Auto, Lens, Default, Neutral, Forest, or Dark. Auto follows the app light/dark theme; explicit choices keep diagrams fixed. Diagram exports use the currently rendered Mermaid theme.
 
 ```mermaid
 flowchart LR
