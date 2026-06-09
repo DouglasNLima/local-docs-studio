@@ -24,6 +24,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/files/document-import-service.js',
   './assets/scripts/files/document-import-worker.js',
   './assets/scripts/files/lens-artifact-bundle-service.js',
+  './assets/scripts/native/native-bridge-client.js',
   './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
   './assets/scripts/files/file-service.js',

@@ -1273,6 +1273,94 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
   await expect(page.locator('#editor')).toHaveValue(before);
 });
 
+test('native bridge diagnostic reports unavailable in browser mode', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Windows bridge unavailable in this browser mode.');
+});
+
+test('native bridge diagnostic sends a strict ping and reports host pong', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          const response = {
+            protocolVersion: 1,
+            id: message.id,
+            type: 'lensDocs.native.pong',
+            source: 'LensDocsStudio.Windows',
+            timestamp: '2026-06-09T00:00:00.000Z',
+            payload: {
+              host: 'LensDocsStudio.Windows',
+              capabilities: ['diagnostics.ping'],
+            },
+          };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({ data: response }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText(/Windows bridge available: LensDocsStudio\.Windows \(diagnostics\.ping\)\./);
+  const [message] = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(message).toEqual(expect.objectContaining({
+    protocolVersion: 1,
+    type: 'lensDocs.native.ping',
+    source: 'LensDocsStudio.Web',
+    payload: {},
+  }));
+  expect(message.id).toEqual(expect.any(String));
+  expect(message.id.length).toBeGreaterThan(0);
+  expect(new Date(message.timestamp).toString()).not.toBe('Invalid Date');
+});
+
+test('native bridge diagnostic handles malformed host responses safely', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          const response = {
+            protocolVersion: 999,
+            id: message.id,
+            type: 'lensDocs.native.pong',
+            source: 'LensDocsStudio.Windows',
+            timestamp: '2026-06-09T00:00:00.000Z',
+            payload: {},
+          };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({ data: response }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
+});
+
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {
   await gotoApp(page);
   const menu = page.locator('.context-menu');

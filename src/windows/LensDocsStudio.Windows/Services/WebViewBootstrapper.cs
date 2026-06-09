@@ -6,6 +6,7 @@ namespace LensDocsStudio.Windows.Services;
 public sealed class WebViewBootstrapper
 {
     private const string AppHostName = "lens-docs-studio.local";
+    private readonly NativeBridge nativeBridge = new();
 
     public async Task InitialiseAsync(WebView2 webView, string staticAppRoot)
     {
@@ -18,6 +19,7 @@ public sealed class WebViewBootstrapper
             CoreWebView2HostResourceAccessKind.DenyCors);
 
         coreWebView.Settings.IsStatusBarEnabled = false;
+        nativeBridge.Attach(coreWebView);
         webView.Source = new Uri($"https://{AppHostName}/index.html");
     }
 }

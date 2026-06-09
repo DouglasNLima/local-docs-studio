@@ -13,6 +13,7 @@ import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createExportProfileService } from './exports/export-profile-service.js';
+import { createNativeBridgeClient } from './native/native-bridge-client.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createDialogService } from './ui/dialog-service.js';
@@ -214,6 +215,7 @@ export function createAppController() {
     let snapshotDbPromise = null;
 
     const state = createInitialState({ readStoredNumber });
+    const nativeBridgeClient = createNativeBridgeClient();
     let openTableEditor = () => {};
     let openProgressBarEditor = () => {};
     let openInsertHelper = () => {};
@@ -904,6 +906,7 @@ export function createAppController() {
           if (button.dataset.menuAction === 'createSnapshot') await createActiveSnapshot();
           if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
+          if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
           closeOpenMenus();
         });
       });
@@ -2327,6 +2330,30 @@ ${unresolvedRows}
         setStatus('Could not open the feature guide.', 'danger');
         console.error(error);
       }
+    }
+
+    async function checkNativeBridge() {
+      setStatus('Checking Windows bridge...', 'busy');
+      const result = await nativeBridgeClient.ping();
+      if (!result.available) {
+        setStatus('Windows bridge unavailable in this browser mode.', 'info');
+        return;
+      }
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows bridge diagnostic failed safely.', 'warning');
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : 'Windows host';
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((capability) => typeof capability === 'string' && capability.trim())
+        : [];
+      const capabilitySummary = capabilities.length ? capabilities.join(', ') : 'no capabilities reported';
+      setStatus(`Windows bridge available: ${host} (${capabilitySummary}).`, 'ok');
     }
 
     async function loadStudioTemplate(key) {
