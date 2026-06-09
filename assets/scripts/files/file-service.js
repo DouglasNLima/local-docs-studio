@@ -958,6 +958,7 @@ export function createFileService({
 
       const content = editor.value;
       try {
+        await flushPendingRenderBeforeSave();
         if (await hasNativeFileCapability('file.saveAs')) {
           const saved = await saveRecordToNativeHandleAs(record, content);
           if (saved) return true;
