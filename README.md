@@ -2,7 +2,7 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
-Lens Docs Studio is a local-first documentation workspace that runs entirely in the browser and can be published from GitHub Pages. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the browser supports it, and export clean documentation packages without a backend.
+Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
 
 ## Use The App
 
@@ -18,6 +18,8 @@ Use **Help > Open feature guide** to open the local Markdown feature guide insid
 
 The first Windows desktop shell lives under `src/windows/LensDocsStudio.Windows/`. It uses WinUI 3 and WebView2 to host the same static app from packaged local files, keeping the browser and GitHub Pages runtime unchanged.
 
+The desktop direction is offline-first: package the static assets with the app, load them through WebView2 virtual host mapping, and avoid requiring a production local HTTP server. GitHub Pages remains a secondary web demo, fallback, and validation target for the shared runtime.
+
 Run it locally from the repository root:
 
 ```powershell
@@ -31,6 +33,28 @@ dotnet build src/windows/LensDocsStudio.Windows.sln
 ```
 
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It does not add native open/save dialogues, file associations, installers, auto-update, or native export behaviour yet.
+
+## Roadmap And Branches
+
+- `develop` is the active implementation branch.
+- `main` remains the stable publication branch.
+- The Windows desktop app is the primary distribution direction.
+- The static browser/PWA app remains the core runtime and must keep working from GitHub Pages and local static validation.
+- Future Windows work includes native file open/save, native workspace/folder access, offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, and `.mermaid`, and a release flow from `develop` to `main`.
+
+See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
+
+### Windows Bridge Diagnostics
+
+The Windows shell includes a narrow native bridge for diagnostics only. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful response reports `LensDocsStudio.Windows` and the `diagnostics.ping` capability. The bridge does not expose native file operations, shell commands, local paths, environment data, Git status, PDF export, or general-purpose host execution.
+
+Manual smoke path:
+
+1. Run the Windows shell with `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
+2. Open **Help > Check Windows bridge**.
+3. Confirm the status reports `LensDocsStudio.Windows` and `diagnostics.ping`.
+4. Open the same app in a browser or PWA mode.
+5. Confirm the same action reports that the Windows bridge is unavailable without errors.
 
 ## Key Features
 
@@ -185,7 +209,7 @@ For the versioned contract see `docs/architecture/lens-artifact-bundle-contract.
 
 ## Project Structure
 
-The app is static and buildless. GitHub Pages can serve it directly without npm, a backend, or a bundler.
+The core runtime is static and buildless. GitHub Pages can serve it directly without npm, a backend, or a bundler, and the Windows shell hosts the same static assets through WebView2 virtual host mapping.
 
 The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for primary actions, selected states, focus states, and brand moments while keeping the product generic for local Markdown, Mermaid, and documentation workflows.
 
@@ -193,6 +217,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `md-mmd-renderer-v5.html` is a compatibility redirect for older links from the original app name.
 - `assets/styles/app.css` contains the app UI styles.
 - `docs/architecture/lens-docs-studio-ui-definitions.md` exports the reusable UI definitions and token CSS for carrying the Lens Docs Studio look and feel into another app.
+- `docs/architecture/windows-offline-distribution-roadmap.md` captures the Windows offline distribution direction and branch strategy.
 - `assets/scripts/main.js` boots the ESM app controller.
 - `assets/scripts/app-controller.js` composes the app services and coordinates UI/event flow.
 - `assets/scripts/dom.js` centralises DOM element lookup.
@@ -250,7 +275,7 @@ Firefox and Safari can still open files through fallback file pickers and export
 
 ## Publish To GitHub Pages
 
-GitHub Actions is the recommended publication path. The workflow in `.github/workflows/pages.yml` runs the static checks and Playwright tests first, then deploys only the static app files to GitHub Pages from the repository default branch.
+GitHub Actions is the recommended publication path. Release-ready changes flow from `develop` to `main`; the workflow in `.github/workflows/pages.yml` runs the static checks and Playwright tests first, then deploys only the static app files to GitHub Pages from `main`.
 
 Repository settings:
 
@@ -261,7 +286,7 @@ Repository settings:
 Deployment behaviour:
 
 - Pull requests run the full test suite but do not publish.
-- Pushes to the default branch publish only after `npm test` passes.
+- Pushes to `main` publish only after `npm test` passes.
 - The Pages artefact contains `index.html`, the legacy redirect, manifest, service worker, icon, `assets/`, and `docs/`.
 - The public URL should open the app at `/`; older links to `/md-mmd-renderer-v5.html` redirect to `/index.html`.
 

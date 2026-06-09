@@ -1,6 +1,6 @@
 # Lens Docs Studio Artefact Bundle Manual Smoke Checklist
 
-Use this checklist for release candidate validation of Lens Docs Studio artefact bundle support. Keep the app generic, browser-only, static, GitHub Pages-compatible, and local-first throughout the smoke.
+Use this checklist for release candidate validation of Lens Docs Studio artefact bundle support. Keep the app generic, static-runtime based, GitHub Pages-compatible, and local-first throughout the smoke. The Windows shell may host the same runtime through WebView2, but artefact bundle behaviour must remain browser/PWA compatible.
 
 ## Generic Workflows
 
@@ -50,5 +50,5 @@ Use this checklist for release candidate validation of Lens Docs Studio artefact
 - [ ] Confirm first-party UI and docs keep British English.
 - [ ] Confirm the Lens Docs Studio name and generic tagline remain visible.
 - [ ] Confirm no external service calls occur from manifest metadata.
-- [ ] Confirm there is no telemetry, backend, API call, account flow, cloud sync, WebView2, framework, bundler, transpiler, production build step, or automatic publishing.
+- [ ] Confirm there is no telemetry, backend, API call, account flow, cloud sync, framework, bundler, transpiler, production build step, production local HTTP server requirement, or automatic publishing.
 - [ ] Confirm browser-local persistence keys were not renamed and no new artefact metadata, reader filter, or active built-in profile keys were created.
