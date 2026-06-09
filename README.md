@@ -2,7 +2,7 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
-Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, and `.mermaid` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
+Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
 
 ## Use The App
 
@@ -32,7 +32,7 @@ Build it with:
 dotnet build src/windows/LensDocsStudio.Windows.sln
 ```
 
-The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It does not add native open/save dialogues, file associations, installers, auto-update, or native export behaviour yet.
+The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It does not add folder/workspace bridging, file watchers, file associations, installers, auto-update, or native export behaviour yet.
 
 ## Roadmap And Branches
 
@@ -40,21 +40,29 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - `main` remains the stable publication branch.
 - The Windows desktop app is the primary distribution direction.
 - The static browser/PWA app remains the core runtime and must keep working from GitHub Pages and local static validation.
-- Future Windows work includes native file open/save, native workspace/folder access, offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, and `.mermaid`, and a release flow from `develop` to `main`.
+- Phase 2B adds native single-file open/save/save-as for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files through an opaque WebView2 bridge handle.
+- Future Windows work includes native workspace/folder access, offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 
-### Windows Bridge Diagnostics
+### Windows Native Bridge
 
-The Windows shell includes a narrow native bridge for diagnostics only. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful response reports `LensDocsStudio.Windows` and the `diagnostics.ping` capability. The bridge does not expose native file operations, shell commands, local paths, environment data, Git status, PDF export, or general-purpose host execution.
+The Windows shell includes a narrow native bridge. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful Phase 2B response reports `LensDocsStudio.Windows` and the `diagnostics.ping`, `file.open`, `file.save`, and `file.saveAs` capabilities.
+
+Native file operations are limited to one selected UTF-8 text file at a time. The bridge supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files up to 5 MB. The host keeps full paths in memory behind opaque `nativeHandleId` values; the web app uses those handles for save operations and does not show or export local paths by default.
+
+The bridge does not expose folder access, workspace bridging, file watchers, file associations, native PDF export, Git operations, shell commands, local paths in browser/PWA mode, environment data, usernames, secrets, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
 
 Manual smoke path:
 
 1. Run the Windows shell with `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Open **Help > Check Windows bridge**.
-3. Confirm the status reports `LensDocsStudio.Windows` and `diagnostics.ping`.
-4. Open the same app in a browser or PWA mode.
-5. Confirm the same action reports that the Windows bridge is unavailable without errors.
+2. Use **File > Open file** to open a `.md` file.
+3. Edit the file.
+4. Use **File > Save changes**.
+5. Reopen the file externally and confirm the content changed.
+6. Use **File > Save as** to save a copy.
+7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` are reported.
+8. Open the same app in a normal browser or PWA mode and confirm there are no native bridge errors.
 
 ## Key Features
 
@@ -68,7 +76,7 @@ Manual smoke path:
 - Formatted clipboard paste that converts HTML content into Markdown, with spreadsheet table support for HTML table or TSV clipboard data, plus Edit > Paste Special actions for table, text, code block, quote, HTML-to-Markdown, list, checklist, numbered list, and Mermaid block paste.
 - Editor copy support for Markdown with rendered Mermaid diagrams embedded as pasteable image data for work item fields that do not render Mermaid source.
 - DOCX, HTML, and text-only PDF import that converts documents into clean editable Markdown with supported embedded images as exportable session assets where available.
-- Standalone `.mmd` and `.mermaid` diagram rendering.
+- Standalone `.mmd`, `.mermaid`, and `.txt` text-file editing.
 - Local workspace browser with flat list or folder tree views, filtering, dirty-file markers, external-change markers, and add/new-file actions.
 - Markdown editor with line numbers, formatting buttons, `Ctrl/Cmd+Z`, `Ctrl/Cmd+Y`, and common formatting shortcuts.
 - Manual browser-local snapshots for comparing, restoring, and deleting explicit document versions.
@@ -186,7 +194,7 @@ Open `index.html` directly from the extracted folder, or upload the ZIP contents
 ## Advanced Import And Export
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
-- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, and `.mermaid` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
+- **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Export artefact review pack** appears after a valid artefact bundle import and explicitly includes a rebuilt safe `lens-artifact-bundle.json` alongside the normal Markdown Bundle manifest. Generic Markdown Bundle export never includes artefact metadata.
 - **Built-in export profiles** are session-only presets for generic documentation, GitHub Pages docs sites, Azure DevOps Wiki Markdown, and artefact review work. Applying the Azure DevOps Wiki Markdown preset uses a session override and does not write the existing DevOps preference key. Saved local export profiles still use the existing local library storage key.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.

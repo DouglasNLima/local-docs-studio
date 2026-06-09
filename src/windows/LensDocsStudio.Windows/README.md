@@ -33,30 +33,39 @@ If build tooling is missing, install the WinUI 3/Windows App SDK development com
 
 ## Scope
 
-This shell is intentionally thin. It creates the desktop window, initialises WebView2, and loads the packaged static app. Native file bridge behaviour, file associations, packaging, auto-update, folder watching, and native export flows are left for later phases.
+This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, and exposes a narrow native bridge for single-file open/save/save-as. File associations, packaging, auto-update, folder watching, workspace bridging, and native export flows are left for later phases.
 
 ## Roadmap
 
-- Native file open/save bridge.
 - Native workspace/folder bridge.
 - Offline runtime hardening.
 - Windows installer and packaging.
 - First-run setup wizard.
-- File associations for `.md`, `.markdown`, `.mmd`, and `.mermaid`.
+- File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 
 GitHub Pages should stay available as a secondary web demo, fallback, and validation target for the shared static runtime.
 
-## Bridge Diagnostics
+## Native Bridge
 
-The shell registers a fail-closed WebView2 message handler for diagnostics only. The static app can send `lensDocs.native.ping` through **Help > Check Windows bridge**, and the host replies with `lensDocs.native.pong`, protocol version `1`, `LensDocsStudio.Windows`, the app version when available, and `diagnostics.ping`.
+The shell registers a fail-closed WebView2 message handler. The static app can send `lensDocs.native.ping` through **Help > Check Windows bridge**, and the host replies with `lensDocs.native.pong`, protocol version `1`, `LensDocsStudio.Windows`, the app version when available, and these capabilities:
 
-The bridge intentionally does not expose file open/save, folder selection, file watchers, file associations, native PDF export, Git operations, shell commands, local paths, usernames, environment variables, or file contents.
+- `diagnostics.ping`
+- `file.open`
+- `file.save`
+- `file.saveAs`
+
+The file bridge supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files. It reads and writes UTF-8 text only and rejects files above 5 MB. Native open and save-as use Windows file pickers. Native save writes only to an existing host-owned opaque `nativeHandleId`; the web app never sends arbitrary paths. The host keeps the handle-to-path map in memory for this phase.
+
+The bridge intentionally does not expose folder selection, workspace access, recursive directory listing, file watchers, file associations, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
 
 Manual smoke:
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Open **Help > Check Windows bridge**.
-3. Confirm the status reports `LensDocsStudio.Windows` and `diagnostics.ping`.
-4. Open the static app in a normal browser.
-5. Confirm the same action reports that the Windows bridge is unavailable without errors.
+2. Use **File > Open file** to open a `.md` file.
+3. Edit the file.
+4. Use **File > Save changes**.
+5. Reopen the file externally and confirm the content changed.
+6. Use **File > Save as** to save a copy.
+7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` are reported.
+8. Open the static app in a normal browser and confirm no native bridge errors are reported.

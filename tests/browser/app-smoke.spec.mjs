@@ -499,6 +499,101 @@ async function installMockFileSystemAccess(page) {
   });
 }
 
+async function installMockNativeBridge(page) {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.__nativeBridgeSaves = [];
+    window.__nativeBridgeScenario = {
+      openFile: 'success',
+      saveFile: 'success',
+      saveFileAs: 'success',
+    };
+
+    function emit(response) {
+      window.setTimeout(() => {
+        listeners.forEach((listener) => listener({ data: response }));
+      }, 0);
+    }
+
+    function baseResponse(message, type, payload) {
+      return {
+        protocolVersion: 1,
+        id: message.id,
+        type,
+        source: 'LensDocsStudio.Windows',
+        timestamp: '2026-06-09T00:00:00.000Z',
+        payload,
+      };
+    }
+
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          if (message.type === 'lensDocs.native.ping') {
+            emit(baseResponse(message, 'lensDocs.native.pong', {
+              host: 'LensDocsStudio.Windows',
+              capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.openFile') {
+            if (window.__nativeBridgeScenario.openFile === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.openFileResult', { cancelled: true }));
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFile === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.openFileResult', {}), protocolVersion: 999 });
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.openFileResult', {
+              cancelled: false,
+              name: 'native-open.md',
+              displayName: 'native-open.md',
+              extension: '.md',
+              encoding: 'utf-8',
+              content: '# Native Open\n',
+              nativeHandleId: 'native-handle-1',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveFile') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.saveFileResult', {
+              saved: window.__nativeBridgeScenario.saveFile !== 'failed',
+              name: 'native-open.md',
+              displayName: 'native-open.md',
+              encoding: 'utf-8',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveFileAs') {
+            if (window.__nativeBridgeScenario.saveFileAs === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.saveFileAsResult', { cancelled: true }));
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.saveFileAsResult', {
+              cancelled: false,
+              saved: true,
+              name: 'native-copy.md',
+              displayName: 'native-copy.md',
+              encoding: 'utf-8',
+              nativeHandleId: 'native-handle-2',
+            }));
+          }
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+}
+
 async function dispatchContextMenu(locator, point = { x: 16, y: 16 }) {
   await locator.scrollIntoViewIfNeeded();
   await locator.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
@@ -1359,6 +1454,75 @@ test('native bridge diagnostic handles malformed host responses safely', async (
   await page.getByRole('button', { name: 'Check Windows bridge' }).click();
 
   await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
+});
+
+test('fake WebView2 bridge opens, saves, and saves as native files', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Open\n');
+  await expect(page.locator('#status')).toHaveText('native-open.md opened from Windows.');
+
+  await page.locator('#editor').fill('# Native Updated\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+  await page.locator('#saveButton').click();
+
+  await expect(page.locator('#status')).toHaveText('native-open.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  const savePayload = await page.evaluate(() => window.__nativeBridgeSaves.at(-1));
+  expect(savePayload).toEqual({
+    nativeHandleId: 'native-handle-1',
+    content: '# Native Updated\n',
+  });
+
+  await page.locator('#saveAsButton').click();
+  await expect(page.locator('#status')).toHaveText('native-copy.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-copy.md');
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveFileAs')).toBe(true);
+  const saveAsMessage = messages.findLast((message) => message.type === 'lensDocs.native.saveFileAs');
+  expect(saveAsMessage.payload).toEqual({
+    suggestedName: 'native-open.md',
+    content: '# Native Updated\n',
+  });
+});
+
+test('fake WebView2 bridge handles cancelled and malformed native file responses safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFile = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#status')).toHaveText('Open file cancelled.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFile = 'malformed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'New Markdown file' }).click();
+  await submitAppDialog(page, { button: 'Create file' });
+  await page.locator('#editor').fill('# Draft\n');
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.saveFileAs = 'cancelled';
+  });
+  await page.locator('#saveAsButton').click();
+  await expect(page.locator('#status')).toHaveText('Save as cancelled.');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
 });
 
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {

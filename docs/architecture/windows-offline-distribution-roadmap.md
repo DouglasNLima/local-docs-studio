@@ -23,16 +23,35 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Do not introduce a backend, production server route, production build step, CDN dependency, or cloud service for normal desktop operation.
 - Keep GitHub Pages compatibility as a regression target for the shared runtime.
 
+## Implemented Phase 2B
+
+- Native single-file open/save/save-as bridge for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files.
+- Windows-native open and save pickers through the WinUI 3/WebView2 host.
+- UTF-8 text-only reads and writes with a 5 MB file size limit.
+- Opaque host-owned `nativeHandleId` values instead of exposing absolute paths to the web app.
+- Browser, PWA, and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
+- **Help > Check Windows bridge** reports `diagnostics.ping`, `file.open`, `file.save`, and `file.saveAs` when hosted by the Windows shell.
+
 ## Future Roadmap
 
-- Native file open/save bridge for Markdown, Mermaid, and supported import/export workflows.
 - Native workspace/folder bridge for durable folder access, workspace recall, and folder-oriented workflows.
 - Offline runtime hardening, including packaged asset coverage, WebView2 origin behaviour, service worker expectations, and clear fallback messages.
 - Windows installer and packaging for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
-- File associations for `.md`, `.markdown`, `.mmd`, and `.mermaid`.
+- File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 
-## Non-Goals For This Step
+## Non-Goals For Phase 2B
 
-This roadmap update does not implement runtime behaviour. Native bridges beyond diagnostics, installer changes, file associations, and release automation remain future implementation work.
+Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
+
+## Manual Smoke
+
+1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
+2. Use **File > Open file** to open a `.md` file.
+3. Edit the file.
+4. Use **File > Save changes**.
+5. Reopen the file externally and confirm the content changed.
+6. Use **File > Save as** to save a copy.
+7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` capabilities.
+8. Open the app in normal browser mode and confirm no native bridge errors.

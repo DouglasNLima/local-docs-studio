@@ -17,6 +17,7 @@ export function createFileService({
   dom,
   callbacks,
   helpers,
+  nativeBridgeClient = null,
 }) {
   const { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview } = dom;
   const {
@@ -60,6 +61,11 @@ export function createFileService({
     async function openFile() {
       if (!await confirmDiscardUnsaved('Open a file and discard unsaved edits?')) return;
 
+      if (await hasNativeFileCapability('file.open')) {
+        const opened = await openNativeFile();
+        if (opened) return;
+      }
+
       try {
         if ('showOpenFilePicker' in window) {
           const [handle] = await window.showOpenFilePicker({
@@ -93,6 +99,44 @@ export function createFileService({
       fileInput.dataset.mode = 'open';
       fileInput.multiple = false;
       fileInput.click();
+    }
+
+    async function openNativeFile() {
+      try {
+        setStatus('Opening file from Windows...', 'busy');
+        const result = await nativeBridgeClient.openFile();
+        if (!result.ok) {
+          setStatus(result.message || 'Windows open file failed safely. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const payload = result.response?.payload || {};
+        if (payload.cancelled) {
+          setStatus('Open file cancelled.', 'info');
+          return true;
+        }
+
+        if (!isValidNativeFilePayload(payload)) {
+          setStatus('Windows open file returned an unsupported file response. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const name = payload.displayName || payload.name;
+        const content = String(payload.content ?? '');
+        const file = new File([content], name, { type: getMimeTypeForPath(name) });
+        await setLibraryFromRecords([{
+          name,
+          path: name,
+          file,
+          nativeHandleId: payload.nativeHandleId,
+        }], 'Windows file', { workspaceKind: 'file' });
+        setStatus(`${name} opened from Windows.`, 'ok');
+        return true;
+      } catch (error) {
+        setStatus('Windows open file failed safely. Using the browser fallback...', 'warning');
+        console.error(error);
+        return false;
+      }
     }
 
     async function openFolder() {
@@ -801,6 +845,11 @@ export function createFileService({
 
       try {
         await flushPendingRenderBeforeSave();
+        if (record.nativeHandleId && await hasNativeFileCapability('file.save')) {
+          await saveRecordToNativeHandle(record, content);
+          return;
+        }
+
         if (record.handle) {
           if (!await ensureWritePermission(record.handle)) {
             setStatus('Browser permission is needed to save back to the opened file.', 'warning');
@@ -842,6 +891,11 @@ export function createFileService({
 
       const content = editor.value;
       try {
+        if (await hasNativeFileCapability('file.saveAs')) {
+          const saved = await saveRecordToNativeHandleAs(record, content);
+          if (saved) return true;
+        }
+
         if ('showSaveFilePicker' in window) {
           const oldPath = record.path;
           const handle = await window.showSaveFilePicker({
@@ -870,6 +924,117 @@ export function createFileService({
         console.error(error);
         return false;
       }
+    }
+
+    async function hasNativeFileCapability(capability) {
+      if (!nativeBridgeClient?.isAvailable?.()) return false;
+      try {
+        return await nativeBridgeClient.hasCapability(capability);
+      } catch {
+        return false;
+      }
+    }
+
+    async function saveRecordToNativeHandle(record, content) {
+      setStatus(`Saving ${record.name} through Windows...`, 'busy');
+      const result = await nativeBridgeClient.saveFile({
+        nativeHandleId: record.nativeHandleId,
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows save failed safely.', 'danger');
+        updateSaveButton();
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      if (!payload.saved) {
+        setStatus('Windows save did not complete.', 'warning');
+        updateSaveButton();
+        return;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content);
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content);
+    }
+
+    async function saveRecordToNativeHandleAs(record, content) {
+      setStatus(`Saving ${record.name} through Windows...`, 'busy');
+      const oldPath = record.path;
+      const result = await nativeBridgeClient.saveFileAs({
+        suggestedName: record.name || getMarkdownExportName(),
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows save as failed safely. Using the browser fallback...', 'warning');
+        return false;
+      }
+
+      const payload = result.response?.payload || {};
+      if (payload.cancelled) {
+        setStatus('Save as cancelled.', 'info');
+        return true;
+      }
+      if (!payload.saved || !isValidNativeSaveAsPayload(payload)) {
+        setStatus('Windows save as returned an unsupported response. Using the browser fallback...', 'warning');
+        return false;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content, { oldPath, replaceHandle: true });
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content, oldPath);
+      return true;
+    }
+
+    function updateRecordAfterNativeSave(record, payload, content, options = {}) {
+      const oldPath = options.oldPath || record.path;
+      const nextName = payload.displayName || payload.name || record.name;
+      if (options.replaceHandle) {
+        record.name = nextName;
+        record.path = getUniqueRecordPath(normalisePath(nextName || record.path || record.name), record);
+        record.nativeHandleId = payload.nativeHandleId;
+        record.handle = null;
+        state.files.sort(compareRecords);
+      }
+
+      record.file = new File([content], record.name, { type: getMimeTypeForPath(record.name) });
+      record.converted = false;
+      record.needsSave = false;
+      updateRecordFingerprint(record, record.file);
+      state.fileName = record.name;
+      state.activePath = record.path;
+      if (oldPath && oldPath !== record.path) {
+        state.fileCache.delete(oldPath);
+        state.dirtyPaths.delete(oldPath);
+        state.externalChangePaths?.delete(oldPath);
+      }
+      state.fileCache.set(record.path, content);
+      state.dirtyPaths.delete(record.path);
+      state.externalChangePaths?.delete(record.path);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+    }
+
+    function isValidNativeFilePayload(payload) {
+      return payload
+        && !payload.cancelled
+        && typeof payload.name === 'string'
+        && isSupportedFile(payload.name)
+        && typeof payload.content === 'string'
+        && typeof payload.nativeHandleId === 'string'
+        && payload.nativeHandleId.trim();
+    }
+
+    function isValidNativeSaveAsPayload(payload) {
+      return payload
+        && typeof payload.name === 'string'
+        && isSupportedFile(payload.name)
+        && typeof payload.nativeHandleId === 'string'
+        && payload.nativeHandleId.trim();
     }
 
     async function saveRecordToHandle(record, handle, content, options = {}) {

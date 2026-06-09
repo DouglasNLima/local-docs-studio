@@ -305,10 +305,14 @@ export function createUiService({
         if (refreshFileButton) refreshFileButton.title = 'Converted documents have no linked local source to refresh';
         return;
       }
-      saveButton.title = record?.handle
-        ? 'Save changes back to the opened file'
-        : 'Save changes using your browser file picker';
-      if (saveAsButton) saveAsButton.title = 'Save a copy using your browser file picker';
+      saveButton.title = record?.nativeHandleId
+        ? 'Save changes through the Windows app'
+        : record?.handle
+          ? 'Save changes back to the opened file'
+          : 'Save changes using your browser file picker';
+      if (saveAsButton) saveAsButton.title = record?.nativeHandleId
+        ? 'Save a copy through the Windows app'
+        : 'Save a copy using your browser file picker';
       if (refreshFileButton) refreshFileButton.title = record?.handle
         ? 'Read the linked local file again'
         : 'No linked local file to refresh';

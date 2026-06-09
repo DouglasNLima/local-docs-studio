@@ -3,6 +3,12 @@ export const BRIDGE_PROTOCOL_VERSION = 1;
 export const nativeBridgeMessageTypes = {
   ping: 'lensDocs.native.ping',
   pong: 'lensDocs.native.pong',
+  openFile: 'lensDocs.native.openFile',
+  openFileResult: 'lensDocs.native.openFileResult',
+  saveFile: 'lensDocs.native.saveFile',
+  saveFileResult: 'lensDocs.native.saveFileResult',
+  saveFileAs: 'lensDocs.native.saveFileAs',
+  saveFileAsResult: 'lensDocs.native.saveFileAsResult',
   error: 'lensDocs.native.error',
 };
 
@@ -50,10 +56,38 @@ export function createNativeBridgeClient({
     }
 
     const message = createMessage(nativeBridgeMessageTypes.ping);
-    return await sendMessage(message);
+    return await sendMessage(message, [nativeBridgeMessageTypes.pong]);
   }
 
-  function sendMessage(message) {
+  async function hasCapability(capability) {
+    const result = await ping();
+    if (!result.ok) return false;
+    const capabilities = result.response?.payload?.capabilities;
+    return Array.isArray(capabilities) && capabilities.includes(capability);
+  }
+
+  async function openFile() {
+    const message = createMessage(nativeBridgeMessageTypes.openFile);
+    return await sendMessage(message, [nativeBridgeMessageTypes.openFileResult]);
+  }
+
+  async function saveFile({ nativeHandleId, content }) {
+    const message = createMessage(nativeBridgeMessageTypes.saveFile, {
+      nativeHandleId,
+      content,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.saveFileResult]);
+  }
+
+  async function saveFileAs({ suggestedName, content }) {
+    const message = createMessage(nativeBridgeMessageTypes.saveFileAs, {
+      suggestedName,
+      content,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.saveFileAsResult]);
+  }
+
+  function sendMessage(message, expectedTypes) {
     return new Promise((resolve) => {
       const currentWebView = getWebView(windowRef);
       if (!currentWebView) {
@@ -79,6 +113,7 @@ export function createNativeBridgeClient({
       pendingMessages.set(message.id, {
         resolve,
         timeoutId,
+        expectedTypes,
       });
 
       try {
@@ -101,7 +136,7 @@ export function createNativeBridgeClient({
     if (!pending) return;
 
     clearPending(message.id);
-    const validation = validateHostResponse(message);
+    const validation = validateHostResponse(message, pending.expectedTypes);
     if (!validation.ok) {
       pending.resolve({
         ok: false,
@@ -113,7 +148,7 @@ export function createNativeBridgeClient({
     }
 
     pending.resolve({
-      ok: message.type === nativeBridgeMessageTypes.pong,
+      ok: pending.expectedTypes.includes(message.type),
       available: true,
       response: message,
       message: message.type === nativeBridgeMessageTypes.pong
@@ -134,6 +169,10 @@ export function createNativeBridgeClient({
     isAvailable,
     createMessage,
     ping,
+    hasCapability,
+    openFile,
+    saveFile,
+    saveFileAs,
   };
 }
 
@@ -163,7 +202,7 @@ function normaliseHostMessage(rawMessage) {
   return rawMessage;
 }
 
-function validateHostResponse(message) {
+function validateHostResponse(message, expectedTypes = []) {
   if (message.protocolVersion !== BRIDGE_PROTOCOL_VERSION) {
     return {
       ok: false,
@@ -171,11 +210,12 @@ function validateHostResponse(message) {
       message: 'Native bridge returned an unsupported protocol response.',
     };
   }
-  if (![nativeBridgeMessageTypes.pong, nativeBridgeMessageTypes.error].includes(message.type)) {
+  const supportedTypes = [...expectedTypes, nativeBridgeMessageTypes.error];
+  if (!supportedTypes.includes(message.type)) {
     return {
       ok: false,
       reason: 'unsupported-message',
-      message: 'Native bridge returned an unsupported diagnostic response.',
+      message: 'Native bridge returned an unsupported response.',
     };
   }
   if (typeof message.source !== 'string' || !message.source.trim()) {

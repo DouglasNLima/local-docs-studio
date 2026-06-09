@@ -689,6 +689,7 @@ export function createAppController() {
         normalisePath,
         uniqueByPath,
       },
+      nativeBridgeClient,
     });
     openArtifactReaderPath = selectFile;
     const workspaceSearchTools = createWorkspaceSearchService({

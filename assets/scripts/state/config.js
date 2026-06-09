@@ -1,4 +1,4 @@
-export const supportedFilePattern = /\.(md|markdown|mmd|mermaid)$/i;
+export const supportedFilePattern = /\.(md|markdown|mmd|mermaid|txt)$/i;
 export const APP_VERSION = '0.1.0';
 export const APP_BUILD = '56';
 export const APP_BROWSER_TITLE = `Lens Docs Studio v${APP_VERSION} (build ${APP_BUILD})`;

@@ -9,12 +9,14 @@ namespace LensDocsStudio.Windows;
 public sealed partial class MainWindow : Window
 {
     private readonly StaticAppLocator staticAppLocator = new();
-    private readonly WebViewBootstrapper webViewBootstrapper = new();
+    private readonly WebViewBootstrapper webViewBootstrapper;
 
     public MainWindow()
     {
         InitializeComponent();
         Title = "Lens Docs Studio";
+        var nativeFileService = new NativeFileService(this);
+        webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(nativeFileService));
         _ = InitialiseAsync();
     }
 
