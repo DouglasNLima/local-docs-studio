@@ -54,6 +54,16 @@ Native file and workspace operations support `.md`, `.markdown`, `.mmd`, `.merma
 
 The bridge does not expose file watchers, recent native folders, file associations, native PDF export, Git operations, shell commands, delete/rename/move operations, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
 
+Automated Windows native bridge smoke:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
+```
+
+Use `-NoBuild` to reuse the latest built shell, and `-TimeoutSeconds 90` on slower machines. The script creates a temporary smoke root, writes Markdown and Mermaid fixtures, launches the WinUI/WebView2 shell with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, validates saved fixture content, and exits non-zero on failure. It intentionally does not automate Windows file or folder picker UI.
+
+The smoke-only bridge capability `smoke.nativeFixtures` and the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, single-file open/save/save-as, workspace open/save/create, protocol safety, structured completion, and clean shell shutdown.
+
 Manual smoke path:
 
 1. Run the Windows shell with `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.

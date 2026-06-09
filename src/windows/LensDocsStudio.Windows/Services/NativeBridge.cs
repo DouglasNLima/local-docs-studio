@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using LensDocsStudio.Windows.Smoke;
 using Microsoft.Web.WebView2.Core;
 
 namespace LensDocsStudio.Windows.Services;
@@ -23,6 +24,14 @@ public sealed class NativeBridge
     private const string SaveWorkspaceFileResultType = "lensDocs.native.saveWorkspaceFileResult";
     private const string CreateWorkspaceFileType = "lensDocs.native.createWorkspaceFile";
     private const string CreateWorkspaceFileResultType = "lensDocs.native.createWorkspaceFileResult";
+    private const string SmokeOpenFixtureFileType = "lensDocs.native.smoke.openFixtureFile";
+    private const string SmokeOpenFixtureFileResultType = "lensDocs.native.smoke.openFixtureFileResult";
+    private const string SmokeOpenFixtureWorkspaceType = "lensDocs.native.smoke.openFixtureWorkspace";
+    private const string SmokeOpenFixtureWorkspaceResultType = "lensDocs.native.smoke.openFixtureWorkspaceResult";
+    private const string SmokeSaveFixtureFileAsType = "lensDocs.native.smoke.saveFixtureFileAs";
+    private const string SmokeSaveFixtureFileAsResultType = "lensDocs.native.smoke.saveFixtureFileAsResult";
+    private const string SmokeCompleteType = "lensDocs.native.smoke.complete";
+    private const string SmokeCompleteResultType = "lensDocs.native.smoke.completeResult";
     private const string ErrorType = "lensDocs.native.error";
     private static readonly string[] Capabilities =
     [
@@ -34,13 +43,25 @@ public sealed class NativeBridge
         "workspace.saveFile",
         "workspace.createFile",
     ];
+    private static readonly string[] SmokeCapabilities =
+    [
+        "smoke.nativeFixtures",
+    ];
     private readonly NativeFileService nativeFileService;
     private readonly NativeWorkspaceService nativeWorkspaceService;
+    private readonly SmokeFixtureService? smokeFixtureService;
+    private readonly SmokeCompletionService? smokeCompletionService;
 
-    public NativeBridge(NativeFileService nativeFileService, NativeWorkspaceService nativeWorkspaceService)
+    public NativeBridge(
+        NativeFileService nativeFileService,
+        NativeWorkspaceService nativeWorkspaceService,
+        SmokeFixtureService? smokeFixtureService = null,
+        SmokeCompletionService? smokeCompletionService = null)
     {
         this.nativeFileService = nativeFileService;
         this.nativeWorkspaceService = nativeWorkspaceService;
+        this.smokeFixtureService = smokeFixtureService;
+        this.smokeCompletionService = smokeCompletionService;
     }
 
     public void Attach(CoreWebView2 coreWebView)
@@ -121,6 +142,19 @@ public sealed class NativeBridge
                         ReadPayloadString(root, "path"),
                         ReadPayloadString(root, "content")));
                     break;
+                case SmokeOpenFixtureFileType:
+                    PostResult(coreWebView, id, SmokeOpenFixtureFileResultType, await RequireSmokeFixtures().OpenFixtureFileAsync());
+                    break;
+                case SmokeSaveFixtureFileAsType:
+                    PostResult(coreWebView, id, SmokeSaveFixtureFileAsResultType, await RequireSmokeFixtures().SaveFixtureFileAsAsync(
+                        ReadPayloadString(root, "content")));
+                    break;
+                case SmokeOpenFixtureWorkspaceType:
+                    PostResult(coreWebView, id, SmokeOpenFixtureWorkspaceResultType, await RequireSmokeFixtures().OpenFixtureWorkspaceAsync());
+                    break;
+                case SmokeCompleteType:
+                    PostResult(coreWebView, id, SmokeCompleteResultType, RequireSmokeCompletion().Complete(ReadPayload(root)));
+                    break;
                 default:
                     PostError(coreWebView, id, "Native bridge message type is unsupported.");
                     break;
@@ -140,7 +174,7 @@ public sealed class NativeBridge
         }
     }
 
-    private static void PostPong(CoreWebView2 coreWebView, string id)
+    private void PostPong(CoreWebView2 coreWebView, string id)
     {
         var message = new
         {
@@ -153,7 +187,7 @@ public sealed class NativeBridge
             {
                 host = HostSource,
                 appVersion = GetAppVersion(),
-                capabilities = Capabilities,
+                capabilities = GetCapabilities(),
             },
         };
         coreWebView.PostWebMessageAsJson(JsonSerializer.Serialize(message));
@@ -217,6 +251,33 @@ public sealed class NativeBridge
         return Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "unknown";
     }
 
+    private string[] GetCapabilities()
+    {
+        return smokeFixtureService?.Enabled == true
+            ? [.. Capabilities, .. SmokeCapabilities]
+            : Capabilities;
+    }
+
+    private SmokeFixtureService RequireSmokeFixtures()
+    {
+        if (smokeFixtureService?.Enabled == true)
+        {
+            return smokeFixtureService;
+        }
+
+        throw new NativeFileException("Smoke fixture operations are unavailable.");
+    }
+
+    private SmokeCompletionService RequireSmokeCompletion()
+    {
+        if (smokeFixtureService?.Enabled == true && smokeCompletionService is not null)
+        {
+            return smokeCompletionService;
+        }
+
+        throw new NativeFileException("Smoke completion is unavailable.");
+    }
+
     private static string? ReadString(JsonElement root, string propertyName)
     {
         return root.TryGetProperty(propertyName, out var property) && property.ValueKind == JsonValueKind.String
@@ -237,6 +298,13 @@ public sealed class NativeBridge
         return root.TryGetProperty("payload", out var payload)
             && payload.ValueKind == JsonValueKind.Object
             ? ReadString(payload, propertyName)
+            : null;
+    }
+
+    private static JsonElement? ReadPayload(JsonElement root)
+    {
+        return root.TryGetProperty("payload", out var payload) && payload.ValueKind == JsonValueKind.Object
+            ? payload
             : null;
     }
 }

@@ -35,7 +35,17 @@ public sealed class NativeWorkspaceService
             return new { cancelled = true };
         }
 
-        var rootPath = Path.GetFullPath(folder.Path);
+        return await OpenFolderPathAsync(folder.Path, folder.Name);
+    }
+
+    public async Task<object> OpenFolderPathAsync(string path, string? workspaceName = null)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
+        {
+            throw new NativeFileException("The selected folder is unavailable.");
+        }
+
+        var rootPath = Path.GetFullPath(path);
         var workspaceId = Guid.NewGuid().ToString("N");
         nativeWorkspaces[workspaceId] = rootPath;
 
@@ -46,7 +56,7 @@ public sealed class NativeWorkspaceService
         return new
         {
             cancelled = false,
-            workspaceName = folder.Name,
+            workspaceName = string.IsNullOrWhiteSpace(workspaceName) ? Path.GetFileName(rootPath) : workspaceName,
             nativeWorkspaceId = workspaceId,
             files,
             limits = new

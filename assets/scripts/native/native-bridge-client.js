@@ -15,6 +15,14 @@ export const nativeBridgeMessageTypes = {
   saveWorkspaceFileResult: 'lensDocs.native.saveWorkspaceFileResult',
   createWorkspaceFile: 'lensDocs.native.createWorkspaceFile',
   createWorkspaceFileResult: 'lensDocs.native.createWorkspaceFileResult',
+  smokeOpenFixtureFile: 'lensDocs.native.smoke.openFixtureFile',
+  smokeOpenFixtureFileResult: 'lensDocs.native.smoke.openFixtureFileResult',
+  smokeSaveFixtureFileAs: 'lensDocs.native.smoke.saveFixtureFileAs',
+  smokeSaveFixtureFileAsResult: 'lensDocs.native.smoke.saveFixtureFileAsResult',
+  smokeOpenFixtureWorkspace: 'lensDocs.native.smoke.openFixtureWorkspace',
+  smokeOpenFixtureWorkspaceResult: 'lensDocs.native.smoke.openFixtureWorkspaceResult',
+  smokeComplete: 'lensDocs.native.smoke.complete',
+  smokeCompleteResult: 'lensDocs.native.smoke.completeResult',
   error: 'lensDocs.native.error',
 };
 
@@ -115,6 +123,28 @@ export function createNativeBridgeClient({
     return await sendMessage(message, [nativeBridgeMessageTypes.createWorkspaceFileResult]);
   }
 
+  async function openSmokeFixtureFile() {
+    const message = createMessage(nativeBridgeMessageTypes.smokeOpenFixtureFile);
+    return await sendMessage(message, [nativeBridgeMessageTypes.smokeOpenFixtureFileResult]);
+  }
+
+  async function saveSmokeFixtureFileAs({ content }) {
+    const message = createMessage(nativeBridgeMessageTypes.smokeSaveFixtureFileAs, {
+      content,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.smokeSaveFixtureFileAsResult]);
+  }
+
+  async function openSmokeFixtureWorkspace() {
+    const message = createMessage(nativeBridgeMessageTypes.smokeOpenFixtureWorkspace);
+    return await sendMessage(message, [nativeBridgeMessageTypes.smokeOpenFixtureWorkspaceResult]);
+  }
+
+  async function completeSmoke(payload) {
+    const message = createMessage(nativeBridgeMessageTypes.smokeComplete, payload);
+    return await sendMessage(message, [nativeBridgeMessageTypes.smokeCompleteResult]);
+  }
+
   function sendMessage(message, expectedTypes) {
     return new Promise((resolve) => {
       const currentWebView = getWebView(windowRef);
@@ -204,6 +234,10 @@ export function createNativeBridgeClient({
     openFolder,
     saveWorkspaceFile,
     createWorkspaceFile,
+    openSmokeFixtureFile,
+    saveSmokeFixtureFileAs,
+    openSmokeFixtureWorkspace,
+    completeSmoke,
   };
 }
 

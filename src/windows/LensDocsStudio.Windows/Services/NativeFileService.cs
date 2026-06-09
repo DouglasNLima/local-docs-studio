@@ -51,8 +51,13 @@ public sealed class NativeFileService
             return new { cancelled = true };
         }
 
-        ValidatePath(file.Path);
-        var info = new FileInfo(file.Path);
+        return await OpenFilePathAsync(file.Path);
+    }
+
+    public async Task<object> OpenFilePathAsync(string path)
+    {
+        ValidatePath(path);
+        var info = new FileInfo(path);
         if (info.Length > MaxFileBytes)
         {
             throw new NativeFileException("Choose a UTF-8 text file up to 5 MB.");
@@ -61,20 +66,21 @@ public sealed class NativeFileService
         string content;
         try
         {
-            content = await File.ReadAllTextAsync(file.Path, strictUtf8);
+            content = await File.ReadAllTextAsync(path, strictUtf8);
         }
         catch (DecoderFallbackException)
         {
             throw new NativeFileException("Choose a UTF-8 encoded text file.");
         }
 
-        var handleId = CreateHandle(file.Path);
+        var handleId = CreateHandle(path);
+        var name = Path.GetFileName(path);
         return new
         {
             cancelled = false,
-            name = file.Name,
-            displayName = file.Name,
-            extension = Path.GetExtension(file.Name).ToLowerInvariant(),
+            name,
+            displayName = name,
+            extension = Path.GetExtension(name).ToLowerInvariant(),
             encoding = "utf-8",
             content,
             nativeHandleId = handleId,
@@ -122,15 +128,22 @@ public sealed class NativeFileService
             return new { cancelled = true };
         }
 
-        ValidatePath(file.Path);
-        await File.WriteAllTextAsync(file.Path, content ?? string.Empty, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
-        var handleId = CreateHandle(file.Path);
+        return await SaveFileAsPathAsync(file.Path, content);
+    }
+
+    public async Task<object> SaveFileAsPathAsync(string path, string? content)
+    {
+        ValidatePath(path);
+        ValidateContent(content);
+        await File.WriteAllTextAsync(path, content ?? string.Empty, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        var handleId = CreateHandle(path);
+        var name = Path.GetFileName(path);
         return new
         {
             cancelled = false,
             saved = true,
-            name = file.Name,
-            displayName = file.Name,
+            name,
+            displayName = name,
             encoding = "utf-8",
             nativeHandleId = handleId,
         };

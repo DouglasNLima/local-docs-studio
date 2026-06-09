@@ -499,17 +499,20 @@ async function installMockFileSystemAccess(page) {
   });
 }
 
-async function installMockNativeBridge(page) {
-  await page.addInitScript(() => {
+async function installMockNativeBridge(page, options = {}) {
+  await page.addInitScript((options) => {
+    const smokeEnabled = Boolean(options.smoke);
     const listeners = [];
     window.__nativeBridgeMessages = [];
     window.__nativeBridgeSaves = [];
+    window.__nativeBridgeSmokeResults = [];
     window.__nativeBridgeScenario = {
       openFile: 'success',
       saveFile: 'success',
       saveFileAs: 'success',
       openFolder: 'success',
       saveWorkspaceFile: 'success',
+      smokeWorkspace: options.smokeWorkspace || 'success',
     };
 
     function emit(response) {
@@ -534,17 +537,19 @@ async function installMockNativeBridge(page) {
         postMessage(message) {
           window.__nativeBridgeMessages.push(message);
           if (message.type === 'lensDocs.native.ping') {
+            const capabilities = [
+              'diagnostics.ping',
+              'file.open',
+              'file.save',
+              'file.saveAs',
+              'workspace.openFolder',
+              'workspace.saveFile',
+              'workspace.createFile',
+            ];
+            if (smokeEnabled) capabilities.push('smoke.nativeFixtures');
             emit(baseResponse(message, 'lensDocs.native.pong', {
               host: 'LensDocsStudio.Windows',
-              capabilities: [
-                'diagnostics.ping',
-                'file.open',
-                'file.save',
-                'file.saveAs',
-                'workspace.openFolder',
-                'workspace.saveFile',
-                'workspace.createFile',
-              ],
+              capabilities,
             }));
             return;
           }
@@ -669,6 +674,73 @@ async function installMockNativeBridge(page) {
               content: message.payload.content || '',
               nativeHandleId: 'native-workspace-file-new',
             }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.openFixtureFile') {
+            emit(baseResponse(message, 'lensDocs.native.smoke.openFixtureFileResult', {
+              cancelled: false,
+              name: 'single-file.md',
+              displayName: 'single-file.md',
+              extension: '.md',
+              encoding: 'utf-8',
+              content: '# Smoke single file\n',
+              nativeHandleId: 'native-smoke-single-file',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.saveFixtureFileAs') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.smoke.saveFixtureFileAsResult', {
+              cancelled: false,
+              saved: true,
+              name: 'single-file-copy.md',
+              displayName: 'single-file-copy.md',
+              encoding: 'utf-8',
+              nativeHandleId: 'native-smoke-save-as',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.openFixtureWorkspace') {
+            if (window.__nativeBridgeScenario.smokeWorkspace === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.smoke.openFixtureWorkspaceResult', {}), protocolVersion: 999 });
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.smoke.openFixtureWorkspaceResult', {
+              cancelled: false,
+              workspaceName: 'Smoke Workspace',
+              nativeWorkspaceId: 'native-smoke-workspace',
+              files: [
+                {
+                  name: 'README.md',
+                  path: 'README.md',
+                  displayPath: 'README.md',
+                  extension: '.md',
+                  encoding: 'utf-8',
+                  content: '# Smoke workspace\n',
+                  nativeHandleId: 'native-smoke-workspace-readme',
+                },
+              ],
+              limits: {
+                maxFileSizeBytes: 5242880,
+                maxFiles: 500,
+                maxDepth: 12,
+              },
+              skipped: [],
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.complete') {
+            window.__nativeBridgeSmokeResults.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.smoke.completeResult', {
+              completed: true,
+              accepted: true,
+              resultPath: 'smoke-result.json',
+              exitCode: message.payload?.success ? 0 : 1,
+            }));
           }
         },
         addEventListener(type, listener) {
@@ -676,7 +748,7 @@ async function installMockNativeBridge(page) {
         },
       },
     };
-  });
+  }, options);
 }
 
 async function dispatchContextMenu(locator, point = { x: 16, y: 16 }) {
@@ -1690,6 +1762,70 @@ test('fake WebView2 bridge handles cancelled and malformed native workspace resp
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+});
+
+test('native smoke runner stays dormant when smoke capability is absent', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome).toEqual({ ran: false, reason: 'smoke-capability-absent' });
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages.map((message) => message.type));
+  expect(messages).toContain('lensDocs.native.ping');
+  expect(messages).not.toContain('lensDocs.native.smoke.openFixtureFile');
+});
+
+test('native smoke runner posts structured success for smoke fixtures', async ({ page }) => {
+  await installMockNativeBridge(page, { smoke: true });
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome.ran).toBe(true);
+  expect(smokeOutcome.result.success).toBe(true);
+
+  const [result] = await page.evaluate(() => window.__nativeBridgeSmokeResults);
+  expect(result.success).toBe(true);
+  expect(result.steps.map((step) => step.name)).toEqual(expect.arrayContaining([
+    'Windows shell started',
+    'WebView2 app loaded',
+    'Bridge ping returned LensDocsStudio.Windows',
+    'Capabilities include diagnostics.ping',
+    'Capabilities include file.open',
+    'Capabilities include file.save',
+    'Capabilities include file.saveAs',
+    'Capabilities include workspace.openFolder',
+    'Capabilities include workspace.saveFile',
+    'Single fixture file opened',
+    'Single fixture file saved',
+    'Save-as wrote a new file',
+    'Fixture workspace opened',
+    'Workspace file saved',
+    'Workspace file created, if capability exists',
+    'Browser app did not report bridge protocol error',
+  ]));
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages.map((message) => message.type));
+  expect(messages).toEqual(expect.arrayContaining([
+    'lensDocs.native.smoke.openFixtureFile',
+    'lensDocs.native.saveFile',
+    'lensDocs.native.smoke.saveFixtureFileAs',
+    'lensDocs.native.smoke.openFixtureWorkspace',
+    'lensDocs.native.saveWorkspaceFile',
+    'lensDocs.native.createWorkspaceFile',
+    'lensDocs.native.smoke.complete',
+  ]));
+});
+
+test('native smoke runner reports failure safely for malformed smoke responses', async ({ page }) => {
+  await installMockNativeBridge(page, { smoke: true, smokeWorkspace: 'malformed' });
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome.ran).toBe(true);
+  expect(smokeOutcome.result.success).toBe(false);
+
+  const [result] = await page.evaluate(() => window.__nativeBridgeSmokeResults);
+  expect(result.success).toBe(false);
+  expect(result.errors.some((error) => /protocol/i.test(error))).toBe(true);
 });
 
 test('File menu open folder falls back safely when Windows bridge lacks workspace capabilities', async ({ page }) => {

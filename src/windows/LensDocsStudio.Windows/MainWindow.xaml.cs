@@ -1,4 +1,5 @@
 using LensDocsStudio.Windows.Services;
+using LensDocsStudio.Windows.Smoke;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
@@ -11,13 +12,24 @@ public sealed partial class MainWindow : Window
     private readonly StaticAppLocator staticAppLocator = new();
     private readonly WebViewBootstrapper webViewBootstrapper;
 
-    public MainWindow()
+    public MainWindow(SmokeOptions? smokeOptions = null)
     {
         InitializeComponent();
         Title = "Lens Docs Studio";
+        smokeOptions ??= SmokeOptions.Disabled;
         var nativeFileService = new NativeFileService(this);
         var nativeWorkspaceService = new NativeWorkspaceService(this);
-        webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(nativeFileService, nativeWorkspaceService));
+        var smokeFixtureService = smokeOptions.Enabled
+            ? new SmokeFixtureService(smokeOptions, nativeFileService, nativeWorkspaceService)
+            : null;
+        var smokeCompletionService = smokeOptions.Enabled
+            ? new SmokeCompletionService(smokeOptions)
+            : null;
+        webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(
+            nativeFileService,
+            nativeWorkspaceService,
+            smokeFixtureService,
+            smokeCompletionService));
         _ = InitialiseAsync();
     }
 

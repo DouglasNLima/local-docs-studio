@@ -64,6 +64,26 @@ The workspace bridge uses a Windows folder picker, discovers supported files rec
 
 The bridge intentionally does not expose file watchers, recent native folders, file associations, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, absolute workspace paths, delete/rename/move operations, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
 
+## Automated Native Bridge Smoke
+
+Run the Windows smoke harness from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
+```
+
+Optional flags:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -TimeoutSeconds 90
+```
+
+The script creates a temporary smoke root with a single Markdown file and a small workspace, builds the shell unless `-NoBuild` is passed, launches the executable with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, validates the changed fixture files, and returns a non-zero exit code if any assertion fails.
+
+The smoke harness does not automate native picker UI. Instead, the host exposes `smoke.nativeFixtures` and the `lensDocs.native.smoke.*` messages only when the smoke flag is present. Those fixture messages are fail-closed, root-bound to `--smoke-root`, and do not expose usernames, machine names, environment variables, unrestricted browsing, shell commands, or arbitrary host operations. Normal launches do not show smoke controls or smoke capabilities.
+
+The smoke validates shell launch, WebView2 app load, `diagnostics.ping`, native file open/save/save-as through controlled fixtures, native workspace open/save/create through controlled fixtures, absence of bridge protocol errors, structured completion, and clean shell shutdown. If it fails, inspect the console summary and, when `-KeepSmokeRoot` is used, the retained `smoke-result.json` and fixture files.
+
 Manual smoke:
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.

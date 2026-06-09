@@ -53,6 +53,21 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 
+## Implemented Windows Smoke Harness
+
+- `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` creates controlled temporary fixtures, builds or reuses the Windows shell, launches it with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, checks fixture file content, and exits non-zero on failure.
+- The smoke-only `smoke.nativeFixtures` capability is reported only when `--smoke-native-bridge` is present. Normal Windows shell launches, browser mode, and GitHub Pages mode do not expose smoke fixture APIs.
+- Smoke fixture operations are limited to the explicit smoke root. They do not automate Windows picker UI, expose local environment details, run shell commands, reveal unrestricted paths, or change production bridge validation.
+- The smoke covers shell start, WebView2 app load, bridge diagnostics, native single-file open/save/save-as, native workspace open/save/create, protocol-error reporting, structured completion, and clean shutdown.
+
+Run it with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
+```
+
+Use `-NoBuild -TimeoutSeconds 90` to reuse an existing build on slower validation hosts.
+
 ## Non-Goals For Phase 2B
 
 Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
