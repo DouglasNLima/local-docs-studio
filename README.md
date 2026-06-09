@@ -14,6 +14,24 @@ Lens Docs Studio is a local-first documentation workspace that runs entirely in 
 Files stay in the browser unless you save, copy, or export them.
 Use **Help > Open feature guide** to open the local Markdown feature guide inside the app in read-only mode.
 
+## Windows Shell
+
+The first Windows desktop shell lives under `src/windows/LensDocsStudio.Windows/`. It uses WinUI 3 and WebView2 to host the same static app from packaged local files, keeping the browser and GitHub Pages runtime unchanged.
+
+Run it locally from the repository root:
+
+```powershell
+dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj
+```
+
+Build it with:
+
+```powershell
+dotnet build src/windows/LensDocsStudio.Windows.sln
+```
+
+The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It does not add native open/save dialogues, file associations, installers, auto-update, or native export behaviour yet.
+
 ## Key Features
 
 - Markdown preview powered by Marked and DOMPurify.
@@ -194,6 +212,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `docs/integration/lens-artifact-bundle-producer-guide.md` documents how compatible tools can create safe optional artefact bundle ZIPs.
 - `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md` captures the release candidate smoke checklist for the artefact bundle flow.
 - `tests/fixtures/artifact-bundles/` contains source-controlled Markdown, Mermaid, JSON, and asset fixtures used to build deterministic ZIPs during browser tests.
+- `src/windows/LensDocsStudio.Windows/` contains the optional WinUI 3 and WebView2 desktop shell that hosts the same static app from local packaged files.
 
 Rendered HTML, Docs Site, and Word exports remain standalone outputs with their own embedded styles/scripts where needed.
 

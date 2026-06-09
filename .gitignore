@@ -2,4 +2,7 @@ node_modules/
 test-results/
 playwright-report/
 artifacts/
+**/bin/
+**/obj/
+.vs/
 *.log
