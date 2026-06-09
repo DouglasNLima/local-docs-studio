@@ -9,6 +9,12 @@ export const nativeBridgeMessageTypes = {
   saveFileResult: 'lensDocs.native.saveFileResult',
   saveFileAs: 'lensDocs.native.saveFileAs',
   saveFileAsResult: 'lensDocs.native.saveFileAsResult',
+  openFolder: 'lensDocs.native.openFolder',
+  openFolderResult: 'lensDocs.native.openFolderResult',
+  saveWorkspaceFile: 'lensDocs.native.saveWorkspaceFile',
+  saveWorkspaceFileResult: 'lensDocs.native.saveWorkspaceFileResult',
+  createWorkspaceFile: 'lensDocs.native.createWorkspaceFile',
+  createWorkspaceFileResult: 'lensDocs.native.createWorkspaceFileResult',
   error: 'lensDocs.native.error',
 };
 
@@ -85,6 +91,28 @@ export function createNativeBridgeClient({
       content,
     });
     return await sendMessage(message, [nativeBridgeMessageTypes.saveFileAsResult]);
+  }
+
+  async function openFolder() {
+    const message = createMessage(nativeBridgeMessageTypes.openFolder);
+    return await sendMessage(message, [nativeBridgeMessageTypes.openFolderResult]);
+  }
+
+  async function saveWorkspaceFile({ nativeHandleId, content }) {
+    const message = createMessage(nativeBridgeMessageTypes.saveWorkspaceFile, {
+      nativeHandleId,
+      content,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.saveWorkspaceFileResult]);
+  }
+
+  async function createWorkspaceFile({ nativeWorkspaceId, path, content }) {
+    const message = createMessage(nativeBridgeMessageTypes.createWorkspaceFile, {
+      nativeWorkspaceId,
+      path,
+      content,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.createWorkspaceFileResult]);
   }
 
   function sendMessage(message, expectedTypes) {
@@ -173,6 +201,9 @@ export function createNativeBridgeClient({
     openFile,
     saveFile,
     saveFileAs,
+    openFolder,
+    saveWorkspaceFile,
+    createWorkspaceFile,
   };
 }
 

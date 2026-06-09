@@ -32,7 +32,7 @@ Build it with:
 dotnet build src/windows/LensDocsStudio.Windows.sln
 ```
 
-The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It does not add folder/workspace bridging, file watchers, file associations, installers, auto-update, or native export behaviour yet.
+The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, and saving workspace files through host-owned opaque handles. It does not add file watchers, recent native folders, file associations, installers, auto-update, delete/rename/move operations, or native export behaviour yet.
 
 ## Roadmap And Branches
 
@@ -41,28 +41,32 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - The Windows desktop app is the primary distribution direction.
 - The static browser/PWA app remains the core runtime and must keep working from GitHub Pages and local static validation.
 - Phase 2B adds native single-file open/save/save-as for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files through an opaque WebView2 bridge handle.
-- Future Windows work includes native workspace/folder access, offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
+- Phase 2C adds native open folder, recursive workspace discovery, workspace file save, and native Markdown file creation through opaque workspace and file handles.
+- Future Windows work includes external-change detection/file watching, offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 
 ### Windows Native Bridge
 
-The Windows shell includes a narrow native bridge. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful Phase 2B response reports `LensDocsStudio.Windows` and the `diagnostics.ping`, `file.open`, `file.save`, and `file.saveAs` capabilities.
+The Windows shell includes a narrow native bridge. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful Phase 2C response reports `LensDocsStudio.Windows` and the `diagnostics.ping`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, and `workspace.createFile` capabilities.
 
-Native file operations are limited to one selected UTF-8 text file at a time. The bridge supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files up to 5 MB. The host keeps full paths in memory behind opaque `nativeHandleId` values; the web app uses those handles for save operations and does not show or export local paths by default.
+Native file and workspace operations support `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files. Single files and workspace files are limited to 5 MB per file. Native workspace discovery loads up to 500 supported files and recurses up to 12 directory levels. Oversized, unreadable, invalid UTF-8, or limit-skipped files are reported with safe relative paths and user-facing reasons. The host keeps full paths in memory behind opaque `nativeWorkspaceId` and `nativeHandleId` values; the web app uses those handles for save operations and does not show or export local paths by default.
 
-The bridge does not expose folder access, workspace bridging, file watchers, file associations, native PDF export, Git operations, shell commands, local paths in browser/PWA mode, environment data, usernames, secrets, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
+The bridge does not expose file watchers, recent native folders, file associations, native PDF export, Git operations, shell commands, delete/rename/move operations, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
 
 Manual smoke path:
 
 1. Run the Windows shell with `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Use **File > Open file** to open a `.md` file.
-3. Edit the file.
-4. Use **File > Save changes**.
-5. Reopen the file externally and confirm the content changed.
-6. Use **File > Save as** to save a copy.
-7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` are reported.
-8. Open the same app in a normal browser or PWA mode and confirm there are no native bridge errors.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder` and `workspace.saveFile` are reported.
+3. Use **File > Open folder**.
+4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
+5. Confirm the workspace browser loads relative paths.
+6. Select multiple files and confirm editor/preview update.
+7. Edit a workspace file.
+8. Use **File > Save changes**.
+9. Reopen the file externally and confirm the content changed.
+10. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+11. Open the same app in a normal browser or PWA mode and confirm there are no native bridge errors.
 
 ## Key Features
 

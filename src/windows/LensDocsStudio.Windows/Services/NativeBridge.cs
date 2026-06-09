@@ -17,13 +17,30 @@ public sealed class NativeBridge
     private const string SaveFileResultType = "lensDocs.native.saveFileResult";
     private const string SaveFileAsType = "lensDocs.native.saveFileAs";
     private const string SaveFileAsResultType = "lensDocs.native.saveFileAsResult";
+    private const string OpenFolderType = "lensDocs.native.openFolder";
+    private const string OpenFolderResultType = "lensDocs.native.openFolderResult";
+    private const string SaveWorkspaceFileType = "lensDocs.native.saveWorkspaceFile";
+    private const string SaveWorkspaceFileResultType = "lensDocs.native.saveWorkspaceFileResult";
+    private const string CreateWorkspaceFileType = "lensDocs.native.createWorkspaceFile";
+    private const string CreateWorkspaceFileResultType = "lensDocs.native.createWorkspaceFileResult";
     private const string ErrorType = "lensDocs.native.error";
-    private static readonly string[] Capabilities = ["diagnostics.ping", "file.open", "file.save", "file.saveAs"];
+    private static readonly string[] Capabilities =
+    [
+        "diagnostics.ping",
+        "file.open",
+        "file.save",
+        "file.saveAs",
+        "workspace.openFolder",
+        "workspace.saveFile",
+        "workspace.createFile",
+    ];
     private readonly NativeFileService nativeFileService;
+    private readonly NativeWorkspaceService nativeWorkspaceService;
 
-    public NativeBridge(NativeFileService nativeFileService)
+    public NativeBridge(NativeFileService nativeFileService, NativeWorkspaceService nativeWorkspaceService)
     {
         this.nativeFileService = nativeFileService;
+        this.nativeWorkspaceService = nativeWorkspaceService;
     }
 
     public void Attach(CoreWebView2 coreWebView)
@@ -88,6 +105,20 @@ public sealed class NativeBridge
                 case SaveFileAsType:
                     PostResult(coreWebView, id, SaveFileAsResultType, await nativeFileService.SaveFileAsAsync(
                         ReadPayloadString(root, "suggestedName"),
+                        ReadPayloadString(root, "content")));
+                    break;
+                case OpenFolderType:
+                    PostResult(coreWebView, id, OpenFolderResultType, await nativeWorkspaceService.OpenFolderAsync());
+                    break;
+                case SaveWorkspaceFileType:
+                    PostResult(coreWebView, id, SaveWorkspaceFileResultType, await nativeWorkspaceService.SaveWorkspaceFileAsync(
+                        ReadPayloadString(root, "nativeHandleId"),
+                        ReadPayloadString(root, "content")));
+                    break;
+                case CreateWorkspaceFileType:
+                    PostResult(coreWebView, id, CreateWorkspaceFileResultType, await nativeWorkspaceService.CreateWorkspaceFileAsync(
+                        ReadPayloadString(root, "nativeWorkspaceId"),
+                        ReadPayloadString(root, "path"),
                         ReadPayloadString(root, "content")));
                     break;
                 default:

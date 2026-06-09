@@ -1618,6 +1618,7 @@ export function createAppController() {
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
       state.workspaceDirectoryHandle = null;
+      state.nativeWorkspaceId = '';
       state.workspaceKind = '';
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;

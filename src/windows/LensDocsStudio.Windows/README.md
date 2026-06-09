@@ -33,11 +33,11 @@ If build tooling is missing, install the WinUI 3/Windows App SDK development com
 
 ## Scope
 
-This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, and exposes a narrow native bridge for single-file open/save/save-as. File associations, packaging, auto-update, folder watching, workspace bridging, and native export flows are left for later phases.
+This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, and exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file operations. File associations, packaging, auto-update, folder watching, recent native folders, delete/rename/move operations, and native export flows are left for later phases.
 
 ## Roadmap
 
-- Native workspace/folder bridge.
+- External-change detection and file watching for native workspaces.
 - Offline runtime hardening.
 - Windows installer and packaging.
 - First-run setup wizard.
@@ -54,18 +54,26 @@ The shell registers a fail-closed WebView2 message handler. The static app can s
 - `file.open`
 - `file.save`
 - `file.saveAs`
+- `workspace.openFolder`
+- `workspace.saveFile`
+- `workspace.createFile`
 
 The file bridge supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files. It reads and writes UTF-8 text only and rejects files above 5 MB. Native open and save-as use Windows file pickers. Native save writes only to an existing host-owned opaque `nativeHandleId`; the web app never sends arbitrary paths. The host keeps the handle-to-path map in memory for this phase.
 
-The bridge intentionally does not expose folder selection, workspace access, recursive directory listing, file watchers, file associations, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
+The workspace bridge uses a Windows folder picker, discovers supported files recursively, and returns only safe relative paths plus opaque `nativeWorkspaceId` and `nativeHandleId` values. Workspace discovery uses these conservative limits: 5 MB per file, 500 loaded supported files, and 12 directory levels. Oversized files, invalid UTF-8 files, unreadable files, and files skipped by limits are returned as skipped metadata with relative paths and safe reasons. New Markdown files can be created inside the selected native workspace when the path is relative, uses a supported extension, does not escape the selected folder, and does not overwrite an existing file.
+
+The bridge intentionally does not expose file watchers, recent native folders, file associations, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, absolute workspace paths, delete/rename/move operations, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
 
 Manual smoke:
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Use **File > Open file** to open a `.md` file.
-3. Edit the file.
-4. Use **File > Save changes**.
-5. Reopen the file externally and confirm the content changed.
-6. Use **File > Save as** to save a copy.
-7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` are reported.
-8. Open the static app in a normal browser and confirm no native bridge errors are reported.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder` and `workspace.saveFile` are reported.
+3. Use **File > Open folder**.
+4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
+5. Confirm the workspace browser loads relative paths.
+6. Select multiple files and confirm editor/preview update.
+7. Edit a workspace file.
+8. Use **File > Save changes**.
+9. Reopen the file externally and confirm the content changed.
+10. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+11. Open the static app in a normal browser and confirm no native bridge errors are reported.

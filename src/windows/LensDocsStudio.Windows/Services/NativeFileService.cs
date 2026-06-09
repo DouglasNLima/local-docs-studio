@@ -27,6 +27,11 @@ public sealed class NativeFileService
         ownerWindowHandle = WindowNative.GetWindowHandle(ownerWindow);
     }
 
+    public static bool IsSupportedExtension(string? extension)
+    {
+        return !string.IsNullOrWhiteSpace(extension) && SupportedExtensions.Contains(extension);
+    }
+
     public async Task<object> OpenFileAsync()
     {
         var picker = new FileOpenPicker
@@ -139,7 +144,7 @@ public sealed class NativeFileService
         }
 
         var extension = Path.GetExtension(path);
-        if (!SupportedExtensions.Contains(extension))
+        if (!IsSupportedExtension(extension))
         {
             throw new NativeFileException("Choose a .md, .markdown, .mmd, .mermaid, or .txt file.");
         }
@@ -162,7 +167,7 @@ public sealed class NativeFileService
             return "document.md";
         }
 
-        return SupportedExtensions.Contains(Path.GetExtension(fileName))
+        return IsSupportedExtension(Path.GetExtension(fileName))
             ? fileName
             : $"{Path.GetFileNameWithoutExtension(fileName)}.md";
     }

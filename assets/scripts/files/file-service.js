@@ -142,6 +142,11 @@ export function createFileService({
     async function openFolder() {
       if (!await confirmDiscardUnsaved('Open a folder and discard unsaved edits?')) return;
 
+      if (await hasNativeFileCapability('workspace.openFolder')) {
+        const opened = await openNativeFolder();
+        if (opened) return;
+      }
+
       try {
         if ('showDirectoryPicker' in window) {
           const directoryHandle = await window.showDirectoryPicker({
@@ -163,6 +168,56 @@ export function createFileService({
       }
 
       folderInput.click();
+    }
+
+    async function openNativeFolder() {
+      try {
+        setStatus('Opening folder from Windows...', 'busy');
+        const result = await nativeBridgeClient.openFolder();
+        if (!result.ok) {
+          setStatus(result.message || 'Windows open folder failed safely. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const payload = result.response?.payload || {};
+        if (payload.cancelled) {
+          setStatus('Open folder cancelled.', 'info');
+          return true;
+        }
+
+        if (!isValidNativeWorkspacePayload(payload)) {
+          setStatus('Windows open folder returned an unsupported workspace response. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const records = payload.files.map((file) => {
+          const path = normalisePath(file.path || file.displayPath || file.name);
+          const name = file.name || path.split('/').pop() || path;
+          const content = String(file.content ?? '');
+          return {
+            name,
+            path,
+            file: new File([content], name, { type: getMimeTypeForPath(path) }),
+            nativeHandleId: file.nativeHandleId,
+          };
+        });
+        await setLibraryFromRecords(records, payload.workspaceName || 'Windows workspace', {
+          workspaceKind: 'native-folder',
+          nativeWorkspaceId: payload.nativeWorkspaceId,
+        });
+
+        const skipped = Array.isArray(payload.skipped) ? payload.skipped : [];
+        if (skipped.length) {
+          setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows. ${skipped.length} file${skipped.length === 1 ? '' : 's'} skipped by workspace limits.`, 'warning');
+        } else if (records.length) {
+          setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows.`, 'ok');
+        }
+        return true;
+      } catch (error) {
+        setStatus('Windows open folder failed safely. Using the browser fallback...', 'warning');
+        console.error(error);
+        return false;
+      }
     }
 
     async function importZip() {
@@ -209,6 +264,11 @@ export function createFileService({
 
       if (state.workspaceDirectoryHandle) {
         await createFileInWorkspace(name);
+        return;
+      }
+
+      if (state.nativeWorkspaceId && await hasNativeFileCapability('workspace.createFile')) {
+        await createNativeWorkspaceFile(name);
         return;
       }
 
@@ -412,6 +472,7 @@ export function createFileService({
       state.fileName = '';
       state.folderName = folderName;
       state.workspaceDirectoryHandle = options.directoryHandle || null;
+      state.nativeWorkspaceId = options.nativeWorkspaceId || '';
       state.workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
@@ -472,6 +533,7 @@ export function createFileService({
         state.fileName = '';
         state.folderName = imported.folderName;
         state.workspaceDirectoryHandle = null;
+        state.nativeWorkspaceId = '';
         state.workspaceKind = imported.artifactBundle ? 'artefact-bundle' : imported.bundle ? 'bundle' : 'zip';
         state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
@@ -567,6 +629,7 @@ export function createFileService({
       state.fileName = '';
       state.folderName = imported.records.length === 1 ? 'Imported document' : 'Imported documents';
       state.workspaceDirectoryHandle = null;
+      state.nativeWorkspaceId = '';
       state.workspaceKind = 'converted';
       state.artifactBundle = null;
       state.fileCache.clear();
@@ -846,6 +909,10 @@ export function createFileService({
       try {
         await flushPendingRenderBeforeSave();
         if (record.nativeHandleId && await hasNativeFileCapability('file.save')) {
+          if (state.workspaceKind === 'native-folder' && await hasNativeFileCapability('workspace.saveFile')) {
+            await saveRecordToNativeWorkspaceHandle(record, content);
+            return;
+          }
           await saveRecordToNativeHandle(record, content);
           return;
         }
@@ -960,6 +1027,31 @@ export function createFileService({
       await afterSaveActiveFile?.(record, content);
     }
 
+    async function saveRecordToNativeWorkspaceHandle(record, content) {
+      setStatus(`Saving ${record.name} through Windows workspace...`, 'busy');
+      const result = await nativeBridgeClient.saveWorkspaceFile({
+        nativeHandleId: record.nativeHandleId,
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows workspace save failed safely.', 'danger');
+        updateSaveButton();
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      if (!payload.saved) {
+        setStatus('Windows workspace save did not complete.', 'warning');
+        updateSaveButton();
+        return;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content);
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content);
+    }
+
     async function saveRecordToNativeHandleAs(record, content) {
       setStatus(`Saving ${record.name} through Windows...`, 'busy');
       const oldPath = record.path;
@@ -1035,6 +1127,31 @@ export function createFileService({
         && isSupportedFile(payload.name)
         && typeof payload.nativeHandleId === 'string'
         && payload.nativeHandleId.trim();
+    }
+
+    function isValidNativeWorkspacePayload(payload) {
+      return payload
+        && !payload.cancelled
+        && typeof payload.workspaceName === 'string'
+        && typeof payload.nativeWorkspaceId === 'string'
+        && payload.nativeWorkspaceId.trim()
+        && Array.isArray(payload.files)
+        && payload.files.every(isValidNativeWorkspaceFilePayload);
+    }
+
+    function isValidNativeWorkspaceFilePayload(file) {
+      const path = normalisePath(file?.path || file?.displayPath || file?.name || '');
+      return file
+        && typeof file.name === 'string'
+        && isSupportedFile(file.name)
+        && path
+        && !path.startsWith('/')
+        && !/^[a-z]:/i.test(path)
+        && !path.split('/').some((part) => part === '.' || part === '..')
+        && isSupportedFile(path)
+        && typeof file.content === 'string'
+        && typeof file.nativeHandleId === 'string'
+        && file.nativeHandleId.trim();
     }
 
     async function saveRecordToHandle(record, handle, content, options = {}) {
@@ -1177,6 +1294,49 @@ export function createFileService({
       } catch (error) {
         if (error?.name === 'AbortError') return;
         setStatus('Could not create the file in this workspace.', 'danger');
+        console.error(error);
+      }
+    }
+
+    async function createNativeWorkspaceFile(path) {
+      try {
+        setStatus(`Creating ${path} through Windows workspace...`, 'busy');
+        const result = await nativeBridgeClient.createWorkspaceFile({
+          nativeWorkspaceId: state.nativeWorkspaceId,
+          path,
+          content: '',
+        });
+
+        if (!result.ok) {
+          setStatus(result.message || 'Windows workspace file creation failed safely.', 'danger');
+          return;
+        }
+
+        const payload = result.response?.payload || {};
+        if (!payload.created || !isValidNativeWorkspaceFilePayload(payload)) {
+          setStatus('Windows workspace returned an unsupported file response.', 'warning');
+          return;
+        }
+
+        const recordPath = normalisePath(payload.path || payload.displayPath || path);
+        const recordName = payload.name || recordPath.split('/').pop() || recordPath;
+        const content = String(payload.content ?? '');
+        const record = prepareRecord({
+          name: recordName,
+          path: recordPath,
+          file: new File([content], recordName, { type: getMimeTypeForPath(recordPath) }),
+          nativeHandleId: payload.nativeHandleId,
+        });
+        state.fileCache.set(recordPath, content);
+        state.savedContentCache?.set(recordPath, content);
+        await addRecordsToWorkspace([record], {
+          folderName: state.folderName || 'Windows workspace',
+          selectPath: recordPath,
+        });
+        state.workspaceKind = 'native-folder';
+        setStatus(`${recordPath} added to the Windows workspace.`, 'ok');
+      } catch (error) {
+        setStatus('Could not create the file in this Windows workspace.', 'danger');
         console.error(error);
       }
     }

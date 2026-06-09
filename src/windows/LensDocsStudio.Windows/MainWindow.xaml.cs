@@ -16,7 +16,8 @@ public sealed partial class MainWindow : Window
         InitializeComponent();
         Title = "Lens Docs Studio";
         var nativeFileService = new NativeFileService(this);
-        webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(nativeFileService));
+        var nativeWorkspaceService = new NativeWorkspaceService(this);
+        webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(nativeFileService, nativeWorkspaceService));
         _ = InitialiseAsync();
     }
 

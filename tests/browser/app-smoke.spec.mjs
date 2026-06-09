@@ -508,6 +508,8 @@ async function installMockNativeBridge(page) {
       openFile: 'success',
       saveFile: 'success',
       saveFileAs: 'success',
+      openFolder: 'success',
+      saveWorkspaceFile: 'success',
     };
 
     function emit(response) {
@@ -534,7 +536,15 @@ async function installMockNativeBridge(page) {
           if (message.type === 'lensDocs.native.ping') {
             emit(baseResponse(message, 'lensDocs.native.pong', {
               host: 'LensDocsStudio.Windows',
-              capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+              capabilities: [
+                'diagnostics.ping',
+                'file.open',
+                'file.save',
+                'file.saveAs',
+                'workspace.openFolder',
+                'workspace.saveFile',
+                'workspace.createFile',
+              ],
             }));
             return;
           }
@@ -583,6 +593,81 @@ async function installMockNativeBridge(page) {
               displayName: 'native-copy.md',
               encoding: 'utf-8',
               nativeHandleId: 'native-handle-2',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.openFolder') {
+            if (window.__nativeBridgeScenario.openFolder === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.openFolderResult', { cancelled: true }));
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFolder === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.openFolderResult', {}), protocolVersion: 999 });
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.openFolderResult', {
+              cancelled: false,
+              workspaceName: 'Project Docs',
+              nativeWorkspaceId: 'native-workspace-1',
+              files: [
+                {
+                  name: 'README.md',
+                  path: 'README.md',
+                  displayPath: 'README.md',
+                  extension: '.md',
+                  encoding: 'utf-8',
+                  content: '# Native Workspace\n',
+                  nativeHandleId: 'native-workspace-file-1',
+                },
+                {
+                  name: 'flow.mmd',
+                  path: 'diagrams/flow.mmd',
+                  displayPath: 'diagrams/flow.mmd',
+                  extension: '.mmd',
+                  encoding: 'utf-8',
+                  content: 'flowchart TD\n  A-->B\n',
+                  nativeHandleId: 'native-workspace-file-2',
+                },
+              ],
+              limits: {
+                maxFileSizeBytes: 5242880,
+                maxFiles: 500,
+                maxDepth: 12,
+              },
+              skipped: [
+                {
+                  path: 'large.md',
+                  reason: 'File exceeds the 5 MB limit.',
+                },
+              ],
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveWorkspaceFile') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.saveWorkspaceFileResult', {
+              saved: window.__nativeBridgeScenario.saveWorkspaceFile !== 'failed',
+              name: 'README.md',
+              path: 'README.md',
+              displayPath: 'README.md',
+              encoding: 'utf-8',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.createWorkspaceFile') {
+            emit(baseResponse(message, 'lensDocs.native.createWorkspaceFileResult', {
+              cancelled: false,
+              created: true,
+              name: message.payload.path.split('/').pop(),
+              path: message.payload.path,
+              displayPath: message.payload.path,
+              extension: '.md',
+              encoding: 'utf-8',
+              content: message.payload.content || '',
+              nativeHandleId: 'native-workspace-file-new',
             }));
           }
         },
@@ -1523,6 +1608,130 @@ test('fake WebView2 bridge handles cancelled and malformed native file responses
   await page.locator('#saveAsButton').click();
   await expect(page.locator('#status')).toHaveText('Save as cancelled.');
   await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+});
+
+test('fake WebView2 bridge opens and saves native workspace folders', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+  await expect(page.locator('#fileCount')).toHaveText('2');
+  await expect(page.locator('#fileList')).toContainText('README.md');
+  await expect(page.locator('#fileList')).toContainText('diagrams/flow.mmd');
+  await expect(page.locator('#activeFileLabel')).toHaveText('diagrams/flow.mmd');
+  await expect(page.locator('#editor')).toHaveValue('flowchart TD\n  A-->B\n');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Native Workspace Updated\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+  await page.locator('#saveButton').click();
+
+  await expect(page.locator('#status')).toHaveText('README.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  const savePayload = await page.evaluate(() => window.__nativeBridgeSaves.at(-1));
+  expect(savePayload).toEqual({
+    nativeHandleId: 'native-workspace-file-1',
+    content: '# Native Workspace Updated\n',
+  });
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveWorkspaceFile')).toBe(true);
+});
+
+test('fake WebView2 bridge creates Markdown files in native workspaces', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+
+  if (!await page.locator('details.menu[open]').isVisible()) {
+    await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  }
+  await page.getByRole('button', { name: 'New Markdown file' }).click();
+  await page.locator('#appDialogPromptInput').fill('notes/new-note.md');
+  await submitAppDialog(page, { button: 'Create file' });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('notes/new-note.md');
+  await expect(page.locator('#fileList')).toContainText('notes/new-note.md');
+  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText('notes/new-note.md added to the Windows workspace.');
+  const createMessage = await page.evaluate(() => window.__nativeBridgeMessages.findLast((message) => message.type === 'lensDocs.native.createWorkspaceFile'));
+  expect(createMessage.payload).toEqual({
+    nativeWorkspaceId: 'native-workspace-1',
+    path: 'notes/new-note.md',
+    content: '',
+  });
+});
+
+test('fake WebView2 bridge handles cancelled and malformed native workspace responses safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('Open folder cancelled.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'malformed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+});
+
+test('File menu open folder falls back safely when Windows bridge lacks workspace capabilities', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({
+              data: {
+                protocolVersion: 1,
+                id: message.id,
+                type: 'lensDocs.native.pong',
+                source: 'LensDocsStudio.Windows',
+                timestamp: '2026-06-09T00:00:00.000Z',
+                payload: {
+                  host: 'LensDocsStudio.Windows',
+                  capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+                },
+              },
+            }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+    window.showDirectoryPicker = async () => {
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(false);
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
 });
 
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {

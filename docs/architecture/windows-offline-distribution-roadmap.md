@@ -32,9 +32,21 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Browser, PWA, and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
 - **Help > Check Windows bridge** reports `diagnostics.ping`, `file.open`, `file.save`, and `file.saveAs` when hosted by the Windows shell.
 
+## Implemented Phase 2C
+
+- Native open folder through the WinUI 3/WebView2 host.
+- Recursive workspace discovery for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files.
+- Conservative native workspace limits: 5 MB per file, 500 loaded supported files, and 12 directory levels.
+- Safe skipped-file metadata for oversized files, invalid UTF-8 files, unreadable files, and files skipped by workspace limits.
+- Opaque host-owned `nativeWorkspaceId` and `nativeHandleId` values. Absolute selected-folder and file paths stay in memory in the Windows host.
+- Native workspace file save through `workspace.saveFile`, using the existing active-file save flow and preserving dirty-state semantics.
+- Native Markdown file creation inside the selected workspace through `workspace.createFile`, with relative-path, extension, boundary, and no-overwrite checks enforced by the host.
+- Browser, PWA, and GitHub Pages mode continue to use existing browser folder pickers and fallbacks.
+- **Help > Check Windows bridge** reports `workspace.openFolder`, `workspace.saveFile`, and `workspace.createFile` in addition to the Phase 2B capabilities when hosted by the Windows shell.
+
 ## Future Roadmap
 
-- Native workspace/folder bridge for durable folder access, workspace recall, and folder-oriented workflows.
+- Native workspace external-change detection and file watching.
 - Offline runtime hardening, including packaged asset coverage, WebView2 origin behaviour, service worker expectations, and clear fallback messages.
 - Windows installer and packaging for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
@@ -45,13 +57,20 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 
 Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
 
+## Non-Goals For Phase 2C
+
+Phase 2C does not implement file watchers, external-change live notifications, recent native folders, workspace restore after restart, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, a full first-run wizard, delete/rename/move operations, arbitrary host command execution, or an editor rewrite.
+
 ## Manual Smoke
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Use **File > Open file** to open a `.md` file.
-3. Edit the file.
-4. Use **File > Save changes**.
-5. Reopen the file externally and confirm the content changed.
-6. Use **File > Save as** to save a copy.
-7. Use **Help > Check Windows bridge** and confirm `file.open`, `file.save`, and `file.saveAs` capabilities.
-8. Open the app in normal browser mode and confirm no native bridge errors.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder` and `workspace.saveFile` capabilities.
+3. Use **File > Open folder**.
+4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
+5. Confirm the workspace browser loads relative paths.
+6. Select multiple files and confirm editor/preview update.
+7. Edit a workspace file.
+8. Use **File > Save changes**.
+9. Reopen the file externally and confirm the content changed.
+10. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+11. Open the app in normal browser mode and confirm no native bridge errors.
