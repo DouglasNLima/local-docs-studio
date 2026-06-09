@@ -1602,6 +1602,7 @@ test('fake WebView2 bridge handles cancelled and malformed native file responses
   await page.getByRole('button', { name: 'New Markdown file' }).click();
   await submitAppDialog(page, { button: 'Create file' });
   await page.locator('#editor').fill('# Draft\n');
+  await expect(page.locator('#status')).toHaveText(/Rendered · edited in memory/);
   await page.evaluate(() => {
     window.__nativeBridgeScenario.saveFileAs = 'cancelled';
   });
