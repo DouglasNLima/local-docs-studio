@@ -512,6 +512,7 @@ export function createAppController() {
         editor,
         preview,
         scrollSyncToggle,
+        editorFindPanel,
       },
     });
     let exportTools;
