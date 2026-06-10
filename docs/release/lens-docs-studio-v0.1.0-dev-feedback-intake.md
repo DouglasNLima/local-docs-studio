@@ -11,7 +11,7 @@ Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.
 Capture:
 
 - Windows version
-- Install method: ZIP or installer
+- Install method: ZIP portable package or Inno installer
 - Runtime prerequisites installed
 - Exact asset used
 - SHA256 verified or not
@@ -57,8 +57,10 @@ Capture:
 
 - Unsigned installer.
 - Runtime prerequisites are separate.
-- WebView2 user data may remain after uninstall.
+- WebView2 user data may remain after uninstall under `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2`.
 - ZIP and installer are prerelease assets only.
+- ZIP is the portable/fallback package for manual extraction and smoke validation. It does not create Start Menu or uninstall entries.
+- The Inno installer is the easier Windows install path with a Start Menu shortcut, optional Desktop shortcut, optional/default-safe file associations, and uninstall support.
 - File associations are optional/default-safe and should be treated as opt-in.
 
 ## Suggested Issue Body

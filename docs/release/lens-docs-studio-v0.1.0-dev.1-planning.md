@@ -27,7 +27,7 @@ No public issue feedback was available at planning time, so this triage treats t
 | Item | Source | Category | Severity | Decision | Notes |
 | --- | --- | --- | --- | --- | --- |
 | No public prerelease issues filed | GitHub Issues | Feedback intake | Low | Accepted caveat | Continue monitoring before Phase 3S and again before publication. |
-| WebView2 user data may remain after uninstall | Known issues, Phase 3M/3Q notes | Uninstall | Medium | Should fix for `v0.1.0-dev.1` | Target a low-risk installer uninstall cleanup if it does not endanger user data or normal WebView2 behaviour. |
+| WebView2 user data may remain after uninstall | Known issues, Phase 3M/3Q notes | Uninstall | Medium | Documentation-only for `v0.1.0-dev.1` | Phase 3S chose `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY` because the WebView2 folder may contain browser-local user/session state. |
 | Installer is unsigned | Known issues, publication record | Installer | Medium | Accepted caveat | Signing remains out of scope for the next dev prerelease. Keep warnings explicit. |
 | Runtime prerequisites are external | Known issues, publication record | Runtime prerequisites | Medium | Documentation-only | Clarify ZIP versus installer expectations and prerequisite ownership; do not add bootstrappers in this cycle. |
 | File associations are optional/default-safe | Known issues, setup notes | File associations | Low | Accepted caveat | Keep opt-in behaviour. Revalidate documentation wording before the next publication. |
@@ -45,8 +45,8 @@ Before Phase 3S starts, repeat the GitHub issue search. Any new blocker, checksu
 
 ### Should fix for v0.1.0-dev.1
 
-- Investigate whether the installer uninstall can safely remove only installer-owned WebView2 runtime data under the per-user install path.
-- Perform a fully manual human-only watcher/conflict UX evidence pass against a packaged Windows shell, covering changed, deleted, renamed, dirty, and dirty-external-conflict states.
+- Document the WebView2 uninstall caveat and manual clean-uninstall path without silently deleting local browser state.
+- Add a fully manual human-only watcher/conflict UX evidence checklist for a packaged Windows shell, covering changed, deleted, renamed, dirty, and dirty-external-conflict states.
 - Tighten release-note wording that helps testers choose between the ZIP fallback and unsigned installer.
 
 ### Documentation-only
@@ -81,7 +81,7 @@ Before Phase 3S starts, repeat the GitHub issue search. Any new blocker, checksu
 
 Proceed with a small targeted `v0.1.0-dev.1` cycle only if Phase 3S can stay low risk:
 
-- Prefer installer uninstall cleanup if the WebView2 data ownership boundary is clear.
+- Keep WebView2 uninstall cleanup documented-only unless the data ownership boundary becomes clear enough for an explicit safe cleanup option.
 - Prefer documentation clarifications over runtime changes where feedback shows confusion rather than defects.
 - Use manual packaged-shell evidence to decide whether watcher/conflict UX needs code changes or only release confidence notes.
 - Avoid expanding scope beyond the documented prerelease caveats unless new GitHub feedback appears.
@@ -125,6 +125,7 @@ Proceed with a small targeted `v0.1.0-dev.1` cycle only if Phase 3S can stay low
   - `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1`
   - native install/uninstall smoke for the installer path
 - If UI behaviour changes, run `npm run test:browser`.
+- Complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` before upload.
 - Verify generated ZIP and installer checksums before upload.
 - Verify no generated artefacts are committed.
 

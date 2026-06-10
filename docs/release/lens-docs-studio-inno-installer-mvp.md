@@ -19,6 +19,20 @@ The MVP installer:
 
 The MVP does not publish a release, upload assets, create or move tags, merge to `main`, sign binaries, add auto-update, add MSIX, add WiX, install runtimes, download prerequisites, or change runtime app behaviour.
 
+## WebView2 Uninstall Cleanup Decision
+
+Decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`.
+
+Phase 3S inspected the Inno installer script and build flow. The installer owns the application files, shortcuts, and optional Lens registry entries, but the WebView2 folder created beside the executable can contain browser-local user state such as local storage, session data, caches, and first-run setup state:
+
+```text
+%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2
+```
+
+The current MVP should not silently delete that folder during uninstall because it may remove user/session state. Inno Setup also does not provide a simple safe optional uninstall task in the current MVP flow. For `v0.1.0-dev.1`, cleanup remains documented-only: users who want a fully clean uninstall may remove the folder manually after uninstall, once they have confirmed they no longer need local browser state from the Windows shell.
+
+Future installer work can revisit an explicit cleanup option if the app separates disposable cache from user/session data clearly enough to make deletion safe.
+
 ## Runtime Prerequisites
 
 The installer deliberately documents prerequisites rather than bootstrapping them:
@@ -117,7 +131,8 @@ When an installer is successfully built, validate on a Windows test machine:
 7. Open the app and run **Help > Check Windows bridge**.
 8. Confirm a local Markdown file can open, edit, and save.
 9. Uninstall Lens Docs Studio from Windows Settings or the uninstaller shortcut.
-10. Confirm the install folder is removed, except for any user-created data outside the installer-owned folder.
+10. Confirm installer-owned files, shortcuts, and Lens registry entries are removed.
+11. If `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2` remains, treat it as documented WebView2 user data. Remove it manually only for an explicit clean-uninstall test after confirming no local browser state needs to be preserved.
 
 Run a separate opt-in association test only after the baseline install/uninstall passes. Confirm registry writes stay under `HKCU:\Software\Classes`, supported files can open with Lens Docs Studio when Windows allows it, and uninstall removes Lens-owned ProgIds without touching unrelated defaults or `UserChoice`.
 

@@ -68,11 +68,11 @@ Build the Phase 3M internal unsigned Inno Setup installer MVP with:
 pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
 ```
 
-The installer build wraps the existing certified Windows package output, validates packaged `StaticApp/`, writes a single setup executable plus `.sha256` and report under `artifacts/installers/inno/`, installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not install runtimes, publish or upload a release, create or move tags, sign binaries, add auto-update, merge to `main`, or replace the ZIP fallback. See `docs/release/lens-docs-studio-inno-installer-mvp.md`.
+The installer build wraps the existing certified Windows package output, validates packaged `StaticApp/`, writes a single setup executable plus `.sha256` and report under `artifacts/installers/inno/`, installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not install runtimes, publish or upload a release, create or move tags, sign binaries, add auto-update, merge to `main`, or replace the ZIP fallback. Uninstall removes installer-owned files, shortcuts, and Lens registry entries; WebView2 user data may remain under `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2` so browser-local state is not silently deleted. See `docs/release/lens-docs-studio-inno-installer-mvp.md`.
 
 The Phase 3N installer RC asset plan recommended adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
 
-Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback, the unsigned Inno Setup installer is available as a prerelease installer, runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. Phase 3R records `v0.1.0-dev.1` triage and next-cycle scope in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
+Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback for manual extraction, smoke validation, and environments avoiding installers; it does not create Start Menu or uninstall entries. The unsigned Inno Setup installer is the easier Windows install path with a Start Menu shortcut, optional Desktop shortcut, optional/default-safe file associations, uninstall support, and the WebView2 user data caveat. Runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. Phase 3R records `v0.1.0-dev.1` triage and next-cycle scope in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
 
 Prepare a dry-run GitHub Release artefact set with:
 
@@ -119,6 +119,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3N records the installer RC asset plan for optionally adding the certified Inno Setup installer to the existing draft prerelease without publishing it.
 - Phase 3Q records the public `v0.1.0-dev` prerelease publication and adds structured feedback intake plus known caveats.
 - Phase 3R records prerelease feedback triage and recommends targeted `v0.1.0-dev.1` planning scope.
+- Phase 3S documents the WebView2 uninstall cleanup decision, adds the manual watcher/conflict evidence checklist, and clarifies ZIP versus installer wording for the next dev prerelease.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -127,6 +128,7 @@ See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer sp
 See `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for the Phase 3N installer draft-release asset plan.
 See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` for the Phase 3Q public prerelease publication record.
 See `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md` for the Phase 3R prerelease feedback triage and `v0.1.0-dev.1` planning record.
+See `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` for the manual watcher/conflict evidence checklist required before `v0.1.0-dev.1` publication.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge

@@ -8,9 +8,10 @@ Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.
 
 - Installer is unsigned and may trigger Windows SmartScreen or browser download warnings.
 - Runtime prerequisites are not bootstrapped by either asset. Users must install the .NET 8 Desktop Runtime, the matching Windows App SDK Runtime, and the Evergreen WebView2 Runtime separately.
-- WebView2 user data may remain after uninstall.
+- WebView2 user data may remain after uninstall under `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2`. This is documented-only for the next dev prerelease because deleting it silently could remove browser-local user/session state.
 - File associations are optional/default-safe. The installer must not be treated as a mandatory file association path.
-- ZIP remains available as the portable/fallback package.
+- ZIP remains available as the portable/fallback package for manual extraction, smoke validation, and environments that avoid installers. It does not create a Start Menu entry or uninstall entry unless the user creates shortcuts manually.
+- The Inno installer is the easier Windows install path. It creates a Start Menu shortcut, offers an optional Desktop shortcut, keeps file associations opt-in/default-safe, remains unsigned, still requires runtime prerequisites, and supports uninstall with the WebView2 user data caveat above.
 - ZIP and installer assets are prerelease assets only.
 
 ## Explicit Non-claims

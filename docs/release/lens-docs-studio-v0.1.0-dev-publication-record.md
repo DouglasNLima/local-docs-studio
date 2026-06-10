@@ -23,6 +23,8 @@
 | `LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | Installer verification | n/a |
 | `LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | Installer build/install evidence | n/a |
 
+The ZIP is the portable/fallback package for manual extraction, smoke validation, and environments that avoid installers. It does not create Start Menu or uninstall entries. The Inno installer is the easier Windows install path, creates a Start Menu shortcut, offers an optional Desktop shortcut, keeps file associations opt-in/default-safe, and supports uninstall.
+
 ## Verification
 
 - Pre-flight checks: the final internal RC review confirmed the ZIP and installer assets, release notes, checksums, ZIP smoke, installer install/uninstall smoke, and native bridge smoke before publication.
@@ -50,7 +52,7 @@
 
 ## Known Caveats
 
-- WebView2 user data may remain after uninstall.
+- WebView2 user data may remain after uninstall under `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2`; this is preserved by default because it may contain browser-local user/session state.
 - Installer is unsigned.
 - Runtime prerequisites must be installed separately.
 - ZIP and installer assets are prerelease assets only.

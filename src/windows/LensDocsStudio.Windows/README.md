@@ -93,11 +93,11 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
 
 The script builds or reuses the framework-dependent Windows folder package, validates the packaged `StaticApp/`, compiles `installer/inno/LensDocsStudio.iss` with Inno Setup, writes the setup executable to `artifacts/installers/inno/`, creates a `.sha256` file, and writes a Markdown build report. Pass `-NoPackageBuild` to reuse an existing `artifacts/windows/LensDocsStudio.Windows-<version>/` package, or `-InnoCompilerPath` when `ISCC.exe` is not on `PATH`.
 
-This MVP installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not bootstrap the .NET 8 Desktop Runtime, Windows App SDK Runtime, or Evergreen WebView2 Runtime, and it does not publish releases, upload artefacts, sign binaries, create tags, move tags, or merge to `main`.
+This MVP installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not bootstrap the .NET 8 Desktop Runtime, Windows App SDK Runtime, or Evergreen WebView2 Runtime, and it does not publish releases, upload artefacts, sign binaries, create tags, move tags, or merge to `main`. Uninstall removes installer-owned files, shortcuts, and Lens registry entries; WebView2 user data may remain under `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2` so browser-local state is not silently deleted.
 
 The Phase 3N installer RC asset plan is documented in `docs/release/lens-docs-studio-installer-rc-asset-plan.md`. It recommended a later explicit upload of the certified unsigned installer assets to the existing draft prerelease only after release notes were amended, while keeping the ZIP as the primary fallback and keeping the release unpublished.
 
-The Phase 3Q publication record documents `v0.1.0-dev` as a public GitHub prerelease, not stable/latest. The ZIP remains the portable fallback, the unsigned Inno Setup installer remains prerequisite-dependent, and feedback intake is documented for prerelease users. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` and `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`.
+The Phase 3Q publication record documents `v0.1.0-dev` as a public GitHub prerelease, not stable/latest. The ZIP remains the portable fallback for manual extraction, smoke validation, and environments avoiding installers; it does not create Start Menu or uninstall entries. The unsigned Inno Setup installer remains prerequisite-dependent, provides the easier Windows install path, and includes a Start Menu shortcut, optional Desktop shortcut, optional/default-safe file associations, uninstall support, and the WebView2 user data caveat. Feedback intake is documented for prerelease users. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` and `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`.
 
 Prepare a dry-run GitHub Release artefact set from the repository root:
 
@@ -141,6 +141,7 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Classic installer MVP with Inno Setup.
 - Installer RC asset plan for the existing draft prerelease.
 - Public `v0.1.0-dev` prerelease publication record and feedback intake.
+- `v0.1.0-dev.1` targeted prerelease documentation, including WebView2 uninstall guidance and manual watcher/conflict evidence.
 - Later fuller Windows installer work, signing, prerequisite bootstrapping, MSIX reassessment, and winget publication.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 
