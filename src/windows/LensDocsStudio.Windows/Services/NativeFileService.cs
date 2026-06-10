@@ -56,7 +56,7 @@ public sealed class NativeFileService
 
     public async Task<object> OpenFilePathAsync(string path)
     {
-        ValidatePath(path);
+        ValidateOpenPath(path);
         var info = new FileInfo(path);
         if (info.Length > MaxFileBytes)
         {
@@ -160,6 +160,22 @@ public sealed class NativeFileService
         if (!IsSupportedExtension(extension))
         {
             throw new NativeFileException("Choose a .md, .markdown, .mmd, .mermaid, or .txt file.");
+        }
+    }
+
+    private static void ValidateOpenPath(string? path)
+    {
+        ValidatePath(path);
+
+        var fullPath = Path.GetFullPath(path!);
+        if (!File.Exists(fullPath))
+        {
+            throw new NativeFileException("The selected file is unavailable.");
+        }
+
+        if (Directory.Exists(fullPath))
+        {
+            throw new NativeFileException("Choose a file, not a folder.");
         }
     }
 

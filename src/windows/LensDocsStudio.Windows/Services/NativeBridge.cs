@@ -13,6 +13,10 @@ public sealed class NativeBridge
     private const string HostSource = "LensDocsStudio.Windows";
     private const string PingType = "lensDocs.native.ping";
     private const string PongType = "lensDocs.native.pong";
+    private const string AppReadyType = "lensDocs.native.appReady";
+    private const string AppReadyResultType = "lensDocs.native.appReadyResult";
+    private const string StartupFileType = "lensDocs.native.startupFile";
+    private const string StartupFileErrorType = "lensDocs.native.startupFileError";
     private const string OpenFileType = "lensDocs.native.openFile";
     private const string OpenFileResultType = "lensDocs.native.openFileResult";
     private const string SaveFileType = "lensDocs.native.saveFile";
@@ -42,6 +46,7 @@ public sealed class NativeBridge
     private static readonly string[] Capabilities =
     [
         "diagnostics.ping",
+        "file.startupOpen",
         "file.open",
         "file.save",
         "file.saveAs",
@@ -58,19 +63,23 @@ public sealed class NativeBridge
     ];
     private readonly NativeFileService nativeFileService;
     private readonly NativeWorkspaceService nativeWorkspaceService;
+    private readonly string? startupFilePath;
     private readonly SmokeFixtureService? smokeFixtureService;
     private readonly SmokeCompletionService? smokeCompletionService;
     private readonly DispatcherQueue dispatcherQueue;
     private CoreWebView2? attachedCoreWebView;
+    private bool startupFilePosted;
 
     public NativeBridge(
         NativeFileService nativeFileService,
         NativeWorkspaceService nativeWorkspaceService,
+        string? startupFilePath = null,
         SmokeFixtureService? smokeFixtureService = null,
         SmokeCompletionService? smokeCompletionService = null)
     {
         this.nativeFileService = nativeFileService;
         this.nativeWorkspaceService = nativeWorkspaceService;
+        this.startupFilePath = string.IsNullOrWhiteSpace(startupFilePath) ? null : startupFilePath;
         this.smokeFixtureService = smokeFixtureService;
         this.smokeCompletionService = smokeCompletionService;
         dispatcherQueue = DispatcherQueue.GetForCurrentThread();
@@ -128,6 +137,10 @@ public sealed class NativeBridge
             {
                 case PingType:
                     PostPong(coreWebView, id);
+                    break;
+                case AppReadyType:
+                    PostResult(coreWebView, id, AppReadyResultType, new { ready = true });
+                    _ = PostStartupFileAsync(coreWebView);
                     break;
                 case OpenFileType:
                     PostResult(coreWebView, id, OpenFileResultType, await nativeFileService.OpenFileAsync());
@@ -239,6 +252,41 @@ public sealed class NativeBridge
         catch
         {
             nativeWorkspaceService.StopWatching();
+        }
+    }
+
+    private async Task PostStartupFileAsync(CoreWebView2 coreWebView)
+    {
+        if (startupFilePosted || string.IsNullOrWhiteSpace(startupFilePath))
+        {
+            return;
+        }
+
+        startupFilePosted = true;
+
+        try
+        {
+            PostResult(
+                coreWebView,
+                Guid.NewGuid().ToString("N"),
+                StartupFileType,
+                await nativeFileService.OpenFilePathAsync(startupFilePath));
+        }
+        catch (NativeFileException ex)
+        {
+            PostResult(
+                coreWebView,
+                Guid.NewGuid().ToString("N"),
+                StartupFileErrorType,
+                new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            PostResult(
+                coreWebView,
+                Guid.NewGuid().ToString("N"),
+                StartupFileErrorType,
+                new { message = "Windows could not open the startup file safely." });
         }
     }
 

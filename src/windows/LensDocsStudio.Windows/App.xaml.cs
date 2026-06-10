@@ -1,3 +1,4 @@
+using LensDocsStudio.Windows.Services;
 using LensDocsStudio.Windows.Smoke;
 using Microsoft.UI.Xaml;
 
@@ -14,10 +15,15 @@ public partial class App : Application
 
     protected override void OnLaunched(LaunchActivatedEventArgs args)
     {
-        var smokeOptions = !string.IsNullOrWhiteSpace(args.Arguments)
-            ? SmokeOptions.Parse(args.Arguments)
-            : SmokeOptions.Parse(Environment.GetCommandLineArgs().Skip(1));
-        window = new MainWindow(smokeOptions);
+        var launchArguments = Environment.GetCommandLineArgs().Skip(1).ToList();
+        if (launchArguments.Count == 0 && !string.IsNullOrWhiteSpace(args.Arguments))
+        {
+            launchArguments = SmokeOptions.SplitArguments(args.Arguments);
+        }
+
+        var smokeOptions = SmokeOptions.Parse(launchArguments);
+        var startupFilePath = StartupFileArguments.GetStartupFilePath(launchArguments);
+        window = new MainWindow(smokeOptions, startupFilePath);
         window.Activate();
     }
 }

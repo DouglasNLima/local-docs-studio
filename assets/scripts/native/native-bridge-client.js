@@ -3,6 +3,10 @@ export const BRIDGE_PROTOCOL_VERSION = 1;
 export const nativeBridgeMessageTypes = {
   ping: 'lensDocs.native.ping',
   pong: 'lensDocs.native.pong',
+  appReady: 'lensDocs.native.appReady',
+  appReadyResult: 'lensDocs.native.appReadyResult',
+  startupFile: 'lensDocs.native.startupFile',
+  startupFileError: 'lensDocs.native.startupFileError',
   openFile: 'lensDocs.native.openFile',
   openFileResult: 'lensDocs.native.openFileResult',
   saveFile: 'lensDocs.native.saveFile',
@@ -77,6 +81,11 @@ export function createNativeBridgeClient({
 
     const message = createMessage(nativeBridgeMessageTypes.ping);
     return await sendMessage(message, [nativeBridgeMessageTypes.pong]);
+  }
+
+  async function notifyAppReady() {
+    const message = createMessage(nativeBridgeMessageTypes.appReady);
+    return await sendMessage(message, [nativeBridgeMessageTypes.appReadyResult]);
   }
 
   async function hasCapability(capability) {
@@ -277,6 +286,7 @@ export function createNativeBridgeClient({
     isAvailable,
     createMessage,
     ping,
+    notifyAppReady,
     hasCapability,
     openFile,
     saveFile,
@@ -355,7 +365,11 @@ function validateHostResponse(message, expectedTypes = []) {
 
 function validateHostEvent(message) {
   if (!message || message.protocolVersion !== BRIDGE_PROTOCOL_VERSION) return false;
-  if (message.type !== nativeBridgeMessageTypes.workspaceChanged) return false;
+  if (![
+    nativeBridgeMessageTypes.workspaceChanged,
+    nativeBridgeMessageTypes.startupFile,
+    nativeBridgeMessageTypes.startupFileError,
+  ].includes(message.type)) return false;
   if (typeof message.id !== 'string' || !message.id.trim()) return false;
   if (message.source !== 'LensDocsStudio.Windows') return false;
   if (typeof message.timestamp !== 'string' || !message.timestamp.trim()) return false;

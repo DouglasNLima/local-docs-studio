@@ -2,6 +2,7 @@ import { createNativeBridgeClient } from './native-bridge-client.js';
 
 const REQUIRED_CAPABILITIES = [
   'diagnostics.ping',
+  'file.startupOpen',
   'file.open',
   'file.save',
   'file.saveAs',
@@ -12,6 +13,8 @@ const REQUIRED_CAPABILITIES = [
 ];
 
 const SINGLE_FILE_UPDATED = '# Windows Smoke Single File\n\nSaved by the automated native bridge smoke.\n';
+const STARTUP_FILE_INITIAL = '# Startup file\n\nInitial command-line fixture content.\n';
+const STARTUP_FILE_UPDATED = '# Windows Smoke Startup File\n\nSaved by the automated native bridge smoke.\n';
 const SAVE_AS_CONTENT = '# Windows Smoke Save As\n\nWritten by the automated native bridge smoke.\n';
 const WORKSPACE_UPDATED = '# Windows Smoke Workspace\n\nSaved by the automated native bridge smoke.\n';
 const CREATED_WORKSPACE_CONTENT = '# Windows Smoke Created File\n\nCreated by the automated native bridge smoke.\n';
@@ -65,6 +68,30 @@ export async function runNativeBridgeSmoke({
     }
 
     recordStep('Capabilities include smoke.nativeFixtures', capabilities.includes('smoke.nativeFixtures'));
+
+    const startupLoaded = await waitForEditorValue(windowRef, STARTUP_FILE_INITIAL, 7000);
+    recordStep('Startup file argument loaded', isMockNativeBridge || startupLoaded, {
+      skipped: isMockNativeBridge,
+      message: startupLoaded ? 'Startup file content loaded.' : 'Startup file content was not loaded.',
+    });
+
+    if (startupLoaded) {
+      const editor = windowRef.document?.querySelector('#editor');
+      const saveButton = windowRef.document?.querySelector('#saveButton');
+      editor.value = STARTUP_FILE_UPDATED;
+      const InputEventCtor = windowRef.InputEvent || windowRef.Event;
+      editor.dispatchEvent(new InputEventCtor('input', { bubbles: true, inputType: 'insertText', data: '' }));
+      saveButton?.click();
+      const saved = await waitForStatus(windowRef, 'startup-file.md saved.', 7000);
+      recordStep('Startup file argument saved through active file handle', saved, {
+        message: saved ? 'Startup file save completed.' : 'Timed out waiting for startup file save.',
+      });
+    } else {
+      recordStep('Startup file argument saved through active file handle', isMockNativeBridge, {
+        skipped: isMockNativeBridge,
+        message: 'Startup file was not loaded.',
+      });
+    }
 
     const fixtureFile = await bridgeClient.openSmokeFixtureFile();
     const fixturePayload = fixtureFile.response?.payload || {};
@@ -206,6 +233,32 @@ function waitForWorkspaceChange(bridgeClient, nativeWorkspaceId, expectedPath) {
         relativeOnly: Boolean(path && !path.startsWith('/') && !/^[a-z]:/i.test(path) && !path.includes('\\')),
       });
     });
+  });
+}
+
+function waitForEditorValue(windowRef, expectedValue, timeoutMs) {
+  return waitUntil(timeoutMs, () => windowRef.document?.querySelector('#editor')?.value === expectedValue);
+}
+
+function waitForStatus(windowRef, expectedText, timeoutMs) {
+  return waitUntil(timeoutMs, () => windowRef.document?.querySelector('#status')?.textContent?.trim() === expectedText);
+}
+
+function waitUntil(timeoutMs, predicate) {
+  return new Promise((resolve) => {
+    const startedAt = Date.now();
+    const timer = setInterval(() => {
+      if (predicate()) {
+        clearInterval(timer);
+        resolve(true);
+        return;
+      }
+
+      if (Date.now() - startedAt >= timeoutMs) {
+        clearInterval(timer);
+        resolve(false);
+      }
+    }, 100);
   });
 }
 

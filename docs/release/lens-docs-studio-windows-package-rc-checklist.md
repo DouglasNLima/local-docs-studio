@@ -10,7 +10,7 @@ Run from the repository root on `develop`:
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
 ```
 
-The script builds the Windows package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus matching JSON metadata under `artifacts/windows/release-candidates/`.
+The script builds the Windows package, validates the packaged `StaticApp/` and file association script dry-runs, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus matching JSON metadata under `artifacts/windows/release-candidates/`.
 
 Use explicit release-candidate version values when preparing a named RC:
 
@@ -23,7 +23,9 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 - [ ] Extract the generated ZIP into a clean local folder.
 - [ ] Launch `LensDocsStudio.Windows.exe` from the extracted folder.
 - [ ] Confirm the app opens without a local HTTP server, GitHub Pages, or a CDN.
-- [ ] Use **Help > Check Windows bridge** and confirm `diagnostics.ping`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, `workspace.createFile`, `workspace.watch`, and `workspace.refreshFile` are reported.
+- [ ] Use **Help > Check Windows bridge** and confirm `diagnostics.ping`, `file.startupOpen`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, `workspace.createFile`, `workspace.watch`, and `workspace.refreshFile` are reported.
+- [ ] Launch `LensDocsStudio.Windows.exe` with a supported `.md` file path argument and confirm that file loads.
+- [ ] Edit the startup file and use **File > Save changes** to confirm it saves through the native handle.
 - [ ] Use **Help > Open feature guide** and confirm the local guide opens in read-only mode.
 - [ ] Use **File > Open file** with a `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` file.
 - [ ] Edit the file and use **File > Save changes**.
@@ -40,21 +42,26 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 - [ ] Delete a workspace file externally and confirm local content is not silently erased.
 - [ ] Rename a workspace file externally and confirm the safe renamed indication.
 - [ ] Disconnect network access or otherwise block internet access, relaunch from the extracted folder, and confirm the app still opens, renders Markdown, renders Mermaid, opens the feature guide, and can run local save workflows.
+- [ ] Run `pwsh -NoLogo -NoProfile -File scripts/windows/Register-WindowsFileAssociations.ps1 -DryRun` and confirm planned HKCU operations are printed without writing.
+- [ ] Run `pwsh -NoLogo -NoProfile -File scripts/windows/Unregister-WindowsFileAssociations.ps1 -DryRun` and confirm planned removals are printed without writing.
+- [ ] If safe on the tester machine, register the package executable, open a supported file through Windows **Open with** or double-click, confirm it loads, then unregister.
 
 ## Certification Claims
 
 - [ ] The package was built by `scripts/windows/Build-WindowsPackage.ps1`.
 - [ ] The packaged `StaticApp/` was validated by `scripts/windows/Test-WindowsStaticAssets.ps1`.
-- [ ] The packaged executable passed `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`.
+- [ ] The file association scripts parsed and passed `-DryRun` validation.
+- [ ] The packaged executable passed `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, including startup file argument load/save.
 - [ ] The generated report records package version, branch, commit SHA, build timestamp, output folder, ZIP path, ZIP size, SHA256 checksum, runtime prerequisites, validation commands, command output, and results.
 - [ ] The package is a folder/ZIP distributable for manual RC testing.
 
 ## Certification Non-Claims
 
-- [ ] No MSIX package, installer wizard, signing, certificates, Store publishing, auto-update, file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included.
+- [ ] No MSIX package, installer wizard, signing, certificates, Store publishing, auto-update, machine-wide file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included.
 - [ ] The RC gate does not prove prerequisites are installed on tester machines.
 - [ ] The RC gate does not perform antivirus reputation checks, accessibility audits, performance benchmarks, telemetry reviews, network interception, or cross-machine install validation.
 - [ ] The RC gate does not certify new editor/runtime behaviour beyond packaged asset validation, packaged native bridge smoke, and this manual checklist.
+- [ ] The file association MVP does not set Windows `UserChoice`, does not guarantee default-app selection without user confirmation, and does not implement single-instance forwarding.
 
 ## Runtime Prerequisites
 

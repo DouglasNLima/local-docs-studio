@@ -68,7 +68,7 @@ public sealed record SmokeOptions(bool Enabled, string? RootPath, int TimeoutSec
         return new SmokeOptions(true, fullRoot, timeoutSeconds);
     }
 
-    private static List<string> SplitArguments(string? arguments)
+    public static List<string> SplitArguments(string? arguments)
     {
         var tokens = new List<string>();
         if (string.IsNullOrWhiteSpace(arguments))

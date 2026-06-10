@@ -68,6 +68,37 @@ function Assert-PackagedFile {
     Assert-Asset (Test-Path -LiteralPath $path -PathType Leaf) "Missing packaged static app file: $relativePath"
 }
 
+function Assert-PowerShellScriptParses {
+    param([string]$Path)
+
+    $tokens = $null
+    $parseErrors = $null
+    [System.Management.Automation.PSParser]::Tokenize((Get-Content -LiteralPath $Path -Raw), [ref]$parseErrors) | Out-Null
+    Assert-Asset (-not $parseErrors -or $parseErrors.Count -eq 0) "PowerShell script has parse errors: $Path"
+}
+
+function Invoke-DryRunScript {
+    param(
+        [string]$Name,
+        [string]$Path
+    )
+
+    Write-AssetLine "Validating $Name dry run..."
+    $output = & pwsh -NoLogo -NoProfile -File $Path -DryRun 2>&1 | ForEach-Object { $_.ToString() }
+    Assert-Asset ($LASTEXITCODE -eq 0) "$Name -DryRun failed: $($output -join [Environment]::NewLine)"
+    Assert-Asset (($output -join [Environment]::NewLine) -match 'DRY RUN|Dry run') "$Name -DryRun did not print dry-run operations."
+}
+
+foreach ($scriptName in @(
+    'Register-WindowsFileAssociations.ps1',
+    'Unregister-WindowsFileAssociations.ps1'
+)) {
+    $scriptPath = Join-Path $PSScriptRoot $scriptName
+    Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows file association script: $scriptName"
+    Assert-PowerShellScriptParses -Path $scriptPath
+    Invoke-DryRunScript -Name $scriptName -Path $scriptPath
+}
+
 if ($StaticAppRoot) {
     $NoBuild = $true
 }

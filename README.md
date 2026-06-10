@@ -28,7 +28,7 @@ Supported runtime modes:
 - Windows shell / packaged local assets: WebView2 loads the copied app through `https://lens-docs-studio.local/`, backed by packaged files rather than a server.
 - Windows shell / offline mode: the packaged shell can load the app, CSS, JavaScript modules, local vendor libraries, the help guide, templates, snippets, and existing export workflows without internet access.
 
-For Windows production usage, a local HTTP server is not required. Runtime dependencies are pinned under `assets/vendor/`, and the Windows project copies `index.html`, `md-mmd-renderer-v5.html`, `manifest.webmanifest`, `icon.svg`, `service-worker.js`, `assets/`, and `docs/` into the desktop output. Offline hardening does not add an installer, auto-update, file associations, account sync, Git integration, native PDF export, or any network fallback.
+For Windows production usage, a local HTTP server is not required. Runtime dependencies are pinned under `assets/vendor/`, and the Windows project copies `index.html`, `md-mmd-renderer-v5.html`, `manifest.webmanifest`, `icon.svg`, `service-worker.js`, `assets/`, and `docs/` into the desktop output. Offline hardening does not add an installer, auto-update, account sync, Git integration, native PDF export, or any network fallback.
 
 Run it locally from the repository root:
 
@@ -48,7 +48,7 @@ Create the Phase 3B folder/ZIP package with:
 pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1
 ```
 
-The package script publishes a framework-dependent `win-x64` folder to `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/`, creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, validates `StaticApp/`, and runs the native bridge smoke harness against the packaged executable unless `-NoSmoke` is passed. Run the package by launching `LensDocsStudio.Windows.exe` from the package folder. The Phase 3B package is intentionally a folder/ZIP distributable; it does not add MSIX, signing, certificates, file associations, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
+The package script publishes a framework-dependent `win-x64` folder to `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/`, creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, validates `StaticApp/`, and runs the native bridge smoke harness against the packaged executable unless `-NoSmoke` is passed. Run the package by launching `LensDocsStudio.Windows.exe` from the package folder. The package is intentionally a folder/ZIP distributable; it does not add MSIX, signing, certificates, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
 
 Certify a Windows package release candidate with:
 
@@ -56,9 +56,9 @@ Certify a Windows package release candidate with:
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
 ```
 
-The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus JSON metadata under `artifacts/windows/release-candidates/`. Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. Phase 3C certification is an audit gate for the folder/ZIP package only; it does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
+The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus JSON metadata under `artifacts/windows/release-candidates/`. Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. The certification is an audit gate for the folder/ZIP package only; it does not add MSIX, signing, certificates, Store publishing, auto-update, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
 
-The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. It does not add recent native folders, file associations, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
+The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
 
@@ -72,21 +72,42 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 2E refines the native workspace conflict UX with distinct changed, deleted, renamed, dirty, and dirty-external-conflict indicators plus explicit refresh/discard prompts.
 - Phase 3B adds the first repeatable folder/ZIP Windows package flow.
 - Phase 3C adds the release-candidate certification gate for the Windows folder/ZIP package.
-- Future Windows work includes a fuller installer path, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
+- Phase 3D adds a controlled Windows file association MVP for manual per-user registration and startup file arguments.
+- Future Windows work includes a fuller installer path, first-run setup, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 
 ### Windows Native Bridge
 
-The Windows shell includes a narrow native bridge. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful Phase 2D response reports `LensDocsStudio.Windows` and the `diagnostics.ping`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, `workspace.createFile`, `workspace.watch`, and `workspace.refreshFile` capabilities.
+The Windows shell includes a narrow native bridge. Use **Help > Check Windows bridge** to send a versioned ping from the web app to the WebView2 host. A successful response reports `LensDocsStudio.Windows` and the `diagnostics.ping`, `file.startupOpen`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, `workspace.createFile`, `workspace.watch`, and `workspace.refreshFile` capabilities.
 
 Native file and workspace operations support `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files. Single files and workspace files are limited to 5 MB per file. Native workspace discovery loads up to 500 supported files and recurses up to 12 directory levels. Oversized, unreadable, invalid UTF-8, or limit-skipped files are reported with safe relative paths and user-facing reasons. The host keeps full paths in memory behind opaque `nativeWorkspaceId` and `nativeHandleId` values; the web app uses those handles for save operations and does not show or export local paths by default.
+
+Startup file arguments use the same native single-file model. When Windows launches `LensDocsStudio.Windows.exe "C:\path\README.md"`, the host validates that the path exists, is a file, uses a supported extension, is no larger than 5 MB, and can be read as UTF-8. After WebView2 and the web bridge are ready, the host sends `lensDocs.native.startupFile` with the normal file payload and a host-owned `nativeHandleId`. Invalid startup files are reported through a safe status message.
 
 Native workspace watching starts after a Windows workspace folder is opened and is disposed when another workspace opens, the app closes, smoke completes, or the watcher fails. The host reports only supported-file changes under the selected root through `lensDocs.native.workspaceChanged`; payload paths are relative and revalidated before the web app marks records. Watcher events are debounced for 500 ms and coalesced so deletes win over changes, create-plus-change remains created, and host-recognised renames are reported as renames. Native save/create operations are suppressed for a short best-effort two-second window; if suppression is uncertain, the app prefers showing an external-change marker.
 
 The web app never auto-merges or auto-reloads dirty content. Changed files are marked as changed outside the app, dirty files keep local edits, deleted active files keep their in-memory content, created files are added as marked workspace records when the host provides a handle, and safe renames update clean records while dirty records remain marked for explicit action. The workspace list uses compact state dots for clean, dirty, externally changed, externally deleted, externally renamed, and dirty external-conflict records. **Refresh active file** uses `lensDocs.native.refreshWorkspaceFile` for native workspace records and confirms before discarding dirty local edits. If a file was deleted outside Lens Docs Studio, refresh does not erase the editor; keep the in-memory content and use **Save as** or copy the text to recover it.
 
-The bridge does not expose recent native folders, file associations, native PDF export, Git operations, shell commands, delete/rename/move operations initiated from the app, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks; native watcher capabilities are unavailable there.
+The bridge does not expose recent native folders, native PDF export, Git operations, shell commands, delete/rename/move operations initiated from the app, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks; native watcher and startup file capabilities are unavailable there.
+
+### Windows File Associations
+
+The file association MVP is for manual development and package testing. It registers per-user `HKCU:\Software\Classes` entries only, requires no administrator rights, and supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+
+Register the current packaged executable:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Register-WindowsFileAssociations.ps1 -ExecutablePath "artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe"
+```
+
+Unregister Lens Docs Studio association keys and values:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Unregister-WindowsFileAssociations.ps1
+```
+
+Both scripts support `-DryRun`. Registration uses ProgIds `LensDocsStudio.Markdown`, `LensDocsStudio.Mermaid`, and `LensDocsStudio.Text` with an open command of `"<path-to-LensDocsStudio.Windows.exe>" "%1"`. The scripts do not write `UserChoice`, do not require machine-wide registry access, and do not remove unrelated user defaults. Windows may still require confirmation in **Open with** or Settings before it makes Lens Docs Studio the default app. This MVP is not MSIX, not signed, not installer-integrated, and does not implement single-instance forwarding.
 
 Automated Windows native bridge smoke:
 
@@ -94,9 +115,9 @@ Automated Windows native bridge smoke:
 pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
 ```
 
-Use `-NoBuild` to reuse the latest built shell, and `-TimeoutSeconds 90` on slower machines. The script creates a temporary smoke root, writes Markdown and Mermaid fixtures, launches the WinUI/WebView2 shell with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, validates saved fixture content, and exits non-zero on failure. It intentionally does not automate Windows file or folder picker UI.
+Use `-NoBuild` to reuse the latest built shell, and `-TimeoutSeconds 90` on slower machines. The script creates a temporary smoke root, writes Markdown and Mermaid fixtures, launches the WinUI/WebView2 shell with `--smoke-native-bridge --smoke-root "<temp-folder>" "<temp-folder>\startup-file.md"`, waits for `smoke-result.json`, validates startup-file and fixture content, and exits non-zero on failure. It intentionally does not automate Windows file or folder picker UI.
 
-The smoke-only bridge capabilities `smoke.nativeFixtures` and `smoke.workspaceChange` plus the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, single-file open/save/save-as, workspace open/save/create, workspace watcher event delivery with relative paths, protocol safety, structured completion, and clean shell shutdown. Phase 2E conflict prompts are covered by fake WebView2 browser tests and the manual smoke path below, keeping the Windows smoke harness small and stable.
+The smoke-only bridge capabilities `smoke.nativeFixtures` and `smoke.workspaceChange` plus the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, startup file argument loading and save, single-file open/save/save-as, workspace open/save/create, workspace watcher event delivery with relative paths, protocol safety, structured completion, and clean shell shutdown. Conflict prompts are covered by fake WebView2 browser tests and the manual smoke path below, keeping the Windows smoke harness small and stable.
 
 Windows packaged asset validation:
 
@@ -104,7 +125,7 @@ Windows packaged asset validation:
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
 ```
 
-Use `-NoBuild` to inspect the latest `StaticApp/` output. The check verifies the shell, service worker cache list, vendor manifest, pinned vendor files, help guide, web manifest, icon, and packaged runtime files, then scans runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
+Use `-NoBuild` to inspect the latest `StaticApp/` output. The check verifies the shell, service worker cache list, vendor manifest, pinned vendor files, help guide, web manifest, icon, packaged runtime files, and Windows file association scripts, then scans runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
 
 Pass `-StaticAppRoot` to validate a specific package output, for example `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/StaticApp`.
 

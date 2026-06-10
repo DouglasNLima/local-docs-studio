@@ -7,7 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const productName = 'Lens Docs Studio';
 const productTagline = 'Local Markdown, Mermaid, and documentation studio';
 const productVersion = '0.1.0';
-const productBuild = '56';
+const productBuild = '57';
 const productBrowserTitle = `${productName} v${productVersion} (build ${productBuild})`;
 const forbiddenShellPhrases = [
   'Power Platform Lens family',

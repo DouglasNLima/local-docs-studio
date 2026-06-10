@@ -13,6 +13,7 @@ $projectPath = Join-Path $repoRoot 'src\windows\LensDocsStudio.Windows\LensDocsS
 $smokeRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("lens-docs-studio-native-smoke-{0}" -f ([guid]::NewGuid().ToString('N')))
 $resultPath = Join-Path $smokeRoot 'smoke-result.json'
 $expectedSingleFile = "# Windows Smoke Single File`n`nSaved by the automated native bridge smoke.`n"
+$expectedStartupFile = "# Windows Smoke Startup File`n`nSaved by the automated native bridge smoke.`n"
 $expectedSaveAs = "# Windows Smoke Save As`n`nWritten by the automated native bridge smoke.`n"
 $expectedWorkspaceFile = "# Windows Smoke Workspace`n`nSaved by the automated native bridge smoke.`n"
 $expectedCreatedFile = "# Windows Smoke Created File`n`nCreated by the automated native bridge smoke.`n"
@@ -64,6 +65,7 @@ New-Item -ItemType Directory -Path (Join-Path $smokeRoot 'workspace\docs') -Forc
 New-Item -ItemType Directory -Path (Join-Path $smokeRoot 'workspace\diagrams') -Force | Out-Null
 
 Set-Content -LiteralPath (Join-Path $smokeRoot 'single-file.md') -Value "# Smoke single file`n`nInitial fixture content." -Encoding utf8
+Set-Content -LiteralPath (Join-Path $smokeRoot 'startup-file.md') -Value "# Startup file`n`nInitial command-line fixture content." -Encoding utf8
 Set-Content -LiteralPath (Join-Path $smokeRoot 'workspace\README.md') -Value "# Smoke workspace`n`nInitial workspace fixture." -Encoding utf8
 Set-Content -LiteralPath (Join-Path $smokeRoot 'workspace\docs\overview.md') -Value "# Overview`n`nWorkspace overview fixture." -Encoding utf8
 Set-Content -LiteralPath (Join-Path $smokeRoot 'workspace\diagrams\sample.mmd') -Value "flowchart TD`n  A-->B" -Encoding utf8
@@ -89,7 +91,8 @@ try {
         '--smoke-root',
         $smokeRoot,
         '--smoke-timeout-seconds',
-        [string]$TimeoutSeconds
+        [string]$TimeoutSeconds,
+        (Join-Path $smokeRoot 'startup-file.md')
     ) -PassThru
 
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -117,6 +120,7 @@ try {
     Assert-Smoke ($failedSteps.Count -eq 0) ("Smoke result reported failed steps: {0}" -f (($failedSteps | ForEach-Object { $_.name }) -join ', '))
 
     Assert-Smoke ((Get-Content -LiteralPath (Join-Path $smokeRoot 'single-file.md') -Raw) -eq $expectedSingleFile) 'Single fixture file was not saved with the expected content.'
+    Assert-Smoke ((Get-Content -LiteralPath (Join-Path $smokeRoot 'startup-file.md') -Raw) -eq $expectedStartupFile) 'Startup file argument was not saved with the expected content.'
     Assert-Smoke ((Test-Path -LiteralPath (Join-Path $smokeRoot 'single-file-copy.md'))) 'Save-as fixture file was not created.'
     Assert-Smoke ((Get-Content -LiteralPath (Join-Path $smokeRoot 'single-file-copy.md') -Raw) -eq $expectedSaveAs) 'Save-as fixture file content was not expected.'
     Assert-Smoke ((Get-Content -LiteralPath (Join-Path $smokeRoot 'workspace\README.md') -Raw) -eq $expectedWorkspaceFile) 'Workspace README was not saved with the expected content.'
@@ -131,11 +135,14 @@ try {
         'WebView2 did not require a local HTTP server',
         'Bridge ping returned LensDocsStudio.Windows',
         'Capabilities include diagnostics.ping',
+        'Capabilities include file.startupOpen',
         'Capabilities include file.open',
         'Capabilities include file.save',
         'Capabilities include file.saveAs',
         'Capabilities include workspace.openFolder',
         'Capabilities include workspace.saveFile',
+        'Startup file argument loaded',
+        'Startup file argument saved through active file handle',
         'Single fixture file opened',
         'Single fixture file saved',
         'Save-as wrote a new file',

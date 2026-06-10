@@ -13,7 +13,7 @@ public sealed partial class MainWindow : Window
     private readonly WebViewBootstrapper webViewBootstrapper;
     private readonly NativeWorkspaceService nativeWorkspaceService;
 
-    public MainWindow(SmokeOptions? smokeOptions = null)
+    public MainWindow(SmokeOptions? smokeOptions = null, string? startupFilePath = null)
     {
         InitializeComponent();
         Title = "Lens Docs Studio";
@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
         webViewBootstrapper = new WebViewBootstrapper(new NativeBridge(
             nativeFileService,
             nativeWorkspaceService,
+            startupFilePath,
             smokeFixtureService,
             smokeCompletionService));
         Closed += (_, _) => nativeWorkspaceService.StopWatching();

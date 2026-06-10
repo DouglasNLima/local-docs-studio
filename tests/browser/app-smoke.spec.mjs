@@ -559,9 +559,15 @@ async function installMockNativeBridge(page, options = {}) {
       webview: {
         postMessage(message) {
           window.__nativeBridgeMessages.push(message);
+          if (message.type === 'lensDocs.native.appReady') {
+            emit(baseResponse(message, 'lensDocs.native.appReadyResult', { ready: true }));
+            return;
+          }
+
           if (message.type === 'lensDocs.native.ping') {
             const capabilities = [
               'diagnostics.ping',
+              'file.startupOpen',
               'file.open',
               'file.save',
               'file.saveAs',
@@ -1611,6 +1617,21 @@ test('native bridge diagnostic sends a strict ping and reports host pong', async
       webview: {
         postMessage(message) {
           window.__nativeBridgeMessages.push(message);
+          if (message.type === 'lensDocs.native.appReady') {
+            const response = {
+              protocolVersion: 1,
+              id: message.id,
+              type: 'lensDocs.native.appReadyResult',
+              source: 'LensDocsStudio.Windows',
+              timestamp: '2026-06-09T00:00:00.000Z',
+              payload: { ready: true },
+            };
+            window.setTimeout(() => {
+              listeners.forEach((listener) => listener({ data: response }));
+            }, 0);
+            return;
+          }
+
           const response = {
             protocolVersion: 1,
             id: message.id,
@@ -1638,7 +1659,7 @@ test('native bridge diagnostic sends a strict ping and reports host pong', async
   await page.getByRole('button', { name: 'Check Windows bridge' }).click();
 
   await expect(page.locator('#status')).toHaveText(/Windows bridge available: LensDocsStudio\.Windows \(diagnostics\.ping\)\./);
-  const [message] = await page.evaluate(() => window.__nativeBridgeMessages);
+  const message = await page.evaluate(() => window.__nativeBridgeMessages.find((item) => item.type === 'lensDocs.native.ping'));
   expect(message).toEqual(expect.objectContaining({
     protocolVersion: 1,
     type: 'lensDocs.native.ping',
@@ -2124,11 +2145,14 @@ test('native smoke runner posts structured success for smoke fixtures', async ({
     'WebView2 did not require a local HTTP server',
     'Bridge ping returned LensDocsStudio.Windows',
     'Capabilities include diagnostics.ping',
+    'Capabilities include file.startupOpen',
     'Capabilities include file.open',
     'Capabilities include file.save',
     'Capabilities include file.saveAs',
     'Capabilities include workspace.openFolder',
     'Capabilities include workspace.saveFile',
+    'Startup file argument loaded',
+    'Startup file argument saved through active file handle',
     'Single fixture file opened',
     'Single fixture file saved',
     'Save-as wrote a new file',

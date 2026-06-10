@@ -61,6 +61,8 @@ export function createFileService({
 
     if (nativeBridgeClient?.on) {
       nativeBridgeClient.on(nativeBridgeMessageTypes.workspaceChanged, handleNativeWorkspaceChanged);
+      nativeBridgeClient.on(nativeBridgeMessageTypes.startupFile, handleNativeStartupFile);
+      nativeBridgeClient.on(nativeBridgeMessageTypes.startupFileError, handleNativeStartupFileError);
     }
 
     async function openFile() {
@@ -127,14 +129,7 @@ export function createFileService({
         }
 
         const name = payload.displayName || payload.name;
-        const content = String(payload.content ?? '');
-        const file = new File([content], name, { type: getMimeTypeForPath(name) });
-        await setLibraryFromRecords([{
-          name,
-          path: name,
-          file,
-          nativeHandleId: payload.nativeHandleId,
-        }], 'Windows file', { workspaceKind: 'file' });
+        await openNativeFilePayload(payload, 'Windows file');
         setStatus(`${name} opened from Windows.`, 'ok');
         return true;
       } catch (error) {
@@ -142,6 +137,37 @@ export function createFileService({
         console.error(error);
         return false;
       }
+    }
+
+    async function handleNativeStartupFile(message) {
+      const payload = message?.payload || {};
+      if (!isValidNativeFilePayload(payload)) {
+        setStatus('Windows could not open the startup file safely.', 'warning');
+        return;
+      }
+
+      await openNativeFilePayload(payload, 'Windows startup file');
+      const name = payload.displayName || payload.name;
+      setStatus(`${name} opened from Windows.`, 'ok');
+    }
+
+    function handleNativeStartupFileError(message) {
+      const errorMessage = message?.payload?.message;
+      setStatus(typeof errorMessage === 'string' && errorMessage.trim()
+        ? errorMessage
+        : 'Windows could not open the startup file safely.', 'warning');
+    }
+
+    async function openNativeFilePayload(payload, libraryName) {
+      const name = payload.displayName || payload.name;
+      const content = String(payload.content ?? '');
+      const file = new File([content], name, { type: getMimeTypeForPath(name) });
+      await setLibraryFromRecords([{
+        name,
+        path: name,
+        file,
+        nativeHandleId: payload.nativeHandleId,
+      }], libraryName, { workspaceKind: 'file' });
     }
 
     async function openFolder() {

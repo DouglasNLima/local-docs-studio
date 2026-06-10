@@ -105,11 +105,24 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - `docs/release/lens-docs-studio-windows-package-rc-checklist.md` captures manual packaged-app smoke steps and explicit certification claims/non-claims.
 - The RC gate certifies only the folder/ZIP package, packaged static runtime validation, packaged native bridge smoke, metadata capture, and documented manual smoke scope. It does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
 
+## Implemented Phase 3D
+
+- The Windows shell accepts supported startup file path arguments for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+- Startup files are validated by the native file service before reading: the path must exist, be a file, use a supported extension, stay within the 5 MB native file limit, and decode as UTF-8.
+- The host waits for WebView2 initialisation and a web-app `lensDocs.native.appReady` message before sending `lensDocs.native.startupFile`.
+- Startup file payloads reuse the native single-file shape with content, display name, extension, and a host-owned opaque `nativeHandleId`; absolute paths stay in the Windows host.
+- Invalid startup file arguments produce safe status messages through `lensDocs.native.startupFileError`; no-argument launch behaviour is unchanged.
+- `scripts/windows/Register-WindowsFileAssociations.ps1` registers per-user HKCU file associations for development/package testing, using `LensDocsStudio.Markdown`, `LensDocsStudio.Mermaid`, and `LensDocsStudio.Text` ProgIds and an open command of `"<path-to-LensDocsStudio.Windows.exe>" "%1"`.
+- `scripts/windows/Unregister-WindowsFileAssociations.ps1` removes only Lens Docs Studio ProgIds and Lens-owned extension values. It leaves unrelated defaults and Windows `UserChoice` keys alone.
+- Both file association scripts support `-DryRun`, and `scripts/windows/Test-WindowsStaticAssets.ps1` parses the scripts and validates dry-run output.
+- The Windows native bridge smoke launches the shell with a temporary startup `.md` file argument, confirms the file loads, saves it through the existing active-file save flow, and validates the file content after smoke completion.
+- This MVP is not MSIX, not signed, not installer-integrated, not machine-wide, and does not implement single-instance forwarding.
+
 ## Future Roadmap
 
 - Fuller Windows installer work for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
-- File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+- Single-instance forwarding for file-open activation.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 
 ## Implemented Windows Smoke Harness
@@ -117,7 +130,7 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` creates controlled temporary fixtures, builds or reuses the Windows shell, launches it with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, checks fixture file content, and exits non-zero on failure.
 - The smoke-only `smoke.nativeFixtures` capability is reported only when `--smoke-native-bridge` is present. Normal Windows shell launches, browser mode, and GitHub Pages mode do not expose smoke fixture APIs.
 - Smoke fixture operations are limited to the explicit smoke root. They do not automate Windows picker UI, expose local environment details, run shell commands, reveal unrestricted paths, or change production bridge validation.
-- The smoke covers shell start, WebView2 app load, bridge diagnostics, native single-file open/save/save-as, native workspace open/save/create, one external workspace watcher event with a relative path, protocol-error reporting, structured completion, and clean shutdown.
+- The smoke covers shell start, WebView2 app load, bridge diagnostics, startup file argument load/save, native single-file open/save/save-as, native workspace open/save/create, one external workspace watcher event with a relative path, protocol-error reporting, structured completion, and clean shutdown.
 
 Run it with:
 
@@ -129,11 +142,11 @@ Use `-NoBuild -TimeoutSeconds 90` to reuse an existing build on slower validatio
 
 ## Non-Goals For Phase 2B
 
-Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
+Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
 
 ## Non-Goals For Phase 2C
 
-Phase 2C does not implement file watchers, external-change live notifications, recent native folders, workspace restore after restart, file associations, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, a full first-run wizard, delete/rename/move operations, arbitrary host command execution, or an editor rewrite.
+Phase 2C does not implement file watchers, external-change live notifications, recent native folders, workspace restore after restart, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, a full first-run wizard, delete/rename/move operations, arbitrary host command execution, or an editor rewrite.
 
 ## Manual Smoke
 

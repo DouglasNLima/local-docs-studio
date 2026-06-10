@@ -793,6 +793,7 @@ export function createAppController() {
     initRecentHandles();
     registerServiceWorker();
     document.documentElement.dataset.appReady = 'true';
+    nativeBridgeClient.notifyAppReady?.();
 
     function installEventHandlers() {
       sampleButton.addEventListener('click', () => loadExample('sample'));
