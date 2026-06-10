@@ -302,6 +302,8 @@ public sealed class NativeBridge
             payload = new
             {
                 host = HostSource,
+                origin = "https://lens-docs-studio.local/",
+                webView2RuntimeAvailable = true,
                 appVersion = GetAppVersion(),
                 capabilities = GetCapabilities(),
             },

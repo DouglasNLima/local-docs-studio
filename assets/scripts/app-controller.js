@@ -18,6 +18,7 @@ import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createDialogService } from './ui/dialog-service.js';
 import { createUiService } from './ui/ui-service.js';
+import { createWindowsSetupService } from './ui/windows-setup-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
@@ -208,6 +209,15 @@ export function createAppController() {
       insertHelperFields,
       insertHelperApplyButton,
       insertHelperCancelButton,
+      windowsSetupDialog,
+      windowsSetupTitle,
+      windowsSetupSummary,
+      windowsSetupStepList,
+      windowsSetupBody,
+      windowsSetupBackButton,
+      windowsSetupNextButton,
+      windowsSetupSkipButton,
+      windowsSetupCloseButton,
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
@@ -746,6 +756,29 @@ export function createAppController() {
         undoEditorChange,
       },
     });
+    const windowsSetupTools = createWindowsSetupService({
+      dom: {
+        windowsSetupDialog,
+        windowsSetupTitle,
+        windowsSetupSummary,
+        windowsSetupStepList,
+        windowsSetupBody,
+        windowsSetupBackButton,
+        windowsSetupNextButton,
+        windowsSetupSkipButton,
+        windowsSetupCloseButton,
+      },
+      callbacks: {
+        openWorkspace: openFolder,
+        openSample: initialiseSample,
+        openFeatureGuide: openToolGuide,
+        startBlankDocument: startBlankSetupDocument,
+        closeOpenMenus,
+        setStatus,
+      },
+      nativeBridgeClient,
+      storageKeys,
+    });
 
     const {
       sample,
@@ -786,6 +819,7 @@ export function createAppController() {
     installScrollSyncHandlers();
     installSelectionSyncHandlers();
     installContextMenuHandlers();
+    windowsSetupTools.installWindowsSetupHandlers();
     installEventHandlers();
     renderLocalLibrary();
     initialiseWelcome();
@@ -794,6 +828,7 @@ export function createAppController() {
     registerServiceWorker();
     document.documentElement.dataset.appReady = 'true';
     nativeBridgeClient.notifyAppReady?.();
+    void windowsSetupTools.maybeOpenFirstRun();
 
     function installEventHandlers() {
       sampleButton.addEventListener('click', () => loadExample('sample'));
@@ -909,6 +944,7 @@ export function createAppController() {
           if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
           if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
+          if (button.dataset.menuAction === 'openWindowsSetup') await windowsSetupTools.openWindowsSetupWizard();
           closeOpenMenus();
         });
       });
@@ -2902,6 +2938,38 @@ ${unresolvedRows}
       updateActiveFileLabel();
       updateSaveButton();
       renderPreview();
+    }
+
+    async function startBlankSetupDocument() {
+      if (!await confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+      const name = 'untitled.md';
+      clearFocusedModes();
+      clearManagedAssets();
+      clearScrollPositions();
+      clearWorkspaceContentCaches();
+      state.files = [{
+        name,
+        path: name,
+        file: new File([''], name, { type: 'text/markdown' }),
+        needsSave: true,
+      }];
+      state.folderName = 'Blank document';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, '');
+      markWorkspaceCleanContent(name, '');
+      state.dirtyPaths.add(name);
+      editor.value = '';
+      editor.placeholder = 'Start writing Markdown here.';
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus('Blank Markdown document ready.', 'ok');
+      editor.focus({ preventScroll: true });
     }
 
     function togglePreviewMaximized(force) {

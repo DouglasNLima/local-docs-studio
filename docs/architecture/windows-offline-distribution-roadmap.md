@@ -118,10 +118,21 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The Windows native bridge smoke launches the shell with a temporary startup `.md` file argument, confirms the file loads, saves it through the existing active-file save flow, and validates the file content after smoke completion.
 - This MVP is not MSIX, not signed, not installer-integrated, not machine-wide, and does not implement single-instance forwarding.
 
+## Implemented Phase 3E
+
+- The Windows shell shows a compact first-run setup wizard only when the app is hosted by `LensDocsStudio.Windows`, the native bridge reports workspace capability, and local browser storage has not recorded completion.
+- Browser, GitHub Pages, local-server, and PWA mode do not auto-open the wizard. **Help > Open setup wizard** can reopen it manually; browser mode shows a safe Windows-only readiness message.
+- Setup completion is stored locally with `lensDocs.windowsSetup.completed`, `lensDocs.windowsSetup.completedAt`, and `lensDocs.windowsSetup.version`. Resetting browser storage may show the wizard again.
+- The readiness step reports only safe data: Windows host detected, native bridge availability, packaged origin, WebView2 runtime availability when reported, and capability labels. It does not expose usernames, machine names, environment variables, executable paths, secrets, or arbitrary local paths.
+- The workspace step calls the existing native `workspace.openFolder` flow only after the user clicks **Open a workspace folder**.
+- The file association step is guidance-only. It shows supported extensions and the per-user registration command, but the app does not write registry keys, does not require administrator rights, does not write `UserChoice`, and does not perform machine-wide setup.
+- The starter step can open the Markdown + Mermaid sample, open the local feature guide, or start an unsaved blank Markdown document.
+- The automated native bridge smoke suppresses the wizard through the smoke-only capability so smoke automation does not need to dismiss first-run setup. Normal launches remain unchanged.
+- This MVP is not MSIX, not an installer wizard, not a WebView2 bootstrapper, not auto-update, not telemetry, not cloud sync, and not a complex settings page.
+
 ## Future Roadmap
 
 - Fuller Windows installer work for offline distribution.
-- First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
 - Single-instance forwarding for file-open activation.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 

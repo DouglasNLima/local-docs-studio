@@ -7,7 +7,7 @@
   <meta name="theme-color" content="#111318" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="data:,">
-  <title>Lens Docs Studio v0.1.0 (build 57)</title>
+  <title>Lens Docs Studio v0.1.0 (build 58)</title>
   <link rel="stylesheet" href="./assets/vendor/katex-0.16.25.min.css" />
   <link rel="stylesheet" href="./assets/styles/app.css" />
 </head>
@@ -19,7 +19,7 @@
         <div>
           <h1>Lens Docs Studio</h1>
           <small>Local Markdown, Mermaid, and documentation studio</small>
-          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 57)</span>
+          <span class="version-badge" id="appVersionBadge">v0.1.0 (build 58)</span>
         </div>
       </div>
 
@@ -280,6 +280,8 @@
             <div class="menu-heading">Diagnostics</div>
             <button type="button" data-menu-action="checkNativeBridge">Check Windows bridge</button>
             <div class="menu-note">Checks the optional Windows host bridge. Browser and PWA mode stay fully local when it is unavailable.</div>
+            <button type="button" data-menu-action="openWindowsSetup">Open setup wizard</button>
+            <div class="menu-note">Opens the compact Windows first-run setup wizard. Browser and PWA mode show a Windows-only readiness message.</div>
             <hr>
             <div class="menu-heading">Workflow tips</div>
             <div class="help-tips">
@@ -826,6 +828,31 @@
       <div class="template-dialog-actions">
         <button type="button" id="insertHelperCancelButton">Cancel</button>
         <button class="primary" type="button" id="insertHelperApplyButton">Insert</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog windows-setup-dialog" id="windowsSetupDialog" aria-labelledby="windowsSetupTitle" aria-describedby="windowsSetupSummary">
+    <form class="utility-dialog-card windows-setup-card" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Windows setup</span>
+        <button class="template-dialog-close" type="button" id="windowsSetupCloseButton" aria-label="Close setup wizard">X</button>
+      </div>
+      <div class="windows-setup-layout">
+        <aside class="windows-setup-steps" aria-label="Setup steps">
+          <ol id="windowsSetupStepList"></ol>
+        </aside>
+        <section class="windows-setup-panel">
+          <h2 id="windowsSetupTitle">Welcome</h2>
+          <p id="windowsSetupSummary">A quick local setup check for the Windows desktop shell.</p>
+          <div class="windows-setup-body" id="windowsSetupBody"></div>
+          <div class="template-dialog-actions windows-setup-footer">
+            <button type="button" id="windowsSetupSkipButton">Skip setup</button>
+            <span class="windows-setup-footer-spacer"></span>
+            <button type="button" id="windowsSetupBackButton">Back</button>
+            <button class="primary" type="button" id="windowsSetupNextButton">Get started</button>
+          </div>
+        </section>
       </div>
     </form>
   </dialog>

@@ -91,7 +91,7 @@ Use `-NoBuild` to inspect the latest build output, or pass `-StaticAppRoot` to v
 
 ## Scope
 
-This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, handles supported startup file arguments, and exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh operations. Fuller installer work, auto-update, recent native folders, single-instance forwarding, delete/rename/move operations initiated from the app, and native export flows are left for later phases.
+This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, handles supported startup file arguments, exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh operations, and supports a compact in-app first-run setup wizard. Fuller installer work, auto-update, recent native folders, single-instance forwarding, delete/rename/move operations initiated from the app, and native export flows are left for later phases.
 
 ## Roadmap
 
@@ -99,8 +99,8 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Folder/ZIP Windows package MVP.
 - Windows folder/ZIP release candidate certification.
 - Windows file associations MVP.
+- Windows first-run setup wizard MVP.
 - Fuller Windows installer work.
-- First-run setup wizard.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 
 GitHub Pages should stay available as a secondary web demo, fallback, and validation target for the shared static runtime.
@@ -133,6 +133,24 @@ Watcher events are debounced for 500 ms and coalesced: deletes win over changes,
 The web app owns all user-facing decisions. It marks records as externally changed, preserves dirty in-memory edits, keeps deleted active-file content in memory, adds safe created files when the host provides a handle, updates clean renamed records, and reloads only when the user explicitly uses **Refresh active file**. Native refresh uses `lensDocs.native.refreshWorkspaceFile` and reads only a validated file that belongs to the selected native workspace. Phase 2E adds compact changed, deleted, renamed, dirty, and dirty-external-conflict markers in the workspace list. Dirty refresh prompts must be confirmed before local edits are discarded; cancelled refresh keeps the editor content and marker. Deleted-file refresh reports that the file no longer exists and keeps the in-memory content available for **Save as** or copying.
 
 The bridge intentionally does not expose recent native folders, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, absolute workspace paths, delete/rename/move operations initiated from the app, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
+
+## First-Run Setup Wizard
+
+The Windows shell can show a compact first-run setup wizard after the web app confirms the Windows native bridge. It appears only in the Windows desktop shell when `lensDocs.windowsSetup.completed` is absent from local browser storage. Browser, GitHub Pages, local-server, and PWA launches do not auto-open it.
+
+The wizard is an in-app onboarding aid, not an installer wizard. It checks safe readiness details, offers the native workspace folder picker, shows file association guidance, and can open a starter document. It can be skipped, and it can be reopened later from **Help > Open setup wizard**.
+
+Stored local keys:
+
+- `lensDocs.windowsSetup.completed`
+- `lensDocs.windowsSetup.completedAt`
+- `lensDocs.windowsSetup.version`
+
+The readiness step reports only safe host data: `LensDocsStudio.Windows`, the packaged origin, a WebView2 runtime availability flag when the host can report it, and capability labels such as `diagnostics.ping`, `file.open`, and `workspace.openFolder`. It does not expose usernames, machine names, environment variables, full executable paths, arbitrary local paths, or secrets.
+
+File association setup is guidance-only in the wizard. It lists `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, then shows the per-user `Register-WindowsFileAssociations.ps1` command for the packaged executable. The app does not write registry keys, does not require administrator rights, does not write `UserChoice`, and does not perform machine-wide setup.
+
+The automated native bridge smoke is not required to complete the wizard. Smoke launches expose the smoke-only bridge capability, and the web app suppresses first-run setup for that capability so existing smoke automation can run without modal interaction. Normal launches still show first-run setup when storage is clean.
 
 ## Windows File Associations
 

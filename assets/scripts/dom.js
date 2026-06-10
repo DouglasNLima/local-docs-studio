@@ -172,6 +172,15 @@ export const domIds = {
   insertHelperFields: 'insertHelperFields',
   insertHelperApplyButton: 'insertHelperApplyButton',
   insertHelperCancelButton: 'insertHelperCancelButton',
+  windowsSetupDialog: 'windowsSetupDialog',
+  windowsSetupTitle: 'windowsSetupTitle',
+  windowsSetupSummary: 'windowsSetupSummary',
+  windowsSetupStepList: 'windowsSetupStepList',
+  windowsSetupBody: 'windowsSetupBody',
+  windowsSetupBackButton: 'windowsSetupBackButton',
+  windowsSetupNextButton: 'windowsSetupNextButton',
+  windowsSetupSkipButton: 'windowsSetupSkipButton',
+  windowsSetupCloseButton: 'windowsSetupCloseButton',
 };
 
 export function getDomElements(root = document) {

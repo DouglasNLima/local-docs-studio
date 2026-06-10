@@ -23,6 +23,13 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 - [ ] Extract the generated ZIP into a clean local folder.
 - [ ] Launch `LensDocsStudio.Windows.exe` from the extracted folder.
 - [ ] Confirm the app opens without a local HTTP server, GitHub Pages, or a CDN.
+- [ ] With clean WebView2 app storage, confirm the first-run setup wizard appears.
+- [ ] Use **Skip setup**, relaunch, and confirm the wizard does not auto-open again.
+- [ ] Use **Help > Open setup wizard** and confirm it reopens after completion.
+- [ ] In the setup wizard, confirm runtime readiness reports the Windows host, native bridge, packaged origin, WebView2 runtime availability when reported, and safe capability labels.
+- [ ] In the setup wizard, use **Open a workspace folder** and confirm it opens the normal native folder picker.
+- [ ] In the setup wizard, confirm file association guidance lists `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` and does not write registry keys.
+- [ ] In the setup wizard, open the Markdown + Mermaid sample or feature guide and confirm it loads.
 - [ ] Use **Help > Check Windows bridge** and confirm `diagnostics.ping`, `file.startupOpen`, `file.open`, `file.save`, `file.saveAs`, `workspace.openFolder`, `workspace.saveFile`, `workspace.createFile`, `workspace.watch`, and `workspace.refreshFile` are reported.
 - [ ] Launch `LensDocsStudio.Windows.exe` with a supported `.md` file path argument and confirm that file loads.
 - [ ] Edit the startup file and use **File > Save changes** to confirm it saves through the native handle.
@@ -52,12 +59,13 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 - [ ] The packaged `StaticApp/` was validated by `scripts/windows/Test-WindowsStaticAssets.ps1`.
 - [ ] The file association scripts parsed and passed `-DryRun` validation.
 - [ ] The packaged executable passed `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, including startup file argument load/save.
+- [ ] The first-run setup wizard was manually checked or explicitly deferred with a reason.
 - [ ] The generated report records package version, branch, commit SHA, build timestamp, output folder, ZIP path, ZIP size, SHA256 checksum, runtime prerequisites, validation commands, command output, and results.
 - [ ] The package is a folder/ZIP distributable for manual RC testing.
 
 ## Certification Non-Claims
 
-- [ ] No MSIX package, installer wizard, signing, certificates, Store publishing, auto-update, machine-wide file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included.
+- [ ] No MSIX package, installer wizard, signing, certificates, Store publishing, auto-update, machine-wide file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included. The first-run setup wizard is in-app onboarding only.
 - [ ] The RC gate does not prove prerequisites are installed on tester machines.
 - [ ] The RC gate does not perform antivirus reputation checks, accessibility audits, performance benchmarks, telemetry reviews, network interception, or cross-machine install validation.
 - [ ] The RC gate does not certify new editor/runtime behaviour beyond packaged asset validation, packaged native bridge smoke, and this manual checklist.

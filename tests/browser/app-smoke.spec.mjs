@@ -514,6 +514,10 @@ async function installMockNativeBridge(page, options = {}) {
   await page.addInitScript((options) => {
     const smokeEnabled = Boolean(options.smoke);
     const listeners = [];
+    if (!options.setupIncomplete) {
+      window.localStorage.setItem('lensDocs.windowsSetup.completed', 'true');
+      window.localStorage.setItem('lensDocs.windowsSetup.version', 'test');
+    }
     window.__nativeBridgeMessages = [];
     window.__nativeBridgeSaves = [];
     window.__nativeBridgeSmokeResults = [];
@@ -1701,6 +1705,123 @@ test('native bridge diagnostic handles malformed host responses safely', async (
   await page.getByRole('button', { name: 'Check Windows bridge' }).click();
 
   await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
+});
+
+test('browser mode does not auto-show Windows setup wizard', async ({ page }) => {
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Open setup wizard' }).click();
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Runtime readiness');
+  await expect(page.locator('#status')).toHaveText('Windows setup is only available in the Windows desktop shell.');
+});
+
+test('fake Windows bridge mode auto-shows first-run setup wizard', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Welcome');
+  await expect(page.locator('#windowsSetupSummary')).toContainText('Windows desktop shell');
+});
+
+test('Windows setup wizard can be skipped and stays completed on reload', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Skip setup' }).click();
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  const stored = await page.evaluate(() => ({
+    completed: window.localStorage.getItem('lensDocs.windowsSetup.completed'),
+    completedAt: window.localStorage.getItem('lensDocs.windowsSetup.completedAt'),
+    version: window.localStorage.getItem('lensDocs.windowsSetup.version'),
+  }));
+  expect(stored.completed).toBe('true');
+  expect(stored.completedAt).toEqual(expect.any(String));
+  expect(stored.version).toBe('phase-3e-mvp');
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+});
+
+test('Help menu reopens completed Windows setup wizard', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Open setup wizard' }).click();
+
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Welcome');
+});
+
+test('Windows setup runtime readiness shows safe capability labels', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Runtime readiness');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Windows host detected');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Native bridge available');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace.openFolder');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace.refreshFile');
+  await expect(page.locator('#windowsSetupBody')).not.toContainText('Users\\');
+});
+
+test('Windows setup workspace step opens native folder only when clicked', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Workspace');
+
+  let openFolderMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((item) => item.type === 'lensDocs.native.openFolder').length);
+  expect(openFolderMessages).toBe(0);
+
+  await page.getByRole('button', { name: 'Open a workspace folder' }).click();
+  await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('File associations');
+  openFolderMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((item) => item.type === 'lensDocs.native.openFolder').length);
+  expect(openFolderMessages).toBe(1);
+});
+
+test('Windows setup file association step is guidance only', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue without workspace' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('File associations');
+  await expect(page.locator('#windowsSetupBody')).toContainText('does not write registry keys');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Register-WindowsFileAssociations.ps1');
+
+  const nativeTypes = await page.evaluate(() => window.__nativeBridgeMessages.map((item) => item.type));
+  expect(nativeTypes).not.toContain('lensDocs.native.registerFileAssociations');
+});
+
+test('Windows setup starter step opens sample and completes', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue without workspace' }).click();
+  await page.getByRole('button', { name: 'I will do this later' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Starter document');
+
+  await page.getByRole('button', { name: 'Open Markdown + Mermaid sample' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('sample.md');
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Done');
+  await page.getByRole('button', { name: 'Start using Lens Docs Studio' }).click();
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  await expect.poll(async () => page.evaluate(() => window.localStorage.getItem('lensDocs.windowsSetup.completed'))).toBe('true');
 });
 
 test('fake WebView2 bridge opens, saves, and saves as native files', async ({ page }) => {

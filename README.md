@@ -58,7 +58,7 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 
 The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus JSON metadata under `artifacts/windows/release-candidates/`. Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. The certification is an audit gate for the folder/ZIP package only; it does not add MSIX, signing, certificates, Store publishing, auto-update, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
 
-The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
+The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. The Windows first-run setup wizard appears only in the Windows shell, can be skipped, can be reopened from **Help > Open setup wizard**, and stores completion in browser-local storage. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
 
@@ -73,9 +73,11 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3B adds the first repeatable folder/ZIP Windows package flow.
 - Phase 3C adds the release-candidate certification gate for the Windows folder/ZIP package.
 - Phase 3D adds a controlled Windows file association MVP for manual per-user registration and startup file arguments.
-- Future Windows work includes a fuller installer path, first-run setup, single-instance forwarding, and a release flow from `develop` to `main`.
+- Phase 3E adds a compact in-app Windows first-run setup wizard for runtime readiness, optional workspace opening, file association guidance, and starter documents.
+- Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
+See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge
 
@@ -90,6 +92,16 @@ Native workspace watching starts after a Windows workspace folder is opened and 
 The web app never auto-merges or auto-reloads dirty content. Changed files are marked as changed outside the app, dirty files keep local edits, deleted active files keep their in-memory content, created files are added as marked workspace records when the host provides a handle, and safe renames update clean records while dirty records remain marked for explicit action. The workspace list uses compact state dots for clean, dirty, externally changed, externally deleted, externally renamed, and dirty external-conflict records. **Refresh active file** uses `lensDocs.native.refreshWorkspaceFile` for native workspace records and confirms before discarding dirty local edits. If a file was deleted outside Lens Docs Studio, refresh does not erase the editor; keep the in-memory content and use **Save as** or copy the text to recover it.
 
 The bridge does not expose recent native folders, native PDF export, Git operations, shell commands, delete/rename/move operations initiated from the app, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks; native watcher and startup file capabilities are unavailable there.
+
+### Windows First-Run Setup
+
+The Windows shell shows a compact first-run setup wizard when `lensDocs.windowsSetup.completed` is not present in local browser storage. Browser, GitHub Pages, local-server, and PWA mode do not auto-open it. Users can skip setup, finish setup, or reopen it later through **Help > Open setup wizard**. Resetting local browser storage may show it again.
+
+The wizard checks safe Windows readiness details: host identity, native bridge availability, packaged origin, WebView2 runtime availability when reported, and bridge capability labels. It can open the existing native workspace folder picker, show guidance for the per-user file association scripts, open the Markdown + Mermaid sample, open the local feature guide, or start an unsaved blank Markdown document.
+
+File association setup remains guidance-only inside the wizard. It shows the supported extensions and the `Register-WindowsFileAssociations.ps1` command, but the app itself does not write registry keys, does not require administrator rights, and does not write Windows `UserChoice`. The completion state uses `lensDocs.windowsSetup.completed`, `lensDocs.windowsSetup.completedAt`, and `lensDocs.windowsSetup.version`.
+
+The automated native bridge smoke suppresses first-run setup by using the smoke-only bridge capability. Normal Windows launches are unaffected.
 
 ### Windows File Associations
 
