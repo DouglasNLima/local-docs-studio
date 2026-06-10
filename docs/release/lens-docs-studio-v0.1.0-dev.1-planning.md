@@ -148,7 +148,7 @@ Do not create labels during Phase 3R. If issue volume starts, use this candidate
 ## Proposed Phase Sequence
 
 - Phase 3S: Implement `v0.1.0-dev.1` targeted fixes.
-- Phase 3T: Build and certify `v0.1.0-dev.1` ZIP/installer assets.
+- Phase 3T: Create the `v0.1.0-dev.1` certification plan and decide whether new ZIP/installer assets are needed.
 - Phase 3U: Publish `v0.1.0-dev.1` prerelease, if certified.
 
 ## Recommendation

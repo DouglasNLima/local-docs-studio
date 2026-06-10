@@ -31,6 +31,8 @@ Use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md` for structured
 
 Phase 3R triage for the next targeted prerelease cycle is recorded in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`.
 
+Phase 3T certification planning is recorded in `docs/release/lens-docs-studio-v0.1.0-dev.1-certification-plan.md`.
+
 Recommended next-cycle path:
 
 - Choose `v0.1.0-dev.1` for targeted prerelease fixes or documentation corrections.

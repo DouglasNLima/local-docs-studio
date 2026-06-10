@@ -51,5 +51,6 @@ The manual human-only watcher/conflict pass has not been executed in Phase 3S. I
 ## Notes
 
 - Phase 3S added this checklist only; it did not fake manual evidence.
+- Phase 3T carried this requirement forward in `docs/release/lens-docs-studio-v0.1.0-dev.1-certification-plan.md`; it still must not be marked passed without a real packaged Windows picker pass.
 - Supporting automated coverage remains the native bridge smoke and focused browser regressions for watcher/conflict behaviour.
 - If any checklist item fails, capture exact steps, screenshots where useful, affected file state, and whether content was preserved before deciding whether the issue blocks `v0.1.0-dev.1`.
