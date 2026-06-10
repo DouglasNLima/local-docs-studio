@@ -76,6 +76,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps
 
 The review gate reruns release preparation in dry-run mode, validates the ZIP, checksum, RC report, release notes, tag/target strategy, and generated GitHub CLI command, then writes an ignored review report under `artifacts/releases/<tag>/`. A ready result means the artefact set is suitable for an intentional manual draft prerelease step; it still does not publish, upload, create tags, sign the ZIP, or merge to `main`.
 
+Review an existing GitHub draft prerelease with `docs/release/lens-docs-studio-draft-release-review.md`. The checklist covers live release metadata, notes, assets, ZIP download, SHA256 verification, extraction, packaged app launch, native bridge smoke, remaining manual RC tester checks, known limitations, and the draft-release verdict without publishing.
+
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. The Windows first-run setup wizard appears only in the Windows shell, can be skipped, can be reopened from **Help > Open setup wizard**, and stores completion in browser-local storage. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
@@ -95,6 +97,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3F records the Windows installer decision gate: ZIP and GitHub Releases first, then an MSIX/classic installer spike once signing and update strategy are clear.
 - Phase 3G adds a dry-run-first GitHub Release ZIP publication flow for preparing release notes, checksum, RC report, and the `gh release create` command.
 - Phase 3H adds a dry-run review gate for certifying the prepared GitHub Release artefact set before any intentional draft prerelease publication.
+- Phase 3J adds the live GitHub draft release review checklist for keeping an uploaded prerelease draft ready for internal RC testing without publishing it.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -366,6 +369,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `docs/integration/lens-artifact-bundle-producer-guide.md` documents how compatible tools can create safe optional artefact bundle ZIPs.
 - `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md` captures the release candidate smoke checklist for the artefact bundle flow.
 - `docs/release/lens-docs-studio-windows-package-rc-checklist.md` captures the Windows folder/ZIP package release candidate checklist.
+- `docs/release/lens-docs-studio-draft-release-review.md` captures the live GitHub draft prerelease review checklist.
 - `tests/fixtures/artifact-bundles/` contains source-controlled Markdown, Mermaid, JSON, and asset fixtures used to build deterministic ZIPs during browser tests.
 - `src/windows/LensDocsStudio.Windows/` contains the optional WinUI 3 and WebView2 desktop shell that hosts the same static app from local packaged files.
 

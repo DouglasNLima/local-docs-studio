@@ -117,6 +117,12 @@ gh release create v0.1.0-dev `
 
 Do not run the command manually unless the release notes, checksum, and RC report have been reviewed.
 
+## Review An Existing Draft
+
+After a draft prerelease has been created and assets have been uploaded, use `docs/release/lens-docs-studio-draft-release-review.md` to inspect the GitHub release metadata, release notes, uploaded assets, downloaded ZIP, checksum, extraction, packaged executable, native bridge smoke, manual tester workflow, known limitations, and draft-release verdict.
+
+This review keeps the release as a draft. It does not publish, create another release, move tags, rebuild assets, or merge to `main`.
+
 ## Checksum Validation
 
 The generated `.sha256` file contains:

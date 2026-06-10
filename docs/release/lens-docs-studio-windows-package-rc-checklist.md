@@ -22,6 +22,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -
 
 That script prepares the release artefact folder, checksum, generated release notes, RC report copy, and draft prerelease GitHub CLI command. It does not publish, upload files, create local tags, sign the package, add an installer, add auto-update, or merge to `main`. See `docs/release/github-release-publication-flow.md`.
 
+When a real draft prerelease already exists on GitHub, use `docs/release/lens-docs-studio-draft-release-review.md` to review the live draft metadata, uploaded assets, downloaded ZIP checksum, extraction, native bridge smoke, and remaining manual RC tester checks without publishing the release.
+
 Use explicit release-candidate version values when preparing a named RC:
 
 ```powershell
