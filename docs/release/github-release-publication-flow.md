@@ -2,6 +2,8 @@
 
 Phase 3G prepares a repeatable GitHub Release publication flow for the certified Windows folder/ZIP package. It operationalises the Phase 3F decision to use GitHub Releases for ZIP artefacts while MSIX, classic installers, signing, prerequisite bootstrapping, and auto-update remain deferred.
 
+Phase 3L keeps this ZIP publication flow as the internal RC fallback and recommends `Phase 3M - Classic Installer MVP with Inno Setup`. Until that installer exists and signing policy is chosen, the GitHub Release ZIP remains the auditable distribution artefact for controlled testing.
+
 The default path is safe: it creates local release artefacts and prints the GitHub CLI command, but it does not create a GitHub release and does not upload files.
 
 ## Prepare A Dry Run
@@ -156,6 +158,7 @@ This flow does not add:
 - Code signing.
 - MSIX.
 - A classic installer.
+- The Phase 3L recommended Inno Setup MVP.
 - Auto-update.
 - WebView2 bootstrapper or Fixed Version Runtime bundling.
 - Machine-wide file associations.

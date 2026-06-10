@@ -144,6 +144,8 @@ Review date: `2026-06-10`
 
 Draft release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/untagged-79b1580fe9b2fc43270b`
 
+Follow-up decision: Phase 3L keeps this draft as an internal RC and proceeds with the installer spike in `docs/architecture/windows-installer-spike.md`. The spike recommends `Phase 3M - Classic Installer MVP with Inno Setup` while preserving the ZIP release as the fallback RC artefact.
+
 ZIP SHA256 verification:
 
 ```text

@@ -81,6 +81,8 @@ Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual p
 
 Phase 3F records the installer decision gate in `docs/architecture/windows-installer-decision-gate.md`. The accepted short-term path is to keep the certified folder/ZIP artefact for release candidates and GitHub Releases, then run a separate MSIX/classic installer spike before adding production installer scripts, signing, prerequisite bootstrapping, auto-update, or winget metadata.
 
+Phase 3L records that spike in `docs/architecture/windows-installer-spike.md`. It recommends `Phase 3M - Classic Installer MVP with Inno Setup`, with the current ZIP package retained as the internal RC fallback. The recommendation does not add a production installer, signing, runtime bootstrapper, WebView2 bootstrapper, auto-update, or winget metadata yet.
+
 Prepare a dry-run GitHub Release artefact set from the repository root:
 
 ```powershell
@@ -120,7 +122,8 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Windows first-run setup wizard MVP.
 - Windows installer decision gate.
 - GitHub Release ZIP publication flow.
-- Fuller Windows installer work.
+- Classic installer MVP with Inno Setup.
+- Later fuller Windows installer work, signing, prerequisite bootstrapping, MSIX reassessment, and winget publication.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 
 GitHub Pages should stay available as a secondary web demo, fallback, and validation target for the shared static runtime.

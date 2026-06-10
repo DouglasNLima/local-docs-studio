@@ -153,10 +153,20 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The gate writes an ignored review report under `artifacts/releases/<tag>/` with the product, version, tag, target commit, package ZIP, SHA256 value, RC report path, release notes path, generated command, verdict, manual publication checklist, and known limitations.
 - `CERTIFIED_DRAFT_RELEASE_READY` means the local dry-run artefacts are ready for an intentional manual draft prerelease publication step. It does not publish, upload, create tags, sign the ZIP, add MSIX, add a classic installer, add auto-update, or merge to `main`.
 
+## Implemented Phase 3L
+
+- `docs/architecture/windows-installer-spike.md` records the MSIX versus classic installer spike after the internal RC manual smoke passed with notes.
+- The spike compares MSIX, WiX Toolset, Inno Setup, continuing ZIP plus GitHub Releases only, and a later winget path.
+- The recommended next phase is `Phase 3M - Classic Installer MVP with Inno Setup`.
+- The current ZIP and GitHub Releases path remains the internal RC fallback while the installer remains unsigned and prototype-only.
+- Runtime prerequisites stay documented and framework-dependent for now: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
+- WebView2 bootstrapper, Fixed Version Runtime, runtime bootstrappers, code signing, auto-update, public publication, MSIX, WiX, and production Inno installer output remain out of scope for Phase 3L.
+
 ## Future Roadmap
 
 - MSIX versus classic installer spike for offline distribution.
-- Chosen Windows installer MVP with signing, prerequisite handling, shortcuts, uninstall, and file associations.
+- Classic installer MVP with Inno Setup, using the existing certified folder package as input and keeping ZIP as fallback.
+- Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.
 - Single-instance forwarding for file-open activation.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 

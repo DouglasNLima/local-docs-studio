@@ -4,6 +4,8 @@
 
 Accepted for Phase 3F.
 
+Phase 3L follow-up: `docs/architecture/windows-installer-spike.md` completed the MSIX versus classic installer spike and recommends `Phase 3M - Classic Installer MVP with Inno Setup`.
+
 ## Context
 
 Lens Docs Studio has a Windows-first path on `develop` while the shared static app remains compatible with GitHub Pages and local static hosting. The Windows shell is a thin WinUI 3 and WebView2 host that loads packaged local static assets from `StaticApp/` through `https://lens-docs-studio.local/`.
@@ -179,9 +181,9 @@ After an installer path is selected, GitHub Releases can add signed MSIX or clas
 
 1. Phase 3F: publish this decision gate and update references in the existing Windows docs.
 2. Phase 3G: add the dry-run-first GitHub Release ZIP publication flow, including release notes, checksum, RC report, and GitHub CLI command preparation.
-3. Phase 3H candidate: run an installer spike with MSIX and one classic installer technology, using clean-machine validation.
-4. Phase 3I candidate: implement the chosen installer MVP with signing, prerequisite handling, shortcuts, uninstall, and file associations.
-5. Later phase: decide auto-update and winget publication after installer artefacts are stable and signed.
+3. Phase 3L: run an installer spike with MSIX, WiX Toolset, Inno Setup, ZIP-only, and winget-path evaluation.
+4. Phase 3M candidate: implement a classic installer MVP with Inno Setup, using the existing certified folder package as input.
+5. Later phase: decide signing, prerequisite bootstrapping, auto-update, MSIX reassessment, and winget publication after installer artefacts are stable.
 
 ## Out Of Scope
 
@@ -230,7 +232,7 @@ Future installer validation should include:
 
 ## Open Questions
 
-- Which classic installer technology should be prototyped first: WiX, Inno Setup, or another option?
+- Which Inno Setup MVP details should be implemented first: install location, prerequisite checks, optional file association task, and silent install validation?
 - Is MSIX sideloading acceptable for the intended first external tester audience?
 - Will public distribution use a commercial code-signing certificate before installer MVP?
 - Should the app eventually support App Installer updates, an installer-owned updater, winget upgrades, or manual GitHub Release updates only?

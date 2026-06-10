@@ -60,6 +60,8 @@ The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`
 
 The Phase 3F installer decision gate keeps the folder/ZIP package as the short-term release candidate artefact and defers MSIX or classic installer implementation to a separate spike after signing, prerequisite, file association, and update policy decisions. See `docs/architecture/windows-installer-decision-gate.md`.
 
+The Phase 3L installer spike compares MSIX, WiX Toolset, Inno Setup, continuing ZIP plus GitHub Releases, and a later winget path. It recommends `Phase 3M - Classic Installer MVP with Inno Setup` while keeping the certified ZIP as the internal RC fallback. See `docs/architecture/windows-installer-spike.md`.
+
 Prepare a dry-run GitHub Release artefact set with:
 
 ```powershell
@@ -98,10 +100,12 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3G adds a dry-run-first GitHub Release ZIP publication flow for preparing release notes, checksum, RC report, and the `gh release create` command.
 - Phase 3H adds a dry-run review gate for certifying the prepared GitHub Release artefact set before any intentional draft prerelease publication.
 - Phase 3J adds the live GitHub draft release review checklist for keeping an uploaded prerelease draft ready for internal RC testing without publishing it.
+- Phase 3L records the MSIX versus classic installer spike and recommends a classic installer MVP with Inno Setup.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 See `docs/architecture/windows-installer-decision-gate.md` for the installer strategy decision gate.
+See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer spike and Phase 3M recommendation.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge
