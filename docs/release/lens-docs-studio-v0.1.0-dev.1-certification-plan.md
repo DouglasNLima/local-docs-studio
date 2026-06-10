@@ -3,7 +3,7 @@
 ## Context
 
 - Current published prerelease: `v0.1.0-dev` at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev`
-- Current develop commit: `2db2ced6bbd2a2f0cf4596bcb3b43622b2391d84`
+- Current develop commit: `a5e471e133351008f2a116aceefa980c63dcaad4`
 - Previous release target: `v0.1.0-dev`
 - Planned release tag: `v0.1.0-dev.1`
 - Planning date: `2026-06-10`
@@ -22,7 +22,7 @@ The changes known at certification-planning time are release documentation, guid
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
-- Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U packaged ZIP launch/setup was attempted, but the manual human-only Windows picker observations are `BLOCKED`.
+- Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U.1 packaged ZIP retry launched the app, but the manual evidence is `BLOCKED` at the folder-picker gate because **Open folder** produced an `Open` file dialog and the app reported `Native bridge did not respond.`
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
 - Any runtime/package/installer config changes: none identified.
 
@@ -38,7 +38,13 @@ Result:
 
 Evidence notes:
 
-Phase 3U downloaded and extracted the published `v0.1.0-dev` ZIP asset, prepared a temporary `%TEMP%\LensDocsStudio-WatcherManual` workspace, and launched `LensDocsStudio.Windows.exe` from the extracted packaged app. The required human-only observations through the real Windows folder picker were not completed, so the evidence remains blocked rather than passed.
+Phase 3U.1 downloaded and extracted the published `v0.1.0-dev` ZIP asset, prepared a temporary `%TEMP%\LDS-WatcherManual` workspace, launched `LensDocsStudio.Windows.exe` from the extracted packaged app, and reached the real packaged app UI. The installed app source was unavailable, so the published ZIP was used.
+
+The required observations through the real Windows folder picker were not completed. Invoking **Open folder** displayed an `Open` file dialog with Markdown/Mermaid file filters, and the app status reported `Native bridge did not respond.` Because the required folder picker could not be used to select the workspace folder, the manual evidence remains blocked rather than passed.
+
+Blocker category: `MANUAL_WATCHER_CONFLICT_BLOCKED_FOLDER_PICKER`
+
+Recommended next action: add a temporary operator debug overlay.
 
 Automated browser tests, fake WebView2 coverage, or packaged launch alone are not substitutes for this item. Before `v0.1.0-dev.1` is published, a tester should complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` against a ZIP or installed Windows shell build and update the result to `PASS`, `PASS_WITH_NOTES`, or `FAILED`.
 
@@ -131,4 +137,4 @@ Future phase:
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Because the current scope is docs-only and the watcher/conflict manual evidence remains blocked, do not publish `v0.1.0-dev.1` yet. Prefer completing the manual evidence pass first, then either keep these docs on `develop` for `v0.1.0-rc.1` planning or publish a docs-only prerelease only if there is a clear communication reason.
+Because the current scope is docs-only and the watcher/conflict manual evidence remains blocked at the folder-picker gate, do not publish `v0.1.0-dev.1` yet. Prefer adding a temporary operator debug overlay before the next manual retry, then either keep these docs on `develop` for `v0.1.0-rc.1` planning or publish a docs-only prerelease only if there is a clear communication reason.

@@ -10,13 +10,13 @@ Do not mark items as passed unless a tester performed the action through the rea
 
 | Field | Value |
 | --- | --- |
-| Tester | Codex attempted packaged launch; human-only UI observation not completed. |
-| Date | 2026-06-10 |
+| Tester | Codex attempted packaged launch and folder-picker retry; manual watcher observations not completed. |
+| Date | 2026-06-10 23:41:20 +01:00 |
 | Build or installer asset | `LensDocsStudio.Windows-0.1.0-dev.zip` from the published `v0.1.0-dev` prerelease |
-| Commit SHA | `7f8d6f048312c338844ed75440861739c9b10992` |
+| Commit SHA | App asset version `0.1.0-dev+8b215d039188af94d32857239e6829916f4b74fc`; docs retry run from `a5e471e133351008f2a116aceefa980c63dcaad4` |
 | Windows version | Microsoft Windows 11 Home `10.0.26200` |
 | Install method | Extracted ZIP app from the published prerelease |
-| Workspace path type | Temporary local folder under `%TEMP%\LensDocsStudio-WatcherManual` |
+| Workspace path type | Temporary local folder under `%TEMP%\LDS-WatcherManual` |
 
 ## Phase 3U Attempt
 
@@ -78,3 +78,34 @@ Scenario results:
 - Phase 3U confirmed the published ZIP could be downloaded, extracted, and launched, but did not complete the human-only UI evidence. A future tester must still perform the checklist and update this verdict to `MANUAL_WATCHER_CONFLICT_PASS`, `MANUAL_WATCHER_CONFLICT_PASS_WITH_NOTES`, or `MANUAL_WATCHER_CONFLICT_FAILED`.
 - Supporting automated coverage remains the native bridge smoke and focused browser regressions for watcher/conflict behaviour.
 - If any checklist item fails, capture exact steps, screenshots where useful, affected file state, and whether content was preserved before deciding whether the issue blocks `v0.1.0-dev.1`.
+
+## Phase 3U.1 Retry Attempt
+
+Phase 3U.1 used the simplified step-by-step flow and did not modify the published `v0.1.0-dev` release, tags, or assets.
+
+- Release checked: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev`
+- Asset source used: `LensDocsStudio.Windows-0.1.0-dev.zip` from the published `v0.1.0-dev` prerelease, because the installed app was not present at `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe`
+- Extracted packaged app: `%TEMP%\LensDocsStudio-v0.1.0-dev-release\extracted\LensDocsStudio.Windows.exe`
+- Manual workspace: `%TEMP%\LDS-WatcherManual`
+- Test file prepared: `watcher.md`
+- Packaged launch result: the Windows process started and showed the real packaged app UI.
+- Setup result: the first-run setup screen was skipped through the visible packaged UI.
+- Folder-picker result: blocked before workspace selection. Invoking **Open folder** showed an `Open` file dialog with Markdown/Mermaid file filters, and the app status reported `Native bridge did not respond.` This was not the required Windows folder picker and did not permit the `%TEMP%\LDS-WatcherManual` workspace to be selected as a folder.
+
+Result: **MANUAL_WATCHER_CONFLICT_BLOCKED**
+
+Blocker category: **MANUAL_WATCHER_CONFLICT_BLOCKED_FOLDER_PICKER**
+
+Recommended next action: **add a temporary operator debug overlay** so the next manual run can confirm native bridge readiness and folder-picker availability before the watcher scenarios begin.
+
+The `v0.1.0-dev.1` watcher/conflict certification blocker is not cleared.
+
+Scenario results:
+
+| Scenario | Result | Notes |
+| --- | --- | --- |
+| Clean external change | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
+| Dirty conflict cancel | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
+| Dirty conflict confirm | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
+| External delete | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
+| External rename | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
