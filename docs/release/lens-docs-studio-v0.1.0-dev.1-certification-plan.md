@@ -22,7 +22,7 @@ The changes known at certification-planning time are release documentation, guid
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
-- Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the manual packaged Windows picker pass remains `NOT RUN`.
+- Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U packaged ZIP launch/setup was attempted, but the manual human-only Windows picker observations are `BLOCKED`.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
 - Any runtime/package/installer config changes: none identified.
 
@@ -32,15 +32,15 @@ Result:
 
 - [ ] PASS
 - [ ] PASS_WITH_NOTES
-- [x] NOT_RUN
-- [ ] BLOCKED
+- [ ] NOT_RUN
+- [x] BLOCKED
 - [ ] FAILED
 
 Evidence notes:
 
-The manual evidence pass was not practical in this phase because it requires a normal packaged Windows launch, the real Windows folder picker, external file edits, and human observation of clean-change, dirty-conflict, delete, and rename states. Automated browser or fake WebView2 coverage is not a substitute for this item.
+Phase 3U downloaded and extracted the published `v0.1.0-dev` ZIP asset, prepared a temporary `%TEMP%\LensDocsStudio-WatcherManual` workspace, and launched `LensDocsStudio.Windows.exe` from the extracted packaged app. The required human-only observations through the real Windows folder picker were not completed, so the evidence remains blocked rather than passed.
 
-The requirement is explicitly carried forward. Before `v0.1.0-dev.1` is published, a tester should complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` against a ZIP or installed Windows shell build and update the result to `PASS`, `PASS_WITH_NOTES`, `FAILED`, or `BLOCKED`.
+Automated browser tests, fake WebView2 coverage, or packaged launch alone are not substitutes for this item. Before `v0.1.0-dev.1` is published, a tester should complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` against a ZIP or installed Windows shell build and update the result to `PASS`, `PASS_WITH_NOTES`, or `FAILED`.
 
 ## Artefact Decision
 
@@ -120,7 +120,7 @@ Future phase:
 
 - [ ] DEV1_CERTIFICATION_READY
 - [ ] DEV1_CERTIFICATION_READY_WITH_NOTES
-- [x] DEV1_CERTIFICATION_BLOCKED_WATCHER_EVIDENCE_NOT_RUN
+- [x] DEV1_CERTIFICATION_BLOCKED_WATCHER_EVIDENCE_BLOCKED
 - [ ] DEV1_CERTIFICATION_BLOCKED_ARTEFACT_DECISION
 - [ ] DEV1_CERTIFICATION_BLOCKED_VALIDATION
 
@@ -131,5 +131,4 @@ Future phase:
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Because the current scope is docs-only and the watcher/conflict manual evidence remains `NOT RUN`, do not publish `v0.1.0-dev.1` yet. Prefer completing the manual evidence pass first, then either keep these docs on `develop` for `v0.1.0-rc.1` planning or publish a docs-only prerelease only if there is a clear communication reason.
-
+Because the current scope is docs-only and the watcher/conflict manual evidence remains blocked, do not publish `v0.1.0-dev.1` yet. Prefer completing the manual evidence pass first, then either keep these docs on `develop` for `v0.1.0-rc.1` planning or publish a docs-only prerelease only if there is a clear communication reason.
