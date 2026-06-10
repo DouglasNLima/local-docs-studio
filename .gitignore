@@ -2,6 +2,9 @@ node_modules/
 test-results/
 playwright-report/
 artifacts/
+artifacts/installers/inno/
+*.exe
+*.sha256
 **/bin/
 **/obj/
 .vs/

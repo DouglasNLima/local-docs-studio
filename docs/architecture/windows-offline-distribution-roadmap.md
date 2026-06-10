@@ -162,10 +162,19 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Runtime prerequisites stay documented and framework-dependent for now: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
 - WebView2 bootstrapper, Fixed Version Runtime, runtime bootstrappers, code signing, auto-update, public publication, MSIX, WiX, and production Inno installer output remain out of scope for Phase 3L.
 
+## Implemented Phase 3M
+
+- `installer/inno/LensDocsStudio.iss` adds the internal unsigned Inno Setup installer MVP authoring.
+- `scripts/windows/Build-WindowsInnoInstaller.ps1` builds or reuses the Phase 3B/3C Windows folder package, validates packaged `StaticApp/`, compiles the installer with Inno Setup, writes a SHA256 file, and creates a Markdown report under `artifacts/installers/inno/`.
+- The installer installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, avoids administrator elevation, creates a Start Menu shortcut, offers an optional Desktop shortcut, and uninstalls installer-owned files.
+- File associations are an unchecked optional task, per-user only under `HKCU:\Software\Classes`, and avoid Windows `UserChoice`. The manual register/unregister scripts remain available for ZIP and development workflows.
+- Runtime prerequisites remain documented rather than bootstrapped: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
+- Phase 3M does not publish a release, upload installer artefacts, create or move tags, merge to `main`, add signing, add auto-update, add MSIX, add WiX, bundle WebView2 Fixed Version Runtime, or change runtime app behaviour.
+
 ## Future Roadmap
 
 - MSIX versus classic installer spike for offline distribution.
-- Classic installer MVP with Inno Setup, using the existing certified folder package as input and keeping ZIP as fallback.
+- Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
 - Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.
 - Single-instance forwarding for file-open activation.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.

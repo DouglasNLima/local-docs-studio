@@ -2,7 +2,7 @@
 
 ## Status
 
-Phase 3L spike decision.
+Phase 3L spike decision, followed by Phase 3M internal Inno Setup installer MVP implementation.
 
 ## Current RC State
 
@@ -16,6 +16,8 @@ The Windows-first path is active on `develop`. A real GitHub draft prerelease ex
 - Phase 3K verdict: `INTERNAL_RC_MANUAL_SMOKE_PASSED_WITH_NOTES`
 
 This spike does not publish the draft, create another release, create or move tags, merge to `main`, or change the uploaded RC artefacts.
+
+Phase 3M also keeps those boundaries. It adds local installer source, build scripting, checksum generation, and validation/reporting only.
 
 ## Installer Goals
 
@@ -120,6 +122,18 @@ The ZIP package should remain the fallback RC artefact and continue to be publis
 - Detect missing prerequisites and show clear guidance before launch. Do not bootstrap in the first MVP unless clean-machine evidence proves the warning-only path is too rough.
 - Produce a signed-installer-ready artefact shape, but keep actual signing out until certificate policy is chosen.
 - Add validation for install, launch, uninstall, silent install where feasible, and GitHub Release artefact naming.
+
+## Implemented Phase 3M MVP
+
+- `installer/inno/LensDocsStudio.iss` wraps the existing certified Windows package output.
+- `scripts/windows/Build-WindowsInnoInstaller.ps1` builds or reuses the package, validates packaged static assets, compiles with `ISCC.exe`, writes SHA256, and creates an installer report.
+- `docs/release/lens-docs-studio-inno-installer-mvp.md` documents build, validation, manual smoke, prerequisite, shortcut, and file association decisions.
+- Installer output is ignored under `artifacts/installers/inno/`.
+- The installer is per-user, unsigned, internal-only, and uses `PrivilegesRequired=lowest`.
+- Start Menu shortcut creation is default; Desktop shortcut creation is optional.
+- File associations are an unchecked optional task, written only to `HKCU:\Software\Classes`, and do not write `UserChoice`.
+- Runtime prerequisites remain documentation-level only: .NET 8 Desktop Runtime, Windows App SDK Runtime, and Evergreen WebView2 Runtime.
+- ZIP plus GitHub Releases remains the fallback RC path.
 
 ## Runtime Prerequisite Recommendation
 

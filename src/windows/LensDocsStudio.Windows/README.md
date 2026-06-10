@@ -83,6 +83,18 @@ Phase 3F records the installer decision gate in `docs/architecture/windows-insta
 
 Phase 3L records that spike in `docs/architecture/windows-installer-spike.md`. It recommends `Phase 3M - Classic Installer MVP with Inno Setup`, with the current ZIP package retained as the internal RC fallback. The recommendation does not add a production installer, signing, runtime bootstrapper, WebView2 bootstrapper, auto-update, or winget metadata yet.
 
+## Inno Setup Installer MVP
+
+Create the Phase 3M internal unsigned installer from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
+```
+
+The script builds or reuses the framework-dependent Windows folder package, validates the packaged `StaticApp/`, compiles `installer/inno/LensDocsStudio.iss` with Inno Setup, writes the setup executable to `artifacts/installers/inno/`, creates a `.sha256` file, and writes a Markdown build report. Pass `-NoPackageBuild` to reuse an existing `artifacts/windows/LensDocsStudio.Windows-<version>/` package, or `-InnoCompilerPath` when `ISCC.exe` is not on `PATH`.
+
+This MVP installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not bootstrap the .NET 8 Desktop Runtime, Windows App SDK Runtime, or Evergreen WebView2 Runtime, and it does not publish releases, upload artefacts, sign binaries, create tags, move tags, or merge to `main`.
+
 Prepare a dry-run GitHub Release artefact set from the repository root:
 
 ```powershell

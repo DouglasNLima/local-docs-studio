@@ -62,6 +62,14 @@ The Phase 3F installer decision gate keeps the folder/ZIP package as the short-t
 
 The Phase 3L installer spike compares MSIX, WiX Toolset, Inno Setup, continuing ZIP plus GitHub Releases, and a later winget path. It recommends `Phase 3M - Classic Installer MVP with Inno Setup` while keeping the certified ZIP as the internal RC fallback. See `docs/architecture/windows-installer-spike.md`.
 
+Build the Phase 3M internal unsigned Inno Setup installer MVP with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
+```
+
+The installer build wraps the existing certified Windows package output, validates packaged `StaticApp/`, writes a single setup executable plus `.sha256` and report under `artifacts/installers/inno/`, installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not install runtimes, publish or upload a release, create or move tags, sign binaries, add auto-update, merge to `main`, or replace the ZIP fallback. See `docs/release/lens-docs-studio-inno-installer-mvp.md`.
+
 Prepare a dry-run GitHub Release artefact set with:
 
 ```powershell
@@ -101,6 +109,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3H adds a dry-run review gate for certifying the prepared GitHub Release artefact set before any intentional draft prerelease publication.
 - Phase 3J adds the live GitHub draft release review checklist for keeping an uploaded prerelease draft ready for internal RC testing without publishing it.
 - Phase 3L records the MSIX versus classic installer spike and recommends a classic installer MVP with Inno Setup.
+- Phase 3M adds the internal unsigned Inno Setup installer MVP build path while keeping ZIP plus GitHub Releases as the fallback.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -392,6 +401,7 @@ npm test
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` checks the Windows `StaticApp/` output for complete packaged offline assets and unexpected runtime external dependencies.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` creates and certifies a Windows folder/ZIP release candidate, then writes auditable report metadata.
+- `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1` builds the internal unsigned Inno Setup installer MVP from the certified Windows package output, or reports `INNO_INSTALLER_MVP_BLOCKED_INNO_SETUP_NOT_INSTALLED` when Inno Setup is missing.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun` prepares the GitHub Release ZIP artefact set, checksum, release notes, and draft prerelease `gh release create` command without publishing.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
