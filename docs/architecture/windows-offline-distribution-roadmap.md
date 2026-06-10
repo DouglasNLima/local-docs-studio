@@ -97,6 +97,14 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The packaging MVP requires the .NET desktop runtime, the matching Windows App SDK runtime, and the Evergreen WebView2 Runtime. It does not bundle WebView2 Fixed Version Runtime.
 - This phase deliberately excludes MSIX, signing, certificates, file associations, installer wizard UI, auto-update, store publishing metadata, and prerequisite bootstrapping.
 
+## Implemented Phase 3C
+
+- `scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` creates a repeatable release-candidate gate for the Windows folder/ZIP package.
+- The RC gate builds the package with the Phase 3B packaging script, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes Markdown plus JSON report artefacts under `artifacts/windows/release-candidates/`.
+- The report records package version, branch, commit SHA, build timestamp, configuration, runtime identifier, output folder, ZIP path, ZIP size, checksum, runtime prerequisites, validation commands, command output, durations, and pass/fail results.
+- `docs/release/lens-docs-studio-windows-package-rc-checklist.md` captures manual packaged-app smoke steps and explicit certification claims/non-claims.
+- The RC gate certifies only the folder/ZIP package, packaged static runtime validation, packaged native bridge smoke, metadata capture, and documented manual smoke scope. It does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
+
 ## Future Roadmap
 
 - Fuller Windows installer work for offline distribution.

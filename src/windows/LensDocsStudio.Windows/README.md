@@ -61,6 +61,24 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -Configur
 
 This phase is limited to a folder/ZIP distributable. It does not add MSIX, signing, certificates, file associations, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
 
+## Release Candidate Certification
+
+Create and certify a Windows package release candidate from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
+```
+
+The certification script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes Markdown plus JSON report artefacts under `artifacts/windows/release-candidates/`.
+
+Use an explicit RC version when preparing a named candidate:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1 -Version 0.1.0-rc.1 -TimeoutSeconds 90
+```
+
+Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. The RC gate certifies only the folder/ZIP package, packaged static runtime validation, packaged native bridge smoke, package metadata, and documented manual smoke scope. It does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
+
 ## Offline Static Asset Validation
 
 Run the packaged asset check from the repository root:
@@ -79,6 +97,7 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 
 - Offline runtime hardening.
 - Folder/ZIP Windows package MVP.
+- Windows folder/ZIP release candidate certification.
 - Fuller Windows installer work.
 - First-run setup wizard.
 - File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.

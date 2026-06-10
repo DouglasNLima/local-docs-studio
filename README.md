@@ -50,6 +50,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1
 
 The package script publishes a framework-dependent `win-x64` folder to `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/`, creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, validates `StaticApp/`, and runs the native bridge smoke harness against the packaged executable unless `-NoSmoke` is passed. Run the package by launching `LensDocsStudio.Windows.exe` from the package folder. The Phase 3B package is intentionally a folder/ZIP distributable; it does not add MSIX, signing, certificates, file associations, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
 
+Certify a Windows package release candidate with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
+```
+
+The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus JSON metadata under `artifacts/windows/release-candidates/`. Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. Phase 3C certification is an audit gate for the folder/ZIP package only; it does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
+
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. It does not add recent native folders, file associations, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
@@ -63,6 +71,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 2D adds native workspace external-change detection, safe relative watcher events, explicit native refresh, and non-destructive web UI markers for changed, created, deleted, and renamed workspace files.
 - Phase 2E refines the native workspace conflict UX with distinct changed, deleted, renamed, dirty, and dirty-external-conflict indicators plus explicit refresh/discard prompts.
 - Phase 3B adds the first repeatable folder/ZIP Windows package flow.
+- Phase 3C adds the release-candidate certification gate for the Windows folder/ZIP package.
 - Future Windows work includes a fuller installer path, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -301,6 +310,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `docs/tool-guide.md` is the built-in read-only feature guide opened from the Help menu.
 - `docs/integration/lens-artifact-bundle-producer-guide.md` documents how compatible tools can create safe optional artefact bundle ZIPs.
 - `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md` captures the release candidate smoke checklist for the artefact bundle flow.
+- `docs/release/lens-docs-studio-windows-package-rc-checklist.md` captures the Windows folder/ZIP package release candidate checklist.
 - `tests/fixtures/artifact-bundles/` contains source-controlled Markdown, Mermaid, JSON, and asset fixtures used to build deterministic ZIPs during browser tests.
 - `src/windows/LensDocsStudio.Windows/` contains the optional WinUI 3 and WebView2 desktop shell that hosts the same static app from local packaged files.
 
@@ -318,6 +328,7 @@ npm test
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` checks the Windows `StaticApp/` output for complete packaged offline assets and unexpected runtime external dependencies.
+- `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` creates and certifies a Windows folder/ZIP release candidate, then writes auditable report metadata.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 
