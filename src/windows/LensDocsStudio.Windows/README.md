@@ -81,6 +81,14 @@ Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual p
 
 Phase 3F records the installer decision gate in `docs/architecture/windows-installer-decision-gate.md`. The accepted short-term path is to keep the certified folder/ZIP artefact for release candidates and GitHub Releases, then run a separate MSIX/classic installer spike before adding production installer scripts, signing, prerequisite bootstrapping, auto-update, or winget metadata.
 
+Prepare a dry-run GitHub Release artefact set from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun
+```
+
+The release preparation script builds and certifies the Windows ZIP by default, then writes `artifacts/releases/<tag>/` with the ZIP, `.sha256` checksum, RC report, generated release notes, and the draft prerelease `gh release create` command. It does not publish, upload files, create local tags, add signing, add an installer, or merge to `main` unless a later release operator explicitly chooses the documented publish path. See `docs/release/github-release-publication-flow.md`.
+
 ## Offline Static Asset Validation
 
 Run the packaged asset check from the repository root:
@@ -103,6 +111,7 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Windows file associations MVP.
 - Windows first-run setup wizard MVP.
 - Windows installer decision gate.
+- GitHub Release ZIP publication flow.
 - Fuller Windows installer work.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 

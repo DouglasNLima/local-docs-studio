@@ -163,6 +163,8 @@ For the current path, GitHub Releases should publish:
 - Manual file association guidance.
 - Clear non-claims for signing, installers, auto-update, Store, and winget.
 
+Phase 3G implements a dry-run-first preparation flow in `scripts/windows/Prepare-WindowsGitHubRelease.ps1`. The script prepares the release folder under `artifacts/releases/<tag>/`, generates release notes and checksum output, and prints the `gh release create` command. It does not publish unless `-Publish` is explicitly supplied.
+
 After an installer path is selected, GitHub Releases can add signed MSIX or classic installer artefacts while retaining the ZIP as an advanced/manual package if still useful.
 
 ## Consequences
@@ -176,7 +178,7 @@ After an installer path is selected, GitHub Releases can add signed MSIX or clas
 ## Recommended Implementation Plan
 
 1. Phase 3F: publish this decision gate and update references in the existing Windows docs.
-2. Phase 3G candidate: improve GitHub Release ZIP publication documentation, including checksum and RC report expectations.
+2. Phase 3G: add the dry-run-first GitHub Release ZIP publication flow, including release notes, checksum, RC report, and GitHub CLI command preparation.
 3. Phase 3H candidate: run an installer spike with MSIX and one classic installer technology, using clean-machine validation.
 4. Phase 3I candidate: implement the chosen installer MVP with signing, prerequisite handling, shortcuts, uninstall, and file associations.
 5. Later phase: decide auto-update and winget publication after installer artefacts are stable and signed.
@@ -197,7 +199,7 @@ Phase 3F does not implement:
 - Uninstall registration.
 - Auto-update.
 - winget manifests.
-- GitHub Release publication automation.
+- Automatic GitHub Release publication without an explicit release-operator command.
 
 ## Validation Plan
 
@@ -208,6 +210,7 @@ npm run test:static
 dotnet build src/windows/LensDocsStudio.Windows.sln
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
+pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun
 ```
 
 `npm run test:browser` is optional for this phase because no runtime, UI, import/export, layout, clipboard, or browser workflow code changes are intended. If runtime or project files are changed in a later installer phase, run the full browser and Windows smoke/package suite.

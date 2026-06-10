@@ -14,6 +14,14 @@ The script builds the Windows package, validates the packaged `StaticApp/` and f
 
 Phase 3F keeps this folder/ZIP package as the short-term release candidate artefact. The installer decision gate in `docs/architecture/windows-installer-decision-gate.md` defers MSIX, classic installer work, signing, prerequisite bootstrapping, auto-update, and winget metadata to later phases.
 
+Phase 3G adds a dry-run-first GitHub Release preparation flow for the certified ZIP:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun
+```
+
+That script prepares the release artefact folder, checksum, generated release notes, RC report copy, and draft prerelease GitHub CLI command. It does not publish, upload files, create local tags, sign the package, add an installer, add auto-update, or merge to `main`. See `docs/release/github-release-publication-flow.md`.
+
 Use explicit release-candidate version values when preparing a named RC:
 
 ```powershell
@@ -63,6 +71,7 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 - [ ] The packaged executable passed `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, including startup file argument load/save.
 - [ ] The first-run setup wizard was manually checked or explicitly deferred with a reason.
 - [ ] The generated report records package version, branch, commit SHA, build timestamp, output folder, ZIP path, ZIP size, SHA256 checksum, runtime prerequisites, validation commands, command output, and results.
+- [ ] If preparing a GitHub Release draft, `scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun` generated the release notes, checksum, RC report copy, ZIP copy, and `gh release create` command under `artifacts/releases/<tag>/`.
 - [ ] The package is a folder/ZIP distributable for manual RC testing.
 
 ## Certification Non-Claims

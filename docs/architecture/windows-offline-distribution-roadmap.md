@@ -138,9 +138,16 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The current runtime prerequisite policy remains framework-dependent: .NET desktop runtime, matching Windows App SDK runtime, and Evergreen WebView2 Runtime.
 - WebView2 bootstrapper, WebView2 Fixed Version Runtime, self-contained publish, installer-owned file associations, auto-update, winget manifests, and production installer scripts are not implemented in this phase.
 
+## Implemented Phase 3G
+
+- `scripts/windows/Prepare-WindowsGitHubRelease.ps1` prepares a GitHub Release artefact set for the certified Windows folder/ZIP package.
+- The script is dry-run-first. It builds and certifies the package by default, copies the certified ZIP into `artifacts/releases/<tag>/`, writes a SHA256 checksum file, generates release notes, and prints the exact draft prerelease `gh release create` command without publishing.
+- `docs/release/templates/github-release-notes.md` provides the release notes template, and `docs/release/github-release-publication-flow.md` documents dry-run, publish, checksum, GitHub CLI, and tag strategy.
+- The flow refuses dirty worktrees, non-`develop` branches, stale target commits, failed RC certification, and missing checksums unless an explicit local rehearsal override is supplied where documented.
+- This phase does not add auto-update, MSIX, a classic installer, signing, Store publishing, WebView2 bootstrapper, WebView2 Fixed Version Runtime, machine-wide file associations, release CI/CD, a merge to `main`, or automatic GitHub Release publication.
+
 ## Future Roadmap
 
-- GitHub Release ZIP publication flow for certified Windows package artefacts.
 - MSIX versus classic installer spike for offline distribution.
 - Chosen Windows installer MVP with signing, prerequisite handling, shortcuts, uninstall, and file associations.
 - Single-instance forwarding for file-open activation.
