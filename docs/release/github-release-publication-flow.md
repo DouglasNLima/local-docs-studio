@@ -4,6 +4,8 @@ Phase 3G prepares a repeatable GitHub Release publication flow for the certified
 
 Phase 3L keeps this ZIP publication flow as the internal RC fallback and recommends `Phase 3M - Classic Installer MVP with Inno Setup`. Phase 3M adds a local unsigned Inno Setup installer build path, but the GitHub Release ZIP remains the auditable fallback artefact for controlled testing until installer signing, upload, and publication policy are explicitly chosen.
 
+Phase 3N records the installer RC asset plan in `docs/release/lens-docs-studio-installer-rc-asset-plan.md`. It recommends adding the certified unsigned Inno Setup installer, checksum, and installer report as additional assets to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, while keeping the ZIP as the primary fallback and keeping the release unpublished.
+
 The default path is safe: it creates local release artefacts and prints the GitHub CLI command, but it does not create a GitHub release and does not upload files.
 
 ## Prepare A Dry Run
@@ -86,6 +88,8 @@ artifacts/installers/inno/
 ```
 
 Those installer artefacts are not uploaded by this ZIP publication flow.
+
+If installer assets are approved later, use the Phase 3N plan rather than this ZIP preparation script. Stop on duplicate asset names unless an operator explicitly approves a `--clobber` plan.
 
 ## Reusing An Existing Certified Package
 

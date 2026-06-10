@@ -95,6 +95,8 @@ The script builds or reuses the framework-dependent Windows folder package, vali
 
 This MVP installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not bootstrap the .NET 8 Desktop Runtime, Windows App SDK Runtime, or Evergreen WebView2 Runtime, and it does not publish releases, upload artefacts, sign binaries, create tags, move tags, or merge to `main`.
 
+The Phase 3N installer RC asset plan is documented in `docs/release/lens-docs-studio-installer-rc-asset-plan.md`. It recommends a later explicit upload of the certified unsigned installer assets to the existing draft prerelease only after release notes are amended, while keeping the ZIP as the primary fallback and keeping the release unpublished.
+
 Prepare a dry-run GitHub Release artefact set from the repository root:
 
 ```powershell
@@ -135,6 +137,7 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Windows installer decision gate.
 - GitHub Release ZIP publication flow.
 - Classic installer MVP with Inno Setup.
+- Installer RC asset plan for the existing draft prerelease.
 - Later fuller Windows installer work, signing, prerequisite bootstrapping, MSIX reassessment, and winget publication.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 

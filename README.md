@@ -70,6 +70,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
 
 The installer build wraps the existing certified Windows package output, validates packaged `StaticApp/`, writes a single setup executable plus `.sha256` and report under `artifacts/installers/inno/`, installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not install runtimes, publish or upload a release, create or move tags, sign binaries, add auto-update, merge to `main`, or replace the ZIP fallback. See `docs/release/lens-docs-studio-inno-installer-mvp.md`.
 
+The Phase 3N installer RC asset plan recommends adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
+
 Prepare a dry-run GitHub Release artefact set with:
 
 ```powershell
@@ -110,11 +112,13 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3J adds the live GitHub draft release review checklist for keeping an uploaded prerelease draft ready for internal RC testing without publishing it.
 - Phase 3L records the MSIX versus classic installer spike and recommends a classic installer MVP with Inno Setup.
 - Phase 3M adds the internal unsigned Inno Setup installer MVP build path while keeping ZIP plus GitHub Releases as the fallback.
+- Phase 3N records the installer RC asset plan for optionally adding the certified Inno Setup installer to the existing draft prerelease without publishing it.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 See `docs/architecture/windows-installer-decision-gate.md` for the installer strategy decision gate.
 See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer spike and Phase 3M recommendation.
+See `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for the Phase 3N installer draft-release asset plan.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge

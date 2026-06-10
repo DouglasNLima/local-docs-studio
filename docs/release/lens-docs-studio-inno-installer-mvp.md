@@ -102,6 +102,8 @@ Certification ran on commit `9439f95813d6e8654032b7fef3b414af1fa267e6` from `dev
 - Uninstall completed and removed shortcuts plus the installed-app entry. A WebView2 runtime data folder remained under the install path after the native smoke: `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2\EBWebView`.
 - The GitHub draft release remained unpublished.
 
+Phase 3N records the release-asset decision in `docs/release/lens-docs-studio-installer-rc-asset-plan.md`. It recommends a later explicit upload of the certified installer `.exe`, `.sha256`, and report to the existing draft prerelease only after release notes are amended, with the ZIP remaining the primary fallback.
+
 ## Manual Installer Smoke
 
 When an installer is successfully built, validate on a Windows test machine:

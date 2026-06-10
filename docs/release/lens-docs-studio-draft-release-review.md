@@ -278,3 +278,4 @@ Choose one:
 - The uploaded RC report records `Result: PASS` for the package certification on commit `8b215d039188af94d32857239e6829916f4b74fc`.
 - The current review confirms draft metadata, notes readability, asset presence, download, SHA256 verification, extraction, and automated native bridge smoke on the downloaded ZIP.
 - Interactive tester checks remain open for first-run setup UX, help guide opening, file association guidance, and workspace watcher/conflict UX. These do not block internal RC testing, but they should be completed before publishing beyond the controlled draft prerelease audience.
+- Phase 3N adds `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for deciding whether to add the certified unsigned Inno Setup installer as extra draft assets. The plan keeps this draft unpublished and keeps the ZIP as the primary fallback.
