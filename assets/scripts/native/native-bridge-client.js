@@ -15,12 +15,17 @@ export const nativeBridgeMessageTypes = {
   saveWorkspaceFileResult: 'lensDocs.native.saveWorkspaceFileResult',
   createWorkspaceFile: 'lensDocs.native.createWorkspaceFile',
   createWorkspaceFileResult: 'lensDocs.native.createWorkspaceFileResult',
+  refreshWorkspaceFile: 'lensDocs.native.refreshWorkspaceFile',
+  refreshWorkspaceFileResult: 'lensDocs.native.refreshWorkspaceFileResult',
+  workspaceChanged: 'lensDocs.native.workspaceChanged',
   smokeOpenFixtureFile: 'lensDocs.native.smoke.openFixtureFile',
   smokeOpenFixtureFileResult: 'lensDocs.native.smoke.openFixtureFileResult',
   smokeSaveFixtureFileAs: 'lensDocs.native.smoke.saveFixtureFileAs',
   smokeSaveFixtureFileAsResult: 'lensDocs.native.smoke.saveFixtureFileAsResult',
   smokeOpenFixtureWorkspace: 'lensDocs.native.smoke.openFixtureWorkspace',
   smokeOpenFixtureWorkspaceResult: 'lensDocs.native.smoke.openFixtureWorkspaceResult',
+  smokeTouchWorkspaceFile: 'lensDocs.native.smoke.touchWorkspaceFile',
+  smokeTouchWorkspaceFileResult: 'lensDocs.native.smoke.touchWorkspaceFileResult',
   smokeComplete: 'lensDocs.native.smoke.complete',
   smokeCompleteResult: 'lensDocs.native.smoke.completeResult',
   error: 'lensDocs.native.error',
@@ -36,6 +41,7 @@ export function createNativeBridgeClient({
   now = () => new Date().toISOString(),
 } = {}) {
   const pendingMessages = new Map();
+  const eventListeners = new Map();
   const webview = getWebView(windowRef);
 
   if (webview && typeof webview.addEventListener === 'function') {
@@ -123,6 +129,29 @@ export function createNativeBridgeClient({
     return await sendMessage(message, [nativeBridgeMessageTypes.createWorkspaceFileResult]);
   }
 
+  async function refreshWorkspaceFile({ nativeWorkspaceId, nativeHandleId, path }) {
+    const message = createMessage(nativeBridgeMessageTypes.refreshWorkspaceFile, {
+      nativeWorkspaceId,
+      nativeHandleId,
+      path,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.refreshWorkspaceFileResult]);
+  }
+
+  function on(type, listener) {
+    if (typeof type !== 'string' || typeof listener !== 'function') {
+      return () => {};
+    }
+
+    const listeners = eventListeners.get(type) || new Set();
+    listeners.add(listener);
+    eventListeners.set(type, listeners);
+    return () => {
+      listeners.delete(listener);
+      if (!listeners.size) eventListeners.delete(type);
+    };
+  }
+
   async function openSmokeFixtureFile() {
     const message = createMessage(nativeBridgeMessageTypes.smokeOpenFixtureFile);
     return await sendMessage(message, [nativeBridgeMessageTypes.smokeOpenFixtureFileResult]);
@@ -138,6 +167,11 @@ export function createNativeBridgeClient({
   async function openSmokeFixtureWorkspace() {
     const message = createMessage(nativeBridgeMessageTypes.smokeOpenFixtureWorkspace);
     return await sendMessage(message, [nativeBridgeMessageTypes.smokeOpenFixtureWorkspaceResult]);
+  }
+
+  async function touchSmokeWorkspaceFile() {
+    const message = createMessage(nativeBridgeMessageTypes.smokeTouchWorkspaceFile);
+    return await sendMessage(message, [nativeBridgeMessageTypes.smokeTouchWorkspaceFileResult]);
   }
 
   async function completeSmoke(payload) {
@@ -191,7 +225,10 @@ export function createNativeBridgeClient({
   function handleHostMessage(rawMessage) {
     const message = normaliseHostMessage(rawMessage);
     const pending = message?.id ? pendingMessages.get(message.id) : null;
-    if (!pending) return;
+    if (!pending) {
+      handleHostEvent(message);
+      return;
+    }
 
     clearPending(message.id);
     const validation = validateHostResponse(message, pending.expectedTypes);
@@ -223,6 +260,19 @@ export function createNativeBridgeClient({
     pendingMessages.delete(id);
   }
 
+  function handleHostEvent(message) {
+    if (!validateHostEvent(message)) return;
+    const listeners = eventListeners.get(message.type);
+    if (!listeners?.size) return;
+    listeners.forEach((listener) => {
+      try {
+        listener(message);
+      } catch (error) {
+        console.error('Native bridge event listener failed.', error);
+      }
+    });
+  }
+
   return {
     isAvailable,
     createMessage,
@@ -234,9 +284,12 @@ export function createNativeBridgeClient({
     openFolder,
     saveWorkspaceFile,
     createWorkspaceFile,
+    refreshWorkspaceFile,
+    on,
     openSmokeFixtureFile,
     saveSmokeFixtureFileAs,
     openSmokeFixtureWorkspace,
+    touchSmokeWorkspaceFile,
     completeSmoke,
   };
 }
@@ -298,6 +351,15 @@ function validateHostResponse(message, expectedTypes = []) {
     };
   }
   return { ok: true };
+}
+
+function validateHostEvent(message) {
+  if (!message || message.protocolVersion !== BRIDGE_PROTOCOL_VERSION) return false;
+  if (message.type !== nativeBridgeMessageTypes.workspaceChanged) return false;
+  if (typeof message.id !== 'string' || !message.id.trim()) return false;
+  if (message.source !== 'LensDocsStudio.Windows') return false;
+  if (typeof message.timestamp !== 'string' || !message.timestamp.trim()) return false;
+  return Boolean(message.payload && typeof message.payload === 'object');
 }
 
 function getSafeErrorMessage(message) {

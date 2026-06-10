@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json;
 using LensDocsStudio.Windows.Smoke;
+using Microsoft.UI.Dispatching;
 using Microsoft.Web.WebView2.Core;
 
 namespace LensDocsStudio.Windows.Services;
@@ -24,10 +25,15 @@ public sealed class NativeBridge
     private const string SaveWorkspaceFileResultType = "lensDocs.native.saveWorkspaceFileResult";
     private const string CreateWorkspaceFileType = "lensDocs.native.createWorkspaceFile";
     private const string CreateWorkspaceFileResultType = "lensDocs.native.createWorkspaceFileResult";
+    private const string RefreshWorkspaceFileType = "lensDocs.native.refreshWorkspaceFile";
+    private const string RefreshWorkspaceFileResultType = "lensDocs.native.refreshWorkspaceFileResult";
+    private const string WorkspaceChangedType = "lensDocs.native.workspaceChanged";
     private const string SmokeOpenFixtureFileType = "lensDocs.native.smoke.openFixtureFile";
     private const string SmokeOpenFixtureFileResultType = "lensDocs.native.smoke.openFixtureFileResult";
     private const string SmokeOpenFixtureWorkspaceType = "lensDocs.native.smoke.openFixtureWorkspace";
     private const string SmokeOpenFixtureWorkspaceResultType = "lensDocs.native.smoke.openFixtureWorkspaceResult";
+    private const string SmokeTouchWorkspaceFileType = "lensDocs.native.smoke.touchWorkspaceFile";
+    private const string SmokeTouchWorkspaceFileResultType = "lensDocs.native.smoke.touchWorkspaceFileResult";
     private const string SmokeSaveFixtureFileAsType = "lensDocs.native.smoke.saveFixtureFileAs";
     private const string SmokeSaveFixtureFileAsResultType = "lensDocs.native.smoke.saveFixtureFileAsResult";
     private const string SmokeCompleteType = "lensDocs.native.smoke.complete";
@@ -42,15 +48,20 @@ public sealed class NativeBridge
         "workspace.openFolder",
         "workspace.saveFile",
         "workspace.createFile",
+        "workspace.watch",
+        "workspace.refreshFile",
     ];
     private static readonly string[] SmokeCapabilities =
     [
         "smoke.nativeFixtures",
+        "smoke.workspaceChange",
     ];
     private readonly NativeFileService nativeFileService;
     private readonly NativeWorkspaceService nativeWorkspaceService;
     private readonly SmokeFixtureService? smokeFixtureService;
     private readonly SmokeCompletionService? smokeCompletionService;
+    private readonly DispatcherQueue dispatcherQueue;
+    private CoreWebView2? attachedCoreWebView;
 
     public NativeBridge(
         NativeFileService nativeFileService,
@@ -62,10 +73,13 @@ public sealed class NativeBridge
         this.nativeWorkspaceService = nativeWorkspaceService;
         this.smokeFixtureService = smokeFixtureService;
         this.smokeCompletionService = smokeCompletionService;
+        dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        this.nativeWorkspaceService.WorkspaceChanged += HandleWorkspaceChanged;
     }
 
     public void Attach(CoreWebView2 coreWebView)
     {
+        attachedCoreWebView = coreWebView;
         coreWebView.WebMessageReceived += HandleWebMessageReceived;
     }
 
@@ -142,6 +156,12 @@ public sealed class NativeBridge
                         ReadPayloadString(root, "path"),
                         ReadPayloadString(root, "content")));
                     break;
+                case RefreshWorkspaceFileType:
+                    PostResult(coreWebView, id, RefreshWorkspaceFileResultType, await nativeWorkspaceService.RefreshWorkspaceFileAsync(
+                        ReadPayloadString(root, "nativeWorkspaceId"),
+                        ReadPayloadString(root, "nativeHandleId"),
+                        ReadPayloadString(root, "path")));
+                    break;
                 case SmokeOpenFixtureFileType:
                     PostResult(coreWebView, id, SmokeOpenFixtureFileResultType, await RequireSmokeFixtures().OpenFixtureFileAsync());
                     break;
@@ -152,7 +172,11 @@ public sealed class NativeBridge
                 case SmokeOpenFixtureWorkspaceType:
                     PostResult(coreWebView, id, SmokeOpenFixtureWorkspaceResultType, await RequireSmokeFixtures().OpenFixtureWorkspaceAsync());
                     break;
+                case SmokeTouchWorkspaceFileType:
+                    PostResult(coreWebView, id, SmokeTouchWorkspaceFileResultType, await RequireSmokeFixtures().TouchWorkspaceFileAsync());
+                    break;
                 case SmokeCompleteType:
+                    nativeWorkspaceService.StopWatching();
                     PostResult(coreWebView, id, SmokeCompleteResultType, RequireSmokeCompletion().Complete(ReadPayload(root)));
                     break;
                 default:
@@ -171,6 +195,50 @@ public sealed class NativeBridge
         catch (Exception)
         {
             TryPostSafeError(sender, args, "Windows file operation failed safely.");
+        }
+    }
+
+    private void HandleWorkspaceChanged(object? sender, WorkspaceChangedEventArgs args)
+    {
+        if (!dispatcherQueue.HasThreadAccess)
+        {
+            _ = dispatcherQueue.TryEnqueue(() => HandleWorkspaceChanged(sender, args));
+            return;
+        }
+
+        var coreWebView = attachedCoreWebView;
+        if (coreWebView is null)
+        {
+            return;
+        }
+
+        var message = new
+        {
+            protocolVersion = ProtocolVersion,
+            id = Guid.NewGuid().ToString("N"),
+            type = WorkspaceChangedType,
+            source = HostSource,
+            timestamp = DateTimeOffset.UtcNow.ToString("O"),
+            payload = new
+            {
+                nativeWorkspaceId = args.NativeWorkspaceId,
+                changes = args.Changes.Select(static change => new
+                {
+                    kind = change.Kind,
+                    path = change.Path,
+                    oldPath = change.OldPath,
+                    nativeHandleId = change.NativeHandleId,
+                }).ToArray(),
+            },
+        };
+
+        try
+        {
+            coreWebView.PostWebMessageAsJson(JsonSerializer.Serialize(message));
+        }
+        catch
+        {
+            nativeWorkspaceService.StopWatching();
         }
     }
 

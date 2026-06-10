@@ -512,6 +512,7 @@ async function installMockNativeBridge(page, options = {}) {
       saveFileAs: 'success',
       openFolder: 'success',
       saveWorkspaceFile: 'success',
+      refreshWorkspaceFile: 'success',
       smokeWorkspace: options.smokeWorkspace || 'success',
     };
 
@@ -520,6 +521,17 @@ async function installMockNativeBridge(page, options = {}) {
         listeners.forEach((listener) => listener({ data: response }));
       }, 0);
     }
+
+    window.__emitNativeWorkspaceChanged = (payload) => {
+      emit({
+        protocolVersion: 1,
+        id: `event-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        type: 'lensDocs.native.workspaceChanged',
+        source: 'LensDocsStudio.Windows',
+        timestamp: '2026-06-09T00:00:00.000Z',
+        payload,
+      });
+    };
 
     function baseResponse(message, type, payload) {
       return {
@@ -545,8 +557,10 @@ async function installMockNativeBridge(page, options = {}) {
               'workspace.openFolder',
               'workspace.saveFile',
               'workspace.createFile',
+              'workspace.watch',
+              'workspace.refreshFile',
             ];
-            if (smokeEnabled) capabilities.push('smoke.nativeFixtures');
+            if (smokeEnabled) capabilities.push('smoke.nativeFixtures', 'smoke.workspaceChange');
             emit(baseResponse(message, 'lensDocs.native.pong', {
               host: 'LensDocsStudio.Windows',
               capabilities,
@@ -662,6 +676,27 @@ async function installMockNativeBridge(page, options = {}) {
             return;
           }
 
+          if (message.type === 'lensDocs.native.refreshWorkspaceFile') {
+            if (window.__nativeBridgeScenario.refreshWorkspaceFile === 'missing') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: 'The Windows workspace file is no longer available.',
+              }));
+              return;
+            }
+            const path = message.payload.path || 'README.md';
+            emit(baseResponse(message, 'lensDocs.native.refreshWorkspaceFileResult', {
+              refreshed: true,
+              name: path.split('/').pop(),
+              path,
+              displayPath: path,
+              extension: path.endsWith('.mmd') ? '.mmd' : '.md',
+              encoding: 'utf-8',
+              content: window.__nativeBridgeRefreshContent || `# Refreshed ${path}\n`,
+              nativeHandleId: message.payload.nativeHandleId || 'native-workspace-file-refreshed',
+            }));
+            return;
+          }
+
           if (message.type === 'lensDocs.native.createWorkspaceFile') {
             emit(baseResponse(message, 'lensDocs.native.createWorkspaceFileResult', {
               cancelled: false,
@@ -730,6 +765,29 @@ async function installMockNativeBridge(page, options = {}) {
               },
               skipped: [],
             }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.touchWorkspaceFile') {
+            emit(baseResponse(message, 'lensDocs.native.smoke.touchWorkspaceFileResult', {
+              changed: true,
+              path: 'docs/overview.md',
+            }));
+            emit({
+              protocolVersion: 1,
+              id: `event-${Date.now()}`,
+              type: 'lensDocs.native.workspaceChanged',
+              source: 'LensDocsStudio.Windows',
+              timestamp: '2026-06-09T00:00:00.000Z',
+              payload: {
+                nativeWorkspaceId: 'native-smoke-workspace',
+                changes: [{
+                  kind: 'changed',
+                  path: 'docs/overview.md',
+                  nativeHandleId: 'native-smoke-workspace-overview',
+                }],
+              },
+            });
             return;
           }
 
@@ -1741,6 +1799,161 @@ test('fake WebView2 bridge creates Markdown files in native workspaces', async (
     path: 'notes/new-note.md',
     content: '',
   });
+});
+
+test('fake WebView2 watcher marks changed native workspace files and refreshes explicitly', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeRefreshContent = '# Native Workspace\n\nChanged externally.\n';
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · changed outside the app');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nChanged externally.\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  const refreshMessage = await page.evaluate(() => window.__nativeBridgeMessages.findLast((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessage.payload).toEqual({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: 'native-workspace-file-1',
+    path: 'README.md',
+  });
+});
+
+test('fake WebView2 watcher preserves dirty local edits on native workspace changes', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Local draft\n');
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in memory · changed outside the app');
+  await expect(page.locator('#status')).toHaveText('External change detected while local edits exist. Save or refresh explicitly.');
+});
+
+test('fake WebView2 watcher marks deleted active native files without clearing content', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('Rendered');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'deleted',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · deleted outside the app');
+});
+
+test('fake WebView2 watcher reports created and renamed native workspace files safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'created',
+        path: 'docs/new-external.md',
+        nativeHandleId: 'native-workspace-file-created',
+      }],
+    });
+  });
+  await expect(page.locator('#fileList')).toContainText('docs/new-external.md');
+
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'renamed',
+        oldPath: 'README.md',
+        path: 'docs/final.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#fileList')).toContainText('docs/final.md');
+  await expect(page.locator('#activeFileLabel')).toHaveText('docs/final.md · renamed outside the app');
+});
+
+test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace events', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await page.locator('[data-path="README.md"]').click();
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'other-workspace',
+      changes: [{ kind: 'changed', path: 'README.md' }],
+    });
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [
+        { kind: 'changed', path: 'C:/Users/example/secret.md' },
+        { kind: 'changed', path: '../secret.md' },
+        { kind: 'changed', path: '/rooted.md' },
+        { kind: 'changed', path: 'notes/ignored.exe' },
+        { kind: 'renamed', path: 'safe.md' },
+        { kind: 'unknown', path: 'README.md' },
+      ],
+    });
+  });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
 });
 
 test('fake WebView2 bridge handles cancelled and malformed native workspace responses safely', async ({ page }) => {

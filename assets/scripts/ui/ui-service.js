@@ -190,9 +190,8 @@ export function createUiService({
       if (state.externalChangePaths.has(file.path)) {
         const external = document.createElement('span');
         external.className = 'external-change-dot';
-        external.title = state.dirtyPaths.has(file.path)
-          ? 'Edited in memory and changed outside the app'
-          : 'Changed outside the app';
+        const detail = state.externalChangeDetails?.get(file.path);
+        external.title = getExternalChangeTitle(file, detail);
         button.appendChild(external);
         return;
       }
@@ -281,7 +280,8 @@ export function createUiService({
     function updateActiveFileLabel() {
       const record = state.files.find((item) => item.path === state.activePath);
       const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in memory' : '';
-      const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ' · changed outside the app' : '';
+      const detail = state.activePath ? state.externalChangeDetails?.get(state.activePath) : null;
+      const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ` · ${getExternalChangeLabel(detail)}` : '';
       const readOnly = record?.readOnly ? ' · read-only' : '';
       activeFileLabel.textContent = state.activePath ? `${state.activePath}${dirty}${external}${readOnly}` : 'No file selected';
     }
@@ -292,11 +292,11 @@ export function createUiService({
       const disabled = !record || Boolean(record?.readOnly);
       saveButton.disabled = disabled;
       if (saveAsButton) saveAsButton.disabled = disabled;
-      if (refreshFileButton) refreshFileButton.disabled = !record || !record.handle;
+      if (refreshFileButton) refreshFileButton.disabled = !record || (!record.handle && !record.nativeHandleId);
       if (record?.readOnly) {
         saveButton.title = 'Read-only guide documents cannot be saved.';
         if (saveAsButton) saveAsButton.title = 'Read-only guide documents cannot be saved.';
-        if (refreshFileButton) refreshFileButton.title = record.handle ? 'Refresh active file' : 'No linked local file to refresh';
+        if (refreshFileButton) refreshFileButton.title = record.handle || record.nativeHandleId ? 'Refresh active file' : 'No linked local file to refresh';
         return;
       }
       if (canSaveConvertedCopy) {
@@ -313,9 +313,26 @@ export function createUiService({
       if (saveAsButton) saveAsButton.title = record?.nativeHandleId
         ? 'Save a copy through the Windows app'
         : 'Save a copy using your browser file picker';
-      if (refreshFileButton) refreshFileButton.title = record?.handle
-        ? 'Read the linked local file again'
-        : 'No linked local file to refresh';
+      if (refreshFileButton) refreshFileButton.title = record?.nativeHandleId
+        ? 'Read the Windows workspace file again'
+        : record?.handle
+          ? 'Read the linked local file again'
+          : 'No linked local file to refresh';
+    }
+
+    function getExternalChangeTitle(file, detail) {
+      const dirtyPrefix = state.dirtyPaths.has(file.path) ? 'Edited in memory and ' : '';
+      if (detail?.kind === 'deleted') return `${dirtyPrefix}deleted outside the app`;
+      if (detail?.kind === 'renamed') return `${dirtyPrefix}renamed outside the app`;
+      if (detail?.kind === 'created') return 'Created outside the app';
+      return `${dirtyPrefix}changed outside the app`;
+    }
+
+    function getExternalChangeLabel(detail) {
+      if (detail?.kind === 'deleted') return 'deleted outside the app';
+      if (detail?.kind === 'renamed') return 'renamed outside the app';
+      if (detail?.kind === 'created') return 'created outside the app';
+      return 'changed outside the app';
     }
 
     function hasUnsavedChanges() {

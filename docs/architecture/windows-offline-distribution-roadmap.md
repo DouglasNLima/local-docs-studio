@@ -44,9 +44,20 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Browser, PWA, and GitHub Pages mode continue to use existing browser folder pickers and fallbacks.
 - **Help > Check Windows bridge** reports `workspace.openFolder`, `workspace.saveFile`, and `workspace.createFile` in addition to the Phase 2B capabilities when hosted by the Windows shell.
 
+## Implemented Phase 2D
+
+- Native workspace watching starts after `workspace.openFolder` and is disposed when a different workspace opens, the app closes, smoke completes, or watcher errors occur.
+- The Windows host watches only the selected workspace root and only supported editable files: `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+- Host-to-web watcher events use `lensDocs.native.workspaceChanged` with protocol version `1`, the active `nativeWorkspaceId`, safe relative paths, and `changed`, `created`, `deleted`, or host-recognised `renamed` changes.
+- Explicit native refresh uses `lensDocs.native.refreshWorkspaceFile` / `lensDocs.native.refreshWorkspaceFileResult` and reads only a validated file belonging to the selected native workspace.
+- Watcher events are debounced for 500 ms and coalesced. Deleted beats changed, changed-created files remain created, and recognised renames avoid separate delete/create notifications.
+- Native save/create operations suppress matching watcher noise for a best-effort two-second window. Real external changes should still be surfaced when uncertain.
+- The web app marks external changes without automatic merge or automatic dirty reload. Dirty editor content is preserved until the user explicitly refreshes or saves.
+- Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected and do not expose `workspace.watch` or `workspace.refreshFile`.
+- **Help > Check Windows bridge** reports `workspace.watch` and `workspace.refreshFile` in addition to the Phase 2B and Phase 2C capabilities when hosted by the Windows shell.
+
 ## Future Roadmap
 
-- Native workspace external-change detection and file watching.
 - Offline runtime hardening, including packaged asset coverage, WebView2 origin behaviour, service worker expectations, and clear fallback messages.
 - Windows installer and packaging for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
@@ -58,7 +69,7 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` creates controlled temporary fixtures, builds or reuses the Windows shell, launches it with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, checks fixture file content, and exits non-zero on failure.
 - The smoke-only `smoke.nativeFixtures` capability is reported only when `--smoke-native-bridge` is present. Normal Windows shell launches, browser mode, and GitHub Pages mode do not expose smoke fixture APIs.
 - Smoke fixture operations are limited to the explicit smoke root. They do not automate Windows picker UI, expose local environment details, run shell commands, reveal unrestricted paths, or change production bridge validation.
-- The smoke covers shell start, WebView2 app load, bridge diagnostics, native single-file open/save/save-as, native workspace open/save/create, protocol-error reporting, structured completion, and clean shutdown.
+- The smoke covers shell start, WebView2 app load, bridge diagnostics, native single-file open/save/save-as, native workspace open/save/create, one external workspace watcher event with a relative path, protocol-error reporting, structured completion, and clean shutdown.
 
 Run it with:
 
@@ -79,13 +90,18 @@ Phase 2C does not implement file watchers, external-change live notifications, r
 ## Manual Smoke
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder` and `workspace.saveFile` capabilities.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder`, `workspace.saveFile`, `workspace.watch`, and `workspace.refreshFile` capabilities.
 3. Use **File > Open folder**.
 4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
 5. Confirm the workspace browser loads relative paths.
 6. Select multiple files and confirm editor/preview update.
 7. Edit a workspace file.
 8. Use **File > Save changes**.
-9. Reopen the file externally and confirm the content changed.
-10. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
-11. Open the app in normal browser mode and confirm no native bridge errors.
+9. Modify that file externally in another editor while Lens Docs Studio has no local edits.
+10. Confirm external-change indicator/status appears.
+11. Use **Refresh active file** and confirm content updates.
+12. Modify the file again externally while local edits exist in Lens Docs Studio.
+13. Confirm local edits are preserved and conflict/external-change indication appears.
+14. Delete or rename a workspace file externally and confirm safe indication.
+15. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+16. Open the app in normal browser mode and confirm no native bridge errors.

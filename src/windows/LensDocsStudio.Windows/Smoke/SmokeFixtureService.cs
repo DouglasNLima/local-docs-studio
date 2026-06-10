@@ -43,6 +43,23 @@ public sealed class SmokeFixtureService
         return nativeWorkspaceService.OpenFolderPathAsync(path);
     }
 
+    public async Task<object> TouchWorkspaceFileAsync()
+    {
+        var relativePath = Path.Combine("workspace", "docs", "overview.md");
+        var path = ResolveSmokePath(relativePath);
+        if (!File.Exists(path))
+        {
+            throw new NativeFileException("The smoke workspace file is unavailable.");
+        }
+
+        await File.WriteAllTextAsync(path, "# Overview\r\n\r\nExternally changed by the automated native bridge smoke.\r\n");
+        return new
+        {
+            changed = true,
+            path = "docs/overview.md",
+        };
+    }
+
     private string ResolveSmokePath(string relativePath)
     {
         if (!Enabled || string.IsNullOrWhiteSpace(options.RootPath))

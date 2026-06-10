@@ -11,6 +11,7 @@ public sealed partial class MainWindow : Window
 {
     private readonly StaticAppLocator staticAppLocator = new();
     private readonly WebViewBootstrapper webViewBootstrapper;
+    private readonly NativeWorkspaceService nativeWorkspaceService;
 
     public MainWindow(SmokeOptions? smokeOptions = null)
     {
@@ -18,7 +19,7 @@ public sealed partial class MainWindow : Window
         Title = "Lens Docs Studio";
         smokeOptions ??= SmokeOptions.Disabled;
         var nativeFileService = new NativeFileService(this);
-        var nativeWorkspaceService = new NativeWorkspaceService(this);
+        nativeWorkspaceService = new NativeWorkspaceService(this);
         var smokeFixtureService = smokeOptions.Enabled
             ? new SmokeFixtureService(smokeOptions, nativeFileService, nativeWorkspaceService)
             : null;
@@ -30,6 +31,7 @@ public sealed partial class MainWindow : Window
             nativeWorkspaceService,
             smokeFixtureService,
             smokeCompletionService));
+        Closed += (_, _) => nativeWorkspaceService.StopWatching();
         _ = InitialiseAsync();
     }
 

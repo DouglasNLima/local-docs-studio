@@ -7,6 +7,8 @@ const REQUIRED_CAPABILITIES = [
   'file.saveAs',
   'workspace.openFolder',
   'workspace.saveFile',
+  'workspace.watch',
+  'workspace.refreshFile',
 ];
 
 const SINGLE_FILE_UPDATED = '# Windows Smoke Single File\n\nSaved by the automated native bridge smoke.\n';
@@ -124,6 +126,32 @@ export async function runNativeBridgeSmoke({
       });
     }
 
+    if (capabilities.includes('smoke.workspaceChange') && typeof bridgeClient.on === 'function') {
+      const watcherEventPromise = waitForWorkspaceChange(bridgeClient, workspacePayload.nativeWorkspaceId, 'docs/overview.md');
+      const touched = await bridgeClient.touchSmokeWorkspaceFile();
+      recordStep('Smoke workspace file externally changed', touched.ok && touched.response?.payload?.changed === true, {
+        path: touched.response?.payload?.path || '',
+        message: touched.message,
+      });
+      const watcherEvent = await watcherEventPromise;
+      recordStep('Workspace watcher event received', watcherEvent.received, {
+        path: watcherEvent.path || '',
+        message: watcherEvent.message || '',
+      });
+      recordStep('Workspace watcher event used a relative path', watcherEvent.received && watcherEvent.relativeOnly, {
+        path: watcherEvent.path || '',
+      });
+    } else {
+      recordStep('Workspace watcher event received', true, {
+        skipped: true,
+        message: 'smoke.workspaceChange capability absent.',
+      });
+      recordStep('Workspace watcher event used a relative path', true, {
+        skipped: true,
+        message: 'smoke.workspaceChange capability absent.',
+      });
+    }
+
     recordStep('Browser app did not report bridge protocol error', !errors.some((error) => /protocol/i.test(error)));
   } catch (error) {
     recordStep('Smoke completed without runner exception', false, {
@@ -146,6 +174,30 @@ export async function runNativeBridgeSmoke({
   }
 
   return { ran: true, result };
+}
+
+function waitForWorkspaceChange(bridgeClient, nativeWorkspaceId, expectedPath) {
+  return new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      unsubscribe();
+      resolve({ received: false, message: 'Timed out waiting for workspace watcher event.' });
+    }, 7000);
+
+    const unsubscribe = bridgeClient.on('lensDocs.native.workspaceChanged', (message) => {
+      const payload = message?.payload || {};
+      if (payload.nativeWorkspaceId !== nativeWorkspaceId || !Array.isArray(payload.changes)) return;
+      const change = payload.changes.find((item) => item?.path === expectedPath);
+      if (!change) return;
+      clearTimeout(timeout);
+      unsubscribe();
+      const path = String(change.path || '');
+      resolve({
+        received: true,
+        path,
+        relativeOnly: Boolean(path && !path.startsWith('/') && !/^[a-z]:/i.test(path) && !path.includes('\\')),
+      });
+    });
+  });
 }
 
 function isValidFilePayload(payload) {

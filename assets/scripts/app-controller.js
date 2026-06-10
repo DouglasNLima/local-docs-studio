@@ -1617,6 +1617,7 @@ export function createAppController() {
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
+      state.externalChangeDetails?.clear();
       state.workspaceDirectoryHandle = null;
       state.nativeWorkspaceId = '';
       state.workspaceKind = '';

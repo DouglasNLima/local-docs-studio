@@ -64,6 +64,7 @@ export function createInitialState({ readStoredNumber }) {
     savedContentCache: new Map(),
     dirtyPaths: new Set(),
     externalChangePaths: new Set(),
+    externalChangeDetails: new Map(),
     deletionOverridePaths: new Set(),
     draftWorkspaceKey: '',
     diagramZoom: readStoredNumber(storageKeys.diagramZoom, 1),
