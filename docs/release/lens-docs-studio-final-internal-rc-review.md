@@ -4,6 +4,8 @@ Final internal release-candidate review for the complete `v0.1.0-dev` draft prer
 
 This review did not publish the draft release, create or move tags, create another release, merge to `main`, replace release assets, or rebuild artefacts.
 
+Post-publication note: Phase 3Q later published `v0.1.0-dev` as a public prerelease without changing the assets, tag, or target commit. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` for the current publication record and feedback process.
+
 ## Release
 
 - Tag: `v0.1.0-dev`

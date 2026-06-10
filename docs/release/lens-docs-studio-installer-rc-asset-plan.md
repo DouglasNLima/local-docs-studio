@@ -4,6 +4,8 @@ Status: Phase 3N planning gate.
 
 This plan decides whether the certified Phase 3M.1 Inno Setup installer should be added as extra assets on the existing `v0.1.0-dev` GitHub draft prerelease. It does not upload assets, publish the draft, create a new release, create or move tags, merge to `main`, sign binaries, add auto-update, add MSIX/WiX, add runtime bootstrapping, or change app behaviour.
 
+Post-publication note: Phase 3Q later recorded `v0.1.0-dev` as a public GitHub prerelease with the ZIP fallback and unsigned Inno Setup installer assets present. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`; keep this Phase 3N document as the historical upload plan.
+
 ## Context
 
 The Windows-first release path is active on `develop`. ZIP plus GitHub Releases remains the internal release-candidate fallback, and the current GitHub release is still a draft prerelease for controlled RC review.

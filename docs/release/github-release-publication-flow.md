@@ -6,6 +6,8 @@ Phase 3L keeps this ZIP publication flow as the internal RC fallback and recomme
 
 Phase 3N records the installer RC asset plan in `docs/release/lens-docs-studio-installer-rc-asset-plan.md`. It recommends adding the certified unsigned Inno Setup installer, checksum, and installer report as additional assets to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, while keeping the ZIP as the primary fallback and keeping the release unpublished.
 
+Phase 3Q records the later publication of `v0.1.0-dev` as a public GitHub prerelease in `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`. The release is not stable/latest, the ZIP remains the fallback package, the Inno Setup installer remains unsigned and prerequisite-dependent, and feedback intake is documented in `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`.
+
 The default path is safe: it creates local release artefacts and prints the GitHub CLI command, but it does not create a GitHub release and does not upload files.
 
 ## Prepare A Dry Run
@@ -139,6 +141,8 @@ Do not run the command manually unless the release notes, checksum, and RC repor
 After a draft prerelease has been created and assets have been uploaded, use `docs/release/lens-docs-studio-draft-release-review.md` to inspect the GitHub release metadata, release notes, uploaded assets, downloaded ZIP, checksum, extraction, packaged executable, native bridge smoke, manual tester workflow, known limitations, and draft-release verdict.
 
 This review keeps the release as a draft. It does not publish, create another release, move tags, rebuild assets, or merge to `main`.
+
+After `v0.1.0-dev` was intentionally published as a public prerelease, use `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` as the publication record and `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md` for feedback triage.
 
 ## Checksum Validation
 

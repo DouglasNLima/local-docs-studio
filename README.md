@@ -70,7 +70,9 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
 
 The installer build wraps the existing certified Windows package output, validates packaged `StaticApp/`, writes a single setup executable plus `.sha256` and report under `artifacts/installers/inno/`, installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, creates a Start Menu shortcut, offers an optional Desktop shortcut, and keeps file associations as an unchecked per-user task. It does not install runtimes, publish or upload a release, create or move tags, sign binaries, add auto-update, merge to `main`, or replace the ZIP fallback. See `docs/release/lens-docs-studio-inno-installer-mvp.md`.
 
-The Phase 3N installer RC asset plan recommends adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
+The Phase 3N installer RC asset plan recommended adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
+
+Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback, the unsigned Inno Setup installer is available as a prerelease installer, runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
 
 Prepare a dry-run GitHub Release artefact set with:
 
@@ -89,6 +91,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps
 The review gate reruns release preparation in dry-run mode, validates the ZIP, checksum, RC report, release notes, tag/target strategy, and generated GitHub CLI command, then writes an ignored review report under `artifacts/releases/<tag>/`. A ready result means the artefact set is suitable for an intentional manual draft prerelease step; it still does not publish, upload, create tags, sign the ZIP, or merge to `main`.
 
 Review an existing GitHub draft prerelease with `docs/release/lens-docs-studio-draft-release-review.md`. The checklist covers live release metadata, notes, assets, ZIP download, SHA256 verification, extraction, packaged app launch, native bridge smoke, remaining manual RC tester checks, known limitations, and the draft-release verdict without publishing.
+
+For the public `v0.1.0-dev` prerelease publication record and feedback intake, see `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`, `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`, and `docs/release/lens-docs-studio-v0.1.0-dev-known-issues.md`.
 
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. The Windows first-run setup wizard appears only in the Windows shell, can be skipped, can be reopened from **Help > Open setup wizard**, and stores completion in browser-local storage. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
@@ -113,12 +117,14 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3L records the MSIX versus classic installer spike and recommends a classic installer MVP with Inno Setup.
 - Phase 3M adds the internal unsigned Inno Setup installer MVP build path while keeping ZIP plus GitHub Releases as the fallback.
 - Phase 3N records the installer RC asset plan for optionally adding the certified Inno Setup installer to the existing draft prerelease without publishing it.
+- Phase 3Q records the public `v0.1.0-dev` prerelease publication and adds structured feedback intake plus known caveats.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 See `docs/architecture/windows-installer-decision-gate.md` for the installer strategy decision gate.
 See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer spike and Phase 3M recommendation.
 See `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for the Phase 3N installer draft-release asset plan.
+See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` for the Phase 3Q public prerelease publication record.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge
