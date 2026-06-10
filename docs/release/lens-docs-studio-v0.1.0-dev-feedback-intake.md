@@ -109,3 +109,7 @@ Does this block prerelease adoption? yes / no / unsure
 - Treat checksum mismatches as blocker until the asset, local file, and command used for verification are understood.
 - Do not infer stability from successful prerelease installs.
 - Do not convert feedback about candidate findings, external documents, or imported artefact metadata into confirmed findings without user review.
+
+## Next-Cycle Planning
+
+Phase 3R triage and `v0.1.0-dev.1` scope planning are recorded in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`.

@@ -28,6 +28,8 @@ Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.
 
 Use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md` for structured feedback capture and triage.
 
+Phase 3R triage for the next targeted prerelease cycle is recorded in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`.
+
 Recommended next-cycle path:
 
 - Choose `v0.1.0-dev.1` for targeted prerelease fixes or documentation corrections.

@@ -72,7 +72,7 @@ The installer build wraps the existing certified Windows package output, validat
 
 The Phase 3N installer RC asset plan recommended adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
 
-Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback, the unsigned Inno Setup installer is available as a prerelease installer, runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
+Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback, the unsigned Inno Setup installer is available as a prerelease installer, runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. Phase 3R records `v0.1.0-dev.1` triage and next-cycle scope in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
 
 Prepare a dry-run GitHub Release artefact set with:
 
@@ -118,6 +118,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3M adds the internal unsigned Inno Setup installer MVP build path while keeping ZIP plus GitHub Releases as the fallback.
 - Phase 3N records the installer RC asset plan for optionally adding the certified Inno Setup installer to the existing draft prerelease without publishing it.
 - Phase 3Q records the public `v0.1.0-dev` prerelease publication and adds structured feedback intake plus known caveats.
+- Phase 3R records prerelease feedback triage and recommends targeted `v0.1.0-dev.1` planning scope.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -125,6 +126,7 @@ See `docs/architecture/windows-installer-decision-gate.md` for the installer str
 See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer spike and Phase 3M recommendation.
 See `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for the Phase 3N installer draft-release asset plan.
 See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` for the Phase 3Q public prerelease publication record.
+See `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md` for the Phase 3R prerelease feedback triage and `v0.1.0-dev.1` planning record.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge

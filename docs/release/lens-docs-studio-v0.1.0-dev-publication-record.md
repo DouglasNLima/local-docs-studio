@@ -66,3 +66,5 @@ Known issues and caveats are summarised in `docs/release/lens-docs-studio-v0.1.0
 - `v0.1.0-dev.1`: preferred if public prerelease feedback finds targeted fixes or documentation clarifications before a release-candidate label.
 - `v0.1.0-rc.1`: use when the prerelease feedback queue is clear enough to begin a stable-candidate pass.
 - `v0.1.0` stable: defer until prerelease/RC feedback, prerequisite communication, installer confidence, and stable publication readiness are complete.
+
+Phase 3R planning for the recommended `v0.1.0-dev.1` scope is recorded in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`.
