@@ -42,6 +42,14 @@ Build it with:
 dotnet build src/windows/LensDocsStudio.Windows.sln
 ```
 
+Create the Phase 3B folder/ZIP package with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1
+```
+
+The package script publishes a framework-dependent `win-x64` folder to `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/`, creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, validates `StaticApp/`, and runs the native bridge smoke harness against the packaged executable unless `-NoSmoke` is passed. Run the package by launching `LensDocsStudio.Windows.exe` from the package folder. The Phase 3B package is intentionally a folder/ZIP distributable; it does not add MSIX, signing, certificates, file associations, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
+
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. It does not add recent native folders, file associations, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
@@ -54,7 +62,8 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 2C adds native open folder, recursive workspace discovery, workspace file save, and native Markdown file creation through opaque workspace and file handles.
 - Phase 2D adds native workspace external-change detection, safe relative watcher events, explicit native refresh, and non-destructive web UI markers for changed, created, deleted, and renamed workspace files.
 - Phase 2E refines the native workspace conflict UX with distinct changed, deleted, renamed, dirty, and dirty-external-conflict indicators plus explicit refresh/discard prompts.
-- Future Windows work includes offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
+- Phase 3B adds the first repeatable folder/ZIP Windows package flow.
+- Future Windows work includes a fuller installer path, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
 
@@ -87,6 +96,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
 ```
 
 Use `-NoBuild` to inspect the latest `StaticApp/` output. The check verifies the shell, service worker cache list, vendor manifest, pinned vendor files, help guide, web manifest, icon, and packaged runtime files, then scans runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
+
+Pass `-StaticAppRoot` to validate a specific package output, for example `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/StaticApp`.
 
 Manual smoke path:
 

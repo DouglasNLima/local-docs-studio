@@ -9,7 +9,7 @@ The Windows app is the primary product distribution direction. The static browse
 - Windows 10 version 2004 or later.
 - .NET 8 SDK or newer.
 - Windows App SDK runtime matching the project package version.
-- WebView2 Runtime, normally provided by Microsoft Edge on current Windows installations.
+- Evergreen WebView2 Runtime, normally provided by Microsoft Edge on current Windows installations.
 
 ## Run Locally
 
@@ -41,6 +41,26 @@ dotnet build src/windows/LensDocsStudio.Windows.sln
 
 If build tooling is missing, install the WinUI 3/Windows App SDK development components through Visual Studio Installer and retry the command.
 
+## Folder/ZIP Package
+
+Create the Phase 3B package from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1
+```
+
+By default this creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/` and `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`. Launch the packaged app with `LensDocsStudio.Windows.exe` inside the output folder. The executable expects `StaticApp/` beside it and loads `index.html` through the WebView2 virtual host, without a local HTTP server.
+
+The package is framework-dependent for this MVP. It requires the .NET desktop runtime, the Windows App SDK runtime that matches `Microsoft.WindowsAppSDK`, and the Evergreen WebView2 Runtime. Later installer phases may bootstrap prerequisites, but Phase 3B does not bundle WebView2 Fixed Version Runtime.
+
+Useful options:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -Configuration Release -VersionSuffix dev -NoSmoke -KeepOutput
+```
+
+This phase is limited to a folder/ZIP distributable. It does not add MSIX, signing, certificates, file associations, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
+
 ## Offline Static Asset Validation
 
 Run the packaged asset check from the repository root:
@@ -49,16 +69,17 @@ Run the packaged asset check from the repository root:
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
 ```
 
-Use `-NoBuild` to inspect the latest build output. The script locates the latest `StaticApp/` output, checks `index.html`, `assets/styles/app.css`, `assets/scripts/main.js`, every service-worker runtime asset, `assets/vendor/manifest.json`, every listed vendor file, `docs/tool-guide.md`, `manifest.webmanifest`, and `icon.svg`, then scans packaged runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
+Use `-NoBuild` to inspect the latest build output, or pass `-StaticAppRoot` to validate a specific package output. The script locates or uses the selected `StaticApp/` output, checks `index.html`, `assets/styles/app.css`, `assets/scripts/main.js`, every service-worker runtime asset, `assets/vendor/manifest.json`, every listed vendor file, `docs/tool-guide.md`, `manifest.webmanifest`, and `icon.svg`, then scans packaged runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
 
 ## Scope
 
-This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, and exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh operations. File associations, packaging, auto-update, recent native folders, delete/rename/move operations initiated from the app, and native export flows are left for later phases.
+This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, and exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh operations. File associations, fuller installer work, auto-update, recent native folders, delete/rename/move operations initiated from the app, and native export flows are left for later phases.
 
 ## Roadmap
 
 - Offline runtime hardening.
-- Windows installer and packaging.
+- Folder/ZIP Windows package MVP.
+- Fuller Windows installer work.
 - First-run setup wizard.
 - File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.

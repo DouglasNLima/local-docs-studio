@@ -204,6 +204,7 @@ const americanEnglishPattern = /\b(artifact|artifacts|behavior|behaviors|center|
 for (const copyFile of firstPartyCopyFiles) {
   const source = readFileSync(toRootPath(copyFile), 'utf8')
     .replace(/theme-color/g, '')
+    .replace(/artifacts[\\/][^\s`)]+/gi, '')
     .replace(/lens-artifact-bundle[\w.-]*/gi, '')
     .replace(/artifact-bundles?/gi, '')
     .replace(/artifactBundle/g, '')

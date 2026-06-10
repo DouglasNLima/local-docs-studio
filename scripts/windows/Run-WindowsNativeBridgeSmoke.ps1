@@ -1,7 +1,8 @@
 param(
     [switch]$NoBuild,
     [int]$TimeoutSeconds = 60,
-    [switch]$KeepSmokeRoot
+    [switch]$KeepSmokeRoot,
+    [string]$AppExecutablePath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,6 +34,12 @@ function Assert-Smoke {
 }
 
 function Get-WindowsShellExecutable {
+    if ($AppExecutablePath) {
+        $resolvedExecutablePath = Resolve-Path -LiteralPath $AppExecutablePath -ErrorAction Stop
+        Assert-Smoke ($resolvedExecutablePath.Path -like '*.exe') "Windows shell executable must be an .exe file: $($resolvedExecutablePath.Path)"
+        return $resolvedExecutablePath.Path
+    }
+
     $projectDirectory = Split-Path -Parent $projectPath
     $candidates = Get-ChildItem -LiteralPath (Join-Path $projectDirectory 'bin') -Recurse -Filter 'LensDocsStudio.Windows.exe' -ErrorAction SilentlyContinue |
         Sort-Object @{ Expression = { if ($_.FullName -match '\\x64\\') { 0 } else { 1 } }; Ascending = $true }, @{ Expression = { $_.LastWriteTimeUtc }; Descending = $true }
@@ -63,6 +70,10 @@ Set-Content -LiteralPath (Join-Path $smokeRoot 'workspace\diagrams\sample.mmd') 
 
 $process = $null
 try {
+    if ($AppExecutablePath) {
+        $NoBuild = $true
+    }
+
     if (-not $NoBuild) {
         Write-SmokeLine 'Building Windows shell...'
         dotnet build $solutionPath

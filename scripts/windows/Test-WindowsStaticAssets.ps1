@@ -2,7 +2,8 @@ param(
     [switch]$NoBuild,
     [string]$Configuration = 'Debug',
     [string]$Platform = 'Any CPU',
-    [string]$PreferredOutputPlatform = 'x64'
+    [string]$PreferredOutputPlatform = 'x64',
+    [string]$StaticAppRoot
 )
 
 $ErrorActionPreference = 'Stop'
@@ -67,6 +68,10 @@ function Assert-PackagedFile {
     Assert-Asset (Test-Path -LiteralPath $path -PathType Leaf) "Missing packaged static app file: $relativePath"
 }
 
+if ($StaticAppRoot) {
+    $NoBuild = $true
+}
+
 if (-not $NoBuild) {
     Write-AssetLine "Building Windows shell ($Configuration|$Platform)..."
     dotnet build $solutionPath -c $Configuration -p:Platform=$Platform
@@ -75,7 +80,12 @@ if (-not $NoBuild) {
     }
 }
 
-$staticAppRoot = Get-LatestStaticAppRoot
+$staticAppRoot = if ($StaticAppRoot) {
+    $resolvedStaticAppRoot = Resolve-Path -LiteralPath $StaticAppRoot -ErrorAction Stop
+    $resolvedStaticAppRoot.Path
+} else {
+    Get-LatestStaticAppRoot
+}
 Write-AssetLine "Inspecting $staticAppRoot"
 
 $requiredRootAssets = @(

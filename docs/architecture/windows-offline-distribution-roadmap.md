@@ -88,9 +88,18 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Network request interception is not part of Phase 3A smoke automation. The certification uses static URL scanning plus packaged asset validation to avoid brittle WebView2 network automation while still enforcing offline runtime completeness.
 - Offline-capable for this phase means the Windows app can launch from packaged local assets, load CSS and JavaScript modules, load vendored Markdown, Mermaid, Highlight.js, DOMPurify, KaTeX, ZIP, Word, and PDF import dependencies, open the local help guide, use templates and snippets, use native single-file and workspace workflows, detect external workspace changes, and run existing export paths without GitHub Pages, CDN access, or a local HTTP server.
 
+## Implemented Phase 3B
+
+- `scripts/windows/Build-WindowsPackage.ps1` creates a repeatable folder/ZIP distributable under `artifacts/windows/`, using a framework-dependent `win-x64` publish of the unpackaged WinUI 3 shell.
+- The package output keeps `LensDocsStudio.Windows.exe` and the copied `StaticApp/` folder together so WebView2 can load the app from `https://lens-docs-studio.local/` without GitHub Pages, a CDN, an external URL, or a local HTTP server.
+- `scripts/windows/Test-WindowsStaticAssets.ps1` accepts `-StaticAppRoot` so the validator can inspect the actual package output as well as the latest development build output.
+- `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` accepts `-AppExecutablePath` so the automated native bridge smoke can run against the packaged executable when practical.
+- The packaging MVP requires the .NET desktop runtime, the matching Windows App SDK runtime, and the Evergreen WebView2 Runtime. It does not bundle WebView2 Fixed Version Runtime.
+- This phase deliberately excludes MSIX, signing, certificates, file associations, installer wizard UI, auto-update, store publishing metadata, and prerequisite bootstrapping.
+
 ## Future Roadmap
 
-- Windows installer and packaging for offline distribution.
+- Fuller Windows installer work for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
 - File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
