@@ -12,6 +12,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 
 The script builds the Windows package, validates the packaged `StaticApp/` and file association script dry-runs, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus matching JSON metadata under `artifacts/windows/release-candidates/`.
 
+Phase 3F keeps this folder/ZIP package as the short-term release candidate artefact. The installer decision gate in `docs/architecture/windows-installer-decision-gate.md` defers MSIX, classic installer work, signing, prerequisite bootstrapping, auto-update, and winget metadata to later phases.
+
 Use explicit release-candidate version values when preparing a named RC:
 
 ```powershell
@@ -65,7 +67,7 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 
 ## Certification Non-Claims
 
-- [ ] No MSIX package, installer wizard, signing, certificates, Store publishing, auto-update, machine-wide file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included. The first-run setup wizard is in-app onboarding only.
+- [ ] No MSIX package, classic installer, installer wizard, signing, certificates, Store publishing, auto-update, winget manifest, machine-wide file associations, WebView2 bootstrapper, WebView2 Fixed Version Runtime, telemetry, cloud sync, or merge to `main` is included. The first-run setup wizard is in-app onboarding only.
 - [ ] The RC gate does not prove prerequisites are installed on tester machines.
 - [ ] The RC gate does not perform antivirus reputation checks, accessibility audits, performance benchmarks, telemetry reviews, network interception, or cross-machine install validation.
 - [ ] The RC gate does not certify new editor/runtime behaviour beyond packaged asset validation, packaged native bridge smoke, and this manual checklist.

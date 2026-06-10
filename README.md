@@ -58,6 +58,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 
 The RC script builds the folder/ZIP package, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes a Markdown report plus JSON metadata under `artifacts/windows/release-candidates/`. Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. The certification is an audit gate for the folder/ZIP package only; it does not add MSIX, signing, certificates, Store publishing, auto-update, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
 
+The Phase 3F installer decision gate keeps the folder/ZIP package as the short-term release candidate artefact and defers MSIX or classic installer implementation to a separate spike after signing, prerequisite, file association, and update policy decisions. See `docs/architecture/windows-installer-decision-gate.md`.
+
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. The Windows first-run setup wizard appears only in the Windows shell, can be skipped, can be reopened from **Help > Open setup wizard**, and stores completion in browser-local storage. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
@@ -74,9 +76,11 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3C adds the release-candidate certification gate for the Windows folder/ZIP package.
 - Phase 3D adds a controlled Windows file association MVP for manual per-user registration and startup file arguments.
 - Phase 3E adds a compact in-app Windows first-run setup wizard for runtime readiness, optional workspace opening, file association guidance, and starter documents.
+- Phase 3F records the Windows installer decision gate: ZIP and GitHub Releases first, then an MSIX/classic installer spike once signing and update strategy are clear.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
+See `docs/architecture/windows-installer-decision-gate.md` for the installer strategy decision gate.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge

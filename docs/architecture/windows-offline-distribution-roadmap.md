@@ -130,9 +130,19 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The automated native bridge smoke suppresses the wizard through the smoke-only capability so smoke automation does not need to dismiss first-run setup. Normal launches remain unchanged.
 - This MVP is not MSIX, not an installer wizard, not a WebView2 bootstrapper, not auto-update, not telemetry, not cloud sync, and not a complex settings page.
 
+## Implemented Phase 3F
+
+- `docs/architecture/windows-installer-decision-gate.md` records the Windows installer decision gate.
+- The accepted short-term path keeps the current folder/ZIP package as the release candidate artefact and uses GitHub Releases for ZIP publication when ready.
+- MSIX and classic installer implementation are deferred to a separate spike that must validate signing, prerequisite handling, shortcuts, file associations, uninstall, upgrade, and clean-machine behaviour.
+- The current runtime prerequisite policy remains framework-dependent: .NET desktop runtime, matching Windows App SDK runtime, and Evergreen WebView2 Runtime.
+- WebView2 bootstrapper, WebView2 Fixed Version Runtime, self-contained publish, installer-owned file associations, auto-update, winget manifests, and production installer scripts are not implemented in this phase.
+
 ## Future Roadmap
 
-- Fuller Windows installer work for offline distribution.
+- GitHub Release ZIP publication flow for certified Windows package artefacts.
+- MSIX versus classic installer spike for offline distribution.
+- Chosen Windows installer MVP with signing, prerequisite handling, shortcuts, uninstall, and file associations.
 - Single-instance forwarding for file-open activation.
 - Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
 

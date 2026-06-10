@@ -79,6 +79,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidat
 
 Use `docs/release/lens-docs-studio-windows-package-rc-checklist.md` for manual packaged-app smoke. The RC gate certifies only the folder/ZIP package, packaged static runtime validation, packaged native bridge smoke, package metadata, and documented manual smoke scope. It does not add MSIX, signing, certificates, Store publishing, auto-update, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
 
+Phase 3F records the installer decision gate in `docs/architecture/windows-installer-decision-gate.md`. The accepted short-term path is to keep the certified folder/ZIP artefact for release candidates and GitHub Releases, then run a separate MSIX/classic installer spike before adding production installer scripts, signing, prerequisite bootstrapping, auto-update, or winget metadata.
+
 ## Offline Static Asset Validation
 
 Run the packaged asset check from the repository root:
@@ -100,6 +102,7 @@ This shell is intentionally thin. It creates the desktop window, initialises Web
 - Windows folder/ZIP release candidate certification.
 - Windows file associations MVP.
 - Windows first-run setup wizard MVP.
+- Windows installer decision gate.
 - Fuller Windows installer work.
 - Release flow from `develop` to `main`, where `develop` is the active implementation branch and `main` remains the stable publication branch.
 
