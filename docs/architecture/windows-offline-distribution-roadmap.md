@@ -146,6 +146,13 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The flow refuses dirty worktrees, non-`develop` branches, stale target commits, failed RC certification, and missing checksums unless an explicit local rehearsal override is supplied where documented.
 - This phase does not add auto-update, MSIX, a classic installer, signing, Store publishing, WebView2 bootstrapper, WebView2 Fixed Version Runtime, machine-wide file associations, release CI/CD, a merge to `main`, or automatic GitHub Release publication.
 
+## Implemented Phase 3H
+
+- `scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1` adds a dry-run review gate for the prepared GitHub Release artefact set.
+- The gate reruns release preparation in dry-run mode by default, validates the artefact folder, ZIP, SHA256 file, RC report, release notes, tag/target strategy, and generated draft prerelease `gh release create` command.
+- The gate writes an ignored review report under `artifacts/releases/<tag>/` with the product, version, tag, target commit, package ZIP, SHA256 value, RC report path, release notes path, generated command, verdict, manual publication checklist, and known limitations.
+- `CERTIFIED_DRAFT_RELEASE_READY` means the local dry-run artefacts are ready for an intentional manual draft prerelease publication step. It does not publish, upload, create tags, sign the ZIP, add MSIX, add a classic installer, add auto-update, or merge to `main`.
+
 ## Future Roadmap
 
 - MSIX versus classic installer spike for offline distribution.

@@ -36,6 +36,29 @@ The default values are:
 
 The generated artefacts are ignored source outputs and must not be committed.
 
+## Certify The Dry-run Output
+
+Run the publication gate before any manual draft prerelease publication:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1
+```
+
+The gate is dry-run only. By default it reruns `Prepare-WindowsGitHubRelease.ps1 -DryRun`, validates the prepared artefact folder, checks the ZIP checksum file against the calculated SHA256, confirms the RC report and release notes are present, checks that release notes mention prerequisites, known limitations, and SHA256 verification guidance, then verifies that the generated `gh release create` command targets `DouglasNLima/local-docs-studio` with the expected tag, target commit, `--draft`, `--prerelease`, ZIP asset, SHA256 asset, RC report asset, and notes file.
+
+The gate writes an ignored review report to:
+
+```text
+artifacts/releases/<tag>/LensDocsStudio.Windows-<version>-release-review.md
+```
+
+Possible results are:
+
+- `CERTIFIED_DRAFT_RELEASE_READY`: the dry-run artefact set is ready for an intentional manual draft prerelease publication step.
+- `BLOCKED`: at least one required dry-run publication check failed.
+
+Ready means the generated artefacts and command have passed the local review gate. It does not mean the ZIP is signed, installer-backed, auto-updating, published, uploaded, tagged, merged to `main`, or suitable for stable release publication.
+
 ## Artefact Set
 
 The default dry run prepares:
@@ -72,6 +95,8 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -
 Publishing requires the GitHub CLI to be installed, authenticated, and authorised for `DouglasNLima/local-docs-studio`. The script passes `--draft` and `--prerelease` by default. If the tag does not already exist, `gh release create --target <commit>` may create the release tag on GitHub as part of release creation. The script does not create or move local tags.
 
 Supplying both `-Publish` and `-DryRun` keeps the run dry.
+
+Do not use `-Publish` unless you are intentionally creating the draft prerelease after reviewing the dry-run gate report. The publication gate never supplies `-Publish`.
 
 ## Generated GitHub CLI Command
 
@@ -142,6 +167,7 @@ dotnet build src/windows/LensDocsStudio.Windows.sln
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
 pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1
 pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1
 ```
 
 If runtime, project, UI, import/export, clipboard, or browser workflow files change, also run:

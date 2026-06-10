@@ -89,6 +89,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -
 
 The release preparation script builds and certifies the Windows ZIP by default, then writes `artifacts/releases/<tag>/` with the ZIP, `.sha256` checksum, RC report, generated release notes, and the draft prerelease `gh release create` command. It does not publish, upload files, create local tags, add signing, add an installer, or merge to `main` unless a later release operator explicitly chooses the documented publish path. See `docs/release/github-release-publication-flow.md`.
 
+Before any real draft prerelease is created, run the dry-run review gate from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1
+```
+
+The gate validates the prepared artefact set, release notes, SHA256 checksum, RC report, target commit, tag strategy, and generated `gh release create` command. It writes an ignored review report under `artifacts/releases/<tag>/` and does not publish, upload, or create tags.
+
 ## Offline Static Asset Validation
 
 Run the packaged asset check from the repository root:

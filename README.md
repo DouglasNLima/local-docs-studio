@@ -68,6 +68,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -
 
 The Phase 3G release preparation script builds and certifies the Windows ZIP package, copies the certified ZIP into `artifacts/releases/<tag>/`, writes a `.sha256` checksum, generates release notes from `docs/release/templates/github-release-notes.md`, and prints the exact `gh release create` command. Dry-run is the default: no GitHub release is created, no files are uploaded, no local tags are created, and no merge to `main` is performed. Use `-Publish` only after reviewing the generated release notes, checksum, and RC report. See `docs/release/github-release-publication-flow.md`.
 
+Certify the dry-run output before any manual draft prerelease publication with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1
+```
+
+The review gate reruns release preparation in dry-run mode, validates the ZIP, checksum, RC report, release notes, tag/target strategy, and generated GitHub CLI command, then writes an ignored review report under `artifacts/releases/<tag>/`. A ready result means the artefact set is suitable for an intentional manual draft prerelease step; it still does not publish, upload, create tags, sign the ZIP, or merge to `main`.
+
 The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. It adds native single-file open, save, and save-as dialogues for UTF-8 Markdown, Mermaid, and text files up to 5 MB. It also adds a native workspace foundation for opening a selected folder, loading supported files recursively, creating Markdown files in that workspace, saving workspace files through host-owned opaque handles, and detecting external changes in the selected native workspace. The Windows file association MVP adds command-line startup file handling and manual per-user HKCU registration scripts for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`. The Windows first-run setup wizard appears only in the Windows shell, can be skipped, can be reopened from **Help > Open setup wizard**, and stores completion in browser-local storage. It does not add recent native folders, installers, auto-update, delete/rename/move operations initiated from the app, or native export behaviour yet.
 
 ## Roadmap And Branches
@@ -86,6 +94,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3E adds a compact in-app Windows first-run setup wizard for runtime readiness, optional workspace opening, file association guidance, and starter documents.
 - Phase 3F records the Windows installer decision gate: ZIP and GitHub Releases first, then an MSIX/classic installer spike once signing and update strategy are clear.
 - Phase 3G adds a dry-run-first GitHub Release ZIP publication flow for preparing release notes, checksum, RC report, and the `gh release create` command.
+- Phase 3H adds a dry-run review gate for certifying the prepared GitHub Release artefact set before any intentional draft prerelease publication.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
