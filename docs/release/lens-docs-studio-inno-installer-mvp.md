@@ -1,6 +1,6 @@
 # Lens Docs Studio Inno Installer MVP
 
-Status: Phase 3M internal installer MVP.
+Status: Phase 3M.1 certified internal installer MVP.
 
 This phase adds a repeatable classic Windows installer build path with Inno Setup while keeping the certified Windows folder/ZIP package as the internal release-candidate fallback.
 
@@ -83,6 +83,24 @@ artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe
 artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256
 artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup-report.md
 ```
+
+## Phase 3M.1 Certification Result
+
+Certification ran on commit `9439f95813d6e8654032b7fef3b414af1fa267e6` from `develop`.
+
+- Inno Setup 6.7.3 was installed per-user with `winget`.
+- `ISCC.exe` path: `C:\Users\dougl\AppData\Local\Programs\Inno Setup 6\ISCC.exe`.
+- Installer build: `PASS`.
+- Installer artefact: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe`.
+- Installer SHA256: `152051F7CDAB5A33F8D8E5C219F937A54777687B8980D750B486BE572883FA8E`.
+- Installer report: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup-report.md`.
+- Baseline install used the default per-user path and did not require elevation.
+- Start Menu shortcut was created and pointed at the installed executable.
+- Optional Desktop shortcut was selected for the smoke and pointed at the installed executable.
+- Installed-app native bridge smoke passed against `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe`.
+- File associations were left unchecked; no Lens ProgId keys or `UserChoice` writes were observed.
+- Uninstall completed and removed shortcuts plus the installed-app entry. A WebView2 runtime data folder remained under the install path after the native smoke: `%LOCALAPPDATA%\Programs\Lens Docs Studio\LensDocsStudio.Windows.exe.WebView2\EBWebView`.
+- The GitHub draft release remained unpublished.
 
 ## Manual Installer Smoke
 

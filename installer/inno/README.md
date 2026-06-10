@@ -1,6 +1,6 @@
 # Inno Setup Installer MVP
 
-Status: Phase 3M internal installer MVP.
+Status: Phase 3M.1 certified internal installer MVP.
 
 This folder contains the Inno Setup authoring for the internal unsigned Lens Docs Studio installer MVP. Do not add generated setup executables, signed binaries, downloaded runtime installers, or release artefacts here.
 
@@ -30,6 +30,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1
 ```
 
 If Inno Setup is not installed, the script exits safely with `INNO_INSTALLER_MVP_BLOCKED_INNO_SETUP_NOT_INSTALLED` and writes an ignored report under `artifacts/installers/inno/`.
+
+Phase 3M.1 certification used Inno Setup 6.7.3 installed per-user at:
+
+```text
+C:\Users\dougl\AppData\Local\Programs\Inno Setup 6\ISCC.exe
+```
+
+The certified internal installer artefact was generated under `artifacts/installers/inno/` with SHA256 `152051F7CDAB5A33F8D8E5C219F937A54777687B8980D750B486BE572883FA8E`. Baseline install, Start Menu shortcut, optional Desktop shortcut, installed native bridge smoke, and uninstall passed. File associations were left unchecked for the baseline smoke.
 
 ## Future Prototype Questions
 
