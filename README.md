@@ -43,6 +43,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 2B adds native single-file open/save/save-as for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files through an opaque WebView2 bridge handle.
 - Phase 2C adds native open folder, recursive workspace discovery, workspace file save, and native Markdown file creation through opaque workspace and file handles.
 - Phase 2D adds native workspace external-change detection, safe relative watcher events, explicit native refresh, and non-destructive web UI markers for changed, created, deleted, and renamed workspace files.
+- Phase 2E refines the native workspace conflict UX with distinct changed, deleted, renamed, dirty, and dirty-external-conflict indicators plus explicit refresh/discard prompts.
 - Future Windows work includes offline runtime hardening, installer/packaging, first-run setup, file associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`, and a release flow from `develop` to `main`.
 
 See `docs/architecture/windows-offline-distribution-roadmap.md` for the current Windows offline distribution roadmap.
@@ -55,7 +56,7 @@ Native file and workspace operations support `.md`, `.markdown`, `.mmd`, `.merma
 
 Native workspace watching starts after a Windows workspace folder is opened and is disposed when another workspace opens, the app closes, smoke completes, or the watcher fails. The host reports only supported-file changes under the selected root through `lensDocs.native.workspaceChanged`; payload paths are relative and revalidated before the web app marks records. Watcher events are debounced for 500 ms and coalesced so deletes win over changes, create-plus-change remains created, and host-recognised renames are reported as renames. Native save/create operations are suppressed for a short best-effort two-second window; if suppression is uncertain, the app prefers showing an external-change marker.
 
-The web app never auto-merges or auto-reloads dirty content. Changed files are marked as changed outside the app, dirty files keep local edits, deleted active files keep their in-memory content, created files are added as marked workspace records when the host provides a handle, and safe renames update clean records while dirty records remain marked for explicit action. **Refresh active file** uses `lensDocs.native.refreshWorkspaceFile` for native workspace records and confirms before discarding dirty local edits.
+The web app never auto-merges or auto-reloads dirty content. Changed files are marked as changed outside the app, dirty files keep local edits, deleted active files keep their in-memory content, created files are added as marked workspace records when the host provides a handle, and safe renames update clean records while dirty records remain marked for explicit action. The workspace list uses compact state dots for clean, dirty, externally changed, externally deleted, externally renamed, and dirty external-conflict records. **Refresh active file** uses `lensDocs.native.refreshWorkspaceFile` for native workspace records and confirms before discarding dirty local edits. If a file was deleted outside Lens Docs Studio, refresh does not erase the editor; keep the in-memory content and use **Save as** or copy the text to recover it.
 
 The bridge does not expose recent native folders, file associations, native PDF export, Git operations, shell commands, delete/rename/move operations initiated from the app, local paths in browser/PWA mode, environment data, usernames, secrets, machine names, or general-purpose host execution. Browser and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks; native watcher capabilities are unavailable there.
 
@@ -67,7 +68,7 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
 
 Use `-NoBuild` to reuse the latest built shell, and `-TimeoutSeconds 90` on slower machines. The script creates a temporary smoke root, writes Markdown and Mermaid fixtures, launches the WinUI/WebView2 shell with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, validates saved fixture content, and exits non-zero on failure. It intentionally does not automate Windows file or folder picker UI.
 
-The smoke-only bridge capabilities `smoke.nativeFixtures` and `smoke.workspaceChange` plus the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, single-file open/save/save-as, workspace open/save/create, workspace watcher event delivery with relative paths, protocol safety, structured completion, and clean shell shutdown.
+The smoke-only bridge capabilities `smoke.nativeFixtures` and `smoke.workspaceChange` plus the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, single-file open/save/save-as, workspace open/save/create, workspace watcher event delivery with relative paths, protocol safety, structured completion, and clean shell shutdown. Phase 2E conflict prompts are covered by fake WebView2 browser tests and the manual smoke path below, keeping the Windows smoke harness small and stable.
 
 Manual smoke path:
 
@@ -81,10 +82,15 @@ Manual smoke path:
 8. Use **File > Save changes**.
 9. Modify the selected file externally while Lens Docs Studio has no local edits and confirm an external-change marker/status appears.
 10. Use **Refresh active file** and confirm the content updates.
-11. Modify the file externally again while local edits exist in Lens Docs Studio and confirm local edits are preserved with a conflict/external-change indication.
-12. Delete or rename a workspace file externally and confirm the app shows a safe indication without clearing editor content.
-13. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
-14. Open the same app in a normal browser or PWA mode and confirm there are no native bridge errors.
+11. Modify the same file externally again.
+12. Make local edits in Lens Docs Studio before refreshing.
+13. Confirm local edits remain and the dirty/external-conflict marker appears.
+14. Cancel **Refresh active file** and confirm local edits remain.
+15. Confirm refresh and verify external content loads.
+16. Delete a workspace file externally and confirm local content is not silently erased.
+17. Rename a workspace file externally and confirm the safe renamed indication.
+18. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+19. Open the same app in a normal browser or PWA mode and confirm there are no native bridge errors.
 
 ## Key Features
 

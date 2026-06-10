@@ -884,6 +884,7 @@ export function createFileService({
         }
         await renderPreview();
         restoreScrollPosition?.(record.path);
+        showNativeWorkspaceChangeStatus(record);
       } catch (error) {
         setStatus(`Could not open ${record.name}.`, 'danger');
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
@@ -1373,6 +1374,7 @@ export function createFileService({
       updateSaveButton();
       const activeDetail = state.externalChangeDetails?.get(state.activePath);
       if (activeDetail) {
+        clearTimeout(state.debounceId);
         setStatus(getNativeWorkspaceChangeStatus(activeDetail, state.dirtyPaths.has(state.activePath)), 'warning');
         return;
       }
@@ -1477,21 +1479,26 @@ export function createFileService({
 
     function getNativeWorkspaceChangeStatus(detail, dirty) {
       if (detail.kind === 'deleted') {
-        return dirty
-          ? 'External deletion detected while local edits exist. Local edits are preserved.'
-          : `External deletion detected: ${detail.path}.`;
+        return 'File was deleted outside Lens Docs Studio. Local content is preserved in memory.';
       }
       if (detail.kind === 'renamed') {
         return dirty
-          ? 'External rename detected while local edits exist. Local edits are preserved.'
-          : `External rename detected: ${detail.oldPath || 'workspace file'} to ${detail.path}.`;
+          ? 'File was renamed outside Lens Docs Studio while local edits exist. Review before saving.'
+          : 'File was renamed outside Lens Docs Studio. Review before saving.';
       }
       if (detail.kind === 'created') {
         return `External file created: ${detail.path}. Use Refresh active file to load it.`;
       }
       return dirty
         ? 'External change detected while local edits exist. Save or refresh explicitly.'
-        : `External change detected: ${detail.path}.`;
+        : 'External change detected. Use Refresh active file to reload.';
+    }
+
+    function showNativeWorkspaceChangeStatus(record) {
+      const detail = state.externalChangeDetails?.get(record?.path);
+      if (!detail) return false;
+      setStatus(getNativeWorkspaceChangeStatus(detail, state.dirtyPaths.has(record.path)), 'warning');
+      return true;
     }
 
     async function refreshActiveFile() {
@@ -1525,7 +1532,7 @@ export function createFileService({
     async function refreshNativeWorkspaceFile(record) {
       const detail = state.externalChangeDetails?.get(record.path);
       if (detail?.kind === 'deleted') {
-        setStatus(`${record.name} was deleted outside the app. Local content is still preserved in memory.`, 'warning');
+        setStatus('File was deleted outside Lens Docs Studio. Local content is preserved in memory.', 'warning');
         return;
       }
 
@@ -1535,6 +1542,7 @@ export function createFileService({
         confirmLabel: 'Reload file',
         danger: true,
       })) {
+        showNativeWorkspaceChangeStatus(record);
         return;
       }
 

@@ -67,7 +67,7 @@ The native watcher starts only for the selected Windows workspace root. It watch
 
 Watcher events are debounced for 500 ms and coalesced: deletes win over changes, a created file that also changes stays created, and host-recognised renames are sent as renames. Native save/create operations track recently written relative paths and suppress matching watcher noise for a best-effort two-second window. If suppression is uncertain, the app prefers showing an external-change marker rather than hiding a real change.
 
-The web app owns all user-facing decisions. It marks records as externally changed, preserves dirty in-memory edits, keeps deleted active-file content in memory, adds safe created files when the host provides a handle, updates clean renamed records, and reloads only when the user explicitly uses **Refresh active file**. Native refresh uses `lensDocs.native.refreshWorkspaceFile` and reads only a validated file that belongs to the selected native workspace.
+The web app owns all user-facing decisions. It marks records as externally changed, preserves dirty in-memory edits, keeps deleted active-file content in memory, adds safe created files when the host provides a handle, updates clean renamed records, and reloads only when the user explicitly uses **Refresh active file**. Native refresh uses `lensDocs.native.refreshWorkspaceFile` and reads only a validated file that belongs to the selected native workspace. Phase 2E adds compact changed, deleted, renamed, dirty, and dirty-external-conflict markers in the workspace list. Dirty refresh prompts must be confirmed before local edits are discarded; cancelled refresh keeps the editor content and marker. Deleted-file refresh reports that the file no longer exists and keeps the in-memory content available for **Save as** or copying.
 
 The bridge intentionally does not expose recent native folders, file associations, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, absolute workspace paths, delete/rename/move operations initiated from the app, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
 
@@ -89,7 +89,7 @@ The script creates a temporary smoke root with a single Markdown file and a smal
 
 The smoke harness does not automate native picker UI. Instead, the host exposes `smoke.nativeFixtures`, `smoke.workspaceChange`, and the `lensDocs.native.smoke.*` messages only when the smoke flag is present. Those fixture messages are fail-closed, root-bound to `--smoke-root`, and do not expose usernames, machine names, environment variables, unrestricted browsing, shell commands, or arbitrary host operations. Normal launches do not show smoke controls or smoke capabilities.
 
-The smoke validates shell launch, WebView2 app load, `diagnostics.ping`, native file open/save/save-as through controlled fixtures, native workspace open/save/create through controlled fixtures, one external workspace change event with a relative path, absence of bridge protocol errors, structured completion, and clean shell shutdown. If it fails, inspect the console summary and, when `-KeepSmokeRoot` is used, the retained `smoke-result.json` and fixture files.
+The smoke validates shell launch, WebView2 app load, `diagnostics.ping`, native file open/save/save-as through controlled fixtures, native workspace open/save/create through controlled fixtures, one external workspace change event with a relative path, absence of bridge protocol errors, structured completion, and clean shell shutdown. Phase 2E keeps the automated harness unchanged to avoid brittle picker and editor automation; changed/deleted/renamed/dirty conflict prompts are covered by fake WebView2 browser tests and the manual smoke below. If smoke fails, inspect the console summary and, when `-KeepSmokeRoot` is used, the retained `smoke-result.json` and fixture files.
 
 Manual smoke:
 
@@ -104,8 +104,12 @@ Manual smoke:
 9. Modify that file externally in another editor while Lens Docs Studio has no local edits.
 10. Confirm an external-change indicator/status appears.
 11. Use **Refresh active file** and confirm content updates.
-12. Modify the file again externally while local edits exist in Lens Docs Studio.
-13. Confirm local edits are preserved and conflict/external-change indication appears.
-14. Delete or rename a workspace file externally and confirm safe indication.
-15. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
-16. Open the static app in a normal browser and confirm no native bridge errors are reported.
+12. Modify the same file externally again.
+13. Make local edits in Lens Docs Studio before refreshing.
+14. Confirm local edits remain and the dirty/external-conflict marker appears.
+15. Cancel **Refresh active file** and confirm local edits remain.
+16. Confirm refresh and verify external content loads.
+17. Delete a workspace file externally and confirm local content is not silently erased.
+18. Rename a workspace file externally and confirm the safe renamed indication.
+19. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+20. Open the static app in a normal browser and confirm no native bridge errors are reported.

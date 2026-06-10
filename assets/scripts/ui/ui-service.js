@@ -168,6 +168,7 @@ export function createUiService({
       const icon = document.createElement('span');
       icon.className = 'file-icon';
       icon.textContent = getFileExtensionLabel(file.name);
+      button.dataset.fileState = getFileState(file);
 
       const textWrap = document.createElement('span');
       textWrap.className = 'file-text';
@@ -187,15 +188,27 @@ export function createUiService({
     }
 
     function appendFileStateMarker(button, file) {
+      const dirty = state.dirtyPaths.has(file.path);
+      const detail = state.externalChangeDetails?.get(file.path);
+
       if (state.externalChangePaths.has(file.path)) {
+        const markers = document.createElement('span');
+        markers.className = 'file-state-markers';
+        if (dirty) {
+          const dirtyMarker = document.createElement('span');
+          dirtyMarker.className = 'dirty-dot';
+          dirtyMarker.title = 'Edited in memory';
+          markers.appendChild(dirtyMarker);
+        }
         const external = document.createElement('span');
-        external.className = 'external-change-dot';
-        const detail = state.externalChangeDetails?.get(file.path);
+        external.className = `external-change-dot external-change-dot--${getExternalChangeKind(detail)}`;
         external.title = getExternalChangeTitle(file, detail);
-        button.appendChild(external);
+        markers.appendChild(external);
+        button.appendChild(markers);
         return;
       }
-      if (state.dirtyPaths.has(file.path)) {
+
+      if (dirty) {
         const dirty = document.createElement('span');
         dirty.className = 'dirty-dot';
         dirty.title = 'Edited in memory';
@@ -213,6 +226,18 @@ export function createUiService({
       const spacer = document.createElement('span');
       spacer.setAttribute('aria-hidden', 'true');
       button.appendChild(spacer);
+    }
+
+    function getFileState(file) {
+      const detail = state.externalChangeDetails?.get(file.path);
+      if (state.externalChangePaths.has(file.path)) {
+        if (state.dirtyPaths.has(file.path)) return 'dirtyExternalConflict';
+        if (detail?.kind === 'deleted') return 'externalDeleted';
+        if (detail?.kind === 'renamed') return 'externalRenamed';
+        return 'externalChanged';
+      }
+      if (state.dirtyPaths.has(file.path)) return 'dirty';
+      return 'clean';
     }
 
     function buildFileTree(records) {
@@ -326,6 +351,13 @@ export function createUiService({
       if (detail?.kind === 'renamed') return `${dirtyPrefix}renamed outside the app`;
       if (detail?.kind === 'created') return 'Created outside the app';
       return `${dirtyPrefix}changed outside the app`;
+    }
+
+    function getExternalChangeKind(detail) {
+      if (detail?.kind === 'deleted') return 'deleted';
+      if (detail?.kind === 'renamed') return 'renamed';
+      if (detail?.kind === 'created') return 'created';
+      return 'changed';
     }
 
     function getExternalChangeLabel(detail) {

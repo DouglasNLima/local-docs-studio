@@ -82,6 +82,17 @@ async function loadSample(page) {
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
+async function openFileMenu(page) {
+  const fileMenu = page.locator('details.menu').filter({
+    has: page.locator('summary').filter({ hasText: /^File$/ }),
+  });
+  if (!await fileMenu.locator('.menu-panel').isVisible()) {
+    await fileMenu.locator('summary').click();
+  }
+  await expect(fileMenu.locator('.menu-panel')).toBeVisible();
+  return fileMenu;
+}
+
 async function expectMobileMenuPanelUsable(page, menuName) {
   await page.locator('summary').filter({ hasText: new RegExp(`^${menuName}$`) }).click();
   const panel = page.locator('details.menu[open] .menu-panel');
@@ -1438,8 +1449,8 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
   await page.locator('#fileList [data-tree-folder="docs"]').click();
   await expect(page.locator('#fileList [data-tree-folder="docs"]')).toHaveAttribute('aria-selected', 'true');
 
-  await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.locator('details.menu[open]').getByRole('button', { name: 'New Markdown file' }).click();
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'New Markdown file' }).click();
   await expect(page.locator('#appDialogPromptInput')).toHaveValue('docs/untitled.md');
   await submitAppDialog(page, { value: 'docs/notes.md', button: 'Create file' });
   await expect(page.locator('#activeFileLabel')).toHaveText('docs/notes.md');
@@ -1453,8 +1464,8 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
   await page.evaluate(() => {
     window.__mockFs.openPickerQueue = [[window.__mockFs.addedHandle]];
   });
-  await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.locator('details.menu[open]').getByRole('button', { name: 'Add file to workspace' }).click();
+  const reopenedFileMenu = await openFileMenu(page);
+  await reopenedFileMenu.getByRole('button', { name: 'Add file to workspace' }).click();
   await expect(page.locator('#fileCount')).toHaveText('3');
   await expect(page.locator('#activeFileLabel')).toHaveText('added.md');
 
@@ -1807,7 +1818,9 @@ test('fake WebView2 watcher marks changed native workspace files and refreshes e
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
   await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
 
   await page.evaluate(() => {
@@ -1823,11 +1836,16 @@ test('fake WebView2 watcher marks changed native workspace files and refreshes e
   });
 
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md · changed outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalChanged');
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'changed outside the app');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('External change detected. Use Refresh active file to reload.');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
 
   await page.locator('#refreshFileButton').click();
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nChanged externally.\n');
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
   const refreshMessage = await page.evaluate(() => window.__nativeBridgeMessages.findLast((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
   expect(refreshMessage.payload).toEqual({
     nativeWorkspaceId: 'native-workspace-1',
@@ -1842,7 +1860,9 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace chan
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
   await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.locator('#editor').fill('# Local draft\n');
   await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
@@ -1861,7 +1881,57 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace chan
 
   await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in memory · changed outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await expect(page.locator('#fileList [data-path="README.md"] .dirty-dot')).toHaveCount(1);
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'Edited in memory and changed outside the app');
+  await page.locator('#fileList [data-path="README.md"]').click();
   await expect(page.locator('#status')).toHaveText('External change detected while local edits exist. Save or refresh explicitly.');
+});
+
+test('fake WebView2 watcher confirms before refreshing dirty native workspace conflicts', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Local draft\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeRefreshContent = '# Native Workspace\n\nExternal version.\n';
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#appDialog')).toBeVisible();
+  await expect(page.locator('#appDialogTitle')).toHaveText('Reload Windows file?');
+  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('#appDialog')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('External change detected while local edits exist. Save or refresh explicitly.');
+  let refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(0);
+
+  await page.locator('#refreshFileButton').click();
+  await submitAppDialog(page, { button: 'Reload file' });
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nExternal version.\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
+  refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(1);
 });
 
 test('fake WebView2 watcher marks deleted active native files without clearing content', async ({ page }) => {
@@ -1870,8 +1940,10 @@ test('fake WebView2 watcher marks deleted active native files without clearing c
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
   await page.locator('[data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('Rendered');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
 
   await page.evaluate(() => {
     window.__emitNativeWorkspaceChanged({
@@ -1886,6 +1958,15 @@ test('fake WebView2 watcher marks deleted active native files without clearing c
 
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md · deleted outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalDeleted');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('File was deleted outside Lens Docs Studio. Local content is preserved in memory.');
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#status')).toHaveText('File was deleted outside Lens Docs Studio. Local content is preserved in memory.');
+  const refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(0);
 });
 
 test('fake WebView2 watcher reports created and renamed native workspace files safely', async ({ page }) => {
@@ -1895,6 +1976,7 @@ test('fake WebView2 watcher reports created and renamed native workspace files s
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
 
   await page.evaluate(() => {
     window.__emitNativeWorkspaceChanged({
@@ -1907,8 +1989,10 @@ test('fake WebView2 watcher reports created and renamed native workspace files s
     });
   });
   await expect(page.locator('#fileList')).toContainText('docs/new-external.md');
+  await expect(page.locator('#fileList [data-path="docs/new-external.md"]')).toHaveAttribute('data-file-state', 'externalChanged');
 
   await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.evaluate(() => {
     window.__emitNativeWorkspaceChanged({
@@ -1924,6 +2008,40 @@ test('fake WebView2 watcher reports created and renamed native workspace files s
 
   await expect(page.locator('#fileList')).toContainText('docs/final.md');
   await expect(page.locator('#activeFileLabel')).toHaveText('docs/final.md · renamed outside the app');
+  await expect(page.locator('#status')).toHaveText('File was renamed outside Lens Docs Studio. Review before saving.');
+  await expect(page.locator('#fileList [data-path="docs/final.md"]')).toHaveAttribute('data-file-state', 'externalRenamed');
+});
+
+test('fake WebView2 watcher preserves dirty local edits on native workspace renames', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Dirty before rename\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'renamed',
+        oldPath: 'README.md',
+        path: 'docs/final.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Dirty before rename\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in memory · renamed outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('File was renamed outside Lens Docs Studio while local edits exist. Review before saving.');
 });
 
 test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace events', async ({ page }) => {
@@ -1932,6 +2050,7 @@ test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace eve
 
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
   await page.locator('[data-path="README.md"]').click();
 
   await page.evaluate(() => {
@@ -1954,6 +2073,7 @@ test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace eve
 
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
 });
 
 test('fake WebView2 bridge handles cancelled and malformed native workspace responses safely', async ({ page }) => {

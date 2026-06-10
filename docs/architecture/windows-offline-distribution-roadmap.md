@@ -56,6 +56,17 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected and do not expose `workspace.watch` or `workspace.refreshFile`.
 - **Help > Check Windows bridge** reports `workspace.watch` and `workspace.refreshFile` in addition to the Phase 2B and Phase 2C capabilities when hosted by the Windows shell.
 
+## Implemented Phase 2E
+
+- The workspace list exposes compact state markers for clean, dirty, externally changed, externally deleted, externally renamed, and dirty external-conflict files.
+- Selecting an affected native workspace file shows a concise status message that explains whether to refresh, preserve local edits, recover deleted content, or review a rename before saving.
+- Clean externally changed files reload only through explicit **Refresh active file** and clear the marker after a successful `workspace.refreshFile` response.
+- Dirty externally changed or renamed files keep local editor content until the user explicitly confirms refresh; cancelling refresh preserves both the content and the conflict marker.
+- Deleted active files keep their in-memory editor content. Refresh reports that the file was deleted outside Lens Docs Studio and does not erase the editor.
+- Rename handling remains non-destructive: clean recognised renames move the record to the new relative path, while dirty renames stay on the in-memory record with a conflict marker.
+- Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected; native IDs and watcher state remain in memory and are not written to exports.
+- The automated smoke harness remains focused on stable bridge coverage. Conflict prompts and marker states are covered by fake WebView2 browser tests plus the manual smoke path below.
+
 ## Future Roadmap
 
 - Offline runtime hardening, including packaged asset coverage, WebView2 origin behaviour, service worker expectations, and clear fallback messages.
@@ -100,8 +111,12 @@ Phase 2C does not implement file watchers, external-change live notifications, r
 9. Modify that file externally in another editor while Lens Docs Studio has no local edits.
 10. Confirm external-change indicator/status appears.
 11. Use **Refresh active file** and confirm content updates.
-12. Modify the file again externally while local edits exist in Lens Docs Studio.
-13. Confirm local edits are preserved and conflict/external-change indication appears.
-14. Delete or rename a workspace file externally and confirm safe indication.
-15. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
-16. Open the app in normal browser mode and confirm no native bridge errors.
+12. Modify the same file externally again.
+13. Make local edits in Lens Docs Studio before refreshing.
+14. Confirm local edits remain and the dirty/external-conflict marker appears.
+15. Cancel **Refresh active file** and confirm local edits remain.
+16. Confirm refresh and verify external content loads.
+17. Delete a workspace file externally and confirm local content is not silently erased.
+18. Rename a workspace file externally and confirm the safe renamed indication.
+19. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+20. Open the app in normal browser mode and confirm no native bridge errors.
