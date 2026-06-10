@@ -20,6 +20,16 @@ The first Windows desktop shell lives under `src/windows/LensDocsStudio.Windows/
 
 The desktop direction is offline-first: package the static assets with the app, load them through WebView2 virtual host mapping, and avoid requiring a production local HTTP server. GitHub Pages remains a secondary web demo, fallback, and validation target for the shared runtime.
 
+Supported runtime modes:
+
+- Browser / GitHub Pages: static web publication from `main` after the shared browser checks pass.
+- Browser / local static server: development and validation through a simple static server such as `python -m http.server 4173`.
+- Windows shell / development run: `dotnet run` builds the shell and copies the shared static runtime into `StaticApp/`.
+- Windows shell / packaged local assets: WebView2 loads the copied app through `https://lens-docs-studio.local/`, backed by packaged files rather than a server.
+- Windows shell / offline mode: the packaged shell can load the app, CSS, JavaScript modules, local vendor libraries, the help guide, templates, snippets, and existing export workflows without internet access.
+
+For Windows production usage, a local HTTP server is not required. Runtime dependencies are pinned under `assets/vendor/`, and the Windows project copies `index.html`, `md-mmd-renderer-v5.html`, `manifest.webmanifest`, `icon.svg`, `service-worker.js`, `assets/`, and `docs/` into the desktop output. Offline hardening does not add an installer, auto-update, file associations, account sync, Git integration, native PDF export, or any network fallback.
+
 Run it locally from the repository root:
 
 ```powershell
@@ -69,6 +79,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
 Use `-NoBuild` to reuse the latest built shell, and `-TimeoutSeconds 90` on slower machines. The script creates a temporary smoke root, writes Markdown and Mermaid fixtures, launches the WinUI/WebView2 shell with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, validates saved fixture content, and exits non-zero on failure. It intentionally does not automate Windows file or folder picker UI.
 
 The smoke-only bridge capabilities `smoke.nativeFixtures` and `smoke.workspaceChange` plus the `lensDocs.native.smoke.*` messages are unavailable in normal launches. When enabled, fixture operations are limited to the explicit smoke root and cannot browse arbitrary paths, expose environment details, run host commands, or weaken production bridge validation. The smoke validates shell launch, WebView2 app load, bridge ping, single-file open/save/save-as, workspace open/save/create, workspace watcher event delivery with relative paths, protocol safety, structured completion, and clean shell shutdown. Phase 2E conflict prompts are covered by fake WebView2 browser tests and the manual smoke path below, keeping the Windows smoke harness small and stable.
+
+Windows packaged asset validation:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
+```
+
+Use `-NoBuild` to inspect the latest `StaticApp/` output. The check verifies the shell, service worker cache list, vendor manifest, pinned vendor files, help guide, web manifest, icon, and packaged runtime files, then scans runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
 
 Manual smoke path:
 
@@ -288,6 +306,7 @@ npm test
 ```
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
+- `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` checks the Windows `StaticApp/` output for complete packaged offline assets and unexpected runtime external dependencies.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 

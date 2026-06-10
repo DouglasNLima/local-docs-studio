@@ -39,6 +39,7 @@ export async function runNativeBridgeSmoke({
     const ping = await bridgeClient.ping();
     const payload = ping.response?.payload || {};
     capabilities = Array.isArray(payload.capabilities) ? payload.capabilities : [];
+    const isMockNativeBridge = Boolean(windowRef.__nativeBridgeScenario);
 
     if (!capabilities.includes('smoke.nativeFixtures')) {
       return { ran: false, reason: 'smoke-capability-absent' };
@@ -49,6 +50,14 @@ export async function runNativeBridgeSmoke({
       message: ping.message,
     });
     recordStep('WebView2 app loaded', Boolean(windowRef.document?.querySelector('#editor')));
+    recordStep('WebView2 loaded packaged static assets', isMockNativeBridge || windowRef.location?.origin === 'https://lens-docs-studio.local', {
+      origin: windowRef.location?.origin || '',
+      skipped: isMockNativeBridge,
+    });
+    recordStep('WebView2 did not require a local HTTP server', isMockNativeBridge || !/^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])/i.test(windowRef.location?.href || ''), {
+      href: windowRef.location?.href || '',
+      skipped: isMockNativeBridge,
+    });
     recordStep('Bridge ping returned LensDocsStudio.Windows', ping.ok && payload.host === 'LensDocsStudio.Windows');
 
     for (const capability of REQUIRED_CAPABILITIES) {

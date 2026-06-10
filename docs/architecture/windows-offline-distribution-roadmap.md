@@ -23,6 +23,18 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Do not introduce a backend, production server route, production build step, CDN dependency, or cloud service for normal desktop operation.
 - Keep GitHub Pages compatibility as a regression target for the shared runtime.
 
+## Runtime Modes
+
+Lens Docs Studio supports these runtime modes:
+
+1. Browser / GitHub Pages.
+2. Browser / local static server.
+3. Windows shell / development run.
+4. Windows shell / packaged local assets.
+5. Windows shell / offline mode.
+
+Browser / GitHub Pages and browser / local static server modes validate the shared static runtime. Windows shell / development run builds the WinUI 3 host and copies the shared runtime into `StaticApp/`. Windows shell / packaged local assets and Windows shell / offline mode load that copied runtime through WebView2 virtual host mapping. In the Windows production path, a local HTTP server is not required and the app must not depend on GitHub Pages, CDNs, external scripts, external stylesheets, or development-only files.
+
 ## Implemented Phase 2B
 
 - Native single-file open/save/save-as bridge for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files.
@@ -67,9 +79,17 @@ The static browser/PWA app remains the core runtime. It must continue to run fro
 - Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected; native IDs and watcher state remain in memory and are not written to exports.
 - The automated smoke harness remains focused on stable bridge coverage. Conflict prompts and marker states are covered by fake WebView2 browser tests plus the manual smoke path below.
 
+## Implemented Phase 3A
+
+- Static checks verify runtime module syntax, relative imports, service-worker cache entries, vendor manifest entries, required pinned vendor dependencies, shell references, manifest icons, Windows static asset copy configuration, and offline runtime documentation.
+- Runtime external dependency scanning covers the app shell, service worker, manifest, app CSS, vendor manifest, and first-party JavaScript modules. It blocks external script/style/CDN/font runtime references while allowing documentation examples, generated export XML namespaces, and user-authored Markdown links.
+- `scripts/windows/Test-WindowsStaticAssets.ps1` builds or inspects the Windows output, locates `StaticApp/`, verifies required app shell files, every service-worker runtime asset, every vendor manifest entry, the help guide, web manifest, and icon, then scans packaged runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
+- The Windows native bridge smoke records that WebView2 loaded from `https://lens-docs-studio.local/` and did not use localhost or loopback HTTP for the smoke workflow.
+- Network request interception is not part of Phase 3A smoke automation. The certification uses static URL scanning plus packaged asset validation to avoid brittle WebView2 network automation while still enforcing offline runtime completeness.
+- Offline-capable for this phase means the Windows app can launch from packaged local assets, load CSS and JavaScript modules, load vendored Markdown, Mermaid, Highlight.js, DOMPurify, KaTeX, ZIP, Word, and PDF import dependencies, open the local help guide, use templates and snippets, use native single-file and workspace workflows, detect external workspace changes, and run existing export paths without GitHub Pages, CDN access, or a local HTTP server.
+
 ## Future Roadmap
 
-- Offline runtime hardening, including packaged asset coverage, WebView2 origin behaviour, service worker expectations, and clear fallback messages.
 - Windows installer and packaging for offline distribution.
 - First-run setup wizard for initial preferences, file association prompts, offline readiness, and migration notes.
 - File associations for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.

@@ -22,11 +22,26 @@ function toRootPath(filePath) {
   return path.resolve(root, filePath);
 }
 
+function readRootFile(filePath) {
+  return readFileSync(toRootPath(filePath), 'utf8');
+}
+
 function walk(directory) {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     const fullPath = path.join(directory, entry.name);
     return entry.isDirectory() ? walk(fullPath) : [fullPath];
   });
+}
+
+function assertLocalFileExists(filePath, context) {
+  const resolved = toRootPath(filePath.replace(/^\.\//, ''));
+  if (!existsSync(resolved) || !statSync(resolved).isFile()) {
+    fail(`${context} does not exist: ${filePath}`);
+  }
+}
+
+function normaliseAssetPath(asset) {
+  return asset.replace(/^\.\//, '');
 }
 
 const moduleFiles = walk(toRootPath('assets/scripts')).filter((filePath) => filePath.endsWith('.js'));
@@ -50,20 +65,17 @@ for (const filePath of moduleFiles) {
   }
 }
 
-const serviceWorker = readFileSync(toRootPath('service-worker.js'), 'utf8');
+const serviceWorker = readRootFile('service-worker.js');
 const localAssetsMatch = serviceWorker.match(/const LOCAL_ASSETS = \[([\s\S]*?)\];/);
 if (!localAssetsMatch) fail('Could not find LOCAL_ASSETS in service-worker.js');
 if (serviceWorker.includes('cdn.jsdelivr.net')) fail('service-worker.js must not depend on jsDelivr at runtime');
 if (!serviceWorker.includes('assets/vendor/manifest.json')) fail('service-worker.js must load the vendor asset manifest');
 
 const localAssets = [...localAssetsMatch[1].matchAll(/'([^']+)'/g)].map((match) => match[1]);
-const localAssetSet = new Set(localAssets.map((asset) => asset.replace(/^\.\//, '')));
+const localAssetSet = new Set(localAssets.map(normaliseAssetPath));
 for (const asset of localAssets) {
   if (asset === './') continue;
-  const assetPath = toRootPath(asset.replace(/^\.\//, ''));
-  if (!existsSync(assetPath) || !statSync(assetPath).isFile()) {
-    fail(`Service worker asset does not exist: ${asset}`);
-  }
+  assertLocalFileExists(asset, 'Service worker asset');
 }
 
 const vendorDirectory = toRootPath('assets/vendor');
@@ -78,14 +90,18 @@ const requiredVendorAssets = [
   './assets/vendor/dompurify-3.4.5.es.js',
   './assets/vendor/highlight-11.11.1.esm.js',
   './assets/vendor/fflate-0.8.2.browser.js',
+  './assets/vendor/katex-0.16.25.min.css',
+  './assets/vendor/chunks/mermaid.esm.min/katex-K3KEBU37.js',
+  './assets/vendor/mammoth-1.12.0.browser.min.js',
+  './assets/vendor/pdfjs-5.7.284.js',
+  './assets/vendor/pdfjs-5.7.284.worker.js',
 ];
 for (const asset of requiredVendorAssets) {
   if (!vendorAssets.includes(asset)) fail(`Vendor manifest is missing ${asset}`);
 }
 for (const asset of vendorAssets) {
   if (!asset.startsWith('./assets/vendor/')) fail(`Vendor manifest asset must stay under assets/vendor: ${asset}`);
-  const assetPath = toRootPath(asset.replace(/^\.\//, ''));
-  if (!existsSync(assetPath) || !statSync(assetPath).isFile()) fail(`Vendor manifest asset does not exist: ${asset}`);
+  assertLocalFileExists(asset, 'Vendor manifest asset');
 }
 
 for (const filePath of moduleFiles) {
@@ -95,7 +111,7 @@ for (const filePath of moduleFiles) {
   }
 }
 
-const index = readFileSync(toRootPath('index.html'), 'utf8');
+const index = readRootFile('index.html');
 if (!index.includes('./assets/styles/app.css')) fail('index.html does not load app.css');
 if (!index.includes('./assets/scripts/main.js')) fail('index.html does not load main.js');
 if (!index.includes('./manifest.webmanifest')) fail('index.html does not load manifest.webmanifest');
@@ -111,9 +127,44 @@ if (index.includes('Local Docs Studio') || index.includes('Local Markdown, Merma
 
 const localReferencePattern = /\b(?:href|src)=["'](\.\/[^"']+)["']/g;
 for (const match of index.matchAll(localReferencePattern)) {
-  const referencedPath = toRootPath(match[1].replace(/^\.\//, ''));
-  if (!existsSync(referencedPath)) {
-    fail(`index.html references a missing local asset: ${match[1]}`);
+  assertLocalFileExists(match[1], 'index.html local asset');
+}
+
+const runtimeExternalReferencePatterns = [
+  { name: 'external scripts', pattern: /<script\b[^>]*\bsrc=["']https?:\/\//i },
+  { name: 'external stylesheets', pattern: /<link\b[^>]*\bhref=["']https?:\/\/[^"']+["'][^>]*\brel=["']stylesheet["']/i },
+  { name: 'stylesheet imports', pattern: /@import\s+(?:url\()?["']?https?:\/\//i },
+  { name: 'remote CSS URLs', pattern: /url\(["']?https?:\/\//i },
+  { name: 'CDN host references', pattern: /\b(?:cdn\.|unpkg\.|jsdelivr\.|googleapis\.|fonts\.)/i },
+];
+const runtimeFilesForExternalScan = [
+  'index.html',
+  'md-mmd-renderer-v5.html',
+  'manifest.webmanifest',
+  'service-worker.js',
+  'assets/styles/app.css',
+  'assets/vendor/manifest.json',
+  ...moduleFiles.map((filePath) => path.relative(root, filePath).replaceAll(path.sep, '/')),
+];
+for (const filePath of runtimeFilesForExternalScan) {
+  const source = readRootFile(filePath);
+  for (const { name, pattern } of runtimeExternalReferencePatterns) {
+    if (pattern.test(source)) {
+      fail(`${filePath} contains unexpected ${name}; runtime dependencies must be local.`);
+    }
+  }
+}
+
+const localRuntimeFetchPattern = /fetch\(\s*['"]([^'"]+)['"]/g;
+const generatedOutputFetchTargets = new Set(['./assets/search-index.json']);
+for (const filePath of runtimeFilesForExternalScan) {
+  const source = readRootFile(filePath);
+  for (const match of source.matchAll(localRuntimeFetchPattern)) {
+    const target = match[1];
+    if (/^https?:\/\//i.test(target)) fail(`${filePath} fetches an external runtime URL: ${target}`);
+    if (target.startsWith('./') && !generatedOutputFetchTargets.has(target)) {
+      assertLocalFileExists(target, `${filePath} fetch target`);
+    }
   }
 }
 
@@ -131,13 +182,10 @@ if (manifest.display !== 'standalone') fail('manifest.webmanifest display should
 if (!Array.isArray(manifest.icons) || !manifest.icons.length) fail('manifest.webmanifest must include at least one icon');
 for (const icon of manifest.icons) {
   if (!icon.src?.startsWith('./')) fail(`Manifest icon must use a relative src: ${icon.src}`);
-  const iconPath = toRootPath(icon.src.replace(/^\.\//, ''));
-  if (!existsSync(iconPath) || !statSync(iconPath).isFile()) {
-    fail(`Manifest icon does not exist: ${icon.src}`);
-  }
+  assertLocalFileExists(icon.src, 'Manifest icon');
 }
 
-const appCss = readFileSync(toRootPath('assets/styles/app.css'), 'utf8');
+const appCss = readRootFile('assets/styles/app.css');
 if (!appCss.includes('#FF883E')) fail('app.css must include the Lens accent #FF883E');
 
 const firstPartyCopyFiles = [
@@ -256,4 +304,34 @@ for (const requiredText of ['Publish To GitHub Pages', 'npm ci', 'npm test', 'Gi
   if (!readme.includes(requiredText)) fail(`README.md is missing publication guidance: ${requiredText}`);
 }
 
-console.log(`Static checks passed for ${moduleFiles.length} module files, ${localAssets.length} shell assets, and ${vendorAssets.length} vendor assets.`);
+const windowsProject = readRootFile('src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj');
+for (const requiredStaticAppPath of [
+  'index.html',
+  'md-mmd-renderer-v5.html',
+  'manifest.webmanifest',
+  'icon.svg',
+  'service-worker.js',
+  'assets\\**\\*',
+  'docs\\**\\*',
+]) {
+  if (!windowsProject.includes(requiredStaticAppPath)) {
+    fail(`Windows project static app copy configuration is missing ${requiredStaticAppPath}`);
+  }
+}
+if (!windowsProject.includes('StaticApp\\')) fail('Windows project must copy static assets under StaticApp');
+
+const windowsStaticAssetScript = 'scripts/windows/Test-WindowsStaticAssets.ps1';
+if (!existsSync(toRootPath(windowsStaticAssetScript))) fail(`${windowsStaticAssetScript} must exist`);
+
+for (const requiredDocText of [
+  'Windows shell / packaged local assets',
+  'Windows shell / offline mode',
+  'scripts/windows/Test-WindowsStaticAssets.ps1',
+  'local HTTP server is not required',
+]) {
+  if (!readme.includes(requiredDocText) && !readRootFile('docs/architecture/windows-offline-distribution-roadmap.md').includes(requiredDocText)) {
+    fail(`Offline runtime documentation is missing: ${requiredDocText}`);
+  }
+}
+
+console.log(`Static checks passed for ${moduleFiles.length} module files, ${localAssets.length} shell assets, ${vendorAssets.length} vendor assets, and ${runtimeFilesForExternalScan.length} runtime external-dependency scans.`);

@@ -116,6 +116,8 @@ try {
     foreach ($required in @(
         'Windows shell started',
         'WebView2 app loaded',
+        'WebView2 loaded packaged static assets',
+        'WebView2 did not require a local HTTP server',
         'Bridge ping returned LensDocsStudio.Windows',
         'Capabilities include diagnostics.ping',
         'Capabilities include file.open',

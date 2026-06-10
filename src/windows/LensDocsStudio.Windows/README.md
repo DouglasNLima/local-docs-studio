@@ -23,6 +23,16 @@ The project copies `index.html`, `assets/`, `docs/`, `manifest.webmanifest`, `ic
 
 Packaged static assets and WebView2 virtual host mapping are the preferred desktop hosting model. A local HTTP server is useful for development and validation, but it should not become a production requirement.
 
+Supported runtime modes:
+
+- Browser / GitHub Pages.
+- Browser / local static server.
+- Windows shell / development run.
+- Windows shell / packaged local assets.
+- Windows shell / offline mode.
+
+The Windows shell / packaged local assets and Windows shell / offline mode paths use the copied `StaticApp/` folder. A production Windows launch must not depend on GitHub Pages, a CDN, an external URL, or a local server for the app shell, CSS, JavaScript modules, local vendor libraries, the help guide, templates, snippets, or existing export flows.
+
 ## Build
 
 ```powershell
@@ -30,6 +40,16 @@ dotnet build src/windows/LensDocsStudio.Windows.sln
 ```
 
 If build tooling is missing, install the WinUI 3/Windows App SDK development components through Visual Studio Installer and retry the command.
+
+## Offline Static Asset Validation
+
+Run the packaged asset check from the repository root:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1
+```
+
+Use `-NoBuild` to inspect the latest build output. The script locates the latest `StaticApp/` output, checks `index.html`, `assets/styles/app.css`, `assets/scripts/main.js`, every service-worker runtime asset, `assets/vendor/manifest.json`, every listed vendor file, `docs/tool-guide.md`, `manifest.webmanifest`, and `icon.svg`, then scans packaged runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
 
 ## Scope
 
@@ -89,7 +109,7 @@ The script creates a temporary smoke root with a single Markdown file and a smal
 
 The smoke harness does not automate native picker UI. Instead, the host exposes `smoke.nativeFixtures`, `smoke.workspaceChange`, and the `lensDocs.native.smoke.*` messages only when the smoke flag is present. Those fixture messages are fail-closed, root-bound to `--smoke-root`, and do not expose usernames, machine names, environment variables, unrestricted browsing, shell commands, or arbitrary host operations. Normal launches do not show smoke controls or smoke capabilities.
 
-The smoke validates shell launch, WebView2 app load, `diagnostics.ping`, native file open/save/save-as through controlled fixtures, native workspace open/save/create through controlled fixtures, one external workspace change event with a relative path, absence of bridge protocol errors, structured completion, and clean shell shutdown. Phase 2E keeps the automated harness unchanged to avoid brittle picker and editor automation; changed/deleted/renamed/dirty conflict prompts are covered by fake WebView2 browser tests and the manual smoke below. If smoke fails, inspect the console summary and, when `-KeepSmokeRoot` is used, the retained `smoke-result.json` and fixture files.
+The smoke validates shell launch, WebView2 app load from `https://lens-docs-studio.local/`, absence of a localhost/loopback server requirement, `diagnostics.ping`, native file open/save/save-as through controlled fixtures, native workspace open/save/create through controlled fixtures, one external workspace change event with a relative path, absence of bridge protocol errors, structured completion, and clean shell shutdown. Network inspection is intentionally not part of the smoke harness in this phase; static URL scanning and packaged asset validation cover accidental runtime dependencies without making WebView2 automation brittle. If smoke fails, inspect the console summary and, when `-KeepSmokeRoot` is used, the retained `smoke-result.json` and fixture files.
 
 Manual smoke:
 
