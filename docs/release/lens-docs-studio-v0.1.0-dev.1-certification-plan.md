@@ -25,6 +25,8 @@ Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-a
 
 Phase 3AB is an artefact rebaseline checkpoint for the Phase 3AA native picker completion hardening. It rebuilt local ZIP, package RC, and Inno installer artefacts from `develop` commit `055e51dedacd28ea277a480b60bd0333feec6004`, after Phase 3AA completed packaged Stage A diagnostics, real native picker workspace selection, and Stage B watcher/conflict evidence.
 
+Phase 3AD is the authoritative local publication bundle freeze for `v0.1.0-dev.1`. It froze the final local ZIP, installer, installer checksum, installer report, and release-candidate metadata under `artifacts/windows/publication-bundles/v0.1.0-dev.1/` from source commit `c776fffdc8364c2c978f8106869a2d6bf50477ff`. Phase 3AD did not publish anything and did not create or modify release assets, tags, releases, or `main` merges.
+
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
@@ -138,6 +140,16 @@ Phase 3AB release-candidate artefact rebaseline:
 - Phase 3W artefacts from `e2026d728c131cf2e203928487b9aeb09b744da7` are superseded and stale because Phase 3AA changed Windows runtime code afterward.
 - These are local release-candidate artefacts only. No GitHub release assets, releases, tags, or `main` merges were changed, and no production readiness or go-live claim is made.
 
+Phase 3AD publication bundle freeze:
+
+- Source commit: `c776fffdc8364c2c978f8106869a2d6bf50477ff` on `develop`.
+- Frozen bundle: `artifacts/windows/publication-bundles/v0.1.0-dev.1/`.
+- Frozen ZIP: `artifacts/windows/publication-bundles/v0.1.0-dev.1/LensDocsStudio.Windows-0.1.0-dev.zip`, SHA256 `3C9C343B8ABB06655B6A2DD55CACEEFF2542ED64BCF4FF943AFC7A5957C79A7A`.
+- Frozen installer: `artifacts/windows/publication-bundles/v0.1.0-dev.1/LensDocsStudio.Windows-0.1.0-dev-Setup.exe`, SHA256 `4C2A79C7DF446957DE6F6D2E41271D0C7563178BB47ECACC09E001752C930745`.
+- Frozen metadata: `artifacts/windows/publication-bundles/v0.1.0-dev.1/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T174119Z.md` and `.json`.
+- `v0.1.0-dev.1` tag and release were missing during the read-only Phase 3AD check, so a later authorised publication would be create-new.
+- No publication was performed. No GitHub release assets, releases, tags, or `main` merges were changed, and no production readiness or go-live claim is made.
+
 ## Artefact Decision
 
 ### ZIP
@@ -227,4 +239,4 @@ Future phase:
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Phase 3AA completed the real packaged diagnostics, native picker, and watcher/conflict evidence that earlier phases left blocked. Phase 3AB rebuilt fresh local ZIP and installer artefacts from the Phase 3AA commit and passed validation. This plan is ready with notes for a future approved prerelease publication step, but Phase 3AB did not publish anything: any future publication still needs explicit approval, release notes review, and fresh artefact confirmation from the selected publication commit.
+Phase 3AA completed the real packaged diagnostics, native picker, and watcher/conflict evidence that earlier phases left blocked. Phase 3AB rebuilt fresh local ZIP and installer artefacts from the Phase 3AA commit and passed validation. Phase 3AD froze the authoritative local publication bundle from commit `c776fffdc8364c2c978f8106869a2d6bf50477ff`. This plan is ready with notes for a future approved prerelease publication step, but Phase 3AD did not publish anything: any future publication still needs explicit approval and release notes review.
