@@ -1203,6 +1203,7 @@ export function createAppController() {
           const action = actionButton.dataset.sidebarAction;
           if (action === 'openFile') await openFile();
           if (action === 'openFolder') await openFolder();
+          if (action === 'diagnostics') await openWindowsShellDiagnostics();
           if (action === 'newFile') await newMarkdownDocument();
           if (action === 'addFile') await addFilesToWorkspace();
           if (action === 'create') openCreateMenu();
@@ -2312,16 +2313,17 @@ ${unresolvedRows}
       setExportTrust('', '');
       preview.innerHTML = `
         <section class="welcome-state" aria-label="Welcome">
-          <p class="welcome-kicker">Browser-only Markdown and Mermaid</p>
-          <h2>Start with a file, a folder, or a ready-made document.</h2>
-          <p>Open files, create documents, preview Markdown and Mermaid, and export clean documentation packages when the work is ready.</p>
+          <p class="welcome-kicker">Local Markdown, Mermaid, and documentation studio</p>
+          <h2>Start with a documentation folder.</h2>
+          <p>Open a folder to browse and watch a local workspace, open one file for a quick edit, or create a starter document. Your files stay local unless you choose to save, copy, export, or import content.</p>
           <div class="welcome-choice-grid">
             <div class="welcome-choice">
-              <strong>Open local work</strong>
-              <span>Use an existing Markdown or Mermaid file, or browse a folder of docs.</span>
+              <strong>Open local docs</strong>
+              <span>Use Open folder for workspace-style browsing and file watching. Use Open file for a single Markdown, Mermaid, or text document.</span>
               <div class="welcome-actions">
-                <button class="primary" type="button" data-welcome-action="openFile">Open file</button>
-                <button type="button" data-welcome-action="openFolder">Open folder</button>
+                <button class="primary" type="button" data-welcome-action="openFolder">Open folder</button>
+                <button type="button" data-welcome-action="openFile">Open file</button>
+                <button type="button" data-welcome-action="diagnostics">Diagnostics</button>
               </div>
             </div>
             <div class="welcome-choice">
@@ -2335,7 +2337,7 @@ ${unresolvedRows}
               <button type="button" data-welcome-action="sample">Try sample</button>
             </div>
           </div>
-          <div class="privacy-note">Files stay in this browser unless you save, copy, or export them.</div>
+          <div class="privacy-note">The Windows desktop shell runs the same local app from packaged files. If Open folder does not work there, use Diagnostics from this screen or Help.</div>
         </section>`;
       updateDocumentUx();
       setStatus('Ready');
@@ -3397,6 +3399,7 @@ ${unresolvedRows}
         const action = welcomeAction.dataset.welcomeAction;
         if (action === 'openFile') await openFile();
         if (action === 'openFolder') await openFolder();
+        if (action === 'diagnostics') await openWindowsShellDiagnostics();
         if (action === 'sample') await loadExample('sample');
         if (action === 'create') openCreateMenu();
         return;

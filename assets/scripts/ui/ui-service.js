@@ -292,10 +292,11 @@ export function createUiService({
       element.className = 'empty-state';
       element.innerHTML = `
         <strong>No documents loaded</strong>
-        <p>Open a file or folder, or create a new Markdown document from a local template.</p>
+        <p>Open a folder for workspace-style browsing and watching, or open one file for a quick local edit.</p>
         <div class="empty-actions">
-          <button type="button" data-sidebar-action="openFile">Open file</button>
           <button type="button" data-sidebar-action="openFolder">Open folder</button>
+          <button type="button" data-sidebar-action="openFile">Open file</button>
+          <button type="button" data-sidebar-action="diagnostics">Diagnostics</button>
           <button type="button" data-sidebar-action="newFile">New file</button>
           <button type="button" data-sidebar-action="addFile">Add file</button>
         </div>`;

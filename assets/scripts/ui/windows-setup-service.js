@@ -209,9 +209,9 @@ export function createWindowsSetupService({
   }
 
   function getStepSummary(stepId) {
-    if (stepId === 'welcome') return 'A quick local setup check for the Windows desktop shell.';
-    if (stepId === 'runtime') return 'Check the host, offline shell, and native bridge capabilities.';
-    if (stepId === 'workspace') return 'Optionally open a local documentation folder.';
+    if (stepId === 'welcome') return 'Set up the local Windows desktop shell.';
+    if (stepId === 'runtime') return 'Check packaged local files and Windows bridge capabilities.';
+    if (stepId === 'workspace') return 'Open a local documentation folder when you want workspace browsing.';
     if (stepId === 'associations') return 'Review safe per-user file association guidance.';
     if (stepId === 'starter') return 'Open a useful starting document or begin with a blank file.';
     return 'Finish setup and continue working locally.';
@@ -235,7 +235,7 @@ export function createWindowsSetupService({
     const fragment = document.createDocumentFragment();
     const paragraph = document.createElement('p');
     paragraph.className = 'windows-setup-lead';
-    paragraph.textContent = 'Lens Docs Studio is ready to work locally with Markdown, Mermaid, and documentation workspaces.';
+    paragraph.textContent = 'Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. The Windows desktop shell opens the same app from packaged local files, so you can work with local documents without a backend.';
     fragment.appendChild(paragraph);
     return fragment;
   }
@@ -286,7 +286,7 @@ export function createWindowsSetupService({
     const fragment = document.createDocumentFragment();
     const paragraph = document.createElement('p');
     paragraph.className = 'windows-setup-lead';
-    paragraph.textContent = 'Open a local folder now, or continue and choose one later from File or the sidebar.';
+    paragraph.textContent = 'Open a folder when you want workspace-style browsing, search, saves, and file watching. Open a single file later for quick edits. If Open folder does not work, use Help > Windows shell diagnostics.';
     const actions = document.createElement('div');
     actions.className = 'windows-setup-actions';
     actions.append(

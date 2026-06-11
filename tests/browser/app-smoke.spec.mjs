@@ -1715,6 +1715,38 @@ test('native bridge diagnostic handles malformed host responses safely', async (
   await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
 });
 
+test('first-run welcome explains local onboarding actions without release claims', async ({ page }) => {
+  await gotoApp(page);
+
+  const welcome = page.locator('.welcome-state');
+  await expect(welcome).toBeVisible();
+  await expect(welcome).toContainText('Local Markdown, Mermaid, and documentation studio');
+  await expect(welcome).toContainText('Start with a documentation folder.');
+  await expect(welcome).toContainText('Open a folder to browse and watch a local workspace');
+  await expect(welcome).toContainText('Your files stay local unless you choose to save, copy, export, or import content.');
+  await expect(welcome).toContainText('If Open folder does not work there, use Diagnostics from this screen or Help.');
+
+  const primaryAction = welcome.locator('.welcome-actions button.primary');
+  await expect(primaryAction).toHaveText('Open folder');
+  await expect(welcome.getByRole('button', { name: 'Open file' })).toBeVisible();
+  await expect(welcome.getByRole('button', { name: 'Diagnostics' })).toBeVisible();
+  await expect(welcome).not.toContainText(/production readiness|go-live|go live|stable-channel|stable channel/i);
+  await expect(welcome).not.toContainText(/browser fallback/i);
+});
+
+test('empty file list keeps Open folder first and exposes Diagnostics', async ({ page }) => {
+  await gotoApp(page);
+
+  const emptyState = page.locator('#fileList .empty-state');
+  await expect(emptyState).toContainText('Open a folder for workspace-style browsing and watching');
+  await expect(emptyState.locator('.empty-actions button').first()).toHaveText('Open folder');
+  await expect(emptyState.getByRole('button', { name: 'Open file' })).toBeVisible();
+  await expect(emptyState.getByRole('button', { name: 'Diagnostics' })).toBeVisible();
+
+  await emptyState.getByRole('button', { name: 'Diagnostics' }).click();
+  await expect(page.locator('#windowsShellDiagnosticsDialog')).toBeVisible();
+});
+
 test('Windows shell diagnostics report browser fallback safely', async ({ page }) => {
   await gotoApp(page);
 
@@ -1874,6 +1906,10 @@ test('fake Windows bridge mode auto-shows first-run setup wizard', async ({ page
   await expect(page.locator('#windowsSetupDialog')).toBeVisible();
   await expect(page.locator('#windowsSetupTitle')).toHaveText('Welcome');
   await expect(page.locator('#windowsSetupSummary')).toContainText('Windows desktop shell');
+  await expect(page.locator('#windowsSetupBody')).toContainText('local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('#windowsSetupBody')).toContainText('packaged local files');
+  await expect(page.locator('#windowsSetupBody')).toContainText('without a backend');
+  await expect(page.locator('#windowsSetupBody')).not.toContainText(/production readiness|go-live|go live/i);
 });
 
 test('Windows setup wizard can be skipped and stays completed on reload', async ({ page }) => {
@@ -1928,6 +1964,8 @@ test('Windows setup workspace step opens native folder only when clicked', async
   await page.getByRole('button', { name: 'Get started' }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.locator('#windowsSetupTitle')).toHaveText('Workspace');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace-style browsing, search, saves, and file watching');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Help > Windows shell diagnostics');
 
   let openFolderMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((item) => item.type === 'lensDocs.native.openFolder').length);
   expect(openFolderMessages).toBe(0);

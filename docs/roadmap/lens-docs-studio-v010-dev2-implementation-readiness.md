@@ -56,6 +56,12 @@ This readiness verdict does not approve a release. It only says that the candida
 
 The sequence favours low-risk visibility and copy work before larger support-bundle or installer-evidence design. Any slice can be deferred if feedback shows it is not needed for a small dev prerelease.
 
+Implementation notes as of 2026-06-11:
+
+- Phase 3AK implemented the first slice, diagnostics visibility polish for bridge and folder-picker issues, on `develop`.
+- Phase 3AL implements the second slice, first-run/onboarding copy polish, on `develop`.
+- These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
+
 ## Non-Goals
 
 - Do not edit, delete, replace, re-upload, rebuild, or republish `v0.1.0-dev.1` release assets.
