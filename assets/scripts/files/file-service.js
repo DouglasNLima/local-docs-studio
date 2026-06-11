@@ -58,6 +58,10 @@ export function createFileService({
     normalisePath,
     uniqueByPath,
   } = helpers;
+  const openFolderDiagnostics = {
+    lastAttempt: 'not-attempted',
+    lastMessage: '',
+  };
 
     if (nativeBridgeClient?.on) {
       nativeBridgeClient.on(nativeBridgeMessageTypes.workspaceChanged, handleNativeWorkspaceChanged);
@@ -179,6 +183,7 @@ export function createFileService({
         return;
       }
       if (nativeRoute.bridgeAvailable) {
+        updateOpenFolderAttempt(nativeRoute.pingPassed ? 'capability-missing' : 'bridge-unavailable', getNativeOpenFolderUnavailableMessage(nativeRoute));
         setStatus(getNativeOpenFolderUnavailableMessage(nativeRoute), 'warning');
         return;
       }
@@ -189,6 +194,7 @@ export function createFileService({
             id: 'md-mmd-renderer-folder',
             mode: 'readwrite',
           });
+          updateOpenFolderAttempt('browser-picker-opened', 'Browser directory picker opened.');
           setStatus('Reading folder...');
           const records = await collectDirectoryRecords(directoryHandle);
           await setLibraryFromRecords(records, directoryHandle.name || 'Selected folder', {
@@ -199,7 +205,11 @@ export function createFileService({
           return;
         }
       } catch (error) {
-        if (error?.name === 'AbortError') return;
+        if (error?.name === 'AbortError') {
+          updateOpenFolderAttempt('cancelled', 'Browser folder picker cancelled.');
+          return;
+        }
+        updateOpenFolderAttempt('browser-picker-error', 'Browser folder picker failed.');
         setStatus('Folder picker failed. Using the browser fallback...', 'warning');
       }
 
@@ -208,20 +218,25 @@ export function createFileService({
 
     async function openNativeFolder() {
       try {
+        updateOpenFolderAttempt('native-picker-opened', 'Native Windows folder picker opened.');
         setStatus('Opening folder from Windows...', 'busy');
         const result = await nativeBridgeClient.openFolder();
         if (!result.ok) {
-          setStatus(result.message || 'Windows open folder failed safely.', 'danger');
+          const message = getNativeOpenFolderFailureMessage(result);
+          updateOpenFolderAttempt(result.reason === 'timeout' ? 'timeout' : 'native-error', message);
+          setStatus(message, 'danger');
           return false;
         }
 
         const payload = result.response?.payload || {};
         if (payload.cancelled) {
+          updateOpenFolderAttempt('cancelled', 'Open folder cancelled.');
           setStatus('Open folder cancelled.', 'info');
           return true;
         }
 
         if (!isValidNativeWorkspacePayload(payload)) {
+          updateOpenFolderAttempt('native-error', 'Windows open folder returned an unsupported workspace response.');
           setStatus('Windows open folder returned an unsupported workspace response.', 'danger');
           return false;
         }
@@ -244,12 +259,17 @@ export function createFileService({
 
         const skipped = Array.isArray(payload.skipped) ? payload.skipped : [];
         if (skipped.length) {
+          updateOpenFolderAttempt('folder-selected', `${records.length} Windows workspace file${records.length === 1 ? '' : 's'} loaded; skipped files reported.`);
           setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows. ${skipped.length} file${skipped.length === 1 ? '' : 's'} skipped by workspace limits.`, 'warning');
         } else if (records.length) {
+          updateOpenFolderAttempt('folder-selected', `${records.length} Windows workspace file${records.length === 1 ? '' : 's'} loaded.`);
           setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows.`, 'ok');
+        } else {
+          updateOpenFolderAttempt('folder-selected', 'Windows workspace selected with no supported files.');
         }
         return true;
       } catch (error) {
+        updateOpenFolderAttempt('native-error', 'Windows open folder failed safely.');
         setStatus('Windows open folder failed safely.', 'danger');
         console.error(error);
         return false;
@@ -1076,6 +1096,33 @@ export function createFileService({
         return `${route.message || 'Windows bridge did not respond.'} Open folder cannot use the browser fallback while running in the Windows shell. Use Help > Windows shell diagnostics, retry the bridge check, then try Open folder again.`;
       }
       return 'Windows Open folder is unavailable because workspace.openFolder was not reported. Use Help > Windows shell diagnostics before retrying manual watcher evidence.';
+    }
+
+    function getNativeOpenFolderFailureMessage(result) {
+      if (result.reason === 'timeout') {
+        return 'Windows folder picker timed out. Open folder cannot use the browser fallback while running in the Windows shell.';
+      }
+      return getBoundedOpenFolderMessage(result.message || 'Windows open folder failed safely.');
+    }
+
+    function getBoundedOpenFolderMessage(message) {
+      const text = typeof message === 'string' && message.trim()
+        ? message.trim()
+        : 'Windows open folder failed safely.';
+      const safeText = text
+        .replace(/[A-Za-z]:\\[^\s"'<>]+/g, '[local path]')
+        .replace(/\/Users\/[^\s"'<>]+/g, '[local path]')
+        .replace(/%TEMP%[^\s"'<>]*/gi, '[local path]');
+      return safeText.length > 180 ? `${safeText.slice(0, 177)}...` : safeText;
+    }
+
+    function updateOpenFolderAttempt(status, message = '') {
+      openFolderDiagnostics.lastAttempt = status;
+      openFolderDiagnostics.lastMessage = getBoundedOpenFolderMessage(message);
+    }
+
+    function getOpenFolderDiagnostics() {
+      return { ...openFolderDiagnostics };
     }
 
     async function saveRecordToNativeHandle(record, content) {
@@ -1963,5 +2010,6 @@ export function createFileService({
       refreshActiveFile,
       checkForExternalUpdates,
       ensureWritePermission,
+      getOpenFolderDiagnostics,
     };
 }

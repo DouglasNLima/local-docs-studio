@@ -673,6 +673,7 @@ export function createAppController() {
       refreshActiveFile,
       checkForExternalUpdates,
       ensureWritePermission,
+      getOpenFolderDiagnostics,
     } = createFileService({
       state,
       dom: { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview },
@@ -2429,6 +2430,7 @@ ${unresolvedRows}
       }
 
       setStatus('Checking Windows shell diagnostics...', 'busy');
+      setWindowsShellDiagnosticsPending();
       const routeState = typeof nativeBridgeClient.getCapabilityState === 'function'
         ? await nativeBridgeClient.getCapabilityState('workspace.openFolder')
         : await getFallbackCapabilityState('workspace.openFolder');
@@ -2460,10 +2462,12 @@ ${unresolvedRows}
       const webViewBridgePresent = Boolean(routeState.bridgeAvailable);
       const pingPassed = Boolean(result.ok);
       const openFolderNative = Boolean(routeState.hasCapability);
+      const openFolderCapabilityState = getOpenFolderCapabilityDiagnosticState(routeState);
       const supportsDirectoryPicker = 'showDirectoryPicker' in window;
       const supportsFolderInput = Boolean(folderInput);
       const openFolderRoute = getOpenFolderDiagnosticRoute({
         bridgeAvailable: webViewBridgePresent,
+        pingPassed,
         openFolderNative,
         supportsDirectoryPicker,
         supportsFolderInput,
@@ -2471,6 +2475,7 @@ ${unresolvedRows}
       const browserFallbackActive = openFolderRoute.browserFallbackActive;
       const pwaMode = isStandaloneDisplayMode();
       const lastError = getSafeDiagnosticError(result, diagnostics);
+      const openFolderAttempt = getOpenFolderAttemptDiagnostic(getOpenFolderDiagnostics?.());
       const nextStep = getWindowsShellDiagnosticNextStep({
         pingPassed,
         isWindowsShell: isWindowsShell || webViewBridgePresent,
@@ -2483,7 +2488,7 @@ ${unresolvedRows}
       windowsShellDiagnosticsBody.innerHTML = `
         ${renderDiagnosticSection('Mode', [
           ['Running in browser/PWA', isWindowsShell ? 'No' : (pwaMode ? 'Yes (PWA display mode)' : 'Yes')],
-          ['Running in Windows WebView2 shell', yesNo(isWindowsShell || webViewBridgePresent)],
+          ['WebView2 shell detected', getWebViewShellDiagnosticValue({ isWindowsShell, bridgeAvailable: webViewBridgePresent, host })],
           ['Bridge message handler registered', yesNo(Boolean(diagnostics.messageHandlerRegistered))],
         ])}
         ${renderDiagnosticSection('Native bridge', [
@@ -2502,14 +2507,19 @@ ${unresolvedRows}
         </section>
         ${renderDiagnosticSection('Workspace action routing', [
           ['Open folder route', openFolderRoute.label],
+          ['workspace.openFolder capability', openFolderCapabilityState],
           ['Open folder will use native bridge', yesNo(openFolderNative)],
-          ['Browser fallback active', yesNo(browserFallbackActive)],
+          ['Browser fallback state', getBrowserFallbackState({ bridgeAvailable: webViewBridgePresent, browserFallbackActive })],
           ['Browser fallback route', browserFallbackActive ? openFolderRoute.fallbackLabel : 'Not active'],
           ['Directory picker API available', yesNo(supportsDirectoryPicker)],
           ['Folder input fallback available', yesNo(supportsFolderInput)],
         ])}
+        ${renderDiagnosticSection('Last Open folder attempt', [
+          ['Attempt state', openFolderAttempt.label],
+          ['Attempt detail', openFolderAttempt.detail],
+        ])}
         <section class="windows-shell-diagnostics-section">
-          <h3>Operator next step</h3>
+          <h3>Troubleshooting</h3>
           <p>${escapeHtml(nextStep)}</p>
         </section>
       `;
@@ -2525,6 +2535,26 @@ ${unresolvedRows}
       setStatus(pingPassed
         ? 'Windows shell diagnostics completed.'
         : 'Windows shell diagnostics found the bridge unavailable or failing.', pingPassed ? 'ok' : 'warning');
+    }
+
+    function setWindowsShellDiagnosticsPending() {
+      windowsShellDiagnosticsBody.innerHTML = `
+        ${renderDiagnosticSection('Native bridge', [
+          ['Ping result', 'Pending'],
+          ['workspace.openFolder capability', 'Pending'],
+          ['Open folder route', 'Pending'],
+          ['Browser fallback state', 'Pending'],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Troubleshooting</h3>
+          <p>Refreshing bridge and folder-picker diagnostics...</p>
+        </section>
+      `;
+      if (!windowsShellDiagnosticsDialog.open && typeof windowsShellDiagnosticsDialog.showModal === 'function') {
+        windowsShellDiagnosticsDialog.showModal();
+      } else {
+        windowsShellDiagnosticsDialog.setAttribute('open', '');
+      }
     }
 
     function closeWindowsShellDiagnostics() {
@@ -2553,7 +2583,7 @@ ${unresolvedRows}
 
     function getDiagnosticStatusKind(value) {
       if (/^(yes|pass)/i.test(value)) return 'ok';
-      if (/^(no|fail|timeout|unavailable|not reported)/i.test(value)) return 'warning';
+      if (/^(no|fail|timeout|unavailable|not reported|missing|failing|blocked|native error)/i.test(value)) return 'warning';
       return 'info';
     }
 
@@ -2579,6 +2609,7 @@ ${unresolvedRows}
 
     function getOpenFolderDiagnosticRoute({
       bridgeAvailable,
+      pingPassed,
       openFolderNative,
       supportsDirectoryPicker,
       supportsFolderInput,
@@ -2592,7 +2623,9 @@ ${unresolvedRows}
       }
       if (bridgeAvailable) {
         return {
-          label: 'unavailable in Windows shell',
+          label: pingPassed
+            ? 'blocked because native bridge is present but capability failed'
+            : 'blocked because native bridge is present but capability check failed',
           browserFallbackActive: false,
           fallbackLabel: 'Blocked while native bridge is present',
         };
@@ -2618,6 +2651,46 @@ ${unresolvedRows}
       };
     }
 
+    function getWebViewShellDiagnosticValue({ isWindowsShell, bridgeAvailable, host }) {
+      if (isWindowsShell) return 'Yes';
+      if (bridgeAvailable) return host ? 'Unknown host' : 'Unknown';
+      return 'No';
+    }
+
+    function getOpenFolderCapabilityDiagnosticState(routeState) {
+      if (routeState.hasCapability) return 'available';
+      if (!routeState.bridgeAvailable) return 'pending';
+      if (!routeState.pingPassed) return 'failing';
+      return 'missing';
+    }
+
+    function getBrowserFallbackState({ bridgeAvailable, browserFallbackActive }) {
+      if (bridgeAvailable) return 'inactive in packaged WebView2';
+      return browserFallbackActive ? 'available in browser/PWA context' : 'unavailable in this browser';
+    }
+
+    function getOpenFolderAttemptDiagnostic(openFolderDiagnostics = {}) {
+      const detail = typeof openFolderDiagnostics.lastMessage === 'string' && openFolderDiagnostics.lastMessage.trim()
+        ? openFolderDiagnostics.lastMessage.trim()
+        : 'No Open folder result has been recorded in this session.';
+      const labels = {
+        'not-attempted': 'not attempted',
+        'native-picker-opened': 'native picker opened',
+        'folder-selected': 'folder selected',
+        cancelled: 'user cancelled',
+        'native-error': 'native error',
+        timeout: 'timeout',
+        'bridge-unavailable': 'bridge unavailable',
+        'capability-missing': 'workspace.openFolder missing',
+        'browser-picker-opened': 'browser picker opened',
+        'browser-picker-error': 'browser picker error',
+      };
+      return {
+        label: labels[openFolderDiagnostics.lastAttempt] || 'not attempted',
+        detail,
+      };
+    }
+
     function getSafeDiagnosticError(result, diagnostics = {}) {
       if (result.ok) return diagnostics.lastErrorReason || 'None';
       if (result.reason === 'timeout' || diagnostics.requestTimedOut) return 'timeout';
@@ -2640,13 +2713,13 @@ ${unresolvedRows}
         return 'Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.';
       }
       if (bridgeAvailable) {
-        return 'Use Retry bridge check. If workspace.openFolder is still unavailable, do not start watcher evidence; record the route and last native error from this dialog.';
+        return 'Use Retry bridge check. If workspace.openFolder is still missing or failing, keep browser fallback inactive, record this dialog, and do not start watcher evidence.';
       }
       if (!pingPassed || !isWindowsShell) {
-        return 'Do not start watcher evidence. Record the ping result, host, last native error, and whether the app was launched from the packaged Windows executable.';
+        return 'In browser or PWA mode, use the browser picker if available. For packaged evidence, launch the Windows executable and retry diagnostics.';
       }
       if (!supportsDirectoryPicker && supportsFolderInput) {
-        return 'Record that Open folder will fall back to the browser file input route; this is not valid Windows folder-picker evidence.';
+        return 'Browser file input fallback is available only outside the packaged WebView2 shell and is not valid Windows folder-picker evidence.';
       }
       return 'Record the missing workspace.openFolder capability before retrying manual watcher evidence.';
     }

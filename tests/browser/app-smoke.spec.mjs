@@ -530,6 +530,7 @@ async function installMockNativeBridge(page, options = {}) {
       refreshWorkspaceFile: 'success',
       smokeWorkspace: options.smokeWorkspace || 'success',
     };
+    window.__nativeBridgeCapabilities = Array.isArray(options.capabilities) ? [...options.capabilities] : null;
 
     function emit(response, delayMs = 0) {
       window.setTimeout(() => {
@@ -569,7 +570,7 @@ async function installMockNativeBridge(page, options = {}) {
           }
 
           if (message.type === 'lensDocs.native.ping') {
-            const capabilities = Array.isArray(options.capabilities) ? [...options.capabilities] : [
+            const capabilities = Array.isArray(window.__nativeBridgeCapabilities) ? [...window.__nativeBridgeCapabilities] : [
               'diagnostics.ping',
               'file.startupOpen',
               'file.open',
@@ -644,7 +645,7 @@ async function installMockNativeBridge(page, options = {}) {
             }
             if (window.__nativeBridgeScenario.openFolder === 'native-error') {
               emit(baseResponse(message, 'lensDocs.native.error', {
-                message: 'Windows folder picker could not open safely.',
+                message: window.__nativeBridgeScenario.openFolderErrorMessage || 'Windows folder picker could not open safely.',
               }));
               return;
             }
@@ -1722,12 +1723,16 @@ test('Windows shell diagnostics report browser fallback safely', async ({ page }
 
   const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
   await expect(diagnostics).toBeVisible();
-  await expect(diagnostics).toContainText('Running in Windows WebView2 shell');
+  await expect(diagnostics).toContainText('WebView2 shell detected');
   await expect(diagnostics).toContainText('Ping result');
   await expect(diagnostics).toContainText('Fail');
-  await expect(diagnostics).toContainText('Open folder will use native bridge');
-  await expect(diagnostics).toContainText('Browser fallback active');
-  await expect(diagnostics).toContainText('Yes');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('browser directory picker');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('available in browser/PWA context');
+  await expect(diagnostics).toContainText('Attempt state');
+  await expect(diagnostics).toContainText('not attempted');
   await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
   await expect(page.locator('#status')).toHaveText('Windows shell diagnostics found the bridge unavailable or failing.');
 });
@@ -1741,7 +1746,8 @@ test('Windows shell diagnostics show fake WebView2 workspace capabilities and na
 
   const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
   await expect(diagnostics).toBeVisible();
-  await expect(diagnostics).toContainText('Running in Windows WebView2 shell');
+  await expect(diagnostics).toContainText('WebView2 shell detected');
+  await expect(diagnostics).toContainText('Yes');
   await expect(diagnostics).toContainText('Ping result');
   await expect(diagnostics).toContainText('Pass');
   await expect(diagnostics).toContainText('Host');
@@ -1749,8 +1755,11 @@ test('Windows shell diagnostics show fake WebView2 workspace capabilities and na
   await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
   await expect(diagnostics).toContainText('Open folder route');
   await expect(diagnostics).toContainText('native bridge');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('available');
   await expect(diagnostics).toContainText('Open folder will use native bridge');
-  await expect(diagnostics).toContainText('Browser fallback active');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('inactive in packaged WebView2');
   await expect(diagnostics).toContainText('Not active');
   await expect(page.getByRole('button', { name: 'Retry bridge check' })).toBeVisible();
   await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
@@ -1802,14 +1811,48 @@ test('Windows shell diagnostics differentiate missing native folder routing from
   await expect(diagnostics).toBeVisible();
   await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'false');
   await expect(diagnostics).toContainText('Open folder route');
-  await expect(diagnostics).toContainText('unavailable in Windows shell');
+  await expect(diagnostics).toContainText('blocked because native bridge is present but capability failed');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('missing');
   await expect(diagnostics).toContainText('Open folder will use native bridge');
   await expect(diagnostics).toContainText('No');
-  await expect(diagnostics).toContainText('Browser fallback active');
-  await expect(diagnostics).toContainText('No');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('inactive in packaged WebView2');
   await expect(diagnostics).toContainText('Browser fallback route');
   await expect(diagnostics).toContainText('Not active');
   await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+});
+
+test('Windows shell diagnostics retry refreshes stale workspace capability state', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('missing');
+  await expect(diagnostics).toContainText('blocked because native bridge is present but capability failed');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeCapabilities = [
+      'diagnostics.ping',
+      'file.open',
+      'file.save',
+      'file.saveAs',
+      'workspace.openFolder',
+    ];
+  });
+  await page.getByRole('button', { name: 'Retry bridge check' }).click();
+
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
+  await expect(diagnostics).toContainText('available');
+  await expect(diagnostics).toContainText('native bridge');
+  const pingCount = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.ping').length);
+  expect(pingCount).toBeGreaterThanOrEqual(2);
 });
 
 test('browser mode does not auto-show Windows setup wizard', async ({ page }) => {
@@ -2352,6 +2395,26 @@ test('fake WebView2 bridge handles cancelled and malformed native workspace resp
   await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
 });
 
+test('Windows shell diagnostics display cancelled native open folder separately', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('Open folder cancelled.');
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('Last Open folder attempt');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).toContainText('user cancelled');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).not.toContainText('native error');
+});
+
 test('fake WebView2 bridge surfaces native workspace picker errors without browser fallback', async ({ page }) => {
   await installMockNativeBridge(page);
   await page.addInitScript(() => {
@@ -2372,6 +2435,31 @@ test('fake WebView2 bridge surfaces native workspace picker errors without brows
   await expect(page.locator('#status')).toHaveText('Windows folder picker could not open safely.');
   await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
   await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+});
+
+test('native open folder error copy is bounded and redacts local paths', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+    window.__nativeBridgeScenario.openFolderErrorMessage = `Windows folder picker could not attach to C:\\Users\\person\\Private\\Workspace because ${'details '.repeat(40)}`;
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toContainText('[local path]');
+  const statusText = await page.locator('#status').textContent();
+  expect(statusText).toContain('[local path]');
+  expect(statusText).not.toContain('C:\\Users\\person');
+  expect(statusText.length).toBeLessThanOrEqual(190);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('native error');
+  await expect(diagnostics).toContainText('[local path]');
+  await expect(diagnostics).not.toContainText('C:\\Users\\person');
 });
 
 test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {
