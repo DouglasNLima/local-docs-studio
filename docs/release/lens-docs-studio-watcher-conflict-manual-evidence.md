@@ -516,3 +516,96 @@ Validation after the Phase 3Y runtime fix:
 | `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath "artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe"` | PASS | Freshly rebuilt packaged executable native bridge smoke completed successfully. |
 
 No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3Y.
+
+## Phase 3Z Human-assisted Packaged Stage B Checkpoint
+
+Phase 3Z started from `develop` commit `e59c92fa1ed2dcf64ffa212d9b50a6c75d19fd6c`, which contains the Phase 3Y packaged workspace-selection timeout fix. The tracked working tree was clean before the evidence pass. Ignored/generated paths present before the work included `artifacts/`, `node_modules/`, `src/windows/.vs/`, `src/windows/LensDocsStudio.Windows/bin/`, `src/windows/LensDocsStudio.Windows/obj/`, and `test-results/`; these were not staged as source.
+
+- Evidence branch: `develop`.
+- Package executable used: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`.
+- Package timestamp observed before launch: 11 June 2026, 13:33:03 local time.
+- Phase 3Y supporting commit: `e59c92fa1ed2dcf64ffa212d9b50a6c75d19fd6c`.
+- Temporary watcher workspace prepared: `C:\Temp\LensDocsStudio-StageB`.
+- Test file prepared: `stage-b.md`.
+- Initial file content:
+
+```md
+# Stage B
+Initial content
+```
+
+### Phase 3Y Supporting Evidence Boundary
+
+Phase 3Y remains supporting evidence for the native picker timeout fix only. It proved that `workspace.openFolder` uses the native bridge route with a `300000 ms` interactive picker timeout and no longer reports the old false `Native bridge did not respond.` error during the previous short timeout window. Phase 3Y did not complete Stage B watcher/conflict scenarios because the workspace was not selected through the real packaged folder picker.
+
+### Phase 3Z Stage A - Packaged Diagnostics
+
+Result: **PACKAGED_DIAGNOSTICS_PASS**
+
+The real packaged executable was launched from `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe` with WebView2 remote debugging enabled only as an observation/control aid for the visible packaged UI. **Help > Windows shell diagnostics** was opened and **Retry bridge check** was clicked in the packaged app.
+
+Observed diagnostic values after **Retry bridge check**:
+
+| Field | Observed value |
+| --- | --- |
+| Running in browser/PWA | `No` |
+| Running in Windows WebView2 shell | `Yes` |
+| Bridge message handler registered | `Yes` |
+| Bridge ping | `Pass` |
+| Protocol version | `1` |
+| Host | `LensDocsStudio.Windows` |
+| Last native request | `lensDocs.native.ping` |
+| Last native response | `lensDocs.native.pong` |
+| Last native error | `None` |
+| `diagnostics.ping` capability | `available` |
+| `file.open` capability | `available` |
+| `file.save` capability | `available` |
+| `file.saveAs` capability | `available` |
+| `workspace.openFolder` capability | `available` |
+| `workspace.saveFile` capability | `available` |
+| `workspace.createFile` capability | `available` |
+| `workspace.watch` capability | `available` |
+| `workspace.refreshFile` capability | `available` |
+| Open folder route decision | `native bridge` |
+| Open folder will use native bridge | `Yes` |
+| Browser fallback active | `No` |
+| Browser fallback route | `Not active` |
+| Directory picker API available | `Yes` |
+| Folder input fallback available | `Yes` |
+| Operator next step shown | `Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.` |
+
+### Phase 3Z Human-assisted Native Picker Selection
+
+Result: **BLOCKED_STAGE_B_HUMAN_PICKER_NOT_COMPLETED**
+
+After Stage A diagnostics passed, **Open folder** was clicked in the visible packaged app. The app status changed to `Opening folder from Windows...`, no browser fallback file input was visible, and the native bridge route remained active.
+
+The agent requested a human/operator to select `C:\Temp\LensDocsStudio-StageB` in the native Windows folder picker. The workspace selection was not completed during this evidence pass, and the packaged app remained at `Opening folder from Windows...` with no selected workspace and no editor content loaded. A desktop UI Automation inspection did not expose a selectable native picker window to the agent session, and a deeper read-only UI Automation scan failed with `RPC_E_SERVERFAULT`. No timeout or `Native bridge did not respond.` error was observed during the polling window, and browser fallback remained inactive.
+
+Because the real packaged app did not receive the selected workspace, the watcher/conflict scenarios were not run.
+
+### Phase 3Z Stage B - Watcher/Conflict Evidence
+
+Result: **BLOCKED_STAGE_B_HUMAN_PICKER_NOT_COMPLETED**
+
+| Scenario | Workspace/file used | Initial file content | In-app state before external change | External change made | Prompt/modal/notification observed | User action taken | Final editor content | Final file content on disk | Final dirty/conflict state | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Clean external change | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | See Phase 3Z setup above. | Workspace not selected; editor empty. | Not made. | No browser fallback observed. App status stayed `Opening folder from Windows...`; no selected workspace reached the packaged app. | Scenario aborted to avoid fabricating watcher evidence. | Not applicable; file was not opened in the editor. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+| Dirty conflict cancel | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | See Phase 3Z setup above. | Not reached because workspace was not loaded. | Not made. | Not observed. | Not executed. | Not applicable. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+| Dirty conflict confirm | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | See Phase 3Z setup above. | Not reached because workspace was not loaded. | Not made. | Not observed. | Not executed. | Not applicable. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+
+### Phase 3Z Validation
+
+Validation after the Phase 3Z documentation-only evidence update:
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npm run test:static` | PASS | Static checks passed for 46 module files, 53 shell assets, 150 vendor assets, and 52 runtime external-dependency scans. |
+| `npm run test:browser` | TIMEOUT, then covered by direct Playwright run | The suite progressed through both projects but the command harness timed out after 15 minutes before returning a final summary. |
+| `npx playwright test --reporter=line` | PASS | Completed all 220 browser smoke tests across Chromium and Microsoft Edge. This is the same Playwright suite invoked by `npm run test:browser`; the direct command was used only to allow the long-running suite to finish with a final result. |
+| `dotnet build src/windows/LensDocsStudio.Windows.sln` | PASS | Build succeeded with 0 warnings and 0 errors. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` | PASS | Verified 53 service-worker assets and 150 vendor assets in packaged `StaticApp/`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Rebuilt ignored local package/RC outputs for validation; report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T135958Z.md`, ZIP SHA256 `FA76C8A0D7FD395A15FF8DDFF0F24CFDA5CCC6F0C2A502C4B32374F1ACA99C99`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Development build native bridge smoke completed successfully. |
+
+No runtime code changed during Phase 3Z. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3Z.
