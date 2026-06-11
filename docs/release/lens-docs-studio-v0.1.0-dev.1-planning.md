@@ -2,14 +2,14 @@
 
 ## Context
 
-- Current prerelease: `Lens Docs Studio v0.1.0-dev`
-- Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev`
-- Current tag: `v0.1.0-dev`
-- Current target commit: `8b215d039188af94d32857239e6829916f4b74fc`
-- Current latest develop commit: `cf71a642ca7035e313c22275c363dcab2bcddf95`
+- Current prerelease: `Lens Docs Studio v0.1.0-dev.1`
+- Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`
+- Current tag: `v0.1.0-dev.1`
+- Frozen source commit: `c776fffdc8364c2c978f8106869a2d6bf50477ff`
+- Post-publication verification commit: `256a7af04e4f8d6775c42da855d5732fa574a31b`
 - Planning date: `2026-06-10`
 - Repository: `DouglasNLima/local-docs-studio`
-- Branch policy: work directly on `develop`; do not modify the published `v0.1.0-dev` release.
+- Branch policy: work directly on `develop`; do not modify published release assets unless a future release is explicitly authorised.
 
 ## Feedback Sources Reviewed
 
@@ -26,12 +26,12 @@ No public issue feedback was available at planning time, so this triage treats t
 
 | Item | Source | Category | Severity | Decision | Notes |
 | --- | --- | --- | --- | --- | --- |
-| No public prerelease issues filed | GitHub Issues | Feedback intake | Low | Accepted caveat | Continue monitoring before Phase 3S and again before publication. |
+| No public prerelease issues filed | GitHub Issues | Feedback intake | Low | Accepted caveat | Continue monitoring after prerelease publication. |
 | WebView2 user data may remain after uninstall | Known issues, Phase 3M/3Q notes | Uninstall | Medium | Documentation-only for `v0.1.0-dev.1` | Phase 3S chose `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY` because the WebView2 folder may contain browser-local user/session state. |
 | Installer is unsigned | Known issues, publication record | Installer | Medium | Accepted caveat | Signing remains out of scope for the next dev prerelease. Keep warnings explicit. |
 | Runtime prerequisites are external | Known issues, publication record | Runtime prerequisites | Medium | Documentation-only | Clarify ZIP versus installer expectations and prerequisite ownership; do not add bootstrappers in this cycle. |
 | File associations are optional/default-safe | Known issues, setup notes | File associations | Low | Accepted caveat | Keep opt-in behaviour. Revalidate documentation wording before the next publication. |
-| Watcher/conflict UX had `PASS_WITH_NOTES` | Phase 3K draft release review | Workspace watcher | Medium | Should fix for `v0.1.0-dev.1` | No code fix is known from public feedback; perform a manual human-only evidence pass before publishing new assets. |
+| Watcher/conflict UX had `PASS_WITH_NOTES` | Phase 3K draft release review | Workspace watcher | Medium | Addressed for `v0.1.0-dev.1` | Phase 3AA completed packaged Stage A and Stage B evidence before publication. |
 | ZIP versus installer wording may need clearer separation | Publication record, known issues | Documentation | Low | Documentation-only | Release notes and docs should distinguish portable fallback from unsigned installer path. |
 | Issue template uses `prerelease-feedback` label | Issue template | Feedback triage | Low | Defer | If issue volume appears, add a fuller label taxonomy in a separate GitHub hygiene step. |
 
@@ -68,14 +68,17 @@ Before Phase 3S starts, repeat the GitHub issue search. Any new blocker, checksu
 - Broad issue label automation or active GitHub project triage.
 - Main branch merge or stable/latest release positioning.
 
-### Accepted caveats
+### Accepted caveats after publication
 
-- `v0.1.0-dev.1`, if published, remains a prerelease.
+- `v0.1.0-dev.1` is published and remains a prerelease.
 - Installer remains unsigned.
 - Runtime prerequisites remain external.
 - ZIP remains the fallback package.
 - File associations remain optional/default-safe.
-- No release assets, tags, or releases are changed during Phase 3R.
+- Post-publication verification passed.
+- Stage A and Stage B packaged evidence passed.
+- The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified.
+- No release assets require further action unless a future release is authorised.
 
 ## Recommended Scope for v0.1.0-dev.1
 
@@ -97,7 +100,7 @@ The fix changes packaged static runtime code:
 - In WebView2, missing capability or bridge failure produces clear operator guidance instead of opening the browser folder/file-input fallback.
 - Windows shell diagnostics now show the same route decision and include **Retry bridge check**.
 
-Manual packaged route verification is still not recorded here, and watcher/conflict evidence remains blocked until a tester completes the fixed packaged Windows picker pass. Because runtime code changed, `v0.1.0-dev.1` is no longer docs-only. Fresh ZIP and installer artefacts are required if this fix is published.
+Phase 3AA later completed packaged diagnostics, real native picker selection, and Stage B watcher/conflict evidence. Because runtime code changed, `v0.1.0-dev.1` was not docs-only and required fresh ZIP and installer artefacts before publication.
 
 ## Explicitly Out of Scope for v0.1.0-dev.1
 
@@ -112,7 +115,7 @@ Manual packaged route verification is still not recorded here, and watcher/confl
 - Main branch merge.
 - Modifying the published `v0.1.0-dev` release.
 - Replacing, deleting, or uploading assets for `v0.1.0-dev`.
-- Creating or moving tags.
+- Creating or moving tags outside an authorised release phase.
 
 ## Acceptance Criteria
 
@@ -126,21 +129,13 @@ Manual packaged route verification is still not recorded here, and watcher/confl
 - No regression in installer install/uninstall path.
 - `v0.1.0-dev.1` remains prerelease and does not become stable/latest.
 
-## Revalidation Before Publishing v0.1.0-dev.1
+## Post-v0.1.0-dev.1 Next Work
 
-- Repeat GitHub open issue and prerelease issue searches.
-- Re-read known issues and confirm every accepted caveat is still accurately documented.
-- Run `npm run test:static`.
-- If installer or Windows shell artefacts change, run:
-  - `dotnet build src/windows/LensDocsStudio.Windows.sln`
-  - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`
-  - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1`
-  - `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1`
-  - native install/uninstall smoke for the installer path
-- If UI behaviour changes, run `npm run test:browser`.
-- Complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` before upload.
-- Verify generated ZIP and installer checksums before upload.
-- Verify no generated artefacts are committed.
+- Collect user feedback from prerelease usage.
+- Monitor installer and download issues.
+- Plan the next dev release scope from observed feedback and known limitations.
+- Decide later whether any release should be promoted, superseded, or archived.
+- Keep production readiness as a separate approval gate.
 
 ## Proposed Labels
 
@@ -162,10 +157,9 @@ Do not create labels during Phase 3R. If issue volume starts, use this candidate
 
 - Phase 3S: Implement `v0.1.0-dev.1` targeted fixes.
 - Phase 3T: Create the `v0.1.0-dev.1` certification plan and decide whether new ZIP/installer assets are needed.
-- Phase 3U: Publish `v0.1.0-dev.1` prerelease, if certified.
+- Phase 3U/3AF: Publish and verify `v0.1.0-dev.1` prerelease.
+- Phase 3AG: Close release documentation and rebaseline the roadmap.
 
 ## Recommendation
 
-Proceed with `v0.1.0-dev.1` targeted fixes.
-
-The next phase should start with the WebView2 uninstall caveat, watcher/conflict manual evidence, and concise release-note/documentation improvements. Keep `v0.1.0-rc.1` planning deferred until the prerelease feedback queue remains clear after this targeted pass.
+`v0.1.0-dev.1` is now published as a prerelease and passed post-publication verification. Continue with feedback collection, installer/download monitoring, and next dev-release planning. Keep production readiness, promotion, supersession, or archival decisions separate from this prerelease closure.

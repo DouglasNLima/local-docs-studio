@@ -72,7 +72,7 @@ The installer build wraps the existing certified Windows package output, validat
 
 The Phase 3N installer RC asset plan recommended adding the certified unsigned Inno Setup installer, checksum, and report to the existing `v0.1.0-dev` draft prerelease in a later explicit upload phase, with the release left unpublished and the ZIP kept as the primary fallback. See `docs/release/lens-docs-studio-installer-rc-asset-plan.md`.
 
-Phase 3Q records that `v0.1.0-dev` is now a public GitHub prerelease, not stable/latest. The ZIP remains available as the portable fallback for manual extraction, smoke validation, and environments avoiding installers; it does not create Start Menu or uninstall entries. The unsigned Inno Setup installer is the easier Windows install path with a Start Menu shortcut, optional Desktop shortcut, optional/default-safe file associations, uninstall support, and the WebView2 user data caveat. Runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. Phase 3R records `v0.1.0-dev.1` triage and next-cycle scope in `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md`. See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md`.
+Phase 3Q records that `v0.1.0-dev` is a public GitHub prerelease, not stable/latest. Phase 3AG records that `v0.1.0-dev.1` is now published as a verified prerelease after Stage A and Stage B packaged evidence, publication from the frozen Phase 3AD bundle, and Phase 3AF post-publication verification. The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified. The ZIP remains available as the portable fallback for manual extraction, smoke validation, and environments avoiding installers; it does not create Start Menu or uninstall entries. The unsigned Inno Setup installer is the easier Windows install path with a Start Menu shortcut, optional Desktop shortcut, optional/default-safe file associations, uninstall support, and the WebView2 user data caveat. Runtime prerequisites remain separate, and structured feedback should use `docs/release/lens-docs-studio-v0.1.0-dev-feedback-intake.md`. See `docs/release/lens-docs-studio-v010-dev1-release-closure.md`.
 
 Prepare a dry-run GitHub Release artefact set with:
 
@@ -119,6 +119,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3N records the installer RC asset plan for optionally adding the certified Inno Setup installer to the existing draft prerelease without publishing it.
 - Phase 3Q records the public `v0.1.0-dev` prerelease publication and adds structured feedback intake plus known caveats.
 - Phase 3R records prerelease feedback triage and recommends targeted `v0.1.0-dev.1` planning scope.
+- Phase 3AG closes `v0.1.0-dev.1` as a published and post-publication-verified prerelease/dev release. No release assets require further action unless a future release is authorised.
 - Phase 3S documents the WebView2 uninstall cleanup decision, adds the manual watcher/conflict evidence checklist, and clarifies ZIP versus installer wording for the next dev prerelease.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
@@ -128,7 +129,8 @@ See `docs/architecture/windows-installer-spike.md` for the Phase 3L installer sp
 See `docs/release/lens-docs-studio-installer-rc-asset-plan.md` for the Phase 3N installer draft-release asset plan.
 See `docs/release/lens-docs-studio-v0.1.0-dev-publication-record.md` for the Phase 3Q public prerelease publication record.
 See `docs/release/lens-docs-studio-v0.1.0-dev.1-planning.md` for the Phase 3R prerelease feedback triage and `v0.1.0-dev.1` planning record.
-See `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` for the manual watcher/conflict evidence checklist required before `v0.1.0-dev.1` publication.
+See `docs/release/lens-docs-studio-v010-dev1-release-closure.md` for the Phase 3AG release closure and roadmap rebaseline.
+See `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` for the packaged watcher/conflict evidence chain that cleared before `v0.1.0-dev.1` publication.
 See `docs/release/windows-first-run-setup-mvp.md` for the Windows setup wizard MVP notes.
 
 ### Windows Native Bridge

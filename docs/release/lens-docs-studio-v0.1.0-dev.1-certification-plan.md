@@ -29,6 +29,8 @@ Phase 3AD is the authoritative local publication bundle freeze for `v0.1.0-dev.1
 
 Phase 3AF is the read-only post-publication verification checkpoint for the published `v0.1.0-dev.1` GitHub prerelease. It verifies the tag, prerelease state, published asset set, downloaded asset hashes, downloaded ZIP smoke, and a contained installer smoke in `docs/release/phase-3af-post-publication-verification.md`. Phase 3AF does not change release assets, tags, releases, runtime code, or `main`, and does not claim production readiness or go-live approval.
 
+Phase 3AG closes the `v0.1.0-dev.1` prerelease evidence chain as documentation-only release closure and roadmap rebaseline. `v0.1.0-dev.1` is published as a prerelease, post-publication verification passed, Stage A and Stage B packaged evidence passed, and no release assets require further action unless a future release is authorised.
+
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
@@ -41,8 +43,9 @@ Phase 3AF is the read-only post-publication verification checkpoint for the publ
 - Phase 3AA checkpoint: native folder picker owner HWND resolution, UI dispatcher marshalling, foregrounding, structured picker errors, and cancellation preservation were hardened. The rebuilt packaged app completed Stage A diagnostics, selected a workspace through the real native picker, and passed Stage B clean external change, dirty conflict cancel, and dirty conflict confirm scenarios.
 - Phase 3AB checkpoint: fresh local package, package RC, and Inno installer artefacts were rebuilt from Phase 3AA commit `055e51dedacd28ea277a480b60bd0333feec6004`; all requested static, browser, Windows build, package RC, static asset, native smoke, packaged native smoke, package build, and installer build validation passed. The Phase 3W artefacts from `e2026d728c131cf2e203928487b9aeb09b744da7` are superseded and stale.
 - Phase 3AF checkpoint: after publication, the `v0.1.0-dev.1` prerelease, tag, exact six-asset set, downloaded ZIP and installer hashes, extracted ZIP static assets, packaged native bridge smoke, and contained installer install/smoke/uninstall behaviour were verified. No GitHub release assets, tags, releases, `main` merges, runtime code, production readiness claim, or go-live approval changed.
+- Phase 3AG checkpoint: release closure records `v0.1.0-dev.1` as a published and verified prerelease/dev release. The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified. No further release-asset action is required unless a future release is authorised.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
-- Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents are changed, installer config is unchanged, and release assets, tags, and releases are unchanged.
+- Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents changed, installer config is unchanged, and Phase 3AG does not change release assets, tags, or releases.
 
 ## Manual Watcher/Conflict Evidence
 
@@ -204,7 +207,7 @@ If runtime/UI changes:
 
 ## Release Notes Requirements
 
-Any future `v0.1.0-dev.1` release notes must state:
+The published `v0.1.0-dev.1` release notes and closure evidence state:
 
 - `v0.1.0-dev.1` is a prerelease.
 - It is not stable/latest.
@@ -213,33 +216,30 @@ Any future `v0.1.0-dev.1` release notes must state:
 - Installer remains unsigned.
 - WebView2 user data may remain after uninstall.
 - Watcher/conflict manual evidence status, including whether it passed, passed with notes, failed, was blocked, or was not run.
-- Whether assets are reused from `v0.1.0-dev` or rebuilt for `v0.1.0-dev.1`.
+- Assets were rebuilt and published from the frozen Phase 3AD bundle.
 
 ## Publication Plan
 
-Do not execute in this phase.
+Publication has been completed for `v0.1.0-dev.1`.
 
-Future phase:
-
-- Tag: `v0.1.0-dev.1`, only if publication is approved later.
-- Target commit: the future validated `develop` commit selected at publication time.
-- Assets: reuse `v0.1.0-dev` assets for docs-only communication, or build fresh ZIP/installer assets only after package/installer-affecting changes or an explicit release clarity decision.
-- Release notes: use the requirements above and keep prerelease, unsigned installer, runtime prerequisite, ZIP versus installer, WebView2 uninstall, and watcher/conflict evidence caveats visible.
-- Verification: repeat release page verification after publication if a future phase creates the prerelease.
+- Tag: `v0.1.0-dev.1`.
+- Target commit: frozen source commit `c776fffdc8364c2c978f8106869a2d6bf50477ff`.
+- Assets: fresh ZIP and installer assets from the frozen Phase 3AD bundle.
+- Release state: prerelease/dev release, not production or stable.
+- Verification: Phase 3AF post-publication verification passed.
 
 ## Verdict
 
-- [ ] DEV1_CERTIFICATION_READY
-- [x] DEV1_CERTIFICATION_READY_WITH_NOTES
+- [x] DEV1_CERTIFICATION_READY
+- [ ] DEV1_CERTIFICATION_READY_WITH_NOTES
 - [ ] DEV1_CERTIFICATION_BLOCKED_WATCHER_EVIDENCE_BLOCKED
 - [ ] DEV1_CERTIFICATION_BLOCKED_ARTEFACT_DECISION
 - [ ] DEV1_CERTIFICATION_BLOCKED_VALIDATION
 
 ## Recommendation
 
-- [ ] Publish docs-only v0.1.0-dev.1 prerelease later.
-- [x] Build and certify new ZIP/installer for v0.1.0-dev.1.
-- [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
+- [x] Published `v0.1.0-dev.1` prerelease.
+- [x] Built and certified new ZIP/installer for `v0.1.0-dev.1`.
 - [ ] Pause pending more feedback.
 
-Phase 3AA completed the real packaged diagnostics, native picker, and watcher/conflict evidence that earlier phases left blocked. Phase 3AB rebuilt fresh local ZIP and installer artefacts from the Phase 3AA commit and passed validation. Phase 3AD froze the authoritative local publication bundle from commit `c776fffdc8364c2c978f8106869a2d6bf50477ff`. This plan is ready with notes for a future approved prerelease publication step, but Phase 3AD did not publish anything: any future publication still needs explicit approval and release notes review.
+Phase 3AA completed the real packaged diagnostics, native picker, and watcher/conflict evidence that earlier phases left blocked. Phase 3AB rebuilt fresh local ZIP and installer artefacts from the Phase 3AA commit and passed validation. Phase 3AD froze the authoritative local publication bundle from commit `c776fffdc8364c2c978f8106869a2d6bf50477ff`. Publication evidence and Phase 3AF verification confirm that `v0.1.0-dev.1` is published as a prerelease and passed post-publication checks. Next work is feedback collection, installer/download monitoring, and later planning for the next dev release or release disposition decision. Production readiness remains a separate approval gate.

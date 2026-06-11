@@ -177,7 +177,16 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Fresh local Windows package, package RC, and Inno installer artefacts were rebuilt from `develop` commit `e2026d728c131cf2e203928487b9aeb09b744da7`; they remained ignored local outputs under `artifacts/` and were not published or committed.
 - Automated static checks, browser smoke, Windows solution build, packaged static asset validation, package RC validation, development native smoke, package `-NoSmoke` build, packaged native smoke, and installer build passed.
 - Manual packaged diagnostics remained blocked because the checkpoint environment could launch the packaged executable but could not operate and observe the real WebView2 diagnostics UI. Watcher/conflict scenarios therefore remain blocked rather than passed.
-- `v0.1.0-dev.1` remains package-and-installer-affecting. A future publication still requires fresh ZIP and installer artefacts from the selected publication commit and must not infer manual packaged verification from automated bridge smoke.
+- `v0.1.0-dev.1` remained package-and-installer-affecting at this checkpoint. Later phases completed manual packaged verification, froze fresh ZIP and installer artefacts, published `v0.1.0-dev.1` as a prerelease, and passed post-publication verification.
+
+## Implemented Phase 3AG
+
+- `docs/release/lens-docs-studio-v010-dev1-release-closure.md` closes the `v0.1.0-dev.1` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.1` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`.
+- Post-publication verification passed for the release tag, prerelease state, published asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
+- Stage A and Stage B packaged evidence passed through the Phase 3AA native picker and watcher/conflict checkpoint.
+- The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified.
+- No release assets require further action unless a future release is authorised. Production readiness remains a separate approval gate.
 
 ## Future Roadmap
 
