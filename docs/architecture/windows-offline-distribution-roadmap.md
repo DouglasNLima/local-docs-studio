@@ -200,9 +200,17 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - `docs/release/lens-docs-studio-prerelease-feedback-intake.md` records the feedback intake process for `v0.1.0-dev.1` prerelease users, including categories, minimum reproduction details, privacy exclusions, triage labels/statuses, scope mapping, and escalation criteria.
 - The candidate scope is not an approved release plan. It does not authorise implementation, package or installer rebuilds, release asset changes, new tags or releases, `main` merges, production readiness claims, or go-live approval.
 
+## Implemented Phase 3AJ
+
+- `docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md` converts the Phase 3AI candidate scope into an ordered implementation readiness plan for a possible `v0.1.0-dev.2` cycle.
+- The recommended first implementation slice is diagnostics visibility polish for native bridge and folder-picker issues, because it should reduce support cost and improve prerelease feedback triage.
+- The readiness plan records acceptance gates, validation expectations, evidence requirements, release artefact boundaries, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3AJ is planning-only. It does not change runtime code, approve release publication, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
-- Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any `v0.1.0-dev.2` implementation scope.
+- Start the first `v0.1.0-dev.2` implementation slice from the Phase 3AJ readiness plan only after confirming it still matches current prerelease feedback and release monitoring.
+- Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any broader `v0.1.0-dev.2` implementation or release scope.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
 - Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.

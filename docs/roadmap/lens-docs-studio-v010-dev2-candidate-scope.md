@@ -152,3 +152,5 @@ Use `docs/release/lens-docs-studio-prerelease-feedback-intake.md` for `v0.1.0-de
 `v0.1.0-dev.2` is a candidate planning target only. The next decision is feedback triage and scope approval, not release publication.
 
 `v0.1.0-dev.1` remains the current published prerelease/dev release. No release assets, tags, releases, `main` merges, production readiness claims, or go-live approvals are changed by this planning document.
+
+Phase 3AJ follows this candidate scope with `docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md`, an implementation readiness plan that orders candidate slices and recommends diagnostics visibility polish as the first slice. That readiness plan still does not approve `v0.1.0-dev.2` publication, production readiness, go-live approval, release asset changes, tags, releases, or `main` merges.
