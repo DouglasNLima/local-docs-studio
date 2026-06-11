@@ -609,3 +609,102 @@ Validation after the Phase 3Z documentation-only evidence update:
 | `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Development build native bridge smoke completed successfully. |
 
 No runtime code changed during Phase 3Z. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3Z.
+
+## Phase 3AA - Native Picker Completion Hardening
+
+Phase 3AA started from `develop` with Phase 3Z commit `e1a6fc1ff2cb7ea64a7f8d78534760d24ad43966` in history. The tracked working tree was clean before changes. Ignored/generated paths present before the work included `artifacts/`, `node_modules/`, `src/windows/.vs/`, `src/windows/LensDocsStudio.Windows/bin/`, `src/windows/LensDocsStudio.Windows/obj/`, and `test-results/`; these were not treated as source.
+
+- Evidence branch: `develop`.
+- Package executable used after rebuild: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`.
+- Temporary watcher workspace used: `C:\Temp\LensDocsStudio-StageB`.
+- Test file used: `stage-b.md`.
+- Initial file content:
+
+```md
+# Stage B
+
+Initial content.
+```
+
+### Phase 3AA Root Cause And Fix
+
+Root cause found: the native workspace folder picker path cached the owner window handle during `MainWindow` construction, before the app window was activated, and then reused that handle without re-resolving, restoring, or foregrounding the owner at picker invocation time. In the packaged UI this left the bridge request valid and pending, but made the picker completion path fragile because the native picker could be inaccessible to the operator even though diagnostics and `workspace.openFolder` capability were healthy.
+
+Fix made: `NativeWorkspaceService.OpenFolderAsync()` now marshals picker work to the UI dispatcher when needed, resolves the owner HWND at invocation time, activates/restores/foregrounds the app window before showing the folder picker, catches picker attach/show failures, and returns structured native errors through the existing bridge instead of leaving a request permanently pending. Cancellation remains a distinct `{ cancelled: true }` result.
+
+Regression added: the fake WebView2 browser smoke harness now covers a structured native `openFolder` error and verifies that the browser directory picker is not called while the Windows native bridge route is active.
+
+During the first post-rebuild interactive attempt, the packaged static file contained the existing `300000 ms` interactive timeout, but the WebView2 runtime still reported the old `Native bridge did not respond.` status after picker interaction. The generated package WebView2 user data directory was cleared so the rebuilt static app was loaded fresh. This removed stale runtime cache from the evidence environment only; no product bypass, hidden workspace injection, fallback route, release artefact, tag, or GitHub release change was made.
+
+### Phase 3AA Stage A - Packaged Diagnostics
+
+Result: **PACKAGED_DIAGNOSTICS_PASS**
+
+The rebuilt packaged executable was launched from `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe` with WebView2 remote debugging enabled only as an observation/control aid for the visible packaged UI. **Help > Windows shell diagnostics** was opened and **Retry bridge check** was clicked in the packaged app.
+
+Observed diagnostic values after **Retry bridge check**:
+
+| Field | Observed value |
+| --- | --- |
+| Running in browser/PWA | `No` |
+| Running in Windows WebView2 shell | `Yes` |
+| Bridge message handler registered | `Yes` |
+| Bridge ping | `Pass` |
+| Protocol version | `1` |
+| Host | `LensDocsStudio.Windows` |
+| Last native request | `lensDocs.native.ping` |
+| Last native response | `lensDocs.native.pong` |
+| Last native error | `None` |
+| `diagnostics.ping` capability | `available` |
+| `file.open` capability | `available` |
+| `file.save` capability | `available` |
+| `file.saveAs` capability | `available` |
+| `workspace.openFolder` capability | `available` |
+| `workspace.saveFile` capability | `available` |
+| `workspace.createFile` capability | `available` |
+| `workspace.watch` capability | `available` |
+| `workspace.refreshFile` capability | `available` |
+| Open folder route decision | `native bridge` |
+| Open folder will use native bridge | `Yes` |
+| Browser fallback active | `No` |
+| Browser fallback route | `Not active` |
+| Directory picker API available | `Yes` |
+| Folder input fallback available | `Yes` |
+
+### Phase 3AA Native Picker Selection
+
+Result: **WORKSPACE_SELECTED_THROUGH_REAL_PACKAGED_PICKER**
+
+After Stage A diagnostics passed, **File > Open folder** was clicked in the visible packaged app. The app status changed to `Opening folder from Windows...`, no browser fallback picker appeared, and the native bridge route remained active past the old short-timeout window.
+
+Win32 window enumeration observed a visible native `Select Folder` dialog with class `#32770`, owned by the Lens Docs Studio main window HWND, and positioned on-screen. The temporary workspace `C:\Temp\LensDocsStudio-StageB` was selected through that real native picker. The selected workspace reached the app, `stage-b.md` loaded, the editor showed the initial Markdown content, the file list contained one file, and the file state was `clean`.
+
+The cancellation path was also checked through a real native picker after Stage B: clicking the native `Cancel` button returned `Open folder cancelled.`, preserved the currently loaded `stage-b.md`, and left the file state `clean`. Browser fallback remained inactive.
+
+### Phase 3AA Stage B - Watcher/Conflict Evidence
+
+Result: **PACKAGED_STAGE_B_PASS**
+
+| Scenario | Workspace/file used | In-app state before external change | External change made | Prompt/modal/notification observed | User action taken | Final editor content | Final file content on disk | Final dirty/conflict state | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Clean external change | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | `stage-b.md` loaded clean with `# Stage B` and `Initial content.` | Disk file changed to `# Stage B` and `External clean change.` | App marked `stage-b.md · changed outside the app`; status `External change detected. Use Refresh active file to reload.` | Clicked **Refresh active file**. | `# Stage B` and `External clean change.` | `# Stage B` and `External clean change.` | `clean` | `PASS` |
+| Dirty conflict cancel | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | Editor dirty with `Local dirty draft for cancel.` | Disk file changed to `External conflict version for cancel.` | App marked `stage-b.md · edited in memory · changed outside the app`; status `External change detected while local edits exist. Save or refresh explicitly.` Refresh prompt text: `stage-b.md has in-memory edits. Reload the Windows workspace file and discard those edits?` Buttons: `Cancel`, `Reload file`. | Clicked `Cancel`. | `# Stage B` and `Local dirty draft for cancel.` | `# Stage B` and `External conflict version for cancel.` | `dirtyExternalConflict` | `PASS` |
+| Dirty conflict confirm | `C:\Temp\LensDocsStudio-StageB\stage-b.md` | File reset clean, then editor dirty with `Local dirty draft for confirm.` | Disk file changed to `External conflict version for confirm.` | App marked `stage-b.md · edited in memory · changed outside the app`; status `External change detected while local edits exist. Save or refresh explicitly.` Same Refresh prompt with `Cancel` and `Reload file`. | Clicked `Reload file`. | `# Stage B` and `External conflict version for confirm.` | `# Stage B` and `External conflict version for confirm.` | `clean` | `PASS` |
+
+No Stage B pass is inferred from automated tests alone; the scenarios above were observed in the real packaged app after selecting the workspace through the native Windows folder picker.
+
+### Phase 3AA Validation
+
+Validation after the Phase 3AA runtime and evidence update:
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `dotnet build src/windows/LensDocsStudio.Windows.sln` | PASS | Build succeeded with 0 warnings and 0 errors after replacing source-generated interop with classic `DllImport`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke` | PASS | Rebuilt ignored local package output and ZIP; native bridge smoke intentionally skipped by the package script flag. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Standalone native bridge smoke completed successfully after the validation sweep. |
+| `npm run test:static` | PASS | Static checks passed for 46 module files, 53 shell assets, 150 vendor assets, and 52 runtime external-dependency scans. |
+| `npm run test:browser` | PASS | Completed all 222 browser smoke tests across Chromium and Microsoft Edge, including the new native picker error regression. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` | PASS | Built the Windows shell and verified 53 service-worker assets and 150 vendor assets in packaged `StaticApp/`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Rebuilt ignored local package/RC outputs; report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T145652Z.md`, ZIP SHA256 `EB101B189245BD7B237490304014805D6747557267A5F6355FCA9D6DD5788C84`. |
+
+Browser fallback was not re-enabled. No production readiness is claimed. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3AA.

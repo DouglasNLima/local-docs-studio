@@ -1,4 +1,6 @@
 using System.Text;
+using System.Runtime.InteropServices;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
@@ -12,7 +14,8 @@ public sealed class NativeWorkspaceService
     private static readonly TimeSpan WatcherDebounceInterval = TimeSpan.FromMilliseconds(500);
     private static readonly TimeSpan HostWriteSuppressionWindow = TimeSpan.FromSeconds(2);
 
-    private readonly nint ownerWindowHandle;
+    private readonly Window ownerWindow;
+    private readonly DispatcherQueue dispatcherQueue;
     private readonly Dictionary<string, string> nativeWorkspaces = new(StringComparer.Ordinal);
     private readonly Dictionary<string, WorkspaceFileHandle> nativeFileHandles = new(StringComparer.Ordinal);
     private readonly Dictionary<string, string> nativeFileHandlesByPath = new(StringComparer.OrdinalIgnoreCase);
@@ -29,19 +32,77 @@ public sealed class NativeWorkspaceService
 
     public NativeWorkspaceService(Window ownerWindow)
     {
-        ownerWindowHandle = WindowNative.GetWindowHandle(ownerWindow);
+        this.ownerWindow = ownerWindow;
+        dispatcherQueue = DispatcherQueue.GetForCurrentThread();
     }
 
     public async Task<object> OpenFolderAsync()
     {
+        if (!dispatcherQueue.HasThreadAccess)
+        {
+            return await EnqueueOpenFolderAsync();
+        }
+
+        return await OpenFolderOnUiThreadAsync();
+    }
+
+    private async Task<object> EnqueueOpenFolderAsync()
+    {
+        var completion = new TaskCompletionSource<object>(TaskCreationOptions.RunContinuationsAsynchronously);
+        if (!dispatcherQueue.TryEnqueue(async () =>
+        {
+            try
+            {
+                completion.SetResult(await OpenFolderOnUiThreadAsync());
+            }
+            catch (Exception ex)
+            {
+                completion.SetException(ex);
+            }
+        }))
+        {
+            throw new NativeFileException("Windows folder picker could not open safely.");
+        }
+
+        return await completion.Task;
+    }
+
+    private async Task<object> OpenFolderOnUiThreadAsync()
+    {
+        var ownerWindowHandle = WindowNative.GetWindowHandle(ownerWindow);
+        if (ownerWindowHandle == 0)
+        {
+            throw new NativeFileException("Windows folder picker could not attach to the app window.");
+        }
+
+        ownerWindow.Activate();
+        NativeWindowInterop.RestoreAndForeground(ownerWindowHandle);
+
         var picker = new FolderPicker
         {
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
         };
         picker.FileTypeFilter.Add("*");
-        InitializeWithWindow.Initialize(picker, ownerWindowHandle);
 
-        var folder = await picker.PickSingleFolderAsync();
+        try
+        {
+            InitializeWithWindow.Initialize(picker, ownerWindowHandle);
+        }
+        catch
+        {
+            throw new NativeFileException("Windows folder picker could not attach to the app window.");
+        }
+
+        global::Windows.Storage.StorageFolder? folder;
+        try
+        {
+            folder = await picker.PickSingleFolderAsync();
+        }
+        catch
+        {
+            throw new NativeFileException("Windows folder picker could not open safely.");
+        }
+
         if (folder is null)
         {
             return new { cancelled = true };
@@ -664,3 +725,27 @@ public sealed class NativeWorkspaceService
 public sealed record WorkspaceChangedEventArgs(string NativeWorkspaceId, IReadOnlyList<PendingWorkspaceChange> Changes);
 
 public sealed record PendingWorkspaceChange(string Kind, string Path, string? OldPath, string? NativeHandleId);
+
+internal static class NativeWindowInterop
+{
+    private const int SwRestore = 9;
+
+    public static void RestoreAndForeground(nint windowHandle)
+    {
+        if (windowHandle == 0)
+        {
+            return;
+        }
+
+        _ = ShowWindow(windowHandle, SwRestore);
+        _ = SetForegroundWindow(windowHandle);
+    }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ShowWindow(nint hWnd, int nCmdShow);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SetForegroundWindow(nint hWnd);
+}

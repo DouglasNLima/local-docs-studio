@@ -642,6 +642,12 @@ async function installMockNativeBridge(page, options = {}) {
               emit(baseResponse(message, 'lensDocs.native.openFolderResult', { cancelled: true }));
               return;
             }
+            if (window.__nativeBridgeScenario.openFolder === 'native-error') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: 'Windows folder picker could not open safely.',
+              }));
+              return;
+            }
             if (window.__nativeBridgeScenario.openFolder === 'malformed') {
               emit({ ...baseResponse(message, 'lensDocs.native.openFolderResult', {}), protocolVersion: 999 });
               return;
@@ -2344,6 +2350,28 @@ test('fake WebView2 bridge handles cancelled and malformed native workspace resp
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+});
+
+test('fake WebView2 bridge surfaces native workspace picker errors without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Windows folder picker could not open safely.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
 });
 
 test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {
