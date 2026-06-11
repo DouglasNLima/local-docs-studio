@@ -37,6 +37,7 @@ export const nativeBridgeMessageTypes = {
 
 const WEB_SOURCE = 'LensDocsStudio.Web';
 const DEFAULT_TIMEOUT_MS = 2500;
+const INTERACTIVE_PICKER_TIMEOUT_MS = 300000;
 
 export function createNativeBridgeClient({
   windowRef = window,
@@ -154,7 +155,9 @@ export function createNativeBridgeClient({
 
   async function openFolder() {
     const message = createMessage(nativeBridgeMessageTypes.openFolder);
-    return await sendMessage(message, [nativeBridgeMessageTypes.openFolderResult]);
+    return await sendMessage(message, [nativeBridgeMessageTypes.openFolderResult], {
+      timeoutMs: INTERACTIVE_PICKER_TIMEOUT_MS,
+    });
   }
 
   async function saveWorkspaceFile({ nativeHandleId, content }) {
@@ -224,7 +227,7 @@ export function createNativeBridgeClient({
     return await sendMessage(message, [nativeBridgeMessageTypes.smokeCompleteResult]);
   }
 
-  function sendMessage(message, expectedTypes) {
+  function sendMessage(message, expectedTypes, options = {}) {
     return new Promise((resolve) => {
       const currentWebView = getWebView(windowRef);
       if (!currentWebView) {
@@ -243,6 +246,9 @@ export function createNativeBridgeClient({
       diagnostics.lastErrorReason = '';
       diagnostics.requestTimedOut = false;
 
+      const requestTimeoutMs = Number.isFinite(options.timeoutMs) && options.timeoutMs > 0
+        ? options.timeoutMs
+        : timeoutMs;
       const timeoutId = windowRef.setTimeout?.(() => {
         pendingMessages.delete(message.id);
         recordBridgeFailure('timeout', { timedOut: true });
@@ -252,7 +258,7 @@ export function createNativeBridgeClient({
           reason: 'timeout',
           message: 'Native bridge did not respond.',
         });
-      }, timeoutMs);
+      }, requestTimeoutMs);
 
       pendingMessages.set(message.id, {
         resolve,

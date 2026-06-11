@@ -531,10 +531,10 @@ async function installMockNativeBridge(page, options = {}) {
       smokeWorkspace: options.smokeWorkspace || 'success',
     };
 
-    function emit(response) {
+    function emit(response, delayMs = 0) {
       window.setTimeout(() => {
         listeners.forEach((listener) => listener({ data: response }));
-      }, 0);
+      }, delayMs);
     }
 
     window.__emitNativeWorkspaceChanged = (payload) => {
@@ -646,6 +646,7 @@ async function installMockNativeBridge(page, options = {}) {
               emit({ ...baseResponse(message, 'lensDocs.native.openFolderResult', {}), protocolVersion: 999 });
               return;
             }
+            const delayMs = window.__nativeBridgeScenario.openFolder === 'delayed' ? 3000 : 0;
             emit(baseResponse(message, 'lensDocs.native.openFolderResult', {
               cancelled: false,
               workspaceName: 'Project Docs',
@@ -681,7 +682,7 @@ async function installMockNativeBridge(page, options = {}) {
                   reason: 'File exceeds the 5 MB limit.',
                 },
               ],
-            }));
+            }), delayMs);
             return;
           }
 
@@ -2343,6 +2344,23 @@ test('fake WebView2 bridge handles cancelled and malformed native workspace resp
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+});
+
+test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'delayed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Opening folder from Windows...');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.', { timeout: 5000 });
+  await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-path="diagrams/flow.mmd"]')).toBeVisible();
+  await expect(page.locator('#status')).not.toHaveText(/Native bridge did not respond/);
 });
 
 test('native smoke runner stays dormant when smoke capability is absent', async ({ page }) => {
