@@ -188,8 +188,15 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified.
 - No release assets require further action unless a future release is authorised. Production readiness remains a separate approval gate.
 
+## Implemented Phase 3AH
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev1-backlog.md` records the post-prerelease backlog and `v0.1.0-dev.2` planning gate.
+- Candidate next dev-release themes include first-run/onboarding copy, bridge and folder-picker diagnostics visibility, an optional troubleshooting support export, watcher/conflict UX copy, installer upgrade/uninstall evidence, old prerelease disposition, and real prerelease user feedback.
+- The backlog does not approve next-release scope, change runtime code, rebuild packages, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
+- Review the Phase 3AH backlog before approving any `v0.1.0-dev.2` implementation scope.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
 - Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.
