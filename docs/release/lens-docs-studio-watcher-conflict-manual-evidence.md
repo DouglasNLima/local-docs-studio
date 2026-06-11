@@ -316,3 +316,105 @@ Stage B was not run because Stage A did not produce the required real packaged d
 Stage B result: **BLOCKED_STAGE_A_NOT_VERIFIED**.
 
 Overall manual watcher/conflict result remains **MANUAL_WATCHER_CONFLICT_BLOCKED**. The `v0.1.0-dev.1` watcher/conflict certification blocker is not cleared.
+
+## Phase 3X Packaged Diagnostics and Watcher Checkpoint
+
+Phase 3X used the Phase 3W local Windows package artefacts that were still present and tied to source commit `e2026d728c131cf2e203928487b9aeb09b744da7`.
+
+- Evidence branch: `develop`.
+- Evidence starting commit: `1f920052ce9fb4588d7cdb00a5618d8bc2206629`.
+- Package folder used: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev`.
+- Package ZIP present: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`.
+- Installer present: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe`.
+- Installer report commit: `e2026d728c131cf2e203928487b9aeb09b744da7`.
+- RC metadata present: `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T102300Z.json`, commit `e2026d728c131cf2e203928487b9aeb09b744da7`.
+- Temporary watcher workspace prepared: `%TEMP%\LDS-Phase3X-WatcherManual`.
+- Test file prepared: `watcher-phase3x.md`.
+- Initial file content:
+
+```md
+# Phase 3X watcher evidence
+
+Initial file content for clean scenario.
+```
+
+### Stage A - Packaged Diagnostics Observation
+
+Result: **PACKAGED_DIAGNOSTICS_PASS**
+
+The packaged executable was launched from `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`. The real WebView2 UI was visible with window title `Lens Docs Studio`. The first-run setup screen was skipped through the visible packaged UI. **Help > Windows shell diagnostics** was opened from the packaged UI, the diagnostics dialog was observed, and **Retry bridge check** was clicked in the diagnostics dialog.
+
+Observed diagnostic values after **Retry bridge check**:
+
+| Field | Observed value |
+| --- | --- |
+| Running in browser/PWA | `No` |
+| Running in Windows WebView2 shell | `Yes` |
+| Bridge message handler registered | `Yes` |
+| Bridge ping | `Pass` |
+| Protocol version | `1` |
+| Host | `LensDocsStudio.Windows` |
+| Last native request | `lensDocs.native.ping` |
+| Last native response | `lensDocs.native.pong` |
+| Last native error | `None` |
+| `diagnostics.ping` capability | `available` |
+| `file.open` capability | `available` |
+| `file.save` capability | `available` |
+| `file.saveAs` capability | `available` |
+| `workspace.openFolder` capability | `available` |
+| `workspace.saveFile` capability | `available` |
+| `workspace.createFile` capability | `available` |
+| `workspace.watch` capability | `available` |
+| `workspace.refreshFile` capability | `available` |
+| Open folder route decision | `native bridge` |
+| Open folder will use native bridge | `Yes` |
+| Browser fallback active | `No` |
+| Browser fallback route | `Not active` |
+| Directory picker API available | `Yes` |
+| Folder input fallback available | `Yes` |
+| Operator next step shown | `Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.` |
+
+Stage A confirms the packaged diagnostics surface and native bridge capability state. This is real packaged UI evidence, not automated native smoke evidence.
+
+### Stage B - Watcher/Conflict Evidence
+
+Result: **BLOCKED_STAGE_B_WORKSPACE_NOT_SELECTED**
+
+Stage B was attempted only after Stage A diagnostics passed. The scenario workspace was a temporary folder under `%TEMP%`, not user data. The watcher scenarios could not be completed because the workspace folder was not selected through a reliable real packaged UI route in this agent session.
+
+Observed blocker details:
+
+- After the successful Stage A run in the normal packaged instance, screen-level desktop input was sufficient to operate diagnostics but was not reliable enough to invoke and operate the longer **Open folder** and watcher workflow.
+- The same packaged executable was relaunched once with `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS=--remote-debugging-port=9222` to allow DOM-level operation of the visible packaged WebView2 UI without rebuilding or modifying the artefact.
+- In that debug-launched packaged instance, clicking **Open folder** through the app UI did not show a browser fallback picker, but the app status reported `Native bridge did not respond.`
+- Because a real workspace folder was not selected, no watcher scenario was run to completion and no user data was overwritten.
+
+Scenario results:
+
+| Scenario | Workspace/file used | Initial file content | In-app state before external change | External change made | Prompt/modal/notification observed | User action taken | Final editor content | Final file content on disk | Final dirty/conflict state | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Clean external change | `%TEMP%\LDS-Phase3X-WatcherManual\watcher-phase3x.md` | See Stage B setup above. | `No file selected`; workspace not loaded. | Not made. | `Native bridge did not respond.` during debug-launched Open folder attempt; no browser fallback picker observed. | Aborted scenario to avoid fabricating evidence. | Not applicable; file was not opened in the editor. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+| Dirty conflict cancel | `%TEMP%\LDS-Phase3X-WatcherManual\watcher-phase3x.md` | See Stage B setup above. | Not reached because workspace was not loaded. | Not made. | Not observed. | Not executed. | Not applicable. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+| Dirty conflict confirm | `%TEMP%\LDS-Phase3X-WatcherManual\watcher-phase3x.md` | See Stage B setup above. | Not reached because workspace was not loaded. | Not made. | Not observed. | Not executed. | Not applicable. | Original initial content remained on disk. | Not applicable. | `BLOCKED` |
+
+### Phase 3X Verdict
+
+Overall manual watcher/conflict result remains **MANUAL_WATCHER_CONFLICT_BLOCKED**.
+
+Stage A is no longer blocked for this artefact set because the packaged diagnostics UI was operated and observed. Stage B remains blocked because the real packaged workspace selection and watcher/conflict scenarios were not completed. Automated native bridge smoke remains supporting evidence only and is not counted as watcher/conflict manual evidence.
+
+### Phase 3X Validation
+
+Validation after the Phase 3X documentation updates:
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npm run test:static` | PASS | Static checks passed for 46 module files, 53 shell assets, 150 vendor assets, and 52 runtime external-dependency scans. |
+| `npm run test:browser` | TIMEOUT, then covered by direct Playwright run | Two attempts timed out at the command harness limits of 5 minutes and 10 minutes before producing a final result. The suite was then rerun directly with a line reporter and a longer timeout. |
+| `npx playwright test --reporter=line` | PASS | Completed all 218 browser smoke tests across Chromium and Microsoft Edge. This is the same Playwright suite invoked by `npm run test:browser`; the direct command was used only to avoid the previous harness timeout and expose progress. |
+| `dotnet build src/windows/LensDocsStudio.Windows.sln` | PASS | Build succeeded with 0 warnings and 0 errors. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` | PASS | Verified 53 service-worker assets and 150 vendor assets in packaged `StaticApp/`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Refreshed ignored local package/RC outputs for validation; report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T115834Z.md`, ZIP SHA256 `576CD191EF8579841FABB4573C82043DF86FA7B47D12EE9B2203CD31D2E1B623`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Development build native bridge smoke completed successfully. |
+
+No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3X.

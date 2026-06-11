@@ -30,6 +30,7 @@ Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-a
 - Phase 3U.2 diagnostic aid: **Help > Windows shell diagnostics** reports browser/PWA versus WebView2 shell mode, bridge ping result, safe capability labels, Open folder routing, browser fallback route, and the next operator step without showing local absolute paths.
 - Phase 3V Open folder routing fix: **File > Open folder** now uses a fresh native capability probe and fails closed in WebView2 when `workspace.openFolder` is missing or the bridge does not respond, instead of silently falling through to the browser folder/file-input route.
 - Phase 3W checkpoint: fresh local package, package RC, and Inno installer artefacts were rebuilt from current `develop`; automated static, browser, Windows build, package RC, static asset, and native smoke validation passed. Manual packaged diagnostics and watcher/conflict evidence remained blocked because this agent session could launch the packaged app but could not operate and observe the real WebView2 diagnostics UI.
+- Phase 3X checkpoint: the Phase 3W packaged executable was operated through the real WebView2 UI, **Help > Windows shell diagnostics** was opened, **Retry bridge check** was used, and diagnostics passed with `workspace.openFolder` available and Open folder routing set to `native bridge`. Stage B watcher/conflict evidence remains blocked because a temporary workspace could not be selected through a reliable packaged UI route in this agent session; the debug-launched UI reported `Native bridge did not respond.` when **Open folder** was clicked.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
 - Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents are changed, installer config is unchanged, and release assets, tags, and releases are unchanged.
 
@@ -88,6 +89,15 @@ Phase 3W evidence/artefact alignment:
 - Validation passed: `npm run test:static`, `npm run test:browser`, `dotnet build src/windows/LensDocsStudio.Windows.sln`, `scripts/windows/Test-WindowsStaticAssets.ps1`, `scripts/windows/Test-WindowsPackageReleaseCandidate.ps1`, `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, `scripts/windows/Build-WindowsPackage.ps1 -NoSmoke`, packaged native bridge smoke against the rebuilt executable, and `scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild`.
 - Stage A packaged diagnostics: blocked. The freshly rebuilt packaged executable launched with window title `Lens Docs Studio`, but the session could not operate **Help > Windows shell diagnostics**, use **Retry bridge check**, and observe the real diagnostics values.
 - Stage B watcher/conflict scenarios: blocked because Stage A was not verified.
+- No GitHub release assets, releases, tags, or `main` merges were changed.
+
+Phase 3X packaged diagnostics and watcher checkpoint:
+
+- Evidence commit at start: `1f920052ce9fb4588d7cdb00a5618d8bc2206629` on `develop`.
+- Artefact used: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`, from the Phase 3W package built from `e2026d728c131cf2e203928487b9aeb09b744da7`.
+- Stage A packaged diagnostics: **PACKAGED_DIAGNOSTICS_PASS**. Observed in the real WebView2 UI after **Retry bridge check**: Windows WebView2 shell `Yes`, bridge ping `Pass`, `workspace.openFolder` `available`, Open folder route decision `native bridge`, Open folder will use native bridge `Yes`, browser fallback active `No`, browser fallback route `Not active`.
+- Stage B watcher/conflict scenarios: **BLOCKED_STAGE_B_WORKSPACE_NOT_SELECTED**. A temporary workspace under `%TEMP%\LDS-Phase3X-WatcherManual` was prepared, but no scenario reached external-change execution because the workspace folder was not selected through a reliable packaged UI route in this environment. A debug-launched instance of the same packaged executable reported `Native bridge did not respond.` when **Open folder** was clicked, and no browser fallback picker was observed.
+- Scenario verdicts: Clean external change `BLOCKED`; dirty conflict cancel `BLOCKED`; dirty conflict confirm `BLOCKED`.
 - No GitHub release assets, releases, tags, or `main` merges were changed.
 
 ## Artefact Decision
