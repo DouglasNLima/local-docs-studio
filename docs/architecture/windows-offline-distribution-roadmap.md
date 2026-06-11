@@ -194,9 +194,15 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Candidate next dev-release themes include first-run/onboarding copy, bridge and folder-picker diagnostics visibility, an optional troubleshooting support export, watcher/conflict UX copy, installer upgrade/uninstall evidence, old prerelease disposition, and real prerelease user feedback.
 - The backlog does not approve next-release scope, change runtime code, rebuild packages, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
 
+## Implemented Phase 3AI
+
+- `docs/roadmap/lens-docs-studio-v010-dev2-candidate-scope.md` converts the Phase 3AH backlog into candidate `v0.1.0-dev.2` scope.
+- `docs/release/lens-docs-studio-prerelease-feedback-intake.md` records the feedback intake process for `v0.1.0-dev.1` prerelease users, including categories, minimum reproduction details, privacy exclusions, triage labels/statuses, scope mapping, and escalation criteria.
+- The candidate scope is not an approved release plan. It does not authorise implementation, package or installer rebuilds, release asset changes, new tags or releases, `main` merges, production readiness claims, or go-live approval.
+
 ## Future Roadmap
 
-- Review the Phase 3AH backlog before approving any `v0.1.0-dev.2` implementation scope.
+- Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any `v0.1.0-dev.2` implementation scope.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
 - Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.

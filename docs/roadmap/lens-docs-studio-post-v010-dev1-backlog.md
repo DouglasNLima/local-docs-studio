@@ -115,3 +115,5 @@ Potential scope, pending separate approval:
 ## Planning Gate Verdict
 
 Phase 3AH opens the post-prerelease backlog for the next development cycle. `v0.1.0-dev.1` remains closed, and `v0.1.0-dev.2` remains unapproved until candidate scope is reviewed against real feedback, installer/download monitoring, and the known technical risks above.
+
+Phase 3AI records that candidate scope in `docs/roadmap/lens-docs-studio-v010-dev2-candidate-scope.md` and records the prerelease feedback intake process in `docs/release/lens-docs-studio-prerelease-feedback-intake.md`. These documents are planning-only and do not approve implementation, release publication, production readiness, or go-live.
