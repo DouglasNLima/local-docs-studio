@@ -23,6 +23,8 @@ Phase 3V changes runtime UI routing for **File > Open folder** in the packaged W
 
 Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-affecting change. It rebuilt local ZIP, package RC, and Inno installer artefacts from `develop` commit `e2026d728c131cf2e203928487b9aeb09b744da7`, but did not publish or upload them.
 
+Phase 3AB is an artefact rebaseline checkpoint for the Phase 3AA native picker completion hardening. It rebuilt local ZIP, package RC, and Inno installer artefacts from `develop` commit `055e51dedacd28ea277a480b60bd0333feec6004`, after Phase 3AA completed packaged Stage A diagnostics, real native picker workspace selection, and Stage B watcher/conflict evidence.
+
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
@@ -32,6 +34,8 @@ Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-a
 - Phase 3W checkpoint: fresh local package, package RC, and Inno installer artefacts were rebuilt from current `develop`; automated static, browser, Windows build, package RC, static asset, and native smoke validation passed. Manual packaged diagnostics and watcher/conflict evidence remained blocked because this agent session could launch the packaged app but could not operate and observe the real WebView2 diagnostics UI.
 - Phase 3X checkpoint: the Phase 3W packaged executable was operated through the real WebView2 UI, **Help > Windows shell diagnostics** was opened, **Retry bridge check** was used, and diagnostics passed with `workspace.openFolder` available and Open folder routing set to `native bridge`. Stage B watcher/conflict evidence remains blocked because a temporary workspace could not be selected through a reliable packaged UI route in this agent session; the debug-launched UI reported `Native bridge did not respond.` when **Open folder** was clicked.
 - Phase 3Y checkpoint: the `Native bridge did not respond.` blocker was diagnosed as a web bridge request timeout mismatch. Diagnostics used a quick ping, but `workspace.openFolder` opened an interactive Windows folder picker through the same `2500 ms` command timeout. Phase 3Y keeps the quick timeout for diagnostics and ordinary bridge probes, gives `openFolder()` a `300000 ms` interactive picker timeout, adds delayed-picker regression coverage, rebuilds the local package, and re-checks packaged diagnostics. Stage B remains `BLOCKED_STAGE_B_WORKSPACE_NOT_SELECTED` because this agent session still could not select the temporary workspace through the real packaged folder picker.
+- Phase 3AA checkpoint: native folder picker owner HWND resolution, UI dispatcher marshalling, foregrounding, structured picker errors, and cancellation preservation were hardened. The rebuilt packaged app completed Stage A diagnostics, selected a workspace through the real native picker, and passed Stage B clean external change, dirty conflict cancel, and dirty conflict confirm scenarios.
+- Phase 3AB checkpoint: fresh local package, package RC, and Inno installer artefacts were rebuilt from Phase 3AA commit `055e51dedacd28ea277a480b60bd0333feec6004`; all requested static, browser, Windows build, package RC, static asset, native smoke, packaged native smoke, package build, and installer build validation passed. The Phase 3W artefacts from `e2026d728c131cf2e203928487b9aeb09b744da7` are superseded and stale.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
 - Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents are changed, installer config is unchanged, and release assets, tags, and releases are unchanged.
 
@@ -39,10 +43,10 @@ Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-a
 
 Result:
 
-- [ ] PASS
+- [x] PASS
 - [ ] PASS_WITH_NOTES
 - [ ] NOT_RUN
-- [x] BLOCKED
+- [ ] BLOCKED
 - [ ] FAILED
 
 Evidence notes:
@@ -111,6 +115,28 @@ Phase 3Y packaged workspace-selection checkpoint:
 - Workspace-selection result: **BLOCKED_STAGE_B_WORKSPACE_NOT_SELECTED**. After **File > Open folder**, the app stayed on `Opening folder from Windows...` beyond the previous `2500 ms` timeout and no browser fallback appeared, but Windows UI Automation did not expose a selectable folder picker window to the agent session. The temporary workspace under `%TEMP%\LDS-Phase3Y-WatcherManual` was not selected through the real packaged picker.
 - Scenario verdicts: Clean external change `BLOCKED`; dirty conflict cancel `BLOCKED`; dirty conflict confirm `BLOCKED`.
 - No GitHub release assets, releases, tags, or `main` merges were changed.
+
+Phase 3AA native picker and Stage B checkpoint:
+
+- Evidence commit: `055e51dedacd28ea277a480b60bd0333feec6004` on `develop`.
+- Runtime fix: `NativeWorkspaceService.OpenFolderAsync()` now marshals picker work to the UI dispatcher when needed, resolves and foregrounds the owner window at picker invocation time, returns structured native picker attach/show errors, and preserves cancellation as `{ cancelled: true }`.
+- Stage A packaged diagnostics: **PACKAGED_DIAGNOSTICS_PASS**. Observed in the real packaged WebView2 UI after **Retry bridge check** with Windows WebView2 shell `Yes`, bridge ping `Pass`, `workspace.openFolder` `available`, Open folder route decision `native bridge`, Open folder will use native bridge `Yes`, browser fallback active `No`, and browser fallback route `Not active`.
+- Native picker selection: **WORKSPACE_SELECTED_THROUGH_REAL_PACKAGED_PICKER**. The real Windows `Select Folder` dialog was observed, owned by the Lens Docs Studio window, and `C:\Temp\LensDocsStudio-StageB` was selected through the native picker.
+- Stage B watcher/conflict scenarios: **PACKAGED_STAGE_B_PASS**. Clean external change, dirty conflict cancel, and dirty conflict confirm all passed in the real packaged app.
+- Browser fallback was not re-enabled. No GitHub release assets, releases, tags, or `main` merges were changed.
+
+Phase 3AB release-candidate artefact rebaseline:
+
+- Source commit: `055e51dedacd28ea277a480b60bd0333feec6004` on `develop`.
+- Fresh local ZIP: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, SHA256 `DF29869E85AADC3C79525D65CC9DC224B7B23FCF67F9C1CF423D31923A328B03`.
+- Fresh local RC report: `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.md`.
+- Fresh local RC metadata: `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.json`.
+- Fresh local installer: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe`, SHA256 `29A4A985DABB8D7991E27C6F0E611A42EC7B31CA5B122B361ACA2B16B9893EDE`.
+- Installer SHA256 file: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256`.
+- Installer report: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup-report.md`.
+- Validation passed: `npm run test:static`, `npm run test:browser`, `dotnet build src/windows/LensDocsStudio.Windows.sln`, `scripts/windows/Test-WindowsStaticAssets.ps1`, `scripts/windows/Test-WindowsPackageReleaseCandidate.ps1`, `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, `scripts/windows/Build-WindowsPackage.ps1 -NoSmoke`, packaged native smoke against the rebuilt executable, and `scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild`.
+- Phase 3W artefacts from `e2026d728c131cf2e203928487b9aeb09b744da7` are superseded and stale because Phase 3AA changed Windows runtime code afterward.
+- These are local release-candidate artefacts only. No GitHub release assets, releases, tags, or `main` merges were changed, and no production readiness or go-live claim is made.
 
 ## Artefact Decision
 
@@ -189,8 +215,8 @@ Future phase:
 ## Verdict
 
 - [ ] DEV1_CERTIFICATION_READY
-- [ ] DEV1_CERTIFICATION_READY_WITH_NOTES
-- [x] DEV1_CERTIFICATION_BLOCKED_WATCHER_EVIDENCE_BLOCKED
+- [x] DEV1_CERTIFICATION_READY_WITH_NOTES
+- [ ] DEV1_CERTIFICATION_BLOCKED_WATCHER_EVIDENCE_BLOCKED
 - [ ] DEV1_CERTIFICATION_BLOCKED_ARTEFACT_DECISION
 - [ ] DEV1_CERTIFICATION_BLOCKED_VALIDATION
 
@@ -201,4 +227,4 @@ Future phase:
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Because Phase 3V changes runtime routing and watcher/conflict manual evidence remains blocked until the packaged picker pass is repeated, do not publish `v0.1.0-dev.1` yet. Phase 3W proved fresh local ZIP and installer artefacts can be rebuilt and pass automated validation, but any future publication still needs fresh ZIP and installer artefacts from the selected publication commit plus real packaged diagnostics/watcher evidence or an explicit documented exception.
+Phase 3AA completed the real packaged diagnostics, native picker, and watcher/conflict evidence that earlier phases left blocked. Phase 3AB rebuilt fresh local ZIP and installer artefacts from the Phase 3AA commit and passed validation. This plan is ready with notes for a future approved prerelease publication step, but Phase 3AB did not publish anything: any future publication still needs explicit approval, release notes review, and fresh artefact confirmation from the selected publication commit.

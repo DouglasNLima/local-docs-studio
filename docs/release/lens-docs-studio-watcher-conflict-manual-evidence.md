@@ -708,3 +708,56 @@ Validation after the Phase 3AA runtime and evidence update:
 | `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Rebuilt ignored local package/RC outputs; report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T145652Z.md`, ZIP SHA256 `EB101B189245BD7B237490304014805D6747557267A5F6355FCA9D6DD5788C84`. |
 
 Browser fallback was not re-enabled. No production readiness is claimed. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3AA.
+
+## Phase 3AB - Release-candidate artefact rebaseline
+
+Phase 3AB started from `develop` commit `055e51dedacd28ea277a480b60bd0333feec6004`, which contains the Phase 3AA native picker completion hardening. The tracked working tree was clean before the rebaseline. Ignored/generated paths present before the work included `artifacts/`, `node_modules/`, `src/windows/.vs/`, `src/windows/LensDocsStudio.Windows/bin/`, `src/windows/LensDocsStudio.Windows/obj/`, and `test-results/`; these were not treated as source.
+
+The earlier Phase 3W local ZIP, package RC, and Inno installer artefacts were built from `e2026d728c131cf2e203928487b9aeb09b744da7`. They are superseded by the Phase 3AB artefacts below because Phase 3AA changed Windows runtime code after Phase 3W.
+
+### Phase 3AB Artefacts
+
+Built locally from source commit `055e51dedacd28ea277a480b60bd0333feec6004` on `develop`.
+
+| Artefact | Path | Generated | Size | SHA256 |
+| --- | --- | --- | ---: | --- |
+| Windows package folder | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev` | `2026-06-11 17:24:28 +01:00` | n/a | n/a |
+| Windows package ZIP | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev.zip` | `2026-06-11 17:24:28 +01:00` | 33966582 bytes | `DF29869E85AADC3C79525D65CC9DC224B7B23FCF67F9C1CF423D31923A328B03` |
+| Package RC report | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.md` | `2026-06-11 17:24:46 +01:00` | 8430 bytes | `BD6016534331634159B3C00DBA5542CB6EF0DA8F386B261FD6DB3D895A92A28B` |
+| Package RC metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.json` | `2026-06-11 17:24:46 +01:00` | 4939 bytes | `69EE1F0B89242B819CC3DAA76EA918C99FC5257DA7B43C404D28A91C9155000F` |
+| Inno installer | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` | `2026-06-11 17:26:42 +01:00` | 29469676 bytes | `29A4A985DABB8D7991E27C6F0E611A42EC7B31CA5B122B361ACA2B16B9893EDE` |
+| Inno installer checksum | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | `2026-06-11 17:26:42 +01:00` | 110 bytes | `BB391A01CCC262A5E92D6D5F0FCBE5264F67D868B59373702E5101D24CFC3001` |
+| Inno installer report | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | `2026-06-11 17:26:42 +01:00` | 158183 bytes | `3AEF6F6E46944966DDF5C349DC843AC5BEAA55C42F7516A01906DE842995F2A2` |
+
+The package/installer artefacts are local ignored outputs. They were not committed. The package version remains `0.1.0-dev`; `v0.1.0-dev.1` remains package/installer-affecting until any publication uses fresh artefacts built from the selected publication commit.
+
+The rebuilt Windows package includes the Phase 3AA native picker fix because it was published from commit `055e51dedacd28ea277a480b60bd0333feec6004`, which contains the `NativeWorkspaceService.OpenFolderAsync()` dispatcher marshalling, owner HWND re-resolution/foregrounding, structured native picker attach/show errors, and preserved `{ cancelled: true }` cancellation path.
+
+### Phase 3AB Validation
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke` | PASS | Initial fresh package build from `055e51dedacd28ea277a480b60bd0333feec6004`; ZIP SHA256 `1C198652178F696B3C438B08DBF71737C4E7B91E9B0232043759C5ABE27B557B`. Native bridge smoke intentionally skipped by this command. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild` | PASS | Initial fresh installer build from the fresh package; installer SHA256 `1CFF25AD29FEFA9454DE8DF54E3B11EC721DE58004E3AFD631426D2BE87DA531`. |
+| `npm run test:static` | PASS | Static checks passed for 46 module files, 53 shell assets, 150 vendor assets, and 52 runtime external-dependency scans. |
+| `npm run test:browser` | PASS | Completed all 222 browser smoke tests across Chromium and Microsoft Edge. No browser harness timeout occurred in Phase 3AB. |
+| `dotnet build src/windows/LensDocsStudio.Windows.sln` | PASS | Build succeeded with 0 warnings and 0 errors. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` | PASS | Built the Windows shell and verified 53 service-worker assets and 150 vendor assets in packaged `StaticApp/`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Generated package RC report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T161928Z.md`; ZIP SHA256 `2B5CDE34EA2DD233884DA39ADB9BD1A7B90FB1F9B1B0976991621F71852F69DE`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Development build native bridge smoke completed successfully. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke` | PASS | Final requested package rebuild; native bridge smoke intentionally skipped by this command. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Final package RC metadata refresh; report `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.md`, JSON `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T162341Z.json`, ZIP SHA256 `DF29869E85AADC3C79525D65CC9DC224B7B23FCF67F9C1CF423D31923A328B03`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe` | PASS | Packaged native bridge smoke completed successfully against the freshly rebuilt executable. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild` | PASS | Final installer build from the final package; installer SHA256 `29A4A985DABB8D7991E27C6F0E611A42EC7B31CA5B122B361ACA2B16B9893EDE`; checksum file and installer report refreshed. |
+
+### Phase 3AB Evidence Boundary
+
+Phase 3AB did not repeat the interactive packaged diagnostics and watcher/conflict scenarios because Phase 3AA already collected complete real packaged evidence:
+
+- Phase 3AA Stage A: **PACKAGED_DIAGNOSTICS_PASS**.
+- Phase 3AA native picker selection: **WORKSPACE_SELECTED_THROUGH_REAL_PACKAGED_PICKER**.
+- Phase 3AA Stage B: **PACKAGED_STAGE_B_PASS** for clean external change, dirty conflict cancel, and dirty conflict confirm.
+
+No blocked Stage A or Stage B evidence remains for the Phase 3AA/3AB artefact baseline. Phase 3AB is an artefact rebaseline and validation checkpoint, not a new manual watcher/conflict pass.
+
+No runtime code changed during Phase 3AB. Browser folder/file-input fallback was not re-enabled while the native WebView2 bridge is present. No production readiness or go-live claim is made. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3AB.
