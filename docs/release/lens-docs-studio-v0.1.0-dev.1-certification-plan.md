@@ -49,6 +49,22 @@ Recommended next action: run **Help > Windows shell diagnostics** in the package
 
 Automated browser tests, fake WebView2 coverage, or packaged launch alone are not substitutes for this item. Before `v0.1.0-dev.1` is published, a tester should complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` against a ZIP or installed Windows shell build and update the result to `PASS`, `PASS_WITH_NOTES`, or `FAILED`.
 
+Phase 3U.3 used the current `develop` package path with diagnostics built into the distributed package, then completed static and native smoke checks before recording blocker status.
+
+- Package source used: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip` built from `ab6e380685aae7d9aac45e3c6e516245a4767f75`.
+- Validation commands that passed in this phase:
+  - `npm run test:static`
+  - `dotnet build src/windows/LensDocsStudio.Windows.sln`
+  - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`
+  - `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke`
+  - `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`
+
+Phase 3U.3 blockers remaining:
+
+- Stage A diagnostics is not completed in this phase because interactive packaged diagnostics could not be recorded here.
+- Stage B scenarios remain not run.
+- Manual evidence result therefore remains **MANUAL_WATCHER_CONFLICT_BLOCKED**.
+
 ## Artefact Decision
 
 ### ZIP

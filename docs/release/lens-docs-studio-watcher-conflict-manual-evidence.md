@@ -161,3 +161,42 @@ Evidence fields for the next retry:
 | Last native error | |
 | Operator next step shown | |
 | Did **File > Open folder** show a real folder picker? | |
+
+## Phase 3U.3 Manual Watcher/Conflict Evidence with Diagnostics (Current Develop)
+
+Phase 3U.3 was run using a locally built package from current `develop` so diagnostics UI was present in the app under test.
+
+- Build/validation checks: `npm run test:static`, `dotnet build src/windows/LensDocsStudio.Windows.sln`, `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`, `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke`, `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe`.
+- Package source used: current develop publish output at `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip` (built from commit `ab6e380685aae7d9aac45e3c6e516245a4767f75`).
+- Smoke result: PASS for native bridge flow, including `workspace.openFolder`, `workspace.saveFile`, and `workspace.createFile` as required by existing smoke coverage.
+
+### Stage A — Diagnostics Observation
+
+Stage A has not been completed in this run because this environment could not collect the on-device diagnostics checklist interactively from the packaged UI.
+
+- Stage A result: **DIAGNOSTICS_BLOCKED_OTHER** (Manual diagnostics collection not performed in this environment).
+- Notes:
+  - The release flow remained blocked at the previous gate because the previous blocker remains unresolved and the watcher checklist still requires a live picker pass.
+  - The package produced for this phase passed static and native smoke validation, and does include the Phase 3U.2 diagnostic feature.
+
+### Stage B — Manual Watcher/Conflict Evidence
+
+- Stage B: **not run** (Stage A did not complete).
+- Scenario results:
+  - Clean external change: BLOCKED
+  - Dirty conflict cancel: BLOCKED
+  - Dirty conflict confirm: BLOCKED
+  - External delete: BLOCKED
+  - External rename: BLOCKED
+
+### Verdict
+
+Result: **MANUAL_WATCHER_CONFLICT_BLOCKED**
+
+Overall verdict remains blocked.  
+`v0.1.0-dev.1` blocker is **not cleared**.
+
+Required follow-up:
+
+- Run Stage A from a real packaged Windows shell instance via **Help > Windows shell diagnostics**, record the Stage A fields, and continue only if it passes.
+- Then run Stage B scenarios 1–5 and update this document with scenario outcomes.
