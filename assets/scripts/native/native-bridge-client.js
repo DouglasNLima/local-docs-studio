@@ -98,10 +98,29 @@ export function createNativeBridgeClient({
   }
 
   async function hasCapability(capability) {
+    const state = await getCapabilityState(capability);
+    return state.hasCapability;
+  }
+
+  async function getCapabilityState(capability) {
     const result = await ping();
-    if (!result.ok) return false;
-    const capabilities = result.response?.payload?.capabilities;
-    return Array.isArray(capabilities) && capabilities.includes(capability);
+    const payload = result.response?.payload || {};
+    const capabilities = Array.isArray(payload.capabilities)
+      ? payload.capabilities.filter((item) => typeof item === 'string' && item.trim())
+      : [];
+    const host = typeof payload.host === 'string' && payload.host.trim()
+      ? payload.host.trim()
+      : '';
+
+    return {
+      bridgeAvailable: Boolean(result.available),
+      pingPassed: Boolean(result.ok),
+      reason: result.reason || '',
+      message: result.message || '',
+      host,
+      capabilities,
+      hasCapability: Boolean(result.ok && capabilities.includes(capability)),
+    };
   }
 
   function getDiagnostics() {
@@ -327,6 +346,7 @@ export function createNativeBridgeClient({
     ping,
     notifyAppReady,
     hasCapability,
+    getCapabilityState,
     openFile,
     saveFile,
     saveFileAs,

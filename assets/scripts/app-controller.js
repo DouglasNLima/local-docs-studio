@@ -233,6 +233,7 @@ export function createAppController() {
       windowsShellDiagnosticsDialog,
       windowsShellDiagnosticsBody,
       windowsShellDiagnosticsCloseButton,
+      windowsShellDiagnosticsRetryButton,
       windowsShellDiagnosticsDoneButton,
     } = getDomElements();
     let templateDialogResolve = null;
@@ -967,6 +968,7 @@ export function createAppController() {
       });
 
       windowsShellDiagnosticsCloseButton?.addEventListener('click', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsRetryButton?.addEventListener('click', openWindowsShellDiagnostics);
       windowsShellDiagnosticsDoneButton?.addEventListener('click', closeWindowsShellDiagnostics);
       windowsShellDiagnosticsDialog?.addEventListener('cancel', closeWindowsShellDiagnostics);
       windowsShellDiagnosticsDialog?.addEventListener('click', (event) => {
@@ -2427,10 +2429,25 @@ ${unresolvedRows}
       }
 
       setStatus('Checking Windows shell diagnostics...', 'busy');
-      const result = await nativeBridgeClient.ping();
+      const routeState = typeof nativeBridgeClient.getCapabilityState === 'function'
+        ? await nativeBridgeClient.getCapabilityState('workspace.openFolder')
+        : await getFallbackCapabilityState('workspace.openFolder');
       const diagnostics = typeof nativeBridgeClient.getDiagnostics === 'function'
         ? nativeBridgeClient.getDiagnostics()
         : {};
+      const result = {
+        ok: routeState.pingPassed,
+        available: routeState.bridgeAvailable,
+        reason: routeState.reason,
+        message: routeState.message,
+        response: {
+          protocolVersion: routeState.pingPassed ? 1 : undefined,
+          payload: {
+            host: routeState.host,
+            capabilities: routeState.capabilities,
+          },
+        },
+      };
       const payload = result.response?.payload || {};
       const capabilities = Array.isArray(payload.capabilities)
         ? payload.capabilities.filter((capability) => typeof capability === 'string' && capability.trim())
@@ -2440,28 +2457,33 @@ ${unresolvedRows}
         ? payload.host.trim()
         : '';
       const isWindowsShell = result.ok && host === WINDOWS_HOST;
+      const webViewBridgePresent = Boolean(routeState.bridgeAvailable);
       const pingPassed = Boolean(result.ok);
-      const openFolderNative = pingPassed && capabilitySet.has('workspace.openFolder');
+      const openFolderNative = Boolean(routeState.hasCapability);
       const supportsDirectoryPicker = 'showDirectoryPicker' in window;
       const supportsFolderInput = Boolean(folderInput);
-      const fallbackRoute = supportsDirectoryPicker
-        ? 'browser directory picker'
-        : 'browser file input fallback';
-      const browserFallbackActive = !openFolderNative;
+      const openFolderRoute = getOpenFolderDiagnosticRoute({
+        bridgeAvailable: webViewBridgePresent,
+        openFolderNative,
+        supportsDirectoryPicker,
+        supportsFolderInput,
+      });
+      const browserFallbackActive = openFolderRoute.browserFallbackActive;
       const pwaMode = isStandaloneDisplayMode();
       const lastError = getSafeDiagnosticError(result, diagnostics);
       const nextStep = getWindowsShellDiagnosticNextStep({
         pingPassed,
-        isWindowsShell,
+        isWindowsShell: isWindowsShell || webViewBridgePresent,
         openFolderNative,
         supportsDirectoryPicker,
         supportsFolderInput,
+        bridgeAvailable: webViewBridgePresent,
       });
 
       windowsShellDiagnosticsBody.innerHTML = `
         ${renderDiagnosticSection('Mode', [
           ['Running in browser/PWA', isWindowsShell ? 'No' : (pwaMode ? 'Yes (PWA display mode)' : 'Yes')],
-          ['Running in Windows WebView2 shell', yesNo(isWindowsShell)],
+          ['Running in Windows WebView2 shell', yesNo(isWindowsShell || webViewBridgePresent)],
           ['Bridge message handler registered', yesNo(Boolean(diagnostics.messageHandlerRegistered))],
         ])}
         ${renderDiagnosticSection('Native bridge', [
@@ -2479,9 +2501,10 @@ ${unresolvedRows}
           </div>
         </section>
         ${renderDiagnosticSection('Workspace action routing', [
+          ['Open folder route', openFolderRoute.label],
           ['Open folder will use native bridge', yesNo(openFolderNative)],
           ['Browser fallback active', yesNo(browserFallbackActive)],
-          ['Browser fallback route', browserFallbackActive ? fallbackRoute : 'Not active'],
+          ['Browser fallback route', browserFallbackActive ? openFolderRoute.fallbackLabel : 'Not active'],
           ['Directory picker API available', yesNo(supportsDirectoryPicker)],
           ['Folder input fallback available', yesNo(supportsFolderInput)],
         ])}
@@ -2491,7 +2514,9 @@ ${unresolvedRows}
         </section>
       `;
 
-      if (typeof windowsShellDiagnosticsDialog.showModal === 'function') {
+      if (windowsShellDiagnosticsDialog.open) {
+        // Refreshing an already open diagnostic dialog only updates its contents.
+      } else if (typeof windowsShellDiagnosticsDialog.showModal === 'function') {
         windowsShellDiagnosticsDialog.showModal();
       } else {
         windowsShellDiagnosticsDialog.setAttribute('open', '');
@@ -2532,6 +2557,67 @@ ${unresolvedRows}
       return 'info';
     }
 
+    async function getFallbackCapabilityState(capability) {
+      const result = await nativeBridgeClient.ping();
+      const payload = result.response?.payload || {};
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((item) => typeof item === 'string' && item.trim())
+        : [];
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : '';
+      return {
+        bridgeAvailable: Boolean(result.available),
+        pingPassed: Boolean(result.ok),
+        reason: result.reason || '',
+        message: result.message || '',
+        host,
+        capabilities,
+        hasCapability: Boolean(result.ok && capabilities.includes(capability)),
+      };
+    }
+
+    function getOpenFolderDiagnosticRoute({
+      bridgeAvailable,
+      openFolderNative,
+      supportsDirectoryPicker,
+      supportsFolderInput,
+    }) {
+      if (openFolderNative) {
+        return {
+          label: 'native bridge',
+          browserFallbackActive: false,
+          fallbackLabel: 'Not active',
+        };
+      }
+      if (bridgeAvailable) {
+        return {
+          label: 'unavailable in Windows shell',
+          browserFallbackActive: false,
+          fallbackLabel: 'Blocked while native bridge is present',
+        };
+      }
+      if (supportsDirectoryPicker) {
+        return {
+          label: 'browser directory picker',
+          browserFallbackActive: true,
+          fallbackLabel: 'browser directory picker',
+        };
+      }
+      if (supportsFolderInput) {
+        return {
+          label: 'browser file input fallback',
+          browserFallbackActive: true,
+          fallbackLabel: 'browser file input fallback',
+        };
+      }
+      return {
+        label: 'unavailable',
+        browserFallbackActive: false,
+        fallbackLabel: 'No supported folder picker',
+      };
+    }
+
     function getSafeDiagnosticError(result, diagnostics = {}) {
       if (result.ok) return diagnostics.lastErrorReason || 'None';
       if (result.reason === 'timeout' || diagnostics.requestTimedOut) return 'timeout';
@@ -2548,9 +2634,13 @@ ${unresolvedRows}
       openFolderNative,
       supportsDirectoryPicker,
       supportsFolderInput,
+      bridgeAvailable,
     }) {
       if (openFolderNative) {
         return 'Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.';
+      }
+      if (bridgeAvailable) {
+        return 'Use Retry bridge check. If workspace.openFolder is still unavailable, do not start watcher evidence; record the route and last native error from this dialog.';
       }
       if (!pingPassed || !isWindowsShell) {
         return 'Do not start watcher evidence. Record the ping result, host, last native error, and whether the app was launched from the packaged Windows executable.';

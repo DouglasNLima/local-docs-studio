@@ -86,6 +86,19 @@ Proceed with a small targeted `v0.1.0-dev.1` cycle only if Phase 3S can stay low
 - Use manual packaged-shell evidence to decide whether watcher/conflict UX needs code changes or only release confidence notes.
 - Avoid expanding scope beyond the documented prerelease caveats unless new GitHub feedback appears.
 
+## Phase 3V Runtime Fix Planning Note
+
+Phase 3V found that the interactive **Open folder** UI could fall through to browser fallback picker behaviour in a packaged WebView2 shell when the `workspace.openFolder` capability probe was missing, stale, or timed out. That explains why automated native smoke could pass while manual packaged UI evidence was blocked at the picker route.
+
+The fix changes packaged static runtime code:
+
+- Open folder now probes `workspace.openFolder` immediately before routing.
+- In WebView2, Open folder calls the native bridge only when the capability is available.
+- In WebView2, missing capability or bridge failure produces clear operator guidance instead of opening the browser folder/file-input fallback.
+- Windows shell diagnostics now show the same route decision and include **Retry bridge check**.
+
+Manual packaged route verification is still not recorded here, and watcher/conflict evidence remains blocked until a tester completes the fixed packaged Windows picker pass. Because runtime code changed, `v0.1.0-dev.1` is no longer docs-only. Fresh ZIP and installer artefacts are required if this fix is published.
+
 ## Explicitly Out of Scope for v0.1.0-dev.1
 
 - Stable release.

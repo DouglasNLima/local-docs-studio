@@ -569,7 +569,7 @@ async function installMockNativeBridge(page, options = {}) {
           }
 
           if (message.type === 'lensDocs.native.ping') {
-            const capabilities = [
+            const capabilities = Array.isArray(options.capabilities) ? [...options.capabilities] : [
               'diagnostics.ping',
               'file.startupOpen',
               'file.open',
@@ -1740,9 +1740,12 @@ test('Windows shell diagnostics show fake WebView2 workspace capabilities and na
   await expect(diagnostics).toContainText('Host');
   await expect(diagnostics).toContainText('LensDocsStudio.Windows');
   await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('native bridge');
   await expect(diagnostics).toContainText('Open folder will use native bridge');
   await expect(diagnostics).toContainText('Browser fallback active');
   await expect(diagnostics).toContainText('Not active');
+  await expect(page.getByRole('button', { name: 'Retry bridge check' })).toBeVisible();
   await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
   await expect(page.locator('#status')).toHaveText('Windows shell diagnostics completed.');
 });
@@ -1791,12 +1794,15 @@ test('Windows shell diagnostics differentiate missing native folder routing from
   const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
   await expect(diagnostics).toBeVisible();
   await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'false');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('unavailable in Windows shell');
   await expect(diagnostics).toContainText('Open folder will use native bridge');
   await expect(diagnostics).toContainText('No');
   await expect(diagnostics).toContainText('Browser fallback active');
-  await expect(diagnostics).toContainText('Yes');
+  await expect(diagnostics).toContainText('No');
   await expect(diagnostics).toContainText('Browser fallback route');
-  await expect(diagnostics).toContainText(/browser (directory picker|file input fallback)/);
+  await expect(diagnostics).toContainText('Not active');
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
 });
 
 test('browser mode does not auto-show Windows setup wizard', async ({ page }) => {
@@ -1989,6 +1995,14 @@ test('fake WebView2 bridge opens and saves native workspace folders', async ({ p
   await installMockNativeBridge(page);
   await gotoApp(page);
 
+  await page.evaluate(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      return window.__mockFs.directoryHandle;
+    };
+  });
+
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
 
@@ -2017,6 +2031,7 @@ test('fake WebView2 bridge opens and saves native workspace folders', async ({ p
   const messages = await page.evaluate(() => window.__nativeBridgeMessages);
   expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
   expect(messages.some((message) => message.type === 'lensDocs.native.saveWorkspaceFile')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
 });
 
 test('fake WebView2 bridge creates Markdown files in native workspaces', async ({ page }) => {
@@ -2399,36 +2414,14 @@ test('native smoke runner reports failure safely for malformed smoke responses',
   expect(result.errors.some((error) => /protocol/i.test(error))).toBe(true);
 });
 
-test('File menu open folder falls back safely when Windows bridge lacks workspace capabilities', async ({ page }) => {
+test('File menu open folder blocks browser picker when Windows bridge lacks workspace capability', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
   await page.addInitScript(() => {
-    const listeners = [];
-    window.__nativeBridgeMessages = [];
-    window.chrome = {
-      webview: {
-        postMessage(message) {
-          window.__nativeBridgeMessages.push(message);
-          window.setTimeout(() => {
-            listeners.forEach((listener) => listener({
-              data: {
-                protocolVersion: 1,
-                id: message.id,
-                type: 'lensDocs.native.pong',
-                source: 'LensDocsStudio.Windows',
-                timestamp: '2026-06-09T00:00:00.000Z',
-                payload: {
-                  host: 'LensDocsStudio.Windows',
-                  capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
-                },
-              },
-            }));
-          }, 0);
-        },
-        addEventListener(type, listener) {
-          if (type === 'message') listeners.push(listener);
-        },
-      },
-    };
+    window.__browserDirectoryPickerCalls = 0;
     window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
       throw new DOMException('cancelled', 'AbortError');
     };
   });
@@ -2439,7 +2432,26 @@ test('File menu open folder falls back safely when Windows bridge lacks workspac
 
   const messages = await page.evaluate(() => window.__nativeBridgeMessages);
   expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
   await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+  await expect(page.locator('#status')).toHaveText(/workspace\.openFolder was not reported/);
+});
+
+test('File menu open file still uses native file route when workspace capability is absent', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeMessages.some((message) => message.type === 'lensDocs.native.openFile'))).toBe(true);
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(false);
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Open\n');
 });
 
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {

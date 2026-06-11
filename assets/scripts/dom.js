@@ -184,6 +184,7 @@ export const domIds = {
   windowsShellDiagnosticsDialog: 'windowsShellDiagnosticsDialog',
   windowsShellDiagnosticsBody: 'windowsShellDiagnosticsBody',
   windowsShellDiagnosticsCloseButton: 'windowsShellDiagnosticsCloseButton',
+  windowsShellDiagnosticsRetryButton: 'windowsShellDiagnosticsRetryButton',
   windowsShellDiagnosticsDoneButton: 'windowsShellDiagnosticsDoneButton',
 };
 

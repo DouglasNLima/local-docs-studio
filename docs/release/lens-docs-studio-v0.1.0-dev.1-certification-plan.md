@@ -13,19 +13,22 @@
 ## Scope Classification
 
 - [ ] DOCS_ONLY
-- [x] PACKAGE_AFFECTING
+- [ ] PACKAGE_AFFECTING
 - [ ] INSTALLER_AFFECTING
-- [ ] PACKAGE_AND_INSTALLER_AFFECTING
+- [x] PACKAGE_AND_INSTALLER_AFFECTING
 
-The original planning scope was release documentation, guidance, and manual evidence tracking only. Phase 3U.2 adds a temporary browser UI diagnostic aid under Help so operators can inspect Windows shell, native bridge, capability, and Open folder routing state before retrying manual watcher evidence. No Windows shell native source, package script, installer config, service worker, manifest, release asset, tag, or release changes are included in the current scope.
+The original planning scope was release documentation, guidance, and manual evidence tracking only. Phase 3U.2 added a temporary browser UI diagnostic aid under Help so operators can inspect Windows shell, native bridge, capability, and Open folder routing state before retrying manual watcher evidence.
+
+Phase 3V changes runtime UI routing for **File > Open folder** in the packaged WebView2 shell. Because the packaged static app contents changed, `v0.1.0-dev.1` is no longer docs-only and requires fresh ZIP and installer artefacts if published.
 
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
 - Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U.1 packaged ZIP retry launched the app, but the manual evidence is `BLOCKED` at the folder-picker gate because **Open folder** produced an `Open` file dialog and the app reported `Native bridge did not respond.`
 - Phase 3U.2 diagnostic aid: **Help > Windows shell diagnostics** reports browser/PWA versus WebView2 shell mode, bridge ping result, safe capability labels, Open folder routing, browser fallback route, and the next operator step without showing local absolute paths.
+- Phase 3V Open folder routing fix: **File > Open folder** now uses a fresh native capability probe and fails closed in WebView2 when `workspace.openFolder` is missing or the bridge does not respond, instead of silently falling through to the browser folder/file-input route.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
-- Any runtime/package/installer config changes: browser UI diagnostics changed; package, installer, Windows native source, release assets, tags, and releases are unchanged.
+- Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents are changed, installer config is unchanged, and release assets, tags, and releases are unchanged.
 
 ## Manual Watcher/Conflict Evidence
 
@@ -65,27 +68,35 @@ Phase 3U.3 blockers remaining:
 - Stage B scenarios remain not run.
 - Manual evidence result therefore remains **MANUAL_WATCHER_CONFLICT_BLOCKED**.
 
+Phase 3V root cause and status:
+
+- Root cause found: the Open folder UI used the same browser fallback pattern as normal browser mode after a missing or failed `workspace.openFolder` capability probe. In a packaged WebView2 shell this could surface the browser fallback picker/file-input route and confuse manual evidence, even though the native bridge object was present.
+- Fix made: Open folder now probes `workspace.openFolder` immediately before routing. If the bridge is present and the capability is missing or the ping fails, the app stops with a clear status message and sends operators to **Help > Windows shell diagnostics** rather than opening a browser fallback picker.
+- Diagnostics now report **Open folder route**, browser fallback activity, safe last native request/error state, and include **Retry bridge check**.
+- Manual packaged route verification after this fix: not yet completed in this document.
+- Watcher/conflict evidence: still blocked until a tester completes the packaged Windows folder-picker pass.
+
 ## Artefact Decision
 
 ### ZIP
 
-- [x] Reuse existing v0.1.0-dev ZIP
-- [ ] Build new v0.1.0-dev.1 ZIP
+- [ ] Reuse existing v0.1.0-dev ZIP
+- [x] Build new v0.1.0-dev.1 ZIP
 - [ ] Not applicable
 
 Reason:
 
-No Windows app runtime, package asset, static asset, or package script change requires a new ZIP. Publishing a new prerelease with unchanged binary artefacts may confuse testers, so a new ZIP should be built only if a future phase adds package-affecting changes or explicitly chooses a release-notes-only prerelease with clear wording.
+Phase 3V changes packaged static runtime behaviour. A new ZIP is required for `v0.1.0-dev.1` if this fix is published.
 
 ### Installer
 
-- [x] Reuse existing v0.1.0-dev installer
-- [ ] Build new v0.1.0-dev.1 installer
+- [ ] Reuse existing v0.1.0-dev installer
+- [x] Build new v0.1.0-dev.1 installer
 - [ ] Not applicable
 
 Reason:
 
-No installer config, file association, setup wizard, uninstall, shortcut, runtime prerequisite, or Inno script change requires a new installer. A new installer should be built only if a future phase changes installer behaviour or chooses to cut fresh assets for release clarity.
+Installer config is unchanged, but the installed app would otherwise contain stale packaged static assets. A new installer is required for `v0.1.0-dev.1` if this fix is published.
 
 ## Required Validation Before Publication
 
@@ -150,8 +161,8 @@ Future phase:
 ## Recommendation
 
 - [ ] Publish docs-only v0.1.0-dev.1 prerelease later.
-- [ ] Build and certify new ZIP/installer for v0.1.0-dev.1.
+- [x] Build and certify new ZIP/installer for v0.1.0-dev.1.
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Because the current scope is docs-only and the watcher/conflict manual evidence remains blocked at the folder-picker gate, do not publish `v0.1.0-dev.1` yet. Prefer adding a temporary operator debug overlay before the next manual retry, then either keep these docs on `develop` for `v0.1.0-rc.1` planning or publish a docs-only prerelease only if there is a clear communication reason.
+Because Phase 3V changes runtime routing and watcher/conflict manual evidence remains blocked until the packaged picker pass is repeated, do not publish `v0.1.0-dev.1` yet. The next release phase should build and certify fresh ZIP and installer artefacts before publication.

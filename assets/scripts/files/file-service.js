@@ -173,9 +173,14 @@ export function createFileService({
     async function openFolder() {
       if (!await confirmDiscardUnsaved('Open a folder and discard unsaved edits?')) return;
 
-      if (await hasNativeFileCapability('workspace.openFolder')) {
-        const opened = await openNativeFolder();
-        if (opened) return;
+      const nativeRoute = await getNativeCapabilityState('workspace.openFolder');
+      if (nativeRoute.hasCapability) {
+        await openNativeFolder();
+        return;
+      }
+      if (nativeRoute.bridgeAvailable) {
+        setStatus(getNativeOpenFolderUnavailableMessage(nativeRoute), 'warning');
+        return;
       }
 
       try {
@@ -206,7 +211,7 @@ export function createFileService({
         setStatus('Opening folder from Windows...', 'busy');
         const result = await nativeBridgeClient.openFolder();
         if (!result.ok) {
-          setStatus(result.message || 'Windows open folder failed safely. Using the browser fallback...', 'warning');
+          setStatus(result.message || 'Windows open folder failed safely.', 'danger');
           return false;
         }
 
@@ -217,7 +222,7 @@ export function createFileService({
         }
 
         if (!isValidNativeWorkspacePayload(payload)) {
-          setStatus('Windows open folder returned an unsupported workspace response. Using the browser fallback...', 'warning');
+          setStatus('Windows open folder returned an unsupported workspace response.', 'danger');
           return false;
         }
 
@@ -245,7 +250,7 @@ export function createFileService({
         }
         return true;
       } catch (error) {
-        setStatus('Windows open folder failed safely. Using the browser fallback...', 'warning');
+        setStatus('Windows open folder failed safely.', 'danger');
         console.error(error);
         return false;
       }
@@ -1030,12 +1035,47 @@ export function createFileService({
     }
 
     async function hasNativeFileCapability(capability) {
-      if (!nativeBridgeClient?.isAvailable?.()) return false;
-      try {
-        return await nativeBridgeClient.hasCapability(capability);
-      } catch {
-        return false;
+      const state = await getNativeCapabilityState(capability);
+      return state.hasCapability;
+    }
+
+    async function getNativeCapabilityState(capability) {
+      if (!nativeBridgeClient?.isAvailable?.()) {
+        return {
+          bridgeAvailable: false,
+          pingPassed: false,
+          hasCapability: false,
+          reason: 'unavailable',
+          message: 'Native bridge unavailable.',
+        };
       }
+      try {
+        if (typeof nativeBridgeClient.getCapabilityState === 'function') {
+          return await nativeBridgeClient.getCapabilityState(capability);
+        }
+        return {
+          bridgeAvailable: true,
+          pingPassed: true,
+          hasCapability: await nativeBridgeClient.hasCapability(capability),
+          reason: '',
+          message: '',
+        };
+      } catch {
+        return {
+          bridgeAvailable: true,
+          pingPassed: false,
+          hasCapability: false,
+          reason: 'probe-failed',
+          message: 'Windows bridge capability check failed safely.',
+        };
+      }
+    }
+
+    function getNativeOpenFolderUnavailableMessage(route) {
+      if (!route.pingPassed) {
+        return `${route.message || 'Windows bridge did not respond.'} Open folder cannot use the browser fallback while running in the Windows shell. Use Help > Windows shell diagnostics, retry the bridge check, then try Open folder again.`;
+      }
+      return 'Windows Open folder is unavailable because workspace.openFolder was not reported. Use Help > Windows shell diagnostics before retrying manual watcher evidence.';
     }
 
     async function saveRecordToNativeHandle(record, content) {

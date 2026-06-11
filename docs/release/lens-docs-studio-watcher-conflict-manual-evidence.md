@@ -200,3 +200,35 @@ Required follow-up:
 
 - Run Stage A from a real packaged Windows shell instance via **Help > Windows shell diagnostics**, record the Stage A fields, and continue only if it passes.
 - Then run Stage B scenarios 1–5 and update this document with scenario outcomes.
+
+## Phase 3V Packaged Native Bridge / Open Folder Routing Fix
+
+Phase 3V investigated the mismatch between automated packaged native bridge smoke passing and the manual packaged UI showing a file picker plus `Native bridge did not respond.` during **Open folder**.
+
+Root cause found:
+
+- The Open folder UI route used the same browser fallback pattern as browser/PWA mode after a missing or failed `workspace.openFolder` capability probe.
+- In a WebView2 shell, that meant a stale, missing, or timed-out bridge capability check could fall through to browser picker/file-input behaviour instead of stopping with clear operator guidance.
+- The automated native smoke calls bridge messages directly, so it could pass while the interactive UI route still exposed the fallback path.
+
+Fix made:
+
+- **File > Open folder** now performs a fresh `workspace.openFolder` capability probe.
+- If the native bridge is present and `workspace.openFolder` is available, the action calls native `openFolder`.
+- If the native bridge is present but the ping fails or `workspace.openFolder` is missing, the action does not open the browser fallback picker. It reports the problem and points the operator to **Help > Windows shell diagnostics**.
+- Diagnostics now report **Open folder route**, fallback state, safe last native request/error values, and include **Retry bridge check**.
+
+Manual route verification after the fix:
+
+| Field | Value |
+| --- | --- |
+| Help > Windows shell diagnostics opened | Not completed in this document |
+| Running in Windows WebView2 shell | Not recorded |
+| Bridge ping | Not recorded |
+| `workspace.openFolder` | Not recorded |
+| Open folder route | Not recorded |
+| Did **File > Open folder** show a real folder picker? | Not verified |
+
+Result: **MANUAL_WATCHER_CONFLICT_BLOCKED**
+
+The routing fix changes packaged runtime behaviour, so `v0.1.0-dev.1` now requires fresh ZIP and installer artefacts if published. Watcher/conflict evidence remains blocked until the fixed packaged app is launched manually, diagnostics pass, and the full checklist above is completed through the real Windows folder picker.
