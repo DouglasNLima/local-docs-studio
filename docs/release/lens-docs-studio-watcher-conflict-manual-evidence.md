@@ -109,3 +109,55 @@ Scenario results:
 | Dirty conflict confirm | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
 | External delete | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
 | External rename | BLOCKED | Workspace folder could not be opened through the required Windows folder picker. |
+
+## Phase 3U.2 Operator Diagnostics
+
+Phase 3U.2 adds a temporary diagnostic aid for the next packaged Windows shell retry. It is diagnostic readiness only; it does not clear the watcher/conflict blocker and does not replace the manual checklist above.
+
+Open **Help > Windows shell diagnostics** before selecting a watcher workspace. The report should be recorded with the next retry evidence and should not include screenshots or notes that reveal absolute local paths.
+
+Required values before watcher manual evidence can proceed:
+
+- **Running in Windows WebView2 shell**: `Yes`.
+- **Ping result**: `Pass`.
+- **Host**: `LensDocsStudio.Windows`.
+- **Capabilities**: `diagnostics.ping`, `workspace.openFolder`, `workspace.watch`, and `workspace.refreshFile` must be present. `workspace.saveFile` and `workspace.createFile` should also be present for normal workspace operation.
+- **Open folder will use native bridge**: `Yes`.
+- **Browser fallback active**: `No`.
+
+If native bridge ping fails:
+
+- Do not begin watcher evidence.
+- Record the ping result, host value if any, last native request, last native response, last native error, and whether the app was launched from the packaged `LensDocsStudio.Windows.exe`.
+- Re-run the packaged native bridge smoke before attempting the manual watcher pass again.
+
+If `workspace.openFolder` is missing:
+
+- Do not begin watcher evidence.
+- Record the full capability list from the diagnostics panel.
+- Treat the build as unable to provide the required Windows folder-picker path for this checklist.
+
+If **Open folder** routes to a file picker:
+
+- Record that **Open folder will use native bridge** was `No` or that the native request failed.
+- Record the **Browser fallback route** shown by the diagnostics panel.
+- Record the visible picker type and filters, but do not include absolute paths or user-specific folder names.
+- Keep the verdict as `MANUAL_WATCHER_CONFLICT_BLOCKED`.
+
+Evidence fields for the next retry:
+
+| Field | Value |
+| --- | --- |
+| Diagnostics opened from | `Help > Windows shell diagnostics` |
+| Running in Windows WebView2 shell | |
+| Ping result | |
+| Host | |
+| Capabilities present | |
+| Open folder will use native bridge | |
+| Browser fallback active | |
+| Browser fallback route | |
+| Last native request | |
+| Last native response | |
+| Last native error | |
+| Operator next step shown | |
+| Did **File > Open folder** show a real folder picker? | |

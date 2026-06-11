@@ -5140,6 +5140,36 @@ label.file-button.primary,
   flex: 1 1 auto;
 }
 
+.windows-shell-diagnostics-dialog {
+  width: min(94vw, 46rem);
+}
+
+.windows-shell-diagnostics-card {
+  max-height: min(88vh, 42rem);
+}
+
+.windows-shell-diagnostics-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.windows-shell-diagnostics-section {
+  display: grid;
+  gap: .55rem;
+}
+
+.windows-shell-diagnostics-section h3 {
+  margin: 0;
+  font-size: .98rem;
+  line-height: 1.25;
+}
+
+.windows-shell-diagnostics-section p {
+  margin: 0;
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
 .workspace-search-result {
   display: grid;
   justify-items: start;

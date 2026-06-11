@@ -3,7 +3,7 @@
 ## Context
 
 - Current published prerelease: `v0.1.0-dev` at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev`
-- Current develop commit: `a5e471e133351008f2a116aceefa980c63dcaad4`
+- Current develop commit before Phase 3U.2: `b9cefdc6dab5363b3d1cb82cf50f10b61a7ea6f1`
 - Previous release target: `v0.1.0-dev`
 - Planned release tag: `v0.1.0-dev.1`
 - Planning date: `2026-06-10`
@@ -12,19 +12,20 @@
 
 ## Scope Classification
 
-- [x] DOCS_ONLY
-- [ ] PACKAGE_AFFECTING
+- [ ] DOCS_ONLY
+- [x] PACKAGE_AFFECTING
 - [ ] INSTALLER_AFFECTING
 - [ ] PACKAGE_AND_INSTALLER_AFFECTING
 
-The changes known at certification-planning time are release documentation, guidance, and manual evidence tracking only. No runtime, package, installer, service worker, manifest, or Windows shell source changes are included in the current scope.
+The original planning scope was release documentation, guidance, and manual evidence tracking only. Phase 3U.2 adds a temporary browser UI diagnostic aid under Help so operators can inspect Windows shell, native bridge, capability, and Open folder routing state before retrying manual watcher evidence. No Windows shell native source, package script, installer config, service worker, manifest, release asset, tag, or release changes are included in the current scope.
 
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
 - Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U.1 packaged ZIP retry launched the app, but the manual evidence is `BLOCKED` at the folder-picker gate because **Open folder** produced an `Open` file dialog and the app reported `Native bridge did not respond.`
+- Phase 3U.2 diagnostic aid: **Help > Windows shell diagnostics** reports browser/PWA versus WebView2 shell mode, bridge ping result, safe capability labels, Open folder routing, browser fallback route, and the next operator step without showing local absolute paths.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
-- Any runtime/package/installer config changes: none identified.
+- Any runtime/package/installer config changes: browser UI diagnostics changed; package, installer, Windows native source, release assets, tags, and releases are unchanged.
 
 ## Manual Watcher/Conflict Evidence
 
@@ -44,7 +45,7 @@ The required observations through the real Windows folder picker were not comple
 
 Blocker category: `MANUAL_WATCHER_CONFLICT_BLOCKED_FOLDER_PICKER`
 
-Recommended next action: add a temporary operator debug overlay.
+Recommended next action: run **Help > Windows shell diagnostics** in the packaged Windows shell, record the diagnostic fields in the manual evidence document, and proceed to watcher/conflict evidence only if the native bridge ping passes and `workspace.openFolder` is advertised.
 
 Automated browser tests, fake WebView2 coverage, or packaged launch alone are not substitutes for this item. Before `v0.1.0-dev.1` is published, a tester should complete `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` against a ZIP or installed Windows shell build and update the result to `PASS`, `PASS_WITH_NOTES`, or `FAILED`.
 

@@ -181,6 +181,10 @@ export const domIds = {
   windowsSetupNextButton: 'windowsSetupNextButton',
   windowsSetupSkipButton: 'windowsSetupSkipButton',
   windowsSetupCloseButton: 'windowsSetupCloseButton',
+  windowsShellDiagnosticsDialog: 'windowsShellDiagnosticsDialog',
+  windowsShellDiagnosticsBody: 'windowsShellDiagnosticsBody',
+  windowsShellDiagnosticsCloseButton: 'windowsShellDiagnosticsCloseButton',
+  windowsShellDiagnosticsDoneButton: 'windowsShellDiagnosticsDoneButton',
 };
 
 export function getDomElements(root = document) {

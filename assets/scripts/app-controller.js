@@ -34,6 +34,18 @@ const SNAPSHOT_DB_NAME = 'local-docs-studio-snapshots';
 const SNAPSHOT_DB_VERSION = 1;
 const SNAPSHOT_STORE = 'snapshots';
 const LOCAL_LIBRARY_KEY = 'md-mmd-renderer.localLibrary';
+const WINDOWS_HOST = 'LensDocsStudio.Windows';
+const WINDOWS_DIAGNOSTIC_CAPABILITIES = [
+  'diagnostics.ping',
+  'file.open',
+  'file.save',
+  'file.saveAs',
+  'workspace.openFolder',
+  'workspace.saveFile',
+  'workspace.createFile',
+  'workspace.watch',
+  'workspace.refreshFile',
+];
 
 export function createAppController() {
     const {
@@ -218,6 +230,10 @@ export function createAppController() {
       windowsSetupNextButton,
       windowsSetupSkipButton,
       windowsSetupCloseButton,
+      windowsShellDiagnosticsDialog,
+      windowsShellDiagnosticsBody,
+      windowsShellDiagnosticsCloseButton,
+      windowsShellDiagnosticsDoneButton,
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
@@ -944,9 +960,17 @@ export function createAppController() {
           if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
           if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
+          if (button.dataset.menuAction === 'openWindowsShellDiagnostics') await openWindowsShellDiagnostics();
           if (button.dataset.menuAction === 'openWindowsSetup') await windowsSetupTools.openWindowsSetupWizard();
           closeOpenMenus();
         });
+      });
+
+      windowsShellDiagnosticsCloseButton?.addEventListener('click', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsDoneButton?.addEventListener('click', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsDialog?.addEventListener('cancel', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsDialog?.addEventListener('click', (event) => {
+        if (event.target === windowsShellDiagnosticsDialog) closeWindowsShellDiagnostics();
       });
 
       document.querySelectorAll('[data-edit-action]').forEach((button) => {
@@ -2394,6 +2418,158 @@ ${unresolvedRows}
         : [];
       const capabilitySummary = capabilities.length ? capabilities.join(', ') : 'no capabilities reported';
       setStatus(`Windows bridge available: ${host} (${capabilitySummary}).`, 'ok');
+    }
+
+    async function openWindowsShellDiagnostics() {
+      if (!windowsShellDiagnosticsDialog || !windowsShellDiagnosticsBody) {
+        setStatus('Windows shell diagnostics are unavailable in this browser.', 'warning');
+        return;
+      }
+
+      setStatus('Checking Windows shell diagnostics...', 'busy');
+      const result = await nativeBridgeClient.ping();
+      const diagnostics = typeof nativeBridgeClient.getDiagnostics === 'function'
+        ? nativeBridgeClient.getDiagnostics()
+        : {};
+      const payload = result.response?.payload || {};
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((capability) => typeof capability === 'string' && capability.trim())
+        : diagnostics.lastCapabilities || [];
+      const capabilitySet = new Set(capabilities);
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : '';
+      const isWindowsShell = result.ok && host === WINDOWS_HOST;
+      const pingPassed = Boolean(result.ok);
+      const openFolderNative = pingPassed && capabilitySet.has('workspace.openFolder');
+      const supportsDirectoryPicker = 'showDirectoryPicker' in window;
+      const supportsFolderInput = Boolean(folderInput);
+      const fallbackRoute = supportsDirectoryPicker
+        ? 'browser directory picker'
+        : 'browser file input fallback';
+      const browserFallbackActive = !openFolderNative;
+      const pwaMode = isStandaloneDisplayMode();
+      const lastError = getSafeDiagnosticError(result, diagnostics);
+      const nextStep = getWindowsShellDiagnosticNextStep({
+        pingPassed,
+        isWindowsShell,
+        openFolderNative,
+        supportsDirectoryPicker,
+        supportsFolderInput,
+      });
+
+      windowsShellDiagnosticsBody.innerHTML = `
+        ${renderDiagnosticSection('Mode', [
+          ['Running in browser/PWA', isWindowsShell ? 'No' : (pwaMode ? 'Yes (PWA display mode)' : 'Yes')],
+          ['Running in Windows WebView2 shell', yesNo(isWindowsShell)],
+          ['Bridge message handler registered', yesNo(Boolean(diagnostics.messageHandlerRegistered))],
+        ])}
+        ${renderDiagnosticSection('Native bridge', [
+          ['Ping result', pingPassed ? 'Pass' : 'Fail'],
+          ['Protocol version', result.response?.protocolVersion ? String(result.response.protocolVersion) : 'Not reported'],
+          ['Host', host || 'Not reported'],
+          ['Last native request', diagnostics.lastRequestType || 'None'],
+          ['Last native response', diagnostics.lastResponseType || 'None'],
+          ['Last native error', lastError],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Capabilities</h3>
+          <div class="windows-setup-capabilities" aria-label="Windows bridge capabilities">
+            ${WINDOWS_DIAGNOSTIC_CAPABILITIES.map((capability) => `<span data-ready="${capabilitySet.has(capability)}">${escapeHtml(capability)}</span>`).join('')}
+          </div>
+        </section>
+        ${renderDiagnosticSection('Workspace action routing', [
+          ['Open folder will use native bridge', yesNo(openFolderNative)],
+          ['Browser fallback active', yesNo(browserFallbackActive)],
+          ['Browser fallback route', browserFallbackActive ? fallbackRoute : 'Not active'],
+          ['Directory picker API available', yesNo(supportsDirectoryPicker)],
+          ['Folder input fallback available', yesNo(supportsFolderInput)],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Operator next step</h3>
+          <p>${escapeHtml(nextStep)}</p>
+        </section>
+      `;
+
+      if (typeof windowsShellDiagnosticsDialog.showModal === 'function') {
+        windowsShellDiagnosticsDialog.showModal();
+      } else {
+        windowsShellDiagnosticsDialog.setAttribute('open', '');
+      }
+
+      setStatus(pingPassed
+        ? 'Windows shell diagnostics completed.'
+        : 'Windows shell diagnostics found the bridge unavailable or failing.', pingPassed ? 'ok' : 'warning');
+    }
+
+    function closeWindowsShellDiagnostics() {
+      if (windowsShellDiagnosticsDialog?.open && typeof windowsShellDiagnosticsDialog.close === 'function') {
+        windowsShellDiagnosticsDialog.close();
+      } else {
+        windowsShellDiagnosticsDialog?.removeAttribute('open');
+      }
+    }
+
+    function renderDiagnosticSection(title, rows) {
+      return `
+        <section class="windows-shell-diagnostics-section">
+          <h3>${escapeHtml(title)}</h3>
+          <div class="windows-setup-status-list">
+            ${rows.map(([label, value]) => `
+              <div class="windows-setup-status-row" data-status-kind="${getDiagnosticStatusKind(value)}">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(value)}</strong>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function getDiagnosticStatusKind(value) {
+      if (/^(yes|pass)/i.test(value)) return 'ok';
+      if (/^(no|fail|timeout|unavailable|not reported)/i.test(value)) return 'warning';
+      return 'info';
+    }
+
+    function getSafeDiagnosticError(result, diagnostics = {}) {
+      if (result.ok) return diagnostics.lastErrorReason || 'None';
+      if (result.reason === 'timeout' || diagnostics.requestTimedOut) return 'timeout';
+      if (typeof result.message === 'string' && result.message.trim()) return result.message.trim();
+      if (typeof diagnostics.lastErrorReason === 'string' && diagnostics.lastErrorReason.trim()) {
+        return diagnostics.lastErrorReason.trim();
+      }
+      return result.available ? 'Bridge request failed safely.' : 'unavailable';
+    }
+
+    function getWindowsShellDiagnosticNextStep({
+      pingPassed,
+      isWindowsShell,
+      openFolderNative,
+      supportsDirectoryPicker,
+      supportsFolderInput,
+    }) {
+      if (openFolderNative) {
+        return 'Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.';
+      }
+      if (!pingPassed || !isWindowsShell) {
+        return 'Do not start watcher evidence. Record the ping result, host, last native error, and whether the app was launched from the packaged Windows executable.';
+      }
+      if (!supportsDirectoryPicker && supportsFolderInput) {
+        return 'Record that Open folder will fall back to the browser file input route; this is not valid Windows folder-picker evidence.';
+      }
+      return 'Record the missing workspace.openFolder capability before retrying manual watcher evidence.';
+    }
+
+    function yesNo(value) {
+      return value ? 'Yes' : 'No';
+    }
+
+    function isStandaloneDisplayMode() {
+      return Boolean(
+        window.matchMedia?.('(display-mode: standalone)')?.matches
+        || window.navigator?.standalone
+      );
     }
 
     async function loadStudioTemplate(key) {

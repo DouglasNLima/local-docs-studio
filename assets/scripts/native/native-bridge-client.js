@@ -47,11 +47,20 @@ export function createNativeBridgeClient({
   const pendingMessages = new Map();
   const eventListeners = new Map();
   const webview = getWebView(windowRef);
+  const diagnostics = {
+    messageHandlerRegistered: false,
+    lastRequestType: '',
+    lastResponseType: '',
+    lastErrorReason: '',
+    lastCapabilities: [],
+    requestTimedOut: false,
+  };
 
   if (webview && typeof webview.addEventListener === 'function') {
     webview.addEventListener('message', (event) => {
       handleHostMessage(event?.data);
     });
+    diagnostics.messageHandlerRegistered = true;
   }
 
   function isAvailable() {
@@ -93,6 +102,14 @@ export function createNativeBridgeClient({
     if (!result.ok) return false;
     const capabilities = result.response?.payload?.capabilities;
     return Array.isArray(capabilities) && capabilities.includes(capability);
+  }
+
+  function getDiagnostics() {
+    return {
+      ...diagnostics,
+      lastCapabilities: [...diagnostics.lastCapabilities],
+      available: isAvailable(),
+    };
   }
 
   async function openFile() {
@@ -192,6 +209,7 @@ export function createNativeBridgeClient({
     return new Promise((resolve) => {
       const currentWebView = getWebView(windowRef);
       if (!currentWebView) {
+        recordBridgeFailure('unavailable', { timedOut: false });
         resolve({
           ok: false,
           available: false,
@@ -201,8 +219,14 @@ export function createNativeBridgeClient({
         return;
       }
 
+      diagnostics.lastRequestType = message.type;
+      diagnostics.lastResponseType = '';
+      diagnostics.lastErrorReason = '';
+      diagnostics.requestTimedOut = false;
+
       const timeoutId = windowRef.setTimeout?.(() => {
         pendingMessages.delete(message.id);
+        recordBridgeFailure('timeout', { timedOut: true });
         resolve({
           ok: false,
           available: true,
@@ -221,6 +245,7 @@ export function createNativeBridgeClient({
         currentWebView.postMessage(message);
       } catch {
         clearPending(message.id);
+        recordBridgeFailure('post-failed', { timedOut: false });
         resolve({
           ok: false,
           available: false,
@@ -242,6 +267,7 @@ export function createNativeBridgeClient({
     clearPending(message.id);
     const validation = validateHostResponse(message, pending.expectedTypes);
     if (!validation.ok) {
+      recordBridgeFailure(validation.reason, { responseType: message.type });
       pending.resolve({
         ok: false,
         available: true,
@@ -259,6 +285,13 @@ export function createNativeBridgeClient({
         ? 'Native bridge responded.'
         : getSafeErrorMessage(message),
     });
+    diagnostics.lastResponseType = message.type;
+    diagnostics.lastErrorReason = message.type === nativeBridgeMessageTypes.error ? 'host-error' : '';
+    diagnostics.requestTimedOut = false;
+    const capabilities = message.payload?.capabilities;
+    if (Array.isArray(capabilities)) {
+      diagnostics.lastCapabilities = capabilities.filter((capability) => typeof capability === 'string' && capability.trim());
+    }
   }
 
   function clearPending(id) {
@@ -282,6 +315,12 @@ export function createNativeBridgeClient({
     });
   }
 
+  function recordBridgeFailure(reason, { responseType = '', timedOut = false } = {}) {
+    diagnostics.lastResponseType = responseType;
+    diagnostics.lastErrorReason = reason;
+    diagnostics.requestTimedOut = Boolean(timedOut);
+  }
+
   return {
     isAvailable,
     createMessage,
@@ -301,6 +340,7 @@ export function createNativeBridgeClient({
     openSmokeFixtureWorkspace,
     touchSmokeWorkspaceFile,
     completeSmoke,
+    getDiagnostics,
   };
 }
 

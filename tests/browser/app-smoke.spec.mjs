@@ -1707,6 +1707,98 @@ test('native bridge diagnostic handles malformed host responses safely', async (
   await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
 });
 
+test('Windows shell diagnostics report browser fallback safely', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics).toContainText('Running in Windows WebView2 shell');
+  await expect(diagnostics).toContainText('Ping result');
+  await expect(diagnostics).toContainText('Fail');
+  await expect(diagnostics).toContainText('Open folder will use native bridge');
+  await expect(diagnostics).toContainText('Browser fallback active');
+  await expect(diagnostics).toContainText('Yes');
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+  await expect(page.locator('#status')).toHaveText('Windows shell diagnostics found the bridge unavailable or failing.');
+});
+
+test('Windows shell diagnostics show fake WebView2 workspace capabilities and native routing', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics).toContainText('Running in Windows WebView2 shell');
+  await expect(diagnostics).toContainText('Ping result');
+  await expect(diagnostics).toContainText('Pass');
+  await expect(diagnostics).toContainText('Host');
+  await expect(diagnostics).toContainText('LensDocsStudio.Windows');
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
+  await expect(diagnostics).toContainText('Open folder will use native bridge');
+  await expect(diagnostics).toContainText('Browser fallback active');
+  await expect(diagnostics).toContainText('Not active');
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+  await expect(page.locator('#status')).toHaveText('Windows shell diagnostics completed.');
+});
+
+test('Windows shell diagnostics differentiate missing native folder routing from browser fallback', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          const type = message.type === 'lensDocs.native.appReady'
+            ? 'lensDocs.native.appReadyResult'
+            : 'lensDocs.native.pong';
+          const payload = message.type === 'lensDocs.native.appReady'
+            ? { ready: true }
+            : {
+                host: 'LensDocsStudio.Windows',
+                capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+              };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({
+              data: {
+                protocolVersion: 1,
+                id: message.id,
+                type,
+                source: 'LensDocsStudio.Windows',
+                timestamp: '2026-06-09T00:00:00.000Z',
+                payload,
+              },
+            }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'false');
+  await expect(diagnostics).toContainText('Open folder will use native bridge');
+  await expect(diagnostics).toContainText('No');
+  await expect(diagnostics).toContainText('Browser fallback active');
+  await expect(diagnostics).toContainText('Yes');
+  await expect(diagnostics).toContainText('Browser fallback route');
+  await expect(diagnostics).toContainText(/browser (directory picker|file input fallback)/);
+});
+
 test('browser mode does not auto-show Windows setup wizard', async ({ page }) => {
   await gotoApp(page);
 

@@ -280,6 +280,8 @@
             <div class="menu-heading">Diagnostics</div>
             <button type="button" data-menu-action="checkNativeBridge">Check Windows bridge</button>
             <div class="menu-note">Checks the optional Windows host bridge. Browser and PWA mode stay fully local when it is unavailable.</div>
+            <button type="button" data-menu-action="openWindowsShellDiagnostics">Windows shell diagnostics</button>
+            <div class="menu-note">Shows a temporary operator check for Windows shell, bridge capability, and Open folder routing.</div>
             <button type="button" data-menu-action="openWindowsSetup">Open setup wizard</button>
             <div class="menu-note">Opens the compact Windows first-run setup wizard. Browser and PWA mode show a Windows-only readiness message.</div>
             <hr>
@@ -854,6 +856,24 @@
           </div>
         </section>
       </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog windows-shell-diagnostics-dialog" id="windowsShellDiagnosticsDialog" aria-labelledby="windowsShellDiagnosticsTitle" aria-describedby="windowsShellDiagnosticsSummary">
+    <form class="utility-dialog-card windows-shell-diagnostics-card" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Diagnostics</span>
+        <button class="template-dialog-close" type="button" id="windowsShellDiagnosticsCloseButton" aria-label="Close Windows shell diagnostics">X</button>
+      </div>
+      <section class="windows-setup-panel">
+        <h2 id="windowsShellDiagnosticsTitle">Windows shell diagnostics</h2>
+        <p id="windowsShellDiagnosticsSummary">Temporary operator aid for native bridge and workspace routing checks.</p>
+        <div class="windows-shell-diagnostics-body" id="windowsShellDiagnosticsBody"></div>
+        <div class="template-dialog-actions windows-setup-footer">
+          <span class="windows-setup-footer-spacer"></span>
+          <button class="primary" type="button" id="windowsShellDiagnosticsDoneButton">Done</button>
+        </div>
+      </section>
     </form>
   </dialog>
 
