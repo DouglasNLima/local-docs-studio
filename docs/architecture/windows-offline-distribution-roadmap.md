@@ -171,6 +171,14 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Runtime prerequisites remain documented rather than bootstrapped: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
 - Phase 3M does not publish a release, upload installer artefacts, create or move tags, merge to `main`, add signing, add auto-update, add MSIX, add WiX, bundle WebView2 Fixed Version Runtime, or change runtime app behaviour.
 
+## Implemented Phase 3W
+
+- `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` records the Phase 3W evidence/artefact-alignment checkpoint for the Phase 3V packaged Open folder routing fix.
+- Fresh local Windows package, package RC, and Inno installer artefacts were rebuilt from `develop` commit `e2026d728c131cf2e203928487b9aeb09b744da7`; they remained ignored local outputs under `artifacts/` and were not published or committed.
+- Automated static checks, browser smoke, Windows solution build, packaged static asset validation, package RC validation, development native smoke, package `-NoSmoke` build, packaged native smoke, and installer build passed.
+- Manual packaged diagnostics remained blocked because the checkpoint environment could launch the packaged executable but could not operate and observe the real WebView2 diagnostics UI. Watcher/conflict scenarios therefore remain blocked rather than passed.
+- `v0.1.0-dev.1` remains package-and-installer-affecting. A future publication still requires fresh ZIP and installer artefacts from the selected publication commit and must not infer manual packaged verification from automated bridge smoke.
+
 ## Future Roadmap
 
 - MSIX versus classic installer spike for offline distribution.

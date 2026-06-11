@@ -21,12 +21,15 @@ The original planning scope was release documentation, guidance, and manual evid
 
 Phase 3V changes runtime UI routing for **File > Open folder** in the packaged WebView2 shell. Because the packaged static app contents changed, `v0.1.0-dev.1` is no longer docs-only and requires fresh ZIP and installer artefacts if published.
 
+Phase 3W is an evidence/artefact-alignment checkpoint for the Phase 3V package-affecting change. It rebuilt local ZIP, package RC, and Inno installer artefacts from `develop` commit `e2026d728c131cf2e203928487b9aeb09b744da7`, but did not publish or upload them.
+
 ## Changes Since v0.1.0-dev
 
 - WebView2 uninstall cleanup decision: `WEBVIEW2_UNINSTALL_CLEANUP_DOCUMENTED_ONLY`. The WebView2 user data folder may contain browser-local user/session state, so silent uninstall cleanup is not approved for this dev cycle.
 - Watcher/conflict evidence: checklist added in `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md`; the Phase 3U.1 packaged ZIP retry launched the app, but the manual evidence is `BLOCKED` at the folder-picker gate because **Open folder** produced an `Open` file dialog and the app reported `Native bridge did not respond.`
 - Phase 3U.2 diagnostic aid: **Help > Windows shell diagnostics** reports browser/PWA versus WebView2 shell mode, bridge ping result, safe capability labels, Open folder routing, browser fallback route, and the next operator step without showing local absolute paths.
 - Phase 3V Open folder routing fix: **File > Open folder** now uses a fresh native capability probe and fails closed in WebView2 when `workspace.openFolder` is missing or the bridge does not respond, instead of silently falling through to the browser folder/file-input route.
+- Phase 3W checkpoint: fresh local package, package RC, and Inno installer artefacts were rebuilt from current `develop`; automated static, browser, Windows build, package RC, static asset, and native smoke validation passed. Manual packaged diagnostics and watcher/conflict evidence remained blocked because this agent session could launch the packaged app but could not operate and observe the real WebView2 diagnostics UI.
 - ZIP vs installer wording: clarified across release guidance so ZIP is the portable/fallback package and the Inno installer is the easier Windows install path.
 - Any runtime/package/installer config changes: browser UI diagnostics and Open folder routing changed; package source contents are changed, installer config is unchanged, and release assets, tags, and releases are unchanged.
 
@@ -75,6 +78,17 @@ Phase 3V root cause and status:
 - Diagnostics now report **Open folder route**, browser fallback activity, safe last native request/error state, and include **Retry bridge check**.
 - Manual packaged route verification after this fix: not yet completed in this document.
 - Watcher/conflict evidence: still blocked until a tester completes the packaged Windows folder-picker pass.
+
+Phase 3W evidence/artefact alignment:
+
+- Source commit: `e2026d728c131cf2e203928487b9aeb09b744da7` on `develop`.
+- Fresh local ZIP: `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, SHA256 `607C83FFC171C684C1F37599A189F44D5619BCFC56634212047D80D930153FF5`.
+- Fresh local RC report: `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T102300Z.md`.
+- Fresh local installer: `artifacts/installers/inno/LensDocsStudio.Windows-0.1.0-dev-Setup.exe`, SHA256 `D143B628CD83940D50414F82DAD88A0BD98A1865ACED2E64D37996727792AAB3`.
+- Validation passed: `npm run test:static`, `npm run test:browser`, `dotnet build src/windows/LensDocsStudio.Windows.sln`, `scripts/windows/Test-WindowsStaticAssets.ps1`, `scripts/windows/Test-WindowsPackageReleaseCandidate.ps1`, `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1`, `scripts/windows/Build-WindowsPackage.ps1 -NoSmoke`, packaged native bridge smoke against the rebuilt executable, and `scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild`.
+- Stage A packaged diagnostics: blocked. The freshly rebuilt packaged executable launched with window title `Lens Docs Studio`, but the session could not operate **Help > Windows shell diagnostics**, use **Retry bridge check**, and observe the real diagnostics values.
+- Stage B watcher/conflict scenarios: blocked because Stage A was not verified.
+- No GitHub release assets, releases, tags, or `main` merges were changed.
 
 ## Artefact Decision
 
@@ -165,4 +179,4 @@ Future phase:
 - [x] Defer v0.1.0-dev.1 and move to v0.1.0-rc.1 planning.
 - [ ] Pause pending more feedback.
 
-Because Phase 3V changes runtime routing and watcher/conflict manual evidence remains blocked until the packaged picker pass is repeated, do not publish `v0.1.0-dev.1` yet. The next release phase should build and certify fresh ZIP and installer artefacts before publication.
+Because Phase 3V changes runtime routing and watcher/conflict manual evidence remains blocked until the packaged picker pass is repeated, do not publish `v0.1.0-dev.1` yet. Phase 3W proved fresh local ZIP and installer artefacts can be rebuilt and pass automated validation, but any future publication still needs fresh ZIP and installer artefacts from the selected publication commit plus real packaged diagnostics/watcher evidence or an explicit documented exception.

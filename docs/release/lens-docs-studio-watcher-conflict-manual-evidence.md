@@ -232,3 +232,87 @@ Manual route verification after the fix:
 Result: **MANUAL_WATCHER_CONFLICT_BLOCKED**
 
 The routing fix changes packaged runtime behaviour, so `v0.1.0-dev.1` now requires fresh ZIP and installer artefacts if published. Watcher/conflict evidence remains blocked until the fixed packaged app is launched manually, diagnostics pass, and the full checklist above is completed through the real Windows folder picker.
+
+## Phase 3W Evidence/Artefact Alignment Checkpoint
+
+Phase 3W rebuilt fresh local Windows artefacts from current `develop` after the Phase 3V package-affecting Open folder routing fix. This checkpoint did not publish, upload, create, replace, or delete GitHub releases, tags, or release assets, and it did not merge to `main`.
+
+### Repository State
+
+| Field | Value |
+| --- | --- |
+| Branch | `develop` |
+| Source commit | `e2026d728c131cf2e203928487b9aeb09b744da7` |
+| Phase 3V commit included in HEAD | Yes |
+| Tracked working tree before docs edits | Clean |
+| Ignored/generated paths present | `artifacts/`, `node_modules/`, `src/windows/.vs/`, `src/windows/LensDocsStudio.Windows/bin/`, `src/windows/LensDocsStudio.Windows/obj/`, `test-results/` |
+| Status note | `git status --short --ignored` also reported a Windows long-path warning inside generated WebView2 cache output under `src/windows/LensDocsStudio.Windows/bin/.../LensDocsStudio.Windows.exe.WebView2/...`; this is ignored/generated output, not a tracked source change. |
+
+### Fresh Local Artefacts
+
+Built locally from source commit `e2026d728c131cf2e203928487b9aeb09b744da7` on `develop`.
+
+| Artefact | Path | Timestamp (local) | Size | SHA256 |
+| --- | --- | --- | ---: | --- |
+| Windows package folder | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev` | `2026-06-11 11:24:13 +01:00` | n/a | n/a |
+| Windows package ZIP | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev.zip` | `2026-06-11 11:23:59 +01:00` | 33955274 bytes | `607C83FFC171C684C1F37599A189F44D5619BCFC56634212047D80D930153FF5` |
+| Package RC report | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260611T102300Z.md` | `2026-06-11 11:24:18 +01:00` | 8434 bytes | `8A9140CEBD4025528EEDAC302D03D4D04A540F264B2FE92A8C7E5ACBB7027FE0` |
+| Package RC metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260611T102300Z.json` | `2026-06-11 11:24:18 +01:00` | 4941 bytes | `5999A53E703186567B99D3D43765CE3BCF4724E113B27ADC17FE39B38428E1CE` |
+| Inno installer | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` | `2026-06-11 11:26:13 +01:00` | 29648369 bytes | `D143B628CD83940D50414F82DAD88A0BD98A1865ACED2E64D37996727792AAB3` |
+| Inno installer checksum | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | `2026-06-11 11:26:14 +01:00` | 110 bytes | `F28B4A48700F07F9F8E73F694AC309F9755F2DC4E704B71DD16ECBF5938B125A` |
+| Inno installer report | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | `2026-06-11 11:26:14 +01:00` | 151600 bytes | `3CFCB8E96953B0B749EB724A2E607707BD0BFD7CBB5071BD5AD0E0312606B2AD` |
+
+These artefacts are local ignored outputs. They are evidence for this checkpoint only and were not committed.
+
+`v0.1.0-dev.1` remains **PACKAGE_AND_INSTALLER_AFFECTING** because Phase 3V changed packaged static runtime behaviour. Any future publication still requires fresh ZIP and installer artefacts built from the selected publication commit.
+
+### Validation
+
+| Command | Result | Notes |
+| --- | --- | --- |
+| `npm run test:static` | PASS | Static checks passed for 46 module files, 53 shell assets, 150 vendor assets, and 52 runtime external-dependency scans. |
+| `npm run test:browser` | PASS | Playwright browser smoke completed successfully for 218 tests across Chromium and Microsoft Edge. |
+| `dotnet build src/windows/LensDocsStudio.Windows.sln` | PASS | Build succeeded with 0 warnings and 0 errors. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` | PASS | Verified 53 service-worker assets and 150 vendor assets in packaged `StaticApp/`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` | PASS | Final RC report: `artifacts/windows/release-candidates/LensDocsStudio.Windows-0.1.0-dev-rc-20260611T102300Z.md`; ZIP SHA256 `607C83FFC171C684C1F37599A189F44D5619BCFC56634212047D80D930153FF5`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` | PASS | Development build native bridge smoke completed successfully. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1 -NoSmoke` | PASS | Windows folder/ZIP package created; native bridge smoke intentionally skipped by `-NoSmoke`. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/LensDocsStudio.Windows.exe` | PASS | Packaged executable native bridge smoke completed successfully. |
+| `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1 -NoPackageBuild` | PASS | Inno Setup installer created from the fresh local package. |
+
+Automated smoke passing is supporting evidence only. It does not prove that the manual packaged diagnostics UI or watcher/conflict scenarios passed.
+
+### Stage A - Packaged Diagnostics Evidence
+
+The fresh packaged executable was launched from `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev\LensDocsStudio.Windows.exe`. The process started successfully and exposed the window title `Lens Docs Studio`, then it was stopped after launch-only evidence collection so no GUI process was left running.
+
+Interactive diagnostics collection remains blocked in this environment. This agent session can launch and stop the packaged process, but it does not provide a reliable interactive desktop automation channel to operate the real WebView2 menu, open **Help > Windows shell diagnostics**, click **Retry bridge check**, and observe the diagnostics panel values. Therefore the required manual values were not recorded.
+
+| Field | Value |
+| --- | --- |
+| Real packaged executable launched | Yes |
+| Help > Windows shell diagnostics opened | BLOCKED |
+| Retry bridge check used | BLOCKED |
+| Windows WebView2 shell detected | BLOCKED |
+| Bridge ping | BLOCKED |
+| `workspace.openFolder` capability | BLOCKED |
+| Open folder route decision | BLOCKED |
+| Browser fallback suppression while native bridge is present | BLOCKED |
+
+Stage A result: **BLOCKED_INTERACTIVE_DIAGNOSTICS_NOT_EXECUTED**.
+
+Stage A must only be reclassified as PASS after a tester records the diagnostics values from the real packaged app UI.
+
+### Stage B - Watcher/Conflict Evidence
+
+Stage B was not run because Stage A did not produce the required real packaged diagnostics evidence.
+
+| Scenario | Result | Notes |
+| --- | --- | --- |
+| Clean external change | BLOCKED | Not executed because interactive packaged diagnostics could not be operated and observed in this environment. |
+| Dirty conflict cancel | BLOCKED | Not executed because interactive packaged diagnostics could not be operated and observed in this environment. |
+| Dirty conflict confirm | BLOCKED | Not executed because interactive packaged diagnostics could not be operated and observed in this environment. |
+
+Stage B result: **BLOCKED_STAGE_A_NOT_VERIFIED**.
+
+Overall manual watcher/conflict result remains **MANUAL_WATCHER_CONFLICT_BLOCKED**. The `v0.1.0-dev.1` watcher/conflict certification blocker is not cleared.
