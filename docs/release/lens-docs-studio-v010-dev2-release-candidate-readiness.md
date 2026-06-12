@@ -8,6 +8,8 @@ Phase 3AQ is a local release-candidate readiness and artefact rebaseline checkpo
 
 This checkpoint does not publish `v0.1.0-dev.2`, does not create tags or GitHub Releases, does not upload release assets, does not merge to `main`, does not edit, delete, replace, re-upload, rebuild, or republish `v0.1.0-dev.1` assets, and does not claim production readiness or go-live approval.
 
+Phase 3AR later froze the authoritative local `v0.1.0-dev.2` publication bundle for a future approval-gate review in `docs/release/lens-docs-studio-v010-dev2-publication-bundle-freeze.md`. Use Phase 3AR for final frozen bundle paths and hashes; keep this Phase 3AQ document as the earlier readiness and rebaseline record.
+
 ## Repository State
 
 | Check | Result |
@@ -93,6 +95,8 @@ Optional packaged manual sanity was skipped in this automated checkpoint because
 ## Release Artefact Expectations
 
 The local package ZIP and unsigned Inno installer are release-candidate artefacts only. They are suitable for a later publication approval gate to review, but Phase 3AQ does not publish them.
+
+Phase 3AR supersedes the local Phase 3AQ artefact paths and hashes as the frozen publication-bundle handoff. Phase 3AQ remains useful for the earlier readiness context and browser timeout note.
 
 Before any future `v0.1.0-dev.2` publication:
 
