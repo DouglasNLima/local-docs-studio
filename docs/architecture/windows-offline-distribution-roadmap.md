@@ -256,10 +256,17 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Existing release assets remain unchanged, including `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets.
 - No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
 
+## Implemented Phase 3BD
+
+- `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` converts the candidate `v0.1.0-dev.4` scope into an ordered implementation readiness plan.
+- The recommended first slice is support bundle implementation, if explicitly approved, because the design contract is already documented and supports privacy-safe troubleshooting for bridge, folder picker, watcher/conflict, package, and installer issues.
+- The readiness plan records proposed slices, acceptance criteria, validation commands, evidence requirements, release artefact expectations, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3BD is documentation/planning only. It does not implement runtime changes, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
 - Collect feedback against `v0.1.0-dev.3` before deciding the next dev release scope.
-- Treat `v0.1.0-dev.4` as candidate planning only until a separate approval defines implementation scope, validation expectations, and any release artefact plan.
+- Treat `v0.1.0-dev.4` as unreleased and unapproved until a separate approval defines implementation scope, validation expectations, and any release artefact plan. Use the Phase 3BD readiness plan as planning guidance only.
 - Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
 - Monitor installer/download/checksum/runtime-prerequisite issues without changing published release assets.
 - Decide the next dev release scope from prerelease feedback and release-monitoring signals.

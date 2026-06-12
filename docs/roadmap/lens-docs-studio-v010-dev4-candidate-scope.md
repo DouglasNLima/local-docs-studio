@@ -12,6 +12,8 @@ Current verified prerelease/dev release for new validation: `v0.1.0-dev.3`.
 
 Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
 
+Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only implementation readiness gate. It organises this candidate scope into proposed slices and recommends support bundle implementation as the first slice only if explicitly approved. It does not approve runtime work, release publication, production readiness, or go-live.
+
 ## Baseline
 
 The `v0.1.0-dev.3` baseline records:
@@ -143,3 +145,4 @@ If a later phase approves `v0.1.0-dev.4` publication, it must separately define:
 
 Existing `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets remain unchanged.
 
+Use `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` for the Phase 3BD implementation readiness sequence. That readiness plan is still planning-only and is not release approval.

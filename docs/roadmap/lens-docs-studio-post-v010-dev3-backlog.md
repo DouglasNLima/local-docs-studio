@@ -125,5 +125,6 @@ These are candidate ideas only and do not approve implementation:
 
 Phase 3BC opens the post-`v0.1.0-dev.3` backlog and records candidate planning inputs for a possible `v0.1.0-dev.4` cycle. `v0.1.0-dev.4` is not approved, has no committed release date, and has no authorised implementation scope.
 
-Production readiness and go-live remain separate approval gates.
+Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only readiness gate. It recommends support bundle implementation as the first candidate slice only if explicitly approved, and records validation, evidence, release artefact, rollback, and supersedence expectations without changing runtime code or release assets.
 
+Production readiness and go-live remain separate approval gates.
