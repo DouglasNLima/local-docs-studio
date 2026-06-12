@@ -4,7 +4,7 @@ Guidance date: 2026-06-12
 
 ## Current Recommended Prerelease
 
-The current recommended prerelease/dev release for new validation is `v0.1.0-dev.2`.
+The current published prerelease/dev release for new validation is still `v0.1.0-dev.2`.
 
 Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`
 
@@ -21,6 +21,8 @@ Manual packaged sanity failed for `v0.1.0-dev.2` in Phase 3AV. First-run/onboard
 
 Phase 3AT post-publication verification passed for the release tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke. Phase 3AV did not change release assets, tags, releases, packages, installers, or `main`. No further release asset action is required unless a future release is authorised, but new validation must treat the packaged native folder picker as a known failing manual sanity check for `v0.1.0-dev.2`.
 
+Phase 3AW remediated the native Open folder pending guidance on `develop`, and Phase 3AX froze a local unpublished `v0.1.0-dev.3` candidate bundle at `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3`. That bundle is ready for a later publication approval gate only; it has not been published, tagged, uploaded, or merged to `main`, and it does not supersede `v0.1.0-dev.2` until a separate publication step is explicitly approved and completed.
+
 ## Stale Older Prerelease
 
 The older `v0.1.0-dev.1` prerelease assets are superseded for new validation but preserved historically. The older `v0.1.0-dev` prerelease assets are older/stale relative to `v0.1.0-dev.2`.
@@ -28,7 +30,7 @@ The older `v0.1.0-dev.1` prerelease assets are superseded for new validation but
 In this context, stale means:
 
 - A newer prerelease/dev release exists.
-- New installation, validation, support evidence, and download guidance should use `v0.1.0-dev.2` unless a later prerelease supersedes it.
+- New installation, validation, support evidence, and download guidance should use the published `v0.1.0-dev.2` release unless a later prerelease supersedes it.
 - The older assets may still exist on GitHub for historical traceability.
 - Stale does not mean the older release assets were edited, deleted, replaced, re-uploaded, rebuilt, or republished.
 - Stale does not mean the older release is production-ready, unsafe by definition, or approved for any new support baseline.

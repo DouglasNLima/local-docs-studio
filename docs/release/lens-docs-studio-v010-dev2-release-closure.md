@@ -91,6 +91,7 @@ No further release asset action is required unless a future release is explicitl
 
 - Collect prerelease feedback against `v0.1.0-dev.2`.
 - Investigate the Phase 3AV packaged native folder picker failure before attempting to clear manual packaged sanity in a future authorised package or prerelease.
+- Phase 3AW completed the native Open folder pending-guidance remediation on `develop`, and Phase 3AX froze a local unpublished `v0.1.0-dev.3` candidate bundle for a later publication approval gate. `v0.1.0-dev.2` release assets remain unchanged and are not superseded until a separate publication step is approved and completed.
 - Monitor installer, download, checksum, runtime prerequisite, and unsigned-installer issues.
 - Decide the next dev release scope from observed feedback and release monitoring.
 - Keep production readiness and go-live approval as separate approval gates.
