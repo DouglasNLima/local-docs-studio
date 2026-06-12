@@ -238,11 +238,21 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The older `v0.1.0-dev.1` assets remain preserved historical prerelease evidence, and the older `v0.1.0-dev` assets remain stale.
 - No further release asset action is required unless a future release is authorised. Production readiness remains a separate approval gate.
 
+## Implemented Phase 3BB
+
+- `docs/release/lens-docs-studio-v010-dev3-release-closure.md` closes the `v0.1.0-dev.3` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.3` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`.
+- Phase 3BA post-publication verification passed for the release tag, prerelease state, expected six-asset set, downloaded ZIP SHA256 `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9`, downloaded installer SHA256 `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB`, downloaded ZIP smoke, and contained installer smoke.
+- Phase 3BA skipped interactive manual packaged sanity; Phase 3AW remains the referenced manual packaged sanity/remediation evidence for the Open folder pending guidance path.
+- `v0.1.0-dev.2` and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
+- No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
+
 ## Future Roadmap
 
-- Collect feedback against `v0.1.0-dev.2` before deciding the next dev release scope.
-- Execute real manual packaged sanity when interactive packaged-app control is available.
+- Collect feedback against `v0.1.0-dev.3` before deciding the next dev release scope.
+- Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
 - Monitor installer/download/checksum/runtime-prerequisite issues without changing published release assets.
+- Decide the next dev release scope from prerelease feedback and release-monitoring signals.
 - Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.
 - Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
 - Run installer upgrade/uninstall evidence from the Phase 3AO plan only when a future installer-affecting release candidate is explicitly authorised.

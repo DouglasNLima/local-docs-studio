@@ -4,40 +4,49 @@ Guidance date: 2026-06-12
 
 ## Current Recommended Prerelease
 
-The current published prerelease/dev release for new validation is still `v0.1.0-dev.2`.
+The current published prerelease/dev release for new validation is `v0.1.0-dev.3`.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`
+Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
 
 Verified published checksums:
 
 | Artefact | SHA256 |
 | --- | --- |
-| ZIP package | `C7C9E52322EDA140D9AB60F9D8D2BF257EED9EA898F50FC8EFA2D90A04A9BF0B` |
-| Unsigned Inno Setup installer | `01C60DFAA57754EFFCCC763051D5EEDE0DB4E3284936C8BF7D1189D30DCA6C21` |
+| ZIP package | `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9` |
+| Unsigned Inno Setup installer | `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB` |
 
-`v0.1.0-dev.2` is a prerelease/dev release. It is not a production release, stable-channel certification, go-live approval, or a promotion to `main`.
+`v0.1.0-dev.3` is a prerelease/dev release. It is not a production release, stable-channel certification, go-live approval, or a promotion to `main`.
 
-Manual packaged sanity failed for `v0.1.0-dev.2` in Phase 3AV. First-run/onboarding and diagnostics were observed in the real packaged app, and diagnostics reported WebView2/native bridge routing as healthy. However, **Open folder** stayed pending at `Opening folder from Windows...`; no usable native folder picker appeared and no selected/cancelled result returned to the app. Watcher/conflict manual evidence remains blocked by that native picker failure.
+`v0.1.0-dev.3` post-publication verification passed in Phase 3BA for the release tag, prerelease state, expected six-asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
 
-Phase 3AT post-publication verification passed for the release tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke. Phase 3AV did not change release assets, tags, releases, packages, installers, or `main`. No further release asset action is required unless a future release is authorised, but new validation must treat the packaged native folder picker as a known failing manual sanity check for `v0.1.0-dev.2`.
+Manual packaged sanity for Phase 3BA remained `SKIPPED_INTERACTIVE_NATIVE_UI_CONTROL_NOT_EXECUTED`. Phase 3AW remains the current referenced manual packaged sanity/remediation evidence for interactive native UI behaviours, including onboarding, diagnostics, visible native picker selection, cancellation, inactive browser fallback, and watcher changed-on-disk copy after the Open folder pending guidance remediation.
 
-Phase 3AW remediated the native Open folder pending guidance on `develop`, and Phase 3AX froze a local unpublished `v0.1.0-dev.3` candidate bundle at `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3`. That bundle is ready for a later publication approval gate only; it has not been published, tagged, uploaded, or merged to `main`, and it does not supersede `v0.1.0-dev.2` until a separate publication step is explicitly approved and completed.
+No further release asset action is required unless a future release is authorised. `v0.1.0-dev.1` and `v0.1.0-dev.2` assets were not changed by the `v0.1.0-dev.3` publication, verification, or closure evidence.
 
 ## Stale Older Prerelease
 
-The older `v0.1.0-dev.1` prerelease assets are superseded for new validation but preserved historically. The older `v0.1.0-dev` prerelease assets are older/stale relative to `v0.1.0-dev.2`.
+The older `v0.1.0-dev.2` and `v0.1.0-dev.1` prerelease assets are superseded for new validation but preserved historically. The older `v0.1.0-dev` prerelease assets are older/stale relative to `v0.1.0-dev.3`.
 
 In this context, stale means:
 
 - A newer prerelease/dev release exists.
-- New installation, validation, support evidence, and download guidance should use the published `v0.1.0-dev.2` release unless a later prerelease supersedes it.
+- New installation, validation, support evidence, and download guidance should use the published `v0.1.0-dev.3` release unless a later prerelease supersedes it.
 - The older assets may still exist on GitHub for historical traceability.
 - Stale does not mean the older release assets were edited, deleted, replaced, re-uploaded, rebuilt, or republished.
 - Stale does not mean the older release is production-ready, unsafe by definition, or approved for any new support baseline.
 
-Older `v0.1.0-dev.1` and `v0.1.0-dev` assets may be referenced historically when reviewing earlier publication records, comparing prerelease behaviour, investigating a report that explicitly came from an older release, or explaining why later evidence moved to `v0.1.0-dev.2`.
+Older `v0.1.0-dev.2`, `v0.1.0-dev.1`, and `v0.1.0-dev` assets may be referenced historically when reviewing earlier publication records, comparing prerelease behaviour, investigating a report that explicitly came from an older release, or explaining why later evidence moved to `v0.1.0-dev.3`.
 
-Older `v0.1.0-dev.1` and `v0.1.0-dev` assets should not be used for new installation, validation, support evidence, release-candidate certification, or user guidance unless the work is explicitly investigating historical behaviour from those prereleases.
+Older `v0.1.0-dev.2`, `v0.1.0-dev.1`, and `v0.1.0-dev` assets should not be used for new installation, validation, support evidence, release-candidate certification, or user guidance unless the work is explicitly investigating historical behaviour from those prereleases.
+
+## Post-v0.1.0-dev.3 Next Work
+
+- Collect prerelease feedback against `v0.1.0-dev.3`.
+- Monitor Open folder pending guidance feedback.
+- Monitor installer, download, checksum, and runtime-prerequisite issues.
+- Decide the next dev release scope from observed feedback and release-monitoring signals.
+- Keep production readiness and go-live approval as a separate approval gate.
+- Consider support bundle implementation only after explicit approval.
 
 ## Evidence Boundaries
 
