@@ -639,6 +639,9 @@ async function installMockNativeBridge(page, options = {}) {
           }
 
           if (message.type === 'lensDocs.native.openFolder') {
+            if (window.__nativeBridgeScenario.openFolder === 'hanging') {
+              return;
+            }
             if (window.__nativeBridgeScenario.openFolder === 'cancelled') {
               emit(baseResponse(message, 'lensDocs.native.openFolderResult', { cancelled: true }));
               return;
@@ -1734,6 +1737,26 @@ test('first-run welcome explains local onboarding actions without release claims
   await expect(welcome).not.toContainText(/browser fallback/i);
 });
 
+test('welcome Open folder uses the packaged native bridge route without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('.welcome-state').getByRole('button', { name: 'Open folder' }).click();
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+  await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
+});
+
 test('empty file list keeps Open folder first and exposes Diagnostics', async ({ page }) => {
   await gotoApp(page);
 
@@ -2520,6 +2543,34 @@ test('fake WebView2 open folder waits for delayed native picker responses', asyn
   await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
   await expect(page.locator('#fileList [data-path="diagrams/flow.mmd"]')).toBeVisible();
   await expect(page.locator('#status')).not.toHaveText(/Native bridge did not respond/);
+});
+
+test('native open folder pending state shows bounded guidance without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'hanging';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Opening folder from Windows...');
+  await expect(page.locator('#status')).toHaveText(/Still waiting for the Windows folder picker/, { timeout: 7000 });
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).toContainText('pending');
+  await expect(diagnostics).toContainText('Check for a visible Select Folder window');
 });
 
 test('native smoke runner stays dormant when smoke capability is absent', async ({ page }) => {

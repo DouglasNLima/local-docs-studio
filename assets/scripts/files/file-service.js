@@ -12,6 +12,8 @@ const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   // Keep accepting bundles exported before the app was renamed.
   'md-mmd-renderer-bundle.json',
 ]);
+const NATIVE_OPEN_FOLDER_PENDING_NOTICE_MS = 5000;
+const NATIVE_OPEN_FOLDER_PENDING_MESSAGE = 'Still waiting for the Windows folder picker. Check for a visible Select Folder window, then choose a folder or cancel.';
 
 export function createFileService({
   state,
@@ -217,10 +219,17 @@ export function createFileService({
     }
 
     async function openNativeFolder() {
+      let pendingNoticeId = null;
       try {
         updateOpenFolderAttempt('native-picker-opened', 'Native Windows folder picker opened.');
         setStatus('Opening folder from Windows...', 'busy');
+        pendingNoticeId = window.setTimeout?.(() => {
+          updateOpenFolderAttempt('pending', NATIVE_OPEN_FOLDER_PENDING_MESSAGE);
+          setStatus(NATIVE_OPEN_FOLDER_PENDING_MESSAGE, 'warning');
+        }, NATIVE_OPEN_FOLDER_PENDING_NOTICE_MS);
         const result = await nativeBridgeClient.openFolder();
+        clearNativeOpenFolderPendingNotice(pendingNoticeId);
+        pendingNoticeId = null;
         if (!result.ok) {
           const message = getNativeOpenFolderFailureMessage(result);
           updateOpenFolderAttempt(result.reason === 'timeout' ? 'timeout' : 'native-error', message);
@@ -269,6 +278,7 @@ export function createFileService({
         }
         return true;
       } catch (error) {
+        clearNativeOpenFolderPendingNotice(pendingNoticeId);
         updateOpenFolderAttempt('native-error', 'Windows open folder failed safely.');
         setStatus('Windows open folder failed safely.', 'danger');
         console.error(error);
@@ -1119,6 +1129,10 @@ export function createFileService({
     function updateOpenFolderAttempt(status, message = '') {
       openFolderDiagnostics.lastAttempt = status;
       openFolderDiagnostics.lastMessage = getBoundedOpenFolderMessage(message);
+    }
+
+    function clearNativeOpenFolderPendingNotice(timeoutId) {
+      if (timeoutId) window.clearTimeout?.(timeoutId);
     }
 
     function getOpenFolderDiagnostics() {

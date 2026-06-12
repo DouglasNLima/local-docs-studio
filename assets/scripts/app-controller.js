@@ -2681,6 +2681,7 @@ ${unresolvedRows}
         'folder-selected': 'folder selected',
         cancelled: 'user cancelled',
         'native-error': 'native error',
+        pending: 'pending',
         timeout: 'timeout',
         'bridge-unavailable': 'bridge unavailable',
         'capability-missing': 'workspace.openFolder missing',
