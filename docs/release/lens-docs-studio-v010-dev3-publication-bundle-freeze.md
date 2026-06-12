@@ -46,30 +46,32 @@ C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3
 
 This folder is a local frozen candidate only. It was not uploaded, attached to a release, tagged, or published.
 
-| Artefact | Source path | Frozen file | SHA256 |
-| --- | --- | --- | --- |
-| Windows ZIP package | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev.zip` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev.zip` | `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9` |
-| Unsigned Inno Setup installer | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` | `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB` |
-| Installer checksum | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | Contains installer SHA256 above |
-| Installer report | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | References source commit and installer hash above |
-| RC Markdown metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.md` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.md` | References source commit and ZIP hash above |
-| RC JSON metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.json` | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.json` | References source commit and ZIP hash above |
+| Artefact | Frozen bundle file | SHA256 |
+| --- | --- | --- |
+| Windows ZIP package | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev.zip` | `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9` |
+| Unsigned Inno Setup installer | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` | `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB` |
+| Installer checksum | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` | Contains installer SHA256 above |
+| Installer report | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` | References source commit and installer hash above |
+| RC Markdown metadata | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.md` | References source commit and ZIP hash above |
+| RC JSON metadata | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.json` | References source commit and ZIP hash above |
+
+Earlier live artefact locations under `artifacts\windows\`, `artifacts\windows\release-candidates\`, and `artifacts\installers\inno\` were only the source locations copied into this freeze. The frozen bundle paths above are the only Phase 3AX publication handoff paths.
 
 ## Release-Candidate Metadata
 
 | Field | Value |
 | --- | --- |
 | RC build timestamp UTC | `20260612T144833Z` |
-| RC Markdown metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.md` |
-| RC JSON metadata | `C:\Code\MarkdownReader\artifacts\windows\release-candidates\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.json` |
-| Package output folder | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev` |
-| ZIP path | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev.zip` |
+| RC Markdown metadata | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.md` |
+| RC JSON metadata | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-rc-20260612T144833Z.json` |
+| Package output folder recorded by RC metadata | `C:\Code\MarkdownReader\artifacts\windows\LensDocsStudio.Windows-0.1.0-dev` |
+| Frozen ZIP path | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev.zip` |
 | ZIP size | 34054203 bytes |
 | ZIP SHA256 | `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9` |
-| Installer path | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` |
+| Frozen installer path | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe` |
 | Installer SHA256 | `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB` |
-| Installer checksum path | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` |
-| Installer report path | `C:\Code\MarkdownReader\artifacts\installers\inno\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` |
+| Frozen installer checksum path | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup.exe.sha256` |
+| Frozen installer report path | `C:\Code\MarkdownReader\artifacts\windows\publication-bundles\v0.1.0-dev.3\LensDocsStudio.Windows-0.1.0-dev-Setup-report.md` |
 
 ## Frozen File Verification
 
