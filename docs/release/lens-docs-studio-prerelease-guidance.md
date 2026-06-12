@@ -19,9 +19,11 @@ Verified published checksums:
 
 Manual packaged sanity remains blocked for `v0.1.0-dev.2`: the Phase 3AR session could not provide real interactive observation/control of the packaged WebView2 window, onboarding, native folder picker, or watcher/conflict scenario.
 
+Phase 3AT post-publication verification passed for the release tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke. No further release asset action is required unless a future release is authorised.
+
 ## Stale Older Prerelease
 
-The older `v0.1.0-dev.1` and `v0.1.0-dev` prerelease assets are stale/superseded relative to `v0.1.0-dev.2`.
+The older `v0.1.0-dev.1` prerelease assets are superseded for new validation but preserved historically. The older `v0.1.0-dev` prerelease assets are older/stale relative to `v0.1.0-dev.2`.
 
 In this context, stale means:
 

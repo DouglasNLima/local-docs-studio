@@ -2,9 +2,13 @@
 
 Planning date: 2026-06-11
 
+Rebaseline note: Phase 3AU closes `v0.1.0-dev.2` as the current verified prerelease/dev release. This document remains the historical Phase 3AH backlog that led into the `v0.1.0-dev.2` cycle.
+
 ## Status
 
 `v0.1.0-dev.1` is closed as a published, post-publication-verified prerelease/dev release.
+
+`v0.1.0-dev.2` is now published and post-publication verified. Use `docs/release/lens-docs-studio-v010-dev2-release-closure.md` and `docs/release/lens-docs-studio-prerelease-guidance.md` for current prerelease guidance.
 
 Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`
 
@@ -114,10 +118,12 @@ Potential scope, pending separate approval:
 
 ## Planning Gate Verdict
 
-Phase 3AH opens the post-prerelease backlog for the next development cycle. `v0.1.0-dev.1` remains closed, and `v0.1.0-dev.2` remains unapproved until candidate scope is reviewed against real feedback, installer/download monitoring, and the known technical risks above.
+Phase 3AU update: the Phase 3AH backlog has been actioned through the `v0.1.0-dev.2` cycle. `v0.1.0-dev.2` is the current verified prerelease/dev release for new validation; `v0.1.0-dev.1` is superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale. Manual packaged sanity remains `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED`. No further release asset action is required unless a future release is authorised.
+
+Historical Phase 3AH verdict: this document opened the post-prerelease backlog for the next development cycle. At that time, `v0.1.0-dev.1` remained closed and `v0.1.0-dev.2` was unapproved until candidate scope was reviewed against real feedback, installer/download monitoring, and the known technical risks above.
 
 Phase 3AI records that candidate scope in `docs/roadmap/lens-docs-studio-v010-dev2-candidate-scope.md` and records the prerelease feedback intake process in `docs/release/lens-docs-studio-prerelease-feedback-intake.md`. These documents are planning-only and do not approve implementation, release publication, production readiness, or go-live.
 
 Phase 3AJ records implementation readiness in `docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md`, including ordered slices, acceptance gates, validation expectations, evidence requirements, release boundaries, rollback/supersedence considerations, and a ready-to-use first-slice prompt. The recommended first slice is diagnostics visibility polish for native bridge and folder-picker issues.
 
-Phase 3AJ remains planning-only. It does not release `v0.1.0-dev.2`, change runtime code, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+Historical Phase 3AJ note: that readiness plan was planning-only when written. It did not release `v0.1.0-dev.2`, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.

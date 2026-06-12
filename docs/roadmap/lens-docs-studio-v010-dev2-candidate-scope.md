@@ -2,22 +2,30 @@
 
 Planning date: 2026-06-11
 
+Rebaseline note: Phase 3AU closes `v0.1.0-dev.2` as the current verified prerelease/dev release. This document remains the historical Phase 3AI candidate scope that led into the completed `v0.1.0-dev.2` cycle.
+
 ## Status
 
 This document converts the post-`v0.1.0-dev.1` backlog into a candidate scope for a possible `v0.1.0-dev.2` prerelease/dev release.
 
-This is a candidate scope only. It is not an approved release plan, does not authorise implementation, does not authorise package or installer rebuilds, and does not authorise publication.
+Phase 3AU update: the candidate scope has been completed, published, and post-publication verified as `v0.1.0-dev.2`. Current guidance is in `docs/release/lens-docs-studio-v010-dev2-release-closure.md` and `docs/release/lens-docs-studio-prerelease-guidance.md`.
 
-Production readiness, go-live approval, stable-channel certification, promotion to `main`, and any wider release approval remain separate and unclaimed.
+Historical Phase 3AI scope note: when written, this was candidate scope only. It was not yet an approved release plan and did not authorise implementation, package or installer rebuilds, or publication by itself.
+
+Production readiness, go-live approval, stable-channel certification, promotion to `main`, and any wider release approval remain separate and unclaimed after the `v0.1.0-dev.2` publication and closure.
 
 ## Current Baseline
 
-`v0.1.0-dev.1` is the current published prerelease/dev release.
+`v0.1.0-dev.2` is the current verified prerelease/dev release for new validation.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`
+Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`
 
 The baseline evidence records:
 
+- Phase 3AT post-publication verification passed for `v0.1.0-dev.2`, including tag, prerelease state, exact asset set, downloaded hashes, downloaded ZIP smoke, and contained installer smoke.
+- Phase 3AU closed the `v0.1.0-dev.2` evidence chain as documentation-only release closure and roadmap rebaseline.
+- Manual packaged sanity remains `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED`.
+- `v0.1.0-dev.1` is superseded for new validation but preserved historically; `v0.1.0-dev` is older/stale.
 - Stage A packaged diagnostics passed before publication.
 - Stage B packaged watcher/conflict evidence passed before publication.
 - The release was published from the frozen Phase 3AD bundle.
@@ -159,12 +167,14 @@ Phase 3AO records the installer upgrade/uninstall evidence plan in `docs/release
 
 ## Prerelease Guidance Link
 
-Phase 3AP records stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`. It keeps `v0.1.0-dev.1` as the current recommended verified prerelease/dev release for new validation and marks `v0.1.0-dev` as stale/superseded for new installation, validation, and support evidence unless explicitly investigating historical behaviour.
+Phase 3AP records stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`. Phase 3AU rebaselines that guidance so `v0.1.0-dev.2` is the current recommended verified prerelease/dev release for new validation, `v0.1.0-dev.1` is superseded for new validation but preserved historically, and `v0.1.0-dev` is older/stale unless explicitly investigating historical behaviour.
 
 ## Candidate Verdict
 
-`v0.1.0-dev.2` is a candidate planning target only. The next decision is feedback triage and scope approval, not release publication.
+Phase 3AU update: this candidate planning target has been completed and released as `v0.1.0-dev.2`. No further release asset action is required unless a future release is authorised.
 
-`v0.1.0-dev.1` remains the current published prerelease/dev release. No release assets, tags, releases, `main` merges, production readiness claims, or go-live approvals are changed by this planning document.
+Historical Phase 3AI verdict: `v0.1.0-dev.2` was a candidate planning target only at the time this document was created. That planning target has since been completed, published, and verified as a prerelease/dev release.
+
+`v0.1.0-dev.2` is now the current verified prerelease/dev release for new validation. No further release assets, tags, releases, `main` merges, production readiness claims, or go-live approvals are changed by this rebaseline note.
 
 Phase 3AJ follows this candidate scope with `docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md`, an implementation readiness plan that orders candidate slices and recommends diagnostics visibility polish as the first slice. That readiness plan still does not approve `v0.1.0-dev.2` publication, production readiness, go-live approval, release asset changes, tags, releases, or `main` merges.

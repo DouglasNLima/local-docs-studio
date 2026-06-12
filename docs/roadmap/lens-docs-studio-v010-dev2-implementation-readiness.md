@@ -2,22 +2,30 @@
 
 Planning date: 2026-06-11
 
+Rebaseline note: Phase 3AU closes `v0.1.0-dev.2` as the current verified prerelease/dev release. This document remains the historical Phase 3AJ implementation readiness plan for the completed `v0.1.0-dev.2` cycle.
+
 ## Status
 
 This document is the Phase 3AJ implementation readiness gate for a possible `v0.1.0-dev.2` prerelease/dev release.
 
-It converts the Phase 3AI candidate scope into an ordered, reviewable implementation plan. It is not a release approval, does not approve publication, does not authorise package or installer rebuilds by itself, and does not claim production readiness or go-live approval.
+Phase 3AU update: the planned slices were completed, frozen in the Phase 3AR publication bundle, published in Phase 3AS, and post-publication verified in Phase 3AT. Current guidance is in `docs/release/lens-docs-studio-v010-dev2-release-closure.md` and `docs/release/lens-docs-studio-prerelease-guidance.md`.
 
-Production readiness, go-live approval, stable-channel certification, promotion to `main`, tag creation, GitHub Release creation, and release asset changes remain separate and unclaimed.
+Historical Phase 3AJ scope note: this document converted the Phase 3AI candidate scope into an ordered, reviewable implementation plan. It was not a release approval, did not approve publication, did not authorise package or installer rebuilds by itself, and did not claim production readiness or go-live approval.
+
+Production readiness, go-live approval, stable-channel certification, promotion to `main`, and any future tag, GitHub Release, or release asset changes remain separate and unclaimed after the `v0.1.0-dev.2` publication and closure.
 
 ## Current Baseline
 
-`v0.1.0-dev.1` is the current published prerelease/dev release.
+`v0.1.0-dev.2` is the current verified prerelease/dev release for new validation.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`
+Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`
 
 Baseline evidence:
 
+- Phase 3AT post-publication verification passed for `v0.1.0-dev.2`, including tag, prerelease state, exact asset set, downloaded hashes, downloaded ZIP smoke, and contained installer smoke.
+- Phase 3AU closed the `v0.1.0-dev.2` evidence chain as documentation-only release closure and roadmap rebaseline.
+- Manual packaged sanity remains `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED`.
+- `v0.1.0-dev.1` is superseded for new validation but preserved historically; `v0.1.0-dev` is older/stale.
 - Phase 3AA Stage A packaged diagnostics, native picker selection, and Stage B watcher/conflict evidence passed before publication.
 - Phase 3AD froze the authoritative local publication bundle.
 - Phase 3AF post-publication verification passed for the release tag, prerelease state, exact asset set, downloaded ZIP and installer hashes, downloaded ZIP smoke, and contained installer smoke.
@@ -61,9 +69,9 @@ Implementation notes as of 2026-06-11:
 - Phase 3AK implemented the first slice, diagnostics visibility polish for bridge and folder-picker issues, on `develop`.
 - Phase 3AL implements the second slice, first-run/onboarding copy polish, on `develop`.
 - Phase 3AM implements the third slice, watcher/conflict UX copy refinement, on `develop`.
-- Phase 3AN records the fourth slice as design-only optional troubleshooting/support bundle guidance in `docs/architecture/lens-docs-studio-support-bundle-design.md`; implementation is not yet approved.
+- Phase 3AN records the fourth slice as design-only optional troubleshooting/support bundle guidance in `docs/architecture/lens-docs-studio-support-bundle-design.md`; implementation is still not approved without a separate runtime decision.
 - Phase 3AO records the fifth slice as installer upgrade/uninstall evidence planning in `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md`; execution waits for a future `v0.1.0-dev.2` package and installer candidate.
-- Phase 3AP records the sixth slice as stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`; `v0.1.0-dev.1` is the current recommended verified prerelease/dev release, while `v0.1.0-dev` is stale/superseded for new validation.
+- Phase 3AP records the sixth slice as stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`; Phase 3AU rebaselines that guidance so `v0.1.0-dev.2` is the current recommended verified prerelease/dev release, `v0.1.0-dev.1` is superseded for new validation but preserved historically, and `v0.1.0-dev` is stale/superseded for new validation.
 - These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
 
 ## Non-Goals
@@ -460,6 +468,8 @@ Final response must include:
 
 ## Readiness Verdict
 
-Phase 3AJ approves starting the first implementation slice on `develop` with targeted validation. It does not approve `v0.1.0-dev.2` release publication.
+Phase 3AU update: this readiness plan has been actioned through the `v0.1.0-dev.2` cycle. The release is now published and post-publication verified as a prerelease/dev release; manual packaged sanity remains blocked, and no further release asset action is required unless a future release is authorised.
 
-`v0.1.0-dev.1` remains the current published prerelease/dev release. `v0.1.0-dev.2` is not released, not stable/latest, and not production-ready by this document.
+Historical Phase 3AJ verdict: this readiness plan approved starting the first implementation slice on `develop` with targeted validation. It did not approve release publication when written.
+
+`v0.1.0-dev.2` is now released as a verified prerelease/dev release, but it is not stable/latest and is not production-ready by this document or by the Phase 3AU closure.

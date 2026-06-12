@@ -224,17 +224,29 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 ## Implemented Phase 3AP
 
 - `docs/release/lens-docs-studio-prerelease-guidance.md` records stale older prerelease guidance.
-- `v0.1.0-dev.1` is the current recommended verified prerelease/dev release for new installation, validation, support evidence, and download guidance.
-- The older `v0.1.0-dev` assets are stale/superseded relative to `v0.1.0-dev.1`; they remain historical assets and should not be used for new validation unless the work explicitly investigates historical behaviour.
+- `v0.1.0-dev.2` is now the current recommended verified prerelease/dev release for new installation, validation, support evidence, and download guidance.
+- The older `v0.1.0-dev.1` assets are superseded for new validation but preserved as historical release evidence.
+- The older `v0.1.0-dev` assets are stale/superseded relative to `v0.1.0-dev.2`; they remain historical assets and should not be used for new validation unless the work explicitly investigates historical behaviour.
 - Phase 3AP does not change runtime code, rebuild packages or installers, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AU
+
+- `docs/release/lens-docs-studio-v010-dev2-release-closure.md` closes the `v0.1.0-dev.2` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.2` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`.
+- Post-publication verification passed for the release tag, prerelease state, published asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
+- Manual packaged sanity remains `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED` until real interactive packaged-app observation is separately executed.
+- The older `v0.1.0-dev.1` assets remain preserved historical prerelease evidence, and the older `v0.1.0-dev` assets remain stale.
+- No further release asset action is required unless a future release is authorised. Production readiness remains a separate approval gate.
 
 ## Future Roadmap
 
-- Start future `v0.1.0-dev.2` implementation slices from the Phase 3AJ readiness plan only after confirming they still match current prerelease feedback and release monitoring.
+- Collect feedback against `v0.1.0-dev.2` before deciding the next dev release scope.
+- Execute real manual packaged sanity when interactive packaged-app control is available.
+- Monitor installer/download/checksum/runtime-prerequisite issues without changing published release assets.
 - Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.
 - Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
-- Run installer upgrade/uninstall evidence from the Phase 3AO plan only after a future `v0.1.0-dev.2` package and installer candidate exists.
-- Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any broader `v0.1.0-dev.2` implementation or release scope.
+- Run installer upgrade/uninstall evidence from the Phase 3AO plan only when a future installer-affecting release candidate is explicitly authorised.
+- Keep production readiness, go-live approval, stable/latest positioning, signing, and `main` promotion as separate future gates.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
 - Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.
