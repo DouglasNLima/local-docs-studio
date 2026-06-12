@@ -221,9 +221,17 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The plan includes a future ready-to-use execution prompt requiring an explicit source commit, package and installer paths, hashes, temp install paths, no release publication, no user data overwrite, smoke validation, evidence documentation, and docs-only commit/push unless installer defects require a fix.
 - Phase 3AO does not change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
 
+## Implemented Phase 3AP
+
+- `docs/release/lens-docs-studio-prerelease-guidance.md` records stale older prerelease guidance.
+- `v0.1.0-dev.1` is the current recommended verified prerelease/dev release for new installation, validation, support evidence, and download guidance.
+- The older `v0.1.0-dev` assets are stale/superseded relative to `v0.1.0-dev.1`; they remain historical assets and should not be used for new validation unless the work explicitly investigates historical behaviour.
+- Phase 3AP does not change runtime code, rebuild packages or installers, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
 - Start future `v0.1.0-dev.2` implementation slices from the Phase 3AJ readiness plan only after confirming they still match current prerelease feedback and release monitoring.
+- Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.
 - Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
 - Run installer upgrade/uninstall evidence from the Phase 3AO plan only after a future `v0.1.0-dev.2` package and installer candidate exists.
 - Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any broader `v0.1.0-dev.2` implementation or release scope.

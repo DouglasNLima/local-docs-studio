@@ -63,6 +63,7 @@ Implementation notes as of 2026-06-11:
 - Phase 3AM implements the third slice, watcher/conflict UX copy refinement, on `develop`.
 - Phase 3AN records the fourth slice as design-only optional troubleshooting/support bundle guidance in `docs/architecture/lens-docs-studio-support-bundle-design.md`; implementation is not yet approved.
 - Phase 3AO records the fifth slice as installer upgrade/uninstall evidence planning in `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md`; execution waits for a future `v0.1.0-dev.2` package and installer candidate.
+- Phase 3AP records the sixth slice as stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`; `v0.1.0-dev.1` is the current recommended verified prerelease/dev release, while `v0.1.0-dev` is stale/superseded for new validation.
 - These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
 
 ## Non-Goals
@@ -303,7 +304,7 @@ Goal: clarify that `v0.1.0-dev.1` is the preferred verified prerelease/dev relea
 Expected files or areas:
 
 - README release guidance.
-- `docs/release/lens-docs-studio-v0.1.0-dev-known-issues.md`
+- `docs/release/lens-docs-studio-prerelease-guidance.md`
 - Roadmap or release closure notes where cross-links need clarification.
 
 Acceptance criteria:
@@ -316,10 +317,14 @@ Acceptance criteria:
 Validation commands:
 
 - `npm run test:static`
+- `dotnet build src/windows/LensDocsStudio.Windows.sln`
+- `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`
 
 Evidence to collect:
 
 - Static validation result.
+- Windows solution build result.
+- Packaged static asset validation result.
 - Documentation diff summary.
 - Confirmation that release assets, tags, releases, and `main` were untouched.
 

@@ -25,6 +25,7 @@ The baseline evidence records:
 - Phase 3AG closed the release evidence chain without changing runtime code, release assets, tags, releases, or `main`.
 - Phase 3AH opened the post-prerelease backlog without approving next-release scope.
 - Phase 3AO records installer upgrade/uninstall evidence planning for a future installer-affecting `v0.1.0-dev.2` gate. It is planning only and does not rebuild installers, publish release assets, or approve publication.
+- Phase 3AP records stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`. It is documentation/planning only and does not edit older release assets, publish release assets, or approve publication.
 
 ## Already Closed
 
@@ -33,7 +34,7 @@ The baseline evidence records:
 - Downloaded ZIP smoke and contained installer smoke passed.
 - ZIP versus installer positioning is documented.
 - Unsigned installer, external runtime prerequisites, optional/default-safe file associations, and WebView2 user data retention are documented caveats.
-- The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified.
+- The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1`, are superseded for new validation, and were not modified.
 
 ## Candidate Goals
 
@@ -69,7 +70,7 @@ These items are candidates for inclusion if they stay small and are backed by fe
 - Optional troubleshooting/support bundle design covering safe operational metadata, diagnostic status, explicit user consent boundaries, no automatic upload, and strict exclusions for private document content, secrets, tokens, raw stack traces, full private paths, screenshots by default, and unbounded logs.
 - Watcher/conflict UX copy refinement for dirty files, external changes, external deletions, recognised renames, refresh prompts, and recovery wording.
 - Installer upgrade/uninstall evidence planning, now recorded by Phase 3AO in `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md`, including Start Menu shortcut cleanup, optional shortcut cleanup, Lens-owned registry cleanup, WebView2 data retention, silent install/uninstall, upgrade from `v0.1.0-dev.1`, and release asset immutability checks.
-- Stale older prerelease documentation guidance for `v0.1.0-dev`, making clear that `v0.1.0-dev.1` is the preferred verified prerelease/dev release unless a future release supersedes it.
+- Stale older prerelease documentation guidance for `v0.1.0-dev`, now recorded in `docs/release/lens-docs-studio-prerelease-guidance.md`, making clear that `v0.1.0-dev.1` is the preferred verified prerelease/dev release unless a future release supersedes it.
 - Feedback intake templates and triage labels for repeatable prerelease issue handling.
 
 ## Deferred Or Out Of Scope
@@ -155,6 +156,10 @@ Phase 3AN records the optional troubleshooting/support bundle contract in `docs/
 ## Installer Evidence Plan Link
 
 Phase 3AO records the installer upgrade/uninstall evidence plan in `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md`. It is documentation/planning only, does not build or publish installer artefacts, does not change `v0.1.0-dev.1` assets, and does not approve `v0.1.0-dev.2` publication.
+
+## Prerelease Guidance Link
+
+Phase 3AP records stale older prerelease guidance in `docs/release/lens-docs-studio-prerelease-guidance.md`. It keeps `v0.1.0-dev.1` as the current recommended verified prerelease/dev release for new validation and marks `v0.1.0-dev` as stale/superseded for new installation, validation, and support evidence unless explicitly investigating historical behaviour.
 
 ## Candidate Verdict
 
