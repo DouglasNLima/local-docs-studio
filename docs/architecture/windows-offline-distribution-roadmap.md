@@ -214,10 +214,18 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The design excludes document contents, full private paths by default, secrets, tokens, connection strings, raw stack traces, customer data, email addresses, private names from folder paths, unbounded logs, screenshots by default, telemetry upload, and automatic network submission.
 - Phase 3AN does not implement support bundle generation, change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
 
+## Implemented Phase 3AO
+
+- `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md` records the installer upgrade and uninstall evidence plan for any future installer-affecting `v0.1.0-dev.2` publication gate.
+- The plan covers clean and silent install to temp paths, uninstall after install and app launch, upgrade from `v0.1.0-dev.1`, same-version reinstall if supported, shortcut cleanup, Lens-owned file-association cleanup, installed executable native smoke, install-directory residue, WebView2 data retention, release asset immutability checks, and PASS/FAIL/BLOCKED criteria.
+- The plan includes a future ready-to-use execution prompt requiring an explicit source commit, package and installer paths, hashes, temp install paths, no release publication, no user data overwrite, smoke validation, evidence documentation, and docs-only commit/push unless installer defects require a fix.
+- Phase 3AO does not change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
 - Start future `v0.1.0-dev.2` implementation slices from the Phase 3AJ readiness plan only after confirming they still match current prerelease feedback and release monitoring.
 - Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
+- Run installer upgrade/uninstall evidence from the Phase 3AO plan only after a future `v0.1.0-dev.2` package and installer candidate exists.
 - Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any broader `v0.1.0-dev.2` implementation or release scope.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.

@@ -62,6 +62,7 @@ Implementation notes as of 2026-06-11:
 - Phase 3AL implements the second slice, first-run/onboarding copy polish, on `develop`.
 - Phase 3AM implements the third slice, watcher/conflict UX copy refinement, on `develop`.
 - Phase 3AN records the fourth slice as design-only optional troubleshooting/support bundle guidance in `docs/architecture/lens-docs-studio-support-bundle-design.md`; implementation is not yet approved.
+- Phase 3AO records the fifth slice as installer upgrade/uninstall evidence planning in `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md`; execution waits for a future `v0.1.0-dev.2` package and installer candidate.
 - These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
 
 ## Non-Goals
@@ -258,6 +259,8 @@ Out of scope:
 
 Goal: define the evidence required before any future installer-affecting `v0.1.0-dev.2` publication, including upgrade and uninstall behaviour.
 
+Phase 3AO planning note: `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md` defines the future evidence matrix, PASS/FAIL/BLOCKED criteria, temp install path expectations, file association checks, shortcut checks, WebView2 residue expectations, silent install/uninstall checks, rollback/supersedence considerations, and a future execution prompt. This remains planning-only; no installer rebuild or publication is approved by the plan.
+
 Expected files or areas:
 
 - `docs/architecture/windows-offline-distribution-roadmap.md`
@@ -291,6 +294,7 @@ Out of scope:
 - Rebuilding installers.
 - Publishing release assets.
 - Signing, bootstrapping, MSIX, Store, or winget.
+- Editing, deleting, replacing, re-uploading, rebuilding, or republishing `v0.1.0-dev.1` release assets.
 
 ## Slice 6: Stale Older Prerelease Guidance
 
