@@ -47,6 +47,8 @@ Older `v0.1.0-dev.2`, `v0.1.0-dev.1`, and `v0.1.0-dev` assets should not be used
 - Decide the next dev release scope from observed feedback and release-monitoring signals.
 - Keep production readiness and go-live approval as a separate approval gate.
 - Consider support bundle implementation only after explicit approval.
+- Use `docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md` for the post-release backlog.
+- Use `docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md` for candidate planning only; `v0.1.0-dev.4` is not approved and has no committed release date.
 
 ## Evidence Boundaries
 

@@ -247,9 +247,19 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - `v0.1.0-dev.2` and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
 - No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
 
+## Implemented Phase 3BC
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md` records the post-`v0.1.0-dev.3` backlog after release closure.
+- `docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md` records candidate themes for a possible `v0.1.0-dev.4` cycle.
+- `v0.1.0-dev.3` remains the current verified prerelease/dev release for new validation.
+- `v0.1.0-dev.4` is candidate planning only, is not approved, and has no committed release date.
+- Existing release assets remain unchanged, including `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets.
+- No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
+
 ## Future Roadmap
 
 - Collect feedback against `v0.1.0-dev.3` before deciding the next dev release scope.
+- Treat `v0.1.0-dev.4` as candidate planning only until a separate approval defines implementation scope, validation expectations, and any release artefact plan.
 - Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
 - Monitor installer/download/checksum/runtime-prerequisite issues without changing published release assets.
 - Decide the next dev release scope from prerelease feedback and release-monitoring signals.
