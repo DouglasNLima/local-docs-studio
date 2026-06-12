@@ -1423,7 +1423,7 @@ test('File menu starts a blank Markdown document', async ({ page }) => {
   await expect(page.locator('#saveButton')).toBeEnabled();
 
   await page.locator('#editor').fill('# Fresh start\n');
-  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in memory');
+  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in the app');
   await expect(page.locator('#saveButton')).toBeEnabled();
 });
 
@@ -1499,7 +1499,7 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
     window.__mockFs.addedHandle._lastModified += 1000;
     window.dispatchEvent(new Event('focus'));
   });
-  await submitAppDialog(page, { button: 'Reload latest' });
+  await submitAppDialog(page, { button: 'Reload disk version' });
   await expect(page.locator('#editor')).toHaveValue('# Focus reload\n');
 });
 
@@ -2022,7 +2022,7 @@ test('fake WebView2 bridge opens, saves, and saves as native files', async ({ pa
   await expect(page.locator('#status')).toHaveText('native-open.md opened from Windows.');
 
   await page.locator('#editor').fill('# Native Updated\n');
-  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
   await page.locator('#saveButton').click();
 
   await expect(page.locator('#status')).toHaveText('native-open.md saved.');
@@ -2076,7 +2076,7 @@ test('fake WebView2 bridge handles cancelled and malformed native file responses
   });
   await page.locator('#saveAsButton').click();
   await expect(page.locator('#status')).toHaveText('Save as cancelled.');
-  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
 });
 
 test('fake WebView2 bridge opens and saves native workspace folders', async ({ page }) => {
@@ -2106,7 +2106,7 @@ test('fake WebView2 bridge opens and saves native workspace folders', async ({ p
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.locator('#editor').fill('# Native Workspace Updated\n');
-  await expect(page.locator('#activeFileLabel')).toContainText('edited in memory');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
   await page.locator('#saveButton').click();
 
   await expect(page.locator('#status')).toHaveText('README.md saved.');
@@ -2172,11 +2172,11 @@ test('fake WebView2 watcher marks changed native workspace files and refreshes e
     });
   });
 
-  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · changed outside the app');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · changed on disk');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalChanged');
-  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'changed outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'changed on disk');
   await page.locator('#fileList [data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('External change detected. Use Refresh active file to reload.');
+  await expect(page.locator('#status')).toHaveText('This file changed on disk. Use Refresh active file to read the disk version.');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
 
   await page.locator('#refreshFileButton').click();
@@ -2203,7 +2203,7 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace chan
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.locator('#editor').fill('# Local draft\n');
   await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
-  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
 
   await page.evaluate(() => {
     window.__emitNativeWorkspaceChanged({
@@ -2217,12 +2217,12 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace chan
   });
 
   await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
-  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in memory · changed outside the app');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in the app · changed on disk');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
   await expect(page.locator('#fileList [data-path="README.md"] .dirty-dot')).toHaveCount(1);
-  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'Edited in memory and changed outside the app');
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'Edited in the app and changed on disk');
   await page.locator('#fileList [data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('External change detected while local edits exist. Save or refresh explicitly.');
+  await expect(page.locator('#status')).toHaveText('This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.');
 });
 
 test('fake WebView2 watcher confirms before refreshing dirty native workspace conflicts', async ({ page }) => {
@@ -2236,7 +2236,7 @@ test('fake WebView2 watcher confirms before refreshing dirty native workspace co
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.locator('#editor').fill('# Local draft\n');
-  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
 
   await page.evaluate(() => {
     window.__nativeBridgeRefreshContent = '# Native Workspace\n\nExternal version.\n';
@@ -2252,18 +2252,23 @@ test('fake WebView2 watcher confirms before refreshing dirty native workspace co
 
   await page.locator('#refreshFileButton').click();
   await expect(page.locator('#appDialog')).toBeVisible();
-  await expect(page.locator('#appDialogTitle')).toHaveText('Reload Windows file?');
-  await page.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('#appDialogTitle')).toHaveText('Use disk version?');
+  await expect(page.locator('#appDialogMessage')).toHaveText('README.md has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.');
+  await expect(page.getByRole('button', { name: 'Keep app edits' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Use disk version' })).toBeVisible();
+  const dialogCopy = await page.locator('#appDialog').innerText();
+  expect(dialogCopy).not.toMatch(/production|go-live|WebView2|workspaceChanged|dirtyExternalConflict|stack trace/i);
+  await page.getByRole('button', { name: 'Keep app edits' }).click();
   await expect(page.locator('#appDialog')).toBeHidden();
   await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
   await page.locator('#fileList [data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('External change detected while local edits exist. Save or refresh explicitly.');
+  await expect(page.locator('#status')).toHaveText('This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.');
   let refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
   expect(refreshMessages).toHaveLength(0);
 
   await page.locator('#refreshFileButton').click();
-  await submitAppDialog(page, { button: 'Reload file' });
+  await submitAppDialog(page, { button: 'Use disk version' });
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nExternal version.\n');
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
@@ -2294,14 +2299,14 @@ test('fake WebView2 watcher marks deleted active native files without clearing c
   });
 
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
-  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · deleted outside the app');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · deleted on disk');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalDeleted');
   await page.locator('#fileList [data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('File was deleted outside Lens Docs Studio. Local content is preserved in memory.');
+  await expect(page.locator('#status')).toHaveText('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.');
 
   await page.locator('#refreshFileButton').click();
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
-  await expect(page.locator('#status')).toHaveText('File was deleted outside Lens Docs Studio. Local content is preserved in memory.');
+  await expect(page.locator('#status')).toHaveText('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.');
   const refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
   expect(refreshMessages).toHaveLength(0);
 });
@@ -2344,8 +2349,8 @@ test('fake WebView2 watcher reports created and renamed native workspace files s
   });
 
   await expect(page.locator('#fileList')).toContainText('docs/final.md');
-  await expect(page.locator('#activeFileLabel')).toHaveText('docs/final.md · renamed outside the app');
-  await expect(page.locator('#status')).toHaveText('File was renamed outside Lens Docs Studio. Review before saving.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('docs/final.md · renamed on disk');
+  await expect(page.locator('#status')).toHaveText('This file was renamed on disk. Review before saving.');
   await expect(page.locator('#fileList [data-path="docs/final.md"]')).toHaveAttribute('data-file-state', 'externalRenamed');
 });
 
@@ -2360,7 +2365,7 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace rena
   await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
   await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
   await page.locator('#editor').fill('# Dirty before rename\n');
-  await expect(page.locator('#status')).toHaveText('Rendered · edited in memory');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
 
   await page.evaluate(() => {
     window.__emitNativeWorkspaceChanged({
@@ -2375,10 +2380,10 @@ test('fake WebView2 watcher preserves dirty local edits on native workspace rena
   });
 
   await expect(page.locator('#editor')).toHaveValue('# Dirty before rename\n');
-  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in memory · renamed outside the app');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in the app · renamed on disk');
   await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
   await page.locator('#fileList [data-path="README.md"]').click();
-  await expect(page.locator('#status')).toHaveText('File was renamed outside Lens Docs Studio while local edits exist. Review before saving.');
+  await expect(page.locator('#status')).toHaveText('This file was renamed on disk while you have unsaved app edits. Review before saving.');
 });
 
 test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace events', async ({ page }) => {

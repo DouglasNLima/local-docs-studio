@@ -1491,7 +1491,7 @@ export function createFileService({
         setStatus(getNativeWorkspaceChangeStatus(activeDetail, state.dirtyPaths.has(state.activePath)), 'warning');
         return;
       }
-      setStatus(`${marked} workspace file${marked === 1 ? '' : 's'} changed outside the app. Open marked files to review them.`, 'warning');
+      setStatus(`${marked} workspace file${marked === 1 ? '' : 's'} changed on disk. Open marked files to review them.`, 'warning');
     }
 
     function normaliseNativeWorkspaceChange(change) {
@@ -1592,19 +1592,19 @@ export function createFileService({
 
     function getNativeWorkspaceChangeStatus(detail, dirty) {
       if (detail.kind === 'deleted') {
-        return 'File was deleted outside Lens Docs Studio. Local content is preserved in memory.';
+        return 'This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.';
       }
       if (detail.kind === 'renamed') {
         return dirty
-          ? 'File was renamed outside Lens Docs Studio while local edits exist. Review before saving.'
-          : 'File was renamed outside Lens Docs Studio. Review before saving.';
+          ? 'This file was renamed on disk while you have unsaved app edits. Review before saving.'
+          : 'This file was renamed on disk. Review before saving.';
       }
       if (detail.kind === 'created') {
-        return `External file created: ${detail.path}. Use Refresh active file to load it.`;
+        return `${detail.path} was created on disk. Use Refresh active file to read it.`;
       }
       return dirty
-        ? 'External change detected while local edits exist. Save or refresh explicitly.'
-        : 'External change detected. Use Refresh active file to reload.';
+        ? 'This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.'
+        : 'This file changed on disk. Use Refresh active file to read the disk version.';
     }
 
     function showNativeWorkspaceChangeStatus(record) {
@@ -1630,10 +1630,11 @@ export function createFileService({
         setStatus('This document has no linked local file to refresh.', 'warning');
         return;
       }
-      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has in-memory edits. Reload the local file and discard those edits?`, {
-        title: 'Reload local file?',
+      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.`, {
+        title: 'Use disk version?',
         kicker: 'Refresh file',
-        confirmLabel: 'Reload file',
+        confirmLabel: 'Use disk version',
+        cancelLabel: 'Keep app edits',
         danger: true,
       })) {
         return;
@@ -1645,14 +1646,15 @@ export function createFileService({
     async function refreshNativeWorkspaceFile(record) {
       const detail = state.externalChangeDetails?.get(record.path);
       if (detail?.kind === 'deleted') {
-        setStatus('File was deleted outside Lens Docs Studio. Local content is preserved in memory.', 'warning');
+        setStatus('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.', 'warning');
         return;
       }
 
-      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has in-memory edits. Reload the Windows workspace file and discard those edits?`, {
-        title: 'Reload Windows file?',
+      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.`, {
+        title: 'Use disk version?',
         kicker: 'Refresh file',
-        confirmLabel: 'Reload file',
+        confirmLabel: 'Use disk version',
+        cancelLabel: 'Keep app edits',
         danger: true,
       })) {
         showNativeWorkspaceChangeStatus(record);
@@ -1660,7 +1662,7 @@ export function createFileService({
       }
 
       try {
-        setStatus(`Refreshing ${record.name} from Windows workspace...`, 'busy');
+        setStatus(`Refreshing ${record.name} from disk...`, 'busy');
         const result = await nativeBridgeClient.refreshWorkspaceFile({
           nativeWorkspaceId: state.nativeWorkspaceId,
           nativeHandleId: record.nativeHandleId,
@@ -1678,7 +1680,7 @@ export function createFileService({
           return;
         }
 
-        await reloadRecordFromNativePayload(record, payload, { status: `${record.name} refreshed from the Windows workspace.` });
+        await reloadRecordFromNativePayload(record, payload, { status: `${record.name} refreshed from disk.` });
       } catch (error) {
         setStatus('Could not refresh the Windows workspace file.', 'danger');
         console.error(error);
@@ -1709,7 +1711,7 @@ export function createFileService({
       if (changed) {
         renderFileList();
         updateActiveFileLabel();
-        setStatus(`${changed} workspace file${changed === 1 ? '' : 's'} changed outside the app. Open a marked file to review it.`, 'warning');
+        setStatus(`${changed} workspace file${changed === 1 ? '' : 's'} changed on disk. Open a marked file to review it.`, 'warning');
       }
     }
 
@@ -1746,11 +1748,12 @@ export function createFileService({
 
       const dirty = state.dirtyPaths.has(record.path);
       const reload = await confirmAction(dirty
-        ? `${record.name} changed outside the app. Reload the local file and discard your in-memory edits? Choose Cancel to keep your local edits.`
-        : `${record.name} changed outside the app. Reload the latest version?`, {
-        title: 'External change detected',
+        ? `${record.name} changed on disk while you have unsaved app edits. Reloading will replace the app version with the disk version. Choose Keep app edits to continue editing here.`
+        : `${record.name} changed on disk. Reload the disk version?`, {
+        title: 'File changed on disk',
         kicker: 'Local file changed',
-        confirmLabel: dirty ? 'Reload and discard edits' : 'Reload latest',
+        confirmLabel: dirty ? 'Use disk version' : 'Reload disk version',
+        cancelLabel: dirty ? 'Keep app edits' : 'Cancel',
         danger: dirty,
       });
 
@@ -1761,7 +1764,7 @@ export function createFileService({
 
       renderFileList();
       updateActiveFileLabel();
-      setStatus(`${record.name} changed outside the app. Keeping the in-memory version for now.`, 'warning');
+      setStatus(`${record.name} changed on disk. Keeping the app version for now.`, 'warning');
       return 'kept';
     }
 

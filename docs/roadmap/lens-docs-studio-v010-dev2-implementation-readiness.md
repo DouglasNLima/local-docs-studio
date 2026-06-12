@@ -60,6 +60,7 @@ Implementation notes as of 2026-06-11:
 
 - Phase 3AK implemented the first slice, diagnostics visibility polish for bridge and folder-picker issues, on `develop`.
 - Phase 3AL implements the second slice, first-run/onboarding copy polish, on `develop`.
+- Phase 3AM implements the third slice, watcher/conflict UX copy refinement, on `develop`.
 - These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
 
 ## Non-Goals

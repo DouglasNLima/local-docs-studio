@@ -197,7 +197,7 @@ export function createUiService({
         if (dirty) {
           const dirtyMarker = document.createElement('span');
           dirtyMarker.className = 'dirty-dot';
-          dirtyMarker.title = 'Edited in memory';
+          dirtyMarker.title = 'Edited in the app';
           markers.appendChild(dirtyMarker);
         }
         const external = document.createElement('span');
@@ -211,7 +211,7 @@ export function createUiService({
       if (dirty) {
         const dirty = document.createElement('span');
         dirty.className = 'dirty-dot';
-        dirty.title = 'Edited in memory';
+        dirty.title = 'Edited in the app';
         button.appendChild(dirty);
         return;
       }
@@ -305,7 +305,7 @@ export function createUiService({
 
     function updateActiveFileLabel() {
       const record = state.files.find((item) => item.path === state.activePath);
-      const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in memory' : '';
+      const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in the app' : '';
       const detail = state.activePath ? state.externalChangeDetails?.get(state.activePath) : null;
       const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ` · ${getExternalChangeLabel(detail)}` : '';
       const readOnly = record?.readOnly ? ' · read-only' : '';
@@ -347,11 +347,11 @@ export function createUiService({
     }
 
     function getExternalChangeTitle(file, detail) {
-      const dirtyPrefix = state.dirtyPaths.has(file.path) ? 'Edited in memory and ' : '';
-      if (detail?.kind === 'deleted') return `${dirtyPrefix}deleted outside the app`;
-      if (detail?.kind === 'renamed') return `${dirtyPrefix}renamed outside the app`;
-      if (detail?.kind === 'created') return 'Created outside the app';
-      return `${dirtyPrefix}changed outside the app`;
+      const dirtyPrefix = state.dirtyPaths.has(file.path) ? 'Edited in the app and ' : '';
+      if (detail?.kind === 'deleted') return `${dirtyPrefix}deleted on disk`;
+      if (detail?.kind === 'renamed') return `${dirtyPrefix}renamed on disk`;
+      if (detail?.kind === 'created') return 'Created on disk';
+      return `${dirtyPrefix}changed on disk`;
     }
 
     function getExternalChangeKind(detail) {
@@ -362,10 +362,10 @@ export function createUiService({
     }
 
     function getExternalChangeLabel(detail) {
-      if (detail?.kind === 'deleted') return 'deleted outside the app';
-      if (detail?.kind === 'renamed') return 'renamed outside the app';
-      if (detail?.kind === 'created') return 'created outside the app';
-      return 'changed outside the app';
+      if (detail?.kind === 'deleted') return 'deleted on disk';
+      if (detail?.kind === 'renamed') return 'renamed on disk';
+      if (detail?.kind === 'created') return 'created on disk';
+      return 'changed on disk';
     }
 
     function hasUnsavedChanges() {

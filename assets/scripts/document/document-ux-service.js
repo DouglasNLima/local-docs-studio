@@ -447,7 +447,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
     if (state.files.length > 1 && state.dirtyPaths.size) {
       alerts.push({
-        message: `${state.dirtyPaths.size} file${state.dirtyPaths.size === 1 ? '' : 's'} edited in memory.`,
+        message: `${state.dirtyPaths.size} file${state.dirtyPaths.size === 1 ? '' : 's'} edited in the app.`,
         tone: 'info',
       });
     }

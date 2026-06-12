@@ -761,3 +761,16 @@ Phase 3AB did not repeat the interactive packaged diagnostics and watcher/confli
 No blocked Stage A or Stage B evidence remains for the Phase 3AA/3AB artefact baseline. Phase 3AB is an artefact rebaseline and validation checkpoint, not a new manual watcher/conflict pass.
 
 No runtime code changed during Phase 3AB. Browser folder/file-input fallback was not re-enabled while the native WebView2 bridge is present. No production readiness or go-live claim is made. No GitHub release assets, releases, tags, or `main` merges were created, updated, uploaded, deleted, replaced, or changed during Phase 3AB.
+
+## Phase 3AM - Copy Refinement Note
+
+Phase 3AM refines watcher/conflict copy for future `v0.1.0-dev.2` builds. The Phase 3AA/3AB rows above remain historical evidence for the published `v0.1.0-dev.1` baseline and should not be rewritten as if the old manual pass observed the new strings.
+
+New app copy uses "changed on disk", "edited in the app", **Keep app edits**, and **Use disk version** to clarify the same behaviours:
+
+- Clean changed files still reload only through explicit refresh.
+- Dirty conflict cancel still keeps current unsaved app edits.
+- Dirty conflict confirm still accepts the disk version through refresh.
+- Deleted-file guidance still preserves current app content instead of silently clearing the editor.
+
+Phase 3AM does not change watcher/conflict semantics, does not re-enable browser fallback while the native WebView2 bridge is present, and does not change `v0.1.0-dev.1` release assets, tags, releases, or `main`.
