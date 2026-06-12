@@ -4,7 +4,7 @@ Planning date: 2026-06-12
 
 ## Status
 
-This document is the Phase 3BD implementation readiness gate for a possible `v0.1.0-dev.4` prerelease/dev release.
+This document is the Phase 3BD implementation readiness gate for a possible `v0.1.0-dev.4` prerelease/dev release. Phase 3BF later adds the manual packaged sanity helper design in `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` as planning only.
 
 It converts the Phase 3BC candidate scope into an ordered, reviewable implementation plan with explicit slices, acceptance gates, validation expectations, evidence requirements, and release boundaries.
 
@@ -140,6 +140,8 @@ Out of scope:
 - Release publication, package rebuilds, installer rebuilds, asset replacement, tags, releases, `main` merges, production readiness, or go-live.
 
 ## Slice 2: Manual Packaged Sanity Helper/Design
+
+Phase 3BF design status: `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` now defines the safe manual packaged sanity helper/checklist approach. No helper script, runtime product shortcut, package rebuild, installer rebuild, release asset change, tag, release, `main` merge, production readiness, or go-live approval was added.
 
 Goal: design or implement helper guidance for repeatable manual packaged sanity evidence without bypassing real native picker observation.
 
@@ -358,6 +360,14 @@ For Phase 3BD itself, run:
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`
 
 Browser tests, package rebuilds, installer rebuilds, release commands, tag commands, asset uploads, and manual smoke are intentionally skipped for Phase 3BD because the work is documentation/planning only and does not change runtime code or release artefacts.
+
+For Phase 3BF planning-only helper design, run the same documentation-oriented validation:
+
+- `npm run test:static`
+- `dotnet build src/windows/LensDocsStudio.Windows.sln`
+- `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1`
+
+Browser tests, package rebuilds, installer rebuilds, release commands, tag commands, asset uploads, and manual smoke are intentionally skipped for Phase 3BF because it adds only planning documentation and no runtime/helper implementation.
 
 ## Evidence Requirements
 
