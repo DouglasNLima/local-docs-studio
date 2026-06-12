@@ -207,9 +207,17 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The readiness plan records acceptance gates, validation expectations, evidence requirements, release artefact boundaries, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
 - Phase 3AJ is planning-only. It does not change runtime code, approve release publication, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
 
+## Implemented Phase 3AN
+
+- `docs/architecture/lens-docs-studio-support-bundle-design.md` records a design-only contract for a possible future troubleshooting/support bundle.
+- The design allows only safe operational metadata such as app version, source commit when available, packaged/native mode, WebView2 shell detection, bridge ping state, `workspace.openFolder` capability state, route decision, browser fallback state, last Open folder attempt state, bounded native error categories, watcher/conflict event categories, selected workspace presence, safe runtime categories, and manually attached validation summaries.
+- The design excludes document contents, full private paths by default, secrets, tokens, connection strings, raw stack traces, customer data, email addresses, private names from folder paths, unbounded logs, screenshots by default, telemetry upload, and automatic network submission.
+- Phase 3AN does not implement support bundle generation, change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
 ## Future Roadmap
 
-- Start the first `v0.1.0-dev.2` implementation slice from the Phase 3AJ readiness plan only after confirming it still matches current prerelease feedback and release monitoring.
+- Start future `v0.1.0-dev.2` implementation slices from the Phase 3AJ readiness plan only after confirming they still match current prerelease feedback and release monitoring.
+- Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
 - Triage `v0.1.0-dev.1` feedback against the Phase 3AI candidate scope before approving any broader `v0.1.0-dev.2` implementation or release scope.
 - MSIX versus classic installer spike for offline distribution.
 - Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.

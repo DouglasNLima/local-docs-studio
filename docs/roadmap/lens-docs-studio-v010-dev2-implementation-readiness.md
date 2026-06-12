@@ -61,6 +61,7 @@ Implementation notes as of 2026-06-11:
 - Phase 3AK implemented the first slice, diagnostics visibility polish for bridge and folder-picker issues, on `develop`.
 - Phase 3AL implements the second slice, first-run/onboarding copy polish, on `develop`.
 - Phase 3AM implements the third slice, watcher/conflict UX copy refinement, on `develop`.
+- Phase 3AN records the fourth slice as design-only optional troubleshooting/support bundle guidance in `docs/architecture/lens-docs-studio-support-bundle-design.md`; implementation is not yet approved.
 - These implementation slices do not approve `v0.1.0-dev.2` publication, package upload, installer upload, tag creation, release creation, or a merge to `main`.
 
 ## Non-Goals
@@ -216,6 +217,8 @@ Out of scope:
 
 Goal: design an opt-in troubleshooting/support bundle that captures safe diagnostics by default and makes sensitive content boundaries explicit before any implementation.
 
+Phase 3AN design note: `docs/architecture/lens-docs-studio-support-bundle-design.md` defines the proposed support bundle contract, safe contents, exclusions, user consent model, future UX flow, validation expectations, release boundaries, and a future implementation prompt. This remains design-only; runtime support bundle generation is not approved by the design document alone.
+
 Expected files or areas:
 
 - New or updated planning documentation under `docs/architecture/` or `docs/release/`.
@@ -249,6 +252,7 @@ Out of scope:
 - Runtime support bundle export implementation.
 - Uploads, telemetry, external services, or accounts.
 - Automatic evidence-level inference for artefact metadata.
+- Release asset changes, tag creation, release creation, `main` merges, production readiness, or go-live approval.
 
 ## Slice 5: Installer Upgrade/Uninstall Evidence Planning
 

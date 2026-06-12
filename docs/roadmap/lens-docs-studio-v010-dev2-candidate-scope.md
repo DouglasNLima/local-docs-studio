@@ -65,7 +65,7 @@ These items are candidates for inclusion if they stay small and are backed by fe
 
 - First-run/onboarding copy polish for prerequisites, ZIP versus installer selection, setup wizard recovery, and where to find the local feature guide.
 - Diagnostics copy and status-message improvements for native bridge, folder-picker, packaged-origin, WebView2 runtime, and unsupported browser-mode paths.
-- Optional troubleshooting/support bundle design covering safe metadata, selected logs, checksum output, diagnostic status, and explicit user consent boundaries.
+- Optional troubleshooting/support bundle design covering safe operational metadata, diagnostic status, explicit user consent boundaries, no automatic upload, and strict exclusions for private document content, secrets, tokens, raw stack traces, full private paths, screenshots by default, and unbounded logs.
 - Watcher/conflict UX copy refinement for dirty files, external changes, external deletions, recognised renames, refresh prompts, and recovery wording.
 - Installer upgrade/uninstall evidence planning, including Start Menu shortcut cleanup, optional shortcut cleanup, Lens-owned registry cleanup, WebView2 data retention, and prerequisite failure observations.
 - Stale older prerelease documentation guidance for `v0.1.0-dev`, making clear that `v0.1.0-dev.1` is the preferred verified prerelease/dev release unless a future release supersedes it.
@@ -146,6 +146,10 @@ If a later phase approves `v0.1.0-dev.2` publication, it must define:
 ## Feedback Intake Link
 
 Use `docs/release/lens-docs-studio-prerelease-feedback-intake.md` for `v0.1.0-dev.1` feedback collection and triage before deciding whether this candidate scope should become an approved `v0.1.0-dev.2` implementation plan.
+
+## Support Bundle Design Link
+
+Phase 3AN records the optional troubleshooting/support bundle contract in `docs/architecture/lens-docs-studio-support-bundle-design.md`. It is design-only, does not implement bundle generation, does not approve a release, does not change runtime code, and does not change release assets, tags, releases, or `main`.
 
 ## Candidate Verdict
 
