@@ -185,6 +185,9 @@ export const domIds = {
   windowsShellDiagnosticsBody: 'windowsShellDiagnosticsBody',
   windowsShellDiagnosticsCloseButton: 'windowsShellDiagnosticsCloseButton',
   windowsShellDiagnosticsRetryButton: 'windowsShellDiagnosticsRetryButton',
+  windowsShellDiagnosticsCreateBundleButton: 'windowsShellDiagnosticsCreateBundleButton',
+  windowsShellDiagnosticsCopyBundleButton: 'windowsShellDiagnosticsCopyBundleButton',
+  windowsShellDiagnosticsExportBundleButton: 'windowsShellDiagnosticsExportBundleButton',
   windowsShellDiagnosticsDoneButton: 'windowsShellDiagnosticsDoneButton',
 };
 

@@ -111,6 +111,8 @@ Use **View > Manage assets** to preview session images, rename paths across edit
 
 The app runs in the browser. Files stay local unless you save, export, copy, or import a new bundle. There is no backend or account system.
 
+Use **Help > Windows shell diagnostics > Create support bundle** when you need a local troubleshooting summary for bridge, Open folder, or watcher issues. The app shows an inspectable JSON preview before copy or export. The bundle is local, you choose whether to share it, and no automatic upload occurs. It includes safe operational metadata only, such as app version/build, runtime category, bridge capability state, Open folder route/attempt state, selected workspace presence, count buckets, and watcher event category/timestamp. It does not include document contents, imported ZIP contents, full private paths, secrets, tokens, connection strings, emails, raw stack traces, screenshots, browser storage, or WebView2 user data.
+
 Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.
 
 Future compatible producers should follow `docs/integration/lens-artifact-bundle-producer-guide.md`. Release candidates should follow `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.

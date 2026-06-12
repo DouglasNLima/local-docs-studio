@@ -5170,6 +5170,21 @@ label.file-button.primary,
   line-height: 1.5;
 }
 
+.support-bundle-preview {
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: .6rem;
+  padding: .75rem;
+  background: var(--editor-bg);
+  color: var(--text);
+  font-size: .78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .workspace-search-result {
   display: grid;
   justify-items: start;

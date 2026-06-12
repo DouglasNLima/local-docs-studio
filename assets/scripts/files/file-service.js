@@ -267,6 +267,7 @@ export function createFileService({
         });
 
         const skipped = Array.isArray(payload.skipped) ? payload.skipped : [];
+        state.lastSkippedFileCount = skipped.length;
         if (skipped.length) {
           updateOpenFolderAttempt('folder-selected', `${records.length} Windows workspace file${records.length === 1 ? '' : 's'} loaded; skipped files reported.`);
           setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows. ${skipped.length} file${skipped.length === 1 ? '' : 's'} skipped by workspace limits.`, 'warning');
@@ -528,6 +529,7 @@ export function createFileService({
     async function setLibraryFromRecords(records, folderName, options = {}) {
       clearFocusedModes();
       clearManagedAssets?.();
+      state.lastSkippedFileCount = null;
       const uniqueRecords = uniqueByPath(records)
         .filter((record) => isSupportedFile(record.name))
         .map(prepareRecord)
@@ -1583,7 +1585,10 @@ export function createFileService({
 
     function markExternalChange(path, detail) {
       state.externalChangePaths?.add(path);
-      state.externalChangeDetails?.set(path, detail);
+      state.externalChangeDetails?.set(path, {
+        ...detail,
+        receivedAtUtc: new Date().toISOString(),
+      });
     }
 
     function clearExternalChange(path) {

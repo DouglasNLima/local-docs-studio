@@ -2528,6 +2528,139 @@ test('native open folder error copy is bounded and redacts local paths', async (
   await expect(diagnostics).not.toContainText('C:\\Users\\person');
 });
 
+test('support bundle builder redacts unsafe diagnostic text and excludes private content classes', async ({ page }) => {
+  await gotoApp(page);
+
+  const result = await page.evaluate(async () => {
+    const { createSupportBundle } = await import('/assets/scripts/ui/support-bundle-service.js');
+    return createSupportBundle({
+      generatedAtUtc: '2026-06-12T10:00:00.000Z',
+      app: { appVersion: '0.1.0', appBuild: '58', sourceCommit: 'not-a-real-commit with user@example.com' },
+      environment: {
+        runtimeMode: 'windows-shell-packaged',
+        packagedNativeMode: 'yes',
+        webView2ShellDetected: 'yes',
+        appOriginCategory: 'packaged-virtual-host',
+        platformCategory: 'windows',
+        browserEngine: 'edge',
+      },
+      diagnostics: {
+        bridgeMessageHandlerRegistered: true,
+        bridgePingState: 'pass',
+        protocolVersion: '1',
+        host: 'LensDocsStudio.Windows',
+        capabilities: ['diagnostics.ping', 'workspace.openFolder', 'smoke.nativeFixtures'],
+        lastNativeRequestType: 'lensDocs.native.openFolder',
+        lastNativeResponseType: 'lensDocs.native.error',
+        nativeErrorCategory: 'host-error',
+        nativeErrorMessage: 'Failed at C:\\Users\\alice\\Private\\Workspace\\secret.md for alice@example.com token=abc123 connectionString=Server=private\n   at Native.Service(C:\\Users\\alice\\source\\file.cs:42) because details '.repeat(8),
+      },
+      openFolder: {
+        routeDecision: 'native-bridge',
+        workspaceOpenFolderCapability: 'available',
+        browserFallbackState: 'inactive-in-packaged-webview2',
+        lastAttemptState: 'native-error',
+        lastAttemptDetail: '# Private Document\n\nDo not include this Markdown. api_key=hidden C:\\Users\\alice\\Docs',
+        selectedWorkspacePresent: 'yes',
+        workspaceKind: 'native-folder',
+        supportedFileCount: 42,
+        skippedFileCount: 1,
+        activeFileState: 'dirty-external-conflict',
+      },
+      watcher: {
+        lastEventCategory: 'changed',
+        lastEventAtUtc: '2026-06-12T09:59:00.000Z',
+        relativePathOnly: 'yes',
+        dirtyConflictState: 'present',
+      },
+    });
+  });
+
+  expect(result.filename).toBe('lens-docs-studio-support-bundle-20260612T100000Z.json');
+  expect(result.bundle.schemaVersion).toBe(1);
+  expect(result.bundle.privacy.documentContentIncluded).toBe('no');
+  expect(result.bundle.privacy.screenshotsIncluded).toBe('no');
+  expect(result.bundle.privacy.automaticUpload).toBe('no');
+  expect(result.bundle.privacy.telemetry).toBe('no');
+  expect(result.bundle.openFolder.workspacePathIncluded).toBe('no');
+  expect(result.bundle.diagnostics.capabilities['workspace.openFolder']).toBe('available');
+  expect(result.bundle.diagnostics.capabilities).not.toHaveProperty('smoke.nativeFixtures');
+  expect(result.bundle.diagnostics.nativeErrorMessage.length).toBeLessThanOrEqual(160);
+  expect(result.json).toContain('[redacted-path]');
+  expect(result.json).toContain('[redacted-email]');
+  expect(result.json).toContain('[redacted-secret]');
+  expect(result.json).not.toMatch(/C:\\Users\\alice|alice@example\.com|abc123|Server=private|source\\file\.cs|# Private Document|Do not include this Markdown|api_key=hidden|stack trace/i);
+  expect(result.json).not.toContain('lens-artifact-bundle.json');
+});
+
+test('Diagnostics support bundle is visible and requires explicit user action', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('Support bundle');
+  await expect(diagnostics).toContainText('Create a local support bundle preview');
+  await expect(diagnostics).toContainText('Nothing is uploaded automatically');
+  await expect(page.getByRole('button', { name: 'Create support bundle' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Copy summary' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Export local JSON' })).toBeDisabled();
+  await expect(diagnostics.locator('.support-bundle-preview')).toHaveCount(0);
+
+  const messagesBefore = await page.evaluate(() => window.__nativeBridgeMessages.length);
+  await page.waitForTimeout(100);
+  const messagesAfter = await page.evaluate(() => window.__nativeBridgeMessages.length);
+  expect(messagesAfter).toBe(messagesBefore);
+});
+
+test('Diagnostics support bundle preview and local export contain only safe fields', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+    window.__nativeBridgeScenario.openFolderErrorMessage = 'Picker failed for C:\\Users\\casey\\Private\\Workspace with password=hunter2\n   at Native.Service(C:\\Users\\casey\\file.cs:42)';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toContainText('[local path]');
+
+  await page.locator('#editor').fill('# Secret Draft\n\napi_key=local-document-secret\n');
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  await page.getByRole('button', { name: 'Create support bundle' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('.support-bundle-preview')).toBeVisible();
+  await expect(diagnostics).toContainText('Support bundle preview');
+  await expect(diagnostics).toContainText('Workspace path included');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Workspace path included' })).toContainText('no');
+  await expect(page.getByRole('button', { name: 'Copy summary' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Export local JSON' })).toBeEnabled();
+
+  const previewText = await diagnostics.locator('.support-bundle-preview').textContent();
+  const bundle = JSON.parse(previewText);
+  expect(bundle.schemaVersion).toBe(1);
+  expect(bundle.app.name).toBe('Lens Docs Studio');
+  expect(bundle.environment.runtimeMode).toBe('windows-shell-development');
+  expect(bundle.diagnostics.bridgePingState).toBe('pass');
+  expect(bundle.openFolder.lastAttemptState).toBe('native-error');
+  expect(bundle.openFolder.workspacePathIncluded).toBe('no');
+  expect(bundle.privacy.automaticUpload).toBe('no');
+  expect(bundle.privacy.documentContentIncluded).toBe('no');
+  expect(bundle.privacy.secretsTokensConnectionStringsIncluded).toBe('no');
+  expect(bundle.privacy.rawStackTracesIncluded).toBe('no');
+  expect(previewText).not.toMatch(/Secret Draft|local-document-secret|C:\\Users\\casey|hunter2|file\.cs|at Native\.Service|lens-artifact-bundle\.json/i);
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export local JSON' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^lens-docs-studio-support-bundle-\d{8}T\d{6}Z\.json$/);
+  await expect(page.locator('#status')).toHaveText('Support bundle JSON exported locally. No upload was started.');
+});
+
 test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {
   await installMockNativeBridge(page);
   await gotoApp(page);

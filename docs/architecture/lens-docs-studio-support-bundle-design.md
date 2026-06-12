@@ -4,9 +4,11 @@ Design date: 2026-06-12
 
 ## Status
 
-Phase 3AN is a design-only gate for a possible future troubleshooting/support bundle.
+Phase 3AN was the design-only gate for a possible future troubleshooting/support bundle.
 
 This document does not approve implementation, does not change runtime code, does not authorise package or installer rebuilds, does not change release assets, does not create tags or releases, does not merge to `main`, and does not claim production readiness or go-live approval.
+
+Phase 3BE implements the first approved slice on `develop`: explicit-user-action Diagnostics support bundle generation with local JSON preview, copy summary, and export. See `docs/release/phase-3be-support-bundle-implementation.md` for implementation evidence and validation. This does not approve release publication, package or installer publication, release asset changes, tags, `main` merges, production readiness, or go-live.
 
 ## Purpose
 

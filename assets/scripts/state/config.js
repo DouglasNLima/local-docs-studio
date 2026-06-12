@@ -90,6 +90,7 @@ export function createInitialState({ readStoredNumber }) {
     managedAssets: new Map(),
     managedAssetCounter: 0,
     artifactBundle: null,
+    lastSkippedFileCount: null,
     activeBuiltInExportProfile: '',
     sessionDevopsMarkdownExport: null,
     exportProfileDefaults: null,
