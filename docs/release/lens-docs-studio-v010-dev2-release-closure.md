@@ -52,9 +52,10 @@ Final published checksums:
 | Phase 3AR publication bundle freeze | PASS, frozen bundle source commit `5602358ef241c144fccae13e980c9eb2920126d8`, ZIP SHA256 `C7C9E52322EDA140D9AB60F9D8D2BF257EED9EA898F50FC8EFA2D90A04A9BF0B`, installer SHA256 `01C60DFAA57754EFFCCC763051D5EEDE0DB4E3284936C8BF7D1189D30DCA6C21`. |
 | Phase 3AS publication record | PASS, prerelease was published from the frozen Phase 3AR bundle with the expected six assets. |
 | Phase 3AT post-publication verification | PASS, tag, prerelease state, asset inventory, downloaded checksums, downloaded ZIP smoke, and contained installer smoke passed. |
+| Phase 3AV manual packaged sanity | `PACKAGED_MANUAL_SANITY_FAIL`, first-run/onboarding and diagnostics passed, but **Open folder** remained pending at `Opening folder from Windows...` and no usable native folder picker appeared in the packaged `v0.1.0-dev.2` app. Watcher/conflict checks were blocked by this failure. |
 | Downloaded ZIP smoke | PASS |
 | Installer smoke | PASS |
-| Manual packaged sanity | `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED` |
+| Manual packaged sanity | `PACKAGED_MANUAL_SANITY_FAIL` |
 
 ## Completed Slice Summary
 
@@ -71,7 +72,8 @@ Final published checksums:
 - `v0.1.0-dev.2` is a prerelease/dev release, not a production or stable release.
 - Production readiness and go-live approval are not claimed.
 - No merge to `main` was performed.
-- Manual packaged sanity remains blocked until real interactive packaged WebView2/onboarding/native picker/watcher observation is executed.
+- Manual packaged sanity failed in Phase 3AV: diagnostics passed, but the packaged native **Open folder** action stayed pending without showing a usable native folder picker or returning a selected/cancelled result.
+- Watcher/conflict manual evidence for `v0.1.0-dev.2` remains blocked by the native folder picker failure.
 - The Windows installer remains unsigned and may trigger Windows SmartScreen or browser warnings.
 - Runtime prerequisites remain external: .NET Desktop Runtime, Windows App SDK Runtime, and Evergreen WebView2 Runtime.
 - WebView2 browser-local user data may remain after uninstall; cleanup remains documented-only to avoid silently deleting user/session state.
@@ -81,14 +83,14 @@ Final published checksums:
 
 ## Closure Verdict
 
-`v0.1.0-dev.2` is closed as the current verified prerelease/dev release for new validation. Post-publication verification passed, the published ZIP and installer hashes match the frozen Phase 3AR bundle, downloaded ZIP smoke passed, and installer smoke passed.
+`v0.1.0-dev.2` is closed as the current published prerelease/dev release with post-publication verification complete and Phase 3AV manual packaged sanity failure recorded. The published ZIP and installer hashes match the frozen Phase 3AR bundle, downloaded ZIP smoke passed, and installer smoke passed, but the release must not be treated as having cleared manual packaged sanity.
 
 No further release asset action is required unless a future release is explicitly authorised.
 
 ## Next Work
 
 - Collect prerelease feedback against `v0.1.0-dev.2`.
-- Execute real manual packaged sanity when interactive packaged-app observation and control are available.
+- Investigate the Phase 3AV packaged native folder picker failure before attempting to clear manual packaged sanity in a future authorised package or prerelease.
 - Monitor installer, download, checksum, runtime prerequisite, and unsigned-installer issues.
 - Decide the next dev release scope from observed feedback and release monitoring.
 - Keep production readiness and go-live approval as separate approval gates.

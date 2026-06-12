@@ -17,9 +17,9 @@ Verified published checksums:
 
 `v0.1.0-dev.2` is a prerelease/dev release. It is not a production release, stable-channel certification, go-live approval, or a promotion to `main`.
 
-Manual packaged sanity remains blocked for `v0.1.0-dev.2`: the Phase 3AR session could not provide real interactive observation/control of the packaged WebView2 window, onboarding, native folder picker, or watcher/conflict scenario.
+Manual packaged sanity failed for `v0.1.0-dev.2` in Phase 3AV. First-run/onboarding and diagnostics were observed in the real packaged app, and diagnostics reported WebView2/native bridge routing as healthy. However, **Open folder** stayed pending at `Opening folder from Windows...`; no usable native folder picker appeared and no selected/cancelled result returned to the app. Watcher/conflict manual evidence remains blocked by that native picker failure.
 
-Phase 3AT post-publication verification passed for the release tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke. No further release asset action is required unless a future release is authorised.
+Phase 3AT post-publication verification passed for the release tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke. Phase 3AV did not change release assets, tags, releases, packages, installers, or `main`. No further release asset action is required unless a future release is authorised, but new validation must treat the packaged native folder picker as a known failing manual sanity check for `v0.1.0-dev.2`.
 
 ## Stale Older Prerelease
 
