@@ -13,6 +13,7 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $projectPath = Join-Path $repoRoot 'src\windows\LensDocsStudio.Windows\LensDocsStudio.Windows.csproj'
 $packageJsonPath = Join-Path $repoRoot 'package.json'
 $packageRoot = Join-Path $repoRoot 'artifacts\windows'
+. (Join-Path $PSScriptRoot 'WindowsPackagePayloadHygiene.ps1')
 
 function Write-PackageLine {
     param([string]$Message)
@@ -93,6 +94,13 @@ foreach ($resourceFileName in @('App.xbf', 'MainWindow.xbf', 'LensDocsStudio.Win
     Copy-Item -LiteralPath $resourceSource -Destination $resourceTarget -Force
 }
 
+Write-PackageLine 'Removing runtime-generated WebView2/cache payloads from package output...'
+$removedRuntimePayload = @(Clear-WindowsPackageRuntimePayload -RootPath $outputFolder)
+if ($removedRuntimePayload.Count -gt 0) {
+    Write-PackageLine "Removed $($removedRuntimePayload.Count) blocked runtime payload path(s)."
+}
+Assert-WindowsPackagePayloadClean -RootPath $outputFolder -Context 'Windows package folder'
+
 Write-PackageLine 'Validating packaged static assets...'
 & (Join-Path $PSScriptRoot 'Test-WindowsStaticAssets.ps1') -StaticAppRoot $staticAppRoot
 if ($LASTEXITCODE -ne 0) {
@@ -113,8 +121,10 @@ if (-not $NoSmoke) {
 Write-PackageLine "Creating ZIP $zipPath"
 $packageItems = Get-ChildItem -LiteralPath $outputFolder -Force
 Assert-Package ($packageItems.Count -gt 0) "Package output folder is empty: $outputFolder"
+Assert-WindowsPackagePayloadClean -RootPath $outputFolder -Context 'Windows package folder before ZIP'
 Compress-Archive -LiteralPath $packageItems.FullName -DestinationPath $zipPath -Force
 Assert-Package (Test-Path -LiteralPath $zipPath -PathType Leaf) "ZIP artefact was not created: $zipPath"
+Assert-WindowsPackageZipPayloadClean -ZipPath $zipPath -Context 'Windows package ZIP'
 
 Write-Host ''
 Write-PackageLine 'PASS: Windows folder/ZIP package created.'

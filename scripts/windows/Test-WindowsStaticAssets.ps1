@@ -91,12 +91,27 @@ function Invoke-DryRunScript {
 
 foreach ($scriptName in @(
     'Register-WindowsFileAssociations.ps1',
+    'Unregister-WindowsFileAssociations.ps1',
+    'WindowsPackagePayloadHygiene.ps1',
+    'Test-WindowsPackagePayloadHygiene.ps1'
+)) {
+    $scriptPath = Join-Path $PSScriptRoot $scriptName
+    Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows validation script: $scriptName"
+    Assert-PowerShellScriptParses -Path $scriptPath
+}
+
+foreach ($scriptName in @(
+    'Register-WindowsFileAssociations.ps1',
     'Unregister-WindowsFileAssociations.ps1'
 )) {
     $scriptPath = Join-Path $PSScriptRoot $scriptName
-    Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows file association script: $scriptName"
-    Assert-PowerShellScriptParses -Path $scriptPath
     Invoke-DryRunScript -Name $scriptName -Path $scriptPath
+}
+
+Write-AssetLine 'Validating Windows package payload hygiene guard...'
+& pwsh -NoLogo -NoProfile -File (Join-Path $PSScriptRoot 'Test-WindowsPackagePayloadHygiene.ps1')
+if ($LASTEXITCODE -ne 0) {
+    throw "Windows package payload hygiene guard failed with exit code $LASTEXITCODE."
 }
 
 if ($StaticAppRoot) {

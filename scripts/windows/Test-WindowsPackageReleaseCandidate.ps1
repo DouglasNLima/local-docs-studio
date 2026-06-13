@@ -15,6 +15,7 @@ $packageJsonPath = Join-Path $repoRoot 'package.json'
 $projectPath = Join-Path $repoRoot 'src\windows\LensDocsStudio.Windows\LensDocsStudio.Windows.csproj'
 $packageRoot = Join-Path $repoRoot 'artifacts\windows'
 $reportRoot = Join-Path $packageRoot 'release-candidates'
+. (Join-Path $PSScriptRoot 'WindowsPackagePayloadHygiene.ps1')
 
 function Write-RcLine {
     param([string]$Message)
@@ -193,6 +194,8 @@ Assert-Rc (Test-Path -LiteralPath $outputFolder -PathType Container) "Package ou
 Assert-Rc (Test-Path -LiteralPath $zipPath -PathType Leaf) "Package ZIP was not found: $zipPath"
 Assert-Rc (Test-Path -LiteralPath $staticAppRoot -PathType Container) "Packaged StaticApp folder was not found: $staticAppRoot"
 Assert-Rc (Test-Path -LiteralPath $appExecutablePath -PathType Leaf) "Packaged executable was not found: $appExecutablePath"
+Assert-WindowsPackagePayloadClean -RootPath $outputFolder -Context 'Windows release-candidate package folder'
+Assert-WindowsPackageZipPayloadClean -ZipPath $zipPath -Context 'Windows release-candidate package ZIP'
 
 $steps += Invoke-RcStep -Name 'Validate packaged StaticApp' -CommandText "pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1 -StaticAppRoot `"$staticAppRoot`"" -Command $staticCommand
 $steps += Invoke-RcStep -Name 'Run packaged native bridge smoke' -CommandText "pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -AppExecutablePath `"$appExecutablePath`" -TimeoutSeconds $TimeoutSeconds" -Command $smokeCommand

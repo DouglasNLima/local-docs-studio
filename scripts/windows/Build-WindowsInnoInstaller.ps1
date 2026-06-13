@@ -12,6 +12,7 @@ $repoRoot = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $innoScriptPath = Join-Path $repoRoot 'installer\inno\LensDocsStudio.iss'
 $packageRoot = Join-Path $repoRoot 'artifacts\windows'
 $installerRoot = Join-Path $repoRoot 'artifacts\installers\inno'
+. (Join-Path $PSScriptRoot 'WindowsPackagePayloadHygiene.ps1')
 
 function Write-InnoLine {
     param([string]$Message)
@@ -185,6 +186,7 @@ if (-not $NoPackageBuild) {
 Assert-Inno (Test-Path -LiteralPath $packageFolder -PathType Container) "Windows package folder was not found: $packageFolder"
 Assert-Inno (Test-Path -LiteralPath $appExecutablePath -PathType Leaf) "Packaged executable was not found: $appExecutablePath"
 Assert-Inno (Test-Path -LiteralPath $staticAppRoot -PathType Container) "Packaged StaticApp folder was not found: $staticAppRoot"
+Assert-WindowsPackagePayloadClean -RootPath $packageFolder -Context 'Inno installer package source'
 
 Write-InnoLine 'Validating packaged StaticApp assets...'
 & (Join-Path $PSScriptRoot 'Test-WindowsStaticAssets.ps1') -StaticAppRoot $staticAppRoot
