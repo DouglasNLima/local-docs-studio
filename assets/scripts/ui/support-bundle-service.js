@@ -189,7 +189,7 @@ export function createSupportBundle(input = {}) {
   return {
     bundle,
     json: `${JSON.stringify(bundle, null, 2)}\n`,
-    summaryText: buildSupportBundleSummary(bundle),
+    summaryText: buildDiagnosticsSummary(bundle),
     filename: `lens-docs-studio-support-bundle-${formatBundleTimestamp(generatedAtUtc)}.json`,
   };
 }
@@ -211,21 +211,38 @@ export function redactSupportBundleText(value, limit = TEXT_LIMIT) {
   return compact.length > limit ? `${compact.slice(0, Math.max(0, limit - 3))}...` : compact;
 }
 
-function buildSupportBundleSummary(bundle) {
+function buildDiagnosticsSummary(bundle) {
   return [
-    'Lens Docs Studio support bundle summary',
+    'Lens Docs Studio diagnostics summary',
+    `App version: ${bundle.app.appVersion}`,
+    `App build: ${bundle.app.appBuild}`,
     `Schema version: ${bundle.schemaVersion}`,
     `Generated UTC: ${bundle.generatedAtUtc}`,
     `Runtime mode: ${bundle.environment.runtimeMode}`,
+    `Packaged/native mode: ${bundle.environment.packagedNativeMode}`,
     `WebView2 shell detected: ${bundle.environment.webView2ShellDetected}`,
     `Bridge ping state: ${bundle.diagnostics.bridgePingState}`,
     `workspace.openFolder capability: ${bundle.openFolder.workspaceOpenFolderCapability}`,
     `Open folder route: ${bundle.openFolder.routeDecision}`,
+    `Browser fallback state: ${bundle.openFolder.browserFallbackState}`,
     `Last Open folder attempt: ${bundle.openFolder.lastAttemptState}`,
-    `Selected workspace present: ${bundle.openFolder.selectedWorkspacePresent}`,
     `Watcher last event: ${bundle.watcher.lastEventCategory}`,
+    `Watcher timestamp bucket: ${timestampBucket(bundle.watcher.lastEventAtUtc, bundle.generatedAtUtc)}`,
     'Privacy: local bundle only; no automatic upload; no document content, full private paths, secrets, tokens, connection strings, raw stack traces, screenshots, browser storage, or WebView2 user data included.',
   ].join('\n');
+}
+
+function timestampBucket(value, generatedAtUtc) {
+  if (!value || value === 'not recorded') return 'not recorded';
+  const eventDate = new Date(value);
+  const generatedDate = new Date(generatedAtUtc);
+  if (Number.isNaN(eventDate.getTime()) || Number.isNaN(generatedDate.getTime())) return 'unknown';
+  const deltaMs = generatedDate.getTime() - eventDate.getTime();
+  if (deltaMs < 0) return 'future-or-clock-skew';
+  if (deltaMs <= 60_000) return 'within-1-minute';
+  if (deltaMs <= 3_600_000) return 'within-1-hour';
+  if (deltaMs <= 86_400_000) return 'within-1-day';
+  return 'older-than-1-day';
 }
 
 function normaliseCapabilities(capabilities) {

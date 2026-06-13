@@ -2586,9 +2586,16 @@ test('support bundle builder redacts unsafe diagnostic text and excludes private
   expect(result.bundle.diagnostics.capabilities['workspace.openFolder']).toBe('available');
   expect(result.bundle.diagnostics.capabilities).not.toHaveProperty('smoke.nativeFixtures');
   expect(result.bundle.diagnostics.nativeErrorMessage.length).toBeLessThanOrEqual(160);
+  expect(result.summaryText).toContain('Lens Docs Studio diagnostics summary');
+  expect(result.summaryText).toContain('App version: 0.1.0');
+  expect(result.summaryText).toContain('App build: 58');
+  expect(result.summaryText).toContain('Packaged/native mode: yes');
+  expect(result.summaryText).toContain('Browser fallback state: inactive-in-packaged-webview2');
+  expect(result.summaryText).toContain('Watcher timestamp bucket: within-1-minute');
   expect(result.json).toContain('[redacted-path]');
   expect(result.json).toContain('[redacted-email]');
   expect(result.json).toContain('[redacted-secret]');
+  expect(result.summaryText).not.toMatch(/C:\\Users\\alice|alice@example\.com|abc123|Server=private|source\\file\.cs|# Private Document|Do not include this Markdown|api_key=hidden|\bat\s+Native\.Service/i);
   expect(result.json).not.toMatch(/C:\\Users\\alice|alice@example\.com|abc123|Server=private|source\\file\.cs|# Private Document|Do not include this Markdown|api_key=hidden|stack trace/i);
   expect(result.json).not.toContain('lens-artifact-bundle.json');
 });
@@ -2608,6 +2615,7 @@ test('Diagnostics support bundle is visible and requires explicit user action', 
   await expect(page.getByRole('button', { name: 'Copy summary' })).toBeDisabled();
   await expect(page.getByRole('button', { name: 'Export local JSON' })).toBeDisabled();
   await expect(diagnostics.locator('.support-bundle-preview')).toHaveCount(0);
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toBeHidden();
 
   const messagesBefore = await page.evaluate(() => window.__nativeBridgeMessages.length);
   await page.waitForTimeout(100);
@@ -2618,6 +2626,7 @@ test('Diagnostics support bundle is visible and requires explicit user action', 
 test('Diagnostics support bundle preview and local export contain only safe fields', async ({ page }) => {
   await installMockNativeBridge(page);
   await gotoApp(page);
+  await mockClipboardWrite(page);
 
   await page.evaluate(() => {
     window.__nativeBridgeScenario.openFolder = 'native-error';
@@ -2635,6 +2644,7 @@ test('Diagnostics support bundle preview and local export contain only safe fiel
   const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
   await expect(diagnostics.locator('.support-bundle-preview')).toBeVisible();
   await expect(diagnostics).toContainText('Support bundle preview');
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Support bundle preview created locally. Copy and export stay local until you choose to share them.');
   await expect(diagnostics).toContainText('Workspace path included');
   await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Workspace path included' })).toContainText('no');
   await expect(page.getByRole('button', { name: 'Copy summary' })).toBeEnabled();
@@ -2654,11 +2664,60 @@ test('Diagnostics support bundle preview and local export contain only safe fiel
   expect(bundle.privacy.rawStackTracesIncluded).toBe('no');
   expect(previewText).not.toMatch(/Secret Draft|local-document-secret|C:\\Users\\casey|hunter2|file\.cs|at Native\.Service|lens-artifact-bundle\.json/i);
 
+  await page.getByRole('button', { name: 'Copy summary' }).click();
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Diagnostics summary copied locally. No upload was started.');
+  const copiedSummary = await page.evaluate(() => window.__copiedText);
+  expect(copiedSummary).toContain('Lens Docs Studio diagnostics summary');
+  expect(copiedSummary).toContain('App version: 0.1.0');
+  expect(copiedSummary).toContain('App build:');
+  expect(copiedSummary).toContain('Schema version: 1');
+  expect(copiedSummary).toContain('Runtime mode: windows-shell-development');
+  expect(copiedSummary).toContain('Packaged/native mode: yes');
+  expect(copiedSummary).toContain('WebView2 shell detected: yes');
+  expect(copiedSummary).toContain('Bridge ping state: pass');
+  expect(copiedSummary).toContain('workspace.openFolder capability: available');
+  expect(copiedSummary).toContain('Open folder route: native-bridge');
+  expect(copiedSummary).toContain('Browser fallback state: inactive-in-packaged-webview2');
+  expect(copiedSummary).toContain('Last Open folder attempt: native-error');
+  expect(copiedSummary).toContain('Watcher timestamp bucket: not recorded');
+  expect(copiedSummary).not.toMatch(/Secret Draft|local-document-secret|C:\\Users\\casey|casey\\Private|hunter2|file\.cs|at Native\.Service|@|lens-artifact-bundle\.json/i);
+  expect(copiedSummary.length).toBeLessThan(900);
+
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export local JSON' }).click();
   const download = await downloadPromise;
   expect(download.suggestedFilename()).toMatch(/^lens-docs-studio-support-bundle-\d{8}T\d{6}Z\.json$/);
+  expect(download.suggestedFilename()).not.toMatch(/casey|Private|Workspace|Secret/i);
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toContainText('Support bundle JSON exported locally as lens-docs-studio-support-bundle-');
+  const exportMessage = await diagnostics.locator('[data-support-bundle-message]').textContent();
+  expect(exportMessage).toContain('No upload was started.');
+  expect(exportMessage.length).toBeLessThanOrEqual(180);
   await expect(page.locator('#status')).toHaveText('Support bundle JSON exported locally. No upload was started.');
+});
+
+test('Diagnostics support bundle copy failure stays bounded and local', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async () => { throw new Error('Clipboard blocked for C:\\Users\\casey\\Private\\Workspace token=hidden'); },
+      },
+    });
+  });
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  await page.getByRole('button', { name: 'Create support bundle' }).click();
+  await page.getByRole('button', { name: 'Copy summary' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Could not copy the diagnostics summary. No data was uploaded.');
+  const message = await diagnostics.locator('[data-support-bundle-message]').textContent();
+  expect(message.length).toBeLessThanOrEqual(180);
+  expect(message).not.toMatch(/C:\\Users|token=hidden|@/i);
+  await expect(page.locator('#status')).toHaveText('Could not copy the support bundle summary.');
 });
 
 test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {

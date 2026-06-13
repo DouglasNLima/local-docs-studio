@@ -5170,6 +5170,24 @@ label.file-button.primary,
   line-height: 1.5;
 }
 
+.support-bundle-action-message {
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  padding: .55rem .65rem;
+  background: var(--surface);
+}
+
+.support-bundle-action-message[data-status-kind="ok"] {
+  border-color: rgba(22, 163, 74, .32);
+  color: var(--success);
+}
+
+.support-bundle-action-message[data-status-kind="warning"],
+.support-bundle-action-message[data-status-kind="danger"] {
+  border-color: rgba(220, 38, 38, .28);
+  color: var(--danger);
+}
+
 .support-bundle-preview {
   max-height: 14rem;
   overflow: auto;

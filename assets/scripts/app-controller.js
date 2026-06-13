@@ -2582,6 +2582,7 @@ ${unresolvedRows}
           section.innerHTML = renderSupportBundlePreview(latestSupportBundle);
         }
         updateSupportBundleButtons(true);
+        setSupportBundleActionMessage('Support bundle preview created locally. Copy and export stay local until you choose to share them.', 'ok');
         setStatus('Support bundle preview created locally. Review it before copying or exporting.', 'ok');
       } catch (error) {
         latestSupportBundle = null;
@@ -2592,6 +2593,7 @@ ${unresolvedRows}
           section.innerHTML = `
             <h3>Support bundle</h3>
             <p>Could not create the local support bundle preview: ${escapeHtml(safeMessage)}</p>
+            <p class="support-bundle-action-message" data-support-bundle-message data-status-kind="warning">Could not create the local support bundle preview. No data was uploaded.</p>
           `;
         }
         setStatus('Could not create the local support bundle preview.', 'danger');
@@ -2600,19 +2602,23 @@ ${unresolvedRows}
 
     async function copyDiagnosticsSupportBundle() {
       if (!latestSupportBundle) {
+        setSupportBundleActionMessage('Create a support bundle preview before copying a diagnostics summary.', 'warning');
         setStatus('Create a support bundle preview before copying it.', 'warning');
         return;
       }
       try {
         await navigator.clipboard.writeText(latestSupportBundle.summaryText);
+        setSupportBundleActionMessage('Diagnostics summary copied locally. No upload was started.', 'ok');
         setStatus('Support bundle summary copied. You choose whether to share it.', 'ok');
       } catch {
+        setSupportBundleActionMessage('Could not copy the diagnostics summary. No data was uploaded.', 'danger');
         setStatus('Could not copy the support bundle summary.', 'danger');
       }
     }
 
     function exportDiagnosticsSupportBundle() {
       if (!latestSupportBundle) {
+        setSupportBundleActionMessage('Create a support bundle preview before exporting local JSON.', 'warning');
         setStatus('Create a support bundle preview before exporting it.', 'warning');
         return;
       }
@@ -2620,6 +2626,7 @@ ${unresolvedRows}
         new Blob([latestSupportBundle.json], { type: 'application/json;charset=utf-8' }),
         latestSupportBundle.filename
       );
+      setSupportBundleActionMessage(`Support bundle JSON exported locally as ${latestSupportBundle.filename}. No upload was started.`, 'ok');
       setStatus('Support bundle JSON exported locally. No upload was started.', 'ok');
     }
 
@@ -2639,11 +2646,12 @@ ${unresolvedRows}
     function renderSupportBundleIntro({ pending = false } = {}) {
       const copy = pending
         ? 'Create support bundle will be available after diagnostics finish.'
-        : 'Create a local support bundle preview with safe operational metadata from this diagnostics session. Private documents, full paths, secrets, tokens, connection strings, emails, raw stack traces, screenshots, browser storage, and WebView2 user data are not included. Nothing is uploaded automatically; you choose whether to share the copied summary or exported JSON.';
+        : 'Create a local support bundle preview with safe operational metadata from this diagnostics session. Copy summary creates concise local diagnostics text. Export local JSON saves the preview as a local file with a neutral filename. Private documents, full paths, secrets, tokens, connection strings, emails, raw stack traces, screenshots, browser storage, and WebView2 user data are not included. Nothing is uploaded automatically; you choose whether to share the copied summary or exported JSON.';
       return `
         <section class="windows-shell-diagnostics-section support-bundle-panel" data-support-bundle-panel>
           <h3>Support bundle</h3>
           <p>${escapeHtml(copy)}</p>
+          <p class="support-bundle-action-message" data-support-bundle-message hidden></p>
         </section>
       `;
     }
@@ -2675,7 +2683,16 @@ ${unresolvedRows}
           `).join('')}
         </div>
         <pre class="support-bundle-preview" aria-label="Support bundle JSON preview">${escapeHtml(bundleResult.json)}</pre>
+        <p class="support-bundle-action-message" data-support-bundle-message hidden></p>
       `;
+    }
+
+    function setSupportBundleActionMessage(message, kind = 'info') {
+      const messageElement = windowsShellDiagnosticsBody?.querySelector('[data-support-bundle-message]');
+      if (!messageElement) return;
+      messageElement.textContent = redactSupportBundleText(message, 180) || 'Diagnostics action completed.';
+      messageElement.dataset.statusKind = ['ok', 'warning', 'danger', 'info'].includes(kind) ? kind : 'info';
+      messageElement.hidden = false;
     }
 
     function renderDiagnosticSection(title, rows) {
