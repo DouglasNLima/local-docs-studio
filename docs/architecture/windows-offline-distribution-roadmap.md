@@ -279,9 +279,18 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
 - No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
 
+## Implemented Phase 3BN
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md` records the post-`v0.1.0-dev.4` backlog after release closure.
+- `docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md` records candidate themes for a possible `v0.1.0-dev.5` cycle.
+- `v0.1.0-dev.4` remains the current verified prerelease/dev release for new validation. `v0.1.0-dev.5` is candidate planning only, is not approved, and has no committed release date.
+- Existing release assets remain unchanged, including `v0.1.0-dev.4`, `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` assets.
+- No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
+
 ## Future Roadmap
 
 - Collect feedback against `v0.1.0-dev.4` before deciding the next dev release scope.
+- Use the Phase 3BN post-release backlog and `v0.1.0-dev.5` candidate scope as planning input only; they do not approve implementation or publication.
 - Monitor support bundle and Diagnostics copy/export feedback.
 - Monitor payload hygiene, installer, download, checksum, and runtime-prerequisite issues without changing published release assets.
 - Decide whether to address the `v0.1.0-dev.3` to `v0.1.0-dev.4` upgrade path limitation in a future release.

@@ -48,7 +48,8 @@ Older `v0.1.0-dev.3`, `v0.1.0-dev.2`, `v0.1.0-dev.1`, and `v0.1.0-dev` assets sh
 - Decide the next dev release scope from observed feedback and release-monitoring signals.
 - Keep production readiness and go-live approval as a separate approval gate.
 - Consider manual packaged sanity helper implementation only after explicit approval.
-- Use `docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md` for the post-release backlog.
+- Use `docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md` for the post-release backlog.
+- Use `docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md` for candidate `v0.1.0-dev.5` planning only; `v0.1.0-dev.5` is not approved and has no committed release date.
 - Use `docs/release/lens-docs-studio-v010-dev4-release-closure.md` for the `v0.1.0-dev.4` closure and roadmap rebaseline.
 
 ## Evidence Boundaries
