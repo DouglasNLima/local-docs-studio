@@ -93,7 +93,9 @@ foreach ($scriptName in @(
     'Register-WindowsFileAssociations.ps1',
     'Unregister-WindowsFileAssociations.ps1',
     'WindowsPackagePayloadHygiene.ps1',
-    'Test-WindowsPackagePayloadHygiene.ps1'
+    'Test-WindowsPackagePayloadHygiene.ps1',
+    'New-WindowsManualPackagedSanityChecklist.ps1',
+    'Test-WindowsManualPackagedSanityChecklist.ps1'
 )) {
     $scriptPath = Join-Path $PSScriptRoot $scriptName
     Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows validation script: $scriptName"
@@ -112,6 +114,12 @@ Write-AssetLine 'Validating Windows package payload hygiene guard...'
 & pwsh -NoLogo -NoProfile -File (Join-Path $PSScriptRoot 'Test-WindowsPackagePayloadHygiene.ps1')
 if ($LASTEXITCODE -ne 0) {
     throw "Windows package payload hygiene guard failed with exit code $LASTEXITCODE."
+}
+
+Write-AssetLine 'Validating Windows manual packaged sanity checklist helper...'
+& pwsh -NoLogo -NoProfile -File (Join-Path $PSScriptRoot 'Test-WindowsManualPackagedSanityChecklist.ps1')
+if ($LASTEXITCODE -ne 0) {
+    throw "Windows manual packaged sanity checklist helper failed with exit code $LASTEXITCODE."
 }
 
 if ($StaticAppRoot) {

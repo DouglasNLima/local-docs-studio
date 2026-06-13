@@ -8,6 +8,8 @@ Phase 3BF defines a design/planning-only helper approach for repeatable human ve
 
 This plan does not implement runtime code, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, GitHub Releases, a merge to `main`, production readiness, or go-live approval. Existing prerelease assets remain untouched.
 
+Phase 3BP later implements the first approved helper/checklist slice as `scripts/windows/New-WindowsManualPackagedSanityChecklist.ps1`, with targeted validation in `scripts/windows/Test-WindowsManualPackagedSanityChecklist.ps1` and evidence in `docs/release/phase-3bp-manual-packaged-sanity-helper.md`. That implementation remains helper/checklist tooling only; it does not automate native picker decisions, mark manual results, change runtime product behaviour, publish release assets, or claim production readiness/go-live approval.
+
 ## Phase 3BF Repository Checkpoint
 
 | Check | Result |
