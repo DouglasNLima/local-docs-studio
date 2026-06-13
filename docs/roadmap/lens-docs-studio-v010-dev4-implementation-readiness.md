@@ -4,19 +4,21 @@ Planning date: 2026-06-12
 
 ## Status
 
-This document is the Phase 3BD implementation readiness gate for a possible `v0.1.0-dev.4` prerelease/dev release. Phase 3BF later adds the manual packaged sanity helper design in `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` as planning only.
+This document is the Phase 3BD implementation readiness gate for what was then a possible `v0.1.0-dev.4` prerelease/dev release. `v0.1.0-dev.4` has since been published and post-publication verified.
 
 It converts the Phase 3BC candidate scope into an ordered, reviewable implementation plan with explicit slices, acceptance gates, validation expectations, evidence requirements, and release boundaries.
 
-This is an implementation readiness plan, not release approval. It does not approve publication, package rebuilds, installer rebuilds, release asset changes, tag creation, GitHub Release changes, a merge to `main`, production readiness, or go-live.
+This implementation readiness plan did not approve publication, package rebuilds, installer rebuilds, release asset changes, tag creation, GitHub Release changes, a merge to `main`, production readiness, or go-live. Later phase-specific evidence documents record the authorised implementation, freeze, publication, verification, and closure work.
 
 Production readiness, go-live approval, stable-channel certification, stable/latest positioning, and promotion to `main` remain separate and unclaimed.
 
-## Current Baseline
+## Historical Baseline
 
-`v0.1.0-dev.3` is the current verified prerelease/dev release for new validation.
+At the start of Phase 3BD, `v0.1.0-dev.3` was the current verified prerelease/dev release for new validation. `v0.1.0-dev.4` is now the current verified prerelease/dev release for new validation.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
+Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
+
+Historical baseline release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
 
 Verified published checksums:
 
@@ -29,7 +31,7 @@ Baseline evidence:
 
 - Phase 3AW remains the referenced manual packaged sanity/remediation evidence for interactive native UI behaviours after the Open folder pending guidance remediation.
 - Phase 3BA post-publication verification passed for the published `v0.1.0-dev.3` tag, prerelease state, expected six-asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
-- Phase 3BB closed `v0.1.0-dev.3` as the current verified prerelease/dev release.
+- Phase 3BB closed `v0.1.0-dev.3` as the current verified prerelease/dev release at that time.
 - Phase 3BC recorded the post-`v0.1.0-dev.3` backlog and candidate `v0.1.0-dev.4` scope as documentation/planning only.
 - `v0.1.0-dev.2` and `v0.1.0-dev.1` are superseded for new validation but preserved historically.
 - Existing release assets remain unchanged unless a future release-maintenance decision explicitly authorises action.
@@ -423,7 +425,7 @@ Objective:
 Implement the first v0.1.0-dev.4 slice: approved optional troubleshooting/support bundle generation from docs/architecture/lens-docs-studio-support-bundle-design.md.
 
 Context:
-- v0.1.0-dev.3 is the current verified prerelease/dev release for new validation.
+- v0.1.0-dev.3 was the current verified prerelease/dev release for new validation when this prompt was written.
 - docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md recommends support bundle implementation as the first slice only if explicitly approved.
 - This is an implementation slice for develop, not a release approval.
 
@@ -485,8 +487,8 @@ Final response must include:
 
 ## Readiness Verdict
 
-Phase 3BD approves only the implementation readiness plan for a possible `v0.1.0-dev.4` cycle. It does not approve runtime implementation, release publication, package rebuilds, installer rebuilds, asset changes, tags, releases, a merge to `main`, production readiness, or go-live.
+Phase 3BD approved only the implementation readiness plan for the then-possible `v0.1.0-dev.4` cycle. It did not approve runtime implementation, release publication, package rebuilds, installer rebuilds, asset changes, tags, releases, a merge to `main`, production readiness, or go-live.
 
 The recommended first implementation slice is support bundle implementation, if explicitly approved.
 
-`v0.1.0-dev.4` remains unreleased and unapproved. `v0.1.0-dev.3` remains the current verified prerelease/dev release for new validation.
+`v0.1.0-dev.4` later completed the approved support bundle, diagnostics copy/export, payload hygiene, publication, and post-publication verification chain. Current closure status is recorded in `docs/release/lens-docs-studio-v010-dev4-release-closure.md`.

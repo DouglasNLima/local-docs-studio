@@ -4,9 +4,11 @@ Planning date: 2026-06-12
 
 ## Status
 
-`v0.1.0-dev.3` is the current verified prerelease/dev release for new validation.
+This document is historical planning input for the `v0.1.0-dev.4` cycle. `v0.1.0-dev.4` has since been published and post-publication verified, so it is now the current verified prerelease/dev release for new validation.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
+Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
+
+The `v0.1.0-dev.3` release remains preserved historical prerelease evidence at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`.
 
 Verified published checksums:
 
@@ -16,6 +18,8 @@ Verified published checksums:
 | Unsigned Inno Setup installer | `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB` |
 
 Phase 3BC opens a documentation/planning-only post-release backlog and candidate planning gate after Phase 3BB closed the `v0.1.0-dev.3` evidence chain. This backlog does not approve implementation, publication, package rebuilds, installer rebuilds, release asset changes, new tags, new releases, a merge to `main`, production readiness, or go-live.
+
+Phase 3BM now closes the completed `v0.1.0-dev.4` prerelease evidence chain. The remaining next work is tracked from `docs/release/lens-docs-studio-v010-dev4-release-closure.md`.
 
 ## What v0.1.0-dev.3 Closed
 
@@ -123,7 +127,7 @@ These are candidate ideas only and do not approve implementation:
 
 ## Planning Gate Verdict
 
-Phase 3BC opens the post-`v0.1.0-dev.3` backlog and records candidate planning inputs for a possible `v0.1.0-dev.4` cycle. `v0.1.0-dev.4` is not approved, has no committed release date, and has no authorised implementation scope.
+Phase 3BC opened the post-`v0.1.0-dev.3` backlog and recorded candidate planning inputs for the then-possible `v0.1.0-dev.4` cycle. That cycle has since completed through publication, Phase 3BL post-publication verification, and Phase 3BM closure.
 
 Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only readiness gate. It recommends support bundle implementation as the first candidate slice only if explicitly approved, and records validation, evidence, release artefact, rollback, and supersedence expectations without changing runtime code or release assets.
 

@@ -251,8 +251,7 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 
 - `docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md` records the post-`v0.1.0-dev.3` backlog after release closure.
 - `docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md` records candidate themes for a possible `v0.1.0-dev.4` cycle.
-- `v0.1.0-dev.3` remains the current verified prerelease/dev release for new validation.
-- `v0.1.0-dev.4` is candidate planning only, is not approved, and has no committed release date.
+- At the time of Phase 3BC, `v0.1.0-dev.3` remained the current verified prerelease/dev release for new validation and `v0.1.0-dev.4` was candidate planning only.
 - Existing release assets remain unchanged, including `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets.
 - No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
 
@@ -270,16 +269,26 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - The design records the required Phase 3BE baseline, reviewed inputs, temporary workspace convention, PASS/FAIL/BLOCKED evidence fields, cleanup rules, and future implementation prompt.
 - Phase 3BF is documentation/planning only. It does not implement runtime changes, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, releases, a `main` merge, production readiness, or go-live approval.
 
+## Implemented Phase 3BM
+
+- `docs/release/lens-docs-studio-v010-dev4-release-closure.md` closes the `v0.1.0-dev.4` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.4` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`.
+- Phase 3BL post-publication verification passed for the release tag, prerelease state, expected six-asset set, downloaded ZIP SHA256 `06BFA3896E1CCA48F1DC87D2F49D2387A8BCB93078E9F070764F22B048DD860C`, downloaded installer SHA256 `E52DB8B71B34E269F1754E2CCB6AB1691F38E6172CD2C826299A5DCF4A6652FC`, downloaded ZIP smoke, payload hygiene, and contained installer smoke.
+- Phase 3BL skipped interactive manual packaged sanity; Phase 3AW remains the referenced manual packaged sanity/remediation evidence for interactive native UI behaviours.
+- True upgrade from `v0.1.0-dev.3` remains blocked by the already-published baseline installer rollback recorded in Phase 3BH.
+- `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
+- No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
+
 ## Future Roadmap
 
-- Collect feedback against `v0.1.0-dev.3` before deciding the next dev release scope.
-- Treat `v0.1.0-dev.4` as unreleased and unapproved until a separate approval defines implementation scope, validation expectations, and any release artefact plan. Use the Phase 3BD readiness plan as planning guidance only.
+- Collect feedback against `v0.1.0-dev.4` before deciding the next dev release scope.
+- Monitor support bundle and Diagnostics copy/export feedback.
+- Monitor payload hygiene, installer, download, checksum, and runtime-prerequisite issues without changing published release assets.
+- Decide whether to address the `v0.1.0-dev.3` to `v0.1.0-dev.4` upgrade path limitation in a future release.
 - Use the Phase 3BF manual packaged sanity helper plan as the design reference if a future helper/checklist generator is approved; no helper tooling exists yet.
 - Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
-- Monitor installer/download/checksum/runtime-prerequisite issues without changing published release assets.
 - Decide the next dev release scope from prerelease feedback and release-monitoring signals.
 - Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.
-- Implement optional support bundle generation only after the Phase 3AN design contract is explicitly approved for runtime work.
 - Run installer upgrade/uninstall evidence from the Phase 3AO plan only when a future installer-affecting release candidate is explicitly authorised.
 - Keep production readiness, go-live approval, stable/latest positioning, signing, and `main` promotion as separate future gates.
 - MSIX versus classic installer spike for offline distribution.

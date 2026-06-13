@@ -4,13 +4,13 @@ Planning date: 2026-06-12
 
 ## Status
 
-This document is candidate scope only for a possible `v0.1.0-dev.4` prerelease/dev release.
+This document is historical candidate scope for the `v0.1.0-dev.4` prerelease/dev release. `v0.1.0-dev.4` has since been published and post-publication verified.
 
-`v0.1.0-dev.4` is not approved. No release date is committed. No implementation, package rebuild, installer rebuild, tag, GitHub Release, release asset change, `main` merge, production readiness, or go-live approval is authorised by this document.
+This document did not approve implementation, package rebuilds, installer rebuilds, tags, GitHub Releases, release asset changes, a `main` merge, production readiness, or go-live approval. Later phase-specific evidence documents record the authorised implementation, freeze, publication, verification, and closure work.
 
-Current verified prerelease/dev release for new validation: `v0.1.0-dev.3`.
+Current verified prerelease/dev release for new validation: `v0.1.0-dev.4`.
 
-Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
+Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
 
 Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only implementation readiness gate. It organises this candidate scope into proposed slices and recommends support bundle implementation as the first slice only if explicitly approved. Phase 3BE then implements the explicitly approved support bundle slice. Phase 3BF adds `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` as design/planning only for a future manual packaged sanity helper/checklist generator. It records the manual scenario matrix and evidence template shape, but does not implement helper tooling, approve runtime work, release publication, production readiness, or go-live.
 
@@ -20,7 +20,7 @@ The `v0.1.0-dev.3` baseline records:
 
 - Phase 3AW remains the referenced manual packaged sanity/remediation evidence for interactive native UI behaviours.
 - Phase 3BA post-publication verification passed for the published tag, prerelease state, expected six-asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
-- Phase 3BB closed `v0.1.0-dev.3` as the current verified prerelease/dev release.
+- Phase 3BB closed `v0.1.0-dev.3` as the current verified prerelease/dev release at that time.
 - `v0.1.0-dev.2` and `v0.1.0-dev.1` are superseded for new validation but preserved historically.
 - Existing release assets remain unchanged unless a future release maintenance decision explicitly authorises action.
 
@@ -143,8 +143,8 @@ If a later phase approves `v0.1.0-dev.4` publication, it must separately define:
 
 ## Candidate Verdict
 
-`v0.1.0-dev.4` remains a candidate planning target only. It is not an approved release plan, has no committed date, and does not claim production readiness or go-live approval.
+This document remains the historical candidate planning record for `v0.1.0-dev.4`. The completed release is closed by `docs/release/lens-docs-studio-v010-dev4-release-closure.md`.
 
 Existing `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets remain unchanged.
 
-Use `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` for the Phase 3BD implementation readiness sequence and `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` for the Phase 3BF manual packaged sanity helper design. Phase 3BF is planning-only and implements no helper tooling. Neither document is release approval.
+Use `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` for the Phase 3BD implementation readiness sequence, `docs/release/phase-3be-support-bundle-implementation.md`, `docs/release/phase-3bg-diagnostics-export-copy-improvements.md`, `docs/release/phase-3bh-installer-upgrade-evidence.md`, and `docs/release/phase-3bi-installer-payload-hygiene.md` for implementation and evidence records, and `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` for the Phase 3BF manual packaged sanity helper design. Phase 3BF remains planning-only and implements no helper tooling. Production readiness and go-live remain unclaimed.
