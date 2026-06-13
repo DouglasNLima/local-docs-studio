@@ -12,7 +12,7 @@ Current verified prerelease/dev release for new validation: `v0.1.0-dev.3`.
 
 Release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`
 
-Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only implementation readiness gate. It organises this candidate scope into proposed slices and recommends support bundle implementation as the first slice only if explicitly approved. Phase 3BE then implements the explicitly approved support bundle slice. Phase 3BF adds `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` as design/planning only for a future manual packaged sanity helper/checklist generator. It does not implement helper tooling, approve runtime work, release publication, production readiness, or go-live.
+Phase 3BD adds `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` as a documentation/planning-only implementation readiness gate. It organises this candidate scope into proposed slices and recommends support bundle implementation as the first slice only if explicitly approved. Phase 3BE then implements the explicitly approved support bundle slice. Phase 3BF adds `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` as design/planning only for a future manual packaged sanity helper/checklist generator. It records the manual scenario matrix and evidence template shape, but does not implement helper tooling, approve runtime work, release publication, production readiness, or go-live.
 
 ## Baseline
 

@@ -141,7 +141,7 @@ Out of scope:
 
 ## Slice 2: Manual Packaged Sanity Helper/Design
 
-Phase 3BF design status: `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` now defines the safe manual packaged sanity helper/checklist approach. No helper script, runtime product shortcut, package rebuild, installer rebuild, release asset change, tag, release, `main` merge, production readiness, or go-live approval was added.
+Phase 3BF design status: `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` now defines the safe manual packaged sanity helper/checklist approach, including the scenario matrix, evidence fields, privacy rules, cleanup expectations, and future implementation prompt. No helper script, runtime product shortcut, package rebuild, installer rebuild, release asset change, tag, release, `main` merge, production readiness, or go-live approval was added.
 
 Goal: design or implement helper guidance for repeatable manual packaged sanity evidence without bypassing real native picker observation.
 

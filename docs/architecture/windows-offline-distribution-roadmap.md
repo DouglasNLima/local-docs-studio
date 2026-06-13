@@ -267,6 +267,7 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 
 - `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` records the manual packaged sanity helper/checklist design for future human verification of packaged onboarding, Diagnostics retry, native Open folder select/cancel, support bundle preview/copy/export and privacy boundaries, clean external changes, dirty conflict choices, and installer launch/install/uninstall checks when relevant.
 - The plan separates automated package/native smoke from real human observation of packaged UI and native Windows picker behaviour.
+- The design records the required Phase 3BE baseline, reviewed inputs, temporary workspace convention, PASS/FAIL/BLOCKED evidence fields, cleanup rules, and future implementation prompt.
 - Phase 3BF is documentation/planning only. It does not implement runtime changes, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, releases, a `main` merge, production readiness, or go-live approval.
 
 ## Future Roadmap

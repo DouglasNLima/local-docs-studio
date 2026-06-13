@@ -1,12 +1,33 @@
 # Lens Docs Studio Manual Packaged Sanity Helper Plan
 
-Planning date: 2026-06-12
+Planning date: 2026-06-13
 
 ## Status
 
 Phase 3BF defines a design/planning-only helper approach for repeatable human verification of packaged onboarding, Diagnostics, native picker, support bundle, and watcher/conflict UX.
 
 This plan does not implement runtime code, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, GitHub Releases, a merge to `main`, production readiness, or go-live approval. Existing prerelease assets remain untouched.
+
+## Phase 3BF Repository Checkpoint
+
+| Check | Result |
+| --- | --- |
+| Branch | `develop` |
+| Required Phase 3BE commit | PASS, `c5efdaf3fb9c7f1173fa66705adc8f6c8f6c9749` is an ancestor of `HEAD` |
+| Tracked status before edits | Clean, `## develop...origin/develop` |
+| Tracked changes before edits | None |
+| Ignored/generated/downloaded paths | Not staged; expected local outputs such as `artifacts/`, `node_modules/`, `src/windows/.vs/`, `src/windows/LensDocsStudio.Windows/bin/`, `src/windows/LensDocsStudio.Windows/obj/`, `test-results/`, Playwright reports, package downloads, installer outputs, WebView2 user data, and local support bundles remain outside source changes. |
+
+## Reviewed Inputs
+
+Phase 3BF reviewed and aligns with:
+
+- `docs/release/phase-3be-support-bundle-implementation.md`
+- `docs/release/phase-3aw-open-folder-picker-remediation.md`
+- `docs/release/lens-docs-studio-v010-dev3-release-closure.md`
+- `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md`
+- `docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md`
+- existing package/native smoke scripts under `scripts/windows/`, including static asset, package RC, native bridge smoke, package build, and Inno installer build helpers.
 
 ## Purpose
 
