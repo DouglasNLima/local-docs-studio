@@ -6,6 +6,8 @@ Planning date: 2026-06-13
 
 This document is candidate scope only for a possible future `v0.1.0-dev.5` cycle.
 
+Phase 3BO update: `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` now converts this candidate scope into an ordered implementation readiness plan with proposed slices, acceptance gates, validation expectations, evidence requirements, and release boundaries. That readiness plan is planning-only; it does not approve implementation or publication.
+
 `v0.1.0-dev.5` is not approved. No release date is committed. This document does not authorise implementation, package rebuilds, installer rebuilds, release asset changes, new tags, new releases, a `main` merge, production readiness, stable-channel certification, stable/latest positioning, or go-live.
 
 The current verified prerelease/dev release for new validation remains `v0.1.0-dev.4`.
@@ -160,5 +162,4 @@ If a later phase approves `v0.1.0-dev.5` publication, it must separately define:
 
 `v0.1.0-dev.5` remains candidate planning only. It is not approved, has no committed release date, and does not claim production readiness or go-live.
 
-Use `docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md` for the post-`v0.1.0-dev.4` backlog and `docs/release/lens-docs-studio-v010-dev4-release-closure.md` for the current release closure baseline.
-
+Use `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` for the Phase 3BO ordered implementation readiness plan, `docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md` for the post-`v0.1.0-dev.4` backlog, and `docs/release/lens-docs-studio-v010-dev4-release-closure.md` for the current release closure baseline.

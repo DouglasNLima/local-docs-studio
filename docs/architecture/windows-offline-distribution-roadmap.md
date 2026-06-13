@@ -287,14 +287,21 @@ Browser / GitHub Pages and browser / local static server modes validate the shar
 - Existing release assets remain unchanged, including `v0.1.0-dev.4`, `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` assets.
 - No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
 
+## Implemented Phase 3BO
+
+- `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` converts the candidate `v0.1.0-dev.5` scope into an ordered implementation readiness plan.
+- The recommended first slice is manual packaged sanity helper implementation, if explicitly approved, because interactive packaged UI checks are still repeatedly skipped or referenced from Phase 3AW.
+- The readiness plan records proposed slices, acceptance criteria, validation commands, evidence requirements, release artefact expectations, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3BO is documentation/planning only. It does not implement runtime changes, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, releases, a `main` merge, production readiness, or go-live approval.
+
 ## Future Roadmap
 
 - Collect feedback against `v0.1.0-dev.4` before deciding the next dev release scope.
-- Use the Phase 3BN post-release backlog and `v0.1.0-dev.5` candidate scope as planning input only; they do not approve implementation or publication.
+- Use the Phase 3BN post-release backlog, `v0.1.0-dev.5` candidate scope, and Phase 3BO implementation readiness plan as planning input only; they do not approve implementation or publication.
 - Monitor support bundle and Diagnostics copy/export feedback.
 - Monitor payload hygiene, installer, download, checksum, and runtime-prerequisite issues without changing published release assets.
 - Decide whether to address the `v0.1.0-dev.3` to `v0.1.0-dev.4` upgrade path limitation in a future release.
-- Use the Phase 3BF manual packaged sanity helper plan as the design reference if a future helper/checklist generator is approved; no helper tooling exists yet.
+- Use the Phase 3BF manual packaged sanity helper plan and Phase 3BO readiness plan as the design reference if a future helper/checklist generator is explicitly approved; no helper tooling exists yet.
 - Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
 - Decide the next dev release scope from prerelease feedback and release-monitoring signals.
 - Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.

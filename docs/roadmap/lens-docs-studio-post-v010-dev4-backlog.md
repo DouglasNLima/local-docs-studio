@@ -139,5 +139,6 @@ These are candidate ideas only and do not approve implementation:
 
 Phase 3BN records the post-`v0.1.0-dev.4` backlog and candidate planning input for a possible `v0.1.0-dev.5` cycle.
 
-Use `docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md` for the candidate theme draft. `v0.1.0-dev.5` is not approved, has no committed release date, and does not claim production readiness or go-live.
+Phase 3BO adds `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` as the ordered implementation readiness plan for that candidate scope. It recommends manual packaged sanity helper implementation as the first slice only if explicitly approved.
 
+Use `docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md` for the candidate theme draft and `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` for proposed implementation ordering, acceptance gates, validation expectations, evidence requirements, and release boundaries. `v0.1.0-dev.5` is not approved, has no committed release date, and does not claim production readiness or go-live.
