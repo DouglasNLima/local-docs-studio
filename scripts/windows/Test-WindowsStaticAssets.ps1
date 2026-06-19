@@ -95,7 +95,9 @@ foreach ($scriptName in @(
     'WindowsPackagePayloadHygiene.ps1',
     'Test-WindowsPackagePayloadHygiene.ps1',
     'New-WindowsManualPackagedSanityChecklist.ps1',
-    'Test-WindowsManualPackagedSanityChecklist.ps1'
+    'Test-WindowsManualPackagedSanityChecklist.ps1',
+    'New-LocalDevSmokeZip.ps1',
+    'Test-LocalDevSmokeZip.ps1'
 )) {
     $scriptPath = Join-Path $PSScriptRoot $scriptName
     Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows validation script: $scriptName"
@@ -120,6 +122,12 @@ Write-AssetLine 'Validating Windows manual packaged sanity checklist helper...'
 & pwsh -NoLogo -NoProfile -File (Join-Path $PSScriptRoot 'Test-WindowsManualPackagedSanityChecklist.ps1')
 if ($LASTEXITCODE -ne 0) {
     throw "Windows manual packaged sanity checklist helper failed with exit code $LASTEXITCODE."
+}
+
+Write-AssetLine 'Validating local dev smoke ZIP helper...'
+& pwsh -NoLogo -NoProfile -File (Join-Path $PSScriptRoot 'Test-LocalDevSmokeZip.ps1')
+if ($LASTEXITCODE -ne 0) {
+    throw "Local dev smoke ZIP helper failed with exit code $LASTEXITCODE."
 }
 
 if ($StaticAppRoot) {

@@ -50,6 +50,14 @@ pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsPackage.ps1
 
 The package script publishes a framework-dependent `win-x64` folder to `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev/`, creates `artifacts/windows/LensDocsStudio.Windows-0.1.0-dev.zip`, validates `StaticApp/`, and runs the native bridge smoke harness against the packaged executable unless `-NoSmoke` is passed. Run the package by launching `LensDocsStudio.Windows.exe` from the package folder. The package is intentionally a folder/ZIP distributable; it does not add MSIX, signing, certificates, an installer wizard, auto-update, store metadata, or a WebView2 fixed runtime/bootstrapper.
 
+Generate a local development smoke ZIP for browser-only manual validation with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/New-LocalDevSmokeZip.ps1
+```
+
+This writes `artifacts/windows/local-dev-smoke/LensDocsStudio-local-dev-<short-sha>-word-template-smoke.zip` and includes the static app shell, service worker, manifest, app scripts/styles, local vendor files, the feature guide, and the Word export template service. It is deliberately marked as a local development smoke ZIP, not an official release, release asset, installer asset, frozen artefact, production-readiness claim, or publication bundle. The script refuses a dirty working tree by default; use `-AllowDirty` only for temporary local validation, where the generated metadata records the dirty state.
+
 Certify a Windows package release candidate with:
 
 ```powershell
@@ -132,7 +140,7 @@ The shell requires the .NET SDK, Windows App SDK runtime, and WebView2 Runtime. 
 - Phase 3AT verifies the published `v0.1.0-dev.2` prerelease: tag, prerelease state, expected asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke passed. No production readiness/go-live approval, `main` merge, release asset change, or `v0.1.0-dev.1` asset change is claimed.
 - Phase 3AV records a manual packaged sanity failure for the published `v0.1.0-dev.2` native Open folder path, Phase 3AW remediates bounded pending guidance on `develop`, Phase 3AX freezes a local `v0.1.0-dev.3` publication bundle, Phase 3AY audits that frozen bundle with no publication, Phase 3BA verifies the published `v0.1.0-dev.3` prerelease, and Phase 3BB closes it as the current verified prerelease/dev release at that time. Phase 3AW remains the referenced manual packaged sanity/remediation evidence, and Phase 3BA skipped interactive manual packaged sanity.
 - Phase 3BC records the post-`v0.1.0-dev.3` backlog and candidate `v0.1.0-dev.4` scope as documentation/planning only. Phase 3BD adds the implementation readiness plan for the `v0.1.0-dev.4` cycle, Phase 3BE implements explicit-user-action Diagnostics support bundle generation, Phase 3BG improves diagnostics copy/export, Phase 3BI adds payload hygiene guards, Phase 3BL verifies the published prerelease, and Phase 3BM closes it as the current verified prerelease/dev release. Phase 3BF defines the manual packaged sanity helper/checklist approach as planning only. `v0.1.0-dev.4` does not claim production readiness or go-live approval.
-- Phase 3BN records the post-`v0.1.0-dev.4` backlog and candidate `v0.1.0-dev.5` scope as documentation/planning only. Phase 3BO converts that candidate scope into an implementation readiness plan and recommends manual packaged sanity helper implementation as the first slice only if explicitly approved. Phase 3BP implements that first helper/checklist slice as Windows script, test, and documentation only, without runtime app changes, package publication, release assets, tags, releases, `main` merge, production readiness, or go-live approval. `v0.1.0-dev.4` remains the current verified prerelease/dev release for new validation; `v0.1.0-dev.5` is not approved, has no committed release date, and does not claim production readiness or go-live approval.
+- Phase 3BN records the post-`v0.1.0-dev.4` backlog and candidate `v0.1.0-dev.5` scope as documentation/planning only. Phase 3BO converts that candidate scope into an implementation readiness plan and recommends manual packaged sanity helper implementation as the first slice only if explicitly approved. Phase 3BP implements that first helper/checklist slice as Windows script, test, and documentation only, without runtime app changes, package publication, release assets, tags, releases, `main` merge, production readiness, or go-live approval. Phase 3BQ implements the browser-local Word export template MVP, and Phase 3BR adds a local development smoke ZIP generator for manually testing that MVP from the current `develop` tree without creating or changing releases, tags, release assets, installer assets, publication bundles, frozen artefacts, or production-readiness claims. `v0.1.0-dev.4` remains the current verified prerelease/dev release for new validation; `v0.1.0-dev.5` is not approved, has no committed release date, and does not claim production readiness or go-live approval.
 - Phase 3S documents the WebView2 uninstall cleanup decision, adds the manual watcher/conflict evidence checklist, and clarifies ZIP versus installer wording for the next dev prerelease.
 - Future Windows work includes a fuller installer path, single-instance forwarding, and a release flow from `develop` to `main`.
 
@@ -382,6 +390,52 @@ The MVP supports copying `word/styles.xml`, `word/numbering.xml`, `word/theme/th
 
 Known limitations: this is not a visual Word template designer; it does not edit templates, merge complex section-specific first/even page layouts, infer evidence levels, or redistribute corporate branding. Templates and logos are user/organisation-provided assets, and should only be imported or shared when you have permission to use them.
 
+### Local Dev Smoke ZIP
+
+The local dev smoke ZIP packages the browser app assets needed to serve Lens Docs Studio from a simple static server while testing the current working implementation. It differs from the Windows package and official release flows: it does not build the native shell, create an installer, prepare release notes, publish or upload assets, create tags, touch GitHub Releases, freeze a publication bundle, or imply production readiness.
+
+Generate it from the repository root:
+
+```powershell
+cd C:\Code\MarkdownReader
+
+git checkout develop
+git pull origin develop
+
+pwsh -NoLogo -NoProfile -File scripts/windows/New-LocalDevSmokeZip.ps1
+```
+
+The generated ZIP is written under ignored `artifacts/windows/local-dev-smoke/` with a name like `LensDocsStudio-local-dev-<short-sha>-word-template-smoke.zip`. It includes `index.html`, `service-worker.js`, `manifest.webmanifest`, `assets/styles/app.css`, app scripts, local vendor assets, `docs/tool-guide.md`, `assets/scripts/exports/export-service.js`, `assets/scripts/exports/word-template-service.js`, and `lens-docs-studio-local-dev-smoke.json` metadata. It excludes source control internals, `node_modules/`, test output, Playwright reports, generated ignored local output, imported Word template packs, corporate `.docx` templates, extracted logos/media, IndexedDB/browser storage, and machine-local configuration.
+
+Expand and serve it locally:
+
+```powershell
+Expand-Archive `
+  -Path artifacts\windows\local-dev-smoke\LensDocsStudio-local-dev-<short-sha>-word-template-smoke.zip `
+  -DestinationPath artifacts\windows\local-dev-smoke\expanded `
+  -Force
+
+cd artifacts\windows\local-dev-smoke\expanded
+python -m http.server 4173
+```
+
+Open `http://127.0.0.1:4173/`.
+
+Manual Word template smoke:
+
+1. Add Markdown containing a title, heading 1/2/3, body paragraphs, bullet list, numbered list, table, quote, code block, Mermaid diagram, and optional image.
+2. Open **Export > Documents**.
+3. Import a `.docx` template.
+4. Confirm the template display name.
+5. Select the imported template.
+6. Export Word.
+7. Open or inspect the exported `.docx`.
+8. Confirm there is no Word repair prompt.
+9. Confirm supported styles, header, footer, and logo are present where expected.
+10. Switch back to Default and export again to confirm fallback still works.
+
+The HSI/TEKenable corporate document, or any other organisation-provided template, may be used locally for smoke testing only when the tester has permission. It must not be committed, added to generated repository artefacts, uploaded as a release asset, or included in the local dev smoke ZIP.
+
 ## Optional Lens Artefact Bundles
 
 ZIPs generated by Lens-family tools or compatible generators may include an optional `lens-artifact-bundle.json` manifest. When present, Lens Docs Studio imports the Markdown and Mermaid files as normal editable virtual documents, opens a safe declared entry document where available, and shows a compact reader panel from the ZIP metadata.
@@ -447,6 +501,7 @@ npm test
 
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` checks the Windows `StaticApp/` output for complete packaged offline assets and unexpected runtime external dependencies.
+- `pwsh -NoLogo -NoProfile -File scripts/windows/New-LocalDevSmokeZip.ps1` creates an ignored browser-only local development smoke ZIP under `artifacts/windows/local-dev-smoke/` for manual Word template MVP validation; `scripts/windows/Test-LocalDevSmokeZip.ps1` validates its packaging contract and key include/exclude rules.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/New-WindowsManualPackagedSanityChecklist.ps1` creates safe generated fixtures and a local manual packaged sanity checklist under ignored `artifacts/windows/manual-packaged-sanity/`; native picker selection and results remain human-observed.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` creates and certifies a Windows folder/ZIP release candidate, then writes auditable report metadata.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1` builds the internal unsigned Inno Setup installer MVP from the certified Windows package output, or reports `INNO_INSTALLER_MVP_BLOCKED_INNO_SETUP_NOT_INSTALLED` when Inno Setup is missing.

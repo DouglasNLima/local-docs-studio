@@ -2,6 +2,8 @@ node_modules/
 test-results/
 playwright-report/
 artifacts/
+artifacts/windows/local-dev-smoke/
+artifacts/windows/local-dev-smoke-validation/
 artifacts/word-templates/
 artifacts/installers/inno/
 *.exe

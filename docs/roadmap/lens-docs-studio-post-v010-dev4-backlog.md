@@ -8,6 +8,8 @@ Phase 3BN opens a documentation/planning-only post-release backlog and `v0.1.0-d
 
 Phase 3BQ implements the vertical MVP for browser-local Word export templates on `develop`: imported `.docx` files become local Word template packs, the Export menu can select a saved pack, and Word export applies supported styles, numbering, theme, header/footer parts, and referenced media without adding cloud template sharing or release asset changes.
 
+Phase 3BR adds a local dev smoke ZIP generation path for manually validating the Word export template MVP from the current `develop` working tree. The script writes ignored output under `artifacts/windows/local-dev-smoke/`, embeds non-release metadata, validates key include/exclude rules, and preserves the boundary that no GitHub releases, tags, release assets, installer assets, publication bundles, frozen artefacts, corporate templates, or extracted corporate media are created or modified.
+
 The current verified prerelease/dev release for new validation is `v0.1.0-dev.4`.
 
 Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
@@ -46,6 +48,7 @@ Existing release assets remain unchanged. No `v0.1.0-dev.4` asset, older prerele
 - WebView2 user data may remain after uninstall so browser-local state is not silently deleted.
 - Manual packaged sanity helper implementation remains unimplemented and should be considered only after explicit approval.
 - Word export template support is an MVP: it applies the first detected header/footer globally, stores imported packs in the current browser profile, and does not provide a visual designer, template editing, cloud sharing, or redistribution rights for user/organisation-provided corporate assets.
+- Phase 3BR local dev smoke ZIPs are temporary ignored test artefacts for manual validation only. They are not official releases, production-ready packages, publication bundles, or substitutes for future release certification.
 
 ## Feedback Areas To Monitor
 
