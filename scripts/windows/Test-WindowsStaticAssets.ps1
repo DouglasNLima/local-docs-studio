@@ -97,7 +97,9 @@ foreach ($scriptName in @(
     'New-WindowsManualPackagedSanityChecklist.ps1',
     'Test-WindowsManualPackagedSanityChecklist.ps1',
     'New-LocalDevSmokeZip.ps1',
-    'Test-LocalDevSmokeZip.ps1'
+    'Test-LocalDevSmokeZip.ps1',
+    'New-WindowsLocalDevSmokePackage.ps1',
+    'Test-WindowsLocalDevSmokePackage.ps1'
 )) {
     $scriptPath = Join-Path $PSScriptRoot $scriptName
     Assert-Asset (Test-Path -LiteralPath $scriptPath -PathType Leaf) "Missing Windows validation script: $scriptName"

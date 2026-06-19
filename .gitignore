@@ -4,6 +4,8 @@ playwright-report/
 artifacts/
 artifacts/windows/local-dev-smoke/
 artifacts/windows/local-dev-smoke-validation/
+artifacts/windows/local-dev-package-smoke/
+artifacts/windows/local-dev-package-smoke-validation/
 artifacts/word-templates/
 artifacts/installers/inno/
 *.exe

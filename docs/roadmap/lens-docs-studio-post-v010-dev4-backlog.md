@@ -10,6 +10,8 @@ Phase 3BQ implements the vertical MVP for browser-local Word export templates on
 
 Phase 3BR adds a local dev smoke ZIP generation path for manually validating the Word export template MVP from the current `develop` working tree. The script writes ignored output under `artifacts/windows/local-dev-smoke/`, embeds non-release metadata, validates key include/exclude rules, and preserves the boundary that no GitHub releases, tags, release assets, installer assets, publication bundles, frozen artefacts, corporate templates, or extracted corporate media are created or modified.
 
+Phase 3BS adds a Windows local dev smoke ZIP generation path for manually validating the same Word export template MVP inside the Windows shell. The script writes ignored output under `artifacts/windows/local-dev-package-smoke/`, publishes `LensDocsStudio.Windows.exe` with the updated packaged `StaticApp/`, embeds non-release/non-installer metadata, validates key include/exclude rules, and preserves the boundary that no GitHub releases, tags, release assets, installer assets, publication bundles, frozen artefacts, corporate templates, or extracted corporate media are created or modified.
+
 The current verified prerelease/dev release for new validation is `v0.1.0-dev.4`.
 
 Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
@@ -46,9 +48,10 @@ Existing release assets remain unchanged. No `v0.1.0-dev.4` asset, older prerele
 - The unsigned installer can trigger operating-system, browser, or SmartScreen friction.
 - Runtime prerequisites remain external and are not bootstrapped by the installer.
 - WebView2 user data may remain after uninstall so browser-local state is not silently deleted.
-- Manual packaged sanity helper implementation remains unimplemented and should be considered only after explicit approval.
+- Manual packaged sanity helper implementation is available as a local checklist generator only; real packaged UI observation remains human-executed.
 - Word export template support is an MVP: it applies the first detected header/footer globally, stores imported packs in the current browser profile, and does not provide a visual designer, template editing, cloud sharing, or redistribution rights for user/organisation-provided corporate assets.
 - Phase 3BR local dev smoke ZIPs are temporary ignored test artefacts for manual validation only. They are not official releases, production-ready packages, publication bundles, or substitutes for future release certification.
+- Phase 3BS Windows local dev smoke ZIPs are temporary ignored test artefacts for manual validation inside the Windows shell only. They are not official releases, installers, release assets, production-ready packages, publication bundles, or substitutes for future release certification.
 
 ## Feedback Areas To Monitor
 
@@ -81,6 +84,7 @@ Monitor package, installer, download, and payload hygiene behaviour without chan
 - Installer launch, silent install, uninstall, shortcut cleanup, optional file association, and WebView2 user data retention reports.
 - Reports of runtime-generated WebView2 data, browser storage, caches, or logs appearing in future local package or installer sources.
 - Payload hygiene guard failures in local validation.
+- Windows local dev smoke package generation failures, missing Word template assets in packaged `StaticApp/`, or confusion between browser-only smoke ZIPs and Windows shell smoke ZIPs.
 - Runtime-prerequisite failures on clean or lightly configured Windows machines.
 - Whether historical prerelease assets cause users to validate against older releases.
 
@@ -118,7 +122,7 @@ The Phase 3BF helper plan remains the design reference if a helper/checklist gen
 
 These are candidate ideas only and do not approve implementation:
 
-- Implement the manual packaged sanity helper/checklist generator from the Phase 3BF plan, if explicitly approved.
+- Use the manual packaged sanity helper/checklist generator and Windows local dev smoke ZIP for future human-observed Windows shell checks when explicitly approved.
 - Define an upgrade-path strategy after the `v0.1.0-dev.3` baseline rollback finding.
 - Refine installer shortcut, Start Menu, Desktop shortcut, optional file association, and task behaviour based on prerelease feedback.
 - Refine support bundle UX from real prerelease feedback while preserving the local, preview-first, privacy-bounded model.
