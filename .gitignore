@@ -2,6 +2,7 @@ node_modules/
 test-results/
 playwright-report/
 artifacts/
+artifacts/word-templates/
 artifacts/installers/inno/
 *.exe
 *.sha256

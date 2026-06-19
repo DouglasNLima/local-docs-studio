@@ -27,6 +27,7 @@
       <input id="folderInput" type="file" webkitdirectory directory multiple />
       <input id="zipInput" type="file" accept=".zip,application/zip,application/x-zip-compressed" />
       <input id="documentInput" type="file" accept=".docx,.html,.htm,.pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/html,application/pdf" multiple />
+      <input id="wordTemplateInput" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" />
 
       <nav class="topbar-menubar toolbar-group" aria-label="Application menus">
         <details class="menu">
@@ -209,6 +210,14 @@
             <div class="menu-heading">Documents</div>
             <button id="downloadButton" type="button">Export HTML</button>
             <button id="exportWordButton" type="button" title="Export a Word-compatible .docx document">Export Word</button>
+            <label class="menu-field">
+              <span>Word template</span>
+              <select id="wordTemplateSelect" aria-label="Word export template">
+                <option value="">Default</option>
+              </select>
+            </label>
+            <button id="wordTemplateImportButton" type="button">Import Word template</button>
+            <div id="wordTemplateSummary" class="menu-note">Default export uses the built-in document styling.</div>
             <button id="exportPdfButton" type="button">Export PDF</button>
             <div class="menu-note">HTML and Word download files. PDF opens the browser print dialogue with a clean print view.</div>
             <hr>

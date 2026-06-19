@@ -13,6 +13,7 @@ import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createExportProfileService } from './exports/export-profile-service.js';
+import { createWordTemplateService } from './exports/word-template-service.js';
 import { createNativeBridgeClient } from './native/native-bridge-client.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
@@ -65,6 +66,7 @@ export function createAppController() {
       folderInput,
       zipInput,
       documentInput,
+      wordTemplateInput,
       saveButton,
       saveAsButton,
       refreshFileButton,
@@ -72,6 +74,9 @@ export function createAppController() {
       sampleButton,
       downloadButton,
       exportWordButton,
+      wordTemplateSelect,
+      wordTemplateImportButton,
+      wordTemplateSummary,
       exportPdfButton,
       exportMarkdownBundleButton,
       exportArtifactReviewPackButton,
@@ -593,6 +598,19 @@ export function createAppController() {
         getDocTitleFromPath,
       },
     });
+    const wordTemplateTools = createWordTemplateService({
+      dom: {
+        wordTemplateInput,
+        wordTemplateImportButton,
+        wordTemplateSelect,
+        wordTemplateSummary,
+      },
+      callbacks: {
+        closeOpenMenus,
+        promptForText: promptDialog,
+        setStatus,
+      },
+    });
     exportTools = createExportService({
       state,
       dom: { preview, editor, exportTrust },
@@ -609,6 +627,7 @@ export function createAppController() {
         getExportTitle,
         getExportName,
         getWordExportName,
+        getSelectedWordTemplatePack: wordTemplateTools.getSelectedWordTemplatePack,
         getDocTitleFromPath,
         getEffectiveDevopsMarkdownExport: () => getEffectiveDevopsMarkdownExport(),
         closeOpenMenus,
@@ -827,11 +846,13 @@ export function createAppController() {
     updateDocsPreviewButton();
     updateStudioMode();
     dialogTools.installDialogHandlers();
+    wordTemplateTools.installWordTemplateHandlers();
     installResizers();
     draftTools.initDraftStore();
     draftTools.installDraftHandlers();
     installEditorEnhancements();
     exportProfileTools.installBuiltInProfileHandlers();
+    void wordTemplateTools.initWordTemplates();
     exportProfileTools.renderBuiltInProfiles();
     findReplaceTools.installFindReplaceHandlers();
     tableEditorTools.installTableEditorHandlers();

@@ -273,6 +273,9 @@ if (Object.keys(packageJson.scripts || {}).some((scriptName) => /^build($|:)/.te
   fail('package.json must not add a production build command');
 }
 
+const gitignore = readRootFile('.gitignore');
+if (!gitignore.includes('artifacts/word-templates/')) fail('.gitignore must exclude locally imported Word template packs');
+
 const lensArtifactBundleService = readFileSync(toRootPath('assets/scripts/files/lens-artifact-bundle-service.js'), 'utf8');
 for (const forbiddenRuntime of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'localStorage', 'indexedDB', 'openObjectStoreDb']) {
   if (lensArtifactBundleService.includes(forbiddenRuntime)) {

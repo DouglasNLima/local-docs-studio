@@ -69,13 +69,14 @@ flowchart LR
 ## Exports
 
 - **HTML** creates a standalone rendered document.
-- **Word** creates a `.docx` with rendered diagrams and compatible content.
+- **Word** creates a `.docx` with rendered diagrams and compatible content. Use **Import Word template** and the **Word template** selector to apply a browser-local `.docx` template pack during export.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
 - **Docs Site** builds a static ZIP with theme, navigation, and search that can open directly from `index.html` or be hosted on GitHub Pages.
 - Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group. With a loaded artefact bundle, safe metadata can fill missing title, order, evidence, and navigation hints; front matter remains highest priority.
 - **Markdown Bundle** creates a round-trip ZIP with editable source files and managed images. Use **Azure DevOps Mermaid syntax** in the Export menu when the bundle should write Mermaid as `::: mermaid` blocks.
 - **Export artefact review pack** is available only after importing a valid artefact bundle. It exports editable Markdown and managed images with a rebuilt safe `lens-artifact-bundle.json`; ordinary Markdown Bundle export does not include artefact metadata.
 - Built-in export profiles are session-only. The Azure DevOps Wiki Markdown profile uses a session override and does not persist the DevOps Mermaid preference unless you use the existing toggle or saved local profile flow.
+- Word export templates are imported from user-provided `.docx` files and stored locally in this browser profile. The MVP preserves supported styles, numbering, theme, default header/footer parts, header/footer relationships, and referenced media, then maps generated headings, body text, tables, code, quotes, and captions to the detected semantic styles where practical.
 - ZIPs may optionally include `lens-artifact-bundle.json` metadata. When present, the app still imports the Markdown and Mermaid files normally, opens a safe declared entry document, and shows a collapsible artefact reader panel with safe navigation, evidence chips, warnings, and local filters.
 - Artefact bundle round-trip checks use source fixtures for valid, rich, invalid, unsafe, front matter, and generic ZIP cases so ordinary documentation import stays certified alongside the optional reader flow.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Embedded PNG, JPEG, GIF, and WebP images become managed session assets where available. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.

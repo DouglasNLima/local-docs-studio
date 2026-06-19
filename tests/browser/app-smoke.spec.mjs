@@ -240,6 +240,20 @@ async function writeArtifactBundleFixtureZip(testInfo, fixtureName, name = `${fi
   return zipPath;
 }
 
+async function writeWordTemplateFixture(testInfo, name, options = {}) {
+  const docxPath = testInfo.outputPath(name);
+  await writeFile(docxPath, createWordTemplateFixture(options));
+  return docxPath;
+}
+
+async function importWordTemplate(page, filePath, displayName) {
+  await page.locator('#wordTemplateInput').setInputFiles(filePath);
+  await page.locator('#appDialogPromptInput').fill(displayName);
+  await page.getByRole('button', { name: 'Import template' }).click();
+  await expect(page.locator('#status')).toHaveText(new RegExp(`Imported Word template "${displayName}"`));
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(/.+/);
+}
+
 async function tabUntilFocused(page, selector, maxTabs = 40) {
   await page.locator('body').click({ position: { x: 4, y: 4 } });
   for (let index = 0; index < maxTabs; index += 1) {
@@ -955,6 +969,106 @@ function createDocxImportFixture() {
       data: Buffer.from(tinyPngBase64, 'base64'),
     },
   ], { compress: true });
+}
+
+function createWordTemplateFixture({ headers = true, footers = true, media = true, numbering = true, theme = true } = {}) {
+  const files = [
+    {
+      name: '[Content_Types].xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  ${numbering ? '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>' : ''}
+  ${theme ? '<Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>' : ''}
+  ${headers ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' : ''}
+  ${footers ? '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' : ''}
+</Types>`,
+    },
+    {
+      name: '_rels/.rels',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`,
+    },
+    {
+      name: 'word/document.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body><w:p><w:r><w:t>Template source</w:t></w:r></w:p></w:body>
+</w:document>`,
+    },
+    {
+      name: 'word/styles.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:styleId="CorporateTitle"><w:name w:val="Title"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading1"><w:name w:val="Heading 1"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading2"><w:name w:val="Heading 2"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateBody"><w:name w:val="Body Text"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateQuote"><w:name w:val="Quote"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateCode"><w:name w:val="Code"/><w:qFormat/></w:style>
+  <w:style w:type="table" w:styleId="CorporateTable"><w:name w:val="Table Grid"/><w:qFormat/></w:style>
+</w:styles>`,
+    },
+  ];
+
+  if (numbering) {
+    files.push({
+      name: 'word/numbering.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:abstractNum w:abstractNumId="1"><w:lvl w:ilvl="0"><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/></w:lvl></w:abstractNum>
+  <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+</w:numbering>`,
+    });
+  }
+
+  if (theme) {
+    files.push({
+      name: 'word/theme/theme1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Corporate Test Theme"><a:themeElements/></a:theme>`,
+    });
+  }
+
+  if (headers) {
+    files.push({
+      name: 'word/header1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:p><w:r><w:t>Corporate header</w:t></w:r></w:p>
+  ${media ? '<w:p><w:r><w:drawing><wp:inline><wp:extent cx="9525" cy="9525"/><wp:docPr id="1" name="Template logo"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="template-logo.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>' : ''}
+</w:hdr>`,
+    });
+    if (media) {
+      files.push({
+        name: 'word/_rels/header1.xml.rels',
+        data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/template-logo.png"/>
+</Relationships>`,
+      });
+      files.push({
+        name: 'word/media/template-logo.png',
+        data: Buffer.from(tinyPngBase64, 'base64'),
+      });
+    }
+  }
+
+  if (footers) {
+    files.push({
+      name: 'word/footer1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>Corporate footer</w:t></w:r></w:p></w:ftr>`,
+    });
+  }
+
+  return createZipBuffer(files, { compress: true });
 }
 
 function createSimplePdfBuffer(pages) {
@@ -4163,6 +4277,89 @@ test('Word export is a valid native DOCX package without interactive UI text', a
   expect(documentXml).not.toContain('selection-sync-hit');
   expect(documentXml).not.toContain('Document review');
   await expect(page.locator('#exportTrust')).toHaveText(/Word ready: 1\/1 diagram rendered/);
+});
+
+test('Word template import stores manifests and tolerates missing optional parts', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const minimalPath = await writeWordTemplateFixture(testInfo, 'minimal-template.docx', {
+    headers: false,
+    footers: false,
+    media: false,
+    numbering: false,
+    theme: false,
+  });
+  const richPath = await writeWordTemplateFixture(testInfo, 'rich-template.docx');
+
+  await importWordTemplate(page, minimalPath, 'Minimal Word Template');
+  await expect(page.locator('#wordTemplateSummary')).toHaveText(/styles/);
+  await expect(page.locator('#wordTemplateSummary')).not.toHaveText(/headers/);
+
+  await importWordTemplate(page, richPath, 'Corporate Word Template');
+  await expect(page.locator('#wordTemplateSummary')).toHaveText(/styles, numbering, theme, headers, footers, media/);
+
+  const options = await page.locator('#wordTemplateSelect option').evaluateAll((items) => items.map((item) => item.textContent));
+  expect(options).toEqual(expect.arrayContaining(['Default', 'Minimal Word Template', 'Corporate Word Template']));
+
+  const manifests = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordsRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordsRequest.onsuccess = () => resolve(recordsRequest.result);
+      recordsRequest.onerror = () => reject(recordsRequest.error);
+    });
+    db.close();
+    return records.map((record) => record.manifest);
+  });
+
+  expect(manifests).toHaveLength(2);
+  expect(manifests.find((manifest) => manifest.displayName === 'Minimal Word Template')?.capabilities).toMatchObject({
+    styles: true,
+    headers: false,
+    footers: false,
+    media: false,
+  });
+  expect(manifests.find((manifest) => manifest.displayName === 'Corporate Word Template')?.semanticStyleMapping.heading1).toBe('CorporateHeading1');
+});
+
+test('Word export applies selected template parts and preserves default export fallback', async ({ page }, testInfo) => {
+  await openFixture(page, 'mixed.md');
+
+  const defaultPath = await clickExportDownload(page, 'Export Word');
+  const defaultEntries = await readZipEntries(defaultPath);
+  expect(defaultEntries.has('word/styles.xml')).toBe(false);
+  expect(getZipText(defaultEntries, 'word/document.xml')).not.toContain('headerReference');
+
+  const templatePath = await writeWordTemplateFixture(testInfo, 'corporate-template.docx');
+  await importWordTemplate(page, templatePath, 'Corporate Word Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const contentTypes = getZipText(entries, '[Content_Types].xml');
+  const documentXml = getZipText(entries, 'word/document.xml');
+  const relsXml = getZipText(entries, 'word/_rels/document.xml.rels');
+  const headerRelsXml = getZipText(entries, 'word/_rels/header1.xml.rels');
+
+  expect(entries.has('word/styles.xml')).toBe(true);
+  expect(entries.has('word/numbering.xml')).toBe(true);
+  expect(entries.has('word/theme/theme1.xml')).toBe(true);
+  expect(entries.has('word/header1.xml')).toBe(true);
+  expect(entries.has('word/footer1.xml')).toBe(true);
+  expect(entries.has('word/media/template-logo.png')).toBe(true);
+  expect(contentTypes).toContain('wordprocessingml.header+xml');
+  expect(contentTypes).toContain('wordprocessingml.footer+xml');
+  expect(documentXml).toContain('<w:pStyle w:val="CorporateHeading1"/>');
+  expect(documentXml).toContain('<w:tblStyle w:val="CorporateTable"/>');
+  expect(documentXml).toContain('<w:headerReference w:type="default" r:id="rIdTemplateHeader1"/>');
+  expect(documentXml).toContain('<w:footerReference w:type="default" r:id="rIdTemplateFooter1"/>');
+  expect(relsXml).toContain('Target="styles.xml"');
+  expect(relsXml).toContain('Target="header1.xml"');
+  expect(relsXml).toContain('Target="footer1.xml"');
+  expect(headerRelsXml).toContain('Target="media/template-logo.png"');
 });
 
 test('dropped image assets render and travel through HTML, Word, and Docs Site exports', async ({ page }) => {

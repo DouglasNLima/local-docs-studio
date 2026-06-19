@@ -255,7 +255,7 @@ Manual smoke path:
 - Preview follow for editor selections, enabled by default and toggleable from the preview header.
 - Drag-and-drop PNG, JPEG, GIF, and WebP image insertion as session assets that are included in HTML, Word, and Docs Site exports.
 - Managed asset library for previewing session images, renaming Markdown references, and removing unused image assets.
-- HTML export, Word `.docx` export, copy HTML, and copy rendered text.
+- HTML export, Word `.docx` export, reusable Word export templates from imported `.docx` files, copy HTML, and copy rendered text.
 - PDF export through the browser print dialogue with a clean print stylesheet.
 - Markdown Bundle ZIP export for editable docs plus image assets, with an optional Azure DevOps Mermaid syntax checkbox.
 - ZIP import for app bundles and generic Markdown/Mermaid documentation ZIPs.
@@ -364,12 +364,23 @@ Open `index.html` directly from the extracted folder, or upload the ZIP contents
 ## Advanced Import And Export
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
+- **Word export templates** let you import a `.docx` as a browser-local template pack, then choose it from the Export menu before creating Word output. The MVP preserves supported Word styles, numbering, theme, default header/footer parts, header/footer relationships, and referenced media such as logos. Imported packs are stored in IndexedDB for this browser profile; the ignored `artifacts/word-templates/` path is reserved for local/debug copies and must not be committed with user or corporate assets.
 - **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Export artefact review pack** appears after a valid artefact bundle import and explicitly includes a rebuilt safe `lens-artifact-bundle.json` alongside the normal Markdown Bundle manifest. Generic Markdown Bundle export never includes artefact metadata.
 - **Built-in export profiles** are session-only presets for generic documentation, GitHub Pages docs sites, Azure DevOps Wiki Markdown, and artefact review work. Applying the Azure DevOps Wiki Markdown preset uses a session override and does not write the existing DevOps preference key. Saved local export profiles still use the existing local library storage key.
 - **Import ZIP** accepts Markdown Bundles from this app and generic ZIPs that contain Markdown/Mermaid files and PNG, JPEG, GIF, or WebP images. Imported files are editable virtual documents in the browser; SVG image assets are skipped for security.
 - **Import document** converts `.docx`, `.html`, `.htm`, and `.pdf` files into editable Markdown. Word means modern `.docx`; legacy `.doc` files need conversion outside the browser first. Embedded PNG, JPEG, GIF, and WebP images become managed session assets. PDF import is text-only and creates page sections without OCR, image extraction, or visual layout reconstruction.
 - ZIP import does not convert rendered HTML back into Markdown. If a Docs Site ZIP only contains static HTML plus deployment notes, only editable Markdown/Mermaid files found in that ZIP are imported.
+
+### Word Export Templates
+
+Import a corporate or personal `.docx` from **Export > Import Word template**, confirm the display name, then choose it in the **Word template** selector before selecting **Export Word**. The template remains local to the current browser profile and is not uploaded, shared, or added to exported Markdown Bundles.
+
+The template pack manifest records the template id, display name, source filename, creation time, detected capabilities, detected style ids/names where practical, and a semantic mapping for document title, headings, body text, tables, code, quotes, and captions. During export, generated Word paragraphs and tables use those semantic style ids when present, with standard Word-style fallbacks when a mapping is missing.
+
+The MVP supports copying `word/styles.xml`, `word/numbering.xml`, `word/theme/theme1.xml`, safe `word/settings.xml`, `word/header*.xml`, `word/footer*.xml`, their relationship files, and media referenced by those header/footer relationships. The selected template's first detected header/footer is applied globally to the generated document section. Missing optional parts do not block export.
+
+Known limitations: this is not a visual Word template designer; it does not edit templates, merge complex section-specific first/even page layouts, infer evidence levels, or redistribute corporate branding. Templates and logos are user/organisation-provided assets, and should only be imported or shared when you have permission to use them.
 
 ## Optional Lens Artefact Bundles
 
@@ -396,6 +407,7 @@ The Lens Docs Studio identity uses the `#FF883E` accent in a restrained way for 
 - `assets/styles/app.css` contains the app UI styles.
 - `docs/architecture/lens-docs-studio-ui-definitions.md` exports the reusable UI definitions and token CSS for carrying the Lens Docs Studio look and feel into another app.
 - `docs/architecture/windows-offline-distribution-roadmap.md` captures the Windows offline distribution direction and branch strategy.
+- `docs/architecture/word-export-templates.md` captures the local Word template-pack MVP, storage, mapping, and limitations.
 - `docs/architecture/lens-docs-studio-support-bundle-design.md` captures the design-only contract for a possible future local troubleshooting/support bundle.
 - `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` captures the manual packaged sanity helper/checklist approach; `scripts/windows/New-WindowsManualPackagedSanityChecklist.ps1` implements the local checklist generator and keeps real native picker selection as a human-observed step.
 - `assets/scripts/main.js` boots the ESM app controller.

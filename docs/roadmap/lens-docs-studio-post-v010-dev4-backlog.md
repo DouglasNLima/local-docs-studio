@@ -6,6 +6,8 @@ Planning date: 2026-06-13
 
 Phase 3BN opens a documentation/planning-only post-release backlog and `v0.1.0-dev.5` candidate planning gate after Phase 3BM closed the `v0.1.0-dev.4` evidence chain.
 
+Phase 3BQ implements the vertical MVP for browser-local Word export templates on `develop`: imported `.docx` files become local Word template packs, the Export menu can select a saved pack, and Word export applies supported styles, numbering, theme, header/footer parts, and referenced media without adding cloud template sharing or release asset changes.
+
 The current verified prerelease/dev release for new validation is `v0.1.0-dev.4`.
 
 Current release URL: `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`
@@ -43,6 +45,7 @@ Existing release assets remain unchanged. No `v0.1.0-dev.4` asset, older prerele
 - Runtime prerequisites remain external and are not bootstrapped by the installer.
 - WebView2 user data may remain after uninstall so browser-local state is not silently deleted.
 - Manual packaged sanity helper implementation remains unimplemented and should be considered only after explicit approval.
+- Word export template support is an MVP: it applies the first detected header/footer globally, stores imported packs in the current browser profile, and does not provide a visual designer, template editing, cloud sharing, or redistribution rights for user/organisation-provided corporate assets.
 
 ## Feedback Areas To Monitor
 
