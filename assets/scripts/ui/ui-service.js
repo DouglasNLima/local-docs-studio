@@ -168,6 +168,7 @@ export function createUiService({
       const icon = document.createElement('span');
       icon.className = 'file-icon';
       icon.textContent = getFileExtensionLabel(file.name);
+      button.dataset.fileState = getFileState(file);
 
       const textWrap = document.createElement('span');
       textWrap.className = 'file-text';
@@ -187,19 +188,30 @@ export function createUiService({
     }
 
     function appendFileStateMarker(button, file) {
+      const dirty = state.dirtyPaths.has(file.path);
+      const detail = state.externalChangeDetails?.get(file.path);
+
       if (state.externalChangePaths.has(file.path)) {
+        const markers = document.createElement('span');
+        markers.className = 'file-state-markers';
+        if (dirty) {
+          const dirtyMarker = document.createElement('span');
+          dirtyMarker.className = 'dirty-dot';
+          dirtyMarker.title = 'Edited in the app';
+          markers.appendChild(dirtyMarker);
+        }
         const external = document.createElement('span');
-        external.className = 'external-change-dot';
-        external.title = state.dirtyPaths.has(file.path)
-          ? 'Edited in memory and changed outside the app'
-          : 'Changed outside the app';
-        button.appendChild(external);
+        external.className = `external-change-dot external-change-dot--${getExternalChangeKind(detail)}`;
+        external.title = getExternalChangeTitle(file, detail);
+        markers.appendChild(external);
+        button.appendChild(markers);
         return;
       }
-      if (state.dirtyPaths.has(file.path)) {
+
+      if (dirty) {
         const dirty = document.createElement('span');
         dirty.className = 'dirty-dot';
-        dirty.title = 'Edited in memory';
+        dirty.title = 'Edited in the app';
         button.appendChild(dirty);
         return;
       }
@@ -214,6 +226,18 @@ export function createUiService({
       const spacer = document.createElement('span');
       spacer.setAttribute('aria-hidden', 'true');
       button.appendChild(spacer);
+    }
+
+    function getFileState(file) {
+      const detail = state.externalChangeDetails?.get(file.path);
+      if (state.externalChangePaths.has(file.path)) {
+        if (state.dirtyPaths.has(file.path)) return 'dirtyExternalConflict';
+        if (detail?.kind === 'deleted') return 'externalDeleted';
+        if (detail?.kind === 'renamed') return 'externalRenamed';
+        return 'externalChanged';
+      }
+      if (state.dirtyPaths.has(file.path)) return 'dirty';
+      return 'clean';
     }
 
     function buildFileTree(records) {
@@ -268,10 +292,11 @@ export function createUiService({
       element.className = 'empty-state';
       element.innerHTML = `
         <strong>No documents loaded</strong>
-        <p>Open a file or folder, or create a new Markdown document from a local template.</p>
+        <p>Open a folder for workspace-style browsing and watching, or open one file for a quick local edit.</p>
         <div class="empty-actions">
-          <button type="button" data-sidebar-action="openFile">Open file</button>
           <button type="button" data-sidebar-action="openFolder">Open folder</button>
+          <button type="button" data-sidebar-action="openFile">Open file</button>
+          <button type="button" data-sidebar-action="diagnostics">Diagnostics</button>
           <button type="button" data-sidebar-action="newFile">New file</button>
           <button type="button" data-sidebar-action="addFile">Add file</button>
         </div>`;
@@ -280,8 +305,9 @@ export function createUiService({
 
     function updateActiveFileLabel() {
       const record = state.files.find((item) => item.path === state.activePath);
-      const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in memory' : '';
-      const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ' · changed outside the app' : '';
+      const dirty = state.activePath && state.dirtyPaths.has(state.activePath) ? ' · edited in the app' : '';
+      const detail = state.activePath ? state.externalChangeDetails?.get(state.activePath) : null;
+      const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ` · ${getExternalChangeLabel(detail)}` : '';
       const readOnly = record?.readOnly ? ' · read-only' : '';
       activeFileLabel.textContent = state.activePath ? `${state.activePath}${dirty}${external}${readOnly}` : 'No file selected';
     }
@@ -292,11 +318,11 @@ export function createUiService({
       const disabled = !record || Boolean(record?.readOnly);
       saveButton.disabled = disabled;
       if (saveAsButton) saveAsButton.disabled = disabled;
-      if (refreshFileButton) refreshFileButton.disabled = !record || !record.handle;
+      if (refreshFileButton) refreshFileButton.disabled = !record || (!record.handle && !record.nativeHandleId);
       if (record?.readOnly) {
         saveButton.title = 'Read-only guide documents cannot be saved.';
         if (saveAsButton) saveAsButton.title = 'Read-only guide documents cannot be saved.';
-        if (refreshFileButton) refreshFileButton.title = record.handle ? 'Refresh active file' : 'No linked local file to refresh';
+        if (refreshFileButton) refreshFileButton.title = record.handle || record.nativeHandleId ? 'Refresh active file' : 'No linked local file to refresh';
         return;
       }
       if (canSaveConvertedCopy) {
@@ -305,13 +331,41 @@ export function createUiService({
         if (refreshFileButton) refreshFileButton.title = 'Converted documents have no linked local source to refresh';
         return;
       }
-      saveButton.title = record?.handle
-        ? 'Save changes back to the opened file'
-        : 'Save changes using your browser file picker';
-      if (saveAsButton) saveAsButton.title = 'Save a copy using your browser file picker';
-      if (refreshFileButton) refreshFileButton.title = record?.handle
-        ? 'Read the linked local file again'
-        : 'No linked local file to refresh';
+      saveButton.title = record?.nativeHandleId
+        ? 'Save changes through the Windows app'
+        : record?.handle
+          ? 'Save changes back to the opened file'
+          : 'Save changes using your browser file picker';
+      if (saveAsButton) saveAsButton.title = record?.nativeHandleId
+        ? 'Save a copy through the Windows app'
+        : 'Save a copy using your browser file picker';
+      if (refreshFileButton) refreshFileButton.title = record?.nativeHandleId
+        ? 'Read the Windows workspace file again'
+        : record?.handle
+          ? 'Read the linked local file again'
+          : 'No linked local file to refresh';
+    }
+
+    function getExternalChangeTitle(file, detail) {
+      const dirtyPrefix = state.dirtyPaths.has(file.path) ? 'Edited in the app and ' : '';
+      if (detail?.kind === 'deleted') return `${dirtyPrefix}deleted on disk`;
+      if (detail?.kind === 'renamed') return `${dirtyPrefix}renamed on disk`;
+      if (detail?.kind === 'created') return 'Created on disk';
+      return `${dirtyPrefix}changed on disk`;
+    }
+
+    function getExternalChangeKind(detail) {
+      if (detail?.kind === 'deleted') return 'deleted';
+      if (detail?.kind === 'renamed') return 'renamed';
+      if (detail?.kind === 'created') return 'created';
+      return 'changed';
+    }
+
+    function getExternalChangeLabel(detail) {
+      if (detail?.kind === 'deleted') return 'deleted on disk';
+      if (detail?.kind === 'renamed') return 'renamed on disk';
+      if (detail?.kind === 'created') return 'created on disk';
+      return 'changed on disk';
     }
 
     function hasUnsavedChanges() {

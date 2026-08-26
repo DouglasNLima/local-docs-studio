@@ -653,7 +653,7 @@ export function createRenderingService({
     }
 
     function setRenderStatus(diagramErrors) {
-      const dirtySuffix = state.dirtyPaths.has(state.activePath) ? ' · edited in memory' : '';
+      const dirtySuffix = state.dirtyPaths.has(state.activePath) ? ' · edited in the app' : '';
 
       if (diagramErrors) {
         setStatus(`Rendered with ${diagramErrors} diagram error${diagramErrors === 1 ? '' : 's'}${dirtySuffix}`, 'warning');

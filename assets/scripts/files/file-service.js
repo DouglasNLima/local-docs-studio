@@ -4,6 +4,7 @@ import {
   LENS_ARTIFACT_BUNDLE_MANIFEST_NAME,
   parseLensArtifactBundleManifest,
 } from './lens-artifact-bundle-service.js';
+import { nativeBridgeMessageTypes } from '../native/native-bridge-client.js';
 
 const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   'lens-docs-studio-bundle.json',
@@ -11,12 +12,15 @@ const MARKDOWN_BUNDLE_MANIFEST_NAMES = new Set([
   // Keep accepting bundles exported before the app was renamed.
   'md-mmd-renderer-bundle.json',
 ]);
+const NATIVE_OPEN_FOLDER_PENDING_NOTICE_MS = 5000;
+const NATIVE_OPEN_FOLDER_PENDING_MESSAGE = 'Still waiting for the Windows folder picker. Check for a visible Select Folder window, then choose a folder or cancel.';
 
 export function createFileService({
   state,
   dom,
   callbacks,
   helpers,
+  nativeBridgeClient = null,
 }) {
   const { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview } = dom;
   const {
@@ -56,9 +60,24 @@ export function createFileService({
     normalisePath,
     uniqueByPath,
   } = helpers;
+  const openFolderDiagnostics = {
+    lastAttempt: 'not-attempted',
+    lastMessage: '',
+  };
+
+    if (nativeBridgeClient?.on) {
+      nativeBridgeClient.on(nativeBridgeMessageTypes.workspaceChanged, handleNativeWorkspaceChanged);
+      nativeBridgeClient.on(nativeBridgeMessageTypes.startupFile, handleNativeStartupFile);
+      nativeBridgeClient.on(nativeBridgeMessageTypes.startupFileError, handleNativeStartupFileError);
+    }
 
     async function openFile() {
       if (!await confirmDiscardUnsaved('Open a file and discard unsaved edits?')) return;
+
+      if (await hasNativeFileCapability('file.open')) {
+        const opened = await openNativeFile();
+        if (opened) return;
+      }
 
       try {
         if ('showOpenFilePicker' in window) {
@@ -95,8 +114,81 @@ export function createFileService({
       fileInput.click();
     }
 
+    async function openNativeFile() {
+      try {
+        setStatus('Opening file from Windows...', 'busy');
+        const result = await nativeBridgeClient.openFile();
+        if (!result.ok) {
+          setStatus(result.message || 'Windows open file failed safely. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const payload = result.response?.payload || {};
+        if (payload.cancelled) {
+          setStatus('Open file cancelled.', 'info');
+          return true;
+        }
+
+        if (!isValidNativeFilePayload(payload)) {
+          setStatus('Windows open file returned an unsupported file response. Using the browser fallback...', 'warning');
+          return false;
+        }
+
+        const name = payload.displayName || payload.name;
+        await openNativeFilePayload(payload, 'Windows file');
+        setStatus(`${name} opened from Windows.`, 'ok');
+        return true;
+      } catch (error) {
+        setStatus('Windows open file failed safely. Using the browser fallback...', 'warning');
+        console.error(error);
+        return false;
+      }
+    }
+
+    async function handleNativeStartupFile(message) {
+      const payload = message?.payload || {};
+      if (!isValidNativeFilePayload(payload)) {
+        setStatus('Windows could not open the startup file safely.', 'warning');
+        return;
+      }
+
+      await openNativeFilePayload(payload, 'Windows startup file');
+      const name = payload.displayName || payload.name;
+      setStatus(`${name} opened from Windows.`, 'ok');
+    }
+
+    function handleNativeStartupFileError(message) {
+      const errorMessage = message?.payload?.message;
+      setStatus(typeof errorMessage === 'string' && errorMessage.trim()
+        ? errorMessage
+        : 'Windows could not open the startup file safely.', 'warning');
+    }
+
+    async function openNativeFilePayload(payload, libraryName) {
+      const name = payload.displayName || payload.name;
+      const content = String(payload.content ?? '');
+      const file = new File([content], name, { type: getMimeTypeForPath(name) });
+      await setLibraryFromRecords([{
+        name,
+        path: name,
+        file,
+        nativeHandleId: payload.nativeHandleId,
+      }], libraryName, { workspaceKind: 'file' });
+    }
+
     async function openFolder() {
       if (!await confirmDiscardUnsaved('Open a folder and discard unsaved edits?')) return;
+
+      const nativeRoute = await getNativeCapabilityState('workspace.openFolder');
+      if (nativeRoute.hasCapability) {
+        await openNativeFolder();
+        return;
+      }
+      if (nativeRoute.bridgeAvailable) {
+        updateOpenFolderAttempt(nativeRoute.pingPassed ? 'capability-missing' : 'bridge-unavailable', getNativeOpenFolderUnavailableMessage(nativeRoute));
+        setStatus(getNativeOpenFolderUnavailableMessage(nativeRoute), 'warning');
+        return;
+      }
 
       try {
         if ('showDirectoryPicker' in window) {
@@ -104,6 +196,7 @@ export function createFileService({
             id: 'md-mmd-renderer-folder',
             mode: 'readwrite',
           });
+          updateOpenFolderAttempt('browser-picker-opened', 'Browser directory picker opened.');
           setStatus('Reading folder...');
           const records = await collectDirectoryRecords(directoryHandle);
           await setLibraryFromRecords(records, directoryHandle.name || 'Selected folder', {
@@ -114,11 +207,84 @@ export function createFileService({
           return;
         }
       } catch (error) {
-        if (error?.name === 'AbortError') return;
+        if (error?.name === 'AbortError') {
+          updateOpenFolderAttempt('cancelled', 'Browser folder picker cancelled.');
+          return;
+        }
+        updateOpenFolderAttempt('browser-picker-error', 'Browser folder picker failed.');
         setStatus('Folder picker failed. Using the browser fallback...', 'warning');
       }
 
       folderInput.click();
+    }
+
+    async function openNativeFolder() {
+      let pendingNoticeId = null;
+      try {
+        updateOpenFolderAttempt('native-picker-opened', 'Native Windows folder picker opened.');
+        setStatus('Opening folder from Windows...', 'busy');
+        pendingNoticeId = window.setTimeout?.(() => {
+          updateOpenFolderAttempt('pending', NATIVE_OPEN_FOLDER_PENDING_MESSAGE);
+          setStatus(NATIVE_OPEN_FOLDER_PENDING_MESSAGE, 'warning');
+        }, NATIVE_OPEN_FOLDER_PENDING_NOTICE_MS);
+        const result = await nativeBridgeClient.openFolder();
+        clearNativeOpenFolderPendingNotice(pendingNoticeId);
+        pendingNoticeId = null;
+        if (!result.ok) {
+          const message = getNativeOpenFolderFailureMessage(result);
+          updateOpenFolderAttempt(result.reason === 'timeout' ? 'timeout' : 'native-error', message);
+          setStatus(message, 'danger');
+          return false;
+        }
+
+        const payload = result.response?.payload || {};
+        if (payload.cancelled) {
+          updateOpenFolderAttempt('cancelled', 'Open folder cancelled.');
+          setStatus('Open folder cancelled.', 'info');
+          return true;
+        }
+
+        if (!isValidNativeWorkspacePayload(payload)) {
+          updateOpenFolderAttempt('native-error', 'Windows open folder returned an unsupported workspace response.');
+          setStatus('Windows open folder returned an unsupported workspace response.', 'danger');
+          return false;
+        }
+
+        const records = payload.files.map((file) => {
+          const path = normalisePath(file.path || file.displayPath || file.name);
+          const name = file.name || path.split('/').pop() || path;
+          const content = String(file.content ?? '');
+          return {
+            name,
+            path,
+            file: new File([content], name, { type: getMimeTypeForPath(path) }),
+            nativeHandleId: file.nativeHandleId,
+          };
+        });
+        await setLibraryFromRecords(records, payload.workspaceName || 'Windows workspace', {
+          workspaceKind: 'native-folder',
+          nativeWorkspaceId: payload.nativeWorkspaceId,
+        });
+
+        const skipped = Array.isArray(payload.skipped) ? payload.skipped : [];
+        state.lastSkippedFileCount = skipped.length;
+        if (skipped.length) {
+          updateOpenFolderAttempt('folder-selected', `${records.length} Windows workspace file${records.length === 1 ? '' : 's'} loaded; skipped files reported.`);
+          setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows. ${skipped.length} file${skipped.length === 1 ? '' : 's'} skipped by workspace limits.`, 'warning');
+        } else if (records.length) {
+          updateOpenFolderAttempt('folder-selected', `${records.length} Windows workspace file${records.length === 1 ? '' : 's'} loaded.`);
+          setStatus(`${records.length} file${records.length === 1 ? '' : 's'} loaded from Windows.`, 'ok');
+        } else {
+          updateOpenFolderAttempt('folder-selected', 'Windows workspace selected with no supported files.');
+        }
+        return true;
+      } catch (error) {
+        clearNativeOpenFolderPendingNotice(pendingNoticeId);
+        updateOpenFolderAttempt('native-error', 'Windows open folder failed safely.');
+        setStatus('Windows open folder failed safely.', 'danger');
+        console.error(error);
+        return false;
+      }
     }
 
     async function importZip() {
@@ -165,6 +331,11 @@ export function createFileService({
 
       if (state.workspaceDirectoryHandle) {
         await createFileInWorkspace(name);
+        return;
+      }
+
+      if (state.nativeWorkspaceId && await hasNativeFileCapability('workspace.createFile')) {
+        await createNativeWorkspaceFile(name);
         return;
       }
 
@@ -358,6 +529,7 @@ export function createFileService({
     async function setLibraryFromRecords(records, folderName, options = {}) {
       clearFocusedModes();
       clearManagedAssets?.();
+      state.lastSkippedFileCount = null;
       const uniqueRecords = uniqueByPath(records)
         .filter((record) => isSupportedFile(record.name))
         .map(prepareRecord)
@@ -368,6 +540,7 @@ export function createFileService({
       state.fileName = '';
       state.folderName = folderName;
       state.workspaceDirectoryHandle = options.directoryHandle || null;
+      state.nativeWorkspaceId = options.nativeWorkspaceId || '';
       state.workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
@@ -375,6 +548,7 @@ export function createFileService({
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
+      state.externalChangeDetails?.clear();
       afterLibraryLoaded?.();
       clearScrollPositions?.();
       fileSearch.value = '';
@@ -428,6 +602,7 @@ export function createFileService({
         state.fileName = '';
         state.folderName = imported.folderName;
         state.workspaceDirectoryHandle = null;
+        state.nativeWorkspaceId = '';
         state.workspaceKind = imported.artifactBundle ? 'artefact-bundle' : imported.bundle ? 'bundle' : 'zip';
         state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
@@ -439,6 +614,7 @@ export function createFileService({
         });
         state.dirtyPaths.clear();
         state.externalChangePaths?.clear();
+        state.externalChangeDetails?.clear();
         afterLibraryLoaded?.();
         clearScrollPositions?.();
         fileSearch.value = '';
@@ -523,12 +699,14 @@ export function createFileService({
       state.fileName = '';
       state.folderName = imported.records.length === 1 ? 'Imported document' : 'Imported documents';
       state.workspaceDirectoryHandle = null;
+      state.nativeWorkspaceId = '';
       state.workspaceKind = 'converted';
       state.artifactBundle = null;
       state.fileCache.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
+      state.externalChangeDetails?.clear();
       afterLibraryLoaded?.();
       clearScrollPositions?.();
       fileSearch.value = '';
@@ -769,6 +947,7 @@ export function createFileService({
         }
         await renderPreview();
         restoreScrollPosition?.(record.path);
+        showNativeWorkspaceChangeStatus(record);
       } catch (error) {
         setStatus(`Could not open ${record.name}.`, 'danger');
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
@@ -801,6 +980,15 @@ export function createFileService({
 
       try {
         await flushPendingRenderBeforeSave();
+        if (record.nativeHandleId && await hasNativeFileCapability('file.save')) {
+          if (state.workspaceKind === 'native-folder' && await hasNativeFileCapability('workspace.saveFile')) {
+            await saveRecordToNativeWorkspaceHandle(record, content);
+            return;
+          }
+          await saveRecordToNativeHandle(record, content);
+          return;
+        }
+
         if (record.handle) {
           if (!await ensureWritePermission(record.handle)) {
             setStatus('Browser permission is needed to save back to the opened file.', 'warning');
@@ -842,6 +1030,12 @@ export function createFileService({
 
       const content = editor.value;
       try {
+        await flushPendingRenderBeforeSave();
+        if (await hasNativeFileCapability('file.saveAs')) {
+          const saved = await saveRecordToNativeHandleAs(record, content);
+          if (saved) return true;
+        }
+
         if ('showSaveFilePicker' in window) {
           const oldPath = record.path;
           const handle = await window.showSaveFilePicker({
@@ -872,6 +1066,235 @@ export function createFileService({
       }
     }
 
+    async function hasNativeFileCapability(capability) {
+      const state = await getNativeCapabilityState(capability);
+      return state.hasCapability;
+    }
+
+    async function getNativeCapabilityState(capability) {
+      if (!nativeBridgeClient?.isAvailable?.()) {
+        return {
+          bridgeAvailable: false,
+          pingPassed: false,
+          hasCapability: false,
+          reason: 'unavailable',
+          message: 'Native bridge unavailable.',
+        };
+      }
+      try {
+        if (typeof nativeBridgeClient.getCapabilityState === 'function') {
+          return await nativeBridgeClient.getCapabilityState(capability);
+        }
+        return {
+          bridgeAvailable: true,
+          pingPassed: true,
+          hasCapability: await nativeBridgeClient.hasCapability(capability),
+          reason: '',
+          message: '',
+        };
+      } catch {
+        return {
+          bridgeAvailable: true,
+          pingPassed: false,
+          hasCapability: false,
+          reason: 'probe-failed',
+          message: 'Windows bridge capability check failed safely.',
+        };
+      }
+    }
+
+    function getNativeOpenFolderUnavailableMessage(route) {
+      if (!route.pingPassed) {
+        return `${route.message || 'Windows bridge did not respond.'} Open folder cannot use the browser fallback while running in the Windows shell. Use Help > Windows shell diagnostics, retry the bridge check, then try Open folder again.`;
+      }
+      return 'Windows Open folder is unavailable because workspace.openFolder was not reported. Use Help > Windows shell diagnostics before retrying manual watcher evidence.';
+    }
+
+    function getNativeOpenFolderFailureMessage(result) {
+      if (result.reason === 'timeout') {
+        return 'Windows folder picker timed out. Open folder cannot use the browser fallback while running in the Windows shell.';
+      }
+      return getBoundedOpenFolderMessage(result.message || 'Windows open folder failed safely.');
+    }
+
+    function getBoundedOpenFolderMessage(message) {
+      const text = typeof message === 'string' && message.trim()
+        ? message.trim()
+        : 'Windows open folder failed safely.';
+      const safeText = text
+        .replace(/[A-Za-z]:\\[^\s"'<>]+/g, '[local path]')
+        .replace(/\/Users\/[^\s"'<>]+/g, '[local path]')
+        .replace(/%TEMP%[^\s"'<>]*/gi, '[local path]');
+      return safeText.length > 180 ? `${safeText.slice(0, 177)}...` : safeText;
+    }
+
+    function updateOpenFolderAttempt(status, message = '') {
+      openFolderDiagnostics.lastAttempt = status;
+      openFolderDiagnostics.lastMessage = getBoundedOpenFolderMessage(message);
+    }
+
+    function clearNativeOpenFolderPendingNotice(timeoutId) {
+      if (timeoutId) window.clearTimeout?.(timeoutId);
+    }
+
+    function getOpenFolderDiagnostics() {
+      return { ...openFolderDiagnostics };
+    }
+
+    async function saveRecordToNativeHandle(record, content) {
+      setStatus(`Saving ${record.name} through Windows...`, 'busy');
+      const result = await nativeBridgeClient.saveFile({
+        nativeHandleId: record.nativeHandleId,
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows save failed safely.', 'danger');
+        updateSaveButton();
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      if (!payload.saved) {
+        setStatus('Windows save did not complete.', 'warning');
+        updateSaveButton();
+        return;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content);
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content);
+    }
+
+    async function saveRecordToNativeWorkspaceHandle(record, content) {
+      setStatus(`Saving ${record.name} through Windows workspace...`, 'busy');
+      const result = await nativeBridgeClient.saveWorkspaceFile({
+        nativeHandleId: record.nativeHandleId,
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows workspace save failed safely.', 'danger');
+        updateSaveButton();
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      if (!payload.saved) {
+        setStatus('Windows workspace save did not complete.', 'warning');
+        updateSaveButton();
+        return;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content);
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content);
+    }
+
+    async function saveRecordToNativeHandleAs(record, content) {
+      setStatus(`Saving ${record.name} through Windows...`, 'busy');
+      const oldPath = record.path;
+      const result = await nativeBridgeClient.saveFileAs({
+        suggestedName: record.name || getMarkdownExportName(),
+        content,
+      });
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows save as failed safely. Using the browser fallback...', 'warning');
+        return false;
+      }
+
+      const payload = result.response?.payload || {};
+      if (payload.cancelled) {
+        setStatus('Save as cancelled.', 'info');
+        return true;
+      }
+      if (!payload.saved || !isValidNativeSaveAsPayload(payload)) {
+        setStatus('Windows save as returned an unsupported response. Using the browser fallback...', 'warning');
+        return false;
+      }
+
+      updateRecordAfterNativeSave(record, payload, content, { oldPath, replaceHandle: true });
+      setStatus(buildSaveStatus(record.name), state.managedAssets?.size ? 'warning' : 'ok');
+      await afterSaveActiveFile?.(record, content, oldPath);
+      return true;
+    }
+
+    function updateRecordAfterNativeSave(record, payload, content, options = {}) {
+      const oldPath = options.oldPath || record.path;
+      const nextName = payload.displayName || payload.name || record.name;
+      if (options.replaceHandle) {
+        record.name = nextName;
+        record.path = getUniqueRecordPath(normalisePath(nextName || record.path || record.name), record);
+        record.nativeHandleId = payload.nativeHandleId;
+        record.handle = null;
+        state.files.sort(compareRecords);
+      }
+
+      record.file = new File([content], record.name, { type: getMimeTypeForPath(record.name) });
+      record.converted = false;
+      record.needsSave = false;
+      updateRecordFingerprint(record, record.file);
+      state.fileName = record.name;
+      state.activePath = record.path;
+      if (oldPath && oldPath !== record.path) {
+        state.fileCache.delete(oldPath);
+        state.dirtyPaths.delete(oldPath);
+        state.externalChangePaths?.delete(oldPath);
+        state.externalChangeDetails?.delete(oldPath);
+      }
+      state.fileCache.set(record.path, content);
+      state.dirtyPaths.delete(record.path);
+      state.externalChangePaths?.delete(record.path);
+      state.externalChangeDetails?.delete(record.path);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+    }
+
+    function isValidNativeFilePayload(payload) {
+      return payload
+        && !payload.cancelled
+        && typeof payload.name === 'string'
+        && isSupportedFile(payload.name)
+        && typeof payload.content === 'string'
+        && typeof payload.nativeHandleId === 'string'
+        && payload.nativeHandleId.trim();
+    }
+
+    function isValidNativeSaveAsPayload(payload) {
+      return payload
+        && typeof payload.name === 'string'
+        && isSupportedFile(payload.name)
+        && typeof payload.nativeHandleId === 'string'
+        && payload.nativeHandleId.trim();
+    }
+
+    function isValidNativeWorkspacePayload(payload) {
+      return payload
+        && !payload.cancelled
+        && typeof payload.workspaceName === 'string'
+        && typeof payload.nativeWorkspaceId === 'string'
+        && payload.nativeWorkspaceId.trim()
+        && Array.isArray(payload.files)
+        && payload.files.every(isValidNativeWorkspaceFilePayload);
+    }
+
+    function isValidNativeWorkspaceFilePayload(file) {
+      const path = normalisePath(file?.path || file?.displayPath || file?.name || '');
+      return file
+        && typeof file.name === 'string'
+        && isSupportedFile(file.name)
+        && path
+        && !path.startsWith('/')
+        && !/^[a-z]:/i.test(path)
+        && !path.split('/').some((part) => part === '.' || part === '..')
+        && isSupportedFile(path)
+        && typeof file.content === 'string'
+        && typeof file.nativeHandleId === 'string'
+        && file.nativeHandleId.trim();
+    }
+
     async function saveRecordToHandle(record, handle, content, options = {}) {
       const oldPath = options.oldPath || record.path;
       setStatus(`Saving ${record.name}...`);
@@ -897,10 +1320,12 @@ export function createFileService({
         state.fileCache.delete(oldPath);
         state.dirtyPaths.delete(oldPath);
         state.externalChangePaths?.delete(oldPath);
+        state.externalChangeDetails?.delete(oldPath);
       }
       state.fileCache.set(record.path, content);
       state.dirtyPaths.delete(record.path);
       state.externalChangePaths?.delete(record.path);
+      state.externalChangeDetails?.delete(record.path);
       renderFileList();
       updateActiveFileLabel();
       updateSaveButton();
@@ -1016,26 +1441,269 @@ export function createFileService({
       }
     }
 
+    async function createNativeWorkspaceFile(path) {
+      try {
+        setStatus(`Creating ${path} through Windows workspace...`, 'busy');
+        const result = await nativeBridgeClient.createWorkspaceFile({
+          nativeWorkspaceId: state.nativeWorkspaceId,
+          path,
+          content: '',
+        });
+
+        if (!result.ok) {
+          setStatus(result.message || 'Windows workspace file creation failed safely.', 'danger');
+          return;
+        }
+
+        const payload = result.response?.payload || {};
+        if (!payload.created || !isValidNativeWorkspaceFilePayload(payload)) {
+          setStatus('Windows workspace returned an unsupported file response.', 'warning');
+          return;
+        }
+
+        const recordPath = normalisePath(payload.path || payload.displayPath || path);
+        const recordName = payload.name || recordPath.split('/').pop() || recordPath;
+        const content = String(payload.content ?? '');
+        const record = prepareRecord({
+          name: recordName,
+          path: recordPath,
+          file: new File([content], recordName, { type: getMimeTypeForPath(recordPath) }),
+          nativeHandleId: payload.nativeHandleId,
+        });
+        state.fileCache.set(recordPath, content);
+        state.savedContentCache?.set(recordPath, content);
+        await addRecordsToWorkspace([record], {
+          folderName: state.folderName || 'Windows workspace',
+          selectPath: recordPath,
+        });
+        state.workspaceKind = 'native-folder';
+        setStatus(`${recordPath} added to the Windows workspace.`, 'ok');
+      } catch (error) {
+        setStatus('Could not create the file in this Windows workspace.', 'danger');
+        console.error(error);
+      }
+    }
+
+    function handleNativeWorkspaceChanged(message) {
+      const payload = message?.payload || {};
+      if (!state.nativeWorkspaceId || payload.nativeWorkspaceId !== state.nativeWorkspaceId) return;
+      if (!Array.isArray(payload.changes)) return;
+
+      let marked = 0;
+      payload.changes.forEach((change) => {
+        const safeChange = normaliseNativeWorkspaceChange(change);
+        if (!safeChange) return;
+        marked += applyNativeWorkspaceChange(safeChange) ? 1 : 0;
+      });
+
+      if (!marked) return;
+      state.files.sort(compareRecords);
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      const activeDetail = state.externalChangeDetails?.get(state.activePath);
+      if (activeDetail) {
+        clearTimeout(state.debounceId);
+        setStatus(getNativeWorkspaceChangeStatus(activeDetail, state.dirtyPaths.has(state.activePath)), 'warning');
+        return;
+      }
+      setStatus(`${marked} workspace file${marked === 1 ? '' : 's'} changed on disk. Open marked files to review them.`, 'warning');
+    }
+
+    function normaliseNativeWorkspaceChange(change) {
+      if (!change || typeof change !== 'object') return null;
+      const kind = String(change.kind || '').trim();
+      if (!['changed', 'created', 'deleted', 'renamed'].includes(kind)) return null;
+      const path = sanitiseWorkspaceFilePath(change.path);
+      if (!path) return null;
+      const oldPath = kind === 'renamed' ? sanitiseWorkspaceFilePath(change.oldPath) : '';
+      if (kind === 'renamed' && !oldPath) return null;
+      const nativeHandleId = typeof change.nativeHandleId === 'string' && change.nativeHandleId.trim()
+        ? change.nativeHandleId.trim()
+        : '';
+      return { kind, path, oldPath, nativeHandleId };
+    }
+
+    function applyNativeWorkspaceChange(change) {
+      if (change.kind === 'created') {
+        const existing = findRecordByPath(change.path);
+        if (existing) {
+          markExternalChange(existing.path, { ...change, kind: 'changed' });
+          return true;
+        }
+
+        const name = change.path.split('/').pop() || change.path;
+        const record = prepareRecord({
+          name,
+          path: change.path,
+          file: new File([''], name, { type: getMimeTypeForPath(change.path) }),
+          nativeHandleId: change.nativeHandleId,
+        });
+        record.externalPlaceholder = true;
+        state.files.push(record);
+        markExternalChange(record.path, change);
+        return true;
+      }
+
+      if (change.kind === 'renamed') {
+        const record = findRecordByPath(change.oldPath);
+        if (!record) {
+          return applyNativeWorkspaceChange({ ...change, kind: 'created' });
+        }
+
+        if (state.dirtyPaths.has(record.path)) {
+          markExternalChange(record.path, change);
+          return true;
+        }
+
+        const oldPath = record.path;
+        record.path = change.path;
+        record.name = change.path.split('/').pop() || record.name;
+        if (change.nativeHandleId) record.nativeHandleId = change.nativeHandleId;
+        moveCachedRecordPath(oldPath, record.path);
+        markExternalChange(record.path, change);
+        state.externalChangePaths?.delete(oldPath);
+        state.externalChangeDetails?.delete(oldPath);
+        if (state.activePath === oldPath) {
+          state.activePath = record.path;
+          state.fileName = record.name;
+        }
+        return true;
+      }
+
+      const record = findRecordByPath(change.path);
+      if (!record) return false;
+      if (change.nativeHandleId) record.nativeHandleId = change.nativeHandleId;
+      markExternalChange(record.path, change);
+      return true;
+    }
+
+    function findRecordByPath(path) {
+      const lower = String(path || '').toLowerCase();
+      return state.files.find((record) => record.path.toLowerCase() === lower);
+    }
+
+    function markExternalChange(path, detail) {
+      state.externalChangePaths?.add(path);
+      state.externalChangeDetails?.set(path, {
+        ...detail,
+        receivedAtUtc: new Date().toISOString(),
+      });
+    }
+
+    function clearExternalChange(path) {
+      state.externalChangePaths?.delete(path);
+      state.externalChangeDetails?.delete(path);
+    }
+
+    function moveCachedRecordPath(oldPath, nextPath) {
+      for (const cache of [state.fileCache, state.savedContentCache]) {
+        if (!cache?.has(oldPath)) continue;
+        cache.set(nextPath, cache.get(oldPath));
+        cache.delete(oldPath);
+      }
+      if (state.dirtyPaths.has(oldPath)) {
+        state.dirtyPaths.delete(oldPath);
+        state.dirtyPaths.add(nextPath);
+      }
+      clearExternalChange(oldPath);
+    }
+
+    function getNativeWorkspaceChangeStatus(detail, dirty) {
+      if (detail.kind === 'deleted') {
+        return 'This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.';
+      }
+      if (detail.kind === 'renamed') {
+        return dirty
+          ? 'This file was renamed on disk while you have unsaved app edits. Review before saving.'
+          : 'This file was renamed on disk. Review before saving.';
+      }
+      if (detail.kind === 'created') {
+        return `${detail.path} was created on disk. Use Refresh active file to read it.`;
+      }
+      return dirty
+        ? 'This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.'
+        : 'This file changed on disk. Use Refresh active file to read the disk version.';
+    }
+
+    function showNativeWorkspaceChangeStatus(record) {
+      const detail = state.externalChangeDetails?.get(record?.path);
+      if (!detail) return false;
+      setStatus(getNativeWorkspaceChangeStatus(detail, state.dirtyPaths.has(record.path)), 'warning');
+      return true;
+    }
+
     async function refreshActiveFile() {
       const record = state.files.find((item) => item.path === state.activePath);
       if (!record) {
         setStatus('No file selected.', 'warning');
         return;
       }
+
+      if (record.nativeHandleId && state.workspaceKind === 'native-folder' && await hasNativeFileCapability('workspace.refreshFile')) {
+        await refreshNativeWorkspaceFile(record);
+        return;
+      }
+
       if (!record.handle) {
         setStatus('This document has no linked local file to refresh.', 'warning');
         return;
       }
-      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has in-memory edits. Reload the local file and discard those edits?`, {
-        title: 'Reload local file?',
+      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.`, {
+        title: 'Use disk version?',
         kicker: 'Refresh file',
-        confirmLabel: 'Reload file',
+        confirmLabel: 'Use disk version',
+        cancelLabel: 'Keep app edits',
         danger: true,
       })) {
         return;
       }
 
       await reloadRecordFromHandle(record, { status: `${record.name} refreshed from the local file.` });
+    }
+
+    async function refreshNativeWorkspaceFile(record) {
+      const detail = state.externalChangeDetails?.get(record.path);
+      if (detail?.kind === 'deleted') {
+        setStatus('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.', 'warning');
+        return;
+      }
+
+      if (state.dirtyPaths.has(record.path) && !await confirmAction(`${record.name} has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.`, {
+        title: 'Use disk version?',
+        kicker: 'Refresh file',
+        confirmLabel: 'Use disk version',
+        cancelLabel: 'Keep app edits',
+        danger: true,
+      })) {
+        showNativeWorkspaceChangeStatus(record);
+        return;
+      }
+
+      try {
+        setStatus(`Refreshing ${record.name} from disk...`, 'busy');
+        const result = await nativeBridgeClient.refreshWorkspaceFile({
+          nativeWorkspaceId: state.nativeWorkspaceId,
+          nativeHandleId: record.nativeHandleId,
+          path: record.path,
+        });
+
+        if (!result.ok) {
+          setStatus(result.message || 'Windows workspace refresh failed safely.', 'danger');
+          return;
+        }
+
+        const payload = result.response?.payload || {};
+        if (!payload.refreshed || !isValidNativeWorkspaceFilePayload(payload)) {
+          setStatus('Windows workspace returned an unsupported refresh response.', 'warning');
+          return;
+        }
+
+        await reloadRecordFromNativePayload(record, payload, { status: `${record.name} refreshed from disk.` });
+      } catch (error) {
+        setStatus('Could not refresh the Windows workspace file.', 'danger');
+        console.error(error);
+      }
     }
 
     async function checkForExternalUpdates() {
@@ -1052,6 +1720,7 @@ export function createFileService({
           const file = await record.handle.getFile();
           if (hasFingerprintChanged(record, file)) {
             state.externalChangePaths?.add(record.path);
+            state.externalChangeDetails?.set(record.path, { kind: 'changed', path: record.path });
             changed += 1;
           }
         } catch {
@@ -1061,7 +1730,7 @@ export function createFileService({
       if (changed) {
         renderFileList();
         updateActiveFileLabel();
-        setStatus(`${changed} workspace file${changed === 1 ? '' : 's'} changed outside the app. Open a marked file to review it.`, 'warning');
+        setStatus(`${changed} workspace file${changed === 1 ? '' : 's'} changed on disk. Open a marked file to review it.`, 'warning');
       }
     }
 
@@ -1072,6 +1741,7 @@ export function createFileService({
         file = await record.handle.getFile();
       } catch {
         state.externalChangePaths?.add(record.path);
+        state.externalChangeDetails?.set(record.path, { kind: 'changed', path: record.path });
         renderFileList();
         updateActiveFileLabel();
         setStatus(`Could not check ${record.name}. Browser permission may be needed.`, 'warning');
@@ -1086,20 +1756,23 @@ export function createFileService({
 
       if (!hasFingerprintChanged(record, file)) {
         state.externalChangePaths?.delete(record.path);
+        state.externalChangeDetails?.delete(record.path);
         return 'none';
       }
 
       const alreadyMarked = state.externalChangePaths?.has(record.path);
       state.externalChangePaths?.add(record.path);
+      state.externalChangeDetails?.set(record.path, { kind: 'changed', path: record.path });
       if (reason === 'focus' && alreadyMarked) return 'marked';
 
       const dirty = state.dirtyPaths.has(record.path);
       const reload = await confirmAction(dirty
-        ? `${record.name} changed outside the app. Reload the local file and discard your in-memory edits? Choose Cancel to keep your local edits.`
-        : `${record.name} changed outside the app. Reload the latest version?`, {
-        title: 'External change detected',
+        ? `${record.name} changed on disk while you have unsaved app edits. Reloading will replace the app version with the disk version. Choose Keep app edits to continue editing here.`
+        : `${record.name} changed on disk. Reload the disk version?`, {
+        title: 'File changed on disk',
         kicker: 'Local file changed',
-        confirmLabel: dirty ? 'Reload and discard edits' : 'Reload latest',
+        confirmLabel: dirty ? 'Use disk version' : 'Reload disk version',
+        cancelLabel: dirty ? 'Keep app edits' : 'Cancel',
         danger: dirty,
       });
 
@@ -1110,7 +1783,7 @@ export function createFileService({
 
       renderFileList();
       updateActiveFileLabel();
-      setStatus(`${record.name} changed outside the app. Keeping the in-memory version for now.`, 'warning');
+      setStatus(`${record.name} changed on disk. Keeping the app version for now.`, 'warning');
       return 'kept';
     }
 
@@ -1129,6 +1802,7 @@ export function createFileService({
       state.savedContentCache?.set(record.path, text);
       state.dirtyPaths.delete(record.path);
       state.externalChangePaths?.delete(record.path);
+      state.externalChangeDetails?.delete(record.path);
       if (record.path === state.activePath) {
         editor.value = text;
         editor.scrollTop = 0;
@@ -1140,6 +1814,44 @@ export function createFileService({
         await renderPreview();
         restoreScrollPosition?.(record.path);
       }
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      setStatus(options.status || `${record.name} refreshed.`, 'ok');
+    }
+
+    async function reloadRecordFromNativePayload(record, payload, options = {}) {
+      const nextPath = normalisePath(payload.path || payload.displayPath || record.path);
+      const nextName = payload.name || nextPath.split('/').pop() || record.name;
+      const oldPath = record.path;
+      const text = String(payload.content ?? '');
+      record.name = nextName;
+      record.path = nextPath;
+      record.file = new File([text], nextName, { type: getMimeTypeForPath(nextPath) });
+      record.nativeHandleId = payload.nativeHandleId || record.nativeHandleId;
+      record.converted = false;
+      record.needsSave = false;
+      record.externalPlaceholder = false;
+      updateRecordFingerprint(record, record.file);
+      if (oldPath !== record.path) {
+        moveCachedRecordPath(oldPath, record.path);
+      }
+      state.fileCache.set(record.path, text);
+      state.savedContentCache?.set(record.path, text);
+      state.dirtyPaths.delete(record.path);
+      clearExternalChange(record.path);
+      state.activePath = record.path;
+      state.fileName = record.name;
+      editor.value = text;
+      editor.scrollTop = 0;
+      preview.scrollTop = 0;
+      resetEditorHistory();
+      syncEditorReadOnly?.();
+      updateEditorChrome?.();
+      await afterSaveActiveFile?.(record, text, oldPath);
+      await renderPreview();
+      restoreScrollPosition?.(record.path);
+      state.files.sort(compareRecords);
       renderFileList();
       updateActiveFileLabel();
       updateSaveButton();
@@ -1320,5 +2032,6 @@ export function createFileService({
       refreshActiveFile,
       checkForExternalUpdates,
       ensureWritePermission,
+      getOpenFolderDiagnostics,
     };
 }

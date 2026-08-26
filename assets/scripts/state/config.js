@@ -1,6 +1,6 @@
-export const supportedFilePattern = /\.(md|markdown|mmd|mermaid)$/i;
+export const supportedFilePattern = /\.(md|markdown|mmd|mermaid|txt)$/i;
 export const APP_VERSION = '0.1.0';
-export const APP_BUILD = '56';
+export const APP_BUILD = '58';
 export const APP_BROWSER_TITLE = `Lens Docs Studio v${APP_VERSION} (build ${APP_BUILD})`;
 
 export const storageKeys = {
@@ -23,6 +23,9 @@ export const storageKeys = {
   typewriterMode: 'md-mmd-renderer.typewriterMode',
   workspaceSearchOptions: 'md-mmd-renderer.workspaceSearchOptions',
   draftStoreVersion: 'md-mmd-renderer.draftStoreVersion',
+  windowsSetupCompleted: 'lensDocs.windowsSetup.completed',
+  windowsSetupCompletedAt: 'lensDocs.windowsSetup.completedAt',
+  windowsSetupVersion: 'lensDocs.windowsSetup.version',
 };
 
 export const mermaidStarters = [
@@ -55,6 +58,7 @@ export function createInitialState({ readStoredNumber }) {
     fileName: '',
     folderName: '',
     workspaceDirectoryHandle: null,
+    nativeWorkspaceId: '',
     workspaceKind: '',
     selectedTreeFolderPath: '',
     renderId: 0,
@@ -63,6 +67,7 @@ export function createInitialState({ readStoredNumber }) {
     savedContentCache: new Map(),
     dirtyPaths: new Set(),
     externalChangePaths: new Set(),
+    externalChangeDetails: new Map(),
     deletionOverridePaths: new Set(),
     draftWorkspaceKey: '',
     diagramZoom: readStoredNumber(storageKeys.diagramZoom, 1),
@@ -85,6 +90,7 @@ export function createInitialState({ readStoredNumber }) {
     managedAssets: new Map(),
     managedAssetCounter: 0,
     artifactBundle: null,
+    lastSkippedFileCount: null,
     activeBuiltInExportProfile: '',
     sessionDevopsMarkdownExport: null,
     exportProfileDefaults: null,

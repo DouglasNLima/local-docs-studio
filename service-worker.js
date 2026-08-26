@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v56';
+const CACHE_NAME = 'lens-docs-studio-v63';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -24,8 +24,11 @@ const LOCAL_ASSETS = [
   './assets/scripts/files/document-import-service.js',
   './assets/scripts/files/document-import-worker.js',
   './assets/scripts/files/lens-artifact-bundle-service.js',
+  './assets/scripts/native/native-bridge-client.js',
+  './assets/scripts/native/native-smoke-runner.js',
   './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
+  './assets/scripts/exports/word-template-service.js',
   './assets/scripts/files/file-service.js',
   './assets/scripts/rendering/render-service.js',
   './assets/scripts/registries/content.js',
@@ -33,7 +36,9 @@ const LOCAL_ASSETS = [
   './assets/scripts/ui/artifact-bundle-reader.js',
   './assets/scripts/ui/context-menu-service.js',
   './assets/scripts/ui/dialog-service.js',
+  './assets/scripts/ui/support-bundle-service.js',
   './assets/scripts/ui/ui-service.js',
+  './assets/scripts/ui/windows-setup-service.js',
   './assets/scripts/utils/binary.js',
   './assets/scripts/utils/browser.js',
   './assets/scripts/utils/devops-markdown.js',
@@ -43,6 +48,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/utils/html-markdown.js',
   './assets/scripts/utils/idb.js',
   './assets/scripts/utils/markdown-table.js',
+  './assets/scripts/utils/markdown-clipboard.js',
   './assets/scripts/utils/math.js',
   './assets/scripts/utils/search.js',
   './assets/scripts/utils/security.js',

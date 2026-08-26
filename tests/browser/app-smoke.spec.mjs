@@ -82,6 +82,17 @@ async function loadSample(page) {
   await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
 }
 
+async function openFileMenu(page) {
+  const fileMenu = page.locator('details.menu').filter({
+    has: page.locator('summary').filter({ hasText: /^File$/ }),
+  });
+  if (!await fileMenu.locator('.menu-panel').isVisible()) {
+    await fileMenu.locator('summary').click();
+  }
+  await expect(fileMenu.locator('.menu-panel')).toBeVisible();
+  return fileMenu;
+}
+
 async function expectMobileMenuPanelUsable(page, menuName) {
   await page.locator('summary').filter({ hasText: new RegExp(`^${menuName}$`) }).click();
   const panel = page.locator('details.menu[open] .menu-panel');
@@ -227,6 +238,20 @@ async function writeArtifactBundleFixtureZip(testInfo, fixtureName, name = `${fi
   const zipPath = testInfo.outputPath(name);
   await writeFile(zipPath, await createArtifactBundleFixtureZip(fixtureName));
   return zipPath;
+}
+
+async function writeWordTemplateFixture(testInfo, name, options = {}) {
+  const docxPath = testInfo.outputPath(name);
+  await writeFile(docxPath, createWordTemplateFixture(options));
+  return docxPath;
+}
+
+async function importWordTemplate(page, filePath, displayName) {
+  await page.locator('#wordTemplateInput').setInputFiles(filePath);
+  await page.locator('#appDialogPromptInput').fill(displayName);
+  await page.getByRole('button', { name: 'Import template' }).click();
+  await expect(page.locator('#status')).toHaveText(new RegExp(`Imported Word template "${displayName}"`));
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(/.+/);
 }
 
 async function tabUntilFocused(page, selector, maxTabs = 40) {
@@ -499,6 +524,337 @@ async function installMockFileSystemAccess(page) {
   });
 }
 
+async function installMockNativeBridge(page, options = {}) {
+  await page.addInitScript((options) => {
+    const smokeEnabled = Boolean(options.smoke);
+    const listeners = [];
+    if (!options.setupIncomplete) {
+      window.localStorage.setItem('lensDocs.windowsSetup.completed', 'true');
+      window.localStorage.setItem('lensDocs.windowsSetup.version', 'test');
+    }
+    window.__nativeBridgeMessages = [];
+    window.__nativeBridgeSaves = [];
+    window.__nativeBridgeSmokeResults = [];
+    window.__nativeBridgeScenario = {
+      openFile: 'success',
+      saveFile: 'success',
+      saveFileAs: 'success',
+      openFolder: 'success',
+      saveWorkspaceFile: 'success',
+      refreshWorkspaceFile: 'success',
+      smokeWorkspace: options.smokeWorkspace || 'success',
+    };
+    window.__nativeBridgeCapabilities = Array.isArray(options.capabilities) ? [...options.capabilities] : null;
+
+    function emit(response, delayMs = 0) {
+      window.setTimeout(() => {
+        listeners.forEach((listener) => listener({ data: response }));
+      }, delayMs);
+    }
+
+    window.__emitNativeWorkspaceChanged = (payload) => {
+      emit({
+        protocolVersion: 1,
+        id: `event-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+        type: 'lensDocs.native.workspaceChanged',
+        source: 'LensDocsStudio.Windows',
+        timestamp: '2026-06-09T00:00:00.000Z',
+        payload,
+      });
+    };
+
+    function baseResponse(message, type, payload) {
+      return {
+        protocolVersion: 1,
+        id: message.id,
+        type,
+        source: 'LensDocsStudio.Windows',
+        timestamp: '2026-06-09T00:00:00.000Z',
+        payload,
+      };
+    }
+
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          if (message.type === 'lensDocs.native.appReady') {
+            emit(baseResponse(message, 'lensDocs.native.appReadyResult', { ready: true }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.ping') {
+            const capabilities = Array.isArray(window.__nativeBridgeCapabilities) ? [...window.__nativeBridgeCapabilities] : [
+              'diagnostics.ping',
+              'file.startupOpen',
+              'file.open',
+              'file.save',
+              'file.saveAs',
+              'workspace.openFolder',
+              'workspace.saveFile',
+              'workspace.createFile',
+              'workspace.watch',
+              'workspace.refreshFile',
+            ];
+            if (smokeEnabled) capabilities.push('smoke.nativeFixtures', 'smoke.workspaceChange');
+            emit(baseResponse(message, 'lensDocs.native.pong', {
+              host: 'LensDocsStudio.Windows',
+              capabilities,
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.openFile') {
+            if (window.__nativeBridgeScenario.openFile === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.openFileResult', { cancelled: true }));
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFile === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.openFileResult', {}), protocolVersion: 999 });
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.openFileResult', {
+              cancelled: false,
+              name: 'native-open.md',
+              displayName: 'native-open.md',
+              extension: '.md',
+              encoding: 'utf-8',
+              content: '# Native Open\n',
+              nativeHandleId: 'native-handle-1',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveFile') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.saveFileResult', {
+              saved: window.__nativeBridgeScenario.saveFile !== 'failed',
+              name: 'native-open.md',
+              displayName: 'native-open.md',
+              encoding: 'utf-8',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveFileAs') {
+            if (window.__nativeBridgeScenario.saveFileAs === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.saveFileAsResult', { cancelled: true }));
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.saveFileAsResult', {
+              cancelled: false,
+              saved: true,
+              name: 'native-copy.md',
+              displayName: 'native-copy.md',
+              encoding: 'utf-8',
+              nativeHandleId: 'native-handle-2',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.openFolder') {
+            if (window.__nativeBridgeScenario.openFolder === 'hanging') {
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFolder === 'cancelled') {
+              emit(baseResponse(message, 'lensDocs.native.openFolderResult', { cancelled: true }));
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFolder === 'native-error') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: window.__nativeBridgeScenario.openFolderErrorMessage || 'Windows folder picker could not open safely.',
+              }));
+              return;
+            }
+            if (window.__nativeBridgeScenario.openFolder === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.openFolderResult', {}), protocolVersion: 999 });
+              return;
+            }
+            const delayMs = window.__nativeBridgeScenario.openFolder === 'delayed' ? 3000 : 0;
+            emit(baseResponse(message, 'lensDocs.native.openFolderResult', {
+              cancelled: false,
+              workspaceName: 'Project Docs',
+              nativeWorkspaceId: 'native-workspace-1',
+              files: [
+                {
+                  name: 'README.md',
+                  path: 'README.md',
+                  displayPath: 'README.md',
+                  extension: '.md',
+                  encoding: 'utf-8',
+                  content: '# Native Workspace\n',
+                  nativeHandleId: 'native-workspace-file-1',
+                },
+                {
+                  name: 'flow.mmd',
+                  path: 'diagrams/flow.mmd',
+                  displayPath: 'diagrams/flow.mmd',
+                  extension: '.mmd',
+                  encoding: 'utf-8',
+                  content: 'flowchart TD\n  A-->B\n',
+                  nativeHandleId: 'native-workspace-file-2',
+                },
+              ],
+              limits: {
+                maxFileSizeBytes: 5242880,
+                maxFiles: 500,
+                maxDepth: 12,
+              },
+              skipped: [
+                {
+                  path: 'large.md',
+                  reason: 'File exceeds the 5 MB limit.',
+                },
+              ],
+            }), delayMs);
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.saveWorkspaceFile') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.saveWorkspaceFileResult', {
+              saved: window.__nativeBridgeScenario.saveWorkspaceFile !== 'failed',
+              name: 'README.md',
+              path: 'README.md',
+              displayPath: 'README.md',
+              encoding: 'utf-8',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.refreshWorkspaceFile') {
+            if (window.__nativeBridgeScenario.refreshWorkspaceFile === 'missing') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: 'The Windows workspace file is no longer available.',
+              }));
+              return;
+            }
+            const path = message.payload.path || 'README.md';
+            emit(baseResponse(message, 'lensDocs.native.refreshWorkspaceFileResult', {
+              refreshed: true,
+              name: path.split('/').pop(),
+              path,
+              displayPath: path,
+              extension: path.endsWith('.mmd') ? '.mmd' : '.md',
+              encoding: 'utf-8',
+              content: window.__nativeBridgeRefreshContent || `# Refreshed ${path}\n`,
+              nativeHandleId: message.payload.nativeHandleId || 'native-workspace-file-refreshed',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.createWorkspaceFile') {
+            emit(baseResponse(message, 'lensDocs.native.createWorkspaceFileResult', {
+              cancelled: false,
+              created: true,
+              name: message.payload.path.split('/').pop(),
+              path: message.payload.path,
+              displayPath: message.payload.path,
+              extension: '.md',
+              encoding: 'utf-8',
+              content: message.payload.content || '',
+              nativeHandleId: 'native-workspace-file-new',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.openFixtureFile') {
+            emit(baseResponse(message, 'lensDocs.native.smoke.openFixtureFileResult', {
+              cancelled: false,
+              name: 'single-file.md',
+              displayName: 'single-file.md',
+              extension: '.md',
+              encoding: 'utf-8',
+              content: '# Smoke single file\n',
+              nativeHandleId: 'native-smoke-single-file',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.saveFixtureFileAs') {
+            window.__nativeBridgeSaves.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.smoke.saveFixtureFileAsResult', {
+              cancelled: false,
+              saved: true,
+              name: 'single-file-copy.md',
+              displayName: 'single-file-copy.md',
+              encoding: 'utf-8',
+              nativeHandleId: 'native-smoke-save-as',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.openFixtureWorkspace') {
+            if (window.__nativeBridgeScenario.smokeWorkspace === 'malformed') {
+              emit({ ...baseResponse(message, 'lensDocs.native.smoke.openFixtureWorkspaceResult', {}), protocolVersion: 999 });
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.smoke.openFixtureWorkspaceResult', {
+              cancelled: false,
+              workspaceName: 'Smoke Workspace',
+              nativeWorkspaceId: 'native-smoke-workspace',
+              files: [
+                {
+                  name: 'README.md',
+                  path: 'README.md',
+                  displayPath: 'README.md',
+                  extension: '.md',
+                  encoding: 'utf-8',
+                  content: '# Smoke workspace\n',
+                  nativeHandleId: 'native-smoke-workspace-readme',
+                },
+              ],
+              limits: {
+                maxFileSizeBytes: 5242880,
+                maxFiles: 500,
+                maxDepth: 12,
+              },
+              skipped: [],
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.touchWorkspaceFile') {
+            emit(baseResponse(message, 'lensDocs.native.smoke.touchWorkspaceFileResult', {
+              changed: true,
+              path: 'docs/overview.md',
+            }));
+            emit({
+              protocolVersion: 1,
+              id: `event-${Date.now()}`,
+              type: 'lensDocs.native.workspaceChanged',
+              source: 'LensDocsStudio.Windows',
+              timestamp: '2026-06-09T00:00:00.000Z',
+              payload: {
+                nativeWorkspaceId: 'native-smoke-workspace',
+                changes: [{
+                  kind: 'changed',
+                  path: 'docs/overview.md',
+                  nativeHandleId: 'native-smoke-workspace-overview',
+                }],
+              },
+            });
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.smoke.complete') {
+            window.__nativeBridgeSmokeResults.push(message.payload);
+            emit(baseResponse(message, 'lensDocs.native.smoke.completeResult', {
+              completed: true,
+              accepted: true,
+              resultPath: 'smoke-result.json',
+              exitCode: message.payload?.success ? 0 : 1,
+            }));
+          }
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  }, options);
+}
+
 async function dispatchContextMenu(locator, point = { x: 16, y: 16 }) {
   await locator.scrollIntoViewIfNeeded();
   await locator.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => resolve())));
@@ -613,6 +969,106 @@ function createDocxImportFixture() {
       data: Buffer.from(tinyPngBase64, 'base64'),
     },
   ], { compress: true });
+}
+
+function createWordTemplateFixture({ headers = true, footers = true, media = true, numbering = true, theme = true } = {}) {
+  const files = [
+    {
+      name: '[Content_Types].xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Default Extension="png" ContentType="image/png"/>
+  <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+  <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  ${numbering ? '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>' : ''}
+  ${theme ? '<Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>' : ''}
+  ${headers ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' : ''}
+  ${footers ? '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' : ''}
+</Types>`,
+    },
+    {
+      name: '_rels/.rels',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`,
+    },
+    {
+      name: 'word/document.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <w:body><w:p><w:r><w:t>Template source</w:t></w:r></w:p></w:body>
+</w:document>`,
+    },
+    {
+      name: 'word/styles.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:styleId="CorporateTitle"><w:name w:val="Title"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading1"><w:name w:val="Heading 1"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading2"><w:name w:val="Heading 2"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateBody"><w:name w:val="Body Text"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateQuote"><w:name w:val="Quote"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateCode"><w:name w:val="Code"/><w:qFormat/></w:style>
+  <w:style w:type="table" w:styleId="CorporateTable"><w:name w:val="Table Grid"/><w:qFormat/></w:style>
+</w:styles>`,
+    },
+  ];
+
+  if (numbering) {
+    files.push({
+      name: 'word/numbering.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:abstractNum w:abstractNumId="1"><w:lvl w:ilvl="0"><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/></w:lvl></w:abstractNum>
+  <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+</w:numbering>`,
+    });
+  }
+
+  if (theme) {
+    files.push({
+      name: 'word/theme/theme1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Corporate Test Theme"><a:themeElements/></a:theme>`,
+    });
+  }
+
+  if (headers) {
+    files.push({
+      name: 'word/header1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
+  <w:p><w:r><w:t>Corporate header</w:t></w:r></w:p>
+  ${media ? '<w:p><w:r><w:drawing><wp:inline><wp:extent cx="9525" cy="9525"/><wp:docPr id="1" name="Template logo"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="template-logo.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>' : ''}
+</w:hdr>`,
+    });
+    if (media) {
+      files.push({
+        name: 'word/_rels/header1.xml.rels',
+        data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdLogo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/template-logo.png"/>
+</Relationships>`,
+      });
+      files.push({
+        name: 'word/media/template-logo.png',
+        data: Buffer.from(tinyPngBase64, 'base64'),
+      });
+    }
+  }
+
+  if (footers) {
+    files.push({
+      name: 'word/footer1.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>Corporate footer</w:t></w:r></w:p></w:ftr>`,
+    });
+  }
+
+  return createZipBuffer(files, { compress: true });
 }
 
 function createSimplePdfBuffer(pages) {
@@ -1084,7 +1540,7 @@ test('File menu starts a blank Markdown document', async ({ page }) => {
   await expect(page.locator('#saveButton')).toBeEnabled();
 
   await page.locator('#editor').fill('# Fresh start\n');
-  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in memory');
+  await expect(page.locator('#activeFileLabel')).toContainText('untitled.md · edited in the app');
   await expect(page.locator('#saveButton')).toBeEnabled();
 });
 
@@ -1128,8 +1584,8 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
   await page.locator('#fileList [data-tree-folder="docs"]').click();
   await expect(page.locator('#fileList [data-tree-folder="docs"]')).toHaveAttribute('aria-selected', 'true');
 
-  await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.locator('details.menu[open]').getByRole('button', { name: 'New Markdown file' }).click();
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'New Markdown file' }).click();
   await expect(page.locator('#appDialogPromptInput')).toHaveValue('docs/untitled.md');
   await submitAppDialog(page, { value: 'docs/notes.md', button: 'Create file' });
   await expect(page.locator('#activeFileLabel')).toHaveText('docs/notes.md');
@@ -1143,8 +1599,8 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
   await page.evaluate(() => {
     window.__mockFs.openPickerQueue = [[window.__mockFs.addedHandle]];
   });
-  await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.locator('details.menu[open]').getByRole('button', { name: 'Add file to workspace' }).click();
+  const reopenedFileMenu = await openFileMenu(page);
+  await reopenedFileMenu.getByRole('button', { name: 'Add file to workspace' }).click();
   await expect(page.locator('#fileCount')).toHaveText('3');
   await expect(page.locator('#activeFileLabel')).toHaveText('added.md');
 
@@ -1160,7 +1616,7 @@ test('workspace folders can create, add, refresh, and detect changed files', asy
     window.__mockFs.addedHandle._lastModified += 1000;
     window.dispatchEvent(new Event('focus'));
   });
-  await submitAppDialog(page, { button: 'Reload latest' });
+  await submitAppDialog(page, { button: 'Reload disk version' });
   await expect(page.locator('#editor')).toHaveValue('# Focus reload\n');
 });
 
@@ -1273,6 +1729,1265 @@ test('Help menu opens the feature guide as read-only Markdown', async ({ page })
   await expect(page.locator('#editor')).toHaveValue(before);
 });
 
+test('native bridge diagnostic reports unavailable in browser mode', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Windows bridge unavailable in this browser mode.');
+});
+
+test('native bridge diagnostic sends a strict ping and reports host pong', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          if (message.type === 'lensDocs.native.appReady') {
+            const response = {
+              protocolVersion: 1,
+              id: message.id,
+              type: 'lensDocs.native.appReadyResult',
+              source: 'LensDocsStudio.Windows',
+              timestamp: '2026-06-09T00:00:00.000Z',
+              payload: { ready: true },
+            };
+            window.setTimeout(() => {
+              listeners.forEach((listener) => listener({ data: response }));
+            }, 0);
+            return;
+          }
+
+          const response = {
+            protocolVersion: 1,
+            id: message.id,
+            type: 'lensDocs.native.pong',
+            source: 'LensDocsStudio.Windows',
+            timestamp: '2026-06-09T00:00:00.000Z',
+            payload: {
+              host: 'LensDocsStudio.Windows',
+              capabilities: ['diagnostics.ping'],
+            },
+          };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({ data: response }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText(/Windows bridge available: LensDocsStudio\.Windows \(diagnostics\.ping\)\./);
+  const message = await page.evaluate(() => window.__nativeBridgeMessages.find((item) => item.type === 'lensDocs.native.ping'));
+  expect(message).toEqual(expect.objectContaining({
+    protocolVersion: 1,
+    type: 'lensDocs.native.ping',
+    source: 'LensDocsStudio.Web',
+    payload: {},
+  }));
+  expect(message.id).toEqual(expect.any(String));
+  expect(message.id.length).toBeGreaterThan(0);
+  expect(new Date(message.timestamp).toString()).not.toBe('Invalid Date');
+});
+
+test('native bridge diagnostic handles malformed host responses safely', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          const response = {
+            protocolVersion: 999,
+            id: message.id,
+            type: 'lensDocs.native.pong',
+            source: 'LensDocsStudio.Windows',
+            timestamp: '2026-06-09T00:00:00.000Z',
+            payload: {},
+          };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({ data: response }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Check Windows bridge' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Native bridge returned an unsupported protocol response.');
+});
+
+test('first-run welcome explains local onboarding actions without release claims', async ({ page }) => {
+  await gotoApp(page);
+
+  const welcome = page.locator('.welcome-state');
+  await expect(welcome).toBeVisible();
+  await expect(welcome).toContainText('Local Markdown, Mermaid, and documentation studio');
+  await expect(welcome).toContainText('Start with a documentation folder.');
+  await expect(welcome).toContainText('Open a folder to browse and watch a local workspace');
+  await expect(welcome).toContainText('Your files stay local unless you choose to save, copy, export, or import content.');
+  await expect(welcome).toContainText('If Open folder does not work there, use Diagnostics from this screen or Help.');
+
+  const primaryAction = welcome.locator('.welcome-actions button.primary');
+  await expect(primaryAction).toHaveText('Open folder');
+  await expect(welcome.getByRole('button', { name: 'Open file' })).toBeVisible();
+  await expect(welcome.getByRole('button', { name: 'Diagnostics' })).toBeVisible();
+  await expect(welcome).not.toContainText(/production readiness|go-live|go live|stable-channel|stable channel/i);
+  await expect(welcome).not.toContainText(/browser fallback/i);
+});
+
+test('welcome Open folder uses the packaged native bridge route without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('.welcome-state').getByRole('button', { name: 'Open folder' }).click();
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+  await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
+});
+
+test('empty file list keeps Open folder first and exposes Diagnostics', async ({ page }) => {
+  await gotoApp(page);
+
+  const emptyState = page.locator('#fileList .empty-state');
+  await expect(emptyState).toContainText('Open a folder for workspace-style browsing and watching');
+  await expect(emptyState.locator('.empty-actions button').first()).toHaveText('Open folder');
+  await expect(emptyState.getByRole('button', { name: 'Open file' })).toBeVisible();
+  await expect(emptyState.getByRole('button', { name: 'Diagnostics' })).toBeVisible();
+
+  await emptyState.getByRole('button', { name: 'Diagnostics' }).click();
+  await expect(page.locator('#windowsShellDiagnosticsDialog')).toBeVisible();
+});
+
+test('Windows shell diagnostics report browser fallback safely', async ({ page }) => {
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics).toContainText('WebView2 shell detected');
+  await expect(diagnostics).toContainText('Ping result');
+  await expect(diagnostics).toContainText('Fail');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('browser directory picker');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('available in browser/PWA context');
+  await expect(diagnostics).toContainText('Attempt state');
+  await expect(diagnostics).toContainText('not attempted');
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+  await expect(page.locator('#status')).toHaveText('Windows shell diagnostics found the bridge unavailable or failing.');
+});
+
+test('Windows shell diagnostics show fake WebView2 workspace capabilities and native routing', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics).toContainText('WebView2 shell detected');
+  await expect(diagnostics).toContainText('Yes');
+  await expect(diagnostics).toContainText('Ping result');
+  await expect(diagnostics).toContainText('Pass');
+  await expect(diagnostics).toContainText('Host');
+  await expect(diagnostics).toContainText('LensDocsStudio.Windows');
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('native bridge');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('available');
+  await expect(diagnostics).toContainText('Open folder will use native bridge');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('inactive in packaged WebView2');
+  await expect(diagnostics).toContainText('Not active');
+  await expect(page.getByRole('button', { name: 'Retry bridge check' })).toBeVisible();
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+  await expect(page.locator('#status')).toHaveText('Windows shell diagnostics completed.');
+});
+
+test('Windows shell diagnostics differentiate missing native folder routing from browser fallback', async ({ page }) => {
+  await page.addInitScript(() => {
+    const listeners = [];
+    window.__nativeBridgeMessages = [];
+    window.chrome = {
+      webview: {
+        postMessage(message) {
+          window.__nativeBridgeMessages.push(message);
+          const type = message.type === 'lensDocs.native.appReady'
+            ? 'lensDocs.native.appReadyResult'
+            : 'lensDocs.native.pong';
+          const payload = message.type === 'lensDocs.native.appReady'
+            ? { ready: true }
+            : {
+                host: 'LensDocsStudio.Windows',
+                capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+              };
+          window.setTimeout(() => {
+            listeners.forEach((listener) => listener({
+              data: {
+                protocolVersion: 1,
+                id: message.id,
+                type,
+                source: 'LensDocsStudio.Windows',
+                timestamp: '2026-06-09T00:00:00.000Z',
+                payload,
+              },
+            }));
+          }, 0);
+        },
+        addEventListener(type, listener) {
+          if (type === 'message') listeners.push(listener);
+        },
+      },
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toBeVisible();
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'false');
+  await expect(diagnostics).toContainText('Open folder route');
+  await expect(diagnostics).toContainText('blocked because native bridge is present but capability failed');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('missing');
+  await expect(diagnostics).toContainText('Open folder will use native bridge');
+  await expect(diagnostics).toContainText('No');
+  await expect(diagnostics).toContainText('Browser fallback state');
+  await expect(diagnostics).toContainText('inactive in packaged WebView2');
+  await expect(diagnostics).toContainText('Browser fallback route');
+  await expect(diagnostics).toContainText('Not active');
+  await expect(diagnostics).not.toContainText(/C:\\|\/Users\/|%TEMP%/);
+});
+
+test('Windows shell diagnostics retry refreshes stale workspace capability state', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('workspace.openFolder capability');
+  await expect(diagnostics).toContainText('missing');
+  await expect(diagnostics).toContainText('blocked because native bridge is present but capability failed');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeCapabilities = [
+      'diagnostics.ping',
+      'file.open',
+      'file.save',
+      'file.saveAs',
+      'workspace.openFolder',
+    ];
+  });
+  await page.getByRole('button', { name: 'Retry bridge check' }).click();
+
+  await expect(diagnostics.locator('.windows-setup-capabilities span', { hasText: 'workspace.openFolder' })).toHaveAttribute('data-ready', 'true');
+  await expect(diagnostics).toContainText('available');
+  await expect(diagnostics).toContainText('native bridge');
+  const pingCount = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.ping').length);
+  expect(pingCount).toBeGreaterThanOrEqual(2);
+});
+
+test('browser mode does not auto-show Windows setup wizard', async ({ page }) => {
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Open setup wizard' }).click();
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Runtime readiness');
+  await expect(page.locator('#status')).toHaveText('Windows setup is only available in the Windows desktop shell.');
+});
+
+test('fake Windows bridge mode auto-shows first-run setup wizard', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Welcome');
+  await expect(page.locator('#windowsSetupSummary')).toContainText('Windows desktop shell');
+  await expect(page.locator('#windowsSetupBody')).toContainText('local Markdown, Mermaid, and documentation studio');
+  await expect(page.locator('#windowsSetupBody')).toContainText('packaged local files');
+  await expect(page.locator('#windowsSetupBody')).toContainText('without a backend');
+  await expect(page.locator('#windowsSetupBody')).not.toContainText(/production readiness|go-live|go live/i);
+});
+
+test('Windows setup wizard can be skipped and stays completed on reload', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Skip setup' }).click();
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  const stored = await page.evaluate(() => ({
+    completed: window.localStorage.getItem('lensDocs.windowsSetup.completed'),
+    completedAt: window.localStorage.getItem('lensDocs.windowsSetup.completedAt'),
+    version: window.localStorage.getItem('lensDocs.windowsSetup.version'),
+  }));
+  expect(stored.completed).toBe('true');
+  expect(stored.completedAt).toEqual(expect.any(String));
+  expect(stored.version).toBe('phase-3e-mvp');
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+});
+
+test('Help menu reopens completed Windows setup wizard', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Open setup wizard' }).click();
+
+  await expect(page.locator('#windowsSetupDialog')).toBeVisible();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Welcome');
+});
+
+test('Windows setup runtime readiness shows safe capability labels', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Runtime readiness');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Windows host detected');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Native bridge available');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace.openFolder');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace.refreshFile');
+  await expect(page.locator('#windowsSetupBody')).not.toContainText('Users\\');
+});
+
+test('Windows setup workspace step opens native folder only when clicked', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Workspace');
+  await expect(page.locator('#windowsSetupBody')).toContainText('workspace-style browsing, search, saves, and file watching');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Help > Windows shell diagnostics');
+
+  let openFolderMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((item) => item.type === 'lensDocs.native.openFolder').length);
+  expect(openFolderMessages).toBe(0);
+
+  await page.getByRole('button', { name: 'Open a workspace folder' }).click();
+  await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('File associations');
+  openFolderMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((item) => item.type === 'lensDocs.native.openFolder').length);
+  expect(openFolderMessages).toBe(1);
+});
+
+test('Windows setup file association step is guidance only', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue without workspace' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('File associations');
+  await expect(page.locator('#windowsSetupBody')).toContainText('does not write registry keys');
+  await expect(page.locator('#windowsSetupBody')).toContainText('Register-WindowsFileAssociations.ps1');
+
+  const nativeTypes = await page.evaluate(() => window.__nativeBridgeMessages.map((item) => item.type));
+  expect(nativeTypes).not.toContain('lensDocs.native.registerFileAssociations');
+});
+
+test('Windows setup starter step opens sample and completes', async ({ page }) => {
+  await installMockNativeBridge(page, { setupIncomplete: true });
+  await gotoApp(page);
+
+  await page.getByRole('button', { name: 'Get started' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('button', { name: 'Continue without workspace' }).click();
+  await page.getByRole('button', { name: 'I will do this later' }).click();
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Starter document');
+
+  await page.getByRole('button', { name: 'Open Markdown + Mermaid sample' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('sample.md');
+  await expect(page.locator('#windowsSetupTitle')).toHaveText('Done');
+  await page.getByRole('button', { name: 'Start using Lens Docs Studio' }).click();
+  await expect(page.locator('#windowsSetupDialog')).not.toBeVisible();
+  await expect.poll(async () => page.evaluate(() => window.localStorage.getItem('lensDocs.windowsSetup.completed'))).toBe('true');
+});
+
+test('fake WebView2 bridge opens, saves, and saves as native files', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Open\n');
+  await expect(page.locator('#status')).toHaveText('native-open.md opened from Windows.');
+
+  await page.locator('#editor').fill('# Native Updated\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
+  await page.locator('#saveButton').click();
+
+  await expect(page.locator('#status')).toHaveText('native-open.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  const savePayload = await page.evaluate(() => window.__nativeBridgeSaves.at(-1));
+  expect(savePayload).toEqual({
+    nativeHandleId: 'native-handle-1',
+    content: '# Native Updated\n',
+  });
+
+  await page.locator('#saveAsButton').click();
+  await expect(page.locator('#status')).toHaveText('native-copy.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-copy.md');
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveFileAs')).toBe(true);
+  const saveAsMessage = messages.findLast((message) => message.type === 'lensDocs.native.saveFileAs');
+  expect(saveAsMessage.payload).toEqual({
+    suggestedName: 'native-open.md',
+    content: '# Native Updated\n',
+  });
+});
+
+test('fake WebView2 bridge handles cancelled and malformed native file responses safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFile = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#status')).toHaveText('Open file cancelled.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFile = 'malformed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.getByRole('button', { name: 'New Markdown file' }).click();
+  await submitAppDialog(page, { button: 'Create file' });
+  await page.locator('#editor').fill('# Draft\n');
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.saveFileAs = 'cancelled';
+  });
+  await page.locator('#saveAsButton').click();
+  await expect(page.locator('#status')).toHaveText('Save as cancelled.');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
+});
+
+test('fake WebView2 bridge opens and saves native workspace folders', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      return window.__mockFs.directoryHandle;
+    };
+  });
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+  await expect(page.locator('#fileCount')).toHaveText('2');
+  await expect(page.locator('#fileList')).toContainText('README.md');
+  await expect(page.locator('#fileList')).toContainText('diagrams/flow.mmd');
+  await expect(page.locator('#activeFileLabel')).toHaveText('diagrams/flow.mmd');
+  await expect(page.locator('#editor')).toHaveValue('flowchart TD\n  A-->B\n');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Native Workspace Updated\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
+  await page.locator('#saveButton').click();
+
+  await expect(page.locator('#status')).toHaveText('README.md saved.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  const savePayload = await page.evaluate(() => window.__nativeBridgeSaves.at(-1));
+  expect(savePayload).toEqual({
+    nativeHandleId: 'native-workspace-file-1',
+    content: '# Native Workspace Updated\n',
+  });
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.saveWorkspaceFile')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+});
+
+test('fake WebView2 bridge creates Markdown files in native workspaces', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+
+  if (!await page.locator('details.menu[open]').isVisible()) {
+    await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  }
+  await page.getByRole('button', { name: 'New Markdown file' }).click();
+  await page.locator('#appDialogPromptInput').fill('notes/new-note.md');
+  await submitAppDialog(page, { button: 'Create file' });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('notes/new-note.md');
+  await expect(page.locator('#fileList')).toContainText('notes/new-note.md');
+  await expect(page.locator('#editor')).toHaveValue('');
+  await expect(page.locator('#status')).toHaveText('notes/new-note.md added to the Windows workspace.');
+  const createMessage = await page.evaluate(() => window.__nativeBridgeMessages.findLast((message) => message.type === 'lensDocs.native.createWorkspaceFile'));
+  expect(createMessage.payload).toEqual({
+    nativeWorkspaceId: 'native-workspace-1',
+    path: 'notes/new-note.md',
+    content: '',
+  });
+});
+
+test('fake WebView2 watcher marks changed native workspace files and refreshes explicitly', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeRefreshContent = '# Native Workspace\n\nChanged externally.\n';
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · changed on disk');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalChanged');
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'changed on disk');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('This file changed on disk. Use Refresh active file to read the disk version.');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nChanged externally.\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
+  const refreshMessage = await page.evaluate(() => window.__nativeBridgeMessages.findLast((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessage.payload).toEqual({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: 'native-workspace-file-1',
+    path: 'README.md',
+  });
+});
+
+test('fake WebView2 watcher preserves dirty local edits on native workspace changes', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Local draft\n');
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in the app · changed on disk');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await expect(page.locator('#fileList [data-path="README.md"] .dirty-dot')).toHaveCount(1);
+  await expect(page.locator('#fileList [data-path="README.md"] .external-change-dot')).toHaveAttribute('title', 'Edited in the app and changed on disk');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.');
+});
+
+test('fake WebView2 watcher confirms before refreshing dirty native workspace conflicts', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Local draft\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeRefreshContent = '# Native Workspace\n\nExternal version.\n';
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'changed',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#appDialog')).toBeVisible();
+  await expect(page.locator('#appDialogTitle')).toHaveText('Use disk version?');
+  await expect(page.locator('#appDialogMessage')).toHaveText('README.md has unsaved app edits. Refresh will replace them with the current disk version. Choose Keep app edits to continue editing here.');
+  await expect(page.getByRole('button', { name: 'Keep app edits' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Use disk version' })).toBeVisible();
+  const dialogCopy = await page.locator('#appDialog').innerText();
+  expect(dialogCopy).not.toMatch(/production|go-live|WebView2|workspaceChanged|dirtyExternalConflict|stack trace/i);
+  await page.getByRole('button', { name: 'Keep app edits' }).click();
+  await expect(page.locator('#appDialog')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue('# Local draft\n');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('This file changed on disk while you have unsaved app edits. Choose Save to keep app edits on disk, or Refresh to review before using the disk version.');
+  let refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(0);
+
+  await page.locator('#refreshFileButton').click();
+  await submitAppDialog(page, { button: 'Use disk version' });
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n\nExternal version.\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
+  refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(1);
+});
+
+test('fake WebView2 watcher marks deleted active native files without clearing content', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'deleted',
+        path: 'README.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · deleted on disk');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'externalDeleted');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.');
+
+  await page.locator('#refreshFileButton').click();
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#status')).toHaveText('This file was deleted on disk. The app keeps your current content so you can copy it or use Save as.');
+  const refreshMessages = await page.evaluate(() => window.__nativeBridgeMessages.filter((message) => message.type === 'lensDocs.native.refreshWorkspaceFile'));
+  expect(refreshMessages).toHaveLength(0);
+});
+
+test('fake WebView2 watcher reports created and renamed native workspace files safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'created',
+        path: 'docs/new-external.md',
+        nativeHandleId: 'native-workspace-file-created',
+      }],
+    });
+  });
+  await expect(page.locator('#fileList')).toContainText('docs/new-external.md');
+  await expect(page.locator('#fileList [data-path="docs/new-external.md"]')).toHaveAttribute('data-file-state', 'externalChanged');
+
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'renamed',
+        oldPath: 'README.md',
+        path: 'docs/final.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#fileList')).toContainText('docs/final.md');
+  await expect(page.locator('#activeFileLabel')).toHaveText('docs/final.md · renamed on disk');
+  await expect(page.locator('#status')).toHaveText('This file was renamed on disk. Review before saving.');
+  await expect(page.locator('#fileList [data-path="docs/final.md"]')).toHaveAttribute('data-file-state', 'externalRenamed');
+});
+
+test('fake WebView2 watcher preserves dirty local edits on native workspace renames', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await page.locator('#editor').fill('# Dirty before rename\n');
+  await expect(page.locator('#status')).toHaveText('Rendered · edited in the app');
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [{
+        kind: 'renamed',
+        oldPath: 'README.md',
+        path: 'docs/final.md',
+        nativeHandleId: 'native-workspace-file-1',
+      }],
+    });
+  });
+
+  await expect(page.locator('#editor')).toHaveValue('# Dirty before rename\n');
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md · edited in the app · renamed on disk');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'dirtyExternalConflict');
+  await page.locator('#fileList [data-path="README.md"]').click();
+  await expect(page.locator('#status')).toHaveText('This file was renamed on disk while you have unsaved app edits. Review before saving.');
+});
+
+test('fake WebView2 watcher ignores malformed, unsafe, and unknown-workspace events', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.');
+  await page.locator('[data-path="README.md"]').click();
+
+  await page.evaluate(() => {
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'other-workspace',
+      changes: [{ kind: 'changed', path: 'README.md' }],
+    });
+    window.__emitNativeWorkspaceChanged({
+      nativeWorkspaceId: 'native-workspace-1',
+      changes: [
+        { kind: 'changed', path: 'C:/Users/example/secret.md' },
+        { kind: 'changed', path: '../secret.md' },
+        { kind: 'changed', path: '/rooted.md' },
+        { kind: 'changed', path: 'notes/ignored.exe' },
+        { kind: 'renamed', path: 'safe.md' },
+        { kind: 'unknown', path: 'README.md' },
+      ],
+    });
+  });
+
+  await expect(page.locator('#activeFileLabel')).toHaveText('README.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Workspace\n');
+  await expect(page.locator('#fileList [data-path="README.md"]')).toHaveAttribute('data-file-state', 'clean');
+});
+
+test('fake WebView2 bridge handles cancelled and malformed native workspace responses safely', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('Open folder cancelled.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'malformed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText(/unsupported protocol response|Using the browser fallback/);
+});
+
+test('Windows shell diagnostics display cancelled native open folder separately', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'cancelled';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toHaveText('Open folder cancelled.');
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('Last Open folder attempt');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).toContainText('user cancelled');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).not.toContainText('native error');
+});
+
+test('fake WebView2 bridge surfaces native workspace picker errors without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Windows folder picker could not open safely.');
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+});
+
+test('native open folder error copy is bounded and redacts local paths', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+    window.__nativeBridgeScenario.openFolderErrorMessage = `Windows folder picker could not attach to C:\\Users\\person\\Private\\Workspace because ${'details '.repeat(40)}`;
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toContainText('[local path]');
+  const statusText = await page.locator('#status').textContent();
+  expect(statusText).toContain('[local path]');
+  expect(statusText).not.toContain('C:\\Users\\person');
+  expect(statusText.length).toBeLessThanOrEqual(190);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('native error');
+  await expect(diagnostics).toContainText('[local path]');
+  await expect(diagnostics).not.toContainText('C:\\Users\\person');
+});
+
+test('support bundle builder redacts unsafe diagnostic text and excludes private content classes', async ({ page }) => {
+  await gotoApp(page);
+
+  const result = await page.evaluate(async () => {
+    const { createSupportBundle } = await import('/assets/scripts/ui/support-bundle-service.js');
+    return createSupportBundle({
+      generatedAtUtc: '2026-06-12T10:00:00.000Z',
+      app: { appVersion: '0.1.0', appBuild: '58', sourceCommit: 'not-a-real-commit with user@example.com' },
+      environment: {
+        runtimeMode: 'windows-shell-packaged',
+        packagedNativeMode: 'yes',
+        webView2ShellDetected: 'yes',
+        appOriginCategory: 'packaged-virtual-host',
+        platformCategory: 'windows',
+        browserEngine: 'edge',
+      },
+      diagnostics: {
+        bridgeMessageHandlerRegistered: true,
+        bridgePingState: 'pass',
+        protocolVersion: '1',
+        host: 'LensDocsStudio.Windows',
+        capabilities: ['diagnostics.ping', 'workspace.openFolder', 'smoke.nativeFixtures'],
+        lastNativeRequestType: 'lensDocs.native.openFolder',
+        lastNativeResponseType: 'lensDocs.native.error',
+        nativeErrorCategory: 'host-error',
+        nativeErrorMessage: 'Failed at C:\\Users\\alice\\Private\\Workspace\\secret.md for alice@example.com token=abc123 connectionString=Server=private\n   at Native.Service(C:\\Users\\alice\\source\\file.cs:42) because details '.repeat(8),
+      },
+      openFolder: {
+        routeDecision: 'native-bridge',
+        workspaceOpenFolderCapability: 'available',
+        browserFallbackState: 'inactive-in-packaged-webview2',
+        lastAttemptState: 'native-error',
+        lastAttemptDetail: '# Private Document\n\nDo not include this Markdown. api_key=hidden C:\\Users\\alice\\Docs',
+        selectedWorkspacePresent: 'yes',
+        workspaceKind: 'native-folder',
+        supportedFileCount: 42,
+        skippedFileCount: 1,
+        activeFileState: 'dirty-external-conflict',
+      },
+      watcher: {
+        lastEventCategory: 'changed',
+        lastEventAtUtc: '2026-06-12T09:59:00.000Z',
+        relativePathOnly: 'yes',
+        dirtyConflictState: 'present',
+      },
+    });
+  });
+
+  expect(result.filename).toBe('lens-docs-studio-support-bundle-20260612T100000Z.json');
+  expect(result.bundle.schemaVersion).toBe(1);
+  expect(result.bundle.privacy.documentContentIncluded).toBe('no');
+  expect(result.bundle.privacy.screenshotsIncluded).toBe('no');
+  expect(result.bundle.privacy.automaticUpload).toBe('no');
+  expect(result.bundle.privacy.telemetry).toBe('no');
+  expect(result.bundle.openFolder.workspacePathIncluded).toBe('no');
+  expect(result.bundle.diagnostics.capabilities['workspace.openFolder']).toBe('available');
+  expect(result.bundle.diagnostics.capabilities).not.toHaveProperty('smoke.nativeFixtures');
+  expect(result.bundle.diagnostics.nativeErrorMessage.length).toBeLessThanOrEqual(160);
+  expect(result.summaryText).toContain('Lens Docs Studio diagnostics summary');
+  expect(result.summaryText).toContain('App version: 0.1.0');
+  expect(result.summaryText).toContain('App build: 58');
+  expect(result.summaryText).toContain('Packaged/native mode: yes');
+  expect(result.summaryText).toContain('Browser fallback state: inactive-in-packaged-webview2');
+  expect(result.summaryText).toContain('Watcher timestamp bucket: within-1-minute');
+  expect(result.json).toContain('[redacted-path]');
+  expect(result.json).toContain('[redacted-email]');
+  expect(result.json).toContain('[redacted-secret]');
+  expect(result.summaryText).not.toMatch(/C:\\Users\\alice|alice@example\.com|abc123|Server=private|source\\file\.cs|# Private Document|Do not include this Markdown|api_key=hidden|\bat\s+Native\.Service/i);
+  expect(result.json).not.toMatch(/C:\\Users\\alice|alice@example\.com|abc123|Server=private|source\\file\.cs|# Private Document|Do not include this Markdown|api_key=hidden|stack trace/i);
+  expect(result.json).not.toContain('lens-artifact-bundle.json');
+});
+
+test('Diagnostics support bundle is visible and requires explicit user action', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics).toContainText('Support bundle');
+  await expect(diagnostics).toContainText('Create a local support bundle preview');
+  await expect(diagnostics).toContainText('Nothing is uploaded automatically');
+  await expect(page.getByRole('button', { name: 'Create support bundle' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Copy summary' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Export local JSON' })).toBeDisabled();
+  await expect(diagnostics.locator('.support-bundle-preview')).toHaveCount(0);
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toBeHidden();
+
+  const messagesBefore = await page.evaluate(() => window.__nativeBridgeMessages.length);
+  await page.waitForTimeout(100);
+  const messagesAfter = await page.evaluate(() => window.__nativeBridgeMessages.length);
+  expect(messagesAfter).toBe(messagesBefore);
+});
+
+test('Diagnostics support bundle preview and local export contain only safe fields', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+  await mockClipboardWrite(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'native-error';
+    window.__nativeBridgeScenario.openFolderErrorMessage = 'Picker failed for C:\\Users\\casey\\Private\\Workspace with password=hunter2\n   at Native.Service(C:\\Users\\casey\\file.cs:42)';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#status')).toContainText('[local path]');
+
+  await page.locator('#editor').fill('# Secret Draft\n\napi_key=local-document-secret\n');
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  await page.getByRole('button', { name: 'Create support bundle' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('.support-bundle-preview')).toBeVisible();
+  await expect(diagnostics).toContainText('Support bundle preview');
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Support bundle preview created locally. Copy and export stay local until you choose to share them.');
+  await expect(diagnostics).toContainText('Workspace path included');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Workspace path included' })).toContainText('no');
+  await expect(page.getByRole('button', { name: 'Copy summary' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Export local JSON' })).toBeEnabled();
+
+  const previewText = await diagnostics.locator('.support-bundle-preview').textContent();
+  const bundle = JSON.parse(previewText);
+  expect(bundle.schemaVersion).toBe(1);
+  expect(bundle.app.name).toBe('Lens Docs Studio');
+  expect(bundle.environment.runtimeMode).toBe('windows-shell-development');
+  expect(bundle.diagnostics.bridgePingState).toBe('pass');
+  expect(bundle.openFolder.lastAttemptState).toBe('native-error');
+  expect(bundle.openFolder.workspacePathIncluded).toBe('no');
+  expect(bundle.privacy.automaticUpload).toBe('no');
+  expect(bundle.privacy.documentContentIncluded).toBe('no');
+  expect(bundle.privacy.secretsTokensConnectionStringsIncluded).toBe('no');
+  expect(bundle.privacy.rawStackTracesIncluded).toBe('no');
+  expect(previewText).not.toMatch(/Secret Draft|local-document-secret|C:\\Users\\casey|hunter2|file\.cs|at Native\.Service|lens-artifact-bundle\.json/i);
+
+  await page.getByRole('button', { name: 'Copy summary' }).click();
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Diagnostics summary copied locally. No upload was started.');
+  const copiedSummary = await page.evaluate(() => window.__copiedText);
+  expect(copiedSummary).toContain('Lens Docs Studio diagnostics summary');
+  expect(copiedSummary).toContain('App version: 0.1.0');
+  expect(copiedSummary).toContain('App build:');
+  expect(copiedSummary).toContain('Schema version: 1');
+  expect(copiedSummary).toContain('Runtime mode: windows-shell-development');
+  expect(copiedSummary).toContain('Packaged/native mode: yes');
+  expect(copiedSummary).toContain('WebView2 shell detected: yes');
+  expect(copiedSummary).toContain('Bridge ping state: pass');
+  expect(copiedSummary).toContain('workspace.openFolder capability: available');
+  expect(copiedSummary).toContain('Open folder route: native-bridge');
+  expect(copiedSummary).toContain('Browser fallback state: inactive-in-packaged-webview2');
+  expect(copiedSummary).toContain('Last Open folder attempt: native-error');
+  expect(copiedSummary).toContain('Watcher timestamp bucket: not recorded');
+  expect(copiedSummary).not.toMatch(/Secret Draft|local-document-secret|C:\\Users\\casey|casey\\Private|hunter2|file\.cs|at Native\.Service|@|lens-artifact-bundle\.json/i);
+  expect(copiedSummary.length).toBeLessThan(900);
+
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export local JSON' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toMatch(/^lens-docs-studio-support-bundle-\d{8}T\d{6}Z\.json$/);
+  expect(download.suggestedFilename()).not.toMatch(/casey|Private|Workspace|Secret/i);
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toContainText('Support bundle JSON exported locally as lens-docs-studio-support-bundle-');
+  const exportMessage = await diagnostics.locator('[data-support-bundle-message]').textContent();
+  expect(exportMessage).toContain('No upload was started.');
+  expect(exportMessage.length).toBeLessThanOrEqual(180);
+  await expect(page.locator('#status')).toHaveText('Support bundle JSON exported locally. No upload was started.');
+});
+
+test('Diagnostics support bundle copy failure stays bounded and local', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+  await page.evaluate(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async () => { throw new Error('Clipboard blocked for C:\\Users\\casey\\Private\\Workspace token=hidden'); },
+      },
+    });
+  });
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  await page.getByRole('button', { name: 'Create support bundle' }).click();
+  await page.getByRole('button', { name: 'Copy summary' }).click();
+
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('[data-support-bundle-message]')).toHaveText('Could not copy the diagnostics summary. No data was uploaded.');
+  const message = await diagnostics.locator('[data-support-bundle-message]').textContent();
+  expect(message.length).toBeLessThanOrEqual(180);
+  expect(message).not.toMatch(/C:\\Users|token=hidden|@/i);
+  await expect(page.locator('#status')).toHaveText('Could not copy the support bundle summary.');
+});
+
+test('fake WebView2 open folder waits for delayed native picker responses', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'delayed';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Opening folder from Windows...');
+  await expect(page.locator('#status')).toHaveText('2 files loaded from Windows. 1 file skipped by workspace limits.', { timeout: 5000 });
+  await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
+  await expect(page.locator('#fileList [data-path="diagrams/flow.mmd"]')).toBeVisible();
+  await expect(page.locator('#status')).not.toHaveText(/Native bridge did not respond/);
+});
+
+test('native open folder pending state shows bounded guidance without browser fallback', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.evaluate(() => {
+    window.__nativeBridgeScenario.openFolder = 'hanging';
+  });
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Opening folder from Windows...');
+  await expect(page.locator('#status')).toHaveText(/Still waiting for the Windows folder picker/, { timeout: 7000 });
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Windows shell diagnostics' }).click();
+  const diagnostics = page.locator('#windowsShellDiagnosticsDialog');
+  await expect(diagnostics.locator('.windows-setup-status-row', { hasText: 'Attempt state' })).toContainText('pending');
+  await expect(diagnostics).toContainText('Check for a visible Select Folder window');
+});
+
+test('native smoke runner stays dormant when smoke capability is absent', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome).toEqual({ ran: false, reason: 'smoke-capability-absent' });
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages.map((message) => message.type));
+  expect(messages).toContain('lensDocs.native.ping');
+  expect(messages).not.toContain('lensDocs.native.smoke.openFixtureFile');
+});
+
+test('native smoke runner posts structured success for smoke fixtures', async ({ page }) => {
+  await installMockNativeBridge(page, { smoke: true });
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome.ran).toBe(true);
+  expect(smokeOutcome.result.success).toBe(true);
+
+  const [result] = await page.evaluate(() => window.__nativeBridgeSmokeResults);
+  expect(result.success).toBe(true);
+  expect(result.steps.map((step) => step.name)).toEqual(expect.arrayContaining([
+    'Windows shell started',
+    'WebView2 app loaded',
+    'WebView2 loaded packaged static assets',
+    'WebView2 did not require a local HTTP server',
+    'Bridge ping returned LensDocsStudio.Windows',
+    'Capabilities include diagnostics.ping',
+    'Capabilities include file.startupOpen',
+    'Capabilities include file.open',
+    'Capabilities include file.save',
+    'Capabilities include file.saveAs',
+    'Capabilities include workspace.openFolder',
+    'Capabilities include workspace.saveFile',
+    'Startup file argument loaded',
+    'Startup file argument saved through active file handle',
+    'Single fixture file opened',
+    'Single fixture file saved',
+    'Save-as wrote a new file',
+    'Fixture workspace opened',
+    'Workspace file saved',
+    'Workspace file created, if capability exists',
+    'Browser app did not report bridge protocol error',
+  ]));
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages.map((message) => message.type));
+  expect(messages).toEqual(expect.arrayContaining([
+    'lensDocs.native.smoke.openFixtureFile',
+    'lensDocs.native.saveFile',
+    'lensDocs.native.smoke.saveFixtureFileAs',
+    'lensDocs.native.smoke.openFixtureWorkspace',
+    'lensDocs.native.saveWorkspaceFile',
+    'lensDocs.native.createWorkspaceFile',
+    'lensDocs.native.smoke.complete',
+  ]));
+});
+
+test('native smoke runner reports failure safely for malformed smoke responses', async ({ page }) => {
+  await installMockNativeBridge(page, { smoke: true, smokeWorkspace: 'malformed' });
+  await gotoApp(page);
+
+  const smokeOutcome = await page.evaluate(() => window.__lensDocsNativeSmokePromise);
+  expect(smokeOutcome.ran).toBe(true);
+  expect(smokeOutcome.result.success).toBe(false);
+
+  const [result] = await page.evaluate(() => window.__nativeBridgeSmokeResults);
+  expect(result.success).toBe(false);
+  expect(result.errors.some((error) => /protocol/i.test(error))).toBe(true);
+});
+
+test('File menu open folder blocks browser picker when Windows bridge lacks workspace capability', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
+  await page.addInitScript(() => {
+    window.__browserDirectoryPickerCalls = 0;
+    window.showDirectoryPicker = async () => {
+      window.__browserDirectoryPickerCalls += 1;
+      throw new DOMException('cancelled', 'AbortError');
+    };
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(false);
+  await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
+  await expect(page.locator('#activeFileLabel')).toHaveText('No file selected');
+  await expect(page.locator('#status')).toHaveText(/workspace\.openFolder was not reported/);
+});
+
+test('File menu open file still uses native file route when workspace capability is absent', async ({ page }) => {
+  await installMockNativeBridge(page, {
+    capabilities: ['diagnostics.ping', 'file.open', 'file.save', 'file.saveAs'],
+  });
+  await gotoApp(page);
+
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeMessages.some((message) => message.type === 'lensDocs.native.openFile'))).toBe(true);
+  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFile')).toBe(true);
+  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(false);
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  await expect(page.locator('#editor')).toHaveValue('# Native Open\n');
+});
+
 test('custom context menu handles editor actions and preserves native fallbacks', async ({ page }) => {
   await gotoApp(page);
   const menu = page.locator('.context-menu');
@@ -1345,6 +3060,124 @@ test('editor context menu copies Markdown with Mermaid diagrams as clipboard ima
   expect(copiedMarkdown).toContain("const message = 'release ready';");
   expect(copiedHtml).toContain('<img');
   expect(copiedHtml).toContain('data:image/png;base64,');
+  expect(copiedHtml).toContain('data-markdown-clipboard="source"');
+  expect(copiedHtml).toContain('```js');
+  expect(copiedHtml).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+});
+
+test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered image payloads', async ({ page }) => {
+  await gotoApp(page);
+  const source = await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8');
+
+  const result = await page.evaluate(async (fixture) => {
+    const { composeMarkdownClipboardHtml, findMarkdownImageTokens } = await import('/assets/scripts/utils/markdown-clipboard.js');
+    const markdown = fixture
+      .replace('<test image>', 'data:image/png;base64,AAAA')
+      .replace('<second test image>', 'data:image/png;base64,BBBB');
+    const html = composeMarkdownClipboardHtml(markdown);
+    const fencedImageSource = '```text\n![not an attachment](data:image/png;base64,CODE)\n```';
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    return {
+      html,
+      markdown,
+      tokens: findMarkdownImageTokens(markdown),
+      fencedTokens: findMarkdownImageTokens(fencedImageSource),
+      textContent: document.body.textContent,
+      images: [...document.querySelectorAll('img')].map((image) => ({
+        index: image.dataset.markdownClipboardImage,
+        src: image.getAttribute('src'),
+        alt: image.getAttribute('alt'),
+      })),
+    };
+  }, source);
+
+  const sourceWithoutImages = result.markdown.replace(/!\[[^\]\r\n]*\]\([^)]*\)/g, '');
+  expect(result.tokens).toMatchObject([
+    { alt: 'Architecture diagram', href: 'data:image/png;base64,AAAA' },
+    { alt: 'Secondary diagram', href: 'data:image/png;base64,BBBB' },
+  ]);
+  expect(result.tokens[0].start).toBe(result.markdown.indexOf('![Architecture diagram]'));
+  expect(result.tokens[1].start).toBe(result.markdown.indexOf('![Secondary diagram]'));
+  expect(result.fencedTokens).toEqual([]);
+  expect(normaliseLineEndings(result.textContent)).toBe(normaliseLineEndings(sourceWithoutImages));
+  expect(result.images).toEqual([
+    { index: '0', src: 'data:image/png;base64,AAAA', alt: 'Architecture diagram' },
+    { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Secondary diagram' },
+  ]);
+  expect(result.html).toContain('# HSI Marking Chart – Current-State Process and Component Architecture');
+  expect(result.html).toContain('## 1. Purpose');
+  expect(result.html).toContain('### Phase A – Source image discovery and ingestion');
+  expect(result.html).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+  expect(result.html).not.toContain('data:image/svg');
+});
+
+test('Copy Markdown with images keeps a no-asset source byte-for-byte in plain text', async ({ page }) => {
+  await openFixture(page, 'azure-devops-markdown-fidelity.md');
+  await mockClipboardWrite(page);
+  await clickEditAction(page, 'Copy Markdown with images');
+
+  await expect(page.locator('#status')).toHaveText(/Markdown with images copied/, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
+  expect(normaliseLineEndings(await page.evaluate(() => window.__copiedText)))
+    .toBe(normaliseLineEndings(await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8')));
+  const copiedHtml = await page.evaluate(() => window.__copiedHtml);
+  expect(copiedHtml).toContain('data-markdown-clipboard="source"');
+  expect(copiedHtml).toContain('# H1 ATX');
+  expect(copiedHtml).toContain('- unordered item 1');
+  expect(copiedHtml).toContain('```text');
+  expect(copiedHtml).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+});
+
+test('Copy Markdown with images embeds multiple managed assets in source order', async ({ page }, testInfo) => {
+  const source = await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8');
+  const firstBytes = await readFile(fixturePath('artifact-bundles/valid-rich/assets/tiny.png'));
+  const secondBytes = await readFile(fixturePath('artifact-bundles/generic-zip/docs/images/logo.png'));
+  const firstBase64 = firstBytes.toString('base64');
+  const secondBase64 = secondBytes.toString('base64');
+  const zipPath = await writeZipFixture(testInfo, 'azure-devops-markdown-fidelity-assets.zip', [
+    {
+      name: 'azure-devops-markdown-fidelity.md',
+      data: source
+        .replace('<test image>', 'assets/first-test.png')
+        .replace('<second test image>', 'assets/second-test.png'),
+    },
+    { name: 'assets/first-test.png', data: firstBytes },
+    { name: 'assets/second-test.png', data: secondBytes },
+  ]);
+
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 document and 2 image assets from ZIP/, { timeout: 20_000 });
+  await mockClipboardWrite(page);
+  await clickEditAction(page, 'Copy Markdown with images');
+
+  await expect(page.locator('#status')).toHaveText(/2 managed images embedded/, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
+  const copiedMarkdown = await page.evaluate(() => window.__copiedText);
+  const markdownImages = [...copiedMarkdown.matchAll(/!\[([^\]\r\n]*)\]\((data:image\/png;base64,[^)]+)\)/g)]
+    .map((match) => ({ alt: match[1], src: match[2] }));
+  expect(markdownImages).toEqual([
+    { alt: 'Architecture diagram', src: `data:image/png;base64,${firstBase64}` },
+    { alt: 'Secondary diagram', src: `data:image/png;base64,${secondBase64}` },
+  ]);
+
+  const copiedHtml = await page.evaluate(() => window.__copiedHtml);
+  const htmlImages = await page.evaluate((html) => {
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    return [...document.querySelectorAll('img')].map((image) => ({
+      index: image.dataset.markdownClipboardImage,
+      alt: image.alt,
+      src: image.src,
+    }));
+  }, copiedHtml);
+  expect(htmlImages).toEqual([
+    { index: '0', alt: 'Architecture diagram', src: `data:image/png;base64,${firstBase64}` },
+    { index: '1', alt: 'Secondary diagram', src: `data:image/png;base64,${secondBase64}` },
+  ]);
+  expect(copiedMarkdown).toContain('# HSI Marking Chart – Current-State Process and Component Architecture');
+  expect(copiedMarkdown).toContain('- the components involved in the current process;');
+  expect(copiedMarkdown).toContain('```text');
+  expect(copiedMarkdown).not.toContain('data:image/svg');
 });
 
 test('custom context menu exposes preview-specific copy and export actions', async ({ page }) => {
@@ -2562,6 +4395,89 @@ test('Word export is a valid native DOCX package without interactive UI text', a
   expect(documentXml).not.toContain('selection-sync-hit');
   expect(documentXml).not.toContain('Document review');
   await expect(page.locator('#exportTrust')).toHaveText(/Word ready: 1\/1 diagram rendered/);
+});
+
+test('Word template import stores manifests and tolerates missing optional parts', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const minimalPath = await writeWordTemplateFixture(testInfo, 'minimal-template.docx', {
+    headers: false,
+    footers: false,
+    media: false,
+    numbering: false,
+    theme: false,
+  });
+  const richPath = await writeWordTemplateFixture(testInfo, 'rich-template.docx');
+
+  await importWordTemplate(page, minimalPath, 'Minimal Word Template');
+  await expect(page.locator('#wordTemplateSummary')).toHaveText(/styles/);
+  await expect(page.locator('#wordTemplateSummary')).not.toHaveText(/headers/);
+
+  await importWordTemplate(page, richPath, 'Corporate Word Template');
+  await expect(page.locator('#wordTemplateSummary')).toHaveText(/styles, numbering, theme, headers, footers, media/);
+
+  const options = await page.locator('#wordTemplateSelect option').evaluateAll((items) => items.map((item) => item.textContent));
+  expect(options).toEqual(expect.arrayContaining(['Default', 'Minimal Word Template', 'Corporate Word Template']));
+
+  const manifests = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordsRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordsRequest.onsuccess = () => resolve(recordsRequest.result);
+      recordsRequest.onerror = () => reject(recordsRequest.error);
+    });
+    db.close();
+    return records.map((record) => record.manifest);
+  });
+
+  expect(manifests).toHaveLength(2);
+  expect(manifests.find((manifest) => manifest.displayName === 'Minimal Word Template')?.capabilities).toMatchObject({
+    styles: true,
+    headers: false,
+    footers: false,
+    media: false,
+  });
+  expect(manifests.find((manifest) => manifest.displayName === 'Corporate Word Template')?.semanticStyleMapping.heading1).toBe('CorporateHeading1');
+});
+
+test('Word export applies selected template parts and preserves default export fallback', async ({ page }, testInfo) => {
+  await openFixture(page, 'mixed.md');
+
+  const defaultPath = await clickExportDownload(page, 'Export Word');
+  const defaultEntries = await readZipEntries(defaultPath);
+  expect(defaultEntries.has('word/styles.xml')).toBe(false);
+  expect(getZipText(defaultEntries, 'word/document.xml')).not.toContain('headerReference');
+
+  const templatePath = await writeWordTemplateFixture(testInfo, 'corporate-template.docx');
+  await importWordTemplate(page, templatePath, 'Corporate Word Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const contentTypes = getZipText(entries, '[Content_Types].xml');
+  const documentXml = getZipText(entries, 'word/document.xml');
+  const relsXml = getZipText(entries, 'word/_rels/document.xml.rels');
+  const headerRelsXml = getZipText(entries, 'word/_rels/header1.xml.rels');
+
+  expect(entries.has('word/styles.xml')).toBe(true);
+  expect(entries.has('word/numbering.xml')).toBe(true);
+  expect(entries.has('word/theme/theme1.xml')).toBe(true);
+  expect(entries.has('word/header1.xml')).toBe(true);
+  expect(entries.has('word/footer1.xml')).toBe(true);
+  expect(entries.has('word/media/template-logo.png')).toBe(true);
+  expect(contentTypes).toContain('wordprocessingml.header+xml');
+  expect(contentTypes).toContain('wordprocessingml.footer+xml');
+  expect(documentXml).toContain('<w:pStyle w:val="CorporateHeading1"/>');
+  expect(documentXml).toContain('<w:tblStyle w:val="CorporateTable"/>');
+  expect(documentXml).toContain('<w:headerReference w:type="default" r:id="rIdTemplateHeader1"/>');
+  expect(documentXml).toContain('<w:footerReference w:type="default" r:id="rIdTemplateFooter1"/>');
+  expect(relsXml).toContain('Target="styles.xml"');
+  expect(relsXml).toContain('Target="header1.xml"');
+  expect(relsXml).toContain('Target="footer1.xml"');
+  expect(headerRelsXml).toContain('Target="media/template-logo.png"');
 });
 
 test('dropped image assets render and travel through HTML, Word, and Docs Site exports', async ({ page }) => {

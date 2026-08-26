@@ -2,10 +2,12 @@ import { base64ToUint8Array, textToBase64 } from '../utils/binary.js';
 import { downloadBlob } from '../utils/browser.js';
 import { isSupportedFile } from '../utils/files.js';
 import { escapeHtml, escapeXml, sanitiseFileName, slugify } from '../utils/format.js';
+import { composeMarkdownClipboardHtml, findMarkdownImageTokens } from '../utils/markdown-clipboard.js';
 import { createZipBlob, wrapBase64 } from '../utils/zip.js';
 import { formatMarkdownForDevOpsBundle } from '../utils/devops-markdown.js';
 import { resolveWikilinkTarget, stripAppWikilinkActions } from '../utils/wikilinks.js';
 import { parseFrontMatter } from '../utils/front-matter.js';
+import { buildWordTemplatePackageAdditions } from './word-template-service.js';
 import {
   LENS_ARTIFACT_BUNDLE_MANIFEST_NAME,
   buildSafeArtifactBundleExportMetadata,
@@ -43,6 +45,7 @@ export function createExportService({
     getExportTitle,
     getExportName,
     getWordExportName,
+    getSelectedWordTemplatePack = async () => null,
     getDocTitleFromPath,
     getEffectiveDevopsMarkdownExport = () => state.devopsMarkdownExport,
     closeOpenMenus,
@@ -321,7 +324,8 @@ export function createExportService({
 
         const content = await buildWordExportContent();
         setExportTrust(buildExportConfidence('Word', renderResult, content.images), renderResult.diagramErrors ? 'warning' : 'ok');
-        downloadBlob(createDocxFromContent(content), getWordExportName());
+        const templatePack = await getSelectedWordTemplatePack();
+        downloadBlob(createDocxFromContent(content, templatePack), getWordExportName());
         setStatus(renderResult.diagramErrors ? 'Word document exported with diagram errors.' : 'Word document exported.', renderResult.diagramErrors ? 'warning' : 'ok');
       } catch (error) {
         setStatus('Word export failed.', 'danger');
@@ -494,7 +498,7 @@ export function createExportService({
 
       try {
         const result = await buildMarkdownWithClipboardImages(source, scope);
-        const html = await buildClipboardMarkdownHtml(result.markdown);
+        const html = buildClipboardMarkdownHtml(result.markdown);
         if (navigator.clipboard?.write && window.ClipboardItem) {
           await navigator.clipboard.write([
             new ClipboardItem({
@@ -575,9 +579,8 @@ export function createExportService({
       };
     }
 
-    async function buildClipboardMarkdownHtml(markdown) {
-      const body = sanitizeRenderedHtml(await buildMarkdownHtml(markdown));
-      return `<article>${body}</article>`;
+    function buildClipboardMarkdownHtml(markdown) {
+      return composeMarkdownClipboardHtml(markdown);
     }
 
     function collectMermaidSourceBlocks(source) {
@@ -715,12 +718,24 @@ export function createExportService({
     }
 
     function embedManagedAssetMarkdownImages(markdown) {
+      const source = String(markdown || '');
       let convertedAssets = 0;
-      const rewritten = String(markdown || '').replace(/!\[([^\]\n]*)\]\(([^)\s]+)(\s+["'][^"']*["'])?\)/g, (raw, alt, href, title = '') => {
-        const asset = getManagedAssetForMarkdownHref(href);
-        if (!asset) return raw;
-        convertedAssets += 1;
-        return `![${alt}](${getManagedAssetDataUrl(asset)}${title})`;
+      const replacements = findMarkdownImageTokens(source)
+        .map((token) => ({ token, asset: getManagedAssetForMarkdownHref(token.href) }))
+        .filter(({ asset }) => asset)
+        .map(({ token, asset }) => {
+          convertedAssets += 1;
+          const title = token.title ? ` ${token.title}` : '';
+          return {
+            start: token.start,
+            end: token.end,
+            text: `![${token.alt}](${getManagedAssetDataUrl(asset)}${title})`,
+          };
+        });
+
+      let rewritten = source;
+      replacements.sort((left, right) => right.start - left.start).forEach((replacement) => {
+        rewritten = `${rewritten.slice(0, replacement.start)}${replacement.text}${rewritten.slice(replacement.end)}`;
       });
 
       return { markdown: rewritten, convertedAssets };
@@ -2749,9 +2764,11 @@ Open \`index.html\` directly from this folder for a local copy, or upload the co
     })();`;
     }
 
-    function createDocxFromContent({ root, images }) {
+    function createDocxFromContent({ root, images }, templatePack = null) {
       const title = escapeXml(getExportTitle());
       const now = new Date().toISOString();
+      const templateAdditions = buildWordTemplatePackageAdditions(templatePack);
+      const styleMapping = templateAdditions.styleMapping;
       const imageRelationships = images.map((image, index) => ({
         ...image,
         relationshipId: `rIdImage${index + 1}`,
@@ -2773,6 +2790,7 @@ Open \`index.html\` directly from this folder for a local copy, or upload the co
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
   <Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
+${templateAdditions.contentTypeOverrides.map((override) => `  ${override}`).join('\n')}
 </Types>`;
 
       const rootRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -2785,13 +2803,15 @@ Open \`index.html\` directly from this folder for a local copy, or upload the co
       const documentRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 ${imageRelationships.map((image) => `  <Relationship Id="${image.relationshipId}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="${escapeXml(image.target)}"/>`).join('\n')}
+${templateAdditions.documentRelationshipEntries.join('\n')}
 </Relationships>`;
 
       const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
   <w:body>
-${buildWordBodyXml(root, imageRelationships)}
+${buildWordBodyXml(root, imageRelationships, styleMapping)}
     <w:sectPr>
+      ${templateAdditions.sectPrReferences.join('\n      ')}
       <w:pgSz w:w="11906" w:h="16838"/>
       <w:pgMar w:top="840" w:right="840" w:bottom="960" w:left="840" w:header="720" w:footer="720" w:gutter="0"/>
     </w:sectPr>
@@ -2826,6 +2846,7 @@ ${buildWordBodyXml(root, imageRelationships)}
         { name: 'docProps/app.xml', data: appXml },
         { name: 'word/document.xml', data: documentXml },
         { name: 'word/_rels/document.xml.rels', data: documentRels },
+        ...templateAdditions.files,
         ...imageRelationships.map((image) => ({
           name: image.partName,
           data: base64ToUint8Array(image.base64),
@@ -2833,8 +2854,8 @@ ${buildWordBodyXml(root, imageRelationships)}
       ], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
     }
 
-    function buildWordBodyXml(root, imageRelationships) {
-      const blocks = wordBlocksFromChildren(root, { imageRelationships });
+    function buildWordBodyXml(root, imageRelationships, styleMapping) {
+      const blocks = wordBlocksFromChildren(root, { imageRelationships, styleMapping });
       return blocks.length ? blocks.join('\n') : buildWordParagraph([buildWordTextRun('')]);
     }
 
@@ -2870,7 +2891,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       }
 
       if (node.classList.contains('code-block')) {
-        return [buildWordCodeBlock(node)];
+        return [buildWordCodeBlock(node, context)];
       }
 
       if (tagName === 'figure' && node.hasAttribute('data-progress-bar')) {
@@ -2881,6 +2902,7 @@ ${buildWordBodyXml(root, imageRelationships)}
         const level = Number(tagName.slice(1));
         const sizes = { 1: 48, 2: 36, 3: 28, 4: 24, 5: 22, 6: 20 };
         return [buildWordParagraph(collectWordInlineRuns(node, { bold: true, size: sizes[level] ?? 24, color: '0F172A' }), {
+          styleId: getHeadingStyleId(level, context.styleMapping),
           before: level === 1 ? 160 : 240,
           after: 120,
           keepNext: true,
@@ -2891,15 +2913,15 @@ ${buildWordBodyXml(root, imageRelationships)}
         if (node.querySelector('img[data-word-image-name]')) {
           return wordBlocksFromParagraphWithImages(node, context);
         }
-        return [buildWordParagraph(collectWordInlineRuns(node), { after: 160 })];
+        return [buildWordParagraph(collectWordInlineRuns(node), { styleId: context.styleMapping.body, after: 160 })];
       }
 
       if (tagName === 'pre') {
-        return [buildWordParagraph([buildWordTextRun(node.textContent, { code: true })], { code: true, after: 180 })];
+        return [buildWordParagraph([buildWordTextRun(node.textContent, { code: true })], { styleId: context.styleMapping.code, code: true, after: 180 })];
       }
 
       if (tagName === 'blockquote') {
-        return [buildWordParagraph(collectWordInlineRuns(node, { italic: true, color: '475569' }), { indentLeft: 360, after: 160 })];
+        return [buildWordParagraph(collectWordInlineRuns(node, { italic: true, color: '475569' }), { styleId: context.styleMapping.quote, indentLeft: 360, after: 160 })];
       }
 
       if (tagName === 'details') {
@@ -2916,11 +2938,11 @@ ${buildWordBodyXml(root, imageRelationships)}
           .map((item, index) => buildWordParagraph([
             buildWordTextRun(tagName === 'ol' ? `${index + 1}. ` : '- '),
             ...collectWordInlineRuns(item),
-          ], { indentLeft: 360, hanging: 240, after: 80 }));
+          ], { styleId: context.styleMapping.body, indentLeft: 360, hanging: 240, after: 80 }));
       }
 
       if (tagName === 'table') {
-        return [buildWordTable(node)];
+        return [buildWordTable(node, context)];
       }
 
       if (tagName === 'hr') {
@@ -2933,7 +2955,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       }
 
       const runs = collectWordInlineRuns(node);
-      return runs.length ? [buildWordParagraph(runs, { after: 160 })] : [];
+      return runs.length ? [buildWordParagraph(runs, { styleId: context.styleMapping.body, after: 160 })] : [];
     }
 
     function wordBlocksFromParagraphWithImages(paragraph, context) {
@@ -2942,7 +2964,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       textClone.querySelectorAll('img[data-word-image-name]').forEach((image) => image.remove());
 
       if (textClone.textContent.trim()) {
-        blocks.push(buildWordParagraph(collectWordInlineRuns(textClone), { after: 120 }));
+        blocks.push(buildWordParagraph(collectWordInlineRuns(textClone), { styleId: context.styleMapping.body, after: 120 }));
       }
 
       paragraph.querySelectorAll('img[data-word-image-name]').forEach((image) => {
@@ -2952,10 +2974,10 @@ ${buildWordBodyXml(root, imageRelationships)}
       return blocks;
     }
 
-    function buildWordCodeBlock(block) {
+    function buildWordCodeBlock(block, context) {
       const code = block.querySelector('pre code');
       const runs = code ? collectWordCodeRuns(code) : [];
-      return buildWordParagraph(runs.length ? runs : [buildWordTextRun('', { code: true })], { code: true, after: 180 });
+      return buildWordParagraph(runs.length ? runs : [buildWordTextRun('', { code: true })], { styleId: context.styleMapping.code, code: true, after: 180 });
     }
 
     function buildWordProgressBar(figure) {
@@ -3085,6 +3107,7 @@ ${buildWordBodyXml(root, imageRelationships)}
       const parts = [];
       const spacing = [];
 
+      if (options.styleId) parts.push(`<w:pStyle w:val="${escapeXml(options.styleId)}"/>`);
       if (options.keepNext) parts.push('<w:keepNext/>');
       if (options.before || options.after) {
         if (options.before) spacing.push(`w:before="${options.before}"`);
@@ -3130,19 +3153,26 @@ ${buildWordBodyXml(root, imageRelationships)}
       return parts.length ? `<w:rPr>${parts.join('')}</w:rPr>` : '';
     }
 
-    function buildWordTable(table) {
+    function getHeadingStyleId(level, styleMapping) {
+      if (level <= 1) return styleMapping.heading1 || styleMapping.documentTitle;
+      if (level === 2) return styleMapping.heading2;
+      return styleMapping.heading3;
+    }
+
+    function buildWordTable(table, context) {
       const rows = [...table.querySelectorAll('tr')];
       const rowXml = rows.map((row) => {
         const cells = [...row.children].filter((cell) => ['td', 'th'].includes(cell.tagName.toLowerCase()));
         const cellXml = cells.map((cell) => {
           const isHeader = cell.tagName.toLowerCase() === 'th';
           const runs = collectWordInlineRuns(cell, isHeader ? { bold: true } : {});
-          return `<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>${buildWordParagraph(runs.length ? runs : [buildWordTextRun('')])}</w:tc>`;
+          return `<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>${buildWordParagraph(runs.length ? runs : [buildWordTextRun('')], { styleId: context.styleMapping.body })}</w:tc>`;
         }).join('');
         return `<w:tr>${cellXml}</w:tr>`;
       }).join('');
 
-      return `    <w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders><w:top w:val="single" w:sz="4" w:color="D5DCE8"/><w:left w:val="single" w:sz="4" w:color="D5DCE8"/><w:bottom w:val="single" w:sz="4" w:color="D5DCE8"/><w:right w:val="single" w:sz="4" w:color="D5DCE8"/><w:insideH w:val="single" w:sz="4" w:color="D5DCE8"/><w:insideV w:val="single" w:sz="4" w:color="D5DCE8"/></w:tblBorders></w:tblPr>${rowXml}</w:tbl>`;
+      const tableStyle = context.styleMapping.table ? `<w:tblStyle w:val="${escapeXml(context.styleMapping.table)}"/>` : '';
+      return `    <w:tbl><w:tblPr>${tableStyle}<w:tblW w:w="0" w:type="auto"/><w:tblBorders><w:top w:val="single" w:sz="4" w:color="D5DCE8"/><w:left w:val="single" w:sz="4" w:color="D5DCE8"/><w:bottom w:val="single" w:sz="4" w:color="D5DCE8"/><w:right w:val="single" w:sz="4" w:color="D5DCE8"/><w:insideH w:val="single" w:sz="4" w:color="D5DCE8"/><w:insideV w:val="single" w:sz="4" w:color="D5DCE8"/></w:tblBorders></w:tblPr>${rowXml}</w:tbl>`;
     }
 
     function buildWordImageParagraph(imageElement, context) {

@@ -1,0 +1,360 @@
+# Windows Offline Distribution Roadmap
+
+Lens Docs Studio is moving towards a Windows desktop distribution while preserving the existing static browser/PWA app as the core runtime. The Windows app hosts the same Markdown, Mermaid, import, export, Docs Site, and local documentation workflows through WinUI 3 and WebView2.
+
+## Branch Strategy
+
+- `develop` is the active implementation branch for Windows shell work, browser runtime changes, tests, and documentation updates.
+- `main` remains the stable publication branch for GitHub Pages and release-ready documentation.
+- Release candidates should flow from `develop` to `main` after static browser validation, Windows shell validation, and documentation review.
+- GitHub Pages remains a secondary web demo, fallback, and validation target. It should continue proving that the core runtime works as static files without a backend.
+
+## Product Direction
+
+The primary distribution direction is a fully offline-capable Windows desktop app built with WinUI 3 and WebView2. The desktop host should package the static app assets locally and load them through WebView2 virtual host mapping, avoiding any requirement for a production local HTTP server.
+
+The static browser/PWA app remains the core runtime. It must continue to run from GitHub Pages, from a local static server for development and validation, and from packaged desktop assets. Runtime features should stay browser-defensive so unsupported native capabilities degrade cleanly in web mode.
+
+## Hosting Model
+
+- Package `index.html`, `assets/`, `docs/`, `manifest.webmanifest`, `icon.svg`, `md-mmd-renderer-v5.html`, and `service-worker.js` with the Windows app.
+- Prefer WebView2 virtual host mapping for packaged assets, using an app-local origin such as `https://lens-docs-studio.local/`.
+- Keep local static servers as development and validation tools only.
+- Do not introduce a backend, production server route, production build step, CDN dependency, or cloud service for normal desktop operation.
+- Keep GitHub Pages compatibility as a regression target for the shared runtime.
+
+## Runtime Modes
+
+Lens Docs Studio supports these runtime modes:
+
+1. Browser / GitHub Pages.
+2. Browser / local static server.
+3. Windows shell / development run.
+4. Windows shell / packaged local assets.
+5. Windows shell / offline mode.
+
+Browser / GitHub Pages and browser / local static server modes validate the shared static runtime. Windows shell / development run builds the WinUI 3 host and copies the shared runtime into `StaticApp/`. Windows shell / packaged local assets and Windows shell / offline mode load that copied runtime through WebView2 virtual host mapping. In the Windows production path, a local HTTP server is not required and the app must not depend on GitHub Pages, CDNs, external scripts, external stylesheets, or development-only files.
+
+## Implemented Phase 2B
+
+- Native single-file open/save/save-as bridge for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files.
+- Windows-native open and save pickers through the WinUI 3/WebView2 host.
+- UTF-8 text-only reads and writes with a 5 MB file size limit.
+- Opaque host-owned `nativeHandleId` values instead of exposing absolute paths to the web app.
+- Browser, PWA, and GitHub Pages mode continue to use the existing browser picker, File System Access, and download fallbacks.
+- **Help > Check Windows bridge** reports `diagnostics.ping`, `file.open`, `file.save`, and `file.saveAs` when hosted by the Windows shell.
+
+## Implemented Phase 2C
+
+- Native open folder through the WinUI 3/WebView2 host.
+- Recursive workspace discovery for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files.
+- Conservative native workspace limits: 5 MB per file, 500 loaded supported files, and 12 directory levels.
+- Safe skipped-file metadata for oversized files, invalid UTF-8 files, unreadable files, and files skipped by workspace limits.
+- Opaque host-owned `nativeWorkspaceId` and `nativeHandleId` values. Absolute selected-folder and file paths stay in memory in the Windows host.
+- Native workspace file save through `workspace.saveFile`, using the existing active-file save flow and preserving dirty-state semantics.
+- Native Markdown file creation inside the selected workspace through `workspace.createFile`, with relative-path, extension, boundary, and no-overwrite checks enforced by the host.
+- Browser, PWA, and GitHub Pages mode continue to use existing browser folder pickers and fallbacks.
+- **Help > Check Windows bridge** reports `workspace.openFolder`, `workspace.saveFile`, and `workspace.createFile` in addition to the Phase 2B capabilities when hosted by the Windows shell.
+
+## Implemented Phase 2D
+
+- Native workspace watching starts after `workspace.openFolder` and is disposed when a different workspace opens, the app closes, smoke completes, or watcher errors occur.
+- The Windows host watches only the selected workspace root and only supported editable files: `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+- Host-to-web watcher events use `lensDocs.native.workspaceChanged` with protocol version `1`, the active `nativeWorkspaceId`, safe relative paths, and `changed`, `created`, `deleted`, or host-recognised `renamed` changes.
+- Explicit native refresh uses `lensDocs.native.refreshWorkspaceFile` / `lensDocs.native.refreshWorkspaceFileResult` and reads only a validated file belonging to the selected native workspace.
+- Watcher events are debounced for 500 ms and coalesced. Deleted beats changed, changed-created files remain created, and recognised renames avoid separate delete/create notifications.
+- Native save/create operations suppress matching watcher noise for a best-effort two-second window. Real external changes should still be surfaced when uncertain.
+- The web app marks external changes without automatic merge or automatic dirty reload. Dirty editor content is preserved until the user explicitly refreshes or saves.
+- Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected and do not expose `workspace.watch` or `workspace.refreshFile`.
+- **Help > Check Windows bridge** reports `workspace.watch` and `workspace.refreshFile` in addition to the Phase 2B and Phase 2C capabilities when hosted by the Windows shell.
+
+## Implemented Phase 2E
+
+- The workspace list exposes compact state markers for clean, dirty, externally changed, externally deleted, externally renamed, and dirty external-conflict files.
+- Selecting an affected native workspace file shows a concise status message that explains whether to refresh, preserve local edits, recover deleted content, or review a rename before saving.
+- Clean externally changed files reload only through explicit **Refresh active file** and clear the marker after a successful `workspace.refreshFile` response.
+- Dirty externally changed or renamed files keep local editor content until the user explicitly confirms refresh; cancelling refresh preserves both the content and the conflict marker.
+- Deleted active files keep their in-memory editor content. Refresh reports that the file was deleted outside Lens Docs Studio and does not erase the editor.
+- Rename handling remains non-destructive: clean recognised renames move the record to the new relative path, while dirty renames stay on the in-memory record with a conflict marker.
+- Browser, PWA, GitHub Pages, and non-native browser folder workflows are unaffected; native IDs and watcher state remain in memory and are not written to exports.
+- The automated smoke harness remains focused on stable bridge coverage. Conflict prompts and marker states are covered by fake WebView2 browser tests plus the manual smoke path below.
+
+## Implemented Phase 3A
+
+- Static checks verify runtime module syntax, relative imports, service-worker cache entries, vendor manifest entries, required pinned vendor dependencies, shell references, manifest icons, Windows static asset copy configuration, and offline runtime documentation.
+- Runtime external dependency scanning covers the app shell, service worker, manifest, app CSS, vendor manifest, and first-party JavaScript modules. It blocks external script/style/CDN/font runtime references while allowing documentation examples, generated export XML namespaces, and user-authored Markdown links.
+- `scripts/windows/Test-WindowsStaticAssets.ps1` builds or inspects the Windows output, locates `StaticApp/`, verifies required app shell files, every service-worker runtime asset, every vendor manifest entry, the help guide, web manifest, and icon, then scans packaged runtime files for unexpected external script, style, CDN, or remote CSS dependencies.
+- The Windows native bridge smoke records that WebView2 loaded from `https://lens-docs-studio.local/` and did not use localhost or loopback HTTP for the smoke workflow.
+- Network request interception is not part of Phase 3A smoke automation. The certification uses static URL scanning plus packaged asset validation to avoid brittle WebView2 network automation while still enforcing offline runtime completeness.
+- Offline-capable for this phase means the Windows app can launch from packaged local assets, load CSS and JavaScript modules, load vendored Markdown, Mermaid, Highlight.js, DOMPurify, KaTeX, ZIP, Word, and PDF import dependencies, open the local help guide, use templates and snippets, use native single-file and workspace workflows, detect external workspace changes, and run existing export paths without GitHub Pages, CDN access, or a local HTTP server.
+
+## Implemented Phase 3B
+
+- `scripts/windows/Build-WindowsPackage.ps1` creates a repeatable folder/ZIP distributable under `artifacts/windows/`, using a framework-dependent `win-x64` publish of the unpackaged WinUI 3 shell.
+- The package output keeps `LensDocsStudio.Windows.exe` and the copied `StaticApp/` folder together so WebView2 can load the app from `https://lens-docs-studio.local/` without GitHub Pages, a CDN, an external URL, or a local HTTP server.
+- `scripts/windows/Test-WindowsStaticAssets.ps1` accepts `-StaticAppRoot` so the validator can inspect the actual package output as well as the latest development build output.
+- `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` accepts `-AppExecutablePath` so the automated native bridge smoke can run against the packaged executable when practical.
+- The packaging MVP requires the .NET desktop runtime, the matching Windows App SDK runtime, and the Evergreen WebView2 Runtime. It does not bundle WebView2 Fixed Version Runtime.
+- This phase deliberately excludes MSIX, signing, certificates, file associations, installer wizard UI, auto-update, store publishing metadata, and prerequisite bootstrapping.
+
+## Implemented Phase 3C
+
+- `scripts/windows/Test-WindowsPackageReleaseCandidate.ps1` creates a repeatable release-candidate gate for the Windows folder/ZIP package.
+- The RC gate builds the package with the Phase 3B packaging script, validates the packaged `StaticApp/`, runs the native bridge smoke harness against the packaged executable, calculates the ZIP SHA256 checksum, and writes Markdown plus JSON report artefacts under `artifacts/windows/release-candidates/`.
+- The report records package version, branch, commit SHA, build timestamp, configuration, runtime identifier, output folder, ZIP path, ZIP size, checksum, runtime prerequisites, validation commands, command output, durations, and pass/fail results.
+- `docs/release/lens-docs-studio-windows-package-rc-checklist.md` captures manual packaged-app smoke steps and explicit certification claims/non-claims.
+- The RC gate certifies only the folder/ZIP package, packaged static runtime validation, packaged native bridge smoke, metadata capture, and documented manual smoke scope. It does not add MSIX, signing, certificates, Store publishing, auto-update, file associations, installer prerequisite bootstrapping, telemetry, cloud sync, or a merge to `main`.
+
+## Implemented Phase 3D
+
+- The Windows shell accepts supported startup file path arguments for `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`.
+- Startup files are validated by the native file service before reading: the path must exist, be a file, use a supported extension, stay within the 5 MB native file limit, and decode as UTF-8.
+- The host waits for WebView2 initialisation and a web-app `lensDocs.native.appReady` message before sending `lensDocs.native.startupFile`.
+- Startup file payloads reuse the native single-file shape with content, display name, extension, and a host-owned opaque `nativeHandleId`; absolute paths stay in the Windows host.
+- Invalid startup file arguments produce safe status messages through `lensDocs.native.startupFileError`; no-argument launch behaviour is unchanged.
+- `scripts/windows/Register-WindowsFileAssociations.ps1` registers per-user HKCU file associations for development/package testing, using `LensDocsStudio.Markdown`, `LensDocsStudio.Mermaid`, and `LensDocsStudio.Text` ProgIds and an open command of `"<path-to-LensDocsStudio.Windows.exe>" "%1"`.
+- `scripts/windows/Unregister-WindowsFileAssociations.ps1` removes only Lens Docs Studio ProgIds and Lens-owned extension values. It leaves unrelated defaults and Windows `UserChoice` keys alone.
+- Both file association scripts support `-DryRun`, and `scripts/windows/Test-WindowsStaticAssets.ps1` parses the scripts and validates dry-run output.
+- The Windows native bridge smoke launches the shell with a temporary startup `.md` file argument, confirms the file loads, saves it through the existing active-file save flow, and validates the file content after smoke completion.
+- This MVP is not MSIX, not signed, not installer-integrated, not machine-wide, and does not implement single-instance forwarding.
+
+## Implemented Phase 3E
+
+- The Windows shell shows a compact first-run setup wizard only when the app is hosted by `LensDocsStudio.Windows`, the native bridge reports workspace capability, and local browser storage has not recorded completion.
+- Browser, GitHub Pages, local-server, and PWA mode do not auto-open the wizard. **Help > Open setup wizard** can reopen it manually; browser mode shows a safe Windows-only readiness message.
+- Setup completion is stored locally with `lensDocs.windowsSetup.completed`, `lensDocs.windowsSetup.completedAt`, and `lensDocs.windowsSetup.version`. Resetting browser storage may show the wizard again.
+- The readiness step reports only safe data: Windows host detected, native bridge availability, packaged origin, WebView2 runtime availability when reported, and capability labels. It does not expose usernames, machine names, environment variables, executable paths, secrets, or arbitrary local paths.
+- The workspace step calls the existing native `workspace.openFolder` flow only after the user clicks **Open a workspace folder**.
+- The file association step is guidance-only. It shows supported extensions and the per-user registration command, but the app does not write registry keys, does not require administrator rights, does not write `UserChoice`, and does not perform machine-wide setup.
+- The starter step can open the Markdown + Mermaid sample, open the local feature guide, or start an unsaved blank Markdown document.
+- The automated native bridge smoke suppresses the wizard through the smoke-only capability so smoke automation does not need to dismiss first-run setup. Normal launches remain unchanged.
+- This MVP is not MSIX, not an installer wizard, not a WebView2 bootstrapper, not auto-update, not telemetry, not cloud sync, and not a complex settings page.
+
+## Implemented Phase 3F
+
+- `docs/architecture/windows-installer-decision-gate.md` records the Windows installer decision gate.
+- The accepted short-term path keeps the current folder/ZIP package as the release candidate artefact and uses GitHub Releases for ZIP publication when ready.
+- MSIX and classic installer implementation are deferred to a separate spike that must validate signing, prerequisite handling, shortcuts, file associations, uninstall, upgrade, and clean-machine behaviour.
+- The current runtime prerequisite policy remains framework-dependent: .NET desktop runtime, matching Windows App SDK runtime, and Evergreen WebView2 Runtime.
+- WebView2 bootstrapper, WebView2 Fixed Version Runtime, self-contained publish, installer-owned file associations, auto-update, winget manifests, and production installer scripts are not implemented in this phase.
+
+## Implemented Phase 3G
+
+- `scripts/windows/Prepare-WindowsGitHubRelease.ps1` prepares a GitHub Release artefact set for the certified Windows folder/ZIP package.
+- The script is dry-run-first. It builds and certifies the package by default, copies the certified ZIP into `artifacts/releases/<tag>/`, writes a SHA256 checksum file, generates release notes, and prints the exact draft prerelease `gh release create` command without publishing.
+- `docs/release/templates/github-release-notes.md` provides the release notes template, and `docs/release/github-release-publication-flow.md` documents dry-run, publish, checksum, GitHub CLI, and tag strategy.
+- The flow refuses dirty worktrees, non-`develop` branches, stale target commits, failed RC certification, and missing checksums unless an explicit local rehearsal override is supplied where documented.
+- This phase does not add auto-update, MSIX, a classic installer, signing, Store publishing, WebView2 bootstrapper, WebView2 Fixed Version Runtime, machine-wide file associations, release CI/CD, a merge to `main`, or automatic GitHub Release publication.
+
+## Implemented Phase 3H
+
+- `scripts/windows/Test-WindowsGitHubReleaseDryRun.ps1` adds a dry-run review gate for the prepared GitHub Release artefact set.
+- The gate reruns release preparation in dry-run mode by default, validates the artefact folder, ZIP, SHA256 file, RC report, release notes, tag/target strategy, and generated draft prerelease `gh release create` command.
+- The gate writes an ignored review report under `artifacts/releases/<tag>/` with the product, version, tag, target commit, package ZIP, SHA256 value, RC report path, release notes path, generated command, verdict, manual publication checklist, and known limitations.
+- `CERTIFIED_DRAFT_RELEASE_READY` means the local dry-run artefacts are ready for an intentional manual draft prerelease publication step. It does not publish, upload, create tags, sign the ZIP, add MSIX, add a classic installer, add auto-update, or merge to `main`.
+
+## Implemented Phase 3L
+
+- `docs/architecture/windows-installer-spike.md` records the MSIX versus classic installer spike after the internal RC manual smoke passed with notes.
+- The spike compares MSIX, WiX Toolset, Inno Setup, continuing ZIP plus GitHub Releases only, and a later winget path.
+- The recommended next phase is `Phase 3M - Classic Installer MVP with Inno Setup`.
+- The current ZIP and GitHub Releases path remains the internal RC fallback while the installer remains unsigned and prototype-only.
+- Runtime prerequisites stay documented and framework-dependent for now: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
+- WebView2 bootstrapper, Fixed Version Runtime, runtime bootstrappers, code signing, auto-update, public publication, MSIX, WiX, and production Inno installer output remain out of scope for Phase 3L.
+
+## Implemented Phase 3M
+
+- `installer/inno/LensDocsStudio.iss` adds the internal unsigned Inno Setup installer MVP authoring.
+- `scripts/windows/Build-WindowsInnoInstaller.ps1` builds or reuses the Phase 3B/3C Windows folder package, validates packaged `StaticApp/`, compiles the installer with Inno Setup, writes a SHA256 file, and creates a Markdown report under `artifacts/installers/inno/`.
+- The installer installs per-user under `%LOCALAPPDATA%\Programs\Lens Docs Studio`, avoids administrator elevation, creates a Start Menu shortcut, offers an optional Desktop shortcut, and uninstalls installer-owned files.
+- File associations are an unchecked optional task, per-user only under `HKCU:\Software\Classes`, and avoid Windows `UserChoice`. The manual register/unregister scripts remain available for ZIP and development workflows.
+- Runtime prerequisites remain documented rather than bootstrapped: .NET 8 Desktop Runtime, Windows App SDK Runtime matching the project package reference, and Evergreen WebView2 Runtime.
+- Phase 3M does not publish a release, upload installer artefacts, create or move tags, merge to `main`, add signing, add auto-update, add MSIX, add WiX, bundle WebView2 Fixed Version Runtime, or change runtime app behaviour.
+
+## Implemented Phase 3W
+
+- `docs/release/lens-docs-studio-watcher-conflict-manual-evidence.md` records the Phase 3W evidence/artefact-alignment checkpoint for the Phase 3V packaged Open folder routing fix.
+- Fresh local Windows package, package RC, and Inno installer artefacts were rebuilt from `develop` commit `e2026d728c131cf2e203928487b9aeb09b744da7`; they remained ignored local outputs under `artifacts/` and were not published or committed.
+- Automated static checks, browser smoke, Windows solution build, packaged static asset validation, package RC validation, development native smoke, package `-NoSmoke` build, packaged native smoke, and installer build passed.
+- Manual packaged diagnostics remained blocked because the checkpoint environment could launch the packaged executable but could not operate and observe the real WebView2 diagnostics UI. Watcher/conflict scenarios therefore remain blocked rather than passed.
+- `v0.1.0-dev.1` remained package-and-installer-affecting at this checkpoint. Later phases completed manual packaged verification, froze fresh ZIP and installer artefacts, published `v0.1.0-dev.1` as a prerelease, and passed post-publication verification.
+
+## Implemented Phase 3AG
+
+- `docs/release/lens-docs-studio-v010-dev1-release-closure.md` closes the `v0.1.0-dev.1` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.1` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.1`.
+- Post-publication verification passed for the release tag, prerelease state, published asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
+- Stage A and Stage B packaged evidence passed through the Phase 3AA native picker and watcher/conflict checkpoint.
+- The older `v0.1.0-dev` assets remain older/stale relative to `v0.1.0-dev.1` and were not modified.
+- No release assets require further action unless a future release is authorised. Production readiness remains a separate approval gate.
+
+## Implemented Phase 3AH
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev1-backlog.md` records the post-prerelease backlog and `v0.1.0-dev.2` planning gate.
+- Candidate next dev-release themes include first-run/onboarding copy, bridge and folder-picker diagnostics visibility, an optional troubleshooting support export, watcher/conflict UX copy, installer upgrade/uninstall evidence, old prerelease disposition, and real prerelease user feedback.
+- The backlog does not approve next-release scope, change runtime code, rebuild packages, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AI
+
+- `docs/roadmap/lens-docs-studio-v010-dev2-candidate-scope.md` converts the Phase 3AH backlog into candidate `v0.1.0-dev.2` scope.
+- `docs/release/lens-docs-studio-prerelease-feedback-intake.md` records the feedback intake process for `v0.1.0-dev.1` prerelease users, including categories, minimum reproduction details, privacy exclusions, triage labels/statuses, scope mapping, and escalation criteria.
+- The candidate scope is not an approved release plan. It does not authorise implementation, package or installer rebuilds, release asset changes, new tags or releases, `main` merges, production readiness claims, or go-live approval.
+
+## Implemented Phase 3AJ
+
+- `docs/roadmap/lens-docs-studio-v010-dev2-implementation-readiness.md` converts the Phase 3AI candidate scope into an ordered implementation readiness plan for a possible `v0.1.0-dev.2` cycle.
+- The recommended first implementation slice is diagnostics visibility polish for native bridge and folder-picker issues, because it should reduce support cost and improve prerelease feedback triage.
+- The readiness plan records acceptance gates, validation expectations, evidence requirements, release artefact boundaries, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3AJ is planning-only. It does not change runtime code, approve release publication, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AN
+
+- `docs/architecture/lens-docs-studio-support-bundle-design.md` records a design-only contract for a possible future troubleshooting/support bundle.
+- The design allows only safe operational metadata such as app version, source commit when available, packaged/native mode, WebView2 shell detection, bridge ping state, `workspace.openFolder` capability state, route decision, browser fallback state, last Open folder attempt state, bounded native error categories, watcher/conflict event categories, selected workspace presence, safe runtime categories, and manually attached validation summaries.
+- The design excludes document contents, full private paths by default, secrets, tokens, connection strings, raw stack traces, customer data, email addresses, private names from folder paths, unbounded logs, screenshots by default, telemetry upload, and automatic network submission.
+- Phase 3AN does not implement support bundle generation, change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AO
+
+- `docs/release/lens-docs-studio-installer-upgrade-uninstall-evidence-plan.md` records the installer upgrade and uninstall evidence plan for any future installer-affecting `v0.1.0-dev.2` publication gate.
+- The plan covers clean and silent install to temp paths, uninstall after install and app launch, upgrade from `v0.1.0-dev.1`, same-version reinstall if supported, shortcut cleanup, Lens-owned file-association cleanup, installed executable native smoke, install-directory residue, WebView2 data retention, release asset immutability checks, and PASS/FAIL/BLOCKED criteria.
+- The plan includes a future ready-to-use execution prompt requiring an explicit source commit, package and installer paths, hashes, temp install paths, no release publication, no user data overwrite, smoke validation, evidence documentation, and docs-only commit/push unless installer defects require a fix.
+- Phase 3AO does not change runtime code, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AP
+
+- `docs/release/lens-docs-studio-prerelease-guidance.md` records stale older prerelease guidance.
+- `v0.1.0-dev.2` is now the current recommended verified prerelease/dev release for new installation, validation, support evidence, and download guidance.
+- The older `v0.1.0-dev.1` assets are superseded for new validation but preserved as historical release evidence.
+- The older `v0.1.0-dev` assets are stale/superseded relative to `v0.1.0-dev.2`; they remain historical assets and should not be used for new validation unless the work explicitly investigates historical behaviour.
+- Phase 3AP does not change runtime code, rebuild packages or installers, edit release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3AU
+
+- `docs/release/lens-docs-studio-v010-dev2-release-closure.md` closes the `v0.1.0-dev.2` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.2` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.2`.
+- Post-publication verification passed for the release tag, prerelease state, published asset set, downloaded ZIP SHA256, downloaded installer SHA256, downloaded ZIP smoke, and contained installer smoke.
+- Manual packaged sanity remains `BLOCKED_MANUAL_PACKAGED_SANITY_NOT_EXECUTED` until real interactive packaged-app observation is separately executed.
+- The older `v0.1.0-dev.1` assets remain preserved historical prerelease evidence, and the older `v0.1.0-dev` assets remain stale.
+- No further release asset action is required unless a future release is authorised. Production readiness remains a separate approval gate.
+
+## Implemented Phase 3BB
+
+- `docs/release/lens-docs-studio-v010-dev3-release-closure.md` closes the `v0.1.0-dev.3` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.3` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.3`.
+- Phase 3BA post-publication verification passed for the release tag, prerelease state, expected six-asset set, downloaded ZIP SHA256 `8EDD6AF39590E28FB24412177145C36C85E6174B8AFEDC0EF5DBE2A9A61437E9`, downloaded installer SHA256 `CE22AD4E11C5C9CC4F67B469DF12683FDC4F66994007E995F85FAF03F59795DB`, downloaded ZIP smoke, and contained installer smoke.
+- Phase 3BA skipped interactive manual packaged sanity; Phase 3AW remains the referenced manual packaged sanity/remediation evidence for the Open folder pending guidance path.
+- `v0.1.0-dev.2` and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
+- No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
+
+## Implemented Phase 3BC
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev3-backlog.md` records the post-`v0.1.0-dev.3` backlog after release closure.
+- `docs/roadmap/lens-docs-studio-v010-dev4-candidate-scope.md` records candidate themes for a possible `v0.1.0-dev.4` cycle.
+- At the time of Phase 3BC, `v0.1.0-dev.3` remained the current verified prerelease/dev release for new validation and `v0.1.0-dev.4` was candidate planning only.
+- Existing release assets remain unchanged, including `v0.1.0-dev.1`, `v0.1.0-dev.2`, and `v0.1.0-dev.3` assets.
+- No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
+
+## Implemented Phase 3BD
+
+- `docs/roadmap/lens-docs-studio-v010-dev4-implementation-readiness.md` converts the candidate `v0.1.0-dev.4` scope into an ordered implementation readiness plan.
+- The recommended first slice is support bundle implementation, if explicitly approved, because the design contract is already documented and supports privacy-safe troubleshooting for bridge, folder picker, watcher/conflict, package, and installer issues.
+- The readiness plan records proposed slices, acceptance criteria, validation commands, evidence requirements, release artefact expectations, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3BD is documentation/planning only. It does not implement runtime changes, rebuild packages or installers, change release assets, create tags or releases, merge to `main`, or claim production readiness/go-live approval.
+
+## Implemented Phase 3BF
+
+- `docs/testing/lens-docs-studio-manual-packaged-sanity-helper-plan.md` records the manual packaged sanity helper/checklist design for future human verification of packaged onboarding, Diagnostics retry, native Open folder select/cancel, support bundle preview/copy/export and privacy boundaries, clean external changes, dirty conflict choices, and installer launch/install/uninstall checks when relevant.
+- The plan separates automated package/native smoke from real human observation of packaged UI and native Windows picker behaviour.
+- The design records the required Phase 3BE baseline, reviewed inputs, temporary workspace convention, PASS/FAIL/BLOCKED evidence fields, cleanup rules, and future implementation prompt.
+- Phase 3BF is documentation/planning only. It does not implement runtime changes, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, releases, a `main` merge, production readiness, or go-live approval.
+
+## Implemented Phase 3BM
+
+- `docs/release/lens-docs-studio-v010-dev4-release-closure.md` closes the `v0.1.0-dev.4` prerelease evidence chain as documentation-only release closure and roadmap rebaseline.
+- `v0.1.0-dev.4` is published as a prerelease/dev release at `https://github.com/DouglasNLima/local-docs-studio/releases/tag/v0.1.0-dev.4`.
+- Phase 3BL post-publication verification passed for the release tag, prerelease state, expected six-asset set, downloaded ZIP SHA256 `06BFA3896E1CCA48F1DC87D2F49D2387A8BCB93078E9F070764F22B048DD860C`, downloaded installer SHA256 `E52DB8B71B34E269F1754E2CCB6AB1691F38E6172CD2C826299A5DCF4A6652FC`, downloaded ZIP smoke, payload hygiene, and contained installer smoke.
+- Phase 3BL skipped interactive manual packaged sanity; Phase 3AW remains the referenced manual packaged sanity/remediation evidence for interactive native UI behaviours.
+- True upgrade from `v0.1.0-dev.3` remains blocked by the already-published baseline installer rollback recorded in Phase 3BH.
+- `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` are superseded for new validation but preserved historically, and `v0.1.0-dev` remains older/stale.
+- No further release asset action is required unless a future release is authorised. No `main` merge, production readiness, or go-live approval is claimed.
+
+## Implemented Phase 3BN
+
+- `docs/roadmap/lens-docs-studio-post-v010-dev4-backlog.md` records the post-`v0.1.0-dev.4` backlog after release closure.
+- `docs/roadmap/lens-docs-studio-v010-dev5-candidate-scope.md` records candidate themes for a possible `v0.1.0-dev.5` cycle.
+- `v0.1.0-dev.4` remains the current verified prerelease/dev release for new validation. `v0.1.0-dev.5` is candidate planning only, is not approved, and has no committed release date.
+- Existing release assets remain unchanged, including `v0.1.0-dev.4`, `v0.1.0-dev.3`, `v0.1.0-dev.2`, and `v0.1.0-dev.1` assets.
+- No runtime code, package rebuild, installer rebuild, tag, release, `main` merge, production readiness, or go-live approval is changed by this planning gate.
+
+## Implemented Phase 3BO
+
+- `docs/roadmap/lens-docs-studio-v010-dev5-implementation-readiness.md` converts the candidate `v0.1.0-dev.5` scope into an ordered implementation readiness plan.
+- The recommended first slice is manual packaged sanity helper implementation, if explicitly approved, because interactive packaged UI checks are still repeatedly skipped or referenced from Phase 3AW.
+- The readiness plan records proposed slices, acceptance criteria, validation commands, evidence requirements, release artefact expectations, rollback/supersedence considerations, and a ready-to-use first-slice execution prompt.
+- Phase 3BO is documentation/planning only. It does not implement runtime changes, helper scripts, package rebuilds, installer rebuilds, release asset changes, tags, releases, a `main` merge, production readiness, or go-live approval.
+
+## Future Roadmap
+
+- Collect feedback against `v0.1.0-dev.4` before deciding the next dev release scope.
+- Use the Phase 3BN post-release backlog, `v0.1.0-dev.5` candidate scope, and Phase 3BO implementation readiness plan as planning input only; they do not approve implementation or publication.
+- Monitor support bundle and Diagnostics copy/export feedback.
+- Monitor payload hygiene, installer, download, checksum, and runtime-prerequisite issues without changing published release assets.
+- Decide whether to address the `v0.1.0-dev.3` to `v0.1.0-dev.4` upgrade path limitation in a future release.
+- Use the Phase 3BF manual packaged sanity helper plan and Phase 3BO readiness plan as the design reference if a future helper/checklist generator is explicitly approved; no helper tooling exists yet.
+- Monitor Open folder pending guidance feedback and keep Phase 3AW as the current referenced manual packaged sanity/remediation evidence until a later authorised manual pass supersedes it.
+- Decide the next dev release scope from prerelease feedback and release-monitoring signals.
+- Keep `docs/release/lens-docs-studio-prerelease-guidance.md` current whenever a future prerelease is published; mark previous prereleases as superseded in documentation while preserving historical evidence and leaving old assets untouched unless separately authorised.
+- Run installer upgrade/uninstall evidence from the Phase 3AO plan only when a future installer-affecting release candidate is explicitly authorised.
+- Keep production readiness, go-live approval, stable/latest positioning, signing, and `main` promotion as separate future gates.
+- MSIX versus classic installer spike for offline distribution.
+- Broader installer validation, using the Phase 3M Inno Setup MVP as input and keeping ZIP as fallback.
+- Later signing, prerequisite bootstrapping, shortcuts, uninstall hardening, file associations, MSIX reassessment, and winget publication after the installer artefact is stable.
+- Single-instance forwarding for file-open activation.
+- Release flow from `develop` to `main`, including browser static checks, Windows shell smoke checks, release notes, and GitHub Pages publication validation.
+
+## Implemented Windows Smoke Harness
+
+- `scripts/windows/Run-WindowsNativeBridgeSmoke.ps1` creates controlled temporary fixtures, builds or reuses the Windows shell, launches it with `--smoke-native-bridge --smoke-root "<temp-folder>"`, waits for `smoke-result.json`, checks fixture file content, and exits non-zero on failure.
+- The smoke-only `smoke.nativeFixtures` capability is reported only when `--smoke-native-bridge` is present. Normal Windows shell launches, browser mode, and GitHub Pages mode do not expose smoke fixture APIs.
+- Smoke fixture operations are limited to the explicit smoke root. They do not automate Windows picker UI, expose local environment details, run shell commands, reveal unrestricted paths, or change production bridge validation.
+- The smoke covers shell start, WebView2 app load, bridge diagnostics, startup file argument load/save, native single-file open/save/save-as, native workspace open/save/create, one external workspace watcher event with a relative path, protocol-error reporting, structured completion, and clean shutdown.
+
+Run it with:
+
+```powershell
+pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1
+```
+
+Use `-NoBuild -TimeoutSeconds 90` to reuse an existing build on slower validation hosts.
+
+## Non-Goals For Phase 2B
+
+Phase 2B does not implement open folder, workspace folder bridging, recursive directory access, file watchers, recent files through the native bridge, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, or arbitrary native command execution.
+
+## Non-Goals For Phase 2C
+
+Phase 2C does not implement file watchers, external-change live notifications, recent native folders, workspace restore after restart, native drag/drop integration, native PDF export, Git integration, installer/MSIX work, auto-update, a full first-run wizard, delete/rename/move operations, arbitrary host command execution, or an editor rewrite.
+
+## Manual Smoke
+
+1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder`, `workspace.saveFile`, `workspace.watch`, and `workspace.refreshFile` capabilities.
+3. Use **File > Open folder**.
+4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
+5. Confirm the workspace browser loads relative paths.
+6. Select multiple files and confirm editor/preview update.
+7. Edit a workspace file.
+8. Use **File > Save changes**.
+9. Modify that file externally in another editor while Lens Docs Studio has no local edits.
+10. Confirm external-change indicator/status appears.
+11. Use **Refresh active file** and confirm content updates.
+12. Modify the same file externally again.
+13. Make local edits in Lens Docs Studio before refreshing.
+14. Confirm local edits remain and the dirty/external-conflict marker appears.
+15. Cancel **Refresh active file** and confirm local edits remain.
+16. Confirm refresh and verify external content loads.
+17. Delete a workspace file externally and confirm local content is not silently erased.
+18. Rename a workspace file externally and confirm the safe renamed indication.
+19. Use **File > Open file**, **File > Save changes**, and **File > Save as** to confirm single-file native operations still work.
+20. Open the app in normal browser mode and confirm no native bridge errors.

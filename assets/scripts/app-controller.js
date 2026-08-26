@@ -1,6 +1,6 @@
 import { createContentRegistries } from './registries/content.js';
 import { getDomElements } from './dom.js';
-import { createInitialState, storageKeys } from './state/config.js';
+import { APP_BUILD, APP_VERSION, createInitialState, storageKeys } from './state/config.js';
 import { createEditorService } from './editor/editor-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
@@ -13,10 +13,14 @@ import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createExportProfileService } from './exports/export-profile-service.js';
+import { createWordTemplateService } from './exports/word-template-service.js';
+import { createNativeBridgeClient } from './native/native-bridge-client.js';
 import { createRenderingService } from './rendering/render-service.js';
 import { createContextMenuService } from './ui/context-menu-service.js';
 import { createDialogService } from './ui/dialog-service.js';
+import { createSupportBundle, redactSupportBundleText } from './ui/support-bundle-service.js';
 import { createUiService } from './ui/ui-service.js';
+import { createWindowsSetupService } from './ui/windows-setup-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
@@ -32,6 +36,18 @@ const SNAPSHOT_DB_NAME = 'local-docs-studio-snapshots';
 const SNAPSHOT_DB_VERSION = 1;
 const SNAPSHOT_STORE = 'snapshots';
 const LOCAL_LIBRARY_KEY = 'md-mmd-renderer.localLibrary';
+const WINDOWS_HOST = 'LensDocsStudio.Windows';
+const WINDOWS_DIAGNOSTIC_CAPABILITIES = [
+  'diagnostics.ping',
+  'file.open',
+  'file.save',
+  'file.saveAs',
+  'workspace.openFolder',
+  'workspace.saveFile',
+  'workspace.createFile',
+  'workspace.watch',
+  'workspace.refreshFile',
+];
 
 export function createAppController() {
     const {
@@ -50,6 +66,7 @@ export function createAppController() {
       folderInput,
       zipInput,
       documentInput,
+      wordTemplateInput,
       saveButton,
       saveAsButton,
       refreshFileButton,
@@ -57,6 +74,9 @@ export function createAppController() {
       sampleButton,
       downloadButton,
       exportWordButton,
+      wordTemplateSelect,
+      wordTemplateImportButton,
+      wordTemplateSummary,
       exportPdfButton,
       exportMarkdownBundleButton,
       exportArtifactReviewPackButton,
@@ -207,6 +227,23 @@ export function createAppController() {
       insertHelperFields,
       insertHelperApplyButton,
       insertHelperCancelButton,
+      windowsSetupDialog,
+      windowsSetupTitle,
+      windowsSetupSummary,
+      windowsSetupStepList,
+      windowsSetupBody,
+      windowsSetupBackButton,
+      windowsSetupNextButton,
+      windowsSetupSkipButton,
+      windowsSetupCloseButton,
+      windowsShellDiagnosticsDialog,
+      windowsShellDiagnosticsBody,
+      windowsShellDiagnosticsCloseButton,
+      windowsShellDiagnosticsRetryButton,
+      windowsShellDiagnosticsCreateBundleButton,
+      windowsShellDiagnosticsCopyBundleButton,
+      windowsShellDiagnosticsExportBundleButton,
+      windowsShellDiagnosticsDoneButton,
     } = getDomElements();
     let templateDialogResolve = null;
     let pendingSpecialPasteMode = '';
@@ -214,11 +251,13 @@ export function createAppController() {
     let snapshotDbPromise = null;
 
     const state = createInitialState({ readStoredNumber });
+    const nativeBridgeClient = createNativeBridgeClient();
     let openTableEditor = () => {};
     let openProgressBarEditor = () => {};
     let openInsertHelper = () => {};
     let openArtifactReaderPath = async () => {};
     let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
+    let latestSupportBundle = null;
     const dialogTools = createDialogService({
       dom: {
         appDialog,
@@ -512,6 +551,7 @@ export function createAppController() {
         editor,
         preview,
         scrollSyncToggle,
+        editorFindPanel,
       },
     });
     let exportTools;
@@ -558,6 +598,19 @@ export function createAppController() {
         getDocTitleFromPath,
       },
     });
+    const wordTemplateTools = createWordTemplateService({
+      dom: {
+        wordTemplateInput,
+        wordTemplateImportButton,
+        wordTemplateSelect,
+        wordTemplateSummary,
+      },
+      callbacks: {
+        closeOpenMenus,
+        promptForText: promptDialog,
+        setStatus,
+      },
+    });
     exportTools = createExportService({
       state,
       dom: { preview, editor, exportTrust },
@@ -574,6 +627,7 @@ export function createAppController() {
         getExportTitle,
         getExportName,
         getWordExportName,
+        getSelectedWordTemplatePack: wordTemplateTools.getSelectedWordTemplatePack,
         getDocTitleFromPath,
         getEffectiveDevopsMarkdownExport: () => getEffectiveDevopsMarkdownExport(),
         closeOpenMenus,
@@ -643,6 +697,7 @@ export function createAppController() {
       refreshActiveFile,
       checkForExternalUpdates,
       ensureWritePermission,
+      getOpenFolderDiagnostics,
     } = createFileService({
       state,
       dom: { fileInput, folderInput, zipInput, documentInput, recentList, fileSearch, editor, preview },
@@ -686,6 +741,7 @@ export function createAppController() {
         normalisePath,
         uniqueByPath,
       },
+      nativeBridgeClient,
     });
     openArtifactReaderPath = selectFile;
     const workspaceSearchTools = createWorkspaceSearchService({
@@ -742,6 +798,29 @@ export function createAppController() {
         undoEditorChange,
       },
     });
+    const windowsSetupTools = createWindowsSetupService({
+      dom: {
+        windowsSetupDialog,
+        windowsSetupTitle,
+        windowsSetupSummary,
+        windowsSetupStepList,
+        windowsSetupBody,
+        windowsSetupBackButton,
+        windowsSetupNextButton,
+        windowsSetupSkipButton,
+        windowsSetupCloseButton,
+      },
+      callbacks: {
+        openWorkspace: openFolder,
+        openSample: initialiseSample,
+        openFeatureGuide: openToolGuide,
+        startBlankDocument: startBlankSetupDocument,
+        closeOpenMenus,
+        setStatus,
+      },
+      nativeBridgeClient,
+      storageKeys,
+    });
 
     const {
       sample,
@@ -767,11 +846,13 @@ export function createAppController() {
     updateDocsPreviewButton();
     updateStudioMode();
     dialogTools.installDialogHandlers();
+    wordTemplateTools.installWordTemplateHandlers();
     installResizers();
     draftTools.initDraftStore();
     draftTools.installDraftHandlers();
     installEditorEnhancements();
     exportProfileTools.installBuiltInProfileHandlers();
+    void wordTemplateTools.initWordTemplates();
     exportProfileTools.renderBuiltInProfiles();
     findReplaceTools.installFindReplaceHandlers();
     tableEditorTools.installTableEditorHandlers();
@@ -782,6 +863,7 @@ export function createAppController() {
     installScrollSyncHandlers();
     installSelectionSyncHandlers();
     installContextMenuHandlers();
+    windowsSetupTools.installWindowsSetupHandlers();
     installEventHandlers();
     renderLocalLibrary();
     initialiseWelcome();
@@ -789,6 +871,8 @@ export function createAppController() {
     initRecentHandles();
     registerServiceWorker();
     document.documentElement.dataset.appReady = 'true';
+    nativeBridgeClient.notifyAppReady?.();
+    void windowsSetupTools.maybeOpenFirstRun();
 
     function installEventHandlers() {
       sampleButton.addEventListener('click', () => loadExample('sample'));
@@ -903,8 +987,22 @@ export function createAppController() {
           if (button.dataset.menuAction === 'createSnapshot') await createActiveSnapshot();
           if (button.dataset.menuAction === 'manageSnapshots') await openSnapshotManager();
           if (button.dataset.menuAction === 'openToolGuide') await openToolGuide();
+          if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
+          if (button.dataset.menuAction === 'openWindowsShellDiagnostics') await openWindowsShellDiagnostics();
+          if (button.dataset.menuAction === 'openWindowsSetup') await windowsSetupTools.openWindowsSetupWizard();
           closeOpenMenus();
         });
+      });
+
+      windowsShellDiagnosticsCloseButton?.addEventListener('click', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsRetryButton?.addEventListener('click', openWindowsShellDiagnostics);
+      windowsShellDiagnosticsCreateBundleButton?.addEventListener('click', createDiagnosticsSupportBundle);
+      windowsShellDiagnosticsCopyBundleButton?.addEventListener('click', copyDiagnosticsSupportBundle);
+      windowsShellDiagnosticsExportBundleButton?.addEventListener('click', exportDiagnosticsSupportBundle);
+      windowsShellDiagnosticsDoneButton?.addEventListener('click', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsDialog?.addEventListener('cancel', closeWindowsShellDiagnostics);
+      windowsShellDiagnosticsDialog?.addEventListener('click', (event) => {
+        if (event.target === windowsShellDiagnosticsDialog) closeWindowsShellDiagnostics();
       });
 
       document.querySelectorAll('[data-edit-action]').forEach((button) => {
@@ -1134,6 +1232,7 @@ export function createAppController() {
           const action = actionButton.dataset.sidebarAction;
           if (action === 'openFile') await openFile();
           if (action === 'openFolder') await openFolder();
+          if (action === 'diagnostics') await openWindowsShellDiagnostics();
           if (action === 'newFile') await newMarkdownDocument();
           if (action === 'addFile') await addFilesToWorkspace();
           if (action === 'create') openCreateMenu();
@@ -1612,7 +1711,9 @@ export function createAppController() {
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
+      state.externalChangeDetails?.clear();
       state.workspaceDirectoryHandle = null;
+      state.nativeWorkspaceId = '';
       state.workspaceKind = '';
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
@@ -2241,16 +2342,17 @@ ${unresolvedRows}
       setExportTrust('', '');
       preview.innerHTML = `
         <section class="welcome-state" aria-label="Welcome">
-          <p class="welcome-kicker">Browser-only Markdown and Mermaid</p>
-          <h2>Start with a file, a folder, or a ready-made document.</h2>
-          <p>Open files, create documents, preview Markdown and Mermaid, and export clean documentation packages when the work is ready.</p>
+          <p class="welcome-kicker">Local Markdown, Mermaid, and documentation studio</p>
+          <h2>Start with a documentation folder.</h2>
+          <p>Open a folder to browse and watch a local workspace, open one file for a quick edit, or create a starter document. Your files stay local unless you choose to save, copy, export, or import content.</p>
           <div class="welcome-choice-grid">
             <div class="welcome-choice">
-              <strong>Open local work</strong>
-              <span>Use an existing Markdown or Mermaid file, or browse a folder of docs.</span>
+              <strong>Open local docs</strong>
+              <span>Use Open folder for workspace-style browsing and file watching. Use Open file for a single Markdown, Mermaid, or text document.</span>
               <div class="welcome-actions">
-                <button class="primary" type="button" data-welcome-action="openFile">Open file</button>
-                <button type="button" data-welcome-action="openFolder">Open folder</button>
+                <button class="primary" type="button" data-welcome-action="openFolder">Open folder</button>
+                <button type="button" data-welcome-action="openFile">Open file</button>
+                <button type="button" data-welcome-action="diagnostics">Diagnostics</button>
               </div>
             </div>
             <div class="welcome-choice">
@@ -2264,7 +2366,7 @@ ${unresolvedRows}
               <button type="button" data-welcome-action="sample">Try sample</button>
             </div>
           </div>
-          <div class="privacy-note">Files stay in this browser unless you save, copy, or export them.</div>
+          <div class="privacy-note">The Windows desktop shell runs the same local app from packaged files. If Open folder does not work there, use Diagnostics from this screen or Help.</div>
         </section>`;
       updateDocumentUx();
       setStatus('Ready');
@@ -2326,6 +2428,640 @@ ${unresolvedRows}
         setStatus('Could not open the feature guide.', 'danger');
         console.error(error);
       }
+    }
+
+    async function checkNativeBridge() {
+      setStatus('Checking Windows bridge...', 'busy');
+      const result = await nativeBridgeClient.ping();
+      if (!result.available) {
+        setStatus('Windows bridge unavailable in this browser mode.', 'info');
+        return;
+      }
+
+      if (!result.ok) {
+        setStatus(result.message || 'Windows bridge diagnostic failed safely.', 'warning');
+        return;
+      }
+
+      const payload = result.response?.payload || {};
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : 'Windows host';
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((capability) => typeof capability === 'string' && capability.trim())
+        : [];
+      const capabilitySummary = capabilities.length ? capabilities.join(', ') : 'no capabilities reported';
+      setStatus(`Windows bridge available: ${host} (${capabilitySummary}).`, 'ok');
+    }
+
+    async function openWindowsShellDiagnostics() {
+      if (!windowsShellDiagnosticsDialog || !windowsShellDiagnosticsBody) {
+        setStatus('Windows shell diagnostics are unavailable in this browser.', 'warning');
+        return;
+      }
+
+      setStatus('Checking Windows shell diagnostics...', 'busy');
+      setWindowsShellDiagnosticsPending();
+      const routeState = typeof nativeBridgeClient.getCapabilityState === 'function'
+        ? await nativeBridgeClient.getCapabilityState('workspace.openFolder')
+        : await getFallbackCapabilityState('workspace.openFolder');
+      const diagnostics = typeof nativeBridgeClient.getDiagnostics === 'function'
+        ? nativeBridgeClient.getDiagnostics()
+        : {};
+      const result = {
+        ok: routeState.pingPassed,
+        available: routeState.bridgeAvailable,
+        reason: routeState.reason,
+        message: routeState.message,
+        response: {
+          protocolVersion: routeState.pingPassed ? 1 : undefined,
+          payload: {
+            host: routeState.host,
+            capabilities: routeState.capabilities,
+          },
+        },
+      };
+      const payload = result.response?.payload || {};
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((capability) => typeof capability === 'string' && capability.trim())
+        : diagnostics.lastCapabilities || [];
+      const capabilitySet = new Set(capabilities);
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : '';
+      const isWindowsShell = result.ok && host === WINDOWS_HOST;
+      const webViewBridgePresent = Boolean(routeState.bridgeAvailable);
+      const pingPassed = Boolean(result.ok);
+      const openFolderNative = Boolean(routeState.hasCapability);
+      const openFolderCapabilityState = getOpenFolderCapabilityDiagnosticState(routeState);
+      const supportsDirectoryPicker = 'showDirectoryPicker' in window;
+      const supportsFolderInput = Boolean(folderInput);
+      const openFolderRoute = getOpenFolderDiagnosticRoute({
+        bridgeAvailable: webViewBridgePresent,
+        pingPassed,
+        openFolderNative,
+        supportsDirectoryPicker,
+        supportsFolderInput,
+      });
+      const browserFallbackActive = openFolderRoute.browserFallbackActive;
+      const pwaMode = isStandaloneDisplayMode();
+      const lastError = getSafeDiagnosticError(result, diagnostics);
+      const openFolderAttempt = getOpenFolderAttemptDiagnostic(getOpenFolderDiagnostics?.());
+      const nextStep = getWindowsShellDiagnosticNextStep({
+        pingPassed,
+        isWindowsShell: isWindowsShell || webViewBridgePresent,
+        openFolderNative,
+        supportsDirectoryPicker,
+        supportsFolderInput,
+        bridgeAvailable: webViewBridgePresent,
+      });
+      latestSupportBundle = null;
+
+      windowsShellDiagnosticsBody.innerHTML = `
+        ${renderDiagnosticSection('Mode', [
+          ['Running in browser/PWA', isWindowsShell ? 'No' : (pwaMode ? 'Yes (PWA display mode)' : 'Yes')],
+          ['WebView2 shell detected', getWebViewShellDiagnosticValue({ isWindowsShell, bridgeAvailable: webViewBridgePresent, host })],
+          ['Bridge message handler registered', yesNo(Boolean(diagnostics.messageHandlerRegistered))],
+        ])}
+        ${renderDiagnosticSection('Native bridge', [
+          ['Ping result', pingPassed ? 'Pass' : 'Fail'],
+          ['Protocol version', result.response?.protocolVersion ? String(result.response.protocolVersion) : 'Not reported'],
+          ['Host', host || 'Not reported'],
+          ['Last native request', diagnostics.lastRequestType || 'None'],
+          ['Last native response', diagnostics.lastResponseType || 'None'],
+          ['Last native error', lastError],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Capabilities</h3>
+          <div class="windows-setup-capabilities" aria-label="Windows bridge capabilities">
+            ${WINDOWS_DIAGNOSTIC_CAPABILITIES.map((capability) => `<span data-ready="${capabilitySet.has(capability)}">${escapeHtml(capability)}</span>`).join('')}
+          </div>
+        </section>
+        ${renderDiagnosticSection('Workspace action routing', [
+          ['Open folder route', openFolderRoute.label],
+          ['workspace.openFolder capability', openFolderCapabilityState],
+          ['Open folder will use native bridge', yesNo(openFolderNative)],
+          ['Browser fallback state', getBrowserFallbackState({ bridgeAvailable: webViewBridgePresent, browserFallbackActive })],
+          ['Browser fallback route', browserFallbackActive ? openFolderRoute.fallbackLabel : 'Not active'],
+          ['Directory picker API available', yesNo(supportsDirectoryPicker)],
+          ['Folder input fallback available', yesNo(supportsFolderInput)],
+        ])}
+        ${renderDiagnosticSection('Last Open folder attempt', [
+          ['Attempt state', openFolderAttempt.label],
+          ['Attempt detail', openFolderAttempt.detail],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Troubleshooting</h3>
+          <p>${escapeHtml(nextStep)}</p>
+        </section>
+        ${renderSupportBundleIntro()}
+      `;
+      updateSupportBundleButtons(false);
+
+      if (windowsShellDiagnosticsDialog.open) {
+        // Refreshing an already open diagnostic dialog only updates its contents.
+      } else if (typeof windowsShellDiagnosticsDialog.showModal === 'function') {
+        windowsShellDiagnosticsDialog.showModal();
+      } else {
+        windowsShellDiagnosticsDialog.setAttribute('open', '');
+      }
+
+      setStatus(pingPassed
+        ? 'Windows shell diagnostics completed.'
+        : 'Windows shell diagnostics found the bridge unavailable or failing.', pingPassed ? 'ok' : 'warning');
+    }
+
+    function setWindowsShellDiagnosticsPending() {
+      latestSupportBundle = null;
+      windowsShellDiagnosticsBody.innerHTML = `
+        ${renderDiagnosticSection('Native bridge', [
+          ['Ping result', 'Pending'],
+          ['workspace.openFolder capability', 'Pending'],
+          ['Open folder route', 'Pending'],
+          ['Browser fallback state', 'Pending'],
+        ])}
+        <section class="windows-shell-diagnostics-section">
+          <h3>Troubleshooting</h3>
+          <p>Refreshing bridge and folder-picker diagnostics...</p>
+        </section>
+        ${renderSupportBundleIntro({ pending: true })}
+      `;
+      updateSupportBundleButtons(false);
+      if (!windowsShellDiagnosticsDialog.open && typeof windowsShellDiagnosticsDialog.showModal === 'function') {
+        windowsShellDiagnosticsDialog.showModal();
+      } else {
+        windowsShellDiagnosticsDialog.setAttribute('open', '');
+      }
+    }
+
+    async function createDiagnosticsSupportBundle() {
+      if (!windowsShellDiagnosticsBody) return;
+      try {
+        latestSupportBundle = createSupportBundle(buildSupportBundleInput());
+        const section = windowsShellDiagnosticsBody.querySelector('[data-support-bundle-panel]');
+        if (section) {
+          section.innerHTML = renderSupportBundlePreview(latestSupportBundle);
+        }
+        updateSupportBundleButtons(true);
+        setSupportBundleActionMessage('Support bundle preview created locally. Copy and export stay local until you choose to share them.', 'ok');
+        setStatus('Support bundle preview created locally. Review it before copying or exporting.', 'ok');
+      } catch (error) {
+        latestSupportBundle = null;
+        updateSupportBundleButtons(false);
+        const safeMessage = redactSupportBundleText(error?.message || 'Support bundle creation failed safely.', 120) || 'Support bundle creation failed safely.';
+        const section = windowsShellDiagnosticsBody.querySelector('[data-support-bundle-panel]');
+        if (section) {
+          section.innerHTML = `
+            <h3>Support bundle</h3>
+            <p>Could not create the local support bundle preview: ${escapeHtml(safeMessage)}</p>
+            <p class="support-bundle-action-message" data-support-bundle-message data-status-kind="warning">Could not create the local support bundle preview. No data was uploaded.</p>
+          `;
+        }
+        setStatus('Could not create the local support bundle preview.', 'danger');
+      }
+    }
+
+    async function copyDiagnosticsSupportBundle() {
+      if (!latestSupportBundle) {
+        setSupportBundleActionMessage('Create a support bundle preview before copying a diagnostics summary.', 'warning');
+        setStatus('Create a support bundle preview before copying it.', 'warning');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(latestSupportBundle.summaryText);
+        setSupportBundleActionMessage('Diagnostics summary copied locally. No upload was started.', 'ok');
+        setStatus('Support bundle summary copied. You choose whether to share it.', 'ok');
+      } catch {
+        setSupportBundleActionMessage('Could not copy the diagnostics summary. No data was uploaded.', 'danger');
+        setStatus('Could not copy the support bundle summary.', 'danger');
+      }
+    }
+
+    function exportDiagnosticsSupportBundle() {
+      if (!latestSupportBundle) {
+        setSupportBundleActionMessage('Create a support bundle preview before exporting local JSON.', 'warning');
+        setStatus('Create a support bundle preview before exporting it.', 'warning');
+        return;
+      }
+      downloadBlob(
+        new Blob([latestSupportBundle.json], { type: 'application/json;charset=utf-8' }),
+        latestSupportBundle.filename
+      );
+      setSupportBundleActionMessage(`Support bundle JSON exported locally as ${latestSupportBundle.filename}. No upload was started.`, 'ok');
+      setStatus('Support bundle JSON exported locally. No upload was started.', 'ok');
+    }
+
+    function closeWindowsShellDiagnostics() {
+      if (windowsShellDiagnosticsDialog?.open && typeof windowsShellDiagnosticsDialog.close === 'function') {
+        windowsShellDiagnosticsDialog.close();
+      } else {
+        windowsShellDiagnosticsDialog?.removeAttribute('open');
+      }
+    }
+
+    function updateSupportBundleButtons(created) {
+      if (windowsShellDiagnosticsCopyBundleButton) windowsShellDiagnosticsCopyBundleButton.disabled = !created;
+      if (windowsShellDiagnosticsExportBundleButton) windowsShellDiagnosticsExportBundleButton.disabled = !created;
+    }
+
+    function renderSupportBundleIntro({ pending = false } = {}) {
+      const copy = pending
+        ? 'Create support bundle will be available after diagnostics finish.'
+        : 'Create a local support bundle preview with safe operational metadata from this diagnostics session. Copy summary creates concise local diagnostics text. Export local JSON saves the preview as a local file with a neutral filename. Private documents, full paths, secrets, tokens, connection strings, emails, raw stack traces, screenshots, browser storage, and WebView2 user data are not included. Nothing is uploaded automatically; you choose whether to share the copied summary or exported JSON.';
+      return `
+        <section class="windows-shell-diagnostics-section support-bundle-panel" data-support-bundle-panel>
+          <h3>Support bundle</h3>
+          <p>${escapeHtml(copy)}</p>
+          <p class="support-bundle-action-message" data-support-bundle-message hidden></p>
+        </section>
+      `;
+    }
+
+    function renderSupportBundlePreview(bundleResult) {
+      const bundle = bundleResult.bundle;
+      return `
+        <h3>Support bundle preview</h3>
+        <p>This bundle is created locally. You choose whether to copy or export it, and no automatic upload occurs.</p>
+        <div class="windows-setup-status-list">
+          ${[
+            ['Schema version', String(bundle.schemaVersion)],
+            ['Generated UTC', bundle.generatedAtUtc],
+            ['Runtime mode', bundle.environment.runtimeMode],
+            ['WebView2 shell detected', bundle.environment.webView2ShellDetected],
+            ['Bridge ping state', bundle.diagnostics.bridgePingState],
+            ['workspace.openFolder capability', bundle.openFolder.workspaceOpenFolderCapability],
+            ['Open folder route', bundle.openFolder.routeDecision],
+            ['Last Open folder attempt', bundle.openFolder.lastAttemptState],
+            ['Selected workspace present', bundle.openFolder.selectedWorkspacePresent],
+            ['Workspace path included', bundle.openFolder.workspacePathIncluded],
+            ['Watcher last event', bundle.watcher.lastEventCategory],
+            ['Privacy boundary', 'no document content, full private paths, secrets, tokens, connection strings, raw stack traces, screenshots, browser storage, or WebView2 user data'],
+          ].map(([label, value]) => `
+            <div class="windows-setup-status-row" data-status-kind="${getDiagnosticStatusKind(value)}">
+              <span>${escapeHtml(label)}</span>
+              <strong>${escapeHtml(value)}</strong>
+            </div>
+          `).join('')}
+        </div>
+        <pre class="support-bundle-preview" aria-label="Support bundle JSON preview">${escapeHtml(bundleResult.json)}</pre>
+        <p class="support-bundle-action-message" data-support-bundle-message hidden></p>
+      `;
+    }
+
+    function setSupportBundleActionMessage(message, kind = 'info') {
+      const messageElement = windowsShellDiagnosticsBody?.querySelector('[data-support-bundle-message]');
+      if (!messageElement) return;
+      messageElement.textContent = redactSupportBundleText(message, 180) || 'Diagnostics action completed.';
+      messageElement.dataset.statusKind = ['ok', 'warning', 'danger', 'info'].includes(kind) ? kind : 'info';
+      messageElement.hidden = false;
+    }
+
+    function renderDiagnosticSection(title, rows) {
+      return `
+        <section class="windows-shell-diagnostics-section">
+          <h3>${escapeHtml(title)}</h3>
+          <div class="windows-setup-status-list">
+            ${rows.map(([label, value]) => `
+              <div class="windows-setup-status-row" data-status-kind="${getDiagnosticStatusKind(value)}">
+                <span>${escapeHtml(label)}</span>
+                <strong>${escapeHtml(value)}</strong>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }
+
+    function getDiagnosticStatusKind(value) {
+      if (/^(yes|pass)/i.test(value)) return 'ok';
+      if (/^(no|fail|timeout|unavailable|not reported|missing|failing|blocked|native error)/i.test(value)) return 'warning';
+      return 'info';
+    }
+
+    async function getFallbackCapabilityState(capability) {
+      const result = await nativeBridgeClient.ping();
+      const payload = result.response?.payload || {};
+      const capabilities = Array.isArray(payload.capabilities)
+        ? payload.capabilities.filter((item) => typeof item === 'string' && item.trim())
+        : [];
+      const host = typeof payload.host === 'string' && payload.host.trim()
+        ? payload.host.trim()
+        : '';
+      return {
+        bridgeAvailable: Boolean(result.available),
+        pingPassed: Boolean(result.ok),
+        reason: result.reason || '',
+        message: result.message || '',
+        host,
+        capabilities,
+        hasCapability: Boolean(result.ok && capabilities.includes(capability)),
+      };
+    }
+
+    function getOpenFolderDiagnosticRoute({
+      bridgeAvailable,
+      pingPassed,
+      openFolderNative,
+      supportsDirectoryPicker,
+      supportsFolderInput,
+    }) {
+      if (openFolderNative) {
+        return {
+          label: 'native bridge',
+          browserFallbackActive: false,
+          fallbackLabel: 'Not active',
+        };
+      }
+      if (bridgeAvailable) {
+        return {
+          label: pingPassed
+            ? 'blocked because native bridge is present but capability failed'
+            : 'blocked because native bridge is present but capability check failed',
+          browserFallbackActive: false,
+          fallbackLabel: 'Blocked while native bridge is present',
+        };
+      }
+      if (supportsDirectoryPicker) {
+        return {
+          label: 'browser directory picker',
+          browserFallbackActive: true,
+          fallbackLabel: 'browser directory picker',
+        };
+      }
+      if (supportsFolderInput) {
+        return {
+          label: 'browser file input fallback',
+          browserFallbackActive: true,
+          fallbackLabel: 'browser file input fallback',
+        };
+      }
+      return {
+        label: 'unavailable',
+        browserFallbackActive: false,
+        fallbackLabel: 'No supported folder picker',
+      };
+    }
+
+    function getWebViewShellDiagnosticValue({ isWindowsShell, bridgeAvailable, host }) {
+      if (isWindowsShell) return 'Yes';
+      if (bridgeAvailable) return host ? 'Unknown host' : 'Unknown';
+      return 'No';
+    }
+
+    function getOpenFolderCapabilityDiagnosticState(routeState) {
+      if (routeState.hasCapability) return 'available';
+      if (!routeState.bridgeAvailable) return 'pending';
+      if (!routeState.pingPassed) return 'failing';
+      return 'missing';
+    }
+
+    function getBrowserFallbackState({ bridgeAvailable, browserFallbackActive }) {
+      if (bridgeAvailable) return 'inactive in packaged WebView2';
+      return browserFallbackActive ? 'available in browser/PWA context' : 'unavailable in this browser';
+    }
+
+    function getOpenFolderAttemptDiagnostic(openFolderDiagnostics = {}) {
+      const detail = typeof openFolderDiagnostics.lastMessage === 'string' && openFolderDiagnostics.lastMessage.trim()
+        ? openFolderDiagnostics.lastMessage.trim()
+        : 'No Open folder result has been recorded in this session.';
+      const labels = {
+        'not-attempted': 'not attempted',
+        'native-picker-opened': 'native picker opened',
+        'folder-selected': 'folder selected',
+        cancelled: 'user cancelled',
+        'native-error': 'native error',
+        pending: 'pending',
+        timeout: 'timeout',
+        'bridge-unavailable': 'bridge unavailable',
+        'capability-missing': 'workspace.openFolder missing',
+        'browser-picker-opened': 'browser picker opened',
+        'browser-picker-error': 'browser picker error',
+      };
+      return {
+        label: labels[openFolderDiagnostics.lastAttempt] || 'not attempted',
+        detail,
+      };
+    }
+
+    function getSafeDiagnosticError(result, diagnostics = {}) {
+      if (result.ok) return diagnostics.lastErrorReason || 'None';
+      if (result.reason === 'timeout' || diagnostics.requestTimedOut) return 'timeout';
+      if (typeof result.message === 'string' && result.message.trim()) return result.message.trim();
+      if (typeof diagnostics.lastErrorReason === 'string' && diagnostics.lastErrorReason.trim()) {
+        return diagnostics.lastErrorReason.trim();
+      }
+      return result.available ? 'Bridge request failed safely.' : 'unavailable';
+    }
+
+    function getWindowsShellDiagnosticNextStep({
+      pingPassed,
+      isWindowsShell,
+      openFolderNative,
+      supportsDirectoryPicker,
+      supportsFolderInput,
+      bridgeAvailable,
+    }) {
+      if (openFolderNative) {
+        return 'Use File > Open folder from the Windows shell, confirm a real folder picker appears, then continue the watcher/conflict manual evidence pass.';
+      }
+      if (bridgeAvailable) {
+        return 'Use Retry bridge check. If workspace.openFolder is still missing or failing, keep browser fallback inactive, record this dialog, and do not start watcher evidence.';
+      }
+      if (!pingPassed || !isWindowsShell) {
+        return 'In browser or PWA mode, use the browser picker if available. For packaged evidence, launch the Windows executable and retry diagnostics.';
+      }
+      if (!supportsDirectoryPicker && supportsFolderInput) {
+        return 'Browser file input fallback is available only outside the packaged WebView2 shell and is not valid Windows folder-picker evidence.';
+      }
+      return 'Record the missing workspace.openFolder capability before retrying manual watcher evidence.';
+    }
+
+    function buildSupportBundleInput() {
+      const diagnostics = typeof nativeBridgeClient.getDiagnostics === 'function'
+        ? nativeBridgeClient.getDiagnostics()
+        : {};
+      const capabilitySet = new Set(Array.isArray(diagnostics.lastCapabilities) ? diagnostics.lastCapabilities : []);
+      const openFolderDiagnostics = getOpenFolderDiagnostics?.() || {};
+      const bridgeAvailable = Boolean(diagnostics.available);
+      const host = diagnostics.lastCapabilities?.length ? WINDOWS_HOST : '';
+      const webView2ShellDetected = bridgeAvailable ? (host === WINDOWS_HOST ? 'yes' : 'unknown') : 'no';
+      const supportsDirectoryPicker = 'showDirectoryPicker' in window;
+      const supportsFolderInput = Boolean(folderInput);
+      const openFolderNative = capabilitySet.has('workspace.openFolder');
+      const route = getOpenFolderDiagnosticRoute({
+        bridgeAvailable,
+        pingPassed: bridgeAvailable && !diagnostics.requestTimedOut,
+        openFolderNative,
+        supportsDirectoryPicker,
+        supportsFolderInput,
+      });
+      const activeFileState = getSupportBundleActiveFileState();
+      const watcherState = getSupportBundleWatcherState();
+      return {
+        generatedAtUtc: new Date().toISOString(),
+        app: {
+          appVersion: APP_VERSION,
+          appBuild: APP_BUILD,
+          sourceCommit: '',
+        },
+        environment: {
+          runtimeMode: getSupportBundleRuntimeMode({ bridgeAvailable, webView2ShellDetected }),
+          packagedNativeMode: bridgeAvailable ? 'yes' : 'no',
+          webView2ShellDetected,
+          appOriginCategory: getSupportBundleOriginCategory(),
+          platformCategory: getSupportBundlePlatformCategory(),
+          browserEngine: getSupportBundleBrowserEngine(),
+        },
+        diagnostics: {
+          bridgeMessageHandlerRegistered: Boolean(diagnostics.messageHandlerRegistered),
+          bridgePingState: diagnostics.requestTimedOut ? 'timeout' : (bridgeAvailable ? 'pass' : 'unavailable'),
+          protocolVersion: bridgeAvailable ? '1' : 'not reported',
+          host: bridgeAvailable ? WINDOWS_HOST : '',
+          capabilities: [...capabilitySet],
+          lastNativeRequestType: diagnostics.lastRequestType || 'none',
+          lastNativeResponseType: diagnostics.lastResponseType || 'none',
+          nativeErrorCategory: diagnostics.lastErrorReason || 'none',
+          nativeErrorMessage: diagnostics.lastErrorReason || 'none',
+        },
+        openFolder: {
+          routeDecision: getSupportBundleRouteDecision(route.label),
+          workspaceOpenFolderCapability: openFolderNative ? 'available' : (bridgeAvailable ? 'missing' : 'pending'),
+          browserFallbackState: getSupportBundleBrowserFallbackState(getBrowserFallbackState({
+            bridgeAvailable,
+            browserFallbackActive: route.browserFallbackActive,
+          })),
+          lastAttemptState: getSupportBundleAttemptState(openFolderDiagnostics.lastAttempt),
+          lastAttemptDetail: openFolderDiagnostics.lastMessage || '',
+          selectedWorkspacePresent: state.files.length ? 'yes' : 'no',
+          workspaceKind: getSupportBundleWorkspaceKind(),
+          supportedFileCount: state.files.length,
+          skippedFileCount: state.lastSkippedFileCount,
+          activeFileState,
+        },
+        watcher: watcherState,
+      };
+    }
+
+    function getSupportBundleRuntimeMode({ bridgeAvailable }) {
+      if (bridgeAvailable && getSupportBundleOriginCategory() === 'packaged-virtual-host') return 'windows-shell-packaged';
+      if (bridgeAvailable) return 'windows-shell-development';
+      const category = getSupportBundleOriginCategory();
+      if (category === 'github-pages') return 'browser-github-pages';
+      if (category === 'local-static-server') return 'browser-local-static-server';
+      if (category === 'file-url') return 'browser-file-url';
+      return 'unknown';
+    }
+
+    function getSupportBundleOriginCategory() {
+      const { protocol, hostname, origin } = window.location;
+      if (/^https:\/\/lens-docs-studio\.local\/?$/i.test(origin || '')) return 'packaged-virtual-host';
+      if (protocol === 'file:') return 'file-url';
+      if (/github\.io$/i.test(hostname || '')) return 'github-pages';
+      if (/^(localhost|127\.0\.0\.1|\[::1\])$/i.test(hostname || '')) return 'local-static-server';
+      return 'unknown';
+    }
+
+    function getSupportBundlePlatformCategory() {
+      const source = `${navigator.userAgentData?.platform || ''} ${navigator.platform || ''} ${navigator.userAgent || ''}`.toLowerCase();
+      if (source.includes('windows') || source.includes('win32')) return 'windows';
+      if (source.includes('mac')) return 'macos';
+      if (source.includes('android')) return 'android';
+      if (/iphone|ipad|ios/.test(source)) return 'ios';
+      if (source.includes('linux')) return 'linux';
+      return 'unknown';
+    }
+
+    function getSupportBundleBrowserEngine() {
+      const source = navigator.userAgent || '';
+      if (/Edg\//.test(source)) return 'edge';
+      if (/Firefox\//.test(source)) return 'firefox';
+      if (/Chrome\/|Chromium\//.test(source)) return 'chromium';
+      if (/Safari\//.test(source)) return 'safari';
+      return 'unknown';
+    }
+
+    function getSupportBundleRouteDecision(label) {
+      if (label === 'native bridge') return 'native-bridge';
+      if (/blocked because native bridge/i.test(label)) return 'blocked-native-bridge-present';
+      if (label === 'browser directory picker') return 'browser-directory-picker';
+      if (label === 'browser file input fallback') return 'browser-file-input-fallback';
+      if (label === 'unavailable') return 'unavailable';
+      return 'unknown';
+    }
+
+    function getSupportBundleBrowserFallbackState(label) {
+      if (label === 'inactive in packaged WebView2') return 'inactive-in-packaged-webview2';
+      if (label === 'available in browser/PWA context') return 'available-in-browser-pwa-context';
+      if (label === 'unavailable in this browser') return 'unavailable-in-this-browser';
+      return 'unknown';
+    }
+
+    function getSupportBundleAttemptState(value) {
+      const states = {
+        'not-attempted': 'not-attempted',
+        'native-picker-opened': 'native-picker-opened',
+        'folder-selected': 'folder-selected',
+        cancelled: 'user-cancelled',
+        'native-error': 'native-error',
+        pending: 'pending',
+        timeout: 'timeout',
+        'bridge-unavailable': 'bridge-unavailable',
+        'capability-missing': 'capability-missing',
+        'browser-picker-opened': 'browser-picker-opened',
+        'browser-picker-error': 'browser-picker-error',
+      };
+      return states[value] || 'not-attempted';
+    }
+
+    function getSupportBundleWorkspaceKind() {
+      const kinds = {
+        folder: 'browser-folder',
+        'folder-fallback': 'browser-folder',
+        'native-folder': 'native-folder',
+        file: 'single-file',
+        zip: 'imported-zip',
+        bundle: 'imported-zip',
+        'artefact-bundle': 'imported-artefact-bundle',
+        converted: 'converted-document',
+        virtual: 'virtual-document',
+      };
+      return kinds[state.workspaceKind] || (state.files.length ? 'virtual-document' : 'unknown');
+    }
+
+    function getSupportBundleActiveFileState() {
+      if (!state.activePath) return 'none';
+      const detail = state.externalChangeDetails?.get(state.activePath);
+      if (state.dirtyPaths.has(state.activePath) && detail) return 'dirty-external-conflict';
+      if (state.dirtyPaths.has(state.activePath)) return 'edited-in-app';
+      if (detail?.kind === 'deleted') return 'external-deleted';
+      if (detail?.kind === 'renamed') return 'external-renamed';
+      if (detail) return 'external-change';
+      return 'clean';
+    }
+
+    function getSupportBundleWatcherState() {
+      const details = [...(state.externalChangeDetails?.values() || [])];
+      const latest = details
+        .filter((detail) => detail && typeof detail === 'object')
+        .sort((a, b) => String(b.receivedAtUtc || '').localeCompare(String(a.receivedAtUtc || '')))[0];
+      const dirtyConflict = state.activePath && state.externalChangeDetails?.has(state.activePath) && state.dirtyPaths.has(state.activePath);
+      return {
+        lastEventCategory: dirtyConflict ? 'dirty-conflict' : (latest?.kind || 'none'),
+        lastEventAtUtc: latest?.receivedAtUtc || '',
+        relativePathOnly: latest ? 'yes' : 'unknown',
+        dirtyConflictState: dirtyConflict ? 'present' : 'none',
+      };
+    }
+
+    function yesNo(value) {
+      return value ? 'Yes' : 'No';
+    }
+
+    function isStandaloneDisplayMode() {
+      return Boolean(
+        window.matchMedia?.('(display-mode: standalone)')?.matches
+        || window.navigator?.standalone
+      );
     }
 
     async function loadStudioTemplate(key) {
@@ -2872,6 +3608,38 @@ ${unresolvedRows}
       renderPreview();
     }
 
+    async function startBlankSetupDocument() {
+      if (!await confirmDiscardUnsaved('Start a blank Markdown document and discard unsaved edits?')) return;
+      const name = 'untitled.md';
+      clearFocusedModes();
+      clearManagedAssets();
+      clearScrollPositions();
+      clearWorkspaceContentCaches();
+      state.files = [{
+        name,
+        path: name,
+        file: new File([''], name, { type: 'text/markdown' }),
+        needsSave: true,
+      }];
+      state.folderName = 'Blank document';
+      state.activePath = name;
+      state.fileName = name;
+      state.fileCache.set(name, '');
+      markWorkspaceCleanContent(name, '');
+      state.dirtyPaths.add(name);
+      editor.value = '';
+      editor.placeholder = 'Start writing Markdown here.';
+      resetScrollForCurrentDocument();
+      resetEditorHistory();
+      syncEditorReadOnly();
+      renderFileList();
+      updateActiveFileLabel();
+      updateSaveButton();
+      await renderPreview();
+      setStatus('Blank Markdown document ready.', 'ok');
+      editor.focus({ preventScroll: true });
+    }
+
     function togglePreviewMaximized(force) {
       const shouldMaximize = typeof force === 'boolean'
         ? force
@@ -2958,6 +3726,7 @@ ${unresolvedRows}
         const action = welcomeAction.dataset.welcomeAction;
         if (action === 'openFile') await openFile();
         if (action === 'openFolder') await openFolder();
+        if (action === 'diagnostics') await openWindowsShellDiagnostics();
         if (action === 'sample') await loadExample('sample');
         if (action === 'create') openCreateMenu();
         return;

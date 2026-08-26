@@ -392,6 +392,27 @@
       accent-color: var(--accent);
     }
 
+    .menu-field {
+      display: grid;
+      gap: .28rem;
+      min-width: 0;
+      padding: .35rem .55rem;
+      border: 1px solid var(--border-soft);
+      border-radius: .7rem;
+      color: var(--muted-strong);
+      font-size: .82rem;
+    }
+
+    .menu-field span {
+      font-size: .76rem;
+      font-weight: 750;
+    }
+
+    .menu-field select {
+      width: 100%;
+      min-width: 0;
+    }
+
     .menu-panel hr {
       width: 100%;
       height: 1px;
@@ -4648,13 +4669,38 @@ label.file-button.primary,
   color: var(--accent);
 }
 
+.file-state-markers {
+  display: inline-flex;
+  align-items: center;
+  gap: .32rem;
+  margin-left: auto;
+}
+
+.file-state-markers .dirty-dot {
+  margin-left: 0;
+}
+
 .external-change-dot {
   width: .62rem;
   height: .62rem;
-  margin-left: auto;
   border-radius: 50%;
   background: var(--accent);
   box-shadow: 0 0 0 3px rgba(255, 136, 62, .14);
+}
+
+.external-change-dot--deleted {
+  background: var(--danger);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, .13);
+}
+
+.external-change-dot--renamed {
+  background: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .13);
+}
+
+.external-change-dot--created {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, .13);
 }
 
 #focusModeButton {
@@ -4967,6 +5013,215 @@ label.file-button.primary,
   gap: .35rem;
   max-height: min(56vh, 32rem);
   overflow: auto;
+}
+
+.windows-setup-dialog {
+  width: min(94vw, 52rem);
+}
+
+.windows-setup-card {
+  max-height: min(88vh, 42rem);
+}
+
+.windows-setup-layout {
+  display: grid;
+  grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+  gap: 1rem;
+  min-height: 24rem;
+}
+
+.windows-setup-steps {
+  border-right: 1px solid var(--border-soft);
+  padding-right: .8rem;
+}
+
+.windows-setup-steps ol {
+  display: grid;
+  gap: .35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.windows-setup-steps li {
+  border: 1px solid transparent;
+  border-radius: .55rem;
+  padding: .48rem .58rem;
+  color: var(--muted-strong);
+  font-size: .86rem;
+}
+
+.windows-setup-steps li[data-setup-step-state="active"] {
+  border-color: rgba(255, 136, 62, .42);
+  background: rgba(255, 136, 62, .1);
+  color: var(--text);
+  font-weight: 700;
+}
+
+.windows-setup-steps li[data-setup-step-state="done"] {
+  color: var(--ok);
+}
+
+.windows-setup-panel {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  gap: .8rem;
+  min-width: 0;
+}
+
+.windows-setup-panel h2 {
+  margin: 0;
+  font-size: 1.28rem;
+  line-height: 1.2;
+}
+
+.windows-setup-panel > p,
+.windows-setup-lead,
+.windows-setup-muted {
+  margin: 0;
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
+.windows-setup-body {
+  display: grid;
+  align-content: start;
+  gap: .85rem;
+  min-width: 0;
+}
+
+.windows-setup-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.windows-setup-status-list {
+  display: grid;
+  gap: .45rem;
+}
+
+.windows-setup-status-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 1.4fr);
+  gap: .8rem;
+  align-items: center;
+  border: 1px solid var(--border-soft);
+  border-radius: .6rem;
+  padding: .58rem .68rem;
+  background: var(--surface-muted);
+}
+
+.windows-setup-status-row strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: .9rem;
+}
+
+.windows-setup-status-row[data-status-kind="ok"] strong { color: var(--ok); }
+.windows-setup-status-row[data-status-kind="warning"] strong { color: var(--warning); }
+.windows-setup-status-row[data-status-kind="info"] strong { color: var(--muted-strong); }
+
+.windows-setup-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+}
+
+.windows-setup-capabilities span {
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: .25rem .5rem;
+  background: var(--surface-muted);
+  color: var(--muted-strong);
+  font-size: .78rem;
+}
+
+.windows-setup-capabilities span[data-ready="true"] {
+  border-color: rgba(22, 163, 74, .36);
+  color: var(--ok);
+}
+
+.windows-setup-command {
+  display: block;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--border);
+  border-radius: .6rem;
+  padding: .75rem;
+  background: var(--editor-bg);
+  color: var(--text);
+}
+
+.windows-setup-footer {
+  align-items: center;
+}
+
+.windows-setup-footer-spacer {
+  flex: 1 1 auto;
+}
+
+.windows-shell-diagnostics-dialog {
+  width: min(94vw, 46rem);
+}
+
+.windows-shell-diagnostics-card {
+  max-height: min(88vh, 42rem);
+}
+
+.windows-shell-diagnostics-body {
+  display: grid;
+  gap: 1rem;
+}
+
+.windows-shell-diagnostics-section {
+  display: grid;
+  gap: .55rem;
+}
+
+.windows-shell-diagnostics-section h3 {
+  margin: 0;
+  font-size: .98rem;
+  line-height: 1.25;
+}
+
+.windows-shell-diagnostics-section p {
+  margin: 0;
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
+.support-bundle-action-message {
+  border: 1px solid var(--border);
+  border-radius: .5rem;
+  padding: .55rem .65rem;
+  background: var(--surface);
+}
+
+.support-bundle-action-message[data-status-kind="ok"] {
+  border-color: rgba(22, 163, 74, .32);
+  color: var(--success);
+}
+
+.support-bundle-action-message[data-status-kind="warning"],
+.support-bundle-action-message[data-status-kind="danger"] {
+  border-color: rgba(220, 38, 38, .28);
+  color: var(--danger);
+}
+
+.support-bundle-preview {
+  max-height: 14rem;
+  overflow: auto;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: .6rem;
+  padding: .75rem;
+  background: var(--editor-bg);
+  color: var(--text);
+  font-size: .78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .workspace-search-result {
@@ -5385,6 +5640,38 @@ label.file-button.primary,
 }
 
 @media (max-width: 760px) {
+  .windows-setup-layout {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .windows-setup-steps {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+    padding: 0 0 .7rem;
+  }
+
+  .windows-setup-steps ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .windows-setup-status-row {
+    grid-template-columns: 1fr;
+    gap: .25rem;
+  }
+
+  .windows-setup-footer {
+    flex-direction: column-reverse;
+  }
+
+  .windows-setup-footer button {
+    width: 100%;
+  }
+
+  .windows-setup-footer-spacer {
+    display: none;
+  }
+
   .diff-grid {
     grid-template-columns: 1fr;
   }
