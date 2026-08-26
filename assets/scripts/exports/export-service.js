@@ -2,6 +2,7 @@ import { base64ToUint8Array, textToBase64 } from '../utils/binary.js';
 import { downloadBlob } from '../utils/browser.js';
 import { isSupportedFile } from '../utils/files.js';
 import { escapeHtml, escapeXml, sanitiseFileName, slugify } from '../utils/format.js';
+import { composeMarkdownClipboardHtml, findMarkdownImageTokens } from '../utils/markdown-clipboard.js';
 import { createZipBlob, wrapBase64 } from '../utils/zip.js';
 import { formatMarkdownForDevOpsBundle } from '../utils/devops-markdown.js';
 import { resolveWikilinkTarget, stripAppWikilinkActions } from '../utils/wikilinks.js';
@@ -497,7 +498,7 @@ export function createExportService({
 
       try {
         const result = await buildMarkdownWithClipboardImages(source, scope);
-        const html = await buildClipboardMarkdownHtml(result.markdown);
+        const html = buildClipboardMarkdownHtml(result.markdown);
         if (navigator.clipboard?.write && window.ClipboardItem) {
           await navigator.clipboard.write([
             new ClipboardItem({
@@ -578,9 +579,8 @@ export function createExportService({
       };
     }
 
-    async function buildClipboardMarkdownHtml(markdown) {
-      const body = sanitizeRenderedHtml(await buildMarkdownHtml(markdown));
-      return `<article>${body}</article>`;
+    function buildClipboardMarkdownHtml(markdown) {
+      return composeMarkdownClipboardHtml(markdown);
     }
 
     function collectMermaidSourceBlocks(source) {
@@ -718,12 +718,24 @@ export function createExportService({
     }
 
     function embedManagedAssetMarkdownImages(markdown) {
+      const source = String(markdown || '');
       let convertedAssets = 0;
-      const rewritten = String(markdown || '').replace(/!\[([^\]\n]*)\]\(([^)\s]+)(\s+["'][^"']*["'])?\)/g, (raw, alt, href, title = '') => {
-        const asset = getManagedAssetForMarkdownHref(href);
-        if (!asset) return raw;
-        convertedAssets += 1;
-        return `![${alt}](${getManagedAssetDataUrl(asset)}${title})`;
+      const replacements = findMarkdownImageTokens(source)
+        .map((token) => ({ token, asset: getManagedAssetForMarkdownHref(token.href) }))
+        .filter(({ asset }) => asset)
+        .map(({ token, asset }) => {
+          convertedAssets += 1;
+          const title = token.title ? ` ${token.title}` : '';
+          return {
+            start: token.start,
+            end: token.end,
+            text: `![${token.alt}](${getManagedAssetDataUrl(asset)}${title})`,
+          };
+        });
+
+      let rewritten = source;
+      replacements.sort((left, right) => right.start - left.start).forEach((replacement) => {
+        rewritten = `${rewritten.slice(0, replacement.start)}${replacement.text}${rewritten.slice(replacement.end)}`;
       });
 
       return { markdown: rewritten, convertedAssets };

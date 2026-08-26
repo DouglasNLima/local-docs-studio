@@ -342,7 +342,7 @@ The Export menu includes document-level diagram actions:
 - **Export SVG** for the current rendered Mermaid diagram.
 - **Export PNG** for a raster image version.
 - **Copy Mermaid** for the current standalone diagram source or first Mermaid block.
-- **Copy Markdown with images** from the Edit menu or Editor context menu to copy Markdown while replacing complete Mermaid blocks with inline PNG image references.
+- **Copy Markdown with images** from the Edit menu or Editor context menu to copy Markdown while replacing complete Mermaid blocks with inline PNG image references. Its rich clipboard carrier keeps the source Markdown literal and exposes only the image elements needed for automatic attachment handling in Azure DevOps Markdown work item fields; see [`docs/release/copy-markdown-with-images-azure-devops-fidelity.md`](docs/release/copy-markdown-with-images-azure-devops-fidelity.md).
 
 Use the **Diagram theme** selector in the preview header to choose Auto, Lens, Default, Neutral, Forest, or Dark. Auto follows the app light/dark theme; explicit choices keep rendered diagrams fixed. SVG, PNG, Word, PDF, copy-as-image, and Docs Site exports use the currently rendered Mermaid theme.
 

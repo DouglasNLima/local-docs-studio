@@ -3060,6 +3060,123 @@ test('editor context menu copies Markdown with Mermaid diagrams as clipboard ima
   expect(copiedMarkdown).toContain("const message = 'release ready';");
   expect(copiedHtml).toContain('<img');
   expect(copiedHtml).toContain('data:image/png;base64,');
+  expect(copiedHtml).toContain('data-markdown-clipboard="source"');
+  expect(copiedHtml).toContain('```js');
+  expect(copiedHtml).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+});
+
+test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered image payloads', async ({ page }) => {
+  await gotoApp(page);
+  const source = await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8');
+
+  const result = await page.evaluate(async (fixture) => {
+    const { composeMarkdownClipboardHtml, findMarkdownImageTokens } = await import('/assets/scripts/utils/markdown-clipboard.js');
+    const markdown = fixture
+      .replace('<test image>', 'data:image/png;base64,AAAA')
+      .replace('<second test image>', 'data:image/png;base64,BBBB');
+    const html = composeMarkdownClipboardHtml(markdown);
+    const fencedImageSource = '```text\n![not an attachment](data:image/png;base64,CODE)\n```';
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    return {
+      html,
+      markdown,
+      tokens: findMarkdownImageTokens(markdown),
+      fencedTokens: findMarkdownImageTokens(fencedImageSource),
+      textContent: document.body.textContent,
+      images: [...document.querySelectorAll('img')].map((image) => ({
+        index: image.dataset.markdownClipboardImage,
+        src: image.getAttribute('src'),
+        alt: image.getAttribute('alt'),
+      })),
+    };
+  }, source);
+
+  const sourceWithoutImages = result.markdown.replace(/!\[[^\]\r\n]*\]\([^)]*\)/g, '');
+  expect(result.tokens).toMatchObject([
+    { alt: 'Architecture diagram', href: 'data:image/png;base64,AAAA' },
+    { alt: 'Secondary diagram', href: 'data:image/png;base64,BBBB' },
+  ]);
+  expect(result.tokens[0].start).toBe(result.markdown.indexOf('![Architecture diagram]'));
+  expect(result.tokens[1].start).toBe(result.markdown.indexOf('![Secondary diagram]'));
+  expect(result.fencedTokens).toEqual([]);
+  expect(result.textContent).toBe(sourceWithoutImages);
+  expect(result.images).toEqual([
+    { index: '0', src: 'data:image/png;base64,AAAA', alt: 'Architecture diagram' },
+    { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Secondary diagram' },
+  ]);
+  expect(result.html).toContain('# HSI Marking Chart – Current-State Process and Component Architecture');
+  expect(result.html).toContain('## 1. Purpose');
+  expect(result.html).toContain('### Phase A – Source image discovery and ingestion');
+  expect(result.html).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+  expect(result.html).not.toContain('data:image/svg');
+});
+
+test('Copy Markdown with images keeps a no-asset source byte-for-byte in plain text', async ({ page }) => {
+  await openFixture(page, 'azure-devops-markdown-fidelity.md');
+  await mockClipboardWrite(page);
+  await clickEditAction(page, 'Copy Markdown with images');
+
+  await expect(page.locator('#status')).toHaveText(/Markdown with images copied/, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
+  expect(await page.evaluate(() => window.__copiedText)).toBe(await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8'));
+  const copiedHtml = await page.evaluate(() => window.__copiedHtml);
+  expect(copiedHtml).toContain('data-markdown-clipboard="source"');
+  expect(copiedHtml).toContain('# H1 ATX');
+  expect(copiedHtml).toContain('- unordered item 1');
+  expect(copiedHtml).toContain('```text');
+  expect(copiedHtml).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
+});
+
+test('Copy Markdown with images embeds multiple managed assets in source order', async ({ page }, testInfo) => {
+  const source = await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8');
+  const firstBytes = await readFile(fixturePath('artifact-bundles/valid-rich/assets/tiny.png'));
+  const secondBytes = await readFile(fixturePath('artifact-bundles/generic-zip/docs/images/logo.png'));
+  const firstBase64 = firstBytes.toString('base64');
+  const secondBase64 = secondBytes.toString('base64');
+  const zipPath = await writeZipFixture(testInfo, 'azure-devops-markdown-fidelity-assets.zip', [
+    {
+      name: 'azure-devops-markdown-fidelity.md',
+      data: source
+        .replace('<test image>', 'assets/first-test.png')
+        .replace('<second test image>', 'assets/second-test.png'),
+    },
+    { name: 'assets/first-test.png', data: firstBytes },
+    { name: 'assets/second-test.png', data: secondBytes },
+  ]);
+
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 1 document and 2 image assets from ZIP/, { timeout: 20_000 });
+  await mockClipboardWrite(page);
+  await clickEditAction(page, 'Copy Markdown with images');
+
+  await expect(page.locator('#status')).toHaveText(/2 managed images embedded/, { timeout: 20_000 });
+  await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
+  const copiedMarkdown = await page.evaluate(() => window.__copiedText);
+  const markdownImages = [...copiedMarkdown.matchAll(/!\[([^\]\r\n]*)\]\((data:image\/png;base64,[^)]+)\)/g)]
+    .map((match) => ({ alt: match[1], src: match[2] }));
+  expect(markdownImages).toEqual([
+    { alt: 'Architecture diagram', src: `data:image/png;base64,${firstBase64}` },
+    { alt: 'Secondary diagram', src: `data:image/png;base64,${secondBase64}` },
+  ]);
+
+  const copiedHtml = await page.evaluate(() => window.__copiedHtml);
+  const htmlImages = await page.evaluate((html) => {
+    const document = new DOMParser().parseFromString(html, 'text/html');
+    return [...document.querySelectorAll('img')].map((image) => ({
+      index: image.dataset.markdownClipboardImage,
+      alt: image.alt,
+      src: image.src,
+    }));
+  }, copiedHtml);
+  expect(htmlImages).toEqual([
+    { index: '0', alt: 'Architecture diagram', src: `data:image/png;base64,${firstBase64}` },
+    { index: '1', alt: 'Secondary diagram', src: `data:image/png;base64,${secondBase64}` },
+  ]);
+  expect(copiedMarkdown).toContain('# HSI Marking Chart – Current-State Process and Component Architecture');
+  expect(copiedMarkdown).toContain('- the components involved in the current process;');
+  expect(copiedMarkdown).toContain('```text');
+  expect(copiedMarkdown).not.toContain('data:image/svg');
 });
 
 test('custom context menu exposes preview-specific copy and export actions', async ({ page }) => {
