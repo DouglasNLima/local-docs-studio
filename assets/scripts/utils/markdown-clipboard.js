@@ -40,12 +40,12 @@ export function findMarkdownImageTokens(markdown) {
  */
 export function composeMarkdownClipboardHtml(markdown) {
   const source = String(markdown ?? '');
-  const parts = ['<span data-markdown-clipboard="source" style="white-space: pre-wrap">'];
+  const parts = ['<span data-markdown-clipboard="source">'];
   let cursor = 0;
   let imageIndex = 0;
 
   findMarkdownImageTokens(source).forEach((token) => {
-    parts.push(escapeHtml(source.slice(cursor, token.start)));
+    parts.push(encodeMarkdownClipboardText(source.slice(cursor, token.start)));
 
     if (isClipboardImageDataUrl(token.href)) {
       const titleAttribute = token.titleText
@@ -54,14 +54,25 @@ export function composeMarkdownClipboardHtml(markdown) {
       parts.push(`<img data-markdown-clipboard-image="${imageIndex}" src="${escapeHtml(token.href)}" alt="${escapeHtml(token.alt)}"${titleAttribute}>`);
       imageIndex += 1;
     } else {
-      parts.push(escapeHtml(token.raw));
+      parts.push(encodeMarkdownClipboardText(token.raw));
     }
 
     cursor = token.end;
   });
 
-  parts.push(escapeHtml(source.slice(cursor)), '</span>');
+  parts.push(encodeMarkdownClipboardText(source.slice(cursor)), '</span>');
   return parts.join('');
+}
+
+/**
+ * Encode literal Markdown for the HTML clipboard carrier.
+ *
+ * HTML source newlines are whitespace and may be collapsed by the paste
+ * destination, so each logical source line boundary is represented by an
+ * explicit BR element after escaping the source text.
+ */
+export function encodeMarkdownClipboardText(value) {
+  return escapeHtml(value).replace(/\r\n|\r|\n/g, '<br>');
 }
 
 export function isClipboardImageDataUrl(value) {

@@ -3077,12 +3077,25 @@ test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered 
     const html = composeMarkdownClipboardHtml(markdown);
     const fencedImageSource = '```text\n![not an attachment](data:image/png;base64,CODE)\n```';
     const document = new DOMParser().parseFromString(html, 'text/html');
+    function readTransportText(node) {
+      let value = '';
+      node?.childNodes.forEach((child) => {
+        if (child.nodeType === 3) {
+          value += child.nodeValue;
+        } else if (child.nodeType === 1 && child.tagName === 'BR') {
+          value += '\n';
+        } else if (child.nodeType === 1 && child.tagName !== 'IMG') {
+          value += readTransportText(child);
+        }
+      });
+      return value;
+    }
     return {
       html,
       markdown,
       tokens: findMarkdownImageTokens(markdown),
       fencedTokens: findMarkdownImageTokens(fencedImageSource),
-      textContent: document.body.textContent,
+      transportText: readTransportText(document.querySelector('[data-markdown-clipboard="source"]')),
       images: [...document.querySelectorAll('img')].map((image) => ({
         index: image.dataset.markdownClipboardImage,
         src: image.getAttribute('src'),
@@ -3099,7 +3112,7 @@ test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered 
   expect(result.tokens[0].start).toBe(result.markdown.indexOf('![Architecture diagram]'));
   expect(result.tokens[1].start).toBe(result.markdown.indexOf('![Secondary diagram]'));
   expect(result.fencedTokens).toEqual([]);
-  expect(normaliseLineEndings(result.textContent)).toBe(normaliseLineEndings(sourceWithoutImages));
+  expect(normaliseLineEndings(result.transportText)).toBe(normaliseLineEndings(sourceWithoutImages));
   expect(result.images).toEqual([
     { index: '0', src: 'data:image/png;base64,AAAA', alt: 'Architecture diagram' },
     { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Secondary diagram' },
@@ -3109,6 +3122,176 @@ test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered 
   expect(result.html).toContain('### Phase A – Source image discovery and ingestion');
   expect(result.html).not.toMatch(/<(?:h[1-6]|ul|ol|pre|table|strong|em|hr|blockquote|a)(?:\s|>)/i);
   expect(result.html).not.toContain('data:image/svg');
+});
+
+test('Markdown clipboard HTML encodes source line boundaries explicitly', async ({ page }) => {
+  await gotoApp(page);
+  const fixture = await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8');
+
+  const result = await page.evaluate(async (fixtureSource) => {
+      const module = await import('/assets/scripts/utils/markdown-clipboard.js');
+      const normalise = (value) => String(value).replace(/\r\n?/g, '\n');
+      const cases = [
+        { name: 'LF', source: 'alpha\nbeta\ngamma' },
+        { name: 'CRLF', source: 'alpha\r\nbeta\r\ngamma' },
+        { name: 'CR', source: 'alpha\rbeta\rgamma' },
+        { name: 'one blank line', source: 'before\n\nafter' },
+        { name: 'multiple blank lines', source: 'before\n\n\nafter' },
+        { name: 'document ending with newline', source: 'before\n' },
+        { name: 'document without final newline', source: 'before' },
+        { name: 'hard line break', source: 'first line  \nsecond line' },
+        {
+          name: 'empty lines around consecutive images',
+          source: 'before\r\n\r\n![First](data:image/png;base64,AAAA)\r\n![Second](data:image/png;base64,BBBB)\r\n\r\nafter',
+        },
+      ];
+
+      function readTransportText(node) {
+        let value = '';
+        node?.childNodes.forEach((child) => {
+          if (child.nodeType === 3) {
+            value += child.nodeValue;
+          } else if (child.nodeType === 1 && child.tagName === 'BR') {
+            value += '\n';
+          } else if (child.nodeType === 1 && child.tagName === 'IMG') {
+            value += `[image:${child.dataset.markdownClipboardImage}]`;
+          } else if (child.nodeType === 1) {
+            value += readTransportText(child);
+          }
+        });
+        return value;
+      }
+
+      function inspect(html) {
+        const document = new DOMParser().parseFromString(html, 'text/html');
+        const root = document.querySelector('[data-markdown-clipboard="source"]');
+        return {
+          html,
+          rawLineBreaks: (html.match(/[\r\n]/g) || []).length,
+          brCount: root?.querySelectorAll('br').length || 0,
+          transportText: readTransportText(root),
+          images: [...(root?.querySelectorAll('img') || [])].map((image) => ({
+            index: image.dataset.markdownClipboardImage,
+            src: image.getAttribute('src'),
+            alt: image.getAttribute('alt'),
+          })),
+          hasSemanticMarkdownElements: /<(?:h[1-6]|ul|ol|li|pre|table|strong|em|hr|blockquote|a|code)(?:\s|>)/i.test(html),
+        };
+      }
+
+      function expectedTransportText(source) {
+        let value = '';
+        let cursor = 0;
+        let imageIndex = 0;
+        module.findMarkdownImageTokens(source).forEach((token) => {
+          value += normalise(source.slice(cursor, token.start));
+          if (module.isClipboardImageDataUrl(token.href)) {
+            value += `[image:${imageIndex}]`;
+            imageIndex += 1;
+          } else {
+            value += normalise(token.raw);
+          }
+          cursor = token.end;
+        });
+        return value + normalise(source.slice(cursor));
+      }
+
+      const entries = cases.map((entry) => {
+        const html = module.composeMarkdownClipboardHtml(entry.source);
+        const inspected = inspect(html);
+        return {
+          ...entry,
+          ...inspected,
+          logicalLineBreaks: (entry.source.match(/\r\n|\r|\n/g) || []).length,
+          expectedTransportText: expectedTransportText(entry.source),
+        };
+      });
+
+      const sensitiveSource = '`x < y && y > z`\n\n<a-tag>\n\nAT&T\n\n"quoted"';
+      const sensitive = {
+        source: sensitiveSource,
+        ...inspect(module.composeMarkdownClipboardHtml(sensitiveSource)),
+      };
+
+      const complexSource = `${fixtureSource
+        .replace('<test image>', 'data:image/png;base64,AAAA')
+        .replace('<second test image>', 'data:image/png;base64,BBBB')}\n\n\`\`\`text\n![not an attachment](data:image/png;base64,CODE)\n\`\`\``;
+      const complex = {
+        source: complexSource,
+        ...inspect(module.composeMarkdownClipboardHtml(complexSource)),
+        tokens: module.findMarkdownImageTokens(complexSource),
+      };
+
+      return { entries, sensitive, complex };
+  }, fixture);
+
+  for (const entry of result.entries) {
+    expect(entry.rawLineBreaks).toBe(0);
+    expect(entry.brCount).toBe(entry.logicalLineBreaks);
+    expect(entry.transportText).toBe(entry.expectedTransportText);
+    expect(entry.hasSemanticMarkdownElements).toBe(false);
+  }
+
+  const lf = result.entries.find((entry) => entry.name === 'LF');
+  const crlf = result.entries.find((entry) => entry.name === 'CRLF');
+  const cr = result.entries.find((entry) => entry.name === 'CR');
+  expect(lf.html).toBe(crlf.html);
+  expect(lf.html).toBe(cr.html);
+
+  const blankLines = result.entries.find((entry) => entry.name === 'multiple blank lines');
+  expect(blankLines.html).toContain('before<br><br><br>after');
+
+  const finalNewline = result.entries.find((entry) => entry.name === 'document ending with newline');
+  const noFinalNewline = result.entries.find((entry) => entry.name === 'document without final newline');
+  expect(finalNewline.html).toContain('before<br></span>');
+  expect(noFinalNewline.html).toContain('before</span>');
+  expect(noFinalNewline.html).not.toContain('before<br>');
+
+  const hardBreak = result.entries.find((entry) => entry.name === 'hard line break');
+  expect(hardBreak.html).toContain('first line  <br>second line');
+
+  const images = result.entries.find((entry) => entry.name === 'empty lines around consecutive images');
+  expect(images.images).toEqual([
+    { index: '0', src: 'data:image/png;base64,AAAA', alt: 'First' },
+    { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Second' },
+  ]);
+  expect(images.html.match(/data:image\/png;base64,AAAA/g)).toHaveLength(1);
+  expect(images.html.match(/data:image\/png;base64,BBBB/g)).toHaveLength(1);
+  expect(images.html).toContain('<br><br><img data-markdown-clipboard-image="0"');
+  expect(images.html).toContain('<img data-markdown-clipboard-image="0" src="data:image/png;base64,AAAA" alt="First"><br><img data-markdown-clipboard-image="1"');
+  expect(images.html).toContain('<img data-markdown-clipboard-image="1" src="data:image/png;base64,BBBB" alt="Second"><br><br>after');
+
+  expect(result.sensitive.html).toContain('&lt;');
+  expect(result.sensitive.html).toContain('&amp;');
+  expect(result.sensitive.html).toContain('&gt;');
+  expect(result.sensitive.html).toContain('&quot;quoted&quot;');
+  expect(result.sensitive.html).not.toContain('<a-tag>');
+  expect(result.sensitive.html).not.toContain('style=');
+  expect(result.sensitive.rawLineBreaks).toBe(0);
+  expect(result.sensitive.brCount).toBe(6);
+  expect(result.sensitive.transportText).toBe(result.sensitive.source.replace(/\r\n?|\n/g, '\n'));
+  expect(result.sensitive.images).toEqual([]);
+
+  expect(result.complex.rawLineBreaks).toBe(0);
+  expect(result.complex.brCount).toBe((result.complex.source.match(/\r\n|\r|\n/g) || []).length);
+  expect(result.complex.transportText).toBe(result.complex.source
+    .replace('![Architecture diagram](data:image/png;base64,AAAA)', '[image:0]')
+    .replace('![Secondary diagram](data:image/png;base64,BBBB)', '[image:1]')
+    .replace(/\r\n?|\n/g, '\n'));
+  expect(result.complex.tokens).toHaveLength(2);
+  expect(result.complex.images).toEqual([
+    { index: '0', src: 'data:image/png;base64,AAAA', alt: 'Architecture diagram' },
+    { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Secondary diagram' },
+  ]);
+  expect(result.complex.html).toContain('# HSI Marking Chart – Current-State Process and Component Architecture');
+  expect(result.complex.html).toContain('## 1. Purpose');
+  expect(result.complex.html).toContain('### Phase A – Source image discovery and ingestion');
+  expect(result.complex.html).toContain('- the components involved in the current process;');
+  expect(result.complex.html).toContain('```text');
+  expect(result.complex.html).toContain('![not an attachment](data:image/png;base64,CODE)');
+  expect(result.complex.html).not.toMatch(/<(?:h[1-6]|ul|ol|li|pre|table|strong|em|hr|blockquote|a|code)(?:\s|>)/i);
+  expect(result.complex.html.match(/data:image\/png;base64,AAAA/g)).toHaveLength(1);
+  expect(result.complex.html.match(/data:image\/png;base64,BBBB/g)).toHaveLength(1);
 });
 
 test('Copy Markdown with images keeps a no-asset source byte-for-byte in plain text', async ({ page }) => {

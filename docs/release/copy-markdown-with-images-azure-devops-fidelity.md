@@ -19,6 +19,8 @@ Multiple images stay associated by source offsets and document order. The Markdo
 
 The previous HTML path called `buildMarkdownHtml`, which rendered headings, lists, tables, code blocks, and rules as semantic HTML. The observed Azure DevOps Setext headings and rewritten list markers are the result of Azure selecting that `text/html` / CF_HTML path and applying its best-effort HTML-to-Markdown conversion. The corrected carrier deliberately has no semantic heading, list, table, code, emphasis, link, or rule elements. Azure can still see the data-backed `<img>` elements that trigger its existing automatic Work Item attachment handling, while the text it converts is the canonical Markdown source.
 
+The carrier also encodes every source `LF`, `CRLF`, or `CR` as an explicit `<br>` element. This is required because raw HTML source newlines are collapsible whitespace and the destination may ignore the carrier's CSS; the line structure therefore does not depend on `white-space: pre-wrap`.
+
 ## Deterministic automated coverage
 
 `tests/fixtures/azure-devops-markdown-fidelity.md` contains the HSI Marking Chart sample excerpt and the required Markdown fidelity cases: ATX headings, bold and italic syntax, inline code, a horizontal rule, nested unordered and ordered lists, a blockquote, a link, a table, a fenced code block, and two ordered image positions.
@@ -27,6 +29,7 @@ The browser regression coverage verifies that:
 
 - the source-only `text/plain` result is unchanged;
 - the HTML carrier has no semantic formatting elements that could cause HTML-to-Markdown re-serialisation;
+- every logical source line boundary is represented by an explicit `<br>` rather than raw HTML whitespace;
 - ATX headings, list markers, fences, and the HSI headings remain literal source text;
 - two data-image tokens produce two ordered `<img>` elements with the correct alt text and payload;
 - image-looking text inside fenced code is not treated as an attachment token.
