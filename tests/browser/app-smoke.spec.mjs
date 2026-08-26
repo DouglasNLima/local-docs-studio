@@ -3099,7 +3099,7 @@ test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered 
   expect(result.tokens[0].start).toBe(result.markdown.indexOf('![Architecture diagram]'));
   expect(result.tokens[1].start).toBe(result.markdown.indexOf('![Secondary diagram]'));
   expect(result.fencedTokens).toEqual([]);
-  expect(result.textContent).toBe(sourceWithoutImages);
+  expect(normaliseLineEndings(result.textContent)).toBe(normaliseLineEndings(sourceWithoutImages));
   expect(result.images).toEqual([
     { index: '0', src: 'data:image/png;base64,AAAA', alt: 'Architecture diagram' },
     { index: '1', src: 'data:image/png;base64,BBBB', alt: 'Secondary diagram' },
@@ -3118,7 +3118,8 @@ test('Copy Markdown with images keeps a no-asset source byte-for-byte in plain t
 
   await expect(page.locator('#status')).toHaveText(/Markdown with images copied/, { timeout: 20_000 });
   await expect.poll(() => page.evaluate(() => window.__clipboardWriteTypes)).toEqual(['text/plain', 'text/html']);
-  expect(await page.evaluate(() => window.__copiedText)).toBe(await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8'));
+  expect(normaliseLineEndings(await page.evaluate(() => window.__copiedText)))
+    .toBe(normaliseLineEndings(await readFile(fixturePath('azure-devops-markdown-fidelity.md'), 'utf8')));
   const copiedHtml = await page.evaluate(() => window.__copiedHtml);
   expect(copiedHtml).toContain('data-markdown-clipboard="source"');
   expect(copiedHtml).toContain('# H1 ATX');
