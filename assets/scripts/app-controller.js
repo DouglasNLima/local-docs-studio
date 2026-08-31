@@ -494,6 +494,7 @@ export function createAppController() {
     const {
       installDocumentUxHandlers,
       toggleOutline,
+      openPreviewFind,
       updateDocumentUx,
     } = createDocumentUxService({
       state,
@@ -1122,18 +1123,6 @@ export function createAppController() {
         if (!isShortcut) return;
 
         const key = event.key.toLowerCase();
-        if (key === 'f' && !event.shiftKey) {
-          event.preventDefault();
-          findReplaceTools.openEditorFind();
-          return;
-        }
-
-        if (key === 'h') {
-          event.preventDefault();
-          findReplaceTools.openFindReplace({ replace: true });
-          return;
-        }
-
         if (isActiveReadOnly() && ['z', 'y', 'b', 'i', 'k'].includes(key)) {
           event.preventDefault();
           setStatus('This guide is read-only. Open or create a Markdown file to edit.', 'warning');
@@ -1253,6 +1242,7 @@ export function createAppController() {
       });
       inputMaximizeButton?.addEventListener('click', () => toggleInputMaximized());
       previewMaximizeButton.addEventListener('click', togglePreviewMaximized);
+      preview.addEventListener('pointerdown', focusPreviewForKeyboard);
       preview.addEventListener('click', handlePreviewClick);
       recentList.addEventListener('click', handleRecentClick);
       window.addEventListener('focus', () => {
@@ -1275,12 +1265,20 @@ export function createAppController() {
           workspaceSearchTools.openWorkspaceSearch('content');
           return;
         }
-        if (isShortcut && key === 'f' && document.activeElement !== editor) {
-          event.preventDefault();
-          findReplaceTools.openEditorFind();
-          return;
+        if (isShortcut && key === 'f' && !event.shiftKey && !event.defaultPrevented) {
+          const keyboardSurface = resolveKeyboardSurface(event);
+          if (keyboardSurface === 'editor') {
+            event.preventDefault();
+            findReplaceTools.openEditorFind();
+            return;
+          }
+          if (keyboardSurface === 'preview') {
+            event.preventDefault();
+            openPreviewFind();
+            return;
+          }
         }
-        if (isShortcut && key === 'h' && document.activeElement !== editor) {
+        if (isShortcut && key === 'h') {
           event.preventDefault();
           findReplaceTools.openFindReplace({ replace: true });
           return;
@@ -1372,6 +1370,39 @@ export function createAppController() {
 
         await setLibraryFromRecords(dropped, dropped.length === 1 ? 'Dropped file' : 'Dropped files');
       });
+    }
+
+    function resolveKeyboardSurface(event) {
+      const eventSurface = getKeyboardSurface(event.target);
+      const activeSurface = getKeyboardSurface(document.activeElement);
+
+      // A real key event normally has the focussed element as its target. If
+      // those two authorities disagree, do not guess from stale UI state.
+      if (eventSurface && activeSurface && eventSurface !== activeSurface) return '';
+      return eventSurface || activeSurface;
+    }
+
+    function getKeyboardSurface(node) {
+      const element = node?.nodeType === Node.ELEMENT_NODE ? node : node?.parentElement;
+      if (!element) return '';
+
+      const inputPane = editor.closest('.input-pane');
+      if (inputPane?.contains(element)) return 'editor';
+
+      const previewPane = preview.closest('.preview-pane');
+      if (previewPane?.contains(element)) return 'preview';
+
+      return '';
+    }
+
+    function focusPreviewForKeyboard(event) {
+      if (event.button !== 0) return;
+      const target = event.target?.nodeType === Node.ELEMENT_NODE ? event.target : event.target?.parentElement;
+      if (!target) return;
+
+      const interactiveTarget = target.closest('a, button, input, select, textarea, summary, [contenteditable="true"], [tabindex]:not([tabindex="-1"])');
+      if (interactiveTarget && interactiveTarget !== preview) return;
+      preview.focus({ preventScroll: true });
     }
 
     function handleEditorPaste(event) {

@@ -4197,6 +4197,76 @@ test('editor find icon opens inline search with keyboard navigation', async ({ p
   await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(0);
 });
 
+test('find keyboard routing follows the actual editor or preview focus', async ({ page }) => {
+  await gotoApp(page);
+  await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.', 0, 0);
+  await renderPreviewWithShortcut(page);
+
+  const editor = page.locator('#editor');
+  const editorFindPanel = page.locator('#editorFindPanel');
+  const editorFindInput = page.locator('#editorFindInput');
+  const preview = page.locator('#preview');
+  const previewFindPanel = page.locator('#previewFindPanel');
+  const previewFindInput = page.locator('#previewFindInput');
+
+  await editor.focus();
+  await page.keyboard.press('Control+F');
+  await expect(editorFindPanel).toBeVisible();
+  await expect(editorFindInput).toBeFocused();
+  await editorFindInput.fill('review');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+
+  await editor.focus();
+  await editor.evaluate((element) => element.setSelectionRange(element.value.length, element.value.length));
+  const beforeTyping = await editor.inputValue();
+  await page.keyboard.type(' typed');
+  await expect(editor).toHaveValue(`${beforeTyping} typed`);
+  const beforeEnter = await editor.inputValue();
+  await page.keyboard.press('Enter');
+  await expect(editor).toHaveValue(`${beforeEnter}\n`);
+
+  await editorFindInput.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('2/3');
+  await page.keyboard.press('Shift+Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await page.keyboard.press('Escape');
+  await expect(editorFindPanel).toBeHidden();
+
+  await page.locator('#preview h1').click();
+  await expect(preview).toBeFocused();
+  await page.keyboard.press('Control+F');
+  await expect(previewFindPanel).toBeVisible();
+  await expect(previewFindInput).toBeFocused();
+  await previewFindInput.fill('review');
+  await expect(page.locator('#previewFindCount')).toHaveText('1/3');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#previewFindCount')).toHaveText('2/3');
+  await page.keyboard.press('Shift+Enter');
+  await expect(page.locator('#previewFindCount')).toHaveText('1/3');
+  await page.keyboard.press('Escape');
+  await expect(previewFindPanel).toBeHidden();
+
+  for (const surface of ['editor', 'preview', 'editor', 'preview', 'editor']) {
+    if (surface === 'editor') {
+      await editor.focus();
+      await page.keyboard.press('Control+F');
+      await expect(editorFindPanel).toBeVisible();
+      await expect(editorFindInput).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(editorFindPanel).toBeHidden();
+    } else {
+      await page.locator('#preview h1').click();
+      await expect(preview).toBeFocused();
+      await page.keyboard.press('Control+F');
+      await expect(previewFindPanel).toBeVisible();
+      await expect(previewFindInput).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(previewFindPanel).toBeHidden();
+    }
+  }
+});
+
 test('focus mode exposes a visible exit button and keeps Escape fallback', async ({ page }) => {
   await gotoApp(page);
 

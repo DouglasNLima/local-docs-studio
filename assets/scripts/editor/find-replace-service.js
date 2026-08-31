@@ -52,13 +52,12 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     findReplaceAllButton?.addEventListener('click', replaceAll);
     editorFindToggleButton?.addEventListener('click', toggleEditorFind);
     editorFindInput?.addEventListener('input', refreshEditorFind);
-    editorFindInput?.addEventListener('keydown', handleEditorFindKeydown);
+    editorFindPanel?.addEventListener('keydown', handleEditorFindKeydown);
     editorFindPrevButton?.addEventListener('click', () => goToEditorMatch(-1));
     editorFindNextButton?.addEventListener('click', () => goToEditorMatch(1));
     editorFindClearButton?.addEventListener('click', closeEditorFind);
     editor.addEventListener('input', refreshEditorFind);
     editor.addEventListener('scroll', syncEditorFindLayer);
-    document.addEventListener('keydown', handleEditorFindGlobalKeydown, true);
   }
 
   function openFindReplace({ replace = false } = {}) {
@@ -207,28 +206,17 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
   }
 
   function handleEditorFindKeydown(event) {
-    if (event.key === 'Escape') {
-      closeEditorFind(event);
-      event.stopPropagation();
-      return;
-    }
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-      goToEditorMatch(event.shiftKey ? -1 : 1);
-    }
-  }
+    if (event.defaultPrevented
+      || editorFindPanel.hidden
+      || !editorFindPanel.contains(event.target)
+      || document.activeElement !== event.target) return;
 
-  function handleEditorFindGlobalKeydown(event) {
-    if (!editorFindPanel || editorFindPanel.hidden) return;
-    const target = event.target;
-    if (target !== editor && !editorFindPanel.contains(target)) return;
     if (event.key === 'Escape') {
       closeEditorFind(event);
       event.stopPropagation();
       return;
     }
-    if (event.key === 'Enter' && !event.isComposing) {
+    if (event.key === 'Enter' && event.target === editorFindInput && !event.isComposing) {
       event.preventDefault();
       event.stopPropagation();
       goToEditorMatch(event.shiftKey ? -1 : 1);
@@ -249,6 +237,11 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
     const selectionStart = editor.selectionStart;
     const nextIndex = editorFindState.matches.findIndex((match) => match.index + match.length >= selectionStart);
     editorFindState.activeIndex = nextIndex === -1 ? 0 : nextIndex;
+    if (document.activeElement === editor) {
+      renderEditorFindLayer();
+      updateEditorFindCount();
+      return;
+    }
     selectActiveEditorMatch();
   }
 

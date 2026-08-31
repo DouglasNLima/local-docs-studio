@@ -57,16 +57,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
     previewFindToggleButton.addEventListener('click', togglePreviewFind);
     previewFindInput.addEventListener('input', () => applyPreviewSearch(previewFindInput.value));
-    previewFindInput.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        if (event.shiftKey) goToSearchMatch(-1);
-        else goToSearchMatch(1);
-      }
-      if (event.key === 'Escape') {
-        closePreviewFind();
-      }
-    });
+    previewFindPanel.addEventListener('keydown', handlePreviewFindKeydown);
     previewFindPrevButton.addEventListener('click', () => goToSearchMatch(-1));
     previewFindNextButton.addEventListener('click', () => goToSearchMatch(1));
     previewFindClearButton.addEventListener('click', closePreviewFind);
@@ -187,22 +178,44 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function togglePreviewFind() {
-    const shouldOpen = previewFindPanel.hidden;
-    previewFindPanel.hidden = !shouldOpen;
-    previewFindToggleButton.setAttribute('aria-pressed', String(shouldOpen));
-    if (shouldOpen) {
-      previewFindInput.focus();
-      previewFindInput.select();
-      applyPreviewSearch(previewFindInput.value);
-    } else {
-      clearPreviewSearch({ clearInput: true });
-    }
+    if (previewFindPanel.hidden) openPreviewFind();
+    else closePreviewFind();
+  }
+
+  function openPreviewFind() {
+    previewFindPanel.hidden = false;
+    previewFindToggleButton.setAttribute('aria-pressed', 'true');
+    previewFindInput.focus();
+    previewFindInput.select();
+    applyPreviewSearch(previewFindInput.value);
   }
 
   function closePreviewFind() {
+    const shouldRestorePreviewFocus = previewFindPanel.contains(document.activeElement);
     previewFindPanel.hidden = true;
     previewFindToggleButton.setAttribute('aria-pressed', 'false');
     clearPreviewSearch({ clearInput: true });
+    if (shouldRestorePreviewFocus) preview.focus({ preventScroll: true });
+  }
+
+  function handlePreviewFindKeydown(event) {
+    if (event.defaultPrevented
+      || previewFindPanel.hidden
+      || !previewFindPanel.contains(event.target)
+      || document.activeElement !== event.target) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      closePreviewFind();
+      return;
+    }
+
+    if (event.key === 'Enter' && event.target === previewFindInput && !event.isComposing) {
+      event.preventDefault();
+      event.stopPropagation();
+      goToSearchMatch(event.shiftKey ? -1 : 1);
+    }
   }
 
   function applyPreviewSearch(query) {
@@ -710,6 +723,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   return {
     installDocumentUxHandlers,
     toggleOutline,
+    openPreviewFind,
     updateDocumentUx,
     updatePreviewOutline,
     clearPreviewSearch,
