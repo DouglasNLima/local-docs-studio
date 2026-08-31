@@ -67,9 +67,20 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function updateDocumentUx() {
-    clearPreviewSearch({ clearInput: false });
+    refreshPreviewSearch();
     updatePreviewOutline();
     updateDocumentReview();
+  }
+
+  function refreshPreviewSearch() {
+    const query = previewFindInput.value;
+    if (previewFindPanel.hidden || !String(query || '').trim()) {
+      clearPreviewSearch({ clearInput: false });
+      return;
+    }
+
+    const activeIndex = searchState.activeIndex;
+    applyPreviewSearch(query, { activeIndex });
   }
 
   function toggleOutline() {
@@ -218,7 +229,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     }
   }
 
-  function applyPreviewSearch(query) {
+  function applyPreviewSearch(query, { activeIndex = 0 } = {}) {
     clearSearchHighlights();
     searchState.matches = [];
     searchState.activeIndex = -1;
@@ -232,7 +243,9 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     const textNodes = collectSearchableTextNodes();
     textNodes.forEach((node) => highlightTextNode(node, needle));
     searchState.matches = [...preview.querySelectorAll('mark.preview-search-hit')];
-    searchState.activeIndex = searchState.matches.length ? 0 : -1;
+    searchState.activeIndex = searchState.matches.length
+      ? Math.min(Math.max(0, Number(activeIndex) || 0), searchState.matches.length - 1)
+      : -1;
     updateSearchActiveMatch(true);
   }
 

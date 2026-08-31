@@ -1001,6 +1001,7 @@ export function createAppController() {
 
       document.querySelectorAll('[data-menu-action]').forEach((button) => {
         button.addEventListener('click', async () => {
+          closeOpenMenus();
           if (button.dataset.menuAction === 'newMarkdown') await newMarkdownDocument();
           if (button.dataset.menuAction === 'openFile') await openFile();
           if (button.dataset.menuAction === 'openFolder') await openFolder();
@@ -1016,7 +1017,6 @@ export function createAppController() {
           if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
           if (button.dataset.menuAction === 'openWindowsShellDiagnostics') await openWindowsShellDiagnostics();
           if (button.dataset.menuAction === 'openWindowsSetup') await windowsSetupTools.openWindowsSetupWizard();
-          closeOpenMenus();
         });
       });
 

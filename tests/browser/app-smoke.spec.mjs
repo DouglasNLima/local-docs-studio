@@ -2678,14 +2678,12 @@ test('fake WebView2 bridge creates Markdown files in native workspaces', async (
   await installMockNativeBridge(page);
   await gotoApp(page);
 
-  await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
 
-  if (!await page.locator('details.menu[open]').isVisible()) {
-    await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  }
-  await page.getByRole('button', { name: 'New Markdown file' }).click();
+  const reopenedFileMenu = await openFileMenu(page);
+  await reopenedFileMenu.getByRole('button', { name: 'New Markdown file' }).click();
   await page.locator('#appDialogPromptInput').fill('notes/new-note.md');
   await submitAppDialog(page, { button: 'Create file' });
 
@@ -4691,6 +4689,16 @@ test('find keyboard routing follows the actual editor or preview focus', async (
   await expect(page.locator('#previewFindCount')).toHaveText('1/3');
   await page.keyboard.press('Enter');
   await expect(page.locator('#previewFindCount')).toHaveText('2/3');
+
+  const renderedHeading = await page.locator('#preview h1').elementHandle();
+  await editor.focus();
+  await page.keyboard.press('Control+Enter');
+  await expect.poll(() => renderedHeading.evaluate((element) => element.isConnected)).toBe(false);
+  await expect(page.locator('#status')).toHaveText(/Rendered/, { timeout: 60_000 });
+  await expect(previewFindInput).toHaveValue('review');
+  await expect(page.locator('#previewFindCount')).toHaveText('2/3');
+
+  await previewFindInput.focus();
   await page.keyboard.press('Shift+Enter');
   await expect(page.locator('#previewFindCount')).toHaveText('1/3');
   await page.keyboard.press('Escape');
