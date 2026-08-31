@@ -26,6 +26,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
   const {
     closeOpenMenus,
     replaceEditorRange,
+    scrollEditorToIndex,
     setStatus,
   } = callbacks;
 
@@ -259,6 +260,7 @@ export function createFindReplaceService({ editor, dom, callbacks }) {
       return;
     }
     editor.setSelectionRange(match.index, match.index + match.length);
+    scrollEditorToIndex?.(match.index);
     renderEditorFindLayer();
     syncEditorFindLayer();
     updateEditorFindCount();

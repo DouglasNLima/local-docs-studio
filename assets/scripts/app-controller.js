@@ -427,6 +427,7 @@ export function createAppController() {
       callbacks: {
         closeOpenMenus,
         replaceEditorRange,
+        scrollEditorToIndex: (index) => scrollEditorToIndex(index, 0.32),
         setStatus,
       },
     });

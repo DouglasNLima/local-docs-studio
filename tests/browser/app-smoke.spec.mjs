@@ -4197,6 +4197,40 @@ test('editor find icon opens inline search with keyboard navigation', async ({ p
   await expect(page.locator('#editorFindLayer .editor-find-hit')).toHaveCount(0);
 });
 
+test('editor find next scrolls the active match into view', async ({ page }) => {
+  await gotoApp(page);
+  const source = [
+    '# Search scroll fixture',
+    '',
+    'first review occurrence',
+    ...Array.from({ length: 90 }, (_, index) => `filler line ${index + 1}`),
+    'second review occurrence',
+    ...Array.from({ length: 90 }, (_, index) => `tail line ${index + 1}`),
+    'third review occurrence',
+  ].join('\n');
+  await setEditorValueAndSelection(page, source, 0, 0);
+  await renderPreviewWithShortcut(page);
+
+  const editor = page.locator('#editor');
+  const editorFindInput = page.locator('#editorFindInput');
+  await editor.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await editor.focus();
+  await page.keyboard.press('Control+F');
+  await editorFindInput.fill('review');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await expect.poll(() => editor.evaluate((element) => element.scrollTop)).toBe(0);
+
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('2/3');
+  await expect.poll(() => editor.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+
+  await page.keyboard.press('Shift+Enter');
+  await expect(page.locator('#editorFindCount')).toHaveText('1/3');
+  await expect.poll(() => editor.evaluate((element) => element.scrollTop)).toBe(0);
+});
+
 test('find keyboard routing follows the actual editor or preview focus', async ({ page }) => {
   await gotoApp(page);
   await setEditorValueAndSelection(page, '# Review\n\nFirst review note.\n\nSecond review note.', 0, 0);
