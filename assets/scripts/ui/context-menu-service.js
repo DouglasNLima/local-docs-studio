@@ -3,7 +3,7 @@ export function createContextMenuService({
   dom,
   callbacks,
 }) {
-  const { editor, preview } = dom;
+  const { editor, preview, fileList } = dom;
   const {
     closeOpenMenus,
     copyCodeBlock,
@@ -24,6 +24,15 @@ export function createContextMenuService({
     isActiveReadOnly,
     redoEditorChange,
     replaceEditorRange,
+    selectFile,
+    selectTreeFolder,
+    openTreeFolder,
+    revealInFileExplorer,
+    copyPath,
+    copyRelativePath,
+    canCopyRelativePath,
+    moveWorkspaceFile,
+    removeFromWorkspace,
     setStatus,
     undoEditorChange,
   } = callbacks;
@@ -48,7 +57,7 @@ export function createContextMenuService({
     menu.addEventListener('keydown', handleMenuKeydown);
   }
 
-  function handleContextMenu(event) {
+  async function handleContextMenu(event) {
     const target = getElementTarget(event.target);
     if (!target) return;
 
@@ -57,7 +66,8 @@ export function createContextMenuService({
       return;
     }
 
-    const items = getContextItems(target);
+    const sidebarTarget = getSidebarTarget(target);
+    const items = sidebarTarget ? getSidebarItems(sidebarTarget) : getContextItems(target);
     if (!items.length) {
       closeContextMenu();
       return;
@@ -65,9 +75,20 @@ export function createContextMenuService({
 
     event.preventDefault();
     event.stopPropagation();
-    lastInvoker = target;
+    closeContextMenu();
     closeOpenMenus();
     hideMermaidAutocomplete();
+
+    if (sidebarTarget) {
+      await selectSidebarTarget(sidebarTarget);
+      const refreshedTarget = findSidebarTarget(sidebarTarget);
+      if (!refreshedTarget) return;
+      lastInvoker = refreshedTarget.element;
+      openContextMenu(getSidebarItems(refreshedTarget), event.clientX, event.clientY);
+      return;
+    }
+
+    lastInvoker = target;
     openContextMenu(items, event.clientX, event.clientY);
   }
 
@@ -81,6 +102,100 @@ export function createContextMenuService({
     }
 
     return [];
+  }
+
+  function getSidebarTarget(target) {
+    if (!fileList?.contains(target)) return null;
+
+    const file = target.closest('[data-path]');
+    if (file && fileList.contains(file)) {
+      return {
+        kind: 'file',
+        path: file.dataset.path || '',
+        mode: state.fileBrowserView === 'tree' ? 'tree' : 'list',
+        element: file,
+      };
+    }
+
+    const folder = target.closest('[data-tree-folder]');
+    if (folder && fileList.contains(folder)) {
+      return {
+        kind: 'directory',
+        path: folder.dataset.treeFolder || '',
+        mode: 'tree',
+        element: folder,
+      };
+    }
+
+    return null;
+  }
+
+  function findSidebarTarget(target) {
+    if (!fileList) return null;
+    const selector = target.kind === 'file' ? '[data-path]' : '[data-tree-folder]';
+    const element = [...fileList.querySelectorAll(selector)].find((candidate) => (
+      target.kind === 'file'
+        ? candidate.dataset.path === target.path
+        : candidate.dataset.treeFolder === target.path
+    ));
+    return element ? { ...target, element } : null;
+  }
+
+  async function selectSidebarTarget(target) {
+    if (target.kind === 'file') {
+      await selectFile?.(target.path);
+      return;
+    }
+    selectTreeFolder?.(target.path);
+  }
+
+  function getSidebarItems(target) {
+    const isFile = target.kind === 'file';
+    const record = isFile ? state.files.find((item) => item.path === target.path) : null;
+    const index = isFile ? state.files.indexOf(record) : -1;
+    const lastIndex = state.files.length - 1;
+    const targetForAction = {
+      kind: isFile ? 'file' : 'directory',
+      path: target.path,
+      record,
+    };
+    const items = [
+      item('sidebar-open', 'Open', () => isFile
+        ? selectFile?.(target.path)
+        : openTreeFolder?.(target.path)),
+      item('sidebar-reveal-in-explorer', 'Reveal in File Explorer', () => revealInFileExplorer?.(targetForAction)),
+      item('sidebar-copy-path', 'Copy path', () => copyPath?.(targetForAction)),
+      item('sidebar-copy-relative-path', 'Copy relative path', () => copyRelativePath?.(targetForAction), {
+        disabled: !canCopyRelativePath?.(targetForAction),
+      }),
+    ];
+
+    if (isFile && target.mode !== 'tree') {
+      items.push(
+        separator(),
+        item('sidebar-move-top', 'Move to top', () => moveWorkspaceFile?.(target.path, 'top'), {
+          disabled: index <= 0,
+        }),
+        item('sidebar-move-up', 'Move up', () => moveWorkspaceFile?.(target.path, 'up'), {
+          disabled: index <= 0,
+        }),
+        item('sidebar-move-down', 'Move down', () => moveWorkspaceFile?.(target.path, 'down'), {
+          disabled: index < 0 || index >= lastIndex,
+        }),
+        item('sidebar-move-bottom', 'Move to bottom', () => moveWorkspaceFile?.(target.path, 'bottom'), {
+          disabled: index < 0 || index >= lastIndex,
+        }),
+      );
+    }
+
+    if (isFile) {
+      items.push(
+        separator(),
+        item('sidebar-remove', 'Remove from workspace', () => removeFromWorkspace?.(target.path)),
+      );
+    }
+
+    return cleanMenuItems(items);
   }
 
   function getEditorItems() {
@@ -244,11 +359,12 @@ export function createContextMenuService({
   }
 
   function closeContextMenu(options = {}) {
-    if (!menu || menu.hidden) return;
+    if (!menu) return;
+    const wasOpen = !menu.hidden;
     menu.hidden = true;
     menu.innerHTML = '';
 
-    if (options.restoreFocus && lastInvoker instanceof HTMLElement) {
+    if (wasOpen && options.restoreFocus && lastInvoker instanceof HTMLElement && lastInvoker.isConnected) {
       lastInvoker.focus();
     }
     lastInvoker = null;
@@ -269,8 +385,9 @@ export function createContextMenuService({
   }
 
   function handleWindowKeydown(event) {
-    if (event.key === 'Escape') {
-      closeContextMenu();
+    if (event.key === 'Escape' && menu && !menu.hidden) {
+      event.preventDefault();
+      closeContextMenu({ restoreFocus: true });
     }
   }
 
@@ -279,7 +396,7 @@ export function createContextMenuService({
     if (!buttons.length) {
       if (event.key === 'Escape' || event.key === 'Tab') {
         event.preventDefault();
-        closeContextMenu();
+        closeContextMenu({ restoreFocus: event.key === 'Escape' });
       }
       return;
     }
@@ -317,7 +434,7 @@ export function createContextMenuService({
 
     if (event.key === 'Escape' || event.key === 'Tab') {
       event.preventDefault();
-      closeContextMenu();
+      closeContextMenu({ restoreFocus: event.key === 'Escape' });
     }
   }
 

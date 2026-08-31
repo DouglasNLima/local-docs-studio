@@ -534,12 +534,16 @@ async function installMockNativeBridge(page, options = {}) {
     }
     window.__nativeBridgeMessages = [];
     window.__nativeBridgeSaves = [];
+    window.__nativeBridgePathRequests = [];
+    window.__nativeBridgeRevealRequests = [];
     window.__nativeBridgeSmokeResults = [];
     window.__nativeBridgeScenario = {
       openFile: 'success',
       saveFile: 'success',
       saveFileAs: 'success',
       openFolder: 'success',
+      resolvePath: 'success',
+      revealInExplorer: 'success',
       saveWorkspaceFile: 'success',
       refreshWorkspaceFile: 'success',
       smokeWorkspace: options.smokeWorkspace || 'success',
@@ -595,6 +599,8 @@ async function installMockNativeBridge(page, options = {}) {
               'workspace.createFile',
               'workspace.watch',
               'workspace.refreshFile',
+              'filesystem.resolvePath',
+              'shell.revealInExplorer',
             ];
             if (smokeEnabled) capabilities.push('smoke.nativeFixtures', 'smoke.workspaceChange');
             emit(baseResponse(message, 'lensDocs.native.pong', {
@@ -675,7 +681,7 @@ async function installMockNativeBridge(page, options = {}) {
               cancelled: false,
               workspaceName: 'Project Docs',
               nativeWorkspaceId: 'native-workspace-1',
-              files: [
+              files: options.emptyWorkspace ? [] : [
                 {
                   name: 'README.md',
                   path: 'README.md',
@@ -739,6 +745,42 @@ async function installMockNativeBridge(page, options = {}) {
               encoding: 'utf-8',
               content: window.__nativeBridgeRefreshContent || `# Refreshed ${path}\n`,
               nativeHandleId: message.payload.nativeHandleId || 'native-workspace-file-refreshed',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.resolvePath') {
+            window.__nativeBridgePathRequests.push(message.payload);
+            if (window.__nativeBridgeScenario.resolvePath === 'failed') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: 'The Windows app could not resolve that path.',
+              }));
+              return;
+            }
+            const relativePath = message.payload.relativePath || 'README.md';
+            const path = message.payload.nativeWorkspaceId
+              ? `C:\\Users\\test user\\Project Docs\\${relativePath.replaceAll('/', '\\')}`
+              : `C:\\Users\\test user\\Standalone\\${relativePath.split('/').pop()}`;
+            emit(baseResponse(message, 'lensDocs.native.resolvePathResult', {
+              resolved: true,
+              path,
+              targetKind: message.payload.targetKind || 'file',
+            }));
+            return;
+          }
+
+          if (message.type === 'lensDocs.native.revealInExplorer') {
+            window.__nativeBridgeRevealRequests.push(message.payload);
+            if (window.__nativeBridgeScenario.revealInExplorer === 'failed') {
+              emit(baseResponse(message, 'lensDocs.native.error', {
+                message: 'File Explorer could not open the selected location.',
+              }));
+              return;
+            }
+            emit(baseResponse(message, 'lensDocs.native.revealInExplorerResult', {
+              revealed: true,
+              selected: message.payload.targetKind === 'file',
+              targetKind: message.payload.targetKind || 'file',
             }));
             return;
           }
@@ -871,6 +913,10 @@ async function dispatchContextMenu(locator, point = { x: 16, y: 16 }) {
       clientY: rect.top + y,
     }));
   }, point);
+}
+
+async function getSidebarPaths(page) {
+  return await page.locator('#fileList [data-path]').evaluateAll((items) => items.map((item) => item.dataset.path));
 }
 
 async function writeZipEntriesToDirectory(entries, directory) {
@@ -1672,6 +1718,212 @@ test('file browser tree view shows workspace folder hierarchy', async ({ page },
   await expect(page.locator('#fileViewListButton')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('#fileList .file-tree')).toHaveCount(0);
   await expect(page.locator('#fileList [data-path="docs/guide/setup.md"]')).toBeVisible();
+});
+
+test('sidebar context menu selects files, orders the workspace, copies paths, and removes without deleting', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await mockClipboardWrite(page);
+  await page.evaluate(() => {
+    window.__mockFs.directoryHandle.files.set('Alpha.md', window.__mockFs.createFileHandle('Alpha.md', '# Alpha\n'));
+    window.__mockFs.directoryHandle.files.set('space & unicode é.md', window.__mockFs.createFileHandle('space & unicode é.md', '# Unicode\n'));
+    window.__mockFs.directoryHandle.files.set('zeta file.md', window.__mockFs.createFileHandle('zeta file.md', '# Zeta\n'));
+  });
+
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#fileCount')).toHaveText('3');
+  await expect(page.locator('#activeFileLabel')).toHaveText('Alpha.md');
+  const target = page.locator('#fileList [data-path="zeta file.md"]');
+  const first = page.locator('#fileList [data-path="Alpha.md"]');
+  const menu = page.locator('.context-menu');
+
+  await dispatchContextMenu(target);
+  await expect(menu).toBeVisible();
+  await expect(target).toHaveClass(/active/);
+  await expect(page.locator('#activeFileLabel')).toHaveText('zeta file.md');
+  for (const label of ['Open', 'Reveal in File Explorer', 'Copy path', 'Copy relative path', 'Move to top', 'Move up', 'Move down', 'Move to bottom', 'Remove from workspace']) {
+    await expect(menu.getByRole('menuitem', { name: label, exact: true })).toBeVisible();
+  }
+  await menu.getByRole('menuitem', { name: 'Copy path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('zeta file.md');
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Copy relative path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('zeta file.md');
+
+  const unicode = page.locator('#fileList [data-path="space & unicode é.md"]');
+  await dispatchContextMenu(unicode);
+  await menu.getByRole('menuitem', { name: 'Copy path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('space & unicode é.md');
+  await dispatchContextMenu(unicode);
+  await menu.getByRole('menuitem', { name: 'Copy relative path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('space & unicode é.md');
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Move to top', exact: true }).click();
+  expect((await getSidebarPaths(page))[0]).toBe('zeta file.md');
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Move down', exact: true }).click();
+  expect((await getSidebarPaths(page))[1]).toBe('zeta file.md');
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Move up', exact: true }).click();
+  expect((await getSidebarPaths(page))[0]).toBe('zeta file.md');
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Move to bottom', exact: true }).click();
+  expect((await getSidebarPaths(page)).at(-1)).toBe('zeta file.md');
+
+  await dispatchContextMenu(target);
+  await expect(menu.getByRole('menuitem', { name: 'Move down', exact: true })).toBeDisabled();
+  await expect(menu.getByRole('menuitem', { name: 'Move to bottom', exact: true })).toBeDisabled();
+
+  await dispatchContextMenu(first);
+  await expect(menu.getByRole('menuitem', { name: 'Move to top', exact: true })).toBeDisabled();
+  await expect(menu.getByRole('menuitem', { name: 'Move up', exact: true })).toBeDisabled();
+  await expect(menu.getByRole('menuitem', { name: 'Move down', exact: true })).toBeEnabled();
+  await expect(menu.getByRole('menuitem', { name: 'Move to bottom', exact: true })).toBeEnabled();
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+  await expect(page.locator('#fileList [data-path="Alpha.md"]')).toBeFocused();
+
+  await dispatchContextMenu(target);
+  await menu.getByRole('menuitem', { name: 'Remove from workspace', exact: true }).click();
+  await expect(page.locator('#fileCount')).toHaveText('2');
+  await expect(target).toHaveCount(0);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.directoryHandle.files.has('zeta file.md'))).toBe(true);
+  await expect(page.locator('#status')).toHaveText(/source file was not deleted/);
+});
+
+test('folder-tree context menu omits manual ordering commands', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await page.evaluate(() => {
+    const docs = window.__mockFs.createDirectoryHandle('docs');
+    docs.files.set('guide.md', window.__mockFs.createFileHandle('guide.md', '# Guide\n'));
+    window.__mockFs.directoryHandle.directories.set('docs', docs);
+  });
+
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open folder' }).click();
+  await page.locator('#fileViewTreeButton').click();
+  const folder = page.locator('#fileList [data-tree-folder="docs"]');
+  await dispatchContextMenu(folder);
+  const menu = page.locator('.context-menu');
+  await expect(menu).toBeVisible();
+  await expect(folder).toHaveAttribute('aria-selected', 'true');
+  for (const label of ['Open', 'Reveal in File Explorer', 'Copy path', 'Copy relative path']) {
+    await expect(menu.getByRole('menuitem', { name: label, exact: true })).toBeVisible();
+  }
+  for (const label of ['Move to top', 'Move up', 'Move down', 'Move to bottom', 'Remove from workspace']) {
+    await expect(menu.getByRole('menuitem', { name: label, exact: true })).toHaveCount(0);
+  }
+  await page.keyboard.press('Escape');
+  await expect(menu).toBeHidden();
+});
+
+test('native sidebar actions resolve safe paths and reveal files, folders, and the workspace root', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+  await mockClipboardWrite(page);
+
+  let fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#fileCount')).toHaveText('2');
+  await page.locator('#fileViewTreeButton').click();
+
+  const flow = page.locator('#fileList [data-path="diagrams/flow.mmd"]');
+  await dispatchContextMenu(flow);
+  const menu = page.locator('.context-menu');
+  await menu.getByRole('menuitem', { name: 'Open', exact: true }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('diagrams/flow.mmd');
+
+  await dispatchContextMenu(flow);
+  await menu.getByRole('menuitem', { name: 'Copy path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe(String.raw`C:\Users\test user\Project Docs\diagrams\flow.mmd`);
+  const copiedPath = await page.evaluate(() => ({
+    text: window.__copiedText,
+    request: window.__nativeBridgePathRequests.at(-1),
+  }));
+  expect(copiedPath.text).toBe(String.raw`C:\Users\test user\Project Docs\diagrams\flow.mmd`);
+  expect(copiedPath.request).toMatchObject({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: 'native-workspace-file-2',
+    relativePath: 'diagrams/flow.mmd',
+    targetKind: 'file',
+  });
+
+  await dispatchContextMenu(flow);
+  await menu.getByRole('menuitem', { name: 'Copy relative path', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedText)).toBe('diagrams/flow.mmd');
+
+  await dispatchContextMenu(flow);
+  await menu.getByRole('menuitem', { name: 'Reveal in File Explorer', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.length)).toBe(1);
+  const fileReveal = await page.evaluate(() => window.__nativeBridgeRevealRequests.at(-1));
+  expect(fileReveal).toMatchObject({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: 'native-workspace-file-2',
+    relativePath: 'diagrams/flow.mmd',
+    targetKind: 'file',
+  });
+
+  const folder = page.locator('#fileList [data-tree-folder="diagrams"]');
+  await dispatchContextMenu(folder);
+  await menu.getByRole('menuitem', { name: 'Reveal in File Explorer', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.length)).toBe(2);
+  const folderReveal = await page.evaluate(() => window.__nativeBridgeRevealRequests.at(-1));
+  expect(folderReveal).toMatchObject({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: '',
+    relativePath: 'diagrams',
+    targetKind: 'directory',
+  });
+
+  await page.locator('#revealExplorerButton').click();
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.length)).toBe(3);
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.at(-1))).toMatchObject({
+    targetKind: 'directory',
+    relativePath: 'diagrams',
+  });
+
+  await flow.click();
+  await page.locator('#revealExplorerButton').click();
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.length)).toBe(4);
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.at(-1))).toMatchObject({
+    targetKind: 'file',
+    relativePath: 'diagrams/flow.mmd',
+  });
+
+  await installMockNativeBridge(page, { emptyWorkspace: true });
+  await page.reload();
+  await waitForAppReady(page);
+  fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open folder' }).click();
+  await expect(page.locator('#fileCount')).toHaveText('0');
+  await expect(page.locator('#revealExplorerButton')).toBeEnabled();
+  await page.locator('#revealExplorerButton').click();
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeRevealRequests.at(-1))).toMatchObject({
+    nativeWorkspaceId: 'native-workspace-1',
+    nativeHandleId: '',
+    relativePath: '',
+    targetKind: 'directory',
+  });
+});
+
+test('standalone native files do not offer misleading workspace-relative paths', async ({ page }) => {
+  await installMockNativeBridge(page);
+  await gotoApp(page);
+
+  const fileMenu = await openFileMenu(page);
+  await fileMenu.getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#activeFileLabel')).toHaveText('native-open.md');
+  await dispatchContextMenu(page.locator('#fileList [data-path="native-open.md"]'));
+  const menu = page.locator('.context-menu');
+  await expect(menu.getByRole('menuitem', { name: 'Copy relative path', exact: true })).toBeDisabled();
+  await page.keyboard.press('Escape');
 });
 
 test('collapsed sidebar keeps the split workspace stretched', async ({ page }) => {

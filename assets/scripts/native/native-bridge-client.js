@@ -21,6 +21,10 @@ export const nativeBridgeMessageTypes = {
   createWorkspaceFileResult: 'lensDocs.native.createWorkspaceFileResult',
   refreshWorkspaceFile: 'lensDocs.native.refreshWorkspaceFile',
   refreshWorkspaceFileResult: 'lensDocs.native.refreshWorkspaceFileResult',
+  resolvePath: 'lensDocs.native.resolvePath',
+  resolvePathResult: 'lensDocs.native.resolvePathResult',
+  revealInExplorer: 'lensDocs.native.revealInExplorer',
+  revealInExplorerResult: 'lensDocs.native.revealInExplorerResult',
   workspaceChanged: 'lensDocs.native.workspaceChanged',
   smokeOpenFixtureFile: 'lensDocs.native.smoke.openFixtureFile',
   smokeOpenFixtureFileResult: 'lensDocs.native.smoke.openFixtureFileResult',
@@ -184,6 +188,26 @@ export function createNativeBridgeClient({
       path,
     });
     return await sendMessage(message, [nativeBridgeMessageTypes.refreshWorkspaceFileResult]);
+  }
+
+  async function resolvePath({ nativeWorkspaceId, nativeHandleId, relativePath, targetKind }) {
+    const message = createMessage(nativeBridgeMessageTypes.resolvePath, {
+      nativeWorkspaceId,
+      nativeHandleId,
+      relativePath,
+      targetKind,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.resolvePathResult]);
+  }
+
+  async function revealInExplorer({ nativeWorkspaceId, nativeHandleId, relativePath, targetKind }) {
+    const message = createMessage(nativeBridgeMessageTypes.revealInExplorer, {
+      nativeWorkspaceId,
+      nativeHandleId,
+      relativePath,
+      targetKind,
+    });
+    return await sendMessage(message, [nativeBridgeMessageTypes.revealInExplorerResult]);
   }
 
   function on(type, listener) {
@@ -360,6 +384,8 @@ export function createNativeBridgeClient({
     saveWorkspaceFile,
     createWorkspaceFile,
     refreshWorkspaceFile,
+    resolvePath,
+    revealInExplorer,
     on,
     openSmokeFixtureFile,
     saveSmokeFixtureFileAs,

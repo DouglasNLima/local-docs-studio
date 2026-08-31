@@ -144,6 +144,23 @@ public sealed class NativeWorkspaceService
         };
     }
 
+    public object ResolvePath(string? nativeWorkspaceId, string? nativeHandleId, string? relativePath, string? targetKind)
+    {
+        var target = ResolveExplorerTarget(nativeWorkspaceId, nativeHandleId, relativePath, targetKind);
+        return new
+        {
+            resolved = true,
+            path = target.FullPath,
+            targetKind = target.IsFile ? "file" : "directory",
+        };
+    }
+
+    public object RevealInExplorer(string? nativeWorkspaceId, string? nativeHandleId, string? relativePath, string? targetKind)
+    {
+        var target = ResolveExplorerTarget(nativeWorkspaceId, nativeHandleId, relativePath, targetKind);
+        return NativeExplorerService.Reveal(target.FullPath, target.IsFile);
+    }
+
     public async Task<object> SaveWorkspaceFileAsync(string? nativeHandleId, string? content)
     {
         if (string.IsNullOrWhiteSpace(nativeHandleId) || !nativeFileHandles.TryGetValue(nativeHandleId, out var handle))
@@ -432,6 +449,86 @@ public sealed class NativeWorkspaceService
         }
 
         return cleanPath;
+    }
+
+    private static string ValidateRelativeWorkspaceDirectoryPath(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return string.Empty;
+
+        var normalised = path.Replace('\\', '/').Trim();
+        if (normalised.StartsWith("/", StringComparison.Ordinal)
+            || Path.IsPathRooted(normalised)
+            || normalised.Contains("//", StringComparison.Ordinal))
+        {
+            throw new NativeFileException("Use a relative workspace folder path.");
+        }
+
+        var parts = normalised.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Any(static part => part is "." or "..")
+            || parts.Any(ContainsInvalidPathCharacters))
+        {
+            throw new NativeFileException("Use a relative workspace folder path.");
+        }
+
+        return string.Join('/', parts);
+    }
+
+    private (string FullPath, bool IsFile) ResolveExplorerTarget(
+        string? nativeWorkspaceId,
+        string? nativeHandleId,
+        string? relativePath,
+        string? targetKind)
+    {
+        if (string.IsNullOrWhiteSpace(nativeWorkspaceId)
+            || !nativeWorkspaces.TryGetValue(nativeWorkspaceId, out var rootPath))
+        {
+            throw new NativeFileException("The Windows workspace handle is no longer available.");
+        }
+
+        var isFile = string.Equals(targetKind, "file", StringComparison.OrdinalIgnoreCase);
+        var isDirectory = string.Equals(targetKind, "directory", StringComparison.OrdinalIgnoreCase);
+        if (!isFile && !isDirectory)
+        {
+            throw new NativeFileException("The Windows reveal target is invalid.");
+        }
+
+        if (isFile)
+        {
+            string safeRelativePath;
+            if (!string.IsNullOrWhiteSpace(nativeHandleId))
+            {
+                if (!nativeFileHandles.TryGetValue(nativeHandleId, out var handle)
+                    || handle.WorkspaceId != nativeWorkspaceId)
+                {
+                    throw new NativeFileException("The Windows workspace file handle is no longer available.");
+                }
+
+                safeRelativePath = handle.RelativePath;
+            }
+            else
+            {
+                safeRelativePath = ValidateRelativeWorkspacePath(relativePath);
+            }
+
+            var fullPath = ResolveInsideRoot(rootPath, safeRelativePath);
+            if (!File.Exists(fullPath))
+            {
+                throw new NativeFileException("The selected file is unavailable.");
+            }
+
+            return (fullPath, true);
+        }
+
+        var safeRelativeDirectoryPath = ValidateRelativeWorkspaceDirectoryPath(relativePath);
+        var directoryPath = string.IsNullOrWhiteSpace(safeRelativeDirectoryPath)
+            ? rootPath
+            : ResolveInsideRoot(rootPath, safeRelativeDirectoryPath);
+        if (!Directory.Exists(directoryPath))
+        {
+            throw new NativeFileException("The selected folder is unavailable.");
+        }
+
+        return (directoryPath, false);
     }
 
     private static bool ContainsInvalidPathCharacters(string value)

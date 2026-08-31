@@ -50,6 +50,7 @@ export function createFileService({
     afterSaveActiveFile,
     promptForText,
     confirmAction,
+    copyToClipboard,
   } = callbacks;
   const {
     compareRecords,
@@ -917,6 +918,7 @@ export function createFileService({
 
         state.activePath = record.path;
         state.fileName = record.name;
+        state.selectedTreeFolderPath = '';
 
         if (!state.fileCache.has(record.path)) {
           const { file, text } = await readRecordSource(record);
@@ -952,6 +954,263 @@ export function createFileService({
         setStatus(`Could not open ${record.name}.`, 'danger');
         preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
         updateSaveButton();
+      }
+    }
+
+    function moveWorkspaceFile(path, direction) {
+      const index = state.files.findIndex((record) => record.path === path);
+      if (index < 0 || state.fileBrowserView === 'tree') return false;
+
+      const lastIndex = state.files.length - 1;
+      let targetIndex = index;
+      if (direction === 'top') targetIndex = 0;
+      if (direction === 'up') targetIndex = index - 1;
+      if (direction === 'down') targetIndex = index + 1;
+      if (direction === 'bottom') targetIndex = lastIndex;
+      if (targetIndex < 0 || targetIndex > lastIndex || targetIndex === index) return false;
+
+      const [record] = state.files.splice(index, 1);
+      state.files.splice(targetIndex, 0, record);
+      renderFileList();
+      const labels = {
+        top: 'Moved to the top of the workspace.',
+        up: 'Moved up in the workspace.',
+        down: 'Moved down in the workspace.',
+        bottom: 'Moved to the bottom of the workspace.',
+      };
+      setStatus(labels[direction] || 'Workspace order updated.', 'ok');
+      return true;
+    }
+
+    async function removeFromWorkspace(path) {
+      const index = state.files.findIndex((record) => record.path === path);
+      if (index < 0) return false;
+
+      const record = state.files[index];
+      if (state.dirtyPaths.has(record.path)
+        && !await confirmDiscardUnsaved(`Remove ${record.name} from the workspace and discard its unsaved edits?`)) {
+        return false;
+      }
+
+      const wasActive = state.activePath === record.path;
+      const nextRecord = state.files[index + 1] || state.files[index - 1] || null;
+      state.files.splice(index, 1);
+      state.fileCache.delete(record.path);
+      state.savedContentCache?.delete(record.path);
+      state.dirtyPaths.delete(record.path);
+      state.externalChangePaths?.delete(record.path);
+      state.externalChangeDetails?.delete(record.path);
+      state.scrollPositions?.delete(record.path);
+
+      renderFileList();
+      if (wasActive) {
+        state.activePath = '';
+        state.fileName = '';
+        editor.value = '';
+        editor.scrollTop = 0;
+        preview.scrollTop = 0;
+        resetEditorHistory();
+        syncEditorReadOnly?.();
+        updateEditorChrome?.();
+        if (nextRecord && state.files.includes(nextRecord)) {
+          await selectFile(nextRecord.path);
+        } else {
+          preview.innerHTML = '<div class="empty-state">No document selected.</div>';
+          updateActiveFileLabel();
+          updateDiagramControls(0);
+          updatePreviewOutline();
+          updateSaveButton();
+        }
+      } else {
+        updateActiveFileLabel();
+        updateSaveButton();
+      }
+
+      setStatus(`${record.name} removed from the workspace. The source file was not deleted.`, 'ok');
+      return true;
+    }
+
+    function canCopyRelativePath(target = {}) {
+      return Boolean(resolveActionTarget(target, { allowWorkspaceRoot: false })?.path && hasWorkspaceRoot());
+    }
+
+    async function copyPath(target = {}) {
+      const resolved = resolveActionTarget(target);
+      if (!resolved) {
+        setStatus('No workspace item is available to copy.', 'warning');
+        return false;
+      }
+
+      let value = '';
+      if (hasNativeTarget(resolved)) {
+        value = await resolveNativeActionPath(resolved);
+      } else {
+        value = getBrowserPathRepresentation(resolved);
+      }
+      if (!value) return false;
+
+      return await copyPathValue(value, 'Path copied.', 'Could not copy path.');
+    }
+
+    async function copyRelativePath(target = {}) {
+      const resolved = resolveActionTarget(target, { allowWorkspaceRoot: false });
+      if (!resolved?.path || !hasWorkspaceRoot()) {
+        setStatus('Relative path is unavailable for a standalone file. Open a workspace folder first.', 'warning');
+        return false;
+      }
+
+      return await copyPathValue(normalisePath(resolved.path), 'Relative path copied.', 'Could not copy relative path.');
+    }
+
+    async function revealInFileExplorer(target = {}) {
+      const resolved = resolveActionTarget(target);
+      if (!resolved) {
+        setStatus('No workspace item or folder is available to reveal.', 'warning');
+        return false;
+      }
+      if (!hasNativeTarget(resolved) || typeof nativeBridgeClient?.revealInExplorer !== 'function') {
+        setStatus('Reveal in File Explorer is available in the Windows app.', 'warning');
+        return false;
+      }
+
+      const route = await getNativeCapabilityState('shell.revealInExplorer');
+      if (!route.hasCapability) {
+        setStatus(route.message || 'Reveal in File Explorer is unavailable in the Windows app.', 'warning');
+        return false;
+      }
+
+      try {
+        setStatus(`Revealing ${resolved.label} in File Explorer...`, 'busy');
+        const result = await nativeBridgeClient.revealInExplorer(buildNativeActionPayload(resolved));
+        const payload = result.response?.payload || {};
+        if (!result.ok || !payload.revealed) {
+          setStatus(result.message || 'File Explorer could not reveal that location.', 'warning');
+          return false;
+        }
+        setStatus(`${resolved.label} revealed in File Explorer.`, 'ok');
+        return true;
+      } catch (error) {
+        setStatus('File Explorer could not reveal that location.', 'warning');
+        console.error(error);
+        return false;
+      }
+    }
+
+    function resolveActionTarget(target = {}, options = {}) {
+      const explicitKind = target.kind === 'directory' || target.kind === 'folder'
+        ? 'directory'
+        : target.kind === 'file' ? 'file' : '';
+      if (explicitKind) {
+        const path = normalisePath(target.path || target.record?.path || '');
+        const record = explicitKind === 'file'
+          ? state.files.find((item) => item.path === path) || target.record || null
+          : null;
+        return {
+          kind: explicitKind,
+          path,
+          record,
+          label: record?.name || path || state.folderName || 'the workspace folder',
+        };
+      }
+
+      if (state.fileBrowserView === 'tree' && state.selectedTreeFolderPath) {
+        const path = normalisePath(state.selectedTreeFolderPath);
+        return {
+          kind: 'directory',
+          path,
+          record: null,
+          label: path || state.folderName || 'the workspace folder',
+        };
+      }
+
+      const activeRecord = state.files.find((record) => record.path === state.activePath);
+      if (activeRecord) {
+        return {
+          kind: 'file',
+          path: activeRecord.path,
+          record: activeRecord,
+          label: activeRecord.name,
+        };
+      }
+
+      if (options.allowWorkspaceRoot !== false && hasWorkspaceRoot()) {
+        return {
+          kind: 'directory',
+          path: '',
+          record: null,
+          label: state.folderName || 'the workspace folder',
+        };
+      }
+
+      return null;
+    }
+
+    function hasWorkspaceRoot() {
+      return Boolean(state.nativeWorkspaceId || state.workspaceDirectoryHandle
+        || (state.workspaceKind && state.workspaceKind !== 'file'));
+    }
+
+    function hasNativeTarget(target) {
+      return Boolean(state.nativeWorkspaceId || target.record?.nativeHandleId);
+    }
+
+    function buildNativeActionPayload(target) {
+      return {
+        nativeWorkspaceId: state.nativeWorkspaceId || '',
+        nativeHandleId: target.record?.nativeHandleId || '',
+        relativePath: target.path || '',
+        targetKind: target.kind,
+      };
+    }
+
+    async function resolveNativeActionPath(target) {
+      if (typeof nativeBridgeClient?.resolvePath !== 'function') {
+        setStatus('The Windows app cannot resolve this path safely.', 'warning');
+        return '';
+      }
+
+      const route = await getNativeCapabilityState('filesystem.resolvePath');
+      if (!route.hasCapability) {
+        setStatus(route.message || 'The Windows app cannot resolve this path safely.', 'warning');
+        return '';
+      }
+
+      try {
+        const result = await nativeBridgeClient.resolvePath(buildNativeActionPayload(target));
+        const path = result.response?.payload?.path;
+        if (!result.ok || !result.response?.payload?.resolved || typeof path !== 'string' || !path.trim()) {
+          setStatus(result.message || 'The Windows app could not resolve that path.', 'warning');
+          return '';
+        }
+        return path;
+      } catch (error) {
+        setStatus('The Windows app could not resolve that path.', 'warning');
+        console.error(error);
+        return '';
+      }
+    }
+
+    function getBrowserPathRepresentation(target) {
+      const filePath = target.record?.file?.path;
+      if (typeof filePath === 'string' && filePath.trim() && !/^([a-z]:)?[\\/]fakepath[\\/]/i.test(filePath)) {
+        return filePath.trim();
+      }
+      return target.path || '';
+    }
+
+    async function copyPathValue(value, successMessage, failureMessage) {
+      if (typeof copyToClipboard === 'function') {
+        await copyToClipboard(value, successMessage, failureMessage);
+        return true;
+      }
+      try {
+        await navigator.clipboard.writeText(value);
+        setStatus(successMessage, 'ok');
+        return true;
+      } catch (error) {
+        setStatus(failureMessage, 'danger');
+        console.error(error);
+        return false;
       }
     }
 
@@ -1228,7 +1487,6 @@ export function createFileService({
         record.path = getUniqueRecordPath(normalisePath(nextName || record.path || record.name), record);
         record.nativeHandleId = payload.nativeHandleId;
         record.handle = null;
-        state.files.sort(compareRecords);
       }
 
       record.file = new File([content], record.name, { type: getMimeTypeForPath(record.name) });
@@ -1307,7 +1565,6 @@ export function createFileService({
         record.handle = handle;
         record.name = handle.name || record.name;
         record.path = getUniqueRecordPath(normalisePath(handle.name || record.path || record.name), record);
-        state.files.sort(compareRecords);
       }
 
       record.file = file;
@@ -1389,7 +1646,7 @@ export function createFileService({
         added.push(record);
       });
 
-      state.files = uniqueByPath(state.files).sort(compareRecords);
+      state.files = uniqueByPath(state.files);
       state.folderName = options.folderName || state.folderName || 'Workspace';
       state.workspaceKind = state.workspaceKind || 'virtual';
       state.artifactBundle = null;
@@ -1497,7 +1754,6 @@ export function createFileService({
       });
 
       if (!marked) return;
-      state.files.sort(compareRecords);
       renderFileList();
       updateActiveFileLabel();
       updateSaveButton();
@@ -1851,7 +2107,6 @@ export function createFileService({
       await afterSaveActiveFile?.(record, text, oldPath);
       await renderPreview();
       restoreScrollPosition?.(record.path);
-      state.files.sort(compareRecords);
       renderFileList();
       updateActiveFileLabel();
       updateSaveButton();
@@ -2027,6 +2282,12 @@ export function createFileService({
       ensureReadPermission,
       setLibraryFromRecords,
       selectFile,
+      moveWorkspaceFile,
+      removeFromWorkspace,
+      revealInFileExplorer,
+      copyPath,
+      copyRelativePath,
+      canCopyRelativePath,
       saveActiveFile,
       saveActiveFileAs,
       refreshActiveFile,

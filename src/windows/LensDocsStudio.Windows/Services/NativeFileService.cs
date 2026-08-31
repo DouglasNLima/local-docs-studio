@@ -149,6 +149,23 @@ public sealed class NativeFileService
         };
     }
 
+    public object ResolvePath(string? nativeHandleId)
+    {
+        var path = ResolveHandlePath(nativeHandleId);
+        return new
+        {
+            resolved = true,
+            path,
+            targetKind = "file",
+        };
+    }
+
+    public object RevealInExplorer(string? nativeHandleId)
+    {
+        var path = ResolveHandlePath(nativeHandleId);
+        return NativeExplorerService.Reveal(path, selectFile: true);
+    }
+
     private static void ValidatePath(string? path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -204,8 +221,20 @@ public sealed class NativeFileService
     private string CreateHandle(string path)
     {
         var handleId = Guid.NewGuid().ToString("N");
-        nativeHandles[handleId] = path;
+        nativeHandles[handleId] = Path.GetFullPath(path);
         return handleId;
+    }
+
+    private string ResolveHandlePath(string? nativeHandleId)
+    {
+        if (string.IsNullOrWhiteSpace(nativeHandleId)
+            || !nativeHandles.TryGetValue(nativeHandleId, out var path))
+        {
+            throw new NativeFileException("The Windows file handle is no longer available.");
+        }
+
+        ValidateOpenPath(path);
+        return Path.GetFullPath(path);
     }
 }
 

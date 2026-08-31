@@ -127,7 +127,7 @@ Use `-NoBuild` to inspect the latest build output, or pass `-StaticAppRoot` to v
 
 ## Scope
 
-This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, handles supported startup file arguments, exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh operations, and supports a compact in-app first-run setup wizard. Fuller installer work, auto-update, recent native folders, single-instance forwarding, delete/rename/move operations initiated from the app, and native export flows are left for later phases.
+This shell is intentionally thin. It creates the desktop window, initialises WebView2, loads the packaged static app, handles supported startup file arguments, exposes a narrow native bridge for single-file open/save/save-as plus native workspace open folder/save/create-file/watch/refresh/reveal operations, and supports a compact in-app first-run setup wizard. Fuller installer work, auto-update, recent native folders, single-instance forwarding, disk delete/rename/move operations initiated from the app, and native export flows are left for later phases.
 
 ## Roadmap
 
@@ -161,6 +161,8 @@ The shell registers a fail-closed WebView2 message handler. The static app can s
 - `workspace.createFile`
 - `workspace.watch`
 - `workspace.refreshFile`
+- `filesystem.resolvePath`
+- `shell.revealInExplorer`
 
 The file bridge supports `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files. It reads and writes UTF-8 text only and rejects files above 5 MB. Native open and save-as use Windows file pickers. Native save writes only to an existing host-owned opaque `nativeHandleId`; the web app never sends arbitrary paths. The host keeps the handle-to-path map in memory for this phase.
 
@@ -168,13 +170,15 @@ Startup file arguments use the same bridge payload as native open. When the shel
 
 The workspace bridge uses a Windows folder picker, discovers supported files recursively, and returns only safe relative paths plus opaque `nativeWorkspaceId` and `nativeHandleId` values. Workspace discovery uses these conservative limits: 5 MB per file, 500 loaded supported files, and 12 directory levels. Oversized files, invalid UTF-8 files, unreadable files, and files skipped by limits are returned as skipped metadata with relative paths and safe reasons. New Markdown files can be created inside the selected native workspace when the path is relative, uses a supported extension, does not escape the selected folder, and does not overwrite an existing file.
 
+The sidebar can explicitly request `filesystem.resolvePath` for **Copy path** and can request `shell.revealInExplorer` for **Reveal in File Explorer**. The host validates file targets against an opaque workspace/file handle or a safe relative workspace path, validates directory targets inside the selected workspace root, and then opens File Explorer with a file selected or a directory opened. It does not accept arbitrary shell commands or unvalidated paths. Missing or invalid locations return safe native errors. Sidebar manual ordering remains web-app list state only, and **Remove from workspace** does not delete files from disk.
+
 The native watcher starts only for the selected Windows workspace root. It watches supported editable files (`.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt`), validates every event path back inside the workspace root, and sends only relative paths to the web app through `lensDocs.native.workspaceChanged`. It stops when a new workspace opens, the app closes, smoke completes, or watcher errors occur.
 
 Watcher events are debounced for 500 ms and coalesced: deletes win over changes, a created file that also changes stays created, and host-recognised renames are sent as renames. Native save/create operations track recently written relative paths and suppress matching watcher noise for a best-effort two-second window. If suppression is uncertain, the app prefers showing an external-change marker rather than hiding a real change.
 
 The web app owns all user-facing decisions. It marks records as externally changed, preserves dirty in-memory edits, keeps deleted active-file content in memory, adds safe created files when the host provides a handle, updates clean renamed records, and reloads only when the user explicitly uses **Refresh active file**. Native refresh uses `lensDocs.native.refreshWorkspaceFile` and reads only a validated file that belongs to the selected native workspace. Phase 2E adds compact changed, deleted, renamed, dirty, and dirty-external-conflict markers in the workspace list. Dirty refresh prompts must be confirmed before local edits are discarded; cancelled refresh keeps the editor content and marker. Deleted-file refresh reports that the file no longer exists and keeps the in-memory content available for **Save as** or copying.
 
-The bridge intentionally does not expose recent native folders, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, absolute workspace paths, delete/rename/move operations initiated from the app, or unrestricted filesystem access. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
+The bridge intentionally does not expose recent native folders, native PDF export, Git operations, shell commands, usernames, environment variables, secrets, machine names, arbitrary absolute workspace paths, disk delete/rename/move operations initiated from the app, or unrestricted filesystem access. Explicit **Copy path** is the bounded exception: it returns the validated selected item path only after the user asks for it. Browser and GitHub Pages mode remain supported and report the bridge as unavailable without errors.
 
 ## First-Run Setup Wizard
 
@@ -237,7 +241,7 @@ The smoke validates shell launch, WebView2 app load from `https://lens-docs-stud
 Manual smoke:
 
 1. Run `dotnet run --project src/windows/LensDocsStudio.Windows/LensDocsStudio.Windows.csproj`.
-2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder`, `workspace.saveFile`, `workspace.watch`, and `workspace.refreshFile` are reported.
+2. Use **Help > Check Windows bridge** and confirm `workspace.openFolder`, `workspace.saveFile`, `workspace.watch`, `workspace.refreshFile`, `filesystem.resolvePath`, and `shell.revealInExplorer` are reported.
 3. Use **File > Open folder**.
 4. Select a folder containing `.md`, `.markdown`, `.mmd`, `.mermaid`, or `.txt` files.
 5. Confirm the workspace browser loads relative paths.

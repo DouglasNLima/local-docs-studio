@@ -52,6 +52,7 @@ export const domIds = {
   treeExpandButton: 'treeExpandButton',
   treeCollapseButton: 'treeCollapseButton',
   treeRevealButton: 'treeRevealButton',
+  revealExplorerButton: 'revealExplorerButton',
   fileCount: 'fileCount',
   folderBadge: 'folderBadge',
   artifactBundleSummary: 'artifactBundleSummary',

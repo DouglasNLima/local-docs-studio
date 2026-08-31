@@ -31,6 +31,10 @@ public sealed class NativeBridge
     private const string CreateWorkspaceFileResultType = "lensDocs.native.createWorkspaceFileResult";
     private const string RefreshWorkspaceFileType = "lensDocs.native.refreshWorkspaceFile";
     private const string RefreshWorkspaceFileResultType = "lensDocs.native.refreshWorkspaceFileResult";
+    private const string ResolvePathType = "lensDocs.native.resolvePath";
+    private const string ResolvePathResultType = "lensDocs.native.resolvePathResult";
+    private const string RevealInExplorerType = "lensDocs.native.revealInExplorer";
+    private const string RevealInExplorerResultType = "lensDocs.native.revealInExplorerResult";
     private const string WorkspaceChangedType = "lensDocs.native.workspaceChanged";
     private const string SmokeOpenFixtureFileType = "lensDocs.native.smoke.openFixtureFile";
     private const string SmokeOpenFixtureFileResultType = "lensDocs.native.smoke.openFixtureFileResult";
@@ -55,6 +59,8 @@ public sealed class NativeBridge
         "workspace.createFile",
         "workspace.watch",
         "workspace.refreshFile",
+        "filesystem.resolvePath",
+        "shell.revealInExplorer",
     ];
     private static readonly string[] SmokeCapabilities =
     [
@@ -174,6 +180,12 @@ public sealed class NativeBridge
                         ReadPayloadString(root, "nativeWorkspaceId"),
                         ReadPayloadString(root, "nativeHandleId"),
                         ReadPayloadString(root, "path")));
+                    break;
+                case ResolvePathType:
+                    PostResult(coreWebView, id, ResolvePathResultType, ResolvePath(root));
+                    break;
+                case RevealInExplorerType:
+                    PostResult(coreWebView, id, RevealInExplorerResultType, RevealInExplorer(root));
                     break;
                 case SmokeOpenFixtureFileType:
                     PostResult(coreWebView, id, SmokeOpenFixtureFileResultType, await RequireSmokeFixtures().OpenFixtureFileAsync());
@@ -424,5 +436,27 @@ public sealed class NativeBridge
         return root.TryGetProperty("payload", out var payload) && payload.ValueKind == JsonValueKind.Object
             ? payload
             : null;
+    }
+
+    private object ResolvePath(JsonElement root)
+    {
+        var nativeWorkspaceId = ReadPayloadString(root, "nativeWorkspaceId");
+        var nativeHandleId = ReadPayloadString(root, "nativeHandleId");
+        var relativePath = ReadPayloadString(root, "relativePath");
+        var targetKind = ReadPayloadString(root, "targetKind");
+        return !string.IsNullOrWhiteSpace(nativeWorkspaceId)
+            ? nativeWorkspaceService.ResolvePath(nativeWorkspaceId, nativeHandleId, relativePath, targetKind)
+            : nativeFileService.ResolvePath(nativeHandleId);
+    }
+
+    private object RevealInExplorer(JsonElement root)
+    {
+        var nativeWorkspaceId = ReadPayloadString(root, "nativeWorkspaceId");
+        var nativeHandleId = ReadPayloadString(root, "nativeHandleId");
+        var relativePath = ReadPayloadString(root, "relativePath");
+        var targetKind = ReadPayloadString(root, "targetKind");
+        return !string.IsNullOrWhiteSpace(nativeWorkspaceId)
+            ? nativeWorkspaceService.RevealInExplorer(nativeWorkspaceId, nativeHandleId, relativePath, targetKind)
+            : nativeFileService.RevealInExplorer(nativeHandleId);
     }
 }

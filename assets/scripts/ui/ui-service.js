@@ -19,6 +19,7 @@ export function createUiService({
     treeExpandButton,
     treeCollapseButton,
     treeRevealButton,
+    revealExplorerButton,
     fileCount,
     folderBadge,
     artifactBundleSummary,
@@ -426,12 +427,27 @@ export function createUiService({
 
     function toggleTreeFolder(path) {
       if (!path) return;
-      state.selectedTreeFolderPath = path;
+      selectTreeFolder(path, { render: false });
       if (state.collapsedTreeFolders.has(path)) {
         state.collapsedTreeFolders.delete(path);
       } else {
         state.collapsedTreeFolders.add(path);
       }
+      renderFileList();
+    }
+
+    function selectTreeFolder(path, options = {}) {
+      if (!path) return;
+      state.selectedTreeFolderPath = path;
+      if (options.render !== false) renderFileList();
+    }
+
+    function openTreeFolder(path) {
+      if (!path) return;
+      state.collapsedTreeFolders.delete(path);
+      state.fileBrowserView = 'tree';
+      localStorage.setItem(storageKeys.fileBrowserView, 'tree');
+      selectTreeFolder(path, { render: false });
       renderFileList();
     }
 
@@ -475,6 +491,9 @@ export function createUiService({
         button.disabled = !isTree || !state.files.length;
       });
       if (treeRevealButton) treeRevealButton.disabled = !isTree || !state.activePath;
+      if (revealExplorerButton) {
+        revealExplorerButton.disabled = !(state.files.length || state.workspaceDirectoryHandle || state.nativeWorkspaceId);
+      }
     }
 
     function getAllTreeFolderPaths() {
@@ -696,6 +715,8 @@ export function createUiService({
       syncMobileMenuLayout,
       setFileBrowserView,
       toggleTreeFolder,
+      selectTreeFolder,
+      openTreeFolder,
       expandTreeFolders,
       collapseTreeFolders,
       revealActiveFileInTree,

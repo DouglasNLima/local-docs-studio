@@ -47,6 +47,8 @@ const WINDOWS_DIAGNOSTIC_CAPABILITIES = [
   'workspace.createFile',
   'workspace.watch',
   'workspace.refreshFile',
+  'filesystem.resolvePath',
+  'shell.revealInExplorer',
 ];
 
 export function createAppController() {
@@ -104,6 +106,7 @@ export function createAppController() {
       treeExpandButton,
       treeCollapseButton,
       treeRevealButton,
+      revealExplorerButton,
       fileCount,
       folderBadge,
       artifactBundleSummary,
@@ -326,6 +329,8 @@ export function createAppController() {
       restoreSidebarCollapsed,
       setFileBrowserView,
       toggleTreeFolder,
+      selectTreeFolder,
+      openTreeFolder,
       expandTreeFolders,
       collapseTreeFolders,
       revealActiveFileInTree,
@@ -342,6 +347,7 @@ export function createAppController() {
         treeExpandButton,
         treeCollapseButton,
         treeRevealButton,
+        revealExplorerButton,
         fileCount,
         folderBadge,
         artifactBundleSummary,
@@ -694,6 +700,12 @@ export function createAppController() {
       ensureReadPermission,
       setLibraryFromRecords,
       selectFile,
+      moveWorkspaceFile,
+      removeFromWorkspace,
+      revealInFileExplorer,
+      copyPath,
+      copyRelativePath,
+      canCopyRelativePath,
       saveActiveFile,
       saveActiveFileAs,
       refreshActiveFile,
@@ -733,6 +745,7 @@ export function createAppController() {
         afterSaveActiveFile: draftTools.afterSaveActiveFile,
         promptForText: promptDialog,
         confirmAction: confirmDialog,
+        copyToClipboard,
       },
       helpers: {
         compareRecords,
@@ -775,6 +788,7 @@ export function createAppController() {
       dom: {
         editor,
         preview,
+        fileList,
       },
       callbacks: {
         closeOpenMenus,
@@ -796,6 +810,15 @@ export function createAppController() {
         isActiveReadOnly,
         redoEditorChange,
         replaceEditorRange,
+        selectFile,
+        selectTreeFolder,
+        openTreeFolder,
+        revealInFileExplorer,
+        copyPath,
+        copyRelativePath,
+        canCopyRelativePath,
+        moveWorkspaceFile,
+        removeFromWorkspace,
         setStatus,
         undoEditorChange,
       },
@@ -913,6 +936,7 @@ export function createAppController() {
       treeExpandButton?.addEventListener('click', expandTreeFolders);
       treeCollapseButton?.addEventListener('click', collapseTreeFolders);
       treeRevealButton?.addEventListener('click', revealActiveFileInTree);
+      revealExplorerButton?.addEventListener('click', () => revealInFileExplorer());
       focusModeButton?.addEventListener('click', () => toggleFocusMode());
       focusModeExitButton?.addEventListener('click', () => {
         toggleFocusMode(false);
