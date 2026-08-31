@@ -28,6 +28,8 @@ const LOCAL_ASSETS = [
   './assets/scripts/native/native-smoke-runner.js',
   './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
+  './assets/scripts/exports/word-document-exporter.js',
+  './assets/scripts/exports/word-template-package.js',
   './assets/scripts/exports/word-template-service.js',
   './assets/scripts/files/file-service.js',
   './assets/scripts/rendering/render-service.js',

@@ -88,6 +88,20 @@ export function createZipBlob(files, mimeType) {
   return new Blob([...localParts, ...centralParts, endHeader], { type: mimeType });
 }
 
+export async function createCompressedZipBlob(files, mimeType, options = {}) {
+  const { zipSync } = await loadFflate();
+  const encoder = new TextEncoder();
+  const entries = {};
+
+  files.forEach((file) => {
+    entries[file.name] = file.data instanceof Uint8Array ? file.data : encoder.encode(file.data);
+  });
+
+  return new Blob([
+    zipSync(entries, { level: options.level ?? 6 }),
+  ], { type: mimeType });
+}
+
 function crc32(bytes) {
   let crc = 0xffffffff;
   for (const byte of bytes) {

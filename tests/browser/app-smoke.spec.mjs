@@ -254,6 +254,44 @@ async function importWordTemplate(page, filePath, displayName) {
   await expect(page.locator('#wordTemplateSelect')).toHaveValue(/.+/);
 }
 
+function expectPackageRelationshipsValid(entries) {
+  for (const [relationshipPartName, bytes] of entries) {
+    if (!relationshipPartName.endsWith('.rels')) continue;
+    const xml = new TextDecoder().decode(bytes);
+    const relationships = [...xml.matchAll(/<Relationship\b([^>]*)\/?\s*>/g)].map((match) => {
+      const attributes = Object.fromEntries(
+        [...match[1].matchAll(/([A-Za-z:]+)="([^"]*)"/g)].map((attribute) => [attribute[1], attribute[2]]),
+      );
+      return attributes;
+    });
+    const ids = relationships.map((relationship) => relationship.Id).filter(Boolean);
+    expect(new Set(ids).size, `${relationshipPartName} has duplicate relationship IDs`).toBe(ids.length);
+
+    const sourceMatch = relationshipPartName.match(/^(.*)_rels\/([^/]+)\.rels$/);
+    const sourceDirectory = sourceMatch?.[1] || '';
+    relationships
+      .filter((relationship) => relationship.Target && relationship.TargetMode !== 'External')
+      .forEach((relationship) => {
+        const target = relationship.Target.startsWith('/')
+          ? relationship.Target.slice(1)
+          : path.posix.normalize(`${sourceDirectory}${relationship.Target}`);
+        expect(entries.has(target), `${relationshipPartName} points to missing package part ${target}`).toBe(true);
+      });
+  }
+}
+
+async function expectXmlPackagePartsWellFormed(page, entries) {
+  const xmlParts = [...entries]
+    .filter(([name]) => name.endsWith('.xml') || name.endsWith('.rels') || name === '[Content_Types].xml')
+    .map(([name, bytes]) => [name, new TextDecoder().decode(bytes)]);
+  const malformed = await page.evaluate((parts) => parts.flatMap(([name, xml]) => {
+    const document = new DOMParser().parseFromString(xml, 'application/xml');
+    const error = document.querySelector('parsererror');
+    return error ? [`${name}: ${error.textContent}`] : [];
+  }), xmlParts);
+  expect(malformed).toEqual([]);
+}
+
 async function tabUntilFocused(page, selector, maxTabs = 40) {
   await page.locator('body').click({ position: { x: 4, y: 4 } });
   for (let index = 0; index < maxTabs; index += 1) {
@@ -1017,7 +1055,16 @@ function createDocxImportFixture() {
   ], { compress: true });
 }
 
-function createWordTemplateFixture({ headers = true, footers = true, media = true, numbering = true, theme = true } = {}) {
+function createWordTemplateFixture({
+  headers = true,
+  footers = true,
+  media = true,
+  numbering = true,
+  theme = true,
+  automaticHeadingNumbering = numbering,
+  tableStyle = true,
+  variants = false,
+} = {}) {
   const files = [
     {
       name: '[Content_Types].xml',
@@ -1028,10 +1075,15 @@ function createWordTemplateFixture({ headers = true, footers = true, media = tru
   <Default Extension="png" ContentType="image/png"/>
   <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
   <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+  <Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
+  <Override PartName="/word/fontTable.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.fontTable+xml"/>
+  <Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
   ${numbering ? '<Override PartName="/word/numbering.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.numbering+xml"/>' : ''}
   ${theme ? '<Override PartName="/word/theme/theme1.xml" ContentType="application/vnd.openxmlformats-officedocument.theme+xml"/>' : ''}
   ${headers ? '<Override PartName="/word/header1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' : ''}
+  ${headers && variants ? '<Override PartName="/word/header2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/><Override PartName="/word/header3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.header+xml"/>' : ''}
   ${footers ? '<Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' : ''}
+  ${footers && variants ? '<Override PartName="/word/footer2.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/word/footer3.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>' : ''}
 </Types>`,
     },
     {
@@ -1039,27 +1091,99 @@ function createWordTemplateFixture({ headers = true, footers = true, media = tru
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
   <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+  <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
+</Relationships>`,
+    },
+    {
+      name: 'word/_rels/document.xml.rels',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+  <Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+  <Relationship Id="rIdFontTable" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/fontTable" Target="fontTable.xml"/>
+  ${numbering ? '<Relationship Id="rIdNumbering" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/numbering" Target="numbering.xml"/>' : ''}
+  ${theme ? '<Relationship Id="rIdTheme" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/theme" Target="theme/theme1.xml"/>' : ''}
+  ${headers ? '<Relationship Id="rIdHeaderDefault" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header1.xml"/>' : ''}
+  ${headers && variants ? '<Relationship Id="rIdHeaderFirst" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header2.xml"/><Relationship Id="rIdHeaderEven" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/header" Target="header3.xml"/>' : ''}
+  ${footers ? '<Relationship Id="rIdFooterDefault" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>' : ''}
+  ${footers && variants ? '<Relationship Id="rIdFooterFirst" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer2.xml"/><Relationship Id="rIdFooterEven" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer3.xml"/>' : ''}
 </Relationships>`,
     },
     {
       name: 'word/document.xml',
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <w:body><w:p><w:r><w:t>Template source</w:t></w:r></w:p></w:body>
+  <w:body>
+    <w:p><w:pPr><w:pStyle w:val="CorporateTitle"/></w:pPr><w:r><w:t>Template source</w:t></w:r></w:p>
+    <w:p><w:pPr><w:pStyle w:val="CorporateBody"/></w:pPr><w:r><w:t>Obsolete template body content</w:t></w:r></w:p>
+    <w:tbl>
+      <w:tblPr>
+        ${tableStyle ? '<w:tblStyle w:val="CorporateTable"/>' : ''}
+        <w:tblW w:w="9000" w:type="dxa"/>
+        <w:jc w:val="left"/>
+        <w:tblBorders><w:top w:val="double" w:sz="12" w:color="445566"/><w:left w:val="single" w:sz="8" w:color="445566"/><w:bottom w:val="double" w:sz="12" w:color="445566"/><w:right w:val="single" w:sz="8" w:color="445566"/><w:insideH w:val="single" w:sz="4" w:color="778899"/><w:insideV w:val="single" w:sz="4" w:color="778899"/></w:tblBorders>
+        <w:tblCellMar><w:top w:w="120" w:type="dxa"/><w:left w:w="160" w:type="dxa"/><w:bottom w:w="120" w:type="dxa"/><w:right w:w="160" w:type="dxa"/></w:tblCellMar>
+        <w:tblLook w:val="04A0" w:firstRow="1" w:lastRow="0" w:firstColumn="1" w:lastColumn="0" w:noHBand="0" w:noVBand="1"/>
+      </w:tblPr>
+      <w:tblGrid><w:gridCol w:w="3600"/><w:gridCol w:w="5400"/></w:tblGrid>
+      <w:tr><w:trPr><w:tblHeader/><w:cantSplit/></w:trPr>
+        <w:tc><w:tcPr><w:tcW w:w="3600" w:type="dxa"/><w:shd w:fill="DDEEFF"/><w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:color w:val="112233"/></w:rPr><w:t>Prototype heading</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="5400" w:type="dxa"/><w:shd w:fill="DDEEFF"/><w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="40"/></w:pPr><w:r><w:rPr><w:b/><w:color w:val="112233"/></w:rPr><w:t>Prototype value</w:t></w:r></w:p></w:tc>
+      </w:tr>
+      <w:tr><w:trPr><w:cantSplit/></w:trPr>
+        <w:tc><w:tcPr><w:tcW w:w="3600" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:color w:val="223344"/></w:rPr><w:t>Prototype body</w:t></w:r></w:p></w:tc>
+        <w:tc><w:tcPr><w:tcW w:w="5400" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:after="30"/></w:pPr><w:r><w:rPr><w:color w:val="223344"/></w:rPr><w:t>Prototype content</w:t></w:r></w:p></w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:sectPr>
+      ${headers ? '<w:headerReference w:type="default" r:id="rIdHeaderDefault"/>' : ''}
+      ${headers && variants ? '<w:headerReference w:type="first" r:id="rIdHeaderFirst"/><w:headerReference w:type="even" r:id="rIdHeaderEven"/>' : ''}
+      ${footers ? '<w:footerReference w:type="default" r:id="rIdFooterDefault"/>' : ''}
+      ${footers && variants ? '<w:footerReference w:type="first" r:id="rIdFooterFirst"/><w:footerReference w:type="even" r:id="rIdFooterEven"/>' : ''}
+      ${variants ? '<w:titlePg/>' : ''}
+      <w:pgSz w:w="12240" w:h="15840"/>
+      <w:pgMar w:top="1440" w:right="1080" w:bottom="1440" w:left="1080" w:header="720" w:footer="720"/>
+    </w:sectPr>
+  </w:body>
 </w:document>`,
     },
     {
       name: 'word/styles.xml',
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:style w:type="paragraph" w:styleId="CorporateTitle"><w:name w:val="Title"/><w:qFormat/></w:style>
-  <w:style w:type="paragraph" w:styleId="CorporateHeading1"><w:name w:val="Heading 1"/><w:qFormat/></w:style>
-  <w:style w:type="paragraph" w:styleId="CorporateHeading2"><w:name w:val="Heading 2"/><w:qFormat/></w:style>
-  <w:style w:type="paragraph" w:styleId="CorporateBody"><w:name w:val="Body Text"/><w:qFormat/></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateTitle"><w:name w:val="Title"/><w:qFormat/><w:pPr><w:spacing w:after="240"/></w:pPr><w:rPr><w:rFonts w:ascii="Aptos Display" w:hAnsi="Aptos Display"/><w:sz w:val="40"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading1"><w:name w:val="Heading 1"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="0"/>${automaticHeadingNumbering && numbering ? '<w:numPr><w:ilvl w:val="0"/><w:numId w:val="42"/></w:numPr>' : ''}</w:pPr><w:rPr><w:b/><w:color w:val="234567"/><w:sz w:val="30"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading2"><w:name w:val="Heading 2"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="1"/>${automaticHeadingNumbering && numbering ? '<w:numPr><w:ilvl w:val="1"/><w:numId w:val="42"/></w:numPr>' : ''}</w:pPr><w:rPr><w:b/><w:color w:val="345678"/><w:sz w:val="26"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading3"><w:name w:val="Heading 3"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="2"/>${automaticHeadingNumbering && numbering ? '<w:numPr><w:ilvl w:val="2"/><w:numId w:val="42"/></w:numPr>' : ''}</w:pPr><w:rPr><w:b/><w:color w:val="456789"/><w:sz w:val="24"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateHeading4"><w:name w:val="Heading 4"/><w:qFormat/><w:pPr><w:keepNext/><w:keepLines/><w:outlineLvl w:val="3"/>${automaticHeadingNumbering && numbering ? '<w:numPr><w:ilvl w:val="3"/><w:numId w:val="42"/></w:numPr>' : ''}</w:pPr><w:rPr><w:i/><w:color w:val="56789A"/><w:sz w:val="22"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:default="1" w:styleId="CorporateBody"><w:name w:val="Body Text"/><w:qFormat/><w:pPr><w:spacing w:after="120"/></w:pPr><w:rPr><w:rFonts w:ascii="Aptos" w:hAnsi="Aptos"/><w:sz w:val="22"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="CorporateList"><w:name w:val="List Paragraph"/><w:basedOn w:val="CorporateBody"/><w:qFormat/></w:style>
   <w:style w:type="paragraph" w:styleId="CorporateQuote"><w:name w:val="Quote"/><w:qFormat/></w:style>
   <w:style w:type="paragraph" w:styleId="CorporateCode"><w:name w:val="Code"/><w:qFormat/></w:style>
-  <w:style w:type="table" w:styleId="CorporateTable"><w:name w:val="Table Grid"/><w:qFormat/></w:style>
+  ${tableStyle ? '<w:style w:type="table" w:styleId="CorporateTable"><w:name w:val="Table Grid"/><w:qFormat/><w:tblPr><w:tblBorders><w:top w:val="double" w:sz="12" w:color="445566"/><w:left w:val="single" w:sz="8" w:color="445566"/><w:bottom w:val="double" w:sz="12" w:color="445566"/><w:right w:val="single" w:sz="8" w:color="445566"/><w:insideH w:val="single" w:sz="4" w:color="778899"/><w:insideV w:val="single" w:sz="4" w:color="778899"/></w:tblBorders></w:tblPr></w:style>' : ''}
 </w:styles>`,
+    },
+    {
+      name: 'word/settings.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  ${variants ? '<w:evenAndOddHeaders/>' : ''}
+  <w:updateFields w:val="false"/>
+</w:settings>`,
+    },
+    {
+      name: 'word/fontTable.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:fonts xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:font w:name="Aptos"><w:family w:val="swiss"/></w:font><w:font w:name="Aptos Display"><w:family w:val="swiss"/></w:font></w:fonts>`,
+    },
+    {
+      name: 'docProps/core.xml',
+      data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>Template source</dc:title><dc:creator>Fixture author</dc:creator></cp:coreProperties>`,
+    },
+    {
+      name: 'customXml/item1.xml',
+      data: '<?xml version="1.0" encoding="UTF-8"?><fixture-preserved value="yes"/>',
     },
   ];
 
@@ -1068,8 +1192,11 @@ function createWordTemplateFixture({ headers = true, footers = true, media = tru
       name: 'word/numbering.xml',
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:numbering xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-  <w:abstractNum w:abstractNumId="1"><w:lvl w:ilvl="0"><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/></w:lvl></w:abstractNum>
-  <w:num w:numId="1"><w:abstractNumId w:val="1"/></w:num>
+  ${automaticHeadingNumbering ? '<w:abstractNum w:abstractNumId="10"><w:multiLevelType w:val="multilevel"/><w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:pStyle w:val="CorporateHeading1"/><w:lvlText w:val="%1"/></w:lvl><w:lvl w:ilvl="1"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:pStyle w:val="CorporateHeading2"/><w:lvlText w:val="%1.%2"/></w:lvl><w:lvl w:ilvl="2"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:pStyle w:val="CorporateHeading3"/><w:lvlText w:val="%1.%2.%3"/></w:lvl><w:lvl w:ilvl="3"><w:start w:val="1"/><w:numFmt w:val="decimal"/><w:pStyle w:val="CorporateHeading4"/><w:lvlText w:val="%1.%2.%3.%4"/></w:lvl></w:abstractNum><w:num w:numId="42"><w:abstractNumId w:val="10"/></w:num>' : ''}
+  <w:abstractNum w:abstractNumId="20"><w:multiLevelType w:val="multilevel"/><w:lvl w:ilvl="0"><w:numFmt w:val="bullet"/><w:lvlText w:val="•"/></w:lvl><w:lvl w:ilvl="1"><w:numFmt w:val="bullet"/><w:lvlText w:val="○"/></w:lvl><w:lvl w:ilvl="2"><w:numFmt w:val="bullet"/><w:lvlText w:val="▪"/></w:lvl></w:abstractNum>
+  <w:num w:numId="43"><w:abstractNumId w:val="20"/></w:num>
+  <w:abstractNum w:abstractNumId="21"><w:multiLevelType w:val="multilevel"/><w:lvl w:ilvl="0"><w:numFmt w:val="decimal"/><w:lvlText w:val="%1."/></w:lvl><w:lvl w:ilvl="1"><w:numFmt w:val="lowerLetter"/><w:lvlText w:val="%2."/></w:lvl><w:lvl w:ilvl="2"><w:numFmt w:val="lowerRoman"/><w:lvlText w:val="%3."/></w:lvl></w:abstractNum>
+  <w:num w:numId="44"><w:abstractNumId w:val="21"/></w:num>
 </w:numbering>`,
     });
   }
@@ -1087,10 +1214,22 @@ function createWordTemplateFixture({ headers = true, footers = true, media = tru
       name: 'word/header1.xml',
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture">
-  <w:p><w:r><w:t>Corporate header</w:t></w:r></w:p>
+  <w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="8" w:color="445566"/></w:pBdr></w:pPr><w:r><w:rPr><w:b/><w:color w:val="112233"/></w:rPr><w:t xml:space="preserve">Template </w:t></w:r><w:r><w:rPr><w:i/><w:color w:val="334455"/></w:rPr><w:t>source</w:t></w:r></w:p>
   ${media ? '<w:p><w:r><w:drawing><wp:inline><wp:extent cx="9525" cy="9525"/><wp:docPr id="1" name="Template logo"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="template-logo.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdLogo"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>' : ''}
 </w:hdr>`,
     });
+    if (variants) {
+      files.push(
+        {
+          name: 'word/header2.xml',
+          data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Template source</w:t></w:r><w:r><w:t> — first page</w:t></w:r></w:p></w:hdr>`,
+        },
+        {
+          name: 'word/header3.xml',
+          data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:rPr><w:i/></w:rPr><w:t>Template source</w:t></w:r><w:r><w:t> — even page</w:t></w:r></w:p></w:hdr>`,
+        },
+      );
+    }
     if (media) {
       files.push({
         name: 'word/_rels/header1.xml.rels',
@@ -1110,8 +1249,32 @@ function createWordTemplateFixture({ headers = true, footers = true, media = tru
     files.push({
       name: 'word/footer1.xml',
       data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>Corporate footer</w:t></w:r></w:p></w:ftr>`,
+<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:v="urn:schemas-microsoft-com:vml"><w:p><w:r><w:t xml:space="preserve">Corporate footer · Page </w:t></w:r><w:fldSimple w:instr=" PAGE "><w:r><w:t>1</w:t></w:r></w:fldSimple><w:r><w:t xml:space="preserve"> of </w:t></w:r><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> NUMPAGES </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>9</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p><w:p><w:r><w:t>Security Classification: INTERNAL</w:t></w:r>${media ? '<w:r><w:pict><v:shape id="FooterDecoration" type="#_x0000_t75" style="width:8pt;height:8pt"><v:imagedata r:id="rIdFooterDecoration"/></v:shape></w:pict></w:r>' : ''}</w:p></w:ftr>`,
     });
+    if (variants) {
+      files.push(
+        {
+          name: 'word/footer2.xml',
+          data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>First-page footer</w:t></w:r></w:p></w:ftr>`,
+        },
+        {
+          name: 'word/footer3.xml',
+          data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:r><w:t>Even-page footer</w:t></w:r></w:p></w:ftr>`,
+        },
+      );
+    }
+    if (media) {
+      files.push(
+        {
+          name: 'word/_rels/footer1.xml.rels',
+          data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdFooterDecoration" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/footer-decoration.png"/></Relationships>`,
+        },
+        {
+          name: 'word/media/footer-decoration.png',
+          data: Buffer.from(tinyPngBase64, 'base64'),
+        },
+      );
+    }
   }
 
   return createZipBuffer(files, { compress: true });
@@ -5011,12 +5174,257 @@ test('Word export applies selected template parts and preserves default export f
   expect(contentTypes).toContain('wordprocessingml.footer+xml');
   expect(documentXml).toContain('<w:pStyle w:val="CorporateHeading1"/>');
   expect(documentXml).toContain('<w:tblStyle w:val="CorporateTable"/>');
-  expect(documentXml).toContain('<w:headerReference w:type="default" r:id="rIdTemplateHeader1"/>');
-  expect(documentXml).toContain('<w:footerReference w:type="default" r:id="rIdTemplateFooter1"/>');
+  expect(documentXml).toMatch(/<w:headerReference\b[^>]*w:type="default"[^>]*r:id="rIdHeaderDefault"/);
+  expect(documentXml).toMatch(/<w:footerReference\b[^>]*w:type="default"[^>]*r:id="rIdFooterDefault"/);
   expect(relsXml).toContain('Target="styles.xml"');
   expect(relsXml).toContain('Target="header1.xml"');
   expect(relsXml).toContain('Target="footer1.xml"');
   expect(headerRelsXml).toContain('Target="media/template-logo.png"');
+});
+
+test('Word template roundtrip preserves page masters, fields, semantic numbering, and table presentation', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const source = `# Generated Architecture Title
+
+Introductory paragraph with **strong text**, *emphasis*, \`inline code\`, and [a link](https://example.com/docs).
+
+## 3. End-to-End Architecture
+
+### 6.1 Main BPF-driven flow
+
+#### 6.1.2 Deep processing stage
+
+## 2024 Roadmap
+
+### Version 2.0 release identifier
+
+> A template-driven note.
+
+| Component | Responsibility |
+| --- | --- |
+| Dataverse | Stores records |
+| Worker | Processes images |
+
+- First bullet
+  - Nested bullet
+
+1. First ordered item
+2. Second ordered item
+
+Separate ordered sequence:
+
+1. Restarted ordered item
+2. Another restarted item
+
+\`\`\`js
+const ready = true;
+\`\`\`
+
+\`\`\`mermaid
+flowchart LR
+  A[Record] --> B[Image worker]
+\`\`\`
+`;
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('#preview h1')).toHaveText('Generated Architecture Title');
+  await expect(page.locator('.diagram-frame svg')).toBeVisible({ timeout: 60_000 });
+
+  const templatePath = await writeWordTemplateFixture(testInfo, 'page-master-template.docx', { variants: true });
+  const sourceTemplateEntries = await readZipEntries(templatePath);
+  await importWordTemplate(page, templatePath, 'Page Master Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const documentXml = getZipText(entries, 'word/document.xml');
+  const documentRelsXml = getZipText(entries, 'word/_rels/document.xml.rels');
+  const headerXml = getZipText(entries, 'word/header1.xml');
+  const firstHeaderXml = getZipText(entries, 'word/header2.xml');
+  const evenHeaderXml = getZipText(entries, 'word/header3.xml');
+  const footerXml = getZipText(entries, 'word/footer1.xml');
+  const numberingXml = getZipText(entries, 'word/numbering.xml');
+  const settingsXml = getZipText(entries, 'word/settings.xml');
+  const coreXml = getZipText(entries, 'docProps/core.xml');
+
+  expect(await page.locator('#editor').inputValue()).toBe(source);
+  expectPackageRelationshipsValid(entries);
+  await expectXmlPackagePartsWellFormed(page, entries);
+
+  for (const preservedPart of [
+    'word/styles.xml',
+    'word/fontTable.xml',
+    'word/theme/theme1.xml',
+    'word/media/template-logo.png',
+    'word/media/footer-decoration.png',
+    'customXml/item1.xml',
+  ]) {
+    expect(Buffer.from(entries.get(preservedPart)).equals(Buffer.from(sourceTemplateEntries.get(preservedPart))), `${preservedPart} was not preserved byte-for-byte`).toBe(true);
+  }
+
+  expect(documentXml).toMatch(/<w:pStyle w:val="CorporateTitle"\/>[\s\S]*?<w:t[^>]*>Generated Architecture Title<\/w:t>/);
+  expect(documentXml).toMatch(/<w:pStyle w:val="CorporateHeading1"\/>[\s\S]*?<w:t[^>]*>End-to-End Architecture<\/w:t>/);
+  expect(documentXml).toMatch(/<w:pStyle w:val="CorporateHeading2"\/>[\s\S]*?<w:t[^>]*>Main BPF-driven flow<\/w:t>/);
+  expect(documentXml).toMatch(/<w:pStyle w:val="CorporateHeading3"\/>[\s\S]*?<w:t[^>]*>Deep processing stage<\/w:t>/);
+  expect(documentXml).not.toContain('>3. End-to-End Architecture<');
+  expect(documentXml).not.toContain('>6.1 Main BPF-driven flow<');
+  expect(documentXml).not.toContain('>6.1.2 Deep processing stage<');
+  expect(documentXml).toContain('>2024 Roadmap<');
+  expect(documentXml).toContain('>Version 2.0 release identifier<');
+  expect(documentXml).not.toContain('Obsolete template body content');
+  expect(documentXml).not.toContain('Prototype heading');
+  expect(documentXml).not.toContain('Prototype content');
+
+  expect(documentXml).toContain('<w:tblStyle w:val="CorporateTable"/>');
+  expect(documentXml).toContain('<w:top w:val="double" w:sz="12" w:color="445566"/>');
+  expect(documentXml).toContain('<w:tblCellMar>');
+  expect(documentXml).toContain('w:fill="DDEEFF"');
+  expect(documentXml).toContain('<w:tblHeader');
+  expect(documentXml).toContain('>Component<');
+  expect(documentXml).toContain('>Dataverse<');
+  expect(documentXml).toMatch(/<w:numId w:val="43"\/>/);
+  expect(documentXml).toMatch(/<w:numId w:val="45"\/>/);
+  expect(documentXml).toMatch(/<w:numId w:val="46"\/>/);
+  expect(numberingXml).toMatch(/<w:num[^>]*w:numId="45"[\s\S]*?<w:startOverride w:val="1"\/>/);
+  expect(numberingXml).toMatch(/<w:num[^>]*w:numId="46"[\s\S]*?<w:startOverride w:val="1"\/>/);
+  expect(documentXml).toContain('<w:pStyle w:val="CorporateQuote"/>');
+  expect(documentXml).toContain('<w:pStyle w:val="CorporateCode"/>');
+
+  expect(documentXml).toMatch(/<w:headerReference\b[^>]*w:type="default"[^>]*r:id="rIdHeaderDefault"/);
+  expect(documentXml).toMatch(/<w:headerReference\b[^>]*w:type="first"[^>]*r:id="rIdHeaderFirst"/);
+  expect(documentXml).toMatch(/<w:headerReference\b[^>]*w:type="even"[^>]*r:id="rIdHeaderEven"/);
+  expect(documentXml).toMatch(/<w:footerReference\b[^>]*w:type="default"[^>]*r:id="rIdFooterDefault"/);
+  expect(documentXml).toMatch(/<w:footerReference\b[^>]*w:type="first"[^>]*r:id="rIdFooterFirst"/);
+  expect(documentXml).toMatch(/<w:footerReference\b[^>]*w:type="even"[^>]*r:id="rIdFooterEven"/);
+  expect(documentXml).toContain('<w:titlePg');
+  expect(documentXml).toContain('<w:pgSz w:w="12240" w:h="15840"/>');
+  expect(documentXml).toContain('w:right="1080"');
+  expect(documentXml).toContain('w:left="1080"');
+
+  expect(headerXml.replace(/<[^>]+>/g, '')).toContain('Generated Architecture Title');
+  expect(headerXml).not.toContain('Template source');
+  expect(headerXml).toContain('<w:b/>');
+  expect(headerXml).toContain('<w:i/>');
+  expect(headerXml).toContain('<w:fitText');
+  expect(headerXml).toContain('<w:pBdr>');
+  expect(headerXml).toContain('r:embed="rIdLogo"');
+  expect(firstHeaderXml).toContain('Generated Architecture Title');
+  expect(firstHeaderXml).toContain('first page');
+  expect(evenHeaderXml).toContain('Generated Architecture Title');
+  expect(evenHeaderXml).toContain('even page');
+
+  expect(footerXml).toContain('Corporate footer');
+  expect(footerXml).toMatch(/<w:fldSimple\b[^>]*w:instr=" PAGE "/);
+  expect(footerXml).toContain('w:fldCharType="begin"');
+  expect(footerXml).toContain(' NUMPAGES ');
+  expect(footerXml).toContain('w:fldCharType="end"');
+  expect(footerXml).toContain('Security Classification: INTERNAL');
+  expect(footerXml).toContain('r:id="rIdFooterDecoration"');
+  expect(getZipText(entries, 'word/_rels/footer1.xml.rels')).toContain('Target="media/footer-decoration.png"');
+  expect([...entries].filter(([name, bytes]) => name.endsWith('.xml') && new TextDecoder().decode(bytes).includes('Security Classification: INTERNAL'))).toHaveLength(1);
+
+  expect(settingsXml).toContain('<w:evenAndOddHeaders');
+  expect(settingsXml).toMatch(/<w:updateFields\b[^>]*w:val="true"/);
+  expect(coreXml).toContain('<dc:title>Generated Architecture Title</dc:title>');
+  expect(coreXml).toContain('<dc:creator>Fixture author</dc:creator>');
+  expect(documentRelsXml).toContain('TargetMode="External"');
+  expect(documentRelsXml).toContain('Target="https://example.com/docs"');
+  expect([...entries.keys()].some((name) => /^word\/media\/lds-diagram-1(?:-\d+)?\.png$/.test(name))).toBe(true);
+  const imageExtents = [...documentXml.matchAll(/<wp:extent\b[^>]*cx="(\d+)"[^>]*cy="(\d+)"/g)]
+    .map((match) => ({ width: Number(match[1]), height: Number(match[2]) }));
+  expect(imageExtents.length).toBeGreaterThan(0);
+  imageExtents.forEach(({ width, height }) => {
+    expect(width).toBeLessThanOrEqual(10080 * 635);
+    expect(height).toBeLessThanOrEqual(12960 * 635 * 0.9);
+  });
+});
+
+test('Word heading counters remain literal when mapped template styles are not automatically numbered', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const source = `# Counter Authority
+
+## 3. End-to-End Architecture
+
+### 6.1 Main BPF-driven flow
+
+#### 6.1.2 Deep processing stage
+
+## 2024 Roadmap
+
+### Version 2.0 release identifier
+`;
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('#preview h1')).toHaveText('Counter Authority');
+  const templatePath = await writeWordTemplateFixture(testInfo, 'non-numbered-template.docx', {
+    automaticHeadingNumbering: false,
+  });
+  await importWordTemplate(page, templatePath, 'Non-numbered Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const documentXml = getZipText(entries, 'word/document.xml');
+  expect(documentXml).toContain('>3. End-to-End Architecture<');
+  expect(documentXml).toContain('>6.1 Main BPF-driven flow<');
+  expect(documentXml).toContain('>6.1.2 Deep processing stage<');
+  expect(documentXml).toContain('>2024 Roadmap<');
+  expect(documentXml).toContain('>Version 2.0 release identifier<');
+  expect(await page.locator('#editor').inputValue()).toBe(source);
+});
+
+test('Word table direct-formatting prototype is reused without prototype content leakage', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const source = `# Direct Table
+
+| Field | Value |
+| --- | --- |
+| Owner | Architecture |
+`;
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('#preview h1')).toHaveText('Direct Table');
+  const templatePath = await writeWordTemplateFixture(testInfo, 'direct-table-template.docx', { tableStyle: false });
+  await importWordTemplate(page, templatePath, 'Direct Table Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const documentXml = getZipText(entries, 'word/document.xml');
+  expect(documentXml).not.toContain('<w:tblStyle');
+  expect(documentXml).toContain('<w:top w:val="double" w:sz="12" w:color="445566"/>');
+  expect(documentXml).toContain('<w:tblCellMar>');
+  expect(documentXml).toContain('w:fill="DDEEFF"');
+  expect(documentXml).toContain('w:vAlign');
+  expect(documentXml).toContain('>Field<');
+  expect(documentXml).toContain('>Architecture<');
+  expect(documentXml).not.toContain('Prototype heading');
+  expect(documentXml).not.toContain('Prototype body');
+});
+
+test('Word export paginates exceptionally tall Mermaid diagrams into readable image slices', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const flow = Array.from({ length: 28 }, (_, index) => `  N${index + 1}[Process step ${index + 1}] --> N${index + 2}[Process step ${index + 2}]`);
+  const source = [
+    '# Tall Diagram',
+    '',
+    '## Complete process',
+    '',
+    '```mermaid',
+    'flowchart TD',
+    ...flow,
+    '```',
+    '',
+  ].join('\n');
+  await setEditorValueAndSelection(page, source);
+  await expect(page.locator('.diagram-frame svg')).toBeVisible({ timeout: 60_000 });
+  const templatePath = await writeWordTemplateFixture(testInfo, 'tall-diagram-template.docx');
+  await importWordTemplate(page, templatePath, 'Tall Diagram Template');
+
+  const filePath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(filePath);
+  const documentXml = getZipText(entries, 'word/document.xml');
+  const sliceParts = [...entries.keys()].filter((name) => /^word\/media\/lds-diagram-1-part-\d+\.png$/.test(name));
+
+  expect(sliceParts.length).toBeGreaterThan(1);
+  expect(documentXml.match(/<w:pageBreakBefore\/>/g)?.length || 0).toBe(sliceParts.length - 1);
+  expect(documentXml.match(/<w:drawing>/g)?.length || 0).toBe(sliceParts.length);
+  expectPackageRelationshipsValid(entries);
+  await expectXmlPackagePartsWellFormed(page, entries);
 });
 
 test('dropped image assets render and travel through HTML, Word, and Docs Site exports', async ({ page }) => {

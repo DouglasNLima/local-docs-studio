@@ -1,23 +1,28 @@
 # Word Export Templates
 
-Lens Docs Studio supports a small local MVP for reusable Word export templates. A user can import a `.docx` file as a Word template pack, select that pack during Word export, and produce a generated `.docx` that carries supported visual identity parts from the imported package.
+Lens Docs Studio supports reusable Word export templates. A user can import a `.docx` file as a browser-local template, select it during Word export, and produce a generated `.docx` that uses the source package as its presentation and page-master base.
 
 The feature is generic. It is intended for corporate Word templates, personal templates, and other organisation-provided `.docx` sources. No TEKenable, HSI, or other customer-specific asset is hard-coded, bundled, or redistributed.
 
-## Supported MVP
+## Template model
 
-The importer treats `.docx` files as ZIP packages and stores a browser-local pack with:
+The importer treats `.docx` files as Open XML packages and stores a browser-local template model with:
 
-- `manifest.json` metadata held in IndexedDB.
-- The original `template.docx` bytes for local reference.
-- Preserved WordprocessingML parts for styles, numbering, theme, safe settings, headers, footers, header/footer relationships, and referenced media.
+- manifest metadata held in IndexedDB;
+- the original `template.docx` bytes used as the export base;
+- detected semantic styles and heading-numbering metadata;
+- the selected normal content section and its page-master properties;
+- header/footer variants and their relationships;
+- a representative content-table style or direct-formatting prototype;
+- list numbering definitions and the package relationship graph.
 
 The manifest records:
 
 - template id, display name, source filename, creation timestamp, and pack version;
-- detected capabilities for styles, numbering, theme, headers, footers, and media;
+- detected capabilities for styles, numbering, theme, settings, font table, sections, headers, footers, tables, and media;
 - detected style ids and names where practical;
-- semantic style mapping for document title, heading 1, heading 2, heading 3, body, table, code, quote, and caption.
+- semantic style mapping for document title, content headings, body, table, list, code, quote, and caption;
+- whether each mapped content-heading style is automatically numbered.
 
 ## Local Storage
 
@@ -25,38 +30,49 @@ Imported packs are stored in the `local-docs-studio-word-templates` IndexedDB da
 
 The ignored `artifacts/word-templates/` path is reserved for optional local/debug copies when developers need to inspect packs. User-imported templates, logos, and generated packs must not be committed.
 
-## Export Application
+## Export application
 
-When a template is selected, Word export copies supported parts into the generated `.docx`, adds required content type overrides, adds document relationships, and writes section header/footer references for the first detected header and footer.
+When a template is selected, Word export clones the imported package and replaces the main document body while retaining the selected content section's `sectPr`. This preserves compatible package infrastructure such as styles, numbering, theme, font table, settings, headers, footers, DrawingML/VML, fields, relationships, and referenced media. Template body paragraphs, tables, placeholders, and obsolete sections are not copied into the generated body.
 
 Generated document elements use semantic Word styles:
 
-- H1/H2/H3 map to heading style ids.
+- Markdown H1 maps to the document-title style.
+- Markdown H2 maps to the template's top-level content-heading style, H3 to the next level, and so on.
 - Paragraphs map to body style ids.
-- Tables map to a table style id.
+- Tables reuse the detected table style and options, or clone a representative table's direct formatting when no useful style exists.
 - Code blocks and block quotes map to code and quote style ids.
+- Ordered and unordered lists use compatible template numbering definitions with independent concrete numbering instances.
 
 If a mapped style is missing, export falls back to standard Word style names. Missing optional template parts do not block export.
 
-## Header, Footer, And Media Handling
+If a mapped heading style is automatically numbered, a compatible literal counter at the start of the Markdown heading is omitted only from the generated Word text. The Markdown source is unchanged. Literal counters remain when the chosen Word style is not automatically numbered or when the numeric prefix does not match the heading depth.
 
-The MVP copies `word/header*.xml`, `word/footer*.xml`, `word/_rels/header*.xml.rels`, `word/_rels/footer*.xml.rels`, and media referenced by those relationships. External relationships are ignored. Header and footer relationship ids are preserved inside their own relationship files, while document-level relationship ids are generated with template-specific names to avoid collision with exported diagram and image relationships.
+The first Markdown H1 is also used as the document title. Export updates the core title and intended title text in the selected page master's header/footer while preserving the existing runs, formatting, fields, shapes, and layout. It does not perform an unrestricted package-wide text replacement.
 
-The selected template's first detected header and first detected footer are applied globally to the generated document section. Complex first/even/default section layouts are future work.
+## Sections, headers, footers, and media
+
+The analyser scores the source sections to select the normal content page master rather than assuming a fixed section index. Its exact page size, margins, orientation, columns, title-page flag, and first/even/default header/footer references are retained. Because the complete package is cloned, header/footer relationships, media, DrawingML/VML, decorative shapes, and fields such as `PAGE` and `NUMPAGES` remain structurally intact. Export also requests field recalculation when the document opens in Word.
+
+Generated image and Mermaid relationships receive collision-free ids and media names. Images are bounded by the selected section's usable content dimensions. Exceptionally tall rendered Mermaid diagrams are split into overlapping, page-width slices with page breaks so their labels remain readable without overflowing into headers or footers.
+
+## Table prototype handling
+
+The analyser prefers a representative content table and records its table, grid, row, cell, and paragraph properties. Generated tables retain Markdown cell content but reuse applicable style options, borders, cell margins, fills, typography, alignment, widths, banding, and header-row behaviour. Header rows are explicitly marked to repeat across pages. Detection is generic and does not contain template-specific filenames, colours, logos, or labels.
 
 ## Limitations
 
 - No visual template designer is included.
 - Templates cannot be edited in the app.
-- Complex multi-section layouts are not merged.
-- Unsupported or unresolved media is skipped rather than corrupting the generated package.
-- Microsoft Word is not required for automated validation; tests inspect the `.docx` ZIP/package structure.
+- Export selects one normal content page master; it does not reproduce arbitrary cover/front-matter body content or interleave Markdown across several source sections.
+- Ambiguous title locations that cannot be tied to the source document title are left unchanged to avoid corrupting unrelated template text.
+- Unsupported or malformed packages fail gracefully rather than emitting a knowingly corrupt document.
+- Automated tests inspect package structure and relationships; release validation should also open and visually inspect representative output in Microsoft Word.
 - Corporate branding and logos are user/organisation-provided assets and should not be redistributed without permission.
 
 ## Future Enhancements
 
 - Template management actions such as rename, delete, and export pack.
-- Full first/even/default header and footer mapping.
-- Richer content type extraction from the source package.
-- Deeper list/numbering mapping for generated ordered and unordered lists.
+- Optional explicit selection when a template contains several equally plausible content page masters.
+- Richer template diagnostics and a future inspector for detected semantic mappings.
+- More specialised handling for content controls whose displayed title is not linked to package metadata.
 - Optional import diagnostics for unsupported package parts.
