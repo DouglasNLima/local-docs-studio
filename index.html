@@ -210,12 +210,15 @@
             <div class="menu-heading">Documents</div>
             <button id="downloadButton" type="button">Export HTML</button>
             <button id="exportWordButton" type="button" title="Export a Word-compatible .docx document">Export Word</button>
-            <label class="menu-field">
-              <span>Word template</span>
-              <select id="wordTemplateSelect" aria-label="Word export template">
-                <option value="">Default</option>
-              </select>
-            </label>
+            <div class="word-template-selector-row">
+              <label class="menu-field">
+                <span>Word template</span>
+                <select id="wordTemplateSelect" aria-label="Word export template">
+                  <option value="">Default</option>
+                </select>
+              </label>
+              <button id="wordTemplateManageButton" type="button" aria-haspopup="dialog">Manage</button>
+            </div>
             <button id="wordTemplateImportButton" type="button">Import Word template</button>
             <div id="wordTemplateSummary" class="menu-note">Default export uses the built-in document styling.</div>
             <button id="exportPdfButton" type="button">Export PDF</button>
@@ -668,6 +671,22 @@
       <div class="template-dialog-actions">
         <button type="button" id="appDialogCancelButton" data-app-dialog-cancel>Cancel</button>
         <button class="primary" type="submit" id="appDialogConfirmButton">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="utility-dialog word-template-management-dialog" id="wordTemplateManagementDialog" aria-labelledby="wordTemplateManagementTitle" aria-describedby="wordTemplateManagementDescription">
+    <form class="utility-dialog-card word-template-management-card" id="wordTemplateManagementForm">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Word export</span>
+        <button class="template-dialog-close" type="button" id="wordTemplateManagementCloseButton" data-word-template-management-cancel aria-label="Close Word template management">X</button>
+      </div>
+      <h2 id="wordTemplateManagementTitle">Manage Word templates</h2>
+      <p id="wordTemplateManagementDescription">Choose the template used for Word export, or keep the default styling.</p>
+      <div class="word-template-management-list" id="wordTemplateManagementList" role="list" aria-live="polite"></div>
+      <div class="template-dialog-actions">
+        <button class="primary" type="button" id="wordTemplateManagementImportButton">Import Word template</button>
+        <button type="button" data-word-template-management-cancel>Close</button>
       </div>
     </form>
   </dialog>

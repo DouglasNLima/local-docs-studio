@@ -254,6 +254,24 @@ async function importWordTemplate(page, filePath, displayName) {
   await expect(page.locator('#wordTemplateSelect')).toHaveValue(/.+/);
 }
 
+async function openWordTemplateManagement(page) {
+  const manageButton = page.locator('#wordTemplateManageButton');
+  if (!await manageButton.isVisible()) {
+    await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  }
+  await manageButton.click();
+  await expect(page.getByRole('dialog', { name: 'Manage Word templates' })).toBeVisible();
+}
+
+async function importWordTemplateFromManagement(page, filePath, displayName) {
+  await page.locator('#wordTemplateManagementImportButton').click();
+  await page.locator('#wordTemplateInput').setInputFiles(filePath);
+  await page.locator('#appDialogPromptInput').fill(displayName);
+  await page.getByRole('button', { name: 'Import template' }).click();
+  await expect(page.locator('#status')).toHaveText(new RegExp(`Imported Word template "${displayName}"`));
+  await expect(page.locator('#wordTemplateManagementList')).toContainText(displayName);
+}
+
 function expectPackageRelationshipsValid(entries) {
   for (const [relationshipPartName, bytes] of entries) {
     if (!relationshipPartName.endsWith('.rels')) continue;
@@ -5152,6 +5170,379 @@ test('Word template import stores manifests and tolerates missing optional parts
     media: false,
   });
   expect(manifests.find((manifest) => manifest.displayName === 'Corporate Word Template')?.semanticStyleMapping.heading1).toBe('CorporateHeading1');
+});
+
+test('Word template management lists, selects, renames, and deletes isolated templates', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await openWordTemplateManagement(page);
+
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]')).toHaveCount(1);
+  await expect(page.locator('#wordTemplateManagementList')).toContainText('No Word templates imported yet.');
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]').first()).toHaveAttribute('aria-current', 'true');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Manage Word templates' })).toBeHidden();
+  await expect(page.locator('summary').filter({ hasText: /^Export$/ })).toBeFocused();
+  await openWordTemplateManagement(page);
+
+  const firstPath = await writeWordTemplateFixture(testInfo, 'management-first.docx');
+  const secondPath = await writeWordTemplateFixture(testInfo, 'management-second.docx', { variants: true });
+  await importWordTemplateFromManagement(page, firstPath, 'First managed template');
+  await importWordTemplateFromManagement(page, secondPath, 'Second managed template');
+
+  const entries = page.locator('#wordTemplateManagementList [data-word-template-entry]');
+  await expect(entries).toHaveCount(3);
+  await expect(page.locator('#wordTemplateManagementList')).toContainText('Original file: management-first.docx');
+  await expect(page.locator('#wordTemplateManagementList')).toContainText('Original file: management-second.docx');
+  await expect(entries.filter({ hasText: 'Second managed template' })).toHaveAttribute('aria-current', 'true');
+
+  const templateStateBeforeRename = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordsRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordsRequest.onsuccess = () => resolve(recordsRequest.result);
+      recordsRequest.onerror = () => reject(recordsRequest.error);
+    });
+    db.close();
+    return records.map((record) => ({
+      id: record.manifest.id,
+      displayName: record.manifest.displayName,
+      originalFileName: record.manifest.originalFileName,
+      sourceLength: record.templateDocx?.byteLength || 0,
+    }));
+  });
+  const firstBeforeRename = templateStateBeforeRename.find((template) => template.displayName === 'First managed template');
+  expect(firstBeforeRename).toMatchObject({
+    originalFileName: 'management-first.docx',
+  });
+  expect(firstBeforeRename?.id).toBeTruthy();
+  expect(firstBeforeRename?.sourceLength).toBeGreaterThan(0);
+
+  const firstEntry = entries.filter({ hasText: 'First managed template' });
+  await firstEntry.getByRole('button', { name: 'Use template', exact: true }).click();
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(firstBeforeRename.id);
+  await expect(firstEntry).toHaveAttribute('aria-current', 'true');
+  await expect(entries.filter({ hasText: 'Second managed template' })).toHaveAttribute('aria-current', 'false');
+
+  await firstEntry.getByRole('button', { name: 'Rename', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Rename Word template' })).toBeVisible();
+  await page.locator('#appDialogPromptInput').fill('   ');
+  await page.locator('#appDialogConfirmButton').click();
+  await expect(page.getByRole('dialog', { name: 'Rename Word template' })).toBeVisible();
+  await expect(page.locator('.dialog-error-message')).toHaveText('Enter a template name.');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Rename Word template' })).toBeHidden();
+  await expect(firstEntry).toContainText('First managed template');
+
+  await firstEntry.getByRole('button', { name: 'Rename', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Rename Word template' })).toBeVisible();
+  await page.locator('#appDialogPromptInput').fill('  Renamed managed template  ');
+  await page.locator('#appDialogConfirmButton').click();
+  await expect(page.locator('#status')).toHaveText('Renamed Word template to "Renamed managed template".');
+  const renamedEntry = entries.filter({ hasText: 'Renamed managed template' });
+  await expect(renamedEntry).toHaveCount(1);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(firstBeforeRename.id);
+  await expect(renamedEntry).toHaveAttribute('aria-current', 'true');
+
+  const templateStateAfterRename = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordsRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordsRequest.onsuccess = () => resolve(recordsRequest.result);
+      recordsRequest.onerror = () => reject(recordsRequest.error);
+    });
+    db.close();
+    return records.map((record) => ({
+      id: record.manifest.id,
+      displayName: record.manifest.displayName,
+      originalFileName: record.manifest.originalFileName,
+      sourceLength: record.templateDocx?.byteLength || 0,
+    }));
+  });
+  expect(templateStateAfterRename).toEqual(expect.arrayContaining([
+    {
+      id: firstBeforeRename.id,
+      displayName: 'Renamed managed template',
+      originalFileName: 'management-first.docx',
+      sourceLength: firstBeforeRename.sourceLength,
+    },
+  ]));
+
+  await renamedEntry.getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Delete Word template' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Cancel', exact: true })).toBeVisible();
+  await page.locator('#appDialogCancelButton').click();
+  await expect(page.getByRole('dialog', { name: 'Delete Word template' })).toBeHidden();
+  await expect(renamedEntry).toHaveCount(1);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(firstBeforeRename.id);
+
+  await renamedEntry.getByRole('button', { name: 'Delete', exact: true }).click();
+  await page.locator('#appDialogConfirmButton').click();
+  await expect(page.locator('#status')).toHaveText(/Default Word export is now selected/);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue('');
+  await expect(page.locator('#wordTemplateManagementList')).not.toContainText('Renamed managed template');
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]').filter({ hasText: 'No template / Default Word export' })).toHaveAttribute('aria-current', 'true');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('lensDocs.wordExport.templateId'))).toBeNull();
+
+  const remainingTemplates = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordsRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordsRequest.onsuccess = () => resolve(recordsRequest.result);
+      recordsRequest.onerror = () => reject(recordsRequest.error);
+    });
+    db.close();
+    return records.map((record) => ({
+      id: record.manifest.id,
+      displayName: record.manifest.displayName,
+      sourceLength: record.templateDocx?.byteLength || 0,
+    }));
+  });
+  expect(remainingTemplates).toHaveLength(1);
+  expect(remainingTemplates[0]).toMatchObject({
+    displayName: 'Second managed template',
+  });
+  expect(remainingTemplates[0].sourceLength).toBeGreaterThan(0);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue('');
+  await openWordTemplateManagement(page);
+  await expect(page.locator('#wordTemplateManagementList')).not.toContainText('Renamed managed template');
+  await expect(page.locator('#wordTemplateManagementList')).toContainText('Second managed template');
+
+  await openFixture(page, 'mixed.md');
+  const defaultExportPath = await clickExportDownload(page, 'Export Word');
+  const defaultExportEntries = await readZipEntries(defaultExportPath);
+  expect(defaultExportEntries.has('word/styles.xml')).toBe(false);
+});
+
+test('deleting a non-selected Word template preserves the active template and its package', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const retainedPath = await writeWordTemplateFixture(testInfo, 'retained-template.docx');
+  const deletedPath = await writeWordTemplateFixture(testInfo, 'deleted-template.docx', { variants: true });
+  await importWordTemplate(page, retainedPath, 'Retained template');
+  await importWordTemplate(page, deletedPath, 'Deleted template');
+
+  const activeTemplateId = await page.locator('#wordTemplateSelect').inputValue();
+  const retainedEntry = page.locator('#wordTemplateManagementList [data-word-template-entry]').filter({ hasText: 'Retained template' });
+  await openWordTemplateManagement(page);
+  await retainedEntry.getByRole('button', { name: 'Delete', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Delete Word template' })).toBeVisible();
+  await page.locator('#appDialogConfirmButton').click();
+
+  await expect(page.locator('#status')).toHaveText('Deleted Word template "Retained template".');
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(activeTemplateId);
+  await expect(page.locator('#wordTemplateManagementList')).not.toContainText('Retained template');
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]').filter({ hasText: 'Deleted template' })).toHaveAttribute('aria-current', 'true');
+
+  const remainingTemplate = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordRequest.onsuccess = () => resolve(recordRequest.result);
+      recordRequest.onerror = () => reject(recordRequest.error);
+    });
+    db.close();
+    return records.map((record) => ({
+      id: record.manifest.id,
+      displayName: record.manifest.displayName,
+      sourceLength: record.templateDocx?.byteLength || 0,
+    }));
+  });
+  expect(remainingTemplate).toEqual([expect.objectContaining({
+    id: activeTemplateId,
+    displayName: 'Deleted template',
+  })]);
+  expect(remainingTemplate[0].sourceLength).toBeGreaterThan(0);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(activeTemplateId);
+  await openWordTemplateManagement(page);
+  await expect(page.locator('#wordTemplateManagementList')).not.toContainText('Retained template');
+  await expect(page.locator('#wordTemplateManagementList')).toContainText('Deleted template');
+});
+
+test('failed Word template import leaves the management list, selection, and storage unchanged', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await openWordTemplateManagement(page);
+
+  const invalidPath = testInfo.outputPath('invalid-template.docx');
+  await writeFile(invalidPath, Buffer.from('This is not a DOCX package.'));
+  await page.locator('#wordTemplateManagementImportButton').click();
+  await page.locator('#wordTemplateInput').setInputFiles(invalidPath);
+  await page.locator('#appDialogPromptInput').fill('Invalid template');
+  await page.getByRole('button', { name: 'Import template' }).click();
+
+  await expect(page.locator('#status')).toHaveText('Word template import failed.');
+  await expect(page.getByRole('dialog', { name: 'Manage Word templates' })).toBeVisible();
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]')).toHaveCount(1);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue('');
+
+  const storedTemplates = await page.evaluate(async () => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    const db = await new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    const transaction = db.transaction('templates', 'readonly');
+    const recordRequest = transaction.objectStore('templates').getAll();
+    const records = await new Promise((resolve, reject) => {
+      recordRequest.onsuccess = () => resolve(recordRequest.result);
+      recordRequest.onerror = () => reject(recordRequest.error);
+    });
+    db.close();
+    return records;
+  });
+  expect(storedTemplates).toEqual([]);
+});
+
+test('Word template management imports through the canonical flow and repairs stale selection', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const templatePath = await writeWordTemplateFixture(testInfo, 'stale-selection-template.docx');
+  await importWordTemplate(page, templatePath, 'Stale selection template');
+
+  const templateId = await page.locator('#wordTemplateSelect').inputValue();
+  expect(templateId).toBeTruthy();
+  await page.evaluate((id) => {
+    localStorage.setItem('lensDocs.wordExport.templateId', id);
+  }, templateId);
+
+  await page.evaluate((id) => new Promise((resolve, reject) => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction('templates', 'readwrite');
+      transaction.objectStore('templates').delete(id);
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      transaction.onerror = () => reject(transaction.error);
+    };
+    request.onerror = () => reject(request.error);
+  }), templateId);
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue('');
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('lensDocs.wordExport.templateId'))).toBeNull();
+  await openWordTemplateManagement(page);
+  await expect(page.locator('#wordTemplateManagementList [data-word-template-entry]').filter({ hasText: 'No template / Default Word export' })).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('#wordTemplateManagementList')).not.toContainText('Stale selection template');
+});
+
+test('Word template metadata migration preserves identity, provenance, package data, and export', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  const templatePath = await writeWordTemplateFixture(testInfo, 'legacy-template.docx');
+  await importWordTemplate(page, templatePath, 'Legacy template');
+  const templateId = await page.locator('#wordTemplateSelect').inputValue();
+  const beforeMigration = await page.evaluate((id) => new Promise((resolve, reject) => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction('templates', 'readonly');
+      const recordRequest = transaction.objectStore('templates').get(id);
+      recordRequest.onsuccess = () => {
+        const record = recordRequest.result;
+        resolve({
+          id: record.manifest.id,
+          sourceLength: record.templateDocx.byteLength,
+          sourceFilename: record.manifest.sourceFilename,
+        });
+        db.close();
+      };
+      recordRequest.onerror = () => reject(recordRequest.error);
+    };
+    request.onerror = () => reject(request.error);
+  }), templateId);
+
+  await page.evaluate((id) => new Promise((resolve, reject) => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction('templates', 'readwrite');
+      const store = transaction.objectStore('templates');
+      const recordRequest = store.get(id);
+      recordRequest.onsuccess = () => {
+        const record = recordRequest.result;
+        delete record.manifest.templateId;
+        delete record.manifest.originalFileName;
+        delete record.manifest.importedAt;
+        delete record.manifest.templateModel;
+        record.manifest.version = 1;
+        store.put(record);
+      };
+      transaction.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+      transaction.onerror = () => reject(transaction.error);
+    };
+    request.onerror = () => reject(request.error);
+  }), templateId);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(templateId);
+  await openWordTemplateManagement(page);
+  const migratedEntry = page.locator('#wordTemplateManagementList [data-word-template-entry]').filter({ hasText: 'Legacy template' });
+  await expect(migratedEntry).toContainText('Original file: legacy-template.docx');
+  await expect(migratedEntry).toContainText('Imported');
+
+  const afterMigration = await page.evaluate((id) => new Promise((resolve, reject) => {
+    const request = indexedDB.open('local-docs-studio-word-templates', 1);
+    request.onsuccess = () => {
+      const db = request.result;
+      const transaction = db.transaction('templates', 'readonly');
+      const recordRequest = transaction.objectStore('templates').get(id);
+      recordRequest.onsuccess = () => {
+        const record = recordRequest.result;
+        resolve({
+          id: record.manifest.id,
+          templateId: record.manifest.templateId,
+          originalFileName: record.manifest.originalFileName,
+          importedAt: record.manifest.importedAt,
+          sourceLength: record.templateDocx.byteLength,
+        });
+        db.close();
+      };
+      recordRequest.onerror = () => reject(recordRequest.error);
+    };
+    request.onerror = () => reject(request.error);
+  }), templateId);
+  expect(afterMigration).toMatchObject({
+    id: beforeMigration.id,
+    templateId: beforeMigration.id,
+    originalFileName: beforeMigration.sourceFilename,
+    sourceLength: beforeMigration.sourceLength,
+  });
+  expect(afterMigration.importedAt).toBeTruthy();
+
+  await openFixture(page, 'mixed.md');
+  const exportPath = await clickExportDownload(page, 'Export Word');
+  const entries = await readZipEntries(exportPath);
+  expect(entries.has('word/styles.xml')).toBe(true);
+  expect(getZipText(entries, 'word/document.xml')).toContain('Export Fixture');
 });
 
 test('Word export applies selected template parts and preserves default export fallback', async ({ page }, testInfo) => {

@@ -18,7 +18,7 @@ The importer treats `.docx` files as Open XML packages and stores a browser-loca
 
 The manifest records:
 
-- template id, display name, source filename, creation timestamp, and pack version;
+- stable template id, user-editable display name, original source filename, import/creation timestamps, and pack version;
 - detected capabilities for styles, numbering, theme, settings, font table, sections, headers, footers, tables, and media;
 - detected style ids and names where practical;
 - semantic style mapping for document title, content headings, body, table, list, code, quote, and caption;
@@ -29,6 +29,10 @@ The manifest records:
 Imported packs are stored in the `local-docs-studio-word-templates` IndexedDB database for the current browser profile. They are not uploaded, shared, or added to Markdown Bundle exports.
 
 The ignored `artifacts/word-templates/` path is reserved for optional local/debug copies when developers need to inspect packs. User-imported templates, logos, and generated packs must not be committed.
+
+The Export menu's **Manage** action lists the default fallback and all imported packs. List rendering uses persisted manifest metadata and does not parse DOCX packages. A template can be selected, renamed, or deleted from the management dialog. Renaming updates only manifest display metadata; the stable id, original filename, and self-contained DOCX/model data remain unchanged. Deleting a pack removes its single IndexedDB record, including the preserved package and model data. If the deleted or otherwise unavailable pack was selected, the saved selection is cleared and Word export returns to the default path.
+
+Existing records are migrated in place when they are listed. Missing ids are derived deterministically from available metadata and package bytes, existing ids are preserved, and missing provenance is not fabricated. Older records without the cached model remain exportable because the current package analyser can rebuild that model from the preserved DOCX bytes.
 
 ## Export application
 
@@ -71,7 +75,6 @@ The analyser prefers a representative content table and records its table, grid,
 
 ## Future Enhancements
 
-- Template management actions such as rename, delete, and export pack.
 - Optional explicit selection when a template contains several equally plausible content page masters.
 - Richer template diagnostics and a future inspector for detected semantic mappings.
 - More specialised handling for content controls whose displayed title is not linked to package metadata.

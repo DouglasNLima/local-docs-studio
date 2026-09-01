@@ -382,7 +382,7 @@ Open `index.html` directly from the extracted folder, or upload the ZIP contents
 ## Advanced Import And Export
 
 - **Export PDF** prepares a clean print view and opens the browser print dialogue. Choose **Save as PDF** in the browser to create the file.
-- **Word export templates** let you import a `.docx` as a browser-local template pack, then choose it from the Export menu before creating Word output. Export clones the package as a presentation base, replaces its document body, and preserves the selected content page master, styles, numbering, theme, font table, settings, header/footer variants, relationships, fields, shapes, and referenced media such as logos. Imported packs are stored in IndexedDB for this browser profile; the ignored `artifacts/word-templates/` path is reserved for local/debug copies and must not be committed with user or corporate assets.
+- **Word export templates** let you import a `.docx` as a browser-local template pack, then choose it from the Export menu before creating Word output. Use **Manage** beside the Word template selector to list imported templates, select one, rename it, or delete it. Export clones the package as a presentation base, replaces its document body, and preserves the selected content page master, styles, numbering, theme, font table, settings, header/footer variants, relationships, fields, shapes, and referenced media such as logos. Imported packs are stored in IndexedDB for this browser profile; the ignored `artifacts/word-templates/` path is reserved for local/debug copies and must not be committed with user or corporate assets.
 - **Export Markdown Bundle** creates a ZIP with every loaded `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` file, current in-memory edits, image assets, and `lens-docs-studio-bundle.json` metadata. Enable **Azure DevOps Mermaid syntax** to write Mermaid blocks as `::: mermaid` containers and convert top-level `flowchart` declarations to `graph` for DevOps compatibility.
 - **Export artefact review pack** appears after a valid artefact bundle import and explicitly includes a rebuilt safe `lens-artifact-bundle.json` alongside the normal Markdown Bundle manifest. Generic Markdown Bundle export never includes artefact metadata.
 - **Built-in export profiles** are session-only presets for generic documentation, GitHub Pages docs sites, Azure DevOps Wiki Markdown, and artefact review work. Applying the Azure DevOps Wiki Markdown preset uses a session override and does not write the existing DevOps preference key. Saved local export profiles still use the existing local library storage key.
@@ -393,6 +393,8 @@ Open `index.html` directly from the extracted folder, or upload the ZIP contents
 ### Word Export Templates
 
 Import a corporate or personal `.docx` from **Export > Import Word template**, confirm the display name, then choose it in the **Word template** selector before selecting **Export Word**. The template remains local to the current browser profile and is not uploaded, shared, or added to exported Markdown Bundles.
+
+Use **Export > Manage** to see **No template / Default Word export** alongside every imported template. Each entry shows its selected state, original filename, and import date where available. You can select a template directly, rename its display name without changing its stable identity or stored DOCX package, or delete it after confirmation. Deleting the selected template clears the saved selection and returns Word export to the default styling; missing or stale selections are repaired the same way on reload.
 
 The template pack manifest records the template id, display name, source filename, creation time, detected capabilities, detected style ids/names where practical, and a semantic mapping for document title, headings, body text, tables, lists, code, quotes, and captions. Markdown H1 becomes the document title; H2 becomes the first content-heading level, H3 the next, and so on. If a mapped heading is automatically numbered by Word, a compatible literal Markdown counter is omitted from the exported heading text without changing the source Markdown.
 
@@ -435,14 +437,14 @@ Manual Word template smoke:
 
 1. Add Markdown containing a title, heading 1/2/3, body paragraphs, bullet list, numbered list, table, quote, code block, Mermaid diagram, and optional image.
 2. Open **Export > Documents**.
-3. Import a `.docx` template.
-4. Confirm the template display name.
-5. Select the imported template.
-6. Export Word.
-7. Open or inspect the exported `.docx`.
-8. Confirm there is no Word repair prompt.
-9. Confirm supported styles, header, footer, and logo are present where expected.
-10. Switch back to Default and export again to confirm fallback still works.
+3. Import a `.docx` template and confirm the display name.
+4. Open **Manage** and verify the template, original filename, import date, and selected state.
+5. Import a second template, select the first one, rename it, and confirm the main selector updates immediately.
+6. Reload and verify the renamed selected template is still active.
+7. Export Word, then open or inspect the exported `.docx`.
+8. Confirm there is no Word repair prompt and supported styles, header, footer, and logo are present where expected.
+9. Delete the selected template, confirm the destructive prompt, and verify the second template remains while **No template / Default Word export** becomes selected.
+10. Reload and export again to confirm the deleted template stays gone and default Word export still works.
 
 The HSI/TEKenable corporate document, or any other organisation-provided template, may be used locally for smoke testing only when the tester has permission. It must not be committed, added to generated repository artefacts, uploaded as a release asset, or included in the local dev smoke ZIP.
 
@@ -480,14 +482,13 @@ Manual Windows Word template smoke:
 1. Launch `LensDocsStudio.Windows.exe`.
 2. Add Markdown containing a title, heading 1/2/3, body paragraphs, bullet list, numbered list, table, quote, code block, Mermaid diagram, and optional image.
 3. Open **Export > Documents**.
-4. Import a permitted `.docx` template.
-5. Confirm the template display name.
-6. Select the imported template.
-7. Export Word.
-8. Open or inspect the exported `.docx`.
-9. Confirm no Microsoft Word repair prompt.
-10. Confirm supported styles, header/footer, and logo are present where expected.
-11. Switch back to Default and export Word again to confirm fallback still works.
+4. Import a permitted `.docx` template and confirm the display name.
+5. Open **Manage**, verify the original filename and selected state, then import a second template.
+6. Rename the first template and confirm the selector updates immediately; reload and verify the rename and selection persist.
+7. Export Word and inspect the exported `.docx`.
+8. Confirm no Microsoft Word repair prompt and that supported styles, header/footer, and logo are present where expected.
+9. Delete the selected template after confirmation and verify the second template remains while **No template / Default Word export** is selected.
+10. Reload and export Word again to confirm the deleted template stays gone and default fallback still works.
 
 The HSI/TEKenable corporate document, or any other organisation-provided template, may be used locally for smoke testing only when the tester has permission. It must not be committed, included in generated repository artefacts, uploaded as a release asset, or embedded in the package. Template packs remain browser-profile-local; export selects a detected normal content page master and this ZIP is not a substitute for future release certification.
 
