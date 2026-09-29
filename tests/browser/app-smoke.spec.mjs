@@ -4223,7 +4223,7 @@ test.describe('PWA cache regression', () => {
   await expect(onboardingLink).not.toHaveAttribute('target', '_blank');
   await onboardingLink.click();
   await expect(page.locator('#activeFileLabel')).toContainText('Workspace.md');
-  await expect(page).toHaveURL('http://127.0.0.1:4173/');
+  await expect(page).toHaveURL(new URL('/', test.info().project.use.baseURL).href);
   await modularLink.click();
   await expect(page.locator('#activeFileLabel')).toContainText('README.md');
   expect(context.pages()).toHaveLength(initialPageCount);

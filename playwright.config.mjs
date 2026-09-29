@@ -1,5 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const testPort = Number(process.env.LENS_DOCS_TEST_PORT || 4173);
+const testUrl = `http://127.0.0.1:${testPort}`;
+
 export default defineConfig({
   testDir: './tests/browser',
   timeout: 90_000,
@@ -8,16 +11,16 @@ export default defineConfig({
     timeout: 20_000,
   },
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: testUrl,
     acceptDownloads: true,
     // Avoid exhausting Windows loopback sockets across the full browser suite; opt in where PWA caching is under test.
     serviceWorkers: 'block',
     trace: 'on-first-retry',
   },
   webServer: {
-    // Keep the Windows test server on IPv4 to avoid dual-stack socket aborts during long suites.
-    command: 'python -m http.server 4173 --bind 127.0.0.1',
-    url: 'http://127.0.0.1:4173',
+    // Use a quiet static server to keep long Windows browser suites from exhausting loopback sockets.
+    command: `node tests/static/serve-for-playwright.mjs ${testPort}`,
+    url: testUrl,
     reuseExistingServer: true,
     timeout: 15_000,
   },
