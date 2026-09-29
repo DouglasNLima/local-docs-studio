@@ -10,6 +10,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     acceptDownloads: true,
+    // Avoid exhausting Windows loopback sockets across the full browser suite; opt in where PWA caching is under test.
+    serviceWorkers: 'block',
     trace: 'on-first-retry',
   },
   webServer: {

@@ -4160,7 +4160,10 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   expect(indexPage.html).toContain('href="#second"');
 });
 
-test('an obsolete cached renderer cannot override the current app shell on reload', async ({ page, context }) => {
+test.describe('PWA cache regression', () => {
+  test.use({ serviceWorkers: 'allow' });
+
+  test('an obsolete cached renderer cannot override the current app shell on reload', async ({ page, context }) => {
   await gotoApp(page);
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
 
@@ -4224,6 +4227,7 @@ test('an obsolete cached renderer cannot override the current app shell on reloa
   await modularLink.click();
   await expect(page.locator('#activeFileLabel')).toContainText('README.md');
   expect(context.pages()).toHaveLength(initialPageCount);
+  });
 });
 
 test('the entry module waits for an older service worker to release the page', async ({ page }) => {
