@@ -24,6 +24,7 @@ export function createUiService({
     folderBadge,
     artifactBundleSummary,
     activeFileLabel,
+    activeFileLabelPreview,
     saveButton,
     saveAsButton,
     refreshFileButton,
@@ -310,7 +311,10 @@ export function createUiService({
       const detail = state.activePath ? state.externalChangeDetails?.get(state.activePath) : null;
       const external = state.activePath && state.externalChangePaths.has(state.activePath) ? ` · ${getExternalChangeLabel(detail)}` : '';
       const readOnly = record?.readOnly ? ' · read-only' : '';
-      activeFileLabel.textContent = state.activePath ? `${state.activePath}${dirty}${external}${readOnly}` : 'No file selected';
+      const label = state.activePath ? `${state.activePath}${dirty}${external}${readOnly}` : 'No file selected';
+      [activeFileLabel, activeFileLabelPreview].filter(Boolean).forEach((element) => {
+        element.textContent = label;
+      });
     }
 
     function updateSaveButton() {

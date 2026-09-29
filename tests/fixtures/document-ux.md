@@ -14,6 +14,14 @@ The review panel reports structure, links, tables, code blocks, and diagrams.
 
 This section ensures fourth-level headings appear in the outline.
 
+##### Detailed Check
+
+Fifth-level headings remain available in the outline.
+
+###### Lowest Detail
+
+Sixth-level headings use the same rendered identifier rules.
+
 [External reference](https://example.com)
 
 ```js

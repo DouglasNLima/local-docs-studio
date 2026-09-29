@@ -62,6 +62,7 @@ export function analyseMarkdownGovernance({ records = [], activePath = '' } = {}
       name: record.name || String(record.path).split('/').pop() || record.path,
       path: record.path,
       text: String(record.text || '').replace(/\r\n?/g, '\n'),
+      renderedLinks: Array.isArray(record.renderedLinks) ? record.renderedLinks : null,
     }));
   const issues = [];
 
@@ -139,6 +140,31 @@ function collectInternalLinkIssues(record, { records, lineContexts, lineOffsets,
     scanLink({ raw, target: link.target, label: link.label, index, kind: 'wikilink' });
     return raw;
   });
+
+  if (Array.isArray(record.renderedLinks)) {
+    record.renderedLinks.forEach((link) => {
+      const resolution = link.resolution || {};
+      if (resolution.kind === 'resolved' || resolution.kind === 'external') return;
+      if (resolution.kind === 'unsupported' && resolution.reason === 'unsupported-file-type') return;
+      if (!['unresolved', 'invalid', 'unsupported'].includes(resolution.kind)) return;
+      addIssue({
+        rule: 'internal-links',
+        severity: 'warning',
+        line: link.line || 1,
+        column: link.column || 1,
+        length: Math.max(1, String(link.label || link.target || '').length),
+        message: `Broken internal link "${link.label || link.target}".`,
+        suggestion: resolution.reason === 'missing-relative-context'
+          ? 'Open a folder or import the complete ZIP pack before resolving relative document links.'
+          : resolution.reason === 'different-origin'
+            ? 'Open the source and target from the same folder or ZIP pack instead of relating separate file origins.'
+          : ['outside-workspace-root', 'source-outside-root', 'absolute-path'].includes(resolution.reason)
+            ? 'Use a relative path that stays inside the authorised workspace root.'
+            : 'Load the exact target path with matching capitalisation or update the link target.',
+      });
+    });
+    return;
+  }
 
   source.replace(markdownLinkPattern, (raw, label, href, index) => {
     if (raw.startsWith('!')) return raw;

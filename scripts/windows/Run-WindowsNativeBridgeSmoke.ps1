@@ -12,6 +12,7 @@ $solutionPath = Join-Path $repoRoot 'src\windows\LensDocsStudio.Windows.sln'
 $projectPath = Join-Path $repoRoot 'src\windows\LensDocsStudio.Windows\LensDocsStudio.Windows.csproj'
 $smokeRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("lens-docs-studio-native-smoke-{0}" -f ([guid]::NewGuid().ToString('N')))
 $resultPath = Join-Path $smokeRoot 'smoke-result.json'
+$previousWebViewUserDataFolder = [System.Environment]::GetEnvironmentVariable('WEBVIEW2_USER_DATA_FOLDER', 'Process')
 $expectedSingleFile = "# Windows Smoke Single File`n`nSaved by the automated native bridge smoke.`n"
 $expectedStartupFile = "# Windows Smoke Startup File`n`nSaved by the automated native bridge smoke.`n"
 $expectedSaveAs = "# Windows Smoke Save As`n`nWritten by the automated native bridge smoke.`n"
@@ -86,6 +87,7 @@ try {
 
     $exePath = Get-WindowsShellExecutable
     Write-SmokeLine "Launching $exePath"
+    [System.Environment]::SetEnvironmentVariable('WEBVIEW2_USER_DATA_FOLDER', (Join-Path $smokeRoot 'webview2-profile'), 'Process')
     $process = Start-Process -FilePath $exePath -ArgumentList @(
         '--smoke-native-bridge',
         '--smoke-root',
@@ -93,7 +95,7 @@ try {
         '--smoke-timeout-seconds',
         [string]$TimeoutSeconds,
         (Join-Path $smokeRoot 'startup-file.md')
-    ) -PassThru
+    ) -PassThru -WindowStyle Hidden
 
     $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
     while ((Get-Date) -lt $deadline) {
@@ -168,7 +170,15 @@ catch {
 }
 finally {
     Stop-SmokeProcess -Process $process
+    [System.Environment]::SetEnvironmentVariable('WEBVIEW2_USER_DATA_FOLDER', $previousWebViewUserDataFolder, 'Process')
     if (-not $KeepSmokeRoot -and (Test-Path -LiteralPath $smokeRoot)) {
-        Remove-Item -LiteralPath $smokeRoot -Recurse -Force -ErrorAction SilentlyContinue
+        $resolvedSmokeRoot = (Resolve-Path -LiteralPath $smokeRoot -ErrorAction Stop).Path
+        $resolvedTempRoot = [System.IO.Path]::GetFullPath([System.IO.Path]::GetTempPath()).TrimEnd([System.IO.Path]::DirectorySeparatorChar)
+        $expectedPrefix = $resolvedTempRoot + [System.IO.Path]::DirectorySeparatorChar
+        $isExpectedSmokeRoot = $resolvedSmokeRoot.StartsWith($expectedPrefix, [System.StringComparison]::OrdinalIgnoreCase) -and
+            ([System.IO.Path]::GetFileName($resolvedSmokeRoot) -match '^lens-docs-studio-native-smoke-[a-f0-9]{32}$')
+        if ($isExpectedSmokeRoot) {
+            Remove-Item -LiteralPath $resolvedSmokeRoot -Recurse -Force -ErrorAction SilentlyContinue
+        }
     }
 }

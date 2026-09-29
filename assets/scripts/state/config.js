@@ -60,6 +60,8 @@ export function createInitialState({ readStoredNumber }) {
     workspaceDirectoryHandle: null,
     nativeWorkspaceId: '',
     workspaceKind: '',
+    workspaceRootPath: '',
+    workspacePathContextId: '',
     selectedTreeFolderPath: '',
     renderId: 0,
     debounceId: 0,

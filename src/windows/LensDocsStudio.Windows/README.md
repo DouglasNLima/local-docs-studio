@@ -232,7 +232,7 @@ Optional flags:
 pwsh -NoLogo -NoProfile -File scripts/windows/Run-WindowsNativeBridgeSmoke.ps1 -NoBuild -TimeoutSeconds 90
 ```
 
-The script creates a temporary smoke root with a startup Markdown file, a single Markdown fixture, and a small workspace. It builds the shell unless `-NoBuild` is passed, launches the executable with `--smoke-native-bridge --smoke-root "<temp-folder>" "<temp-folder>\startup-file.md"`, waits for `smoke-result.json`, validates the changed startup and fixture files, and returns a non-zero exit code if any assertion fails.
+The script creates a temporary smoke root with an isolated WebView2 profile, a startup Markdown file, a single Markdown fixture, and a small workspace. It builds the shell unless `-NoBuild` is passed, launches the executable with `--smoke-native-bridge --smoke-root "<temp-folder>" "<temp-folder>\startup-file.md"`, waits for `smoke-result.json`, validates the changed startup and fixture files, and returns a non-zero exit code if any assertion fails. It leaves the normal WebView2 profile untouched.
 
 The smoke harness does not automate native picker UI. Instead, the host exposes `smoke.nativeFixtures`, `smoke.workspaceChange`, and the `lensDocs.native.smoke.*` messages only when the smoke flag is present. Those fixture messages are fail-closed, root-bound to `--smoke-root`, and do not expose usernames, machine names, environment variables, unrestricted browsing, shell commands, or arbitrary host operations. Normal launches do not show smoke controls or smoke capabilities.
 

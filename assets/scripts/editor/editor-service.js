@@ -568,6 +568,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         codeBlock: () => insertBlock('```\n', '\n```', 'code'),
         mermaidBlock: () => insertBlock('```mermaid\n', '\n```', 'flowchart LR\n  A[Start] --> B[Finish]'),
         link: insertLink,
+        documentLink: () => commandHandlers.documentLink?.(),
         image: insertImage,
         horizontalRule: insertHorizontalRule,
         table: () => {

@@ -114,6 +114,9 @@ for (const filePath of moduleFiles) {
 const index = readRootFile('index.html');
 if (!index.includes('./assets/styles/app.css')) fail('index.html does not load app.css');
 if (!index.includes('./assets/scripts/main.js')) fail('index.html does not load main.js');
+const cacheRevision = serviceWorker.match(/const CACHE_NAME = 'lens-docs-studio-v(\d+)'/)?.[1];
+const shellRevision = index.match(/src="\.\/assets\/scripts\/main\.js\?shell=(\d+)"/)?.[1];
+if (!cacheRevision || shellRevision !== cacheRevision) fail('The app entry revision must match the service worker cache revision');
 if (!index.includes('./manifest.webmanifest')) fail('index.html does not load manifest.webmanifest');
 if (!index.includes('Content-Security-Policy')) fail('index.html must define a Content-Security-Policy meta tag');
 if (!index.includes(`<title>${productBrowserTitle}</title>`)) fail('index.html must include the Lens Docs Studio browser title with version and build');
@@ -127,7 +130,7 @@ if (index.includes('Local Docs Studio') || index.includes('Local Markdown, Merma
 
 const localReferencePattern = /\b(?:href|src)=["'](\.\/[^"']+)["']/g;
 for (const match of index.matchAll(localReferencePattern)) {
-  assertLocalFileExists(match[1], 'index.html local asset');
+  assertLocalFileExists(match[1].split(/[?#]/)[0], 'index.html local asset');
 }
 
 const runtimeExternalReferencePatterns = [

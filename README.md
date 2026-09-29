@@ -311,11 +311,15 @@ The editor stays buildless and native, using a `textarea` with a synchronised li
 - **Mermaid autocomplete** appears with `Ctrl/Cmd+Space` in Mermaid files or Mermaid fenced blocks, and can also open from Mermaid-like line prefixes. Use arrow keys, `Enter` or `Tab` to insert a snippet, and `Escape` to close it.
 - **Mermaid validation** runs before each diagram render. Fenced Mermaid blocks and Azure DevOps `::: mermaid` blocks are both accepted. Invalid diagrams show a localised error with copy/jump actions while the rest of the Markdown continues rendering.
 - **Progress bar** in the editor toolbar opens a small dialogue for text, percentage, and preset colour, then inserts semantic HTML that renders in the preview and exports.
+- **Document link** beside the standard Link command searches loaded documents by title, filename, or path, offers their rendered headings and explicit anchors, previews an exact relative Markdown link, and inserts it as one Undo operation. It uses selected editor text when available and stays disabled for read-only documents.
 - **Rich insert helpers** add emoji, callouts, status badges, collapsible details, captioned image figures, keyboard shortcuts, and anchors from compact dialogues.
 - **Paste Special** in the Edit menu can paste clipboard content as a Markdown table, plain text, fenced code block, quote, Markdown-converted HTML, list, checklist, numbered list, or Mermaid block. Regular paste automatically converts formatted HTML into Markdown and keeps spreadsheet tables as Markdown tables when the clipboard provides HTML table or tab-separated text; plain text stays plain, and **Paste as text** forces unformatted text.
 - **Image drag-and-drop** on the editor inserts Markdown such as `![diagram](assets/images/diagram.png)`. The Markdown file save-back writes the link text only; the image binaries live in the browser session and are embedded or bundled when you export. User-supplied SVG images are blocked as assets for security; rendered Mermaid diagrams can still be exported as SVG.
 - **Manage assets** in the View menu shows session images, usage counts, rename controls that update editable Markdown references, and removal for unused assets.
 - **Create snapshot** and **Manage snapshots** in the File menu store explicit browser-local document versions separately from automatic draft recovery.
+- Rendered relative Markdown links navigate exact, case-sensitive documents inside the current folder or imported ZIP instead of leaving the app. Resolution starts from the source document's directory, supports safe `./`, `../`, query/fragment separation, rendered heading IDs, and explicit anchors, and rejects paths outside the workspace, absolute/UNC paths, dangerous schemes, and malformed encodings. HTTP/HTTPS, `mailto:`, `tel:`, and protocol-relative links remain external.
+- **Back** and **Forward** beside the active document name restore document, section, preview position, and editor context for the current workspace. This session history is separate from Undo and browser history, records successful sidebar/link/section navigation, drops its Forward branch after a new navigation, and clears with the workspace.
+- Relative document navigation and generated links require a known shared workspace relationship. Open a folder or import the complete ZIP rather than relying on filenames from unrelated loose files; conventional Markdown links never use wikilink-style approximate matching.
 
 ## Local Content Studios
 
@@ -555,6 +559,7 @@ npx playwright install chromium
 npm test
 ```
 
+- `npm run test:unit` checks document link resolution, generated destinations, and service worker cache behaviour.
 - `npm run test:static` checks module syntax, relative imports, service worker cache assets, and the public shell.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Test-WindowsStaticAssets.ps1` checks the Windows `StaticApp/` output for complete packaged offline assets and unexpected runtime external dependencies.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/New-LocalDevSmokeZip.ps1` creates an ignored browser-only local development smoke ZIP under `artifacts/windows/local-dev-smoke/` for manual Word template MVP validation; `scripts/windows/Test-LocalDevSmokeZip.ps1` validates its packaging contract and key include/exclude rules.
@@ -564,6 +569,7 @@ npm test
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Build-WindowsInnoInstaller.ps1` builds the internal unsigned Inno Setup installer MVP from the certified Windows package output, or reports `INNO_INSTALLER_MVP_BLOCKED_INNO_SETUP_NOT_INSTALLED` when Inno Setup is missing.
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun` prepares the GitHub Release ZIP artefact set, checksum, release notes, and draft prerelease `gh release create` command without publishing.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
+- To validate an owner-supplied documentation pack without adding it to the repository, set `LENS_DOCS_REAL_PACK_ZIP` and `LENS_DOCS_REAL_PACK_FOLDER` to its local ZIP and extracted document folder, then run `npx playwright test tests/browser/real-pack-local.spec.mjs`. Set `LENS_DOCS_LOCAL_APP_URL` to a local subpath URL when checking GitHub Pages style hosting. These two tests are skipped when the corresponding source is unavailable.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
 
 ## Browser Support

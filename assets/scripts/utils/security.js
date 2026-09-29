@@ -26,6 +26,7 @@ const renderedHtmlAttributes = [
   'data-line',
   'data-doc-path',
   'data-wikilink-target',
+  'data-wikilink-token',
 ];
 
 const forbiddenHtmlTags = [
@@ -318,7 +319,7 @@ function scrubUnsafeUrls(root, { allowDataImages = true } = {}) {
 function isSafeLinkUrl(value) {
   const url = String(value || '').trim();
   if (!url) return false;
-  return /^(https?:|mailto:|#|\.?\.?\/|[^:?#/][^:]*$)/i.test(url);
+  return /^(https?:|mailto:|tel:|\/\/|#|\.?\.?\/|[^:?#/][^:]*$)/i.test(url);
 }
 
 function isSafeImageUrl(value, allowDataImages) {

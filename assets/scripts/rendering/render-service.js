@@ -6,6 +6,12 @@ import { sanitizeMermaidSvg, sanitizeRenderedHtml } from '../utils/security.js';
 import { createWikilinkExtension } from '../utils/wikilinks.js';
 import { createMathExtensions } from '../utils/math.js';
 import { parseFrontMatter, stripFrontMatter } from '../utils/front-matter.js';
+import {
+  classifyDocumentHref,
+  getTrustedPreviewInternalLink,
+  trustPreviewInternalLink,
+} from '../utils/document-links.js';
+import { prepareDocumentSections } from '../document/document-sections.js';
 
 const MERMAID_MODULE_PATH = '../../vendor/mermaid-11.15.0.esm.min.js';
 const MERMAID_IMPORT_RETRIES = 2;
@@ -47,6 +53,7 @@ export function createRenderingService({
   let katex = null;
   let mermaidPromise = null;
   let mermaid = null;
+  let currentWikilinkTrustToken = '';
 
   async function loadMarked() {
     if (!markedPromise) {
@@ -61,7 +68,9 @@ export function createRenderingService({
         });
         marked.use({
           extensions: [
-            createWikilinkExtension(),
+            createWikilinkExtension({
+              getTrustToken: () => currentWikilinkTrustToken,
+            }),
             ...createMathExtensions({
               renderMath: katexRenderer
                 ? (source, displayMode) => katexRenderer.renderToString(source, {
@@ -289,22 +298,35 @@ export function createRenderingService({
         setStatus('Rendering...');
         setExportTrust('', '');
 
+        const wikilinkTrustToken = selectedMode === 'mermaid' ? '' : createPreviewLinkTrustToken();
         const dirtyHtml = selectedMode === 'mermaid'
           ? buildMermaidOnlyHtml(source)
-          : await buildMarkdownHtml(source);
+          : await buildMarkdownHtml(source, { wikilinkTrustToken });
+
+        if (renderId !== state.renderId) {
+          return { ok: false, cancelled: true, diagramErrors: 0 };
+        }
 
         const renderedHtml = sanitizeRenderedHtml(dirtyHtml);
         const modeBanner = buildModeBanner(source, selectedMode);
         const previewHtml = `${modeBanner}${renderedHtml}`;
         beforePreviewRender?.();
         preview.innerHTML = state.docsPreview ? buildDocsPreviewShell(previewHtml) : previewHtml;
+        markTrustedPreviewLinks(preview, wikilinkTrustToken);
+        prepareDocumentSections(preview.querySelector('.docs-site-content') || preview);
         hydrateManagedAssetImages(preview);
         prepareTableBlocksIn(preview);
 
         preview.querySelectorAll('a[href]').forEach((anchor) => {
-          if (anchor.dataset.docPath || anchor.dataset.wikilinkTarget) return;
-          anchor.setAttribute('target', '_blank');
-          anchor.setAttribute('rel', 'noopener noreferrer');
+          if (getTrustedPreviewInternalLink(anchor)) return;
+          const classification = classifyDocumentHref(anchor.getAttribute('href') || '');
+          if (classification.kind === 'external') {
+            anchor.setAttribute('target', '_blank');
+            anchor.setAttribute('rel', 'noopener noreferrer');
+          } else {
+            anchor.removeAttribute('target');
+            anchor.removeAttribute('rel');
+          }
         });
 
         const diagrams = [...preview.querySelectorAll('.mermaid')];
@@ -343,14 +365,66 @@ export function createRenderingService({
       }
     }
 
-    async function buildMarkdownHtml(source) {
+    async function buildMarkdownHtml(source, { wikilinkTrustToken = '' } = {}) {
       const parsed = parseFrontMatter(source);
       const cleaned = normaliseDevOpsMermaidBlocks(parsed.body);
       await preloadHighlightForSource(cleaned);
       const marked = await loadMarked();
-      const tokens = marked.lexer(cleaned);
-      assignLineNumbers(tokens, cleaned, parsed.lineOffset);
-      return marked.parser(tokens);
+      currentWikilinkTrustToken = wikilinkTrustToken;
+      try {
+        const tokens = marked.lexer(cleaned);
+        assignLineNumbers(tokens, cleaned, parsed.lineOffset);
+        return marked.parser(tokens);
+      } finally {
+        currentWikilinkTrustToken = '';
+      }
+    }
+
+    async function inspectMarkdownDocument(source, fileName = '') {
+      const selectedMode = resolveModeFor(source, fileName);
+      if (selectedMode === 'mermaid') {
+        return { title: '', sections: [], links: [] };
+      }
+      const wikilinkTrustToken = createPreviewLinkTrustToken();
+      const html = sanitizeRenderedHtml(await buildMarkdownHtml(source, { wikilinkTrustToken }));
+      const template = document.createElement('template');
+      template.innerHTML = html;
+      const sections = prepareDocumentSections(template.content);
+      const title = template.content.querySelector('h1')?.textContent?.replace(/\s+/g, ' ').trim() || '';
+      const links = [...template.content.querySelectorAll('a[href]')]
+        .filter((anchor) => anchor.getAttribute('data-wikilink-token') !== wikilinkTrustToken)
+        .map((anchor) => ({
+          href: anchor.getAttribute('href') || '',
+          label: anchor.textContent?.replace(/\s+/g, ' ').trim() || '',
+          line: Number(anchor.closest('[data-line]')?.dataset.line || '1'),
+        }));
+      return { title, sections, links };
+    }
+
+    function markTrustedPreviewLinks(root, wikilinkTrustToken) {
+      root.querySelectorAll('a[data-wikilink-token]').forEach((anchor) => {
+        if (wikilinkTrustToken && anchor.getAttribute('data-wikilink-token') === wikilinkTrustToken) {
+          trustPreviewInternalLink(anchor, {
+            kind: 'wikilink',
+            target: anchor.getAttribute('data-wikilink-target') || '',
+          });
+        }
+        anchor.removeAttribute('data-wikilink-token');
+      });
+
+      const docsNavigation = root.querySelector(':scope > .docs-site-preview > .docs-site-nav');
+      docsNavigation?.querySelectorAll('a[data-doc-path]').forEach((anchor) => {
+        trustPreviewInternalLink(anchor, {
+          kind: 'document',
+          target: anchor.getAttribute('data-doc-path') || '',
+        });
+      });
+    }
+
+    function createPreviewLinkTrustToken() {
+      const bytes = new Uint32Array(4);
+      globalThis.crypto?.getRandomValues?.(bytes);
+      return `link-${[...bytes].map((value) => value.toString(16).padStart(8, '0')).join('')}`;
     }
 
     async function preloadHighlightForSource(source) {
@@ -908,6 +982,7 @@ export function createRenderingService({
     return {
       renderPreview,
       buildMarkdownHtml,
+      inspectMarkdownDocument,
       buildMermaidOnlyHtml,
       renderMermaidDiagrams,
       prepareDiagramFramesIn,

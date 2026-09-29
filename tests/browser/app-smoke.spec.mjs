@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { createArtifactBundleFixtureZip } from './helpers/fixtures.mjs';
+import { createArtifactBundleFixtureZip, createDocumentNavigationFixtureZip } from './helpers/fixtures.mjs';
 import { createZipBuffer, getZipText, readZipEntries } from './helpers/zip.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -237,6 +237,12 @@ async function writeZipFixture(testInfo, name, files) {
 async function writeArtifactBundleFixtureZip(testInfo, fixtureName, name = `${fixtureName}.zip`) {
   const zipPath = testInfo.outputPath(name);
   await writeFile(zipPath, await createArtifactBundleFixtureZip(fixtureName));
+  return zipPath;
+}
+
+async function writeDocumentNavigationFixtureZip(testInfo, name = 'document-navigation.zip') {
+  const zipPath = testInfo.outputPath(name);
+  await writeFile(zipPath, await createDocumentNavigationFixtureZip());
   return zipPath;
 }
 
@@ -1355,7 +1361,7 @@ test('root loads the buildless app shell', async ({ page }) => {
   await expect(page.locator('.brand-mark')).not.toHaveText('LD');
   await expect(page.locator('body')).not.toContainText('Review Markdown, Mermaid, and evidence artefacts from the Power Platform Lens family.');
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
-  await expect(page.locator('script[type="module"][src$="/assets/scripts/main.js"]')).toHaveCount(1);
+  await expect(page.locator('script[type="module"][src*="/assets/scripts/main.js?shell="]')).toHaveCount(1);
   await expect(page.locator('link[rel="stylesheet"][href$="/assets/styles/app.css"]')).toHaveCount(1);
 
   const brandColour = await page.locator('.brand-mark').evaluate((element) => getComputedStyle(element).color);
@@ -2297,8 +2303,8 @@ test('welcome Open folder uses the packaged native bridge route without browser 
 
   await page.locator('.welcome-state').getByRole('button', { name: 'Open folder' }).click();
 
-  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
-  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeMessages
+    .some((message) => message.type === 'lensDocs.native.openFolder'))).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
   await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
   await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
@@ -2640,7 +2646,9 @@ test('fake WebView2 bridge handles cancelled and malformed native file responses
   await page.locator('summary').filter({ hasText: /^File$/ }).click();
   await page.getByRole('button', { name: 'New Markdown file' }).click();
   await submitAppDialog(page, { button: 'Create file' });
+  await expect(page.locator('#status')).toHaveText('Blank Markdown document ready.');
   await page.locator('#editor').fill('# Draft\n');
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
   await page.evaluate(() => {
     window.__nativeBridgeScenario.saveFileAs = 'cancelled';
   });
@@ -3880,7 +3888,7 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
 
 test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
   await gotoApp(page);
-  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(23);
+  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(24);
   await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(5);
 
   const cases = [
@@ -3930,7 +3938,7 @@ test('emoji picker search includes expanded documentation emojis', async ({ page
   await page.getByRole('button', { name: 'Insert emoji' }).click();
 
   await expect(page.locator('#editor')).toHaveValue('🛡️');
-  await expect(page.locator('#status')).toHaveText(/Emoji inserted/);
+  await expect(page.locator('#status')).toHaveText(/Emoji inserted|Rendered/);
 });
 
 test('table toolbar opens a visual editor for new and existing Markdown tables', async ({ page }) => {
@@ -4152,6 +4160,498 @@ test('wikilinks navigate, backlinks appear in review, and Docs Site export strip
   expect(indexPage.html).toContain('href="#second"');
 });
 
+test('an obsolete cached renderer cannot override the current app shell on reload', async ({ page, context }) => {
+  await gotoApp(page);
+  await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
+
+  const cachedRendererUrl = await page.evaluate(async () => {
+    const cacheName = (await caches.keys()).find((name) => name.startsWith('lens-docs-studio-v'));
+    if (!cacheName) throw new Error('The app shell cache was not created.');
+    const rendererUrl = new URL('./assets/scripts/rendering/render-service.js', location.href).href;
+    const cache = await caches.open(cacheName);
+    await cache.put(rendererUrl, new Response([
+      'throw new Error("Obsolete cached renderer should not execute.");',
+      'export function createRenderService() {}',
+    ].join('\n'), {
+      headers: { 'Content-Type': 'text/javascript' },
+    }));
+    return rendererUrl;
+  });
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+  await expect.poll(() => page.evaluate(async (url) => {
+    const cacheName = (await caches.keys()).find((name) => name.startsWith('lens-docs-studio-v'));
+    const response = cacheName ? await (await caches.open(cacheName)).match(url) : null;
+    return response ? (await response.text()).includes('classifyDocumentHref') : false;
+  }, cachedRendererUrl)).toBe(true);
+
+  await page.evaluate(() => {
+    const transfer = new DataTransfer();
+    [
+      ['Workspace.md', [
+        '# Workspace guide',
+        '',
+        '[Modular documentation](README.md)',
+        '',
+        '[Onboarding](#chapter-01)',
+        '',
+        '<a id="chapter-01"></a>',
+        '',
+        '# Onboarding',
+      ].join('\n')],
+      ['README.md', '# Modular documentation\n'],
+    ].forEach(([name, content]) => {
+      const file = new File([content], name, { type: 'text/markdown' });
+      Object.defineProperty(file, 'webkitRelativePath', { value: `Cache regression/${name}` });
+      transfer.items.add(file);
+    });
+    const input = document.querySelector('#folderInput');
+    Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  await page.locator('#fileList [data-path="Cache regression/Workspace.md"]').click();
+  await expect(page.locator('#activeFileLabel')).toContainText('Workspace.md');
+  const initialPageCount = context.pages().length;
+  const modularLink = page.getByRole('link', { name: 'Modular documentation' });
+  const onboardingLink = page.getByRole('link', { name: 'Onboarding', exact: true });
+  await expect(modularLink).not.toHaveAttribute('target', '_blank');
+  await expect(onboardingLink).not.toHaveAttribute('target', '_blank');
+  await onboardingLink.click();
+  await expect(page.locator('#activeFileLabel')).toContainText('Workspace.md');
+  await expect(page).toHaveURL('http://127.0.0.1:4173/');
+  await modularLink.click();
+  await expect(page.locator('#activeFileLabel')).toContainText('README.md');
+  expect(context.pages()).toHaveLength(initialPageCount);
+});
+
+test('the entry module waits for an older service worker to release the page', async ({ page }) => {
+  await page.addInitScript(() => {
+    const events = new EventTarget();
+    const sequence = [];
+    const registration = {
+      installing: null,
+      waiting: null,
+      async update() {
+        sequence.push('update-started');
+        this.installing = {};
+        window.setTimeout(() => {
+          serviceWorker.controller = { version: 'current' };
+          this.installing = null;
+          sequence.push('controller-changed');
+          events.dispatchEvent(new Event('controllerchange'));
+        }, 30);
+        return this;
+      },
+    };
+    const serviceWorker = {
+      controller: { version: 'previous' },
+      async getRegistration() { return registration; },
+      async register() { return registration; },
+      addEventListener: events.addEventListener.bind(events),
+      removeEventListener: events.removeEventListener.bind(events),
+    };
+    Object.defineProperty(navigator, 'serviceWorker', { configurable: true, value: serviceWorker });
+    window.__serviceWorkerStartupSequence = sequence;
+  });
+
+  await gotoApp(page);
+  await expect.poll(() => page.evaluate(() => window.__serviceWorkerStartupSequence)).toEqual([
+    'update-started',
+    'controller-changed',
+  ]);
+  await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+});
+
+test('workspace Markdown links navigate documents and sections without HTTP escape and preserve reading history', async ({ page, context }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo);
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  await expect(page.locator('#status')).toHaveText(/Imported 5 documents from ZIP/, { timeout: 20_000 });
+
+  const onboardingPath = 'Documentation Pack/Onboarding.md';
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  const sourcesPath = 'Documentation Pack/reference/Sources-and-Assurance.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+
+  const escapedRequests = [];
+  page.on('request', (request) => {
+    const pathname = new URL(request.url()).pathname;
+    if (/\/(?:docs|reference)\/.*\.(?:md|markdown)$/i.test(pathname) && !pathname.endsWith('/docs/tool-guide.md')) {
+      escapedRequests.push(request.url());
+    }
+  });
+  const initialPageCount = context.pages().length;
+  const developerLink = page.getByRole('link', { name: 'Developer integration', exact: true });
+  await expect(developerLink).not.toHaveAttribute('target', '_blank');
+  await expect(page.getByRole('link', { name: 'External Markdown' })).toHaveAttribute('target', '_blank');
+
+  const onboardingSelectionStart = await page.locator('#editor').evaluate((editor) => {
+    const start = editor.value.indexOf('Workspace overview');
+    editor.setSelectionRange(start, start + 'Workspace overview'.length);
+    return start;
+  });
+  await developerLink.click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await expect(page.locator(`#fileList [data-path="${developerPath}"]`)).toHaveClass(/active/);
+
+  await page.getByRole('link', { name: 'Platform note P03' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#preview #p03')).toHaveCount(1);
+  await expect.poll(() => page.locator('#preview').evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${developerPath}`);
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
+  await expect(page.locator('#editor')).toHaveJSProperty('selectionStart', onboardingSelectionStart);
+
+  await page.locator('#documentForwardButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await expect(page.locator('#status')).toContainText(`Forward to ${developerPath}`);
+  await page.locator('#documentForwardButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#status')).toContainText(`Forward to ${sourcesPath}`);
+  await expect.poll(() => page.locator('#preview').evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+
+  await page.locator('[data-layout-mode="preview"]').click();
+  await expect(page.locator('#app')).toHaveClass(/layout-preview/);
+  await expect(page.locator('#activeFileLabelPreview')).toContainText(sourcesPath);
+  await expect(page.locator('#previewDocumentBackButton')).toBeVisible();
+  await page.locator('#previewDocumentBackButton').click();
+  await expect(page.locator('#activeFileLabelPreview')).toContainText(developerPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${developerPath}`);
+  await expect(page.locator('#app')).toHaveClass(/layout-preview/);
+  await page.locator('#previewDocumentForwardButton').click();
+  await expect(page.locator('#activeFileLabelPreview')).toContainText(sourcesPath);
+  await expect(page.locator('#status')).toContainText(`Forward to ${sourcesPath}`);
+
+  expect(context.pages()).toHaveLength(initialPageCount);
+  expect(escapedRequests).toEqual([]);
+});
+
+test('an extracted folder keeps its root identity while resolving document and explicit-anchor links', async ({ page }) => {
+  await gotoApp(page);
+  await page.locator('#folderInput').setInputFiles(fixturePath('document-navigation/workspace'));
+
+  const onboardingPath = 'workspace/Onboarding.md';
+  const developerPath = 'workspace/docs/02-Developer-Integration.md';
+  const sourcesPath = 'workspace/reference/Sources-and-Assurance.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await page.getByRole('link', { name: 'Developer integration', exact: true }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await page.getByRole('link', { name: 'Platform note P03' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#preview #p03')).toHaveCount(1);
+});
+
+test('separately added files do not gain pack-relative identity or clear workspace history', async ({ page }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo, 'document-navigation-separate-origin.zip');
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+
+  const onboardingPath = 'Documentation Pack/Onboarding.md';
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+  await page.getByRole('link', { name: 'Developer integration', exact: true }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+
+  await page.evaluate(() => {
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([
+      '# Loose source\n\n[Pack onboarding](Documentation%20Pack/Onboarding.md)\n',
+    ], 'Loose.md', { type: 'text/markdown' }));
+    const input = document.querySelector('#fileInput');
+    input.dataset.mode = 'add';
+    Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  await expect(page.locator('#activeFileLabel')).toContainText('Loose.md');
+  await expect(page.locator('#documentBackButton')).toHaveAttribute('title', `Back to ${developerPath}`);
+
+  await page.getByRole('link', { name: 'Pack onboarding' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('Loose.md');
+  await expect(page.locator('#status')).toContainText('no shared relative workspace context');
+
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${developerPath}`);
+  await page.getByRole('button', { name: 'Document link' }).click();
+  await page.locator('#documentLinkSearchInput').fill('Loose');
+  await expect(page.locator('#documentLinkResults [data-document-path="Loose.md"]')).toHaveCount(0);
+  await expect(page.locator('#documentLinkResults')).toContainText('No loaded document matches this search');
+  await page.locator('#documentLinkCancelButton').click();
+});
+
+test('modified clicks, keyboard activation, and unresolved paths stay inside the workspace', async ({ page, context }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo, 'document-navigation-modifiers.zip');
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  const onboardingPath = 'Documentation Pack/Onboarding.md';
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  const validationPath = 'Documentation Pack/docs/12-Deployment-and-Validation.md';
+  const sourcesPath = 'Documentation Pack/reference/Sources-and-Assurance.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+  const initialPageCount = context.pages().length;
+
+  await page.getByRole('link', { name: 'Missing document' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText('exact file is not loaded');
+  await page.getByRole('link', { name: 'Wrong capitalisation' }).click();
+  await expect(page.locator('#status')).toContainText(`did you mean ${developerPath}`);
+  await page.getByRole('link', { name: 'Outside workspace' }).click();
+  await expect(page.locator('#status')).toContainText('outside the authorised workspace root');
+
+  await page.getByRole('link', { name: 'Native validation' }).click({ modifiers: ['Control'] });
+  await expect(page.locator('#activeFileLabel')).toContainText(validationPath);
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
+
+  await page.getByRole('link', { name: 'Source authority' }).click({ button: 'middle' });
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#documentBackButton')).toHaveAttribute('title', `Back to ${onboardingPath}`);
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
+
+  const referenceLink = page.getByRole('link', { name: 'Developer integration reference' });
+  await referenceLink.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
+  await page.getByRole('link', { name: 'Native validation' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(validationPath);
+  await expect(page.locator('#documentForwardButton')).toBeDisabled();
+  expect(context.pages()).toHaveLength(initialPageCount);
+});
+
+test('document-authored data attributes cannot authorise workspace navigation', async ({ page }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo, 'document-navigation-untrusted-data.zip');
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  const onboardingPath = 'Documentation Pack/Onboarding.md';
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+
+  await setEditorValueAndSelection(page, `# Untrusted attributes
+
+<a href="#" data-doc-path="${developerPath}">Forged document action</a>
+
+<a href="#" class="wikilink" data-wikilink-target="docs/02-Developer-Integration.md">Forged wikilink action</a>
+
+[[docs/02-Developer-Integration.md|Genuine wikilink]]`);
+  await renderPreviewWithShortcut(page);
+
+  await page.getByRole('link', { name: 'Forged document action' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await page.getByRole('link', { name: 'Forged wikilink action' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await page.getByRole('link', { name: 'Genuine wikilink' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+});
+
+test('a newer document selection wins a slow read and a failed read preserves the current document', async ({ page }) => {
+  await gotoApp(page);
+  await page.evaluate(() => {
+    const originalText = File.prototype.text;
+    File.prototype.text = function readTestFile() {
+      if (this.name === '20-slow.md') {
+        return new Promise((resolve) => window.setTimeout(() => resolve('# Slow document\n'), 250));
+      }
+      if (this.name === '40-broken.md') {
+        return Promise.reject(new Error('Synthetic read failure'));
+      }
+      return originalText.call(this);
+    };
+
+    const transfer = new DataTransfer();
+    [
+      ['10-home.md', '# Home document\n'],
+      ['20-slow.md', '# Slow document\n'],
+      ['30-fast.md', '# Fast document\n'],
+      ['40-broken.md', '# Broken document\n'],
+    ].forEach(([name, content]) => {
+      const file = new File([content], name, { type: 'text/markdown' });
+      Object.defineProperty(file, 'webkitRelativePath', { value: `Race workspace/${name}` });
+      transfer.items.add(file);
+    });
+    const input = document.querySelector('#folderInput');
+    Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+
+  await expect(page.locator('#activeFileLabel')).toContainText('Race workspace/10-home.md');
+  await page.evaluate(() => {
+    document.querySelector('#fileList [data-path="Race workspace/20-slow.md"]')?.click();
+    document.querySelector('#fileList [data-path="Race workspace/30-fast.md"]')?.click();
+  });
+  await expect(page.locator('#activeFileLabel')).toContainText('Race workspace/30-fast.md');
+  await page.waitForTimeout(350);
+  await expect(page.locator('#activeFileLabel')).toContainText('Race workspace/30-fast.md');
+  await expect(page.locator('#editor')).toHaveValue('# Fast document\n');
+
+  await page.locator('#fileList [data-path="Race workspace/40-broken.md"]').click();
+  await expect(page.locator('#status')).toHaveText('Could not open 40-broken.md.');
+  await expect(page.locator('#activeFileLabel')).toContainText('Race workspace/30-fast.md');
+  await expect(page.locator('#editor')).toHaveValue('# Fast document\n');
+});
+
+test('a delayed syntax module cannot replace a newer preview render', async ({ page }) => {
+  let releaseHighlight;
+  await page.route('**/assets/vendor/highlight-11.11.1.esm.js', async (route) => {
+    await new Promise((resolve) => { releaseHighlight = resolve; });
+    await route.continue();
+  });
+
+  await gotoApp(page);
+  await page.locator('#editor').fill('```javascript\nconst oldPreview = true;\n```');
+  await expect.poll(() => Boolean(releaseHighlight)).toBe(true);
+
+  await page.locator('#editor').fill('# Newest preview');
+  await expect(page.locator('#preview h1')).toHaveText('Newest preview');
+
+  const highlightResponse = page.waitForResponse((response) => response.url().includes('highlight-11.11.1.esm.js'));
+  releaseHighlight();
+  await highlightResponse;
+  await page.waitForTimeout(300);
+  await expect(page.locator('#editor')).toHaveValue('# Newest preview');
+  await expect(page.locator('#preview h1')).toHaveText('Newest preview');
+  await expect(page.locator('#preview')).not.toContainText('oldPreview');
+});
+
+test('missing sections open the exact document at the start while same-document fragments preserve the dirty buffer', async ({ page }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo, 'document-navigation-sections.zip');
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  const onboardingPath = 'Documentation Pack/Onboarding.md';
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  const sourcesPath = 'Documentation Pack/reference/Sources-and-Assurance.md';
+  await page.locator(`#fileList [data-path="${onboardingPath}"]`).click();
+
+  await page.locator('#editor').evaluate((editor) => {
+    editor.value += '\n\nUnsaved navigation marker.';
+    editor.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: '.' }));
+  });
+  await page.getByRole('link', { name: 'Workspace overview' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText('edited in the app');
+  await expect(page.locator('#editor')).toHaveValue(/Unsaved navigation marker/);
+  await expect(page.locator('#status')).toContainText('at #workspace-overview');
+  await expect(page.locator('#documentBackButton')).toBeEnabled();
+
+  await page.locator(`#fileList [data-path="${developerPath}"]`).click();
+  await page.getByRole('link', { name: 'Missing section' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#status')).toContainText('section #not-present was not found');
+  await expect.poll(() => page.locator('#preview').evaluate((element) => element.scrollTop)).toBe(0);
+
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${developerPath}`);
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
+  await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
+  await expect(page.locator('#editor')).toHaveValue(/Unsaved navigation marker/);
+});
+
+test('Document link dialogue inserts an exact round-trip link as one undo operation', async ({ page }, testInfo) => {
+  const zipPath = await writeDocumentNavigationFixtureZip(testInfo, 'document-link-dialogue.zip');
+  await gotoApp(page);
+  await page.locator('#zipInput').setInputFiles(zipPath);
+  const developerPath = 'Documentation Pack/docs/02-Developer-Integration.md';
+  const sourcesPath = 'Documentation Pack/reference/Sources-and-Assurance.md';
+  await page.locator(`#fileList [data-path="${developerPath}"]`).click();
+
+  await page.locator('#editor').evaluate((editor) => {
+    const start = editor.value.indexOf('selected label');
+    editor.focus();
+    editor.setSelectionRange(start, start + 'selected label'.length);
+  });
+  await page.getByRole('button', { name: 'Document link' }).click();
+  await expect(page.locator('#documentLinkDialog')).toBeVisible();
+  await page.locator('#documentLinkSearchInput').fill('Sources and assurance');
+  const result = page.locator('#documentLinkResults [data-document-path]').filter({ hasText: sourcesPath });
+  await expect(result).toBeVisible();
+  await result.click();
+  await expect(page.locator('#documentLinkSectionSelect')).toContainText('Anchor — Anchor: p03');
+  await expect(page.locator('#documentLinkSectionSelect')).toContainText('H5 — Fifth-level detail');
+  await expect(page.locator('#documentLinkSectionSelect')).toContainText('H6 — Sixth-level detail');
+  await expect(page.locator('#documentLinkSectionSelect')).not.toContainText('False heading inside code');
+  await expect.poll(() => page.locator('#documentLinkSectionSelect option').evaluateAll((options) => options.map((option) => option.value)))
+    .toEqual(expect.arrayContaining(['repeated-heading', 'repeated-heading-2']));
+  await page.locator('#documentLinkSectionSelect').selectOption('p03');
+  await expect(page.locator('#documentLinkGeneratedMarkdown')).toHaveText('[selected label](../reference/Sources-and-Assurance.md#p03)');
+  await page.getByRole('button', { name: 'Insert link' }).click();
+  await expect(page.locator('#documentLinkDialog')).toBeHidden();
+  await expect(page.locator('#editor')).toHaveValue(/\[selected label\]\(\.\.\/reference\/Sources-and-Assurance\.md#p03\)/);
+
+  await page.locator('#editor').press('Control+z');
+  await expect(page.locator('#editor')).not.toHaveValue(/\[selected label\]\(/);
+  await expect(page.locator('#editor')).toHaveValue(/selected label/);
+  await page.locator('#editor').press('Control+Shift+z');
+  await expect(page.locator('#editor')).toHaveValue(/\[selected label\]\(\.\.\/reference\/Sources-and-Assurance\.md#p03\)/);
+  await expect(page.getByRole('link', { name: 'selected label' })).toBeVisible({ timeout: 20_000 });
+  await page.getByRole('link', { name: 'selected label' }).click();
+  await expect(page.locator('#activeFileLabel')).toContainText(sourcesPath);
+  await expect(page.locator('#preview #p03')).toHaveCount(1);
+
+  await page.locator('#documentBackButton').click();
+  const beforeCancel = await page.locator('#editor').inputValue();
+  await page.getByRole('button', { name: 'Document link' }).click();
+  await page.locator('#documentLinkCancelButton').click();
+  await expect(page.locator('#editor')).toHaveValue(beforeCancel);
+
+  const documentLinkButton = page.getByRole('button', { name: 'Document link' });
+  await documentLinkButton.click();
+  await expect(page.locator('#documentLinkSearchInput')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#documentLinkDialog')).toBeHidden();
+  await expect(documentLinkButton).toBeFocused();
+  await expect(page.locator('#editor')).toHaveValue(beforeCancel);
+});
+
+test('Document link dialogue validates current-document start, stale sources, loose files, and read-only documents', async ({ page }) => {
+  await page.setViewportSize({ width: 640, height: 900 });
+  await loadVirtualWorkspace(page, [
+    { name: 'index.md', text: '# Index\n\n## Current section\n\nLoose workspace.\n' },
+    { name: 'second.md', text: '# Second\n' },
+  ]);
+  await page.getByRole('button', { name: 'Document link' }).click();
+  const dialogBox = await page.locator('#documentLinkDialog').boundingBox();
+  expect(dialogBox).not.toBeNull();
+  expect(dialogBox.x).toBeGreaterThanOrEqual(0);
+  expect(dialogBox.x + dialogBox.width).toBeLessThanOrEqual(640);
+  await expect(page.locator('#documentLinkContextNote')).toContainText('Open a folder or import the complete ZIP pack');
+  await expect(page.locator('#documentLinkResults [data-document-path]')).toHaveCount(1);
+  await expect(page.locator('#documentLinkValidation')).toContainText('Choose a section when linking to the current document');
+  await expect(page.locator('#documentLinkApplyButton')).toBeDisabled();
+  await page.locator('#documentLinkSectionSelect').selectOption('current-section');
+  await expect(page.locator('#documentLinkGeneratedMarkdown')).toHaveText('[Index](#current-section)');
+
+  await page.locator('#editor').evaluate((editor) => {
+    editor.value += '\nChanged behind the dialogue.';
+    editor.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: '.' }));
+  });
+  await page.getByRole('button', { name: 'Insert link' }).click();
+  await expect(page.locator('#documentLinkDialog')).toBeVisible();
+  await expect(page.locator('#documentLinkValidation')).toContainText('source document changed');
+  await page.locator('#documentLinkCancelButton').click();
+
+  await page.locator('summary').filter({ hasText: /^Help$/ }).click();
+  await page.getByRole('button', { name: 'Open feature guide' }).click();
+  await submitAppDialogIfVisible(page, { button: 'Discard changes' });
+  await expect(page.locator('#activeFileLabel')).toContainText('read-only');
+  await expect(page.getByRole('button', { name: 'Document link' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Document link' })).toHaveAttribute('title', /unavailable in read-only documents/);
+});
+
 test('document audit flags broken references and docs map opens as read-only markdown', async ({ page }) => {
   await loadVirtualWorkspace(page, [
     {
@@ -4167,7 +4667,7 @@ test('document audit flags broken references and docs map opens as read-only mar
   await expect(page.locator('#documentReviewAlerts')).toContainText('relative document link');
   await expect(page.locator('#documentReviewAlerts')).toContainText('local image reference');
   await expect(page.locator('#documentReviewAlerts')).toContainText('Workspace audit');
-  await expect(page.locator('#documentReviewAlerts')).toContainText('page without backlinks');
+  await expect(page.locator('#documentReviewAlerts')).toContainText(/pages? without backlinks/);
 
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.getByRole('button', { name: 'Open docs map' }).click();
@@ -4249,9 +4749,26 @@ test('local draft recovery and large deletion protection guard browser-local edi
   await page.locator('#fileInput').setInputFiles(file);
   await expect(page.locator('#status')).toHaveText(/Rendered/);
   await setEditorValueAndSelection(page, '# Draft\nRecovered browser-local draft.\n');
-  await page.waitForTimeout(800);
+  await expect.poll(() => page.evaluate(async () => {
+    const database = await new Promise((resolve, reject) => {
+      const request = indexedDB.open('md-mmd-renderer-drafts');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    try {
+      const request = database.transaction('drafts', 'readonly').objectStore('drafts').getAll();
+      const drafts = await new Promise((resolve, reject) => {
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+      return drafts.some((draft) => draft.path === 'draft.md' && draft.text.includes('Recovered browser-local draft.'));
+    } finally {
+      database.close();
+    }
+  })).toBe(true);
 
   await page.reload();
+  await waitForAppReady(page);
   await page.locator('#fileInput').setInputFiles(file);
   await expect(page.getByRole('heading', { name: 'Recover local draft?' })).toBeVisible();
   await page.getByRole('button', { name: 'Restore draft' }).click();
@@ -4375,6 +4892,7 @@ test('writer shortcut is disabled while input maximise handles focused writing',
     localStorage.setItem('md-mmd-renderer.typewriterMode', 'true');
   });
   await page.reload();
+  await waitForAppReady(page);
   await expect(page.locator('#app')).not.toHaveClass(/typewriter-mode/);
 
   await page.keyboard.press('Control+Backslash');
@@ -4971,7 +5489,7 @@ test('broken mermaid fixture shows error actions without export actions', async 
   expect(jumpState.scrollTop).toBeGreaterThan(0);
 });
 
-test('preview outline supports H1-H4 and tracks the active section', async ({ page }) => {
+test('preview outline supports H1-H6 and tracks the active section', async ({ page }) => {
   await openFixture(page, 'document-ux.md');
 
   await page.locator('#outlineToggleButton').click();
@@ -4980,6 +5498,8 @@ test('preview outline supports H1-H4 and tracks the active section', async ({ pa
   await expect(page.locator('#outlineLinks [data-outline-level="2"]')).toHaveText('Product Area');
   await expect(page.locator('#outlineLinks [data-outline-level="3"]')).toHaveText('Review Flow');
   await expect(page.locator('#outlineLinks [data-outline-level="4"]')).toHaveText('Deep Detail');
+  await expect(page.locator('#outlineLinks [data-outline-level="5"]')).toHaveText('Detailed Check');
+  await expect(page.locator('#outlineLinks [data-outline-level="6"]')).toHaveText('Lowest Detail');
 
   await page.locator('#outlineLinks [data-outline-target="deep-detail"]').evaluate((link) => link.click());
   await expect(page.locator('#outlineLinks [data-outline-target="deep-detail"]')).toHaveClass(/active/);
@@ -5045,7 +5565,7 @@ test('document review shows metrics and non-blocking review notes', async ({ pag
 
   await expect(page.locator('#documentReviewPanel')).toBeVisible();
   await expect(page.locator('#documentReviewSummary')).toContainText(/words/);
-  await expect(page.locator('#documentReviewMetrics')).toContainText('Headings: 4');
+  await expect(page.locator('#documentReviewMetrics')).toContainText('Headings: 6');
   await expect(page.locator('#documentReviewMetrics')).toContainText('Links: 1');
   await expect(page.locator('#documentReviewMetrics')).toContainText('Code: 1');
   await expect(page.locator('#documentReviewAlerts')).toContainText('external link');

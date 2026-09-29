@@ -427,6 +427,14 @@
       <section class="workspace" id="workspace">
         <section class="pane input-pane">
           <div class="pane-title editor-pane-title">
+            <div class="document-history-controls" aria-label="Document reading history">
+              <button id="documentBackButton" class="icon-button" type="button" title="Back" aria-label="Back" disabled>
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+              </button>
+              <button id="documentForwardButton" class="icon-button" type="button" title="Forward" aria-label="Forward" disabled>
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+              </button>
+            </div>
             <div class="file-tab" aria-label="Active document">
               <span class="file-tab-icon" aria-hidden="true">MD</span>
               <span class="active-file-label" id="activeFileLabel">sample.md</span>
@@ -488,6 +496,10 @@
             <div class="toolbar-section" aria-label="Insert content">
               <button type="button" data-command="link" title="Link" aria-label="Link">
                 <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 12 20l1.1-1.1"/></svg>
+              </button>
+              <button type="button" data-command="documentLink" title="Document link" aria-label="Document link" aria-describedby="documentLinkAvailabilityHint">
+                <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v6h5"/><path d="M9 14h6"/><path d="M8 17.5a3 3 0 0 0 4.2.1l.8-.8"/><path d="M16 13.5a3 3 0 0 0-4.2-.1l-.8.8"/></svg>
+                <span class="visually-hidden" id="documentLinkAvailabilityHint">Insert a link to a loaded workspace document or section.</span>
               </button>
               <button type="button" data-command="image" title="Image" aria-label="Image">
                 <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8" cy="10" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 5"/></svg>
@@ -557,6 +569,20 @@
 
         <section class="pane preview-pane">
           <div class="pane-title preview-pane-title">
+            <div class="preview-document-session" aria-label="Active document and reading history">
+              <div class="document-history-controls" aria-label="Document reading history">
+                <button id="previewDocumentBackButton" class="icon-button" type="button" title="Back" aria-label="Back" disabled>
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
+                </button>
+                <button id="previewDocumentForwardButton" class="icon-button" type="button" title="Forward" aria-label="Forward" disabled>
+                  <svg class="toolbar-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6"/></svg>
+                </button>
+              </div>
+              <div class="file-tab" aria-label="Active document">
+                <span class="file-tab-icon" aria-hidden="true">MD</span>
+                <span class="active-file-label" id="activeFileLabelPreview">sample.md</span>
+              </div>
+            </div>
             <div class="pane-title-main">
               <span>Preview</span>
               <span class="badge" id="diagramCount">0 diagrams</span>
@@ -867,6 +893,43 @@
     </form>
   </dialog>
 
+  <dialog class="utility-dialog document-link-dialog" id="documentLinkDialog" aria-labelledby="documentLinkTitle" aria-describedby="documentLinkSummary">
+    <form class="utility-dialog-card document-link-card" id="documentLinkForm" method="dialog">
+      <div class="utility-dialog-top">
+        <span class="template-dialog-kicker">Document link</span>
+        <button class="template-dialog-close" type="button" data-document-link-cancel aria-label="Close document link dialogue">X</button>
+      </div>
+      <h2 id="documentLinkTitle">Insert document link</h2>
+      <p id="documentLinkSummary">Choose a loaded document and an optional section. The relative path is calculated from the current document.</p>
+      <p class="document-link-context" id="documentLinkContextNote"></p>
+      <div class="template-dialog-fields document-link-fields">
+        <div class="template-field">
+          <label for="documentLinkSearchInput">Document</label>
+          <input id="documentLinkSearchInput" type="search" autocomplete="off" placeholder="Search title, name, or path" />
+          <div class="document-link-results" id="documentLinkResults" role="listbox" aria-label="Loaded documents"></div>
+        </div>
+        <div class="template-field">
+          <label for="documentLinkTextInput">Link text</label>
+          <input id="documentLinkTextInput" type="text" autocomplete="off" />
+        </div>
+        <div class="template-field">
+          <label for="documentLinkSectionSelect">Section — optional</label>
+          <select id="documentLinkSectionSelect"></select>
+        </div>
+        <div class="template-field">
+          <span class="field-label">Generated Markdown</span>
+          <code class="document-link-markdown" id="documentLinkGeneratedMarkdown">No link generated.</code>
+          <span class="document-link-relative-path" id="documentLinkRelativePath"></span>
+        </div>
+      </div>
+      <p class="document-link-validation" id="documentLinkValidation" aria-live="polite"></p>
+      <div class="template-dialog-actions">
+        <button type="button" id="documentLinkCancelButton">Cancel</button>
+        <button class="primary" type="submit" id="documentLinkApplyButton">Insert link</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog class="utility-dialog windows-setup-dialog" id="windowsSetupDialog" aria-labelledby="windowsSetupTitle" aria-describedby="windowsSetupSummary">
     <form class="utility-dialog-card windows-setup-card" method="dialog">
       <div class="utility-dialog-top">
@@ -914,7 +977,7 @@
     </form>
   </dialog>
 
-  <script type="module" src="./assets/scripts/main.js"></script>
+  <script type="module" src="./assets/scripts/main.js?shell=65"></script>
 </body>
 </html>
 

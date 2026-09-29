@@ -5,6 +5,7 @@ import { createZipBuffer } from './zip.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const artifactBundleFixtureRoot = path.join(root, 'tests', 'fixtures', 'artifact-bundles');
+const documentNavigationFixtureRoot = path.join(root, 'tests', 'fixtures', 'document-navigation', 'workspace');
 const textFixturePattern = /\.(md|markdown|mmd|mermaid|json|txt|svg|html|css|js)$/i;
 const ignoredFixtureNames = new Set(['__MACOSX', 'Thumbs.db', '.DS_Store']);
 
@@ -28,6 +29,19 @@ export async function readArtifactBundleFixtureEntries(name) {
 
 export async function createArtifactBundleFixtureZip(name, options = { compress: true }) {
   return createZipBuffer(await readArtifactBundleFixtureEntries(name), options);
+}
+
+export async function createDocumentNavigationFixtureZip(prefix = 'Documentation Pack', options = { compress: true }) {
+  const files = await walkFixtureDirectory(documentNavigationFixtureRoot);
+  const entries = [];
+  for (const filePath of files.sort((left, right) => left.localeCompare(right))) {
+    const relativePath = path.relative(documentNavigationFixtureRoot, filePath).replaceAll(path.sep, '/');
+    entries.push({
+      name: `${prefix}/${relativePath}`,
+      data: await readFile(filePath, 'utf8'),
+    });
+  }
+  return createZipBuffer(entries, options);
 }
 
 async function walkFixtureDirectory(directory) {

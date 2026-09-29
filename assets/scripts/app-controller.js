@@ -5,6 +5,7 @@ import { createEditorService } from './editor/editor-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
 import { createInsertHelperService } from './editor/insert-helper-service.js';
+import { createDocumentLinkService } from './editor/document-link-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
 import { createProgressBarEditorService } from './editor/progress-bar-editor-service.js';
 import { createTableEditorService } from './editor/table-editor-service.js';
@@ -22,13 +23,19 @@ import { createSupportBundle, redactSupportBundleText } from './ui/support-bundl
 import { createUiService } from './ui/ui-service.js';
 import { createWindowsSetupService } from './ui/windows-setup-service.js';
 import { createDocumentUxService } from './document/document-ux-service.js';
+import { createDocumentNavigationService } from './document/document-navigation-service.js';
 import { analyseMarkdownGovernance } from './document/markdown-governance-service.js';
 import { createScrollSyncService } from './document/scroll-sync-service.js';
 import { createSelectionSyncService } from './document/selection-sync-service.js';
 import { downloadBlob, registerServiceWorker } from './utils/browser.js';
 import { compareRecords, getFolderNameFromFileList, isSupportedFile, normalisePath, uniqueByPath } from './utils/files.js';
 import { escapeHtml, readStoredNumber, sanitiseFileName, slugFromText, todayIso } from './utils/format.js';
-import { collectMarkdownRelativeTargets, collectWikilinkTargets, findWikilinkBacklinks, resolveWikilinkTarget } from './utils/wikilinks.js';
+import { collectWikilinkTargets, resolveWikilinkTarget } from './utils/wikilinks.js';
+import {
+  classifyDocumentHref,
+  getTrustedPreviewInternalLink,
+  resolveWorkspaceDocumentLink,
+} from './utils/document-links.js';
 import { getLineInfoAtIndex } from './utils/search.js';
 import { idbRequest, idbTransactionDone, openObjectStoreDb } from './utils/idb.js';
 
@@ -117,6 +124,11 @@ export function createAppController() {
       folderBadge,
       artifactBundleSummary,
       activeFileLabel,
+      activeFileLabelPreview,
+      previewDocumentBackButton,
+      previewDocumentForwardButton,
+      documentBackButton,
+      documentForwardButton,
       diagramCount,
       mermaidThemeSelect,
       zoomOutButton,
@@ -236,6 +248,18 @@ export function createAppController() {
       insertHelperFields,
       insertHelperApplyButton,
       insertHelperCancelButton,
+      documentLinkDialog,
+      documentLinkForm,
+      documentLinkSearchInput,
+      documentLinkResults,
+      documentLinkTextInput,
+      documentLinkSectionSelect,
+      documentLinkGeneratedMarkdown,
+      documentLinkRelativePath,
+      documentLinkValidation,
+      documentLinkContextNote,
+      documentLinkApplyButton,
+      documentLinkCancelButton,
       windowsSetupDialog,
       windowsSetupTitle,
       windowsSetupSummary,
@@ -264,6 +288,8 @@ export function createAppController() {
     let openTableEditor = () => {};
     let openProgressBarEditor = () => {};
     let openInsertHelper = () => {};
+    let openDocumentLinkDialog = () => {};
+    let documentNavigationTools = null;
     let openArtifactReaderPath = async () => {};
     let getEffectiveDevopsMarkdownExport = () => Boolean(state.devopsMarkdownExport);
     let latestSupportBundle = null;
@@ -309,6 +335,7 @@ export function createAppController() {
           table: () => openTableEditor(),
           progressBar: () => openProgressBarEditor(),
           insertHelper: (type) => openInsertHelper(type),
+          documentLink: () => openDocumentLinkDialog(),
         },
         getAutocompleteFiles: () => state.files,
       },
@@ -358,6 +385,7 @@ export function createAppController() {
         folderBadge,
         artifactBundleSummary,
         activeFileLabel,
+        activeFileLabelPreview,
         saveButton,
         saveAsButton,
         refreshFileButton,
@@ -535,6 +563,7 @@ export function createAppController() {
         getGovernanceAudit,
         openBacklink,
         openGovernanceIssue,
+        navigateToSection: (...args) => documentNavigationTools?.navigateToSection(...args),
       },
     });
     const {
@@ -572,6 +601,7 @@ export function createAppController() {
     const {
       renderPreview,
       buildMarkdownHtml,
+      inspectMarkdownDocument,
       buildMermaidOnlyHtml,
       renderMermaidDiagrams,
       prepareDiagramFramesIn,
@@ -749,7 +779,8 @@ export function createAppController() {
         renderPreview,
         setStatus,
         getMarkdownExportName,
-        afterLibraryLoaded: () => {
+        afterLibraryLoaded: ({ replaced = true } = {}) => {
+          if (replaced) documentNavigationTools?.resetWorkspaceHistory();
           draftTools.updateWorkspaceDraftKey();
           exportProfileTools.resetSessionProfile();
         },
@@ -759,6 +790,8 @@ export function createAppController() {
         promptForText: promptDialog,
         confirmAction: confirmDialog,
         copyToClipboard,
+        beforeActiveFileChange: (...args) => documentNavigationTools?.beforeFileSelection(...args),
+        afterActiveFileChange: (...args) => documentNavigationTools?.afterFileSelection(...args),
       },
       helpers: {
         compareRecords,
@@ -771,6 +804,49 @@ export function createAppController() {
       },
       nativeBridgeClient,
     });
+    documentNavigationTools = createDocumentNavigationService({
+      state,
+      dom: {
+        editor,
+        preview,
+        backButton: documentBackButton,
+        forwardButton: documentForwardButton,
+        additionalBackButtons: [previewDocumentBackButton],
+        additionalForwardButtons: [previewDocumentForwardButton],
+      },
+      callbacks: {
+        selectFile,
+        setStatus,
+        rememberScrollPosition,
+      },
+    });
+    const documentLinkTools = createDocumentLinkService({
+      state,
+      editor,
+      dom: {
+        dialog: documentLinkDialog,
+        form: documentLinkForm,
+        searchInput: documentLinkSearchInput,
+        results: documentLinkResults,
+        linkTextInput: documentLinkTextInput,
+        sectionSelect: documentLinkSectionSelect,
+        generatedMarkdown: documentLinkGeneratedMarkdown,
+        relativePath: documentLinkRelativePath,
+        validation: documentLinkValidation,
+        contextNote: documentLinkContextNote,
+        applyButton: documentLinkApplyButton,
+        cancelButton: documentLinkCancelButton,
+      },
+      callbacks: {
+        replaceEditorRange,
+        setStatus,
+        readRecordText,
+        inspectMarkdownDocument,
+        isActiveReadOnly,
+        getDocTitleFromPath,
+      },
+    });
+    openDocumentLinkDialog = documentLinkTools.openDocumentLinkDialog;
     openArtifactReaderPath = selectFile;
     const workspaceSearchTools = createWorkspaceSearchService({
       state,
@@ -896,10 +972,12 @@ export function createAppController() {
     tableEditorTools.installTableEditorHandlers();
     progressBarEditorTools.installProgressBarEditorHandlers();
     insertHelperTools.installInsertHelperHandlers();
+    documentLinkTools.installDocumentLinkHandlers();
     workspaceSearchTools.installWorkspaceSearchHandlers();
     installDocumentUxHandlers();
     installScrollSyncHandlers();
     installSelectionSyncHandlers();
+    documentNavigationTools.installDocumentNavigationHandlers();
     installContextMenuHandlers();
     windowsSetupTools.installWindowsSetupHandlers();
     installEventHandlers();
@@ -1776,6 +1854,7 @@ export function createAppController() {
     }
 
     function clearWorkspaceContentCaches() {
+      documentNavigationTools?.resetWorkspaceHistory();
       state.fileCache.clear();
       state.savedContentCache.clear();
       state.dirtyPaths.clear();
@@ -1784,6 +1863,8 @@ export function createAppController() {
       state.workspaceDirectoryHandle = null;
       state.nativeWorkspaceId = '';
       state.workspaceKind = '';
+      state.workspaceRootPath = '';
+      state.workspacePathContextId = '';
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
       exportProfileTools.resetSessionProfile();
@@ -1840,14 +1921,13 @@ export function createAppController() {
       for (const record of state.files) {
         if (record.path === state.activePath) continue;
         const source = await readRecordText(record);
-        const matches = findWikilinkBacklinks({
-          source,
-          fromPath: record.path,
-          activePath: state.activePath,
-          files: state.files,
-        });
-        matches.forEach((link) => {
-          const line = getLineInfoAtIndex(source, link.index);
+        const links = await collectDocumentationLinks(source, record);
+        links.forEach((link) => {
+          const target = resolveDocumentationLink(link, state.files, record.path);
+          if (target?.path !== state.activePath) return;
+          const line = link.line
+            ? { line: link.line, column: link.column || 1 }
+            : getLineInfoAtIndex(source, link.index);
           backlinks.push({
             path: record.path,
             line: line.line,
@@ -1869,9 +1949,10 @@ export function createAppController() {
       for (const record of records) {
         const source = await readRecordText(record);
         collectImageReferences(source, record.path).forEach((path) => referencedAssets.add(path));
-        collectDocumentationLinks(source).forEach((link) => {
+        const links = await collectDocumentationLinks(source, record);
+        links.forEach((link) => {
           if (isAssetTarget(link.target)) return;
-          const target = resolveWikilinkTarget(link.target, records, record.path);
+          const target = resolveDocumentationLink(link, records, record.path);
           if (target?.path && incoming.has(target.path)) {
             incoming.set(target.path, incoming.get(target.path) + 1);
           } else {
@@ -1892,10 +1973,24 @@ export function createAppController() {
     async function getGovernanceAudit() {
       const records = [];
       for (const record of getDocumentationRecords()) {
+        const text = await readRecordText(record);
+        const links = await collectDocumentationLinks(text, record);
         records.push({
           name: record.name,
           path: record.path,
-          text: await readRecordText(record),
+          text,
+          renderedLinks: links
+            .filter((link) => link.kind === 'markdown')
+            .map((link) => ({
+              ...link,
+              resolution: resolveWorkspaceDocumentLink({
+                href: link.target,
+                fromPath: record.path,
+                files: state.files,
+                workspaceKind: state.workspaceKind,
+                workspaceRoot: state.workspaceRootPath,
+              }),
+            })),
         });
       }
       return analyseMarkdownGovernance({ records, activePath: state.activePath });
@@ -2102,9 +2197,10 @@ export function createAppController() {
 
       for (const record of records) {
         const source = await readRecordText(record);
-        collectDocumentationLinks(source).forEach((link) => {
+        const documentLinks = await collectDocumentationLinks(source, record);
+        documentLinks.forEach((link) => {
           if (isAssetTarget(link.target)) return;
-          const target = resolveWikilinkTarget(link.target, records, record.path);
+          const target = resolveDocumentationLink(link, records, record.path);
           if (target?.path) {
             links.push({ from: record.path, to: target.path, label: link.kind });
           } else {
@@ -2151,11 +2247,35 @@ ${unresolvedRows}
       return state.files.filter((record) => isSupportedFile(record.name) && !record.generatedMap);
     }
 
-    function collectDocumentationLinks(source) {
+    async function collectDocumentationLinks(source, record) {
+      const rendered = await inspectMarkdownDocument(source, record?.name || record?.path || '');
       return [
         ...collectWikilinkTargets(source),
-        ...collectMarkdownRelativeTargets(source).filter((link) => String(source || '')[Math.max(0, link.index - 1)] !== '!'),
+        ...rendered.links
+          .filter((link) => classifyDocumentHref(link.href).kind !== 'external')
+          .map((link) => ({
+          kind: 'markdown',
+          target: link.href,
+          label: link.label,
+          line: link.line,
+          column: 1,
+          index: 0,
+          })),
       ];
+    }
+
+    function resolveDocumentationLink(link, records, fromPath) {
+      if (link.kind === 'wikilink') {
+        return resolveWikilinkTarget(link.target, records, fromPath);
+      }
+      const resolution = resolveWorkspaceDocumentLink({
+        href: link.target,
+        fromPath,
+        files: records,
+        workspaceKind: state.workspaceKind,
+        workspaceRoot: state.workspaceRootPath,
+      });
+      return resolution.kind === 'resolved' ? resolution.target : null;
     }
 
     function collectImageReferences(source, fromPath) {
@@ -2218,6 +2338,15 @@ ${unresolvedRows}
       editorToolbar.querySelectorAll('[data-command]').forEach((button) => {
         button.disabled = readOnly;
       });
+      const documentLinkButton = editorToolbar.querySelector('[data-command="documentLink"]');
+      if (documentLinkButton) {
+        documentLinkButton.title = readOnly
+          ? 'Document link insertion is unavailable in read-only documents'
+          : 'Document link';
+        documentLinkButton.setAttribute('aria-description', readOnly
+          ? 'Navigation remains available, but this document cannot be edited.'
+          : 'Insert a link to a loaded workspace document or section.');
+      }
     }
 
     function resetScrollForCurrentDocument() {
@@ -3801,20 +3930,20 @@ ${unresolvedRows}
         return;
       }
 
-      const docLink = event.target.closest('[data-doc-path]');
-      if (docLink) {
+      const internalAnchor = event.target.closest('a');
+      const trustedInternalLink = getTrustedPreviewInternalLink(internalAnchor);
+      if (trustedInternalLink?.kind === 'document') {
         event.preventDefault();
-        await selectFile(docLink.dataset.docPath);
+        await selectFile(trustedInternalLink.target);
         return;
       }
 
-      const wikilink = event.target.closest('[data-wikilink-target]');
-      if (wikilink) {
+      if (trustedInternalLink?.kind === 'wikilink') {
         event.preventDefault();
-        const target = resolveWikilinkTarget(wikilink.dataset.wikilinkTarget, state.files, state.activePath);
+        const target = resolveWikilinkTarget(trustedInternalLink.target, state.files, state.activePath);
         if (!target) {
-          wikilink.classList.add('wikilink-unresolved');
-          setStatus(`No loaded file matches [[${wikilink.dataset.wikilinkTarget}]].`, 'warning');
+          internalAnchor.classList.add('wikilink-unresolved');
+          setStatus(`No loaded file matches [[${trustedInternalLink.target}]].`, 'warning');
           return;
         }
         await selectFile(target.path);

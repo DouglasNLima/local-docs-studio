@@ -1,6 +1,7 @@
 import { storageKeys } from '../state/config.js';
-import { cssEscape, slugify } from '../utils/format.js';
+import { cssEscape } from '../utils/format.js';
 import { resolveWikilinkTarget } from '../utils/wikilinks.js';
+import { getTrustedPreviewInternalLink, resolveWorkspaceDocumentLink } from '../utils/document-links.js';
 
 const SEARCH_IGNORE_SELECTOR = [
   '.code-block-header',
@@ -38,6 +39,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     getGovernanceAudit,
     openBacklink,
     openGovernanceIssue,
+    navigateToSection,
   } = callbacks;
 
   const searchState = {
@@ -115,19 +117,10 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function collectOutlineItems() {
-    const usedIds = new Set();
-    return [...getContentRoot().querySelectorAll('h1, h2, h3, h4')].map((heading, index) => {
+    return [...getContentRoot().querySelectorAll('h1, h2, h3, h4, h5, h6')].map((heading, index) => {
       const level = Number(heading.tagName.slice(1));
       const text = heading.textContent.trim() || `Section ${index + 1}`;
-      const base = slugify(text) || `section-${index + 1}`;
-      let id = base;
-      let suffix = 2;
-      while (usedIds.has(id)) {
-        id = `${base}-${suffix}`;
-        suffix += 1;
-      }
-      usedIds.add(id);
-      heading.id = id;
+      const id = heading.id || `section-${index + 1}`;
       return { id, level, text, heading };
     });
   }
@@ -138,7 +131,11 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     event.preventDefault();
     const target = preview.querySelector(`#${cssEscape(link.dataset.outlineTarget)}`);
     lockActiveOutlineLink(link.dataset.outlineTarget);
-    scrollPreviewTarget(target);
+    if (navigateToSection) {
+      void navigateToSection(link.dataset.outlineTarget, { source: 'outline' });
+    } else {
+      scrollPreviewTarget(target);
+    }
     setActiveOutlineLink(link.dataset.outlineTarget);
   }
 
@@ -387,12 +384,13 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     const root = getContentRoot();
     const text = getReviewText(root);
     const words = text.match(/[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*/gu) ?? [];
-    const headings = [...root.querySelectorAll('h1, h2, h3, h4')];
+    const headings = [...root.querySelectorAll('h1, h2, h3, h4, h5, h6')];
     const h1s = headings.filter((heading) => heading.tagName.toLowerCase() === 'h1');
     const links = [...root.querySelectorAll('a[href]')];
     const externalLinks = links.filter((link) => /^(https?:)?\/\//i.test(link.getAttribute('href') || ''));
     const unresolvedWikilinks = [...root.querySelectorAll('[data-wikilink-target]')]
-      .filter((link) => !resolveWikilinkTarget(link.dataset.wikilinkTarget || '', state.files, state.activePath));
+      .filter((link) => getTrustedPreviewInternalLink(link)?.kind === 'wikilink')
+      .filter((link) => !resolveWikilinkTarget(getTrustedPreviewInternalLink(link).target, state.files, state.activePath));
     const brokenRelativeLinks = links.filter((link) => isBrokenRelativeDocumentLink(link));
     const missingImages = [...root.querySelectorAll('img[src]')].filter((image) => isMissingManagedImage(image));
     const tables = root.querySelectorAll('table').length;
@@ -549,12 +547,19 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function isBrokenRelativeDocumentLink(link) {
-    if (link.dataset.wikilinkTarget) return false;
+    if (getTrustedPreviewInternalLink(link)?.kind === 'wikilink') return false;
     const href = link.getAttribute('href') || '';
-    if (!href || href.startsWith('#') || /^(https?:|mailto:|blob:|data:)/i.test(href)) return false;
-    const target = href.split(/[?#]/)[0];
-    if (!target || /\.(png|jpe?g|gif|webp|svg|pdf|zip)$/i.test(target)) return false;
-    return !resolveWikilinkTarget(target, state.files, state.activePath);
+    if (!href || href.startsWith('#')) return false;
+    const resolution = resolveWorkspaceDocumentLink({
+      href,
+      fromPath: state.activePath,
+      files: state.files,
+      workspaceKind: state.workspaceKind,
+      workspaceRoot: state.workspaceRootPath,
+    });
+    if (resolution.kind === 'resolved' || resolution.kind === 'external') return false;
+    if (resolution.kind === 'unsupported' && resolution.reason === 'unsupported-file-type') return false;
+    return ['unresolved', 'invalid', 'unsupported'].includes(resolution.kind);
   }
 
   function isMissingManagedImage(image) {

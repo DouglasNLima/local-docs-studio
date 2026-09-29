@@ -51,6 +51,8 @@ export function createFileService({
     promptForText,
     confirmAction,
     copyToClipboard,
+    beforeActiveFileChange,
+    afterActiveFileChange,
   } = callbacks;
   const {
     compareRecords,
@@ -65,6 +67,9 @@ export function createFileService({
     lastAttempt: 'not-attempted',
     lastMessage: '',
   };
+  let activeSelectionRequestId = 0;
+  let pathContextSequence = 0;
+  const draftRecoveryCheckedPaths = new Set();
 
     if (nativeBridgeClient?.on) {
       nativeBridgeClient.on(nativeBridgeMessageTypes.workspaceChanged, handleNativeWorkspaceChanged);
@@ -351,6 +356,7 @@ export function createFileService({
       await addRecordsToWorkspace([record], {
         folderName: state.folderName || (state.files.length ? 'Workspace' : 'Blank document'),
         selectPath: name,
+        inheritWorkspacePathContext: true,
       });
       editor.focus({ preventScroll: true });
       setStatus('Blank Markdown document ready.', 'ok');
@@ -531,9 +537,16 @@ export function createFileService({
       clearFocusedModes();
       clearManagedAssets?.();
       state.lastSkippedFileCount = null;
+      const workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
+      const hasRelativePathContext = supportsRelativePathContext(workspaceKind);
+      const pathContextId = hasRelativePathContext ? createPathContextId(workspaceKind) : '';
       const uniqueRecords = uniqueByPath(records)
         .filter((record) => isSupportedFile(record.name))
-        .map(prepareRecord)
+        .map((record) => prepareRecord({
+          ...record,
+          hasRelativePathContext,
+          pathContextId,
+        }))
         .sort(compareRecords);
 
       state.files = uniqueRecords;
@@ -542,15 +555,18 @@ export function createFileService({
       state.folderName = folderName;
       state.workspaceDirectoryHandle = options.directoryHandle || null;
       state.nativeWorkspaceId = options.nativeWorkspaceId || '';
-      state.workspaceKind = options.workspaceKind || (options.directoryHandle ? 'folder' : '');
+      state.workspaceKind = workspaceKind;
+      state.workspaceRootPath = options.workspaceRootPath ?? inferWorkspaceRootPath(uniqueRecords, state.workspaceKind);
+      state.workspacePathContextId = pathContextId;
       state.selectedTreeFolderPath = '';
       state.artifactBundle = null;
       state.fileCache.clear();
+      draftRecoveryCheckedPaths.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
       state.externalChangeDetails?.clear();
-      afterLibraryLoaded?.();
+      afterLibraryLoaded?.({ replaced: true });
       clearScrollPositions?.();
       fileSearch.value = '';
       resetActiveScrollPosition?.('');
@@ -598,15 +614,23 @@ export function createFileService({
 
         clearFocusedModes();
         clearManagedAssets?.();
-        state.files = imported.records.map(prepareRecord);
+        const pathContextId = createPathContextId('zip');
+        state.files = imported.records.map((record) => prepareRecord({
+          ...record,
+          hasRelativePathContext: true,
+          pathContextId,
+        }));
         state.activePath = '';
         state.fileName = '';
         state.folderName = imported.folderName;
         state.workspaceDirectoryHandle = null;
         state.nativeWorkspaceId = '';
         state.workspaceKind = imported.artifactBundle ? 'artefact-bundle' : imported.bundle ? 'bundle' : 'zip';
+        state.workspaceRootPath = inferWorkspaceRootPath(imported.records, state.workspaceKind);
+        state.workspacePathContextId = pathContextId;
         state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
+        draftRecoveryCheckedPaths.clear();
         state.savedContentCache?.clear();
         imported.records.forEach((record) => {
           const text = imported.textByPath.get(record.path) || '';
@@ -616,7 +640,7 @@ export function createFileService({
         state.dirtyPaths.clear();
         state.externalChangePaths?.clear();
         state.externalChangeDetails?.clear();
-        afterLibraryLoaded?.();
+        afterLibraryLoaded?.({ replaced: true });
         clearScrollPositions?.();
         fileSearch.value = '';
         resetActiveScrollPosition?.('');
@@ -702,13 +726,16 @@ export function createFileService({
       state.workspaceDirectoryHandle = null;
       state.nativeWorkspaceId = '';
       state.workspaceKind = 'converted';
+      state.workspaceRootPath = '';
+      state.workspacePathContextId = '';
       state.artifactBundle = null;
       state.fileCache.clear();
+      draftRecoveryCheckedPaths.clear();
       state.savedContentCache?.clear();
       state.dirtyPaths.clear();
       state.externalChangePaths?.clear();
       state.externalChangeDetails?.clear();
-      afterLibraryLoaded?.();
+      afterLibraryLoaded?.({ replaced: true });
       clearScrollPositions?.();
       fileSearch.value = '';
       resetActiveScrollPosition?.('');
@@ -905,29 +932,47 @@ export function createFileService({
       return /\.(mmd|mermaid)$/i.test(path) ? 'text/plain' : 'text/markdown';
     }
 
-    async function selectFile(path) {
+    async function selectFile(path, options = {}) {
       const record = state.files.find((item) => item.path === path);
-      if (!record) return;
-      rememberScrollPosition?.();
+      if (!record) return { ok: false, reason: 'document-not-found', path };
+      const requestId = ++activeSelectionRequestId;
+      const previousContext = beforeActiveFileChange?.({ path, record, options }) || null;
+      if (state.activePath) rememberScrollPosition?.();
 
       try {
         if (record.handle) {
           const externalDecision = await handleExternalChange(record, { reason: 'select' });
-          if (externalDecision === 'cancel') return;
+          if (externalDecision === 'cancel') return { ok: false, cancelled: true, reason: 'external-change-cancelled' };
+          if (requestId !== activeSelectionRequestId) return { ok: false, cancelled: true, reason: 'superseded' };
+        }
+
+        const wasCached = state.fileCache.has(record.path);
+        let content = state.fileCache.get(record.path);
+        if (!wasCached) {
+          const { file, text } = await readRecordSource(record);
+          if (requestId !== activeSelectionRequestId) return { ok: false, cancelled: true, reason: 'superseded' };
+          record.file = file;
+          updateRecordFingerprint(record, file);
+          state.fileCache.set(record.path, text);
+          content = text;
+        }
+
+        const shouldCheckDraftRecovery = !draftRecoveryCheckedPaths.has(record.path);
+        const recovered = shouldCheckDraftRecovery
+          ? await afterActiveFileLoaded?.(record, content ?? '')
+          : null;
+        if (requestId !== activeSelectionRequestId) return { ok: false, cancelled: true, reason: 'superseded' };
+        if (shouldCheckDraftRecovery) draftRecoveryCheckedPaths.add(record.path);
+        if (recovered?.content !== undefined) {
+          content = recovered.content;
+          state.fileCache.set(record.path, recovered.content);
+          if (recovered.dirty) state.dirtyPaths.add(record.path);
         }
 
         state.activePath = record.path;
         state.fileName = record.name;
         state.selectedTreeFolderPath = '';
-
-        if (!state.fileCache.has(record.path)) {
-          const { file, text } = await readRecordSource(record);
-          record.file = file;
-          updateRecordFingerprint(record, file);
-          state.fileCache.set(record.path, text);
-        }
-
-        editor.value = state.fileCache.get(record.path) ?? '';
+        editor.value = content ?? '';
         editor.scrollTop = 0;
         preview.scrollTop = 0;
         resetEditorHistory();
@@ -936,25 +981,39 @@ export function createFileService({
         renderFileList();
         updateActiveFileLabel();
         updateSaveButton();
-        const recovered = await afterActiveFileLoaded?.(record, editor.value);
-        if (recovered?.content !== undefined && recovered.content !== editor.value) {
-          editor.value = recovered.content;
-          state.fileCache.set(record.path, recovered.content);
-          if (recovered.dirty) state.dirtyPaths.add(record.path);
-          resetEditorHistory();
-          updateEditorChrome?.();
-          renderFileList();
-          updateActiveFileLabel();
-          updateSaveButton();
-        }
         await renderPreview();
-        restoreScrollPosition?.(record.path);
+        if (requestId !== activeSelectionRequestId) return { ok: false, cancelled: true, reason: 'superseded' };
+        if (options.scrollMode === 'start') {
+          editor.scrollTop = 0;
+          preview.scrollTop = 0;
+        } else {
+          restoreScrollPosition?.(record.path);
+        }
         showNativeWorkspaceChangeStatus(record);
+        afterActiveFileChange?.({ path: record.path, record, options, previousContext });
+        return { ok: true, path: record.path, record };
       } catch (error) {
         setStatus(`Could not open ${record.name}.`, 'danger');
-        preview.innerHTML = `<pre class="error">${escapeHtml(error?.message ?? String(error))}</pre>`;
         updateSaveButton();
+        return { ok: false, reason: 'read-failed', error };
       }
+    }
+
+    function inferWorkspaceRootPath(records, workspaceKind) {
+      if (!['artefact-bundle', 'bundle', 'folder-fallback', 'zip'].includes(workspaceKind)) return '';
+      const paths = records.map((record) => normalisePath(record.path || record.name || '')).filter(Boolean);
+      if (!paths.length || paths.some((path) => !path.includes('/'))) return '';
+      const first = paths[0].split('/')[0];
+      return first && paths.every((path) => path.split('/')[0] === first) ? first : '';
+    }
+
+    function supportsRelativePathContext(workspaceKind) {
+      return ['artefact-bundle', 'bundle', 'folder', 'folder-fallback', 'native-folder', 'zip'].includes(workspaceKind);
+    }
+
+    function createPathContextId(kind) {
+      pathContextSequence += 1;
+      return `${kind || 'workspace'}-${pathContextSequence}`;
     }
 
     function moveWorkspaceFile(path, direction) {
@@ -996,6 +1055,7 @@ export function createFileService({
       const nextRecord = state.files[index + 1] || state.files[index - 1] || null;
       state.files.splice(index, 1);
       state.fileCache.delete(record.path);
+      draftRecoveryCheckedPaths.delete(record.path);
       state.savedContentCache?.delete(record.path);
       state.dirtyPaths.delete(record.path);
       state.externalChangePaths?.delete(record.path);
@@ -1497,6 +1557,7 @@ export function createFileService({
       state.activePath = record.path;
       if (oldPath && oldPath !== record.path) {
         state.fileCache.delete(oldPath);
+        draftRecoveryCheckedPaths.delete(oldPath);
         state.dirtyPaths.delete(oldPath);
         state.externalChangePaths?.delete(oldPath);
         state.externalChangeDetails?.delete(oldPath);
@@ -1575,6 +1636,7 @@ export function createFileService({
       state.activePath = record.path;
       if (oldPath && oldPath !== record.path) {
         state.fileCache.delete(oldPath);
+        draftRecoveryCheckedPaths.delete(oldPath);
         state.dirtyPaths.delete(oldPath);
         state.externalChangePaths?.delete(oldPath);
         state.externalChangeDetails?.delete(oldPath);
@@ -1629,9 +1691,14 @@ export function createFileService({
     }
 
     async function addRecordsToWorkspace(records, options = {}) {
+      const inheritWorkspacePathContext = Boolean(options.inheritWorkspacePathContext && state.workspacePathContextId);
       const prepared = records
         .filter((record) => isSupportedFile(record.name))
-        .map(prepareRecord);
+        .map((record) => prepareRecord({
+          ...record,
+          hasRelativePathContext: inheritWorkspacePathContext,
+          pathContextId: inheritWorkspacePathContext ? state.workspacePathContextId : '',
+        }));
 
       if (!prepared.length) {
         setStatus('No supported Markdown or Mermaid files were selected.', 'warning');
@@ -1651,7 +1718,7 @@ export function createFileService({
       state.workspaceKind = state.workspaceKind || 'virtual';
       state.artifactBundle = null;
       fileSearch.value = '';
-      afterLibraryLoaded?.();
+      afterLibraryLoaded?.({ replaced: false });
       renderFileList();
       syncEditorReadOnly?.();
       updateSaveButton();
@@ -1689,6 +1756,7 @@ export function createFileService({
         await addRecordsToWorkspace([record], {
           folderName: state.folderName || state.workspaceDirectoryHandle.name || 'Workspace',
           selectPath: path,
+          inheritWorkspacePathContext: true,
         });
         setStatus(`${path} added to the workspace.`, 'ok');
       } catch (error) {
@@ -1732,6 +1800,7 @@ export function createFileService({
         await addRecordsToWorkspace([record], {
           folderName: state.folderName || 'Windows workspace',
           selectPath: recordPath,
+          inheritWorkspacePathContext: true,
         });
         state.workspaceKind = 'native-folder';
         setStatus(`${recordPath} added to the Windows workspace.`, 'ok');
@@ -1794,6 +1863,8 @@ export function createFileService({
           path: change.path,
           file: new File([''], name, { type: getMimeTypeForPath(change.path) }),
           nativeHandleId: change.nativeHandleId,
+          hasRelativePathContext: Boolean(state.workspacePathContextId),
+          pathContextId: state.workspacePathContextId,
         });
         record.externalPlaceholder = true;
         state.files.push(record);

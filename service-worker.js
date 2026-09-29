@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v63';
+const CACHE_NAME = 'lens-docs-studio-v65';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -9,10 +9,13 @@ const LOCAL_ASSETS = [
   './assets/scripts/app-controller.js',
   './assets/scripts/dom.js',
   './assets/scripts/document/document-ux-service.js',
+  './assets/scripts/document/document-navigation-service.js',
+  './assets/scripts/document/document-sections.js',
   './assets/scripts/document/markdown-governance-service.js',
   './assets/scripts/document/selection-sync-service.js',
   './assets/scripts/document/scroll-sync-service.js',
   './assets/scripts/editor/draft-service.js',
+  './assets/scripts/editor/document-link-service.js',
   './assets/scripts/editor/editor-service.js',
   './assets/scripts/editor/find-replace-service.js',
   './assets/scripts/editor/insert-helper-service.js',
@@ -44,6 +47,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/utils/binary.js',
   './assets/scripts/utils/browser.js',
   './assets/scripts/utils/devops-markdown.js',
+  './assets/scripts/utils/document-links.js',
   './assets/scripts/utils/files.js',
   './assets/scripts/utils/format.js',
   './assets/scripts/utils/front-matter.js',
@@ -61,6 +65,8 @@ const LOCAL_ASSETS = [
   './manifest.webmanifest',
   './icon.svg',
 ];
+
+const APP_SHELL_URLS = new Set(LOCAL_ASSETS.map((asset) => new URL(asset, self.registration.scope).href));
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
@@ -98,9 +104,23 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (isLocal) {
+    const appShellUrl = getAppShellUrl(url);
+    if (appShellUrl) {
+      // Source files must come from one current release when online. Serving an
+      // older module first can combine new markup with obsolete behaviour.
+      event.respondWith(networkFirst(request, appShellUrl));
+      return;
+    }
     event.respondWith(staleWhileRevalidate(request));
   }
 });
+
+function getAppShellUrl(url) {
+  const canonicalUrl = new URL(url.href);
+  canonicalUrl.search = '';
+  canonicalUrl.hash = '';
+  return APP_SHELL_URLS.has(canonicalUrl.href) ? canonicalUrl.href : '';
+}
 
 async function readVendorAssets() {
   try {
@@ -116,8 +136,14 @@ async function readVendorAssets() {
 async function networkFirst(request, fallbackUrl) {
   const cache = await caches.open(CACHE_NAME);
   try {
-    const response = await fetch(request);
-    cache.put(request, response.clone());
+    const response = await fetch(new Request(request, { cache: 'no-cache' }));
+    if (response.ok) {
+      try {
+        await cache.put(request, response.clone());
+      } catch {
+        // A successful network response remains usable if cache storage fails.
+      }
+    }
     return response;
   } catch {
     return await cache.match(request) || await cache.match(fallbackUrl);

@@ -28,6 +28,10 @@ The editor keeps the app lightweight while still covering daily documentation wo
 
 Formatting buttons insert Markdown for headings, emphasis, links, lists, task lists, quotes, code blocks, images, horizontal rules, Mermaid blocks, tables, semantic progress bars with preset colours, emoji, callouts, status badges, details blocks, image figures, keyboard shortcuts, and anchors.
 
+Use **Document link** beside the standard Link command to reference another loaded document without calculating its relative path. The dialogue searches titles, filenames, and exact workspace paths, can target a heading or explicit anchor, previews the generated Markdown, and inserts the result as one Undo operation. Selected editor text becomes the initial link text. The current document is included for section links; choose a section rather than **Start of document** when linking to the same page.
+
+Document link insertion needs a known shared workspace relationship, such as an opened folder or imported ZIP. Separately opened or dropped files do not receive invented paths. In a read-only document, navigation remains available while insertion is disabled.
+
 Right-click in the editor or rendered preview to open context actions for the current selection, code block, table, or diagram.
 
 Rendered tables include a Copy button that places tab-separated text on the clipboard so it can be pasted directly into Excel or another spreadsheet.
@@ -51,6 +55,14 @@ The preview renders Markdown and Mermaid together. Use the preview header for:
 - Workspace link/asset audit notes and a View menu docs map for loaded files.
 - Preview maximisation, diagram theme selection, and diagram zoom controls.
 - Follow short editor selections into the preview while using Split layout.
+
+### Workspace document navigation
+
+Ordinary rendered Markdown links to loaded documents stay in the current Lens Docs Studio session. Paths resolve from the source document's directory inside the opened folder or imported pack, so `./`, child paths, and `../` within that workspace work without using the browser URL. Inline and reference-style links share the same exact, case-sensitive path contract. Links can include a rendered heading fragment or a safe explicit anchor, for example `../reference/guide.md#source-authority`; a missing section opens the exact document at its start and reports the missing fragment.
+
+Use **Back** and **Forward** beside the active document name to revisit document and section context. The history belongs to the current workspace, is separate from editor Undo and browser history, and is cleared when the workspace changes. A new navigation after Back clears the Forward branch. Cancelled or failed document changes do not move history.
+
+HTTP/HTTPS, `mailto:`, `tel:`, and protocol-relative links keep their external behaviour. Local absolute paths, UNC paths, paths outside the workspace root, blocked schemes, ambiguous encodings, and missing exact files are not opened or fetched as web addresses. A conventional Markdown link does not use wikilink-style approximate matching; load the complete folder or ZIP when a relative target is unavailable.
 
 ## Mermaid Diagrams
 

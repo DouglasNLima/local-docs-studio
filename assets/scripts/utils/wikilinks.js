@@ -21,7 +21,7 @@ export function normaliseWikilinkTarget(value) {
     .replace(/\/+/g, '/');
 }
 
-export function createWikilinkExtension() {
+export function createWikilinkExtension({ getTrustToken = () => '' } = {}) {
   return {
     name: 'wikilink',
     level: 'inline',
@@ -42,7 +42,11 @@ export function createWikilinkExtension() {
     renderer(token) {
       const target = normaliseWikilinkTarget(token.target);
       const label = token.text || target;
-      return `<a class="wikilink" href="#" data-wikilink-target="${escapeHtml(target)}">${escapeHtml(label)}</a>`;
+      const trustToken = String(getTrustToken() || '');
+      const trustAttribute = trustToken
+        ? ` data-wikilink-token="${escapeHtml(trustToken)}"`
+        : '';
+      return `<a class="wikilink" href="#" data-wikilink-target="${escapeHtml(target)}"${trustAttribute}>${escapeHtml(label)}</a>`;
     },
   };
 }
