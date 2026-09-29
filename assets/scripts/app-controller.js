@@ -600,6 +600,7 @@ export function createAppController() {
     let exportTools;
     const {
       renderPreview,
+      waitForPreviewRender,
       buildMarkdownHtml,
       inspectMarkdownDocument,
       buildMermaidOnlyHtml,
@@ -818,6 +819,7 @@ export function createAppController() {
         selectFile,
         setStatus,
         rememberScrollPosition,
+        waitForPreviewRender,
       },
     });
     const documentLinkTools = createDocumentLinkService({

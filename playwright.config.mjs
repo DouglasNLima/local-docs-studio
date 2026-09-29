@@ -15,7 +15,8 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'python -m http.server 4173',
+    // Keep the Windows test server on IPv4 to avoid dual-stack socket aborts during long suites.
+    command: 'python -m http.server 4173 --bind 127.0.0.1',
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: true,
     timeout: 15_000,

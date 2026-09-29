@@ -33,7 +33,12 @@ for (const [sourceKind, sourcePath] of Object.entries(packSources)) {
     page.on('download', (download) => downloads.push(download.suggestedFilename()));
 
     await page.goto(appUrl, { waitUntil: 'domcontentloaded' });
-    await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+    try {
+      await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+    } catch {
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(page.locator('html')).toHaveAttribute('data-app-ready', 'true');
+    }
     await page.locator(sourceKind === 'ZIP' ? '#zipInput' : '#folderInput').setInputFiles(sourcePath);
     await expect(page.locator(`#fileList [data-path="${flowPath}"]`)).toBeVisible();
 

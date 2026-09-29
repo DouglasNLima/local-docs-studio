@@ -23,6 +23,7 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
     selectFile,
     setStatus,
     rememberScrollPosition,
+    waitForPreviewRender,
   } = callbacks;
 
   let entries = [];
@@ -59,6 +60,10 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
   }
 
   function afterFileSelection({ options = {}, previousContext = null } = {}) {
+    if (options.navigationRequestId && options.navigationRequestId !== navigationRequestId) {
+      updateHistoryControls();
+      return;
+    }
     if (['manual', 'skip'].includes(options.historyMode)) {
       updateHistoryControls();
       return;
@@ -143,6 +148,8 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
         });
         if (sectionFound === null) return false;
       } else {
+        await waitForPreviewRender?.();
+        if (!isCurrentNavigation(requestId, resolution.targetPath)) return false;
         await waitForStableLayout();
         if (!isCurrentNavigation(requestId, resolution.targetPath)) return false;
         setPreviewScroll(0);
@@ -280,6 +287,8 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
 
   async function restoreContext(context, { guard = null } = {}) {
     if (!context || context.path !== state.activePath) return;
+    await waitForPreviewRender?.();
+    if (guard && !guard()) return false;
     await waitForStableLayout();
     if (guard && !guard()) return false;
     if (context.sectionId) {
@@ -302,6 +311,8 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
   }
 
   async function jumpToSection(fragment, { settle = true, guard = null } = {}) {
+    await waitForPreviewRender?.();
+    if (guard && !guard()) return null;
     if (settle) await waitForStableLayout();
     if (guard && !guard()) return null;
     const root = getContentRoot();

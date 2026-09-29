@@ -286,7 +286,24 @@ export function createRenderingService({
     return mermaidTask;
   }
 
-    async function renderPreview() {
+    let latestPreviewRender = Promise.resolve();
+
+    function renderPreview() {
+      const task = performRenderPreview();
+      latestPreviewRender = task;
+      return task;
+    }
+
+    async function waitForPreviewRender() {
+      while (true) {
+        if (state.debounceId) renderPreview();
+        const pending = latestPreviewRender;
+        await pending;
+        if (pending === latestPreviewRender && !state.debounceId) return;
+      }
+    }
+
+    async function performRenderPreview() {
       clearTimeout(state.debounceId);
       state.debounceId = 0;
 
@@ -981,6 +998,7 @@ export function createRenderingService({
 
     return {
       renderPreview,
+      waitForPreviewRender,
       buildMarkdownHtml,
       inspectMarkdownDocument,
       buildMermaidOnlyHtml,

@@ -4294,9 +4294,11 @@ test('workspace Markdown links navigate documents and sections without HTTP esca
 
   const onboardingSelectionStart = await page.locator('#editor').evaluate((editor) => {
     const start = editor.value.indexOf('Workspace overview');
+    editor.focus({ preventScroll: true });
     editor.setSelectionRange(start, start + 'Workspace overview'.length);
     return start;
   });
+  await expect(page.locator('#editor')).toHaveJSProperty('selectionStart', onboardingSelectionStart);
   await developerLink.click();
   await expect(page.locator('#activeFileLabel')).toContainText(developerPath);
   await expect(page.locator(`#fileList [data-path="${developerPath}"]`)).toHaveClass(/active/);
@@ -4563,6 +4565,53 @@ test('missing sections open the exact document at the start while same-document 
   await expect(page.locator('#activeFileLabel')).toContainText(onboardingPath);
   await expect(page.locator('#status')).toContainText(`Back to ${onboardingPath}`);
   await expect(page.locator('#editor')).toHaveValue(/Unsaved navigation marker/);
+});
+
+test('a fragment jump survives a pending diagram render', async ({ page }) => {
+  let releaseMermaid;
+  let mermaidRequested = false;
+  const mermaidGate = new Promise((resolve) => { releaseMermaid = resolve; });
+  await page.route('**/assets/vendor/mermaid-11.15.0.esm.min.js', async (route) => {
+    mermaidRequested = true;
+    await mermaidGate;
+    await route.continue();
+  });
+  await gotoApp(page);
+
+  const before = Array.from({ length: 25 }, (_, index) => `Opening paragraph ${index + 1}.`).join('\n\n');
+  const after = Array.from({ length: 25 }, (_, index) => `Closing paragraph ${index + 1}.`).join('\n\n');
+  const content = [
+    '# Guide',
+    '[Deep section](#deep-section)',
+    '```mermaid',
+    'flowchart TD',
+    '  A --> B',
+    '```',
+    before,
+    '<a id="deep-section"></a>',
+    '## Deep section',
+    after,
+  ].join('\n\n');
+  await page.locator('#fileInput').setInputFiles({
+    name: 'guide.md',
+    mimeType: 'text/markdown',
+    buffer: Buffer.from(content),
+  });
+  await expect.poll(() => mermaidRequested).toBe(true);
+  try {
+    await page.getByRole('link', { name: 'Deep section', exact: true }).click();
+    await page.waitForTimeout(350);
+  } finally {
+    releaseMermaid();
+  }
+
+  await expect(page.locator('.diagram-frame svg')).toBeVisible();
+  await expect(page.locator('#status')).toContainText('Opened guide.md at #deep-section');
+  await expect.poll(() => page.locator('#preview').evaluate((preview) => preview.scrollTop)).toBeGreaterThan(0);
+  await expect(page.locator('#documentBackButton')).toBeEnabled();
+  await page.locator('#documentBackButton').click();
+  await expect(page.locator('#status')).toContainText('Back to guide.md');
+  await expect.poll(() => page.locator('#preview').evaluate((preview) => preview.scrollTop)).toBe(0);
 });
 
 test('Document link dialogue inserts an exact round-trip link as one undo operation', async ({ page }, testInfo) => {
