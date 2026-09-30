@@ -1,8 +1,9 @@
+import { collectImageTokens, serialiseImage, encodeImagePathComponent } from '../utils/image-references.js';
 import { base64ToUint8Array, textToBase64 } from '../utils/binary.js';
 import { downloadBlob } from '../utils/browser.js';
 import { isSupportedFile } from '../utils/files.js';
 import { escapeHtml, escapeXml, sanitiseFileName, slugify } from '../utils/format.js';
-import { composeMarkdownClipboardHtml, findMarkdownImageTokens } from '../utils/markdown-clipboard.js';
+import { composeMarkdownClipboardHtml } from '../utils/markdown-clipboard.js';
 import { createZipBlob } from '../utils/zip.js';
 import { formatMarkdownForDevOpsBundle } from '../utils/devops-markdown.js';
 import { resolveWikilinkTarget, stripAppWikilinkActions } from '../utils/wikilinks.js';
@@ -34,6 +35,7 @@ export function createExportService({
   const { preview, editor, exportTrust } = dom;
   const {
     renderPreview,
+    imageAssets,
     renderMermaidDiagrams,
     buildMarkdownHtml,
     buildMermaidOnlyHtml,
@@ -373,7 +375,11 @@ export function createExportService({
       return exportMarkdownBundleInternal({ includeArtifactReviewManifest: true });
     }
 
-    async function exportMarkdownBundleInternal({ includeArtifactReviewManifest = false } = {}) {
+    async function buildMarkdownBundle() {
+      return exportMarkdownBundleInternal({ download: false });
+    }
+
+    async function exportMarkdownBundleInternal({ includeArtifactReviewManifest = false, download = true } = {}) {
       const records = state.files.filter((record) => isSupportedFile(record.name));
       if (!records.length) {
         setStatus('Open Markdown or Mermaid files before exporting a bundle.', 'warning');
@@ -384,11 +390,15 @@ export function createExportService({
         setStatus(`Building ${includeArtifactReviewManifest ? 'artefact review pack' : 'Markdown bundle'} from ${records.length} document${records.length === 1 ? '' : 's'}...`);
         const documents = [];
         const zipEntries = [];
+        let externalImages = 0;
         const useDevopsMarkdown = Boolean(getEffectiveDevopsMarkdownExport());
 
         for (const record of records) {
           const path = normaliseBundlePath(record.path || record.name);
-          const sourceText = await readRecordText(record);
+          const sourceText = imageAssets.canonicaliseLegacyReferences(await readRecordText(record), record.path);
+          externalImages += imageAssets.storageSummary(sourceText, record.path).external;
+          const missing = await imageAssets.ensureDocumentImages(sourceText, record.path);
+          if (missing.length) throw new Error(missing.join("; "));
           const text = useDevopsMarkdown
             ? formatMarkdownForDevOpsBundle(sourceText, path)
             : sourceText;
@@ -415,17 +425,19 @@ export function createExportService({
           zipEntriesForDownload.push({ name: LENS_ARTIFACT_BUNDLE_MANIFEST_NAME, data: JSON.stringify(reviewManifest, null, 2) });
         }
         const zip = createZipBlob(zipEntriesForDownload, 'application/zip');
+        if (!download) return zip;
 
         const fileSuffix = includeArtifactReviewManifest ? 'artefact-review-pack' : 'markdown-bundle';
         downloadBlob(zip, `${sanitiseFileName(manifest.title) || 'markdown-docs'}-${fileSuffix}.zip`);
         const devOpsSuffix = useDevopsMarkdown ? ' Azure DevOps Mermaid syntax applied.' : '';
         const reviewSuffix = reviewManifest ? ' Safe artefact metadata included.' : '';
-        setExportTrust(`${includeArtifactReviewManifest ? 'Artefact review pack' : 'Markdown bundle'} ready: ${documents.length} document${documents.length === 1 ? '' : 's'} and ${assetEntries.length} asset${assetEntries.length === 1 ? '' : 's'}.${devOpsSuffix}${reviewSuffix}`, 'ok');
+        const externalSuffix = externalImages ? ` ${externalImages} external images remain dependent on network access.` : '';
+        setExportTrust(`${includeArtifactReviewManifest ? 'Artefact review pack' : 'Markdown bundle'} ready: ${documents.length} document${documents.length === 1 ? '' : 's'} and ${assetEntries.length} asset${assetEntries.length === 1 ? '' : 's'}.${devOpsSuffix}${reviewSuffix}${externalSuffix}`, externalImages ? 'warning' : 'ok');
         setStatus(includeArtifactReviewManifest ? 'Artefact review pack exported with safe artefact metadata.' : 'Markdown bundle exported.', 'ok');
         closeOpenMenus();
         return true;
       } catch (error) {
-        setStatus(includeArtifactReviewManifest ? 'Artefact review pack export failed.' : 'Markdown bundle export failed.', 'danger');
+        setStatus(`Portable bundle export failed: ${error.message}`, 'danger');
         console.error(error);
         return false;
       }
@@ -725,16 +737,16 @@ export function createExportService({
     function embedManagedAssetMarkdownImages(markdown) {
       const source = String(markdown || '');
       let convertedAssets = 0;
-      const replacements = findMarkdownImageTokens(source)
+      const replacements = collectImageTokens(source)
         .map((token) => ({ token, asset: getManagedAssetForMarkdownHref(token.href) }))
         .filter(({ asset }) => asset)
         .map(({ token, asset }) => {
           convertedAssets += 1;
-          const title = token.title ? ` ${token.title}` : '';
+          const title = token.title ? ` \"${token.title.replaceAll('\"', '\\\"')}\"` : '';
           return {
             start: token.start,
             end: token.end,
-            text: `![${token.alt}](${getManagedAssetDataUrl(asset)}${title})`,
+            text: token.kind === 'html' ? getManagedAssetDataUrl(asset) : `${serialiseImage({ reference: getManagedAssetDataUrl(asset), alt: token.alt }).slice(0, -1)}${title})`,
           };
         });
 
@@ -820,7 +832,7 @@ export function createExportService({
 
     function getManagedAssetForImage(image, documentPath = state.activePath) {
       if (!state.managedAssets?.size) return null;
-      const path = resolveManagedAssetPath(image.dataset.managedAssetPath || image.getAttribute('src') || '', documentPath);
+      const path = image.dataset.managedAssetPath || resolveManagedAssetPath(image.getAttribute('src') || '', documentPath);
       return state.managedAssets.get(path) || null;
     }
 
@@ -828,23 +840,9 @@ export function createExportService({
       return asset.dataUrl || `data:${asset.mimeType || 'application/octet-stream'};base64,${asset.base64 || ''}`;
     }
 
-    function normaliseAssetPath(value) {
-      return String(value)
-        .replace(/^blob:.*$/i, '')
-        .replace(/^\.?\//, '')
-        .replace(/\\/g, '/');
-    }
-
     function resolveManagedAssetPath(value, documentPath = '') {
-      const path = normaliseAssetPath(value);
-      if (!path) return '';
-      if (state.managedAssets?.has(path)) return path;
-
-      const directory = normaliseAssetPath(documentPath).split('/').slice(0, -1).join('/');
-      if (!directory) return '';
-
-      const resolved = normaliseAssetPath(`${directory}/${path}`);
-      return state.managedAssets?.has(resolved) ? resolved : path;
+      const result = imageAssets.resolve(value, documentPath);
+      return result.kind === 'local' ? result.path : '';
     }
 
     function capturePrintHtmlForTests(html) {
@@ -1101,6 +1099,8 @@ export function createExportService({
 
     async function renderRecordForDocsSite(record, index, usedIds) {
       const source = await readRecordText(record);
+      const missingImages = await imageAssets.ensureDocumentImages(source, record.path);
+      if (missingImages.length) throw new Error(missingImages.join('; '));
       const frontMatter = parseFrontMatter(source);
       const sourceBody = frontMatter.body;
       const selectedMode = resolveModeFor(sourceBody, record.name);
@@ -1117,6 +1117,7 @@ export function createExportService({
       const diagramResult = await renderMermaidDiagrams(diagrams, renderId);
       prepareDiagramFramesIn(container, false, fileStem);
       container.querySelectorAll('.diagram-error-actions').forEach((actions) => actions.remove());
+      await imageAssets.hydrateImages(container, record.path, { diagnostics: false });
       rewriteManagedAssetImageSources(container, record.path);
 
       const metadata = frontMatter.metadata;
@@ -1153,7 +1154,7 @@ export function createExportService({
       root.querySelectorAll('img').forEach((image) => {
         const asset = getManagedAssetForImage(image, documentPath);
         if (!asset) return;
-        image.src = asset.path;
+        image.src = asset.path.split("/").map(encodeImagePathComponent).join("/");
         image.dataset.managedAssetPath = asset.path;
       });
     }
@@ -1173,7 +1174,7 @@ export function createExportService({
 
     function buildManagedAssetZipEntries() {
       if (!state.managedAssets?.size) return [];
-      return [...state.managedAssets.values()].map((asset) => ({
+      return [...state.managedAssets.values()].filter((asset) => asset.base64).map((asset) => ({
         name: asset.path,
         data: base64ToUint8Array(asset.base64 || ''),
       }));
@@ -1181,7 +1182,7 @@ export function createExportService({
 
     function buildMarkdownBundleManifest(documents, assetEntries) {
       const title = state.folderName || getExportTitle() || 'Markdown bundle';
-      const assets = [...(state.managedAssets?.values() || [])].map((asset) => ({
+      const assets = [...(state.managedAssets?.values() || [])].filter((asset) => asset.base64).map((asset) => ({
         path: asset.path,
         name: asset.name,
         mimeType: asset.mimeType,
@@ -1191,6 +1192,7 @@ export function createExportService({
       return {
         formatVersion: 'markdown-bundle-1.0',
         generator: APP_NAME,
+        imageReferences: 'document-relative',
         title,
         exportedAt: new Date().toISOString(),
         documentCount: documents.length,
@@ -2784,6 +2786,7 @@ Open \`index.html\` directly from this folder for a local copy, or upload the co
       exportPreviewWord,
       exportPreviewPdf,
       exportMarkdownBundle,
+      buildMarkdownBundle,
       exportArtifactReviewPack,
       copyRenderedHtml,
       copyMarkdownWithImages,

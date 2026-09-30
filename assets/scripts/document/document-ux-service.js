@@ -40,6 +40,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
     openBacklink,
     openGovernanceIssue,
     navigateToSection,
+    resolveImageReference,
   } = callbacks;
 
   const searchState = {
@@ -392,7 +393,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
       .filter((link) => getTrustedPreviewInternalLink(link)?.kind === 'wikilink')
       .filter((link) => !resolveWikilinkTarget(getTrustedPreviewInternalLink(link).target, state.files, state.activePath));
     const brokenRelativeLinks = links.filter((link) => isBrokenRelativeDocumentLink(link));
-    const missingImages = [...root.querySelectorAll('img[src]')].filter((image) => isMissingManagedImage(image));
+    const missingImages = [...root.querySelectorAll('img[src], img[data-image-missing]')].filter((image) => isMissingManagedImage(image));
     const tables = root.querySelectorAll('table').length;
     const codeBlocks = root.querySelectorAll('.code-block').length
       + [...root.querySelectorAll('pre code')].filter((code) => !code.closest('.code-block')).length;
@@ -463,7 +464,7 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
 
     if (missingImages.length) {
       alerts.push({
-        message: `${missingImages.length} local image reference${missingImages.length === 1 ? '' : 's'} are not managed session assets.`,
+        message: `${missingImages.length} local image reference${missingImages.length === 1 ? ' needs' : 's need'} locating or importing.`,
         tone: 'warning',
         targetId: ensureElementId(missingImages[0], 'missing-image'),
       });
@@ -563,19 +564,11 @@ export function createDocumentUxService({ state, dom, callbacks = {} }) {
   }
 
   function isMissingManagedImage(image) {
+    if (image.dataset.imageMissing) return true;
     const src = image.getAttribute('src') || '';
     if (!src || /^(https?:|blob:|data:)/i.test(src)) return false;
-    const path = normaliseRelativeAssetPath(src);
-    return !state.managedAssets?.has(path);
-  }
-
-  function normaliseRelativeAssetPath(value) {
-    const activeDir = state.activePath.includes('/') ? state.activePath.slice(0, state.activePath.lastIndexOf('/') + 1) : '';
-    return String(`${activeDir}${value}`)
-      .replace(/\\/g, '/')
-      .replace(/^\.\/+/, '')
-      .replace(/\/\.\//g, '/')
-      .replace(/[^/]+\/\.\.\//g, '');
+    const result = resolveImageReference?.(src, state.activePath);
+    return result?.kind === 'local' && !state.managedAssets?.get(result.path)?.base64;
   }
 
   async function updateGovernanceAudit(review) {

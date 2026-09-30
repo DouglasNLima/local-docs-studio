@@ -29,6 +29,7 @@ export function createProgressBarEditorService({ editor, dom, callbacks }) {
   const {
     replaceEditorRange,
     setStatus,
+    captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext,
   } = callbacks;
 
   let progressState = createDefaultProgressState();
@@ -55,6 +56,7 @@ export function createProgressBarEditorService({ editor, dom, callbacks }) {
   }
 
   function openProgressBarEditor() {
+    if (editor.readOnly) return;
     const range = findProgressBarAt(editor.value, editor.selectionStart);
     const selectionText = editor.value.slice(editor.selectionStart, editor.selectionEnd).trim();
     progressState = range
@@ -65,6 +67,7 @@ export function createProgressBarEditorService({ editor, dom, callbacks }) {
           selectionStart: editor.selectionStart,
           selectionEnd: editor.selectionEnd,
         };
+    progressState.context = captureInsertionContext?.();
     renderProgressBarEditor();
     progressBarEditorDialog?.showModal();
     progressBarLabelInput?.focus();
@@ -74,7 +77,7 @@ export function createProgressBarEditorService({ editor, dom, callbacks }) {
   function closeProgressBarEditor(event) {
     event?.preventDefault?.();
     progressBarEditorDialog?.close();
-    editor.focus();
+    restoreInsertionContext?.(progressState.context);
   }
 
   function renderProgressBarEditor() {
@@ -126,6 +129,7 @@ export function createProgressBarEditorService({ editor, dom, callbacks }) {
 
   function applyProgressBar(event) {
     event?.preventDefault?.();
+    if (progressState.context && !isInsertionContextCurrent(progressState.context)) { setStatus('The document changed. Reopen the progress bar editor.', 'warning'); return; }
     const label = normaliseLabel(progressBarLabelInput?.value) || defaultProgressLabel;
     const percent = normalisePercent(progressBarPercentInput?.value);
     const colour = normaliseColour(progressState.colour);

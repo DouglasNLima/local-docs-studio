@@ -53,6 +53,7 @@ export function createFileService({
     copyToClipboard,
     beforeActiveFileChange,
     afterActiveFileChange,
+    getImageStorageSummary,
   } = callbacks;
   const {
     compareRecords,
@@ -626,7 +627,7 @@ export function createFileService({
         state.workspaceDirectoryHandle = null;
         state.nativeWorkspaceId = '';
         state.workspaceKind = imported.artifactBundle ? 'artefact-bundle' : imported.bundle ? 'bundle' : 'zip';
-        state.workspaceRootPath = inferWorkspaceRootPath(imported.records, state.workspaceKind);
+        state.workspaceRootPath = inferWorkspaceRootPath([...imported.records, ...imported.assets], state.workspaceKind);
         state.workspacePathContextId = pathContextId;
         state.artifactBundle = imported.artifactBundle;
         state.fileCache.clear();
@@ -827,6 +828,9 @@ export function createFileService({
       }
 
       const uniqueRecords = uniqueByPath(records).sort(compareRecords);
+      if (bundle && bundle.imageReferences !== 'document-relative') {
+        for (const asset of assets) asset.legacyRootReference = true;
+      }
       const artifactResult = artifactManifestBytes
         ? parseLensArtifactBundleManifest(artifactManifestBytes, uniqueRecords)
         : { bundle: null, warnings: [] };
@@ -935,6 +939,9 @@ export function createFileService({
     async function selectFile(path, options = {}) {
       const record = state.files.find((item) => item.path === path);
       if (!record) return { ok: false, reason: 'document-not-found', path };
+      if (path === state.activePath && !record.handle && !record.nativeHandleId
+        && draftRecoveryCheckedPaths.has(path) && state.fileCache.get(path) === editor.value
+        && options.scrollMode !== 'start') return { ok: true, path, record };
       const requestId = ++activeSelectionRequestId;
       const previousContext = beforeActiveFileChange?.({ path, record, options }) || null;
       if (state.activePath) rememberScrollPosition?.();
@@ -1319,7 +1326,7 @@ export function createFileService({
           return;
         }
 
-        await saveActiveFileAs();
+        await saveActiveFileAs({ checked: true });
       } catch (error) {
         if (error?.name === 'AbortError') return;
         setStatus('Save failed.', 'danger');
@@ -1334,7 +1341,7 @@ export function createFileService({
       await renderPreview();
     }
 
-    async function saveActiveFileAs() {
+    async function saveActiveFileAs({ checked = false } = {}) {
       const record = state.files.find((item) => item.path === state.activePath);
       if (!record) {
         setStatus('No file selected.', 'warning');
@@ -1348,6 +1355,7 @@ export function createFileService({
       }
 
       const content = editor.value;
+      if (!checked && beforeSaveActiveFile && !await beforeSaveActiveFile(record, content)) return false;
       try {
         await flushPendingRenderBeforeSave();
         if (await hasNativeFileCapability('file.saveAs')) {
@@ -2319,9 +2327,8 @@ export function createFileService({
     }
 
     function buildSaveStatus(name) {
-      return state.managedAssets?.size
-        ? `${name} saved with image links. Image binaries are included in exports.`
-        : `${name} saved.`;
+      const summary = getImageStorageSummary?.(editor.value, state.activePath);
+      return `${name} saved.${summary?.message ? ` ${summary.message}` : ''}`;
     }
 
     async function ensureWritePermission(handle) {

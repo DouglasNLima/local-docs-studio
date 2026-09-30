@@ -1,4 +1,5 @@
 import { isPositionInsideDevOpsMermaidBlock } from '../utils/devops-markdown.js';
+import { revealEditorRange } from '../utils/editor-viewport.js';
 
 const HIGHLIGHT_MODULE_PATH = '../../vendor/highlight-11.11.1.esm.js';
 
@@ -519,16 +520,48 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         value: editor.value,
         start: editor.selectionStart,
         end: editor.selectionEnd,
+        top: editor.scrollTop,
+        left: editor.scrollLeft,
       };
+    }
+
+    function captureInsertionContext() {
+      return { ...captureEditorSnapshot(), path: state.activePath,
+        record: state.files.find((record) => record.path === state.activePath),
+        workspace: state.workspacePathContextId, focus: document.activeElement };
+    }
+
+    function isInsertionContextCurrent(context) {
+      return Boolean(context && !editor.readOnly && context.path === state.activePath
+        && context.record === state.files.find((record) => record.path === state.activePath)
+        && context.workspace === state.workspacePathContextId && context.value === editor.value);
+    }
+
+    function restoreInsertionContext(context) {
+      if (!context || context.path !== state.activePath || context.value !== editor.value
+        || context.workspace !== state.workspacePathContextId
+        || context.record !== state.files.find((record) => record.path === state.activePath)) return;
+      editor.focus({ preventScroll: true });
+      editor.setSelectionRange(context.start, context.end);
+      restoreEditorViewport(context);
+    }
+
+    function restoreEditorViewport(snapshot) {
+      editor.scrollTop = snapshot.top ?? editor.scrollTop;
+      editor.scrollLeft = snapshot.left ?? editor.scrollLeft;
+      syncLineNumbers();
+      syncSyntaxLayer();
     }
 
     function restoreEditorSnapshot(snapshot) {
       state.editorHistory.suppress = true;
       editor.value = snapshot.value;
-      editor.focus();
+      editor.focus({ preventScroll: true });
       editor.setSelectionRange(snapshot.start, snapshot.end);
+      restoreEditorViewport(snapshot);
       state.editorHistory.last = captureEditorSnapshot();
       editor.dispatchEvent(new Event('input', { bubbles: true }));
+      restoreEditorViewport(snapshot);
       state.editorHistory.suppress = false;
       updateEditorChrome();
     }
@@ -542,6 +575,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
     }
 
     function executeMarkdownCommand(command) {
+      if (editor.readOnly) return;
       const commands = {
         bold: () => toggleInlineWrap('**', '**', 'bold text'),
         italic: () => toggleInlineWrap('*', '*', 'italic text'),
@@ -569,7 +603,7 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
         mermaidBlock: () => insertBlock('```mermaid\n', '\n```', 'flowchart LR\n  A[Start] --> B[Finish]'),
         link: insertLink,
         documentLink: () => commandHandlers.documentLink?.(),
-        image: insertImage,
+        image: () => commandHandlers.insertHelper?.('imageFigure'),
         horizontalRule: insertHorizontalRule,
         table: () => {
           if (commandHandlers.table) {
@@ -631,15 +665,6 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       const url = 'https://example.com';
       const replacement = `[${text}](${url})`;
       const urlStart = selection.start + text.length + 3;
-      replaceEditorRange(selection.start, selection.end, replacement, urlStart, urlStart + url.length);
-    }
-
-    function insertImage() {
-      const selection = getEditorSelection();
-      const text = selection.text || 'alt text';
-      const url = 'image-url';
-      const replacement = `![${text}](${url})`;
-      const urlStart = selection.start + text.length + 4;
       replaceEditorRange(selection.start, selection.end, replacement, urlStart, urlStart + url.length);
     }
 
@@ -706,12 +731,22 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       };
     }
 
-    function replaceEditorRange(start, end, replacement, selectionStart, selectionEnd) {
-      const value = editor.value;
-      editor.value = `${value.slice(0, start)}${replacement}${value.slice(end)}`;
-      editor.focus();
+    function replaceEditorRange(start, end, replacement, selectionStart, selectionEnd, { reveal = true } = {}) {
+      if (editor.readOnly) return false;
+      const viewport = captureEditorSnapshot();
+      // Capture the current cursor/viewport for this one history unit rather
+      // than reusing the selection from the previous typing event.
+      state.editorHistory.last = viewport;
+      editor.setRangeText(replacement, start, end, 'preserve');
+      editor.focus({ preventScroll: true });
       editor.setSelectionRange(selectionStart, selectionEnd);
+      restoreEditorViewport(viewport);
       editor.dispatchEvent(new Event('input', { bubbles: true }));
+      restoreEditorViewport(viewport);
+      if (reveal) revealEditorRange(editor, start, selectionEnd);
+      syncLineNumbers();
+      syncSyntaxLayer();
+      return true;
     }
 
     return {
@@ -728,5 +763,8 @@ export function createEditorService({ editor, state, dom = {}, callbacks = {} })
       executeMarkdownCommand,
       getEditorSelection,
       replaceEditorRange,
+      captureInsertionContext,
+      isInsertionContextCurrent,
+      restoreInsertionContext,
     };
 }

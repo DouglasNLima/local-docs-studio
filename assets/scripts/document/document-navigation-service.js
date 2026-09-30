@@ -332,6 +332,9 @@ export function createDocumentNavigationService({ state, dom, callbacks }) {
   }
 
   function beginNavigation({ pending = false } = {}) {
+    // A second link can be followed before the first preview has settled. Keep
+    // the source selection now, even if that first navigation is superseded.
+    if (index >= 0 && entries[index]?.path === state.activePath) entries[index] = captureContext();
     navigationRequestId += 1;
     pendingNavigationRequestId = pending ? navigationRequestId : 0;
     updateHistoryControls();

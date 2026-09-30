@@ -55,6 +55,7 @@ public sealed class NativeBridge
         "file.save",
         "file.saveAs",
         "workspace.openFolder",
+        "workspace.images",
         "workspace.saveFile",
         "workspace.createFile",
         "workspace.watch",
@@ -107,6 +108,10 @@ public sealed class NativeBridge
 
         try
         {
+            if (!Uri.TryCreate(args.Source, UriKind.Absolute, out var messageOrigin)
+                || messageOrigin.Scheme != "https" || messageOrigin.Host != "lens-docs-studio.local"
+                || !messageOrigin.IsDefaultPort || messageOrigin.AbsolutePath != "/index.html") return;
+            if (args.WebMessageAsJson.Length > 28 * 1024 * 1024) return;
             using var document = JsonDocument.Parse(args.WebMessageAsJson);
             var root = document.RootElement;
             if (root.ValueKind != JsonValueKind.Object)
@@ -133,7 +138,7 @@ public sealed class NativeBridge
                 return;
             }
 
-            if (ReadString(root, "source") is { } source && source != WebSource)
+            if (ReadString(root, "source") != WebSource)
             {
                 PostError(coreWebView, id, "Native bridge message source is unsupported.");
                 return;
@@ -141,6 +146,21 @@ public sealed class NativeBridge
 
             switch (type)
             {
+                case "lensDocs.native.pickWorkspaceImage":
+                    PostResult(coreWebView, id, "lensDocs.native.pickWorkspaceImageResult", await nativeWorkspaceService.PickWorkspaceImageAsync(ReadPayloadString(root, "nativeWorkspaceId")));
+                    break;
+                case "lensDocs.native.imageDocumentContext":
+                    PostResult(coreWebView, id, "lensDocs.native.imageDocumentContextResult", new { path = nativeWorkspaceService.ImageDocumentPath(ReadPayloadString(root, "nativeWorkspaceId"), nativeFileService.GetAuthorisedPath(ReadPayloadString(root, "nativeHandleId"))) });
+                    break;
+                case "lensDocs.native.listWorkspaceImages":
+                    PostResult(coreWebView, id, "lensDocs.native.listWorkspaceImagesResult", nativeWorkspaceService.ListWorkspaceImages(ReadPayloadString(root, "nativeWorkspaceId")));
+                    break;
+                case "lensDocs.native.readWorkspaceImage":
+                    PostResult(coreWebView, id, "lensDocs.native.readWorkspaceImageResult", await nativeWorkspaceService.ReadWorkspaceImageAsync(ReadPayloadString(root, "nativeWorkspaceId"), ReadPayloadString(root, "path"), ReadPayload(root) is { } imagePayload && imagePayload.TryGetProperty("absoluteInput", out var absolute) && absolute.ValueKind == JsonValueKind.True));
+                    break;
+                case "lensDocs.native.createWorkspaceImage":
+                    PostResult(coreWebView, id, "lensDocs.native.createWorkspaceImageResult", await nativeWorkspaceService.CreateWorkspaceImageAsync(ReadPayloadString(root, "nativeWorkspaceId"), ReadPayloadString(root, "name"), ReadPayloadString(root, "base64"), ReadPayloadString(root, "mimeType")));
+                    break;
                 case PingType:
                     PostPong(coreWebView, id);
                     break;
@@ -318,6 +338,7 @@ public sealed class NativeBridge
                 webView2RuntimeAvailable = true,
                 appVersion = GetAppVersion(),
                 capabilities = GetCapabilities(),
+                imageSmokeMode = smokeFixtureService?.ImageMode ?? string.Empty,
             },
         };
         coreWebView.PostWebMessageAsJson(JsonSerializer.Serialize(message));

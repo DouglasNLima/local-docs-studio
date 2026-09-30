@@ -19,6 +19,7 @@ public sealed class SmokeFixtureService
     }
 
     public bool Enabled => options.Enabled;
+    public string ImageMode => options.ImageMode;
 
     public Task<object> OpenFixtureFileAsync()
     {

@@ -1,4 +1,5 @@
 import { createNativeBridgeClient } from './native-bridge-client.js';
+import { runWorkspaceImageSmoke } from './workspace-image-smoke.js';
 
 const REQUIRED_CAPABILITIES = [
   'diagnostics.ping',
@@ -22,6 +23,7 @@ const CREATED_WORKSPACE_CONTENT = '# Windows Smoke Created File\n\nCreated by th
 export async function runNativeBridgeSmoke({
   windowRef = window,
   bridgeClient = createNativeBridgeClient({ windowRef, timeoutMs: 10000 }),
+  appController = null,
 } = {}) {
   if (!bridgeClient.isAvailable()) {
     return { ran: false, reason: 'unavailable' };
@@ -46,6 +48,9 @@ export async function runNativeBridgeSmoke({
 
     if (!capabilities.includes('smoke.nativeFixtures')) {
       return { ran: false, reason: 'smoke-capability-absent' };
+    }
+    if (payload.imageSmokeMode && appController && !isMockNativeBridge) {
+      return runWorkspaceImageSmoke({ bridgeClient, app: appController, mode: payload.imageSmokeMode });
     }
 
     recordStep('Windows shell started', ping.ok && payload.host === 'LensDocsStudio.Windows', {

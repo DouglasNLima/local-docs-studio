@@ -5983,3 +5983,15 @@ label.file-button.primary,
     grid-template-columns: 2.2rem repeat(var(--table-editor-columns), minmax(7rem, 1fr));
   }
 }
+.image-insertion-card { width: min(760px, calc(100vw - 48px)); }
+.image-insertion-card label { display: block; margin-top: 10px; font-weight: 600; }
+.image-insertion-card input, .image-insertion-card select { width: 100%; }
+.image-workspace-list { max-height: 240px; overflow: auto; margin-top: 10px; }
+.image-workspace-option { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; margin-bottom: 6px; }
+.image-workspace-option > span, .image-workspace-option > span > span { display: block; overflow-wrap: anywhere; }
+.image-workspace-option img { width: 64px; height: 48px; object-fit: contain; }
+.image-workspace-option[hidden] { display: none; }
+.image-insertion-preview { display: block; max-width: 100%; max-height: 180px; object-fit: contain; margin-top: 10px; }
+.image-insertion-preview[hidden] { display: none; }
+.image-storage-status { font-size: 13px; overflow-wrap: anywhere; }
+.image-reference-error, .image-insertion-error { display: block; padding: 6px; color: var(--danger, #b91c1c); overflow-wrap: anywhere; }

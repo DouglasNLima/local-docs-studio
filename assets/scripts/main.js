@@ -36,5 +36,5 @@ const [{ createAppController }, { runNativeBridgeSmoke }] = await Promise.all([
   import('./native/native-smoke-runner.js'),
 ]);
 
-createAppController();
-window.__lensDocsNativeSmokePromise = runNativeBridgeSmoke();
+const appController = createAppController();
+window.__lensDocsNativeSmokePromise = runNativeBridgeSmoke({ appController });

@@ -160,6 +160,8 @@ public sealed class NativeFileService
         };
     }
 
+    internal string GetAuthorisedPath(string? nativeHandleId) => ResolveHandlePath(nativeHandleId);
+
     public object RevealInExplorer(string? nativeHandleId)
     {
         var path = ResolveHandlePath(nativeHandleId);

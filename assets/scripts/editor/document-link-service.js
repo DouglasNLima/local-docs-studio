@@ -27,6 +27,7 @@ export function createDocumentLinkService({ state, editor, dom, callbacks }) {
     inspectMarkdownDocument,
     isActiveReadOnly,
     getDocTitleFromPath,
+    captureInsertionContext, restoreInsertionContext,
   } = callbacks;
 
   const metadataCache = new Map();
@@ -76,6 +77,7 @@ export function createDocumentLinkService({ state, editor, dom, callbacks }) {
     applying = false;
     returnFocus = document.activeElement;
     origin = {
+      context: captureInsertionContext?.(),
       record: activeRecord,
       path: activeRecord.path,
       value: editor.value,
@@ -117,6 +119,7 @@ export function createDocumentLinkService({ state, editor, dom, callbacks }) {
     event?.preventDefault?.();
     if (dialog?.open) dialog.close();
     const target = returnFocus;
+    restoreInsertionContext?.(origin?.context);
     returnFocus = null;
     origin = null;
     applying = false;
@@ -342,6 +345,7 @@ export function createDocumentLinkService({ state, editor, dom, callbacks }) {
     const start = submittedOrigin.selectionStart;
     const end = submittedOrigin.selectionEnd;
     dialog.close();
+    restoreInsertionContext?.(submittedOrigin.context);
     returnFocus = null;
     origin = null;
     applying = false;

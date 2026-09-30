@@ -6,7 +6,7 @@ import { createArtifactBundleFixtureZip, createDocumentNavigationFixtureZip } fr
 import { createZipBuffer, getZipText, readZipEntries } from './helpers/zip.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
-const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=';
+const tinyPngBase64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGP432H3HwAHFALF2h7vpgAAAABJRU5ErkJggg==';
 const tinySvg = '<svg xmlns="http://www.w3.org/2000/svg" onload="window.__auditXss=1"><rect width="1" height="1"/></svg>';
 
 function fixturePath(name) {
@@ -3888,7 +3888,7 @@ test('visual refresh screenshot artefacts cover key shell states', async ({ page
 
 test('editor toolbar icon buttons keep markdown command behaviour', async ({ page }) => {
   await gotoApp(page);
-  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(24);
+  await expect(page.locator('#editorToolbar svg.toolbar-icon')).toHaveCount(23);
   await expect(page.locator('#editorToolbar .toolbar-section')).toHaveCount(5);
 
   const cases = [
@@ -3902,7 +3902,6 @@ test('editor toolbar icon buttons keep markdown command behaviour', async ({ pag
     { command: 'taskListDone', value: '  One\n  - [ ] Two', expected: '  - [x] One\n  - [x] Two' },
     { command: 'quote', value: 'Quote', expected: '> Quote' },
     { command: 'link', value: 'alpha', expected: '[alpha](https://example.com)' },
-    { command: 'image', value: 'alpha', expected: '![alpha](image-url)' },
     { command: 'inlineCode', value: 'alpha', expected: '`alpha`' },
     { command: 'codeBlock', value: 'const x = 1;', expected: '```\nconst x = 1;\n```' },
     { command: 'horizontalRule', value: 'Before', expected: '---' },
@@ -4071,11 +4070,14 @@ test('rich insert toolbar helpers create emoji, callouts, badges, details, figur
   await page.locator('#insertHelperApplyButton').click();
   await expect(page.locator('#editor')).toHaveValue('<details data-details-block>\n  <summary>Release evidence</summary>\n\nScreenshots and logs are attached.\n</details>');
 
-  await openHelper('imageFigure');
-  await page.locator('#imageFigureSrcInput').fill('assets/images/roadmap.png');
-  await page.locator('#imageFigureAltInput').fill('Roadmap diagram');
-  await page.locator('#imageFigureCaptionInput').fill('Quarterly delivery roadmap');
-  await page.locator('#insertHelperApplyButton').click();
+  await setEditorValueAndSelection(page, '');
+  await page.locator('[data-command="image"]').click();
+  await page.locator('#imageSourceInput').selectOption('import');
+  await page.locator('#imageImportInput').setInputFiles({ name: 'roadmap.png', mimeType: 'image/png', buffer: Buffer.from(tinyPngBase64, 'base64') });
+  await page.locator('#imageAltInput').fill('Roadmap diagram');
+  await page.locator('#imageCaptionInput').fill('Quarterly delivery roadmap');
+  await expect(page.locator('[data-image-insert]')).toBeEnabled();
+  await page.locator('[data-image-insert]').click();
   await expect(page.locator('#editor')).toHaveValue('<figure data-image-figure>\n  <img src="assets/images/roadmap.png" alt="Roadmap diagram">\n  <figcaption>Quarterly delivery roadmap</figcaption>\n</figure>');
 
   await openHelper('keyboardShortcut');
@@ -6433,26 +6435,19 @@ test('dropped image assets render and travel through HTML, Word, and Docs Site e
   expect(searchIndex.pages.some((pageData) => pageData.html.includes('assets/images/tiny-image.png'))).toBe(true);
 });
 
-test('asset manager previews and renames managed image references', async ({ page }) => {
+test('asset manager makes temporary storage visible and preserves image files and references', async ({ page }) => {
   await openFixture(page, 'plain.md');
-  await page.locator('#editor').focus();
-  await page.locator('#editor').evaluate((editor) => {
-    editor.setSelectionRange(editor.value.length, editor.value.length);
-  });
   await dropTinyPngOnEditor(page);
   await expect(page.locator('#editor')).toHaveValue(/assets\/images\/tiny-image\.png/);
-
+  const source = await page.locator('#editor').inputValue();
   await page.locator('summary').filter({ hasText: /^View$/ }).click();
   await page.getByRole('button', { name: 'Manage assets' }).click();
   await expect(page.getByRole('heading', { name: 'Managed assets' })).toBeVisible();
   await expect(page.locator('.asset-library-item img')).toBeVisible();
-  await expect(page.locator('[data-asset-action="remove"]')).toBeDisabled();
-
-  await page.locator('.asset-library-main input').fill('assets/images/renamed-image.png');
-  await page.getByRole('button', { name: 'Rename' }).click();
-  await expect(page.locator('#status')).toHaveText(/Renamed asset/);
-  await expect(page.locator('#editor')).toHaveValue(/assets\/images\/renamed-image\.png/);
-  await expect(page.locator('#preview img[data-managed-asset-path="assets/images/renamed-image.png"]')).toHaveAttribute('src', /^blob:/);
+  await expect(page.locator('.asset-library-item')).toContainText('Available in session — not saved to folder');
+  await expect(page.locator('.asset-library-item')).toContainText('Rename/remove unavailable');
+  await expect(page.getByRole('button', { name: 'Save pending images to workspace' })).toBeVisible();
+  expect(await page.locator('#editor').inputValue()).toBe(source);
 });
 
 test('clipboard image paste creates the same managed assets as drag and drop', async ({ page }) => {

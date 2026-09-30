@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lens-docs-studio-v65';
+const CACHE_NAME = 'lens-docs-studio-v67';
 const VENDOR_MANIFEST = './assets/vendor/manifest.json';
 const LOCAL_ASSETS = [
   './',
@@ -19,6 +19,10 @@ const LOCAL_ASSETS = [
   './assets/scripts/editor/editor-service.js',
   './assets/scripts/editor/find-replace-service.js',
   './assets/scripts/editor/insert-helper-service.js',
+  './assets/scripts/editor/image-insertion-service.js',
+  './assets/scripts/files/image-asset-service.js',
+  './assets/scripts/utils/image-references.js',
+  './assets/scripts/utils/editor-viewport.js',
   './assets/scripts/editor/paste-service.js',
   './assets/scripts/editor/progress-bar-editor-service.js',
   './assets/scripts/editor/table-editor-service.js',
@@ -29,6 +33,7 @@ const LOCAL_ASSETS = [
   './assets/scripts/files/lens-artifact-bundle-service.js',
   './assets/scripts/native/native-bridge-client.js',
   './assets/scripts/native/native-smoke-runner.js',
+  './assets/scripts/native/workspace-image-smoke.js',
   './assets/scripts/exports/export-profile-service.js',
   './assets/scripts/exports/export-service.js',
   './assets/scripts/exports/word-document-exporter.js',

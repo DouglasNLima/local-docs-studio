@@ -122,7 +122,7 @@ Drag images onto the editor to insert Markdown links like:
 
 The Markdown file stores the link. Exports include the image data or image files depending on the export type. PNG, JPEG, GIF, and WebP image files are supported; user-supplied SVG images are skipped for security.
 
-Use **View > Manage assets** to preview session images, rename paths across editable Markdown files, and remove unused assets.
+Use **View > Manage assets** to inspect workspace and session images, check dependencies, and save pending image bytes to an authorised folder. Physical rename and removal are unavailable; existing files and references are preserved.
 
 ## Privacy
 
@@ -133,3 +133,13 @@ Use **Help > Windows shell diagnostics > Create support bundle** when you need a
 Optional artefact bundle metadata is session-only and untrusted unless you explicitly export an artefact review pack. Evidence labels are displayed as supplied by the ZIP; candidate findings remain candidate findings. Reader filters stay inside the reader panel and are not stored.
 
 Future compatible producers should follow `docs/integration/lens-artifact-bundle-producer-guide.md`. Release candidates should follow `docs/release/lens-docs-studio-artefact-bundle-manual-smoke.md`.
+
+## Portable workspace images
+
+Use **Insert image** for workspace images, **Import file**, or an HTTPS URL/local reference. Leave **Caption** blank for Markdown or supply a caption for a figure. The dialogue shows the preview, storage state, final document-relative reference and workspace destination.
+
+Paste and drop use the same image pipeline. New raster images use `assets/images/` under an authorised writable workspace; existing images retain their paths. A document in `docs/` normally refers to a root asset with `../assets/...`. Alternative text remains editable. External images remain external and require network access.
+
+Saving Markdown writes references. Images without authorised folder access remain temporary session bytes, clearly labelled in the preview feedback and **View > Manage assets**. Use **Save pending images to workspace** after selecting/authorising a destination, or **Export Markdown Bundle** to include document text and image bytes. Missing bytes require locating/importing the image. A standalone file handle never grants adjacent directory writes.
+
+Physical rename/remove is unavailable in Manage assets. Undo removes a reference and preserves the image file. For transfer, save both pending images and changed Markdown, then copy the complete workspace folder and validate the copy independently of the original profile.

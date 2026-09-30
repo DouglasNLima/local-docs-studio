@@ -164,6 +164,22 @@ export function createNativeBridgeClient({
     });
   }
 
+  async function listWorkspaceImages(payload) {
+    return sendMessage(createMessage('lensDocs.native.listWorkspaceImages', payload), ['lensDocs.native.listWorkspaceImagesResult'], { timeoutMs: 30000 });
+  }
+  async function imageDocumentContext(payload) {
+    return sendMessage(createMessage('lensDocs.native.imageDocumentContext', payload), ['lensDocs.native.imageDocumentContextResult']);
+  }
+  async function pickWorkspaceImage(payload) {
+    return sendMessage(createMessage('lensDocs.native.pickWorkspaceImage', payload), ['lensDocs.native.pickWorkspaceImageResult'], { timeoutMs: INTERACTIVE_PICKER_TIMEOUT_MS });
+  }
+  async function readWorkspaceImage(payload) {
+    return sendMessage(createMessage('lensDocs.native.readWorkspaceImage', payload), ['lensDocs.native.readWorkspaceImageResult'], { timeoutMs: 30000 });
+  }
+  async function createWorkspaceImage(payload) {
+    return sendMessage(createMessage('lensDocs.native.createWorkspaceImage', payload), ['lensDocs.native.createWorkspaceImageResult'], { timeoutMs: 30000 });
+  }
+
   async function saveWorkspaceFile({ nativeHandleId, content }) {
     const message = createMessage(nativeBridgeMessageTypes.saveWorkspaceFile, {
       nativeHandleId,
@@ -381,6 +397,11 @@ export function createNativeBridgeClient({
     saveFile,
     saveFileAs,
     openFolder,
+    listWorkspaceImages,
+    imageDocumentContext,
+    pickWorkspaceImage,
+    readWorkspaceImage,
+    createWorkspaceImage,
     saveWorkspaceFile,
     createWorkspaceFile,
     refreshWorkspaceFile,

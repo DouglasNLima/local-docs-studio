@@ -44,6 +44,8 @@ export function createRenderingService({
     afterPreviewRender,
     getExportFileStem,
     getDocTitleFromPath,
+    hydrateImages,
+    getImageStorageSummary,
   } = callbacks;
 
   let markedPromise = null;
@@ -331,7 +333,8 @@ export function createRenderingService({
         preview.innerHTML = state.docsPreview ? buildDocsPreviewShell(previewHtml) : previewHtml;
         markTrustedPreviewLinks(preview, wikilinkTrustToken);
         prepareDocumentSections(preview.querySelector('.docs-site-content') || preview);
-        hydrateManagedAssetImages(preview);
+        await hydrateImages?.(preview, state.activePath, { source });
+        if (renderId !== state.renderId) return { ok: false, cancelled: true };
         prepareTableBlocksIn(preview);
 
         preview.querySelectorAll('a[href]').forEach((anchor) => {
@@ -368,6 +371,8 @@ export function createRenderingService({
         updatePreviewOutline();
         afterPreviewRender?.();
         setRenderStatus(diagramResult.errors);
+        const imageSummary = getImageStorageSummary?.(source, state.activePath);
+        if (imageSummary?.message) setExportTrust(imageSummary.message, 'warning');
         return { ok: true, cancelled: false, diagramErrors: diagramResult.errors, diagramTotal: diagrams.length };
       } catch (error) {
         if (renderId !== state.renderId) return { ok: false, cancelled: true, diagramErrors: 0 };
@@ -711,36 +716,6 @@ export function createRenderingService({
       actions.append(copy, jump);
       box.append(pre, actions);
       diagram.appendChild(box);
-    }
-
-    function hydrateManagedAssetImages(root) {
-      if (!state.managedAssets?.size) return;
-      root.querySelectorAll('img[src]').forEach((image) => {
-        const path = resolveManagedAssetPath(image.getAttribute('src') || '', state.activePath);
-        const asset = path ? state.managedAssets.get(path) : null;
-        if (!asset?.objectUrl) return;
-        image.dataset.managedAssetPath = asset.path;
-        image.src = asset.objectUrl;
-      });
-    }
-
-    function resolveManagedAssetPath(value, documentPath = '') {
-      const path = normaliseAssetPath(value);
-      if (!path) return '';
-      if (state.managedAssets.has(path)) return path;
-
-      const directory = normaliseAssetPath(documentPath).split('/').slice(0, -1).join('/');
-      if (!directory) return '';
-
-      const resolved = normaliseAssetPath(`${directory}/${path}`);
-      return state.managedAssets.has(resolved) ? resolved : '';
-    }
-
-    function normaliseAssetPath(value) {
-      return String(value)
-        .replace(/^blob:.*$/i, '')
-        .replace(/^\.?\//, '')
-        .replace(/\\/g, '/');
     }
 
     function setRenderStatus(diagramErrors) {

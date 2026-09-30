@@ -155,6 +155,36 @@ public sealed class NativeWorkspaceService
         };
     }
 
+    private string RequireImageWorkspace(string? id)
+    {
+        if (string.IsNullOrEmpty(id) || id != activeWorkspaceId || !nativeWorkspaces.TryGetValue(id, out var root))
+            throw new NativeFileException("The authorised image workspace is no longer active.");
+        return root;
+    }
+
+    public object ListWorkspaceImages(string? id) => WorkspaceImageStore.List(RequireImageWorkspace(id));
+    public string ImageDocumentPath(string? id, string fullPath) => WorkspaceImageStore.DocumentPath(RequireImageWorkspace(id), fullPath);
+    public Task<object> ReadWorkspaceImageAsync(string? id, string? path, bool absoluteInput) => WorkspaceImageStore.ReadAsync(RequireImageWorkspace(id), path, absoluteInput);
+    public Task<object> CreateWorkspaceImageAsync(string? id, string? name, string? base64, string? mime) => WorkspaceImageStore.CreateAsync(RequireImageWorkspace(id), name, base64, mime);
+    public async Task<object> PickWorkspaceImageAsync(string? id)
+    {
+        _ = RequireImageWorkspace(id);
+        var picker = new FileOpenPicker { SuggestedStartLocation = PickerLocationId.PicturesLibrary };
+        foreach (var extension in new[] { ".png", ".jpg", ".jpeg", ".gif", ".webp" }) picker.FileTypeFilter.Add(extension);
+        InitializeWithWindow.Initialize(picker, WindowNative.GetWindowHandle(ownerWindow));
+        var selected = await picker.PickSingleFileAsync();
+        if (selected is null) return new { cancelled = true };
+        var root = RequireImageWorkspace(id);
+        var relative = Path.GetRelativePath(root, selected.Path);
+        var inside = !relative.StartsWith("..\\", StringComparison.Ordinal) && !Path.IsPathRooted(relative);
+        if (inside) return await WorkspaceImageStore.ReadAsync(root, relative);
+        // The picker authorises this one source file, not arbitrary file paths
+        // supplied by JavaScript. Reparse points remain rejected on import.
+        var read = await WorkspaceImageStore.ReadAsync(Path.GetDirectoryName(selected.Path)!, Path.GetFileName(selected.Path));
+        var data = System.Text.Json.JsonSerializer.SerializeToElement(read);
+        return await WorkspaceImageStore.CreateAsync(root, selected.Name, data.GetProperty("base64").GetString(), data.GetProperty("mimeType").GetString());
+    }
+
     public object RevealInExplorer(string? nativeWorkspaceId, string? nativeHandleId, string? relativePath, string? targetKind)
     {
         var target = ResolveExplorerTarget(nativeWorkspaceId, nativeHandleId, relativePath, targetKind);
@@ -339,6 +369,11 @@ public sealed class NativeWorkspaceService
 
         foreach (var child in children)
         {
+            if ((File.GetAttributes(child) & FileAttributes.ReparsePoint) != 0)
+            {
+                skipped.Add(new { path = ToSafeRelativePath(rootPath, child), reason = "Reparse points are not followed." });
+                continue;
+            }
             if (Directory.Exists(child))
             {
                 await CollectFilesAsync(rootPath, child, workspaceId, files, skipped, depth + 1);

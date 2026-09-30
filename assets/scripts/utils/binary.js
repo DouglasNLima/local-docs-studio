@@ -1,5 +1,8 @@
 export function textToBase64(value) {
-  const bytes = new TextEncoder().encode(value);
+  return uint8ArrayToBase64(new TextEncoder().encode(value));
+}
+
+export function uint8ArrayToBase64(bytes) {
   const chunkSize = 0x8000;
   let binary = '';
 

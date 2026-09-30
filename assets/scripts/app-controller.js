@@ -5,6 +5,11 @@ import { createEditorService } from './editor/editor-service.js';
 import { createDraftService } from './editor/draft-service.js';
 import { createFindReplaceService } from './editor/find-replace-service.js';
 import { createInsertHelperService } from './editor/insert-helper-service.js';
+import { createImageInsertionService } from './editor/image-insertion-service.js';
+import { createImageAssetService } from './files/image-asset-service.js';
+import { collectImageTokens } from './utils/image-references.js';
+import { base64ToUint8Array } from './utils/binary.js';
+import { measureEditorIndex } from './utils/editor-viewport.js';
 import { createDocumentLinkService } from './editor/document-link-service.js';
 import { getClipboardPayloadFromEvent, pasteModes, readClipboardPayload, resolvePasteReplacement } from './editor/paste-service.js';
 import { createProgressBarEditorService } from './editor/progress-bar-editor-service.js';
@@ -321,6 +326,9 @@ export function createAppController() {
       executeMarkdownCommand,
       getEditorSelection,
       replaceEditorRange,
+      captureInsertionContext,
+      isInsertionContextCurrent,
+      restoreInsertionContext,
     } = createEditorService({
       editor,
       state,
@@ -413,6 +421,78 @@ export function createAppController() {
       syncMobileMenuLayout(document.querySelector('details.menu[open]'));
     }
 
+    const imageAssets = createImageAssetService({ state, nativeBridgeClient, callbacks: {
+      readRecordText, setStatus,
+      replaceDocumentContent: (record, next) => {
+        if (record.readOnly) return;
+        if (record.path === state.activePath) {
+          const selection = getEditorSelection();
+          replaceEditorRange(0, editor.value.length, next, Math.min(selection.start, next.length), Math.min(selection.end, next.length), { reveal: false });
+        } else { state.fileCache.set(record.path, next); state.dirtyPaths.add(record.path); }
+        renderFileList(); updateSaveButton(); updateActiveFileLabel();
+      },
+    } });
+    const imageInsertionTools = createImageInsertionService({ state, editor, assets: imageAssets, callbacks: {
+      captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext, replaceEditorRange, setStatus,
+      renderPreview: () => renderPreview(), chooseImageFolder: () => chooseImageFolder(),
+      downloadRecoveryAsset: (asset) => downloadBlob(new Blob([base64ToUint8Array(asset.base64)], { type: asset.mimeType }), asset.name),
+    } });
+
+    async function chooseImageFolder() {
+      const snapshot = captureInsertionContext();
+      if (editor.readOnly) throw new Error('This document is read-only.');
+      let directory = null;
+      let nativeId = '';
+      let relativeDocumentPath = snapshot.path;
+      if (nativeBridgeClient.isAvailable()) {
+        const result = await nativeBridgeClient.openFolder();
+        if (!result.ok) throw new Error(result.message);
+        if (result.response?.payload?.cancelled) return;
+        nativeId = result.response?.payload?.nativeWorkspaceId;
+        if (snapshot.record?.nativeHandleId && state.workspaceKind === 'file') {
+          const location = await nativeBridgeClient.imageDocumentContext({ nativeWorkspaceId: nativeId, nativeHandleId: snapshot.record.nativeHandleId });
+          if (!location.ok) throw new Error(location.message);
+          relativeDocumentPath = location.response.payload.path;
+        }
+      } else {
+        if (!window.showDirectoryPicker) throw new Error('Folder writes are unavailable in this browser. Export a Markdown Bundle ZIP.');
+        directory = await window.showDirectoryPicker({ mode: 'readwrite', id: 'lens-docs-image-destination' });
+        if (snapshot.record?.handle && directory.resolve) {
+          const parts = await directory.resolve(snapshot.record.handle);
+          if (!parts?.length) throw new Error('Select the folder containing the opened Markdown document.');
+          relativeDocumentPath = parts.join('/');
+        }
+      }
+      if (!isInsertionContextCurrent(snapshot)) throw new Error('The document changed while selecting a destination. Please retry.');
+      state.workspaceDirectoryHandle = directory;
+      state.nativeWorkspaceId = nativeId;
+      state.workspaceRootPath = '';
+      state.imageWorkspaceVersion = (state.imageWorkspaceVersion || 0) + 1;
+      if (relativeDocumentPath !== snapshot.path) {
+        const newDirectory = relativeDocumentPath.split('/').slice(0, -1).join('/');
+        // Session assets acquired beside a loose document retain that document's
+        // relative meaning once the host confirms its path inside the folder.
+        for (const [path, asset] of [...state.managedAssets]) {
+          if (asset.storage === 'workspace') continue;
+          const rebased = newDirectory ? `${newDirectory}/${path}` : path;
+          if (rebased === path) continue;
+          state.managedAssets.delete(path); asset.path = rebased; state.managedAssets.set(rebased, asset);
+        }
+        // The host confirmed the standalone document's location in this folder.
+        for (const cache of [state.fileCache, state.savedContentCache]) {
+          if (cache.has(snapshot.path)) { cache.set(relativeDocumentPath, cache.get(snapshot.path)); cache.delete(snapshot.path); }
+        }
+        if (state.dirtyPaths.delete(snapshot.path)) state.dirtyPaths.add(relativeDocumentPath);
+        snapshot.record.path = relativeDocumentPath;
+        state.activePath = relativeDocumentPath;
+        renderFileList(); updateActiveFileLabel();
+      }
+      if (!snapshot.record?.handle && !snapshot.record?.nativeHandleId) {
+        setStatus('Image destination selected. Markdown is still virtual/unsaved; save or export it at its document-relative location.', 'warning');
+      }
+      await imageAssets.refreshInventory();
+    }
+
     const draftTools = createDraftService({
       state,
       dom: {
@@ -491,6 +571,7 @@ export function createAppController() {
       callbacks: {
         replaceEditorRange,
         setStatus,
+        captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext,
       },
     });
     openTableEditor = tableEditorTools.openTableEditor;
@@ -511,6 +592,7 @@ export function createAppController() {
       callbacks: {
         replaceEditorRange,
         setStatus,
+        captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext,
       },
     });
     openProgressBarEditor = progressBarEditorTools.openProgressBarEditor;
@@ -529,6 +611,8 @@ export function createAppController() {
       callbacks: {
         replaceEditorRange,
         setStatus,
+        captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext,
+        openImageDialog: () => { ensureImageDropDocument(); imageInsertionTools.openImageDialog(); },
       },
     });
     openInsertHelper = insertHelperTools.openInsertHelper;
@@ -561,6 +645,7 @@ export function createAppController() {
         getBacklinks,
         getWorkspaceAudit,
         getGovernanceAudit,
+        resolveImageReference: imageAssets.resolve,
         openBacklink,
         openGovernanceIssue,
         navigateToSection: (...args) => documentNavigationTools?.navigateToSection(...args),
@@ -641,6 +726,8 @@ export function createAppController() {
         afterPreviewRender,
         getExportFileStem,
         getDocTitleFromPath,
+        hydrateImages: imageAssets.hydrateImages,
+        getImageStorageSummary: imageAssets.storageSummary,
       },
     });
     const wordTemplateTools = createWordTemplateService({
@@ -667,6 +754,7 @@ export function createAppController() {
       state,
       dom: { preview, editor, exportTrust },
       callbacks: {
+        imageAssets,
         renderPreview,
         renderMermaidDiagrams,
         buildMarkdownHtml,
@@ -786,7 +874,18 @@ export function createAppController() {
           exportProfileTools.resetSessionProfile();
         },
         afterActiveFileLoaded: draftTools.afterActiveFileLoaded,
-        beforeSaveActiveFile: draftTools.beforeSaveActiveFile,
+        beforeSaveActiveFile: async (record, content) => {
+          const pending = collectImageTokens(content).some((token) => {
+            const reference = imageAssets.resolve(token.href, record.path);
+            return reference.kind === 'local' && !['workspace', 'workspace-readonly'].includes(state.managedAssets.get(reference.path)?.storage);
+          });
+          if (pending && !await confirmDialog(
+            'Saving Markdown writes references only. Use Manage assets > Save pending images to workspace, or Export Markdown Bundle for a portable copy. Continue saving Markdown links?',
+            { title: 'Images are not saved to the folder', confirmLabel: 'Save Markdown links', cancelLabel: 'Keep editing' },
+          )) return false;
+          return draftTools.beforeSaveActiveFile(record, content);
+        },
+        getImageStorageSummary: imageAssets.storageSummary,
         afterSaveActiveFile: draftTools.afterSaveActiveFile,
         promptForText: promptDialog,
         confirmAction: confirmDialog,
@@ -840,6 +939,7 @@ export function createAppController() {
         cancelButton: documentLinkCancelButton,
       },
       callbacks: {
+        captureInsertionContext, restoreInsertionContext,
         replaceEditorRange,
         setStatus,
         readRecordText,
@@ -1309,6 +1409,11 @@ export function createAppController() {
           }));
 
         await setLibraryFromRecords(records, folderName, { workspaceKind: 'folder-fallback' });
+        for (const file of files.filter(isImageFile)) {
+          try { await imageAssets.registerSelectedImage(file, normalisePath(file.webkitRelativePath || file.name)); }
+          catch (error) { setStatus(`${file.name}: ${error.message}`, 'warning'); }
+        }
+        await renderPreview();
         folderInput.value = '';
       });
 
@@ -1442,6 +1547,7 @@ export function createAppController() {
       });
 
       window.addEventListener('drop', async (event) => {
+        if (event.target !== editor && event.target.closest?.('dialog, input, textarea, select, [contenteditable="true"]')) return;
         event.preventDefault();
         app.classList.remove('drop-active');
 
@@ -1884,35 +1990,7 @@ export function createAppController() {
 
     function scrollEditorToIndex(index, viewportRatio = 0.25) {
       const target = Math.max(0, Math.min(Number(index) || 0, editor.value.length));
-      const style = getComputedStyle(editor);
-      const mirror = document.createElement('div');
-      const marker = document.createElement('span');
-
-      mirror.style.position = 'absolute';
-      mirror.style.visibility = 'hidden';
-      mirror.style.pointerEvents = 'none';
-      mirror.style.left = '-9999px';
-      mirror.style.top = '0';
-      mirror.style.boxSizing = style.boxSizing;
-      mirror.style.width = `${editor.clientWidth}px`;
-      mirror.style.minHeight = '0';
-      mirror.style.padding = style.padding;
-      mirror.style.border = '0';
-      mirror.style.font = style.font;
-      mirror.style.letterSpacing = style.letterSpacing;
-      mirror.style.lineHeight = style.lineHeight;
-      mirror.style.tabSize = style.tabSize;
-      mirror.style.whiteSpace = style.whiteSpace;
-      mirror.style.overflowWrap = style.overflowWrap;
-      mirror.style.wordBreak = style.wordBreak;
-      mirror.style.overflow = 'hidden';
-
-      marker.textContent = '\u200b';
-      mirror.append(document.createTextNode(editor.value.slice(0, target)), marker);
-      document.body.appendChild(mirror);
-      const markerTop = marker.offsetTop;
-      mirror.remove();
-
+      const markerTop = measureEditorIndex(editor, target).top;
       editor.scrollTop = Math.max(0, markerTop - editor.clientHeight * viewportRatio);
       editor.dispatchEvent(new Event('scroll'));
     }
@@ -2041,148 +2119,7 @@ export function createAppController() {
     }
 
     async function openAssetLibrary() {
-      const dialog = document.createElement('dialog');
-      dialog.className = 'utility-dialog asset-library-dialog';
-      dialog.setAttribute('aria-labelledby', 'assetLibraryTitle');
-      document.body.appendChild(dialog);
-
-      const close = () => {
-        dialog.close();
-        dialog.remove();
-      };
-      dialog.addEventListener('cancel', (event) => {
-        event.preventDefault();
-        close();
-      });
-      dialog.addEventListener('click', (event) => {
-        if (event.target === dialog || event.target.closest('[data-asset-close]')) {
-          close();
-        }
-      });
-      dialog.addEventListener('click', async (event) => {
-        const button = event.target.closest('[data-asset-action]');
-        if (!button) return;
-        const path = button.dataset.assetPath || '';
-        if (button.dataset.assetAction === 'rename') {
-          const input = button.closest('.asset-library-item')?.querySelector('[data-asset-input]');
-          await renameManagedAsset(path, input?.value || '');
-          await renderAssetLibrary(dialog);
-        }
-        if (button.dataset.assetAction === 'remove') {
-          await removeManagedAsset(path);
-          await renderAssetLibrary(dialog);
-        }
-      });
-
-      await renderAssetLibrary(dialog);
-      if (typeof dialog.showModal === 'function') dialog.showModal();
-      else dialog.setAttribute('open', '');
-    }
-
-    async function renderAssetLibrary(dialog) {
-      const usage = await getManagedAssetUsage();
-      const assets = [...state.managedAssets.values()].sort((left, right) => left.path.localeCompare(right.path));
-      const rows = assets.map((asset) => {
-        const count = usage.get(asset.path)?.length || 0;
-        const size = formatBytes(asset.size ?? 0);
-        const src = asset.objectUrl || asset.dataUrl || '';
-        return `<div class="asset-library-item">
-          <img src="${escapeHtml(src)}" alt="${escapeHtml(asset.alt || asset.name || 'Asset preview')}">
-          <div class="asset-library-main">
-            <strong>${escapeHtml(asset.name || asset.path)}</strong>
-            <span>${escapeHtml(asset.mimeType || 'image')} · ${escapeHtml(size)} · ${count} use${count === 1 ? '' : 's'}</span>
-            <input value="${escapeHtml(asset.path)}" data-asset-input="${escapeHtml(asset.path)}" aria-label="Asset path for ${escapeHtml(asset.name || asset.path)}">
-          </div>
-          <div class="asset-library-actions">
-            <button type="button" data-asset-action="rename" data-asset-path="${escapeHtml(asset.path)}">Rename</button>
-            <button type="button" data-asset-action="remove" data-asset-path="${escapeHtml(asset.path)}"${count ? ' disabled' : ''}>Remove</button>
-          </div>
-        </div>`;
-      }).join('');
-
-      dialog.innerHTML = `<form class="utility-dialog-card asset-library-card" method="dialog">
-        <div class="utility-dialog-top">
-          <span class="template-dialog-kicker">Session assets</span>
-          <button class="template-dialog-close" type="button" data-asset-close aria-label="Close asset library">X</button>
-        </div>
-        <h2 id="assetLibraryTitle">Managed assets</h2>
-        <p>Review image assets imported into this browser session. Rename updates loaded Markdown references; remove is available for unused assets.</p>
-        <div class="asset-library-list">${rows || '<div class="workspace-search-empty">No managed assets in this session.</div>'}</div>
-        <div class="template-dialog-actions">
-          <button class="primary" type="button" data-asset-close>Done</button>
-        </div>
-      </form>`;
-    }
-
-    async function getManagedAssetUsage() {
-      const usage = new Map([...state.managedAssets.keys()].map((path) => [path, []]));
-      if (!usage.size) return usage;
-      for (const record of getDocumentationRecords()) {
-        const source = await readRecordText(record);
-        collectImageReferences(source, record.path).forEach((path) => {
-          if (usage.has(path)) usage.get(path).push(record.path);
-        });
-      }
-      return usage;
-    }
-
-    async function renameManagedAsset(oldPath, requestedPath) {
-      const asset = state.managedAssets.get(oldPath);
-      const newPath = normaliseManagedAssetPath(requestedPath);
-      if (!asset || !newPath || newPath === oldPath) return;
-      if (state.managedAssets.has(newPath)) {
-        setStatus('Another managed asset already uses that path.', 'warning');
-        return;
-      }
-      if (!/\.(png|jpe?g|gif|webp)$/i.test(newPath)) {
-        setStatus('Managed image assets must keep a PNG, JPEG, GIF, or WebP extension.', 'warning');
-        return;
-      }
-
-      state.managedAssets.delete(oldPath);
-      asset.path = newPath;
-      asset.name = newPath.split('/').pop() || asset.name;
-      state.managedAssets.set(newPath, asset);
-      await replaceAssetReferences(oldPath, newPath);
-      renderFileList();
-      updateActiveFileLabel();
-      updateSaveButton();
-      await renderPreview();
-      setStatus(`Renamed asset to ${newPath}.`, 'ok');
-    }
-
-    async function removeManagedAsset(path) {
-      const usage = await getManagedAssetUsage();
-      if ((usage.get(path)?.length || 0) > 0) {
-        setStatus('Only unused managed assets can be removed.', 'warning');
-        return;
-      }
-      const asset = state.managedAssets.get(path);
-      if (asset?.objectUrl) URL.revokeObjectURL(asset.objectUrl);
-      state.managedAssets.delete(path);
-      await renderPreview();
-      setStatus(`Removed unused asset ${path}.`, 'ok');
-    }
-
-    async function replaceAssetReferences(oldPath, newPath) {
-      for (const record of getDocumentationRecords()) {
-        if (record.readOnly) continue;
-        const source = await readRecordText(record);
-        if (!source.includes(oldPath)) continue;
-        const next = source.split(oldPath).join(newPath);
-        state.fileCache.set(record.path, next);
-        state.dirtyPaths.add(record.path);
-        if (record.path === state.activePath) {
-          editor.value = next;
-        }
-      }
-    }
-
-    function normaliseManagedAssetPath(path) {
-      const normalised = normalisePath(String(path || '').trim())
-        .replace(/^\/+/, '')
-        .replace(/^\.\/+/, '');
-      return normalised || '';
+      return imageInsertionTools.openAssetLibrary();
     }
 
     function formatBytes(size) {
@@ -2281,15 +2218,8 @@ ${unresolvedRows}
     }
 
     function collectImageReferences(source, fromPath) {
-      const paths = [];
-      String(source || '').replace(/!\[[^\]\n]*\]\(([^)\n]+)\)/g, (raw, href) => {
-        const target = String(href || '').split(/[?#]/)[0].trim();
-        if (target && !/^(https?:|data:|blob:)/i.test(target)) {
-          paths.push(normaliseRelativePath(target, fromPath));
-        }
-        return raw;
-      });
-      return paths;
+      return collectImageTokens(source).map((token) => imageAssets.resolve(token.href, fromPath))
+        .filter((reference) => reference.kind === 'local').map((reference) => reference.path);
     }
 
     function normaliseRelativePath(target, fromPath) {
@@ -2360,7 +2290,8 @@ ${unresolvedRows}
       state.managedAssets.forEach((asset) => {
         if (asset.objectUrl) URL.revokeObjectURL(asset.objectUrl);
       });
-      state.managedAssets.clear();
+      state.managedAssets = new Map();
+      state.imageWorkspaceVersion = (state.imageWorkspaceVersion || 0) + 1;
       state.managedAssetCounter = 0;
     }
 
@@ -2401,57 +2332,35 @@ ${unresolvedRows}
       return new File([file], name, { type: file.type || getImageMimeType(name), lastModified: file.lastModified || Date.now() });
     }
 
-    async function insertDroppedImages(files, skippedSvgCount = 0, source = 'drop') {
-      if (!files.length && skippedSvgCount) {
-        setStatus('SVG images are not imported for security; use PNG, JPEG, GIF, or WebP.', 'warning');
-        return;
+    async function insertDroppedImages(files, skippedSvgCount = 0) {
+      if (isActiveReadOnly()) { setStatus('This document is read-only.', 'warning'); return; }
+      if (files.length) {
+        ensureImageDropDocument();
+        await imageInsertionTools.insertFiles(files);
       }
-      if (!files.length) return;
-      if (isActiveReadOnly()) {
-        setStatus('This guide is read-only. Open or create a Markdown file before adding images.', 'warning');
-        return;
-      }
-
-      ensureImageDropDocument();
-
-      const snippets = [];
-      for (const file of files) {
-        const asset = await createManagedImageAsset(file);
-        state.managedAssets.set(asset.path, asset);
-        snippets.push(`![${asset.alt}](${asset.path})`);
-      }
-
-      const selection = getEditorSelection();
-      const prefix = selection.start > 0 && editor.value[selection.start - 1] !== '\n' ? '\n\n' : '';
-      const suffix = selection.end < editor.value.length && editor.value[selection.end] !== '\n' ? '\n\n' : '';
-      const markdown = `${prefix}${snippets.join('\n\n')}${suffix}`;
-      const start = selection.start + prefix.length;
-      replaceEditorRange(selection.start, selection.end, markdown, start, start + snippets.join('\n\n').length);
-      setExportTrust('Images added as session assets. Save writes Markdown links; exports include the image files.', 'warning');
-      const verb = source === 'clipboard' ? 'pasted' : 'inserted';
-      if (skippedSvgCount) {
-        setStatus(`${files.length} image${files.length === 1 ? '' : 's'} ${verb}. SVG images are not imported for security; use PNG, JPEG, GIF, or WebP.`, 'warning');
-        return;
-      }
-      setStatus(`${files.length} image${files.length === 1 ? '' : 's'} ${verb} as exportable assets.`, 'ok');
+      if (skippedSvgCount) setStatus('SVG images are not imported for security; use PNG, JPEG, GIF, or WebP.', 'warning');
     }
 
     function ensureImageDropDocument() {
       if (state.activePath) return;
       clearFocusedModes();
       const name = 'image-notes.md';
+      const content = editor.value;
+      const initialSelection = { start: editor.selectionStart, end: editor.selectionEnd, top: editor.scrollTop, left: editor.scrollLeft };
       state.files = [{
         name,
         path: name,
-        file: new File(['# Image Notes\n'], name, { type: 'text/markdown' }),
+        file: new File([content], name, { type: 'text/markdown' }),
+        virtual: true, needsSave: true, hasRelativePathContext: false,
       }];
       state.folderName = 'Image Notes';
       state.activePath = name;
       state.fileName = name;
       clearWorkspaceContentCaches();
-      state.fileCache.set(name, '# Image Notes\n');
-      markWorkspaceCleanContent(name, '# Image Notes\n');
-      editor.value = '# Image Notes\n';
+      state.fileCache.set(name, content);
+      markWorkspaceCleanContent(name, '');
+      state.dirtyPaths.add(name);
+      editor.value = content;
       clearScrollPositions();
       resetScrollForCurrentDocument();
       resetEditorHistory();
@@ -2459,37 +2368,9 @@ ${unresolvedRows}
       renderFileList();
       updateActiveFileLabel();
       updateSaveButton();
-    }
-
-    async function createManagedImageAsset(file) {
-      const dataUrl = await readFileAsDataUrl(file);
-      const base64 = dataUrl.split(',')[1] || '';
-      const path = makeManagedAssetPath(file);
-      const objectUrl = URL.createObjectURL(file);
-      const alt = file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').trim() || 'Image';
-      return {
-        path,
-        name: path.split('/').pop(),
-        alt,
-        mimeType: file.type || getImageMimeType(path),
-        base64,
-        dataUrl,
-        objectUrl,
-        size: file.size,
-      };
-    }
-
-    function makeManagedAssetPath(file) {
-      const extension = resolveImageExtension(file);
-      const stem = slugFromText(file.name.replace(/\.[^.]+$/, '')) || 'image';
-      let suffix = '';
-      let path = '';
-      do {
-        state.managedAssetCounter += 1;
-        suffix = state.managedAssetCounter === 1 ? '' : `-${state.managedAssetCounter}`;
-        path = `assets/images/${stem}${suffix}.${extension}`;
-      } while (state.managedAssets.has(path));
-      return path;
+      editor.setSelectionRange(initialSelection.start, initialSelection.end);
+      editor.scrollTop = initialSelection.top;
+      editor.scrollLeft = initialSelection.left;
     }
 
     function resolveImageExtension(file) {
@@ -2509,15 +2390,6 @@ ${unresolvedRows}
       if (/\.gif$/i.test(path)) return 'image/gif';
       if (/\.jpe?g$/i.test(path)) return 'image/jpeg';
       return 'image/png';
-    }
-
-    function readFileAsDataUrl(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ''));
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(file);
-      });
     }
 
     function initialiseWelcome() {
@@ -4045,6 +3917,17 @@ ${unresolvedRows}
     function getExportFileStem() {
       return sanitiseFileName(getExportTitle()) || 'rendered-document';
     }
+
+    // Internal smoke entry points: the host enables its isolated fixture route
+    // explicitly. These are passed to the harness, never installed on window.
+    return {
+      state, imageAssets, selectFile, saveActiveFile, renderPreview, importZipFile,
+      buildMarkdownBundle: exportTools.buildMarkdownBundle,
+      loadNativeSmokeWorkspace: async (payload) => setLibraryFromRecords(payload.files.map((file) => ({
+        name: file.name, path: file.path, nativeHandleId: file.nativeHandleId,
+        file: new File([file.content], file.name, { type: 'text/markdown' }),
+      })), payload.workspaceName, { workspaceKind: 'native-folder', nativeWorkspaceId: payload.nativeWorkspaceId }),
+    };
 
 }
 

@@ -97,6 +97,10 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
   const {
     replaceEditorRange,
     setStatus,
+    captureInsertionContext,
+    isInsertionContextCurrent,
+    restoreInsertionContext,
+    openImageDialog,
   } = callbacks;
 
   let helperState = {
@@ -121,10 +125,13 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
   }
 
   function openInsertHelper(type) {
+    if (type === 'imageFigure') { openImageDialog?.(); return; }
+    if (editor.readOnly) return;
     if (!helperTypes.has(type)) return;
     helperState = {
       ...helperState,
       type,
+      context: captureInsertionContext?.(),
       selectedEmoji: emojis[0],
       selectedStatus: statusKinds[1],
       selectionStart: editor.selectionStart,
@@ -139,7 +146,7 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
   function closeInsertHelper(event) {
     event?.preventDefault?.();
     insertHelperDialog?.close();
-    editor.focus();
+    restoreInsertionContext?.(helperState.context);
   }
 
   function renderHelper() {
@@ -175,13 +182,18 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
 
   function applyInsertHelper(event) {
     event?.preventDefault?.();
+    if (helperState.context && !isInsertionContextCurrent(helperState.context)) {
+      setStatus('The document changed. Reopen the insertion helper at the current cursor.', 'warning');
+      return;
+    }
     const config = getHelperConfig(helperState.type);
     const insertion = config.build();
     if (!insertion.text) return;
 
     insertText(insertion.text, { block: insertion.block });
     setStatus(insertion.status, 'ok');
-    closeInsertHelper();
+    insertHelperDialog?.close();
+    editor.focus({ preventScroll: true });
   }
 
   function insertText(text, { block = false } = {}) {
@@ -231,14 +243,6 @@ export function createInsertHelperService({ editor, dom, callbacks }) {
         applyLabel: 'Insert details',
         render: renderDetailsFields,
         build: buildDetailsBlock,
-      },
-      imageFigure: {
-        kicker: 'Image figure',
-        title: 'Insert image figure',
-        summary: 'Create an image with alt text and an optional caption.',
-        applyLabel: 'Insert figure',
-        render: renderImageFigureFields,
-        build: buildImageFigure,
       },
       keyboardShortcut: {
         kicker: 'Shortcut',
@@ -381,28 +385,6 @@ ${body}
 </details>`,
       block: true,
       status: 'Details block inserted.',
-    };
-  }
-
-  function renderImageFigureFields() {
-    insertHelperFields.append(
-      field('Image path or URL', input('imageFigureSrcInput', 'text', 'image-url')),
-      field('Alt text', input('imageFigureAltInput', 'text', helperState.selectionText || 'Image description')),
-      field('Caption', input('imageFigureCaptionInput', 'text', 'Optional caption'))
-    );
-  }
-
-  function buildImageFigure() {
-    const src = normaliseText(readValue('imageFigureSrcInput')) || 'image-url';
-    const alt = normaliseText(readValue('imageFigureAltInput')) || 'Image description';
-    const caption = normaliseText(readValue('imageFigureCaptionInput'));
-    const captionLine = caption ? `\n  <figcaption>${escapeHtml(caption)}</figcaption>` : '';
-    return {
-      text: `<figure data-image-figure>
-  <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}">${captionLine}
-</figure>`,
-      block: true,
-      status: 'Image figure inserted.',
     };
   }
 

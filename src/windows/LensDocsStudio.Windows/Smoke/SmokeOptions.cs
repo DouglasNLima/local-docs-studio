@@ -1,6 +1,6 @@
 namespace LensDocsStudio.Windows.Smoke;
 
-public sealed record SmokeOptions(bool Enabled, string? RootPath, int TimeoutSeconds)
+public sealed record SmokeOptions(bool Enabled, string? RootPath, int TimeoutSeconds, string ImageMode = "")
 {
     public const int DefaultTimeoutSeconds = 60;
 
@@ -22,10 +22,12 @@ public sealed record SmokeOptions(bool Enabled, string? RootPath, int TimeoutSec
         var enabled = false;
         string? rootPath = null;
         var timeoutSeconds = DefaultTimeoutSeconds;
+        var imageMode = string.Empty;
 
         for (var index = 0; index < tokens.Count; index += 1)
         {
             var token = tokens[index];
+            if (token == "--smoke-images" && index + 1 < tokens.Count) { imageMode = tokens[++index]; continue; }
             if (string.Equals(token, "--smoke-native-bridge", StringComparison.OrdinalIgnoreCase))
             {
                 enabled = true;
@@ -65,7 +67,7 @@ public sealed record SmokeOptions(bool Enabled, string? RootPath, int TimeoutSec
             throw new InvalidOperationException("The smoke root does not exist.");
         }
 
-        return new SmokeOptions(true, fullRoot, timeoutSeconds);
+        return new SmokeOptions(true, fullRoot, timeoutSeconds, imageMode);
     }
 
     public static List<string> SplitArguments(string? arguments)

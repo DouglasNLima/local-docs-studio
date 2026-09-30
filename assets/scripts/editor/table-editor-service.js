@@ -19,6 +19,7 @@ export function createTableEditorService({ editor, dom, callbacks }) {
   const {
     replaceEditorRange,
     setStatus,
+    captureInsertionContext, isInsertionContextCurrent, restoreInsertionContext,
   } = callbacks;
 
   let tableState = {
@@ -48,12 +49,14 @@ export function createTableEditorService({ editor, dom, callbacks }) {
   }
 
   function openTableEditor() {
+    if (editor.readOnly) return;
     const range = findMarkdownTableAt(editor.value, editor.selectionStart);
     tableState = {
       rows: normaliseTableRows(range?.rows || createDefaultTable()),
       range,
       activeRow: 0,
       activeColumn: 0,
+      context: captureInsertionContext?.(),
     };
     renderTableGrid();
     tableEditorDialog?.showModal();
@@ -63,7 +66,7 @@ export function createTableEditorService({ editor, dom, callbacks }) {
   function closeTableEditor(event) {
     event?.preventDefault?.();
     tableEditorDialog?.close();
-    editor.focus();
+    restoreInsertionContext?.(tableState.context);
   }
 
   function renderTableGrid() {
@@ -195,6 +198,7 @@ export function createTableEditorService({ editor, dom, callbacks }) {
 
   function applyTable(event) {
     event?.preventDefault?.();
+    if (tableState.context && !isInsertionContextCurrent(tableState.context)) { setStatus('The document changed. Reopen the table editor.', 'warning'); return; }
     const markdown = formatMarkdownTable(tableState.rows);
     if (tableState.range) {
       replaceEditorRange(tableState.range.start, tableState.range.end, markdown, tableState.range.start, tableState.range.start + markdown.length);
