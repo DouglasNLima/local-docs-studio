@@ -26,7 +26,8 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      // Exercise the full browser; the separate headless shell crashes on Windows with 0xC0000005.
+      use: { ...devices['Desktop Chrome'], channel: 'chromium' },
     },
     {
       name: 'edge',
