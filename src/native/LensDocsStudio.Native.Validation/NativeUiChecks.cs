@@ -697,6 +697,29 @@ internal static class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Table context validation did not restore the original document.");
                 checks.Add("Native table context copy isolates one table with literal-cell HTML and Unicode TSV without changing source");
+                const string reviewSource = "# Review Café\n\n### Skipped\n\nColor and TODO remain.\n\n![](missing.png)\n\n[Missing](#absent)";
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(reviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == reviewSource, "The review fixture did not paste.");
+                Find(window, "ViewMenu").Click(); Find(window, "ReviewDocument").Patterns.Invoke.Pattern.Invoke();
+                Window? reviewWindow = null;
+                Wait(() => (reviewWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document review")))?.AsWindow()) is not null,
+                    "The native document review did not open.");
+                var reviewNotes = Find(reviewWindow!, "ReviewIssues").AsListBox();
+                if (reviewNotes.Items.Length != 5 || !Find(reviewWindow!, "ReviewSummary").Name.Contains("2 headings", StringComparison.Ordinal))
+                    throw new IOException("Native review did not retain the current document's metrics and five advisory notes.");
+                reviewNotes.Items.Single(item => item.Name.Contains("TODO marker found", StringComparison.Ordinal)).Select();
+                reviewWindow!.CaptureToFile(Path.Combine(output, "native-document-review.png"));
+                Find(reviewWindow!, "ReviewGoToSource").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name == "TODO marker found.", "Review did not navigate to the selected note.");
+                EditorContext("EditorContextCopy");
+                Wait(() => System.Windows.Clipboard.GetText() == "TODO", "Review navigation did not select the exact TODO marker.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                if (System.Windows.Clipboard.GetText() != "TODO" || editor.Patterns.Value.Pattern.Value.Value != reviewSource || File.ReadAllText(source) != tableSavedSource)
+                    throw new IOException("Review navigation lost the exact source selection or altered document content.");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Document review validation did not restore the original source.");
+                checks.Add("Native document review uses current edits, shows scoped advisory notes and selects exact source without saving or changing text");
             }
             finally
             {

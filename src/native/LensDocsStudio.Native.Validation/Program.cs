@@ -52,6 +52,12 @@ internal static class Program
             try { NativeTableChecks.Run(tableOutput); Console.WriteLine("Native table integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--review")
+        {
+            var reviewOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(reviewOutput);
+            try { NativeReviewChecks.Run(reviewOutput); Console.WriteLine("Native review integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--editor-colours")
         {
             var colourOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(colourOutput);
@@ -108,6 +114,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native editor colours: " + ex.Message); }
         try { NativeTableChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native table copying: " + ex.Message); }
+        try { NativeReviewChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native document review: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

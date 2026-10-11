@@ -1,5 +1,13 @@
 # Native validation report
 
+Native push CI at fd11a8b (38176285630) passes all 33 workflows before installation and after installation/reinstallation. The CSV check saves the native default name with its hidden extension and verifies exact UTF-8 bytes; the installer lifecycle passes. Evidence: artifacts/native/native-ci-fd11a8b-push.log. PR CI remains in progress.
+
+## Current-document review
+
+Release build passes without warnings/errors; all 343 core tests and the standard native harness pass. Fifteen review cases cover exact CRLF/Unicode spans, word boundaries across formatting, entity decoding, reference-image descriptions, same-document heading/named targets, nested/setext/duplicate headings, case-preserving advisory spelling, code/URL/HTML/front-matter exclusion, standalone diagrams, source/issue limits and cancellation. An initial word-count expectation was corrected from 11 to the fixture's actual ten words. Evidence: artifacts/native/tests/native-core-document-review.trx.
+
+Three native control outcomes pass for actual light/dark layouts, metrics, virtualised list bindings, accessible source positions, selection and empty/limited result feedback. Final light/dark images were visually inspected. The detached validation surface initially lost the foreground inherited from its Window; the test host now supplies that same foreground and verifies 4.5:1 summary contrast. Evidence: artifacts/native/validation/native-review.json and native-review-light.png/native-review-dark.png. A 34th desktop workflow invokes the real review dialogue, navigates to TODO and verifies exact clipboard selection with unchanged saved/editor source; CI remains pending. Workspace links, table structure, raw HTML and diagram validity are explicitly outside these first review checks.
+
 Both native runs at 19f110b (38175949120/38175945904) stop at the new default-filename assertion. The retained screenshot and field value show Windows hides the selected CSV extension: fixture-table-2 with CSV table selected. The harness now saves that untouched suggestion and verifies the exact fixture-table-2.csv path and bytes. No product filename change was required. Evidence: artifacts/native/native-ci-19f110b-*-failure.log and artifacts/native/ci-19f110b-pr/ui; fresh CI is pending.
 
 ## Table CSV and current desktop evidence

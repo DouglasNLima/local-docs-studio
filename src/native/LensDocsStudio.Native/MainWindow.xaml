@@ -120,6 +120,8 @@
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate"/>
    </MenuItem>
    <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
+    <MenuItem Header="Document _review…" Click="ReviewDocument" AutomationProperties.AutomationId="ReviewDocument"/>
+    <Separator/>
     <MenuItem x:Name="BackMenu" Header="Go _back" InputGestureText="Alt+Left" Click="NavigateBack" IsEnabled="False"/>
     <MenuItem x:Name="ForwardMenu" Header="Go _forward" InputGestureText="Alt+Right" Click="NavigateForward" IsEnabled="False"/>
     <Separator/>
