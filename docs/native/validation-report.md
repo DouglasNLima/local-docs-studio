@@ -1,5 +1,13 @@
 # Native validation report
 
+## Browser draft-lookup data preservation
+
+At 071718c web push CI 38163847433 passed; PR CI 38163850906 passed 253/254 and exposed a real race in the existing web app. The draft lookup returned the originally loaded content after the user had typed, and file selection replaced the new text with that old value. A deterministic browser regression holds the IndexedDB result until after editing; it failed on the original code with the editor and saved file reverted to `# Opened`. Evidence: artifacts/native/web-draft-race-before and web-ci-071718c-pr-failure.log.
+
+File selection now applies changed recovery content only if the same record remains active and the editor still matches its loaded snapshot. Draft lookup avoids prompting over newer work and retains stored drafts for later review. The service-worker cache advances to v64. Save, delayed lookup and recovery/deletion protection pass twice in Chromium and Edge (12/12, 44.1 seconds). Full static validation and all 256 browser checks pass in 14.4 minutes: artifacts/native/baseline/web-draft-race-full.log. Native and static publishing pipelines remain separate.
+
+All four runs at f33a590 pass: native 38164651741/38164646607 and web 38164651751/38164646614. Native CI validates all 24 desktop outcomes, including the completion window, before installation and after installation/reinstallation. Evidence: artifacts/native/native-ci-f33a590-pr.log.
+
 ## Cancellable native document construction
 
 Release build has no warnings/errors. The native harness adds four passing dispatcher checks using 1,200 paragraphs (74,491 source characters). It verifies input runs before construction completes, every paragraph/source mapping/entity survives, a newly queued input cancels obsolete construction and an already-cancelled request returns no document. The recorded local run handled input at 39.5 ms and finished construction at 339.0 ms. These are observed timings, not performance guarantees. Evidence: artifacts/native/validation/native-layout.json. Standard diagram/export, image, preview, Markdown and editor checks remain green; core remains at 240 passing tests from the preceding completion batch.

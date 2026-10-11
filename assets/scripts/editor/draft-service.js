@@ -128,6 +128,10 @@ export function createDraftService({ state, dom, callbacks }) {
     state.deletionOverridePaths.delete(record.path);
 
     const draft = await getDraft(record.path);
+    if (state.activePath !== record.path || !state.files.includes(record) || editor.value !== content) {
+      // Retain the stored draft for a later review instead of interrupting newer work.
+      return null;
+    }
     if (!draft || draft.text === content || record.readOnly) {
       return { content, dirty: false };
     }

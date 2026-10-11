@@ -1564,6 +1564,37 @@ test('File System Access save writes back to the opened file without Save as', a
   expect(result.savePickerCalls).toBe(0);
 });
 
+test('a delayed draft lookup preserves edits made after the file becomes available', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.addInitScript(() => {
+    const originalGet = IDBObjectStore.prototype.get;
+    let held = false;
+    IDBObjectStore.prototype.get = function get(key) {
+      const request = originalGet.call(this, key);
+      if (this.name === 'drafts' && String(key).endsWith('::opened.md') && !held) {
+        held = true;
+        request.addEventListener('success', (event) => {
+          event.stopImmediatePropagation();
+          window.__draftLookupHeld = true;
+          window.__releaseDraftLookup = () => request.onsuccess.call(request, event);
+        }, { once: true });
+      }
+      return request;
+    };
+  });
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect.poll(() => page.evaluate(() => window.__draftLookupHeld)).toBe(true);
+  await page.locator('#editor').fill('# Edited while recovery is loading\n');
+  await page.evaluate(() => window.__releaseDraftLookup());
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue('# Edited while recovery is loading\n');
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Edited while recovery is loading\n');
+});
+
 test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
   await installMockFileSystemAccess(page);
   await gotoApp(page);
