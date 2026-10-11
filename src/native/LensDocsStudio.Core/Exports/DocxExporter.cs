@@ -14,10 +14,11 @@ namespace LensDocsStudio.Core.Exports;
 
 public sealed class DocxExporter
 {
-    public byte[] Export(ExportContent content, byte[]? template = null)
+    public byte[] Export(ExportContent content, byte[]? template = null, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         using var stream = new MemoryStream();
-        if (template is not null) stream.Write(template);
+        if (template is not null) stream.Write(new DocxTemplateService().Prepare(template, cancellationToken).Bytes);
         using (var package = template is null
             ? WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document, true)
             : WordprocessingDocument.Open(stream, true))
@@ -39,14 +40,15 @@ public sealed class DocxExporter
             var codeStyle = styleMap.Code;
             var numbering = main.NumberingDefinitionsPart ?? main.AddNewPart<NumberingDefinitionsPart>();
             numbering.Numbering ??= new W.Numbering();
-            var nextNumber = numbering.Numbering.Elements<W.NumberingInstance>().Select(n => n.NumberID?.Value ?? 0).DefaultIfEmpty().Max() + 1;
-            var nextAbstract = numbering.Numbering.Elements<W.AbstractNum>().Select(n => n.AbstractNumberId?.Value ?? 0).DefaultIfEmpty().Max() + 1;
-            var drawingId = main.Document.Descendants<DW.DocProperties>().Select(p => p.Id?.Value ?? 0).DefaultIfEmpty().Max() + 1;
+            var usedNumbers = numbering.Numbering.Elements<W.NumberingInstance>().Select(n => n.NumberID?.Value ?? 0).ToHashSet();
+            var usedAbstracts = numbering.Numbering.Elements<W.AbstractNum>().Select(n => n.AbstractNumberId?.Value ?? 0).ToHashSet();
+            var usedDrawings = PartElements<DW.DocProperties>(main, new HashSet<OpenXmlPart>()).Select(p => p.Id?.Value ?? 0).ToHashSet();
+            var nextNumber = 1; var nextAbstract = 1; uint drawingId = 1;
             var pageSize = section.GetFirstChild<W.PageSize>();
             var margins = section.GetFirstChild<W.PageMargin>();
             var widthEmu = ((long)(pageSize?.Width?.Value ?? 11906) - (margins?.Left?.Value ?? 1134) - (margins?.Right?.Value ?? 1134)) * 635;
             var heightEmu = ((long)(pageSize?.Height?.Value ?? 16838) - (margins?.Top?.Value ?? 1134) - (margins?.Bottom?.Value ?? 1134)) * 635;
-            var retainedBookmarks = Bookmarks(main, new HashSet<OpenXmlPart>()).ToArray();
+            var retainedBookmarks = PartElements<W.BookmarkStart>(main, new HashSet<OpenXmlPart>()).ToArray();
             var bookmarkNames = new HashSet<string>(retainedBookmarks.Select(b => b.Name?.Value ?? ""), StringComparer.Ordinal);
             var bookmarkIds = new HashSet<string>(retainedBookmarks.Select(b => b.Id?.Value ?? ""), StringComparer.Ordinal);
             var bookmarks = new Dictionary<string, (string Name, string Id)>(StringComparer.Ordinal);
@@ -60,7 +62,7 @@ public sealed class DocxExporter
                 bookmarks.Add(target.Id, (name, id)); bookmarkIds.Add(id); bookmarkNames.Add(name);
             }
 
-            foreach (var block in content.Document.Syntax) AppendBlock(body, block);
+            foreach (var block in content.Document.Syntax) { cancellationToken.ThrowIfCancellationRequested(); AppendBlock(body, block); }
             body.Append(section);
             package.PackageProperties.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";
             var settings = main.DocumentSettingsPart ?? main.AddNewPart<DocumentSettingsPart>();
@@ -95,7 +97,10 @@ public sealed class DocxExporter
                         foreach (var line in code.Lines.ToString().Split('\n')) cp.Append(new W.Run(new W.RunProperties(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }), new W.Text(line.TrimEnd('\r')) { Space = SpaceProcessingModeValues.Preserve }, new W.Break()));
                         parent.Append(cp); break;
                     case ListBlock list:
+                        while (usedNumbers.Contains(nextNumber)) nextNumber++;
+                        while (usedAbstracts.Contains(nextAbstract)) nextAbstract++;
                         var id = nextNumber++; var abstractId = nextAbstract++;
+                        usedNumbers.Add(id); usedAbstracts.Add(abstractId);
                         var definition = new W.AbstractNum { AbstractNumberId = abstractId };
                         for (var level = 0; level < 9; level++) definition.Append(new W.Level(
                             new W.StartNumberingValue { Val = MarkdownFormatting.OrderedStart(list) },
@@ -237,7 +242,8 @@ public sealed class DocxExporter
                 var cx = image.PixelWidth * 9525L; var cy = image.PixelHeight * 9525L;
                 var scale = Math.Min(1, Math.Min((double)widthEmu / cx, (double)heightEmu / cy));
                 cx = (long)(cx * scale); cy = (long)(cy * scale);
-                var id = drawingId++;
+                while (usedDrawings.Contains(drawingId)) drawingId++;
+                var id = drawingId++; usedDrawings.Add(id);
                 return new W.Run(new W.Drawing(new DW.Inline(
                     new DW.Extent { Cx = cx, Cy = cy },
                     new DW.EffectExtent { LeftEdge = 0, TopEdge = 0, RightEdge = 0, BottomEdge = 0 },
@@ -253,11 +259,11 @@ public sealed class DocxExporter
         return stream.ToArray();
     }
 
-    private static IEnumerable<W.BookmarkStart> Bookmarks(OpenXmlPart part, HashSet<OpenXmlPart> seen)
+    private static IEnumerable<T> PartElements<T>(OpenXmlPart part, HashSet<OpenXmlPart> seen) where T : OpenXmlElement
     {
         if (!seen.Add(part)) yield break;
-        if (part.RootElement is { } root) foreach (var bookmark in root.Descendants<W.BookmarkStart>()) yield return bookmark;
-        foreach (var child in part.Parts) foreach (var bookmark in Bookmarks(child.OpenXmlPart, seen)) yield return bookmark;
+        if (part.RootElement is { } root) foreach (var element in root.Descendants<T>()) yield return element;
+        foreach (var child in part.Parts) foreach (var element in PartElements<T>(child.OpenXmlPart, seen)) yield return element;
     }
 
     private static void ValidateRelationships(OpenXmlPart part, HashSet<OpenXmlPart> seen)

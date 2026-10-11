@@ -16,7 +16,7 @@ public sealed class DocumentExportService
             cancellationToken.ThrowIfCancellationRequested();
             return format switch
             {
-                "DOCX" => new DocxExporter().Export(content, template),
+                "DOCX" => new DocxExporter().Export(content, template, cancellationToken),
                 "PDF" => new PdfExporter().Export(content),
                 "HTML" => Encoding.UTF8.GetBytes(new HtmlExporter().Export(content)),
                 _ => throw new ArgumentException("Unsupported export format.")

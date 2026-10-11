@@ -65,9 +65,10 @@ public partial class MainWindow
         if (picker.ShowDialog(this) != true) return;
         await model.RunAsync(async () =>
         {
-            if (new FileInfo(picker.FileName).Length > 32 * 1024 * 1024) throw new IOException("The template exceeds the 32 MB import limit.");
-            wordTemplate = await File.ReadAllBytesAsync(picker.FileName, model.OperationToken);
-            model.Status = "Word template selected: " + Path.GetFileName(picker.FileName);
+            var prepared = await new DocxTemplateService().ReadAsync(picker.FileName, model.OperationToken);
+            wordTemplate = prepared.Bytes;
+            model.Status = "Word template selected: " + Path.GetFileName(picker.FileName)
+                + (prepared.Warnings.Count == 0 ? "" : ". " + string.Join(" ", prepared.Warnings));
         });
     }
     private void ClearWordTemplate(object sender, RoutedEventArgs e) { wordTemplate = null; model.Status = "Default Word styles selected"; }

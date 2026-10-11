@@ -111,14 +111,14 @@
     <MenuItem Header="Document anchor…" Click="InsertAnchor" AutomationProperties.AutomationId="InsertAnchor"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
-    <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument"/>
+    <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument" AutomationProperties.AutomationId="ExportWord"/>
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument"/>
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
     <Separator/>
-    <MenuItem Header="Select Word _template…" Click="SelectWordTemplate"/>
-    <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate"/>
+    <MenuItem Header="Select Word _template…" Click="SelectWordTemplate" AutomationProperties.AutomationId="SelectWordTemplate"/>
+    <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate" AutomationProperties.AutomationId="ClearWordTemplate"/>
    </MenuItem>
    <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
     <MenuItem Header="Document _review…" Click="ReviewDocument" AutomationProperties.AutomationId="ReviewDocument"/>

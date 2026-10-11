@@ -1,5 +1,13 @@
 # Native validation report
 
+## Word template package extraction
+
+Release build has no warnings/errors; all 439 core tests, the full native harness and static checks pass. Twenty-one package cases verify exclusion of unrelated images/comments/custom XML/author metadata, actual retained logo bytes and links, page fields, inherited first/even/default headers/footers, final page layout, safe settings, unchanged theme XML, preserved numbering and large IDs, archive paths/counts/sizes/checksums, cancellation and rejected active/incomplete/invalid content. Prepared packages are schema-validated before selection. Native integration emits a real DOCX and checks the retained logo, heading, header/footer references, numbering and excluded original content. Evidence: artifacts/native/tests/native-core-word-template-complete.trx and artifacts/native/validation/native-word-template.docx/json.
+
+All four initial regression checks failed against whole-package copying. Expanded tests additionally exposed direct VML resource attributes, repeated drawing IDs and an Open XML AddChild choice replacing header references; these are corrected. The theme fixture initially compared in-memory attribute ordering with saved XML; it now compares the original persisted part with the exported part exactly. Evidence: word-template-package-before.trx, word-template-package-expanded.trx, word-template-section-diagnostic.trx, word-template-package-boundaries.trx and word-theme-diagnostic.trx. A 38th actual desktop workflow now covers select/export/clear/default output and unchanged original files; fresh CI is pending.
+
+All four runs at 529aff3 pass: native 38181034358/38181030926 and web 38181034348/38181030930. Both native runs pass all 37 built, installed and reinstalled workflows, including the figure dialogue correction. Logs: artifacts/native/native-ci-529aff3-pr.log and native-ci-529aff3-push.log. Local foreground validation remains unavailable.
+
 ## Word semantic style mapping
 
 Release build has no warnings/errors; all 418 core tests and the complete native harness pass. Five Word cases verify actual H1–H6 outline levels, body/code/quote/table aliases, incompatible style types, unchanged corporate style XML, prototype table widths and nested quote numbering. Generated packages pass schema validation. Three initial failures demonstrate the previous shifted headings, missing outline levels and incorrect style types. A subsequent fixture had run properties in invalid XML order; correcting the fixture preserves the exact-style assertion. Evidence: artifacts/native/tests/word-template-style-before.trx, word-template-style-after.trx, native-core-word-styles-first.trx, native-core-word-styles.trx and artifacts/native/validation/validation-summary.json.

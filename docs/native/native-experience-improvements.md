@@ -3,6 +3,7 @@
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
+| Validated Word template selection | High / medium | Read and validate on a worker before selection; copy supported formatting into a fresh package, retain referenced logo bytes and exclude unrelated source content. Twenty-one package tests and native integration pass. A 38th desktop selection/export/default-reset workflow awaits CI; reusable library management remains |
 | Semantic Word headings and template styles | High / low | Correct H1–H6 outline levels, typed style aliases, body/code/quote/caption/table mapping and retained corporate formatting. Five package/schema tests pass; template library and complete package extraction remain |
 | Native image caption editing | Medium / low | Convert an existing standalone image or update its figure through labelled native fields. Preserve destination, title, surrounding source and separate Undo/Redo actions. Thirteen core edit cases and an eleventh native editor outcome pass locally; the 37th desktop dialogue workflow awaits CI |
 | Portable image figures with native captions | Medium / medium | Recognised helper markup resolves through existing image preparation and exact HTML URL spans. Captions remain selectable; image copy, source clipboard round trips, asset audit/Save as, Word/PDF/HTML and exported-site checks pass locally. Additional attributes/nested caption content remain inert; the 36th desktop workflow awaits CI |

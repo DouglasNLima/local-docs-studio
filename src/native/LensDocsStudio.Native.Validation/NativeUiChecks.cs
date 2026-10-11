@@ -851,6 +851,31 @@ internal static class NativeUiChecks
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
+            var templateSource = editor.Patterns.Value.Pattern.Value.Value; var templateSavedSource = File.ReadAllText(source);
+            var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
+            var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
+            Find(window, "ExportMenu").Click(); Find(window, "SelectWordTemplate").Patterns.Invoke.Pattern.Invoke();
+            OpenThroughDialogue(templatePath, "Select Word template");
+            Wait(() => Find(window, "Status").Name.StartsWith("Word template selected: native-template.docx", StringComparison.Ordinal), "The native Word template did not validate and select.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
+            var templateExport = Path.Combine(runRoot, "template-export.docx"); SaveThroughDialogue(templateExport, "Export DOCX");
+            Wait(() => File.Exists(templateExport) && Find(window, "Status").Name == "Exported template-export.docx", "Word export with the selected native template did not complete.");
+            NativeWordTemplateChecks.Check(File.ReadAllBytes(templateExport), templatePixels);
+            Find(window, "ExportMenu").Click(); Find(window, "ClearWordTemplate").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(window, "Status").Name == "Default Word styles selected", "The native Word template did not clear.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
+            var defaultExport = Path.Combine(runRoot, "default-export.docx"); SaveThroughDialogue(defaultExport, "Export DOCX");
+            Wait(() => File.Exists(defaultExport) && Find(window, "Status").Name == "Exported default-export.docx", "Default Word export did not complete after clearing the template.");
+            using (var defaultPackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(defaultExport, false))
+            {
+                if (defaultPackage.MainDocumentPart!.HeaderParts.Any() || defaultPackage.MainDocumentPart.FooterParts.Any()
+                    || defaultPackage.MainDocumentPart.StyleDefinitionsPart!.Styles!.Elements<DocumentFormat.OpenXml.Wordprocessing.Style>().Any(style => style.StyleId == "NativeHeading")
+                    || new DocumentFormat.OpenXml.Validation.OpenXmlValidator().Validate(defaultPackage).Any())
+                    throw new IOException("Clearing the native Word template retained its formatting or produced an invalid package.");
+            }
+            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
+                throw new IOException("Template selection or Word export changed original source files.");
+            checks.Add("Native Word template selection and export preserve heading styles, header/footer/logo and source files while excluding private template content; clearing restores default output");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -946,6 +971,18 @@ internal static class NativeUiChecks
             Wait(() => (progressWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Progress indicator")))?.AsWindow()) is not null,
                 "The native progress dialogue did not open.");
             return progressWindow!;
+        }
+        void OpenThroughDialogue(string path, string title)
+        {
+            Window? picker = null;
+            Wait(() => (picker = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null,
+                "The native file selection dialogue did not open.");
+            FocusWindow(picker!); var fileName = Find(picker!, "1001").AsTextBox(); fileName.Focus();
+            Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Open filename field did not acquire keyboard focus.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(path);
+            Wait(() => fileName.Text == path, "The native Open dialogue did not accept the selected path.");
+            (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
+                ?? throw new IOException("The native Open button is unavailable.")).AsButton().Click();
         }
         void SaveThroughDialogue(string destination, string title = "Save document", string? expectedFilename = null)
         {
