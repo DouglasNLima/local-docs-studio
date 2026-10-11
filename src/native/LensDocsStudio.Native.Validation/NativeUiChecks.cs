@@ -687,7 +687,7 @@ internal static class NativeUiChecks
                     throw new IOException("Native table copying changed saved or edited source.");
                 window.CaptureToFile(Path.Combine(output, "native-table-copy.png"));
                 OpenPreviewContext("Native table Café", "ExportPreviewTableCsv").Patterns.Invoke.Pattern.Invoke();
-                var csvPath = Path.Combine(runRoot, "selected-table.csv");
+                var csvPath = Path.Combine(runRoot, "fixture-table-2.csv");
                 SaveThroughDialogue(csvPath, "Export table CSV", "fixture-table-2.csv");
                 Wait(() => Find(window, "Status").Name == "Table exported as UTF-8 CSV.", "The native table CSV command did not finish.");
                 if (!File.ReadAllBytes(csvPath).SequenceEqual(System.Text.Encoding.UTF8.GetBytes("Selected,Value\r\nNative table Café,=1+1\r\nIdentifier,000123"))
@@ -808,11 +808,20 @@ internal static class NativeUiChecks
             var suggested = fileName.Text; var expected = Path.GetFileName(destination);
             try
             {
-                if (expectedFilename is not null && suggested != expectedFilename) throw new IOException("The Save dialogue suggested an incorrect filename: " + suggested);
-                fileName.Focus();
-                Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Save filename field did not acquire keyboard focus.");
-                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(expected);
-                Wait(() => fileName.Text == expected, "The native dialogue did not accept the typed filename.");
+                if (expectedFilename is not null)
+                {
+                    // Windows may hide the selected file type's extension in the filename field.
+                    // Saving the untouched suggestion must still produce the exact expected path.
+                    if (expected != expectedFilename || (suggested != expectedFilename && suggested != Path.GetFileNameWithoutExtension(expectedFilename)))
+                        throw new IOException("The Save dialogue suggested an incorrect filename: " + suggested);
+                }
+                else
+                {
+                    fileName.Focus();
+                    Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Save filename field did not acquire keyboard focus.");
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(expected);
+                    Wait(() => fileName.Text == expected, "The native dialogue did not accept the typed filename.");
+                }
             }
             catch
             {

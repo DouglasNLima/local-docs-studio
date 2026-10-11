@@ -1,5 +1,7 @@
 # Native validation report
 
+Both native runs at 19f110b (38175949120/38175945904) stop at the new default-filename assertion. The retained screenshot and field value show Windows hides the selected CSV extension: fixture-table-2 with CSV table selected. The harness now saves that untouched suggestion and verifies the exact fixture-table-2.csv path and bytes. No product filename change was required. Evidence: artifacts/native/native-ci-19f110b-*-failure.log and artifacts/native/ci-19f110b-pr/ui; fresh CI is pending.
+
 ## Table CSV and current desktop evidence
 
 Release build passes without warnings/errors. All 328 core tests and the standard native integration harness pass. Twelve CSV cases cover exact selected-table output, UTF-8 without BOM, CRLF rows, quotes/newlines, empty cells, literal formula-like/identifier values, passive labels, image alt text, nested tables, unsupported HTML, stale spans, source/cell limits and cancellation. Six combined native table outcomes verify menu dispatch, copied pixels, real guarded CSV files, unavailable resources, conflict refusal and cancelled output without source changes. Evidence: artifacts/native/tests/native-core-table-csv.trx and artifacts/native/validation/native-table.json. The new 33rd desktop workflow verifies the real CSV menu/Save dialogue, default table number and exact output bytes; CI is pending.

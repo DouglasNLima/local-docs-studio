@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Both native runs at 19f110b (38175949120/38175945904) stop at the new default-filename assertion. The retained screenshot and field value show Windows hides the selected CSV extension: fixture-table-2 with CSV table selected. The harness now saves that untouched suggestion and verifies the exact fixture-table-2.csv path and bytes. No product filename change was required. Evidence: artifacts/native/native-ci-19f110b-*-failure.log and artifacts/native/ci-19f110b-pr/ui; fresh CI is pending.
+
 Current milestone: functional parity and Windows workflow certification. This remains an incomplete internal preview, with no release or merge authorised.
 
 ## Baseline and isolation
