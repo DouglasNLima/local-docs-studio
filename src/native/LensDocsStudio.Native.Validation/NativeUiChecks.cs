@@ -725,13 +725,54 @@ internal static class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Document review validation did not restore the original source.");
                 checks.Add("Native document review uses current edits, shows scoped advisory notes and selects exact source without saving or changing text");
+                var reviewTargetPath = Path.Combine(runRoot, "review-target.md"); File.WriteAllText(reviewTargetPath, "# Saved target");
+                AutomationElement? reviewTargetItem = null;
+                Wait(() => (reviewTargetItem = Find(window, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName("review-target.md")))) is not null,
+                    "The workspace review target did not appear in the native tree.");
+                FocusWindow(window); reviewTargetItem!.Patterns.SelectionItem.Pattern.Select(); reviewTargetItem.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# Saved target", "The workspace review target did not open.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText("# New target"); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# New target", "The unsaved target heading did not paste.");
+                sourceTab.Patterns.SelectionItem.Pattern.Select();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "The source tab did not return for workspace review.");
+                const string workspaceReviewSource = "# Workspace review\n\n[New](review-target.md#new-target) [Old](review-target.md#saved-target)";
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(workspaceReviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == workspaceReviewSource, "The workspace review source did not paste.");
+                Find(window, "ViewMenu").Click(); Find(window, "ReviewDocument").Patterns.Invoke.Pattern.Invoke(); reviewWindow = null;
+                Wait(() => (reviewWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document review")))?.AsWindow()) is not null,
+                    "Workspace document review did not open.");
+                if (!Find(reviewWindow!, "ReviewWorkspaceScope").Name.Contains("current open drafts", StringComparison.Ordinal)
+                    || !Find(reviewWindow!, "ReviewResultStatus").Name.StartsWith("1 advisory note.", StringComparison.Ordinal))
+                    throw new IOException("Workspace review did not use the unsaved target heading.");
+                Find(reviewWindow!, "ReviewIssues").AsListBox().Items.Single(item => item.Name.Contains("linked section is missing", StringComparison.Ordinal)).Select();
+                reviewWindow!.CaptureToFile(Path.Combine(output, "native-workspace-review.png"));
+                Find(reviewWindow!, "ReviewGoToSource").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name == "The linked section is missing from its workspace document.", "Workspace review did not navigate to the selected link.");
+                EditorContext("EditorContextCopy");
+                Wait(() => System.Windows.Clipboard.GetText() == "[Old](review-target.md#saved-target)", "Workspace review did not select the exact stale link.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                if (File.ReadAllText(reviewTargetPath) != "# Saved target" || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != workspaceReviewSource)
+                    throw new IOException("Workspace review changed saved or edited documents.");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Workspace review did not restore its source fixture.");
+                reviewTargetItem = Find(window, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName("review-target.md")))
+                    ?? throw new IOException("The workspace review target disappeared from the tree.");
+                reviewTargetItem.Patterns.SelectionItem.Pattern.Select(); reviewTargetItem.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# New target", "The target draft was lost during workspace review.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# Saved target", "Workspace review did not restore its target fixture.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W); sourceTab.Patterns.SelectionItem.Pattern.Select();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Workspace review did not return to the original source tab.");
+                checks.Add("Workspace review validates unsaved target headings and selects stale link source without writing either document");
             }
             finally
             {
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
-            window.Patterns.Window.Pattern.Close();
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
             app.Dispose(); launchedProcess.Dispose(); app = Launch(null);
@@ -753,7 +794,7 @@ internal static class NativeUiChecks
             updateWindow!.Close();
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates"))) is null, "The updates window did not close.");
             window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
-            window.Patterns.Window.Pattern.Close();
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
             RecordResult(new { Passed = true, Checks = checks, FixtureRoot = runRoot });

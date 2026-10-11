@@ -16,6 +16,12 @@ public partial class DocumentReviewWindow : Window
         Summary.Text = $"{Count(metrics.Words, "word")} · {metrics.ReadingMinutes} min read · {Count(metrics.Headings, "heading")} · {Count(metrics.Links, "link")} · {Count(metrics.Images, "image")} · {Count(metrics.Tables, "table")} · {Count(metrics.CodeBlocks, "code block")} · {Count(metrics.Diagrams, "diagram")}";
         ResultStatus.Text = result.Limited ? $"Showing {result.Issues.Count} notes; the review limit was reached."
             : result.Issues.Count == 0 ? "No notes from these checks." : $"{Count(result.Issues.Count, "advisory note")}. Choose one to inspect its source.";
+        WorkspaceScope.Text = result.WorkspaceLinks switch
+        {
+            WorkspaceLinkReviewState.Complete => "Workspace document links checked against saved files and current open drafts.",
+            WorkspaceLinkReviewState.Incomplete => "Some workspace document links could not be checked. Review the notes for details.",
+            _ => "Save this document in a workspace to include workspace document links."
+        };
         Issues.ItemsSource = result.Issues;
         Loaded += (_, _) => { if (Issues.Items.Count > 0) { Issues.SelectedIndex = 0; Issues.Focus(); } else CloseButton.Focus(); };
     }

@@ -1,5 +1,11 @@
 # Native validation report
 
+## Workspace document review
+
+Release build has no warnings/errors; all 375 core tests and the standard native harness pass. Fifteen workspace cases cover encoded/reference links, unsaved target headings, explicit self links, exact CRLF source spans, missing files/sections, locked or invalid text, workspace escapes, private state/overrides, skipped remote/asset links, distinct/aggregate budgets, cancellation and current-buffer fallback when a workspace is unavailable. Four combined native review outcomes verify actual files, captured target headings and complete/incomplete scope feedback without writes. Evidence: artifacts/native/tests/native-core-workspace-review.trx, workspace-review-path.trx and artifacts/native/validation/native-review.json.
+
+The 35th desktop workflow uses a real second tab with an unsaved heading, requires only the stale link to be reported, copies its exact selected source and restores both buffers while checking saved bytes. Fresh desktop/installed CI is pending. At 7370ed5, native PR CI 38177463650 passes all 34 built/installed/reinstalled outcomes, and both web runs 38177463661/38177460073 pass. Native push 38177460090 passes built workflows and the installed review checks, then times out obtaining the main Window automation pattern before shutdown. Its retained screenshot shows the original source, no modal dialogue and a completed preview. The harness now uses actual Alt+F4 for both main-window closures; exit-code, shutdown and restoration checks remain unchanged. The provider timeout cause is not claimed resolved. Evidence: artifacts/native/native-ci-7370ed5-pr.log, native-ci-7370ed5-push-failure.log and ci-7370ed5-push/install-smoke.
+
 ## Original pipe-table review
 
 Release build has no warnings/errors; all 360 core tests and the standard native harness pass. Seventeen table cases verify malformed separators, missing/extra body and separator cells, exact CRLF row selection, alignment, escaped/trailing pipes, empty cells, optional outer delimiters, nested quote/list prefixes, paragraph boundaries and code/HTML/front-matter exclusions. Table analysis uses source rows even when parsing normalises their cell counts. Evidence: artifacts/native/tests/native-core-table-review.trx and table-review-first.trx.

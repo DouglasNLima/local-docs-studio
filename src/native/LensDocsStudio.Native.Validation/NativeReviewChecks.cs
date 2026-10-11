@@ -6,6 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LensDocsStudio.Core.Review;
+using LensDocsStudio.Core.Workspace;
 using LensDocsStudio.Native.Platform;
 
 namespace LensDocsStudio.Native.Validation;
@@ -63,12 +64,29 @@ internal static class NativeReviewChecks
         var limited = new DocumentReviewWindow(new(result.Metrics, result.Issues, true));
         if (!((TextBlock)limited.FindName("ResultStatus")).Text.Contains("limit was reached", StringComparison.Ordinal)) throw new IOException("Native review hid its incomplete result limit.");
         limited.Close();
+        var workspace = Path.Combine(output, "review-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(workspace);
+        var targetPath = Path.Combine(workspace, "Target.md"); File.WriteAllText(targetPath, "# Saved target");
+        var sourcePath = Path.Combine(workspace, "Source.md"); File.WriteAllText(sourcePath, "# Saved source");
+        var workspaceResult = new WorkspaceDocumentReviewService(new DocumentStore(Path.Combine(workspace, "recovery")))
+            .AnalyseAsync("# Current source\n\n[New](Target.md#new-target) [Old](Target.md#saved-target)", sourcePath, new(workspace),
+                new Dictionary<string, string> { [targetPath] = "# New target" }).GetAwaiter().GetResult();
+        var workspaceWindow = new DocumentReviewWindow(workspaceResult);
+        if (workspaceResult.Issues.Count != 1 || workspaceResult.WorkspaceLinks != WorkspaceLinkReviewState.Complete
+            || !((TextBlock)workspaceWindow.FindName("WorkspaceScope")).Text.Contains("current open drafts", StringComparison.Ordinal)
+            || File.ReadAllText(sourcePath) != "# Saved source" || File.ReadAllText(targetPath) != "# Saved target")
+            throw new IOException("Native workspace review did not retain current draft targets, scope feedback or untouched files.");
+        workspaceWindow.Close();
+        var partialWindow = new DocumentReviewWindow(workspaceResult with { WorkspaceLinks = WorkspaceLinkReviewState.Incomplete });
+        if (!((TextBlock)partialWindow.FindName("WorkspaceScope")).Text.StartsWith("Some workspace document links could not be checked.", StringComparison.Ordinal))
+            throw new IOException("Native workspace review hid incomplete link coverage.");
+        partialWindow.Close();
         File.WriteAllText(Path.Combine(output, "native-review.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
             Checks = new[] { "Native light/dark review controls retain metrics, virtualisation and accessible source locations",
                 "Selecting a review note enables its exact original source destination",
-                "Empty and limited results disclose their scope without implying complete document certification" },
+                "Empty and limited results disclose their scope without implying complete document certification",
+                "Workspace review uses current target drafts and reports complete or incomplete coverage without file writes" },
             Limitation = "Control layout and bindings only; real dialogue navigation is validated separately in desktop CI."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }

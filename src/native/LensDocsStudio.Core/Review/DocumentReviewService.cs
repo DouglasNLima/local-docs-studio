@@ -16,7 +16,11 @@ public sealed record DocumentReviewMetrics(int Words, int Headings, int Links, i
 {
     public int ReadingMinutes => Words == 0 ? 0 : Math.Max(1, (Words + 219) / 220);
 }
-public sealed record DocumentReviewResult(DocumentReviewMetrics Metrics, IReadOnlyList<DocumentReviewIssue> Issues, bool Limited);
+public enum WorkspaceLinkReviewState { NotChecked, Complete, Incomplete }
+public sealed record DocumentReviewResult(DocumentReviewMetrics Metrics, IReadOnlyList<DocumentReviewIssue> Issues, bool Limited)
+{
+    public WorkspaceLinkReviewState WorkspaceLinks { get; init; }
+}
 
 /// <summary>Advisory checks of the current Markdown buffer; never reads links or changes source.</summary>
 public sealed partial class DocumentReviewService
@@ -38,16 +42,16 @@ public sealed partial class DocumentReviewService
         cancellationToken.ThrowIfCancellationRequested();
         if (source.Length > MaximumSourceCharacters) throw new IOException("Document review supports up to 4 million source characters.");
         var parsed = new MarkdownService().Parse(source, standaloneMermaid);
+        return AnalyseParsed(parsed, standaloneMermaid, cancellationToken);
+    }
+
+    internal DocumentReviewResult AnalyseParsed(ParsedDocument parsed, bool standaloneMermaid, CancellationToken cancellationToken)
+    {
+        var source = parsed.Source;
         cancellationToken.ThrowIfCancellationRequested();
         var issues = new List<DocumentReviewIssue>(); var limited = false;
         var words = 0; var headings = 0; var links = 0; var images = 0; var tables = 0; var code = 0; var diagrams = 0; var previousLevel = 0;
-        var lineStarts = new List<int> { 0 };
-        for (var index = 0; index < source.Length; index++)
-        {
-            if ((index & 4095) == 0) cancellationToken.ThrowIfCancellationRequested();
-            if (source[index] == '\r') { if (index + 1 < source.Length && source[index + 1] == '\n') index++; lineStarts.Add(index + 1); }
-            else if (source[index] == '\n') lineStarts.Add(index + 1);
-        }
+        var lineStarts = SourceLines(source, cancellationToken);
         var seenHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var targets = parsed.Targets.Select(target => target.Id).ToHashSet(StringComparer.Ordinal);
         WalkBlocks(parsed.Syntax, 0);
@@ -157,6 +161,17 @@ public sealed partial class DocumentReviewService
             cancellationToken.ThrowIfCancellationRequested();
             if (depth > 64) throw new IOException("The document contains excessively nested review content.");
         }
+    }
+    internal static List<int> SourceLines(string source, CancellationToken cancellationToken)
+    {
+        var starts = new List<int> { 0 };
+        for (var index = 0; index < source.Length; index++)
+        {
+            if ((index & 4095) == 0) cancellationToken.ThrowIfCancellationRequested();
+            if (source[index] == '\r') { if (index + 1 < source.Length && source[index + 1] == '\n') index++; starts.Add(index + 1); }
+            else if (source[index] == '\n') starts.Add(index + 1);
+        }
+        return starts;
     }
     private static string Short(string text) => text.Length > 160 ? text[..157] + "…" : text;
     [GeneratedRegex(@"[\p{L}\p{N}]+(?:['-][\p{L}\p{N}]+)*", RegexOptions.CultureInvariant, 100)] private static partial Regex Words();
