@@ -30,6 +30,8 @@ public partial class MainWindow : Window
     private readonly DiagramService diagrams = new();
     private readonly NativeSvgService svg = new();
     private readonly ImageAssetService assets = new();
+    private readonly PreviewImageService previewImages = new();
+    private readonly SemaphoreSlim previewGate = new(1, 1);
     private readonly DispatcherTimer previewTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
     private readonly DispatcherTimer recoveryTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     private CancellationTokenSource? previewCancellation;
@@ -110,12 +112,15 @@ public partial class MainWindow : Window
     {
         if (model.ActiveDocument is not { } tab) { Preview.Document = new FlowDocument(); return; }
         var text = tab.EditorDocument.Text;
+        var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
         var dark = ThemeService.IsDark(model.Theme);
         var standalone = Path.GetExtension(tab.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid";
+        var acquired = false;
         try
         {
+            await previewGate.WaitAsync(cancellation); acquired = true;
             var watch = Stopwatch.StartNew();
             var prepared = await Task.Run(() =>
             {
@@ -139,17 +144,19 @@ public partial class MainWindow : Window
                     catch (Exception ex) when (ex is not OutOfMemoryException)
                     { prepared.results[code] = new(diagram.Source, null, "Native diagram rendering failed: " + ex.Message); }
                 }
-                return drawings;
+                var images = previewImages.Prepare(prepared.source, sourcePath, workspaceRoot, cancellation);
+                return (drawings, images);
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source;
-            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.EffectivePath, tab.EffectiveWorkspace, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings, CopyDocumentImage);
+            rendered = new NativeMarkdownRenderer(svg).Render(parsed, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images);
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
             model.PreviewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
+        finally { if (acquired) previewGate.Release(); }
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
