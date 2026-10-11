@@ -30,10 +30,12 @@ internal static class NativeUiChecks
         using var automation = new UIA3Automation();
         Application? app = null;
         Process? launchedProcess = null;
+        Window? mainWindow = null;
         try
         {
             app = Launch(source);
             var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("Native window did not appear.");
+            mainWindow = window;
             var editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
@@ -881,6 +883,7 @@ internal static class NativeUiChecks
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
             app.Dispose(); launchedProcess.Dispose(); app = Launch(null);
             window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("Restored window did not appear.");
+            mainWindow = window;
             editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Session did not restore saved text.");
             checks.Add("Session restoration reopened the document");
@@ -907,8 +910,19 @@ internal static class NativeUiChecks
         }
         catch (Exception ex)
         {
-            try { app?.GetMainWindow(automation, TimeSpan.FromSeconds(1))?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
-            try { File.WriteAllLines(Path.Combine(output, "native-ui-failure-controls.txt"), app!.GetMainWindow(automation)!.FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
+            try { mainWindow?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
+            try { File.WriteAllLines(Path.Combine(output, "native-ui-failure-controls.txt"), mainWindow!.FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
+            try
+            {
+                var windows = automation.GetDesktop().FindAllChildren(cf => cf.ByProcessId(app!.ProcessId));
+                File.WriteAllLines(Path.Combine(output, "native-ui-failure-windows.txt"), windows.Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name} — {e.BoundingRectangle}"));
+                for (var i = 0; i < windows.Length; i++)
+                {
+                    try { windows[i].CaptureToFile(Path.Combine(output, $"native-ui-failure-window-{i}.png")); } catch { }
+                    try { File.WriteAllLines(Path.Combine(output, $"native-ui-failure-window-{i}.txt"), windows[i].FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
+                }
+            }
+            catch { }
             RecordResult(new { Passed = false, Checks = checks, Error = ex.ToString(), FixtureRoot = runRoot });
             Console.Error.WriteLine(ex);
             return 1;
@@ -998,8 +1012,14 @@ internal static class NativeUiChecks
                 catch (Exception) { /* Preserve the original failure if diagnostic collection also fails. */ }
                 throw;
             }
-            (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
-                ?? throw new IOException("The native Open button is unavailable.")).AsButton().Click();
+            var openButton = (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
+                ?? throw new IOException("The native Open button is unavailable.")).AsButton();
+            File.WriteAllText(Path.Combine(output, "native-open-dialogue.json"), JsonSerializer.Serialize(new { Title = title, Expected = path,
+                Observed = fileName.Text, ButtonId = openButton.AutomationId, ButtonBounds = openButton.BoundingRectangle.ToString() }));
+            // Invoke the labelled command directly; a filename suggestion popup can intercept a coordinate click.
+            openButton.Invoke();
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title))) is null,
+                "The native Open dialogue did not close after its Open command.");
         }
         void SaveThroughDialogue(string destination, string title = "Save document", string? expectedFilename = null)
         {
