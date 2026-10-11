@@ -1,5 +1,11 @@
 # Native validation report
 
+## Cancellable native document construction
+
+Release build has no warnings/errors. The native harness adds four passing dispatcher checks using 1,200 paragraphs (74,491 source characters). It verifies input runs before construction completes, every paragraph/source mapping/entity survives, a newly queued input cancels obsolete construction and an already-cancelled request returns no document. The recorded local run handled input at 39.5 ms and finished construction at 339.0 ms. These are observed timings, not performance guarantees. Evidence: artifacts/native/validation/native-layout.json. Standard diagram/export, image, preview, Markdown and editor checks remain green; core remains at 240 passing tests from the preceding completion batch.
+
+WPF objects are constructed on the UI dispatcher in batches of up to 32 top-level blocks or about 8 ms between yield points. The previous preview remains visible until a complete current result is ready. Final viewer pagination/scrolling, very large individual blocks and true incremental reuse remain unvalidated performance work. Fresh desktop/installed CI for this batch is pending.
+
 ## Native Mermaid completion
 
 Release build has no warnings/errors and all 240 core tests pass. Twenty completion cases cover standalone diagrams, backtick/tilde/Azure DevOps fences, fence lengths, prose/other-code exclusion, comments/quoted labels, token suffixes, CRLF/indentation, catalogue aliases and scan budgets. Seven AvalonEdit outcomes now pass, adding actual completion replacement, single Undo/Redo and read-only/selection protection. The standard native corpus, image, preview and Markdown checks remain green. A new 24th desktop outcome checks Ctrl+Space, Enter, automatic suggestions, Escape and Undo/Redo; interactive CI remains pending.

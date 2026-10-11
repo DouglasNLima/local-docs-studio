@@ -3,6 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using System.Diagnostics;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using Markdig.Extensions.Tables;
@@ -25,18 +27,44 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default).GetAwaiter().GetResult();
+
+    public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
+        IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
+        IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken);
+
+    private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
+        IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
+        IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var foreground = new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         var surface = new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity };
         var sourceElements = new Dictionary<int, TextElement>();
         var warnings = new List<string>();
-        foreach (var block in parsed.Syntax) document.Blocks.Add(Convert(block));
+        var batch = Stopwatch.StartNew(); var blocks = 0;
+        foreach (var block in parsed.Syntax)
+        {
+            document.Blocks.Add(Convert(block));
+            if (incremental && (++blocks % 32 == 0 || batch.ElapsedMilliseconds >= 8))
+            {
+                // Keep the old preview visible while native objects are prepared in small batches.
+                // Input, cancellation and newer source edits can run between these batches.
+                await Dispatcher.Yield(DispatcherPriority.Background);
+                cancellationToken.ThrowIfCancellationRequested(); batch.Restart();
+            }
+        }
+        cancellationToken.ThrowIfCancellationRequested();
         return new(document, sourceElements, warnings);
 
         WpfBlock Convert(MdBlock block)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             WpfBlock result;
             switch (block)
             {
@@ -158,6 +186,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         {
             foreach (var inline in container)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 switch (inline)
                 {
                     case DocumentSemanticInline semantic:

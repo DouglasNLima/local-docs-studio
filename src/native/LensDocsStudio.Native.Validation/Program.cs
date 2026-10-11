@@ -49,6 +49,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native Markdown semantics: " + ex.Message); }
         try { NativeEditorChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
+        try { NativeLayoutChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())
