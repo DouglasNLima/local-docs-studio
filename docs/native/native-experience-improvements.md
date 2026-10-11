@@ -12,6 +12,7 @@
 | Explorer, recent files, drag/drop | High / low | Implement through Windows APIs |
 | Document links and navigation history | High / low | Native filtered document/heading picker, portable encoded references, recent lists and Back/Forward; actual UI checks pass |
 | Reviewed rename and move | High / medium | Preview incoming/outgoing Markdown link changes, refuse collisions/external edits, retain recovery text and roll back guarded writes; core failure tests and native rename UI pass |
+| Recoverable deletion and snapshots | High / medium | Retain saved/unsaved text and local image copies, inspect snapshots in a native browser, restore as a new draft and explicitly choose the saved destination; actual deletion and recovery UI pass |
 | Images before the first save | High / medium | Persist PNG assets with draft recovery and finalise portable paths during Save; source anchors protect edits made while loading |
 | Native DOCX/PDF, clipboard formats | High / medium | Inspect actual outputs and format contracts |
 | Signed user-controlled updates | High / high | Integrated separate check/download/install controls and native settings; policy tests pass; production credentials and signed upgrade certification external |

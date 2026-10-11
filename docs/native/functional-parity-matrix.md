@@ -5,7 +5,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | User need / existing contract | Native design | Status |
 |---|---|---|
 | Markdown/Mermaid/text open, save, Save as, UTF-8 | Native pickers, portable source, safe writes | In progress |
-| Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits and recovery | Partial: file creation/rename and link updates pass UI checks; deletion, folder moves and case-only renames remain |
+| Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits, Windows deletion and recovery | Partial: file creation/rename/deletion and snapshot recovery pass UI checks; folder moves and case-only renames remain |
 | Tabs, recent files, navigation history | Native tabs, persisted recent paths and bounded viewport history | Core and desktop navigation checks pass; broader closed-tab/history cases remain |
 | Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
 | Paste Special, HTML/TSV conversion, rich clipboard | Windows clipboard formats | Incomplete |
@@ -15,7 +15,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |
 | Mermaid zoom/copy/SVG/PNG | Native drawing window and guarded bitmap/vector export | Partial: native zoom UI and SVG/PNG corpus pass; destination clipboard validation remains |
 | Portable local images, paste/drop/URL, assets | Persistent draft assets, guarded Save as and relative paths | Partial: recovery/portability integration checks pass; URL, asset management and clipboard transfer remain |
-| External changes, conflict flow, snapshots/recovery | Fingerprints and journal | In progress |
+| External changes, conflict flow, snapshots/recovery | Fingerprints, journals and a native snapshot browser | Partial: saved/unsaved text and local image copies retained; recovery opens new drafts; broader crash certification remains |
 | Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution, searchable document/heading picker | Native insertion and navigation checks pass; wikilinks remain |
 | Review/governance, links/assets audit, docs map | Source-aware analysis | Incomplete |
 | ZIP/Markdown Bundle/artefact imports | Bounded extraction, passive metadata | Partial: ZIP tests pass; artefact reader remains |

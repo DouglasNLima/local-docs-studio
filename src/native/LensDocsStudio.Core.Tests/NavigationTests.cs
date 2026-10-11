@@ -57,6 +57,15 @@ public sealed class NavigationTests
         Assert.Equal(8, history.Forward.CaretOffset);
     }
 
+    [Fact] public void Removing_a_document_skips_its_previous_and_forward_navigation_entries()
+    {
+        var history = new NavigationHistory(); var removed = Guid.NewGuid(); var other = Guid.NewGuid();
+        history.Visit(new(removed, null, 0, 0)); history.Visit(new(other, "other.md", 0, 0)); history.Visit(new(removed, null, 8, 0));
+        history.CompleteMove(false, history.Back!); history.ForgetDocument(removed);
+        Assert.False(history.CanGoBack); Assert.False(history.CanGoForward);
+        history.Visit(new(Guid.NewGuid(), "last.md", 0, 0)); Assert.Equal(other, history.Back!.DocumentId);
+    }
+
     [Fact] public void Document_links_encode_portable_paths_and_escape_labels()
     {
         var root = Path.Combine(Path.GetTempPath(), "lens-links-" + Guid.NewGuid().ToString("N"));

@@ -56,6 +56,7 @@ public partial class MainWindow : Window
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteImagePaste);
         model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
+        model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
         recoveryTimer.Tick += async (_, _) =>
         {
@@ -145,11 +146,10 @@ public partial class MainWindow : Window
             rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.EffectivePath, tab.EffectiveWorkspace, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings);
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
-            if (rendered.Warnings.Count != 0) model.Status = rendered.Warnings[0];
-            else if (!tab.ExternalChange) model.Status = $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            model.PreviewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
         }
         catch (OperationCanceledException) { }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { model.Status = "Preview could not be updated: " + ex.Message; }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();

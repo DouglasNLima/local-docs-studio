@@ -41,4 +41,9 @@ public sealed class DesktopDialogs
         var window = new MoveDocumentWindow(workspace, plan) { Owner = Owner };
         return window.ShowDialog() == true ? window.ShouldUpdateLinks : null;
     }
+    public LensDocsStudio.Core.State.DocumentSnapshotEntry? SelectSnapshot(LensDocsStudio.Core.State.DocumentSnapshotStore store, LensDocsStudio.Core.State.DocumentSnapshotListing listing)
+    {
+        var window = new SnapshotsWindow(store, listing) { Owner = Owner };
+        return window.ShowDialog() == true ? window.SelectedSnapshot : null;
+    }
 }

@@ -34,7 +34,7 @@ internal static class NativeUiChecks
             var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("Native window did not appear.");
             var editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
-            Wait(() => Find(window, "Status").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
+            Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
@@ -132,6 +132,30 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => File.ReadAllText(createdPath) == "Created through the native workspace.", "The new file did not save its actual edited content.");
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
+            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            Keyboard.Type("\nUnsaved content retained before deletion.");
+            Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Click();
+            Window? deleteWindow = null;
+            Wait(() => (deleteWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Delete document")))?.AsWindow()) is not null, "The deletion confirmation did not open.");
+            (deleteWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("OK"))) ?? throw new InvalidOperationException("The delete confirmation is unavailable.")).AsButton().Invoke();
+            Wait(() => !File.Exists(createdPath) && Find(window, "Status").Name.StartsWith("Deleted created-from-ui.md", StringComparison.Ordinal), "The file was not removed through the Windows shell.");
+            var snapshotStore = new LensDocsStudio.Core.State.DocumentSnapshotStore(state);
+            var retainedSnapshots = snapshotStore.ListAsync().GetAwaiter().GetResult();
+            if (retainedSnapshots.Entries.Count != 2) throw new IOException("Deletion did not retain separate saved and unsaved source snapshots.");
+            checks.Add("Deleting a document uses the Windows shell and retains saved and unsaved source snapshots");
+            Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Click();
+            Window? snapshotsWindow = null;
+            Wait(() => (snapshotsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document snapshots")))?.AsWindow()) is not null, "The native snapshot browser did not open.");
+            var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
+            retainedItem.Select();
+            Wait(() => Find(snapshotsWindow!, "SnapshotSource").AsTextBox().Text.Contains("Unsaved content retained before deletion.", StringComparison.Ordinal) && Find(snapshotsWindow!, "RestoreSnapshot").IsEnabled, "The retained unsaved source did not appear.");
+            Find(snapshotsWindow!, "RestoreSnapshot").AsButton().Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Unsaved content retained before deletion.", StringComparison.Ordinal), "The snapshot was not recovered into a new editor tab.");
+            if (File.Exists(createdPath)) throw new IOException("Inspecting and restoring a snapshot unexpectedly recreated a workspace file.");
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            SaveThroughDialogue(createdPath);
+            Wait(() => File.Exists(createdPath) && File.ReadAllText(createdPath).Contains("Unsaved content retained before deletion.", StringComparison.Ordinal), "The recovered source did not save to its explicitly chosen destination.");
+            checks.Add("Snapshot browser recovers unsaved text into a new draft and Save recreates only the chosen file");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
             var sourceTab = window.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem).And(cf.ByName("fixture.md"))) ?? throw new InvalidOperationException("The original document tab is unavailable.");
             sourceTab.Patterns.SelectionItem.Pattern.Select();
@@ -151,13 +175,7 @@ internal static class NativeUiChecks
             finally { if (previousClipboard is not null) { try { System.Windows.Clipboard.SetDataObject(previousClipboard, true); } catch (ExternalException) { } } }
             var imageDocument = Path.Combine(runRoot, "Image document.md");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Window? saveWindow = null;
-            Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Save document")))?.AsWindow()) is not null, "The native Save dialogue did not open.");
-            FocusWindow(saveWindow!);
-            var fileName = Find(saveWindow!, "1001").AsTextBox();
-            fileName.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(Path.GetFileName(imageDocument));
-            Wait(() => fileName.Text == Path.GetFileName(imageDocument), "The native dialogue did not accept the typed filename.");
-            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
+            SaveThroughDialogue(imageDocument);
             Wait(() => File.Exists(imageDocument), "The document containing the pasted image was not saved.");
             var imageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(imageDocument)).Single(l => l.IsImage).Reference;
             if (!imageReference.StartsWith("assets/images/", StringComparison.Ordinal)) throw new IOException("The saved image still relies on a private draft folder.");
@@ -215,6 +233,16 @@ internal static class NativeUiChecks
             // FlaUI refreshes and disposes its Process instance while locating a window.
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
+        }
+        void SaveThroughDialogue(string destination)
+        {
+            Window? saveWindow = null;
+            Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Save document")))?.AsWindow()) is not null, "The native Save dialogue did not open.");
+            FocusWindow(saveWindow!);
+            var fileName = Find(saveWindow!, "1001").AsTextBox();
+            fileName.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(Path.GetFileName(destination));
+            Wait(() => fileName.Text == Path.GetFileName(destination), "The native dialogue did not accept the typed filename.");
+            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
         }
     }
 

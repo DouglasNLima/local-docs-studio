@@ -15,6 +15,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     public ObservableCollection<WorkspaceEntry> Entries { get; } = [];
     [ObservableProperty] private DocumentViewModel? activeDocument;
     [ObservableProperty] private string status = "Local Markdown, Mermaid, and documentation studio";
+    [ObservableProperty] private string previewStatus = "Preview pending";
     [ObservableProperty] private string? workspaceRoot;
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private string theme = "Light";
@@ -225,16 +226,25 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         tab.AssetWorkspace = root;
     }
 
-    [RelayCommand] private Task ReloadAsync() => RunAsync(async () =>
+    [RelayCommand] private Task ReloadAsync()
     {
-        if (ActiveDocument is not { FilePath: not null } tab) return;
-        if (tab.IsDirty && !dialogs.Confirm("Reloading replaces your editor text with the file on disk. A recovery snapshot will be retained.", "Reload document")) return;
-        await session.WriteAsync($"snapshot-{Guid.NewGuid():N}.json", tab.Recovery());
-        var snapshot = await documents.ReadAsync(tab.FilePath);
-        tab.EditorDocument.Text = snapshot.Text;
-        tab.MarkSaved(snapshot);
-        Status = "Reloaded document";
-    });
+        var tab = ActiveDocument;
+        return RunAsync(async () =>
+        {
+            if (tab is not { FilePath: not null } || !Documents.Contains(tab)) return;
+            if (tab.IsDirty && !dialogs.Confirm("Reloading replaces your editor text with the file on disk. A recovery snapshot will be retained.", "Reload document")) return;
+            tab.IsSaving = true;
+            try
+            {
+                await CaptureSnapshotAsync(tab, "Before reload");
+                var snapshot = await documents.ReadAsync(tab.FilePath, OperationToken);
+                tab.EditorDocument.Text = snapshot.Text;
+                tab.MarkSaved(snapshot);
+                Status = "Reloaded document. Previous editor text is available in Document snapshots.";
+            }
+            finally { tab.IsSaving = false; }
+        });
+    }
 
     [RelayCommand] private async Task CloseDocumentAsync(DocumentViewModel? tab)
     {
@@ -243,6 +253,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         {
             if (!await CanCloseAsync(tab)) return;
             tab.Edited -= OnEdited;
+            if (tab.FilePath is null) DocumentRemoved?.Invoke(tab.Id);
             Documents.Remove(tab);
             if (ActiveDocument == tab) ActiveDocument = Documents.LastOrDefault();
             await PersistSessionAsync();

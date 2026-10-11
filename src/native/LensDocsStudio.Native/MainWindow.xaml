@@ -48,7 +48,10 @@
     <MenuItem Header="_Save" InputGestureText="Ctrl+S" Command="{Binding SaveCommand}"/>
     <MenuItem Header="Save _as…" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveAsCommand}"/>
     <MenuItem Header="_Reload from disk" Command="{Binding ReloadCommand}"/>
+    <MenuItem Header="Take snapshot" Command="{Binding TakeSnapshotCommand}" AutomationProperties.AutomationId="TakeSnapshot"/>
+    <MenuItem Header="Document snapshots…" Command="{Binding BrowseSnapshotsCommand}" AutomationProperties.AutomationId="BrowseSnapshots"/>
     <MenuItem Header="Rename or move document…" InputGestureText="F2" Command="{Binding MoveDocumentCommand}" AutomationProperties.AutomationId="MoveDocument"/>
+    <MenuItem Header="Delete document…" Command="{Binding DeleteDocumentCommand}" AutomationProperties.AutomationId="DeleteDocument"/>
     <MenuItem Header="Reveal in File _Explorer" Click="RevealFile"/>
     <Separator/>
     <MenuItem Header="_Close document" InputGestureText="Ctrl+W" Command="{Binding CloseDocumentCommand}" CommandParameter="{Binding ActiveDocument}"/>
@@ -116,7 +119,8 @@
    </DockPanel>
   </Border>
   <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}">
-   <StatusBarItem><TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" MaxWidth="920" AutomationProperties.AutomationId="Status"/></StatusBarItem>
+   <StatusBarItem><TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" MaxWidth="600" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/></StatusBarItem>
+   <Separator/><StatusBarItem><TextBlock Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/></StatusBarItem>
    <Separator/><StatusBarItem><TextBlock x:Name="CaretStatus" Text="UTF-8"/></StatusBarItem>
    <StatusBarItem><Button Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}"/></StatusBarItem>
   </StatusBar>

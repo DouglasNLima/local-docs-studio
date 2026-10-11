@@ -35,4 +35,10 @@ public sealed class NavigationHistory(int capacity = 100)
         for (var position = 0; position < entries.Count; position++)
             if (entries[position].DocumentId == documentId) entries[position] = entries[position] with { Path = path };
     }
+    public void ForgetDocument(Guid documentId)
+    {
+        for (var position = entries.Count - 1; position >= 0; position--)
+            if (entries[position].DocumentId == documentId) { entries.RemoveAt(position); if (position <= index) index--; }
+        if (index < 0 && entries.Count != 0) index = 0;
+    }
 }
