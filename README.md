@@ -47,6 +47,8 @@ The native **Insert → Document anchor** dialogue creates a named position with
 
 Right-click in the native editor, or press **Shift+F10**, for editing and formatting commands. Right-click a preview code block to copy its plain code or Markdown source. Code copying retains Unicode and indentation; Markdown copying also retains fences, line endings and the surrounding quote/list prefix. Copy actions are limited to four million characters.
 
+Native fenced-code preview uses bundled offline syntax definitions for C#, JavaScript, JSON, Python, XML/XAML, HTML, CSS, PowerShell, SQL, Java, C/C++, PHP, Visual Basic and diff. Light and dark palettes retain selectable source; high contrast uses system text colours. Unknown languages and code beyond the highlighting limits remain fully visible as plain text. Syntax colouring in exported documents remains separate work.
+
 To verify native-generated sites, run `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --docs-site artifacts/native/validation`, then `npx playwright test --config playwright.native-export.config.mjs`. Browser tools are development validation dependencies only; the installed native app does not require them.
 
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.

@@ -620,6 +620,13 @@ internal static class NativeUiChecks
                 EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextMarkdown, "The code context fixture did not paste.");
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("const nativeContext", StringComparison.Ordinal), "The code context fixture did not render.");
+                var codeRange = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange;
+                var stringRange = codeRange.FindText("Café", false, false) ?? throw new IOException("The coloured string was not selectable.");
+                var plainRange = codeRange.FindText("nativeContext", false, false) ?? throw new IOException("The plain identifier was not selectable.");
+                if (stringRange.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) is not int stringColour
+                    || plainRange.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) is not int plainColour || stringColour == plainColour)
+                    throw new IOException("The native preview did not expose distinct syntax colours through UI Automation.");
+                window.CaptureToFile(Path.Combine(output, "native-code-syntax.png"));
                 OpenCodeContext("CopyCodeBlock").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "Code copied as plain text.", "The preview context command did not copy code.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
@@ -631,7 +638,7 @@ internal static class NativeUiChecks
                 if (System.Windows.Clipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
-                checks.Add("Preview code context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
+                checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
             }
             finally
             {

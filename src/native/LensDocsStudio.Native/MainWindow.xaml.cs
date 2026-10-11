@@ -134,7 +134,7 @@ public partial class MainWindow : Window
                     cancellation.ThrowIfCancellationRequested();
                     if (code.Info is "mermaid" or "mmd") results[code] = diagrams.Render(code.Lines.ToString(), dark);
                 }
-                return (source, results);
+                return (source, results, syntax: CodeSyntaxService.Prepare(source, cancellation));
             }, cancellation);
             var nativeDrawings = await StaWorker.RunAsync(() =>
             {
@@ -152,7 +152,7 @@ public partial class MainWindow : Window
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
-                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock);
+                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;

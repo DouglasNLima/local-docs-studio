@@ -1,5 +1,13 @@
 # Native validation report
 
+## Native code syntax colouring
+
+Eight native checks pass across fourteen bundled language families. They verify background preparation, multiline comments, keywords/strings/numbers, exact selectable Unicode/CRLF source, source mapping, 4.5:1 contrast on both code surfaces, high-contrast inheritance, stale/unknown-language fallback, block/line/span/aggregate limits and cancellation. Copied rule graphs preserve recursive state without changing shared definitions; a pathological expression reaches its 25 ms timeout. First preparation in the focused run took approximately 150 ms; this is one host measurement, not a performance certification. Evidence: artifacts/native/validation/native-syntax.json and native-syntax-light.png/native-syntax-dark.png. Both page renders were visually inspected and remain legible/unclipped.
+
+The first check correctly exposed initial definition loading exhausting the 250 ms text-processing budget. Trusted definition loading is now separate from that between-line budget and remains on the worker. All text matches use bounded copied expressions. The full native harness passes after this change; the desktop code workflow now checks distinct numeric foreground attributes through UI Automation before copying exact code and Markdown bytes. Fresh CI is pending. Source and export text are unchanged; export syntax colouring remains incomplete.
+
+All four CI runs at 5152482 pass: native 38172375056/38172372503 and web 38172375146/38172372523. Native CI validates 309 core cases, four browser export checks and all 30 desktop outcomes before installation and after installation/reinstallation. Evidence: artifacts/native/native-ci-5152482-pr.log and native-ci-5152482-push-rerun.log. The push initially passed both corrected context clipboard outcomes, then timed out finding the title bar during window Close. Its screenshot shows restored source and a completed preview; no cause is assumed. The failed-job rerun passes unchanged. Failure evidence remains in artifacts/native/native-ci-5152482-push-failure.log and artifacts/native/ci-5152482-push/ui.
+
 ## Native context actions
 
 Five native context checks pass: actual WPF menu actions dispatch literal Unicode code with indentation and original line endings; Markdown source retains fences, CRLF and a nested quote's opening context; oversized actions are disabled and cannot dispatch content; app commands do not enter selectable preview text or exported HTML. The standard native harness remains green, including the 40 diagram/export cases and prior asset, preview, semantics, editor, layout, Docs Site, progress and anchor outcomes. Evidence: artifacts/native/validation/native-context.json.

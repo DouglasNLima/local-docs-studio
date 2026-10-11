@@ -26,27 +26,28 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
     public PreviewResult Render(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode).GetAwaiter().GetResult();
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode);
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode)
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var foreground = new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
-        var surface = new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
+        Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
+        Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity };
         var sourceElements = new Dictionary<int, TextElement>();
         var warnings = new List<string>();
+        if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var blocks = 0;
         foreach (var block in parsed.Syntax)
         {
@@ -107,7 +108,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     }
                     result = new BlockUIContainer(panel); break;
                 case CodeBlock code:
-                    result = new Paragraph(new Run(code.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
+                    var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
+                    CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
+                    CodeSyntaxColours.Add(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast);
+                    System.Windows.Automation.AutomationProperties.SetAutomationId(codeParagraph, "CodePreview" + code.Span.Start);
+                    result = codeParagraph;
                     result.ContextMenu = CodeContextMenu.Create(code, parsed.Source, copyCode);
                     break;
                 case AlertBlock alert:
