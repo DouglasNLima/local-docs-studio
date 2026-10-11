@@ -31,6 +31,7 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new SemanticInlineRenderer());
         renderer.ObjectRenderers.Insert(0, new AnchorRenderer());
         renderer.ObjectRenderers.Insert(0, new ProgressRenderer());
+        renderer.ObjectRenderers.Insert(0, new FigureRenderer());
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(table is null ? content.Document.Syntax : table.Resolve(content.Document));
         // Generic Markdown attributes can carry event handlers or network-bearing styles.
@@ -93,6 +94,15 @@ public sealed class HtmlExporter
     private sealed class RawBlockRenderer : HtmlObjectRenderer<HtmlBlock>
     {
         protected override void Write(HtmlRenderer renderer, HtmlBlock obj) => renderer.Write("<pre>").Write(WebUtility.HtmlEncode(obj.Lines.ToString())).Write("</pre>");
+    }
+    private sealed class FigureRenderer : HtmlObjectRenderer<DocumentImageFigureBlock>
+    {
+        protected override void Write(HtmlRenderer renderer, DocumentImageFigureBlock obj)
+        {
+            renderer.Write("<figure>"); renderer.WriteLeafInline(obj);
+            if (obj.Caption.Length > 0) renderer.Write("<figcaption>").Write(WebUtility.HtmlEncode(obj.Caption)).Write("</figcaption>");
+            renderer.Write("</figure>");
+        }
     }
     private sealed class ProgressRenderer : HtmlObjectRenderer<DocumentProgressBlock>
     {

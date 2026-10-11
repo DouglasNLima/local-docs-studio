@@ -40,6 +40,7 @@ public sealed class ClipboardExporter
                 "br" => "\n",
                 "hr" => "\n---\n",
                 "li" => ListMarker(element) + children.Trim() + "\n",
+                "figcaption" => "\n" + children.TrimEnd(),
                 "p" or "div" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6" or "pre" or "blockquote" or "figure" => children.TrimEnd() + "\n\n",
                 _ => children
             };

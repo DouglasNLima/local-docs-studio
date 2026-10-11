@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current implementation: passive image figures now retain native pictures, selectable captions, exact source/HTML URL rewrites, asset audit/portable Save as and clipboard image round trips. HTML/Docs Site, Word and PDF retain image/caption content. All 400 core tests, the full native harness including four figure outcomes and four export-browser checks pass locally; light/dark pages were inspected. The 36th desktop figure/clipboard workflow awaits CI. Both native runs at 94119d5 pass all 35 prior workflows before installation and after installation/reinstallation, certifying the tree refresh and target-draft review correction.
+
 Current correction: workspace tree monitoring now subscribes to creation and directory changes, debounces background enumeration and reconciles native nodes in place. Real filesystem and hidden-window checks preserve folder expansion/selection, unsaved source and conflict markers; private native state stays excluded. Seven monitoring outcomes, the full native harness, all 375 core tests and static checks pass locally. Both f29f193 native runs (38178448826/38178446159) exposed the missing refresh before the new review workflow; failure logs and the inspected PR screenshot are retained. The unchanged 35-outcome desktop workflow awaits fresh CI.
 
 Native push CI at fd11a8b (38176285630) passes all 33 workflows before installation and after installation/reinstallation. The CSV check saves the native default name with its hidden extension and verifies exact UTF-8 bytes; the installer lifecycle passes. Evidence: artifacts/native/native-ci-fd11a8b-push.log. PR CI 38176289796 also passes all 33 workflows; native-ci-fd11a8b-pr.log retains the result.
@@ -91,7 +93,7 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: validate automatic tree refresh, workspace review and native-keyboard shutdown in desktop/installed CI, then continue safe HTML semantics, Word template and library parity. The 7370ed5 PR and both web runs pass; its push has the retained Window-pattern timeout. The f29f193 native failures exposed the tree refresh gap corrected locally above. The last complete four-run green revision remains 5152482.
+Next: validate image figures and clipboard preservation in desktop/installed CI, then continue safe details semantics, Word template and library parity. All four runs at 94119d5 pass: native 38179079019/38179073243 and web 38179079027/38179073289.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

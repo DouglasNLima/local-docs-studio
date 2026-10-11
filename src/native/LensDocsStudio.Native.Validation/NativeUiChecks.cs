@@ -766,6 +766,43 @@ internal static class NativeUiChecks
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W); sourceTab.Patterns.SelectionItem.Pattern.Select();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Workspace review did not return to the original source tab.");
                 checks.Add("Workspace review validates unsaved target headings and selects stale link source without writing either document");
+                var figureReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
+                var figureSource = "# Figure preview\n\n<figure data-image-figure>\n<img src=\"" + figureReference + "\" alt=\"Native figure pixels\">\n<figcaption>Figure 1 — Café &amp; evidence</figcaption>\n</figure>";
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(figureSource); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == figureSource, "The figure source did not reach the native editor.");
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Figure 1 — Café & evidence", StringComparison.Ordinal),
+                    "The native figure caption did not become selectable preview text.");
+                Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Figure clipboard preparation did not finish.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                var figureClipboard = System.Windows.Clipboard.GetDataObject()!;
+                var figureHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(
+                    figureClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Figure copying omitted native HTML.")));
+                var figureElement = figureHtml.QuerySelector("figure") ?? throw new IOException("Figure copying omitted its semantic container.");
+                var figureImageUri = figureElement.QuerySelector("img")?.GetAttribute("src") ?? "";
+                if (figureElement.QuerySelector("figcaption")?.TextContent != "Figure 1 — Café & evidence"
+                    || !figureImageUri.StartsWith("data:image/png;base64,", StringComparison.Ordinal)
+                    || !(figureClipboard.GetData(System.Windows.DataFormats.UnicodeText) as string ?? "").Contains("[Native figure pixels]\nFigure 1 — Café & evidence", StringComparison.Ordinal))
+                    throw new IOException("Figure copying lost its caption, image or Unicode text.");
+                var figureBytes = Convert.FromBase64String(figureImageUri["data:image/png;base64,".Length..]);
+                using (var figureStream = new MemoryStream(figureBytes))
+                using (var expectedStream = File.OpenRead(renamedImage))
+                {
+                    var actualFigure = new System.Windows.Media.Imaging.FormatConvertedBitmap(LensDocsStudio.Native.Platform.NativeRasterService.Read(figureStream), System.Windows.Media.PixelFormats.Bgra32, null, 0);
+                    var expectedFigure = new System.Windows.Media.Imaging.FormatConvertedBitmap(LensDocsStudio.Native.Platform.NativeRasterService.Read(expectedStream), System.Windows.Media.PixelFormats.Bgra32, null, 0);
+                    var actualData = new byte[actualFigure.PixelWidth * actualFigure.PixelHeight * 4]; var expectedData = new byte[expectedFigure.PixelWidth * expectedFigure.PixelHeight * 4];
+                    actualFigure.CopyPixels(actualData, actualFigure.PixelWidth * 4, 0); expectedFigure.CopyPixels(expectedData, expectedFigure.PixelWidth * 4, 0);
+                    if (actualFigure.PixelWidth != expectedFigure.PixelWidth || actualFigure.PixelHeight != expectedFigure.PixelHeight || !actualData.SequenceEqual(expectedData))
+                        throw new IOException("Native figure copying changed its pixels.");
+                }
+                if (File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != figureSource)
+                    throw new IOException("Figure preview or copying changed saved or edited source.");
+                window.CaptureToFile(Path.Combine(output, "native-image-figure.png"));
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Figure validation did not restore the original document.");
+                checks.Add("Native image figures expose selectable captions and copy real pixels with semantic HTML and unchanged source");
             }
             finally
             {

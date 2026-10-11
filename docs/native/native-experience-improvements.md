@@ -3,6 +3,7 @@
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
+| Portable image figures with native captions | Medium / medium | Recognised helper markup resolves through existing image preparation and exact HTML URL spans. Captions remain selectable; image copy, source clipboard round trips, asset audit/Save as, Word/PDF/HTML and exported-site checks pass locally. Additional attributes/nested caption content remain inert; the 36th desktop workflow awaits CI |
 | Automatic folder updates without losing position | High / low | Debounced filesystem notifications refresh real files/folders while retaining surviving native controls, expansion, selection and unsaved buffers. Seven local filesystem/WPF checks pass, including conflicts, private-state exclusion and stale refresh cancellation; desktop CI remains pending |
 | Conflict-safe writes, recovery journal | High / medium | Implement before relying on Save |
 | Source-aware preview navigation | High / medium | Markdig spans, native WPF elements |

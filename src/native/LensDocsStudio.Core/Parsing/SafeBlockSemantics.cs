@@ -24,11 +24,14 @@ public sealed class DocumentProgressBlock(string label, double value, double max
 public static class SafeBlockSemantics
 {
     public const int MaximumFragmentCharacters = 16 * 1024;
-    public static void Apply(MarkdownDocument document)
+    public static void Apply(MarkdownDocument document, string source)
     {
         foreach (var html in document.Descendants<HtmlBlock>().ToArray())
         {
-            if (html.Span.Length > MaximumFragmentCharacters || html.Parent is not { } parent) continue;
+            if (html.Parent is not { } parent) continue;
+            if (ImageFigureSemantics.Read(source, html) is { } figure)
+            { parent[parent.IndexOf(html)] = figure; continue; }
+            if (html.Span.Length > MaximumFragmentCharacters) continue;
             var progress = ReadProgress(html.Lines.ToString());
             if (progress is null) continue;
             progress.Span = html.Span; progress.Line = html.Line; progress.Column = html.Column;

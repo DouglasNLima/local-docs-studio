@@ -11,6 +11,11 @@ public static class MarkdownImageSource
         if (span.Start < 0 || span.Length <= 0 || span.End >= source.Length)
             throw new IOException("An image has invalid Markdown source positions.");
         var url = image.UrlSpan;
+        if (image is FigureImageInline)
+        {
+            if (url.Start < span.Start || url.Length <= 0 || url.End > span.End) throw new IOException("A figure image has invalid source positions.");
+            return source[span.Start..url.Start] + System.Net.WebUtility.HtmlEncode(destination) + source[(url.End + 1)..(span.End + 1)];
+        }
         if (image.Reference is null && url.Length > 0 && url.Start >= span.Start && url.End <= span.End)
         {
             if (source[url.Start] == '<' && source[url.End] == '>') destination = "<" + destination + ">";

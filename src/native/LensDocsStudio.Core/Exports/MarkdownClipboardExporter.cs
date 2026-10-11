@@ -36,7 +36,7 @@ public sealed class MarkdownClipboardExporter
             cancellationToken.ThrowIfCancellationRequested();
             if (!content.Images.TryGetValue(image.Url ?? "", out var prepared)) continue;
             Add(new(image.Span.Start, image.Span.Length, MarkdownImageSource.WithDestination(source, image, Data(prepared)),
-                ImageHtml(prepared, MarkdownService.InlineText(image), image.Title)));
+                ImageHtml(prepared, MarkdownService.InlineText(image), image.Title).Insert(4, image is FigureImageInline ? " data-markdown-clipboard-html-image=\"true\"" : "")));
         }
         foreach (var code in content.Document.Syntax.Descendants<FencedCodeBlock>())
         {

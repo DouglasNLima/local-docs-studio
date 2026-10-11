@@ -150,6 +150,12 @@ public sealed class DocxExporter
                             wt.Append(wr);
                         }
                         parent.Append(wt); break;
+                    case DocumentImageFigureBlock figure:
+                        var picture = Paragraph(figure.Inline, bodyStyle);
+                        if (figure.Caption.Length > 0) picture.ParagraphProperties!.KeepNext = new W.KeepNext();
+                        parent.Append(picture);
+                        if (figure.Caption.Length > 0) parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = Style("Caption") }), Run(figure.Caption, MarkdownEmphasis.None)));
+                        break;
                     case DocumentProgressBlock progress:
                         parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() }, Run(progress.Description, MarkdownEmphasis.None)));
                         var progressTable = new W.Table(new W.TableProperties(new W.TableWidth { Type = W.TableWidthUnitValues.Pct, Width = "5000" },

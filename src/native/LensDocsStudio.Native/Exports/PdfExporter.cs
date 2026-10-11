@@ -85,6 +85,11 @@ public sealed class PdfExporter
                         }
                     }
                     break;
+                case DocumentImageFigureBlock figure:
+                    var figureImage = elements.AddParagraph(); Inlines(figureImage.Elements, figure.Inline);
+                    figureImage.Format.KeepWithNext = figure.Caption.Length > 0;
+                    if (figure.Caption.Length > 0) { var caption = elements.AddParagraph(figure.Caption); caption.Format.Font.Size = 9; }
+                    break;
                 case DocumentProgressBlock progress:
                     var progressLabel = elements.AddParagraph(progress.Description); progressLabel.Format.KeepWithNext = true;
                     var progressTable = elements.AddTable();

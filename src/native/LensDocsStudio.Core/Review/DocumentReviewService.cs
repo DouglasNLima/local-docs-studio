@@ -86,6 +86,7 @@ public sealed partial class DocumentReviewService
                     if (!seenHeadings.Add(title)) Add("Headings", ReviewSeverity.Note, $"Duplicate heading \"{Short(title)}\".", "Consider a distinct heading if these sections have different purposes.", heading.Span.Start, heading.Span.Length);
                 }
                 if (block is Table) tables++;
+                if (block is DocumentImageFigureBlock figure) CountWords(figure.Caption);
                 if (block is LeafBlock { Inline: { } inline })
                 {
                     var text = new System.Text.StringBuilder(); WalkInlines(inline, depth + 1, false, text); CountWords(text.ToString());
@@ -106,7 +107,7 @@ public sealed partial class DocumentReviewService
                         {
                             images++;
                             if (string.IsNullOrWhiteSpace(MarkdownService.InlineText(link)))
-                                Add("Alt text", ReviewSeverity.Warning, "Image is missing alt text.", "Add a concise description inside ![...].", link.Span.Start, link.Span.Length);
+                                Add("Alt text", ReviewSeverity.Warning, "Image is missing alt text.", link is FigureImageInline ? "Add a concise description in the image's alt attribute." : "Add a concise description inside ![...].", link.Span.Start, link.Span.Length);
                         }
                         else
                         {

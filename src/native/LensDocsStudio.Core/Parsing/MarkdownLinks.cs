@@ -3,7 +3,7 @@ using Markdig.Syntax.Inlines;
 
 namespace LensDocsStudio.Core.Parsing;
 
-public sealed record MarkdownLink(string Reference, bool IsImage, int Start, int Length);
+public sealed record MarkdownLink(string Reference, bool IsImage, int Start, int Length, bool HtmlEncoded = false);
 
 public static class MarkdownLinks
 {
@@ -11,7 +11,7 @@ public static class MarkdownLinks
         .Where(link => !string.IsNullOrEmpty(link.Url)).Select(link =>
         {
             var span = link.Reference?.UrlSpan ?? link.UrlSpan;
-            return new MarkdownLink(link.Url!, link.IsImage, span.Start, span.Length);
+            return new MarkdownLink(link.Url!, link.IsImage, span.Start, span.Length, link is FigureImageInline);
         }).Where(link => link.Start >= 0 && link.Length > 0 && (long)link.Start + link.Length <= source.Length).ToArray();
 
     public static string Rewrite(string source, IEnumerable<(MarkdownLink Link, string Reference)> changes)
@@ -27,7 +27,7 @@ public static class MarkdownLinks
         {
             if (link.Start < 0 || link.Length <= 0 || (long)link.Start + link.Length > previousStart)
                 throw new IOException("Markdown link source positions overlap or are invalid.");
-            source = source.Remove(link.Start, link.Length).Insert(link.Start, reference);
+            source = source.Remove(link.Start, link.Length).Insert(link.Start, link.HtmlEncoded ? System.Net.WebUtility.HtmlEncode(reference) : reference);
             previousStart = link.Start;
         }
         return source;

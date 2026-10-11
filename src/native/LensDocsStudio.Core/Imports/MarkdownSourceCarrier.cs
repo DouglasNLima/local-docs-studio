@@ -23,6 +23,13 @@ internal static class MarkdownSourceCarrier
                 var reference = image.GetAttribute("src") ?? "";
                 if (!reference.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase)) return null;
                 var title = image.GetAttribute("title");
+                if (image.GetAttribute("data-markdown-clipboard-html-image") == "true")
+                {
+                    source.Append("<img src=\"").Append(System.Net.WebUtility.HtmlEncode(reference)).Append("\" alt=\"")
+                        .Append(System.Net.WebUtility.HtmlEncode(image.GetAttribute("alt") ?? "")).Append('"');
+                    if (!string.IsNullOrEmpty(title)) source.Append(" title=\"").Append(System.Net.WebUtility.HtmlEncode(title)).Append('"');
+                    source.Append('>'); index++; continue;
+                }
                 source.Append("![").Append(HtmlMarkdownConverter.Escape(image.GetAttribute("alt") ?? "Image")).Append("](").Append(reference);
                 if (!string.IsNullOrEmpty(title)) source.Append(" \"").Append(title.Replace("\\", "\\\\").Replace("\"", "\\\"")).Append('"');
                 source.Append(')'); index++;

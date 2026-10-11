@@ -1,5 +1,13 @@
 # Native validation report
 
+## Passive image figures
+
+Release build has no warnings/errors; all 400 core tests and the complete native harness pass. Twenty-five figure cases cover exact original CRLF/image/URL spans, entity decoding, attribute-safe rewrites, optional captions/alt, twelve malformed/unsupported forms, every unfinished source prefix, bounds, code/table-review exclusions, real DOCX media/schema/caption style, mixed-image deduplication, Unicode and HTML-only source clipboard round trips, larger embedded data and actual asset-audit/portable-copy behaviour. Evidence: artifacts/native/tests/native-core-image-figures.trx and image-figure-first.trx.
+
+Four native outcomes verify actual prepared pixels, accessible image descriptions, copy dispatch, selectable source-mapped captions, light/dark WPF pages, real PDF caption/image content and missing-image fallback with unchanged source. Both renders were inspected. Four Chromium/Edge export checks pass from disk/static hosting in 17.7 seconds, including Docs Site and standalone HTML figure captions and decoded images. Port 4194 was verified free; 4193 belongs to another application and was left untouched. The 36th desktop workflow now checks native caption selection, CF_HTML/Unicode and exact copied pixels without writing source; CI is pending. Evidence: artifacts/native/validation/native-figure.json, native-figure-light.png, native-figure-dark.png, native-figure.pdf/docx/html and artifacts/native/site-browser.
+
+Both native CI runs at 94119d5 (38179079019/38179073243) pass all 35 workflows in built, installed and reinstalled applications, including automatic tree refresh, unsaved-target review and Alt+F4 shutdown/session restoration. They also pass 375 core tests, the native harness and four exported-site browser checks. Evidence: artifacts/native/native-ci-94119d5-pr.log and native-ci-94119d5-push.log. Both web runs 38179079027/38179073289 also pass; 94119d5 is the latest complete four-run green revision.
+
 ## Automatic workspace tree refresh
 
 Both native runs at f29f193 (38178448826/38178446159) fail because a newly created review target never appears in the tree. The retained screenshot and source inspection establish that monitoring handled open-file conflicts but did not subscribe to creation or refresh the listing. The product now uses debounced, cancellable background enumeration and reuses surviving native tree nodes. The desktop test remains unchanged.

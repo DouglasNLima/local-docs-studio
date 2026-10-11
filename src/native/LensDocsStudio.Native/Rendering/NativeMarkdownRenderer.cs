@@ -171,6 +171,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
+                case DocumentImageFigureBlock figure:
+                    var figureSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
+                    figureSection.Blocks.Add(Paragraph(figure.Inline));
+                    if (figure.Caption.Length > 0) figureSection.Blocks.Add(new Paragraph(new Run(figure.Caption)) { FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
+                    result = figureSection; break;
                 case DocumentProgressBlock progress:
                     var progressSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
                     progressSection.Blocks.Add(new Paragraph(new Run(progress.Description)) { Margin = new Thickness(0, 0, 0, 5) });

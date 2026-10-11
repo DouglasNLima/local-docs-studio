@@ -16,7 +16,7 @@ internal static class MarkdownTableReview
         foreach (var block in document.Syntax.Descendants().OfType<Block>())
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (block is CodeBlock or HtmlBlock) Exclude(block.Span.Start, block.Span.End);
+            if (block is CodeBlock or HtmlBlock or DocumentImageFigureBlock or DocumentProgressBlock) Exclude(block.Span.Start, block.Span.End);
         }
         for (var index = 0; index + 1 < lineStarts.Count; index++)
         {
