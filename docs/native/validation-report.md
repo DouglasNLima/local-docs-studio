@@ -1,5 +1,11 @@
 # Native validation report
 
+## Automatic workspace tree refresh
+
+Both native runs at f29f193 (38178448826/38178446159) fail because a newly created review target never appears in the tree. The retained screenshot and source inspection establish that monitoring handled open-file conflicts but did not subscribe to creation or refresh the listing. The product now uses debounced, cancellable background enumeration and reuses surviving native tree nodes. The desktop test remains unchanged.
+
+Release build passes without warnings/errors. Seven real filesystem/hidden-WPF outcomes pass: create/rename/delete, nested folders, retained controls/expansion/selection, external conflicts with unchanged unsaved buffers, private-state exclusion, workspace-switch invalidation and disposal. An initial validation assumption was corrected because collapsing a WPF folder naturally changes selection; the final check compares the native selection after collapse. All 375 core tests, the full 40-diagram/export/native harness and static checks pass. Desktop/installed validation is pending. Evidence: artifacts/native/validation/native-workspace-monitor.json, artifacts/native/tests/native-core-workspace-monitor.trx, artifacts/native/native-ci-f29f193-*-failure.log and artifacts/native/ci-f29f193-pr/native-validation/ui.
+
 ## Workspace document review
 
 Release build has no warnings/errors; all 375 core tests and the standard native harness pass. Fifteen workspace cases cover encoded/reference links, unsaved target headings, explicit self links, exact CRLF source spans, missing files/sections, locked or invalid text, workspace escapes, private state/overrides, skipped remote/asset links, distinct/aggregate budgets, cancellation and current-buffer fallback when a workspace is unavailable. Four combined native review outcomes verify actual files, captured target headings and complete/incomplete scope feedback without writes. Evidence: artifacts/native/tests/native-core-workspace-review.trx, workspace-review-path.trx and artifacts/native/validation/native-review.json.

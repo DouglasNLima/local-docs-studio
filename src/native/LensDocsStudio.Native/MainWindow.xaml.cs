@@ -169,10 +169,10 @@ public partial class MainWindow : Window
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
     private async void TreeKeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); } }
-    private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntry { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
+    private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntryViewModel { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
     private async Task RenameTreeEntryAsync()
     {
-        if (WorkspaceTree.SelectedItem is not WorkspaceEntry { IsDirectory: false } entry)
+        if (WorkspaceTree.SelectedItem is not WorkspaceEntryViewModel { IsDirectory: false } entry)
         { model.Status = "Select a document to rename or move."; return; }
         var opened = false;
         await model.RunAsync(async () => { await model.OpenPathAsync(entry.Path); opened = true; });

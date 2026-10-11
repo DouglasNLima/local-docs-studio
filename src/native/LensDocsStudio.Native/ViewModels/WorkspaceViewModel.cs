@@ -12,7 +12,7 @@ namespace LensDocsStudio.Native.ViewModels;
 public partial class WorkspaceViewModel(DocumentStore documents, SessionStore session, WorkspaceService workspaces, DesktopDialogs dialogs) : ObservableObject, IDisposable
 {
     public ObservableCollection<DocumentViewModel> Documents { get; } = [];
-    public ObservableCollection<WorkspaceEntry> Entries { get; } = [];
+    public ObservableCollection<WorkspaceEntryViewModel> Entries { get; } = [];
     [ObservableProperty] private DocumentViewModel? activeDocument;
     [ObservableProperty] private string status = "Local Markdown, Mermaid, and documentation studio";
     [ObservableProperty] private string previewStatus = "Preview pending";
@@ -142,30 +142,18 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     public async Task SetWorkspaceAsync(string path)
     {
         var workspace = new WorkspacePath(path);
-        var listing = await workspaces.EnumerateAsync(workspace, operation?.Token ?? default);
+        var listing = await workspaces.EnumerateAsync(workspace, operation?.Token ?? default, excludedDirectory: StateDirectory);
+        treeRefresh?.Cancel();
         watcher?.Dispose();
+        if (!string.Equals(WorkspaceRoot, workspace.Root, StringComparison.OrdinalIgnoreCase)) Entries.Clear();
         WorkspaceRoot = workspace.Root;
-        Entries.Clear();
-        foreach (var entry in listing.Entries) Entries.Add(entry);
+        WorkspaceEntryViewModel.Reconcile(Entries, listing.Entries);
         Status = listing.Warnings.Count == 0 ? "Workspace opened" : string.Join(" ", listing.Warnings.Distinct());
-        watcher = new FileSystemWatcher(path) { IncludeSubdirectories = true, NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.Size };
-        watcher.Changed += OnFileChanged; watcher.Deleted += OnFileChanged; watcher.Renamed += OnFileChanged;
-        watcher.Error += (_, _) => Application.Current.Dispatcher.BeginInvoke(() => Status = "Folder monitoring was interrupted. Reopen the workspace to resume.");
-        watcher.EnableRaisingEvents = true;
+        StartMonitoring(workspace.Root);
         foreach (var tab in Documents.Where(d => d.FilePath is not null))
             tab.WorkspaceRoot = RootForDocument(tab.FilePath!);
         await RememberWorkspaceAsync(workspace.Root);
     }
-
-    private void OnFileChanged(object sender, FileSystemEventArgs args) => Application.Current.Dispatcher.BeginInvoke(async () =>
-    {
-        foreach (var document in Documents.Where(d => string.Equals(d.FilePath, args.FullPath, StringComparison.OrdinalIgnoreCase) ||
-            args is RenamedEventArgs rename && string.Equals(d.FilePath, rename.OldFullPath, StringComparison.OrdinalIgnoreCase)).ToArray())
-        {
-            try { document.ExternalChange = (await documents.ReadAsync(document.FilePath!)).Fingerprint != document.SavedSnapshot?.Fingerprint; }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { document.ExternalChange = true; }
-        }
-    });
 
     [RelayCommand] private Task SaveAsync()
     {
@@ -315,5 +303,5 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             operationGate.Release();
         }
     }
-    public void Dispose() { watcher?.Dispose(); operation?.Cancel(); }
+    public void Dispose() { disposed = true; treeRefresh?.Cancel(); watcher?.Dispose(); operation?.Cancel(); }
 }

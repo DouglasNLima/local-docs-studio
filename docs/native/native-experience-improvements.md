@@ -3,6 +3,7 @@
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
+| Automatic folder updates without losing position | High / low | Debounced filesystem notifications refresh real files/folders while retaining surviving native controls, expansion, selection and unsaved buffers. Seven local filesystem/WPF checks pass, including conflicts, private-state exclusion and stale refresh cancellation; desktop CI remains pending |
 | Conflict-safe writes, recovery journal | High / medium | Implement before relying on Save |
 | Source-aware preview navigation | High / medium | Markdig spans, native WPF elements |
 | Responsive diagram preview and zoom | High / medium | Background STA conversion, bounded frozen-drawing cache and separate native zoom window; corpus and UI checks pass |

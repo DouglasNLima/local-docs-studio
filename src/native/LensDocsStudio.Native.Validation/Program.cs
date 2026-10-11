@@ -52,6 +52,12 @@ internal static class Program
             try { NativeTableChecks.Run(tableOutput); Console.WriteLine("Native table integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--workspace")
+        {
+            var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
+            try { NativeWorkspaceChecks.Run(workspaceOutput); Console.WriteLine("Native workspace monitoring passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--review")
         {
             var reviewOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(reviewOutput);
@@ -116,6 +122,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native table copying: " + ex.Message); }
         try { NativeReviewChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document review: " + ex.Message); }
+        try { NativeWorkspaceChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native workspace monitoring: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())
