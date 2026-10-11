@@ -8,7 +8,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits, Windows deletion and recovery | Partial: file creation/rename/deletion and snapshot recovery pass UI checks; folder moves and case-only renames remain |
 | Tabs, recent files, navigation history | Native tabs, persisted recent paths and bounded viewport history | Core and desktop navigation checks pass; broader closed-tab/history cases remain |
 | Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
-| Paste Special, HTML/TSV conversion, rich clipboard | Windows Unicode text and CF_HTML with embedded native images | Partial: rendered copy format/image checks pass; actual clipboard UI check pending; Paste Special and destination interoperability remain |
+| Paste Special, HTML/TSV conversion, rich clipboard | Windows Unicode text/CF_HTML, native Edit menu and Ctrl+Shift+V | Partial: nine explicit modes, automatic HTML/TSV conversion and portable image persistence implemented; core/native integration pass, desktop clipboard checks pending; external destination fidelity remains |
 | Markdown headings/tables/tasks/code/quotes/images | Markdig with native WPF preview | In progress |
 | Callouts/badges/details/figures/anchors/progress/math | Explicit safe semantic mapping | Incomplete |
 | Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |

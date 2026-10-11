@@ -52,8 +52,8 @@ public partial class MainWindow : Window
         Editor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting());
         Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
         DataObject.AddPastingHandler(Editor, OnPaste);
-        CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteImage);
-        CommandManager.AddPreviewExecutedHandler(Editor, ExecuteImagePaste);
+        CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
+        CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
         model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
@@ -349,19 +349,6 @@ public partial class MainWindow : Window
         await model.PersistSessionAsync();
         model.Status = tab.FilePath is null ? "Image retained with the recovered draft; Save will copy it beside the document." : "Portable image inserted";
     }
-    private async void OnPaste(object sender, DataObjectPastingEventArgs e)
-    {
-        if (!e.DataObject.GetDataPresent(DataFormats.Bitmap)) return;
-        if (e.DataObject.GetData(DataFormats.Bitmap) is not BitmapSource bitmap) return;
-        e.CancelCommand();
-        await PasteBitmapAsync(bitmap);
-    }
-    private void CanPasteImage(object sender, CanExecuteRoutedEventArgs e)
-    {
-        if (e.Command != ApplicationCommands.Paste || model.IsBusy) return;
-        try { if (Clipboard.ContainsImage()) { e.CanExecute = true; e.Handled = true; } }
-        catch (System.Runtime.InteropServices.ExternalException) { }
-    }
     private void CopyDocumentImage(BitmapSource bitmap)
     {
         try
@@ -370,17 +357,6 @@ public partial class MainWindow : Window
             model.Status = "Image copied. Paste it into a document to create a portable local asset.";
         }
         catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
-    }
-    private async void ExecuteImagePaste(object sender, ExecutedRoutedEventArgs e)
-    {
-        if (e.Command != ApplicationCommands.Paste || model.IsBusy) return;
-        try
-        {
-            if (Clipboard.GetImage() is not { } bitmap) return;
-            e.Handled = true;
-            await PasteBitmapAsync(bitmap);
-        }
-        catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try pasting again."; }
     }
     private async Task PasteBitmapAsync(BitmapSource bitmap)
     {
@@ -493,6 +469,7 @@ public partial class MainWindow : Window
             case Key.N: model.NewDocumentCommand.Execute(null); break;
             case Key.W: model.CloseDocumentCommand.Execute(model.ActiveDocument); break;
             case Key.K when shift: InsertDocumentLink(sender, e); break;
+            case Key.V when shift && Editor.IsKeyboardFocusWithin: _ = PasteClipboardAsAsync(LensDocsStudio.Core.Imports.PasteMode.Text); break;
             case Key.B when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "bold" }, e); break;
             case Key.I when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "italic" }, e); break;
             default: return;

@@ -20,21 +20,22 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 - Browser-free Mermaider rendering, native SVG validation, frozen drawing caches, background STA preparation, zoom and SVG/PNG exports. Forty light/dark corpus cases pass.
 - Bounded ZIP, DOCX, HTML and PDF text imports; guarded DOCX, HTML, local PDF and generic Markdown Bundle exports. Template styles and package headers/footers/media are preserved, with full template contracts still incomplete.
 - Copy rendered content prepares sanitised CF_HTML and Unicode text, embedding native images/diagrams and retaining table cells. Source/image limits, cancellation and clipboard sequence checks protect preparation; external destination fidelity remains to be validated.
+- Automatic HTML/TSV paste and nine Paste Special modes, including literal text with Ctrl+Shift+V. HTML import shares conversion for nested lists, code delimiters, literal punctuation and bounded merged tables. Embedded images are persisted before an undoable anchored source replacement.
 - Fluent light/dark/system controls, high-contrast resources, working-area sizing and saved window placement. Operation and preview status are separate so preview completion cannot hide recovery feedback.
 - Separate self-contained installer/portable packaging and native CI. Development-host preview 4 → 5 upgrade, uninstall/reinstall and preservation checks passed. Fresh Windows runners also exercise installed-app workflows.
 - Compatible GitHub release discovery, channel preferences, signed-manifest policy, bounded downloads, integrity and pinned Authenticode checks, separate download/install consent and temporary update launcher. Production trust is unconfigured; unsigned builds cannot execute downloaded installers.
 
 ## Current evidence
 
-- Local Release build: no warnings/errors. Core: 133 tests pass, including asset recovery and clipboard Unicode, sanitisation and task/table contracts.
-- Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, ten image/operation checks, including independently decoded clipboard images, aggregate budgets and cancellation.
-- Desktop harness: 18 outcomes and installed workflows pass in both native CI runs at 697a108 after replacing menu coordinate clicks with UIA invocation. A 19th outcome now checks actual Windows HTML/text clipboard formats and remains pending. Remote transport uses deterministic simulated responses in integration tests.
+- Local Release build: no warnings/errors. Core: 156 tests pass, including asset recovery, clipboard Unicode/sanitisation, HTML fidelity, all paste modes and quoted table data.
+- Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, twelve image/operation checks, including independently decoded clipboard images, rich image paste, anchored block insertion, budgets and cancellation.
+- Desktop harness: 18 outcomes and installed workflows passed at 697a108. At e356480 both native CI runs reached the new rich-copy check; retained source showed the harness had typed its table without line breaks. That fixture now uses actual Return key events and retains clipboard evidence before assertions. The harness has 21 outcomes, adding rich copy, rich paste/CSV and failure/undo preservation; these additions remain pending. Local foreground access is unavailable. Remote transport uses deterministic simulated responses in integration tests.
 - All four native/web CI runs passed at ecc5fba. At c7467b4, both native CI runs and web PR CI passed; web push failed two Edge readiness checks with refused local-server connections.
 - At 5210d81 both native CI runs passed; web PR CI passed 238/254 and push CI passed 244/254. Traces show transient status assertions, an asynchronous bridge assertion and an import-worker interception wait; other failures report closed browser contexts. Investigation remains open; no web runtime source changed.
 
 ## Remaining work
 
-Next: validate actual rich clipboard automation, then continue Paste Special, editing, review and template parity. Three corrected web timing cases passed twice in each browser (12/12). At 697a108 the full local web run passed 253/254; web PR CI passed 239/254 and push passed 247/254. Browser diagnostics show Windows access violations (0xC0000005). The Chromium project now uses Playwright's full Chromium headless channel, with a complete rerun pending; Edge coverage remains.
+Next: validate the expanded native clipboard workflow in CI, then continue editing, review and template parity. Playwright's full Chromium headless channel replaces the crashing separate headless shell. All 254 local Chromium/Edge checks and static checks pass (14.2 minutes); web push CI 38156841456 at e356480 also passes. The parallel PR run remains pending.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

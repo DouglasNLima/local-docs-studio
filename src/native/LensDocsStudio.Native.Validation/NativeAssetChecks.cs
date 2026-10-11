@@ -81,6 +81,19 @@ internal static class NativeAssetChecks
         var edited = new TextDocument("selected");
         var pending = new DocumentInsertion(edited, 0, 8); edited.Insert(3, "new text"); pending.Insert("IMAGE");
         if (edited.Text != "IMAGEselnew textected") throw new InvalidOperationException("Pending insertion discarded intervening edits.");
+        var blockDocument = new TextDocument("Before selected after");
+        var blockInsertion = new DocumentInsertion(blockDocument, 7, 8);
+        blockDocument.Insert(0, "Typed. ");
+        blockInsertion.Insert("| A | B |\n|---|---|\n| 1 | 2 |", true);
+        if (blockDocument.Text != "Typed. Before \n\n| A | B |\n|---|---|\n| 1 | 2 |\n\n after") throw new IOException("Block paste did not preserve surrounding edits and Markdown separation.");
+        var pasted = new LensDocsStudio.Core.Imports.ClipboardPasteService().Convert(new("", rich.Html), LensDocsStudio.Core.Imports.PasteMode.Auto);
+        var pasteAsset = pasted.Document.Assets.Single();
+        var pastedReference = new ImageAssetService().ImportAsync(savedRoot, destination, pasteAsset.Bytes, "rich-paste", default).GetAwaiter().GetResult();
+        using (var copied = File.OpenRead(new WorkspacePath(savedRoot).ResolveLink(destination, pastedReference)))
+        {
+            var decoded = NativeRasterService.Read(copied);
+            if (decoded.PixelWidth != 64 || decoded.PixelHeight != 48) throw new IOException("Rich HTML paste lost the original image dimensions.");
+        }
         using (var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(root, "queued-writes")), session, new WorkspaceService(), new DesktopDialogs()))
         {
             var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -92,7 +105,7 @@ internal static class NativeAssetChecks
             if (!order.SequenceEqual(new[] { "first", "second" }) || model.IsBusy) throw new InvalidOperationException("Workspace operations did not complete in order.");
         }
         File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Rich clipboard HTML embeds independently decodable native image pixels", "Image preparation respects its aggregate output budget and cancellation", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Rich clipboard HTML embeds independently decodable native image pixels", "Image preparation respects its aggregate output budget and cancellation", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Block paste preserves surrounding edits and Markdown separation", "Rich HTML paste persists independently decoded portable image pixels", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
     }
     private sealed class FixtureImageHandler(byte[] bytes) : HttpMessageHandler
     {

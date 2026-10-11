@@ -61,6 +61,18 @@
    <MenuItem Header="_Edit" AutomationProperties.AutomationId="EditMenu">
     <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}"/>
     <MenuItem Header="_Redo" Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}"/>
+    <MenuItem Header="_Paste" Command="ApplicationCommands.Paste" CommandTarget="{Binding ElementName=Editor}"/>
+    <MenuItem Header="Paste _Special" AutomationProperties.AutomationId="PasteSpecialMenu">
+     <MenuItem Header="Table" Tag="Table" Click="PasteSpecial" AutomationProperties.AutomationId="PasteTable"/>
+     <MenuItem Header="Plain text" InputGestureText="Ctrl+Shift+V" Tag="Text" Click="PasteSpecial" AutomationProperties.AutomationId="PasteText"/>
+     <MenuItem Header="Code block" Tag="Code" Click="PasteSpecial"/>
+     <MenuItem Header="Quote" Tag="Quote" Click="PasteSpecial"/>
+     <MenuItem Header="HTML as Markdown" Tag="Html" Click="PasteSpecial" AutomationProperties.AutomationId="PasteHtml"/>
+     <MenuItem Header="List" Tag="List" Click="PasteSpecial"/>
+     <MenuItem Header="Checklist" Tag="Checklist" Click="PasteSpecial"/>
+     <MenuItem Header="Numbered list" Tag="NumberedList" Click="PasteSpecial"/>
+     <MenuItem Header="Mermaid block" Tag="Mermaid" Click="PasteSpecial"/>
+    </MenuItem>
     <Separator/>
     <MenuItem Header="_Find" InputGestureText="Ctrl+F" Click="OpenFind"/>
     <MenuItem Header="_Replace" InputGestureText="Ctrl+H" Click="OpenReplace"/>

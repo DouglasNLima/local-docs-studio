@@ -271,7 +271,9 @@ internal static class NativeUiChecks
             sourceTab.Patterns.SelectionItem.Pattern.Select();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "The original document did not activate before session restoration.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            Keyboard.Type("\n\n| Area | Status |\n|---|---|\n| Clipboard | Ready |\n");
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN);
+            foreach (var line in new[] { "| Area | Status |", "|---|---|", "| Clipboard | Ready |" })
+            { Keyboard.Type(line); Keyboard.Type(VirtualKeyShort.RETURN); }
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => File.ReadAllText(source).Contains("| Clipboard | Ready |", StringComparison.Ordinal), "The clipboard table fixture did not save.");
             previousClipboard = System.Windows.Clipboard.GetDataObject(); ownedClipboardSequence = 0;
@@ -285,13 +287,72 @@ internal static class NativeUiChecks
                 var rich = clipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("The rich clipboard is missing native HTML Format data.");
                 var fragment = LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(rich);
                 var clipboardHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(fragment);
-                if (!plain.Contains("Café", StringComparison.Ordinal) || !plain.Contains("Clipboard\tReady", StringComparison.Ordinal) ||
-                    clipboardHtml.QuerySelectorAll("table").Length != 1 || !clipboardHtml.QuerySelectorAll("img").Any(i => i.GetAttribute("src")?.StartsWith("data:image/png;base64,", StringComparison.Ordinal) == true) ||
-                    clipboardHtml.QuerySelectorAll("button,script").Length != 0 || plain.Contains("Copy source", StringComparison.Ordinal))
-                    throw new IOException("The Windows clipboard lost Unicode, table cells or diagram pixels, or leaked native preview controls.");
                 File.WriteAllText(Path.Combine(output, "clipboard-fragment.html"), fragment);
                 File.WriteAllText(Path.Combine(output, "clipboard-text.txt"), plain);
+                if (!plain.Contains("Café", StringComparison.Ordinal)) throw new IOException("The Windows clipboard lost Unicode text.");
+                if (!plain.Contains("Clipboard\tReady", StringComparison.Ordinal) || clipboardHtml.QuerySelectorAll("table").Length != 1)
+                    throw new IOException("The Windows clipboard lost the fixture table or its text cells.");
+                if (!clipboardHtml.QuerySelectorAll("img").Any(i => i.GetAttribute("src")?.StartsWith("data:image/png;base64,", StringComparison.Ordinal) == true))
+                    throw new IOException("The Windows clipboard is missing embedded diagram pixels.");
+                if (clipboardHtml.QuerySelectorAll("button,script").Length != 0 || plain.Contains("Copy source", StringComparison.Ordinal))
+                    throw new IOException("The Windows clipboard leaked native preview controls.");
                 checks.Add("Native rich copy publishes Windows HTML Format and Unicode text with real embedded diagram pixels, table cells and no preview controls");
+                var mixed = new System.Windows.DataObject();
+                mixed.SetData(System.Windows.DataFormats.Html, rich, false); mixed.SetData(System.Windows.DataFormats.UnicodeText, plain, false);
+                mixed.SetData(System.Windows.DataFormats.Bitmap, System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96,
+                    System.Windows.Media.PixelFormats.Bgra32, null, new byte[16], 8));
+                System.Windows.Clipboard.SetDataObject(mixed, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The rich paste target is not empty.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                Wait(() => Find(window, "Status").Name.StartsWith("HTML pasted as Markdown.", StringComparison.Ordinal), "Formatted paste did not complete.");
+                var pasted = editor.Patterns.Value.Pattern.Value.Value;
+                if (!pasted.Contains("Café", StringComparison.Ordinal) || !pasted.Contains("| Clipboard | Ready |", StringComparison.Ordinal) || !pasted.Contains("![Mermaid diagram]", StringComparison.Ordinal))
+                    throw new IOException("Formatted paste lost text, table cells or diagram images when the clipboard also offered a bitmap.");
+                var pastedPath = Path.Combine(runRoot, "Rich clipboard document.md");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(pastedPath);
+                Wait(() => File.Exists(pastedPath), "The formatted paste document did not save.");
+                var pastedLinks = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(pastedPath)).Where(link => link.IsImage).ToArray();
+                if (pastedLinks.Length != 1) throw new IOException("Formatted paste did not retain the single diagram image.");
+                var pastedImage = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(pastedPath, pastedLinks[0].Reference);
+                using (var pixels = File.OpenRead(pastedImage))
+                {
+                    var decoded = LensDocsStudio.Native.Platform.NativeRasterService.Read(pixels);
+                    if (decoded.PixelWidth <= 2 || decoded.PixelHeight <= 2) throw new IOException("Paste chose the fallback bitmap instead of the rich diagram image.");
+                }
+                System.Windows.Clipboard.SetText("Item,Value\nCSV,Portable"); ownedClipboardSequence = GetClipboardSequenceNumber();
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+                Find(window, "EditMenu").Click(); Find(window, "PasteSpecialMenu").Patterns.ExpandCollapse.Pattern.Expand();
+                Find(window, "PasteTable").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("| CSV | Portable |", StringComparison.Ordinal), "Paste Special did not convert the CSV table.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+                Wait(() => File.ReadAllText(pastedPath).Contains("| CSV | Portable |", StringComparison.Ordinal), "The pasted CSV table did not save.");
+                checks.Add("Formatted Windows paste prefers HTML over a fallback bitmap, persists portable diagram pixels and exposes CSV table Paste Special");
+                var beforeFailedPaste = editor.Patterns.Value.Pattern.Value.Value;
+                var invalidImage = new System.Windows.DataObject();
+                invalidImage.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Rejected image</p><img src='data:image/png;base64,AQID'>"), false);
+                System.Windows.Clipboard.SetDataObject(invalidImage, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                Window? pasteError = null;
+                Wait(() => (pasteError = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio")))?.AsWindow()) is not null,
+                    "Invalid clipboard pixels did not report an error.");
+                var acknowledge = pasteError!.FindFirstDescendant(cf => cf.ByName("OK").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))) ?? throw new IOException("The paste error has no accessible acknowledgement button.");
+                acknowledge.AsButton().Invoke();
+                Wait(() => window.IsEnabled, "The paste error did not close.");
+                if (editor.Patterns.Value.Pattern.Value.Value != beforeFailedPaste || File.ReadAllText(pastedPath) != beforeFailedPaste)
+                    throw new IOException("An invalid clipboard image discarded the editor selection or changed the saved document.");
+                var literal = new System.Windows.DataObject(); literal.SetData(System.Windows.DataFormats.UnicodeText, "# Literal *source*", false);
+                literal.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Different rich text</p>"), false);
+                System.Windows.Clipboard.SetDataObject(literal, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# Literal *source*", "Ctrl+Shift+V did not choose literal clipboard text.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "Undo did not restore the formatted paste document.");
+                checks.Add("Invalid clipboard pixels preserve selected and saved source; Ctrl+Shift+V chooses literal text and one Undo restores the document");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                sourceTab.Patterns.SelectionItem.Pattern.Select();
             }
             finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
             window.Close();
