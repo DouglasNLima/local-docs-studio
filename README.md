@@ -2,6 +2,19 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
+## Native Windows reconstruction
+
+The new browser-free Windows edition is being implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. It is an incomplete internal development preview, not a production release.
+
+```powershell
+dotnet build src/native/LensDocsStudio.Native.slnx -c Release
+dotnet run --project src/native/LensDocsStudio.Native
+dotnet test src/native/LensDocsStudio.Core.Tests
+dotnet run --project src/native/LensDocsStudio.Native.Validation -- artifacts/native/validation .
+```
+
+See [native implementation progress](docs/native/implementation-progress.md), [functional parity](docs/native/functional-parity-matrix.md) and [validation evidence](docs/native/validation-report.md). Native state uses `%LOCALAPPDATA%/LensDocsStudio.Native`; the legacy shell's installation and state are preserved. GitHub Pages remains a separate static pipeline and requires no .NET build.
+
 Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
 
 ## Use The App

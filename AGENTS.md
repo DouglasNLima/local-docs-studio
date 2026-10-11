@@ -2,6 +2,8 @@
 
 Guidance for coding agents working in this repository.
 
+The browser-only constraints below continue to protect the static web application. The separately authorised native WPF reconstruction under `src/native/` follows `src/native/AGENTS.md` and `docs/native/reconstruction-brief.txt`; it must preserve the web application and existing Windows shell.
+
 ## Project Overview
 
 This is Lens Docs Studio, a buildless, browser-only Markdown, Mermaid, and documentation studio. It must remain compatible with publication on GitHub Pages and should run directly from GitHub Pages or from a local static server, without a backend or production build step.

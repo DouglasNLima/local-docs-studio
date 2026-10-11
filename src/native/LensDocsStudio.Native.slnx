@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="LensDocsStudio.Core.Tests/LensDocsStudio.Core.Tests.csproj" />
+  <Project Path="LensDocsStudio.Core/LensDocsStudio.Core.csproj" />
+  <Project Path="LensDocsStudio.Native.Validation/LensDocsStudio.Native.Validation.csproj" />
+  <Project Path="LensDocsStudio.Native/LensDocsStudio.Native.csproj" />
+</Solution>

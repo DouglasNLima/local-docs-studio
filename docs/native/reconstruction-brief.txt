@@ -1,0 +1,679 @@
+Rebuild Lens Docs Studio as a production-quality, genuinely native Windows desktop application using C#, .NET 10, WPF and Windows-native capabilities.
+Repository: DouglasNLima/local-docs-studio
+Primary implementation branch: develop
+The existing web application is the authoritative reference for functional requirements, document compatibility and established workflows.
+However, the existing web application's UI, architecture and interaction patterns are NOT mandatory design constraints.
+This is a native product reconstruction and improvement initiative, not a mechanical port.
+The goal is to deliver a Windows application that:
+1. Preserves the useful functionality and document compatibility of the current product.
+2. Uses real Windows-native controls, rendering and operating-system integrations.
+3. Improves existing workflows wherever native Windows capabilities offer a better experience.
+4. Remains offline-first, private, robust and responsive.
+5. Includes a proper Windows installation wizard.
+6. Detects new compatible versions published through GitHub Releases.
+7. Notifies users and supports secure, user-initiated local updates.
+8. Can be built, installed, tested and maintained with minimal human intervention.
+This is one continuous engineering goal with internal milestones, not a collection of independent requests requiring approval after each stage.
+Do not stop after creating an architecture document, proof of concept, skeleton application or implementation plan.
+Continue implementing, testing, correcting and integrating until the agreed acceptance criteria are satisfied or a genuine external blocker prevents further progress.
+The application must use native Windows desktop technology.
+Preferred stack:
+- C# and .NET 10 LTS.
+- WPF with XAML.
+- MVVM using CommunityToolkit.Mvvm.
+- AvalonEdit or an equivalently capable native WPF editor.
+- Markdig for Markdown parsing.
+- Native WPF document and visual rendering.
+- Open XML SDK for DOCX processing.
+- Appropriate .NET libraries for PDF, ZIP, SVG and image processing.
+- Windows filesystem, clipboard, shell and accessibility APIs.
+- Inno Setup for installation.
+- GitHub Releases for version distribution.
+Use Windows App SDK capabilities selectively where they provide demonstrable benefits.
+Do not:
+- Host the current application inside WebView2.
+- Use Chromium as an embedded application runtime.
+- Replace the application with Electron, Tauri or Blazor Hybrid.
+- Present HTML inside a native window and claim that the application is native.
+- Reuse the JavaScript application as the primary runtime.
+- Use an embedded browser for the Markdown editor or preview.
+- Silently introduce hidden web dependencies for Mermaid rendering.
+- Require Node.js, a local web server or a browser to run the installed application.
+HTML remains valid as an import/export format and for the separate existing web application.
+The desktop runtime itself must not depend on an HTML UI.
+Use a clean, maintainable, testable modular architecture.
+Separate at least:
+- Domain models.
+- Application services and commands.
+- Document parsing and rendering.
+- Workspace and filesystem management.
+- Import/export services.
+- Windows platform integration.
+- Application preferences and state.
+- Update management.
+- WPF presentation.
+Avoid unnecessary abstractions, microservices or a complex plugin framework.
+Prefer dependency injection, asynchronous operations, cancellation support, structured error handling and explicit ownership of resources.
+Keep UI components independent from persistence and export implementations.
+Never compromise data integrity in exchange for implementation speed.
+Before implementation:
+1. Inspect the latest develop state.
+2. Read AGENTS.md, README.md, docs/tool-guide.md, relevant architecture documents and release procedures.
+3. Review the current application source, automated tests and fixtures.
+4. Review the existing WinUI 3/WebView2 shell and its Windows integrations.
+5. Review the current Inno Setup configuration and packaging scripts.
+6. Examine GitHub Actions workflows and publication rules.
+7. Run the existing web application locally.
+8. Execute the available baseline test suites.
+9. Record the baseline revision and existing test results.
+The current repository contains:
+- A buildless browser/PWA application.
+- A WinUI/WebView2 desktop shell.
+- Native filesystem integration work.
+- Playwright regression tests.
+- Windows packaging scripts.
+- An existing Inno Setup installer.
+- Published development prereleases.
+Inspect their actual current implementations rather than assuming their historical design is still accurate.
+The existing root AGENTS.md describes a browser-only architecture.
+Those restrictions must continue protecting the existing web application but must not prevent the explicitly authorised native reconstruction.
+Update or scope agent instructions accordingly.
+Create native-specific AGENTS.md guidance where appropriate.
+Preserve the existing browser build and GitHub Pages deployment.
+Do not introduce .NET build requirements into the static web publishing pipeline.
+Create and maintain:
+- docs/native/functional-parity-matrix.md
+- docs/native/native-experience-improvements.md
+- docs/native/architecture-decisions.md
+- docs/native/implementation-progress.md
+- docs/native/validation-report.md
+Keep these concise, factual and continuously updated.
+Do not treat documentation as a substitute for implementation.
+The original web application defines what the product must be capable of doing, not how users must interact with it.
+For every existing feature:
+1. Identify its underlying user need.
+2. Identify its current behaviour and data contracts.
+3. Determine whether that behaviour is appropriate for Windows.
+4. Identify improvements made possible by native APIs and controls.
+5. Design and implement the best native interaction.
+6. Validate the resulting user outcome.
+7. Record whether the new implementation is equivalent, improved or incomplete.
+Do not preserve browser-specific limitations simply to maintain visual or behavioural similarity.
+Do not introduce regressions under the justification of redesign.
+A new interaction is acceptable when it provides a better outcome while maintaining expected capabilities and compatibility.
+Proactively investigate improvements involving:
+- Native file and folder dialogues.
+- Windows Explorer integration.
+- Multiple document tabs.
+- Native drag and drop.
+- Context-aware menus.
+- Native keyboard shortcuts.
+- Windows clipboard formats.
+- Document navigation history.
+- Recent files and workspaces.
+- Unsaved-document recovery.
+- External file-change detection.
+- Native search and navigation.
+- High-DPI and multiple-monitor support.
+- Accessibility and keyboard navigation.
+- Native notifications and progress indicators.
+- Windows theme integration.
+- Better image and attachment management.
+- Window and workspace state restoration.
+- Faster incremental preview rendering.
+- Background-safe import/export tasks.
+- Installer and update lifecycle integration.
+These are implementation opportunities, not merely ideas to document.
+For each opportunity, evaluate user impact, complexity, risk and compatibility.
+Implement high-value, low-risk improvements during the reconstruction without requesting individual approval.
+For more substantial improvements, make a technically justified decision consistent with the product goals and safety requirements.
+Document rejected alternatives briefly.
+Design a coherent desktop interface using WPF.
+Retain the Lens Docs Studio identity:
+- Generic local Markdown, Mermaid and documentation studio.
+- British English throughout the interface.
+- Restrained orange accent: #FF883E.
+- Neutral surfaces.
+- Clear visual hierarchy.
+- Accessible contrast.
+- Light and dark themes.
+Avoid recreating the existing HTML layout pixel by pixel.
+Provide a professional workspace experience with:
+- Native application menus and commands.
+- Workspace file tree.
+- Multiple open-document tabs.
+- Editor, Preview and Split layouts.
+- Resizable panels.
+- Context menus.
+- Document outline.
+- Document and workspace navigation.
+- Find and replace appropriate to the focused view.
+- Search within preview.
+- Status indicators.
+- Progress and cancellation for long-running operations.
+- Native settings and preferences.
+- Keyboard-first workflows.
+Consider a command palette for frequently used actions if it improves discoverability and keyboard productivity.
+Pay particular attention to previous problem areas:
+- Ctrl+F must target the correct active context.
+- Editor keyboard input must not be captured by inactive search controls.
+- Inserting an image must not unexpectedly scroll the editor.
+- Internal Markdown links must navigate within the current workspace.
+- Copy/paste must behave correctly in external applications.
+- Panel focus, selection and scrolling must be predictable.
+- File modifications must never silently discard unsaved content.
+Implement useful automated tests for these behaviours.
+Use native UI Automation metadata and keyboard-accessible controls.
+Validate:
+- Focus order.
+- Accessible names.
+- Keyboard navigation.
+- Screen-reader compatibility where testable.
+- High-DPI scaling.
+- Resizing.
+- Multi-monitor layout.
+- Light and dark themes.
+Implement a native Markdown editing experience using AvalonEdit or a demonstrably superior equivalent native editor.
+Expected capabilities include:
+- Unicode and UTF-8 support.
+- Syntax highlighting.
+- Line numbers where useful.
+- Undo and redo.
+- Find and replace.
+- Markdown formatting commands.
+- Lists and tables.
+- Code blocks.
+- Mermaid snippets.
+- Links and images.
+- Autocomplete where appropriate.
+- Paste Special.
+- Context actions.
+- Document snapshots.
+- Large-document responsiveness.
+Preserve the source Markdown rather than requiring conversion into a proprietary document format.
+Use Markdig or an appropriate Markdown parsing layer to generate a structured document model.
+Render that model using WPF-native visual elements.
+Support the existing documented Markdown extensions and semantics, including:
+- Headings.
+- Tables.
+- Task lists.
+- Code blocks.
+- Syntax highlighting.
+- Quotes.
+- Images.
+- Captions.
+- Callouts.
+- Status badges.
+- Details/expandable sections.
+- Anchors.
+- Internal links.
+- Semantic progress indicators.
+- Mermaid diagrams.
+Treat unsupported or potentially unsafe embedded HTML explicitly.
+Never execute untrusted scripts or load active HTML as application UI.
+Design synchronisation around a source-aware document model.
+Provide reliable mapping between source positions and rendered document elements.
+Avoid coupling document navigation to DOM selectors or browser scroll behaviour.
+Support incremental rendering or comparable performance optimisations where useful.
+This is a critical technical risk and must be addressed early.
+Evaluate Mermaider and other credible browser-free .NET diagram rendering approaches.
+Build a compatibility corpus using existing repository fixtures and representative real-world Mermaid documents.
+Validate:
+- Flowcharts.
+- Subgraphs.
+- Labels.
+- Styles.
+- Themes.
+- Layout fidelity.
+- Azure DevOps Mermaid syntax where supported.
+- Invalid syntax handling.
+- SVG export.
+- PNG export.
+- Zoom.
+- Copy actions.
+Use a native SVG rendering approach where appropriate.
+Do not assume that generating valid SVG automatically guarantees correct visual rendering.
+If the first Mermaid library is insufficient:
+1. Investigate alternatives.
+2. Evaluate a native extension or adaptation.
+3. Identify the exact unsupported constructs.
+4. Implement feasible compatibility improvements.
+5. Maintain a visible compatibility report.
+Do not introduce WebView2, headless Chromium or a hidden browser as an unapproved fallback.
+Do not silently replace diagrams with static placeholders and report functional parity.
+Escalate only if a genuinely unavoidable architectural trade-off would violate the native-only requirement.
+Continue implementing independent features while resolving this risk.
+Workspaces must be real filesystem folders.
+Markdown source files, linked documents and local images must remain portable and usable outside Lens Docs Studio.
+Implement:
+- Open folder.
+- Open individual file.
+- Create file.
+- Save.
+- Save As.
+- Rename.
+- Move.
+- Delete with appropriate confirmation.
+- Reveal in File Explorer.
+- Recent workspaces.
+- Recent documents.
+- Folder-tree navigation.
+- File change monitoring.
+- External modification/conflict handling.
+- Workspace restoration.
+Use robust file-writing patterns.
+Prevent silent data loss from:
+- Crashes.
+- Concurrent modification.
+- Failed writes.
+- External renames.
+- File deletion.
+- Invalid paths.
+- Cancelled operations.
+- Network or removable-drive interruptions.
+Where appropriate, use temporary files, safe replacement, backup/recovery and change detection.
+Do not overwrite externally modified documents without a clear conflict-resolution flow.
+Markdown links such as docs/02-Developer-Integration.md must resolve relative to their source document.
+Open matching documents inside the application.
+Provide a convenient native document-link insertion workflow.
+When renaming or moving files, offer to update affected internal links safely.
+Protect against path traversal and unintended access outside the authorised workspace.
+Redesign the entire image workflow for native Windows.
+The current web application's image handling must be treated as a reference, not a design constraint.
+Support:
+- Paste image from clipboard.
+- Drag image into editor.
+- Select local image.
+- Insert image from URL when explicitly requested.
+- Copy images between documents.
+- Preview linked images.
+- Asset management.
+- Rename assets.
+- Remove unused assets.
+- Export with images.
+When an image is added to a workspace document:
+1. Resolve its source.
+2. Validate format and content.
+3. Store it in an appropriate workspace-relative location.
+4. Generate a correct relative Markdown link.
+5. Preserve portability when the workspace folder is copied to another computer.
+6. Avoid filename collisions and unsafe overwrites.
+7. Keep the editor selection and scroll position stable.
+Never rely exclusively on temporary memory or browser-local storage for workspace image persistence.
+If a document has not yet been saved, provide safe temporary asset handling and finalise paths when the document is saved.
+Do not insert a permanent Markdown reference until the required asset persistence has succeeded.
+Ensure image display and document exports resolve assets consistently.
+Treat remote image retrieval as an explicit operation, not a reason to send local documents or paths to remote services.
+Inspect the complete existing feature guide and tests.
+Preserve applicable capabilities including:
+- Markdown and Mermaid editing.
+- ZIP and Markdown Bundle imports.
+- DOCX imports.
+- HTML imports.
+- PDF text imports.
+- HTML export.
+- Word export.
+- PDF export.
+- Static Docs Site export.
+- Markdown Bundle export.
+- Mermaid SVG/PNG export.
+- Clipboard operations.
+- Azure DevOps-specific Markdown compatibility.
+- Template and snippet libraries.
+- Export profiles.
+- Document review and governance checks.
+- Workspace links/assets audit.
+- Optional Lens artefact bundle support.
+Preserve the existing DOCX template contracts.
+Validate:
+- Styles.
+- Numbering.
+- Headings.
+- Tables.
+- Headers and footers.
+- Relationships.
+- Embedded media.
+- Template selection.
+- Template management.
+- Exported document integrity.
+Use Open XML SDK and complementary libraries as justified.
+Do not claim equivalence merely because Microsoft Word can open the generated file.
+Implement actual local PDF generation.
+Do not depend on browser printing or WebView-based export.
+Validate pagination, fonts, tables, images, diagrams and document structure.
+Retain the existing PDF import contract unless deliberate improvements are implemented and tested.
+Pay particular attention to:
+- Rich content copied into Azure DevOps.
+- Markdown formatting.
+- Embedded image handling.
+- Mermaid conversion where appropriate.
+- Plain text compatibility.
+- Tables pasted into Excel.
+- HTML copied from other applications.
+- Large clipboard payloads.
+Use native Windows clipboard formats.
+Automate validation of both clipboard representations and destination behaviour where possible.
+Existing user data must not be abandoned.
+Provide a safe, explicit migration/import route for relevant legacy workspaces, bundles, templates, snippets and settings.
+Do not assume browser-local storage can be read directly or safely from arbitrary browser profiles.
+Prefer supported export/import formats and non-destructive conversion.
+Preserve original files and provide rollback or recovery for migrations that modify local state.
+Do not import or expose personal documents from unrelated browser profiles.
+A properly functioning installer is a mandatory deliverable.
+Use Inno Setup as the initial preferred technology.
+Inspect the existing implementation under:
+- installer/inno/
+- scripts/windows/
+Reuse appropriate packaging logic, but do not retain assumptions tied to WebView2 or the old Windows shell.
+- Per-user installation by default.
+- No administrator privileges for the normal installation path.
+- Self-contained .NET deployment where feasible.
+- No .NET SDK or development-tool prerequisites.
+- No WebView2 prerequisite.
+- Start Menu integration.
+- Optional Desktop shortcut.
+- Optional file associations.
+- Correct uninstall registration.
+- Reliable upgrades over previous native versions.
+- Clear installer product identity and version.
+- Correct handling of files in use.
+- Preserve workspace documents and user data during uninstall.
+- Accessible, understandable installation experience.
+Consider a lightweight first-run onboarding flow separate from the installer.
+The reconstructed WPF application must initially coexist with the current WinUI/WebView2 shell.
+Use distinct identifiers and appropriate isolation for:
+- Installation location.
+- Uninstall records.
+- Application state.
+- File association registration.
+- Update product identity.
+Do not automatically uninstall or replace the old shell during development.
+Test the generated installer on a clean Windows environment.
+Validate installation, first launch, shortcuts, associations, uninstall and reinstall.
+A successful compilation is not sufficient evidence of a successful installation.
+Implement an integrated update service.
+The application must periodically check whether a new compatible version has been published through GitHub Releases.
+Checking for updates and installing updates are separate operations.
+- Check automatically after startup without blocking launch.
+- Check no more than once every 24 hours by default.
+- Allow manual checks from Help/About or Settings.
+- Allow users to disable automatic checks.
+- Support Stable and Preview channels.
+- Default to Stable.
+- Show the available version and release notes.
+- Let users download an authorised update.
+- Let users postpone or ignore a version.
+- Never force an unexpected shutdown.
+- Never install silently.
+- Never require an always-running Windows background service merely for update checks.
+Automatic checking is required while the application is running; checking while closed is not required.
+Do not infer desktop updates from arbitrary repository commits, branches or tags.
+A release is eligible only when its metadata confirms:
+- Correct native product identity.
+- Supported update channel.
+- Compatible Windows architecture.
+- Valid semantic version.
+- Valid installation/update artefact.
+- Required operating-system compatibility.
+Do not offer old WebView2 shell releases as updates to the new WPF application.
+Use a versioned update manifest if it offers better reliability and explicit compatibility.
+Implement secure update handling.
+Consider:
+- HTTPS retrieval.
+- Trusted release metadata.
+- Signed update manifests.
+- Pinned verification keys where appropriate.
+- File integrity verification.
+- Authenticode signature validation.
+- Expected publisher validation.
+- Architecture and product identity validation.
+- Failure-safe behaviour.
+- Protection against downgrade and version spoofing.
+A SHA-256 checksum published beside an installer is not, on its own, proof of trusted origin.
+The expected flow is:
+1. Discover an eligible release.
+2. Notify the user.
+3. Present version and release notes.
+4. Allow the user to authorise download.
+5. Validate the downloaded package.
+6. Ask the user to start installation.
+7. Handle unsaved documents safely.
+8. Close the application gracefully.
+9. Launch the validated installer.
+10. Complete the upgrade.
+11. Restore the previous workspace/session where appropriate.
+Cancellation must not cause data loss.
+If validation fails, do not execute the installer.
+Build the signing and verification integration even if production signing credentials are unavailable.
+Do not create or embed signing secrets.
+Use test certificates or mockable verification boundaries only for development validation.
+If a trusted production signing identity is unavailable, keep unsigned builds clearly marked as internal previews.
+Do not enable automatic execution of an untrusted downloaded installer.
+A notification linking to the verified GitHub release page is an acceptable temporary unsigned-preview fallback, but not a substitute for implementing the complete production update workflow.
+Do not claim production readiness until the required signing and clean-machine validation have succeeded.
+Validate both successful and failed upgrade scenarios.
+Protect application state with appropriate backup and migration rules.
+Support recovery from interrupted or unsuccessful installations.
+Do not implement rollback in a way that silently reverts user documents or loses changes.
+Build a repeatable, automated release process.
+Expected outputs:
+- Self-contained Windows application.
+- Installer executable.
+- Portable ZIP where appropriate.
+- Version metadata.
+- Release notes.
+- Checksums.
+- Test and certification results.
+- Signed artefacts when credentials are available.
+Extend GitHub Actions to build and validate the native solution using Windows runners.
+Keep the existing web pipeline functioning.
+Separate:
+- Development builds.
+- Internal preview releases.
+- Production-ready stable releases.
+Avoid publishing development output as stable.
+Keep release publication explicit and controlled.
+Do not move existing tags or modify historical release assets.
+Do not publish a public release without authorisation.
+Operate with the maximum practical autonomy permitted by the environment.
+- Do not ask for approval before ordinary implementation decisions.
+- Do not request approval for every milestone.
+- Do not stop after producing plans or documentation.
+- Investigate technical problems independently.
+- Choose maintainable solutions based on evidence.
+- Fix defects discovered during testing.
+- Keep making progress on independent features when one area is blocked.
+- Minimise manual instructions to the user.
+- Do not delegate routine validation back to the user.
+Ask for human input only when a decision genuinely requires it, such as:
+- Credentials or authentication.
+- Paid services or commercial licences.
+- Signing certificates.
+- Destructive data migrations.
+- Security-sensitive permissions.
+- Publishing a public release.
+- Changes that materially violate the agreed architecture.
+Start from the latest suitable develop state.
+Create an isolated feature branch, such as:
+feature/native-wpf-rebuild
+Preserve unrelated working-tree changes.
+Work incrementally using meaningful commits.
+Push progress to the authorised implementation branch.
+Create or maintain a draft pull request targeting develop when supported.
+Monitor relevant GitHub Actions runs.
+If CI fails because of your changes:
+1. Read the failure logs.
+2. Identify the root cause.
+3. Implement a correction.
+4. Rerun local validation.
+5. Push the fix.
+6. Recheck CI.
+Repeat until the checks pass or a genuine blocker is documented.
+Do not merge to develop or main without explicit authorisation.
+Do not publish a public release or move tags without explicit authorisation.
+Maintain durable progress records within the repository.
+Before ending a session, record:
+- Current milestone.
+- Implemented functionality.
+- Validated functionality.
+- Known blockers.
+- Relevant evidence.
+- Next executable task.
+Do not rely exclusively on chat history.
+A later Codex session must be able to resume from repository state without requiring the user to repeat the project requirements.
+The native application must be run and tested as an actual Windows desktop application.
+Prefer a dedicated Windows 11 VM or equivalent isolated Windows development environment.
+Use Windows-native Codex execution where available.
+Computer Use may be employed for real GUI validation.
+Layer 1 — Unit tests
+Validate document models, parsing, path handling, state management, version comparison, security checks and other deterministic logic.
+Layer 2 — Integration tests
+Validate real filesystem operations, imports, exports, templates, asset persistence, update metadata and installer integration.
+Layer 3 — Native UI automation
+Use FlaUI/UIA3 or an appropriate Windows UI Automation framework.
+Validate core UI workflows, keyboard interactions, dialogues, focus, navigation and state recovery.
+Layer 4 — Computer Use
+Launch the compiled native application and interact with it visually.
+Exercise realistic workflows such as:
+- Open a workspace.
+- Navigate multiple documents.
+- Edit Markdown.
+- Insert an image.
+- Preview a Mermaid diagram.
+- Export DOCX/PDF.
+- Save and reopen.
+- Change themes/layouts.
+- Test installer onboarding.
+- Receive a simulated update notification.
+- Execute a controlled update test.
+- Restore the application session.
+Use representative fixtures rather than personal documents.
+Do not treat a screenshot as sufficient proof that an operation succeeded.
+Inspect actual output files, persisted state and document contents.
+Never describe an unexecuted test as passed.
+Computer Use requires a suitable interactive Windows session. If unavailable, run all other available tests, identify the unverified GUI scenarios and retain them as open acceptance items.
+For installation and update testing, use disposable environments or snapshots where practical.
+Do not overwrite the developer's existing installation or personal workspace during testing.
+Measure representative workloads, including:
+- Application startup.
+- Workspace enumeration.
+- Opening large Markdown files.
+- Typing responsiveness.
+- Preview updates.
+- Image insertion.
+- Mermaid rendering.
+- Export operations.
+- Memory consumption.
+Avoid unnecessary full-document rendering, blocking the UI thread or excessive memory duplication.
+Use measurements rather than unsupported performance claims.
+Use the following milestones for execution and tracking.
+Advance automatically when the relevant acceptance gate passes.
+- Inspect existing product.
+- Certify web baseline.
+- Create functional parity matrix.
+- Establish native project structure.
+- Configure .NET 10/WPF build.
+- Validate editor, preview, Mermaid and DOCX technical feasibility.
+- Record architectural decisions.
+Do not spend excessive time writing architecture documents before building working software.
+- Native workspace tree.
+- Open and save documents.
+- Multiple tabs.
+- Markdown editor.
+- Native preview.
+- Editor-preview navigation.
+- Local image handling.
+- Internal links.
+- Conflict protection.
+- Session recovery.
+Gate: a real workspace can be edited, saved, closed and reopened without losing documents or assets.
+- Complete Markdown editing commands.
+- Mermaid rendering and exports.
+- Imports and exports.
+- Templates.
+- Clipboard interoperability.
+- Review tools.
+- Search and navigation.
+- High-value Windows-native UX improvements.
+Gate: each relevant feature is validated and the parity matrix distinguishes complete, improved and incomplete functionality.
+- Self-contained packaging.
+- Inno Setup wizard.
+- Installation/uninstallation.
+- User preferences and state preservation.
+- GitHub update checks.
+- Release eligibility filtering.
+- User notifications.
+- Secure download and installation flow.
+- Upgrade and recovery tests.
+Gate: installation and simulated upgrade work end to end in a clean Windows test environment.
+- Accessibility.
+- Responsiveness.
+- Performance.
+- Security review.
+- Filesystem edge cases.
+- Export fidelity.
+- Automated regression coverage.
+- Interactive Windows validation.
+- CI certification.
+- Release-ready artefacts and documentation.
+Gate: no critical data-loss, security or functional blocker remains, and required tests have passed.
+The goal is complete only when the following conditions are satisfied, or remaining blockers are explicitly identified with evidence.
+- The application runs as a genuine WPF desktop application.
+- No embedded browser hosts the application UI.
+- No HTML/JavaScript runtime is required for editing or preview.
+- Normal installed execution does not require development tools or a local server.
+- Existing essential user workflows are supported.
+- Markdown files retain portable, readable formats.
+- Workspace images and links remain valid after copying the workspace.
+- Mermaid compatibility has been validated against real fixtures.
+- Imports/exports meet documented contracts.
+- Legacy user data has a safe migration path.
+- Improvements identified during discovery have been implemented where feasible.
+- The application provides meaningful Windows-native advantages.
+- Keyboard focus, navigation, selection and scrolling behave predictably.
+- Unsaved edits and external changes are safely handled.
+- Installer can be built reproducibly.
+- Clean-machine installation is validated.
+- Uninstall preserves user documents.
+- Updates are discovered through compatible GitHub release metadata.
+- Users are notified without interruption.
+- Installation requires user authorisation.
+- Update security and trust are validated.
+- Failed updates do not silently destroy local state.
+- Automated tests cover critical workflows.
+- The actual desktop application has undergone GUI validation.
+- Build and CI results are recorded.
+- The existing web application remains functional.
+- There are no knowingly hidden critical regressions.
+- Documentation accurately reflects the implementation.
+At completion, provide a concise engineering report containing:
+1. Final architecture and selected technologies.
+2. Implemented features.
+3. Improvements over the existing web experience.
+4. Functional parity status.
+5. Mermaid and export compatibility findings.
+6. Installer and updater implementation status.
+7. Test results with exact evidence.
+8. Performance findings.
+9. Known issues and remaining limitations.
+10. Build/install artefact locations.
+11. Branch, commit and pull request references.
+12. GitHub Actions status.
+13. Any genuinely unavoidable external prerequisites.
+Clearly distinguish:
+- Implemented.
+- Locally validated.
+- CI validated.
+- Ready for internal preview.
+- Ready for production.
+- Blocked or unverified.
+Never claim production certification when signing, compatibility or GUI validation is outstanding.
+Begin immediately.
+First inspect the repository and establish the baseline.
+Then create the native implementation structure and validate the highest-risk components.
+Continue through the milestones autonomously.
+Do not stop after the first working window, first successful build, first functional editor or first milestone.
+The intended final outcome is a fully usable, installer-based, genuinely native Windows edition of Lens Docs Studio, with meaningful Windows-specific improvements and a secure, user-controlled update mechanism.
+Optimise for engineering quality, data safety, actual usability and minimum human intervention.
+The web product is our functional reference.
+The Windows application must be the better desktop product, not merely the same product running in a different window.

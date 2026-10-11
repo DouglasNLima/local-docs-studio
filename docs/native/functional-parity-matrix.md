@@ -1,0 +1,32 @@
+# Functional parity matrix
+
+Reference: docs/tool-guide.md, browser regression tests, registries/content.js and the newer main image/navigation/template contracts. All rows start incomplete until validated outcomes are recorded.
+
+| User need / existing contract | Native design | Status |
+|---|---|---|
+| Markdown/Mermaid/text open, save, Save as, UTF-8 | Native pickers, portable source, safe writes | In progress |
+| Real folder tree, create/rename/move/delete/reveal | Filesystem workspace, safe link updates | Incomplete |
+| Tabs, recent files, navigation history | Native tabs and commands | Incomplete |
+| Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
+| Paste Special, HTML/TSV conversion, rich clipboard | Windows clipboard formats | Incomplete |
+| Markdown headings/tables/tasks/code/quotes/images | Markdig with native WPF preview | In progress |
+| Callouts/badges/details/figures/anchors/progress/math | Explicit safe semantic mapping | Incomplete |
+| Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |
+| Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |
+| Mermaid zoom/copy/SVG/PNG | Native drawing and bitmap export | Incomplete |
+| Portable local images, paste/drop/URL, assets | Relative persistent assets; explicit URL retrieval | Incomplete |
+| External changes, conflict flow, snapshots/recovery | Fingerprints and journal | In progress |
+| Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution | Incomplete |
+| Review/governance, links/assets audit, docs map | Source-aware analysis | Incomplete |
+| ZIP/Markdown Bundle/artefact imports | Bounded extraction, passive metadata | Incomplete |
+| DOCX/HTML/PDF text imports | Native parsers, safe assets | Incomplete |
+| HTML/DOCX/PDF export | Local independent exporters | Incomplete |
+| DOCX templates, styles, numbering, sections/media | Open XML package preservation | Incomplete |
+| Docs Site and Markdown Bundle export | Static portable packages | Incomplete |
+| Optional artefact review pack, front matter priority | Explicit safe rebuilt manifest | Incomplete |
+| Templates/snippets/studios/export profiles | Local library with legacy JSON import | Incomplete |
+| Legacy migration, help, preferences | Explicit import; no browser profile scanning | Incomplete |
+| Light/dark/system, keyboard, UIA, DPI/window restore | Native resources and Windows integration | Incomplete |
+| Installer, uninstall, coexistence, portable ZIP | Isolated self-contained Inno package | Incomplete |
+| GitHub Releases, channels, notifications, secure updates | Compatible signed metadata and consent | Incomplete |
+| Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Baseline testing |
