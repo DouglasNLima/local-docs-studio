@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LensDocsStudio.Core\LensDocsStudio.Core.csproj" />
+    <Content Include="..\..\..\tests\fixtures\azure-devops-markdown-fidelity.md" Link="Fixtures\azure-devops-markdown-fidelity.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

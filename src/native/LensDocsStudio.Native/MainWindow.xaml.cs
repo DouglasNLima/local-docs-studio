@@ -418,7 +418,9 @@ public partial class MainWindow : Window
         try { Clipboard.SetText(new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
         catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
     }
-    private async void CopyRenderedContent(object sender, RoutedEventArgs e)
+    private async void CopyRenderedContent(object sender, RoutedEventArgs e) => await CopyDocumentAsync(false);
+    private async void CopyMarkdownWithImages(object sender, RoutedEventArgs e) => await CopyDocumentAsync(true);
+    private async Task CopyDocumentAsync(bool markdownSource)
     {
         if (model.ActiveDocument is not { } tab) return;
         var source = tab.EditorDocument.Text;
@@ -427,11 +429,12 @@ public partial class MainWindow : Window
         var sequence = NativeClipboardService.Sequence;
         await model.RunAsync(async () =>
         {
-            model.Status = "Preparing formatted clipboard content…";
-            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken);
+            model.Status = markdownSource ? "Preparing Markdown and clipboard images…" : "Preparing formatted clipboard content…";
+            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken, markdownSource);
             model.OperationToken.ThrowIfCancellationRequested();
             NativeClipboardService.WriteRendered(content, sequence);
-            model.Status = "Rendered content copied as HTML and Unicode text. Images are embedded; destination formatting may vary.";
+            model.Status = markdownSource ? "Markdown copied with embedded images. Attachment handling depends on the destination."
+                : "Rendered content copied as HTML and Unicode text. Images are embedded; destination formatting may vary.";
         });
     }
     private void RevealFile(object sender, RoutedEventArgs e)

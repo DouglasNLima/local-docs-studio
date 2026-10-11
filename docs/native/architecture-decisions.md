@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+Copy Markdown with images uses parser source spans to replace image destinations and complete Mermaid blocks. Reference images expand at each occurrence without rewriting shared definitions or ordinary links. Unicode text retains source; CF_HTML carries escaped literal text and ordered PNG image elements without semantic document tags. Remote references are not fetched, unfinished fences stay literal, and preparation has source/image/payload limits. The source-carrier marker is an untrusted format hint. Automatic Markdown paste extracts bounded raster data, then native validation and persistence complete before one anchored editor replacement; forced text remains literal.
+
 Baseline: develop 2cc3b5680958c9c553dad23856e6010c158fccd7, inspected 11 October 2026. The original checkout remains on main 0d100cc29dde2ba80755fb1e8af60ffd9d006b16 with an unrelated untracked attachment directory preserved.
 
 1. Separate src/native solution: .NET 10, WPF, AvalonEdit, CommunityToolkit.Mvvm. Existing web and WinUI/WebView2 shell remain independently buildable.

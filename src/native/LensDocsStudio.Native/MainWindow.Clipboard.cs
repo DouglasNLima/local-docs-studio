@@ -14,7 +14,8 @@ public partial class MainWindow
         var html = data.GetDataPresent(DataFormats.Html, false) ? data.GetData(DataFormats.Html, false) as string : null;
         return new(text ?? "", html ?? "");
     }
-    private static bool NeedsConversion(ClipboardPayload payload) => payload.Html.Length > 0 || payload.Text.Contains('\t');
+    private static bool NeedsConversion(ClipboardPayload payload) => payload.Html.Length > 0 || payload.Text.Contains('\t')
+        || payload.Text.Contains("data:image/", StringComparison.OrdinalIgnoreCase);
 
     private async void PasteSpecial(object sender, RoutedEventArgs e)
         => await PasteClipboardAsAsync(Enum.Parse<PasteMode>((string)((FrameworkElement)sender).Tag));

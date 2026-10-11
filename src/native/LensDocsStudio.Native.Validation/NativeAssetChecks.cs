@@ -94,6 +94,25 @@ internal static class NativeAssetChecks
             var decoded = NativeRasterService.Read(copied);
             if (decoded.PixelWidth != 64 || decoded.PixelHeight != 48) throw new IOException("Rich HTML paste lost the original image dimensions.");
         }
+        var literalSource = "# Source fidelity\r\n\r\n**Bold** and `code`.\r\n\r\n" + File.ReadAllText(destination)
+            + "\r\n![Remote](https://fixture.invalid/not-fetched.png)\r\n\r\n```mermaid\r\nunfinished diagram";
+        var markdownCopy = new ClipboardExportService().PrepareAsync(literalSource, destination, savedRoot, false, markdownSource: true).GetAwaiter().GetResult();
+        var markdownPaste = new LensDocsStudio.Core.Imports.ClipboardPasteService().Convert(new(markdownCopy.PlainText, markdownCopy.Html), LensDocsStudio.Core.Imports.PasteMode.Auto);
+        var markdownAsset = markdownPaste.Document.Assets.Single();
+        var portableReference = new ImageAssetService().ImportAsync(savedRoot, destination, markdownAsset.Bytes, "markdown-paste", default).GetAwaiter().GetResult();
+        var portableSource = markdownPaste.Document.Markdown.Replace(markdownAsset.Reference, portableReference, StringComparison.Ordinal);
+        var originalReference = MarkdownLinks.Read(File.ReadAllText(destination)).Single(l => l.IsImage).Reference;
+        if (portableSource != literalSource.Replace(originalReference, portableReference, StringComparison.Ordinal))
+            throw new IOException("Copy Markdown and native paste changed source outside the local image destination.");
+        using (var input = File.OpenRead(new WorkspacePath(savedRoot).ResolveLink(destination, portableReference)))
+        {
+            var decoded = NativeRasterService.Read(input); var restoredPixels = new byte[64 * 48 * 4];
+            new FormatConvertedBitmap(decoded, PixelFormats.Bgra32, null, 0).CopyPixels(restoredPixels, 64 * 4, 0);
+            if (!restoredPixels.SequenceEqual(pixels)) throw new IOException("Markdown clipboard transfer changed image pixels.");
+        }
+        var markdownDestination = Path.Combine(savedRoot, "Markdown clipboard saved.md");
+        new DocumentStore(Path.Combine(root, "recovery")).SaveAsync(markdownDestination, portableSource, null).GetAwaiter().GetResult();
+        if (File.ReadAllText(markdownDestination) != portableSource) throw new IOException("Markdown clipboard source did not persist exactly.");
         using (var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(root, "queued-writes")), session, new WorkspaceService(), new DesktopDialogs()))
         {
             var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -105,7 +124,7 @@ internal static class NativeAssetChecks
             if (!order.SequenceEqual(new[] { "first", "second" }) || model.IsBusy) throw new InvalidOperationException("Workspace operations did not complete in order.");
         }
         File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Rich clipboard HTML embeds independently decodable native image pixels", "Image preparation respects its aggregate output budget and cancellation", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Block paste preserves surrounding edits and Markdown separation", "Rich HTML paste persists independently decoded portable image pixels", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Rich clipboard HTML embeds independently decodable native image pixels", "Image preparation respects its aggregate output budget and cancellation", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Block paste preserves surrounding edits and Markdown separation", "Rich HTML paste persists independently decoded portable image pixels", "Markdown copy and paste preserve literal source, CRLF, unfinished fences, remote references and exact saved image pixels", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
     }
     private sealed class FixtureImageHandler(byte[] bytes) : HttpMessageHandler
     {

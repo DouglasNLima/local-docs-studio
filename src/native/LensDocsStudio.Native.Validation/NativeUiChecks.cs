@@ -297,6 +297,47 @@ internal static class NativeUiChecks
                 if (clipboardHtml.QuerySelectorAll("button,script").Length != 0 || plain.Contains("Copy source", StringComparison.Ordinal))
                     throw new IOException("The Windows clipboard leaked native preview controls.");
                 checks.Add("Native rich copy publishes Windows HTML Format and Unicode text with real embedded diagram pixels, table cells and no preview controls");
+                var originalMarkdown = editor.Patterns.Value.Pattern.Value.Value;
+                Find(window, "EditMenu").Click(); Find(window, "CopyMarkdownWithImages").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name.StartsWith("Markdown copied with embedded images.", StringComparison.Ordinal), "Markdown clipboard preparation did not finish.");
+                ownedClipboardSequence = GetClipboardSequenceNumber();
+                var sourceClipboard = System.Windows.Clipboard.GetDataObject()!;
+                var sourcePlain = sourceClipboard.GetData(System.Windows.DataFormats.UnicodeText) as string ?? throw new IOException("Markdown copy has no Unicode source.");
+                var sourceHtml = sourceClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Markdown copy has no image carrier.");
+                var carrier = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(sourceHtml));
+                var sourceImage = carrier.QuerySelectorAll("img").Single().GetAttribute("src")!;
+                const string fixtureDiagram = "```mermaid\nflowchart LR\nA[Write] --> B[Review]\n```";
+                if (!originalMarkdown.Contains(fixtureDiagram, StringComparison.Ordinal)
+                    || sourcePlain.Replace("![Mermaid diagram](" + sourceImage + ")", fixtureDiagram, StringComparison.Ordinal) != originalMarkdown
+                    || carrier.QuerySelectorAll("h1,h2,p,table,ul,ol,pre,code,strong,em,script").Length != 0)
+                    throw new IOException("Markdown copying changed literal source or added semantic HTML.");
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The Markdown paste target is not empty.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                Wait(() => Find(window, "Status").Name.StartsWith("Markdown pasted; embedded images saved locally.", StringComparison.Ordinal), "Markdown paste did not persist its image.");
+                var sourcePastePath = Path.Combine(runRoot, "Markdown clipboard document.md");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(sourcePastePath);
+                Wait(() => File.Exists(sourcePastePath), "The Markdown clipboard document did not save.");
+                var savedMarkdown = File.ReadAllText(sourcePastePath);
+                var sourcePasteLink = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(savedMarkdown).Single(l => l.IsImage);
+                if (savedMarkdown.Replace(sourcePasteLink.Reference, sourceImage, StringComparison.Ordinal) != sourcePlain)
+                    throw new IOException("Markdown paste changed source outside the saved image destination.");
+                using (var sourcePixels = new MemoryStream(Convert.FromBase64String(sourceImage.Split(',', 2)[1])))
+                using (var savedPixels = File.OpenRead(new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(sourcePastePath, sourcePasteLink.Reference)))
+                {
+                    var expectedPixels = LensDocsStudio.Native.Platform.NativeRasterService.Read(sourcePixels);
+                    var actualPixels = LensDocsStudio.Native.Platform.NativeRasterService.Read(savedPixels);
+                    if (expectedPixels.PixelWidth != actualPixels.PixelWidth || expectedPixels.PixelHeight != actualPixels.PixelHeight)
+                        throw new IOException("Markdown paste changed the diagram dimensions.");
+                    var stride = expectedPixels.PixelWidth * 4;
+                    var expectedBytes = new byte[stride * expectedPixels.PixelHeight]; var actualBytes = new byte[expectedBytes.Length];
+                    new System.Windows.Media.Imaging.FormatConvertedBitmap(expectedPixels, System.Windows.Media.PixelFormats.Bgra32, null, 0).CopyPixels(expectedBytes, stride, 0);
+                    new System.Windows.Media.Imaging.FormatConvertedBitmap(actualPixels, System.Windows.Media.PixelFormats.Bgra32, null, 0).CopyPixels(actualBytes, stride, 0);
+                    if (!expectedBytes.SequenceEqual(actualBytes)) throw new IOException("Markdown clipboard paste changed diagram pixels.");
+                }
+                checks.Add("Copy Markdown with images preserves literal source through Windows clipboard, native paste and Save as with identical portable diagram pixels");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                sourceTab.Patterns.SelectionItem.Pattern.Select();
                 var mixed = new System.Windows.DataObject();
                 mixed.SetData(System.Windows.DataFormats.Html, rich, false); mixed.SetData(System.Windows.DataFormats.UnicodeText, plain, false);
                 mixed.SetData(System.Windows.DataFormats.Bitmap, System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96,

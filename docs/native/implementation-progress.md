@@ -22,14 +22,15 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 - Bounded ZIP, DOCX, HTML and PDF text imports; guarded DOCX, HTML, local PDF and generic Markdown Bundle exports. Template styles and package headers/footers/media are preserved, with full template contracts still incomplete.
 - Copy rendered content prepares sanitised CF_HTML and Unicode text, embedding native images/diagrams and retaining table cells. Source/image limits, cancellation and clipboard sequence checks protect preparation; external destination fidelity remains to be validated.
 - Automatic HTML/TSV paste and nine Paste Special modes, including literal text with Ctrl+Shift+V. HTML import shares conversion for nested lists, code delimiters, literal punctuation and bounded merged tables. Embedded images are persisted before an undoable anchored source replacement.
+- Copy Markdown with images retains literal source around prepared images/complete Mermaid blocks and carries ordered image elements in CF_HTML. Native paste saves embedded raster data to portable assets. Remote references and incomplete fences stay literal; shared image references expand only at their image occurrences.
 - Fluent light/dark/system controls, high-contrast resources, working-area sizing and saved window placement. Operation and preview status are separate so preview completion cannot hide recovery feedback.
 - Separate self-contained installer/portable packaging and native CI. Development-host preview 4 → 5 upgrade, uninstall/reinstall and preservation checks passed. Fresh Windows runners also exercise installed-app workflows.
 - Compatible GitHub release discovery, channel preferences, signed-manifest policy, bounded downloads, integrity and pinned Authenticode checks, separate download/install consent and temporary update launcher. Production trust is unconfigured; unsigned builds cannot execute downloaded installers.
 
 ## Current evidence
 
-- Local Release build: no warnings/errors. Core: 157 tests pass, including asset recovery, clipboard Unicode/sanitisation, HTML fidelity, all paste modes and literal table metadata.
-- Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, twelve image/operation checks, including independently decoded clipboard images, rich image paste, anchored block insertion, budgets and cancellation.
+- Local Release build: no warnings/errors. Core: 178 tests pass, including source/CRLF clipboard fidelity, image ordering/reference syntax, incomplete fences, source-carrier paste, limits, cancellation and the existing Azure DevOps fidelity fixture.
+- Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, thirteen image/operation checks, including saved Markdown source fidelity and pixel-identical clipboard image transfer, rich image paste, anchored block insertion, budgets and cancellation.
 - Desktop harness: all 21 outcomes pass in both native CI runs at 7ad9a13, including rich copy/paste, saved images, CSV, invalid-image selection preservation, Ctrl+Shift+V and Undo. The same checks pass after installation/reinstallation. Local foreground access is unavailable. Remote transport uses deterministic simulated responses in integration tests.
 - Six native preview checks pass: frozen pixels, content reuse/invalidation, memory budgets/eviction, unresolved resources, cancellation and rendering after source image removal. Both native CI runs at 0e7c343 pass, including 21 desktop outcomes and installed lifecycle.
 - Optional local Office destination checks pass for Word and Excel: actual saved DOCX preserves Unicode, tables, bold and original diagram pixels; XLSX preserves adjacent cells, formula-like text and leading-zero identifiers. Evidence: artifacts/native/office-certified/office-clipboard.json. The original Excel instance was preserved.
@@ -38,7 +39,7 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 
 ## Remaining work
 
-Next: implement source-preserving Markdown/image clipboard transfer and continue rendering, editing, review and template parity. Full Chromium headless mode passes all 254 local browser checks and web push CI at e356480. At 7ad9a13 web PR CI passed 252/254 and push passed 253/254; failures coincide with Edge access violations. Browser crash investigation remains open.
+Next: validate the expanded 22-outcome desktop harness and continue rendering, editing, review and template parity. Both native CI runs at 34d2471 pass; web PR CI 38159859883 passes, while push CI 38159856632 passed 253/254 with a browser access violation before context creation. Playwright is updated from 1.60.0 (Chromium 148) to 1.64.0 (Chromium 156). Static checks and all 254 local Chromium/Edge tests pass in 12.9 minutes; fresh CI remains pending.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

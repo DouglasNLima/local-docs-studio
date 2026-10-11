@@ -12,8 +12,8 @@ public sealed partial class ClipboardPasteService
 {
     public PasteResult Convert(ClipboardPayload payload, PasteMode mode, CancellationToken cancellationToken = default)
     {
-        if (payload.Text.Length > 4 * 1024 * 1024 || payload.Html.Length > HtmlClipboardFormat.MaximumBytes)
-            throw new IOException("Paste is limited to 4 million text characters and 32 MB of HTML. Import larger documents from a file.");
+        if (payload.Text.Length > 32 * 1024 * 1024 || payload.Html.Length > HtmlClipboardFormat.MaximumBytes)
+            throw new IOException("Paste is limited to 32 million text characters and 32 MB of HTML. Import larger documents from a file.");
         cancellationToken.ThrowIfCancellationRequested();
         var text = HtmlMarkdownConverter.Normalise(payload.Text);
         var converter = new HtmlMarkdownConverter();
@@ -25,10 +25,17 @@ public sealed partial class ClipboardPasteService
             var result = converter.Convert(html, cancellationToken);
             return new(result, true, "HTML pasted as Markdown.");
         }
+        PasteResult Markdown(string source)
+        {
+            var imported = new MarkdownImageImporter().Import(source, cancellationToken);
+            return new(imported, false, imported.Assets.Count > 0 ? "Markdown pasted; embedded images saved locally." : "Markdown pasted.");
+        }
         switch (mode)
         {
             case PasteMode.Auto:
-                if (MarkdownLike().IsMatch(text)) return Result(text, false, "Markdown pasted.");
+                if (MarkdownLike().IsMatch(text) || payload.Text.Contains("data:image/", StringComparison.OrdinalIgnoreCase)) return Markdown(payload.Text);
+                var carrier = payload.Html.Contains("data-markdown-clipboard", StringComparison.Ordinal) ? MarkdownSourceCarrier.Read(Html(), cancellationToken) : null;
+                if (carrier is not null) return Markdown(payload.Text.Length > 0 ? payload.Text : carrier);
                 if (!string.IsNullOrWhiteSpace(payload.Html)) return Rich(Html());
                 if (text.Contains('\t') && TryTable(text, '\t', out var table)) return Result(table, true, "Table pasted as Markdown.");
                 return Result(text, false, "Text pasted.");

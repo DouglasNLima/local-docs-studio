@@ -1,5 +1,13 @@
 # Native validation report
 
+## Markdown source clipboard
+
+The native source-copy command retains literal Markdown and emits an image-only CF_HTML carrier. All 178 core tests pass, including CRLF, punctuation/raw HTML, image positions/duplicates/alt/title, reference expansion without shared-definition changes, complete and incomplete fences, standalone Mermaid, HTML-only source carriers, invalid data, cancellation, bounded payloads and the existing Azure DevOps fidelity fixture. Native integration passes thirteen asset/operation outcomes, including persistence of exact source outside an image destination and identical decoded image pixels. Release build has no warnings/errors; 40 diagram/export and six preview checks also pass.
+
+The desktop harness adds a 22nd outcome for the real Edit command, Windows clipboard, native paste and Save as, with source and pixel comparisons. Its fresh CI result is pending; local foreground acquisition remains unavailable. Live Azure DevOps attachment upload and persistence remain unverified and use the existing manual destination gate.
+
+At preceding revision 34d2471, native runs 38159859988 (PR) and 38159856656 (push) passed. Web PR run 38159859883 passed; push run 38159856632 passed 253/254, with a captured browser access violation before a new context was created. Playwright is now pinned to [1.64.0](https://github.com/microsoft/playwright/releases/tag/v1.64.0), updating bundled Chromium from 148 to 156 while retaining the installed Edge project. Static checks and all 254 local Chromium/Edge checks pass in 12.9 minutes (artifacts/native/baseline/web-playwright-164.log). Fresh CI is pending; this dependency update does not by itself prove the intermittent crash is fixed.
+
 Status: implementation in progress; not certified for internal preview or production.
 
 ## Baseline (11 October 2026)

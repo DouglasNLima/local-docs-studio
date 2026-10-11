@@ -81,6 +81,7 @@
     <MenuItem Header="_Italic" InputGestureText="Ctrl+I" Tag="italic" Click="Format"/>
     <MenuItem Header="Copy rendered _text" Click="CopyPreview"/>
     <MenuItem Header="Copy rendered _content" Click="CopyRenderedContent" AutomationProperties.AutomationId="CopyRenderedContent"/>
+    <MenuItem Header="Copy _Markdown with images" Click="CopyMarkdownWithImages" AutomationProperties.AutomationId="CopyMarkdownWithImages"/>
    </MenuItem>
    <MenuItem Header="_Insert">
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
