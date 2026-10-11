@@ -977,10 +977,27 @@ internal static class NativeUiChecks
             Window? picker = null;
             Wait(() => (picker = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null,
                 "The native file selection dialogue did not open.");
-            FocusWindow(picker!); var fileName = Find(picker!, "1001").AsTextBox(); fileName.Focus();
-            Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Open filename field did not acquire keyboard focus.");
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(path);
-            Wait(() => fileName.Text == path, "The native Open dialogue did not accept the selected path.");
+            FocusWindow(picker!);
+            // Select the intended edit by its accessible label instead of a numeric child ID.
+            var fileName = (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))
+                ?? throw new IOException("The labelled Open filename field is unavailable.")).AsTextBox();
+            try
+            {
+                fileName.Focus(); Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Open filename field did not acquire keyboard focus.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(path);
+                Wait(() => fileName.Text == path, "The native Open dialogue did not accept the selected path.");
+            }
+            catch
+            {
+                try
+                {
+                    picker.CaptureToFile(Path.Combine(output, "native-open-dialogue-failure.png"));
+                    File.WriteAllText(Path.Combine(output, "native-open-dialogue.json"), JsonSerializer.Serialize(new { Title = title, Expected = path,
+                        Observed = fileName.Text, fileName.AutomationId, fileName.Name, KeyboardFocus = fileName.Properties.HasKeyboardFocus.Value }));
+                }
+                catch (Exception) { /* Preserve the original failure if diagnostic collection also fails. */ }
+                throw;
+            }
             (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
                 ?? throw new IOException("The native Open button is unavailable.")).AsButton().Click();
         }

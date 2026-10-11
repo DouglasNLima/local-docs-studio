@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current validation correction: both 46c52d4 native runs stop in the new Open dialogue path-entry helper before template import. The inspected screenshot has a blank filename field and address-control focus. The harness now selects the filename edit by accessible label rather than numeric ID and records failed field values/control identity. The application is unchanged; Release build passes and the full 38-workflow desktop result remains pending.
+
 Current addition: Word template selection validates and extracts supported formatting into a fresh package before applying it. Original body content, comments, custom XML, unrelated media and personal package metadata are excluded. Header/footer references, logo bytes, styles, numbering, theme and supported settings remain; active fields/resources and invalid packages fail explicitly. Twenty-one package tests, all 439 core tests, the full native harness and static checks pass; Release build has no warnings/errors. A 38th desktop workflow covers native selection, template export, clearing and default export with unchanged originals; CI is pending.
 
 All four CI runs at 529aff3 pass: native PR/push 38181034358/38181030926 and web PR/push 38181034348/38181030930. Both native runs certify all 37 workflows in built, installed and reinstalled apps, including the corrected decoded-caption assertion. This is the latest complete four-run green revision.

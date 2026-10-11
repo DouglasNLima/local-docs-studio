@@ -1,5 +1,7 @@
 # Native validation report
 
+Native PR/push runs 38182240834/38182237503 at 46c52d4 fail while entering the template path, before import. The retained PR screenshot shows the blank filename field and focus at the address control. The Open helper previously chose numeric child ID 1001; it now selects the edit labelled File name: and captures the exact observed value/control/focus on failure. Product file selection is unchanged. Release build passes; the corrected 38-workflow desktop run remains pending. Evidence: artifacts/native/native-ci-46c52d4-*-failure.log and ci-46c52d4-pr/ui/native-ui-failure.png.
+
 ## Word template package extraction
 
 Release build has no warnings/errors; all 439 core tests, the full native harness and static checks pass. Twenty-one package cases verify exclusion of unrelated images/comments/custom XML/author metadata, actual retained logo bytes and links, page fields, inherited first/even/default headers/footers, final page layout, safe settings, unchanged theme XML, preserved numbering and large IDs, archive paths/counts/sizes/checksums, cancellation and rejected active/incomplete/invalid content. Prepared packages are schema-validated before selection. Native integration emits a real DOCX and checks the retained logo, heading, header/footer references, numbering and excluded original content. Evidence: artifacts/native/tests/native-core-word-template-complete.trx and artifacts/native/validation/native-word-template.docx/json.
