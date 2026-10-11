@@ -67,6 +67,20 @@ internal static class NativeSyntaxChecks
                     throw new IOException("A native code colour does not meet 4.5:1 contrast in the " + (dark ? "dark" : "light") + " palette.");
             if (runs.Select(run => ((SolidColorBrush)run.Foreground).Color).Distinct().Count() < 5)
                 throw new IOException("Native code runs did not receive distinct semantic colours.");
+            using (var host = new System.Windows.Interop.HwndSource(new System.Windows.Interop.HwndSourceParameters("Native preview colour validation")
+                { Width = 840, Height = 600, WindowStyle = unchecked((int)0x80000000) }))
+            {
+                var viewer = new System.Windows.Controls.FlowDocumentScrollViewer { Document = rendered.Document };
+                host.RootVisual = viewer; viewer.Measure(new Size(840, 600)); viewer.Arrange(new Rect(0, 0, 840, 600)); viewer.UpdateLayout();
+                var peer = new System.Windows.Automation.Peers.FlowDocumentScrollViewerAutomationPeer(viewer);
+                var textProvider = (System.Windows.Automation.Provider.ITextProvider)peer.GetPattern(System.Windows.Automation.Peers.PatternInterface.Text);
+                var actual = textProvider.DocumentRange.FindText("Café", false, false).GetAttributeValue(System.Windows.Automation.TextPatternIdentifiers.ForegroundColorAttribute.Id);
+                var expected = ((SolidColorBrush)CodeSyntaxColours.For(CodeTokenRole.String, dark)).Color;
+                // WPF's text provider returns this attribute in RGB order.
+                if (actual is not int attribute || attribute != (expected.R << 16 | expected.G << 8 | expected.B))
+                    throw new IOException("Native preview text did not expose its exact RGB colour through UI Automation: " + JsonSerializer.Serialize(actual));
+                viewer.Document = null;
+            }
             rendered.Document.Background = new SolidColorBrush(dark ? Color.FromRgb(28, 30, 33) : Color.FromRgb(250, 250, 250));
             var paginator = ((IDocumentPaginatorSource)rendered.Document).DocumentPaginator; paginator.PageSize = new Size(840, 600);
             var bitmap = new RenderTargetBitmap(840, 600, 96, 96, PixelFormats.Pbgra32); bitmap.Render(paginator.GetPage(0).Visual);
@@ -112,7 +126,7 @@ internal static class NativeSyntaxChecks
         {
             Passed = true, FirstPreparationMilliseconds = firstMilliseconds, Languages = languageCounts,
             Checks = new[] { "Bundled native definitions colour fourteen language families on a background worker", "Multiline comments, keywords, Unicode strings and numeric tokens retain their roles",
-                "Light/dark WPF runs preserve exact selectable CRLF source and source mapping", "Both code palettes meet 4.5:1 contrast; high contrast inherits system text",
+                "Light/dark WPF runs preserve exact selectable CRLF source, source mapping and numeric UI Automation colours", "Both code palettes meet 4.5:1 contrast; high contrast inherits system text",
                 "Unknown languages and stale plans preserve plain text", "Block, line, span and aggregate limits retain full visible source with feedback", "Cancelled preparation produces no plan",
                 "Copied rule graphs retain recursion, leave shared definitions unchanged and time out pathological expressions" },
             Limitation = "The 250 ms text-processing budget and cancellation are checked between bounded lines, with a 25 ms timeout per regular-expression match. Initial bundled-definition loading is separate. Export syntax colouring is separate."

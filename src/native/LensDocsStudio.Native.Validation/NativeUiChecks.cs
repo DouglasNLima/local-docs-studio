@@ -631,10 +631,22 @@ internal static class NativeUiChecks
                 {
                     Find(window, "ViewMenu").Click(); Find(window, theme + "Theme").Patterns.Invoke.Pattern.Invoke();
                     var colour = ((System.Windows.Media.SolidColorBrush)LensDocsStudio.Native.Rendering.CodeSyntaxColours.For(LensDocsStudio.Native.Rendering.CodeTokenRole.String, theme == "Dark")).Color;
-                    var expectedColour = colour.R | colour.G << 8 | colour.B << 16;
-                    Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("Café", false, false)
-                        ?.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) is int actual && actual == expectedColour,
-                        "Changing the native theme did not redraw the code preview palette.");
+                    var expectedColour = colour.R << 16 | colour.G << 8 | colour.B;
+                    int? observedColour = null;
+                    try
+                    {
+                        Wait(() =>
+                        {
+                            observedColour = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("Café", false, false)
+                                ?.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) as int?;
+                            return observedColour == expectedColour;
+                        }, "Changing the native theme did not redraw the code preview palette.");
+                    }
+                    finally
+                    {
+                        File.WriteAllText(Path.Combine(output, "native-theme-colour-" + theme.ToLowerInvariant() + ".json"),
+                            JsonSerializer.Serialize(new { Theme = theme, Expected = expectedColour, Observed = observedColour }));
+                    }
                     Wait(() => File.ReadAllText(Path.Combine(state, "preferences.json")).Contains("\"" + theme + "\"", StringComparison.Ordinal), "The chosen theme was not persisted.");
                     if (editor.Patterns.Value.Pattern.Value.Value != contextMarkdown) throw new IOException("Changing the native theme altered editor source.");
                     window.CaptureToFile(Path.Combine(output, "native-theme-" + theme.ToLowerInvariant() + ".png"));
