@@ -1,5 +1,11 @@
 # Native validation report
 
+## Content-library migration and portable source services
+
+Twenty-nine new core cases and all 484 core tests pass. The supported browser JSON fixture preserves Unicode, CRLF, Markdown links, suggested filenames and typed profile fields. Import merges without replacement, reassigns conflicting IDs, detects repeated imports and keeps archived entries. Bounds, malformed/ambiguous JSON, unsafe filenames, corrupt state, stale writers, foreign snapshots and cancellation are exercised. Four native outcomes embed actual local raster pixels, retain editable and even invalid Mermaid source, preserve figures/captions, avoid remote fetches and restore independent assets after source-image removal. The complete native harness and static checks pass; Release build has no warnings/errors. Evidence: artifacts/native/tests/local-library-first.trx, native-core-library-migration.trx and artifacts/native/validation/native-library-content.json. Management UI and profile application remain incomplete; no desktop outcome is claimed for these services.
+
+Native PR/push 38183813055/38183810137 at 6f8b058 certify all 39 workflows in built, installed and reinstalled apps. This verifies the corrected Open command and the complete Word library flow, including output package content and restart persistence. Logs: artifacts/native/native-ci-6f8b058-pr.log and native-ci-6f8b058-push.log. Web PR 38183813061 passes; the push run is still in progress.
+
 Native runs 38183356714/38183353200 at 3895c3b fail waiting for Open to close. The expanded diagnostic records ButtonId=DropDown, width 15: the filename combo's arrow shares the accessible name Open with the confirmation button. The inspected main-window screenshot confirms the correct filename and expanded dropdown. The harness now excludes the observed arrow and requires exactly one confirmation command, retaining closure and output checks. No product change was needed. Evidence: artifacts/native/native-ci-3895c3b-*-failure.log and ci-3895c3b-pr/ui/native-open-dialogue.json/native-ui-failure.png. The 39-workflow library suite remains pending.
 
 ## Reusable Word template library

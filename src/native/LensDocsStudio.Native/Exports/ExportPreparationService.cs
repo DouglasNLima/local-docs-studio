@@ -12,7 +12,7 @@ namespace LensDocsStudio.Native.Exports;
 public sealed class ExportPreparationService(MarkdownService markdown, DiagramService diagrams, NativeSvgService svg)
 {
     public ExportContent Prepare(string source, string? sourcePath, string? root, bool dark, CancellationToken cancellationToken = default,
-        long maximumEmbeddedImageBytes = 256 * 1024 * 1024, bool markdownSourceOnly = false, ExportTableSelection? table = null)
+        long maximumEmbeddedImageBytes = 256 * 1024 * 1024, bool markdownSourceOnly = false, ExportTableSelection? table = null, bool prepareDiagrams = true)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var document = markdown.Parse(source, Path.GetExtension(sourcePath)?.ToLowerInvariant() is ".mmd" or ".mermaid");
@@ -27,6 +27,7 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
         foreach (var code in scope.Descendants<FencedCodeBlock>().Where(c => c.Info is "mermaid" or "mmd"))
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (!prepareDiagrams) continue;
             if (markdownSourceOnly && code.ClosingFencedCharCount == 0) continue;
             var result = diagrams.Render(code.Lines.ToString(), dark);
             if (!result.Success) throw new InvalidDataException(result.Error);
