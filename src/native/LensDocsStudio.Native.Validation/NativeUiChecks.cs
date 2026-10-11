@@ -478,7 +478,8 @@ internal static class NativeUiChecks
                     throw new IOException("The native Docs Site lost options, portable assets or private-state isolation.");
             }
             checks.Add("Native Docs Site options and Save dialogue create a portable workspace ZIP without private state");
-            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            // AvalonEdit's outer automation element exposes Value; keyboard input belongs to its text area.
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             var beforeProgress = editor.Patterns.Value.Pattern.Value.Value;
             var progressWindow = OpenProgress(window);
             Find(progressWindow, "ProgressLabel").AsTextBox().Text = "Delivery & review";
@@ -498,7 +499,7 @@ internal static class NativeUiChecks
             Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "100";
             Find(progressWindow, "ApplyProgress").Patterns.Invoke.Pattern.Invoke();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("value=\"100\"", StringComparison.Ordinal), "The native progress update did not apply.");
-            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedProgress, "Progress update Undo did not restore the entire original indicator.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeProgress, "Progress insertion Undo did not restore the original source.");

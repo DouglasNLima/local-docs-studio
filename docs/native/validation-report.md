@@ -2,6 +2,8 @@
 
 ## Native progress indicators
 
+At ee5c0ff both native CI runs (38167486044/38167482057) passed Core, native rendering and exported-site checks, then failed before opening the progress dialogue. The new check called UIA SetFocus on AvalonEdit's outer automation element; existing editor workflows focus the real text area by clicking. The retained screenshot shows the editor present and the preceding Docs Site export complete. The harness now uses that established input path. Evidence: artifacts/native/ci-ee5c0ff-pr/ui and native-ci-ee5c0ff-pr-failure.log. The 26th desktop/installed outcome remains pending.
+
 Release builds without warnings/errors and all 273 core tests pass. Fifteen new cases cover passive progress semantics, decoded labels, exact source spans, finite values/bounds, malformed/active/oversized markup, code examples, literal source copy, HTML/clipboard output, schema-valid Word bars, escaped insertion and exact existing-block updates. Existing formatting tests also pass after sharing block-padding logic.
 
 Four native progress outcomes pass for accessible read-only range values, selectable/source-mapped labels, measured track fills and actual PDF content. WPF light/dark page images were visually inspected. The first screenshot captured tracks before deferred native layout; the harness now drains layout, obtains the current page and requires measured fill widths at 0%, 37% and 100% before capturing. Evidence: artifacts/native/validation/native-progress.json, native-progress-layout-*.json and native-progress-*.png. Word preserves percentage-labelled coloured table bars; PDF emits local coloured bars and labels. This does not claim tagged-PDF certification.
