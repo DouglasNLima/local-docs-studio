@@ -7,7 +7,10 @@ using System.Text.RegularExpressions;
 namespace LensDocsStudio.Core.Parsing;
 
 public sealed record DocumentHeading(string Title, string Anchor, int Level, int SourceStart, int SourceLine);
-public sealed record ParsedDocument(string Source, MarkdownDocument Syntax, IReadOnlyList<DocumentHeading> Headings);
+public sealed record ParsedDocument(string Source, MarkdownDocument Syntax, IReadOnlyList<DocumentHeading> Headings)
+{
+    public DocumentMetadata Metadata { get; init; } = new();
+}
 
 public sealed partial class MarkdownService
 {
@@ -16,7 +19,8 @@ public sealed partial class MarkdownService
     public ParsedDocument Parse(string source, bool standaloneMermaid = false)
     {
         // Azure DevOps containers are replaced with equal-length fence lines to preserve source offsets.
-        var normalised = NormaliseDevOps(source);
+        var frontMatter = standaloneMermaid ? new FrontMatterResult(new(), 0) : FrontMatterService.Read(source);
+        var normalised = NormaliseDevOps(FrontMatterService.HideHeader(source, frontMatter.BodyStart));
         var syntax = Markdown.Parse(standaloneMermaid ? "```mermaid\n" + source + "\n```" : normalised, Pipeline);
         if (standaloneMermaid && syntax.FirstOrDefault() is FencedCodeBlock standalone)
         {
@@ -26,10 +30,10 @@ public sealed partial class MarkdownService
         if (!standaloneMermaid) SafeInlineSemantics.Apply(syntax, source);
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
-        return new(source, syntax, headings);
+        return new(source, syntax, headings) { Metadata = frontMatter.Metadata };
     }
 
-    public string ToSafeHtml(string source) => Markdown.ToHtml(NormaliseDevOps(source),
+    public string ToSafeHtml(string source) => Markdown.ToHtml(NormaliseDevOps(FrontMatterService.HideHeader(source, FrontMatterService.Read(source).BodyStart)),
         new MarkdownPipelineBuilder().UseAdvancedExtensions().DisableHtml().Build());
 
     public static string NormaliseDevOps(string source)

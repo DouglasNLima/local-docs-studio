@@ -22,6 +22,10 @@ internal static class NativeMarkdownChecks
             var result = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, dark,
                 new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
             if (result.Warnings.Count != 0) throw new IOException(string.Join(" ", result.Warnings));
+            if (parsed.Metadata.Title != "Metadata title for export" || parsed.Metadata.NavigationGroup != "Validation"
+                || new TextRange(result.Document.ContentStart, result.Document.ContentEnd).Text.Contains("Metadata title for export", StringComparison.Ordinal)
+                || parsed.Headings[0].SourceStart != parsed.Source.IndexOf("# Formatting fixture", StringComparison.Ordinal))
+                throw new IOException("Front matter leaked into native body text or displaced its source mapping.");
             var callout = result.Document.Blocks.OfType<Section>().Single();
             if (!Text(callout).Contains("Warning", StringComparison.Ordinal) || !Text(callout).Contains("Before publishing", StringComparison.Ordinal)
                 || !Text(callout).Contains("Review evidence", StringComparison.Ordinal) || callout.Tag is not SourceReference source || parsed.Source[source.Start] != '>')
@@ -82,7 +86,8 @@ internal static class NativeMarkdownChecks
                 "Soft and hard line breaks remain distinct", "Light and dark native pages render to actual images",
                 "PDF retains callout labels, ordered starts, soft lines and explicit deletion markers",
                 "Status badges retain selectable decoded text, neutral styling and source mapping",
-                "Keyboard shortcuts retain selectable text and monospace styling", "Preview and PDF retain decoded HTML entities and passive labels" },
+                "Keyboard shortcuts retain selectable text and monospace styling", "Preview and PDF retain decoded HTML entities and passive labels",
+                "Front matter stays separate from body text without changing source positions" },
             PdfLimitation = "MigraDoc has no strikeout font property; PDF retains visible Markdown deletion markers. PDF highlight shading is not yet implemented.",
             PdfText = words
         }, new JsonSerializerOptions { WriteIndented = true }));

@@ -11,6 +11,26 @@ public partial class MainWindow
     private readonly DocumentExportService exports = new();
     private byte[]? wordTemplate;
 
+    private async void ExportDocsSite(object sender, RoutedEventArgs e)
+    {
+        if (model.WorkspaceRoot is not { } root) { dialogs.Error("Open a workspace folder before exporting a Docs Site."); return; }
+        var options = new DocsSiteWindow(Path.GetFileName(root)) { Owner = this };
+        if (options.ShowDialog() != true) return;
+        var picker = new SaveFileDialog { Title = "Save Docs Site", Filter = "Docs Site ZIP|*.zip", FileName = "documentation-site.zip", AddExtension = true, DefaultExt = ".zip" };
+        if (picker.ShowDialog(this) != true) return;
+        if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for a Docs Site."); return; }
+        var edited = model.Documents.Where(d => d.FilePath is not null).ToDictionary(d => d.FilePath!, d => d.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
+        await model.RunAsync(async () =>
+        {
+            var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
+            var result = await new DocsSiteExportService().ExportAsync(root, edited, model.StateDirectory, options.Options,
+                new Progress<string>(message => model.Status = message), model.OperationToken);
+            await WriteExportAsync(picker.FileName, result.Bytes, expected, model.OperationToken);
+            model.Status = $"Docs Site exported: {result.SourcePages} documents, {result.Diagrams} diagrams."
+                + (result.Warnings.Count > 0 ? $" {result.Warnings.Count} links have targets outside this site." : "");
+        });
+    }
+
     private async void ExportDocument(object sender, RoutedEventArgs e)
     {
         if (model.ActiveDocument is not { } tab) return;

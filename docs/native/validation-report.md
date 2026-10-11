@@ -1,5 +1,15 @@
 # Native validation report
 
+## Native Docs Site and front matter
+
+Release build passes without warnings/errors and all 258 core tests pass. Ten front-matter cases cover the existing flat metadata allowlist, aliases, tags, ordering/draft values, BOM/CRLF, exact source positions, unclosed/oversized headers, code examples and literal source copy. Eight Docs Site cases cover metadata priority, ordering, relative document/heading links, generated home, inert content, unresolved links, safe paths, duplicate rejection, options and cancellation.
+
+Native integration exports two real workspace documents with a raster image and a native Mermaid drawing. It retains unsaved text without writing the source and excludes private native state. The standard harness passes 40 diagram/export cases, thirteen asset checks, six preview checks, eleven Markdown outcomes, seven editor checks, four dispatcher checks and four Docs Site outcomes. Evidence: artifacts/native/validation/native-docs-site.json and native-docs-site.zip.
+
+All four exported-site browser checks pass across Chromium/Edge and direct disk/static HTTP hosting. Checks cover decoded images, document/heading navigation, Back, unsaved content, draft metadata, search with inert input, theme persistence and absence of external requests. A screenshot review found vertical centring of short pages; the content margin was corrected, the focused export/browser rerun passed all four checks, and light/dark screenshots were visually inspected. Evidence: artifacts/native/site-browser. A new 25th native desktop outcome exercises the options window and Save dialogue; fresh CI remains pending. Native CI now runs the separate export-browser suite; the web pipeline still has no .NET requirement.
+
+This is partial Docs Site parity. Search currently returns whole-page matches; artefact metadata fallback, wikilinks, broader code/table/diagram actions and export continuation with broken diagrams remain. Missing/invalid images or diagrams fail preparation before the guarded destination write. No deployment is performed.
+
 ## Browser draft-lookup data preservation
 
 At 071718c web push CI 38163847433 passed; PR CI 38163850906 passed 253/254 and exposed a real race in the existing web app. The draft lookup returned the originally loaded content after the user had typed, and file selection replaced the new text with that old value. A deterministic browser regression holds the IndexedDB result until after editing; it failed on the original code with the editor and saved file reverted to `# Opened`. Evidence: artifacts/native/web-draft-race-before and web-ci-071718c-pr-failure.log.
@@ -12,7 +22,7 @@ All four runs at f33a590 pass: native 38164651741/38164646607 and web 3816465175
 
 Release build has no warnings/errors. The native harness adds four passing dispatcher checks using 1,200 paragraphs (74,491 source characters). It verifies input runs before construction completes, every paragraph/source mapping/entity survives, a newly queued input cancels obsolete construction and an already-cancelled request returns no document. The recorded local run handled input at 39.5 ms and finished construction at 339.0 ms. These are observed timings, not performance guarantees. Evidence: artifacts/native/validation/native-layout.json. Standard diagram/export, image, preview, Markdown and editor checks remain green; core remains at 240 passing tests from the preceding completion batch.
 
-WPF objects are constructed on the UI dispatcher in batches of up to 32 top-level blocks or about 8 ms between yield points. The previous preview remains visible until a complete current result is ready. Final viewer pagination/scrolling, very large individual blocks and true incremental reuse remain unvalidated performance work. Fresh desktop/installed CI for this batch is pending.
+WPF objects are constructed on the UI dispatcher in batches of up to 32 top-level blocks or about 8 ms between yield points. The previous preview remains visible until a complete current result is ready. Final viewer pagination/scrolling, very large individual blocks and true incremental reuse remain unvalidated performance work. Desktop/installed CI passes at f33a590, as recorded above.
 
 ## Native Mermaid completion
 

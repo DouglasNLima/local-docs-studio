@@ -1,3 +1,8 @@
+---
+title: Metadata title for export
+navGroup: Validation
+tags: [native, evidence]
+---
 # Formatting fixture
 
 > [!WARNING]

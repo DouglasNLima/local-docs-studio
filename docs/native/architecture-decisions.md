@@ -10,6 +10,10 @@ Recognised status and keyboard HTML snippets are converted to bounded typed inli
 
 Mermaid completion uses a pure Core catalogue/context service and AvalonEdit's native completion window. Context respects standard and Azure DevOps fences, comments and quoted labels; acceptance revalidates the current document and replaces a complete token with preserved indentation/line endings. Automatic scans stop at 256 Ki characters and explicit Ctrl+Space at 4 Mi characters, avoiding unrestricted synchronous scans while typing. Native completion closes on document/focus changes and protects read-only editors and active selections. Wikilink completion is separate remaining work.
 
+Front matter follows the web product's flat allowlisted contract, not general YAML execution. A bounded header is replaced with equal-length blank lines for parsing, preserving original source spans and clipboard text. Metadata provides Docs Site title, description, order, tags, draft and navigation group; visible document headings are the title fallback.
+
+Docs Site export enumerates an explicitly opened workspace, excludes private state and refuses incomplete enumeration. It captures edits to saved documents, prepares images/diagrams on the native STA worker and creates a guarded ZIP. Limits cover 1,000 pages, 32 MB per source, 64 MB aggregate source and 256 MB output. Rendered HTML is sanitised; links resolve only to packaged document identities or explicit external HTTP/mail links. Unresolved local links retain visible labels and report warnings. Fixed JavaScript/CSS templates are embedded export resources; the desktop app never executes them and requires no Node or browser runtime. A separate browser suite validates the destination artifact without adding .NET to web publishing.
+
 Baseline: develop 2cc3b5680958c9c553dad23856e6010c158fccd7, inspected 11 October 2026. The original checkout remains on main 0d100cc29dde2ba80755fb1e8af60ffd9d006b16 with an unrelated untracked attachment directory preserved.
 
 1. Separate src/native solution: .NET 10, WPF, AvalonEdit, CommunityToolkit.Mvvm. Existing web and WinUI/WebView2 shell remain independently buildable.

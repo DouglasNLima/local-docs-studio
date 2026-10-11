@@ -107,11 +107,12 @@
     <MenuItem Header="Code block" Tag="code" Click="Format" AutomationProperties.AutomationId="InsertCode"/>
     <MenuItem Header="Mermaid diagram" Tag="mermaid" Click="Format"/>
    </MenuItem>
-   <MenuItem Header="E_xport">
+   <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument"/>
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument"/>
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle"/>
+    <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
     <Separator/>
     <MenuItem Header="Select Word _template…" Click="SelectWordTemplate"/>
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate"/>

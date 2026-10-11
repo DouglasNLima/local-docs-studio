@@ -21,6 +21,13 @@ internal static class Program
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
         if (args.FirstOrDefault() == "--office")
             return OfficeClipboardChecks.Run(args.ElementAtOrDefault(1) ?? "artifacts/native/office");
+        if (args.FirstOrDefault() == "--docs-site")
+        {
+            var siteOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation");
+            Directory.CreateDirectory(siteOutput);
+            try { NativeDocsSiteChecks.Run(siteOutput); Console.WriteLine("Native Docs Site integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--reject-unsigned")
         {
             try
@@ -51,6 +58,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
+        try { NativeDocsSiteChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

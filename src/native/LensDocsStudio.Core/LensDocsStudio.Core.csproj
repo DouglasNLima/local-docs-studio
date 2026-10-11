@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup><EmbeddedResource Include="Updates\update-trust.json" /></ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Exports\DocsSiteTemplates\site.css" LogicalName="DocsSite.site.css" />
+    <EmbeddedResource Include="Exports\DocsSiteTemplates\site.js" LogicalName="DocsSite.site.js" />
+  </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

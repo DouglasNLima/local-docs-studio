@@ -27,6 +27,18 @@ jobs:
         run: dotnet test src/native/LensDocsStudio.Core.Tests -c Release --no-build --logger "trx;LogFileName=native-core.trx" --results-directory artifacts/native/tests
       - name: Validate native diagram corpus
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .
+      - name: Set up export validation tools
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install static export browser checks
+        run: |
+          npm ci
+          npx playwright install chromium
+      - name: Validate exported Docs Site on disk and static hosting
+        env:
+          LENS_TEST_PORT: '4183'
+        run: npx playwright test --config playwright.native-export.config.mjs
       - name: Validate native desktop workflows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
       - name: Build isolated self-contained installer and portable package
@@ -42,6 +54,7 @@ jobs:
             artifacts/native/tests/
             artifacts/native/validation/
             artifacts/native/ui/
+            artifacts/native/site-browser/
             artifacts/native/install-smoke/**/installer-results.json
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json

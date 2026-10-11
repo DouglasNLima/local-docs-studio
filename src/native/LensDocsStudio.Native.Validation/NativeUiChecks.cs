@@ -452,7 +452,32 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flo\n", "Undo did not restore source after dismissed completion.");
             checks.Add("Native Mermaid completion supports Ctrl+Space, Enter, typing, Escape and one Undo/Redo per insertion");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.END);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SPACE);
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidCompletion"))) is not null,
+                "The diagram could not be completed for site export.");
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            Wait(() => File.ReadAllText(Path.Combine(runRoot, "Completion.mmd")).StartsWith("flowchart TD", StringComparison.Ordinal), "The completed diagram did not save before export.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W); sourceTab.Patterns.SelectionItem.Pattern.Select();
+            Find(window, "ExportMenu").Click(); Find(window, "ExportDocsSite").Patterns.Invoke.Pattern.Invoke();
+            Window? siteWindow = null;
+            Wait(() => (siteWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Export Docs Site")))?.AsWindow()) is not null,
+                "The native Docs Site options did not open.");
+            Find(siteWindow!, "DocsSiteTitle").AsTextBox().Text = "Native UI documentation";
+            Find(siteWindow!, "ConfirmDocsSite").Patterns.Invoke.Pattern.Invoke();
+            var sitePath = Path.Combine(runRoot, "documentation-site.zip"); SaveThroughDialogue(sitePath, "Save Docs Site");
+            Wait(() => File.Exists(sitePath) && Find(window, "Status").Name.StartsWith("Docs Site exported:", StringComparison.Ordinal), "The native Docs Site ZIP did not finish exporting.");
+            using (var siteZip = System.IO.Compression.ZipFile.OpenRead(sitePath))
+            {
+                var manifestEntry = siteZip.GetEntry("site-manifest.json") ?? throw new IOException("The exported site manifest is missing.");
+                using var manifestStream = manifestEntry.Open(); using var manifest = JsonDocument.Parse(manifestStream);
+                if (manifest.RootElement.GetProperty("title").GetString() != "Native UI documentation"
+                    || manifest.RootElement.GetProperty("sourcePageCount").GetInt32() < 2
+                    || manifest.RootElement.GetProperty("pages").EnumerateArray().Any(p => p.GetProperty("path").GetString()!.StartsWith("state/", StringComparison.OrdinalIgnoreCase))
+                    || siteZip.GetEntry("index.html") is null || siteZip.GetEntry("assets/docs-site-data.js") is null)
+                    throw new IOException("The native Docs Site lost options, portable assets or private-state isolation.");
+            }
+            checks.Add("Native Docs Site options and Save dialogue create a portable workspace ZIP without private state");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -509,10 +534,10 @@ internal static class NativeUiChecks
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
         }
-        void SaveThroughDialogue(string destination)
+        void SaveThroughDialogue(string destination, string title = "Save document")
         {
             Window? saveWindow = null;
-            Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Save document")))?.AsWindow()) is not null, "The native Save dialogue did not open.");
+            Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
             var fileName = Find(saveWindow!, "1001").AsTextBox();
             fileName.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(Path.GetFileName(destination));
