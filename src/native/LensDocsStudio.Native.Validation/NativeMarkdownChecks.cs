@@ -47,6 +47,16 @@ internal static class NativeMarkdownChecks
             var hard = result.Document.Blocks.OfType<Paragraph>().Single(p => Text(p).Contains("Hard first", StringComparison.Ordinal));
             if (!Text(soft).Contains("Soft first soft second.", StringComparison.Ordinal) || soft.Inlines.OfType<LineBreak>().Any()
                 || hard.Inlines.OfType<LineBreak>().Count() != 1) throw new IOException("Native soft and hard line breaks are not distinct.");
+            var status = result.Document.Blocks.OfType<Paragraph>().Single(p => Text(p).StartsWith("Status:", StringComparison.Ordinal));
+            var badge = status.Inlines.OfType<Span>().Single();
+            if (Text(badge) != "Ready & reviewed" || badge.FontWeight != FontWeights.SemiBold || badge.Background is null
+                || badge.Tag is not SourceReference badgeSource || !parsed.Source[badgeSource.Start..].StartsWith("<span data-status-badge", StringComparison.Ordinal))
+                throw new IOException("Native status badge lost selectable decoded text, styling or source mapping.");
+            var shortcut = result.Document.Blocks.OfType<Paragraph>().Single(p => Text(p).StartsWith("Use ", StringComparison.Ordinal));
+            if (Text(shortcut).Trim() != "Use Ctrl + K or F1." || shortcut.Inlines.OfType<Span>().Count(s => s.FontFamily.Source == "Consolas") != 2)
+                throw new IOException("Native shortcut lost selectable keyboard labels or styling.");
+            if (!result.Document.Blocks.OfType<Paragraph>().Any(p => Text(p).Contains("Entities: A < B & C ©.", StringComparison.Ordinal)))
+                throw new IOException("Native text lost decoded HTML entities.");
             result.Document.Background = new SolidColorBrush(dark ? Color.FromRgb(28, 30, 33) : Color.FromRgb(250, 250, 250));
             var paginator = ((IDocumentPaginatorSource)result.Document).DocumentPaginator;
             paginator.PageSize = new Size(900, 1100);
@@ -61,7 +71,8 @@ internal static class NativeMarkdownChecks
         File.WriteAllBytes(Path.Combine(output, "native-semantics.docx"), new DocxExporter().Export(content));
         using var inspected = UglyToad.PdfPig.PdfDocument.Open(pdf);
         var words = string.Join(" ", inspected.GetPages().SelectMany(p => p.GetWords()).Select(w => w.Text));
-        foreach (var expected in new[] { "Warning", "Before publishing", "7. Item seven", "0. Item zero", "~~Withdrawn~~", "Soft first soft second." })
+        foreach (var expected in new[] { "Warning", "Before publishing", "7. Item seven", "0. Item zero", "~~Withdrawn~~", "Soft first soft second.",
+            "Ready & reviewed", "Ctrl + K", "F1", "Entities: A < B & C ©." })
             if (!words.Contains(expected, StringComparison.Ordinal)) throw new IOException("The PDF lost semantic fixture content: " + expected);
         File.WriteAllText(Path.Combine(output, "native-semantics.json"), JsonSerializer.Serialize(new
         {
@@ -69,7 +80,9 @@ internal static class NativeMarkdownChecks
             Checks = new[] { "Callouts retain kind, formatted body and source mapping", "Ordered lists retain seven and zero starting values",
                 "Table columns retain left, centre and right alignment", "Independent emphasis retains strike, scripts, insertion and highlight",
                 "Soft and hard line breaks remain distinct", "Light and dark native pages render to actual images",
-                "PDF retains callout labels, ordered starts, soft lines and explicit deletion markers" },
+                "PDF retains callout labels, ordered starts, soft lines and explicit deletion markers",
+                "Status badges retain selectable decoded text, neutral styling and source mapping",
+                "Keyboard shortcuts retain selectable text and monospace styling", "Preview and PDF retain decoded HTML entities and passive labels" },
             PdfLimitation = "MigraDoc has no strikeout font property; PDF retains visible Markdown deletion markers. PDF highlight shading is not yet implemented.",
             PdfText = words
         }, new JsonSerializerOptions { WriteIndented = true }));

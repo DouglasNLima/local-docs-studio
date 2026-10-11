@@ -27,6 +27,8 @@ Native paste converts formatted HTML and spreadsheet TSV into editable Markdown,
 
 Native preview and Word export retain labelled callouts, ordered starting numbers, table alignment, strikethrough, scripts, insertion underline and highlighting. PDF preserves callout labels, list starts and alignment, but currently represents deletion with visible `~~` markers and omits highlight shading; these remain recorded parity gaps.
 
+Native preview also recognises the existing status-badge and keyboard-shortcut snippets as selectable text. Labels and HTML entities survive HTML, Word and PDF export; imported HTML attributes are discarded. Source copy retains the original markup. Other HTML-based document helpers remain under implementation.
+
 Native formatting toggles bold, italic and strikethrough while retaining the selected text. Insert offers line-based headings, lists and quotes, five callout kinds, tables and code/Mermaid blocks. Code fences adapt to selected backticks, block insertion separates surrounding paragraphs, and template placeholders are selected for typing. Each formatting action is undoable as one edit.
 
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.

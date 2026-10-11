@@ -157,7 +157,12 @@ public sealed class DocxExporter
                 {
                     switch (inline)
                     {
+                        case DocumentSemanticInline semantic:
+                            var semanticRun = Run(semantic.Text, formatting | (semantic.Kind == DocumentInlineKind.StatusBadge ? MarkdownEmphasis.Bold : MarkdownEmphasis.None));
+                            if (semantic.Kind != DocumentInlineKind.StatusBadge) semanticRun.RunProperties!.RunFonts = new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" };
+                            target.Append(semanticRun); break;
                         case LiteralInline literal: target.Append(Run(literal.Content.ToString(), formatting)); break;
+                        case HtmlEntityInline entity: target.Append(Run(entity.Transcoded.ToString(), formatting)); break;
                         case CodeInline code: var run = Run(code.Content, formatting); run.RunProperties!.Append(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }); target.Append(run); break;
                         case LineBreakInline line: target.Append(line.IsHard ? new W.Run(new W.Break()) : Run(" ", formatting)); break;
                         case Markdig.Extensions.TaskLists.TaskList task: target.Append(Run(task.Checked ? "☑ " : "☐ ", formatting)); break;

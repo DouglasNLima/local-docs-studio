@@ -1,10 +1,16 @@
 # Native validation report
 
+## Passive inline semantics and entities
+
+All 220 core tests pass; Release build has no warnings/errors. Twelve new cases cover bounded status/keyboard snippets, exact source spans, decoded and Markdown-visible labels, inert attributes, malformed/oversized input, retained links/images, code examples, safe HTML/Word exports and unchanged literal Markdown clipboard source. Native semantics now has ten passing outcomes, including selectable labels, source mapping and decoded entities in actual WPF/PDF output. Light/dark PNG pages were visually inspected. Forty diagram/export, thirteen asset, six preview and five editor outcomes continue to pass. Evidence: artifacts/native/tests/native-core.trx and artifacts/native/validation.
+
+Both web runs at 83b2d71 pass (38163021285 PR, 38163015901 push). Both native runs reached the new callout menu check and failed its assumption that a whole typed sentence forms one Undo action. Retained session text shows that two Undo presses removed only the final two characters. The harness now restores the exact placeholder through bounded typing Undo steps, verifies the marker and preceding source after each step, then requires one Undo for the complete insertion and checks Redo. This correction awaits fresh desktop/installed CI. Failure evidence remains in artifacts/native/ci-83b2d71-pr and native-ci-83b2d71-pr-failure.log.
+
 ## Native editing plans
 
 All 208 core tests pass. Twenty-one editing cases cover whitespace-preserving and nested emphasis toggles, CRLF and adaptive code fences, literal inline backticks, selected-line boundaries, list conversion without duplicate markers, retained checked tasks, numbering/indentation, empty-line caret placement, all five callout kinds and templates that retain selected text. Five real AvalonEdit checks pass for selection retention, complete Undo/Redo actions, read-only protection, typing after a heading marker, and editing a callout body without changing its marker. Evidence: artifacts/native/tests/native-core.trx and artifacts/native/validation/native-editor.json.
 
-The desktop harness adds a 23rd outcome for Insert → Callout → Note, typing into its selected body, Undo, Redo and restoring the original document. Its first CI run is pending. Local foreground acquisition remains unavailable; the standard native harness does not claim an interactive desktop result.
+The desktop harness adds a 23rd outcome for Insert → Callout → Note, typing into its selected body, Undo, Redo and restoring the original document. The first CI failure and corrected typing assumption are recorded above. Local foreground acquisition remains unavailable; the standard native harness does not claim an interactive desktop result.
 
 Both native and both web CI runs at dd25fb0 passed: 38161563199/38161560292 native and 38161563173/38161560423 web. All four runs at 51a055b also pass: native 38162421898/38162417725 and web 38162421948/38162417778, including Markdown semantics, 22 desktop outcomes, installed lifecycle and complete browser checks.
 

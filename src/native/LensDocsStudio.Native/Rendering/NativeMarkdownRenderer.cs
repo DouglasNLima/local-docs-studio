@@ -160,7 +160,15 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             {
                 switch (inline)
                 {
+                    case DocumentSemanticInline semantic:
+                        var passive = new Span(new Run(semantic.Text)) { Background = surface,
+                            Tag = new SourceReference(semantic.Span.Start, semantic.Span.End, semantic.Line) };
+                        if (semantic.Kind == DocumentInlineKind.StatusBadge) { passive.FontWeight = FontWeights.SemiBold; passive.ToolTip = "Status: " + semantic.Text; }
+                        else { passive.FontFamily = new FontFamily("Consolas"); passive.ToolTip = "Keyboard shortcut: " + semantic.Text; }
+                        System.Windows.Automation.AutomationProperties.SetName(passive, semantic.Text);
+                        target.Add(passive); break;
                     case LiteralInline literal: target.Add(new Run(literal.Content.ToString())); break;
+                    case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
                     case CodeInline code: target.Add(new Run(code.Content) { FontFamily = new FontFamily("Consolas"), Background = surface }); break;
                     case LineBreakInline line: if (line.IsHard) target.Add(new LineBreak()); else target.Add(new Run(" ")); break;
                     case EmphasisInline emphasis:

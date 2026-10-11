@@ -396,13 +396,26 @@ internal static class NativeUiChecks
                 Find(window, "InsertMenu").Click(); Find(window, "CalloutMenu").Patterns.ExpandCollapse.Pattern.Expand();
                 Find(window, "InsertNote").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> [!NOTE]", StringComparison.Ordinal), "The native callout menu did not insert a note.");
-                Keyboard.Type("Review evidence.");
+                var insertedCallout = editor.Patterns.Value.Pattern.Value.Value;
+                const string calloutBody = "Review evidence.";
+                Keyboard.Type(calloutBody);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> Review evidence.", StringComparison.Ordinal), "Callout typing did not replace only the selected body.");
                 if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeFailedPaste, StringComparison.Ordinal))
                     throw new IOException("Callout insertion changed the preceding document.");
+                // Windows text input can create one undo group per character. First restore the exact
+                // placeholder state, then require the formatting action itself to undo in one step.
+                for (var typedUndo = 0; editor.Patterns.Value.Pattern.Value.Value != insertedCallout && typedUndo < calloutBody.Length + 1; typedUndo++)
+                {
+                    var beforeUndo = editor.Patterns.Value.Pattern.Value.Value;
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                    Wait(() => editor.Patterns.Value.Pattern.Value.Value != beforeUndo, "Undo did not change the typed callout body.");
+                    if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeFailedPaste + "\n\n> [!NOTE]\n> ", StringComparison.Ordinal))
+                        throw new IOException("Undo of callout typing also changed its structural marker or preceding document.");
+                }
+                if (editor.Patterns.Value.Pattern.Value.Value != insertedCallout)
+                    throw new IOException("Undo of callout typing did not restore the exact inserted placeholder.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "Two Undo actions did not restore the document before callout insertion and typing.");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "One Undo did not remove the complete callout insertion.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> [!NOTE]", StringComparison.Ordinal), "Redo did not restore the inserted callout.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);

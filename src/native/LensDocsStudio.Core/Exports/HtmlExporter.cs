@@ -28,6 +28,7 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new LinkRenderer(content));
         renderer.ObjectRenderers.Insert(0, new RawBlockRenderer());
         renderer.ObjectRenderers.Insert(0, new RawInlineRenderer());
+        renderer.ObjectRenderers.Insert(0, new SemanticInlineRenderer());
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(content.Document.Syntax);
         // Generic Markdown attributes can carry event handlers or network-bearing styles.
@@ -92,5 +93,13 @@ public sealed class HtmlExporter
     private sealed class RawInlineRenderer : HtmlObjectRenderer<HtmlInline>
     {
         protected override void Write(HtmlRenderer renderer, HtmlInline obj) => renderer.Write(WebUtility.HtmlEncode(obj.Tag));
+    }
+    private sealed class SemanticInlineRenderer : HtmlObjectRenderer<DocumentSemanticInline>
+    {
+        protected override void Write(HtmlRenderer renderer, DocumentSemanticInline obj)
+        {
+            var tag = obj.Kind == DocumentInlineKind.StatusBadge ? "strong" : "kbd";
+            renderer.Write("<").Write(tag).Write(">").Write(WebUtility.HtmlEncode(obj.Text)).Write("</").Write(tag).Write(">");
+        }
     }
 }

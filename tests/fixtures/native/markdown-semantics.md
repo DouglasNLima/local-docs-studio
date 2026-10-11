@@ -24,3 +24,9 @@ soft second.
 
 Hard first  
 hard second.
+
+Status: <span data-status-badge data-status-kind="ready">Ready &amp; reviewed</span>.
+
+Use <span data-shortcut><kbd>Ctrl</kbd> + <kbd>K</kbd></span> or <kbd>F1</kbd>.
+
+Entities: A &lt; B &amp; C &#169;.

@@ -98,7 +98,13 @@ public sealed class PdfExporter
             {
                 switch (inline)
                 {
+                    case DocumentSemanticInline semantic:
+                        var semanticText = elements.AddFormattedText(semantic.Text);
+                        if (semantic.Kind == DocumentInlineKind.StatusBadge) semanticText.Bold = true;
+                        else semanticText.Font.Name = "Consolas";
+                        break;
                     case LiteralInline literal: elements.AddText(literal.Content.ToString()); break;
+                    case HtmlEntityInline entity: elements.AddText(entity.Transcoded.ToString()); break;
                     case CodeInline code: elements.AddFormattedText(code.Content).Font.Name = "Consolas"; break;
                     case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else elements.AddText(" "); break;
                     case Markdig.Extensions.TaskLists.TaskList task: elements.AddText(task.Checked ? "☑ " : "☐ "); break;

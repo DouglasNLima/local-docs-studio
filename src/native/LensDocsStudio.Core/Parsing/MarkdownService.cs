@@ -23,6 +23,7 @@ public sealed partial class MarkdownService
             standalone.Span = new(0, Math.Max(0, source.Length - 1));
             standalone.Line = 0;
         }
+        if (!standaloneMermaid) SafeInlineSemantics.Apply(syntax, source);
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
         return new(source, syntax, headings);
@@ -68,7 +69,9 @@ public sealed partial class MarkdownService
     public static string InlineText(ContainerInline? inline) => inline is null ? "" :
         string.Concat(inline.Select(child => child switch
         {
+            DocumentSemanticInline semantic => semantic.Text,
             LiteralInline literal => literal.Content.ToString(),
+            HtmlEntityInline entity => entity.Transcoded.ToString(),
             CodeInline code => code.Content,
             LineBreakInline => " ",
             ContainerInline container => InlineText(container),
