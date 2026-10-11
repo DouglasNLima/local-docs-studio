@@ -131,6 +131,20 @@ public sealed class DocxExporter
                             wt.Append(wr);
                         }
                         parent.Append(wt); break;
+                    case DocumentProgressBlock progress:
+                        parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() }, Run(progress.Description, MarkdownEmphasis.None)));
+                        var progressTable = new W.Table(new W.TableProperties(new W.TableWidth { Type = W.TableWidthUnitValues.Pct, Width = "5000" },
+                            new W.TableLayout { Type = W.TableLayoutValues.Fixed }, new W.TableCellMarginDefault(new W.TopMargin { Type = W.TableWidthUnitValues.Dxa, Width = "0" }, new W.BottomMargin { Type = W.TableWidthUnitValues.Dxa, Width = "0" })));
+                        var progressGrid = new W.TableGrid(); var progressRow = new W.TableRow(new W.TableRowProperties(new W.TableRowHeight { Val = 120, HeightType = W.HeightRuleValues.Exact }));
+                        var fill = Math.Clamp((int)Math.Round(progress.Percentage * 50), 0, 5000);
+                        foreach (var (amount, colour) in new[] { (fill, progress.ColourHex), (5000 - fill, "EDEDED") })
+                        {
+                            if (amount == 0) continue;
+                            progressGrid.Append(new W.GridColumn { Width = Math.Max(1, widthEmu / 635 * amount / 5000).ToString(System.Globalization.CultureInfo.InvariantCulture) });
+                            progressRow.Append(new W.TableCell(new W.TableCellProperties(new W.TableCellWidth { Type = W.TableWidthUnitValues.Pct, Width = amount.ToString(System.Globalization.CultureInfo.InvariantCulture) },
+                                new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = colour }), new W.Paragraph(new W.ParagraphProperties(new W.SpacingBetweenLines { Before = "0", After = "0", Line = "20", LineRule = W.LineSpacingRuleValues.Exact }))));
+                        }
+                        progressTable.Append(progressGrid, progressRow); parent.Append(progressTable); break;
                     case HtmlBlock html:
                         parent.Append(new W.Paragraph(new W.Run(new W.Text(html.Lines.ToString()) { Space = SpaceProcessingModeValues.Preserve }))); break;
                     case AlertBlock alert:

@@ -478,6 +478,34 @@ internal static class NativeUiChecks
                     throw new IOException("The native Docs Site lost options, portable assets or private-state isolation.");
             }
             checks.Add("Native Docs Site options and Save dialogue create a portable workspace ZIP without private state");
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var beforeProgress = editor.Patterns.Value.Pattern.Value.Value;
+            var progressWindow = OpenProgress(window);
+            Find(progressWindow, "ProgressLabel").AsTextBox().Text = "Delivery & review";
+            Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "101";
+            Find(progressWindow, "ApplyProgress").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(progressWindow, "ProgressValidation").Name.Contains("0 to 100", StringComparison.Ordinal), "The progress editor accepted an out-of-range percentage.");
+            if (editor.Patterns.Value.Pattern.Value.Value != beforeProgress) throw new IOException("Invalid progress input changed the source.");
+            Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "65";
+            Find(progressWindow, "ApplyProgress").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("value=\"65\"", StringComparison.Ordinal), "The native progress editor did not insert its percentage.");
+            var insertedProgress = editor.Patterns.Value.Pattern.Value.Value;
+            if (!insertedProgress.StartsWith(beforeProgress, StringComparison.Ordinal) || !insertedProgress.Contains("Delivery &amp; review", StringComparison.Ordinal))
+                throw new IOException("Progress insertion lost preceding source or escaped label text.");
+            progressWindow = OpenProgress(window);
+            if (Find(progressWindow, "ProgressLabel").AsTextBox().Text != "Delivery & review" || Find(progressWindow, "ProgressPercentage").AsTextBox().Text != "65")
+                throw new IOException("The native progress editor did not reopen the selected indicator.");
+            Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "100";
+            Find(progressWindow, "ApplyProgress").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("value=\"100\"", StringComparison.Ordinal), "The native progress update did not apply.");
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedProgress, "Progress update Undo did not restore the entire original indicator.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeProgress, "Progress insertion Undo did not restore the original source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedProgress, "Progress Redo changed the indicator.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            checks.Add("Native progress dialogue validates input, reopens an existing indicator and preserves complete Undo/Redo actions");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -533,6 +561,14 @@ internal static class NativeUiChecks
             // FlaUI refreshes and disposes its Process instance while locating a window.
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
+        }
+        Window OpenProgress(Window mainWindow)
+        {
+            Find(mainWindow, "InsertMenu").Click(); Find(mainWindow, "InsertProgress").Patterns.Invoke.Pattern.Invoke();
+            Window? progressWindow = null;
+            Wait(() => (progressWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Progress indicator")))?.AsWindow()) is not null,
+                "The native progress dialogue did not open.");
+            return progressWindow!;
         }
         void SaveThroughDialogue(string destination, string title = "Save document")
         {

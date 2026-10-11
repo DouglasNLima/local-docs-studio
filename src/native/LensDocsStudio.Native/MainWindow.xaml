@@ -106,6 +106,7 @@
     </MenuItem>
     <MenuItem Header="Code block" Tag="code" Click="Format" AutomationProperties.AutomationId="InsertCode"/>
     <MenuItem Header="Mermaid diagram" Tag="mermaid" Click="Format"/>
+    <MenuItem Header="Progress indicator…" Click="InsertProgress" AutomationProperties.AutomationId="InsertProgress"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument"/>

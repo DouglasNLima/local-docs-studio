@@ -81,6 +81,15 @@ public sealed class PdfExporter
                         }
                     }
                     break;
+                case DocumentProgressBlock progress:
+                    var progressLabel = elements.AddParagraph(progress.Description); progressLabel.Format.KeepWithNext = true;
+                    var progressTable = elements.AddTable();
+                    var ratio = Math.Round(Math.Clamp(progress.Percentage / 100, 0, 1), 4);
+                    var portions = new[] { (ratio, Color.Parse("#" + progress.ColourHex)), (1 - ratio, Colors.WhiteSmoke) }.Where(p => p.Item1 > 0).ToArray();
+                    foreach (var portion in portions) progressTable.AddColumn(Unit.FromCentimeter(17 * portion.Item1));
+                    var progressRow = progressTable.AddRow(); progressRow.Height = Unit.FromPoint(6); progressRow.HeightRule = MigraDoc.DocumentObjectModel.Tables.RowHeightRule.Exactly;
+                    for (var portionIndex = 0; portionIndex < portions.Length; portionIndex++) progressRow.Cells[portionIndex].Shading.Color = portions[portionIndex].Item2;
+                    break;
                 case HtmlBlock html: elements.AddParagraph(html.Lines.ToString()); break;
                 case AlertBlock alert:
                     var label = elements.AddParagraph(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()));

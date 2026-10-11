@@ -27,7 +27,7 @@ public sealed partial class MarkdownService
             standalone.Span = new(0, Math.Max(0, source.Length - 1));
             standalone.Line = 0;
         }
-        if (!standaloneMermaid) SafeInlineSemantics.Apply(syntax, source);
+        if (!standaloneMermaid) { SafeInlineSemantics.Apply(syntax, source); SafeBlockSemantics.Apply(syntax); }
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
         return new(source, syntax, headings) { Metadata = frontMatter.Metadata };

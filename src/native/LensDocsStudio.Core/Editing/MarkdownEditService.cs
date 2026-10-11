@@ -11,7 +11,6 @@ public sealed partial class MarkdownEditService
     {
         if (start < 0 || length < 0 || (long)start + length > source.Length) throw new ArgumentOutOfRangeException(nameof(start));
         var selected = source.Substring(start, length);
-        var newline = source.IndexOf('\n') is var first && first > 0 && source[first - 1] == '\r' ? "\r\n" : "\n";
         MarkdownEdit Edit(int offset, int count, string value, int selectionOffset = 0, int? selectionLength = null)
             => new(offset, count, value, offset + selectionOffset, selectionLength ?? value.Length);
         MarkdownEdit Wrap(string marker, string placeholder)
@@ -35,15 +34,7 @@ public sealed partial class MarkdownEditService
             return Edit(start, length, selected[..leading] + marker + body + marker + (trailing > 0 ? selected[^trailing..] : ""), leading + marker.Length, body.Length);
         }
         MarkdownEdit Block(string value, string? selectText = null)
-        {
-            value = HtmlMarkdownConverter.Normalise(value).Replace("\n", newline).Trim('\r', '\n');
-            var before = source.AsSpan(Math.Max(0, start - 4), Math.Min(4, start));
-            var after = source.AsSpan(start + length, Math.Min(4, source.Length - start - length));
-            var prefix = before.Length == 0 || before.EndsWith(newline + newline, StringComparison.Ordinal) ? "" : before.EndsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
-            var suffix = after.Length == 0 || after.StartsWith(newline + newline, StringComparison.Ordinal) ? "" : after.StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
-            var selectionOffset = selectText is null ? -1 : value.LastIndexOf(selectText, StringComparison.Ordinal);
-            return Edit(start, length, prefix + value + suffix, prefix.Length + (selectionOffset < 0 ? value.Length : selectionOffset), selectionOffset < 0 ? 0 : selectText!.Length);
-        }
+            => PlanBlock(source, start, length, value, selectText);
         if (action is "bold" or "italic" or "strike") return Wrap(action == "bold" ? "**" : action == "italic" ? "*" : "~~", action == "strike" ? "deleted text" : action + " text");
         if (action == "inline-code")
         {
@@ -99,6 +90,19 @@ public sealed partial class MarkdownEditService
             "table" => Block((length == 0 ? "" : selected + "\n\n") + "| Column | Description |\n|---|---|\n| Value | Details |", "Value"),
             _ => throw new ArgumentException("Unknown Markdown editing action.", nameof(action))
         };
+    }
+    public static MarkdownEdit PlanBlock(string source, int start, int length, string value, string? selectText = null)
+    {
+        if (start < 0 || length < 0 || (long)start + length > source.Length) throw new ArgumentOutOfRangeException(nameof(start));
+        var newline = source.IndexOf('\n') is var first && first > 0 && source[first - 1] == '\r' ? "\r\n" : "\n";
+        value = HtmlMarkdownConverter.Normalise(value).Replace("\n", newline).Trim('\r', '\n');
+        if (selectText is not null) selectText = HtmlMarkdownConverter.Normalise(selectText).Replace("\n", newline);
+        var before = source.AsSpan(Math.Max(0, start - 4), Math.Min(4, start));
+        var after = source.AsSpan(start + length, Math.Min(4, source.Length - start - length));
+        var prefix = before.Length == 0 || before.EndsWith(newline + newline, StringComparison.Ordinal) ? "" : before.EndsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
+        var suffix = after.Length == 0 || after.StartsWith(newline + newline, StringComparison.Ordinal) ? "" : after.StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
+        var selectionOffset = selectText is null ? -1 : value.LastIndexOf(selectText, StringComparison.Ordinal);
+        return new(start, length, prefix + value + suffix, start + prefix.Length + (selectionOffset < 0 ? value.Length : selectionOffset), selectionOffset < 0 ? 0 : selectText!.Length);
     }
     [GeneratedRegex("`+")] private static partial Regex Backticks();
     [GeneratedRegex("(\\r\\n|\\n|\\r)")] private static partial Regex LineSeparators();

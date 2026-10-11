@@ -17,7 +17,7 @@ public sealed class HtmlExporter
         var title = WebUtility.HtmlEncode(content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation");
         return "<!doctype html>\n<html lang=\"en-GB\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
             "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">" +
-            "<title>" + title + "</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1.5rem;color:#202124;background:#fafafa}img{max-width:100%;height:auto}pre{white-space:pre-wrap;padding:1rem;background:#f3f4f6}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:.5rem}blockquote{border-left:3px solid #ff883e;margin-left:0;padding-left:1rem}a{color:#174ea6}</style></head><body>" +
+            "<title>" + title + "</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1.5rem;color:#202124;background:#fafafa}img{max-width:100%;height:auto}pre{white-space:pre-wrap;padding:1rem;background:#f3f4f6}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:.5rem}blockquote{border-left:3px solid #ff883e;margin-left:0;padding-left:1rem}a{color:#174ea6}.document-progress{margin:1rem 0}.document-progress progress{width:100%;accent-color:#FF883E}.progress-green progress{accent-color:#2F855A}.progress-blue progress{accent-color:#2563EB}.progress-amber progress{accent-color:#B7791F}.progress-red progress{accent-color:#C53030}.progress-neutral progress{accent-color:#64748B}</style></head><body>" +
             fragment + "</body></html>";
     }
     public string RenderFragment(ExportContent content)
@@ -29,6 +29,7 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new RawBlockRenderer());
         renderer.ObjectRenderers.Insert(0, new RawInlineRenderer());
         renderer.ObjectRenderers.Insert(0, new SemanticInlineRenderer());
+        renderer.ObjectRenderers.Insert(0, new ProgressRenderer());
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(content.Document.Syntax);
         // Generic Markdown attributes can carry event handlers or network-bearing styles.
@@ -45,6 +46,8 @@ public sealed class HtmlExporter
                     "type" => element.LocalName == "input" && attribute.Value == "checkbox",
                     "src" => element.LocalName == "img" && attribute.Value.StartsWith("data:image/png;base64,", StringComparison.Ordinal),
                     "href" => element.LocalName == "a" && SafeLink(attribute.Value),
+                    "max" or "value" => element.LocalName == "progress",
+                    "aria-label" => element.LocalName == "progress",
                     "style" => attribute.Value is "text-align: left;" or "text-align: center;" or "text-align: right;",
                     _ => false
                 };
@@ -89,6 +92,15 @@ public sealed class HtmlExporter
     private sealed class RawBlockRenderer : HtmlObjectRenderer<HtmlBlock>
     {
         protected override void Write(HtmlRenderer renderer, HtmlBlock obj) => renderer.Write("<pre>").Write(WebUtility.HtmlEncode(obj.Lines.ToString())).Write("</pre>");
+    }
+    private sealed class ProgressRenderer : HtmlObjectRenderer<DocumentProgressBlock>
+    {
+        protected override void Write(HtmlRenderer renderer, DocumentProgressBlock obj)
+        {
+            renderer.Write("<figure class=\"document-progress progress-").Write(obj.Colour).Write("\"><figcaption>").Write(WebUtility.HtmlEncode(obj.Description))
+                .Write("</figcaption><progress aria-label=\"").Write(WebUtility.HtmlEncode(obj.Description)).Write("\" max=\"100\" value=\"")
+                .Write(obj.Percentage.ToString("0.########", System.Globalization.CultureInfo.InvariantCulture)).Write("\"></progress></figure>");
+        }
     }
     private sealed class RawInlineRenderer : HtmlObjectRenderer<HtmlInline>
     {

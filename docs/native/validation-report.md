@@ -1,5 +1,15 @@
 # Native validation report
 
+## Native progress indicators
+
+Release builds without warnings/errors and all 273 core tests pass. Fifteen new cases cover passive progress semantics, decoded labels, exact source spans, finite values/bounds, malformed/active/oversized markup, code examples, literal source copy, HTML/clipboard output, schema-valid Word bars, escaped insertion and exact existing-block updates. Existing formatting tests also pass after sharing block-padding logic.
+
+Four native progress outcomes pass for accessible read-only range values, selectable/source-mapped labels, measured track fills and actual PDF content. WPF light/dark page images were visually inspected. The first screenshot captured tracks before deferred native layout; the harness now drains layout, obtains the current page and requires measured fill widths at 0%, 37% and 100% before capturing. Evidence: artifacts/native/validation/native-progress.json, native-progress-layout-*.json and native-progress-*.png. Word preserves percentage-labelled coloured table bars; PDF emits local coloured bars and labels. This does not claim tagged-PDF certification.
+
+The standard harness remains green for 40 diagram/export cases, thirteen asset checks, six preview checks, eleven Markdown outcomes, eight editor checks, four dispatcher checks and four Docs Site outcomes. All four disk/HTTP Chromium/Edge export checks pass in 18.1 seconds, including accessible progress values and colour in both standalone HTML and the Docs Site. The new 26th desktop outcome checks invalid input, insertion, reopening, editing and complete Undo/Redo; fresh CI remains pending.
+
+All four runs at c3277ef pass: native 38166520778/38166517733 and web 38166520761/38166517729. Native CI passes 258 core tests, four destination browser checks and all 25 desktop outcomes before installation and after installation/reinstallation. Evidence: artifacts/native/native-ci-c3277ef-pr.log. This also certifies the guarded web draft recovery in both CI runs.
+
 ## Native Docs Site and front matter
 
 Release build passes without warnings/errors and all 258 core tests pass. Ten front-matter cases cover the existing flat metadata allowlist, aliases, tags, ordering/draft values, BOM/CRLF, exact source positions, unclosed/oversized headers, code examples and literal source copy. Eight Docs Site cases cover metadata priority, ordering, relative document/heading links, generated home, inert content, unresolved links, safe paths, duplicate rejection, options and cancellation.

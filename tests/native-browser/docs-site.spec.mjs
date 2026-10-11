@@ -15,6 +15,8 @@ for (const mode of ['disk', 'static hosting']) {
     await page.goto(mode === 'disk' ? pathToFileURL(path.resolve(relative)).href : '/' + relative);
     await expect(page.locator('#siteTitle')).toHaveText('Native handbook');
     await expect(page.locator('#content h1')).toHaveText('Native documentation');
+    await expect(page.getByRole('progressbar', { name: 'Review progress: 37%' })).toHaveAttribute('value', '37');
+    await expect(page.locator('#content progress')).toHaveCSS('accent-color', 'rgb(37, 99, 235)');
     await expect(page.locator('#content img')).toHaveCount(2);
     await expect.poll(() => page.locator('#content img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
     await page.locator('#content').getByRole('link', { name: 'Start here' }).click();
@@ -42,6 +44,13 @@ for (const mode of ['disk', 'static hosting']) {
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await page.screenshot({ path: test.info().outputPath('native-site-dark.png'), fullPage: true });
+    const standalone = 'artifacts/native/validation/native-progress.html';
+    await page.goto(mode === 'disk' ? pathToFileURL(path.resolve(standalone)).href : '/' + standalone);
+    await expect(page.getByRole('progressbar')).toHaveCount(3);
+    await expect(page.getByRole('progressbar', { name: 'Evidence & review: 37%' })).toHaveAttribute('value', '37');
+    await expect(page.getByRole('progressbar', { name: 'Not started: 0%' })).toHaveAttribute('value', '0');
+    await expect(page.getByRole('progressbar', { name: 'Complete: 100%' })).toHaveAttribute('value', '100');
+    await expect(page.getByRole('progressbar', { name: 'Evidence & review: 37%' })).toHaveCSS('accent-color', 'rgb(37, 99, 235)');
     expect(errors).toEqual([]);
     expect(external).toEqual([]);
   });

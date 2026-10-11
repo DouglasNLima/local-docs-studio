@@ -163,6 +163,15 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
+                case DocumentProgressBlock progress:
+                    var progressSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
+                    progressSection.Blocks.Add(new Paragraph(new Run(progress.Description)) { Margin = new Thickness(0, 0, 0, 5) });
+                    var bar = new ProgressBar { Minimum = 0, Maximum = progress.Maximum, Value = progress.Value, Height = 12,
+                        Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#" + progress.ColourHex)), Background = surface,
+                        IsIndeterminate = false, IsTabStop = false };
+                    System.Windows.Automation.AutomationProperties.SetName(bar, progress.Description);
+                    System.Windows.Automation.AutomationProperties.SetAutomationId(bar, "DocumentProgress" + progress.Span.Start);
+                    progressSection.Blocks.Add(new BlockUIContainer(bar)); result = progressSection; break;
                 case HtmlBlock html:
                     warnings.Add("Embedded HTML is shown as source until its native semantic rendering is supported.");
                     result = new Paragraph(new Run(html.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 12, Background = surface }; break;

@@ -1,6 +1,8 @@
 using System.Text.Json;
 using ICSharpCode.AvalonEdit;
 using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Core.Editing;
+using LensDocsStudio.Core.Parsing;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -49,12 +51,27 @@ internal static class NativeEditorChecks
         if (EditorCompletionService.Apply(editor, true, "flowchart TD") || editor.Text != "flo") throw new IOException("Completion changed a read-only document.");
         editor.IsReadOnly = false; editor.Select(0, 3);
         if (EditorCompletionService.Apply(editor, true, "flowchart TD") || editor.Text != "flo") throw new IOException("Completion overwrote an active selection.");
+        editor.Text = source; editor.Document.UndoStack.ClearAll();
+        var progressEdit = ProgressEditService.Plan(new MarkdownService().Parse(source), 7, 8, new("Review", 37, "blue"));
+        EditorFormattingService.Apply(editor, progressEdit); var progressSource = editor.Text;
+        if (editor.SelectedText != progressEdit.Replacement.Trim() || !editor.SelectedText.StartsWith("<figure", StringComparison.Ordinal))
+            throw new IOException("Progress insertion did not retain its complete editable selection.");
+        var progressUpdate = ProgressEditService.Plan(new MarkdownService().Parse(editor.Text), editor.SelectionStart, editor.SelectionLength, new("Ready", 100, "green"));
+        EditorFormattingService.Apply(editor, progressUpdate);
+        if (!editor.Text.Contains("value=\"100\"", StringComparison.Ordinal)) throw new IOException("Progress editing did not update the existing indicator.");
+        editor.Document.UndoStack.Undo();
+        if (editor.Text != progressSource) throw new IOException("Progress update did not form one Undo action.");
+        editor.Document.UndoStack.Undo();
+        if (editor.Text != source) throw new IOException("Progress insertion Undo lost the original source.");
+        editor.Document.UndoStack.Redo();
+        if (editor.Text != progressSource) throw new IOException("Progress insertion Redo changed source.");
         File.WriteAllText(Path.Combine(output, "native-editor.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
             Checks = new[] { "Inline formatting retains selection and toggles", "Undo and Redo operate on complete formatting actions",
                 "Read-only editors reject formatting", "Line commands leave a typing caret after their marker", "Callout typing replaces only its body and Undo restores original source",
-                "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text" }
+                "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text",
+                "Progress insertion and editing retain selection and form separate complete Undo/Redo actions" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
