@@ -153,8 +153,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             if (Path.GetExtension(path).Equals(".svg", StringComparison.OrdinalIgnoreCase)) throw new IOException("User-supplied SVG images are not displayed.");
                             if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Image exceeds 32 MB.");
                             using var file = File.OpenRead(path);
-                            var bitmap = BitmapFrame.Create(file, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                            bitmap.Freeze();
+                            var bitmap = LensDocsStudio.Native.Platform.NativeRasterService.Read(file);
                             var image = new Image { Source = bitmap, Stretch = Stretch.Uniform, MaxWidth = 720, MaxHeight = 720, ToolTip = alt };
                             System.Windows.Automation.AutomationProperties.SetName(image, alt.Length == 0 ? "Document image" : alt);
                             target.Add(new InlineUIContainer(image));

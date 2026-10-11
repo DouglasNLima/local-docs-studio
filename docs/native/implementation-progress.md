@@ -1,46 +1,39 @@
 # Native implementation progress
 
-Current milestone: native filesystem editing, recovery and asset workflows.
+Current milestone: native filesystem editing, recovery and asset workflows. This remains an incomplete internal preview, with no release or merge authorised.
 
-- Isolated worktree and feature/native-wpf-rebuild branch from develop 2cc3b5680958c9c553dad23856e6010c158fccd7.
-- Original web checkout and untracked attachments preserved.
-- Reviewed feature guide, browser test inventory, native filesystem/watcher services, static publication workflow, Inno installer and Word template contracts (including newer main).
-- .NET SDK 10.0.401, Windows x64 and Inno Setup available.
-- Baseline legacy Release build passed: 0 errors, 6 existing PRI qualifier warnings.
-- Baseline legacy native bridge smoke passed; output files checked by the existing harness.
-- Full web baseline passed: 254 browser tests and static integrity checks. Evidence: artifacts/native/baseline.
-- Native Release build passes with zero warnings/errors; 67 core tests pass.
-- Implemented guarded UTF-8 saves, portable path resolution, folder enumeration, recovery/session stores, source-aware Markdig parsing and Mermaid error handling.
-- Integrated WPF workspace tree, tabs, AvalonEdit, source-tagged FlowDocument preview, native Mermaid drawing, diagram SVG/PNG export, outline, contextual find/replace, basic formatting, local image ingestion, themes/layout and external-change indicators.
-- Actual WPF GUI inspected through Computer Use; contextual search, Unicode save and session restoration validated. FlaUI exercises six desktop outcomes, including update settings, and verifies clean process exits. Its first run exposed and led to a fix for re-entrant WPF shutdown.
-- Forty native light/dark Mermaid corpus cases pass, including explicit expected-invalid inputs. Selected PNGs and the generated PDF were visually inspected; broader visual fidelity remains open.
-- DOCX, HTML and local PDF export implemented. DOCX schema/style/relationship tests pass; generated PDF text and diagram image verified with PdfPig. Template export preserves package headers/footers/media, but the full page-master/prototype contract is incomplete.
-- ZIP and DOCX/HTML/PDF text import implemented with bounded input, passive metadata and new-folder persistence. Generic Markdown bundles include current editor text and portable assets, excluding the artefact manifest.
-- Export replacement checks the destination under an exclusive handle and records a durable recovery journal before committing. Import staging keeps failed conversions out of completed workspaces.
-- Self-contained packaging and the separate Inno installer passed a development-host install/save/reopen/uninstall/reinstall lifecycle. Same-state activations use a same-user named pipe; a native-only mutex protects files in use during installation.
-- Integrated periodic GitHub release checks, native update settings, version/channel/architecture/product/OS eligibility, RSA-PSS manifest verification, streamed download integrity and pinned Windows Authenticode publisher validation. Separate download/install commands and a temporary native launcher protect graceful shutdown. Production trust remains unconfigured; unsigned previews can open eligible release pages but cannot run downloaded installers.
-- Added preview packaging, optional existing-certificate signing, manifest signing integration and dependency notices. Publication remains a separate unauthorised action.
-- Native CI workflow added independently of the unchanged Pages pipeline.
-- Native diagrams are prepared on a background STA thread and frozen drawings are reused through bounded caches. Eight unsafe SVG resource payloads are rejected and the forty-case corpus passes. Native zoom adds a seventh passing UI outcome.
-- Built-in WPF Fluent resources provide light/dark controls, Windows theme changes and high-contrast colours. Per-monitor DPI metadata, working-area sizing and saved window placement are implemented; multi-monitor and screen-reader certification remain open.
-- Different-version upgrade from preview 4 to preview 5 passed on the development host, including actual installed-app checks, uninstall/reinstall and preservation of source, existing defaults and legacy registration.
-- Native PR/push CI and web PR CI passed at 5ee7202. The web push run and rerun failed in different browser tests (including a refused local-server connection); logs are retained for investigation.
-- Recent documents/workspaces, bounded Back/Forward history and a searchable native document-link picker with heading targets are implemented. Ten desktop outcomes pass, including link insertion, actual internal navigation and persisted recent paths.
-- Unsaved images are retained in an isolated draft folder recorded in session recovery. Save as copies referenced images to portable relative locations and rebases links inside a workspace. Leaving document links in another workspace requires an explicit in-product confirmation. Native PNG decoding, recovered-draft exports and source-anchor insertion pass integration checks.
-- Malformed save journals are retained and reported without hiding other drafts. Malformed session versions are archived before future state writes can replace them. Drive-root workspaces use correct containment checks.
-- Core suite: 78 tests pass. Native rendering/export/asset integration: 40 diagram cases plus SVG safety and recovered-image checks pass. Desktop harness: 11 outcomes pass, including actual clipboard bitmap paste into an unsaved document and Save through the Windows dialogue. The image test exposed AvalonEdit's text-only Paste enablement; native routed paste handling now accepts image-only clipboard data.
-- CI at 78a9f0e exposed a Save-dialogue automation issue: the runner retained the default filename after a UIA value assignment. The harness now types the filename and clicks Save. It also asserts that a finalised image is in assets/images, including when native test state happens to be inside the workspace; draft finalisation now always copies images out of private state. This adds a 79th navigation/asset/recovery test.
-- Busy workspace operations now queue instead of dropping Save or a second file activation. Save captures its target tab when invoked. A native integration check verifies ordering; pending insertions retain their original document and source anchors.
-- Native file/folder creation and a reviewed rename/move workflow are implemented. The plan rebases the moved document's links/images and updates incoming Markdown/reference links. It never replaces a destination, checks fingerprints, retains a durable multi-file recovery record and rolls back guarded changes after failure. Interrupted plans open as named draft copies; their paths never trigger automatic filesystem replay.
-- Current validation: Release build without warnings/errors, 87 core tests and 13 native UI outcomes. Desktop tests exercise real rename, incoming-link updates, open-tab refresh and creating/editing/saving a workspace file. Case-only renames, folder moves and deletion are still incomplete.
-- Both native CI jobs passed at df784df, including self-contained packaging and installed-app lifecycle. Web PR CI passed; web push CI failed and its log is being investigated.
+## Baseline and isolation
 
-- The filesystem batch at ecc5fba passed both native CI jobs and web PR CI. Its desktop test explicitly saves unsaved linked edits before replanning/reviewing a move.
-- Native deletion now retains separate saved and unsaved source snapshots, isolates the selected file, then asks Windows to recycle it. Cancelled/failed deletion restores the original path when available; a new external file is never replaced during rollback. The snapshot browser previews exact retained source and opens a new draft; saving that copy requires a chosen destination. Manual snapshots and pre-reload snapshots also retain independent local image copies where possible, with explicit warnings otherwise.
-- Current local validation: 95 core tests, Release build with no warnings/errors, and 15 desktop outcomes including actual Windows deletion and unsaved-text restoration. Operation messages and preview status have separate native status fields so rendering no longer hides recovery feedback.
+- Feature branch/worktree: feature/native-wpf-rebuild, based on develop 2cc3b5680958c9c553dad23856e6010c158fccd7. Original main checkout and unrelated attachments are preserved.
+- Reviewed the feature guide, browser tests, existing Windows integrations, installer, publication rules and newer main image/navigation/Word template contracts.
+- Baseline web static checks and all 254 Chromium/Edge tests passed. Legacy Windows Release build passed with six existing PRI warnings; native bridge smoke passed. Evidence: artifacts/native/baseline.
+- The .NET 10/WPF solution, state, Inno identity, associations and update product are separate from the web application and WinUI/WebView2 shell.
 
-Next executable tasks: validate snapshot/deletion packaging in CI; implement image clipboard portability and asset management; investigate intermittent web CI server/rendering failures; continue editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
+## Implemented and exercised
 
-Known implementation limitations: full-document native preview rebuild; HTML shown as source; full template fidelity, Docs Site, asset management, richer editing/review, general preferences and installer/update certification are incomplete. Temporary draft assets are retained for recovery; automatic cache pruning is not implemented. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
+- Guarded UTF-8 saves, exclusive conflict checks, durable recovery journals, session/draft recovery, queued commands and background import/export. Malformed recovery records are retained and reported.
+- WPF workspace tree, native pickers, tabs, recent paths, Back/Forward viewports, internal document/heading links, outline, focused editor/preview search, AvalonEdit formatting and source-aware native preview.
+- File/folder creation, reviewed document rename/move with incoming/outgoing Markdown link updates, rollback and named recovery drafts. Actual unsaved linked edits survive the save/replan/review flow.
+- Confirmed Windows deletion with separate saved/unsaved snapshots; a native snapshot browser restores new drafts for explicit Save as. Local images are copied into snapshots where possible, with warnings for missing assets. Manual and pre-reload snapshots use the same store.
+- Persistent clipboard/drop/local images, draft asset recovery and portable Save as. Explicit HTTPS image downloads have bounded size, redirects and timeouts; no document content, cookies or local paths are sent. Native raster dimensions are checked before the decoded pixel cache is allocated.
+- Browser-free Mermaider rendering, native SVG validation, frozen drawing caches, background STA preparation, zoom and SVG/PNG exports. Forty light/dark corpus cases pass.
+- Bounded ZIP, DOCX, HTML and PDF text imports; guarded DOCX, HTML, local PDF and generic Markdown Bundle exports. Template styles and package headers/footers/media are preserved, with full template contracts still incomplete.
+- Fluent light/dark/system controls, high-contrast resources, working-area sizing and saved window placement. Operation and preview status are separate so preview completion cannot hide recovery feedback.
+- Separate self-contained installer/portable packaging and native CI. Development-host preview 4 → 5 upgrade, uninstall/reinstall and preservation checks passed. Fresh Windows runners also exercise installed-app workflows.
+- Compatible GitHub release discovery, channel preferences, signed-manifest policy, bounded downloads, integrity and pinned Authenticode checks, separate download/install consent and temporary update launcher. Production trust is unconfigured; unsigned builds cannot execute downloaded installers.
 
-Open external acceptance prerequisites: trusted production signing identity and clean Windows installation/update certification. GUI automation is available. No release or merge authorised.
+## Current evidence
+
+- Local Release build: no warnings/errors. Core: 104 tests pass, including remote-image policy and streamed-size/cancellation cases.
+- Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, eight image/operation checks, and a valid oversized PNG rejected by its dimensions.
+- Desktop harness: 15 outcomes passed again after the image-download/raster changes, including image persistence, Windows deletion and unsaved-text restoration. The remote transport itself uses deterministic simulated responses in integration tests.
+- All four native/web CI runs passed at ecc5fba. At c7467b4, both native CI runs and web PR CI passed; web push failed two Edge readiness checks with refused local-server connections.
+- The local web follow-up uses HTTP/1.1, a larger connection queue and retained failure traces. Static checks passed; the full browser run passed 250 tests and failed four. Two failures exposed an asynchronous menu-test race, now corrected, and two reported closed browser processes. All four passed on a focused rerun. Fresh CI is required; no web runtime source changed.
+
+## Remaining work
+
+Next: inspect CI for the image-download and browser-test infrastructure changes; implement image clipboard portability and asset management; continue richer editing, review and template parity.
+
+Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
+
+External acceptance prerequisites: a trusted production signing identity and clean Windows install/update certification. Fresh CI runner evidence does not establish SDK-free clean-machine or positive signed-upgrade certification.

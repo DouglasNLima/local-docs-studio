@@ -11,11 +11,9 @@ public sealed class ImageAssetService
         var encoded = await StaWorker.RunAsync(() =>
         {
             using var input = new MemoryStream(bytes, false);
-            var decoder = BitmapDecoder.Create(input, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            var frame = decoder.Frames[0];
-            if ((long)frame.PixelWidth * frame.PixelHeight > 64_000_000) throw new IOException("The image exceeds the 64 megapixel limit.");
+            var frame = NativeRasterService.Read(input);
             // Re-encode imported raster data as portable PNG without active content.
-            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(frame);
+            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(frame));
             using var output = new MemoryStream(); encoder.Save(output);
             if (output.Length > 32 * 1024 * 1024) throw new IOException("The converted image exceeds the 32 MB import limit.");
             return output.ToArray();

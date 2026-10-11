@@ -73,6 +73,7 @@
     <MenuItem Header="Link" Tag="link" Click="Format"/>
     <MenuItem Header="Workspace document link…" InputGestureText="Ctrl+Shift+K" Click="InsertDocumentLink" AutomationProperties.AutomationId="DocumentLinkMenu"/>
     <MenuItem Header="Local image…" Click="InsertImage"/>
+    <MenuItem Header="Image from URL…" Click="InsertRemoteImage" AutomationProperties.AutomationId="InsertRemoteImage"/>
     <MenuItem Header="Table" Tag="table" Click="Format"/>
     <MenuItem Header="Task list" Tag="task" Click="Format"/>
     <MenuItem Header="Code block" Tag="code" Click="Format"/>

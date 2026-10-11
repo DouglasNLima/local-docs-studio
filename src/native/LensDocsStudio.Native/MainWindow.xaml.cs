@@ -299,8 +299,14 @@ public partial class MainWindow : Window
         try
         {
             WorkspacePath.RejectReparsePoints(path);
-            if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Images are limited to 32 MB.");
-            await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path), tab, insertion);
+            byte[] bytes;
+            await using (var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, true))
+            {
+                if (input.Length > 32 * 1024 * 1024) throw new IOException("Images are limited to 32 MB.");
+                bytes = new byte[checked((int)input.Length)];
+                await input.ReadExactlyAsync(bytes);
+            }
+            await AddImageAsync(bytes, Path.GetFileName(path), tab, insertion);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { dialogs.Error(ex.Message); }
     }
@@ -309,23 +315,39 @@ public partial class MainWindow : Window
         var tab = targetTab ?? model.ActiveDocument;
         if (tab is null) return;
         insertion ??= new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
+        await model.RunAsync(() => PersistImageAsync(bytes, name, tab, insertion));
+    }
+    private async void InsertRemoteImage(object sender, RoutedEventArgs e)
+    {
+        if (model.ActiveDocument is not { } tab) return;
+        var insertion = new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
+        var prompt = new TextPromptWindow("Insert image from URL", "HTTPS image address. This downloads the image when you choose Download and insert.", "https://", "Download and insert") { Owner = this };
+        if (prompt.ShowDialog() != true) return;
         await model.RunAsync(async () =>
         {
-            if (!model.Documents.Contains(tab)) { model.Status = "Image insertion cancelled because its document was closed."; return; }
-            model.EnsureDraftWorkspace(tab);
-            var root = tab.EffectiveWorkspace ?? Path.GetDirectoryName(tab.EffectivePath!)!;
-            var reference = await assets.ImportAsync(root, tab.EffectivePath!, bytes, name, model.OperationToken);
-            var value = "![" + Path.GetFileNameWithoutExtension(name).Replace("\\", "\\\\").Replace("[", "\\[").Replace("]", "\\]") + "](" + reference + ")";
-            var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
-            var caret = insertion.Insert(value);
-            if (model.ActiveDocument == tab)
-            {
-                Editor.CaretOffset = caret;
-                Editor.ScrollToVerticalOffset(vertical); Editor.ScrollToHorizontalOffset(horizontal); Editor.Focus();
-            }
-            await model.PersistSessionAsync();
-            model.Status = tab.FilePath is null ? "Image retained with the recovered draft; Save will copy it beside the document." : "Portable image inserted";
+            if (!model.Documents.Contains(tab)) return;
+            model.Status = "Downloading image…";
+            using var client = RemoteImageService.CreateClient();
+            var bytes = await new RemoteImageService(client).DownloadAsync(prompt.Value, model.OperationToken);
+            await PersistImageAsync(bytes, "downloaded-image.png", tab, insertion);
         });
+    }
+    private async Task PersistImageAsync(byte[] bytes, string name, DocumentViewModel tab, DocumentInsertion insertion)
+    {
+        if (!model.Documents.Contains(tab)) { model.Status = "Image insertion cancelled because its document was closed."; return; }
+        model.EnsureDraftWorkspace(tab);
+        var root = tab.EffectiveWorkspace ?? Path.GetDirectoryName(tab.EffectivePath!)!;
+        var reference = await assets.ImportAsync(root, tab.EffectivePath!, bytes, name, model.OperationToken);
+        var value = "![" + Path.GetFileNameWithoutExtension(name).Replace("\\", "\\\\").Replace("[", "\\[").Replace("]", "\\]") + "](" + reference + ")";
+        var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
+        var caret = insertion.Insert(value);
+        if (model.ActiveDocument == tab)
+        {
+            Editor.CaretOffset = caret;
+            Editor.ScrollToVerticalOffset(vertical); Editor.ScrollToHorizontalOffset(horizontal); Editor.Focus();
+        }
+        await model.PersistSessionAsync();
+        model.Status = tab.FilePath is null ? "Image retained with the recovered draft; Save will copy it beside the document." : "Portable image inserted";
     }
     private async void OnPaste(object sender, DataObjectPastingEventArgs e)
     {

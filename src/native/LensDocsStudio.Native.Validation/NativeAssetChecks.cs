@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Net.Http;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ICSharpCode.AvalonEdit.Document;
@@ -41,6 +42,22 @@ internal static class NativeAssetChecks
         var saved = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(File.ReadAllText(destination), destination, savedRoot, false);
         if (saved.Images.Count != 1 || saved.Images.Values.Single().PixelWidth != 64 || saved.Images.Values.Single().PixelHeight != 48)
             throw new InvalidOperationException("Saved document did not retain its actual image.");
+        using (var client = new HttpClient(new FixtureImageHandler(bytes.ToArray())))
+        {
+            var downloaded = new RemoteImageService(client).DownloadAsync("https://fixture.invalid/image.png").GetAwaiter().GetResult();
+            var imported = new ImageAssetService().ImportAsync(savedRoot, destination, downloaded, "downloaded-image.png").GetAwaiter().GetResult();
+            var importedPath = new WorkspacePath(savedRoot).ResolveLink(destination, imported);
+            using var input = File.OpenRead(importedPath);
+            var decoded = BitmapFrame.Create(input, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            if (decoded.PixelWidth != 64 || decoded.PixelHeight != 48) throw new IOException("The downloaded image did not persist as a decodable PNG.");
+        }
+        var imageCount = Directory.GetFiles(Path.Combine(savedRoot, "assets", "images")).Length;
+        var invalidRejected = false;
+        try { new ImageAssetService().ImportAsync(savedRoot, destination, "<svg onload='run()'/>"u8.ToArray(), "spoofed.png").GetAwaiter().GetResult(); }
+        catch (Exception ex) when (ex is IOException or NotSupportedException or ArgumentException or System.Runtime.InteropServices.COMException) { invalidRejected = true; }
+        if (!invalidRejected || Directory.GetFiles(Path.Combine(savedRoot, "assets", "images")).Length != imageCount)
+            throw new IOException("An invalid remote image was persisted before successful decoding.");
+        NativeRasterChecks.RejectOversizedRaster();
         var document = new TextDocument("Before selected after");
         var insertion = new DocumentInsertion(document, 7, 8);
         document.Insert(0, "Typed while loading. ");
@@ -60,6 +77,11 @@ internal static class NativeAssetChecks
             if (!order.SequenceEqual(new[] { "first", "second" }) || model.IsBusy) throw new InvalidOperationException("Workspace operations did not complete in order.");
         }
         File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private sealed class FixtureImageHandler(byte[] bytes) : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken) => Task.FromResult(new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+        { Content = new ByteArrayContent(bytes) { Headers = { ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png") } } });
     }
 }

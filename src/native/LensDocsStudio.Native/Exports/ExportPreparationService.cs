@@ -31,9 +31,8 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
             if (new FileInfo(path).Length > 32 * 1024 * 1024 || Path.GetExtension(path).Equals(".svg", StringComparison.OrdinalIgnoreCase))
                 throw new IOException("An image cannot be safely exported: " + link.Url);
             using var input = File.OpenRead(path);
-            var bitmap = BitmapFrame.Create(input, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-            if ((long)bitmap.PixelWidth * bitmap.PixelHeight > 64_000_000) throw new IOException("An image exceeds the 64 megapixel limit.");
-            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(bitmap);
+            var bitmap = LensDocsStudio.Native.Platform.NativeRasterService.Read(input);
+            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
             using var bytes = new MemoryStream(); encoder.Save(bytes);
             images[link.Url ?? ""] = new(bytes.ToArray(), bitmap.PixelWidth, bitmap.PixelHeight, MarkdownService.InlineText(link));
         }
