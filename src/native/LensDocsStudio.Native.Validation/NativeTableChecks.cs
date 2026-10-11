@@ -43,15 +43,19 @@ internal static class NativeTableChecks
         if (!actualPixels.SequenceEqual(pixels) || copied.PlainText.Contains("Excluded", StringComparison.Ordinal)
             || html.QuerySelectorAll("table").Length != 1 || !copied.PlainText.Contains("Identifier\t000123", StringComparison.Ordinal)
             || !html.QuerySelector("table")!.HasAttribute("x:str")) throw new IOException("Selected table copy lost pixels, literal cells or its content boundary.");
-        var received = new List<ExportTableSelection>();
-        var rendered = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, false, new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { }, copyTable: received.Add);
+        var received = new List<ExportTableSelection>(); var csvSelections = new List<ExportTableSelection>();
+        var rendered = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, false, new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { }, copyTable: received.Add, exportTableCsv: csvSelections.Add);
         var nativeTable = (System.Windows.Documents.Table)rendered.SourceElements[table.Span.Start];
         ((MenuItem)nativeTable.ContextMenu.Items[0]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-        if (received.Single() != selection || new TextRange(nativeTable.ContentStart, nativeTable.ContentEnd).Text.Contains("Copy table", StringComparison.Ordinal))
+        ((MenuItem)nativeTable.ContextMenu.Items[1]).RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+        if (received.Single() != selection || csvSelections.Single() != selection || new TextRange(nativeTable.ContentStart, nativeTable.ContentEnd).Text.Contains("Copy table", StringComparison.Ordinal))
             throw new IOException("The native table action selected a different source span or leaked into document text.");
-        var oversized = TableContextMenu.Create(table, source + new string('x', 4 * 1024 * 1024), received.Add);
-        var disabled = (MenuItem)oversized.Items[0]; disabled.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
-        if (disabled.IsEnabled || received.Count != 1) throw new IOException("Oversized table copying was not disabled before dispatch.");
+        var oversized = TableContextMenu.Create(table, source + new string('x', 4 * 1024 * 1024), received.Add, csvSelections.Add);
+        foreach (MenuItem disabled in oversized.Items)
+        {
+            disabled.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+            if (disabled.IsEnabled || received.Count != 1 || csvSelections.Count != 1) throw new IOException("Oversized table actions were not disabled before dispatch.");
+        }
         var broken = source.Replace("[asset]: image.png", "[asset]: selected-missing.png", StringComparison.Ordinal);
         try
         {
@@ -59,6 +63,31 @@ internal static class NativeTableChecks
             throw new IOException("Missing content inside the selected table did not stop preparation.");
         }
         catch (FileNotFoundException) { }
+        var csv = new TableCsvExporter().Export(broken, selection);
+        var csvPath = Path.Combine(workspace, "source-table-1.csv");
+        var store = new ExportFileStore(Path.Combine(workspace, "recovery"));
+        store.WriteAsync(csvPath, csv.Bytes, null).GetAwaiter().GetResult();
+        var expectedCsv = System.Text.Encoding.UTF8.GetBytes("Name,Value\r\nCafé,=1+1\r\nIdentifier,000123");
+        if (csv.TableNumber != 1 || !File.ReadAllBytes(csvPath).SequenceEqual(expectedCsv))
+            throw new IOException("Saved table CSV lost Unicode, literal values or its resource-independent boundary.");
+        var conflictPath = Path.Combine(workspace, "conflict.csv"); File.WriteAllBytes(conflictPath, csv.Bytes);
+        var previous = ExportFileStore.ReadExistingAsync(conflictPath).GetAwaiter().GetResult();
+        File.WriteAllText(conflictPath, "External revision");
+        try
+        {
+            store.WriteAsync(conflictPath, csv.Bytes, previous).GetAwaiter().GetResult();
+            throw new InvalidOperationException("CSV export overwrote an external revision.");
+        }
+        catch (IOException) { }
+        if (File.ReadAllText(conflictPath) != "External revision") throw new IOException("CSV conflict handling lost the external revision.");
+        var cancelledPath = Path.Combine(workspace, "cancelled.csv");
+        using (var cancelled = new CancellationTokenSource())
+        {
+            cancelled.Cancel();
+            try { store.WriteAsync(cancelledPath, csv.Bytes, null, cancelled.Token).GetAwaiter().GetResult(); throw new IOException("Cancelled CSV export completed."); }
+            catch (OperationCanceledException) { }
+        }
+        if (File.Exists(cancelledPath) || Directory.EnumerateFiles(workspace, "*.tmp").Any()) throw new IOException("Cancelled CSV export left a partial output.");
         if (File.ReadAllText(path) != source) throw new IOException("Table copying altered source files.");
         File.WriteAllText(Path.Combine(output, "native-table.json"), JsonSerializer.Serialize(new
         {
@@ -66,7 +95,9 @@ internal static class NativeTableChecks
             Checks = new[] { "Only selected-table resources are prepared; unrelated missing images and invalid diagrams do not block copying",
                 "Referenced images retain decoded pixels and literal-cell metadata in formatted table output",
                 "Native table context actions dispatch exact source positions without entering document text",
-                "Oversized actions cannot dispatch and missing selected images fail without source writes" }
+                "Oversized actions cannot dispatch and missing selected images fail without source writes",
+                "Guarded CSV output retains exact UTF-8 cells and image labels without reading missing resources",
+                "CSV conflicts retain external bytes and cancellation leaves no partial output or source changes" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

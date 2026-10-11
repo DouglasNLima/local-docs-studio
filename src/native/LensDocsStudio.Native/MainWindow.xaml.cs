@@ -154,7 +154,8 @@ public partial class MainWindow : Window
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
-                selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id));
+                selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
+                selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;

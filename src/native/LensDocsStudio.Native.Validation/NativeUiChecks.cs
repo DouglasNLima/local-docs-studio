@@ -26,6 +26,7 @@ internal static class NativeUiChecks
         Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
         var checks = new List<string>();
+        var saveDialogueChecks = new List<object>();
         using var automation = new UIA3Automation();
         Application? app = null;
         Process? launchedProcess = null;
@@ -685,6 +686,14 @@ internal static class NativeUiChecks
                 if (File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
                     throw new IOException("Native table copying changed saved or edited source.");
                 window.CaptureToFile(Path.Combine(output, "native-table-copy.png"));
+                OpenPreviewContext("Native table Café", "ExportPreviewTableCsv").Patterns.Invoke.Pattern.Invoke();
+                var csvPath = Path.Combine(runRoot, "selected-table.csv");
+                SaveThroughDialogue(csvPath, "Export table CSV", "fixture-table-2.csv");
+                Wait(() => Find(window, "Status").Name == "Table exported as UTF-8 CSV.", "The native table CSV command did not finish.");
+                if (!File.ReadAllBytes(csvPath).SequenceEqual(System.Text.Encoding.UTF8.GetBytes("Selected,Value\r\nNative table Café,=1+1\r\nIdentifier,000123"))
+                    || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
+                    throw new IOException("Native table CSV lost its selected cells, encoding or unchanged source.");
+                checks.Add("Native table CSV context action and Save dialogue retain selected UTF-8 cells, table numbering and unchanged source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Table context validation did not restore the original document.");
                 checks.Add("Native table context copy isolates one table with literal-cell HTML and Unicode TSV without changing source");
@@ -790,14 +799,35 @@ internal static class NativeUiChecks
                 "The native progress dialogue did not open.");
             return progressWindow!;
         }
-        void SaveThroughDialogue(string destination, string title = "Save document")
+        void SaveThroughDialogue(string destination, string title = "Save document", string? expectedFilename = null)
         {
             Window? saveWindow = null;
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
             var fileName = Find(saveWindow!, "1001").AsTextBox();
-            fileName.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(Path.GetFileName(destination));
-            Wait(() => fileName.Text == Path.GetFileName(destination), "The native dialogue did not accept the typed filename.");
+            var suggested = fileName.Text; var expected = Path.GetFileName(destination);
+            try
+            {
+                if (expectedFilename is not null && suggested != expectedFilename) throw new IOException("The Save dialogue suggested an incorrect filename: " + suggested);
+                fileName.Focus();
+                Wait(() => fileName.Properties.HasKeyboardFocus.Value, "The Save filename field did not acquire keyboard focus.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(expected);
+                Wait(() => fileName.Text == expected, "The native dialogue did not accept the typed filename.");
+            }
+            catch
+            {
+                try { saveWindow!.CaptureToFile(Path.Combine(output, "native-save-dialogue-failure.png")); } catch (Exception) { }
+                throw;
+            }
+            finally
+            {
+                try
+                {
+                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName.Text, KeyboardFocus = fileName.Properties.HasKeyboardFocus.Value });
+                    File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
+                }
+                catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }
+            }
             (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
         }
     }

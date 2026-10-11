@@ -8,14 +8,20 @@ namespace LensDocsStudio.Native.Rendering;
 
 public static class TableContextMenu
 {
-    public static ContextMenu Create(MdTable table, string source, Action<ExportTableSelection>? copy)
+    public static ContextMenu Create(MdTable table, string source, Action<ExportTableSelection>? copy, Action<ExportTableSelection>? exportCsv = null)
     {
         var menu = new ContextMenu(); AutomationProperties.SetName(menu, "Table actions");
-        var bounded = source.Length <= 4 * 1024 * 1024 && table.Span.Start >= 0 && table.Span.Length > 0 && table.Span.End < source.Length;
-        var item = new MenuItem { Header = "Copy table for Excel", IsEnabled = copy is not null && bounded };
-        AutomationProperties.SetAutomationId(item, "CopyPreviewTable");
-        if (!bounded) { item.ToolTip = "Table copying supports documents up to 4 million characters."; ToolTipService.SetShowOnDisabled(item, true); }
-        item.Click += (_, _) => { if (copy is not null && bounded) copy(new(table.Span.Start, table.Span.Length)); };
-        menu.Items.Add(item); return menu;
+        var bounded = source.Length <= TableCsvExporter.MaximumSourceCharacters && table.Span.Start >= 0 && table.Span.Length > 0 && table.Span.End < source.Length;
+        Add("Copy table for Excel", "CopyPreviewTable", copy);
+        Add("Export table CSV…", "ExportPreviewTableCsv", exportCsv);
+        return menu;
+        void Add(string label, string id, Action<ExportTableSelection>? action)
+        {
+            var item = new MenuItem { Header = label, IsEnabled = action is not null && bounded };
+            AutomationProperties.SetAutomationId(item, id);
+            if (!bounded) { item.ToolTip = "Table actions support documents up to 4 million characters."; ToolTipService.SetShowOnDisabled(item, true); }
+            item.Click += (_, _) => { if (action is not null && bounded) action(new(table.Span.Start, table.Span.Length)); };
+            menu.Items.Add(item);
+        }
     }
 }
