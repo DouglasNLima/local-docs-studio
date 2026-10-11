@@ -29,6 +29,8 @@ Native paste converts formatted HTML and spreadsheet TSV into editable Markdown,
 
 Native preview and Word export retain labelled callouts, ordered starting numbers, table alignment, strikethrough, scripts, insertion underline and highlighting. PDF preserves callout labels, list starts and alignment, but currently represents deletion with visible `~~` markers and omits highlight shading; these remain recorded parity gaps.
 
+Native Word export maps H1–H6 to their matching heading styles and supplies outline levels when a template lacks them. Template body, code, quote, caption and table styles are matched by compatible style type and recognised names; existing formatting and prototype table widths are retained. Word template selection is currently session-only; a reusable native template library remains under implementation.
+
 Native preview also recognises the existing status-badge and keyboard-shortcut snippets as selectable text. Labels and HTML entities survive HTML, Word and PDF export; imported HTML attributes are discarded. Source copy retains the original markup. Other HTML-based document helpers remain under implementation.
 
 The existing `<figure data-image-figure>` helper displays a native image and selectable caption. Recognised figures use the same workspace image checks, portable Save as, asset audit and source-preserving clipboard paths as Markdown images. HTML/Docs Site, Word and PDF exports retain the picture and caption. Recognition accepts one image with quoted `src`, optional `alt`/`title`, and an optional plain-text `figcaption`; additional attributes, nested caption markup and unsupported structures remain inert source.

@@ -34,20 +34,9 @@ public sealed class DocxExporter
             body.RemoveAllChildren();
             var styles = main.StyleDefinitionsPart ?? main.AddNewPart<StyleDefinitionsPart>();
             styles.Styles ??= new W.Styles();
-            string Style(string name, string? fallback = null)
-            {
-                var existing = styles.Styles.Elements<W.Style>().FirstOrDefault(s =>
-                    string.Equals(s.StyleName?.Val?.Value, name, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(s.StyleId?.Value, name.Replace(" ", ""), StringComparison.OrdinalIgnoreCase));
-                if (existing?.StyleId?.Value is { } id) return id;
-                var newId = fallback ?? name.Replace(" ", "");
-                if (!styles.Styles.Elements<W.Style>().Any(s => s.StyleId == newId))
-                    styles.Styles.Append(new W.Style(new W.StyleName { Val = name }) { StyleId = newId, Type = W.StyleValues.Paragraph });
-                return newId;
-            }
-            var titleStyle = Style("Title");
-            var bodyStyle = Style("Normal");
-            var codeStyle = Style("Code", "LensCode");
+            var styleMap = new DocxStyleMap(styles.Styles);
+            var bodyStyle = styleMap.Body;
+            var codeStyle = styleMap.Code;
             var numbering = main.NumberingDefinitionsPart ?? main.AddNewPart<NumberingDefinitionsPart>();
             numbering.Numbering ??= new W.Numbering();
             var nextNumber = numbering.Numbering.Elements<W.NumberingInstance>().Select(n => n.NumberID?.Value ?? 0).DefaultIfEmpty().Max() + 1;
@@ -80,12 +69,12 @@ public sealed class DocxExporter
             settings.Settings.Append(new W.UpdateFieldsOnOpen { Val = true });
             main.Document.Save(); styles.Styles.Save(); numbering.Numbering.Save(); settings.Settings.Save();
 
-            void AppendBlock(OpenXmlCompositeElement parent, Block block, int? listId = null, int depth = 0)
+            void AppendBlock(OpenXmlCompositeElement parent, Block block, int? listId = null, int depth = 0, string? paragraphStyle = null)
             {
                 switch (block)
                 {
                     case HeadingBlock heading:
-                        var hp = Paragraph(heading.Inline, heading.Level == 1 ? titleStyle : Style("Heading " + (heading.Level - 1)));
+                        var hp = Paragraph(heading.Inline, styleMap.Heading(heading.Level));
                         hp.ParagraphProperties!.KeepNext = new W.KeepNext();
                         if (headingTargets.TryGetValue(heading.Span.Start, out var headingTarget))
                         {
@@ -95,7 +84,7 @@ public sealed class DocxExporter
                         }
                         parent.Append(hp); break;
                     case ParagraphBlock paragraph:
-                        var p = Paragraph(paragraph.Inline, bodyStyle);
+                        var p = Paragraph(paragraph.Inline, paragraphStyle ?? bodyStyle);
                         if (listId.HasValue) p.ParagraphProperties!.NumberingProperties = new W.NumberingProperties(new W.NumberingLevelReference { Val = Math.Min(depth, 8) }, new W.NumberingId { Val = listId.Value });
                         parent.Append(p); break;
                     case FencedCodeBlock code when code.Info is "mermaid" or "mmd":
@@ -116,7 +105,7 @@ public sealed class DocxExporter
                             new W.PreviousParagraphProperties(new W.Indentation { Left = ((level + 1) * 360).ToString(), Hanging = "240" })) { LevelIndex = level });
                         numbering.Numbering.InsertBefore(definition, numbering.Numbering.Elements<W.NumberingInstance>().FirstOrDefault());
                         numbering.Numbering.Append(new W.NumberingInstance(new W.AbstractNumId { Val = abstractId }) { NumberID = id });
-                        foreach (var item in list.OfType<ListItemBlock>()) foreach (var child in item) AppendBlock(parent, child, id, listId.HasValue ? depth + 1 : depth);
+                        foreach (var item in list.OfType<ListItemBlock>()) foreach (var child in item) AppendBlock(parent, child, id, listId.HasValue ? depth + 1 : depth, paragraphStyle);
                         break;
                     case Markdig.Extensions.Tables.Table table:
                         var wt = new W.Table();
@@ -124,6 +113,7 @@ public sealed class DocxExporter
                             new W.TableBorders(new W.TopBorder { Val = W.BorderValues.Single, Size = 4 }, new W.LeftBorder { Val = W.BorderValues.Single, Size = 4 },
                                 new W.BottomBorder { Val = W.BorderValues.Single, Size = 4 }, new W.RightBorder { Val = W.BorderValues.Single, Size = 4 },
                                 new W.InsideHorizontalBorder { Val = W.BorderValues.Single, Size = 4 }, new W.InsideVerticalBorder { Val = W.BorderValues.Single, Size = 4 })));
+                        wt.TableProperties!.TableStyle ??= new W.TableStyle { Val = styleMap.Table };
                         var columns = table.OfType<Markdig.Extensions.Tables.TableRow>().Select(r => r.Count).DefaultIfEmpty(1).Max();
                         wt.Append(new W.TableGrid(Enumerable.Range(0, columns).Select(_ => new W.GridColumn { Width = (widthEmu / 635 / columns).ToString() })));
                         foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
@@ -154,7 +144,7 @@ public sealed class DocxExporter
                         var picture = Paragraph(figure.Inline, bodyStyle);
                         if (figure.Caption.Length > 0) picture.ParagraphProperties!.KeepNext = new W.KeepNext();
                         parent.Append(picture);
-                        if (figure.Caption.Length > 0) parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = Style("Caption") }), Run(figure.Caption, MarkdownEmphasis.None)));
+                        if (figure.Caption.Length > 0) parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = styleMap.Caption }), Run(figure.Caption, MarkdownEmphasis.None)));
                         break;
                     case DocumentProgressBlock progress:
                         parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() }, Run(progress.Description, MarkdownEmphasis.None)));
@@ -178,8 +168,11 @@ public sealed class DocxExporter
                             Run(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()), MarkdownEmphasis.Bold)));
                         foreach (var child in alert) AppendBlock(parent, child, listId, depth);
                         break;
+                    case QuoteBlock quote:
+                        foreach (var child in quote) AppendBlock(parent, child, listId, depth, styleMap.Quote);
+                        break;
                     case ContainerBlock container:
-                        foreach (var child in container) AppendBlock(parent, child, listId, depth); break;
+                        foreach (var child in container) AppendBlock(parent, child, listId, depth, paragraphStyle); break;
                     case ThematicBreakBlock:
                         parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphBorders(new W.BottomBorder { Val = W.BorderValues.Single, Size = 4 })))); break;
                 }

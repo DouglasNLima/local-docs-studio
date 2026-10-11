@@ -49,8 +49,8 @@ public sealed class DocxExportTests
         Assert.Single(main.Document.Descendants<W.TableHeader>());
         Assert.Equal(2, main.Document.Descendants<W.NumberingProperties>().Count());
         Assert.NotEmpty(main.NumberingDefinitionsPart!.Numbering!.Elements<W.NumberingInstance>());
-        Assert.Contains(main.Document.Descendants<W.ParagraphStyleId>(), s => s.Val == "Title");
         Assert.Contains(main.Document.Descendants<W.ParagraphStyleId>(), s => s.Val == "Heading1");
+        Assert.Contains(main.Document.Descendants<W.ParagraphStyleId>(), s => s.Val == "Heading2");
     }
 
     [Fact]

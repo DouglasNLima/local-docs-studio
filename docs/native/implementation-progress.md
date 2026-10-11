@@ -1,5 +1,9 @@
 # Native implementation progress
 
+Current correction: Word export maps Markdown headings to their actual Word heading levels, resolves body/code/quote/caption/table aliases by compatible style type and creates readable fallback styles with outline levels. Corporate style XML and table prototype properties are retained. All 418 core tests and the complete native harness pass; Release build has no warnings/errors. Three initial regression failures establish the old heading/type mapping gaps. One subsequent fixture used invalid run-property order; it was corrected without changing the preservation requirement.
+
+All four CI runs at 5cde3ff pass, including 36 built/installed/reinstalled desktop outcomes. The f74183a PR native run reaches the new figure dialogue and fails a literal Unicode-source assertion: its inspected screenshot shows the correct caption, encoded as &#233; in source. The harness now checks the parsed caption. The push native run times out earlier in UI Automation; no product cause is established. Logs and screenshots are retained; the corrected 37-outcome workflow awaits CI.
+
 Current addition: Insert → Image figure edits a standalone image's alternative text/caption or reopens a recognised figure. The source plan preserves image destinations, titles, shared reference definitions, CRLF and surrounding text. Thirteen core edit cases and an eleventh native editor outcome pass; all 413 core tests pass. The 37th desktop dialogue/Undo workflow awaits CI. Both 5cde3ff native runs have passed the earlier 36-workflow built stage; installed lifecycle checks are running.
 
 The full native harness and static checks also pass. An initial PHP syntax check failed; its summary is retained, and unchanged product code passes the focused syntax check and complete rerun. Diagnostic details were added without relaxing the check or processing limits. The exact first failure condition remains unproven.

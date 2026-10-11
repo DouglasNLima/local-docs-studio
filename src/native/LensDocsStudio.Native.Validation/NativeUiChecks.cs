@@ -818,7 +818,8 @@ internal static class NativeUiChecks
                 Find(figureWindow!, "FigureCaption").AsTextBox().Text = "Caption Café & evidence";
                 figureWindow!.CaptureToFile(Path.Combine(output, "native-figure-dialogue.png"));
                 Find(figureWindow!, "ApplyImageFigure").AsButton().Invoke();
-                Wait(() => Find(window, "Status").Name == "Image figure updated." && editor.Patterns.Value.Pattern.Value.Value.Contains("<figcaption>Caption Café &amp; evidence</figcaption>", StringComparison.Ordinal),
+                Wait(() => Find(window, "Status").Name == "Image figure updated." && new LensDocsStudio.Core.Parsing.MarkdownService().Parse(editor.Patterns.Value.Pattern.Value.Value)
+                    .Syntax.OfType<LensDocsStudio.Core.Parsing.DocumentImageFigureBlock>().SingleOrDefault()?.Caption == "Caption Café & evidence",
                     "The figure dialogue did not apply the caption.");
                 var convertedFigure = editor.Patterns.Value.Pattern.Value.Value;
                 Find(window, "InsertMenu").Click(); Find(window, "EditImageFigure").Patterns.Invoke.Pattern.Invoke();

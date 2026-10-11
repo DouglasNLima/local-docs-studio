@@ -3,6 +3,7 @@
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
+| Semantic Word headings and template styles | High / low | Correct H1–H6 outline levels, typed style aliases, body/code/quote/caption/table mapping and retained corporate formatting. Five package/schema tests pass; template library and complete package extraction remain |
 | Native image caption editing | Medium / low | Convert an existing standalone image or update its figure through labelled native fields. Preserve destination, title, surrounding source and separate Undo/Redo actions. Thirteen core edit cases and an eleventh native editor outcome pass locally; the 37th desktop dialogue workflow awaits CI |
 | Portable image figures with native captions | Medium / medium | Recognised helper markup resolves through existing image preparation and exact HTML URL spans. Captions remain selectable; image copy, source clipboard round trips, asset audit/Save as, Word/PDF/HTML and exported-site checks pass locally. Additional attributes/nested caption content remain inert; the 36th desktop workflow awaits CI |
 | Automatic folder updates without losing position | High / low | Debounced filesystem notifications refresh real files/folders while retaining surviving native controls, expansion, selection and unsaved buffers. Seven local filesystem/WPF checks pass, including conflicts, private-state exclusion and stale refresh cancellation; desktop CI remains pending |
