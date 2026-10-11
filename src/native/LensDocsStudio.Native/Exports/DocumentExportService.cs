@@ -12,7 +12,7 @@ public sealed class DocumentExportService
     public Task<byte[]> ExportAsync(string format, string source, string? sourcePath, string? workspaceRoot, bool dark, byte[]? template, CancellationToken cancellationToken = default) =>
         StaWorker.RunAsync(() =>
         {
-            var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark);
+            var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             return format switch
             {

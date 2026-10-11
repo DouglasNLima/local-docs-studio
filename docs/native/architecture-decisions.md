@@ -12,6 +12,8 @@ Baseline: develop 2cc3b5680958c9c553dad23856e6010c158fccd7, inspected 11 October
 
 Candidate library documentation and versions are verified against upstream repositories and NuGet. Pinned lock files will record restored dependencies.
 
+Rendered copy shares the HTML export model, sanitises generated attributes and embeds native PNG images/diagrams without local source paths. Windows CF_HTML offsets count UTF-8 bytes, following the [Microsoft clipboard format specification](https://learn.microsoft.com/en-us/windows/win32/dataxchg/html-clipboard-format). Unicode text provides semantic paragraphs, task states and tab-separated table cells. Preparation runs on a cancellable STA worker with source/image budgets; the final write refuses an intervening clipboard change. Destination application fidelity requires separate validation.
+
 Native SVG parsing runs on an STA worker; frozen drawings can safely cross to the UI thread. Bounded caches retain unchanged diagrams without retaining full document trees. SVG input is checked for active elements, external resource references and CSS escapes before SharpVectors receives it. Local fragment paint definitions remain supported. FlowDocument construction is still on the UI thread and large-document rendering remains an open performance item.
 
 Use .NET 10's built-in WPF Fluent resource dictionaries rather than introducing a separate UI framework. Apply Windows high-contrast system colours, expose native automation names and retain per-monitor DPI metadata. Window placement uses the Windows placement API so removed monitors can be reconciled by the operating system.

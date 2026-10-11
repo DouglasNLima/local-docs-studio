@@ -42,6 +42,21 @@ internal static class NativeAssetChecks
         var saved = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(File.ReadAllText(destination), destination, savedRoot, false);
         if (saved.Images.Count != 1 || saved.Images.Values.Single().PixelWidth != 64 || saved.Images.Values.Single().PixelHeight != 48)
             throw new InvalidOperationException("Saved document did not retain its actual image.");
+        var rich = new ClipboardExportService().PrepareAsync(File.ReadAllText(destination), destination, savedRoot, false).GetAwaiter().GetResult();
+        var clipboardHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(rich.Html));
+        var embedded = clipboardHtml.QuerySelector("img")?.GetAttribute("src") ?? throw new IOException("Rich copying lost the saved image.");
+        using (var imageBytes = new MemoryStream(Convert.FromBase64String(embedded.Split(',', 2)[1])))
+        {
+            var copied = NativeRasterService.Read(imageBytes);
+            if (copied.PixelWidth != 64 || copied.PixelHeight != 48) throw new IOException("Rich clipboard pixels do not match the saved image.");
+        }
+        var boundedPreparation = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService());
+        var sizeRejected = false; var cancellationHonoured = false;
+        try { boundedPreparation.Prepare(File.ReadAllText(destination), destination, savedRoot, false, maximumEmbeddedImageBytes: 8); }
+        catch (IOException) { sizeRejected = true; }
+        try { boundedPreparation.Prepare(File.ReadAllText(destination), destination, savedRoot, false, new CancellationToken(true)); }
+        catch (OperationCanceledException) { cancellationHonoured = true; }
+        if (!sizeRejected || !cancellationHonoured) throw new IOException("Output image preparation did not respect its byte budget or cancellation.");
         using (var client = new HttpClient(new FixtureImageHandler(bytes.ToArray())))
         {
             var downloaded = new RemoteImageService(client).DownloadAsync("https://fixture.invalid/image.png").GetAwaiter().GetResult();
@@ -77,7 +92,7 @@ internal static class NativeAssetChecks
             if (!order.SequenceEqual(new[] { "first", "second" }) || model.IsBusy) throw new InvalidOperationException("Workspace operations did not complete in order.");
         }
         File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Rich clipboard HTML embeds independently decodable native image pixels", "Image preparation respects its aggregate output budget and cancellation", "Simulated HTTPS image response is decoded and persisted as a native PNG", "Invalid image content is rejected before persistence", "Raster dimensions are checked before allocating the pixel cache", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
     }
     private sealed class FixtureImageHandler(byte[] bytes) : HttpMessageHandler
     {

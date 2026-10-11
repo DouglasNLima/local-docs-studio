@@ -270,6 +270,30 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
             sourceTab.Patterns.SelectionItem.Pattern.Select();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "The original document did not activate before session restoration.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            Keyboard.Type("\n\n| Area | Status |\n|---|---|\n| Clipboard | Ready |\n");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            Wait(() => File.ReadAllText(source).Contains("| Clipboard | Ready |", StringComparison.Ordinal), "The clipboard table fixture did not save.");
+            previousClipboard = System.Windows.Clipboard.GetDataObject(); ownedClipboardSequence = 0;
+            try
+            {
+                Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Rich clipboard preparation did not finish.");
+                ownedClipboardSequence = GetClipboardSequenceNumber();
+                var clipboard = System.Windows.Clipboard.GetDataObject()!;
+                var plain = clipboard.GetData(System.Windows.DataFormats.UnicodeText) as string ?? throw new IOException("The rich clipboard is missing Unicode text.");
+                var rich = clipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("The rich clipboard is missing native HTML Format data.");
+                var fragment = LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(rich);
+                var clipboardHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(fragment);
+                if (!plain.Contains("Café", StringComparison.Ordinal) || !plain.Contains("Clipboard\tReady", StringComparison.Ordinal) ||
+                    clipboardHtml.QuerySelectorAll("table").Length != 1 || !clipboardHtml.QuerySelectorAll("img").Any(i => i.GetAttribute("src")?.StartsWith("data:image/png;base64,", StringComparison.Ordinal) == true) ||
+                    clipboardHtml.QuerySelectorAll("button,script").Length != 0 || plain.Contains("Copy source", StringComparison.Ordinal))
+                    throw new IOException("The Windows clipboard lost Unicode, table cells or diagram pixels, or leaked native preview controls.");
+                File.WriteAllText(Path.Combine(output, "clipboard-fragment.html"), fragment);
+                File.WriteAllText(Path.Combine(output, "clipboard-text.txt"), plain);
+                checks.Add("Native rich copy publishes Windows HTML Format and Unicode text with real embedded diagram pixels, table cells and no preview controls");
+            }
+            finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

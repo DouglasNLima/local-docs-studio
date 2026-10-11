@@ -58,7 +58,7 @@
     <MenuItem Header="_Close document" InputGestureText="Ctrl+W" Command="{Binding CloseDocumentCommand}" CommandParameter="{Binding ActiveDocument}"/>
     <MenuItem Header="E_xit" Click="Exit"/>
    </MenuItem>
-   <MenuItem Header="_Edit">
+   <MenuItem Header="_Edit" AutomationProperties.AutomationId="EditMenu">
     <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}"/>
     <MenuItem Header="_Redo" Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}"/>
     <Separator/>
@@ -68,6 +68,7 @@
     <MenuItem Header="_Bold" InputGestureText="Ctrl+B" Tag="bold" Click="Format"/>
     <MenuItem Header="_Italic" InputGestureText="Ctrl+I" Tag="italic" Click="Format"/>
     <MenuItem Header="Copy rendered _text" Click="CopyPreview"/>
+    <MenuItem Header="Copy rendered _content" Click="CopyRenderedContent" AutomationProperties.AutomationId="CopyRenderedContent"/>
    </MenuItem>
    <MenuItem Header="_Insert">
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
