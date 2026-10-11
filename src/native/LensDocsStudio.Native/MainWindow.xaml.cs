@@ -153,7 +153,8 @@ public partial class MainWindow : Window
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
-                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax);
+                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
+                selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;
@@ -418,20 +419,23 @@ public partial class MainWindow : Window
     }
     private async void CopyRenderedContent(object sender, RoutedEventArgs e) => await CopyDocumentAsync(false);
     private async void CopyMarkdownWithImages(object sender, RoutedEventArgs e) => await CopyDocumentAsync(true);
-    private async Task CopyDocumentAsync(bool markdownSource)
+    private async Task CopyDocumentAsync(bool markdownSource, LensDocsStudio.Core.Exports.ExportTableSelection? table = null, string? expectedSource = null, Guid? expectedDocument = null)
     {
         if (model.ActiveDocument is not { } tab) return;
         var source = tab.EditorDocument.Text;
+        if (table is not null && (expectedDocument != tab.Id || expectedSource != source))
+        { model.Status = "The preview is out of date. Wait for the updated table and copy again."; return; }
         var sourcePath = tab.EffectivePath; var workspace = tab.EffectiveWorkspace;
         var dark = ThemeService.IsDark(model.Theme);
         var sequence = NativeClipboardService.Sequence;
         await model.RunAsync(async () =>
         {
             model.Status = markdownSource ? "Preparing Markdown and clipboard images…" : "Preparing formatted clipboard content…";
-            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken, markdownSource);
+            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken, markdownSource, table);
             model.OperationToken.ThrowIfCancellationRequested();
             NativeClipboardService.WriteRendered(content, sequence);
-            model.Status = markdownSource ? "Markdown copied with embedded images. Attachment handling depends on the destination."
+            model.Status = table is not null ? "Table copied as formatted content and tab-separated text."
+                : markdownSource ? "Markdown copied with embedded images. Attachment handling depends on the destination."
                 : "Rendered content copied as HTML and Unicode text. Images are embedded; destination formatting may vary.";
         });
     }

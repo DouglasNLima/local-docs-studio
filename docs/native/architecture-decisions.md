@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+Table copying captures the displayed document identity, source and table span. The window refuses an outdated preview before queuing preparation. A validated table selection resolves against the complete parsed document, retaining reference definitions while limiting image/diagram preparation and HTML rendering to that table. The shared clipboard exporter applies existing literal-cell metadata and Unicode fallback; rendering does not detach or mutate the syntax tree. Clipboard sequence protection remains in force. Context menus stay outside document/export text. CSV export is separate remaining work.
+
 Markdown editor highlighting shares the preview's fixed readable palette. It runs before AvalonEdit's selection transformer, so syntax colours cannot override selected text. The window reapplies theme/selection resources and redraws existing lines on user or Windows theme changes; high contrast retains system text/highlight colours. Per-line scans are bounded to 4,096 characters, 512 matches, an 8 ms between-match budget and a 25 ms regex timeout. Matches are collected before applying styles, so a failed/limited scan leaves consistent inherited text. Theme changes never replace the editor document or selection.
 
 Native colour validation inspects real control runs and WPF text providers in hidden native hosts, without requiring foreground keyboard access. Desktop checks exercise actual theme menus separately. WPF's numeric foreground attribute is verified as RGB; tests must not assume Win32 BGR ordering.

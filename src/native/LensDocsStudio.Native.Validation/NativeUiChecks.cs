@@ -664,13 +664,37 @@ internal static class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
+                const string tableMarkdown = "# Excluded introduction\n\n| Other | Table |\n|---|---|\n| Excluded | row |\n\n" +
+                    "| Selected | Value |\n|---|---|\n| Native table Café | =1+1 |\n| Identifier | 000123 |\n\nExcluded conclusion.";
+                var tableSavedSource = File.ReadAllText(source);
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(tableMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == tableMarkdown, "The table context fixture did not paste.");
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native table Café", StringComparison.Ordinal), "The table context fixture did not render.");
+                OpenPreviewContext("Native table Café", "CopyPreviewTable").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name == "Table copied as formatted content and tab-separated text.", "The native table context command did not copy its table.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                var tableClipboardHtml = System.Windows.Clipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Table copy did not publish Windows HTML Format.");
+                var tableHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(tableClipboardHtml));
+                if (System.Windows.Clipboard.GetText() != "Selected\tValue\nNative table Café\t=1+1\nIdentifier\t000123"
+                    || tableHtml.QuerySelectorAll("table").Length != 1 || !tableHtml.QuerySelector("table")!.HasAttribute("x:str")
+                    || tableHtml.Body!.TextContent.Contains("Excluded", StringComparison.Ordinal)
+                    || tableHtml.QuerySelectorAll("td,th").Any(cell => !(cell.GetAttribute("style") ?? "").Contains("mso-number-format", StringComparison.Ordinal)))
+                    throw new IOException("Native table copy lost its selected-table boundary or literal-cell clipboard contract.");
+                if (File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
+                    throw new IOException("Native table copying changed saved or edited source.");
+                window.CaptureToFile(Path.Combine(output, "native-table-copy.png"));
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Table context validation did not restore the original document.");
+                checks.Add("Native table context copy isolates one table with literal-cell HTML and Unicode TSV without changing source");
             }
             finally
             {
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
-            window.Close();
+            window.Patterns.Window.Pattern.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
             app.Dispose(); launchedProcess.Dispose(); app = Launch(null);
@@ -692,7 +716,7 @@ internal static class NativeUiChecks
             updateWindow!.Close();
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates"))) is null, "The updates window did not close.");
             window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
-            window.Close();
+            window.Patterns.Window.Pattern.Close();
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
             RecordResult(new { Passed = true, Checks = checks, FixtureRoot = runRoot });
@@ -738,14 +762,15 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F10);
             ContextAction(id).Patterns.Invoke.Pattern.Invoke();
         }
-        AutomationElement OpenCodeContext(string id)
+        AutomationElement OpenCodeContext(string id) => OpenPreviewContext("const nativeContext", id);
+        AutomationElement OpenPreviewContext(string text, string id)
         {
             var previewWindow = app!.GetMainWindow(automation)!;
-            var range = Find(previewWindow, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("const nativeContext", false, false)
-                ?? throw new IOException("The preview code text range is unavailable.");
+            var range = Find(previewWindow, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText(text, false, false)
+                ?? throw new IOException("The requested preview text range is unavailable.");
             range.ScrollIntoView(true);
             var bounds = range.GetBoundingRectangles().FirstOrDefault(r => r.Width > 0 && r.Height > 0);
-            if (bounds.Width <= 0) throw new IOException("The preview code text has no visible native bounds.");
+            if (bounds.Width <= 0) throw new IOException("The requested preview text has no visible native bounds.");
             Mouse.Click(new System.Drawing.Point(bounds.X + Math.Max(1, bounds.Width / 3), bounds.Y + Math.Max(1, bounds.Height / 2)), MouseButton.Right);
             return ContextAction(id);
         }

@@ -12,10 +12,11 @@ namespace LensDocsStudio.Native.Exports;
 public sealed class ExportPreparationService(MarkdownService markdown, DiagramService diagrams, NativeSvgService svg)
 {
     public ExportContent Prepare(string source, string? sourcePath, string? root, bool dark, CancellationToken cancellationToken = default,
-        long maximumEmbeddedImageBytes = 256 * 1024 * 1024, bool markdownSourceOnly = false)
+        long maximumEmbeddedImageBytes = 256 * 1024 * 1024, bool markdownSourceOnly = false, ExportTableSelection? table = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var document = markdown.Parse(source, Path.GetExtension(sourcePath)?.ToLowerInvariant() is ".mmd" or ".mermaid");
+        ContainerBlock scope = table is null ? document.Syntax : table.Resolve(document);
         var diagramImages = new Dictionary<int, ExportImage>();
         long imageBytes = 0;
         void CountImage(byte[] bytes)
@@ -23,7 +24,7 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
             imageBytes += bytes.Length;
             if (imageBytes > maximumEmbeddedImageBytes) throw new IOException("Prepared images exceed the output size limit. Export fewer or smaller images.");
         }
-        foreach (var code in document.Syntax.Descendants<FencedCodeBlock>().Where(c => c.Info is "mermaid" or "mmd"))
+        foreach (var code in scope.Descendants<FencedCodeBlock>().Where(c => c.Info is "mermaid" or "mmd"))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (markdownSourceOnly && code.ClosingFencedCharCount == 0) continue;
@@ -35,7 +36,7 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
             diagramImages[code.Span.Start] = new(bytes, (int)Math.Ceiling(drawing.Width * 2), (int)Math.Ceiling(drawing.Height * 2), "Mermaid diagram");
         }
         var images = new Dictionary<string, ExportImage>();
-        foreach (var link in document.Syntax.Descendants<LinkInline>().Where(l => l.IsImage))
+        foreach (var link in scope.Descendants<LinkInline>().Where(l => l.IsImage))
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (images.ContainsKey(link.Url ?? "")) continue;

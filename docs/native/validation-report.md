@@ -1,5 +1,13 @@
 # Native validation report
 
+## Selected table clipboard output
+
+Release build has no warnings/errors; all 316 core tests and the standard native harness pass. Seven new core cases verify that one selected table excludes surrounding text/other tables, retains formatted/literal cells and reference definitions, refuses invalid/stale spans and leaves source/tree ownership unchanged. Four native outcomes verify scoped resource preparation, decoded image pixels, exact context dispatch, copy limits and failure for a missing selected image without source writes. An unrelated missing image or invalid diagram does not block table preparation. Evidence: artifacts/native/tests/table-clipboard.trx, native-core.trx and artifacts/native/validation/native-table.json.
+
+The 32nd desktop workflow invokes the real table context menu and checks exact Unicode TSV, a single formatted table, literal-cell metadata, excluded surrounding content, unchanged files/editor text and complete Undo of its fixture. Fresh CI is pending. CSV export and broader table actions remain incomplete.
+
+Native push CI at 1d251b7 passes all 31 built/installed/reinstalled workflows (38174416805), including real theme menus and verified RGB attributes. PR CI 38174420173 passes the built workflow but later times out finding the title bar during installed Close, matching the earlier intermittent 5152482 failure. The harness now closes the main window through its native Window automation pattern, avoiding the title-bar subtree lookup while retaining real shutdown, exit-code and restoration checks. Evidence: artifacts/native/native-ci-1d251b7-pr-failure.log, native-ci-1d251b7-push.log and ci-1d251b7-pr. Revalidation of this correction remains pending.
+
 ## Editor colours and theme changes
 
 Both native CI runs at 1d2be61 (38173960384/38173958016) passed native integration but failed the new desktop theme-colour assertion. The screenshot shows a correctly redrawn dark preview, and preferences contain Dark. A hidden native text-provider check establishes that WPF returns RGB integers: 1,467,700 in the light fixture and 10,933,918 in the dark fixture. The desktop assertion had assumed BGR. It now uses the verified RGB ordering and records expected/observed values per theme. No production colour logic changed for this correction. Release build and the complete native harness pass locally; desktop/installed revalidation remains pending. Failure evidence: artifacts/native/native-ci-1d2be61-pr-failure.log and artifacts/native/ci-1d2be61-pr/ui.
