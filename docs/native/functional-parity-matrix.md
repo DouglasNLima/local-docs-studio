@@ -6,7 +6,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 |---|---|---|
 | Markdown/Mermaid/text open, save, Save as, UTF-8 | Native pickers, portable source, safe writes | In progress |
 | Real folder tree, create/rename/move/delete/reveal | Filesystem workspace, safe link updates | Incomplete |
-| Tabs, recent files, navigation history | Native tabs and commands | Incomplete |
+| Tabs, recent files, navigation history | Native tabs, persisted recent paths and bounded viewport history | Core and desktop navigation checks pass; broader closed-tab/history cases remain |
 | Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
 | Paste Special, HTML/TSV conversion, rich clipboard | Windows clipboard formats | Incomplete |
 | Markdown headings/tables/tasks/code/quotes/images | Markdig with native WPF preview | In progress |
@@ -14,9 +14,9 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |
 | Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |
 | Mermaid zoom/copy/SVG/PNG | Native drawing window and guarded bitmap/vector export | Partial: native zoom UI and SVG/PNG corpus pass; destination clipboard validation remains |
-| Portable local images, paste/drop/URL, assets | Relative persistent assets; explicit URL retrieval | Incomplete |
+| Portable local images, paste/drop/URL, assets | Persistent draft assets, guarded Save as and relative paths | Partial: recovery/portability integration checks pass; URL, asset management and clipboard transfer remain |
 | External changes, conflict flow, snapshots/recovery | Fingerprints and journal | In progress |
-| Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution | Incomplete |
+| Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution, searchable document/heading picker | Native insertion and navigation checks pass; wikilinks remain |
 | Review/governance, links/assets audit, docs map | Source-aware analysis | Incomplete |
 | ZIP/Markdown Bundle/artefact imports | Bounded extraction, passive metadata | Partial: ZIP tests pass; artefact reader remains |
 | DOCX/HTML/PDF text imports | Native parsers, safe assets | Partial: conversion tests pass; broader corpus remains |

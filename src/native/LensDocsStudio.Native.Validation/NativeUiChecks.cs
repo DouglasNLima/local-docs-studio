@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Runtime.InteropServices;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
@@ -18,6 +19,8 @@ internal static class NativeUiChecks
         Directory.CreateDirectory(runRoot);
         var source = Path.Combine(runRoot, "fixture.md");
         File.WriteAllText(source, "# Native UI fixture\n\nSearchable text.\n\n```mermaid\nflowchart LR\nA[Write] --> B[Review]\n```\n");
+        var linkedDocument = Path.Combine(runRoot, "Second document.md");
+        File.WriteAllText(linkedDocument, "# Second document\n\nLinked workspace content.\n\n## Details\n\nMore detail.\n");
         var state = Path.Combine(runRoot, "state");
         Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
@@ -33,7 +36,7 @@ internal static class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "Status").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
-            editor.Click();
+            FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             var find = Find(window, "FindText").AsTextBox();
             Wait(() => Find(window, "FindContext").Name == "Find in editor", "Ctrl+F did not choose editor context.");
@@ -61,6 +64,65 @@ internal static class NativeUiChecks
             diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
             diagramWindow.Close();
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
+            FocusWindow(window); editor.Click();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_K);
+            Window? linkWindow = null;
+            Wait(() => (linkWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Insert document link")))?.AsWindow()) is not null, "The native document-link picker did not open.");
+            Find(linkWindow!, "DocumentLinkFilter").AsTextBox().Text = "Second";
+            Find(linkWindow!, "DocumentLinkResults").AsListBox().Select(0);
+            Find(linkWindow!, "InsertDocumentLink").Click();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("[Second document](Second%20document.md)", StringComparison.Ordinal), "The inserted document link was not portable Markdown.");
+            FocusWindow(window);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            Wait(() => File.ReadAllText(source).Contains("Second%20document.md", StringComparison.Ordinal), "The inserted link was not saved.");
+            AutomationElement? documentLink = null;
+            // WPF exposes FlowDocument hyperlinks through UIA TextPattern ranges.
+            Wait(() => (documentLink = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
+                .FirstOrDefault(e => e.Properties.Name.ValueOrDefault == "Second document")) is not null, "The rendered internal link did not appear through the native text pattern.");
+            documentLink!.Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Linked workspace content", StringComparison.Ordinal), "The internal link did not open its workspace document.");
+            checks.Add("Native document-link picker inserts portable Markdown and the link opens inside the workspace");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Back did not restore the previous document.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.RIGHT);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Linked workspace content", StringComparison.Ordinal), "Forward did not restore the linked document.");
+            Find(window, "NavigateBack").Click();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "The native Back button did not work.");
+            checks.Add("Alt+Left, Alt+Right and native buttons navigate document history");
+            Wait(() =>
+            {
+                var preferences = JsonSerializer.Deserialize<LensDocsStudio.Core.State.UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+                return preferences.RecentDocuments?.Contains(source) == true && preferences.RecentDocuments.Contains(linkedDocument) && preferences.RecentWorkspaces?.Contains(runRoot) == true;
+            }, "Recent documents and workspaces were not persisted.");
+            checks.Add("Recent document and workspace paths persist in isolated native preferences");
+            FocusWindow(window);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "A new unsaved document did not open.");
+            var previousClipboard = System.Windows.Clipboard.GetDataObject();
+            try
+            {
+                var bitmap = System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null,
+                    new byte[] { 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255 }, 8);
+                System.Windows.Clipboard.SetImage(bitmap);
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("![pasted-image](assets/images/", StringComparison.Ordinal), "Clipboard image did not persist into the unsaved document.");
+            }
+            finally { if (previousClipboard is not null) { try { System.Windows.Clipboard.SetDataObject(previousClipboard, true); } catch (ExternalException) { } } }
+            var imageDocument = Path.Combine(runRoot, "Image document.md");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            Window? saveWindow = null;
+            Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Save document")))?.AsWindow()) is not null, "The native Save dialogue did not open.");
+            Find(saveWindow!, "1001").AsTextBox().Text = Path.GetFileName(imageDocument);
+            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Invoke();
+            Wait(() => File.Exists(imageDocument), "The document containing the pasted image was not saved.");
+            var imageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(imageDocument)).Single(l => l.IsImage).Reference;
+            var imagePath = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(imageDocument, imageReference);
+            if (!File.Exists(imagePath) || new FileInfo(imagePath).Length < 50) throw new IOException("Saving the unsaved document did not persist its portable image.");
+            checks.Add("Clipboard image in an unsaved document is finalised into a portable image when saved through the native dialogue");
+            FocusWindow(window); Find(window, "NavigateBack").Click();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Back did not return from the image document.");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -93,6 +155,7 @@ internal static class NativeUiChecks
         catch (Exception ex)
         {
             try { app?.GetMainWindow(automation, TimeSpan.FromSeconds(1))?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
+            try { File.WriteAllLines(Path.Combine(output, "native-ui-failure-controls.txt"), app!.GetMainWindow(automation)!.FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
             File.WriteAllText(Path.Combine(output, "native-ui.json"), JsonSerializer.Serialize(new { Passed = false, Checks = checks, Error = ex.ToString(), FixtureRoot = runRoot }, new JsonSerializerOptions { WriteIndented = true }));
             Console.Error.WriteLine(ex);
             return 1;
@@ -103,7 +166,7 @@ internal static class NativeUiChecks
         {
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state);
-            if (path is not null) info.ArgumentList.Add(path);
+            if (path is not null) { info.ArgumentList.Add(runRoot); info.ArgumentList.Add(path); }
             launchedProcess = Process.Start(info) ?? throw new IOException("Could not launch the native validation fixture.");
             launchedProcess.EnableRaisingEvents = true;
             // FlaUI refreshes and disposes its Process instance while locating a window.
@@ -118,6 +181,14 @@ internal static class NativeUiChecks
         Wait(() => (element = window.FindFirstDescendant(cf => cf.ByAutomationId(id))) is not null, "Missing native control: " + id);
         return element!;
     }
+    private static void FocusWindow(Window window)
+    {
+        window.SetForeground();
+        Wait(() => { GetWindowThreadProcessId(GetForegroundWindow(), out var processId); return processId == window.Properties.ProcessId.Value; },
+            "The native test window could not receive foreground focus. The interactive desktop is unavailable for keyboard validation.");
+    }
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out int processId);
     private static void Wait(Func<bool> condition, string failure)
     {
         var timer = Stopwatch.StartNew();

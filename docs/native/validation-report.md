@@ -42,3 +42,13 @@ Preview 4 to preview 5 upgrade, uninstall, reinstall and final uninstall passed 
 At 5ee7202, native PR CI 38144532410 and push CI 38144529767 passed, including the fresh Windows runner's installer lifecycle; web PR CI 38144532440 passed. Web push 38144529782 failed an Edge readiness check; its rerun failed different Chromium rendering and Edge readiness checks (the latter reported ERR_CONNECTION_REFUSED). No web runtime source changed. Logs: artifacts/native/web-ci-5ee7202-failure.log and web-ci-5ee7202-rerun-failure.log. Three local repetitions of the original Edge test passed. The push run is not claimed as passed.
 
 Broad interactive GUI, complete export fidelity, performance, installer, update trust, clean-machine and final CI certification remain pending. No unexecuted check is reported as passed.
+
+## Navigation, assets and recovery follow-up
+
+Release build passes without warnings/errors. Core suite: 78 passed (artifacts/native/tests/native-core.trx). New coverage includes navigation branching, bounded recent paths, portable link encoding, shared image references, Save as rebasing/cancellation, drive-root containment and malformed recovery preservation.
+
+Native UI Automation passes 11 outcomes (artifacts/native/ui/native-ui.json, fixture ui-a9cf84c3d3cb48c5a2d7e65bad9c20b9). It inserts a document link through the native picker, invokes the real WPF hyperlink via UIA TextPattern, tests Alt+Left/Right and Back, checks recent-path persistence, pastes an actual bitmap into an unsaved tab and saves it through the Windows file dialogue. The saved Markdown and PNG are inspected on disk. A text-only paste enablement defect discovered in this run was corrected with native command routing. The harness checks foreground process identity before keyboard sequences.
+
+Native asset integration also passes recovery of an unsaved image, real PNG decoding, image resolution for exports after Save as, and insertion anchors preserving intervening edits (artifacts/native/validation/native-assets.json). All 40 diagram cases and existing export checks pass. Draft images remain retained for recovery; automated cache pruning is not implemented.
+
+At 8b31163, both native CI runs (38146723379 and 38146720387) passed and web push CI 38146720477 passed. Web PR CI 38146723536 failed three different Edge cases; all nine local repetitions of those cases passed (artifacts/native/baseline/edge-8b31163-recheck.log). Failure log retained as artifacts/native/web-ci-8b31163-failure.log. This follow-up batch still needs its own CI results.

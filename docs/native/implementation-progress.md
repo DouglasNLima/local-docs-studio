@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Current milestone: native rendering, desktop interaction and workspace navigation parity.
+Current milestone: native workspace navigation, portable assets and recovery robustness.
 
 - Isolated worktree and feature/native-wpf-rebuild branch from develop 2cc3b5680958c9c553dad23856e6010c158fccd7.
 - Original web checkout and untracked attachments preserved.
@@ -25,9 +25,13 @@ Current milestone: native rendering, desktop interaction and workspace navigatio
 - Built-in WPF Fluent resources provide light/dark controls, Windows theme changes and high-contrast colours. Per-monitor DPI metadata, working-area sizing and saved window placement are implemented; multi-monitor and screen-reader certification remain open.
 - Different-version upgrade from preview 4 to preview 5 passed on the development host, including actual installed-app checks, uninstall/reinstall and preservation of source, existing defaults and legacy registration.
 - Native PR/push CI and web PR CI passed at 5ee7202. The web push run and rerun failed in different browser tests (including a refused local-server connection); logs are retained for investigation.
+- Recent documents/workspaces, bounded Back/Forward history and a searchable native document-link picker with heading targets are implemented. Ten desktop outcomes pass, including link insertion, actual internal navigation and persisted recent paths.
+- Unsaved images are retained in an isolated draft folder recorded in session recovery. Save as copies referenced images to portable relative locations and rebases links inside a workspace. Leaving document links in another workspace requires an explicit in-product confirmation. Native PNG decoding, recovered-draft exports and source-anchor insertion pass integration checks.
+- Malformed save journals are retained and reported without hiding other drafts. Malformed session versions are archived before future state writes can replace them. Drive-root workspaces use correct containment checks.
+- Core suite: 78 tests pass. Native rendering/export/asset integration: 40 diagram cases plus SVG safety and recovered-image checks pass. Desktop harness: 11 outcomes pass, including actual clipboard bitmap paste into an unsaved document and Save through the Windows dialogue. The image test exposed AvalonEdit's text-only Paste enablement; native routed paste handling now accepts image-only clipboard data.
 
-Next executable tasks: implement recent documents/workspaces, navigation history and native document-link insertion; then continue filesystem, image, editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
+Next executable tasks: check this batch in CI; implement safe rename/move/delete and affected-link planning, image clipboard portability and asset management; continue editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
 
-Known implementation limitations: full-document native preview rebuild; HTML shown as source; unsaved-image insertion currently requests an initial save; full template fidelity, Docs Site, asset management, richer editing/review/navigation, general preferences and installer/update certification are incomplete. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
+Known implementation limitations: full-document native preview rebuild; HTML shown as source; full template fidelity, Docs Site, asset management, richer editing/review, general preferences and installer/update certification are incomplete. Temporary draft assets are retained for recovery; automatic cache pruning is not implemented. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
 
 Open external acceptance prerequisites: trusted production signing identity and clean Windows installation/update certification. GUI automation is available. No release or merge authorised.

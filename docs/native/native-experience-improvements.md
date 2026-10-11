@@ -10,6 +10,8 @@
 | Persisted relative images | High / medium | Write bytes successfully before inserting links |
 | Focus-aware search | High / medium | Native UI tests validate editor and preview contexts, focus return and actual typing |
 | Explorer, recent files, drag/drop | High / low | Implement through Windows APIs |
+| Document links and navigation history | High / low | Native filtered document/heading picker, portable encoded references, recent lists and Back/Forward; actual UI checks pass |
+| Images before the first save | High / medium | Persist PNG assets with draft recovery and finalise portable paths during Save; source anchors protect edits made while loading |
 | Native DOCX/PDF, clipboard formats | High / medium | Inspect actual outputs and format contracts |
 | Signed user-controlled updates | High / high | Integrated separate check/download/install controls and native settings; policy tests pass; production credentials and signed upgrade certification external |
 | Per-user installer, coexistence and files in use | High / medium | Separate product identity, optional Open with, graceful-close mutex; actual install/uninstall/reinstall validated on development host |

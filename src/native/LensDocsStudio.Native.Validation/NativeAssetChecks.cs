@@ -1,0 +1,54 @@
+using System.Text.Json;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using ICSharpCode.AvalonEdit.Document;
+using LensDocsStudio.Core.State;
+using LensDocsStudio.Core.Workspace;
+using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Native.Platform;
+using LensDocsStudio.Native.Exports;
+using LensDocsStudio.Core.Rendering;
+using LensDocsStudio.Native.Rendering;
+
+namespace LensDocsStudio.Native.Validation;
+
+internal static class NativeAssetChecks
+{
+    public static void Run(string output)
+    {
+        var root = Path.Combine(output, "assets-" + Guid.NewGuid().ToString("N"));
+        var draftRoot = Path.Combine(root, "draft"); var savedRoot = Path.Combine(root, "saved");
+        Directory.CreateDirectory(draftRoot); Directory.CreateDirectory(savedRoot);
+        var pixels = new byte[64 * 48 * 4];
+        for (var offset = 0; offset < pixels.Length; offset += 4) { pixels[offset] = 62; pixels[offset + 1] = 136; pixels[offset + 2] = 255; pixels[offset + 3] = 255; }
+        var bitmap = BitmapSource.Create(64, 48, 96, 96, PixelFormats.Bgra32, null, pixels, 64 * 4);
+        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using var bytes = new MemoryStream(); encoder.Save(bytes);
+        var sourcePath = Path.Combine(draftRoot, "Untitled.md");
+        var reference = new ImageAssetService().ImportAsync(draftRoot, sourcePath, bytes.ToArray(), "Clipboard image.png").GetAwaiter().GetResult();
+        var text = "# Recovered image\n\n![Clipboard](" + reference + ")\n";
+        var session = new SessionStore(Path.Combine(root, "state"));
+        session.WriteAsync("session.json", new SessionState(1, null, null, [new(Guid.NewGuid(), null, text, null, false, 0, 0, AssetWorkspace: draftRoot)])).GetAwaiter().GetResult();
+        var recovered = session.ReadAsync<SessionState>("session.json").GetAwaiter().GetResult()!.Documents.Single();
+        var draft = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(recovered.Text, sourcePath, recovered.AssetWorkspace, false);
+        if (draft.Images.Count != 1) throw new InvalidOperationException("Recovered draft image did not resolve for export.");
+        var destination = Path.Combine(savedRoot, "saved.md");
+        var transfer = new AssetTransferService().PrepareAsync(recovered.Text, sourcePath, new(draftRoot), destination, new(savedRoot)).GetAwaiter().GetResult();
+        new DocumentStore(Path.Combine(root, "recovery")).SaveAsync(destination, transfer.Text, null).GetAwaiter().GetResult();
+        transfer.Commit(); transfer.DisposeAsync().GetAwaiter().GetResult();
+        var saved = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(File.ReadAllText(destination), destination, savedRoot, false);
+        if (saved.Images.Count != 1 || saved.Images.Values.Single().PixelWidth != 64 || saved.Images.Values.Single().PixelHeight != 48)
+            throw new InvalidOperationException("Saved document did not retain its actual image.");
+        var document = new TextDocument("Before selected after");
+        var insertion = new DocumentInsertion(document, 7, 8);
+        document.Insert(0, "Typed while loading. ");
+        insertion.Insert("![image](assets/image.png)");
+        if (document.Text != "Typed while loading. Before ![image](assets/image.png) after") throw new InvalidOperationException("Image insertion did not follow source edits.");
+        var edited = new TextDocument("selected");
+        var pending = new DocumentInsertion(edited, 0, 8); edited.Insert(3, "new text"); pending.Insert("IMAGE");
+        if (edited.Text != "IMAGEselnew textected") throw new InvalidOperationException("Pending insertion discarded intervening edits.");
+        File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Pending insertion follows offsets and preserves intervening edits" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+}

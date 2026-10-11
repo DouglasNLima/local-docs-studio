@@ -16,9 +16,9 @@ public sealed class DesktopDialogs
         var dialog = new OpenFolderDialog { Title = "Open documentation workspace" };
         return dialog.ShowDialog(Owner) == true ? dialog.FolderName : null;
     }
-    public string? SaveDocument(string name)
+    public string? SaveDocument(string name, string? initialDirectory = null)
     {
-        var dialog = new SaveFileDialog { Title = "Save document", FileName = name, Filter = "Markdown|*.md|Mermaid|*.mmd|Text|*.txt", AddExtension = true, DefaultExt = ".md" };
+        var dialog = new SaveFileDialog { Title = "Save document", FileName = name, InitialDirectory = initialDirectory ?? "", Filter = "Markdown|*.md|Mermaid|*.mmd|Text|*.txt", AddExtension = true, DefaultExt = ".md" };
         return dialog.ShowDialog(Owner) == true ? dialog.FileName : null;
     }
     public string? OpenImage()

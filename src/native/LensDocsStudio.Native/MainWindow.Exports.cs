@@ -28,7 +28,7 @@ public partial class MainWindow
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             model.Status = "Preparing " + format + " export…";
-            var bytes = await exports.ExportAsync(format, source, tab.FilePath, tab.WorkspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken);
+            var bytes = await exports.ExportAsync(format, source, tab.EffectivePath, tab.EffectiveWorkspace, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
             model.Status = "Exported " + Path.GetFileName(picker.FileName);
         });

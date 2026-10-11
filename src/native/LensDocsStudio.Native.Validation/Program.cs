@@ -39,6 +39,8 @@ internal static class Program
         var failures = new List<string>();
         try { NativeSvgChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
+        try { NativeAssetChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native asset persistence: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

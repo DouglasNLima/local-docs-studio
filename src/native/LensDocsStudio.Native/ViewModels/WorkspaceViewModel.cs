@@ -36,9 +36,11 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             var pending = await documents.ReadPendingWritesAsync();
             if (pending.Count != 0) Status = $"{pending.Count} interrupted saves are available in recovery.";
             Preferences = await session.ReadAsync<UserPreferences>("preferences.json") ?? new();
+            RefreshRecentPaths();
             Theme = Preferences.Theme;
             Layout = Preferences.Layout;
-            var saved = await session.ReadAsync<SessionState>("session.json");
+            var saved = await session.ReadAsync<SessionState>("session.json", validate: saved => saved is { SchemaVersion: 1, Documents: not null } &&
+                saved.Documents.All(d => d is { Text: not null } && (d.Path is null || Path.IsPathFullyQualified(d.Path))));
             if (saved is { SchemaVersion: 1 })
             {
                 if (saved.Workspace is not null && Directory.Exists(saved.Workspace)) await SetWorkspaceAsync(saved.Workspace);
@@ -48,6 +50,9 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     if (recovered.Path is not null && recovered.SavedFingerprint is not null)
                         baseline = new(recovered.Path, recovered.SavedText ?? recovered.Text, recovered.SavedFingerprint, recovered.Utf8Bom);
                     var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot };
+                    if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
+                        tab.AssetWorkspace = recovered.AssetWorkspace;
+                    if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath);
                     if (baseline is not null)
                     {
                         try
@@ -77,6 +82,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                 else if (File.Exists(path) && WorkspaceService.IsDocument(path)) await OpenPathAsync(path);
             }
             if (Documents.Count == 0) NewDocument();
+            var warnings = documents.RecoveryWarnings.Concat(session.ReadWarnings).ToArray();
+            if (warnings.Length != 0) dialogs.Error("Some saved state needs review. Original files have been retained.\n\n" + string.Join("\n", warnings));
         });
     }
 
@@ -101,12 +108,12 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     {
         path = Path.GetFullPath(path);
         var existing = Documents.FirstOrDefault(d => string.Equals(d.FilePath, path, StringComparison.OrdinalIgnoreCase));
-        if (existing is not null) { ActiveDocument = existing; return; }
+        if (existing is not null) { ActiveDocument = existing; await RememberDocumentAsync(path); return; }
         var snapshot = await documents.ReadAsync(path);
-        var root = WorkspaceRoot is not null && path.StartsWith(WorkspaceRoot + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
-            ? WorkspaceRoot : Path.GetDirectoryName(path);
+        var root = RootForDocument(path);
         var tab = new DocumentViewModel(snapshot.Text, snapshot) { WorkspaceRoot = root };
         Attach(tab); ActiveDocument = tab; Status = "Opened " + Path.GetFileName(path);
+        await RememberDocumentAsync(path);
     }
 
     [RelayCommand] private async Task OpenFolderAsync()
@@ -127,6 +134,9 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         watcher.Changed += OnFileChanged; watcher.Deleted += OnFileChanged; watcher.Renamed += OnFileChanged;
         watcher.Error += (_, _) => Application.Current.Dispatcher.BeginInvoke(() => Status = "Folder monitoring was interrupted. Reopen the workspace to resume.");
         watcher.EnableRaisingEvents = true;
+        foreach (var tab in Documents.Where(d => d.FilePath is not null))
+            tab.WorkspaceRoot = RootForDocument(tab.FilePath!);
+        await RememberWorkspaceAsync(workspace.Root);
     }
 
     private void OnFileChanged(object sender, FileSystemEventArgs args) => Application.Current.Dispatcher.BeginInvoke(async () =>
@@ -143,21 +153,50 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     [RelayCommand] private Task SaveAsAsync() => RunAsync(async () => { if (ActiveDocument is { } tab) await SaveTabAsync(tab, true); });
     public async Task<bool> SaveTabAsync(DocumentViewModel tab, bool saveAs)
     {
+        if (tab.IsSaving) return false;
         var path = tab.FilePath;
         DocumentSnapshot? expected = tab.SavedSnapshot;
         if (saveAs || path is null)
         {
-            path = dialogs.SaveDocument(Path.GetFileName(path) ?? "Untitled.md");
+            path = dialogs.SaveDocument(Path.GetFileName(path) ?? "Untitled.md", path is null ? tab.WorkspaceRoot ?? WorkspaceRoot : Path.GetDirectoryName(path));
             if (path is null) return false;
             // The native save dialogue has already confirmed replacement; retain a fresh fingerprint.
             expected = File.Exists(path) ? await documents.ReadAsync(path) : null;
         }
-        var text = tab.EditorDocument.Text;
-        var saved = await documents.SaveAsync(path, text, expected);
-        tab.MarkSaved(saved);
-        Status = "Saved " + Path.GetFileName(path);
-        await PersistSessionAsync();
-        return true;
+        if (Documents.Any(other => other != tab && string.Equals(other.FilePath, path, StringComparison.OrdinalIgnoreCase)))
+            throw new IOException("This destination is already open in another tab. Close that tab or choose another filename.");
+        tab.IsSaving = true;
+        try
+        {
+            var text = tab.EditorDocument.Text;
+            await using var transfer = tab.EffectivePath is { } source && tab.EffectiveWorkspace is { } sourceRoot &&
+                !string.Equals(source, path, StringComparison.OrdinalIgnoreCase)
+                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken)
+                : new PreparedAssetTransfer(text);
+            if (transfer.UncopiedDocumentLinks.Count != 0 && !dialogs.Confirm("Local images will be copied. These document links point into the previous workspace and may need updating in this copy:\n\n" +
+                string.Join("\n", transfer.UncopiedDocumentLinks.Distinct().Take(12)) + "\n\nContinue saving the copy?", "Save as in another workspace")) return false;
+            var saved = await documents.SaveAsync(path, transfer.Text, expected, OperationToken);
+            transfer.Commit();
+            if (transfer.Text != text) tab.EditorDocument.Replace(0, tab.EditorDocument.TextLength, transfer.Text);
+            tab.MarkSaved(saved);
+            tab.WorkspaceRoot = RootForDocument(saved.Path);
+            DocumentChanged?.Invoke(this, EventArgs.Empty);
+            await RememberDocumentAsync(saved.Path);
+            Status = "Saved " + Path.GetFileName(path);
+            await PersistSessionAsync();
+            return true;
+        }
+        finally { tab.IsSaving = false; }
+    }
+
+    private string DraftWorkspace(Guid id) => Path.Combine(StateDirectory, "drafts", id.ToString("N"));
+    public void EnsureDraftWorkspace(DocumentViewModel tab)
+    {
+        if (tab.FilePath is not null) return;
+        var root = DraftWorkspace(tab.Id);
+        WorkspacePath.RejectReparsePoints(root);
+        Directory.CreateDirectory(root);
+        tab.AssetWorkspace = root;
     }
 
     [RelayCommand] private Task ReloadAsync() => RunAsync(async () =>

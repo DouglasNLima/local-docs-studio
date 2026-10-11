@@ -52,6 +52,8 @@ public partial class MainWindow : Window
         Editor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting());
         Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
         DataObject.AddPastingHandler(Editor, OnPaste);
+        CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteImage);
+        CommandManager.AddPreviewExecutedHandler(Editor, ExecuteImagePaste);
         model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
         recoveryTimer.Tick += async (_, _) =>
@@ -89,7 +91,7 @@ public partial class MainWindow : Window
     private void BindActiveDocument()
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
-        SaveViewport(); displayedTab = model.ActiveDocument;
+        SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
         Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
         Editor.IsEnabled = displayedTab is not null;
         if (displayedTab is not null)
@@ -97,6 +99,8 @@ public partial class MainWindow : Window
             Editor.CaretOffset = Math.Clamp(displayedTab.CaretOffset, 0, Editor.Document.TextLength);
             Editor.ScrollToVerticalOffset(displayedTab.VerticalOffset);
         }
+        if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
+        RefreshNavigationControls();
     }
     private void TabChanged(object sender, SelectionChangedEventArgs e) { if (e.Source == DocumentTabs) { BindActiveDocument(); QueuePreview(); } }
     private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
@@ -137,7 +141,7 @@ public partial class MainWindow : Window
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source;
-            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.FilePath, tab.WorkspaceRoot, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings);
+            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.EffectivePath, tab.EffectiveWorkspace, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings);
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
             if (rendered.Warnings.Count != 0) model.Status = rendered.Warnings[0];
@@ -161,13 +165,15 @@ public partial class MainWindow : Window
     }
     private void JumpToSource(int offset)
     {
+        CaptureCurrentNavigation();
         Editor.CaretOffset = Math.Clamp(offset, 0, Editor.Document.TextLength);
         Editor.ScrollToLine(Editor.Document.GetLineByOffset(Editor.CaretOffset).LineNumber); Editor.Focus();
+        VisitCurrentNavigation();
     }
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
         if (Outline.SelectedItem is DocumentHeading heading && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-        { element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); }
+        { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
     }
     private async void Navigate(string reference)
     {
@@ -190,7 +196,8 @@ public partial class MainWindow : Window
             if (fragment is not null)
             {
                 var heading = parsed?.Headings.FirstOrDefault(h => h.Anchor == fragment);
-                if (heading is not null && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true) element.BringIntoView();
+                if (heading is not null && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
+                { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
                 else model.Status = "The linked section was not found; the document remains open.";
             }
         });
@@ -275,23 +282,37 @@ public partial class MainWindow : Window
     }
     private async Task AddImageFileAsync(string path)
     {
+        if (model.ActiveDocument is not { } tab) return;
+        var insertion = new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
         try
         {
             WorkspacePath.RejectReparsePoints(path);
             if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Images are limited to 32 MB.");
-            await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path));
+            await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path), tab, insertion);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { dialogs.Error(ex.Message); }
     }
-    private async Task AddImageAsync(byte[] bytes, string name)
+    private async Task AddImageAsync(byte[] bytes, string name, DocumentViewModel? targetTab = null, DocumentInsertion? insertion = null)
     {
+        var tab = targetTab ?? model.ActiveDocument;
+        if (tab is null) return;
+        insertion ??= new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
         await model.RunAsync(async () =>
         {
-            if (model.ActiveDocument is not { } tab) return;
-            if (tab.FilePath is null && !await model.SaveTabAsync(tab, false)) return;
-            var root = tab.WorkspaceRoot ?? Path.GetDirectoryName(tab.FilePath!)!;
-            var reference = await assets.ImportAsync(root, tab.FilePath!, bytes, name);
-            if (model.ActiveDocument == tab) InsertText("![" + Path.GetFileNameWithoutExtension(name).Replace("]", "\\]") + "](" + reference + ")");
+            if (!model.Documents.Contains(tab)) { model.Status = "Image insertion cancelled because its document was closed."; return; }
+            model.EnsureDraftWorkspace(tab);
+            var root = tab.EffectiveWorkspace ?? Path.GetDirectoryName(tab.EffectivePath!)!;
+            var reference = await assets.ImportAsync(root, tab.EffectivePath!, bytes, name, model.OperationToken);
+            var value = "![" + Path.GetFileNameWithoutExtension(name).Replace("\\", "\\\\").Replace("[", "\\[").Replace("]", "\\]") + "](" + reference + ")";
+            var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
+            var caret = insertion.Insert(value);
+            if (model.ActiveDocument == tab)
+            {
+                Editor.CaretOffset = caret;
+                Editor.ScrollToVerticalOffset(vertical); Editor.ScrollToHorizontalOffset(horizontal); Editor.Focus();
+            }
+            await model.PersistSessionAsync();
+            model.Status = tab.FilePath is null ? "Image retained with the recovered draft; Save will copy it beside the document." : "Portable image inserted";
         });
     }
     private async void OnPaste(object sender, DataObjectPastingEventArgs e)
@@ -299,9 +320,41 @@ public partial class MainWindow : Window
         if (!e.DataObject.GetDataPresent(DataFormats.Bitmap)) return;
         if (e.DataObject.GetData(DataFormats.Bitmap) is not BitmapSource bitmap) return;
         e.CancelCommand();
-        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
-        using var output = new MemoryStream(); encoder.Save(output);
-        await AddImageAsync(output.ToArray(), "pasted-image.png");
+        await PasteBitmapAsync(bitmap);
+    }
+    private void CanPasteImage(object sender, CanExecuteRoutedEventArgs e)
+    {
+        if (e.Command != ApplicationCommands.Paste || model.IsBusy) return;
+        try { if (Clipboard.ContainsImage()) { e.CanExecute = true; e.Handled = true; } }
+        catch (System.Runtime.InteropServices.ExternalException) { }
+    }
+    private async void ExecuteImagePaste(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (e.Command != ApplicationCommands.Paste || model.IsBusy) return;
+        try
+        {
+            if (Clipboard.GetImage() is not { } bitmap) return;
+            e.Handled = true;
+            await PasteBitmapAsync(bitmap);
+        }
+        catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try pasting again."; }
+    }
+    private async Task PasteBitmapAsync(BitmapSource bitmap)
+    {
+        if (model.ActiveDocument is not { } tab) return;
+        var insertion = new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
+        try
+        {
+            if ((long)bitmap.PixelWidth * bitmap.PixelHeight > 64_000_000) throw new IOException("The clipboard image exceeds the 64 megapixel limit.");
+            if (!bitmap.IsFrozen) { bitmap = bitmap.Clone(); bitmap.Freeze(); }
+            var bytes = await StaWorker.RunAsync(() =>
+            {
+                var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                using var output = new MemoryStream(); encoder.Save(output); return output.ToArray();
+            });
+            await AddImageAsync(bytes, "pasted-image.png", tab, insertion);
+        }
+        catch (Exception ex) when (ex is IOException or NotSupportedException or ArgumentException or System.Runtime.InteropServices.ExternalException) { dialogs.Error(ex.Message); }
     }
     private void EditorDragOver(object sender, DragEventArgs e) { if (e.Data.GetDataPresent(DataFormats.FileDrop)) { e.Effects = DragDropEffects.Copy; e.Handled = true; } }
     private async void EditorDrop(object sender, DragEventArgs e)
@@ -366,6 +419,8 @@ public partial class MainWindow : Window
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape && FindBar.Visibility == Visibility.Visible) { HideFind(); e.Handled = true; return; }
+        if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey is Key.Left or Key.Right)
+        { _ = MoveNavigationAsync(e.SystemKey == Key.Right); e.Handled = true; return; }
         if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
         var shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
         switch (e.Key)
@@ -376,6 +431,7 @@ public partial class MainWindow : Window
             case Key.O: (shift ? model.OpenFolderCommand : model.OpenDocumentCommand).Execute(null); break;
             case Key.N: model.NewDocumentCommand.Execute(null); break;
             case Key.W: model.CloseDocumentCommand.Execute(model.ActiveDocument); break;
+            case Key.K when shift: InsertDocumentLink(sender, e); break;
             case Key.B when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "bold" }, e); break;
             case Key.I when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "italic" }, e); break;
             default: return;

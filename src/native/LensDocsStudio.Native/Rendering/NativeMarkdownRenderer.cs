@@ -164,6 +164,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         break;
                     case LinkInline link:
                         var hyperlink = new Hyperlink { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = link.Url };
+                        System.Windows.Automation.AutomationProperties.SetName(hyperlink, MarkdownService.InlineText(link));
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(hyperlink, "DocumentLink" + link.Span.Start);
                         AddInlines(hyperlink.Inlines, link);
                         hyperlink.Click += (_, _) => navigate(link.Url ?? "");
                         target.Add(hyperlink); break;

@@ -9,6 +9,7 @@ public sealed class DocumentStore(string recoveryDirectory)
     public const int MaximumDocumentBytes = 32 * 1024 * 1024;
     private readonly SemaphoreSlim writeGate = new(1, 1);
     public string RecoveryDirectory { get; } = Path.GetFullPath(recoveryDirectory);
+    public List<string> RecoveryWarnings { get; } = [];
 
     public async Task<DocumentSnapshot> ReadAsync(string path, CancellationToken cancellationToken = default)
     {
@@ -96,14 +97,25 @@ public sealed class DocumentStore(string recoveryDirectory)
 
     public async Task<IReadOnlyList<PendingWrite>> ReadPendingWritesAsync(CancellationToken cancellationToken = default)
     {
+        RecoveryWarnings.Clear();
         if (!Directory.Exists(RecoveryDirectory)) return [];
         var result = new List<PendingWrite>();
         foreach (var file in Directory.EnumerateFiles(RecoveryDirectory, "*.pending.json"))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (new FileInfo(file).Length > 100 * 1024 * 1024) continue;
-            var record = JsonSerializer.Deserialize<PendingWrite>(await File.ReadAllBytesAsync(file, cancellationToken));
-            if (record is { SchemaVersion: 1 }) result.Add(record);
+            try
+            {
+                WorkspacePath.RejectReparsePoints(file);
+                if (new FileInfo(file).Length > 100 * 1024 * 1024) throw new IOException("The recovery record exceeds the safety limit.");
+                var record = JsonSerializer.Deserialize<PendingWrite>(await File.ReadAllBytesAsync(file, cancellationToken));
+                if (record is not { SchemaVersion: 1, Intended: not null, Original: not null, Path: not null } || !Path.IsPathFullyQualified(record.Path) ||
+                    record.Intended.Length > MaximumDocumentBytes || record.Original.Length > MaximumDocumentBytes)
+                    throw new IOException("The recovery record is unsupported or incomplete.");
+                _ = DocumentSnapshot.FromBytes(record.Path, record.Intended);
+                result.Add(record);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException or System.Text.DecoderFallbackException)
+            { RecoveryWarnings.Add("An unreadable recovery record was retained: " + Path.GetFileName(file) + ". " + ex.Message); }
         }
         return result;
     }

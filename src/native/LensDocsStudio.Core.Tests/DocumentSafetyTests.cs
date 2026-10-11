@@ -106,5 +106,37 @@ public sealed class DocumentSafetyTests : IDisposable
         await Assert.ThrowsAsync<System.Text.DecoderFallbackException>(() => Store.ReadAsync(path));
     }
 
+    [Fact] public void Drive_root_workspaces_accept_children_without_allowing_sibling_prefixes()
+    {
+        var drive = Path.GetPathRoot(root)!;
+        Assert.Equal(root, new WorkspacePath(drive).Resolve(Path.GetRelativePath(drive, root)));
+        Assert.False(WorkspacePath.Contains(root, root + "-other/file.md"));
+    }
+
+    [Fact] public async Task Malformed_recovery_record_does_not_hide_other_recoverable_drafts()
+    {
+        var store = Store;
+        Directory.CreateDirectory(store.RecoveryDirectory);
+        await File.WriteAllTextAsync(Path.Combine(store.RecoveryDirectory, "bad.pending.json"), "{broken");
+        var pending = new PendingWrite(1, Path.Combine(root, "draft.md"), [], DocumentSnapshot.Encode("recover me", false), DateTimeOffset.UtcNow);
+        await File.WriteAllTextAsync(Path.Combine(store.RecoveryDirectory, "valid.pending.json"), System.Text.Json.JsonSerializer.Serialize(pending));
+        var recovered = Assert.Single(await store.ReadPendingWritesAsync());
+        Assert.Equal("recover me", DocumentSnapshot.FromBytes(recovered.Path, recovered.Intended).Text);
+        Assert.Single(store.RecoveryWarnings);
+        Assert.Equal("{broken", await File.ReadAllTextAsync(Path.Combine(store.RecoveryDirectory, "bad.pending.json")));
+    }
+
+    [Fact] public async Task Both_malformed_session_versions_are_retained_before_new_state_is_saved()
+    {
+        var store = new SessionStore(Path.Combine(root, "state"));
+        Directory.CreateDirectory(store.DirectoryPath);
+        await File.WriteAllTextAsync(Path.Combine(store.DirectoryPath, "session.json"), "{broken-primary");
+        await File.WriteAllTextAsync(Path.Combine(store.DirectoryPath, "session.json.bak"), "{broken-backup");
+        Assert.Null(await store.ReadAsync<SessionState>("session.json"));
+        await store.WriteAsync("session.json", new SessionState(1, null, null, []));
+        var retained = Directory.GetFiles(store.DirectoryPath, "*.unreadable-*.json").Select(File.ReadAllText).ToArray();
+        Assert.Contains("{broken-primary", retained); Assert.Contains("{broken-backup", retained);
+    }
+
     public void Dispose() => Directory.Delete(root, true);
 }

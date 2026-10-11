@@ -20,7 +20,7 @@ public sealed class WorkspacePath
             if (component is not ("." or "..") && (component.EndsWith('.') || component.EndsWith(' ')))
                 throw new IOException("The path contains an unsupported Windows filename.");
         var path = Path.GetFullPath(Path.Combine(Root, relativePath.Replace('/', Path.DirectorySeparatorChar)));
-        if (!path.StartsWith(Root + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        if (!Contains(Root, path))
             throw new IOException("The path leaves the workspace.");
         foreach (var part in Path.GetRelativePath(Root, path).Split(Path.DirectorySeparatorChar))
         {
@@ -54,5 +54,12 @@ public sealed class WorkspacePath
                 (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
                 throw new IOException("Symbolic links and junctions are not followed.");
         }
+    }
+
+    public static bool Contains(string root, string path)
+    {
+        root = Path.GetFullPath(root);
+        var prefix = Path.EndsInDirectorySeparator(root) ? root : root + Path.DirectorySeparatorChar;
+        return Path.GetFullPath(path).StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
     }
 }
