@@ -26,19 +26,19 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
     public PreviewResult Render(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default).GetAwaiter().GetResult();
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken);
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken)
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var foreground = new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
@@ -108,6 +108,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = new BlockUIContainer(panel); break;
                 case CodeBlock code:
                     result = new Paragraph(new Run(code.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
+                    result.ContextMenu = CodeContextMenu.Create(code, parsed.Source, copyCode);
                     break;
                 case AlertBlock alert:
                     var callout = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0),

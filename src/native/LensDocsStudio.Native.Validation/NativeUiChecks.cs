@@ -587,6 +587,57 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeAnchor, "Anchor checks did not restore the original source.");
             checks.Add("Native anchors validate identifiers, retain links when labels change, navigate to empty targets and preserve complete Undo/Redo");
+            var contextOriginal = editor.Patterns.Value.Pattern.Value.Value;
+            var contextClipboard = System.Windows.Clipboard.GetDataObject(); uint contextClipboardSequence = 0;
+            try
+            {
+                const string contextText = "Context action — Café";
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(contextText); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextText, "The editor context menu did not paste into its selected text.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText("Clipboard replacement sentinel"); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextCopy");
+                Wait(() => System.Windows.Clipboard.GetText() == contextText, "The editor context Copy command lost selected Unicode text.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextCut"); contextClipboardSequence = GetClipboardSequenceNumber();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The editor context Cut command did not remove its selection.");
+                EditorContext("EditorContextUndo");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextText, "Context Undo did not restore cut text.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); EditorContext("EditorContextBold");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == "**" + contextText + "**", "Context formatting did not retain the editor selection.");
+                EditorContext("EditorContextUndo");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextText, "Context formatting did not form one Undo action.");
+                EditorContext("EditorContextUndo");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Context paste Undo did not restore the original document.");
+                checks.Add("Keyboard-opened editor context commands paste, copy, cut and format selected text with complete Undo");
+
+                const string contextCode = "const nativeContext = 'Café';\n  keepIndent();";
+                const string contextMarkdown = "```js\n" + contextCode + "\n```";
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(contextMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextMarkdown, "The code context fixture did not paste.");
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("const nativeContext", StringComparison.Ordinal), "The code context fixture did not render.");
+                OpenCodeContext("CopyCodeBlock").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name == "Code copied as plain text.", "The preview context command did not copy code.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                if (System.Windows.Clipboard.GetText() != contextCode || System.Windows.Clipboard.ContainsData(System.Windows.DataFormats.Html))
+                    throw new IOException("Copy code lost source content or added rendered HTML to plain code.");
+                OpenCodeContext("CopyCodeMarkdown").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name == "Code block Markdown source copied.", "The preview context command did not copy Markdown.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                if (System.Windows.Clipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
+                checks.Add("Preview code context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
+            }
+            finally
+            {
+                if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
+                { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
+            }
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -642,6 +693,29 @@ internal static class NativeUiChecks
             // FlaUI refreshes and disposes its Process instance while locating a window.
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
+        }
+        AutomationElement ContextAction(string id)
+        {
+            AutomationElement? action = null;
+            Wait(() => (action = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId(id)))) is not null,
+                "The native context action did not appear: " + id);
+            return action!;
+        }
+        void EditorContext(string id)
+        {
+            Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.F10);
+            ContextAction(id).Patterns.Invoke.Pattern.Invoke();
+        }
+        AutomationElement OpenCodeContext(string id)
+        {
+            var previewWindow = app!.GetMainWindow(automation)!;
+            var range = Find(previewWindow, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("const nativeContext", false, false)
+                ?? throw new IOException("The preview code text range is unavailable.");
+            range.ScrollIntoView(true);
+            var bounds = range.GetBoundingRectangles().FirstOrDefault(r => r.Width > 0 && r.Height > 0);
+            if (bounds.Width <= 0) throw new IOException("The preview code text has no visible native bounds.");
+            Mouse.Click(new System.Drawing.Point(bounds.X + Math.Max(1, bounds.Width / 3), bounds.Y + Math.Max(1, bounds.Height / 2)), MouseButton.Right);
+            return ContextAction(id);
         }
         Window OpenAnchor(Window mainWindow)
         {

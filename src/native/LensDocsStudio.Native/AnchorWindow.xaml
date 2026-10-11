@@ -5,10 +5,10 @@
  <StackPanel Margin="24">
   <TextBlock x:Name="Heading" Text="Insert document anchor" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,14"/>
   <Label Content="_Identifier" Target="{Binding ElementName=AnchorId}"/>
-  <TextBox x:Name="AnchorId" Padding="8" MaxLength="128" AutomationProperties.Name="Anchor identifier" AutomationProperties.AutomationId="AnchorIdentifier"/>
+  <TextBox x:Name="AnchorId" Padding="8" MaxLength="128" TextChanged="ClearValidation" AutomationProperties.Name="Anchor identifier" AutomationProperties.AutomationId="AnchorIdentifier"/>
   <TextBlock x:Name="IdentifierHint" Text="Use a unique identifier for links to this position, such as review-notes." TextWrapping="Wrap" Margin="0,6,0,10"/>
   <Label Content="_Visible label (optional)" Target="{Binding ElementName=AnchorLabel}"/>
-  <TextBox x:Name="AnchorLabel" Padding="8" MaxLength="512" AutomationProperties.Name="Anchor visible label" AutomationProperties.AutomationId="AnchorLabel"/>
+  <TextBox x:Name="AnchorLabel" Padding="8" MaxLength="512" TextChanged="ClearValidation" AutomationProperties.Name="Anchor visible label" AutomationProperties.AutomationId="AnchorLabel"/>
   <TextBlock Text="An empty label creates a link target without adding visible text." TextWrapping="Wrap" Margin="0,6,0,0"/>
   <TextBlock x:Name="ValidationMessage" TextWrapping="Wrap" Margin="0,16,0,8" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="AnchorValidation"/>
   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

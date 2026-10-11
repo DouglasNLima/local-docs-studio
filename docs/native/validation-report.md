@@ -1,5 +1,13 @@
 # Native validation report
 
+## Native context actions
+
+Five native context checks pass: actual WPF menu actions dispatch literal Unicode code with indentation and original line endings; Markdown source retains fences, CRLF and a nested quote's opening context; oversized actions are disabled and cannot dispatch content; app commands do not enter selectable preview text or exported HTML. The standard native harness remains green, including the 40 diagram/export cases and prior asset, preview, semantics, editor, layout, Docs Site, progress and anchor outcomes. Evidence: artifacts/native/validation/native-context.json.
+
+The editor now exposes native Undo/Redo, Cut/Copy/Paste, Select all, formatting and document links through its context menu. Command targets explicitly refer to the editor. Preview code blocks offer bounded plain-code and Markdown-source copying through Windows Unicode text; selection and copied source are not rewritten. Two new desktop outcomes exercise Shift+F10 commands, source restoration and real code-context clipboard bytes; these remain pending CI. Table-specific and broader preview context actions remain incomplete.
+
+Both native CI runs at 2d9fff0 pass (38170962442/38170959361), validating 309 core tests, four browser export checks and all 28 desktop workflows before installation and after installation/reinstallation. Evidence: artifacts/native/native-ci-2d9fff0-pr.log and artifacts/native/ci-2d9fff0-pr/ui. The captured anchor dialogue was visually inspected; a stale validation message after corrected input is cleared by the follow-up. Web runs remain under observation.
+
 ## Named document anchors
 
 Release builds without warnings/errors and all 309 core tests pass. Twenty-two anchor cases cover named/empty labels, decoded text, exact source positions, unique duplicate targets shared by headings/anchors, preserved later-declared identifiers, unsupported or active structures, code examples, bounds, HTML/clipboard preservation, Word bookmark/link resolution, retained template bookmarks and insertion/update validation. Evidence: artifacts/native/tests/native-core-anchors.trx.

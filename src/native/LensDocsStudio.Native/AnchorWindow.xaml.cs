@@ -30,4 +30,6 @@ public partial class AnchorWindow : Window
         try { Edit = AnchorEditService.Plan(document, start, length, new(AnchorId.Text, AnchorLabel.Text)); DialogResult = true; }
         catch (ArgumentException ex) { ValidationMessage.Text = ex.Message.Split(" (Parameter", StringSplitOptions.None)[0]; }
     }
+    private void ClearValidation(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    { if (ValidationMessage is not null) ValidationMessage.Text = ""; }
 }

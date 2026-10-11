@@ -152,7 +152,7 @@ public partial class MainWindow : Window
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
-                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation);
+                nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;

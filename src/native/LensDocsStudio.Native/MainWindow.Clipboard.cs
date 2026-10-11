@@ -8,6 +8,17 @@ namespace LensDocsStudio.Native;
 
 public partial class MainWindow
 {
+    private void CopyCodeBlock(Rendering.PreviewTextCopy content)
+    {
+        if (content.Text.Length > Rendering.CodeContextMenu.MaximumCopyCharacters)
+        { model.Status = "Copy supports code blocks up to 4 million characters."; return; }
+        try
+        {
+            Clipboard.SetText(content.Text, TextDataFormat.UnicodeText);
+            model.Status = content.Markdown ? "Code block Markdown source copied." : "Code copied as plain text.";
+        }
+        catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
+    }
     private static ClipboardPayload ReadClipboardText(IDataObject data)
     {
         var text = data.GetDataPresent(DataFormats.UnicodeText, false) ? data.GetData(DataFormats.UnicodeText, false) as string : data.GetData(DataFormats.Text) as string;

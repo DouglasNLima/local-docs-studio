@@ -192,7 +192,23 @@
         Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" Padding="14" BorderThickness="0"
         HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" WordWrap="True"
         AllowDrop="True" PreviewDragOver="EditorDragOver" PreviewDrop="EditorDrop"
-        GotKeyboardFocus="EditorFocused" AutomationProperties.Name="Markdown editor" AutomationProperties.AutomationId="MarkdownEditor"/>
+        GotKeyboardFocus="EditorFocused" AutomationProperties.Name="Markdown editor" AutomationProperties.AutomationId="MarkdownEditor">
+      <avalon:TextEditor.ContextMenu>
+       <ContextMenu AutomationProperties.Name="Editor actions">
+        <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextUndo"/>
+        <MenuItem Header="_Redo" Command="ApplicationCommands.Redo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        <Separator/>
+        <MenuItem Header="Cu_t" Command="ApplicationCommands.Cut" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextCut"/>
+        <MenuItem Header="_Copy" Command="ApplicationCommands.Copy" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextCopy"/>
+        <MenuItem Header="_Paste" Command="ApplicationCommands.Paste" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextPaste"/>
+        <MenuItem Header="Select _all" Command="ApplicationCommands.SelectAll" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        <Separator/>
+        <MenuItem Header="_Bold" Tag="bold" Click="Format" AutomationProperties.AutomationId="EditorContextBold"/>
+        <MenuItem Header="_Italic" Tag="italic" Click="Format"/>
+        <MenuItem Header="Document _link…" Click="InsertDocumentLink"/>
+       </ContextMenu>
+      </avalon:TextEditor.ContextMenu>
+     </avalon:TextEditor>
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
      <FlowDocumentScrollViewer x:Name="Preview" Grid.Column="2" VerticalScrollBarVisibility="Auto" IsToolBarVisible="False"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
