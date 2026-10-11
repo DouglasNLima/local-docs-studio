@@ -1,5 +1,11 @@
 # Native validation report
 
+## Native image figure editor
+
+Release build passes without warnings/errors; all 413 core tests pass. Thirteen edit cases verify standalone conversion, CRLF/source neighbours, destination/title retention, shared references, existing-label replacement/removal, normalised whitespace, unsupported inline/list/quote contexts, invalid selections and bounded caption input. An eleventh native AvalonEdit outcome checks complete selection and independent conversion/edit Undo/Redo. The native desktop harness adds a 37th workflow for opening the dialogue, current field values, conversion, reopening, label editing and exact Undo/Redo without file writes. Evidence: artifacts/native/tests/image-figure-edit-first.trx, native-core-figure-editor.trx and artifacts/native/validation/native-editor.json. Desktop/installed certification remains pending; both 5cde3ff native runs have passed the preceding 36-workflow built-app stage and are running installed lifecycle checks.
+
+The first full local harness run reported one unrelated PHP syntax-colouring failure; the exact limiting condition was not recorded. Its summary is retained at artifacts/native/figure-editor-first-validation-summary.json. The focused syntax run passes with unchanged product code, followed by a complete harness pass. Failure diagnostics now report limit state, block count, elapsed time and source retention; no timeout or assertion was relaxed. Evidence: artifacts/native/figure-editor-syntax-rerun/native-syntax.json and artifacts/native/validation/validation-summary.json. Static checks also pass.
+
 ## Passive image figures
 
 Release build has no warnings/errors; all 400 core tests and the complete native harness pass. Twenty-five figure cases cover exact original CRLF/image/URL spans, entity decoding, attribute-safe rewrites, optional captions/alt, twelve malformed/unsupported forms, every unfinished source prefix, bounds, code/table-review exclusions, real DOCX media/schema/caption style, mixed-image deduplication, Unicode and HTML-only source clipboard round trips, larger embedded data and actual asset-audit/portable-copy behaviour. Evidence: artifacts/native/tests/native-core-image-figures.trx and image-figure-first.trx.

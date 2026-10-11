@@ -47,9 +47,12 @@ internal static class NativeSyntaxChecks
         foreach (var (language, text) in languages)
         {
             var sample = parser.Parse("```" + language + "\n" + text + "\n```");
+            var preparationWatch = Stopwatch.StartNew();
             var plan = Task.Run(() => CodeSyntaxService.Prepare(sample)).GetAwaiter().GetResult();
             if (plan.Limited || plan.Blocks.Count != 1 || plan.Blocks.Single().Value.Text != text)
-                throw new IOException("Bundled syntax definition did not preserve and colour " + language + ".");
+                throw new IOException("Bundled syntax definition did not preserve and colour " + language + ": "
+                    + JsonSerializer.Serialize(new { plan.Limited, Blocks = plan.Blocks.Count, Milliseconds = preparationWatch.Elapsed.TotalMilliseconds,
+                        TextRetained = plan.Blocks.Count == 1 && plan.Blocks.Single().Value.Text == text }));
             languageCounts.Add(language, plan.Blocks.Single().Value.Spans.Count);
         }
         foreach (var dark in new[] { false, true })

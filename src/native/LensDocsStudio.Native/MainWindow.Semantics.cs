@@ -6,6 +6,28 @@ namespace LensDocsStudio.Native;
 
 public partial class MainWindow
 {
+    private async void EditImageFigure(object sender, RoutedEventArgs e)
+    {
+        if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
+        if (tab.EditorDocument.TextLength > 4 * 1024 * 1024) { model.Status = "The image figure editor supports documents up to 4 million characters."; return; }
+        if (Path.GetExtension(tab.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid")
+        { model.Status = "Add image figures to a Markdown document."; return; }
+        var source = tab.EditorDocument.Text; var start = Editor.SelectionStart; var length = Editor.SelectionLength;
+        await model.RunAsync(async () =>
+        {
+            var document = await Task.Run(() => new LensDocsStudio.Core.Parsing.MarkdownService().Parse(source), model.OperationToken);
+            model.OperationToken.ThrowIfCancellationRequested();
+            if (Changed() || Editor.SelectionStart != start || Editor.SelectionLength != length)
+            { model.Status = "The document or selection changed; open the image figure editor again."; return; }
+            if (ImageFigureEditService.Find(document, start, length) is null)
+            { model.Status = "Insert an image first, then place the caret inside its standalone Markdown or existing figure to add a caption."; return; }
+            var window = new ImageFigureWindow(document, start, length) { Owner = this };
+            if (window.ShowDialog() != true || window.Edit is not { } edit) return;
+            if (Changed()) { model.Status = "The document changed; the image figure was not applied. Open the editor again."; return; }
+            EditorFormattingService.Apply(Editor, edit); model.Status = "Image figure updated.";
+        });
+        bool Changed() => model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly;
+    }
     private async void InsertAnchor(object sender, RoutedEventArgs e)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;

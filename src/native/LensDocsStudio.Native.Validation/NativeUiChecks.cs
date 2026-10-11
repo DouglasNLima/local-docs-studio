@@ -803,6 +803,47 @@ internal static class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Figure validation did not restore the original document.");
                 checks.Add("Native image figures expose selectable captions and copy real pixels with semantic HTML and unchanged source");
+                var figureEditOriginal = "# Figure editing\n\n![Original](<" + figureReference + "> \"Retained image title\")";
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                System.Windows.Clipboard.SetText(figureEditOriginal); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == figureEditOriginal, "The standalone image fixture did not paste.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+                Find(window, "InsertMenu").Click(); Find(window, "EditImageFigure").Patterns.Invoke.Pattern.Invoke();
+                Window? figureWindow = null;
+                Wait(() => (figureWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Image figure")))?.AsWindow()) is not null,
+                    "The native image figure editor did not open for a standalone image.");
+                if (Find(figureWindow!, "FigureAlternativeText").AsTextBox().Text != "Original" || Find(figureWindow!, "FigureCaption").AsTextBox().Text != "")
+                    throw new IOException("The image figure dialogue lost the original description.");
+                Find(figureWindow!, "FigureAlternativeText").AsTextBox().Text = "Edited image description";
+                Find(figureWindow!, "FigureCaption").AsTextBox().Text = "Caption Café & evidence";
+                figureWindow!.CaptureToFile(Path.Combine(output, "native-figure-dialogue.png"));
+                Find(figureWindow!, "ApplyImageFigure").AsButton().Invoke();
+                Wait(() => Find(window, "Status").Name == "Image figure updated." && editor.Patterns.Value.Pattern.Value.Value.Contains("<figcaption>Caption Café &amp; evidence</figcaption>", StringComparison.Ordinal),
+                    "The figure dialogue did not apply the caption.");
+                var convertedFigure = editor.Patterns.Value.Pattern.Value.Value;
+                Find(window, "InsertMenu").Click(); Find(window, "EditImageFigure").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => (figureWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Image figure")))?.AsWindow()) is not null,
+                    "The existing figure did not reopen for editing.");
+                if (Find(figureWindow!, "FigureAlternativeText").AsTextBox().Text != "Edited image description" || Find(figureWindow!, "FigureCaption").AsTextBox().Text != "Caption Café & evidence")
+                    throw new IOException("The image figure editor did not restore its current values.");
+                Find(figureWindow!, "FigureCaption").AsTextBox().Text = "Updated caption";
+                Find(figureWindow!, "ApplyImageFigure").AsButton().Invoke();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("<figcaption>Updated caption</figcaption>", StringComparison.Ordinal), "Caption editing did not replace the current figure.");
+                var updatedFigureSource = editor.Patterns.Value.Pattern.Value.Value;
+                var editedFigure = new LensDocsStudio.Core.Parsing.MarkdownService().Parse(updatedFigureSource).Syntax.OfType<LensDocsStudio.Core.Parsing.DocumentImageFigureBlock>().Single();
+                if (editedFigure.Image.Url != figureReference || editedFigure.Image.Title != "Retained image title" || File.ReadAllText(source) != tableSavedSource)
+                    throw new IOException("Figure caption editing changed its destination, title or saved source.");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == convertedFigure, "Caption edit Undo did not restore the previous figure.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == updatedFigureSource, "Caption edit Redo did not restore the edited figure.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == convertedFigure, "Caption edit did not restore before conversion Undo.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == figureEditOriginal, "Figure conversion Undo lost the original Markdown image.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Figure dialogue checks did not restore the original source.");
+                checks.Add("Native image figure dialogue converts existing images, restores editable captions and retains destination/title through complete Undo/Redo");
             }
             finally
             {

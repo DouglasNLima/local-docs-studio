@@ -1,5 +1,9 @@
 # Native implementation progress
 
+Current addition: Insert → Image figure edits a standalone image's alternative text/caption or reopens a recognised figure. The source plan preserves image destinations, titles, shared reference definitions, CRLF and surrounding text. Thirteen core edit cases and an eleventh native editor outcome pass; all 413 core tests pass. The 37th desktop dialogue/Undo workflow awaits CI. Both 5cde3ff native runs have passed the earlier 36-workflow built stage; installed lifecycle checks are running.
+
+The full native harness and static checks also pass. An initial PHP syntax check failed; its summary is retained, and unchanged product code passes the focused syntax check and complete rerun. Diagnostic details were added without relaxing the check or processing limits. The exact first failure condition remains unproven.
+
 Current implementation: passive image figures now retain native pictures, selectable captions, exact source/HTML URL rewrites, asset audit/portable Save as and clipboard image round trips. HTML/Docs Site, Word and PDF retain image/caption content. All 400 core tests, the full native harness including four figure outcomes and four export-browser checks pass locally; light/dark pages were inspected. The 36th desktop figure/clipboard workflow awaits CI. Both native runs at 94119d5 pass all 35 prior workflows before installation and after installation/reinstallation, certifying the tree refresh and target-draft review correction.
 
 Current correction: workspace tree monitoring now subscribes to creation and directory changes, debounces background enumeration and reconciles native nodes in place. Real filesystem and hidden-window checks preserve folder expansion/selection, unsaved source and conflict markers; private native state stays excluded. Seven monitoring outcomes, the full native harness, all 375 core tests and static checks pass locally. Both f29f193 native runs (38178448826/38178446159) exposed the missing refresh before the new review workflow; failure logs and the inspected PR screenshot are retained. The unchanged 35-outcome desktop workflow awaits fresh CI.
@@ -93,7 +97,7 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: validate image figures and clipboard preservation in desktop/installed CI, then continue safe details semantics, Word template and library parity. All four runs at 94119d5 pass: native 38179079019/38179073243 and web 38179079027/38179073289.
+Next: validate the figure rendering/copy and caption dialogue in desktop/installed CI, then continue safe details semantics, Word template and library parity. All four runs at 94119d5 pass: native 38179079019/38179073243 and web 38179079027/38179073289.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

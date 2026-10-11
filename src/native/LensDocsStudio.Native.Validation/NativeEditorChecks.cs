@@ -77,6 +77,17 @@ internal static class NativeEditorChecks
         if (editor.Text != source) throw new IOException("Anchor insertion Undo changed preceding source.");
         editor.Document.UndoStack.Redo();
         if (editor.Text != anchorSource) throw new IOException("Anchor insertion Redo changed source.");
+        const string figureOriginal = "Before\r\n\r\n![Description](image.png)\r\n\r\nAfter";
+        editor.Text = figureOriginal; editor.Document.UndoStack.ClearAll();
+        var figureEdit = ImageFigureEditService.Plan(new MarkdownService().Parse(figureOriginal), figureOriginal.IndexOf("Description", StringComparison.Ordinal), 0, new("Image description", "First caption"));
+        EditorFormattingService.Apply(editor, figureEdit); var figureSource = editor.Text;
+        if (editor.SelectedText != figureEdit.Replacement) throw new IOException("Image figure conversion did not retain its full selection.");
+        EditorFormattingService.Apply(editor, ImageFigureEditService.Plan(new MarkdownService().Parse(figureSource), editor.SelectionStart, editor.SelectionLength, new("Updated description", "Updated caption")));
+        var updatedFigure = editor.Text;
+        editor.Document.UndoStack.Undo(); if (editor.Text != figureSource) throw new IOException("Figure caption editing was not one Undo action.");
+        editor.Document.UndoStack.Undo(); if (editor.Text != figureOriginal) throw new IOException("Figure conversion Undo changed surrounding source.");
+        editor.Document.UndoStack.Redo(); editor.Document.UndoStack.Redo();
+        if (editor.Text != updatedFigure) throw new IOException("Image figure Redo lost the applied description or caption.");
         editor.Text = source; editor.Document.UndoStack.ClearAll(); editor.Select(7, 8);
         var menu = new System.Windows.Controls.ContextMenu();
         var selectAll = new System.Windows.Controls.MenuItem { Command = System.Windows.Input.ApplicationCommands.SelectAll };
@@ -101,7 +112,8 @@ internal static class NativeEditorChecks
                 "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text",
                 "Progress insertion and editing retain selection and form separate complete Undo/Redo actions",
                 "Named and empty anchor insertion/editing preserve selection and complete Undo/Redo actions",
-                "Context Select all and Undo route to AvalonEdit's text area and formatting respects read-only state" }
+                "Context Select all and Undo route to AvalonEdit's text area and formatting respects read-only state",
+                "Image figure conversion and caption editing retain complete selection and separate Undo/Redo actions" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

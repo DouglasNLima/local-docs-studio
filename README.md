@@ -33,6 +33,8 @@ Native preview also recognises the existing status-badge and keyboard-shortcut s
 
 The existing `<figure data-image-figure>` helper displays a native image and selectable caption. Recognised figures use the same workspace image checks, portable Save as, asset audit and source-preserving clipboard paths as Markdown images. HTML/Docs Site, Word and PDF exports retain the picture and caption. Recognition accepts one image with quoted `src`, optional `alt`/`title`, and an optional plain-text `figcaption`; additional attributes, nested caption markup and unsupported structures remain inert source.
 
+To add a caption, insert an image normally, place the caret in its standalone Markdown and choose **Insert → Image figure…**. The dialogue edits alternative text and caption while retaining the existing destination and title. Reopen it inside a recognised figure to update those labels. Each application is one undoable source edit. Images mixed into prose, lists or quotes must first be placed in their own top-level paragraph.
+
 Native formatting toggles bold, italic and strikethrough while retaining the selected text. Insert offers line-based headings, lists and quotes, five callout kinds, tables and code/Mermaid blocks. Code fences adapt to selected backticks, block insertion separates surrounding paragraphs, and template placeholders are selected for typing. Each formatting action is undoable as one edit.
 
 Native editor syntax colours follow the selected light/dark theme and preserve Windows high-contrast text and selection colours. Normal selection uses the Lens accent with dark text. Highlighting runs before selection styling and has bounded line scans; long or malformed lines retain complete editable text without requiring syntax colouring.
