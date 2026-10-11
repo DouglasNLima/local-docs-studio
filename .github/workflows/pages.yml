@@ -32,6 +32,8 @@ jobs:
         run: npx playwright install chromium
 
       - name: Run checks
+        env:
+          DEBUG: pw:browser
         run: npm test
 
       - name: Retain browser failure evidence

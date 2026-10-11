@@ -1864,8 +1864,7 @@ test('welcome Open folder uses the packaged native bridge route without browser 
 
   await page.locator('.welcome-state').getByRole('button', { name: 'Open folder' }).click();
 
-  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
-  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeMessages.some((message) => message.type === 'lensDocs.native.openFolder'))).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
   await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
   await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
@@ -3316,7 +3315,8 @@ test('emoji picker search includes expanded documentation emojis', async ({ page
   await page.getByRole('button', { name: 'Insert emoji' }).click();
 
   await expect(page.locator('#editor')).toHaveValue('🛡️');
-  await expect(page.locator('#status')).toHaveText(/Emoji inserted/);
+  await expect(page.locator('#insertHelperDialog')).toBeHidden();
+  await expect(page.locator('#preview')).toContainText('🛡️');
 });
 
 test('table toolbar opens a visual editor for new and existing Markdown tables', async ({ page }) => {
@@ -5096,23 +5096,29 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
 
   const docxPath = testInfo.outputPath('import-word.docx');
   await writeFile(docxPath, createDocxImportFixture());
-  let releaseWorker;
-  let resolveWorkerRequested;
-  const workerGate = new Promise((resolve) => { releaseWorker = resolve; });
-  const workerRequested = new Promise((resolve) => { resolveWorkerRequested = resolve; });
-  await page.route('**/assets/scripts/files/document-import-worker.js', async (route) => {
-    resolveWorkerRequested();
-    await workerGate;
-    await route.continue();
+  // Gate the real worker's input, which also works when its script is already in the service-worker cache.
+  await page.evaluate(() => {
+    const postMessage = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (message, ...options) {
+      if (message?.fileName?.endsWith('.docx')) {
+        window.__documentImportQueued = true;
+        window.__releaseDocumentImport = () => {
+          Worker.prototype.postMessage = postMessage;
+          postMessage.call(this, message, ...options);
+        };
+        return;
+      }
+      return postMessage.call(this, message, ...options);
+    };
   });
 
   await page.locator('#documentInput').setInputFiles(docxPath);
   await submitAppDialog(page, { button: 'Discard changes' });
-  await workerRequested;
+  await expect.poll(() => page.evaluate(() => window.__documentImportQueued)).toBe(true);
   await expect(page.locator('#status')).toHaveText(/Converting 1 document to Markdown/);
   await expect(page.locator('#status')).toHaveClass(/busy/);
   await expect(page.locator('#status')).toHaveAttribute('aria-busy', 'true');
-  releaseWorker();
+  await page.evaluate(() => window.__releaseDocumentImport());
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/, { timeout: 20_000 });
   await expect(page.locator('#status')).not.toHaveAttribute('aria-busy', 'true');
 

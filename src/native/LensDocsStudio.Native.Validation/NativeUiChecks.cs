@@ -121,7 +121,7 @@ internal static class NativeUiChecks
             Find(window, "NavigateBack").Click();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Renamed%20document.md", StringComparison.Ordinal), "The open linked document did not receive the planned link update.");
             checks.Add("Native rename review saves unsaved linked content, moves the file, updates links and refreshes open editor text");
-            Find(window, "FileMenu").Click(); Find(window, "CreateWorkspaceFile").Click();
+            Find(window, "FileMenu").Click(); Find(window, "CreateWorkspaceFile").Patterns.Invoke.Pattern.Invoke();
             Window? createWindow = null;
             Wait(() => (createWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Create workspace file")))?.AsWindow()) is not null, "The workspace create-file dialogue did not open.");
             Find(createWindow!, "WorkspacePathInput").AsTextBox().Text = "created-from-ui.md";
@@ -134,7 +134,7 @@ internal static class NativeUiChecks
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.Type("\nUnsaved content retained before deletion.");
-            Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Click();
+            Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Patterns.Invoke.Pattern.Invoke();
             Window? deleteWindow = null;
             Wait(() => (deleteWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Delete document")))?.AsWindow()) is not null, "The deletion confirmation did not open.");
             (deleteWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("OK"))) ?? throw new InvalidOperationException("The delete confirmation is unavailable.")).AsButton().Invoke();
@@ -143,7 +143,7 @@ internal static class NativeUiChecks
             var retainedSnapshots = snapshotStore.ListAsync().GetAwaiter().GetResult();
             if (retainedSnapshots.Entries.Count != 2) throw new IOException("Deletion did not retain separate saved and unsaved source snapshots.");
             checks.Add("Deleting a document uses the Windows shell and retains saved and unsaved source snapshots");
-            Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Click();
+            Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Patterns.Invoke.Pattern.Invoke();
             Window? snapshotsWindow = null;
             Wait(() => (snapshotsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document snapshots")))?.AsWindow()) is not null, "The native snapshot browser did not open.");
             var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
@@ -220,7 +220,7 @@ internal static class NativeUiChecks
             var unusedImage = Path.Combine(runRoot, "assets", "images", "unused-ui.png");
             File.Copy(imagePath, unusedImage);
             var unusedBytes = File.ReadAllBytes(unusedImage);
-            Find(window, "FileMenu").Click(); Find(window, "BrowseAssets").Click();
+            Find(window, "FileMenu").Click(); Find(window, "BrowseAssets").Patterns.Invoke.Pattern.Invoke();
             Window? assetsWindow = null;
             Wait(() => (assetsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Workspace images")))?.AsWindow()) is not null, "The native image manager did not open.");
             Find(assetsWindow!, "AssetFilter").AsTextBox().Text = Path.GetFileName(imagePath);
@@ -254,7 +254,7 @@ internal static class NativeUiChecks
             Wait(() => !File.Exists(unusedImage), "The unused image was not removed through the Windows shell.");
             Wait(() => (assetsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Workspace images")))?.AsWindow()) is not null, "The image audit did not reopen after removal.");
             Find(assetsWindow!, "CloseAssets").AsButton().Invoke();
-            Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Click();
+            Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Patterns.Invoke.Pattern.Invoke();
             Wait(() => (snapshotsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document snapshots")))?.AsWindow()) is not null, "The snapshot browser did not open for image recovery.");
             Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.Contains("unused-ui.png", StringComparison.Ordinal)).Select();
             Wait(() => Find(snapshotsWindow!, "RestoreSnapshot").IsEnabled, "The retained image snapshot was unavailable.");
@@ -295,7 +295,7 @@ internal static class NativeUiChecks
             window.Close();
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
-            File.WriteAllText(Path.Combine(output, "native-ui.json"), JsonSerializer.Serialize(new { Passed = true, Checks = checks, FixtureRoot = runRoot }, new JsonSerializerOptions { WriteIndented = true }));
+            RecordResult(new { Passed = true, Checks = checks, FixtureRoot = runRoot });
             Console.WriteLine("Native UI Automation: " + checks.Count + " checks passed.");
             return 0;
         }
@@ -303,12 +303,18 @@ internal static class NativeUiChecks
         {
             try { app?.GetMainWindow(automation, TimeSpan.FromSeconds(1))?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
             try { File.WriteAllLines(Path.Combine(output, "native-ui-failure-controls.txt"), app!.GetMainWindow(automation)!.FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
-            File.WriteAllText(Path.Combine(output, "native-ui.json"), JsonSerializer.Serialize(new { Passed = false, Checks = checks, Error = ex.ToString(), FixtureRoot = runRoot }, new JsonSerializerOptions { WriteIndented = true }));
+            RecordResult(new { Passed = false, Checks = checks, Error = ex.ToString(), FixtureRoot = runRoot });
             Console.Error.WriteLine(ex);
             return 1;
         }
         finally { if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } launchedProcess?.Dispose(); }
 
+        void RecordResult(object result)
+        {
+            var json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(Path.Combine(runRoot, "native-ui.json"), json);
+            File.WriteAllText(Path.Combine(output, "native-ui.json"), json);
+        }
         Application Launch(string? path)
         {
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
