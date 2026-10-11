@@ -1073,11 +1073,12 @@ internal static class NativeUiChecks
                 catch (Exception) { /* Preserve the original failure if diagnostic collection also fails. */ }
                 throw;
             }
-            var openButton = (picker!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
-                ?? throw new IOException("The native Open button is unavailable.")).AsButton();
+            // The filename combo's dropdown arrow is also named Open. It is not the confirmation command.
+            var openButton = picker!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Open")))
+                .Single(element => element.AutomationId != "DropDown").AsButton();
             File.WriteAllText(Path.Combine(output, "native-open-dialogue.json"), JsonSerializer.Serialize(new { Title = title, Expected = path,
                 Observed = fileName.Text, ButtonId = openButton.AutomationId, ButtonBounds = openButton.BoundingRectangle.ToString() }));
-            // Invoke the labelled command directly; a filename suggestion popup can intercept a coordinate click.
+            // Invoke the unambiguous confirmation command without relying on popup-sensitive coordinates.
             openButton.Invoke();
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title))) is null,
                 "The native Open dialogue did not close after its Open command.");
