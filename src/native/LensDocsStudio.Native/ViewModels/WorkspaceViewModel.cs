@@ -27,6 +27,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     private int queuedOperations;
     public UserPreferences Preferences { get; private set; } = new();
     public event EventHandler? DocumentChanged;
+    public event Action<Guid, string>? DocumentRelocated;
     partial void OnActiveDocumentChanged(DocumentViewModel? value) => DocumentChanged?.Invoke(this, EventArgs.Empty);
     public string StateDirectory => session.DirectoryPath;
     public CancellationToken OperationToken => operation?.Token ?? CancellationToken.None;
@@ -51,7 +52,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     DocumentSnapshot? baseline = null;
                     if (recovered.Path is not null && recovered.SavedFingerprint is not null)
                         baseline = new(recovered.Path, recovered.SavedText ?? recovered.Text, recovered.SavedFingerprint, recovered.Utf8Bom);
-                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot };
+                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey };
                     if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
                         tab.AssetWorkspace = recovered.AssetWorkspace;
                     if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath);
@@ -78,14 +79,28 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                 Attach(tab);
                 ActiveDocument = tab;
             }
+            var moveRecovery = new WorkspaceMoveRecovery(Path.Combine(StateDirectory, "move-recovery"));
+            var interruptedMoves = await moveRecovery.ReadAsync(OperationToken);
+            foreach (var item in interruptedMoves.Items)
+                foreach (var draft in item.Drafts.Where(d => !Documents.Any(tab => tab.RecoveryKey == d.Key)))
+                {
+                    var tab = new DocumentViewModel(draft.Text) { DisplayName = draft.Name, RecoveryKey = draft.Key };
+                    Attach(tab); ActiveDocument = tab;
+                }
+            if (interruptedMoves.Items.Count != 0)
+            {
+                await PersistSessionAsync();
+                foreach (var item in interruptedMoves.Items) moveRecovery.MarkReviewed(item.JournalPath);
+            }
             foreach (var path in paths)
             {
                 if (Directory.Exists(path)) await SetWorkspaceAsync(path);
                 else if (File.Exists(path) && WorkspaceService.IsDocument(path)) await OpenPathAsync(path);
             }
             if (Documents.Count == 0) NewDocument();
-            var warnings = documents.RecoveryWarnings.Concat(session.ReadWarnings).ToArray();
-            if (warnings.Length != 0) dialogs.Error("Some saved state needs review. Original files have been retained.\n\n" + string.Join("\n", warnings));
+            var warnings = documents.RecoveryWarnings.Concat(session.ReadWarnings).Concat(interruptedMoves.Warnings).ToList();
+            if (interruptedMoves.Items.Count != 0) warnings.Add("Interrupted file moves were recovered into named draft tabs. Review the original and planned text before saving; no workspace files were automatically changed.");
+            if (warnings.Count != 0) dialogs.Error("Some saved state needs review. Original files have been retained.\n\n" + string.Join("\n", warnings));
         });
     }
 
@@ -168,7 +183,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         DocumentSnapshot? expected = tab.SavedSnapshot;
         if (saveAs || path is null)
         {
-            path = dialogs.SaveDocument(Path.GetFileName(path) ?? "Untitled.md", path is null ? tab.WorkspaceRoot ?? WorkspaceRoot : Path.GetDirectoryName(path));
+            path = dialogs.SaveDocument(Path.GetFileName(path) ?? tab.DisplayName ?? "Untitled.md", path is null ? tab.WorkspaceRoot ?? WorkspaceRoot : Path.GetDirectoryName(path));
             if (path is null) return false;
             // The native save dialogue has already confirmed replacement; retain a fresh fingerprint.
             expected = File.Exists(path) ? await documents.ReadAsync(path) : null;
@@ -189,6 +204,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             transfer.Commit();
             if (transfer.Text != text) tab.EditorDocument.Replace(0, tab.EditorDocument.TextLength, transfer.Text);
             tab.MarkSaved(saved);
+            DocumentRelocated?.Invoke(tab.Id, saved.Path);
             tab.WorkspaceRoot = RootForDocument(saved.Path);
             DocumentChanged?.Invoke(this, EventArgs.Empty);
             await RememberDocumentAsync(saved.Path);

@@ -30,4 +30,9 @@ public sealed class NavigationHistory(int capacity = 100)
         index += forward ? 1 : -1;
         entries[index] = location;
     }
+    public void RelocateDocument(Guid documentId, string path)
+    {
+        for (var position = 0; position < entries.Count; position++)
+            if (entries[position].DocumentId == documentId) entries[position] = entries[position] with { Path = path };
+    }
 }

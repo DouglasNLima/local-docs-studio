@@ -5,7 +5,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | User need / existing contract | Native design | Status |
 |---|---|---|
 | Markdown/Mermaid/text open, save, Save as, UTF-8 | Native pickers, portable source, safe writes | In progress |
-| Real folder tree, create/rename/move/delete/reveal | Filesystem workspace, safe link updates | Incomplete |
+| Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits and recovery | Partial: file creation/rename and link updates pass UI checks; deletion, folder moves and case-only renames remain |
 | Tabs, recent files, navigation history | Native tabs, persisted recent paths and bounded viewport history | Core and desktop navigation checks pass; broader closed-tab/history cases remain |
 | Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
 | Paste Special, HTML/TSV conversion, rich clipboard | Windows clipboard formats | Incomplete |

@@ -20,4 +20,6 @@ Unsaved-document images live in a per-document draft directory under native stat
 
 WPF exposes FlowDocument hyperlinks through UI Automation TextPattern ranges; the desktop harness uses that interface rather than assuming hyperlinks always appear in the initial control tree. Tabs, file tree entries and outline items have explicit readable automation names.
 
+Filesystem moves require a reviewable plan based on source snapshots. The operation refuses existing destinations and external changes, retains a durable record of original/planned text, then guards each write and reverses completed work on failure. Recovery records are interpreted as text drafts only; untrusted journal paths never authorise replay. A successfully persisted recovery session permits archiving the original journal as reviewed, without deleting it. Folder and case-only rename semantics are deferred until separately validated.
+
 Installer files-in-use behaviour uses an application mutex and disables forced closure/restart. Per-user Open with registration does not take over default extensions. See [Inno AppMutex](https://jrsoftware.org/ishelp/topic_setup_appmutex.htm) and [non-administrative installation](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm). No uninstaller action removes application state or workspaces.

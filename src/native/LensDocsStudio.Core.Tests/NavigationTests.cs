@@ -45,6 +45,17 @@ public sealed class NavigationTests
         Assert.Single(recent, p => p.Equals(first, StringComparison.OrdinalIgnoreCase));
         Assert.Empty(RecentPaths.Normalise(["relative.md", "", "\0"]));
     }
+    [Fact] public void Renaming_a_document_updates_paths_in_previous_and_forward_history_entries()
+    {
+        var history = new NavigationHistory();
+        var id = Guid.NewGuid();
+        var first = new NavigationLocation(id, "old.md", 0, 0);
+        history.Visit(first); history.Visit(new(Guid.NewGuid(), "other.md", 0, 0)); history.Visit(first with { CaretOffset = 8 });
+        history.CompleteMove(false, history.Back!);
+        history.RelocateDocument(id, "new.md");
+        Assert.Equal("new.md", history.Back!.Path); Assert.Equal("new.md", history.Forward!.Path);
+        Assert.Equal(8, history.Forward.CaretOffset);
+    }
 
     [Fact] public void Document_links_encode_portable_paths_and_escape_labels()
     {

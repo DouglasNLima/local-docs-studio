@@ -14,12 +14,14 @@ public partial class DocumentViewModel : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
     [ObservableProperty] private bool isSaving;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
+    public string? RecoveryKey { get; set; }
     public string? AssetWorkspace { get; set; }
     public string? EffectivePath => FilePath ?? (AssetWorkspace is null ? null : Path.Combine(AssetWorkspace, "Untitled.md"));
     public string? EffectiveWorkspace => FilePath is null ? AssetWorkspace : WorkspaceRoot;
     public int CaretOffset { get; set; }
     public double VerticalOffset { get; set; }
-    public string Title => (Path.GetFileName(FilePath) ?? "Untitled.md") + (IsDirty ? " •" : "") + (ExternalChange ? " ⚠" : "");
+    public string Title => (Path.GetFileName(FilePath) ?? DisplayName ?? "Untitled.md") + (IsDirty ? " •" : "") + (ExternalChange ? " ⚠" : "");
     public string? WorkspaceRoot { get; set; }
     public event EventHandler? Edited;
 
@@ -41,5 +43,5 @@ public partial class DocumentViewModel : ObservableObject
     }
 
     public RecoveredDocument Recovery() => new(Id, FilePath, EditorDocument.Text, SavedSnapshot?.Fingerprint,
-        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace);
+        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName);
 }

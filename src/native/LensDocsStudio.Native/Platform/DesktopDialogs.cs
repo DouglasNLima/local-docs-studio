@@ -1,5 +1,6 @@
 using Microsoft.Win32;
 using System.Windows;
+using LensDocsStudio.Core.Workspace;
 
 namespace LensDocsStudio.Native.Platform;
 
@@ -30,4 +31,14 @@ public sealed class DesktopDialogs
         "Unsaved document", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
     public bool Confirm(string message, string title) => MessageBox.Show(Owner!, message, title, MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK;
     public void Error(string message) => MessageBox.Show(Owner!, message, "Lens Docs Studio", MessageBoxButton.OK, MessageBoxImage.Warning);
+    public string? WorkspacePathPrompt(string title, string message, string initialValue, string action)
+    {
+        var window = new TextPromptWindow(title, message, initialValue, action) { Owner = Owner };
+        return window.ShowDialog() == true ? window.Value : null;
+    }
+    public bool? ReviewMove(WorkspacePath workspace, WorkspaceMovePlan plan)
+    {
+        var window = new MoveDocumentWindow(workspace, plan) { Owner = Owner };
+        return window.ShowDialog() == true ? window.ShouldUpdateLinks : null;
+    }
 }

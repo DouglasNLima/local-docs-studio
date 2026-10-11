@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Current milestone: native workspace navigation, portable assets and recovery robustness.
+Current milestone: native filesystem editing, recovery and asset workflows.
 
 - Isolated worktree and feature/native-wpf-rebuild branch from develop 2cc3b5680958c9c553dad23856e6010c158fccd7.
 - Original web checkout and untracked attachments preserved.
@@ -31,8 +31,11 @@ Current milestone: native workspace navigation, portable assets and recovery rob
 - Core suite: 78 tests pass. Native rendering/export/asset integration: 40 diagram cases plus SVG safety and recovered-image checks pass. Desktop harness: 11 outcomes pass, including actual clipboard bitmap paste into an unsaved document and Save through the Windows dialogue. The image test exposed AvalonEdit's text-only Paste enablement; native routed paste handling now accepts image-only clipboard data.
 - CI at 78a9f0e exposed a Save-dialogue automation issue: the runner retained the default filename after a UIA value assignment. The harness now types the filename and clicks Save. It also asserts that a finalised image is in assets/images, including when native test state happens to be inside the workspace; draft finalisation now always copies images out of private state. This adds a 79th navigation/asset/recovery test.
 - Busy workspace operations now queue instead of dropping Save or a second file activation. Save captures its target tab when invoked. A native integration check verifies ordering; pending insertions retain their original document and source anchors.
+- Native file/folder creation and a reviewed rename/move workflow are implemented. The plan rebases the moved document's links/images and updates incoming Markdown/reference links. It never replaces a destination, checks fingerprints, retains a durable multi-file recovery record and rolls back guarded changes after failure. Interrupted plans open as named draft copies; their paths never trigger automatic filesystem replay.
+- Current validation: Release build without warnings/errors, 87 core tests and 13 native UI outcomes. Desktop tests exercise real rename, incoming-link updates, open-tab refresh and creating/editing/saving a workspace file. Case-only renames, folder moves and deletion are still incomplete.
+- Both native CI jobs passed at df784df, including self-contained packaging and installed-app lifecycle. Web PR CI passed; web push CI failed and its log is being investigated.
 
-Next executable tasks: check this batch in CI; implement safe rename/move/delete and affected-link planning, image clipboard portability and asset management; continue editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
+Next executable tasks: check the filesystem batch in CI; implement deletion with snapshot recovery, image clipboard portability and asset management; investigate intermittent web CI server/rendering failures; continue editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
 
 Known implementation limitations: full-document native preview rebuild; HTML shown as source; full template fidelity, Docs Site, asset management, richer editing/review, general preferences and installer/update certification are incomplete. Temporary draft assets are retained for recovery; automatic cache pruning is not implemented. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
 

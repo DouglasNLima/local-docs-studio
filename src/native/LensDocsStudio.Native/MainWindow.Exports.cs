@@ -23,12 +23,14 @@ public partial class MainWindow
         if (!Path.GetExtension(picker.FileName).Equals("." + extension, StringComparison.OrdinalIgnoreCase))
         { dialogs.Error("Use the ." + extension + " extension for this export."); return; }
         var source = tab.EditorDocument.Text;
+        var sourcePath = tab.EffectivePath;
+        var workspaceRoot = tab.EffectiveWorkspace;
 
         await model.RunAsync(async () =>
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             model.Status = "Preparing " + format + " export…";
-            var bytes = await exports.ExportAsync(format, source, tab.EffectivePath, tab.EffectiveWorkspace, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken);
+            var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
             model.Status = "Exported " + Path.GetFileName(picker.FileName);
         });

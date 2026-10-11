@@ -56,11 +56,13 @@ public partial class MainWindow
 
     private async void InsertDocumentLink(object sender, RoutedEventArgs e)
     {
+        var tab = model.ActiveDocument;
         await model.RunAsync(async () =>
         {
-            if (model.ActiveDocument is not { } tab) return;
+            if (tab is null || !model.Documents.Contains(tab)) return;
             if (tab.FilePath is null && !await model.SaveTabAsync(tab, false)) return;
-            var insertion = new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
+            var insertion = new DocumentInsertion(tab.EditorDocument, model.ActiveDocument == tab ? Editor.SelectionStart : tab.CaretOffset,
+                model.ActiveDocument == tab ? Editor.SelectionLength : 0);
             var workspace = new WorkspacePath(tab.WorkspaceRoot ?? Path.GetDirectoryName(tab.FilePath!)!);
             var listing = await new WorkspaceService().EnumerateAsync(workspace, model.OperationToken);
             var picker = new DocumentLinkWindow(workspace, tab.FilePath!, listing.Entries, Path.Combine(model.StateDirectory, "write-recovery")) { Owner = this };

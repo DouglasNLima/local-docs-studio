@@ -55,6 +55,7 @@ public partial class MainWindow : Window
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteImage);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteImagePaste);
         model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
+        model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
         recoveryTimer.Tick += async (_, _) =>
         {
@@ -154,6 +155,14 @@ public partial class MainWindow : Window
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
     private async void TreeKeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); } }
     private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntry { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
+    private async Task RenameTreeEntryAsync()
+    {
+        if (WorkspaceTree.SelectedItem is not WorkspaceEntry { IsDirectory: false } entry)
+        { model.Status = "Select a document to rename or move."; return; }
+        var opened = false;
+        await model.RunAsync(async () => { await model.OpenPathAsync(entry.Path); opened = true; });
+        if (opened) model.MoveDocumentCommand.Execute(null);
+    }
     private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = false;
     private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = true;
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -246,6 +255,7 @@ public partial class MainWindow : Window
     }
     private void ReplaceOne(object sender, RoutedEventArgs e)
     {
+        if (Editor.IsReadOnly) return;
         if (string.Equals(Editor.SelectedText, FindText.Text, StringComparison.CurrentCultureIgnoreCase) && FindText.Text.Length != 0)
             Editor.Document.Replace(Editor.SelectionStart, Editor.SelectionLength, ReplaceText.Text);
         FindNext(sender, e);
@@ -271,6 +281,7 @@ public partial class MainWindow : Window
     }
     private void InsertText(string value)
     {
+        if (Editor.IsReadOnly) return;
         var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
         var start = Editor.SelectionStart;
         using (Editor.Document.RunUpdate()) Editor.Document.Replace(start, Editor.SelectionLength, value);
@@ -419,6 +430,8 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
+        { if (WorkspaceTree.IsKeyboardFocusWithin) _ = RenameTreeEntryAsync(); else model.MoveDocumentCommand.Execute(null); e.Handled = true; return; }
         if (e.Key == Key.Escape && FindBar.Visibility == Visibility.Visible) { HideFind(); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.Alt && e.SystemKey is Key.Left or Key.Right)
         { _ = MoveNavigationAsync(e.SystemKey == Key.Right); e.Handled = true; return; }
