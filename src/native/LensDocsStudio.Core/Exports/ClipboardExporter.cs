@@ -1,5 +1,6 @@
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
+using System.Globalization;
 
 namespace LensDocsStudio.Core.Exports;
 
@@ -18,6 +19,13 @@ public sealed class ClipboardExporter
         foreach (var cell in html.QuerySelectorAll("th,td"))
             cell.SetAttribute("style", (cell.GetAttribute("style") ?? "") + "mso-number-format:\"\\@\";");
         var encoded = HtmlClipboardFormat.Encode(html.Body!.InnerHtml);
+        string ListMarker(IElement item)
+        {
+            if (item.ParentElement is not { LocalName: "ol" } list) return "• ";
+            var start = int.TryParse(list.GetAttribute("start"), NumberStyles.None, CultureInfo.InvariantCulture, out var value) ? value : 1;
+            var index = list.Children.TakeWhile(child => child != item).Count(child => child.LocalName == "li");
+            return (start + index).ToString(CultureInfo.InvariantCulture) + ". ";
+        }
         string Read(INode node)
         {
             if (node is IText text) return text.TextContent;
@@ -31,7 +39,7 @@ public sealed class ClipboardExporter
             {
                 "br" => "\n",
                 "hr" => "\n---\n",
-                "li" => "• " + children.Trim() + "\n",
+                "li" => ListMarker(element) + children.Trim() + "\n",
                 "p" or "div" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6" or "pre" or "blockquote" or "figure" => children.TrimEnd() + "\n\n",
                 _ => children
             };

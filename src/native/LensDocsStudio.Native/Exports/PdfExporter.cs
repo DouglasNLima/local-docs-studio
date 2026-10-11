@@ -2,6 +2,8 @@ using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Parsing;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Markdig.Extensions.Alerts;
+using Markdig.Extensions.Tables;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using MdBlock = Markdig.Syntax.Block;
@@ -53,7 +55,7 @@ public sealed class PdfExporter
                     cp.Format.Font.Name = "Consolas"; cp.Format.Font.Size = 8; cp.Format.Shading.Color = Colors.WhiteSmoke;
                     cp.Format.KeepTogether = false; break;
                 case ListBlock list:
-                    var index = 1;
+                    var index = MarkdownFormatting.OrderedStart(list);
                     foreach (var item in list.OfType<ListItemBlock>())
                     {
                         foreach (var child in item) Append(elements, child, list.IsOrdered ? $"{index}. " : "• ");
@@ -71,10 +73,20 @@ public sealed class PdfExporter
                         if (row.IsHeader) { wr.Shading.Color = Colors.WhiteSmoke; wr.Format.Font.Bold = true; }
                         var col = 0;
                         foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
-                        { foreach (var child in cell) Append(wr.Cells[col].Elements, child); col++; }
+                        {
+                            var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : col;
+                            wr.Cells[col].Format.Alignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
+                            { TableColumnAlign.Center => ParagraphAlignment.Center, TableColumnAlign.Right => ParagraphAlignment.Right, _ => ParagraphAlignment.Left } : ParagraphAlignment.Left;
+                            foreach (var child in cell) Append(wr.Cells[col].Elements, child); col++;
+                        }
                     }
                     break;
                 case HtmlBlock html: elements.AddParagraph(html.Lines.ToString()); break;
+                case AlertBlock alert:
+                    var label = elements.AddParagraph(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()));
+                    label.Format.Font.Bold = true; label.Format.KeepWithNext = true; label.Format.Shading.Color = Colors.WhiteSmoke;
+                    foreach (var child in alert) Append(elements, child, marker);
+                    break;
                 case ContainerBlock container: foreach (var child in container) Append(elements, child, marker); break;
                 case ThematicBreakBlock: elements.AddParagraph("—"); break;
             }
@@ -88,15 +100,24 @@ public sealed class PdfExporter
                 {
                     case LiteralInline literal: elements.AddText(literal.Content.ToString()); break;
                     case CodeInline code: elements.AddFormattedText(code.Content).Font.Name = "Consolas"; break;
-                    case LineBreakInline: elements.AddLineBreak(); break;
+                    case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else elements.AddText(" "); break;
                     case Markdig.Extensions.TaskLists.TaskList task: elements.AddText(task.Checked ? "☑ " : "☐ "); break;
                     case LinkInline { IsImage: true } link:
                         if (!content.Images.TryGetValue(link.Url ?? "", out var image)) throw new InvalidDataException("An image could not be exported.");
                         AddImage(elements, image); break;
                     case EmphasisInline emphasis:
                         var formatted = elements.AddFormattedText();
-                        formatted.Bold = emphasis.DelimiterCount == 2; formatted.Italic = emphasis.DelimiterCount == 1;
-                        Inlines(formatted.Elements, emphasis); break;
+                        var formatting = MarkdownFormatting.Emphasis(emphasis);
+                        if (formatting.HasFlag(MarkdownEmphasis.Bold)) formatted.Bold = true;
+                        if (formatting.HasFlag(MarkdownEmphasis.Italic)) formatted.Italic = true;
+                        if (formatting.HasFlag(MarkdownEmphasis.Underline)) formatted.Underline = Underline.Single;
+                        if (formatting.HasFlag(MarkdownEmphasis.Subscript)) formatted.Subscript = true;
+                        if (formatting.HasFlag(MarkdownEmphasis.Superscript)) formatted.Superscript = true;
+                        // MigraDoc has no strikeout font property; keep explicit Markdown deletion markers in PDF output.
+                        if (formatting.HasFlag(MarkdownEmphasis.Strike)) formatted.AddText("~~");
+                        Inlines(formatted.Elements, emphasis);
+                        if (formatting.HasFlag(MarkdownEmphasis.Strike)) formatted.AddText("~~");
+                        break;
                     case HtmlInline html: elements.AddText(html.Tag); break;
                     case ContainerInline nested: Inlines(elements, nested); break;
                 }

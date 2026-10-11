@@ -8,6 +8,13 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class ClipboardExportTests
 {
+    [Fact] public void Rendered_Unicode_copy_keeps_ordered_list_starts_including_zero()
+    {
+        var parsed = new MarkdownService().Parse("7. Seven\n8. Eight\n\nSeparate.\n\n0. Zero\n1. One");
+        var copy = new ClipboardExporter().Export(new(parsed, new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()));
+        Assert.Matches(@"7\. Seven\s+8\. Eight", copy.PlainText); Assert.Matches(@"0\. Zero\s+1\. One", copy.PlainText);
+    }
+
     [Fact] public void Windows_clipboard_offsets_use_UTF8_bytes_for_multilingual_text_and_emoji()
     {
         const string fragment = "<div><p>Café — 日本語 🛡️</p></div>";

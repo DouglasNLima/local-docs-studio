@@ -7,6 +7,22 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class RenderingTests
 {
+    [Theory]
+    [InlineData("NOTE", "Note")]
+    [InlineData("TIP", "Tip")]
+    [InlineData("IMPORTANT", "Important")]
+    [InlineData("WARNING", "Warning")]
+    [InlineData("CAUTION", "Caution")]
+    public void Existing_callout_syntax_retains_its_kind_body_and_source_mapping(string kind, string label)
+    {
+        var source = "# Before\n\n> [!" + kind + "]\n> **Title**\n>\n> Body text.\n";
+        var parsed = new MarkdownService().Parse(source);
+        var alert = Assert.Single(parsed.Syntax.Descendants<Markdig.Extensions.Alerts.AlertBlock>());
+        Assert.Equal(kind, alert.Kind.ToString()); Assert.Equal(label, MarkdownFormatting.CalloutLabel(kind));
+        Assert.Equal(source.IndexOf('>'), alert.Span.Start);
+        Assert.Contains("Body text.", string.Join(" ", alert.Descendants<ParagraphBlock>().Select(p => MarkdownService.InlineText(p.Inline))));
+    }
+
     [Fact]
     public void Headings_retain_exact_source_positions()
     {

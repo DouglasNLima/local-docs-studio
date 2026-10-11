@@ -7,6 +7,7 @@ using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.TaskLists;
+using Markdig.Extensions.Alerts;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MdBlock = Markdig.Syntax.Block;
@@ -80,16 +81,33 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 case CodeBlock code:
                     result = new Paragraph(new Run(code.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
                     break;
+                case AlertBlock alert:
+                    var callout = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0),
+                        Background = surface, Padding = new Thickness(12, 8, 12, 8), Margin = new Thickness(0, 8, 0, 12) };
+                    var label = MarkdownFormatting.CalloutLabel(alert.Kind.ToString());
+                    callout.Blocks.Add(new Paragraph(new Run(label)) { FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) });
+                    System.Windows.Automation.AutomationProperties.SetName(callout, label + " callout");
+                    foreach (var child in alert) callout.Blocks.Add(Convert(child));
+                    result = callout; break;
                 case QuoteBlock quote:
                     var section = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0), Padding = new Thickness(12, 4, 4, 4) };
                     foreach (var child in quote) section.Blocks.Add(Convert(child)); result = section;
                     break;
                 case ListBlock list:
                     var wl = new System.Windows.Documents.List { MarkerStyle = list.IsOrdered ? TextMarkerStyle.Decimal : TextMarkerStyle.Disc, Padding = new Thickness(24, 0, 0, 0) };
+                    var orderedStart = MarkdownFormatting.OrderedStart(list);
+                    if (list.IsOrdered) { wl.StartIndex = Math.Max(1, orderedStart); if (orderedStart == 0) wl.MarkerStyle = TextMarkerStyle.None; }
                     foreach (var item in list.OfType<ListItemBlock>())
                     {
                         var li = new ListItem();
                         foreach (var child in item) li.Blocks.Add(Convert(child));
+                        if (list.IsOrdered && wl.MarkerStyle == TextMarkerStyle.None)
+                        {
+                            if (li.Blocks.FirstBlock is not Paragraph first)
+                            { first = new Paragraph(); if (li.Blocks.FirstBlock is { } firstBlock) li.Blocks.InsertBefore(firstBlock, first); else li.Blocks.Add(first); }
+                            var marker = new Run(orderedStart++ + ". ");
+                            if (first.Inlines.FirstInline is { } initial) first.Inlines.InsertBefore(initial, marker); else first.Inlines.Add(marker);
+                        }
                         wl.ListItems.Add(li);
                     }
                     result = wl; break;
@@ -99,9 +117,15 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                     {
                         var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
+                        var column = 0;
                         foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
                         {
                             var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
+                            wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
+                            var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
+                            column += Math.Max(1, cell.ColumnSpan);
+                            wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
+                            { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
                             if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
                             foreach (var child in cell) wc.Blocks.Add(Convert(child));
                             wr.Cells.Add(wc);
@@ -138,10 +162,17 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 {
                     case LiteralInline literal: target.Add(new Run(literal.Content.ToString())); break;
                     case CodeInline code: target.Add(new Run(code.Content) { FontFamily = new FontFamily("Consolas"), Background = surface }); break;
-                    case LineBreakInline: target.Add(new LineBreak()); break;
+                    case LineBreakInline line: if (line.IsHard) target.Add(new LineBreak()); else target.Add(new Run(" ")); break;
                     case EmphasisInline emphasis:
-                        Span span = emphasis.DelimiterCount == 2 ? new Bold() : new Italic();
-                        if (emphasis.DelimiterChar == '~') span.TextDecorations = TextDecorations.Strikethrough;
+                        var formatting = MarkdownFormatting.Emphasis(emphasis);
+                        var span = new Span();
+                        if (formatting.HasFlag(MarkdownEmphasis.Bold)) span.FontWeight = FontWeights.Bold;
+                        if (formatting.HasFlag(MarkdownEmphasis.Italic)) span.FontStyle = FontStyles.Italic;
+                        if (formatting.HasFlag(MarkdownEmphasis.Strike)) span.TextDecorations = TextDecorations.Strikethrough;
+                        if (formatting.HasFlag(MarkdownEmphasis.Underline)) span.TextDecorations = TextDecorations.Underline;
+                        if (formatting.HasFlag(MarkdownEmphasis.Subscript)) { span.BaselineAlignment = BaselineAlignment.Subscript; span.FontSize = 11; }
+                        if (formatting.HasFlag(MarkdownEmphasis.Superscript)) { span.BaselineAlignment = BaselineAlignment.Superscript; span.FontSize = 11; }
+                        if (formatting.HasFlag(MarkdownEmphasis.Highlight)) span.Background = surface;
                         AddInlines(span.Inlines, emphasis); target.Add(span); break;
                     case TaskList task: target.Add(new Run(task.Checked ? "☑ " : "☐ ")); break;
                     case LinkInline link when link.IsImage:

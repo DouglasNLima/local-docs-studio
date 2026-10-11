@@ -11,6 +11,30 @@ public sealed class DocxExportTests
 {
     private static ExportContent Content(string source) => new(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>());
 
+    [Fact] public void Word_preserves_callout_labels_ordered_starts_alignment_and_independent_text_styles()
+    {
+        var source = "> [!WARNING]\n> **Before publishing**\n>\n> Retain evidence.\n\n7. Seven\n8. Eight\n\nParagraph.\n\n0. Zero\n\n"
+            + "| Left | Centre | Right |\n|:---|:---:|---:|\n| A | B | C |\n\n~~Withdrawn~~ **bold** *italic* H~2~O 2^3^ ++Inserted++ ==Marked==\n\nSoft first\nsoft second.\n\nHard first  \nhard second.";
+        using var stream = new MemoryStream(new DocxExporter().Export(Content(source)));
+        using var document = WordprocessingDocument.Open(stream, false);
+        Assert.Empty(new OpenXmlValidator().Validate(document));
+        var main = document.MainDocumentPart!;
+        Assert.Contains("Warning", main.Document!.InnerText); Assert.Contains("Retain evidence.", main.Document.InnerText);
+        var starts = main.NumberingDefinitionsPart!.Numbering!.Descendants<W.StartNumberingValue>().Select(v => v.Val!.Value).Distinct().ToArray();
+        Assert.Contains(7, starts); Assert.Contains(0, starts);
+        var table = Assert.Single(main.Document.Descendants<W.Table>());
+        Assert.Equal(new[] { W.JustificationValues.Left, W.JustificationValues.Center, W.JustificationValues.Right },
+            table.Elements<W.TableRow>().First().Descendants<W.Justification>().Select(j => j.Val!.Value));
+        var withdrawn = Assert.Single(main.Document.Descendants<W.Run>(), r => r.InnerText == "Withdrawn");
+        Assert.NotNull(withdrawn.RunProperties!.Strike); Assert.Null(withdrawn.RunProperties.Bold); Assert.Null(withdrawn.RunProperties.Italic);
+        Assert.Contains(main.Document.Descendants<W.Run>(), r => r.InnerText == "2" && r.RunProperties?.VerticalTextAlignment?.Val?.Value == W.VerticalPositionValues.Subscript);
+        Assert.Contains(main.Document.Descendants<W.Run>(), r => r.InnerText == "3" && r.RunProperties?.VerticalTextAlignment?.Val?.Value == W.VerticalPositionValues.Superscript);
+        Assert.Contains(main.Document.Descendants<W.Run>(), r => r.InnerText == "Inserted" && r.RunProperties?.Underline is not null);
+        Assert.Contains(main.Document.Descendants<W.Run>(), r => r.InnerText == "Marked" && r.RunProperties?.Shading is not null);
+        Assert.Contains("Soft first soft second.", main.Document.InnerText);
+        Assert.Single(main.Document.Descendants<W.Break>());
+    }
+
     [Fact]
     public void Word_output_has_valid_headings_tables_numbering_and_unicode()
     {

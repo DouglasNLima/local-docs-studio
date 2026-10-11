@@ -1,10 +1,16 @@
 # Native validation report
 
+## Native Markdown semantics
+
+All 187 core tests pass. Five callout kinds retain parsed labels/body and source spans. Word output passes Open XML schema validation and assertions for labelled callouts, ordered starts of 7 and 0, left/centre/right cells, strike without unintended bold/italic, subscript/superscript, insertion underline, neutral highlight and distinct soft/hard breaks. Rendered Unicode clipboard text also retains ordered starts.
+
+The standard native harness adds seven outcomes in native-semantics.json. Actual WPF light/dark document pages were rendered and visually inspected: callout text, list markers, aligned tables and emphasis are visible without clipping. PDF inspection verifies callout labels, list starts, text and explicit deletion markers; generated DOCX/PDF and page PNGs are retained under artifacts/native/validation. MigraDoc has no strikeout property, so PDF uses visible Markdown deletion markers; PDF highlight shading remains incomplete. The solution builds without warnings/errors; the 40 diagram/export, thirteen asset and six preview outcomes continue to pass.
+
 ## Markdown source clipboard
 
 The native source-copy command retains literal Markdown and emits an image-only CF_HTML carrier. All 178 core tests pass, including CRLF, punctuation/raw HTML, image positions/duplicates/alt/title, reference expansion without shared-definition changes, complete and incomplete fences, standalone Mermaid, HTML-only source carriers, invalid data, cancellation, bounded payloads and the existing Azure DevOps fidelity fixture. Native integration passes thirteen asset/operation outcomes, including persistence of exact source outside an image destination and identical decoded image pixels. Release build has no warnings/errors; 40 diagram/export and six preview checks also pass.
 
-The desktop harness adds a 22nd outcome for the real Edit command, Windows clipboard, native paste and Save as, with source and pixel comparisons. Its fresh CI result is pending; local foreground acquisition remains unavailable. Live Azure DevOps attachment upload and persistence remain unverified and use the existing manual destination gate.
+The desktop harness adds a 22nd outcome for the real Edit command, Windows clipboard, native paste and Save as, with source and pixel comparisons. After the first-save correction below, all 22 outcomes pass in native PR CI 38161563199 at dd25fb0, both for the built application and after installation/reinstallation. Evidence: artifacts/native/native-ci-dd25fb0-pr.log. Local foreground acquisition remains unavailable. Live Azure DevOps attachment upload and persistence remain unverified and use the existing manual destination gate.
 
 Both native runs at 0546485 reached the new desktop check and exposed a first-save bug: ordinary links in a draft with pasted images were rebased from its private asset directory. The retained Markdown showed `Renamed%20document.md` becoming `state/drafts/.../Renamed%20document.md`. First save now preserves ordinary link source while transferring images; later Save as still rebases links from a real saved document. Two regression cases cover private state inside and outside the chosen workspace. Evidence: artifacts/native/ci-0546485-pr/ui and native-ci-0546485-pr-failure.log. The unchanged desktop assertion remains the acceptance check for the correction.
 

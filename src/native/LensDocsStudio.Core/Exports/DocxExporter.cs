@@ -3,6 +3,8 @@ using DocumentFormat.OpenXml.Packaging;
 using LensDocsStudio.Core.Parsing;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Markdig.Extensions.Alerts;
+using Markdig.Extensions.Tables;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 using A = DocumentFormat.OpenXml.Drawing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -88,7 +90,7 @@ public sealed class DocxExporter
                         var id = nextNumber++; var abstractId = nextAbstract++;
                         var definition = new W.AbstractNum { AbstractNumberId = abstractId };
                         for (var level = 0; level < 9; level++) definition.Append(new W.Level(
-                            new W.StartNumberingValue { Val = 1 },
+                            new W.StartNumberingValue { Val = MarkdownFormatting.OrderedStart(list) },
                             new W.NumberingFormat { Val = list.IsOrdered ? W.NumberFormatValues.Decimal : W.NumberFormatValues.Bullet },
                             new W.LevelText { Val = list.IsOrdered ? "%" + (level + 1) + "." : "•" },
                             new W.LevelJustification { Val = W.LevelJustificationValues.Left },
@@ -109,11 +111,21 @@ public sealed class DocxExporter
                         {
                             var wr = new W.TableRow();
                             if (row.IsHeader) wr.Append(new W.TableRowProperties(new W.TableHeader()));
+                            var column = 0;
                             foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
                             {
                                 var wc = new W.TableCell();
                                 foreach (var child in cell) AppendBlock(wc, child);
                                 if (!wc.Elements<W.Paragraph>().Any()) wc.Append(new W.Paragraph());
+                                var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
+                                var alignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment : null;
+                                column += Math.Max(1, cell.ColumnSpan);
+                                foreach (var paragraph in wc.Elements<W.Paragraph>())
+                                {
+                                    paragraph.ParagraphProperties ??= new W.ParagraphProperties();
+                                    paragraph.ParagraphProperties.Justification = new W.Justification { Val = alignment switch
+                                    { TableColumnAlign.Center => W.JustificationValues.Center, TableColumnAlign.Right => W.JustificationValues.Right, _ => W.JustificationValues.Left } };
+                                }
                                 wr.Append(wc);
                             }
                             wt.Append(wr);
@@ -121,6 +133,12 @@ public sealed class DocxExporter
                         parent.Append(wt); break;
                     case HtmlBlock html:
                         parent.Append(new W.Paragraph(new W.Run(new W.Text(html.Lines.ToString()) { Space = SpaceProcessingModeValues.Preserve }))); break;
+                    case AlertBlock alert:
+                        parent.Append(new W.Paragraph(new W.ParagraphProperties { KeepNext = new W.KeepNext(), Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "F3F4F6" },
+                            ParagraphBorders = new W.ParagraphBorders(new W.LeftBorder { Val = W.BorderValues.Single, Color = "FF883E", Size = 12 }) },
+                            Run(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()), MarkdownEmphasis.Bold)));
+                        foreach (var child in alert) AppendBlock(parent, child, listId, depth);
+                        break;
                     case ContainerBlock container:
                         foreach (var child in container) AppendBlock(parent, child, listId, depth); break;
                     case ThematicBreakBlock:
@@ -130,36 +148,42 @@ public sealed class DocxExporter
             W.Paragraph Paragraph(ContainerInline? inline, string style)
             {
                 var paragraph = new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = style }));
-                if (inline is not null) Inlines(paragraph, inline, false, false);
+                if (inline is not null) Inlines(paragraph, inline, MarkdownEmphasis.None);
                 return paragraph;
             }
-            void Inlines(OpenXmlCompositeElement target, ContainerInline container, bool bold, bool italic)
+            void Inlines(OpenXmlCompositeElement target, ContainerInline container, MarkdownEmphasis formatting)
             {
                 foreach (var inline in container)
                 {
                     switch (inline)
                     {
-                        case LiteralInline literal: target.Append(Run(literal.Content.ToString(), bold, italic)); break;
-                        case CodeInline code: var run = Run(code.Content, bold, italic); run.RunProperties!.Append(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }); target.Append(run); break;
-                        case LineBreakInline: target.Append(new W.Run(new W.Break())); break;
-                        case Markdig.Extensions.TaskLists.TaskList task: target.Append(Run(task.Checked ? "☑ " : "☐ ", bold, italic)); break;
+                        case LiteralInline literal: target.Append(Run(literal.Content.ToString(), formatting)); break;
+                        case CodeInline code: var run = Run(code.Content, formatting); run.RunProperties!.Append(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }); target.Append(run); break;
+                        case LineBreakInline line: target.Append(line.IsHard ? new W.Run(new W.Break()) : Run(" ", formatting)); break;
+                        case Markdig.Extensions.TaskLists.TaskList task: target.Append(Run(task.Checked ? "☑ " : "☐ ", formatting)); break;
                         case LinkInline { IsImage: true } image:
                             if (!content.Images.TryGetValue(image.Url ?? "", out var asset)) throw new InvalidDataException("An image could not be exported: " + image.Url);
                             target.Append(Image(asset)); break;
                         case LinkInline link when Uri.TryCreate(link.Url, UriKind.Absolute, out var url) && url.Scheme is "https" or "http" or "mailto":
                             var relationship = main.AddHyperlinkRelationship(url, true);
                             var hyperlink = new W.Hyperlink { Id = relationship.Id };
-                            Inlines(hyperlink, link, bold, italic); target.Append(hyperlink); break;
-                        case EmphasisInline emphasis: Inlines(target, emphasis, bold || emphasis.DelimiterCount == 2, italic || emphasis.DelimiterCount == 1); break;
-                        case HtmlInline html: target.Append(Run(html.Tag, bold, italic)); break;
-                        case ContainerInline nested: Inlines(target, nested, bold, italic); break;
+                            Inlines(hyperlink, link, formatting); target.Append(hyperlink); break;
+                        case EmphasisInline emphasis: Inlines(target, emphasis, formatting | MarkdownFormatting.Emphasis(emphasis)); break;
+                        case HtmlInline html: target.Append(Run(html.Tag, formatting)); break;
+                        case ContainerInline nested: Inlines(target, nested, formatting); break;
                     }
                 }
             }
-            static W.Run Run(string text, bool bold, bool italic)
+            static W.Run Run(string text, MarkdownEmphasis formatting)
             {
                 var properties = new W.RunProperties();
-                if (bold) properties.Append(new W.Bold()); if (italic) properties.Append(new W.Italic());
+                if (formatting.HasFlag(MarkdownEmphasis.Bold)) properties.Bold = new W.Bold();
+                if (formatting.HasFlag(MarkdownEmphasis.Italic)) properties.Italic = new W.Italic();
+                if (formatting.HasFlag(MarkdownEmphasis.Strike)) properties.Strike = new W.Strike();
+                if (formatting.HasFlag(MarkdownEmphasis.Underline)) properties.Underline = new W.Underline { Val = W.UnderlineValues.Single };
+                if (formatting.HasFlag(MarkdownEmphasis.Subscript)) properties.VerticalTextAlignment = new W.VerticalTextAlignment { Val = W.VerticalPositionValues.Subscript };
+                if (formatting.HasFlag(MarkdownEmphasis.Superscript)) properties.VerticalTextAlignment = new W.VerticalTextAlignment { Val = W.VerticalPositionValues.Superscript };
+                if (formatting.HasFlag(MarkdownEmphasis.Highlight)) properties.Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "EDEDED" };
                 return new W.Run(properties, new W.Text(text) { Space = SpaceProcessingModeValues.Preserve });
             }
             W.Run Image(ExportImage image)
