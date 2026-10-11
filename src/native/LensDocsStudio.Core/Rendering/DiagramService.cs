@@ -10,9 +10,33 @@ public sealed record DiagramResult(string Source, string? Svg, string? Error)
 
 public sealed class DiagramService
 {
+    private readonly object gate = new();
+    private readonly Dictionary<(string Source, bool Dark), DiagramResult> cache = new();
+    private readonly Queue<(string Source, bool Dark)> order = new();
+    private int cachedCharacters;
     public DiagramResult Render(string source, bool dark = false)
     {
         if (source.Length > 100_000) return new(source, null, "The diagram exceeds the 100,000-character rendering limit.");
+        lock (gate) if (cache.TryGetValue((source, dark), out var existing)) return existing;
+        var result = RenderUncached(source, dark);
+        var cost = source.Length + (result.Svg?.Length ?? 0);
+        if (cost <= 4_000_000)
+        {
+            lock (gate)
+            {
+                if (cache.ContainsKey((source, dark))) return cache[(source, dark)];
+                while (order.Count > 0 && (cache.Count >= 64 || cachedCharacters + cost > 4_000_000))
+                {
+                    var oldest = order.Dequeue(); var removed = cache[oldest]; cache.Remove(oldest);
+                    cachedCharacters -= removed.Source.Length + (removed.Svg?.Length ?? 0);
+                }
+                cache.Add((source, dark), result); order.Enqueue((source, dark)); cachedCharacters += cost;
+            }
+        }
+        return result;
+    }
+    private static DiagramResult RenderUncached(string source, bool dark)
+    {
         if (System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try

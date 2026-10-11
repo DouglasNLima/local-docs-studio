@@ -13,11 +13,15 @@ namespace LensDocsStudio.Native.Rendering;
 /// <summary>Materialises Mermaider CSS colour tokens for a native SVG 1.1 renderer. Never accepts arbitrary remote SVG.</summary>
 public sealed partial class NativeSvgService
 {
+    private readonly Dictionary<string, DrawingImage> drawings = new(StringComparer.Ordinal);
+    private readonly Queue<string> drawingOrder = new();
+    private int cachedCharacters;
     public string Prepare(string generatedSvg)
     {
         using var reader = XmlReader.Create(new StringReader(generatedSvg), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
         var xml = XDocument.Load(reader);
         var root = xml.Root ?? throw new InvalidDataException("The generated diagram is empty.");
+        if (root.Name != XName.Get("svg", "http://www.w3.org/2000/svg")) throw new InvalidDataException("The generated drawing is not an SVG document.");
         var variables = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var style in root.Descendants().Where(e => e.Name.LocalName == "style"))
             foreach (Match match in Variable().Matches(style.Value)) variables[match.Groups[1].Value] = match.Groups[2].Value.Trim();
@@ -25,23 +29,40 @@ public sealed partial class NativeSvgService
             variables[match.Groups[1].Value] = match.Groups[2].Value.Trim();
         foreach (var element in root.DescendantsAndSelf())
         {
-            if (element.Name.LocalName is "script" or "foreignObject" or "image" or "a")
+            if (element.Name.Namespace != root.Name.Namespace || element.Name.LocalName is "script" or "foreignObject" or "image" or "a" or "animate" or "set" or "animateTransform")
                 throw new InvalidDataException("The diagram contains unsupported active or external content.");
             foreach (var attribute in element.Attributes().ToArray())
             {
-                if (attribute.Name.LocalName.StartsWith("on", StringComparison.OrdinalIgnoreCase) || attribute.Name.LocalName == "href")
+                if (attribute.Name.LocalName.StartsWith("on", StringComparison.OrdinalIgnoreCase) || attribute.Name.LocalName == "href" || attribute.Name == XNamespace.Xml + "base")
                     throw new InvalidDataException("The diagram contains an active reference.");
+                if (attribute.Name.LocalName is "style" or "fill" or "stroke" or "filter" or "clip-path" or "mask" or "marker" or "marker-start" or "marker-mid" or "marker-end" or "cursor" or "font" or "font-family" or "color-profile")
+                    RejectExternalCss(attribute.Value);
                 attribute.Value = Resolve(attribute.Value, variables, 0);
             }
             if (element.Name.LocalName == "style")
+            {
+                RejectExternalCss(element.Value);
                 element.Value = Variable().Replace(Resolve(element.Value, variables, 0), "");
+            }
         }
         root.SetAttributeValue("font-family", "Segoe UI");
         return xml.ToString(SaveOptions.DisableFormatting);
     }
+    private static void RejectExternalCss(string value)
+    {
+        if (value.Contains('\\') || Regex.IsMatch(value, @"@(?:import|font-face)|expression\s*\(|(?:https?|ftp|file|data|javascript|vbscript):", RegexOptions.IgnoreCase))
+            throw new InvalidDataException("External or active diagram styles are not supported.");
+        foreach (Match match in Regex.Matches(value, @"url\s*\(([^)]*)\)", RegexOptions.IgnoreCase))
+        {
+            var reference = match.Groups[1].Value.Trim().Trim('\'', '"');
+            if (!Regex.IsMatch(reference, @"^#[A-Za-z_][A-Za-z0-9_.:-]*$"))
+                throw new InvalidDataException("Diagram styles may only reference local SVG definitions.");
+        }
+    }
 
     public DrawingImage Render(string generatedSvg)
     {
+        lock (drawings) if (drawings.TryGetValue(generatedSvg, out var cached)) return cached;
         var svg = Prepare(generatedSvg);
         using var text = new StringReader(svg);
         using var reader = new FileSvgReader(new WpfDrawingSettings { IncludeRuntime = false, TextAsGeometry = true });
@@ -50,6 +71,18 @@ public sealed partial class NativeSvgService
         drawing.Freeze();
         var image = new DrawingImage(drawing);
         image.Freeze();
+        if (generatedSvg.Length <= 2_000_000)
+        {
+            lock (drawings)
+            {
+                if (drawings.TryGetValue(generatedSvg, out var cached)) return cached;
+                while (drawingOrder.Count > 0 && (drawings.Count >= 32 || cachedCharacters + generatedSvg.Length > 2_000_000))
+                {
+                    var oldest = drawingOrder.Dequeue(); drawings.Remove(oldest); cachedCharacters -= oldest.Length;
+                }
+                drawings.Add(generatedSvg, image); drawingOrder.Enqueue(generatedSvg); cachedCharacters += generatedSvg.Length;
+            }
+        }
         return image;
     }
 

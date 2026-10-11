@@ -5,6 +5,8 @@
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
 | Conflict-safe writes, recovery journal | High / medium | Implement before relying on Save |
 | Source-aware preview navigation | High / medium | Markdig spans, native WPF elements |
+| Responsive diagram preview and zoom | High / medium | Background STA conversion, bounded frozen-drawing cache and separate native zoom window; corpus and UI checks pass |
+| Windows theme and window placement | High / low | Fluent WPF controls, system/high-contrast colours, working-area sizing and native placement persistence; broader DPI validation remains |
 | Persisted relative images | High / medium | Write bytes successfully before inserting links |
 | Focus-aware search | High / medium | Native UI tests validate editor and preview contexts, focus return and actual typing |
 | Explorer, recent files, drag/drop | High / low | Implement through Windows APIs |

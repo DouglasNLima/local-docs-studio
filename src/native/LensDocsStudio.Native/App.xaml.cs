@@ -12,6 +12,7 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        AppContext.SetSwitch("Switch.System.Windows.Appearance.DisableFluentThemeWindowBackdrop", true);
         if (e.Args is ["--apply-native-update", var ticket])
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;

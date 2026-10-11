@@ -1,5 +1,5 @@
 <Window x:Class="LensDocsStudio.Native.UpdatesWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="Lens Docs Studio updates" Width="660" Height="570" MinWidth="520" MinHeight="430" WindowStartupLocation="CenterOwner"
+ Title="Lens Docs Studio updates" Width="660" Height="570" MinWidth="600" MinHeight="480" WindowStartupLocation="CenterOwner"
  Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
  <Grid Margin="24">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>

@@ -22,7 +22,8 @@ public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<in
 public sealed class NativeMarkdownRenderer(NativeSvgService svg)
 {
     public PreviewResult Render(ParsedDocument parsed, string? sourcePath, string? workspaceRoot, bool dark,
-        IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram)
+        IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
+        IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null)
     {
         var foreground = new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         var surface = new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
@@ -50,14 +51,15 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     {
                         try
                         {
-                            var drawing = svg.Render(diagram.Svg!);
+                            var drawing = preparedDrawings is not null && preparedDrawings.TryGetValue(code, out var prepared) ? prepared : svg.Render(diagram.Svg!);
                             var image = new Image { Source = drawing, Stretch = Stretch.Uniform, MaxHeight = 900, HorizontalAlignment = HorizontalAlignment.Left };
                             System.Windows.Automation.AutomationProperties.SetName(image, "Mermaid diagram");
                             panel.Children.Add(image);
                             var actions = new StackPanel { Orientation = Orientation.Horizontal };
-                            foreach (var format in new[] { "SVG", "PNG", "Copy source" })
+                            foreach (var format in new[] { "Zoom", "SVG", "PNG", "Copy source" })
                             {
                                 var button = new Button { Content = format, Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                                System.Windows.Automation.AutomationProperties.SetAutomationId(button, "DiagramAction" + format.Replace(" ", "", StringComparison.Ordinal));
                                 button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
                                 actions.Children.Add(button);
                             }

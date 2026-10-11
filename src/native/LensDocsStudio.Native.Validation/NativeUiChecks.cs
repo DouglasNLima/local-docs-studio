@@ -17,7 +17,7 @@ internal static class NativeUiChecks
         var runRoot = Path.Combine(output, "ui-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(runRoot);
         var source = Path.Combine(runRoot, "fixture.md");
-        File.WriteAllText(source, "# Native UI fixture\n\nSearchable text.\n");
+        File.WriteAllText(source, "# Native UI fixture\n\nSearchable text.\n\n```mermaid\nflowchart LR\nA[Write] --> B[Review]\n```\n");
         var state = Path.Combine(runRoot, "state");
         Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
@@ -31,6 +31,7 @@ internal static class NativeUiChecks
             var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("Native window did not appear.");
             var editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
+            Wait(() => Find(window, "Status").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
             editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
@@ -52,6 +53,14 @@ internal static class NativeUiChecks
             Wait(() => Find(window, "FindContext").Name == "Find in preview", "Ctrl+F did not choose preview context.");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
             checks.Add("Ctrl+F targets the focused preview");
+            Find(window, "DiagramActionZoom").Click();
+            Window? diagramWindow = null;
+            Wait(() => (diagramWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Mermaid diagram")))?.AsWindow()) is not null, "The native diagram zoom window did not open.");
+            Find(diagramWindow!, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
+            Wait(() => Find(diagramWindow!, "DiagramZoomLabel").Name == "175%", "The native zoom did not change scale.");
+            diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
+            diagramWindow.Close();
+            checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -66,10 +75,14 @@ internal static class NativeUiChecks
             Wait(() => (updateWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates")))?.AsWindow()) is not null, "The native updates window did not open.");
             var channel = Find(updateWindow!, "UpdateChannel").AsComboBox();
             channel.Select("Preview");
+            channel.Collapse();
             Wait(() => File.ReadAllText(Path.Combine(state, "preferences.json")).Contains("\"Preview\"", StringComparison.Ordinal), "Update channel preference was not persisted.");
             if (Find(updateWindow!, "DownloadUpdate").IsEnabled || Find(updateWindow!, "InstallUpdate").IsEnabled) throw new InvalidOperationException("Untrusted update actions were enabled.");
             checks.Add("Native update preferences persist and untrusted installation actions stay disabled");
+            updateWindow!.CaptureToFile(Path.Combine(output, "native-updates.png"));
             updateWindow!.Close();
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates"))) is null, "The updates window did not close.");
+            window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
             window.Close();
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
@@ -79,6 +92,7 @@ internal static class NativeUiChecks
         }
         catch (Exception ex)
         {
+            try { app?.GetMainWindow(automation, TimeSpan.FromSeconds(1))?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
             File.WriteAllText(Path.Combine(output, "native-ui.json"), JsonSerializer.Serialize(new { Passed = false, Checks = checks, Error = ex.ToString(), FixtureRoot = runRoot }, new JsonSerializerOptions { WriteIndented = true }));
             Console.Error.WriteLine(ex);
             return 1;

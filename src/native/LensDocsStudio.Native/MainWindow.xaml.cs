@@ -46,6 +46,9 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        WindowStateService.FitInitialWindow(this);
+        SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
+        Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
         Editor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting());
         Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
         DataObject.AddPastingHandler(Editor, OnPaste);
@@ -60,10 +63,19 @@ public partial class MainWindow : Window
             finally { recoveryBusy = false; }
         };
     }
+    private void WindowsPreferenceChanged(object sender, UserPreferenceChangedEventArgs e)
+    {
+        if (Dispatcher.HasShutdownStarted) return;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (!closing) { ThemeService.Apply(Application.Current.Resources, model.Theme); QueuePreview(); }
+        });
+    }
 
     private async void WindowLoaded(object sender, RoutedEventArgs e)
     {
         await model.InitialiseAsync(startupPaths);
+        WindowStateService.Restore(this, model.Preferences.Window);
         ThemeService.Apply(Application.Current.Resources, model.Theme);
         SetLayout(model.Layout); BindActiveDocument(); QueuePreview(); Editor.Focus();
         InitialiseUpdates();
@@ -110,9 +122,22 @@ public partial class MainWindow : Window
                 }
                 return (source, results);
             }, cancellation);
+            var nativeDrawings = await StaWorker.RunAsync(() =>
+            {
+                var drawings = new Dictionary<FencedCodeBlock, DrawingImage>();
+                foreach (var (code, diagram) in prepared.results.ToArray())
+                {
+                    cancellation.ThrowIfCancellationRequested();
+                    if (!diagram.Success) continue;
+                    try { drawings[code] = svg.Render(diagram.Svg!); }
+                    catch (Exception ex) when (ex is not OutOfMemoryException)
+                    { prepared.results[code] = new(diagram.Source, null, "Native diagram rendering failed: " + ex.Message); }
+                }
+                return drawings;
+            }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source;
-            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.FilePath, tab.WorkspaceRoot, dark, prepared.results, Navigate, ExportDiagram);
+            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.FilePath, tab.WorkspaceRoot, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings);
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
             if (rendered.Warnings.Count != 0) model.Status = rendered.Warnings[0];
@@ -246,7 +271,17 @@ public partial class MainWindow : Window
     }
     private async void InsertImage(object sender, RoutedEventArgs e)
     {
-        if (dialogs.OpenImage() is { } path) await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path));
+        if (dialogs.OpenImage() is { } path) await AddImageFileAsync(path);
+    }
+    private async Task AddImageFileAsync(string path)
+    {
+        try
+        {
+            WorkspacePath.RejectReparsePoints(path);
+            if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Images are limited to 32 MB.");
+            await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { dialogs.Error(ex.Message); }
     }
     private async Task AddImageAsync(byte[] bytes, string name)
     {
@@ -277,20 +312,25 @@ public partial class MainWindow : Window
         {
             if (WorkspaceService.IsDocument(path)) await model.RunAsync(() => model.OpenPathAsync(path));
             else if (Path.GetExtension(path).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".gif" or ".bmp" or ".webp")
-                await AddImageAsync(await File.ReadAllBytesAsync(path), Path.GetFileName(path));
+                await AddImageFileAsync(path);
         }
     }
-    private void ExportDiagram(string format, string value)
+    private async void ExportDiagram(string format, string value)
     {
         try
         {
+            if (format == "Zoom") { new DiagramWindow(svg.Render(value), selected => ExportDiagram(selected, value)) { Owner = this }.Show(); return; }
             if (format == "Copy source") { Clipboard.SetText(value); model.Status = "Diagram source copied"; return; }
             var extension = format.ToLowerInvariant();
             var dialog = new SaveFileDialog { Filter = format + " diagram|*." + extension, FileName = "diagram." + extension };
             if (dialog.ShowDialog(this) != true) return;
-            if (format == "SVG") File.WriteAllText(dialog.FileName, svg.Prepare(value));
-            else File.WriteAllBytes(dialog.FileName, NativeSvgService.ToPng(svg.Render(value)));
-            model.Status = format + " diagram exported";
+            await model.RunAsync(async () =>
+            {
+                var expected = await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(dialog.FileName, model.OperationToken);
+                var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(svg.Prepare(value)) : NativeSvgService.ToPng(svg.Render(value));
+                await WriteExportAsync(dialog.FileName, bytes, expected, model.OperationToken);
+                model.Status = format + " diagram exported";
+            });
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or System.Runtime.InteropServices.ExternalException) { dialogs.Error(ex.Message); }
     }
@@ -357,6 +397,7 @@ public partial class MainWindow : Window
             {
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
+                await model.UpdatePreferencesAsync(p => p with { Window = WindowStateService.Capture(this) });
                 CompleteClose();
             }
             catch (Exception ex) when (ex is not OutOfMemoryException) { dialogs.Error(ex.Message); }

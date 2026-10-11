@@ -58,7 +58,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                             // SavedSnapshot.Text must remain the saved version, not a recovered draft.
                             if (!tab.ExternalChange) { tab.MarkSaved(current); }
                         }
-                        catch (IOException) { tab.ExternalChange = true; tab.IsDirty = true; }
+                        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { tab.ExternalChange = true; tab.IsDirty = true; }
                     }
                     Attach(tab);
                 }
@@ -135,7 +135,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             args is RenamedEventArgs rename && string.Equals(d.FilePath, rename.OldFullPath, StringComparison.OrdinalIgnoreCase)).ToArray())
         {
             try { document.ExternalChange = (await documents.ReadAsync(document.FilePath!)).Fingerprint != document.SavedSnapshot?.Fingerprint; }
-            catch (IOException) { document.ExternalChange = true; }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { document.ExternalChange = true; }
         }
     });
 

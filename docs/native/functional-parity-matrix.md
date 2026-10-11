@@ -13,7 +13,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Callouts/badges/details/figures/anchors/progress/math | Explicit safe semantic mapping | Incomplete |
 | Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |
 | Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |
-| Mermaid zoom/copy/SVG/PNG | Native drawing and bitmap export | Incomplete |
+| Mermaid zoom/copy/SVG/PNG | Native drawing window and guarded bitmap/vector export | Partial: native zoom UI and SVG/PNG corpus pass; destination clipboard validation remains |
 | Portable local images, paste/drop/URL, assets | Relative persistent assets; explicit URL retrieval | Incomplete |
 | External changes, conflict flow, snapshots/recovery | Fingerprints and journal | In progress |
 | Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution | Incomplete |
@@ -26,7 +26,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Optional artefact review pack, front matter priority | Explicit safe rebuilt manifest | Incomplete |
 | Templates/snippets/studios/export profiles | Local library with legacy JSON import | Incomplete |
 | Legacy migration, help, preferences | Explicit import; no browser profile scanning | Incomplete |
-| Light/dark/system, keyboard, UIA, DPI/window restore | Native resources and Windows integration | Incomplete |
-| Installer, uninstall, coexistence, portable ZIP | Isolated self-contained Inno package | Partial: development-host install/uninstall/reinstall passed; upgrade/clean-machine certification remains |
+| Light/dark/system, keyboard, UIA, DPI/window restore | Fluent controls, system colours, per-monitor DPI and saved placement | Partial: native UI checks pass; broader accessibility and multi-monitor certification remain |
+| Installer, uninstall, coexistence, portable ZIP | Isolated self-contained Inno package | Partial: host install/upgrade/uninstall/reinstall and fresh-runner lifecycle pass; clean-machine certification remains |
 | GitHub Releases, channels, notifications, secure updates | Compatible signed metadata and consent | Partial: UI/policy/negative trust tests pass; positive signed upgrade remains |
-| Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Baseline passed; CI passed at 3fe3cb7 |
+| Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Baseline passed; web PR CI passed at 5ee7202; push rerun has intermittent server/rendering failures |

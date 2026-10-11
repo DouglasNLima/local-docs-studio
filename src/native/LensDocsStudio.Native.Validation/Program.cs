@@ -37,6 +37,8 @@ internal static class Program
         var native = new NativeSvgService();
         var results = new List<object>();
         var failures = new List<string>();
+        try { NativeSvgChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())
@@ -60,7 +62,7 @@ internal static class Program
                     {
                         try
                         {
-                            var drawing = native.Render(diagram.Svg!);
+                            var drawing = LensDocsStudio.Native.Platform.StaWorker.RunAsync(() => native.Render(diagram.Svg!)).GetAwaiter().GetResult();
                             var png = NativeSvgService.ToPng(drawing);
                             File.WriteAllBytes(Path.Combine(output, name + ".png"), png);
                             File.WriteAllText(Path.Combine(output, name + ".svg"), native.Prepare(diagram.Svg!));
@@ -76,6 +78,20 @@ internal static class Program
             }
         }
         if (count == 0) failures.Add("No Mermaid fixtures discovered.");
+        var cacheWatch = Stopwatch.StartNew();
+        const string cacheSource = "flowchart LR\nA[Edit source] --> B[Reuse unchanged diagram]";
+        var cachedDiagram = diagrams.Render(cacheSource);
+        var cachedDrawing = native.Render(cachedDiagram.Svg!);
+        var firstRenderMilliseconds = cacheWatch.Elapsed.TotalMilliseconds;
+        cacheWatch.Restart();
+        var reused = true;
+        for (var repeat = 0; repeat < 20; repeat++)
+        {
+            var nextDiagram = diagrams.Render(cacheSource);
+            reused &= ReferenceEquals(cachedDiagram, nextDiagram) && ReferenceEquals(cachedDrawing, native.Render(nextDiagram.Svg!));
+        }
+        if (!reused) failures.Add("Unchanged diagram rendering did not reuse its native drawing.");
+        File.WriteAllText(Path.Combine(output, "preview-cache.json"), JsonSerializer.Serialize(new { FirstRenderMilliseconds = firstRenderMilliseconds, TwentyCachedRendersMilliseconds = cacheWatch.Elapsed.TotalMilliseconds, Reused = reused }));
         File.WriteAllText(Path.Combine(output, "mermaid-corpus.json"), JsonSerializer.Serialize(new { Total = count, Failures = failures, Results = results }, new JsonSerializerOptions { WriteIndented = true }));
         try
         {

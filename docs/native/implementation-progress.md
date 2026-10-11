@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Current milestone: native import/export validation, desktop regression coverage and packaging.
+Current milestone: native rendering, desktop interaction and workspace navigation parity.
 
 - Isolated worktree and feature/native-wpf-rebuild branch from develop 2cc3b5680958c9c553dad23856e6010c158fccd7.
 - Original web checkout and untracked attachments preserved.
@@ -21,8 +21,12 @@ Current milestone: native import/export validation, desktop regression coverage 
 - Integrated periodic GitHub release checks, native update settings, version/channel/architecture/product/OS eligibility, RSA-PSS manifest verification, streamed download integrity and pinned Windows Authenticode publisher validation. Separate download/install commands and a temporary native launcher protect graceful shutdown. Production trust remains unconfigured; unsigned previews can open eligible release pages but cannot run downloaded installers.
 - Added preview packaging, optional existing-certificate signing, manifest signing integration and dependency notices. Publication remains a separate unauthorised action.
 - Native CI workflow added independently of the unchanged Pages pipeline.
+- Native diagrams are prepared on a background STA thread and frozen drawings are reused through bounded caches. Eight unsafe SVG resource payloads are rejected and the forty-case corpus passes. Native zoom adds a seventh passing UI outcome.
+- Built-in WPF Fluent resources provide light/dark controls, Windows theme changes and high-contrast colours. Per-monitor DPI metadata, working-area sizing and saved window placement are implemented; multi-monitor and screen-reader certification remain open.
+- Different-version upgrade from preview 4 to preview 5 passed on the development host, including actual installed-app checks, uninstall/reinstall and preservation of source, existing defaults and legacy registration.
+- Native PR/push CI and web PR CI passed at 5ee7202. The web push run and rerun failed in different browser tests (including a refused local-server connection); logs are retained for investigation.
 
-Next executable tasks: push the validated milestone and check CI; validate different-version upgrades and the updated package; then continue filesystem, image, editing, review, template and navigation parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
+Next executable tasks: implement recent documents/workspaces, navigation history and native document-link insertion; then continue filesystem, image, editing, review and template parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
 
 Known implementation limitations: full-document native preview rebuild; HTML shown as source; unsaved-image insertion currently requests an initial save; full template fidelity, Docs Site, asset management, richer editing/review/navigation, general preferences and installer/update certification are incomplete. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
 

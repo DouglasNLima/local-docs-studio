@@ -33,4 +33,12 @@ The actual Windows Authenticode API rejected the unsigned installer with 0x800B0
 
 Cold mixed-document preview observed in the UI: 4092 ms on this host. The isolated corpus's first native render was 717 ms; subsequent simple render 35 ms. These are observations, not performance certification.
 
+Subsequent desktop work passes seven UI outcomes, adding an actual native Mermaid window and a 175% zoom assertion. Latest evidence remains artifacts/native/ui/native-ui.json. Light/dark controls, clamped working-area sizing and diagram windows were visually inspected. Per-monitor DPI metadata and placement persistence are implemented but multi-monitor and screen-reader validation remain open.
+
+The SVG safety harness rejects eight active/external-resource payloads and preserves local fragment paint definitions. All 40 diagram cases still pass after validation was added. Evidence: artifacts/native/validation/native-svg-safety.json and validation-summary.json. A single warm fixture took 67.5884 ms for first conversion and 0.075 ms for twenty cached reuses; this measures cache reuse, not full preview or large-document performance.
+
+Preview 4 to preview 5 upgrade, uninstall, reinstall and final uninstall passed with actual installed-app UI checks and preservation assertions. Evidence: artifacts/native/install-smoke/9519c7521c754b94a822a7c035520bea/installer-results.json. This is development-host evidence; cleanMachineCertification remains false.
+
+At 5ee7202, native PR CI 38144532410 and push CI 38144529767 passed, including the fresh Windows runner's installer lifecycle; web PR CI 38144532440 passed. Web push 38144529782 failed an Edge readiness check; its rerun failed different Chromium rendering and Edge readiness checks (the latter reported ERR_CONNECTION_REFUSED). No web runtime source changed. Logs: artifacts/native/web-ci-5ee7202-failure.log and web-ci-5ee7202-rerun-failure.log. Three local repetitions of the original Edge test passed. The push run is not claimed as passed.
+
 Broad interactive GUI, complete export fidelity, performance, installer, update trust, clean-machine and final CI certification remain pending. No unexecuted check is reported as passed.

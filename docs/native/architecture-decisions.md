@@ -12,4 +12,8 @@ Baseline: develop 2cc3b5680958c9c553dad23856e6010c158fccd7, inspected 11 October
 
 Candidate library documentation and versions are verified against upstream repositories and NuGet. Pinned lock files will record restored dependencies.
 
+Native SVG parsing runs on an STA worker; frozen drawings can safely cross to the UI thread. Bounded caches retain unchanged diagrams without retaining full document trees. SVG input is checked for active elements, external resource references and CSS escapes before SharpVectors receives it. Local fragment paint definitions remain supported. FlowDocument construction is still on the UI thread and large-document rendering remains an open performance item.
+
+Use .NET 10's built-in WPF Fluent resource dictionaries rather than introducing a separate UI framework. Apply Windows high-contrast system colours, expose native automation names and retain per-monitor DPI metadata. Window placement uses the Windows placement API so removed monitors can be reconciled by the operating system.
+
 Installer files-in-use behaviour uses an application mutex and disables forced closure/restart. Per-user Open with registration does not take over default extensions. See [Inno AppMutex](https://jrsoftware.org/ishelp/topic_setup_appmutex.htm) and [non-administrative installation](https://jrsoftware.org/ishelp/topic_setup_privilegesrequired.htm). No uninstaller action removes application state or workspaces.

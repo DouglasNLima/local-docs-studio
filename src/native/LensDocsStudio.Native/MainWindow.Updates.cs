@@ -31,6 +31,7 @@ public partial class MainWindow
         {
             SaveViewport();
             if (!await model.PrepareCloseAsync()) return;
+            await model.UpdatePreferencesAsync(p => p with { Window = WindowStateService.Capture(this) });
             await NativeUpdateLauncher.PrepareAsync(update, environment, model.StateDirectory, CancellationToken.None);
             CompleteClose();
         }
