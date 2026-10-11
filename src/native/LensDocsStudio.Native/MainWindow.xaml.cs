@@ -328,7 +328,7 @@ public partial class MainWindow : Window
     {
         if (model.ActiveDocument is not { } tab) return;
         var insertion = new DocumentInsertion(tab.EditorDocument, Editor.SelectionStart, Editor.SelectionLength);
-        var prompt = new TextPromptWindow("Insert image from URL", "HTTPS image address. This downloads the image when you choose Download and insert.", "https://", "Download and insert") { Owner = this };
+        var prompt = new TextPromptWindow("Insert image from URL", "HTTPS image address. This downloads the image when you choose Download and insert.", "https://", "Download and insert", "HTTPS image address", null) { Owner = this };
         if (prompt.ShowDialog() != true) return;
         await model.RunAsync(async () =>
         {

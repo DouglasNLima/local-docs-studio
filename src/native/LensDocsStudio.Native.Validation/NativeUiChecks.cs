@@ -878,6 +878,44 @@ internal static class NativeUiChecks
             if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
                 throw new IOException("Template selection or Word export changed original source files.");
             checks.Add("Native Word template selection and export preserve heading styles, header/footer/logo and source files while excluding private template content; clearing restores default output");
+            var libraryWindow = OpenTemplateLibrary(window);
+            if (Find(libraryWindow, "UseLibraryTemplate").IsEnabled) throw new IOException("An empty Word template library enabled selection.");
+            Find(libraryWindow, "ImportLibraryTemplate").AsButton().Invoke();
+            OpenThroughDialogue(templatePath, "Import Word template to library");
+            NameTemplate("Name Word template", "native-template", "Reusable Café");
+            Wait(() => Find(libraryWindow, "WordTemplateStatus").Name.StartsWith("Imported Reusable Café.", StringComparison.Ordinal)
+                && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The native library did not import reusable template formatting.");
+            Find(libraryWindow, "RenameLibraryTemplate").AsButton().Invoke();
+            NameTemplate("Rename Word template", "Reusable Café", "Renamed Café handbook");
+            Wait(() => Find(libraryWindow, "WordTemplateStatus").Name == "Template renamed.", "The library rename did not complete.");
+            Find(libraryWindow, "CopyLibraryTemplate").AsButton().Invoke();
+            var libraryCopy = Path.Combine(runRoot, "template-library-copy.docx"); SaveThroughDialogue(libraryCopy, "Save Word template copy");
+            Wait(() => File.Exists(libraryCopy) && Find(libraryWindow, "WordTemplateStatus").Name == "Saved reusable formatting to template-library-copy.docx.",
+                "The native library did not save a reusable copy.");
+            var copyContent = new LensDocsStudio.Core.Exports.ExportContent(new LensDocsStudio.Core.Parsing.MarkdownService().Parse("# Reusable template copy"),
+                new Dictionary<int, LensDocsStudio.Core.Exports.ExportImage>(), new Dictionary<string, LensDocsStudio.Core.Exports.ExportImage>());
+            NativeWordTemplateChecks.Check(new LensDocsStudio.Core.Exports.DocxExporter().Export(copyContent, File.ReadAllBytes(libraryCopy)), templatePixels);
+            Find(libraryWindow, "ArchiveLibraryTemplate").AsButton().Invoke();
+            Wait(() => Find(libraryWindow, "WordTemplateStatus").Name.StartsWith("Template archived.", StringComparison.Ordinal)
+                && !Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "Archiving did not remove the template from the active library.");
+            Find(libraryWindow, "ShowArchivedTemplates").Patterns.Toggle.Pattern.Toggle();
+            Wait(() => Find(libraryWindow, "ArchiveLibraryTemplate").Name == "Restore" && Find(libraryWindow, "ArchiveLibraryTemplate").IsEnabled,
+                "The archived template did not become available for restoration.");
+            if (Find(libraryWindow, "UseLibraryTemplate").IsEnabled) throw new IOException("An archived template was available for active selection.");
+            Find(libraryWindow, "ArchiveLibraryTemplate").AsButton().Invoke();
+            Wait(() => Find(libraryWindow, "WordTemplateStatus").Name == "Template restored to the active library.", "The archived template did not restore.");
+            Find(libraryWindow, "ShowArchivedTemplates").Patterns.Toggle.Pattern.Toggle();
+            Wait(() => Find(libraryWindow, "ArchiveLibraryTemplate").Name == "Archive" && Find(libraryWindow, "UseLibraryTemplate").IsEnabled,
+                "The restored template did not return to the active library.");
+            libraryWindow.CaptureToFile(Path.Combine(output, "native-template-library.png"));
+            Find(libraryWindow, "UseLibraryTemplate").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name == "Word template selected: Renamed Café handbook", "The stored library template was not selected.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
+            var libraryExport = Path.Combine(runRoot, "library-export.docx"); SaveThroughDialogue(libraryExport, "Export DOCX");
+            Wait(() => File.Exists(libraryExport) && Find(window, "Status").Name == "Exported library-export.docx", "Word export did not use the library template.");
+            NativeWordTemplateChecks.Check(File.ReadAllBytes(libraryExport), templatePixels);
+            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
+                throw new IOException("The Word template library changed source documents or the imported original.");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -887,6 +925,12 @@ internal static class NativeUiChecks
             editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Session did not restore saved text.");
             checks.Add("Session restoration reopened the document");
+            libraryWindow = OpenTemplateLibrary(window);
+            Wait(() => Find(libraryWindow, "WordTemplateList").FindFirstDescendant(cf => cf.ByName("Renamed Café handbook")) is not null
+                && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The renamed and restored Word template did not survive application restart.");
+            Find(libraryWindow, "DefaultLibraryTemplate").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name == "Default Word styles selected", "The library did not restore default Word styles.");
+            checks.Add("Native template library imports, renames, saves reusable copies, archives/restores, exports with retained formatting and survives restart without changing original files");
             Find(window, "HelpMenu").Click();
             Find(window, "UpdatesMenu").Click();
             Window? updateWindow = null;
@@ -985,6 +1029,23 @@ internal static class NativeUiChecks
             Wait(() => (progressWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Progress indicator")))?.AsWindow()) is not null,
                 "The native progress dialogue did not open.");
             return progressWindow!;
+        }
+        Window OpenTemplateLibrary(Window main)
+        {
+            Find(main, "ExportMenu").Click(); Find(main, "ManageWordTemplates").Patterns.Invoke.Pattern.Invoke();
+            Window? library = null;
+            Wait(() => (library = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Word template library")))?.AsWindow()) is not null,
+                "The native Word template library did not open.");
+            return library!;
+        }
+        void NameTemplate(string title, string previous, string next)
+        {
+            Window? prompt = null;
+            Wait(() => (prompt = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null,
+                "The native template name dialogue did not open.");
+            var input = Find(prompt!, "WorkspacePathInput").AsTextBox();
+            if (input.Text != previous || input.Name != "Template name") throw new IOException("The template name dialogue lost its existing value or accessible label.");
+            input.Text = next; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
         }
         void OpenThroughDialogue(string path, string title)
         {

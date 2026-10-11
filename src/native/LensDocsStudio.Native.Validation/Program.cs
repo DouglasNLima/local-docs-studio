@@ -64,6 +64,12 @@ internal static class Program
             try { NativeWordTemplateChecks.Run(templateOutput); Console.WriteLine("Native Word template integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--template-library")
+        {
+            var libraryOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(libraryOutput);
+            try { NativeTemplateLibraryChecks.Run(libraryOutput); Console.WriteLine("Native template library integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -140,6 +146,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native image figures: " + ex.Message); }
         try { NativeWordTemplateChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Word templates: " + ex.Message); }
+        try { NativeTemplateLibraryChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native template library: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

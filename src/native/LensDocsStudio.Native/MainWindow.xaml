@@ -117,6 +117,7 @@
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
     <Separator/>
+    <MenuItem Header="Word template _library…" Click="ManageWordTemplates" AutomationProperties.AutomationId="ManageWordTemplates"/>
     <MenuItem Header="Select Word _template…" Click="SelectWordTemplate" AutomationProperties.AutomationId="SelectWordTemplate"/>
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate" AutomationProperties.AutomationId="ClearWordTemplate"/>
    </MenuItem>

@@ -10,6 +10,8 @@ public partial class MainWindow
 {
     private readonly DocumentExportService exports = new();
     private byte[]? wordTemplate;
+    private Guid? wordTemplateId;
+    private string wordTemplateName = "Default Word styles";
 
     private async void ExportDocsSite(object sender, RoutedEventArgs e)
     {
@@ -66,10 +68,24 @@ public partial class MainWindow
         await model.RunAsync(async () =>
         {
             var prepared = await new DocxTemplateService().ReadAsync(picker.FileName, model.OperationToken);
-            wordTemplate = prepared.Bytes;
+            wordTemplate = prepared.Bytes; wordTemplateId = null; wordTemplateName = Path.GetFileName(picker.FileName);
             model.Status = "Word template selected: " + Path.GetFileName(picker.FileName)
                 + (prepared.Warnings.Count == 0 ? "" : ". " + string.Join(" ", prepared.Warnings));
         });
     }
-    private void ClearWordTemplate(object sender, RoutedEventArgs e) { wordTemplate = null; model.Status = "Default Word styles selected"; }
+    private void ClearWordTemplate(object sender, RoutedEventArgs e) { wordTemplate = null; wordTemplateId = null; wordTemplateName = "Default Word styles"; model.Status = "Default Word styles selected"; }
+
+    private async void ManageWordTemplates(object sender, RoutedEventArgs e)
+    {
+        await model.RunAsync(async () =>
+        {
+            var library = new WordTemplateLibrary(Path.Combine(model.StateDirectory, "word-templates"));
+            var listing = await Task.Run(() => library.ListAsync(cancellationToken: model.OperationToken), model.OperationToken);
+            var window = new WordTemplatesWindow(library, listing, Path.Combine(model.StateDirectory, "export-recovery"), wordTemplateId, wordTemplateName) { Owner = this };
+            var selected = window.ShowDialog(); wordTemplateName = window.CurrentName;
+            if (selected != true) return;
+            wordTemplate = window.SelectedBytes; wordTemplateId = window.SelectedId; wordTemplateName = window.SelectedName;
+            model.Status = wordTemplate is null ? "Default Word styles selected" : "Word template selected: " + wordTemplateName;
+        });
+    }
 }
