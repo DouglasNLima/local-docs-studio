@@ -392,6 +392,22 @@ internal static class NativeUiChecks
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "Undo did not restore the formatted paste document.");
                 checks.Add("Invalid clipboard pixels preserve selected and saved source; Ctrl+Shift+V chooses literal text and one Undo restores the document");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+                Find(window, "InsertMenu").Click(); Find(window, "CalloutMenu").Patterns.ExpandCollapse.Pattern.Expand();
+                Find(window, "InsertNote").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> [!NOTE]", StringComparison.Ordinal), "The native callout menu did not insert a note.");
+                Keyboard.Type("Review evidence.");
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> Review evidence.", StringComparison.Ordinal), "Callout typing did not replace only the selected body.");
+                if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeFailedPaste, StringComparison.Ordinal))
+                    throw new IOException("Callout insertion changed the preceding document.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "Two Undo actions did not restore the document before callout insertion and typing.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> [!NOTE]", StringComparison.Ordinal), "Redo did not restore the inserted callout.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeFailedPaste, "Undo after Redo did not restore the saved document.");
+                checks.Add("Native callout insertion retains surrounding text, selects its body for typing and supports complete Undo and Redo actions");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
                 sourceTab.Patterns.SelectionItem.Pattern.Select();
             }

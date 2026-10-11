@@ -271,20 +271,7 @@ public partial class MainWindow : Window
     {
         if (model.ActiveDocument is not { IsSaving: false }) return;
         var tag = (sender as FrameworkElement)?.Tag as string;
-        var selected = Editor.SelectedText;
-        var value = tag switch
-        {
-            "bold" => "**" + (selected.Length == 0 ? "bold text" : selected) + "**",
-            "italic" => "*" + (selected.Length == 0 ? "italic text" : selected) + "*",
-            "heading" => "## " + (selected.Length == 0 ? "Heading" : selected),
-            "link" => "[" + (selected.Length == 0 ? "Link text" : selected) + "](document.md)",
-            "table" => "| Column | Description |\n|---|---|\n| Value | Details |\n",
-            "task" => "- [ ] " + (selected.Length == 0 ? "Task" : selected),
-            "code" => "```text\n" + selected + "\n```\n",
-            "mermaid" => "```mermaid\nflowchart LR\n  A[Draft] --> B[Review]\n  B --> C[Publish]\n```\n",
-            _ => selected
-        };
-        InsertText(value);
+        if (tag is not null) EditorFormattingService.Apply(Editor, tag);
     }
     private void InsertText(string value)
     {

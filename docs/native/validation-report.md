@@ -1,5 +1,13 @@
 # Native validation report
 
+## Native editing plans
+
+All 208 core tests pass. Twenty-one editing cases cover whitespace-preserving and nested emphasis toggles, CRLF and adaptive code fences, literal inline backticks, selected-line boundaries, list conversion without duplicate markers, retained checked tasks, numbering/indentation, empty-line caret placement, all five callout kinds and templates that retain selected text. Five real AvalonEdit checks pass for selection retention, complete Undo/Redo actions, read-only protection, typing after a heading marker, and editing a callout body without changing its marker. Evidence: artifacts/native/tests/native-core.trx and artifacts/native/validation/native-editor.json.
+
+The desktop harness adds a 23rd outcome for Insert → Callout → Note, typing into its selected body, Undo, Redo and restoring the original document. Its first CI run is pending. Local foreground acquisition remains unavailable; the standard native harness does not claim an interactive desktop result.
+
+Both native and both web CI runs at dd25fb0 passed: 38161563199/38161560292 native and 38161563173/38161560423 web. All four runs at 51a055b also pass: native 38162421898/38162417725 and web 38162421948/38162417778, including Markdown semantics, 22 desktop outcomes, installed lifecycle and complete browser checks.
+
 ## Native Markdown semantics
 
 All 187 core tests pass. Five callout kinds retain parsed labels/body and source spans. Word output passes Open XML schema validation and assertions for labelled callouts, ordered starts of 7 and 0, left/centre/right cells, strike without unintended bold/italic, subscript/superscript, insertion underline, neutral highlight and distinct soft/hard breaks. Rendered Unicode clipboard text also retains ordered starts.

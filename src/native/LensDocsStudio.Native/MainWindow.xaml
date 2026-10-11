@@ -79,11 +79,13 @@
     <Separator/>
     <MenuItem Header="_Bold" InputGestureText="Ctrl+B" Tag="bold" Click="Format"/>
     <MenuItem Header="_Italic" InputGestureText="Ctrl+I" Tag="italic" Click="Format"/>
+    <MenuItem Header="Strikethrough" Tag="strike" Click="Format"/>
+    <MenuItem Header="Inline code" Tag="inline-code" Click="Format"/>
     <MenuItem Header="Copy rendered _text" Click="CopyPreview"/>
     <MenuItem Header="Copy rendered _content" Click="CopyRenderedContent" AutomationProperties.AutomationId="CopyRenderedContent"/>
     <MenuItem Header="Copy _Markdown with images" Click="CopyMarkdownWithImages" AutomationProperties.AutomationId="CopyMarkdownWithImages"/>
    </MenuItem>
-   <MenuItem Header="_Insert">
+   <MenuItem Header="_Insert" AutomationProperties.AutomationId="InsertMenu">
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
     <MenuItem Header="Workspace document link…" InputGestureText="Ctrl+Shift+K" Click="InsertDocumentLink" AutomationProperties.AutomationId="DocumentLinkMenu"/>
@@ -91,7 +93,17 @@
     <MenuItem Header="Image from URL…" Click="InsertRemoteImage" AutomationProperties.AutomationId="InsertRemoteImage"/>
     <MenuItem Header="Table" Tag="table" Click="Format"/>
     <MenuItem Header="Task list" Tag="task" Click="Format"/>
-    <MenuItem Header="Code block" Tag="code" Click="Format"/>
+    <MenuItem Header="Bullet list" Tag="bullet" Click="Format"/>
+    <MenuItem Header="Numbered list" Tag="numbered" Click="Format"/>
+    <MenuItem Header="Blockquote" Tag="quote" Click="Format"/>
+    <MenuItem Header="Callout" AutomationProperties.AutomationId="CalloutMenu">
+     <MenuItem Header="Note" Tag="callout:NOTE" Click="Format" AutomationProperties.AutomationId="InsertNote"/>
+     <MenuItem Header="Tip" Tag="callout:TIP" Click="Format"/>
+     <MenuItem Header="Important" Tag="callout:IMPORTANT" Click="Format"/>
+     <MenuItem Header="Warning" Tag="callout:WARNING" Click="Format"/>
+     <MenuItem Header="Caution" Tag="callout:CAUTION" Click="Format"/>
+    </MenuItem>
+    <MenuItem Header="Code block" Tag="code" Click="Format" AutomationProperties.AutomationId="InsertCode"/>
     <MenuItem Header="Mermaid diagram" Tag="mermaid" Click="Format"/>
    </MenuItem>
    <MenuItem Header="E_xport">
