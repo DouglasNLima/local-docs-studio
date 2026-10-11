@@ -86,7 +86,7 @@ python -m http.server 4173
 
 Then open `http://127.0.0.1:4173/`.
 
-The Playwright config starts the same server automatically and uses `http://127.0.0.1:4173` as `baseURL`.
+The Playwright config starts `tests/browser/serve-static.py` automatically, serving the same static files with HTTP/1.1 and a larger connection queue for cold PWA loads. Its default `baseURL` is `http://127.0.0.1:4173`; set `LENS_TEST_PORT` to use a different local test port. CI always starts its own server.
 
 ## Architecture And Coding Conventions
 

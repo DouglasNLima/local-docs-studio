@@ -19,6 +19,8 @@ See [native implementation progress](docs/native/implementation-progress.md), [f
 
 The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix identifies features still to be implemented.
 
+The native File menu can create files/folders, review document rename/move and related Markdown link changes, and delete a document with saved/unsaved snapshots. **Document snapshots** previews retained source and opens a recovered draft for an explicit Save as. **Insert → Image from URL** downloads an HTTPS raster image only on request, validates it locally and stores a portable PNG before inserting its link. Missing snapshot images are reported while source text remains recoverable.
+
 The native package includes .NET and requires neither WebView2 nor a local server. Inno Setup installs per user into `Programs/Lens Docs Studio Native`, with optional shortcuts and Open with registration. `scripts/native/Test-NativeInstaller.ps1` exercises actual installation, native save/reopen, uninstall and reinstall in an isolated test directory; it refuses to replace an existing native installation. Pass `-UpgradeInstaller` to include an upgrade. These generated packages are unsigned internal previews. See [native update trust and packaging](docs/native/update-and-packaging.md) before preparing release metadata. No script publishes a release.
 
 Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime, an existing WinUI 3/WebView2 shell and the separate WPF reconstruction described above. The static application continues to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
@@ -581,6 +583,7 @@ npm test
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun` prepares the GitHub Release ZIP artefact set, checksum, release notes, and draft prerelease `gh release create` command without publishing.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
+- Playwright starts the static test server in `tests/browser/serve-static.py`. It uses persistent HTTP connections and a larger connection queue for concurrent module/PWA requests. Set `LENS_TEST_PORT` if another local project uses port 4173. CI retains traces and screenshots for failed browser checks; there is still no production server or build step.
 
 ## Browser Support
 

@@ -2267,9 +2267,9 @@ test('fake WebView2 bridge creates Markdown files in native workspaces', async (
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
 
-  if (!await page.locator('details.menu[open]').isVisible()) {
-    await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  }
+  // The folder badge updates before the asynchronous menu action closes its menu.
+  await expect(page.locator('details.menu[open]')).toHaveCount(0);
+  await openFileMenu(page);
   await page.getByRole('button', { name: 'New Markdown file' }).click();
   await page.locator('#appDialogPromptInput').fill('notes/new-note.md');
   await submitAppDialog(page, { button: 'Create file' });

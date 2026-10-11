@@ -1,5 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const port = Number(process.env.LENS_TEST_PORT || 4173);
+if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('LENS_TEST_PORT must be a port between 1024 and 65535.');
+const baseURL = `http://127.0.0.1:${port}`;
+
 export default defineConfig({
   testDir: './tests/browser',
   timeout: 90_000,
@@ -8,14 +12,15 @@ export default defineConfig({
     timeout: 20_000,
   },
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL,
     acceptDownloads: true,
-    trace: 'on-first-retry',
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
   webServer: {
-    command: 'python -m http.server 4173',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: true,
+    command: `python tests/browser/serve-static.py --port ${port}`,
+    url: baseURL,
+    reuseExistingServer: !process.env.CI,
     timeout: 15_000,
   },
   projects: [
