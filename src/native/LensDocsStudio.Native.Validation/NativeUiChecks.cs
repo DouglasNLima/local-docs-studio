@@ -853,6 +853,7 @@ internal static class NativeUiChecks
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
+            var sourceBeforeLibraryImage = editor.Patterns.Value.Pattern.Value.Value;
             var libraryImageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
             var libraryImageMarkdown = "![Library portable image](" + libraryImageReference + ")";
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
@@ -1019,6 +1020,15 @@ internal static class NativeUiChecks
             if (!File.ReadAllBytes(Path.Combine(state, "preferences.json")).SequenceEqual(preferencesBeforeProfile) || File.ReadAllText(source) != templateSavedSource
                 || editor.Patterns.Value.Pattern.Value.Value != templateSource || !File.ReadAllBytes(browserLibraryPath).SequenceEqual(browserLibraryBytes))
                 throw new IOException("Library or profile actions changed persisted preferences, original JSON or source documents.");
+            FocusWindow(window); editor.Click();
+            for (var undo = 0; undo < 4 && editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage; undo++)
+            {
+                var beforeUndo = editor.Patterns.Value.Pattern.Value.Value;
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value != beforeUndo, "The library fixture image insertion did not undo.");
+            }
+            if (editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage || File.ReadAllText(source) != templateSavedSource)
+                throw new IOException("The library fixture did not restore the original editor and saved source before shutdown.");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

@@ -1,5 +1,7 @@
 # Native validation report
 
+At 621ed92, native PR/push 38185858254/38185856121 pass all added content-library assertions up to shutdown. The retained screenshot shows the correct Unsaved document confirmation for the image deliberately inserted by the fixture. The harness now undoes that image insertion before closing and verifies exact original editor/saved text; it does not dismiss or suppress the product's save prompt. Restart and installed certification require a fresh CI run. Evidence: artifacts/native/ci-621ed92-pr/ui/native-ui-failure.png.
+
 The two native CI runs at 4b6f547 (38185444829 PR / 38185442429 push) pass core/native integration and reach the content-library desktop export. Their assertion expected an embedded image in a document containing no image. Retained exported JSON verifies two templates, two snippets, one profile and editable Mermaid; the earlier image figure test had restored the image-free source. The corrected fixture adds a real local image through the editor before capture and separately checks counts, embedded pixels, Mermaid and equal complete-selection snippet content. Release build passes. Fresh desktop/installed evidence remains pending; no product failure or corrected desktop pass is inferred from this diagnostic.
 
 ## Native content-library and profile controls
