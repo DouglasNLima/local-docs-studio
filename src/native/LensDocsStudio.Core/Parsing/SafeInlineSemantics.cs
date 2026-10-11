@@ -38,14 +38,15 @@ public static partial class SafeInlineSemantics
         }
     }
 
-    private static bool TryRead(HtmlInline opening, string source, out DocumentSemanticInline? semantic, out Inline? last)
+    private static bool TryRead(HtmlInline opening, string source, out LeafInline? semantic, out Inline? last)
     {
         semantic = null; last = null;
         var first = Tag().Match(opening.Tag);
         if (!first.Success || first.Groups[1].Value.Length != 0) return false;
         var tag = first.Groups[2].Value.ToLowerInvariant();
         if (tag == "span" && !opening.Tag.Contains("data-status-badge", StringComparison.OrdinalIgnoreCase)
-            && !opening.Tag.Contains("data-shortcut", StringComparison.OrdinalIgnoreCase)) return false;
+            && !opening.Tag.Contains("data-shortcut", StringComparison.OrdinalIgnoreCase)
+            && !opening.Tag.Contains("data-doc-anchor", StringComparison.OrdinalIgnoreCase)) return false;
         var depth = 1; var count = 0;
         for (var cursor = opening.NextSibling; cursor is not null; cursor = cursor.NextSibling)
         {
@@ -61,7 +62,16 @@ public static partial class SafeInlineSemantics
             var body = parsed.Body!;
             if (body.Children.Length != 1) return false;
             var element = body.Children[0];
-            if (element.LocalName != tag || element.TextContent.Length is 0 or > 512 || element.TextContent.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t'))) return false;
+            if (element.LocalName != tag || element.TextContent.Length > 512 || element.TextContent.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t'))) return false;
+            if (tag == "span" && element.HasAttribute("data-doc-anchor"))
+            {
+                if (!DocumentAnchors.IsValidId(element.Id ?? "") || element.Children.Length != 0
+                    || element.HasAttribute("data-status-badge") || element.HasAttribute("data-shortcut")
+                    || !TryVisibleText(opening.NextSibling, cursor, false, out var label, allowEmpty: true)) return false;
+                semantic = new DocumentAnchorInline(element.Id!, label) { Span = new(start, end), Line = opening.Line, Column = opening.Column };
+                last = cursor; return true;
+            }
+            if (element.TextContent.Length == 0) return false;
             DocumentInlineKind kind; var variant = "";
             if (tag == "span" && element.HasAttribute("data-status-badge"))
             {
@@ -81,16 +91,16 @@ public static partial class SafeInlineSemantics
             // Keep Markdig's decoded visible text, including escaped punctuation and emphasis.
             // Links, images and unknown inline extensions must retain their original syntax tree.
             if (!TryVisibleText(opening.NextSibling, cursor, kind == DocumentInlineKind.Shortcut, out var text)) return false;
-            semantic = new(kind, text, variant) { Span = new(start, end), Line = opening.Line, Column = opening.Column };
+            semantic = new DocumentSemanticInline(kind, text, variant) { Span = new(start, end), Line = opening.Line, Column = opening.Column };
             last = cursor; return true;
         }
         return false;
     }
-    private static bool TryVisibleText(Inline? first, Inline? end, bool allowKeys, out string text)
+    private static bool TryVisibleText(Inline? first, Inline? end, bool allowKeys, out string text, bool allowEmpty = false)
     {
         var result = new StringBuilder(); var nodes = 0;
         var success = Append(first, end, 0); text = result.ToString();
-        return success && text.Length > 0 && !text.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t'));
+        return success && (allowEmpty || text.Length > 0) && !text.Any(c => char.IsControl(c) && c is not ('\r' or '\n' or '\t'));
         bool Append(Inline? start, Inline? stop, int depth)
         {
             if (depth > 32) return false;

@@ -198,6 +198,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 cancellationToken.ThrowIfCancellationRequested();
                 switch (inline)
                 {
+                    case DocumentAnchorInline anchor:
+                        var anchorSpan = new Span(new Run(anchor.Text)) { Tag = new SourceReference(anchor.Span.Start, anchor.Span.End, anchor.Line) };
+                        System.Windows.Automation.AutomationProperties.SetName(anchorSpan, anchor.Text.Length == 0 ? "Anchor: " + anchor.Id : anchor.Text);
+                        sourceElements[anchor.Span.Start] = anchorSpan;
+                        target.Add(anchorSpan); break;
                     case DocumentSemanticInline semantic:
                         var passive = new Span(new Run(semantic.Text)) { Background = surface,
                             Tag = new SourceReference(semantic.Span.Start, semantic.Span.End, semantic.Line) };

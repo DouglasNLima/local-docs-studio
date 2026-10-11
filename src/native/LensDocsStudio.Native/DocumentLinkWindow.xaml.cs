@@ -15,12 +15,14 @@ public partial class DocumentLinkWindow : Window
     private readonly WorkspacePath workspace;
     private readonly string sourcePath;
     private readonly string recoveryDirectory;
+    private readonly IReadOnlyDictionary<string, string>? editedDocuments;
     private CancellationTokenSource? loading;
     public string? MarkdownLink { get; private set; }
 
-    public DocumentLinkWindow(WorkspacePath workspace, string sourcePath, IReadOnlyList<WorkspaceEntry> entries, string recoveryDirectory)
+    public DocumentLinkWindow(WorkspacePath workspace, string sourcePath, IReadOnlyList<WorkspaceEntry> entries, string recoveryDirectory, IReadOnlyDictionary<string, string>? editedDocuments = null)
     {
         this.workspace = workspace; this.sourcePath = sourcePath; this.recoveryDirectory = recoveryDirectory;
+        this.editedDocuments = editedDocuments;
         candidates = Flatten(entries).Select(e => new Candidate(e.Path, Path.GetRelativePath(workspace.Root, e.Path))).ToArray();
         InitializeComponent(); WindowStateService.FitInitialWindow(this);
         DocumentsList.ItemsSource = candidates;
@@ -47,10 +49,12 @@ public partial class DocumentLinkWindow : Window
         if (DocumentsList.SelectedItem is not Candidate selected) return;
         try
         {
-            var snapshot = await new DocumentStore(recoveryDirectory).ReadAsync(selected.Path, token);
-            var headings = await Task.Run(() => new MarkdownService().Parse(snapshot.Text).Headings, token);
+            var source = editedDocuments?.TryGetValue(selected.Path, out var current) == true ? current : (await new DocumentStore(recoveryDirectory).ReadAsync(selected.Path, token)).Text;
+            var standalone = Path.GetExtension(selected.Path).ToLowerInvariant() is ".mmd" or ".mermaid";
+            var targets = await Task.Run(() => new MarkdownService().Parse(source, standalone).Targets, token);
             if (token.IsCancellationRequested || !ReferenceEquals(DocumentsList.SelectedItem, selected)) return;
-            SectionList.ItemsSource = new[] { new SectionChoice("Whole document", null) }.Concat(headings.Select(h => new SectionChoice(h.Title, h.Anchor))).ToArray();
+            SectionList.ItemsSource = new[] { new SectionChoice("Whole document", null) }.Concat(targets.Select(t => new SectionChoice(
+                t.HeadingLevel == 0 ? "Anchor: " + t.Title : t.Title, t.Id))).ToArray();
             SectionList.SelectedIndex = 0;
         }
         catch (OperationCanceledException) { }

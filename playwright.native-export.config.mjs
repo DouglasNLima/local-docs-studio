@@ -6,4 +6,5 @@ export default defineConfig({
   ...base,
   testDir: './tests/native-browser',
   outputDir: './artifacts/native/site-browser',
+  webServer: { ...base.webServer, reuseExistingServer: false },
 });

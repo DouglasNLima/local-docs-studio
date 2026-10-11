@@ -65,13 +65,26 @@ internal static class NativeEditorChecks
         if (editor.Text != source) throw new IOException("Progress insertion Undo lost the original source.");
         editor.Document.UndoStack.Redo();
         if (editor.Text != progressSource) throw new IOException("Progress insertion Redo changed source.");
+        editor.Text = source; editor.Document.UndoStack.ClearAll();
+        var anchorEdit = AnchorEditService.Plan(new MarkdownService().Parse(source), 7, 8, new("review", "Selected label"));
+        EditorFormattingService.Apply(editor, anchorEdit); var anchorSource = editor.Text;
+        if (editor.SelectedText != anchorEdit.Replacement) throw new IOException("Anchor insertion did not select the complete snippet.");
+        EditorFormattingService.Apply(editor, AnchorEditService.Plan(new MarkdownService().Parse(anchorSource), editor.SelectionStart, editor.SelectionLength, new("review", "")));
+        if (!editor.Text.Contains("data-doc-anchor></span>", StringComparison.Ordinal)) throw new IOException("The anchor label was not cleared.");
+        editor.Document.UndoStack.Undo();
+        if (editor.Text != anchorSource) throw new IOException("Anchor label editing was not one Undo action.");
+        editor.Document.UndoStack.Undo();
+        if (editor.Text != source) throw new IOException("Anchor insertion Undo changed preceding source.");
+        editor.Document.UndoStack.Redo();
+        if (editor.Text != anchorSource) throw new IOException("Anchor insertion Redo changed source.");
         File.WriteAllText(Path.Combine(output, "native-editor.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
             Checks = new[] { "Inline formatting retains selection and toggles", "Undo and Redo operate on complete formatting actions",
                 "Read-only editors reject formatting", "Line commands leave a typing caret after their marker", "Callout typing replaces only its body and Undo restores original source",
                 "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text",
-                "Progress insertion and editing retain selection and form separate complete Undo/Redo actions" }
+                "Progress insertion and editing retain selection and form separate complete Undo/Redo actions",
+                "Named and empty anchor insertion/editing preserve selection and complete Undo/Redo actions" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

@@ -216,9 +216,9 @@ public partial class MainWindow : Window
             }
             if (fragment is not null)
             {
-                var heading = parsed?.Headings.FirstOrDefault(h => h.Anchor == fragment);
-                if (heading is not null && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-                { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+                var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
+                if (target is not null && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
+                { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
                 else model.Status = "The linked section was not found; the document remains open.";
             }
         });

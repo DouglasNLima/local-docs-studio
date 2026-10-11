@@ -1,5 +1,17 @@
 # Native validation report
 
+## Named document anchors
+
+Release builds without warnings/errors and all 309 core tests pass. Twenty-two anchor cases cover named/empty labels, decoded text, exact source positions, unique duplicate targets shared by headings/anchors, preserved later-declared identifiers, unsupported or active structures, code examples, bounds, HTML/clipboard preservation, Word bookmark/link resolution, retained template bookmarks and insertion/update validation. Evidence: artifacts/native/tests/native-core-anchors.trx.
+
+The standard native harness remains green and now includes nine editor outcomes plus four anchor outcomes. Both themes retain selectable labels and source destinations; actual native hyperlinks preserve target references. The generated two-page PDF contains four links whose named destinations resolve to the intended heading, named/empty positions and later page. The initial check expected direct page arrays; inspecting the PDF established that MigraDoc correctly uses a named-destination table, which the check now resolves. Evidence: artifacts/native/validation/native-anchors.json, native-anchors.pdf and native-editor.json.
+
+The native anchor dialogue validates identifiers, preserves an existing identifier when editing its label and applies one undoable replacement. The document-link picker includes targets from captured current editor buffers, including unsaved empty anchors. A new 28th desktop outcome validates the dialogues, exact caret destination, source preservation and Undo/Redo; built/installed/reinstalled CI remains pending. Local foreground acquisition is still unavailable.
+
+All four Chromium/Edge disk/HTTP checks pass in 24.4 seconds, including named/empty-anchor focus and Back. The first HTTP run reached an unrelated application already using port 4183, failing before loading the exported site. That server was left running; the suite now refuses existing-server reuse and the successful rerun used free port 4193. Failure evidence: artifacts/native/site-browser-port-collision. Broader anchor forms, anchor rename with incoming-link review and import round-trip fidelity remain open.
+
+All four runs at 95a811f pass: native 38169767628/38169764731 and web 38169767739/38169764725. Native CI validates 287 core tests, four destination browser checks and all 27 desktop outcomes before installation and after installation/reinstallation, including private-state exclusion and unsaved-source bundle export. Evidence: artifacts/native/native-ci-95a811f-pr.log.
+
 ## Markdown Bundle private-state boundary
 
 All 287 core tests pass and Release builds without warnings/errors. Eighteen bundle cases include actual ZIP entries and bytes for exclusion of the configured native state folder, ignored private draft overrides, retained public folders with similar names, exact raster bytes, root/descendant/trailing-separator handling, unrelated exclusions, incomplete enumeration, oversized UTF-8 drafts, empty workspaces and cancellation. Saved source and private recovery files remain unchanged. Evidence: artifacts/native/tests/bundle-boundary-after.trx and native-core-bundle-boundary.trx.

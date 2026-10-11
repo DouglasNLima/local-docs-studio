@@ -107,6 +107,7 @@
     <MenuItem Header="Code block" Tag="code" Click="Format" AutomationProperties.AutomationId="InsertCode"/>
     <MenuItem Header="Mermaid diagram" Tag="mermaid" Click="Format"/>
     <MenuItem Header="Progress indicator…" Click="InsertProgress" AutomationProperties.AutomationId="InsertProgress"/>
+    <MenuItem Header="Document anchor…" Click="InsertAnchor" AutomationProperties.AutomationId="InsertAnchor"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument"/>
@@ -152,7 +153,7 @@
   <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}">
    <StatusBarItem><TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" MaxWidth="600" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/></StatusBarItem>
    <Separator/><StatusBarItem><TextBlock Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/></StatusBarItem>
-   <Separator/><StatusBarItem><TextBlock x:Name="CaretStatus" Text="UTF-8"/></StatusBarItem>
+   <Separator/><StatusBarItem><TextBlock x:Name="CaretStatus" Text="UTF-8" AutomationProperties.AutomationId="CaretStatus"/></StatusBarItem>
    <StatusBarItem><Button Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}"/></StatusBarItem>
   </StatusBar>
   <Grid>

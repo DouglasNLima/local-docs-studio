@@ -31,6 +31,8 @@ public sealed class PdfExporter
         section.PageSetup.TopMargin = section.PageSetup.BottomMargin = Unit.FromCentimeter(2);
         section.PageSetup.LeftMargin = section.PageSetup.RightMargin = Unit.FromCentimeter(2);
         section.Footers.Primary.AddParagraph().AddPageField();
+        var bookmarks = content.Document.Targets.ToDictionary(t => t.Id, t => "LensTarget" + t.SourceStart, StringComparer.Ordinal);
+        var headingTargets = content.Document.Targets.Where(t => t.HeadingLevel > 0).ToDictionary(t => t.SourceStart);
         foreach (var block in content.Document.Syntax) Append(section.Elements, block);
         var renderer = new PdfDocumentRenderer { Document = document };
         renderer.RenderDocument();
@@ -43,7 +45,9 @@ public sealed class PdfExporter
             switch (block)
             {
                 case HeadingBlock heading:
-                    var hp = elements.AddParagraph(); hp.Style = "Heading" + heading.Level; Inlines(hp.Elements, heading.Inline); break;
+                    var hp = elements.AddParagraph(); hp.Style = "Heading" + heading.Level;
+                    if (headingTargets.TryGetValue(heading.Span.Start, out var headingTarget)) hp.AddBookmark(bookmarks[headingTarget.Id]);
+                    Inlines(hp.Elements, heading.Inline); break;
                 case ParagraphBlock paragraph:
                     var p = elements.AddParagraph(); if (marker is not null) p.AddText(marker);
                     Inlines(p.Elements, paragraph.Inline); break;
@@ -107,6 +111,8 @@ public sealed class PdfExporter
             {
                 switch (inline)
                 {
+                    case DocumentAnchorInline anchor:
+                        elements.AddBookmark(bookmarks[anchor.Id]); elements.AddText(anchor.Text); break;
                     case DocumentSemanticInline semantic:
                         var semanticText = elements.AddFormattedText(semantic.Text);
                         if (semantic.Kind == DocumentInlineKind.StatusBadge) semanticText.Bold = true;
@@ -120,6 +126,8 @@ public sealed class PdfExporter
                     case LinkInline { IsImage: true } link:
                         if (!content.Images.TryGetValue(link.Url ?? "", out var image)) throw new InvalidDataException("An image could not be exported.");
                         AddImage(elements, image); break;
+                    case LinkInline link when link.Url?.StartsWith('#') == true && bookmarks.TryGetValue(Uri.UnescapeDataString(link.Url[1..]), out var bookmark):
+                        Inlines(elements.AddHyperlink(bookmark).Elements, link); break;
                     case EmphasisInline emphasis:
                         var formatted = elements.AddFormattedText();
                         var formatting = MarkdownFormatting.Emphasis(emphasis);

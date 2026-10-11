@@ -24,6 +24,14 @@ for (const mode of ['disk', 'static hosting']) {
     await expect(page.getByRole('heading', { name: 'Evidence', exact: true })).toBeFocused();
     await expect(page.locator('#docMeta')).toContainText('Draft');
     await expect(page.locator('#content')).toContainText('Unsaved reviewed content.');
+    await page.locator('#content').getByRole('link', { name: 'Named target', exact: true }).click();
+    await expect(page.locator('#named-position')).toBeFocused();
+    await expect(page.locator('#named-position')).toHaveText('Named destination');
+    await page.locator('#content').getByRole('link', { name: 'Empty target', exact: true }).click();
+    await expect(page.locator('#empty-position')).toBeFocused();
+    await expect(page.locator('#empty-position')).toHaveText('');
+    await page.goBack();
+    await expect(page.locator('#named-position')).toBeFocused();
     await page.locator('#content').getByRole('link', { name: 'Home', exact: true }).click();
     await expect(page.locator('#content h1')).toHaveText('Native documentation');
     await page.goBack();

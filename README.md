@@ -43,6 +43,8 @@ Native Markdown Bundle export includes current edits to saved workspace document
 
 Native ZIP import stages into a new folder, bounds imported content and checks entry sizes and checksums before publishing the workspace. A rejected import leaves existing documents untouched.
 
+The native **Insert → Document anchor** dialogue creates a named position with an optional visible label. Reopening it edits the label while retaining the identifier used by existing links. The document-link picker includes headings and anchors from current editor text. Native preview, HTML/Docs Site and local Word/PDF links preserve supported targets; imported active HTML is not executed.
+
 To verify native-generated sites, run `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --docs-site artifacts/native/validation`, then `npx playwright test --config playwright.native-export.config.mjs`. Browser tools are development validation dependencies only; the installed native app does not require them.
 
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.

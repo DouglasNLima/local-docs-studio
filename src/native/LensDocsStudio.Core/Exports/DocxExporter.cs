@@ -57,6 +57,19 @@ public sealed class DocxExporter
             var margins = section.GetFirstChild<W.PageMargin>();
             var widthEmu = ((long)(pageSize?.Width?.Value ?? 11906) - (margins?.Left?.Value ?? 1134) - (margins?.Right?.Value ?? 1134)) * 635;
             var heightEmu = ((long)(pageSize?.Height?.Value ?? 16838) - (margins?.Top?.Value ?? 1134) - (margins?.Bottom?.Value ?? 1134)) * 635;
+            var retainedBookmarks = Bookmarks(main, new HashSet<OpenXmlPart>()).ToArray();
+            var bookmarkNames = new HashSet<string>(retainedBookmarks.Select(b => b.Name?.Value ?? ""), StringComparer.Ordinal);
+            var bookmarkIds = new HashSet<string>(retainedBookmarks.Select(b => b.Id?.Value ?? ""), StringComparer.Ordinal);
+            var bookmarks = new Dictionary<string, (string Name, string Id)>(StringComparer.Ordinal);
+            var headingTargets = content.Document.Targets.Where(t => t.HeadingLevel > 0).ToDictionary(t => t.SourceStart);
+            var nextBookmark = 0;
+            foreach (var target in content.Document.Targets)
+            {
+                string id, name;
+                do { id = (++nextBookmark).ToString(System.Globalization.CultureInfo.InvariantCulture); name = "LensTarget" + id; }
+                while (bookmarkIds.Contains(id) || bookmarkNames.Contains(name));
+                bookmarks.Add(target.Id, (name, id)); bookmarkIds.Add(id); bookmarkNames.Add(name);
+            }
 
             foreach (var block in content.Document.Syntax) AppendBlock(body, block);
             body.Append(section);
@@ -74,6 +87,12 @@ public sealed class DocxExporter
                     case HeadingBlock heading:
                         var hp = Paragraph(heading.Inline, heading.Level == 1 ? titleStyle : Style("Heading " + (heading.Level - 1)));
                         hp.ParagraphProperties!.KeepNext = new W.KeepNext();
+                        if (headingTargets.TryGetValue(heading.Span.Start, out var headingTarget))
+                        {
+                            var bookmark = bookmarks[headingTarget.Id];
+                            hp.InsertAfter(new W.BookmarkStart { Id = bookmark.Id, Name = bookmark.Name }, hp.ParagraphProperties);
+                            hp.Append(new W.BookmarkEnd { Id = bookmark.Id });
+                        }
                         parent.Append(hp); break;
                     case ParagraphBlock paragraph:
                         var p = Paragraph(paragraph.Inline, bodyStyle);
@@ -171,6 +190,10 @@ public sealed class DocxExporter
                 {
                     switch (inline)
                     {
+                        case DocumentAnchorInline anchor:
+                            var anchorBookmark = bookmarks[anchor.Id];
+                            target.Append(new W.BookmarkStart { Id = anchorBookmark.Id, Name = anchorBookmark.Name }, Run(anchor.Text, formatting), new W.BookmarkEnd { Id = anchorBookmark.Id });
+                            break;
                         case DocumentSemanticInline semantic:
                             var semanticRun = Run(semantic.Text, formatting | (semantic.Kind == DocumentInlineKind.StatusBadge ? MarkdownEmphasis.Bold : MarkdownEmphasis.None));
                             if (semantic.Kind != DocumentInlineKind.StatusBadge) semanticRun.RunProperties!.RunFonts = new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" };
@@ -183,6 +206,9 @@ public sealed class DocxExporter
                         case LinkInline { IsImage: true } image:
                             if (!content.Images.TryGetValue(image.Url ?? "", out var asset)) throw new InvalidDataException("An image could not be exported: " + image.Url);
                             target.Append(Image(asset)); break;
+                        case LinkInline link when link.Url?.StartsWith('#') == true && bookmarks.TryGetValue(Uri.UnescapeDataString(link.Url[1..]), out var localBookmark):
+                            var localLink = new W.Hyperlink { Anchor = localBookmark.Name, History = true };
+                            Inlines(localLink, link, formatting); target.Append(localLink); break;
                         case LinkInline link when Uri.TryCreate(link.Url, UriKind.Absolute, out var url) && url.Scheme is "https" or "http" or "mailto":
                             var relationship = main.AddHyperlinkRelationship(url, true);
                             var hyperlink = new W.Hyperlink { Id = relationship.Id };
@@ -226,6 +252,13 @@ public sealed class DocxExporter
             }
         }
         return stream.ToArray();
+    }
+
+    private static IEnumerable<W.BookmarkStart> Bookmarks(OpenXmlPart part, HashSet<OpenXmlPart> seen)
+    {
+        if (!seen.Add(part)) yield break;
+        if (part.RootElement is { } root) foreach (var bookmark in root.Descendants<W.BookmarkStart>()) yield return bookmark;
+        foreach (var child in part.Parts) foreach (var bookmark in Bookmarks(child.OpenXmlPart, seen)) yield return bookmark;
     }
 
     private static void ValidateRelationships(OpenXmlPart part, HashSet<OpenXmlPart> seen)

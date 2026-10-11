@@ -534,6 +534,59 @@ internal static class NativeUiChecks
             }
             if (editor.Patterns.Value.Pattern.Value.Value != beforeProgress) throw new IOException("The bundle draft was not fully restored.");
             checks.Add("Native Markdown bundle exports unsaved source and portable assets without private state or source-file writes");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var beforeAnchor = editor.Patterns.Value.Pattern.Value.Value;
+            var anchorWindow = OpenAnchor(window);
+            Find(anchorWindow, "AnchorIdentifier").AsTextBox().Text = "invalid id";
+            Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(anchorWindow, "AnchorValidation").Name.Contains("128", StringComparison.Ordinal), "The native anchor dialogue accepted an invalid identifier.");
+            if (editor.Patterns.Value.Pattern.Value.Value != beforeAnchor) throw new IOException("Invalid anchor input changed source.");
+            Find(anchorWindow, "AnchorIdentifier").AsTextBox().Text = "native-anchor";
+            Find(anchorWindow, "AnchorLabel").AsTextBox().Text = "Named native position";
+            anchorWindow.CaptureToFile(Path.Combine(output, "native-anchor-dialogue.png"));
+            Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("data-doc-anchor>Named native position</span>", StringComparison.Ordinal), "The anchor was not inserted.");
+            var insertedAnchor = editor.Patterns.Value.Pattern.Value.Value;
+            anchorWindow = OpenAnchor(window);
+            if (Find(anchorWindow, "AnchorIdentifier").AsTextBox().Text != "native-anchor" || !Find(anchorWindow, "AnchorIdentifier").Patterns.Value.Pattern.IsReadOnly.Value)
+                throw new IOException("Editing an anchor did not preserve its identifier.");
+            Find(anchorWindow, "AnchorLabel").AsTextBox().Text = "";
+            Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("data-doc-anchor></span>", StringComparison.Ordinal), "The empty anchor edit did not apply.");
+            var emptyAnchorSource = editor.Patterns.Value.Pattern.Value.Value;
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_K);
+            Window? anchorLinkWindow = null;
+            Wait(() => (anchorLinkWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Insert document link")))?.AsWindow()) is not null,
+                "The native anchor link picker did not open.");
+            Find(anchorLinkWindow!, "DocumentLinkFilter").AsTextBox().Text = "fixture";
+            Find(anchorLinkWindow!, "DocumentLinkResults").AsListBox().Select(0);
+            Find(anchorLinkWindow!, "DocumentLinkSection").AsComboBox().Expand();
+            Wait(() => Find(anchorLinkWindow!, "DocumentLinkSection").AsComboBox().Items.Any(i => i.Text == "Anchor: native-anchor"), "The link picker did not include the unsaved empty anchor.");
+            Find(anchorLinkWindow!, "DocumentLinkSection").AsComboBox().Select("Anchor: native-anchor");
+            Find(anchorLinkWindow!, "DocumentLinkLabel").AsTextBox().Text = "Visit native anchor";
+            Find(anchorLinkWindow!, "InsertDocumentLink").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith("[Visit native anchor](fixture.md#native-anchor)", StringComparison.Ordinal), "The link picker lost the selected anchor reference.");
+            AutomationElement? namedLink = null;
+            Wait(() => (namedLink = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
+                .FirstOrDefault(e => e.Properties.Name.ValueOrDefault == "Visit native anchor")) is not null, "The native anchor link was not rendered.");
+            namedLink!.Patterns.Invoke.Pattern.Invoke();
+            var anchorOffset = emptyAnchorSource.IndexOf("<span id=\"native-anchor\"", StringComparison.Ordinal);
+            var anchorPrefix = emptyAnchorSource[..anchorOffset]; var anchorLine = anchorPrefix.Count(c => c == '\n') + 1;
+            var anchorColumn = anchorOffset - anchorPrefix.LastIndexOf('\n');
+            Wait(() => Find(window, "CaretStatus").Name == $"Ln {anchorLine}, Col {anchorColumn} · UTF-8", "The native link did not navigate to the empty anchor's exact source position.");
+            FocusWindow(window); editor.Click();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == emptyAnchorSource, "Undo did not remove the complete inserted anchor link.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedAnchor, "Anchor label editing did not form one Undo action.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeAnchor, "Anchor insertion did not restore the original source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedAnchor, "Anchor insertion Redo changed source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeAnchor, "Anchor checks did not restore the original source.");
+            checks.Add("Native anchors validate identifiers, retain links when labels change, navigate to empty targets and preserve complete Undo/Redo");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -589,6 +642,14 @@ internal static class NativeUiChecks
             // FlaUI refreshes and disposes its Process instance while locating a window.
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
+        }
+        Window OpenAnchor(Window mainWindow)
+        {
+            Find(mainWindow, "InsertMenu").Click(); Find(mainWindow, "InsertAnchor").Patterns.Invoke.Pattern.Invoke();
+            Window? anchorWindow = null;
+            Wait(() => (anchorWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Document anchor")))?.AsWindow()) is not null,
+                "The native anchor dialogue did not open.");
+            return anchorWindow!;
         }
         Window OpenProgress(Window mainWindow)
         {

@@ -10,6 +10,7 @@ public sealed record DocumentHeading(string Title, string Anchor, int Level, int
 public sealed record ParsedDocument(string Source, MarkdownDocument Syntax, IReadOnlyList<DocumentHeading> Headings)
 {
     public DocumentMetadata Metadata { get; init; } = new();
+    public IReadOnlyList<DocumentTarget> Targets { get; init; } = [];
 }
 
 public sealed partial class MarkdownService
@@ -28,9 +29,10 @@ public sealed partial class MarkdownService
             standalone.Line = 0;
         }
         if (!standaloneMermaid) { SafeInlineSemantics.Apply(syntax, source); SafeBlockSemantics.Apply(syntax); }
+        var targets = DocumentAnchors.Collect(syntax);
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
-        return new(source, syntax, headings) { Metadata = frontMatter.Metadata };
+        return new(source, syntax, headings) { Metadata = frontMatter.Metadata, Targets = targets };
     }
 
     public string ToSafeHtml(string source) => Markdown.ToHtml(NormaliseDevOps(FrontMatterService.HideHeader(source, FrontMatterService.Read(source).BodyStart)),
@@ -74,6 +76,7 @@ public sealed partial class MarkdownService
         string.Concat(inline.Select(child => child switch
         {
             DocumentSemanticInline semantic => semantic.Text,
+            DocumentAnchorInline anchor => anchor.Text,
             LiteralInline literal => literal.Content.ToString(),
             HtmlEntityInline entity => entity.Transcoded.ToString(),
             CodeInline code => code.Content,

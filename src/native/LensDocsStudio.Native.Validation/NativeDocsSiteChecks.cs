@@ -23,6 +23,7 @@ internal static class NativeDocsSiteChecks
         var edited = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase) { [path] = "---\ntitle: Getting started\norder: 1\nnavGroup: Guides\ntags: [review, evidence]\ndraft: true\n---\n# Getting started\n\n## Evidence\n\nUnsaved reviewed content. [Home](../README.md)\n" };
         edited[path] += "\n## Publishing\n\n" + string.Join(' ', Enumerable.Repeat("Background detail.", 35))
             + " release-ready-token remains searchable.\n\n```html\n<img src=x onerror=run()>\n```\n\n> ### Nested notes\n>\n> Local nested-section-token evidence.\n";
+        edited[path] += "\n[Named target](#named-position) [Empty target](#empty-position)\n\nBefore <span id=named-position data-doc-anchor>Named destination</span> after.\n\nBefore <span id=empty-position data-doc-anchor></span>following text.\n";
         var result = new DocsSiteExportService().ExportAsync(root, edited, state, new("Native handbook", "Local documentation export")).GetAwaiter().GetResult();
         if (result.SourcePages != 2 || result.Diagrams != 1 || result.Warnings.Count != 0) throw new IOException("Native Docs Site lost documents or included private state.");
         var zipPath = Path.Combine(output, "native-docs-site.zip"); File.WriteAllBytes(zipPath, result.Bytes);

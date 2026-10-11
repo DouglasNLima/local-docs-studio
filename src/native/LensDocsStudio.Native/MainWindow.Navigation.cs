@@ -65,7 +65,8 @@ public partial class MainWindow
                 model.ActiveDocument == tab ? Editor.SelectionLength : 0);
             var workspace = new WorkspacePath(tab.WorkspaceRoot ?? Path.GetDirectoryName(tab.FilePath!)!);
             var listing = await new WorkspaceService().EnumerateAsync(workspace, model.OperationToken);
-            var picker = new DocumentLinkWindow(workspace, tab.FilePath!, listing.Entries, Path.Combine(model.StateDirectory, "write-recovery")) { Owner = this };
+            var edited = model.Documents.Where(d => d.FilePath is not null).ToDictionary(d => d.FilePath!, d => d.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
+            var picker = new DocumentLinkWindow(workspace, tab.FilePath!, listing.Entries, Path.Combine(model.StateDirectory, "write-recovery"), edited) { Owner = this };
             if (picker.ShowDialog() != true || picker.MarkdownLink is not { } text) return;
             var vertical = Editor.VerticalOffset; var horizontal = Editor.HorizontalOffset;
             var caret = insertion.Insert(text);

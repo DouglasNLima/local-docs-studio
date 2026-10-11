@@ -1,0 +1,19 @@
+<Window x:Class="LensDocsStudio.Native.AnchorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Document anchor" Width="540" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+ <StackPanel Margin="24">
+  <TextBlock x:Name="Heading" Text="Insert document anchor" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,14"/>
+  <Label Content="_Identifier" Target="{Binding ElementName=AnchorId}"/>
+  <TextBox x:Name="AnchorId" Padding="8" MaxLength="128" AutomationProperties.Name="Anchor identifier" AutomationProperties.AutomationId="AnchorIdentifier"/>
+  <TextBlock x:Name="IdentifierHint" Text="Use a unique identifier for links to this position, such as review-notes." TextWrapping="Wrap" Margin="0,6,0,10"/>
+  <Label Content="_Visible label (optional)" Target="{Binding ElementName=AnchorLabel}"/>
+  <TextBox x:Name="AnchorLabel" Padding="8" MaxLength="512" AutomationProperties.Name="Anchor visible label" AutomationProperties.AutomationId="AnchorLabel"/>
+  <TextBlock Text="An empty label creates a link target without adding visible text." TextWrapping="Wrap" Margin="0,6,0,0"/>
+  <TextBlock x:Name="ValidationMessage" TextWrapping="Wrap" Margin="0,16,0,8" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="AnchorValidation"/>
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+   <Button Content="Cancel" IsCancel="True" Padding="14,6" Margin="0,0,8,0"/>
+   <Button Content="Apply" IsDefault="True" Click="Accept" Padding="14,6" AutomationProperties.AutomationId="ApplyAnchor"/>
+  </StackPanel>
+ </StackPanel>
+</Window>

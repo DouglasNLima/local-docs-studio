@@ -29,6 +29,7 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new RawBlockRenderer());
         renderer.ObjectRenderers.Insert(0, new RawInlineRenderer());
         renderer.ObjectRenderers.Insert(0, new SemanticInlineRenderer());
+        renderer.ObjectRenderers.Insert(0, new AnchorRenderer());
         renderer.ObjectRenderers.Insert(0, new ProgressRenderer());
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(content.Document.Syntax);
@@ -113,5 +114,10 @@ public sealed class HtmlExporter
             var tag = obj.Kind == DocumentInlineKind.StatusBadge ? "strong" : "kbd";
             renderer.Write("<").Write(tag).Write(">").Write(WebUtility.HtmlEncode(obj.Text)).Write("</").Write(tag).Write(">");
         }
+    }
+    private sealed class AnchorRenderer : HtmlObjectRenderer<DocumentAnchorInline>
+    {
+        protected override void Write(HtmlRenderer renderer, DocumentAnchorInline obj) => renderer.Write("<span id=\"")
+            .Write(WebUtility.HtmlEncode(obj.Id)).Write("\">").Write(WebUtility.HtmlEncode(obj.Text)).Write("</span>");
     }
 }
