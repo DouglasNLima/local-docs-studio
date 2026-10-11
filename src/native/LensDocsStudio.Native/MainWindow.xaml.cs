@@ -31,6 +31,7 @@ public partial class MainWindow : Window
     private readonly NativeSvgService svg = new();
     private readonly ImageAssetService assets = new();
     private readonly PreviewImageService previewImages = new();
+    private readonly EditorCompletionService completion;
     private readonly SemaphoreSlim previewGate = new(1, 1);
     private readonly DispatcherTimer previewTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
     private readonly DispatcherTimer recoveryTimer = new() { Interval = TimeSpan.FromSeconds(2) };
@@ -48,6 +49,8 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid");
+        Closed += (_, _) => completion.Dispose();
         WindowStateService.FitInitialWindow(this);
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
@@ -273,6 +276,11 @@ public partial class MainWindow : Window
         var tag = (sender as FrameworkElement)?.Tag as string;
         if (tag is not null) EditorFormattingService.Apply(Editor, tag);
     }
+    private void ShowCompletion(object sender, RoutedEventArgs e)
+    {
+        Editor.Focus();
+        if (!completion.Show()) model.Status = "No Mermaid suggestions at this position. Completion supports up to 4 million characters.";
+    }
     private void InsertText(string value)
     {
         if (Editor.IsReadOnly) return;
@@ -469,6 +477,7 @@ public partial class MainWindow : Window
             case Key.V when shift && Editor.IsKeyboardFocusWithin: _ = PasteClipboardAsAsync(LensDocsStudio.Core.Imports.PasteMode.Text); break;
             case Key.B when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "bold" }, e); break;
             case Key.I when Editor.IsKeyboardFocusWithin: Format(new Button { Tag = "italic" }, e); break;
+            case Key.Space when Editor.IsKeyboardFocusWithin: ShowCompletion(sender, e); break;
             default: return;
         }
         e.Handled = true;

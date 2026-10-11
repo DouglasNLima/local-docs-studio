@@ -31,6 +31,8 @@ Native preview also recognises the existing status-badge and keyboard-shortcut s
 
 Native formatting toggles bold, italic and strikethrough while retaining the selected text. Insert offers line-based headings, lists and quotes, five callout kinds, tables and code/Mermaid blocks. Code fences adapt to selected backticks, block insertion separates surrounding paragraphs, and template placeholders are selected for typing. Each formatting action is undoable as one edit.
 
+Native Mermaid suggestions appear while typing a prefix inside a diagram, or through **Edit → Mermaid suggestions** (`Ctrl+Space`). Enter or Tab accepts a suggestion; Escape dismisses it. Standalone Mermaid, standard Markdown fences and Azure DevOps containers are supported. Insertions preserve line endings and indentation. Automatic completion scans up to 256 Ki characters; explicit completion scans up to 4 Mi characters.
+
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.
 
 The native File menu can create files/folders, review document rename/move and related Markdown link changes, and delete a document with saved/unsaved snapshots. **Document snapshots** previews retained source and opens a recovered draft for an explicit Save as. **Insert → Image from URL** downloads an HTTPS raster image only on request, validates it locally and stores a portable PNG before inserting its link. Missing snapshot images are reported while source text remains recoverable.

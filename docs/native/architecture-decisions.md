@@ -8,6 +8,8 @@ Copy Markdown with images uses parser source spans to replace image destinations
 
 Recognised status and keyboard HTML snippets are converted to bounded typed inline nodes after Markdown parsing. The converter validates an inert fragment and derives visible text from the existing Markdown tree; links, images and unknown structures remain untouched. Native rendering uses selectable WPF spans with fixed neutral styling and source references. HTML, Word and PDF exporters emit fixed text semantics without copying imported attributes. Original Markdown remains authoritative, including for source clipboard output. Entity nodes are explicitly decoded by native text and document exporters.
 
+Mermaid completion uses a pure Core catalogue/context service and AvalonEdit's native completion window. Context respects standard and Azure DevOps fences, comments and quoted labels; acceptance revalidates the current document and replaces a complete token with preserved indentation/line endings. Automatic scans stop at 256 Ki characters and explicit Ctrl+Space at 4 Mi characters, avoiding unrestricted synchronous scans while typing. Native completion closes on document/focus changes and protects read-only editors and active selections. Wikilink completion is separate remaining work.
+
 Baseline: develop 2cc3b5680958c9c553dad23856e6010c158fccd7, inspected 11 October 2026. The original checkout remains on main 0d100cc29dde2ba80755fb1e8af60ffd9d006b16 with an unrelated untracked attachment directory preserved.
 
 1. Separate src/native solution: .NET 10, WPF, AvalonEdit, CommunityToolkit.Mvvm. Existing web and WinUI/WebView2 shell remain independently buildable.

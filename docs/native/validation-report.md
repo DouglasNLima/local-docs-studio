@@ -1,5 +1,11 @@
 # Native validation report
 
+## Native Mermaid completion
+
+Release build has no warnings/errors and all 240 core tests pass. Twenty completion cases cover standalone diagrams, backtick/tilde/Azure DevOps fences, fence lengths, prose/other-code exclusion, comments/quoted labels, token suffixes, CRLF/indentation, catalogue aliases and scan budgets. Seven AvalonEdit outcomes now pass, adding actual completion replacement, single Undo/Redo and read-only/selection protection. The standard native corpus, image, preview and Markdown checks remain green. A new 24th desktop outcome checks Ctrl+Space, Enter, automatic suggestions, Escape and Undo/Redo; interactive CI remains pending.
+
+At 071718c both native CI runs pass (38163850903 PR, 38163847435 push). The corrected callout workflow passes all 23 desktop outcomes in the built, installed and reinstalled app. Evidence: artifacts/native/native-ci-071718c-pr.log. Web runs for this revision are still in progress.
+
 ## Passive inline semantics and entities
 
 All 220 core tests pass; Release build has no warnings/errors. Twelve new cases cover bounded status/keyboard snippets, exact source spans, decoded and Markdown-visible labels, inert attributes, malformed/oversized input, retained links/images, code examples, safe HTML/Word exports and unchanged literal Markdown clipboard source. Native semantics now has ten passing outcomes, including selectable labels, source mapping and decoded entities in actual WPF/PDF output. Light/dark PNG pages were visually inspected. Forty diagram/export, thirteen asset, six preview and five editor outcomes continue to pass. Evidence: artifacts/native/tests/native-core.trx and artifacts/native/validation.

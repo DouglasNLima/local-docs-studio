@@ -21,6 +21,7 @@ internal static class NativeUiChecks
         File.WriteAllText(source, "# Native UI fixture\n\nSearchable text.\n\n```mermaid\nflowchart LR\nA[Write] --> B[Review]\n```\n");
         var linkedDocument = Path.Combine(runRoot, "Second document.md");
         File.WriteAllText(linkedDocument, "# Second document\n\nLinked workspace content.\n\n## Details\n\nMore detail.\n");
+        File.WriteAllText(Path.Combine(runRoot, "Completion.mmd"), "flo\n");
         var state = Path.Combine(runRoot, "state");
         Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
@@ -425,6 +426,33 @@ internal static class NativeUiChecks
                 sourceTab.Patterns.SelectionItem.Pattern.Select();
             }
             finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
+            var completionFile = Find(window, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName("Completion.mmd")))
+                ?? throw new IOException("The standalone Mermaid completion fixture is unavailable in the native tree.");
+            FocusWindow(window); completionFile.Patterns.SelectionItem.Pattern.Select(); completionFile.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flo\n", "The standalone Mermaid fixture did not open.");
+            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.END);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SPACE);
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidCompletion"))) is not null,
+                "Ctrl+Space did not open the native completion window.");
+            Keyboard.Type(VirtualKeyShort.RETURN);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flowchart TD\n  A[Start] --> B[Finish]\n", "Enter did not accept the selected native completion.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flo\n", "One Undo did not restore the incomplete diagram.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.StartsWith("flowchart TD", StringComparison.Ordinal), "Redo did not restore the completed diagram.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flo\n", "Completion could not be undone after Redo.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.END); Keyboard.Type("w");
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidCompletion"))) is not null,
+                "Typing a Mermaid prefix did not offer native completion.");
+            Keyboard.Type(VirtualKeyShort.ESCAPE);
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidCompletion"))) is null,
+                "Escape did not dismiss native completion.");
+            if (editor.Patterns.Value.Pattern.Value.Value != "flow\n") throw new IOException("Dismissing completion changed the typed source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == "flo\n", "Undo did not restore source after dismissed completion.");
+            checks.Add("Native Mermaid completion supports Ctrl+Space, Enter, typing, Escape and one Undo/Redo per insertion");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W); sourceTab.Patterns.SelectionItem.Pattern.Select();
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

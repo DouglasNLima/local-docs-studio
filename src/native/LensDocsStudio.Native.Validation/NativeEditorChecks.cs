@@ -36,11 +36,25 @@ internal static class NativeEditorChecks
         if (!editor.Text.Contains("> Review evidence.", StringComparison.Ordinal)) throw new IOException("Callout typing changed its structural marker.");
         editor.Document.UndoStack.Undo(); editor.Document.UndoStack.Undo();
         if (editor.Text != source) throw new IOException("Undo did not restore the text preceding callout insertion and typing.");
+        const string diagram = "```mermaid\r\n  flo\r\n```";
+        editor.Text = diagram; editor.Document.UndoStack.ClearAll(); editor.CaretOffset = diagram.IndexOf("flo", StringComparison.Ordinal) + 3;
+        if (!EditorCompletionService.Apply(editor, false, "flowchart TD") || editor.Text != "```mermaid\r\n  flowchart TD\r\n    A[Start] --> B[Finish]\r\n```")
+            throw new IOException("Native completion lost surrounding fences, line endings or indentation.");
+        var completed = editor.Text;
+        editor.Document.UndoStack.Undo();
+        if (editor.Text != diagram) throw new IOException("Native completion was not one Undo action.");
+        editor.Document.UndoStack.Redo();
+        if (editor.Text != completed) throw new IOException("Native completion Redo lost source.");
+        editor.Text = "flo"; editor.CaretOffset = 3; editor.IsReadOnly = true;
+        if (EditorCompletionService.Apply(editor, true, "flowchart TD") || editor.Text != "flo") throw new IOException("Completion changed a read-only document.");
+        editor.IsReadOnly = false; editor.Select(0, 3);
+        if (EditorCompletionService.Apply(editor, true, "flowchart TD") || editor.Text != "flo") throw new IOException("Completion overwrote an active selection.");
         File.WriteAllText(Path.Combine(output, "native-editor.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
             Checks = new[] { "Inline formatting retains selection and toggles", "Undo and Redo operate on complete formatting actions",
-                "Read-only editors reject formatting", "Line commands leave a typing caret after their marker", "Callout typing replaces only its body and Undo restores original source" }
+                "Read-only editors reject formatting", "Line commands leave a typing caret after their marker", "Callout typing replaces only its body and Undo restores original source",
+                "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
