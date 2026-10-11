@@ -7,7 +7,7 @@ namespace LensDocsStudio.Core.Workspace;
 public sealed class AssetTransferService
 {
     public async Task<PreparedAssetTransfer> PrepareAsync(string text, string sourcePath, WorkspacePath sourceWorkspace,
-        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default, bool forceCopyImages = false)
+        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default, bool forceCopyImages = false, bool preserveDocumentLinks = false)
     {
         sourceWorkspace.Resolve(Path.GetRelativePath(sourceWorkspace.Root, sourcePath));
         targetWorkspace.Resolve(Path.GetRelativePath(targetWorkspace.Root, targetPath));
@@ -21,6 +21,8 @@ public sealed class AssetTransferService
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (Uri.TryCreate(link.Reference, UriKind.Absolute, out _) || link.Reference.StartsWith('#')) continue;
+                // An unsaved document's asset staging directory is not the origin of its ordinary links.
+                if (preserveDocumentLinks && !link.IsImage) continue;
                 var original = sourceWorkspace.ResolveLink(sourcePath, link.Reference);
                 string destination;
                 if (WorkspacePath.Contains(targetWorkspace.Root, original) && (!link.IsImage || !forceCopyImages)) destination = original;

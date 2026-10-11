@@ -60,5 +60,21 @@ public sealed class AssetTransferTests : IDisposable
         Assert.StartsWith("![a](assets/images/", prepared.Text);
         Assert.DoesNotContain("source/", prepared.Text);
     }
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task First_save_retains_ordinary_links_instead_of_rebasing_them_from_private_image_staging(bool stateInsideWorkspace)
+    {
+        var draftRoot = Path.Combine(root, "source");
+        await File.WriteAllBytesAsync(Path.Combine(draftRoot, "image.png"), png);
+        var targetRoot = stateInsideWorkspace ? root : Path.Combine(root, "destination");
+        const string ordinary = "[Guide](Renamed%20document.md#details)\n[Parent](../guide.md)\n";
+        await using var prepared = await new AssetTransferService().PrepareAsync(ordinary + "![Image](image.png)",
+            Path.Combine(draftRoot, "Untitled.md"), new(draftRoot), Path.Combine(targetRoot, "saved.md"), new(targetRoot),
+            forceCopyImages: true, preserveDocumentLinks: true);
+        Assert.StartsWith(ordinary, prepared.Text); Assert.Empty(prepared.UncopiedDocumentLinks);
+        Assert.Equal(png, await File.ReadAllBytesAsync(Assert.Single(prepared.CreatedPaths)));
+        Assert.DoesNotContain("source/", prepared.Text);
+    }
     public void Dispose() => Directory.Delete(root, true);
 }

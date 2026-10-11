@@ -197,7 +197,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             var text = tab.EditorDocument.Text;
             await using var transfer = tab.EffectivePath is { } source && tab.EffectiveWorkspace is { } sourceRoot &&
                 !string.Equals(source, path, StringComparison.OrdinalIgnoreCase)
-                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken, forceCopyImages: tab.FilePath is null)
+                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken,
+                    forceCopyImages: tab.FilePath is null, preserveDocumentLinks: tab.FilePath is null)
                 : new PreparedAssetTransfer(text);
             if (transfer.UncopiedDocumentLinks.Count != 0 && !dialogs.Confirm("Local images will be copied. These document links point into the previous workspace and may need updating in this copy:\n\n" +
                 string.Join("\n", transfer.UncopiedDocumentLinks.Distinct().Take(12)) + "\n\nContinue saving the copy?", "Save as in another workspace")) return false;
