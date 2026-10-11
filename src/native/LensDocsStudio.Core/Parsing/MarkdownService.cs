@@ -18,6 +18,11 @@ public sealed partial class MarkdownService
         // Azure DevOps containers are replaced with equal-length fence lines to preserve source offsets.
         var normalised = NormaliseDevOps(source);
         var syntax = Markdown.Parse(standaloneMermaid ? "```mermaid\n" + source + "\n```" : normalised, Pipeline);
+        if (standaloneMermaid && syntax.FirstOrDefault() is FencedCodeBlock standalone)
+        {
+            standalone.Span = new(0, Math.Max(0, source.Length - 1));
+            standalone.Line = 0;
+        }
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
         return new(source, syntax, headings);
@@ -26,13 +31,39 @@ public sealed partial class MarkdownService
     public string ToSafeHtml(string source) => Markdown.ToHtml(NormaliseDevOps(source),
         new MarkdownPipelineBuilder().UseAdvancedExtensions().DisableHtml().Build());
 
-    public static string NormaliseDevOps(string source) => DevOpsFence().Replace(source, match =>
-        match.Value.Contains("mermaid", StringComparison.OrdinalIgnoreCase)
-            ? "```" + match.Value[3..]
-            : "```" + match.Value[3..]);
+    public static string NormaliseDevOps(string source)
+    {
+        var lines = source.Split('\n');
+        var devOps = false; char fence = '\0'; var fenceLength = 0;
+        for (var index = 0; index < lines.Length; index++)
+        {
+            var line = lines[index].TrimEnd('\r');
+            var standard = StandardFence().Match(line);
+            if (!devOps && standard.Success)
+            {
+                var marker = standard.Groups[1].Value;
+                if (fence == '\0') { fence = marker[0]; fenceLength = marker.Length; }
+                else if (fence == marker[0] && marker.Length >= fenceLength && line[standard.Length..].Trim().Length == 0) fence = '\0';
+                continue;
+            }
+            if (fence != '\0') continue;
+            var match = DevOpsFence().Match(line);
+            if (!match.Success) continue;
+            var opening = match.Groups[1].Success;
+            if ((!devOps && opening) || (devOps && !opening))
+            {
+                var offset = lines[index].IndexOf(":::", StringComparison.Ordinal);
+                lines[index] = lines[index][..offset] + "```" + lines[index][(offset + 3)..];
+                devOps = opening;
+            }
+        }
+        return string.Join('\n', lines);
+    }
 
-    [GeneratedRegex(@"(?m)^:::(?:[ \t]+mermaid[ \t]*|[ \t]*)(?=\r?$)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"^[ \t]*:::(?:[ \t]*(mermaid)[ \t]*|[ \t]*)$", RegexOptions.IgnoreCase)]
     private static partial Regex DevOpsFence();
+    [GeneratedRegex(@"^ {0,3}(`{3,}|~{3,})")]
+    private static partial Regex StandardFence();
 
     public static string InlineText(ContainerInline? inline) => inline is null ? "" :
         string.Concat(inline.Select(child => child switch

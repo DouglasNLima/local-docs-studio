@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Current milestone: baseline certification and native technical feasibility.
+Current milestone: native import/export validation, desktop regression coverage and packaging.
 
 - Isolated worktree and feature/native-wpf-rebuild branch from develop 2cc3b5680958c9c553dad23856e6010c158fccd7.
 - Original web checkout and untracked attachments preserved.
@@ -9,15 +9,21 @@ Current milestone: baseline certification and native technical feasibility.
 - Baseline legacy Release build passed: 0 errors, 6 existing PRI qualifier warnings.
 - Baseline legacy native bridge smoke passed; output files checked by the existing harness.
 - Full web baseline passed: 254 browser tests and static integrity checks. Evidence: artifacts/native/baseline.
-- Native Release build passes with zero warnings/errors; 24 core tests pass.
+- Native Release build passes with zero warnings/errors; 67 core tests pass.
 - Implemented guarded UTF-8 saves, portable path resolution, folder enumeration, recovery/session stores, source-aware Markdig parsing and Mermaid error handling.
 - Integrated WPF workspace tree, tabs, AvalonEdit, source-tagged FlowDocument preview, native Mermaid drawing, diagram SVG/PNG export, outline, contextual find/replace, basic formatting, local image ingestion, themes/layout and external-change indicators.
-- Actual WPF GUI inspected through Computer Use; editor search and focus return validated. Broader UI testing remains.
-- Initial native Mermaid corpus identified expected-invalid autocomplete input; expanding the corpus and native visual coverage.
+- Actual WPF GUI inspected through Computer Use; contextual search, Unicode save and session restoration validated. FlaUI exercises six desktop outcomes, including update settings, and verifies clean process exits. Its first run exposed and led to a fix for re-entrant WPF shutdown.
+- Forty native light/dark Mermaid corpus cases pass, including explicit expected-invalid inputs. Selected PNGs and the generated PDF were visually inspected; broader visual fidelity remains open.
+- DOCX, HTML and local PDF export implemented. DOCX schema/style/relationship tests pass; generated PDF text and diagram image verified with PdfPig. Template export preserves package headers/footers/media, but the full page-master/prototype contract is incomplete.
+- ZIP and DOCX/HTML/PDF text import implemented with bounded input, passive metadata and new-folder persistence. Generic Markdown bundles include current editor text and portable assets, excluding the artefact manifest.
+- Export replacement checks the destination under an exclusive handle and records a durable recovery journal before committing. Import staging keeps failed conversions out of completed workspaces.
+- Self-contained packaging and the separate Inno installer passed a development-host install/save/reopen/uninstall/reinstall lifecycle. Same-state activations use a same-user named pipe; a native-only mutex protects files in use during installation.
+- Integrated periodic GitHub release checks, native update settings, version/channel/architecture/product/OS eligibility, RSA-PSS manifest verification, streamed download integrity and pinned Windows Authenticode publisher validation. Separate download/install commands and a temporary native launcher protect graceful shutdown. Production trust remains unconfigured; unsigned previews can open eligible release pages but cannot run downloaded installers.
+- Added preview packaging, optional existing-certificate signing, manifest signing integration and dependency notices. Publication remains a separate unauthorised action.
 - Native CI workflow added independently of the unchanged Pages pipeline.
 
-Next executable tasks: complete save/reopen GUI validation; run expanded native Mermaid corpus; implement DOCX and PDF exports with structural tests; extend filesystem/image/session regression coverage; then imports, remaining feature parity, installer and secure update workflow.
+Next executable tasks: push the validated milestone and check CI; validate different-version upgrades and the updated package; then continue filesystem, image, editing, review, template and navigation parity. Positive signed upgrade and clean-machine certification remain external acceptance prerequisites.
 
-Known implementation limitations: full-document native preview rebuild; HTML shown as source; unsaved-image insertion currently requests an initial save; template/export/import, asset management, richer editing/review/navigation, settings/update UI and installer are incomplete. Core save uses an exclusive handle and durable pre-write journal (preserving file ACLs), with explicit recovery after interruption rather than an unlocked replacement race.
+Known implementation limitations: full-document native preview rebuild; HTML shown as source; unsaved-image insertion currently requests an initial save; full template fidelity, Docs Site, asset management, richer editing/review/navigation, general preferences and installer/update certification are incomplete. Core save uses an exclusive handle and durable pre-write journal, preserving file ACLs and providing explicit recovery after interruption. Update launcher copies remain in the local cache for diagnosis.
 
-Open external acceptance prerequisites: trusted production signing identity; disposable clean Windows installation/update environment. These do not block independent development. GUI capability is being investigated. No release or merge authorised.
+Open external acceptance prerequisites: trusted production signing identity and clean Windows installation/update certification. GUI automation is available. No release or merge authorised.

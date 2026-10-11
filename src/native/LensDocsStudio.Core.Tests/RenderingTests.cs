@@ -27,6 +27,21 @@ public sealed class RenderingTests
     }
 
     [Theory]
+    [InlineData("::: note\nText\n:::")]
+    [InlineData("```text\n::: mermaid\nA --> B\n:::\n```")]
+    [InlineData("~~~text\n::: mermaid\nA --> B\n:::\n~~~")]
+    public void Unrelated_containers_and_code_examples_are_preserved(string source) => Assert.Equal(source, MarkdownService.NormaliseDevOps(source));
+
+    [Fact]
+    public void Standalone_diagram_source_reference_does_not_include_a_synthetic_fence()
+    {
+        const string source = "flowchart LR\nA --> B";
+        var block = Assert.IsType<FencedCodeBlock>(new MarkdownService().Parse(source, true).Syntax[0]);
+        Assert.Equal(0, block.Span.Start);
+        Assert.Equal(source.Length - 1, block.Span.End);
+    }
+
+    [Theory]
     [InlineData("flowchart LR\nA[Write] --> B{Review}\nB -->|Yes| C[Export]")]
     [InlineData("sequenceDiagram\nAlice->>Bob: Hello\nBob-->>Alice: Welcome")]
     [InlineData("flowchart TD\nsubgraph Workspace\nA[Draft] --> B[Review]\nend\nB --> C[Publish]")]

@@ -6,6 +6,7 @@
     <AnalysisLevel>latest</AnalysisLevel>
     <Deterministic>true</Deterministic>
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <Version>0.1.0-preview.1</Version>
     <Company>Lens Docs Studio</Company>
     <Copyright>Lens Docs Studio contributors</Copyright>

@@ -4,6 +4,10 @@ using System.Text.Json;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Rendering;
+using LensDocsStudio.Native.Exports;
+using LensDocsStudio.Core.Exports;
+using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Validation;
 using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Validation;
@@ -13,6 +17,18 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--ui")
+            return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
+        if (args.FirstOrDefault() == "--reject-unsigned")
+        {
+            try
+            {
+                new LensDocsStudio.Native.Platform.AuthenticodeVerifier().VerifyAsync(Path.GetFullPath(args[1]), [new("CN=Development test", new string('A', 64))], default).GetAwaiter().GetResult();
+                Console.Error.WriteLine("Unsigned installer was incorrectly accepted."); return 1;
+            }
+            catch (IOException ex) when (ex.Message.StartsWith("Windows rejected the installer signature", StringComparison.Ordinal))
+            { Console.WriteLine("Actual Windows Authenticode verification rejected the unsigned installer: " + ex.Message); return 0; }
+        }
         var output = Path.GetFullPath(args.FirstOrDefault() ?? "artifacts/native/validation");
         var repository = Path.GetFullPath(args.ElementAtOrDefault(1) ?? ".");
         Directory.CreateDirectory(output);
@@ -61,7 +77,36 @@ internal static class Program
         }
         if (count == 0) failures.Add("No Mermaid fixtures discovered.");
         File.WriteAllText(Path.Combine(output, "mermaid-corpus.json"), JsonSerializer.Serialize(new { Total = count, Failures = failures, Results = results }, new JsonSerializerOptions { WriteIndented = true }));
-        Console.WriteLine($"Native Mermaid corpus: {count - failures.Count}/{count} passed. Evidence: {output}");
+        try
+        {
+            var sourcePath = Path.Combine(repository, "tests", "fixtures", "mixed.md");
+            var content = new ExportPreparationService(parser, diagrams, native).Prepare(File.ReadAllText(sourcePath), sourcePath, Path.GetDirectoryName(sourcePath), false);
+            var docx = new DocxExporter().Export(content);
+            File.WriteAllBytes(Path.Combine(output, "mixed.docx"), docx);
+            using (var package = WordprocessingDocument.Open(new MemoryStream(docx), false))
+            {
+                var errors = new OpenXmlValidator().Validate(package).Select(e => e.Description).ToArray();
+                if (errors.Length != 0) throw new InvalidDataException(string.Join("; ", errors));
+                if (!package.MainDocumentPart!.ImageParts.Any()) throw new InvalidDataException("The DOCX has no rendered diagram image.");
+            }
+            var pdf = new PdfExporter().Export(content);
+            File.WriteAllBytes(Path.Combine(output, "mixed.pdf"), pdf);
+            if (!System.Text.Encoding.ASCII.GetString(pdf, 0, 5).Equals("%PDF-")) throw new InvalidDataException("The local PDF header is invalid.");
+            using (var inspected = UglyToad.PdfPig.PdfDocument.Open(pdf))
+            {
+                var pages = inspected.GetPages().ToArray();
+                var text = string.Join(" ", pages.SelectMany(p => p.GetWords()).Select(w => w.Text));
+                if (!text.Contains("Export Fixture", StringComparison.Ordinal) || !text.Contains("Checklist", StringComparison.Ordinal))
+                    throw new InvalidDataException("The PDF lost required document text.");
+                if (!pages.Any(p => p.NumberOfImages > 0)) throw new InvalidDataException("The PDF lost the Mermaid image.");
+                File.WriteAllText(Path.Combine(output, "pdf-inspection.json"), JsonSerializer.Serialize(new { Pages = pages.Length, Images = pages.Sum(p => p.NumberOfImages), Text = text }, new JsonSerializerOptions { WriteIndented = true }));
+            }
+            File.WriteAllText(Path.Combine(output, "mixed.html"), new HtmlExporter().Export(content));
+            Console.WriteLine($"Exports generated and DOCX schema validated: {docx.Length} DOCX bytes, {pdf.Length} PDF bytes.");
+        }
+        catch (Exception ex) { failures.Add("Export validation: " + ex.Message); }
+        File.WriteAllText(Path.Combine(output, "validation-summary.json"), JsonSerializer.Serialize(new { DiagramCases = count, Failures = failures }, new JsonSerializerOptions { WriteIndented = true }));
+        Console.WriteLine($"Native validation: {count} diagram cases and export checks; {failures.Count} failures. Evidence: {output}");
         foreach (var failure in failures) Console.WriteLine(failure);
         return failures.Count == 0 ? 0 : 1;
     }

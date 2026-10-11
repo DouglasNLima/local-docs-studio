@@ -38,7 +38,7 @@ public sealed class WorkspacePath
         if (pathPart.Contains('?') || pathPart.StartsWith('/') || pathPart.StartsWith('\\'))
             throw new IOException("This is not a workspace document link.");
         var decoded = Uri.UnescapeDataString(pathPart);
-        if (decoded.Contains('%') && decoded != pathPart)
+        if (System.Text.RegularExpressions.Regex.IsMatch(decoded, "%[0-9a-fA-F]{2}") && decoded != pathPart)
             throw new IOException("Ambiguous encoded paths are not supported.");
         if (Uri.TryCreate(decoded, UriKind.Absolute, out _))
             throw new IOException("External links require an explicit external action.");

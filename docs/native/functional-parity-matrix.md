@@ -18,15 +18,15 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | External changes, conflict flow, snapshots/recovery | Fingerprints and journal | In progress |
 | Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution | Incomplete |
 | Review/governance, links/assets audit, docs map | Source-aware analysis | Incomplete |
-| ZIP/Markdown Bundle/artefact imports | Bounded extraction, passive metadata | Incomplete |
-| DOCX/HTML/PDF text imports | Native parsers, safe assets | Incomplete |
-| HTML/DOCX/PDF export | Local independent exporters | Incomplete |
-| DOCX templates, styles, numbering, sections/media | Open XML package preservation | Incomplete |
-| Docs Site and Markdown Bundle export | Static portable packages | Incomplete |
+| ZIP/Markdown Bundle/artefact imports | Bounded extraction, passive metadata | Partial: ZIP tests pass; artefact reader remains |
+| DOCX/HTML/PDF text imports | Native parsers, safe assets | Partial: conversion tests pass; broader corpus remains |
+| HTML/DOCX/PDF export | Local independent exporters | Partial: actual outputs and structural checks pass |
+| DOCX templates, styles, numbering, sections/media | Open XML package preservation | Partial: styles, numbering, headers/footers/media; full contract remains |
+| Docs Site and Markdown Bundle export | Static portable packages | Bundle tested; Docs Site incomplete |
 | Optional artefact review pack, front matter priority | Explicit safe rebuilt manifest | Incomplete |
 | Templates/snippets/studios/export profiles | Local library with legacy JSON import | Incomplete |
 | Legacy migration, help, preferences | Explicit import; no browser profile scanning | Incomplete |
 | Light/dark/system, keyboard, UIA, DPI/window restore | Native resources and Windows integration | Incomplete |
-| Installer, uninstall, coexistence, portable ZIP | Isolated self-contained Inno package | Incomplete |
-| GitHub Releases, channels, notifications, secure updates | Compatible signed metadata and consent | Incomplete |
-| Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Baseline testing |
+| Installer, uninstall, coexistence, portable ZIP | Isolated self-contained Inno package | Partial: development-host install/uninstall/reinstall passed; upgrade/clean-machine certification remains |
+| GitHub Releases, channels, notifications, secure updates | Compatible signed metadata and consent | Partial: UI/policy/negative trust tests pass; positive signed upgrade remains |
+| Existing web/PWA/Pages and legacy shell | Preserve separate pipelines | Baseline passed; CI passed at 3fe3cb7 |

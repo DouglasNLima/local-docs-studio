@@ -6,10 +6,11 @@
 | Conflict-safe writes, recovery journal | High / medium | Implement before relying on Save |
 | Source-aware preview navigation | High / medium | Markdig spans, native WPF elements |
 | Persisted relative images | High / medium | Write bytes successfully before inserting links |
-| Focus-aware search | High / medium | Route Ctrl+F from focused pane; regression tests |
+| Focus-aware search | High / medium | Native UI tests validate editor and preview contexts, focus return and actual typing |
 | Explorer, recent files, drag/drop | High / low | Implement through Windows APIs |
 | Native DOCX/PDF, clipboard formats | High / medium | Inspect actual outputs and format contracts |
-| Signed user-controlled updates | High / high | Implement trust boundary; production credentials external |
+| Signed user-controlled updates | High / high | Integrated separate check/download/install controls and native settings; policy tests pass; production credentials and signed upgrade certification external |
+| Per-user installer, coexistence and files in use | High / medium | Separate product identity, optional Open with, graceful-close mutex; actual install/uninstall/reinstall validated on development host |
 | Browser wrapper | Incompatible | Rejected by native-only requirement |
 | Proprietary document store | Portability risk | Rejected; Markdown remains authoritative |
 

@@ -22,9 +22,12 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     private FileSystemWatcher? watcher;
     private CancellationTokenSource? operation;
     private readonly SemaphoreSlim recoveryGate = new(1, 1);
+    private readonly SemaphoreSlim preferencesGate = new(1, 1);
+    public UserPreferences Preferences { get; private set; } = new();
     public event EventHandler? DocumentChanged;
     partial void OnActiveDocumentChanged(DocumentViewModel? value) => DocumentChanged?.Invoke(this, EventArgs.Empty);
     public string StateDirectory => session.DirectoryPath;
+    public CancellationToken OperationToken => operation?.Token ?? CancellationToken.None;
 
     public async Task InitialiseAsync(string[] paths)
     {
@@ -32,9 +35,9 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         {
             var pending = await documents.ReadPendingWritesAsync();
             if (pending.Count != 0) Status = $"{pending.Count} interrupted saves are available in recovery.";
-            var preferences = await session.ReadAsync<UserPreferences>("preferences.json");
-            Theme = preferences?.Theme ?? "Light";
-            Layout = preferences?.Layout ?? "Split";
+            Preferences = await session.ReadAsync<UserPreferences>("preferences.json") ?? new();
+            Theme = Preferences.Theme;
+            Layout = Preferences.Layout;
             var saved = await session.ReadAsync<SessionState>("session.json");
             if (saved is { SchemaVersion: 1 })
             {
@@ -205,6 +208,17 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         try { await session.WriteAsync("session.json", state); }
         finally { recoveryGate.Release(); }
     }
+    public async Task UpdatePreferencesAsync(Func<UserPreferences, UserPreferences> update)
+    {
+        await preferencesGate.WaitAsync();
+        try
+        {
+            var changed = update(Preferences);
+            await session.WriteAsync("preferences.json", changed);
+            Preferences = changed;
+        }
+        finally { preferencesGate.Release(); }
+    }
 
     [RelayCommand] private void CancelOperation() => operation?.Cancel();
     public async Task RunAsync(Func<Task> action)
@@ -214,7 +228,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         operation = new CancellationTokenSource();
         try { await action(); }
         catch (OperationCanceledException) { Status = "Operation cancelled; documents preserved."; }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or System.Runtime.InteropServices.ExternalException or System.Text.Json.JsonException)
+        catch (Exception ex) when (ex is not OutOfMemoryException)
         { Status = ex.Message; dialogs.Error(ex.Message); }
         finally { operation.Dispose(); operation = null; IsBusy = false; }
     }

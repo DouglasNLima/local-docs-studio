@@ -79,6 +79,8 @@ public sealed class DocumentSafetyTests : IDisposable
         var paths = new WorkspacePath(root);
         var source = paths.Resolve("docs/guide.md");
         Assert.Equal(paths.Resolve("reference/Café.md"), paths.ResolveLink(source, "../reference/Caf%C3%A9.md#section"));
+        Assert.Equal(paths.Resolve("reference/Café #1 %.md"), paths.ResolveLink(source, "../reference/Caf%C3%A9%20%231%20%25.md"));
+        Assert.Throws<IOException>(() => paths.ResolveLink(source, "../%252e%252e/escape.md"));
         Assert.Throws<IOException>(() => paths.ResolveLink(source, "../../escape.md"));
         Assert.Throws<IOException>(() => paths.ResolveLink(source, "https://example.com/a.md"));
     }

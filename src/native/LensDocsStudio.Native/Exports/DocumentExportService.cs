@@ -1,0 +1,25 @@
+using System.Text;
+using LensDocsStudio.Core.Exports;
+using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
+using LensDocsStudio.Native.Platform;
+using LensDocsStudio.Native.Rendering;
+
+namespace LensDocsStudio.Native.Exports;
+
+public sealed class DocumentExportService
+{
+    public Task<byte[]> ExportAsync(string format, string source, string? sourcePath, string? workspaceRoot, bool dark, byte[]? template, CancellationToken cancellationToken = default) =>
+        StaWorker.RunAsync(() =>
+        {
+            var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark);
+            cancellationToken.ThrowIfCancellationRequested();
+            return format switch
+            {
+                "DOCX" => new DocxExporter().Export(content, template),
+                "PDF" => new PdfExporter().Export(content),
+                "HTML" => Encoding.UTF8.GetBytes(new HtmlExporter().Export(content)),
+                _ => throw new ArgumentException("Unsupported export format.")
+            };
+        }, cancellationToken);
+}

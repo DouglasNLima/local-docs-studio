@@ -39,6 +39,7 @@ public partial class MainWindow : Window
     private bool previewFocused;
     private bool searchPreview;
     private bool closing;
+    private bool closePending;
     private bool recoveryBusy;
 
     public MainWindow(WorkspaceViewModel model, DesktopDialogs dialogs, string[] startupPaths)
@@ -65,6 +66,7 @@ public partial class MainWindow : Window
         await model.InitialiseAsync(startupPaths);
         ThemeService.Apply(Application.Current.Resources, model.Theme);
         SetLayout(model.Layout); BindActiveDocument(); QueuePreview(); Editor.Focus();
+        InitialiseUpdates();
     }
     private void SaveViewport()
     {
@@ -318,8 +320,8 @@ public partial class MainWindow : Window
     }
     private async Task SavePreferences()
     {
-        try { await new SessionStore(model.StateDirectory).WriteAsync("preferences.json", new UserPreferences(Theme: model.Theme, Layout: model.Layout)); }
-        catch (IOException ex) { model.Status = "Preferences could not be saved: " + ex.Message; }
+        try { await model.UpdatePreferencesAsync(current => current with { Theme = model.Theme, Layout = model.Layout }); }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { model.Status = "Preferences could not be saved: " + ex.Message; }
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
@@ -340,17 +342,26 @@ public partial class MainWindow : Window
         }
         e.Handled = true;
     }
-    private async void WindowClosing(object? sender, CancelEventArgs e)
+    private void WindowClosing(object? sender, CancelEventArgs e)
     {
         if (closing) return;
         e.Cancel = true;
-        try
+        if (closePending) return;
+        if (model.IsBusy) { model.Status = "Wait for the current operation to finish, or cancel it before closing."; return; }
+        closePending = true;
+        // Leave the native Closing event before any nested dialogue or asynchronous save.
+        Dispatcher.BeginInvoke(async () =>
         {
-            SaveViewport();
-            if (!await model.PrepareCloseAsync()) return;
-            closing = true; previewCancellation?.Cancel(); previewTimer.Stop(); recoveryTimer.Stop(); model.Dispose(); Close();
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { dialogs.Error(ex.Message); }
+            IsEnabled = false;
+            try
+            {
+                SaveViewport();
+                if (!await model.PrepareCloseAsync()) return;
+                CompleteClose();
+            }
+            catch (Exception ex) when (ex is not OutOfMemoryException) { dialogs.Error(ex.Message); }
+            finally { closePending = false; IsEnabled = true; }
+        });
     }
     private void Exit(object sender, RoutedEventArgs e) => Close();
     private void About(object sender, RoutedEventArgs e) => MessageBox.Show(this, "Lens Docs Studio — Native Preview\nLocal Markdown, Mermaid, and documentation studio.\n\n.NET 10 · WPF · AvalonEdit · Markdig · Mermaider\n\nInternal development build. Functional parity, installation and production signing are still being validated.", "About Lens Docs Studio");

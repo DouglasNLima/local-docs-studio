@@ -11,9 +11,13 @@ dotnet build src/native/LensDocsStudio.Native.slnx -c Release
 dotnet run --project src/native/LensDocsStudio.Native
 dotnet test src/native/LensDocsStudio.Core.Tests
 dotnet run --project src/native/LensDocsStudio.Native.Validation -- artifacts/native/validation .
+dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
+pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version 0.1.0-preview.10
 ```
 
 See [native implementation progress](docs/native/implementation-progress.md), [functional parity](docs/native/functional-parity-matrix.md) and [validation evidence](docs/native/validation-report.md). Native state uses `%LOCALAPPDATA%/LensDocsStudio.Native`; the legacy shell's installation and state are preserved. GitHub Pages remains a separate static pipeline and requires no .NET build.
+
+The native package includes .NET and requires neither WebView2 nor a local server. Inno Setup installs per user into `Programs/Lens Docs Studio Native`, with optional shortcuts and Open with registration. `scripts/native/Test-NativeInstaller.ps1` exercises actual installation, native save/reopen, uninstall and reinstall in an isolated test directory; it refuses to replace an existing native installation. Pass `-UpgradeInstaller` to include an upgrade. These generated packages are unsigned internal previews. See [native update trust and packaging](docs/native/update-and-packaging.md) before preparing release metadata. No script publishes a release.
 
 Lens Docs Studio is a local-first documentation workspace with a static browser/PWA runtime and an emerging Windows desktop shell. The primary product direction is a fully offline-capable Windows app built with WinUI 3 and WebView2, while the same core runtime must continue to work from GitHub Pages and local static validation. Open local `.md`, `.markdown`, `.mmd`, `.mermaid`, and `.txt` files, preview diagrams, review documents, save local edits when the host supports it, and export clean documentation packages without a backend.
 
