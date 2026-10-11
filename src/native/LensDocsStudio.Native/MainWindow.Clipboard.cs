@@ -8,6 +8,10 @@ namespace LensDocsStudio.Native;
 
 public partial class MainWindow
 {
+    private void PrepareEditorContext(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Controls.ContextMenu menu) EditorContextCommands.Prepare(menu, Editor, model.ActiveDocument is not null);
+    }
     private void CopyCodeBlock(Rendering.PreviewTextCopy content)
     {
         if (content.Text.Length > Rendering.CodeContextMenu.MaximumCopyCharacters)

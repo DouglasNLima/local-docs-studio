@@ -194,14 +194,14 @@
         AllowDrop="True" PreviewDragOver="EditorDragOver" PreviewDrop="EditorDrop"
         GotKeyboardFocus="EditorFocused" AutomationProperties.Name="Markdown editor" AutomationProperties.AutomationId="MarkdownEditor">
       <avalon:TextEditor.ContextMenu>
-       <ContextMenu AutomationProperties.Name="Editor actions">
-        <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextUndo"/>
-        <MenuItem Header="_Redo" Command="ApplicationCommands.Redo" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+       <ContextMenu AutomationProperties.Name="Editor actions" Opened="PrepareEditorContext">
+        <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" AutomationProperties.AutomationId="EditorContextUndo"/>
+        <MenuItem Header="_Redo" Command="ApplicationCommands.Redo"/>
         <Separator/>
-        <MenuItem Header="Cu_t" Command="ApplicationCommands.Cut" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextCut"/>
-        <MenuItem Header="_Copy" Command="ApplicationCommands.Copy" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextCopy"/>
-        <MenuItem Header="_Paste" Command="ApplicationCommands.Paste" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}" AutomationProperties.AutomationId="EditorContextPaste"/>
-        <MenuItem Header="Select _all" Command="ApplicationCommands.SelectAll" CommandTarget="{Binding PlacementTarget, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+        <MenuItem Header="Cu_t" Command="ApplicationCommands.Cut" AutomationProperties.AutomationId="EditorContextCut"/>
+        <MenuItem Header="_Copy" Command="ApplicationCommands.Copy" AutomationProperties.AutomationId="EditorContextCopy"/>
+        <MenuItem Header="_Paste" Command="ApplicationCommands.Paste" AutomationProperties.AutomationId="EditorContextPaste"/>
+        <MenuItem Header="Select _all" Command="ApplicationCommands.SelectAll"/>
         <Separator/>
         <MenuItem Header="_Bold" Tag="bold" Click="Format" AutomationProperties.AutomationId="EditorContextBold"/>
         <MenuItem Header="_Italic" Tag="italic" Click="Format"/>

@@ -77,6 +77,22 @@ internal static class NativeEditorChecks
         if (editor.Text != source) throw new IOException("Anchor insertion Undo changed preceding source.");
         editor.Document.UndoStack.Redo();
         if (editor.Text != anchorSource) throw new IOException("Anchor insertion Redo changed source.");
+        editor.Text = source; editor.Document.UndoStack.ClearAll(); editor.Select(7, 8);
+        var menu = new System.Windows.Controls.ContextMenu();
+        var selectAll = new System.Windows.Controls.MenuItem { Command = System.Windows.Input.ApplicationCommands.SelectAll };
+        var undo = new System.Windows.Controls.MenuItem { Command = System.Windows.Input.ApplicationCommands.Undo };
+        var formatItem = new System.Windows.Controls.MenuItem { Header = "Bold" };
+        menu.Items.Add(selectAll); menu.Items.Add(undo); menu.Items.Add(formatItem);
+        EditorContextCommands.Prepare(menu, editor, true);
+        if (!System.Windows.Input.ApplicationCommands.SelectAll.CanExecute(null, selectAll.CommandTarget)) throw new IOException("The prepared context menu cannot route Select all to the native editor.");
+        System.Windows.Input.ApplicationCommands.SelectAll.Execute(null, selectAll.CommandTarget);
+        if (editor.SelectedText != source) throw new IOException("The context Select all command targeted the wrong native control.");
+        EditorFormattingService.Apply(editor, "bold");
+        if (!System.Windows.Input.ApplicationCommands.Undo.CanExecute(null, undo.CommandTarget)) throw new IOException("The prepared context menu cannot route Undo to the native editor.");
+        System.Windows.Input.ApplicationCommands.Undo.Execute(null, undo.CommandTarget);
+        if (editor.Text != source) throw new IOException("Context Undo did not restore its selected document.");
+        editor.IsReadOnly = true; EditorContextCommands.Prepare(menu, editor, true);
+        if (formatItem.IsEnabled) throw new IOException("Context formatting remained enabled for a read-only document.");
         File.WriteAllText(Path.Combine(output, "native-editor.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
@@ -84,7 +100,8 @@ internal static class NativeEditorChecks
                 "Read-only editors reject formatting", "Line commands leave a typing caret after their marker", "Callout typing replaces only its body and Undo restores original source",
                 "Native Mermaid completion retains fences, indentation and CRLF with one Undo/Redo action", "Completion protects read-only documents and selected text",
                 "Progress insertion and editing retain selection and form separate complete Undo/Redo actions",
-                "Named and empty anchor insertion/editing preserve selection and complete Undo/Redo actions" }
+                "Named and empty anchor insertion/editing preserve selection and complete Undo/Redo actions",
+                "Context Select all and Undo route to AvalonEdit's text area and formatting respects read-only state" }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
