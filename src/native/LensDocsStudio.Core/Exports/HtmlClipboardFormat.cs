@@ -10,7 +10,7 @@ public static partial class HtmlClipboardFormat
 {
     public const int MaximumBytes = 32 * 1024 * 1024;
     private static readonly UTF8Encoding Utf8 = new(false, true);
-    private const string Prefix = "<html><head><meta charset=\"utf-8\"></head><body><!--StartFragment-->";
+    private const string Prefix = "<html xmlns:x=\"urn:schemas-microsoft-com:office:excel\"><head><meta charset=\"utf-8\"></head><body><!--StartFragment-->";
     private const string Suffix = "<!--EndFragment--></body></html>";
     private const string Header = "Version:1.0\r\nStartHTML:{0:D10}\r\nEndHTML:{1:D10}\r\nStartFragment:{2:D10}\r\nEndFragment:{3:D10}\r\n";
 

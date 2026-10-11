@@ -8,9 +8,9 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits, Windows deletion and recovery | Partial: file creation/rename/deletion and snapshot recovery pass UI checks; folder moves and case-only renames remain |
 | Tabs, recent files, navigation history | Native tabs, persisted recent paths and bounded viewport history | Core and desktop navigation checks pass; broader closed-tab/history cases remain |
 | Undo/redo, syntax, formatting, lists/tables, autocomplete | AvalonEdit | Incomplete |
-| Paste Special, HTML/TSV conversion, rich clipboard | Windows Unicode text/CF_HTML, native Edit menu and Ctrl+Shift+V | Nine explicit modes, automatic conversion and portable image persistence pass core, native and installed desktop checks at 7ad9a13; external destination fidelity remains |
+| Paste Special, HTML/TSV conversion, rich clipboard | Windows Unicode text/CF_HTML, native Edit menu and Ctrl+Shift+V | Native/installed checks pass; actual Word preserves Unicode, tables, bold and diagram pixels; Excel preserves adjacent cells and literal values. Azure DevOps/source-with-images clipboard remains |
 | Markdown headings/tables/tasks/code/quotes/images | Markdig with native WPF preview | In progress |
-| Responsive image preparation and large documents | Serial background STA preparation, content cache and decoded memory budgets | Image preparation checks pass; full FlowDocument layout remains on the UI thread and large-document certification is incomplete |
+| Responsive image preparation and large documents | Serial background STA preparation, content cache and decoded memory budgets | Preparation and installed desktop checks pass at 0e7c343; full FlowDocument layout remains on the UI thread and large-document certification is incomplete |
 | Callouts/badges/details/figures/anchors/progress/math | Explicit safe semantic mapping | Incomplete |
 | Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |
 | Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |

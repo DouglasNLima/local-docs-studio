@@ -19,6 +19,8 @@ internal static class Program
     {
         if (args.FirstOrDefault() == "--ui")
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
+        if (args.FirstOrDefault() == "--office")
+            return OfficeClipboardChecks.Run(args.ElementAtOrDefault(1) ?? "artifacts/native/office");
         if (args.FirstOrDefault() == "--reject-unsigned")
         {
             try

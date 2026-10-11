@@ -12,8 +12,12 @@ public sealed class ClipboardExporter
         if (content.Document.Source.Length > 4 * 1024 * 1024 || content.Images.Values.Concat(content.Diagrams.Values).Sum(i => (long)i.PngBytes.Length) > 16 * 1024 * 1024)
             throw new IOException("Copy rendered content is limited to 4 million source characters and 16 MB of prepared images. Export larger documents to a file.");
         var fragment = "<div>" + new HtmlExporter().RenderFragment(content) + "</div>";
-        var encoded = HtmlClipboardFormat.Encode(fragment);
         var html = new HtmlParser().ParseDocument(fragment);
+        // Documentation cells are literal text, including identifiers and formula-like examples.
+        foreach (var table in html.QuerySelectorAll("table")) table.SetAttribute("x:str", "");
+        foreach (var cell in html.QuerySelectorAll("th,td"))
+            cell.SetAttribute("style", (cell.GetAttribute("style") ?? "") + "mso-number-format:\"\\@\";");
+        var encoded = HtmlClipboardFormat.Encode(html.Body!.InnerHtml);
         string Read(INode node)
         {
             if (node is IText text) return text.TextContent;

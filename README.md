@@ -19,9 +19,11 @@ See [native implementation progress](docs/native/implementation-progress.md), [f
 
 The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix identifies features still to be implemented.
 
-Native **Edit → Copy rendered content** supplies formatted HTML and Unicode text with embedded images and diagrams. Preparation is cancellable and bounded; tables retain tab-separated cells in the text representation. Formatting in external destination applications remains under validation.
+Native **Edit → Copy rendered content** supplies formatted HTML and Unicode text with embedded images and diagrams. Preparation is cancellable and bounded; tables retain tab-separated cells in the text representation. Word and Excel destination checks cover Unicode, tables, Word diagram pixels and literal Excel cells; other destinations remain under validation.
 
 Native paste converts formatted HTML and spreadsheet TSV into editable Markdown, retaining embedded images as local assets. **Edit → Paste Special** offers table, text, code, quote, HTML, list, checklist, numbered list and Mermaid modes; `Ctrl+Shift+V` pastes literal text. Images are validated and written before the editor selection is replaced. HTML file imports use the same converter, with warnings for flattened merged cells and unfetched linked images.
+
+When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.
 
 The native File menu can create files/folders, review document rename/move and related Markdown link changes, and delete a document with saved/unsaved snapshots. **Document snapshots** previews retained source and opens a recovered draft for an explicit Save as. **Insert → Image from URL** downloads an HTTPS raster image only on request, validates it locally and stores a portable PNG before inserting its link. Missing snapshot images are reported while source text remains recoverable.
 

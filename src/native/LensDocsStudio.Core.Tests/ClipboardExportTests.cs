@@ -16,7 +16,7 @@ public sealed class ClipboardExportTests
         int Offset(string name) => int.Parse(encoded.Split('\n').Single(l => l.StartsWith(name + ":", StringComparison.Ordinal)).Split(':')[1], CultureInfo.InvariantCulture);
         var start = Offset("StartFragment"); var end = Offset("EndFragment");
         Assert.Equal(fragment, Encoding.UTF8.GetString(bytes, start, end - start));
-        Assert.Equal(bytes.Length, Offset("EndHTML")); Assert.Equal("<html>", Encoding.UTF8.GetString(bytes, Offset("StartHTML"), 6));
+        Assert.Equal(bytes.Length, Offset("EndHTML")); Assert.Equal("<html ", Encoding.UTF8.GetString(bytes, Offset("StartHTML"), 6));
         Assert.Equal(fragment, HtmlClipboardFormat.Decode(encoded));
         Assert.DoesNotContain("SourceURL", encoded);
     }
@@ -89,5 +89,16 @@ public sealed class ClipboardExportTests
         var partialEnd = Encoding.UTF8.GetByteCount(encoded[..encoded.IndexOf('é')]) + 1;
         var changed = string.Join('\n', encoded.Split('\n').Select(l => l.StartsWith("EndFragment:", StringComparison.Ordinal) ? "EndFragment:" + partialEnd.ToString("D10", CultureInfo.InvariantCulture) + "\r" : l));
         Assert.Throws<IOException>(() => HtmlClipboardFormat.Decode(changed));
+    }
+
+    [Fact] public void Clipboard_tables_identify_literal_cells_without_changing_visible_text_or_plain_fallback()
+    {
+        var parsed = new MarkdownService().Parse("| Name | Value |\n|---|---|\n| Formula | =1+1 |\n| Identifier | 000123 |");
+        var result = new ClipboardExporter().Export(new(parsed, new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()));
+        var html = new HtmlParser().ParseDocument(HtmlClipboardFormat.Decode(result.Html));
+        Assert.True(html.QuerySelector("table")!.HasAttribute("x:str"));
+        Assert.All(html.QuerySelectorAll("td,th"), cell => Assert.Contains("mso-number-format:\"\\@\";", cell.GetAttribute("style")));
+        Assert.Contains("Formula\t=1+1", result.PlainText); Assert.Contains("Identifier\t000123", result.PlainText);
+        Assert.Contains("=1+1", html.Body!.TextContent); Assert.Contains("000123", html.Body.TextContent);
     }
 }

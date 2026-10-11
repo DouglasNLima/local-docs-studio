@@ -28,16 +28,17 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 
 ## Current evidence
 
-- Local Release build: no warnings/errors. Core: 156 tests pass, including asset recovery, clipboard Unicode/sanitisation, HTML fidelity, all paste modes and quoted table data.
+- Local Release build: no warnings/errors. Core: 157 tests pass, including asset recovery, clipboard Unicode/sanitisation, HTML fidelity, all paste modes and literal table metadata.
 - Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, twelve image/operation checks, including independently decoded clipboard images, rich image paste, anchored block insertion, budgets and cancellation.
 - Desktop harness: all 21 outcomes pass in both native CI runs at 7ad9a13, including rich copy/paste, saved images, CSV, invalid-image selection preservation, Ctrl+Shift+V and Undo. The same checks pass after installation/reinstallation. Local foreground access is unavailable. Remote transport uses deterministic simulated responses in integration tests.
-- Six native preview preparation checks pass: frozen cross-thread pixels, content reuse/invalidation, fresh/cached memory budgets, unresolved resources, cancellation and rendering after source image removal. This follow-up needs fresh desktop CI.
+- Six native preview checks pass: frozen pixels, content reuse/invalidation, memory budgets/eviction, unresolved resources, cancellation and rendering after source image removal. Both native CI runs at 0e7c343 pass, including 21 desktop outcomes and installed lifecycle.
+- Optional local Office destination checks pass for Word and Excel: actual saved DOCX preserves Unicode, tables, bold and original diagram pixels; XLSX preserves adjacent cells, formula-like text and leading-zero identifiers. Evidence: artifacts/native/office-certified/office-clipboard.json. The original Excel instance was preserved.
 - All four native/web CI runs passed at ecc5fba. At c7467b4, both native CI runs and web PR CI passed; web push failed two Edge readiness checks with refused local-server connections.
 - At 5210d81 both native CI runs passed; web PR CI passed 238/254 and push CI passed 244/254. Traces show transient status assertions, an asynchronous bridge assertion and an import-worker interception wait; other failures report closed browser contexts. Investigation remains open; no web runtime source changed.
 
 ## Remaining work
 
-Next: validate background image preparation in desktop CI, then continue rendering, editing, review and template parity. Full Chromium headless mode passes all 254 local browser checks (14.2 minutes) and web push CI at e356480; its parallel PR run passed 252/254, with two Edge access violations. Browser crash investigation remains open.
+Next: implement source-preserving Markdown/image clipboard transfer and continue rendering, editing, review and template parity. Full Chromium headless mode passes all 254 local browser checks and web push CI at e356480. At 7ad9a13 web PR CI passed 252/254 and push passed 253/254; failures coincide with Edge access violations. Browser crash investigation remains open.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 
