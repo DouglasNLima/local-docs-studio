@@ -507,6 +507,33 @@ internal static class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedProgress, "Progress Redo changed the indicator.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             checks.Add("Native progress dialogue validates input, reopens an existing indicator and preserves complete Undo/Redo actions");
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeProgress, "Progress source was not restored before bundle export.");
+            var savedBeforeBundle = File.ReadAllText(source);
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            const string bundleDraft = " Bundle-only unsaved text."; Keyboard.Type(bundleDraft);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith(bundleDraft, StringComparison.Ordinal), "The bundle draft did not reach the editor.");
+            var bundleSource = editor.Patterns.Value.Pattern.Value.Value;
+            Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
+            var bundlePath = Path.Combine(runRoot, "portable-documents.zip"); SaveThroughDialogue(bundlePath, "Export Markdown bundle");
+            Wait(() => File.Exists(bundlePath) && Find(window, "Status").Name.StartsWith("Markdown bundle exported", StringComparison.Ordinal), "The native Markdown bundle did not finish.");
+            using (var archive = System.IO.Compression.ZipFile.OpenRead(bundlePath))
+            {
+                if (archive.Entries.Any(entry => entry.FullName.StartsWith("state/", StringComparison.OrdinalIgnoreCase))
+                    || !archive.Entries.Any(entry => entry.FullName.StartsWith("assets/images/", StringComparison.OrdinalIgnoreCase)))
+                    throw new IOException("The Markdown bundle included private state or lost portable assets.");
+                using var reader = new StreamReader((archive.GetEntry("fixture.md") ?? throw new IOException("The bundle source is missing.")).Open());
+                if (reader.ReadToEnd() != bundleSource || File.ReadAllText(source) != savedBeforeBundle)
+                    throw new IOException("The Markdown bundle lost current edits or changed the saved source.");
+            }
+            FocusWindow(window); editor.Click();
+            for (var typingUndo = 0; editor.Patterns.Value.Pattern.Value.Value != beforeProgress && typingUndo <= bundleDraft.Length; typingUndo++)
+            {
+                var previous = editor.Patterns.Value.Pattern.Value.Value; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value != previous, "Undo did not restore the bundle-only draft.");
+                if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeProgress, StringComparison.Ordinal)) throw new IOException("Undo changed the original document after bundle export.");
+            }
+            if (editor.Patterns.Value.Pattern.Value.Value != beforeProgress) throw new IOException("The bundle draft was not fully restored.");
+            checks.Add("Native Markdown bundle exports unsaved source and portable assets without private state or source-file writes");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

@@ -1,5 +1,15 @@
 # Native validation report
 
+## Markdown Bundle private-state boundary
+
+All 287 core tests pass and Release builds without warnings/errors. Eighteen bundle cases include actual ZIP entries and bytes for exclusion of the configured native state folder, ignored private draft overrides, retained public folders with similar names, exact raster bytes, root/descendant/trailing-separator handling, unrelated exclusions, incomplete enumeration, oversized UTF-8 drafts, empty workspaces and cancellation. Saved source and private recovery files remain unchanged. Evidence: artifacts/native/tests/bundle-boundary-after.trx and native-core-bundle-boundary.trx.
+
+Two new corrupt-size regressions failed before the correction: imported ZIP content was accepted with central-directory lengths of zero or 1,000 bytes despite containing a different source length. Reads now count actual returned bytes against the remaining aggregate budget and verify both declared length and CRC32 before writing an entry. Tests also reject a changed checksum and preserve valid empty/Unicode documents. Failed imports leave neither the destination nor the staging folder. CRC32 detects content corruption; it is not source authentication or a claim of full ZIP structural validation. Before-fix evidence: artifacts/native/tests/bundle-size-before.trx.
+
+The original exporter recursively included all supported files beneath the workspace, including recovery Markdown/images when private state was stored there. Native export now passes its exact state directory; shared bounded workspace enumeration excludes it and fails on incomplete scans. File reads are bounded and deny concurrent writes while open; edited documents are checked by encoded byte count before allocation. Docs Site also normalises the same equal/descendant boundary. The 27th desktop outcome verifies unsaved source, portable assets, private-state exclusion and unchanged source files through the real bundle dialogue; CI remains pending.
+
+All four runs at 8a0b886 pass: native 38168509418/38168504028 and web 38168509444/38168504022. Native CI verifies 276 core cases, four exported-site browser checks and all 26 desktop outcomes before installation and after installation/reinstallation, including section search and the corrected progress focus check. Evidence: artifacts/native/native-ci-8a0b886-pr.log. The bundle follow-up awaits fresh CI.
+
 ## Docs Site section search
 
 Release build has no warnings/errors and all 276 core tests pass. Three additional Docs Site cases cover section boundaries through nested quotes/lists, code and table text, adjacent inline words, metadata/introductory text, unique targets for repeated explicit heading identifiers, empty pages and repeated-metadata size limits before JSON serialisation. Evidence: artifacts/native/tests/native-core.trx and docs-site-search.trx.

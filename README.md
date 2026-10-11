@@ -39,6 +39,10 @@ Native **Insert → Progress indicator** creates a portable labelled progress fi
 
 The native Docs Site export searches individual sections, including code, tables and nested headings. Results highlight the matching text and open the relevant heading with keyboard focus; browser Back returns to the preceding section. Page metadata remains searchable separately.
 
+Native Markdown Bundle export includes current edits to saved workspace documents and portable raster assets without writing source files. It excludes the configured native state/recovery folder, including when that folder is inside the workspace, and refuses incomplete folder scans or entries exceeding the bundle limits. Generic bundles omit optional artefact metadata.
+
+Native ZIP import stages into a new folder, bounds imported content and checks entry sizes and checksums before publishing the workspace. A rejected import leaves existing documents untouched.
+
 To verify native-generated sites, run `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --docs-site artifacts/native/validation`, then `npx playwright test --config playwright.native-export.config.mjs`. Browser tools are development validation dependencies only; the installed native app does not require them.
 
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.

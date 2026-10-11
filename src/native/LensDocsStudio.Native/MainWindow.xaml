@@ -112,7 +112,7 @@
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument"/>
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument"/>
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
-    <MenuItem Header="Markdown _bundle…" Click="ExportBundle"/>
+    <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
     <Separator/>
     <MenuItem Header="Select Word _template…" Click="SelectWordTemplate"/>

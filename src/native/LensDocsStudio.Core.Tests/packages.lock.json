@@ -109,6 +109,11 @@
         "resolved": "0.15.1",
         "contentHash": "qli1R/Nl8SaNX4MzvHvxNw7d7t1WSFEktbvnZJGdKGi/lNXtMfOMt6/41ryoPMs4C6dTc/rtfpCKpery0UpzmA=="
       },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "10.0.12",
+        "contentHash": "jDix4bBMYnpZdSPcnY+KDV6ik3SRMzpMKby/bZl/XUwIiflwRNAFZ0oOl61R/pSaveIJ8t1gs2BUlrGsPs/bcg=="
+      },
       "System.IO.Packaging": {
         "type": "Transitive",
         "resolved": "10.0.2",
@@ -161,7 +166,8 @@
           "DocumentFormat.OpenXml": "[3.5.1, )",
           "Markdig": "[1.4.0, )",
           "Mermaider": "[0.15.1, )",
-          "PdfPig": "[0.1.16, )"
+          "PdfPig": "[0.1.16, )",
+          "System.IO.Hashing": "[10.0.12, )"
         }
       }
     },

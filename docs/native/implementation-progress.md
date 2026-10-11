@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Current milestone: native filesystem editing, recovery and asset workflows. This remains an incomplete internal preview, with no release or merge authorised.
+Current milestone: functional parity and Windows workflow certification. This remains an incomplete internal preview, with no release or merge authorised.
 
 ## Baseline and isolation
 
@@ -20,6 +20,7 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 - Browser-free Mermaider rendering, native SVG validation, frozen drawing caches, background STA preparation, zoom and SVG/PNG exports. Forty light/dark corpus cases pass.
 - Serial background raster preparation with frozen image reuse by content hash and aggregate/cache budgets. Native layout performs no image file reads. FlowDocument construction now yields in cancellable dispatcher batches while retaining the old preview until a complete current result is ready; pagination and incremental reuse remain open.
 - Bounded ZIP, DOCX, HTML and PDF text imports; guarded DOCX, HTML, local PDF and generic Markdown Bundle exports. Template styles and package headers/footers/media are preserved, with full template contracts still incomplete.
+- Markdown Bundle export excludes the configured private state folder and rejects a workspace inside it. Bounded enumeration refuses incomplete scans; saved files are read with bounded streams and current drafts are checked by UTF-8 byte count. Public folders with similar names and portable assets remain included.
 - Native Docs Site options and guarded ZIP output retain current saved-file drafts, bounded front-matter metadata, embedded native images/diagrams, rewritten document links, generated/readme home, search and light/dark/system themes. Private native state is excluded; generated scripts run only in the exported site.
 - Docs Site section search retains nested headings, code/table text, distinct metadata and unique heading targets. Results show inert highlighted snippets and open the matching section with keyboard focus and browser Back support. Search indexing checks entry/byte budgets before serialisation; client searches yield and cancel obsolete results.
 - Copy rendered content prepares sanitised CF_HTML and Unicode text, embedding native images/diagrams and retaining table cells. Source/image limits, cancellation and clipboard sequence checks protect preparation; external destination fidelity remains to be validated.
@@ -36,7 +37,7 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 
 ## Current evidence
 
-- Local Release build: no warnings/errors. Core: 276 tests pass, including source/clipboard safety, editing, semantic rendering, twenty Mermaid completion cases, ten front-matter cases, eleven Docs Site cases and fifteen progress cases.
+- Local Release build: no warnings/errors. Core: 287 tests pass, including source/clipboard safety, editing, semantic rendering, twenty Mermaid completion cases, ten front-matter cases, eleven Docs Site cases, fifteen progress cases and eighteen bundle cases.
 - Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, thirteen image/operation checks, including saved Markdown source fidelity and pixel-identical clipboard image transfer, rich image paste, anchored block insertion, budgets and cancellation.
 - Desktop harness: all 21 outcomes pass in both native CI runs at 7ad9a13, including rich copy/paste, saved images, CSV, invalid-image selection preservation, Ctrl+Shift+V and Undo. The same checks pass after installation/reinstallation. Local foreground access is unavailable. Remote transport uses deterministic simulated responses in integration tests.
 - Six native preview checks pass: frozen pixels, content reuse/invalidation, memory budgets/eviction, unresolved resources, cancellation and rendering after source image removal. Both native CI runs at 0e7c343 pass, including 21 desktop outcomes and installed lifecycle.
@@ -52,13 +53,16 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 - Four native progress outcomes pass with accessible values, selectable labels, exact source mappings and measured fill widths at 0/37/100 percent after deferred layout. Light/dark images were visually inspected; PDF text and Word structure pass. Eight native editor checks include complete progress insertion/update Undo/Redo. Four destination browser checks pass with progress semantics/colour. The new 26th desktop dialogue outcome awaits CI.
 - Native CI at ee5c0ff stopped before the progress dialogue because the new harness used SetFocus on AvalonEdit's outer automation element. The correction clicks its text area, matching established keyboard checks. Failure logs, screenshot and source are retained under artifacts/native/ci-ee5c0ff-pr; fresh CI remains pending.
 - Focused Docs Site export and four browser checks pass with direct section search, keyboard activation, nested headings, matching snippets, query limits and history. Core verifies unique duplicate-heading targets, text boundaries and pre-serialisation budgets. The sidebar/result viewport was visually inspected; a focused Edge check also passes. Later CI remains pending.
+- Both native runs at 6e8bf20 pass all 26 desktop/installed outcomes, including progress input validation, insertion/editing and Undo/Redo. Evidence: artifacts/native/native-ci-6e8bf20-pr.log. Web runs were superseded by the section-search push; all four runs at c3277ef remain green.
+- Eighteen bundle tests now pass, including actual ZIP state exclusion, draft/source preservation, exact assets, encoded limits, corrupt-size/checksum rejection and refusal of incomplete scans. Two false-size imports failed before the correction; actual-byte accounting and CRC checks now reject them without a partial workspace. Evidence: artifacts/native/tests/bundle-size-before.trx, bundle-boundary-after.trx and native-core-bundle-boundary.trx. The new 27th desktop export-dialogue outcome awaits CI.
+- All four native/web runs pass at 8a0b886: native 38168509418/38168504028, web 38168509444/38168504022. Native validates 276 core, four export-browser checks and all 26 desktop outcomes in built, installed and reinstalled applications. Evidence: artifacts/native/native-ci-8a0b886-pr.log.
 - Optional local Office destination checks pass for Word and Excel: actual saved DOCX preserves Unicode, tables, bold and original diagram pixels; XLSX preserves adjacent cells, formula-like text and leading-zero identifiers. Evidence: artifacts/native/office-certified/office-clipboard.json. The original Excel instance was preserved.
 - All four native/web CI runs passed at ecc5fba. At c7467b4, both native CI runs and web PR CI passed; web push failed two Edge readiness checks with refused local-server connections.
 - At 5210d81 both native CI runs passed; web PR CI passed 238/254 and push CI passed 244/254. Traces show transient status assertions, an asynchronous bridge assertion and an import-worker interception wait; other failures report closed browser contexts. Investigation remains open; no web runtime source changed.
 
 ## Remaining work
 
-Next: validate the progress dialogue and installed workflows in CI, then continue export, semantic, review and template parity. All four native/web runs pass at c3277ef, including the Docs Site dialogue and guarded web-recovery follow-up. Later CI remains under observation.
+Next: validate the bundle import/export boundaries and installed workflows in CI, then continue export, semantic, review and template parity. All four native/web runs pass at 8a0b886, including 26 desktop/installed outcomes. The bundle follow-up remains under validation.
 
 Other gaps: folder moves/case-only rename, safe HTML semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity, template/snippet libraries, general preferences/migration/help, destination clipboard validation, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

@@ -43,12 +43,15 @@ public sealed class MarkdownBundleService
                 var document = WorkspaceService.IsDocument(name);
                 var metadata = name.Equals("lens-artifact-bundle.json", StringComparison.Ordinal);
                 if (!document && !IsAsset(name) && !metadata) { warnings.Add("Unsupported bundle entry skipped: " + name); continue; }
-                if (entry.Length > MaxEntryBytes || (total += entry.Length) > MaxTotalBytes) throw new InvalidDataException("The bundle exceeds the import size limit.");
+                if (entry.Length > MaxEntryBytes || entry.Length > MaxTotalBytes - total) throw new InvalidDataException("The bundle exceeds the import size limit.");
                 if (entry.Length > 1_000_000 && entry.CompressedLength > 0 && entry.Length / entry.CompressedLength > 1000)
                     throw new InvalidDataException("The bundle compression ratio exceeds the safety limit.");
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 using var input = entry.Open();
-                var bytes = await ReadBoundedAsync(input, MaxEntryBytes, cancellationToken);
+                var bytes = await ReadBoundedAsync(input, Math.Min(MaxEntryBytes, MaxTotalBytes - total), cancellationToken);
+                if (bytes.LongLength != entry.Length) throw new InvalidDataException("A ZIP entry does not match its declared size.");
+                if (System.IO.Hashing.Crc32.HashToUInt32(bytes) != entry.Crc32) throw new InvalidDataException("A ZIP entry failed its content checksum check.");
+                total += bytes.LongLength;
                 if (document) _ = Documents.DocumentSnapshot.FromBytes(destination, bytes);
                 await File.WriteAllBytesAsync(destination, bytes, cancellationToken);
                 if (document) documents++; else if (!metadata) assets++;
@@ -70,43 +73,51 @@ public sealed class MarkdownBundleService
     }
 
     public async Task<byte[]> ExportAsync(WorkspacePath workspace, IReadOnlyDictionary<string, string>? editedDocuments = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, string? excludedDirectory = null)
     {
+        excludedDirectory = excludedDirectory is null ? null : Path.TrimEndingDirectorySeparator(Path.GetFullPath(excludedDirectory));
+        if (excludedDirectory is not null && WorkspacePath.ContainsOrEquals(excludedDirectory, workspace.Root))
+            throw new IOException("Choose a document workspace outside the native application's private state folder.");
+        var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken, includeImages: true, excludedDirectory: excludedDirectory);
+        if (listing.Warnings.Count != 0) throw new IOException("The workspace could not be completely read. " + string.Join(" ", listing.Warnings));
+        var files = Files(listing.Entries).ToArray();
+        if (files.Length > MaxEntries) throw new IOException("The workspace exceeds the 2,000-entry bundle limit.");
+        if (!files.Any(WorkspaceService.IsDocument)) throw new IOException("The workspace contains no supported documents for a Markdown bundle.");
         using var stream = new MemoryStream();
         using (var archive = new ZipArchive(stream, ZipArchiveMode.Create, true))
         {
-            var count = 0; long total = 0;
-            async Task Walk(string directory)
+            long total = 0;
+            foreach (var path in files)
             {
-                foreach (var path in Directory.EnumerateFileSystemEntries(directory).Order(StringComparer.OrdinalIgnoreCase))
+                cancellationToken.ThrowIfCancellationRequested();
+                var relative = Path.GetRelativePath(workspace.Root, path).Replace('\\', '/');
+                workspace.Resolve(relative);
+                byte[] bytes;
+                if (WorkspaceService.IsDocument(path) && editedDocuments?.TryGetValue(path, out var edited) == true)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-                    if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0) continue;
-                    if (Directory.Exists(path))
-                    {
-                        if (Path.GetFileName(path) is ".git" or "node_modules" or "bin" or "obj") continue;
-                        await Walk(path); continue;
-                    }
-                    if (!WorkspaceService.IsDocument(path) && !IsAsset(path)) continue;
-                    if (++count > MaxEntries) throw new IOException("The workspace exceeds the 2,000-entry bundle limit.");
-                    var relative = Path.GetRelativePath(workspace.Root, path).Replace('\\', '/');
-                    workspace.Resolve(relative);
-                    byte[] bytes;
-                    if (editedDocuments?.TryGetValue(path, out var edited) == true) bytes = Documents.DocumentSnapshot.Encode(edited, false);
-                    else
-                    {
-                        if (new FileInfo(path).Length > MaxEntryBytes) throw new IOException("A bundle file exceeds 32 MB.");
-                        bytes = await File.ReadAllBytesAsync(path, cancellationToken);
-                    }
-                    if ((total += bytes.Length) > MaxTotalBytes) throw new IOException("The bundle exceeds 256 MB.");
-                    var entry = archive.CreateEntry(relative, CompressionLevel.Optimal);
-                    entry.LastWriteTime = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
-                    using var target = entry.Open(); await target.WriteAsync(bytes, cancellationToken);
+                    if (new System.Text.UTF8Encoding(false, true).GetByteCount(edited) > MaxEntryBytes) throw new IOException("An edited bundle document exceeds 32 MB.");
+                    bytes = Documents.DocumentSnapshot.Encode(edited, false);
                 }
+                else
+                {
+                    await using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, FileOptions.Asynchronous);
+                    if (input.Length > MaxEntryBytes) throw new IOException("A bundle file exceeds 32 MB.");
+                    bytes = await ReadBoundedAsync(input, MaxEntryBytes, cancellationToken);
+                }
+                if ((total += bytes.Length) > MaxTotalBytes) throw new IOException("The bundle exceeds 256 MB.");
+                var entry = archive.CreateEntry(relative, CompressionLevel.Optimal);
+                entry.LastWriteTime = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+                using var target = entry.Open(); await target.WriteAsync(bytes, cancellationToken);
             }
-            await Walk(workspace.Root);
         }
         return stream.ToArray();
+    }
+
+    private static IEnumerable<string> Files(IEnumerable<WorkspaceEntry> entries)
+    {
+        foreach (var entry in entries)
+            if (entry.IsDirectory) { foreach (var file in Files(entry.Children)) yield return file; }
+            else yield return entry.Path;
     }
 
     internal static async Task<byte[]> ReadBoundedAsync(Stream stream, long maximumBytes, CancellationToken cancellationToken)
@@ -116,7 +127,7 @@ public sealed class MarkdownBundleService
         int read;
         while ((read = await stream.ReadAsync(buffer, cancellationToken)) != 0)
         {
-            if (output.Length + read > maximumBytes) throw new InvalidDataException("A decompressed entry exceeds the import limit.");
+            if (output.Length + read > maximumBytes) throw new InvalidDataException("A bundle entry exceeds its size limit.");
             output.Write(buffer, 0, read);
         }
         return output.ToArray();

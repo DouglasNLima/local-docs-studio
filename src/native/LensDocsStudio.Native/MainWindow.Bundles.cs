@@ -33,7 +33,8 @@ public partial class MainWindow
         await model.RunAsync(async () =>
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
-            var bytes = await bundles.ExportAsync(new WorkspacePath(root), edited, model.OperationToken);
+            model.Status = "Preparing Markdown bundle…";
+            var bytes = await bundles.ExportAsync(new WorkspacePath(root), edited, model.OperationToken, model.StateDirectory);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
             model.Status = "Markdown bundle exported with current editor text and portable assets.";
         });

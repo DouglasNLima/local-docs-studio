@@ -14,7 +14,8 @@ public sealed class DocsSiteExportService
         DocsSiteOptions options, IProgress<string>? progress = null, CancellationToken cancellationToken = default)
     {
         var workspace = new WorkspacePath(root);
-        if (workspace.Root.Equals(Path.GetFullPath(stateDirectory), StringComparison.OrdinalIgnoreCase) || WorkspacePath.Contains(stateDirectory, workspace.Root))
+        stateDirectory = Path.TrimEndingDirectorySeparator(Path.GetFullPath(stateDirectory));
+        if (WorkspacePath.ContainsOrEquals(stateDirectory, workspace.Root))
             throw new IOException("Choose a document workspace outside the native application's private state folder.");
         var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken, excludedDirectory: Path.GetFullPath(stateDirectory));
         if (listing.Warnings.Count != 0) throw new IOException("The workspace could not be completely read. " + string.Join(" ", listing.Warnings));
