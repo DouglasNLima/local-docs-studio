@@ -853,6 +853,12 @@ internal static class NativeUiChecks
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
+            var libraryImageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
+            var libraryImageMarkdown = "![Library portable image](" + libraryImageReference + ")";
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(libraryImageMarkdown);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith(libraryImageMarkdown, StringComparison.Ordinal),
+                "The portable-image fixture did not reach the document before library capture.");
             var templateSource = editor.Patterns.Value.Pattern.Value.Value; var templateSavedSource = File.ReadAllText(source);
             var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
             var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
@@ -946,10 +952,13 @@ internal static class NativeUiChecks
             Wait(() => File.Exists(contentExport) && Find(contentLibrary, "ContentLibraryStatus").Name.StartsWith("Exported all active", StringComparison.Ordinal),
                 "The native content library did not export its active entries.");
             var exportedLibrary = LensDocsStudio.Core.State.LocalLibraryFormat.Read(File.ReadAllBytes(contentExport));
-            if (exportedLibrary.Templates.Length != 2 || exportedLibrary.Snippets.Length != 2 || exportedLibrary.Profiles.Length != 1
-                || !exportedLibrary.Templates.Single(item => item.Label == "Native reusable source").Content.Contains("data:image/png;base64,", StringComparison.Ordinal)
-                || !exportedLibrary.Templates.Single(item => item.Label == "Native reusable source").Content.Contains("```mermaid", StringComparison.Ordinal))
-                throw new IOException("The library export lost merged entries, embedded pixels or editable Mermaid.");
+            if (exportedLibrary.Templates.Length != 2 || exportedLibrary.Snippets.Length != 2 || exportedLibrary.Profiles.Length != 1)
+                throw new IOException($"The library export lost merged entries: {exportedLibrary.Templates.Length} templates, {exportedLibrary.Snippets.Length} snippets, {exportedLibrary.Profiles.Length} profiles.");
+            var capturedTemplate = exportedLibrary.Templates.Single(item => item.Label == "Native reusable source").Content;
+            if (!capturedTemplate.Contains("data:image/png;base64,", StringComparison.Ordinal)) throw new IOException("The library export lost the fixture's embedded image.");
+            if (!capturedTemplate.Contains("```mermaid", StringComparison.Ordinal)) throw new IOException("The library export lost editable Mermaid.");
+            if (exportedLibrary.Snippets.Single(item => item.Label == "Reusable selected source").Content != capturedTemplate)
+                throw new IOException("Saving the selected source as a snippet did not retain the same portable content as its template.");
             Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Native reusable source";
             Wait(() => Find(contentLibrary, "UseContentEntry").IsEnabled, "The saved native template was not selectable.");
             contentLibrary.CaptureToFile(Path.Combine(output, "native-content-library.png"));
