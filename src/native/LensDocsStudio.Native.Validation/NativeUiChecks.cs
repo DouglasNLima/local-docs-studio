@@ -164,15 +164,17 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "A new unsaved document did not open.");
             var previousClipboard = System.Windows.Clipboard.GetDataObject();
+            uint ownedClipboardSequence = 0;
             try
             {
                 var bitmap = System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null,
                     new byte[] { 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255 }, 8);
                 System.Windows.Clipboard.SetImage(bitmap);
+                ownedClipboardSequence = GetClipboardSequenceNumber();
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("![pasted-image](assets/images/", StringComparison.Ordinal), "Clipboard image did not persist into the unsaved document.");
             }
-            finally { if (previousClipboard is not null) { try { System.Windows.Clipboard.SetDataObject(previousClipboard, true); } catch (ExternalException) { } } }
+            finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
             var imageDocument = Path.Combine(runRoot, "Image document.md");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             SaveThroughDialogue(imageDocument);
@@ -184,6 +186,35 @@ internal static class NativeUiChecks
             checks.Add("Clipboard image in an unsaved document is finalised into a portable image when saved through the native dialogue");
             FocusWindow(window); Find(window, "NavigateBack").Click();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Back did not return from the image document.");
+            var imageTab = window.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem).And(cf.ByName("Image document.md"))) ?? throw new InvalidOperationException("The image document tab is unavailable.");
+            imageTab.Patterns.SelectionItem.Pattern.Select();
+            previousClipboard = System.Windows.Clipboard.GetDataObject(); ownedClipboardSequence = 0;
+            try
+            {
+                Find(window, "DocumentImage0").RightClick();
+                AutomationElement? copyImage = null;
+                Wait(() => (copyImage = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("CopyDocumentImage")))) is not null, "The native image context menu did not open.");
+                copyImage!.Click();
+                Wait(() => Find(window, "Status").Name.StartsWith("Image copied.", StringComparison.Ordinal), "The rendered image was not copied to the Windows clipboard.");
+                ownedClipboardSequence = GetClipboardSequenceNumber();
+                if (System.Windows.Clipboard.GetImage() is not { PixelWidth: 2, PixelHeight: 2 }) throw new IOException("The clipboard does not contain the rendered image pixels.");
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The destination image draft did not open.");
+                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("![pasted-image](assets/images/", StringComparison.Ordinal), "The copied document image was not pasted into the new draft.");
+                var copiedDocument = Path.Combine(runRoot, "Copied image document.md");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(copiedDocument);
+                Wait(() => File.Exists(copiedDocument), "The copied image document was not saved.");
+                var copiedReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(copiedDocument)).Single(l => l.IsImage).Reference;
+                var copiedPath = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(copiedDocument, copiedReference);
+                if (copiedPath.Equals(imagePath, StringComparison.OrdinalIgnoreCase) || !File.Exists(copiedPath) || !File.Exists(imagePath))
+                    throw new IOException("Copying the image did not retain independent portable assets for both documents.");
+                checks.Add("Rendered image context menu copies native pixels and paste/save creates an independent portable document image");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+            }
+            finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
+            sourceTab.Patterns.SelectionItem.Pattern.Select();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "The original document did not activate before session restoration.");
             window.Close();
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -260,6 +291,14 @@ internal static class NativeUiChecks
     }
     [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
     [DllImport("user32.dll")] private static extern uint GetWindowThreadProcessId(IntPtr window, out int processId);
+    [DllImport("user32.dll")] private static extern uint GetClipboardSequenceNumber();
+    private static void RestoreClipboard(System.Windows.IDataObject? previous, uint ownedSequence)
+    {
+        // Do not replace a clipboard update made by the user or another application during validation.
+        if (ownedSequence == 0 || GetClipboardSequenceNumber() != ownedSequence) return;
+        try { if (previous is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(previous, true); }
+        catch (ExternalException) { }
+    }
     private static void Wait(Func<bool> condition, string failure)
     {
         var timer = Stopwatch.StartNew();

@@ -23,7 +23,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
 {
     public PreviewResult Render(ParsedDocument parsed, string? sourcePath, string? workspaceRoot, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
-        IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null)
+        IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null)
     {
         var foreground = new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         var surface = new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
@@ -154,8 +154,14 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Image exceeds 32 MB.");
                             using var file = File.OpenRead(path);
                             var bitmap = LensDocsStudio.Native.Platform.NativeRasterService.Read(file);
-                            var image = new Image { Source = bitmap, Stretch = Stretch.Uniform, MaxWidth = 720, MaxHeight = 720, ToolTip = alt };
+                            var image = new Image { Source = bitmap, Stretch = Stretch.Uniform, MaxWidth = 720, MaxHeight = 720, ToolTip = alt, Focusable = true };
                             System.Windows.Automation.AutomationProperties.SetName(image, alt.Length == 0 ? "Document image" : alt);
+                            System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DocumentImage" + link.Span.Start);
+                            var menu = new ContextMenu();
+                            var copy = new MenuItem { Header = "Copy image", IsEnabled = copyImage is not null };
+                            System.Windows.Automation.AutomationProperties.SetAutomationId(copy, "CopyDocumentImage");
+                            copy.Click += (_, _) => copyImage?.Invoke(bitmap);
+                            menu.Items.Add(copy); image.ContextMenu = menu;
                             target.Add(new InlineUIContainer(image));
                         }
                         catch (Exception ex) when (ex is IOException or NotSupportedException or ArgumentException or System.Runtime.InteropServices.COMException)

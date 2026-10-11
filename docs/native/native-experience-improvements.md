@@ -15,6 +15,7 @@
 | Recoverable deletion and snapshots | High / medium | Retain saved/unsaved text and local image copies, inspect snapshots in a native browser, restore as a new draft and explicitly choose the saved destination; actual deletion and recovery UI pass |
 | Images before the first save | High / medium | Persist PNG assets with draft recovery and finalise portable paths during Save; source anchors protect edits made while loading |
 | Explicit image URL insertion | Medium / medium | HTTPS download only after the user's command, bounded transfer and redirects, native raster validation and portable persistence before insertion; transport and real image decoding checks pass |
+| Copy rendered images between documents | High / low | Native image context menu writes pixels to the Windows clipboard; paste/save persists an independent asset. Actual desktop automation checks both saved image files |
 | Native DOCX/PDF, clipboard formats | High / medium | Inspect actual outputs and format contracts |
 | Signed user-controlled updates | High / high | Integrated separate check/download/install controls and native settings; policy tests pass; production credentials and signed upgrade certification external |
 | Per-user installer, coexistence and files in use | High / medium | Separate product identity, optional Open with, graceful-close mutex; actual install/uninstall/reinstall validated on development host |

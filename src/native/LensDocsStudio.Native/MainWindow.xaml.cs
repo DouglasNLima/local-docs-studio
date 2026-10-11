@@ -143,7 +143,7 @@ public partial class MainWindow : Window
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source;
-            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.EffectivePath, tab.EffectiveWorkspace, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings);
+            rendered = new NativeMarkdownRenderer(svg).Render(parsed, tab.EffectivePath, tab.EffectiveWorkspace, dark, prepared.results, Navigate, ExportDiagram, nativeDrawings, CopyDocumentImage);
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
             model.PreviewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
@@ -361,6 +361,15 @@ public partial class MainWindow : Window
         if (e.Command != ApplicationCommands.Paste || model.IsBusy) return;
         try { if (Clipboard.ContainsImage()) { e.CanExecute = true; e.Handled = true; } }
         catch (System.Runtime.InteropServices.ExternalException) { }
+    }
+    private void CopyDocumentImage(BitmapSource bitmap)
+    {
+        try
+        {
+            Clipboard.SetImage(bitmap);
+            model.Status = "Image copied. Paste it into a document to create a portable local asset.";
+        }
+        catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
     }
     private async void ExecuteImagePaste(object sender, ExecutedRoutedEventArgs e)
     {

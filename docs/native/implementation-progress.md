@@ -15,7 +15,7 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 - WPF workspace tree, native pickers, tabs, recent paths, Back/Forward viewports, internal document/heading links, outline, focused editor/preview search, AvalonEdit formatting and source-aware native preview.
 - File/folder creation, reviewed document rename/move with incoming/outgoing Markdown link updates, rollback and named recovery drafts. Actual unsaved linked edits survive the save/replan/review flow.
 - Confirmed Windows deletion with separate saved/unsaved snapshots; a native snapshot browser restores new drafts for explicit Save as. Local images are copied into snapshots where possible, with warnings for missing assets. Manual and pre-reload snapshots use the same store.
-- Persistent clipboard/drop/local images, draft asset recovery and portable Save as. Explicit HTTPS image downloads have bounded size, redirects and timeouts; no document content, cookies or local paths are sent. Native raster dimensions are checked before the decoded pixel cache is allocated.
+- Persistent clipboard/drop/local images, draft asset recovery and portable Save as. Rendered images have a native Copy image context action; paste/save in another document creates an independent portable asset. Explicit HTTPS image downloads have bounded size, redirects and timeouts; no document content, cookies or local paths are sent. Native raster dimensions are checked before the decoded pixel cache is allocated.
 - Browser-free Mermaider rendering, native SVG validation, frozen drawing caches, background STA preparation, zoom and SVG/PNG exports. Forty light/dark corpus cases pass.
 - Bounded ZIP, DOCX, HTML and PDF text imports; guarded DOCX, HTML, local PDF and generic Markdown Bundle exports. Template styles and package headers/footers/media are preserved, with full template contracts still incomplete.
 - Fluent light/dark/system controls, high-contrast resources, working-area sizing and saved window placement. Operation and preview status are separate so preview completion cannot hide recovery feedback.
@@ -26,7 +26,7 @@ Current milestone: native filesystem editing, recovery and asset workflows. This
 
 - Local Release build: no warnings/errors. Core: 104 tests pass, including remote-image policy and streamed-size/cancellation cases.
 - Native integration: 40 diagram cases, unsafe SVG rejection, actual DOCX/PDF/HTML outputs, eight image/operation checks, and a valid oversized PNG rejected by its dimensions.
-- Desktop harness: 15 outcomes passed again after the image-download/raster changes, including image persistence, Windows deletion and unsaved-text restoration. The remote transport itself uses deterministic simulated responses in integration tests.
+- Desktop harness: 16 outcomes pass, including copying actual rendered pixels into a second document and preserving both saved image files. The remote transport itself uses deterministic simulated responses in integration tests.
 - All four native/web CI runs passed at ecc5fba. At c7467b4, both native CI runs and web PR CI passed; web push failed two Edge readiness checks with refused local-server connections.
 - The local web follow-up uses HTTP/1.1, a larger connection queue and retained failure traces. Static checks passed; the full browser run passed 250 tests and failed four. Two failures exposed an asynchronous menu-test race, now corrected, and two reported closed browser processes. All four passed on a focused rerun. Fresh CI is required; no web runtime source changed.
 

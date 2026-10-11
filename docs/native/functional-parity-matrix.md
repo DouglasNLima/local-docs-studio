@@ -14,7 +14,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | Editor/preview/split, outline, search, source following | Native panels and span mapping | Incomplete |
 | Mermaid types, styles, subgraphs, themes, invalid input | Mermaider plus native SVG adapter | In progress |
 | Mermaid zoom/copy/SVG/PNG | Native drawing window and guarded bitmap/vector export | Partial: native zoom UI and SVG/PNG corpus pass; destination clipboard validation remains |
-| Portable local images, paste/drop/URL, assets | Persistent draft assets, guarded Save as, explicit HTTPS downloads and relative paths | Partial: persistence/download/raster checks pass; asset management and clipboard transfer remain |
+| Portable local images, paste/drop/URL, assets | Persistent draft assets, guarded Save as, explicit HTTPS downloads and native image copying | Partial: persistence/download/raster checks and copying between documents pass; asset management and rich Markdown/image clipboard transfer remain |
 | External changes, conflict flow, snapshots/recovery | Fingerprints, journals and a native snapshot browser | Partial: saved/unsaved text and local image copies retained; recovery opens new drafts; broader crash certification remains |
 | Internal links, insertion, back/forward, wikilinks | Workspace bounded resolution, searchable document/heading picker | Native insertion and navigation checks pass; wikilinks remain |
 | Review/governance, links/assets audit, docs map | Source-aware analysis | Incomplete |
