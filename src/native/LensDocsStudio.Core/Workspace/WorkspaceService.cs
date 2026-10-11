@@ -6,8 +6,9 @@ public sealed record WorkspaceListing(IReadOnlyList<WorkspaceEntry> Entries, IRe
 public sealed class WorkspaceService
 {
     public static bool IsDocument(string path) => Path.GetExtension(path).ToLowerInvariant() is ".md" or ".markdown" or ".mmd" or ".mermaid" or ".txt";
+    public static bool IsRasterImage(string path) => Path.GetExtension(path).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".gif" or ".bmp" or ".webp";
 
-    public Task<WorkspaceListing> EnumerateAsync(WorkspacePath workspace, CancellationToken cancellationToken = default) =>
+    public Task<WorkspaceListing> EnumerateAsync(WorkspacePath workspace, CancellationToken cancellationToken = default, bool includeImages = false, string? excludedDirectory = null) =>
         Task.Run(() =>
         {
             var warnings = new List<string>();
@@ -26,8 +27,8 @@ public sealed class WorkspaceService
                         var name = Path.GetFileName(entry);
                         if (name is ".git" or "node_modules" or "bin" or "obj" || (File.GetAttributes(entry) & FileAttributes.ReparsePoint) != 0) continue;
                         var folder = Directory.Exists(entry);
-                        if (folder) entries.Add(new(name, entry, true, Walk(entry, depth + 1)));
-                        else if (IsDocument(entry)) entries.Add(new(name, entry, false, []));
+                        if (folder && !entry.Equals(excludedDirectory, StringComparison.OrdinalIgnoreCase)) entries.Add(new(name, entry, true, Walk(entry, depth + 1)));
+                        else if (!folder && (IsDocument(entry) || includeImages && IsRasterImage(entry))) entries.Add(new(name, entry, false, []));
                     }
                 }
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { warnings.Add("An unreadable folder was skipped: " + Path.GetRelativePath(workspace.Root, directory)); }

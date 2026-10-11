@@ -50,6 +50,7 @@
     <MenuItem Header="_Reload from disk" Command="{Binding ReloadCommand}"/>
     <MenuItem Header="Take snapshot" Command="{Binding TakeSnapshotCommand}" AutomationProperties.AutomationId="TakeSnapshot"/>
     <MenuItem Header="Document snapshots…" Command="{Binding BrowseSnapshotsCommand}" AutomationProperties.AutomationId="BrowseSnapshots"/>
+    <MenuItem Header="Workspace images…" Command="{Binding BrowseAssetsCommand}" AutomationProperties.AutomationId="BrowseAssets"/>
     <MenuItem Header="Rename or move document…" InputGestureText="F2" Command="{Binding MoveDocumentCommand}" AutomationProperties.AutomationId="MoveDocument"/>
     <MenuItem Header="Delete document…" Command="{Binding DeleteDocumentCommand}" AutomationProperties.AutomationId="DeleteDocument"/>
     <MenuItem Header="Reveal in File _Explorer" Click="RevealFile"/>

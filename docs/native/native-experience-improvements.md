@@ -16,6 +16,7 @@
 | Images before the first save | High / medium | Persist PNG assets with draft recovery and finalise portable paths during Save; source anchors protect edits made while loading |
 | Explicit image URL insertion | Medium / medium | HTTPS download only after the user's command, bounded transfer and redirects, native raster validation and portable persistence before insertion; transport and real image decoding checks pass |
 | Copy rendered images between documents | High / low | Native image context menu writes pixels to the Windows clipboard; paste/save persists an independent asset. Actual desktop automation checks both saved image files |
+| Workspace image management | High / medium | Native preview/reference list, reviewed Markdown reference updates and removal with exact binary recovery copies. Incomplete audits block removal; HTML references block automatic rename. Core success/failure checks pass; new desktop workflow awaits an available interactive session or CI |
 | Native DOCX/PDF, clipboard formats | High / medium | Inspect actual outputs and format contracts |
 | Signed user-controlled updates | High / high | Integrated separate check/download/install controls and native settings; policy tests pass; production credentials and signed upgrade certification external |
 | Per-user installer, coexistence and files in use | High / medium | Separate product identity, optional Open with, graceful-close mutex; actual install/uninstall/reinstall validated on development host |
