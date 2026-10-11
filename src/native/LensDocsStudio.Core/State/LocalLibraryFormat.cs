@@ -83,8 +83,8 @@ public static class LocalLibraryFormat
             if (profile.DocsSite is { } site)
             {
                 Label(site.Title, 512, "Docs Site title");
-                if (site.Description is null || site.Description.Length > 2048 || site.Description.Any(character => char.IsControl(character) && character is not ('\r' or '\n' or '\t')))
-                    throw new InvalidDataException("Use a Docs Site description of up to 2,048 characters without control characters.");
+                if (site.Description is null || site.Description.Length > 8192 || site.Description.Any(character => char.IsControl(character) && character is not ('\r' or '\n' or '\t')))
+                    throw new InvalidDataException("Use a Docs Site description of up to 8,192 characters without control characters.");
                 if (site.Theme is not ("system" or "light" or "dark")) throw new InvalidDataException("The Docs Site theme must be system, light or dark.");
             }
         }

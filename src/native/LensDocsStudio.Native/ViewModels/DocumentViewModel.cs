@@ -17,7 +17,8 @@ public partial class DocumentViewModel : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
     public string? RecoveryKey { get; set; }
     public string? AssetWorkspace { get; set; }
-    public string? EffectivePath => FilePath ?? (AssetWorkspace is null ? null : Path.Combine(AssetWorkspace, "Untitled.md"));
+    public string? EffectivePath => FilePath ?? (AssetWorkspace is null ? null : Path.Combine(AssetWorkspace,
+        Path.GetExtension(DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid" ? "Untitled.mmd" : "Untitled.md"));
     public string? EffectiveWorkspace => FilePath is null ? AssetWorkspace : WorkspaceRoot;
     public int CaretOffset { get; set; }
     public double VerticalOffset { get; set; }

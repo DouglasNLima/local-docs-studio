@@ -16,8 +16,9 @@ public partial class MainWindow
     private async void ExportDocsSite(object sender, RoutedEventArgs e)
     {
         if (model.WorkspaceRoot is not { } root) { dialogs.Error("Open a workspace folder before exporting a Docs Site."); return; }
-        var options = new DocsSiteWindow(Path.GetFileName(root)) { Owner = this };
+        var options = new DocsSiteWindow(Path.GetFileName(root), recentDocsSiteOptions ?? activeExportProfile?.DocsSite) { Owner = this };
         if (options.ShowDialog() != true) return;
+        recentDocsSiteOptions = new(options.Options.Title, options.Options.Description, options.Options.Theme);
         var picker = new SaveFileDialog { Title = "Save Docs Site", Filter = "Docs Site ZIP|*.zip", FileName = "documentation-site.zip", AddExtension = true, DefaultExt = ".zip" };
         if (picker.ShowDialog(this) != true) return;
         if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for a Docs Site."); return; }

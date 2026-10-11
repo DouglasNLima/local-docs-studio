@@ -43,6 +43,9 @@
     </MenuItem>
     <MenuItem Header="Clear recent lists" Command="{Binding ClearRecentPathsCommand}"/>
     <MenuItem Header="Import Markdown _bundle…" Click="ImportBundle"/>
+    <MenuItem Header="Content _library…" Click="ManageContentLibrary" AutomationProperties.AutomationId="ManageContentLibrary"/>
+    <MenuItem Header="Save document as template…" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveDocumentTemplate"/>
+    <MenuItem Header="Save selection as snippet…" Tag="snippet" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveMarkdownSnippet"/>
     <MenuItem Header="_Import DOCX, HTML or PDF…" Click="ImportDocument"/>
     <Separator/>
     <MenuItem Header="_Save" InputGestureText="Ctrl+S" Command="{Binding SaveCommand}"/>
@@ -116,6 +119,15 @@
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
+    <MenuItem Header="Export _profiles" AutomationProperties.AutomationId="ExportProfilesMenu">
+     <MenuItem x:Name="CurrentExportProfile" Header="Profile: Generic documentation (this session)" IsEnabled="False"/>
+     <MenuItem Header="Generic documentation" Tag="generic" Click="ApplyBuiltInProfile" AutomationProperties.AutomationId="GenericExportProfile"/>
+     <MenuItem Header="Azure DevOps Wiki Markdown" Tag="devops" Click="ApplyBuiltInProfile" AutomationProperties.AutomationId="DevOpsExportProfile"/>
+     <MenuItem Header="GitHub Pages Docs Site" Tag="docs-site" Click="ApplyBuiltInProfile" AutomationProperties.AutomationId="DocsSiteExportProfile"/>
+     <Separator/>
+     <MenuItem Header="Saved profiles…" Tag="profiles" Click="ManageContentLibrary" AutomationProperties.AutomationId="ManageExportProfiles"/>
+     <MenuItem Header="Save current profile…" Click="SaveLibraryProfile" AutomationProperties.AutomationId="SaveExportProfile"/>
+    </MenuItem>
     <Separator/>
     <MenuItem Header="Word template _library…" Click="ManageWordTemplates" AutomationProperties.AutomationId="ManageWordTemplates"/>
     <MenuItem Header="Select Word _template…" Click="SelectWordTemplate" AutomationProperties.AutomationId="SelectWordTemplate"/>

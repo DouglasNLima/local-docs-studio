@@ -916,6 +916,100 @@ internal static class NativeUiChecks
             NativeWordTemplateChecks.Check(File.ReadAllBytes(libraryExport), templatePixels);
             if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
                 throw new IOException("The Word template library changed source documents or the imported original.");
+            Find(window, "FileMenu").Click(); Find(window, "SaveDocumentTemplate").Patterns.Invoke.Pattern.Invoke();
+            NameLibraryEntry("Save document template", "Template name", "Native reusable source");
+            Wait(() => Find(window, "Status").Name == "Saved template: Native reusable source", "The current native document did not save to the content library.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+            Find(window, "FileMenu").Click(); Find(window, "SaveMarkdownSnippet").Patterns.Invoke.Pattern.Invoke();
+            NameLibraryEntry("Save Markdown snippet", "Snippet name", "Reusable selected source");
+            Wait(() => Find(window, "Status").Name == "Saved snippet: Reusable selected source", "The selected Markdown did not save as a reusable snippet.");
+            var contentLibrary = OpenContentLibrary(window);
+            var browserLibraryBytes = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "Fixtures", "native-local-library.json"));
+            var browserLibraryPath = Path.Combine(runRoot, "browser-library.json"); File.WriteAllBytes(browserLibraryPath, browserLibraryBytes);
+            Find(contentLibrary, "ImportContentLibrary").AsButton().Invoke(); OpenThroughDialogue(browserLibraryPath, "Import content library");
+            Wait(() => Find(contentLibrary, "ContentLibraryStatus").Name.StartsWith("Imported 3 entries;", StringComparison.Ordinal), "The browser library did not merge through the native import dialogue.");
+            Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Café handbook";
+            Wait(() => Find(contentLibrary, "UseContentEntry").IsEnabled, "The imported template did not appear in the native library.");
+            Find(contentLibrary, "RenameContentEntry").AsButton().Invoke(); NameLibraryEntry("Rename library entry", "Library name", "Migrated Café handbook");
+            Wait(() => Find(contentLibrary, "ContentLibraryStatus").Name == "Library entry renamed.", "The imported content entry did not rename.");
+            Find(contentLibrary, "ArchiveContentEntry").AsButton().Invoke();
+            Wait(() => Find(contentLibrary, "ContentLibraryStatus").Name.StartsWith("Entry archived.", StringComparison.Ordinal), "The imported content entry did not archive.");
+            Find(contentLibrary, "ArchivedContentLibrary").Patterns.Toggle.Pattern.Toggle();
+            Wait(() => Find(contentLibrary, "ArchiveContentEntry").Name == "Restore" && Find(contentLibrary, "ArchiveContentEntry").IsEnabled,
+                "The archived content entry was not available for restoration.");
+            Find(contentLibrary, "ArchiveContentEntry").AsButton().Invoke();
+            Wait(() => Find(contentLibrary, "ContentLibraryStatus").Name == "Entry restored to the active library.", "The archived content entry did not restore.");
+            Find(contentLibrary, "ArchivedContentLibrary").Patterns.Toggle.Pattern.Toggle();
+            Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "";
+            Find(contentLibrary, "ExportContentLibrary").AsButton().Invoke();
+            var contentExport = Path.Combine(runRoot, "exported-content-library.json"); SaveThroughDialogue(contentExport, "Export content library");
+            Wait(() => File.Exists(contentExport) && Find(contentLibrary, "ContentLibraryStatus").Name.StartsWith("Exported all active", StringComparison.Ordinal),
+                "The native content library did not export its active entries.");
+            var exportedLibrary = LensDocsStudio.Core.State.LocalLibraryFormat.Read(File.ReadAllBytes(contentExport));
+            if (exportedLibrary.Templates.Length != 2 || exportedLibrary.Snippets.Length != 2 || exportedLibrary.Profiles.Length != 1
+                || !exportedLibrary.Templates.Single(item => item.Label == "Native reusable source").Content.Contains("data:image/png;base64,", StringComparison.Ordinal)
+                || !exportedLibrary.Templates.Single(item => item.Label == "Native reusable source").Content.Contains("```mermaid", StringComparison.Ordinal))
+                throw new IOException("The library export lost merged entries, embedded pixels or editable Mermaid.");
+            Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Native reusable source";
+            Wait(() => Find(contentLibrary, "UseContentEntry").IsEnabled, "The saved native template was not selectable.");
+            contentLibrary.CaptureToFile(Path.Combine(output, "native-content-library.png"));
+            Find(contentLibrary, "UseContentEntry").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name.StartsWith("Opened a new document from Native reusable source.", StringComparison.Ordinal), "The template did not create a new native document.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            var createdFromLibrary = Path.Combine(runRoot, "Library created.md"); SaveThroughDialogue(createdFromLibrary);
+            Wait(() => File.Exists(createdFromLibrary), "The template-created document did not save.");
+            var createdSource = File.ReadAllText(createdFromLibrary);
+            if (!createdSource.Contains("Native UI validation — Café", StringComparison.Ordinal) || !createdSource.Contains("```mermaid", StringComparison.Ordinal)
+                || createdSource.Contains("data:image/", StringComparison.Ordinal)) throw new IOException("The template-created document lost editable source or failed to materialise images.");
+            var createdImages = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(createdSource).Where(link => link.IsImage).ToArray();
+            if (createdImages.Length == 0 || createdImages.Any(link => !File.Exists(new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(createdFromLibrary, link.Reference))))
+                throw new IOException("The library-created document has missing portable image assets.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == templateSource, "Template creation or saving lost the previous document navigation state.");
+            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            contentLibrary = OpenContentLibrary(window); Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Select("Markdown snippets");
+            Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Collapse();
+            Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Reusable selected source";
+            Find(contentLibrary, "UseContentEntry").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name == "Inserted snippet: Reusable selected source", "The saved snippet did not insert into its original document.");
+            var withSnippet = editor.Patterns.Value.Pattern.Value.Value;
+            if (withSnippet == templateSource) throw new IOException("Snippet insertion did not change editor content.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == templateSource, "One Undo did not restore source before snippet insertion.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == withSnippet, "Snippet Redo did not restore the whole insertion.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == templateSource, "Snippet validation did not restore the original source.");
+            var preferencesBeforeProfile = File.ReadAllBytes(Path.Combine(state, "preferences.json"));
+            contentLibrary = OpenContentLibrary(window); Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Select("Export profiles");
+            Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Collapse(); Find(contentLibrary, "UseContentEntry").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name == "Applied export profile: Team documentation. Current session only.", "The imported export profile did not apply.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportDocsSite").Patterns.Invoke.Pattern.Invoke();
+            Window? profileSite = null;
+            Wait(() => (profileSite = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Export Docs Site")))?.AsWindow()) is not null,
+                "The profiled Docs Site dialogue did not open.");
+            if (Find(profileSite!, "DocsSiteTitle").AsTextBox().Text != "Café documentation"
+                || profileSite!.FindFirstDescendant(cf => cf.ByName("Site description"))!.AsTextBox().Text != "A portable team handbook.")
+                throw new IOException("The imported profile did not supply its Docs Site defaults.");
+            FocusWindow(profileSite!); Keyboard.Type(VirtualKeyShort.ESCAPE);
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Export Docs Site"))) is null,
+                "The profiled Docs Site dialogue did not cancel.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
+            var profiledBundle = Path.Combine(runRoot, "profile-bundle.zip"); SaveThroughDialogue(profiledBundle, "Export Markdown bundle");
+            Wait(() => File.Exists(profiledBundle) && Find(window, "Status").Name.EndsWith("Azure DevOps Mermaid formatting applied.", StringComparison.Ordinal),
+                "The selected profile did not affect the actual Markdown bundle.");
+            using (var archive = System.IO.Compression.ZipFile.OpenRead(profiledBundle))
+            using (var entry = new StreamReader(archive.GetEntry("fixture.md")!.Open()))
+                if (entry.ReadToEnd() != LensDocsStudio.Core.Exports.DevOpsMarkdownExporter.Convert(templateSource, "fixture.md"))
+                    throw new IOException("The profiled bundle did not retain the exact expected current Markdown source.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportProfilesMenu").Click(); Find(window, "SaveExportProfile").Patterns.Invoke.Pattern.Invoke();
+            NameLibraryEntry("Save export profile", "Profile name", "Native saved profile");
+            Wait(() => Find(window, "Status").Name == "Saved export profile: Native saved profile", "The native export profile did not save to the library.");
+            Find(window, "ExportMenu").Click(); Find(window, "ExportProfilesMenu").Click(); Find(window, "GenericExportProfile").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(window, "Status").Name == "Applied export profile: Generic documentation. Current session only.", "The generic export profile did not reset session overrides.");
+            if (!File.ReadAllBytes(Path.Combine(state, "preferences.json")).SequenceEqual(preferencesBeforeProfile) || File.ReadAllText(source) != templateSavedSource
+                || editor.Patterns.Value.Pattern.Value.Value != templateSource || !File.ReadAllBytes(browserLibraryPath).SequenceEqual(browserLibraryBytes))
+                throw new IOException("Library or profile actions changed persisted preferences, original JSON or source documents.");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -931,6 +1025,12 @@ internal static class NativeUiChecks
             Find(libraryWindow, "DefaultLibraryTemplate").AsButton().Invoke();
             Wait(() => Find(window, "Status").Name == "Default Word styles selected", "The library did not restore default Word styles.");
             checks.Add("Native template library imports, renames, saves reusable copies, archives/restores, exports with retained formatting and survives restart without changing original files");
+            contentLibrary = OpenContentLibrary(window);
+            Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Select("Export profiles"); Find(contentLibrary, "ContentLibraryCategory").AsComboBox().Collapse();
+            Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Native saved profile";
+            Wait(() => Find(contentLibrary, "UseContentEntry").IsEnabled, "The saved native content library did not survive restart.");
+            contentLibrary.Close();
+            checks.Add("Native content library saves portable templates/snippets, merges browser JSON, renames/archives/restores, exports and survives restart; new tabs and snippet Undo preserve source while session profiles control actual bundle output");
             Find(window, "HelpMenu").Click();
             Find(window, "UpdatesMenu").Click();
             Window? updateWindow = null;
@@ -1037,6 +1137,23 @@ internal static class NativeUiChecks
             Wait(() => (library = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Word template library")))?.AsWindow()) is not null,
                 "The native Word template library did not open.");
             return library!;
+        }
+        Window OpenContentLibrary(Window main)
+        {
+            Find(main, "FileMenu").Click(); Find(main, "ManageContentLibrary").Patterns.Invoke.Pattern.Invoke();
+            Window? library = null;
+            Wait(() => (library = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Content library")))?.AsWindow()) is not null,
+                "The native content library did not open.");
+            return library!;
+        }
+        void NameLibraryEntry(string title, string label, string value)
+        {
+            Window? prompt = null;
+            Wait(() => (prompt = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null,
+                "The library naming dialogue did not open: " + title);
+            var input = Find(prompt!, "WorkspacePathInput").AsTextBox();
+            if (input.Name != label) throw new IOException("The library naming dialogue has an incorrect accessible label.");
+            input.Text = value; Find(prompt!, "ConfirmWorkspacePath").AsButton().Invoke();
         }
         void NameTemplate(string title, string previous, string next)
         {

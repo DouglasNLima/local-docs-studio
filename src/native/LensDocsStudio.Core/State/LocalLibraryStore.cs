@@ -63,6 +63,14 @@ public sealed class LocalLibraryStore(string directory)
         return new(saved, merge.Added, merge.AlreadyPresent, merge.ReassignedIds);
     }
 
+    public async Task<LocalLibraryImport> ImportFileAsync(LocalLibrarySnapshot expected, string path, CancellationToken cancellationToken = default)
+    {
+        await using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, FileOptions.Asynchronous);
+        if (input.Length > LocalLibraryFormat.MaximumFileBytes) throw new InvalidDataException("The library JSON exceeds 16 MB.");
+        var bytes = await MarkdownBundleService.ReadBoundedAsync(input, LocalLibraryFormat.MaximumFileBytes, cancellationToken);
+        return await ImportAsync(expected, bytes, cancellationToken);
+    }
+
     public Task<LocalLibrarySnapshot> RenameAsync(LocalLibrarySnapshot expected, LocalLibraryKind kind, string id, string name, bool archived = false,
         CancellationToken cancellationToken = default)
     {

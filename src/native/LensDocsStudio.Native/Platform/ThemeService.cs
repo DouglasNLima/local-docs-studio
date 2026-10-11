@@ -6,8 +6,8 @@ namespace LensDocsStudio.Native.Platform;
 
 public static class ThemeService
 {
-    private static ResourceDictionary? fluent;
-    private static string? appliedTheme;
+    private sealed record AppliedTheme(string Variant, ResourceDictionary Dictionary);
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ResourceDictionary, AppliedTheme> Themes = new();
     public static bool IsDark(string theme)
     {
         if (SystemParameters.HighContrast)
@@ -23,11 +23,12 @@ public static class ThemeService
     {
         var dark = IsDark(theme);
         var variant = theme == "System" ? "Fluent" : dark ? "Fluent.Dark" : "Fluent.Light";
-        if (fluent is null || appliedTheme != variant)
+        Themes.TryGetValue(resources, out var applied);
+        if (applied?.Variant != variant || !resources.MergedDictionaries.Contains(applied.Dictionary))
         {
-            if (fluent is not null) resources.MergedDictionaries.Remove(fluent);
-            fluent = new ResourceDictionary { Source = new Uri($"pack://application:,,,/PresentationFramework.Fluent;component/Themes/{variant}.xaml", UriKind.Absolute) };
-            resources.MergedDictionaries.Add(fluent); appliedTheme = variant;
+            if (applied is not null) resources.MergedDictionaries.Remove(applied.Dictionary);
+            var fluent = new ResourceDictionary { Source = new Uri($"pack://application:,,,/PresentationFramework.Fluent;component/Themes/{variant}.xaml", UriKind.Absolute) };
+            resources.MergedDictionaries.Add(fluent); Themes.Remove(resources); Themes.Add(resources, new(variant, fluent));
         }
         foreach (var (key, light, night) in new[] {
             ("WindowBrush", "#FAFAFA", "#202124"), ("PanelBrush", "#F3F4F6", "#292B2F"),

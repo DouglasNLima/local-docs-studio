@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\LensDocsStudio.Native\LensDocsStudio.Native.csproj" />
+    <Content Include="..\..\..\tests\fixtures\native-local-library.json" Link="Fixtures\native-local-library.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

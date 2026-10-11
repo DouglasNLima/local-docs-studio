@@ -73,7 +73,7 @@ public sealed class MarkdownBundleService
     }
 
     public async Task<byte[]> ExportAsync(WorkspacePath workspace, IReadOnlyDictionary<string, string>? editedDocuments = null,
-        CancellationToken cancellationToken = default, string? excludedDirectory = null)
+        CancellationToken cancellationToken = default, string? excludedDirectory = null, bool devopsMarkdown = false)
     {
         excludedDirectory = excludedDirectory is null ? null : Path.TrimEndingDirectorySeparator(Path.GetFullPath(excludedDirectory));
         if (excludedDirectory is not null && WorkspacePath.ContainsOrEquals(excludedDirectory, workspace.Root))
@@ -103,6 +103,13 @@ public sealed class MarkdownBundleService
                     await using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read, 65536, FileOptions.Asynchronous);
                     if (input.Length > MaxEntryBytes) throw new IOException("A bundle file exceeds 32 MB.");
                     bytes = await ReadBoundedAsync(input, MaxEntryBytes, cancellationToken);
+                }
+                if (devopsMarkdown && Path.GetExtension(path).ToLowerInvariant() is ".md" or ".markdown")
+                {
+                    var snapshot = Documents.DocumentSnapshot.FromBytes(path, bytes);
+                    var converted = Exports.DevOpsMarkdownExporter.Convert(snapshot.Text, path, cancellationToken);
+                    bytes = Documents.DocumentSnapshot.Encode(converted, snapshot.Utf8Bom);
+                    if (bytes.Length > MaxEntryBytes) throw new IOException("A converted Markdown document exceeds 32 MB.");
                 }
                 if ((total += bytes.Length) > MaxTotalBytes) throw new IOException("The bundle exceeds 256 MB.");
                 var entry = archive.CreateEntry(relative, CompressionLevel.Optimal);

@@ -120,7 +120,7 @@ public partial class MainWindow : Window
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
         var dark = ThemeService.IsDark(model.Theme);
-        var standalone = Path.GetExtension(tab.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid";
+        var standalone = Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var acquired = false;
         try
         {

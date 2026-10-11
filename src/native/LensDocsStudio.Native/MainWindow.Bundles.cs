@@ -34,9 +34,10 @@ public partial class MainWindow
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             model.Status = "Preparing Markdown bundle…";
-            var bytes = await bundles.ExportAsync(new WorkspacePath(root), edited, model.OperationToken, model.StateDirectory);
+            var bytes = await bundles.ExportAsync(new WorkspacePath(root), edited, model.OperationToken, model.StateDirectory, activeExportProfile?.DevopsMarkdownExport == true);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
-            model.Status = "Markdown bundle exported with current editor text and portable assets.";
+            model.Status = "Markdown bundle exported with current editor text and portable assets."
+                + (activeExportProfile?.DevopsMarkdownExport == true ? " Azure DevOps Mermaid formatting applied." : "");
         });
     }
 }
