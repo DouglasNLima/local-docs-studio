@@ -627,6 +627,19 @@ internal static class NativeUiChecks
                     || plainRange.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) is not int plainColour || stringColour == plainColour)
                     throw new IOException("The native preview did not expose distinct syntax colours through UI Automation.");
                 window.CaptureToFile(Path.Combine(output, "native-code-syntax.png"));
+                foreach (var theme in new[] { "Dark", "Light" })
+                {
+                    Find(window, "ViewMenu").Click(); Find(window, theme + "Theme").Patterns.Invoke.Pattern.Invoke();
+                    var colour = ((System.Windows.Media.SolidColorBrush)LensDocsStudio.Native.Rendering.CodeSyntaxColours.For(LensDocsStudio.Native.Rendering.CodeTokenRole.String, theme == "Dark")).Color;
+                    var expectedColour = colour.R | colour.G << 8 | colour.B << 16;
+                    Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("Café", false, false)
+                        ?.GetAttributeValue(automation.TextAttributeLibrary.ForegroundColor) is int actual && actual == expectedColour,
+                        "Changing the native theme did not redraw the code preview palette.");
+                    Wait(() => File.ReadAllText(Path.Combine(state, "preferences.json")).Contains("\"" + theme + "\"", StringComparison.Ordinal), "The chosen theme was not persisted.");
+                    if (editor.Patterns.Value.Pattern.Value.Value != contextMarkdown) throw new IOException("Changing the native theme altered editor source.");
+                    window.CaptureToFile(Path.Combine(output, "native-theme-" + theme.ToLowerInvariant() + ".png"));
+                }
+                checks.Add("Native theme menus redraw preview colours, retain editor source and persist the chosen theme");
                 OpenCodeContext("CopyCodeBlock").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "Code copied as plain text.", "The preview context command did not copy code.");
                 contextClipboardSequence = GetClipboardSequenceNumber();

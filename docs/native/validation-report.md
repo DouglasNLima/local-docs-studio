@@ -1,5 +1,13 @@
 # Native validation report
 
+## Editor colours and theme changes
+
+Five native control-layout checks pass through a hidden HWND: actual AvalonEdit runs meet 4.5:1 light/dark contrast, replace colours on redraw, preserve source/selection and use system text/highlight colours in high contrast. Highlighting now precedes selection styling; the previous ordering could overwrite the selected-text colour. Normal Lens selection uses orange with dark text. Oversized/malformed lines retain complete editable source. The malformed 4,096-character fixture laid out in approximately 9 ms on this host; this is not a broad latency certification. Evidence: artifacts/native/validation/native-editor-colours.json and native-editor-colours-light.png/native-editor-colours-dark.png. Both renders were visually inspected.
+
+An initial headless layout assertion saw no visual lines until a hidden native host was supplied. A later high-contrast assertion incorrectly treated the system's selected-text colour as ordinary text; it now checks selected/unselected spans separately and validates selection precedence. Release build has no warnings/errors and the full native harness passes. A new 31st desktop workflow changes themes through real menus, checks numeric preview colours, unchanged editor text and saved preferences; fresh CI remains pending. Local foreground acquisition is still unavailable.
+
+Both native CI runs at 23e50c0 pass (38173326880/38173323501), including 309 core tests, eight syntax outcomes, four browser export checks and all 30 desktop outcomes before installation and after installation/reinstallation. UI Automation verifies distinct code colours before exact code/Markdown clipboard checks. Evidence: artifacts/native/native-ci-23e50c0-pr.log and artifacts/native/ci-23e50c0-pr/ui. Web CI remains under observation.
+
 ## Native code syntax colouring
 
 Eight native checks pass across fourteen bundled language families. They verify background preparation, multiline comments, keywords/strings/numbers, exact selectable Unicode/CRLF source, source mapping, 4.5:1 contrast on both code surfaces, high-contrast inheritance, stale/unknown-language fallback, block/line/span/aggregate limits and cancellation. Copied rule graphs preserve recursive state without changing shared definitions; a pathological expression reaches its 25 ms timeout. First preparation in the focused run took approximately 150 ms; this is one host measurement, not a performance certification. Evidence: artifacts/native/validation/native-syntax.json and native-syntax-light.png/native-syntax-dark.png. Both page renders were visually inspected and remain legible/unclipped.

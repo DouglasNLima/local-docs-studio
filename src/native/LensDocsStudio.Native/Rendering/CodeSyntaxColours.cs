@@ -8,6 +8,8 @@ public static class CodeSyntaxColours
     private static readonly Brush[] Light = Palette("#202124", "#466147", "#166534", "#5B21B6", "#92400E", "#075985");
     private static readonly Brush[] Dark = Palette("#E8EAED", "#A3B89C", "#A6D69E", "#C7B3FF", "#E8C78F", "#91CDF2");
 
+    public static Brush For(CodeTokenRole role, bool dark) => (dark ? Dark : Light)[(int)role];
+
     public static void Add(InlineCollection target, string text, CodeSyntaxBlock? syntax, bool dark, bool highContrast)
     {
         if (syntax is null || syntax.Text != text || highContrast) { target.Add(new Run(text)); return; }

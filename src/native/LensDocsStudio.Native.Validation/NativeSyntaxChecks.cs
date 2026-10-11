@@ -118,7 +118,7 @@ internal static class NativeSyntaxChecks
             Limitation = "The 250 ms text-processing budget and cancellation are checked between bounded lines, with a 25 ms timeout per regular-expression match. Initial bundled-definition loading is separate. Export syntax colouring is separate."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
-    private static double Contrast(Color first, Color second)
+    internal static double Contrast(Color first, Color second)
     {
         double Luminance(Color colour)
         {

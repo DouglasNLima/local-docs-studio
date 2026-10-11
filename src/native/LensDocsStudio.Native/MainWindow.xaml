@@ -119,7 +119,7 @@
     <MenuItem Header="Select Word _template…" Click="SelectWordTemplate"/>
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate"/>
    </MenuItem>
-   <MenuItem Header="_View">
+   <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
     <MenuItem x:Name="BackMenu" Header="Go _back" InputGestureText="Alt+Left" Click="NavigateBack" IsEnabled="False"/>
     <MenuItem x:Name="ForwardMenu" Header="Go _forward" InputGestureText="Alt+Right" Click="NavigateForward" IsEnabled="False"/>
     <Separator/>
@@ -127,8 +127,8 @@
     <MenuItem Header="_Split" Tag="Split" Click="ChangeLayout"/>
     <MenuItem Header="_Preview" Tag="Preview" Click="ChangeLayout"/>
     <Separator/>
-    <MenuItem Header="_Light theme" Tag="Light" Click="ChangeTheme"/>
-    <MenuItem Header="_Dark theme" Tag="Dark" Click="ChangeTheme"/>
+    <MenuItem Header="_Light theme" Tag="Light" Click="ChangeTheme" AutomationProperties.AutomationId="LightTheme"/>
+    <MenuItem Header="_Dark theme" Tag="Dark" Click="ChangeTheme" AutomationProperties.AutomationId="DarkTheme"/>
     <MenuItem Header="_Windows theme" Tag="System" Click="ChangeTheme"/>
    </MenuItem>
    <MenuItem Header="_Help" AutomationProperties.AutomationId="HelpMenu"><MenuItem Header="_Updates…" Click="OpenUpdates" AutomationProperties.AutomationId="UpdatesMenu"/><MenuItem Header="_About the native preview" Click="About"/></MenuItem>

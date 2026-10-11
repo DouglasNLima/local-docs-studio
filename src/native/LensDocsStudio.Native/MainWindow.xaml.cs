@@ -32,6 +32,7 @@ public partial class MainWindow : Window
     private readonly ImageAssetService assets = new();
     private readonly PreviewImageService previewImages = new();
     private readonly EditorCompletionService completion;
+    private readonly MarkdownHighlighting editorHighlighting = new() { HighContrast = SystemParameters.HighContrast };
     private readonly SemaphoreSlim previewGate = new(1, 1);
     private readonly DispatcherTimer previewTimer = new() { Interval = TimeSpan.FromMilliseconds(300) };
     private readonly DispatcherTimer recoveryTimer = new() { Interval = TimeSpan.FromSeconds(2) };
@@ -54,7 +55,7 @@ public partial class MainWindow : Window
         WindowStateService.FitInitialWindow(this);
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
-        Editor.TextArea.TextView.LineTransformers.Add(new MarkdownHighlighting());
+        Editor.TextArea.TextView.LineTransformers.Insert(0, editorHighlighting);
         Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
@@ -77,7 +78,7 @@ public partial class MainWindow : Window
         if (Dispatcher.HasShutdownStarted) return;
         Dispatcher.BeginInvoke(() =>
         {
-            if (!closing) { ThemeService.Apply(Application.Current.Resources, model.Theme); QueuePreview(); }
+            if (!closing) { ApplyTheme(); QueuePreview(); }
         });
     }
 
@@ -85,7 +86,7 @@ public partial class MainWindow : Window
     {
         await model.InitialiseAsync(startupPaths);
         WindowStateService.Restore(this, model.Preferences.Window);
-        ThemeService.Apply(Application.Current.Resources, model.Theme);
+        ApplyTheme();
         SetLayout(model.Layout); BindActiveDocument(); QueuePreview(); Editor.Focus();
         InitialiseUpdates();
     }
@@ -441,7 +442,15 @@ public partial class MainWindow : Window
     private async void ChangeTheme(object sender, RoutedEventArgs e)
     {
         model.Theme = (string)((FrameworkElement)sender).Tag;
-        ThemeService.Apply(Application.Current.Resources, model.Theme); QueuePreview(); await SavePreferences();
+        ApplyTheme(); QueuePreview(); await SavePreferences();
+    }
+    private void ApplyTheme()
+    {
+        ThemeService.Apply(Application.Current.Resources, model.Theme);
+        editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
+        Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
+        Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
+        Editor.TextArea.TextView.Redraw();
     }
     private async void ChangeLayout(object sender, RoutedEventArgs e) { SetLayout((string)((FrameworkElement)sender).Tag); await SavePreferences(); }
     private void SetLayout(string layout)

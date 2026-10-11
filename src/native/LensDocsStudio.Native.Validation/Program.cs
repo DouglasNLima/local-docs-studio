@@ -46,6 +46,12 @@ internal static class Program
             try { NativeContextChecks.Run(contextOutput); Console.WriteLine("Native context integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--editor-colours")
+        {
+            var colourOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(colourOutput);
+            try { NativeEditorColourChecks.Run(colourOutput); Console.WriteLine("Native editor colour integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -92,6 +98,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native context actions: " + ex.Message); }
         try { NativeSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native syntax colouring: " + ex.Message); }
+        try { NativeEditorColourChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native editor colours: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())
