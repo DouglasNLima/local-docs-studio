@@ -14,9 +14,9 @@ internal static class NativeReviewChecks
 {
     public static void Run(string output)
     {
-        const string source = "# Review Café\r\n\r\n### Skipped\r\n\r\nColor and TODO remain.\r\n\r\n![](missing.png)\r\n\r\n[Missing](#absent)";
+        const string source = "# Review Café\r\n\r\n### Skipped\r\n\r\nColor and TODO remain.\r\n\r\n![](missing.png)\r\n\r\n[Missing](#absent)\r\n\r\n| A | B |\r\n|---|---|\r\n| One | Two | Extra |";
         var result = new DocumentReviewService().Analyse(source);
-        if (result.Issues.Count != 5) throw new IOException("The review fixture did not identify its five advisory notes.");
+        if (result.Issues.Count != 6 || result.Issues.Count(issue => issue.Rule == "Tables") != 1) throw new IOException("The review fixture did not identify its six advisory notes including the malformed table.");
         foreach (var dark in new[] { false, true })
         {
             var window = new DocumentReviewWindow(result);
@@ -37,6 +37,14 @@ internal static class NativeReviewChecks
             var container = (ListBoxItem?)list.ItemContainerGenerator.ContainerFromItem(marker);
             if (container is null || !AutomationProperties.GetName(container).Contains("TODO marker found", StringComparison.Ordinal))
                 throw new IOException("The native review item lacks its accessible message and source position.");
+            foreach (var issue in result.Issues)
+            {
+                list.ScrollIntoView(issue); surface.UpdateLayout();
+                var peers = new System.Windows.Automation.Peers.ListBoxAutomationPeer(list).GetChildren();
+                if (!peers.Any(peer => peer.GetName() == issue.AccessibleName))
+                    throw new IOException("A review note was missing from the accessibility tree after scrolling into view: " + issue.AccessibleName);
+            }
+            list.ScrollIntoView(result.Issues[0]); surface.UpdateLayout();
             if (!VirtualizingPanel.GetIsVirtualizing(list) || !((TextBlock)window.FindName("Summary")).Text.Contains("2 headings", StringComparison.Ordinal))
                 throw new IOException("Native review lost bounded list behaviour or document metrics.");
             var summary = (TextBlock)window.FindName("Summary");

@@ -7,8 +7,8 @@
   <TextBlock Text="Review current document" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,10"/>
   <TextBlock x:Name="Summary" Grid.Row="1" TextWrapping="Wrap" Margin="0,0,0,8" AutomationProperties.AutomationId="ReviewSummary"/>
   <StackPanel Grid.Row="2" Margin="0,0,0,12">
-   <TextBlock Text="Advisory checks: headings, Markdown image descriptions, prose spelling, TODO/FIXME and links to this document's headings or anchors." TextWrapping="Wrap"/>
-   <TextBlock Text="Workspace links, table structure, embedded HTML and diagram validity require separate checks." TextWrapping="Wrap" Margin="0,4,0,0"/>
+   <TextBlock Text="Advisory checks: headings, Markdown image descriptions, pipe table rows, prose spelling, TODO/FIXME and links to this document's headings or anchors." TextWrapping="Wrap"/>
+   <TextBlock Text="Workspace links, embedded HTML and diagram validity require separate checks." TextWrapping="Wrap" Margin="0,4,0,0"/>
    <TextBlock x:Name="ResultStatus" TextWrapping="Wrap" Margin="0,8,0,0" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="ReviewResultStatus"/>
   </StackPanel>
   <ListBox x:Name="Issues" Grid.Row="3" SelectionChanged="SelectionChanged" MouseDoubleClick="GoToSelected" KeyDown="ResultKeyDown"

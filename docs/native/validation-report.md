@@ -1,6 +1,12 @@
 # Native validation report
 
-Native push CI at fd11a8b (38176285630) passes all 33 workflows before installation and after installation/reinstallation. The CSV check saves the native default name with its hidden extension and verifies exact UTF-8 bytes; the installer lifecycle passes. Evidence: artifacts/native/native-ci-fd11a8b-push.log. PR CI remains in progress.
+## Original pipe-table review
+
+Release build has no warnings/errors; all 360 core tests and the standard native harness pass. Seventeen table cases verify malformed separators, missing/extra body and separator cells, exact CRLF row selection, alignment, escaped/trailing pipes, empty cells, optional outer delimiters, nested quote/list prefixes, paragraph boundaries and code/HTML/front-matter exclusions. Table analysis uses source rows even when parsing normalises their cell counts. Evidence: artifacts/native/tests/native-core-table-review.trx and table-review-first.trx.
+
+Native light/dark review controls expose six notes including the malformed table. Each note's automation name is verified after it is scrolled into view; an initial test incorrectly expected every virtualised item to be realised simultaneously. Final views were inspected, including their scrollable viewport. The 34-outcome desktop harness now checks End/Home navigation and the table note before selecting TODO. Native push CI at 403e85a (38176849651) passes the earlier complete 34-outcome review workflow in built/installed/reinstalled apps; expanded table/scroll validation awaits CI. Evidence: artifacts/native/native-ci-403e85a-push.log and artifacts/native/validation/native-review.json.
+
+Native push CI at fd11a8b (38176285630) passes all 33 workflows before installation and after installation/reinstallation. The CSV check saves the native default name with its hidden extension and verifies exact UTF-8 bytes; the installer lifecycle passes. Evidence: artifacts/native/native-ci-fd11a8b-push.log. PR CI 38176289796 also passes all 33 workflows; artifacts/native/native-ci-fd11a8b-pr.log retains its result.
 
 ## Current-document review
 

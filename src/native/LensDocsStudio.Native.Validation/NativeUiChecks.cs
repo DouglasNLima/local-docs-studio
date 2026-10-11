@@ -697,7 +697,7 @@ internal static class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Table context validation did not restore the original document.");
                 checks.Add("Native table context copy isolates one table with literal-cell HTML and Unicode TSV without changing source");
-                const string reviewSource = "# Review Café\n\n### Skipped\n\nColor and TODO remain.\n\n![](missing.png)\n\n[Missing](#absent)";
+                const string reviewSource = "# Review Café\n\n### Skipped\n\nColor and TODO remain.\n\n![](missing.png)\n\n[Missing](#absent)\n\n| A | B |\n|---|---|\n| One | Two | Extra |";
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 System.Windows.Clipboard.SetText(reviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == reviewSource, "The review fixture did not paste.");
@@ -706,8 +706,13 @@ internal static class NativeUiChecks
                 Wait(() => (reviewWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document review")))?.AsWindow()) is not null,
                     "The native document review did not open.");
                 var reviewNotes = Find(reviewWindow!, "ReviewIssues").AsListBox();
-                if (reviewNotes.Items.Length != 5 || !Find(reviewWindow!, "ReviewSummary").Name.Contains("2 headings", StringComparison.Ordinal))
-                    throw new IOException("Native review did not retain the current document's metrics and five advisory notes.");
+                if (!Find(reviewWindow!, "ReviewResultStatus").Name.StartsWith("6 advisory notes.", StringComparison.Ordinal)
+                    || !Find(reviewWindow!, "ReviewSummary").Name.Contains("2 headings", StringComparison.Ordinal))
+                    throw new IOException("Native review did not retain the current document's metrics and six advisory notes.");
+                FocusWindow(reviewWindow!); reviewNotes.Focus(); Keyboard.Type(VirtualKeyShort.END);
+                Wait(() => reviewNotes.Items.Any(item => item.Name.Contains("Table row has 3 cells", StringComparison.Ordinal)), "Keyboard scrolling did not expose the table review note.");
+                Keyboard.Type(VirtualKeyShort.HOME);
+                Wait(() => reviewNotes.Items.Any(item => item.Name.Contains("TODO marker found", StringComparison.Ordinal)), "Keyboard scrolling did not return to the marker review note.");
                 reviewNotes.Items.Single(item => item.Name.Contains("TODO marker found", StringComparison.Ordinal)).Select();
                 reviewWindow!.CaptureToFile(Path.Combine(output, "native-document-review.png"));
                 Find(reviewWindow!, "ReviewGoToSource").Patterns.Invoke.Pattern.Invoke();

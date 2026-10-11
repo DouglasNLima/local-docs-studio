@@ -51,6 +51,8 @@ public sealed partial class DocumentReviewService
         var seenHeadings = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var targets = parsed.Targets.Select(target => target.Id).ToHashSet(StringComparer.Ordinal);
         WalkBlocks(parsed.Syntax, 0);
+        if (!standaloneMermaid) MarkdownTableReview.Scan(source, parsed, lineStarts,
+            (start, length, message, suggestion) => Add("Tables", ReviewSeverity.Warning, message, suggestion, start, length), cancellationToken);
         if (parsed.Syntax.Count == 0)
             Add("Document", ReviewSeverity.Warning, "Document is empty.", "Add document content.", 0, 0);
         else if (!standaloneMermaid && !parsed.Headings.Any(heading => heading.Level == 1))
