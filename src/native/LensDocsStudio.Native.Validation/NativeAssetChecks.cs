@@ -10,6 +10,7 @@ using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.Exports;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Rendering;
+using LensDocsStudio.Native.ViewModels;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -48,7 +49,17 @@ internal static class NativeAssetChecks
         var edited = new TextDocument("selected");
         var pending = new DocumentInsertion(edited, 0, 8); edited.Insert(3, "new text"); pending.Insert("IMAGE");
         if (edited.Text != "IMAGEselnew textected") throw new InvalidOperationException("Pending insertion discarded intervening edits.");
+        using (var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(root, "queued-writes")), session, new WorkspaceService(), new DesktopDialogs()))
+        {
+            var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var order = new List<string>();
+            var first = model.RunAsync(async () => { await release.Task; order.Add("first"); });
+            var second = model.RunAsync(() => { order.Add("second"); return Task.CompletedTask; });
+            if (!model.IsBusy || second.IsCompleted) throw new InvalidOperationException("A queued operation was discarded while the workspace was busy.");
+            release.SetResult(); Task.WhenAll(first, second).GetAwaiter().GetResult();
+            if (!order.SequenceEqual(new[] { "first", "second" }) || model.IsBusy) throw new InvalidOperationException("Workspace operations did not complete in order.");
+        }
         File.WriteAllText(Path.Combine(output, "native-assets.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Pending insertion follows offsets and preserves intervening edits" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = new[] { "Native image decoding and durable PNG persistence", "Unsaved draft image resolves after session recovery", "Save as produces portable source and a real image", "Pending insertion follows offsets and preserves intervening edits", "Busy workspace operations queue without discarding user commands" }, FixtureRoot = root }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

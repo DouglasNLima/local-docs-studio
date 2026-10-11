@@ -114,10 +114,14 @@ internal static class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Window? saveWindow = null;
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Save document")))?.AsWindow()) is not null, "The native Save dialogue did not open.");
-            Find(saveWindow!, "1001").AsTextBox().Text = Path.GetFileName(imageDocument);
-            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Invoke();
+            FocusWindow(saveWindow!);
+            var fileName = Find(saveWindow!, "1001").AsTextBox();
+            fileName.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(Path.GetFileName(imageDocument));
+            Wait(() => fileName.Text == Path.GetFileName(imageDocument), "The native dialogue did not accept the typed filename.");
+            (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button).And(cf.ByName("Save"))) ?? throw new InvalidOperationException("The Save button is unavailable.")).AsButton().Click();
             Wait(() => File.Exists(imageDocument), "The document containing the pasted image was not saved.");
             var imageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(imageDocument)).Single(l => l.IsImage).Reference;
+            if (!imageReference.StartsWith("assets/images/", StringComparison.Ordinal)) throw new IOException("The saved image still relies on a private draft folder.");
             var imagePath = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(imageDocument, imageReference);
             if (!File.Exists(imagePath) || new FileInfo(imagePath).Length < 50) throw new IOException("Saving the unsaved document did not persist its portable image.");
             checks.Add("Clipboard image in an unsaved document is finalised into a portable image when saved through the native dialogue");

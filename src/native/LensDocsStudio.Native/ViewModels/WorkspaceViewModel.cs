@@ -23,6 +23,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     private CancellationTokenSource? operation;
     private readonly SemaphoreSlim recoveryGate = new(1, 1);
     private readonly SemaphoreSlim preferencesGate = new(1, 1);
+    private readonly SemaphoreSlim operationGate = new(1, 1);
+    private int queuedOperations;
     public UserPreferences Preferences { get; private set; } = new();
     public event EventHandler? DocumentChanged;
     partial void OnActiveDocumentChanged(DocumentViewModel? value) => DocumentChanged?.Invoke(this, EventArgs.Empty);
@@ -149,8 +151,16 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         }
     });
 
-    [RelayCommand] private Task SaveAsync() => RunAsync(async () => { if (ActiveDocument is { } tab) await SaveTabAsync(tab, false); });
-    [RelayCommand] private Task SaveAsAsync() => RunAsync(async () => { if (ActiveDocument is { } tab) await SaveTabAsync(tab, true); });
+    [RelayCommand] private Task SaveAsync()
+    {
+        var tab = ActiveDocument;
+        return RunAsync(async () => { if (tab is not null && Documents.Contains(tab)) await SaveTabAsync(tab, false); });
+    }
+    [RelayCommand] private Task SaveAsAsync()
+    {
+        var tab = ActiveDocument;
+        return RunAsync(async () => { if (tab is not null && Documents.Contains(tab)) await SaveTabAsync(tab, true); });
+    }
     public async Task<bool> SaveTabAsync(DocumentViewModel tab, bool saveAs)
     {
         if (tab.IsSaving) return false;
@@ -171,7 +181,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             var text = tab.EditorDocument.Text;
             await using var transfer = tab.EffectivePath is { } source && tab.EffectiveWorkspace is { } sourceRoot &&
                 !string.Equals(source, path, StringComparison.OrdinalIgnoreCase)
-                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken)
+                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken, forceCopyImages: tab.FilePath is null)
                 : new PreparedAssetTransfer(text);
             if (transfer.UncopiedDocumentLinks.Count != 0 && !dialogs.Confirm("Local images will be copied. These document links point into the previous workspace and may need updating in this copy:\n\n" +
                 string.Join("\n", transfer.UncopiedDocumentLinks.Distinct().Take(12)) + "\n\nContinue saving the copy?", "Save as in another workspace")) return false;
@@ -262,14 +272,20 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     [RelayCommand] private void CancelOperation() => operation?.Cancel();
     public async Task RunAsync(Func<Task> action)
     {
-        if (IsBusy) return;
+        queuedOperations++;
         IsBusy = true;
+        await operationGate.WaitAsync();
         operation = new CancellationTokenSource();
         try { await action(); }
         catch (OperationCanceledException) { Status = "Operation cancelled; documents preserved."; }
         catch (Exception ex) when (ex is not OutOfMemoryException)
         { Status = ex.Message; dialogs.Error(ex.Message); }
-        finally { operation.Dispose(); operation = null; IsBusy = false; }
+        finally
+        {
+            operation.Dispose(); operation = null;
+            queuedOperations--; IsBusy = queuedOperations != 0;
+            operationGate.Release();
+        }
     }
     public void Dispose() { watcher?.Dispose(); operation?.Cancel(); }
 }

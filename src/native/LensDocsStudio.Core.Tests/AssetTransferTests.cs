@@ -50,5 +50,15 @@ public sealed class AssetTransferTests : IDisposable
         var source = Path.Combine(root, "source", "draft.md"); var target = Path.Combine(root, "destination", "saved.md");
         await Assert.ThrowsAsync<IOException>(() => new AssetTransferService().PrepareAsync("![a](../../outside.png)", source, new(Path.GetDirectoryName(source)!), target, new(Path.GetDirectoryName(target)!)));
     }
+    [Fact] public async Task Finalising_a_draft_copies_images_out_of_private_state_even_when_state_is_inside_the_workspace()
+    {
+        var draftRoot = Path.Combine(root, "source");
+        await File.WriteAllBytesAsync(Path.Combine(draftRoot, "image.png"), png);
+        await using var prepared = await new AssetTransferService().PrepareAsync("![a](image.png)", Path.Combine(draftRoot, "Untitled.md"), new(draftRoot),
+            Path.Combine(root, "saved.md"), new(root), forceCopyImages: true);
+        Assert.Single(prepared.CreatedPaths);
+        Assert.StartsWith("![a](assets/images/", prepared.Text);
+        Assert.DoesNotContain("source/", prepared.Text);
+    }
     public void Dispose() => Directory.Delete(root, true);
 }

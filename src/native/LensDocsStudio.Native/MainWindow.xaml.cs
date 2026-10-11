@@ -252,6 +252,7 @@ public partial class MainWindow : Window
     }
     private void Format(object sender, RoutedEventArgs e)
     {
+        if (model.ActiveDocument is not { IsSaving: false }) return;
         var tag = (sender as FrameworkElement)?.Tag as string;
         var selected = Editor.SelectedText;
         var value = tag switch

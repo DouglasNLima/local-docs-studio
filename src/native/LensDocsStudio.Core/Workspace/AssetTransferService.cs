@@ -7,7 +7,7 @@ namespace LensDocsStudio.Core.Workspace;
 public sealed class AssetTransferService
 {
     public async Task<PreparedAssetTransfer> PrepareAsync(string text, string sourcePath, WorkspacePath sourceWorkspace,
-        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default)
+        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default, bool forceCopyImages = false)
     {
         sourceWorkspace.Resolve(Path.GetRelativePath(sourceWorkspace.Root, sourcePath));
         targetWorkspace.Resolve(Path.GetRelativePath(targetWorkspace.Root, targetPath));
@@ -23,7 +23,7 @@ public sealed class AssetTransferService
                 if (Uri.TryCreate(link.Reference, UriKind.Absolute, out _) || link.Reference.StartsWith('#')) continue;
                 var original = sourceWorkspace.ResolveLink(sourcePath, link.Reference);
                 string destination;
-                if (WorkspacePath.Contains(targetWorkspace.Root, original)) destination = original;
+                if (WorkspacePath.Contains(targetWorkspace.Root, original) && (!link.IsImage || !forceCopyImages)) destination = original;
                 else if (!link.IsImage) { transfer.UncopiedDocumentLinks.Add(link.Reference); continue; }
                 else if (!copied.TryGetValue(original, out destination!))
                 {
