@@ -37,6 +37,8 @@ Native **Export → Docs Site** creates a static ZIP from the open workspace, in
 
 Native **Insert → Progress indicator** creates a portable labelled progress figure. Place the caret inside an existing recognised figure to edit its label, percentage and colour. The native preview exposes an accessible progress value with selectable text; Word, PDF, HTML and Docs Site exports retain the label and bar. Malformed or unsupported embedded HTML remains visible as source.
 
+The native Docs Site export searches individual sections, including code, tables and nested headings. Results highlight the matching text and open the relevant heading with keyboard focus; browser Back returns to the preceding section. Page metadata remains searchable separately.
+
 To verify native-generated sites, run `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --docs-site artifacts/native/validation`, then `npx playwright test --config playwright.native-export.config.mjs`. Browser tools are development validation dependencies only; the installed native app does not require them.
 
 When desktop Office is installed, optional destination validation uses disposable documents: `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --office artifacts/native/office`. Word must have no existing session; Excel validation verifies a new process. Office is not required to run the native application or its standard checks.

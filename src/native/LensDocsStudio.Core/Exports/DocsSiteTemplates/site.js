@@ -65,19 +65,59 @@
     if (target) target.tabIndex = -1;
     requestAnimationFrame(() => { (target || content).scrollIntoView({ block:'start' }); if (fragment) (target || content).focus({ preventScroll:true }); });
   }
-  search.addEventListener('input', () => {
-    const terms = search.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+  let searchGeneration = 0;
+  function snippet(value, terms) {
+    const text = value.replace(/\s+/g, ' '); const lower = text.toLowerCase();
+    const matches = terms.map(term => lower.indexOf(term)).filter(index => index >= 0);
+    const start = Math.max(0, (matches.length ? Math.min(...matches) : 0) - 54);
+    const visible = (start ? '…' : '') + text.slice(start, start + 180) + (start + 180 < text.length ? '…' : '');
+    const normalised = visible.toLowerCase(); const span = element('span', ''); let position = 0;
+    while (position < visible.length) {
+      let match = -1; let size = 0;
+      for (const term of terms) {
+        const index = normalised.indexOf(term, position);
+        if (index >= 0 && (match < 0 || index < match || index === match && term.length > size)) { match = index; size = term.length; }
+      }
+      if (match < 0) { span.append(document.createTextNode(visible.slice(position))); break; }
+      span.append(document.createTextNode(visible.slice(position, match)), element('mark', visible.slice(match, match + size)));
+      position = match + size;
+    }
+    return span;
+  }
+  search.addEventListener('input', async () => {
+    const generation = ++searchGeneration;
+    if (search.value.length > 512) { results.hidden = false; nav.hidden = true; results.replaceChildren(element('p', 'Use up to 512 characters in a search.')); return; }
+    const terms = [...new Set(search.value.trim().toLowerCase().split(/\s+/).filter(Boolean))];
     results.replaceChildren(); results.hidden = terms.length === 0; nav.hidden = terms.length !== 0;
     if (!terms.length) return;
-    const matched = data.entries.map(entry => {
-      const title = (entry.title + ' ' + entry.headingText).toLocaleLowerCase();
-      const text = (entry.text + ' ' + entry.path).toLocaleLowerCase();
-      return { entry, score:terms.every(term => title.includes(term) || text.includes(term)) ? terms.reduce((score, term) => score + (title.includes(term) ? 8 : 1), 0) : 0 };
-    }).filter(item => item.score > 0).sort((a, b) => b.score - a.score).slice(0, 30);
-    for (const { entry } of matched) {
+    if (terms.length > 16) { results.append(element('p', 'Use up to 16 search terms.')); return; }
+    results.append(element('p', 'Searching…'));
+    const matched = []; let batchStarted = performance.now();
+    for (const entry of data.entries || []) {
+      const indexed = entry.searchText || (entry.searchText = {
+        title:entry.title.toLowerCase(), heading:entry.headingText.toLowerCase(), path:entry.path.toLowerCase(), text:entry.text.toLowerCase()
+      });
+      if (terms.every(term => indexed.title.includes(term) || indexed.heading.includes(term) || indexed.path.includes(term) || indexed.text.includes(term))) {
+        const score = terms.reduce((total, term) => total + (indexed.heading.includes(term) ? 12 : 0) + (indexed.title.includes(term) ? 8 : 0)
+          + (indexed.path.includes(term) ? 4 : 0) + (indexed.text.includes(term) ? 1 : 0), 0);
+        matched.push({ entry, score });
+      }
+      if (performance.now() - batchStarted >= 8) {
+        await new Promise(resolve => setTimeout(resolve, 0));
+        if (generation !== searchGeneration) return;
+        batchStarted = performance.now();
+      }
+    }
+    if (generation !== searchGeneration) return;
+    results.replaceChildren();
+    for (const { entry } of matched.sort((a, b) => b.score - a.score).slice(0, 30)) {
       const button = element('button', '', 'search-result'); button.type = 'button';
-      button.append(element('strong', entry.title), element('small', entry.path), element('span', entry.text.replace(/\s+/g, ' ').slice(0, 180)));
-      button.addEventListener('click', () => { location.hash = entry.pageId; showPage(); }); results.append(button);
+      button.append(element('strong', entry.headingId ? entry.headingText : entry.title), element('small', entry.headingId ? entry.title + ' · ' + entry.path : entry.path), snippet(entry.text, terms));
+      button.addEventListener('click', () => {
+        const hash = '#' + entry.pageId + (entry.headingId ? '/' + encodeURIComponent(entry.headingId) : '');
+        if (location.hash === hash) showPage(); else location.hash = hash;
+      });
+      results.append(button);
     }
     if (!matched.length) results.append(element('p', 'No results.'));
   });

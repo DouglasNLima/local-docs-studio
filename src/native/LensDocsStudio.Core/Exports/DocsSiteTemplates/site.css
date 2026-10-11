@@ -33,10 +33,11 @@ th { background:var(--panel); }
 pre { background:var(--panel); padding:1rem; overflow:auto; border-radius:6px; }
 code,kbd { font-family:Consolas,monospace; background:var(--panel); }
 blockquote,.markdown-alert { border-left:3px solid #FF883E; background:var(--panel); margin:1rem 0; padding:.3rem 1rem; }
-.search-result { display:block; width:100%; text-align:left; margin:.65rem 0; }
+.search-result { display:block; width:100%; text-align:left; margin:.65rem 0; overflow-wrap:anywhere; }
 .search-result strong,.search-result small,.search-result span { display:block; }
 .search-result small { color:var(--muted); }
 .search-result span { font-size:.85rem; }
+.search-result mark { background:#FFE4CD; color:#202124; }
 .skip-link { position:fixed; top:-100px; left:1rem; z-index:2; padding:.5rem; background:var(--bg); }
 .skip-link:focus { top:.5rem; }
 [hidden] { display:none!important; }

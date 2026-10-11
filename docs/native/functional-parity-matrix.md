@@ -23,7 +23,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 | DOCX/HTML/PDF text imports | Native parsers, safe assets | Partial: conversion tests pass; broader corpus remains |
 | HTML/DOCX/PDF export | Local independent exporters | Actual outputs and structural checks pass; DOCX retains callouts/list starts/alignment/extended emphasis. PDF retains explicit deletion markers; strikeout/highlight fidelity remains |
 | DOCX templates, styles, numbering, sections/media | Open XML package preservation | Partial: styles, numbering, headers/footers/media; full contract remains |
-| Docs Site and Markdown Bundle export | Guarded static ZIPs with native preparation and offline export templates | Bundle tested. Docs Site core, real-image integration and four disk/HTTP Chromium/Edge checks pass; metadata, navigation, search and themes work. Native dialogue passes built/installed/reinstalled CI at c3277ef. Section search, artefact fallback, wikilinks and broader export controls remain |
+| Docs Site and Markdown Bundle export | Guarded static ZIPs with native preparation and offline export templates | Bundle tested. Docs Site core, real-image integration and four disk/HTTP Chromium/Edge checks pass; metadata, navigation, direct section search and themes work. Native dialogue passes built/installed/reinstalled CI at c3277ef. Artefact fallback, wikilinks and broader export controls remain |
 | Optional artefact review pack, front matter priority | Explicit safe rebuilt manifest | Incomplete |
 | Templates/snippets/studios/export profiles | Local library with legacy JSON import | Incomplete |
 | Legacy migration, help, preferences | Explicit import; no browser profile scanning | Incomplete |

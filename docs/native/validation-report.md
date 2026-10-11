@@ -1,5 +1,11 @@
 # Native validation report
 
+## Docs Site section search
+
+Release build has no warnings/errors and all 276 core tests pass. Three additional Docs Site cases cover section boundaries through nested quotes/lists, code and table text, adjacent inline words, metadata/introductory text, unique targets for repeated explicit heading identifiers, empty pages and repeated-metadata size limits before JSON serialisation. Evidence: artifacts/native/tests/native-core.trx and docs-site-search.trx.
+
+The focused native site export passes and all four disk/static-hosting Chromium/Edge checks pass (37.2 seconds) for direct section navigation, keyboard activation, matching snippets, nested heading focus, Back, inert source snippets, query limits, themes and existing image/progress content. A focused Edge disk rerun also verifies the hidden skip-link position and captures the viewport; the result/sidebar layout was visually inspected. Static checks pass. Search uses bounded section entries and yields between batches; large-site timing certification remains open.
+
 ## Native progress indicators
 
 At ee5c0ff both native CI runs (38167486044/38167482057) passed Core, native rendering and exported-site checks, then failed before opening the progress dialogue. The new check called UIA SetFocus on AvalonEdit's outer automation element; existing editor workflows focus the real text area by clicking. The retained screenshot shows the editor present and the preceding Docs Site export complete. The harness now uses that established input path. Evidence: artifacts/native/ci-ee5c0ff-pr/ui and native-ci-ee5c0ff-pr-failure.log. The 26th desktop/installed outcome remains pending.
@@ -20,7 +26,7 @@ Native integration exports two real workspace documents with a raster image and 
 
 All four exported-site browser checks pass across Chromium/Edge and direct disk/static HTTP hosting. Checks cover decoded images, document/heading navigation, Back, unsaved content, draft metadata, search with inert input, theme persistence and absence of external requests. A screenshot review found vertical centring of short pages; the content margin was corrected, the focused export/browser rerun passed all four checks, and light/dark screenshots were visually inspected. Evidence: artifacts/native/site-browser. A new 25th native desktop outcome exercises the options window and Save dialogue; fresh CI remains pending. Native CI now runs the separate export-browser suite; the web pipeline still has no .NET requirement.
 
-This is partial Docs Site parity. Search currently returns whole-page matches; artefact metadata fallback, wikilinks, broader code/table/diagram actions and export continuation with broken diagrams remain. Missing/invalid images or diagrams fail preparation before the guarded destination write. No deployment is performed.
+This is partial Docs Site parity. Section search is implemented in the follow-up above. Artefact metadata fallback, wikilinks, broader code/table/diagram actions and export continuation with broken diagrams remain. Missing/invalid images or diagrams fail preparation before the guarded destination write. No deployment is performed.
 
 ## Browser draft-lookup data preservation
 

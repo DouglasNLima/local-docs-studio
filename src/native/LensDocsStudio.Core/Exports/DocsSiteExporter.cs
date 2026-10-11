@@ -26,7 +26,14 @@ public sealed class DocsSiteExporter
     {
         path = ValidatePath(path);
         var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content));
-        var headings = html.Body!.QuerySelectorAll("h1,h2,h3,h4,h5,h6").Select(h => new DocsSiteHeading(h.Id ?? "", h.TextContent.Trim(), h.LocalName[1] - '0')).ToArray();
+        var headingElements = html.Body!.QuerySelectorAll("h1,h2,h3,h4,h5,h6");
+        var usedIds = new HashSet<string>(html.Body.QuerySelectorAll("[id]").Except(headingElements).Select(e => e.Id!), StringComparer.Ordinal);
+        var headings = headingElements.Select(h =>
+        {
+            var baseId = string.IsNullOrEmpty(h.Id) ? "section" : h.Id; var id = baseId; var suffix = 2;
+            while (!usedIds.Add(id)) id = baseId + "-" + suffix++;
+            h.Id = id; return new DocsSiteHeading(id, h.TextContent.Trim(), h.LocalName[1] - '0');
+        }).ToArray();
         var metadata = content.Document.Metadata;
         var title = metadata.Title.Length > 0 ? metadata.Title : headings.FirstOrDefault()?.Text ?? System.IO.Path.GetFileNameWithoutExtension(path);
         var id = "page-" + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(path.ToUpperInvariant())))[..16];
@@ -67,8 +74,7 @@ public sealed class DocsSiteExporter
             NavGroup = p.Metadata.NavigationGroup, ArtifactKind = "", EvidenceLevel = "", p.Headings,
             p.DiagramTotal, DiagramErrors = 0, p.GeneratedHome
         }).ToArray();
-        var entries = pages.Select(p => new { Id = p.Id + "--page", PageId = p.Id, p.Title, p.Path, HeadingId = "", HeadingText = p.Title, Level = 1,
-            Text = p.SearchText + " " + p.Metadata.Description + " " + string.Join(' ', p.Metadata.Tags) + " " + p.Metadata.NavigationGroup }).ToArray();
+        var entries = DocsSiteSearch.Build(pages, bodyBytes, cancellationToken);
         var index = new { FormatVersion = "docs-site-2.0", options.Title, options.Description, DefaultTheme = options.Theme, HomePageId = home.Id, Pages = records, Entries = entries };
         var manifest = new { FormatVersion = "docs-site-2.0", Generator = "Lens Docs Studio Native", options.Title, options.Description, DefaultTheme = options.Theme,
             GeneratedAt = DateTimeOffset.UtcNow, SourcePageCount = sourcePages.Count, PageCount = pages.Count, DiagramTotal = pages.Sum(p => p.DiagramTotal), DiagramErrors = 0,
