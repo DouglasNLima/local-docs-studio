@@ -18,14 +18,15 @@ internal static partial class NativeUiChecks
         var imageId = "DiagramPreview" + text.IndexOf("```mermaid", StringComparison.Ordinal);
         var originalHelp = Find(window, imageId).Properties.HelpText.Value;
         var checks = new List<object>();
+        var paint = new List<object>();
         Appearance("Light");
         foreach (var choice in new[] { "Default", "Neutral", "Forest", "Lens", "Dark", "Auto" })
         {
             Select(choice, choice == "Auto" ? "Lens" : choice);
-            if (choice == "Forest") window.CaptureToFile(Path.Combine(output, "native-diagram-forest-light.png"));
+            if (choice == "Forest") CaptureForest("Light");
         }
         Appearance("Dark"); Select("Forest", "Forest");
-        window.CaptureToFile(Path.Combine(output, "native-diagram-forest-dark.png"));
+        CaptureForest("Dark");
         Select("Auto", "Dark");
         Appearance(before.Theme);
         Select(before.Preview?.DiagramTheme ?? "Auto", originalHelp["Diagram theme: ".Length..]);
@@ -35,7 +36,24 @@ internal static partial class NativeUiChecks
             || after.AutomaticUpdateChecks != before.AutomaticUpdateChecks || after.UpdateChannel != before.UpdateChannel)
             throw new IOException("Diagram theme selection changed source, unrelated preferences or update consent.");
         File.WriteAllText(Path.Combine(output, "native-ui-diagram-themes.json"), JsonSerializer.Serialize(new
-        { Passed = true, Checks = checks, SourcePreserved = true, OriginalPreferencesRestored = true }, new JsonSerializerOptions { WriteIndented = true }));
+        { Passed = true, Checks = checks, Paint = paint, SourcePreserved = true, OriginalPreferencesRestored = true }, new JsonSerializerOptions { WriteIndented = true }));
+
+        void CaptureForest(string applicationTheme)
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew(); var attempts = 0;
+            Wait(() =>
+            {
+                var diagram = Find(window, imageId); var bounds = diagram.BoundingRectangle; var windowBounds = window.BoundingRectangle;
+                var region = new System.Drawing.Rectangle(bounds.Left - windowBounds.Left, bounds.Top - windowBounds.Top, bounds.Width, bounds.Height);
+                using var screenshot = window.Capture(); attempts++;
+                var observation = NativeDiagramPaintChecks.ObserveForest(screenshot, region);
+                if (!observation.Passed) return false;
+                // Keep the exact accepted frame; a second capture could observe a later update.
+                screenshot.Save(Path.Combine(output, "native-diagram-forest-" + applicationTheme.ToLowerInvariant() + ".png"), System.Drawing.Imaging.ImageFormat.Png);
+                paint.Add(new { ApplicationTheme = applicationTheme, Attempts = attempts, Milliseconds = watch.Elapsed.TotalMilliseconds, Observation = observation });
+                return true;
+            }, "The Forest diagram did not paint both labelled nodes within the desktop observation deadline.");
+        }
 
         void Appearance(string theme)
         {
