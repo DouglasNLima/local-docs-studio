@@ -1,5 +1,9 @@
 # Native implementation progress
 
+Current addition: maths renders through bundled WpfMath/XamlMath resources with exact source mapping, native context copy, plain preview copy and formula search. Standard matrix/cases/aligned syntax is adapted without changing source; invalid/oversized input remains readable. HTML, Word, PDF and rich clipboard use correctly sized high-resolution images. All 579 core tests, full native integration, static checks and four exported-site browser cases pass; Release build is clean. Five native maths outcomes cover 32 theme/render cases, actual packages, frozen reuse, bounds, cancellation and source fidelity. The 43rd desktop workflow awaits CI.
+
+All four runs at 1825cfd pass: native PR/push 38188833064/38188829327 and web PR/push 38188833058/38188829326. Both native runs certify all 42 workflows in built, installed and reinstalled apps, including details editing, nested expansion, hidden-text Find and complete Undo/Redo. This validates the corrected preview-revision waits. Evidence: artifacts/native/native-ci-1825cfd-pr.log and artifacts/native/ci-1825cfd-pr.
+
 At 6100324 both native runs reach the new details workflow, then fail its heading-after-expansion assertion. The fixture performs rapid Undo/Redo while preview rendering is debounced, so its previous name-only check can find the earlier section before replacement. It now waits for each distinct rendered summary before the next edit, and retains expansion/source/text diagnostics if the assertion fails again. Native product behaviour is unchanged; the correction awaits CI. Evidence: artifacts/native/native-ci-6100324-pr-failure.log and artifacts/native/ci-6100324-pr/ui.
 
 Current addition: complete passive details sections use native nested expanders and retain source mapping, headings, links, images, tables and diagrams. Preview Find and navigation reveal hidden targets without changing source. Insert → Details section provides guarded, validated summary/body editing with complete Undo/Redo. Word/PDF/clipboard retain closed content; HTML/Docs Site preserve expansion and hidden-section search. Release build has no warnings/errors; all 552 core tests, full native integration, static checks and four exported-site browser cases pass. Six native details outcomes cover themes, accessible expansion, source targeting, exports and editor layout/Undo. The 42nd desktop workflow awaits CI.
@@ -135,7 +139,7 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: certify the 42nd details desktop/installed workflow, then continue math, artefact workflows, settings and remaining parity. All four runs at 55c6639 pass all existing 41 desktop workflows and complete web checks.
+Next: certify the 43rd maths desktop/installed workflow, then continue artefact workflows, settings and remaining parity. All four runs at 1825cfd pass all existing 42 desktop workflows and complete web checks.
 
 Other gaps: folder moves/case-only rename, broader safe HTML/math semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity and legacy pack migration, general preferences/migration/help, live Azure DevOps attachments, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 

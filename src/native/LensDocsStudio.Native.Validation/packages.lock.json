@@ -127,6 +127,19 @@
         "resolved": "8.0.0",
         "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA=="
       },
+      "WpfMath": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "216GtCBYFMPw5SaArNcuTgemgAWw985LihSEf7mtOjJYTN04X4BVFGPrkJ2Fiv1ffL8gX2xiRw/o+q1SC5oSAA==",
+        "dependencies": {
+          "XamlMath.Shared": "2.1.0"
+        }
+      },
+      "XamlMath.Shared": {
+        "type": "Transitive",
+        "resolved": "2.1.0",
+        "contentHash": "p7W78KZc2EWuVqAd704m4yGWg0HtxahjNYRVxDWhw7npf8oMD8C7EUc1pjkjZIcmk5PxXJ+t5FE2Fs3gBYjv1A=="
+      },
       "lensdocsstudio.core": {
         "type": "Project",
         "dependencies": {
@@ -145,7 +158,8 @@
           "CommunityToolkit.Mvvm": "[8.4.2, )",
           "LensDocsStudio.Core": "[0.1.0-preview.1, )",
           "PDFsharp-MigraDoc-WPF": "[6.2.4, )",
-          "SharpVectors.Wpf": "[1.8.6, )"
+          "SharpVectors.Wpf": "[1.8.6, )",
+          "WpfMath": "[2.1.0, )"
         }
       }
     },

@@ -10,7 +10,7 @@ public sealed class ClipboardExporter
 {
     public ExportedClipboard Export(ExportContent content, ExportTableSelection? table = null)
     {
-        if (content.Document.Source.Length > 4 * 1024 * 1024 || content.Images.Values.Concat(content.Diagrams.Values).Sum(i => (long)i.PngBytes.Length) > 16 * 1024 * 1024)
+        if (content.Document.Source.Length > 4 * 1024 * 1024 || content.Images.Values.Concat(content.Diagrams.Values).Concat(content.Formulae.Values).Sum(i => (long)i.PngBytes.Length) > 16 * 1024 * 1024)
             throw new IOException("Copy rendered content is limited to 4 million source characters and 16 MB of prepared images. Export larger documents to a file.");
         var fragment = "<div>" + new HtmlExporter().RenderFragment(content, table, flattenDetails: true) + "</div>";
         var html = new HtmlParser().ParseDocument(fragment);

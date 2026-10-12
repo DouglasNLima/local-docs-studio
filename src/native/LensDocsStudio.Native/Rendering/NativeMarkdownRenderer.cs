@@ -11,6 +11,7 @@ using LensDocsStudio.Core.Rendering;
 using Markdig.Extensions.Tables;
 using Markdig.Extensions.TaskLists;
 using Markdig.Extensions.Alerts;
+using Markdig.Extensions.Mathematics;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MdBlock = Markdig.Syntax.Block;
@@ -21,12 +22,24 @@ namespace LensDocsStudio.Native.Rendering;
 
 public sealed record SourceReference(int Start, int End, int Line);
 public sealed record PreviewDetails(int SourceStart, int SourceEnd, Expander Toggle);
+public sealed record PreviewMaths(string Source, InlineUIContainer Element);
 public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<int, TextElement> SourceElements, IReadOnlyList<string> Warnings)
 {
     public IReadOnlyList<PreviewDetails> Details { get; init; } = [];
+    public IReadOnlyList<PreviewMaths> Formulae { get; init; } = [];
     public void RevealSource(int offset)
     { foreach (var section in Details) if (offset >= section.SourceStart && offset <= section.SourceEnd) section.Toggle.IsExpanded = true; }
     public void ExpandDetails() { foreach (var section in Details) section.Toggle.IsExpanded = true; }
+    public string ReadText()
+    {
+        ExpandDetails(); var text = new System.Text.StringBuilder(); var position = Document.ContentStart;
+        foreach (var formula in Formulae)
+        {
+            text.Append(new TextRange(position, formula.Element.ElementStart).Text).Append(formula.Source);
+            position = formula.Element.ElementEnd;
+        }
+        return text.Append(new TextRange(position, Document.ContentEnd).Text).ToString();
+    }
 }
 
 public sealed class NativeMarkdownRenderer(NativeSvgService svg)
@@ -34,19 +47,22 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
     public PreviewResult Render(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv).GetAwaiter().GetResult();
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv);
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
-        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax, Action<ExportTableSelection>? copyTable, Action<ExportTableSelection>? exportTableCsv)
+        IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax, Action<ExportTableSelection>? copyTable, Action<ExportTableSelection>? exportTableCsv,
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
@@ -55,6 +71,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity };
         var sourceElements = new Dictionary<int, TextElement>();
         var detailSections = new List<PreviewDetails>();
+        var formulaSources = new List<PreviewMaths>();
         var warnings = new List<string>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var blocks = 0;
@@ -70,7 +87,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             }
         }
         cancellationToken.ThrowIfCancellationRequested();
-        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly() };
+        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly() };
 
         WpfBlock Convert(MdBlock block)
         {
@@ -84,6 +101,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     hp.FontWeight = FontWeights.SemiBold; hp.Margin = new Thickness(0, 16, 0, 8); result = hp;
                     break;
                 case ParagraphBlock paragraph: result = Paragraph(paragraph.Inline); break;
+                case MathBlock formula:
+                    result = new Paragraph(Formula(formula, formula.Lines.ToString(), true)) { Margin = new Thickness(0, 12, 0, 12) }; break;
                 case FencedCodeBlock code when diagrams.TryGetValue(code, out var diagram):
                     var panel = new StackPanel { Margin = new Thickness(0, 6, 0, 12) };
                     if (diagram.Success)
@@ -254,6 +273,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     case LiteralInline literal: target.Add(new Run(literal.Content.ToString())); break;
                     case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
                     case CodeInline code: target.Add(new Run(code.Content) { FontFamily = new FontFamily("Consolas"), Background = surface }); break;
+                    case MathInline formula: target.Add(Formula(formula, formula.Content.ToString(), formula.DelimiterCount == 2)); break;
                     case LineBreakInline line: if (line.IsHard) target.Add(new LineBreak()); else target.Add(new Run(" ")); break;
                     case EmphasisInline emphasis:
                         var formatting = MarkdownFormatting.Emphasis(emphasis);
@@ -297,6 +317,27 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     case ContainerInline nested: AddInlines(target, nested); break;
                 }
             }
+        }
+        System.Windows.Documents.Inline Formula(Markdig.Syntax.MarkdownObject node, string source, bool display)
+        {
+            var sourceStart = node.Span.Start;
+            PreviewFormula? prepared = null; preparedFormulae?.TryGetValue(sourceStart, out prepared);
+            if (prepared?.Drawing is not { } drawing)
+            {
+                warnings.Add(prepared?.Error ?? "The formula is shown as source because its native drawing was unavailable.");
+                return new Run(source) { FontFamily = new FontFamily("Consolas"), ToolTip = warnings[^1] };
+            }
+            var image = new Image { Source = drawing, Width = Math.Min(720, drawing.Width), Height = Math.Min(720 / drawing.Width, 1) * drawing.Height,
+                Stretch = Stretch.Uniform, HorizontalAlignment = HorizontalAlignment.Left, ToolTip = source, Focusable = true };
+            System.Windows.Automation.AutomationProperties.SetName(image, "Formula: " + source);
+            System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DocumentFormula" + sourceStart);
+            var copy = new MenuItem { Header = "Copy LaTeX source", IsEnabled = copyCode is not null };
+            System.Windows.Automation.AutomationProperties.SetAutomationId(copy, "CopyFormulaSource");
+            copy.Click += (_, _) => copyCode?.Invoke(new(source, false));
+            image.ContextMenu = new ContextMenu(); image.ContextMenu.Items.Add(copy);
+            var inline = new InlineUIContainer(image) { BaselineAlignment = display ? BaselineAlignment.Center : BaselineAlignment.TextBottom,
+                Tag = new SourceReference(sourceStart, node.Span.End, node.Line) };
+            sourceElements[sourceStart] = inline; formulaSources.Add(new(source, inline)); return inline;
         }
     }
 }

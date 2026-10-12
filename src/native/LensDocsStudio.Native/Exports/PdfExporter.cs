@@ -44,6 +44,10 @@ public sealed class PdfExporter
         {
             switch (block)
             {
+                case Markdig.Extensions.Mathematics.MathBlock formula:
+                    var fp = elements.AddParagraph();
+                    if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(fp.Elements, formulaImage);
+                    else fp.AddText(formula.Lines.ToString()); break;
                 case HeadingBlock heading:
                     var hp = elements.AddParagraph(); hp.Style = "Heading" + heading.Level;
                     if (headingTargets.TryGetValue(heading.Span.Start, out var headingTarget)) hp.AddBookmark(bookmarks[headingTarget.Id]);
@@ -120,6 +124,9 @@ public sealed class PdfExporter
             {
                 switch (inline)
                 {
+                    case Markdig.Extensions.Mathematics.MathInline formula:
+                        if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(elements, formulaImage);
+                        else elements.AddText(formula.Content.ToString()); break;
                     case DocumentAnchorInline anchor:
                         elements.AddBookmark(bookmarks[anchor.Id]); elements.AddText(anchor.Text); break;
                     case DocumentSemanticInline semantic:
@@ -159,7 +166,7 @@ public sealed class PdfExporter
         {
             var image = elements.AddImage("base64:" + Convert.ToBase64String(asset.PngBytes));
             image.LockAspectRatio = true;
-            var width = Math.Min(482, asset.PixelWidth * 72d / 144);
+            var width = Math.Min(482, asset.DisplayWidth > 0 ? asset.DisplayWidth * 72 / 96 : asset.PixelWidth * 72d / 144);
             var height = width * asset.PixelHeight / asset.PixelWidth;
             if (height > 700) width *= 700 / height;
             image.Width = Unit.FromPoint(width);

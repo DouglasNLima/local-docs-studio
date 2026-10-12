@@ -86,7 +86,7 @@
     <MenuItem Header="Strikethrough" Tag="strike" Click="Format"/>
     <MenuItem Header="Inline code" Tag="inline-code" Click="Format"/>
     <MenuItem Header="Mermaid suggestions" InputGestureText="Ctrl+Space" Click="ShowCompletion" AutomationProperties.AutomationId="ShowMermaidCompletion"/>
-    <MenuItem Header="Copy rendered _text" Click="CopyPreview"/>
+    <MenuItem Header="Copy rendered _text" Click="CopyPreview" AutomationProperties.AutomationId="CopyRenderedText"/>
     <MenuItem Header="Copy rendered _content" Click="CopyRenderedContent" AutomationProperties.AutomationId="CopyRenderedContent"/>
     <MenuItem Header="Copy _Markdown with images" Click="CopyMarkdownWithImages" AutomationProperties.AutomationId="CopyMarkdownWithImages"/>
    </MenuItem>

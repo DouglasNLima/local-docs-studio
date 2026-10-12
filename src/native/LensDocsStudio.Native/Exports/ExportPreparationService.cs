@@ -60,6 +60,19 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
             var png = bytes.ToArray(); CountImage(png);
             images[link.Url ?? ""] = new(png, bitmap.PixelWidth, bitmap.PixelHeight, MarkdownService.InlineText(link));
         }
-        return new(document, diagramImages, images);
+        var formulaImages = new Dictionary<int, ExportImage>();
+        if (!markdownSourceOnly)
+        {
+            var formulae = new NativeMathService().Prepare(document, false, cancellationToken, scope);
+            foreach (var formula in DocumentMathematics.Read(scope))
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (formulae[formula.SourceStart].Drawing is not { } drawing) continue;
+                var bytes = NativeSvgService.ToPng(drawing, 3); CountImage(bytes);
+                formulaImages[formula.SourceStart] = new(bytes, (int)Math.Ceiling(drawing.Width * 3), (int)Math.Ceiling(drawing.Height * 3),
+                    formula.Text, drawing.Width, drawing.Height);
+            }
+        }
+        return new(document, diagramImages, images) { Formulae = formulaImages };
     }
 }

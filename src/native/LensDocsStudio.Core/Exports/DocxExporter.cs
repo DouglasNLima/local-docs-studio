@@ -75,6 +75,9 @@ public sealed class DocxExporter
             {
                 switch (block)
                 {
+                    case Markdig.Extensions.Mathematics.MathBlock formula:
+                        parent.Append(new W.Paragraph(content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)
+                            ? Image(formulaImage) : Run(formula.Lines.ToString(), MarkdownEmphasis.None))); break;
                     case HeadingBlock heading:
                         var hp = Paragraph(heading.Inline, styleMap.Heading(heading.Level));
                         hp.ParagraphProperties!.KeepNext = new W.KeepNext();
@@ -199,6 +202,9 @@ public sealed class DocxExporter
                 {
                     switch (inline)
                     {
+                        case Markdig.Extensions.Mathematics.MathInline formula:
+                            target.Append(content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)
+                                ? Image(formulaImage) : Run(formula.Content.ToString(), formatting)); break;
                         case DocumentAnchorInline anchor:
                             var anchorBookmark = bookmarks[anchor.Id];
                             target.Append(new W.BookmarkStart { Id = anchorBookmark.Id, Name = anchorBookmark.Name }, Run(anchor.Text, formatting), new W.BookmarkEnd { Id = anchorBookmark.Id });
@@ -244,7 +250,8 @@ public sealed class DocxExporter
             {
                 var part = main.AddImagePart(ImagePartType.Png);
                 using var data = new MemoryStream(image.PngBytes); part.FeedData(data);
-                var cx = image.PixelWidth * 9525L; var cy = image.PixelHeight * 9525L;
+                var cx = (long)((image.DisplayWidth > 0 ? image.DisplayWidth : image.PixelWidth) * 9525);
+                var cy = (long)((image.DisplayHeight > 0 ? image.DisplayHeight : image.PixelHeight) * 9525);
                 var scale = Math.Min(1, Math.Min((double)widthEmu / cx, (double)heightEmu / cy));
                 cx = (long)(cx * scale); cy = (long)(cy * scale);
                 while (usedDrawings.Contains(drawingId)) drawingId++;

@@ -20,10 +20,14 @@ foreach ($entry in ($assets.libraries.GetEnumerator() | Sort-Object Key)) {
     $notices.Add(''); $notices.Add("## $($metadata.id) $($metadata.version)"); $notices.Add('')
     $notices.Add("Authors: $($metadata.authors). Copyright: $($metadata.copyright)")
     $notices.Add("Licence: $expression. Project: $($metadata.projectUrl)")
-    if ($metadata.license.type -eq 'expression' -and -not (Test-Path -LiteralPath (Join-Path $licences "$expression.txt"))) {
-        throw "Include the licence text for $expression before packaging $($metadata.id)."
+    if ($metadata.license.type -eq 'expression') {
+        foreach ($componentLicence in ($expression -split '\s+AND\s+')) {
+            if (-not (Test-Path -LiteralPath (Join-Path $licences "$componentLicence.txt"))) {
+                throw "Include the licence text for $componentLicence before packaging $($metadata.id)."
+            }
+        }
     }
-    $packageNotices = Get-ChildItem -LiteralPath $packageRoot -Recurse -File | Where-Object { $_.Name -match '^(licen[cs]e|notice|thirdpartynotices)(\.|$)' }
+    $packageNotices = Get-ChildItem -LiteralPath $packageRoot -Recurse -File | Where-Object { $_.Name -match '^(licen[cs]e|notice|thirdpartynotices|font-licen[cs]es)(\.|$)' }
     foreach ($notice in $packageNotices) {
         $target = Join-Path $licences ($metadata.id + '/' + [IO.Path]::GetRelativePath($packageRoot, $notice.FullName))
         New-Item -ItemType Directory -Path (Split-Path -Parent $target) -Force | Out-Null

@@ -19,6 +19,7 @@ public sealed partial class MarkdownService
     private static MarkdownPipeline CreatePipeline()
     {
         var builder = new MarkdownPipelineBuilder().UseAdvancedExtensions().UsePreciseSourceLocation();
+        builder.InlineParsers.Insert(0, new DocumentMathInlineParser());
         builder.BlockParsers.Insert(0, new DetailsBlockParser()); return builder.Build();
     }
 
@@ -85,6 +86,7 @@ public sealed partial class MarkdownService
             LiteralInline literal => literal.Content.ToString(),
             HtmlEntityInline entity => entity.Transcoded.ToString(),
             CodeInline code => code.Content,
+            Markdig.Extensions.Mathematics.MathInline formula => formula.Content.ToString(),
             LineBreakInline => " ",
             ContainerInline container => InlineText(container),
             _ => ""

@@ -152,7 +152,8 @@ public sealed partial class HtmlMarkdownConverter
         return Read(document.Body!).Trim();
     }
 
-    public static string Escape(string value) => MarkdownPunctuation().Replace(value, "\\$0");
+    public static string Escape(string value) => MarkdownPunctuation().Replace(value.Replace("&", "&amp;", StringComparison.Ordinal),
+        match => match.Value switch { "(" => "&#40;", ")" => "&#41;", _ => "\\" + match.Value });
     public static string Fence(string value, string language = "")
     {
         value = Normalise(value);
@@ -201,7 +202,7 @@ public sealed partial class HtmlMarkdownConverter
         }
         return document;
     }
-    [GeneratedRegex(@"[\\`*_{}\[\]<>()!#+.\-|~>=]")] private static partial Regex MarkdownPunctuation();
+    [GeneratedRegex(@"[\\`*_{}\[\]<>()!#+.\-|~>=$]")] private static partial Regex MarkdownPunctuation();
     [GeneratedRegex(@"\s+")] private static partial Regex Whitespace();
     [GeneratedRegex("`+")] private static partial Regex Backticks();
     [GeneratedRegex(@"^data:image/(png|jpeg|gif|webp|bmp);base64,([A-Za-z0-9+/=\s]+)$", RegexOptions.IgnoreCase)] private static partial Regex DataImage();

@@ -1174,6 +1174,43 @@ internal static class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "The details fixture did not restore original source.");
             if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
             checks.Add("Native details dialogue restores and edits Markdown; accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
+            const string mathsFixture = "\n\n## Native maths UI\n\nNative formula $\\frac{x^2}{y_1}$ keeps its source.\n";
+            var beforeMaths = editor.Patterns.Value.Pattern.Value.Value;
+            var mathsClipboard = System.Windows.Clipboard.GetDataObject(); uint mathsSequence = 0;
+            try
+            {
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+                System.Windows.Clipboard.SetText(mathsFixture); mathsSequence = GetClipboardSequenceNumber();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeMaths + mathsFixture, "Literal maths fixture insertion changed source.");
+                var mathsStart = (beforeMaths + mathsFixture).IndexOf("$\\frac{x^2}{y_1}$", beforeMaths.Length, StringComparison.Ordinal);
+                var formulaImage = Find(window, "DocumentFormula" + mathsStart);
+                if (formulaImage.Name != @"Formula: \frac{x^2}{y_1}") throw new IOException("The native formula lost its accessible LaTeX label.");
+                var mathsHeading = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.FindText("Native maths UI", false, false)
+                    ?? throw new IOException("The formula heading did not appear in native preview text.");
+                mathsHeading.ScrollIntoView(true);
+                Wait(() => !formulaImage.IsOffscreen && formulaImage.BoundingRectangle.Width > 10, "The native formula did not acquire visible bounds.");
+                var formulaBounds = formulaImage.BoundingRectangle;
+                Mouse.Click(new System.Drawing.Point(formulaBounds.X + formulaBounds.Width / 2, formulaBounds.Y + formulaBounds.Height / 2), MouseButton.Right);
+                ContextAction("CopyFormulaSource").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => System.Windows.Clipboard.GetText() == @"\frac{x^2}{y_1}", "Formula context copy changed the LaTeX source.");
+                mathsSequence = GetClipboardSequenceNumber();
+                Find(window, "EditMenu").Click(); Find(window, "CopyRenderedText").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => System.Windows.Clipboard.GetText().Contains(@"Native formula \frac{x^2}{y_1} keeps its source.", StringComparison.Ordinal),
+                    "Copy rendered text lost the formula or surrounding prose.");
+                mathsSequence = GetClipboardSequenceNumber();
+                preview = Find(window, "DocumentPreview"); preview.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+                Wait(() => Find(window, "FindContext").Name == "Find in preview", "Formula search used the wrong context.");
+                Find(window, "FindText").AsTextBox().Text = @"\frac{x^2}{y_1}"; Keyboard.Type(VirtualKeyShort.RETURN);
+                Wait(() => Find(window, "Status").Name.StartsWith("Matching formula selected", StringComparison.Ordinal), "Preview Find did not locate native LaTeX source.");
+                Keyboard.Type(VirtualKeyShort.ESCAPE); window.CaptureToFile(Path.Combine(output, "native-maths-preview.png"));
+                if (editor.Patterns.Value.Pattern.Value.Value != beforeMaths + mathsFixture || File.ReadAllText(source) != templateSavedSource)
+                    throw new IOException("Native formula preview, copy or search changed source.");
+            }
+            finally { RestoreClipboard(mathsClipboard, mathsSequence); }
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeMaths, "One Undo did not restore the source before the maths fixture.");
+            checks.Add("Native maths has accessible drawing bounds, exact LaTeX context/plain copy and focused preview search, while preserving source and complete insertion Undo");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

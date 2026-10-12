@@ -88,6 +88,12 @@ internal static class Program
             try { NativeDetailsChecks.Run(detailsOutput); Console.WriteLine("Native details integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--maths")
+        {
+            var mathsOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(mathsOutput);
+            try { NativeMathChecks.Run(mathsOutput); Console.WriteLine("Native maths integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -174,6 +180,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native content catalogue: " + ex.Message); }
         try { NativeDetailsChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native details sections: " + ex.Message); }
+        try { NativeMathChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native maths: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

@@ -6,6 +6,7 @@ using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using LensDocsStudio.Core.Parsing;
+using Markdig.Extensions.Mathematics;
 
 namespace LensDocsStudio.Core.Exports;
 
@@ -33,6 +34,8 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new ProgressRenderer());
         renderer.ObjectRenderers.Insert(0, new FigureRenderer());
         renderer.ObjectRenderers.Insert(0, new DetailsRenderer(flattenDetails));
+        renderer.ObjectRenderers.Insert(0, new MathBlockRenderer(content));
+        renderer.ObjectRenderers.Insert(0, new MathInlineRenderer(content));
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(table is null ? content.Document.Syntax : table.Resolve(content.Document));
         // Generic Markdown attributes can carry event handlers or network-bearing styles.
@@ -52,6 +55,7 @@ public sealed class HtmlExporter
                     "max" or "value" => element.LocalName == "progress",
                     "aria-label" => element.LocalName == "progress",
                     "open" => element.LocalName == "details",
+                    "width" or "height" => element.LocalName == "img" && int.TryParse(attribute.Value, out var size) && size is > 0 and <= 8192,
                     "style" => attribute.Value is "text-align: left;" or "text-align: center;" or "text-align: right;",
                     _ => false
                 };
@@ -106,6 +110,26 @@ public sealed class HtmlExporter
                 .Write(WebUtility.HtmlEncode(obj.Summary)).Write("</summary>");
             renderer.WriteChildren(obj); renderer.Write(flatten ? "</section>" : "</details>");
         }
+    }
+    private static void Formula(HtmlRenderer renderer, ExportContent content, int start, string source, bool display)
+    {
+        renderer.Write(display ? "<div class=\"document-math math-block\">" : "<span class=\"document-math math-inline\">");
+        if (content.Formulae.TryGetValue(start, out var image))
+        {
+            renderer.Write("<img alt=\"").Write(WebUtility.HtmlEncode(source)).Write("\" src=\"data:image/png;base64,")
+                .Write(Convert.ToBase64String(image.PngBytes)).Write("\" width=\"").Write(((int)Math.Ceiling(image.DisplayWidth)).ToString(System.Globalization.CultureInfo.InvariantCulture))
+                .Write("\" height=\"").Write(((int)Math.Ceiling(image.DisplayHeight)).ToString(System.Globalization.CultureInfo.InvariantCulture)).Write("\">");
+        }
+        else renderer.Write("<code>").Write(WebUtility.HtmlEncode(source)).Write("</code>");
+        renderer.Write(display ? "</div>" : "</span>");
+    }
+    private sealed class MathBlockRenderer(ExportContent content) : HtmlMathBlockRenderer
+    {
+        protected override void Write(HtmlRenderer renderer, MathBlock block) => Formula(renderer, content, block.Span.Start, block.Lines.ToString(), true);
+    }
+    private sealed class MathInlineRenderer(ExportContent content) : HtmlMathInlineRenderer
+    {
+        protected override void Write(HtmlRenderer renderer, MathInline inline) => Formula(renderer, content, inline.Span.Start, inline.Content.ToString(), inline.DelimiterCount == 2);
     }
     private sealed class FigureRenderer : HtmlObjectRenderer<DocumentImageFigureBlock>
     {

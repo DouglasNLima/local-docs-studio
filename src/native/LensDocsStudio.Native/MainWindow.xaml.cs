@@ -31,6 +31,7 @@ public partial class MainWindow : Window
     private readonly NativeSvgService svg = new();
     private readonly ImageAssetService assets = new();
     private readonly PreviewImageService previewImages = new();
+    private readonly NativeMathService previewMaths = new();
     private readonly EditorCompletionService completion;
     private readonly MarkdownHighlighting editorHighlighting = new() { HighContrast = SystemParameters.HighContrast };
     private readonly SemaphoreSlim previewGate = new(1, 1);
@@ -149,13 +150,14 @@ public partial class MainWindow : Window
                     { prepared.results[code] = new(diagram.Source, null, "Native diagram rendering failed: " + ex.Message); }
                 }
                 var images = previewImages.Prepare(prepared.source, sourcePath, workspaceRoot, cancellation);
-                return (drawings, images);
+                var formulae = previewMaths.Prepare(prepared.source, dark, cancellation);
+                return (drawings, images, formulae);
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
-                selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id));
+                selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;
@@ -246,7 +248,15 @@ public partial class MainWindow : Window
         {
             rendered?.ExpandDetails();
             var start = Preview.Selection.IsEmpty ? Preview.Document.ContentStart : Preview.Selection.End;
-            if (!FindPreview(start, query)) FindPreview(Preview.Document.ContentStart, query);
+            if (!FindPreview(start, query) && !FindPreview(Preview.Document.ContentStart, query) && rendered is not null)
+            {
+                var match = rendered.Formulae.FirstOrDefault(formula => formula.Source.Contains(query, StringComparison.CurrentCultureIgnoreCase));
+                if (match is not null)
+                {
+                    Preview.Selection.Select(match.Element.ElementStart, match.Element.ElementEnd); match.Element.BringIntoView();
+                    model.Status = "Matching formula selected; its LaTeX source is available from the context menu.";
+                }
+            }
             return;
         }
         var text = Editor.Document.Text;
@@ -416,7 +426,7 @@ public partial class MainWindow : Window
     }
     private void CopyPreview(object sender, RoutedEventArgs e)
     {
-        try { rendered?.ExpandDetails(); Clipboard.SetText(new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
+        try { Clipboard.SetText(rendered?.ReadText() ?? new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
         catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
     }
     private async void CopyRenderedContent(object sender, RoutedEventArgs e) => await CopyDocumentAsync(false);

@@ -68,6 +68,12 @@ for (const mode of ['disk', 'static hosting']) {
     await expect(page.locator('#content details[open]')).toHaveCount(2);
     await expect(page.getByRole('heading', { name: 'Recovery evidence', exact: true })).toBeFocused();
     await expect(page.locator('#content')).toContainText('Details-search-token remains available');
+    await page.locator('#searchInput').fill('mathSearchToken');
+    await expect(page.locator('#searchResults .search-result strong')).toHaveText('Formula evidence');
+    await page.locator('#searchResults .search-result').click();
+    await expect(page.getByRole('heading', { name: 'Formula evidence', exact: true })).toBeFocused();
+    await expect(page.locator('#content .document-math img')).toHaveAttribute('alt', 'Q_{mathSearchToken}=\\frac{a}{b}');
+    await expect(page.locator('#content .document-math img')).toHaveCSS('background-color', 'rgb(250, 250, 250)');
     await page.locator('#searchInput').fill('src=x');
     await expect(page.locator('#searchResults mark')).toHaveText('src=x');
     await expect(page.locator('#searchResults img')).toHaveCount(0);
@@ -107,6 +113,13 @@ for (const mode of ['disk', 'static hosting']) {
     await page.locator('summary').filter({ hasText: 'Nested review' }).click();
     await expect(page.getByText('Nested needle 042.', { exact: true })).toBeVisible();
     await expect.poll(() => page.locator('img').evaluateAll(images => images.length === 2 && images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+    const maths = 'artifacts/native/validation/native-maths.html';
+    await page.goto(mode === 'disk' ? pathToFileURL(path.resolve(maths)).href : '/' + maths);
+    await expect(page.locator('.document-math img')).toHaveCount(16);
+    await expect(page.getByRole('img', { name: 'E=mc^2', exact: true })).toBeVisible();
+    await expect.poll(() => page.locator('.document-math img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > image.width))).toBe(true);
+    expect(await page.locator('p').first().textContent()).toContain('Inline');
+    await page.screenshot({ path: test.info().outputPath('native-maths-export.png'), fullPage: true });
     expect(errors).toEqual([]);
     expect(external).toEqual([]);
   });

@@ -32,7 +32,10 @@ public sealed class DocsSiteExporter
         {
             var baseId = string.IsNullOrEmpty(h.Id) ? "section" : h.Id; var id = baseId; var suffix = 2;
             while (!usedIds.Add(id)) id = baseId + "-" + suffix++;
-            h.Id = id; return new DocsSiteHeading(id, h.TextContent.Trim(), h.LocalName[1] - '0');
+            h.Id = id;
+            var headingCopy = (IElement)h.Clone(true);
+            foreach (var image in headingCopy.QuerySelectorAll("img")) image.ReplaceWith(html.CreateTextNode(image.GetAttribute("alt") ?? ""));
+            return new DocsSiteHeading(id, headingCopy.TextContent.Trim(), h.LocalName[1] - '0');
         }).ToArray();
         var metadata = content.Document.Metadata;
         var title = metadata.Title.Length > 0 ? metadata.Title : headings.FirstOrDefault()?.Text ?? System.IO.Path.GetFileNameWithoutExtension(path);
