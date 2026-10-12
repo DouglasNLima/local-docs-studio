@@ -2,7 +2,19 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest local work: Word code and quote import
+## Latest successful CI: 2af4471
+
+All four runs pass on attempt 1: native PR 38322046930, native push 38322043071, web PR 38322046933 and web push 38322043043. Both web logs record 262 passed cases, with static checks passing for 50 modules, 57 shell assets, 150 vendor assets and 56 runtime external-dependency scans. Each downloaded native TRX passes 912 core tests; the native corpus has 40 diagram/export cases and zero failures.
+
+Downloaded reports independently pass the PDF/Word list, block and style checks; four 62-check desktop contexts; three installed runtime-origin checks; five wizard outcomes; four files-in-use assertions; 20 preserved state files; two restored sessions; and disposable-certificate cleanup. All eight native-details-keyboard.json reports confirm actual Space expansion/collapse, header focus and preserved Markdown. The new template is included in these packages.
+
+Preview.246 matches clean PR merge 504cf6e34d53a4bfb58b7a2c2f9d78def7efa34d for head 2af4471fcdd982fa4888b025bd1ad08f058d91c7; preview.245 independently matches that clean branch head. All eight installer/ZIP hashes, sizes, runtime entries and unsigned metadata pass. The latest installer is 58,863,020 bytes, SHA-256 8E4C1DFAA0D4825A0DF9524C4087EE755E91DC7CC22078AD656FA8EF8D977B5F; portable ZIP SHA-256 DFAEDC77E0A1ED91A9EFA3C8EDED21DE1827721DBA34981CC32FDE8A861F3544. Both installers remain NotSigned and update envelopes contain no identity/signature. Neither downloaded installer was executed locally.
+
+Evidence is under artifacts/native/ci-2af4471-pr and ci-2af4471-push, including package-verification.json, runtime-evidence-review.json and native-runtime-inventory.json. Static dependency/payload inspection finds the required native runtime components and no matches for the known browser/JavaScript runtimes checked; this corroborates source composition and hosted execution, rather than claiming exhaustive behavioural proof. The downloaded light/dark details pages were visually inspected; details-visual-review.json records the observations and hashes.
+
+Details first input is 23.9392 ms (PR) and 20.2413 ms (push), with maximum input gaps of 29.7557 ms and 28.9035 ms. The complete text/source checks and 250 ms input bound remain unchanged. These passing samples do not establish elimination of the prior intermittent delay. The earlier failures remain below.
+
+## Word code and quote import: original local evidence
 
 Seven of eight initial regressions failed because code and quote paragraphs became ordinary text; the control confirms that generic spacing styles should remain ordinary text. The correction passes all 897 core tests, a zero-warning/error Release build, static checks and the complete native harness with 40 diagram/export cases and zero failures. Fourteen new cases cover literal Unicode, punctuation, entities, tabs and backticks; list placement; grouped quote paragraphs; bounded/cyclic/default/inherited styles and outline overrides; safe bookmark placement; table-cell flattening; literal hyperlink labels; and unchanged embedded image bytes. The original failures are retained in `artifacts/native/word-blocks-before/word-blocks-before.trx`; the complete result is `word-blocks-after/word-blocks-all.trx`.
 
@@ -14,7 +26,7 @@ Native PR 38318722662 and push 38318719792 fail on attempt 1. Both reach the Wor
 
 The push also fails native details construction with 728.273 ms first input/maximum gap. Stage records place 727.126 ms inside `DetailsToggle.InitializeComponent`; the sampled thread CPU does not increase during that interval. Text and source are complete. This localises the delay but does not establish its cause. The original logs, reports and artefacts are retained under `ci-4adb0ad-pr-failure` and `ci-4adb0ad-push-failure`. The 250 ms input bound is unchanged; no unchanged-source retry was requested.
 
-## Latest local work: inherited Word numbering
+## Inherited Word numbering: original local evidence
 
 Eight initial regressions fail under `artifacts/native/word-style-lists-before`. The correction passes 14 new cases for paragraph/default styles, inherited continuation indents, direct identifier/level/zero overrides, abstract style associations, marker overrides, headings, linked numbering styles, missing/wrong-type references and bounded/cyclic chains. The earlier code test now includes CRLF input. All 912 core tests pass in `word-style-lists-after/word-style-lists-final.trx`; Release builds with zero warnings/errors and static checks pass.
 
@@ -24,15 +36,15 @@ The full native harness passes 40 diagram/export cases with zero failures in `wo
 
 The 4adb0ad trace motivates removing per-control pack-resource loading from details construction. The same fixed XAML template is parsed from memory once per WPF thread. Native controls, automation patterns, bindings, foreground, dimensions and chevron remain. Full local validation passes 40 corpus/export cases with zero failures under `artifacts/native/details-memory-template-validation`; Release has zero warnings/errors. The focused header test invokes the actual Toggle automation provider, checks collapse/restore and a focusable 28-pixel area. Its final pages under `details-memory-template-final` match the preceding light/dark PNGs byte for byte (SHA-256 `81664B124DE95FAA1138788BDF0F7967BA9B065974E6BD53422C32C44AA55956` and `D48A2FF8F030D7B69CBD6302713814B92C469F8FA004D88CC0C1F1AF756D28F0`). The first probe captured before relayout and omitted arrows; moving control actions before pagination restores the actual final layout without weakening visual checks.
 
-Three new process samples in `details-memory-template-sample-1` through `-3` pass 12 nested layout cases, preserve complete text/source and retain the 250 ms limit. Maximum input gap is 63.34 ms; first details-template initialisation takes 14.16–15.53 ms. `details-memory-template-samples.json` records the measurements. This replaces a specific resource-loading path, but neither these local samples nor the 4adb0ad trace establish the intermittent delay's root cause or elimination. Actual Space-key expansion/collapse and retained focus/source are added to the existing hosted details workflow, with per-context evidence; that new keyboard assertion remains pending.
+Three new process samples in `details-memory-template-sample-1` through `-3` pass 12 nested layout cases, preserve complete text/source and retain the 250 ms limit. Maximum input gap is 63.34 ms; first details-template initialisation takes 14.16–15.53 ms. `details-memory-template-samples.json` records the measurements. This replaces a specific resource-loading path, but neither these local samples nor the 4adb0ad trace establish the intermittent delay's root cause or elimination. Actual Space-key expansion/collapse and retained focus/source are added to the existing hosted details workflow, with per-context evidence; that keyboard assertion now passes in all eight 2af4471 application contexts.
 
-## Latest successful CI: f86170d
+## Previous successful CI: f86170d
 
 Native PR 38319856432, native push 38319852791 and web PR/push 38319856463/38319852885 all pass on attempt 1. Both web logs record 262 passing cases. Downloaded native reports independently verify 912 core tests, 40 diagram/export cases, every PDF/Word list group, exact code/quote reimport and style-supplied numbering. Twelve inherited items retain six lists and exactly the same Markdown, including continuations and supported block content. Both hosted CRLF block probes now pass.
 
 Each native run passes four 62-check desktop contexts, three installed runtime-origin checks, five wizard outcomes, four files-in-use assertions, 20 preserved state files, restored sessions and disposable-certificate cleanup. Preview.244 matches clean PR merge `14bdb064fc09ccee80b8a875a0d081a6af92b289`, with captured parent head `f86170d5ab4866e858996e58f0b6561caf7db459`; preview.243 independently matches that clean branch head. All eight installer/ZIP hashes, sizes, runtime entries and unsigned metadata pass. The latest installer is 58,860,041 bytes with SHA-256 `6B91C0A18887BF6084287F733FA39F5DE27D8BD25026B830C438E48D8DBB711F`; the ZIP hash is `C81FB2E847A04C3CD79A544FF528895215182B8C56012729A3565880FBEE566D`.
 
-Evidence is under `artifacts/native/ci-f86170d-pr` and `ci-f86170d-push`, including `package-verification.json` and `runtime-evidence-review.json`. Neither package was executed locally. Details first input/maximum gap passes at 68.506 ms (PR) and 63.5606 ms (push), with complete text/source. These runs precede the template mitigation and do not establish the intermittent delay's cause. The later template/keyboard change requires separate CI.
+Evidence is under `artifacts/native/ci-f86170d-pr` and `ci-f86170d-push`, including `package-verification.json` and `runtime-evidence-review.json`. Neither package was executed locally. Details first input/maximum gap passes at 68.506 ms (PR) and 63.5606 ms (push), with complete text/source. These runs precede the template mitigation and do not establish the intermittent delay's cause. The later template/keyboard change is verified separately at 2af4471 above.
 
 ## Previous successful CI: 0d9d54f
 

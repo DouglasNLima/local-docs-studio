@@ -2,7 +2,7 @@
 
 The web feature guide, regression tests and content catalogue define the functional reference. The native application preserves their useful outcomes with WPF controls and portable local files. Production acceptance remains incomplete.
 
-Latest verified packages: unsigned preview.244 at clean PR merge 14bdb06 for head f86170d. Both native and both web runs pass on their first attempts; downloaded reports verify 912 core tests, 40 diagram/export cases, four 62-check desktop contexts, installed runtime origins, restored sessions and 20 preserved state files. Word styles/code/quotes and the CRLF correction pass. The later details-template mitigation needs its own CI. Exact evidence and earlier failures are in the [validation report](validation-report.md) and [engineering handover](engineering-handover.md).
+Latest verified packages: unsigned preview.246 at clean PR merge 504cf6e for head 2af4471. Both native and both web runs pass on their first attempts. Downloaded reports verify 912 core tests, 40 diagram/export cases, four 62-check desktop contexts per native run, installed runtime origins, restored sessions and 20 preserved state files. The details keyboard regression passes in all eight contexts. Exact evidence, package hashes and earlier failures are in the [validation report](validation-report.md) and [engineering handover](engineering-handover.md).
 
 The PDF list correction passes both b3a4d59 native runs. It retains single markers, nested/continuation alignment, zero/nine-digit starts and table/image bounds, with exact selectable text over 90 continuation paragraphs. All seven hosted push PDF pages were inspected. Actual package hashes, clean revisions and unsigned metadata are independently verified for previews .233 and .234.
 
@@ -10,7 +10,7 @@ The Word export list correction passes 850 core tests and the complete native ha
 
 The table retains feature-specific evidence and explicit limits. Earlier run numbers identify the original proof for that feature; current aggregate CI does not certify broader untested behaviour. The [archived matrix](history/functional-parity-matrix-through-b3a4d59.md) preserves the previous chronological notes in full.
 
-The later details-template change preserves native expansion patterns and byte-identical light/dark pages. Three fresh local processes pass 12 nested construction cases, with maximum input gap 63.34 ms. This does not prove the recurring CI pause is fixed. A focused hosted keyboard assertion remains pending.
+The later details-template change preserves native expansion patterns and byte-identical light/dark pages. Three fresh local processes pass 12 nested construction cases, with maximum input gap 63.34 ms. This does not prove the recurring CI pause is fixed. The hosted Space-key assertion now passes in all eight application contexts at 2af4471, preserving focus and source.
 
 | User need / existing contract | Native design | Status |
 |---|---|---|
