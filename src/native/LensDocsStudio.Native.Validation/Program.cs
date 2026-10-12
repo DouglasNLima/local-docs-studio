@@ -154,6 +154,12 @@ internal static class Program
             try { NativeClipboardApartmentChecks.Run(apartmentOutput); Console.WriteLine("Native clipboard apartment validation passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--shell-layout")
+        {
+            var shellOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(shellOutput);
+            try { NativeShellLayoutChecks.Run(shellOutput); Console.WriteLine("Native shell layout passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -212,6 +218,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }
         try { NativeClipboardApartmentChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native clipboard apartments: " + ex.Message); }
+        try { NativeShellLayoutChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native shell layout: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }

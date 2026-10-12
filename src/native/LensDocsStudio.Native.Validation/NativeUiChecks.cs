@@ -59,6 +59,8 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
+            CheckMinimumWindow(window, editor, output, source);
+            checks.Add("Minimum-size native window retains visible Cancel and Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             var find = Find(window, "FindText").AsTextBox();

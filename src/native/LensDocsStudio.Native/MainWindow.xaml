@@ -176,10 +176,16 @@
    </DockPanel>
   </Border>
   <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}">
-   <StatusBarItem><TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" MaxWidth="600" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/></StatusBarItem>
-   <Separator/><StatusBarItem><TextBlock Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/></StatusBarItem>
-   <Separator/><StatusBarItem><TextBlock x:Name="CaretStatus" Text="UTF-8" AutomationProperties.AutomationId="CaretStatus"/></StatusBarItem>
-   <StatusBarItem><Button Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}"/></StatusBarItem>
+   <StatusBar.ItemsPanel><ItemsPanelTemplate><Grid/></ItemsPanelTemplate></StatusBar.ItemsPanel>
+   <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+    <Grid>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
+     <TextBlock Grid.Column="1" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/>
+     <TextBlock Grid.Column="2" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
+     <Button Grid.Column="3" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation"/>
+    </Grid>
+   </StatusBarItem>
   </StatusBar>
   <Grid>
    <Grid.ColumnDefinitions><ColumnDefinition Width="230" MinWidth="150"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
@@ -202,13 +208,13 @@
      <TabControl.ContentTemplate><DataTemplate><Grid Height="0"/></DataTemplate></TabControl.ContentTemplate>
     </TabControl>
     <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8">
-     <StackPanel Orientation="Horizontal">
+     <WrapPanel>
       <TextBlock x:Name="FindContext" Text="Find in editor" VerticalAlignment="Center" Margin="0,0,8,0"/>
       <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" KeyDown="FindKeyDown"/>
       <TextBox x:Name="ReplaceText" Width="150" Padding="5" Margin="5,0" Visibility="Collapsed" AutomationProperties.Name="Replacement text"/>
-      <Button Content="Next" Click="FindNext"/><Button x:Name="ReplaceButton" Content="Replace" Visibility="Collapsed" Click="ReplaceOne"/>
-      <Button Content="Close" Click="CloseFind"/>
-     </StackPanel>
+      <Button Content="Next" Click="FindNext" AutomationProperties.AutomationId="FindNext"/><Button x:Name="ReplaceButton" Content="Replace" Visibility="Collapsed" Click="ReplaceOne" AutomationProperties.AutomationId="ReplaceOne"/>
+      <Button Content="Close" Click="CloseFind" AutomationProperties.AutomationId="CloseFind"/>
+     </WrapPanel>
     </Border>
     <Grid x:Name="ContentGrid">
      <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineColumn" Width="180"/></Grid.ColumnDefinitions>
