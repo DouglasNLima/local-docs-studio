@@ -15,7 +15,8 @@ public sealed class WorkspaceMoveRecovery(string directory)
         var items = new List<MoveRecoveryItem>(); var warnings = new List<string>();
         if (!Directory.Exists(DirectoryPath)) return new(items, warnings);
         long totalCharacters = 0;
-        foreach (var path in Directory.EnumerateFiles(DirectoryPath, "*.move.json").Concat(Directory.EnumerateFiles(DirectoryPath, "*.asset.json")))
+        foreach (var path in Directory.EnumerateFiles(DirectoryPath, "*.move.json").Concat(Directory.EnumerateFiles(DirectoryPath, "*.asset.json"))
+            .Concat(Directory.EnumerateFiles(DirectoryPath, "*.folder-move.json")))
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -31,7 +32,21 @@ public sealed class WorkspaceMoveRecovery(string directory)
                     drafts.Add(new(Path.GetFileName(path) + ":" + drafts.Count, name, text));
                 }
                 IReadOnlyList<DocumentLinkChange> changes;
-                if (path.EndsWith(".asset.json", StringComparison.Ordinal))
+                if (path.EndsWith(".folder-move.json", StringComparison.Ordinal))
+                {
+                    var journal = JsonSerializer.Deserialize<WorkspaceFolderMoveJournal>(bytes);
+                    if (journal is not { SchemaVersion: 1, Plan.Source: not null, Plan.Destination: not null, Plan.Documents: not null }) throw new IOException("The folder move record is incomplete or unsupported.");
+                    foreach (var change in journal.Plan.Documents)
+                    {
+                        if (change is not { Original.Text: not null, UpdatedText: not null, Destination: not null }) throw new IOException("A folder move recovery document is incomplete.");
+                        Add("Recovered original — " + Path.GetFileName(change.Original.Path), change.Original.Text);
+                        if (change.UpdatedText != change.Original.Text) Add("Planned folder links — " + Path.GetFileName(change.Destination), change.UpdatedText);
+                    }
+                    changes = [];
+                    warnings.Add("An interrupted folder move needs review: " + Path.GetFileName(journal.Plan.Source) + " → " + Path.GetFileName(journal.Plan.Destination)
+                        + ". Inspect the current folder and assets before moving anything. No file paths were replayed.");
+                }
+                else if (path.EndsWith(".asset.json", StringComparison.Ordinal))
                 {
                     var journal = JsonSerializer.Deserialize<AssetMoveJournal>(bytes);
                     if (journal is not { SchemaVersion: 1, Plan.Source.Path: not null, Plan.Destination: not null, Plan.Documents: not null }) throw new IOException("The image move record is incomplete or unsupported.");
@@ -63,7 +78,7 @@ public sealed class WorkspaceMoveRecovery(string directory)
     public void MarkReviewed(string path)
     {
         path = Path.GetFullPath(path);
-        if (!WorkspacePath.Contains(DirectoryPath, path) || Path.GetDirectoryName(path) != DirectoryPath || !(path.EndsWith(".move.json", StringComparison.Ordinal) || path.EndsWith(".asset.json", StringComparison.Ordinal)))
+        if (!WorkspacePath.Contains(DirectoryPath, path) || Path.GetDirectoryName(path) != DirectoryPath || !(path.EndsWith(".move.json", StringComparison.Ordinal) || path.EndsWith(".asset.json", StringComparison.Ordinal) || path.EndsWith(".folder-move.json", StringComparison.Ordinal)))
             throw new IOException("The move recovery record is outside native state.");
         WorkspacePath.RejectReparsePoints(path);
         // Call only after the draft copies have been saved in session recovery. Retain the journal.

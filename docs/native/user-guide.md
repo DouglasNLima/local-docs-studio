@@ -38,7 +38,11 @@ Unsaved documents and edits are retained in separate recovery state. **File → 
 
 If another application changes a file, Lens Docs Studio flags the difference and keeps your editor text. Follow the conflict choices rather than assuming the version on disk is unchanged. **Reload from disk** asks about unsaved work and retains recovery where supported.
 
-Use **Rename or move document** to review affected links before applying a move, including a filename case change such as `Guide.md` to `GUIDE.md`. Existing destination entries are never replaced, and private application state is excluded from link updates. **Delete document** uses recoverable Windows deletion and retains a snapshot. Folder moves remain under development.
+Use **Rename or move document** to review affected links before applying a move, including a filename case change such as `Guide.md` to `GUIDE.md`. Existing destination entries are never replaced, and private application state is excluded from link updates. **Delete document** uses recoverable Windows deletion and retains a snapshot.
+
+Select a folder in the workspace tree and press **F2**, or choose **File → Rename or move selected folder**, to move the complete folder with assets and empty subfolders. Save any open workspace edits when prompted, then review the destination and document link changes. The destination's parent folder must already exist; existing folders are never merged. Clear the link-update option to keep document bytes unchanged. Raw HTML references and unresolved wiki targets need the manual review described in the warnings.
+
+Folder moves check up to 5,000 entries, 256 MB of file content and 1,000 workspace documents, with bounded source/recovery text. New or changed files stop a reviewed move. Failed link writes attempt to restore completed writes and the original folder; if external changes prevent reversal, current files and recovery text are retained for review. Startup recovery opens original/planned text as drafts and never replays folder paths. Open tabs, recent paths and Back/Forward follow a successful move. Case-only folder renaming is not yet supported.
 
 ## Images and attachments
 

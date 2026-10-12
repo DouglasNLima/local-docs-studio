@@ -41,6 +41,11 @@ public sealed class DesktopDialogs
         var window = new MoveDocumentWindow(workspace, plan) { Owner = Owner };
         return window.ShowDialog() == true ? window.ShouldUpdateLinks : null;
     }
+    public bool? ReviewFolderMove(WorkspacePath workspace, WorkspaceFolderMovePlan plan)
+    {
+        var window = new MoveFolderWindow(workspace, plan) { Owner = Owner };
+        return window.ShowDialog() == true ? window.ShouldUpdateLinks : null;
+    }
     public WorkspaceAssetAction? SelectAssetAction(WorkspacePath workspace, WorkspaceAssetAudit audit)
     {
         var window = new WorkspaceAssetsWindow(workspace, audit) { Owner = Owner };

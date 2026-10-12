@@ -127,6 +127,8 @@ internal static partial class NativeUiChecks
             checks.Add("Native rename review saves unsaved linked content, moves the file, updates links and refreshes open editor text");
             CheckCaseOnlyRename(window, editor, automation, app.ProcessId, source, renamedDocument);
             checks.Add("Case-only rename reviews real filename/link changes, refreshes open drafts and history, and restores original spelling without changing document bytes");
+            CheckFolderMove(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("Native folder F2 review preserves unsaved edits, binary assets and empty folders, updates incoming Markdown/wiki links in open tabs and relocates Back/Forward history");
             Find(window, "FileMenu").Click(); Find(window, "CreateWorkspaceFile").Patterns.Invoke.Pattern.Invoke();
             Window? createWindow = null;
             Wait(() => (createWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Create workspace file")))?.AsWindow()) is not null, "The workspace create-file dialogue did not open.");
@@ -1514,9 +1516,17 @@ internal static partial class NativeUiChecks
             // Retry a transient UIA observation within the original deadline, never the user action.
             try { if (condition()) return; }
             catch (Exception ex) when (ex is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException
-                || ex is COMException && ex.HResult == unchecked((int)0x80131505)) { lastObservationError = ex; }
+                || IsObservationTimeout(ex)) { lastObservationError = ex; }
             Thread.Sleep(100);
         }
         throw new InvalidOperationException(failure, lastObservationError);
+    }
+    private static bool IsObservationTimeout(Exception error) => error is COMException && error.HResult == unchecked((int)0x80131505)
+        || error is FlaUI.Core.Exceptions.PatternNotSupportedException { InnerException: COMException inner } && inner.HResult == unchecked((int)0x80131505);
+    private static string ReadEditorText(AutomationElement editor)
+    {
+        string? text = null;
+        Wait(() => { text = editor.Patterns.Value.Pattern.Value.Value; return true; }, "The editor text provider remained unavailable.");
+        return text!;
     }
 }

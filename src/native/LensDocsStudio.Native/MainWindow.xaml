@@ -56,6 +56,7 @@
     <MenuItem Header="Document snapshots…" Command="{Binding BrowseSnapshotsCommand}" AutomationProperties.AutomationId="BrowseSnapshots"/>
     <MenuItem Header="Workspace images…" Command="{Binding BrowseAssetsCommand}" AutomationProperties.AutomationId="BrowseAssets"/>
     <MenuItem Header="Rename or move document…" InputGestureText="F2" Command="{Binding MoveDocumentCommand}" AutomationProperties.AutomationId="MoveDocument"/>
+    <MenuItem Header="Rename or move selected folder…" Command="{Binding MoveFolderCommand}" CommandParameter="{Binding SelectedItem, ElementName=WorkspaceTree}" AutomationProperties.AutomationId="MoveFolder"/>
     <MenuItem Header="Delete document…" Command="{Binding DeleteDocumentCommand}" AutomationProperties.AutomationId="DeleteDocument"/>
     <MenuItem Header="Reveal in File _Explorer" Click="RevealFile"/>
     <Separator/>

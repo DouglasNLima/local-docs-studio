@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Native push at 5c26bac passes all 50 built/installed/reinstalled workflows, including map and case-only rename. Folder moves add thirteen core cases and four native review outcomes; all 699 core tests and native integration pass. Workflow 51 and the wrapped UIA observation correction await CI.
+
 Case-only file renames now use the existing review, conflict checks, link updates and rollback. Six added core cases pass within all 686 core tests; the 50th desktop workflow checks filename spelling, linked tabs and history in both directions. CI remains pending.
 
 The 43457b1 desktop map run validates report copying, exact source selection and Back navigation. Its retained native diagram is correct, but direct desktop-child lookup misses the owned window. Stable automation identity and descendant discovery now cover that hierarchy; desktop/installed revalidation is pending.
@@ -10,6 +12,7 @@ Wiki desktop validation at 8289763 confirms completion but exposes an incorrect 
 
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
+| Complete folder moves with reviewed references | High / medium | Native tree F2 and File menu preserve confirmed drafts, binary assets and empty subfolders, review ordinary/wiki links, reject changed inventories/collisions and retain recovery on incomplete reversal. Tabs/history/recent paths follow successful moves. Thirteen core cases and four native layout outcomes pass; desktop/installed workflow 51 is pending |
 | Filename case changes with reviewed links | Medium / low | Rename Guide.md to GUIDE.md without a temporary user file or bypassing collision checks. Preserve exact source bytes when no edits are needed, retain parent spelling and reverse completed changes on failure. Private state is excluded. Six core cases pass; desktop/installed round-trip checks await CI |
 | Read-only workspace document map | High / low | Native searchable documents, incoming/outgoing links, unresolved filters and exact source selection use current saved-file drafts. Back/Forward, native diagrams and passive Markdown reports preserve source. Partial scans and bounded graph/report coverage remain explicit. Both themes and minimum client sizes were inspected; desktop copy/navigation/diagram/Undo validation awaits CI |
 | Unambiguous native wiki links and completion | High / low | Source-aware links expose readable aliases and full-path completion. Duplicate short names report candidate paths; navigation, reviewed moves and review stay workspace-scoped. Completion preserves one Undo/Redo and avoids literal code. Forty-seven core cases, four native outcomes and eight exported-browser cases pass; the 48th desktop workflow awaits CI |

@@ -176,8 +176,10 @@ public partial class MainWindow : Window
     private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntryViewModel { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
     private async Task RenameTreeEntryAsync()
     {
+        if (WorkspaceTree.SelectedItem is WorkspaceEntryViewModel { IsDirectory: true } folder)
+        { model.MoveFolderCommand.Execute(folder); return; }
         if (WorkspaceTree.SelectedItem is not WorkspaceEntryViewModel { IsDirectory: false } entry)
-        { model.Status = "Select a document to rename or move."; return; }
+        { model.Status = "Select a document or folder to rename or move."; return; }
         var opened = false;
         await model.RunAsync(async () => { await model.OpenPathAsync(entry.Path); opened = true; });
         if (opened) model.MoveDocumentCommand.Execute(null);

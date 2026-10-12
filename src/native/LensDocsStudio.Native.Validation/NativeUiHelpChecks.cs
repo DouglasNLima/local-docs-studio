@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckHelpGuide(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string source)
     {
-        var original = editor.Patterns.Value.Pattern.Value.Value; var saved = File.ReadAllText(source);
+        var original = ReadEditorText(editor); var saved = File.ReadAllText(source);
         FocusWindow(owner); Keyboard.Type(VirtualKeyShort.F1);
         Window? guide = null;
         Wait(() => (guide = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Native guide")))?.AsWindow()) is not null,
@@ -31,7 +31,7 @@ internal static partial class NativeUiChecks
         Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Native guide"))) is null,
             "Escape did not close the native guide.");
-        if (editor.Patterns.Value.Pattern.Value.Value != original || File.ReadAllText(source) != saved)
+        if (ReadEditorText(editor) != original || File.ReadAllText(source) != saved)
             throw new IOException("Using the native help guide changed the active document.");
     }
 }
