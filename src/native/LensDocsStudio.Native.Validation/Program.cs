@@ -329,8 +329,6 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native diagram painting: " + ex.Message); }
         try { NativeDiagramFailureChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native diagram recovery: " + ex.Message); }
-        try { NativeDetailsLatencyChecks.Run(output); }
-        catch (Exception ex) { failures.Add("Native details expansion: " + ex.Message); }
         try { NativeSvgChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }
@@ -407,6 +405,9 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native content catalogue: " + ex.Message); }
         try { NativeDetailsChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native details sections: " + ex.Message); }
+        // Keep the existing first-construction timing check ahead of this control-heavy fixture.
+        try { NativeDetailsLatencyChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native details expansion: " + ex.Message); }
         try { NativeMathChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native maths: " + ex.Message); }
         try { NativeArtifactChecks.Run(output, repository); }
