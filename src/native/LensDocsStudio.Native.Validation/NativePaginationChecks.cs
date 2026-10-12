@@ -46,6 +46,7 @@ internal static class NativePaginationChecks
             host.RootVisual = viewer; Layout(viewer);
             while (firstInputMilliseconds < 0) Pump();
             if (viewer.ViewingMode != FlowDocumentReaderViewingMode.Page) throw new IOException("Automatic reading did not paginate the long fixture.");
+            CheckAccessiblePageCounter(viewer);
             CheckAccessibleText(viewer, "Item 4000");
             var target = Find(result.Document, "Item 4000");
             var beats = 0; double worstInputMilliseconds = 0;
@@ -62,6 +63,7 @@ internal static class NativePaginationChecks
                 throw new IOException("Paged navigation did not reveal and select the final item: " + JsonSerializer.Serialize(new
                 { navigation.Result, viewer.PageNumber, viewer.PageCount, selection = viewer.Selection?.Text, viewer.IsLoaded, viewer.IsVisible }));
             Layout(viewer);
+            CheckAccessiblePageCounter(viewer);
             var rectangle = target.GetCharacterRect(LogicalDirection.Forward);
             if (rectangle.IsEmpty || rectangle.Top < 0 || rectangle.Bottom > viewer.ActualHeight)
                 throw new IOException("The selected paginated target is outside the visible page: " + rectangle);
@@ -145,6 +147,16 @@ internal static class NativePaginationChecks
         if (peer.GetPattern(PatternInterface.Text) is not ITextProvider provider
             || !provider.DocumentRange.GetText(-1).Contains(expected, StringComparison.Ordinal))
             throw new IOException("The reading control does not expose its complete document through native text automation.");
+    }
+
+    private static void CheckAccessiblePageCounter(DocumentPreview viewer)
+    {
+        var counter = (FrameworkElement)viewer.Template.FindName("PageNumber", viewer);
+        var peer = FrameworkElementAutomationPeer.CreatePeerForElement(counter);
+        if (!peer.IsControlElement() || peer.GetAutomationId() != "PreviewPageNumber"
+            || peer.GetName() != $"Page {viewer.PageNumber} of {viewer.PageCount}")
+            throw new IOException("The current page counter is missing from native control-view automation or has an obsolete accessible name: "
+                + JsonSerializer.Serialize(new { control = peer.IsControlElement(), id = peer.GetAutomationId(), name = peer.GetName(), viewer.PageNumber, viewer.PageCount }));
     }
 
     private static void CheckDiagram(DocumentPreview viewer, NativeMarkdownRenderer renderer, string output)

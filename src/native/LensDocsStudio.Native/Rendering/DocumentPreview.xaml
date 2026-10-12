@@ -11,9 +11,10 @@
          <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
          <Button Grid.Column="0" Content="‹" Padding="8,2" Margin="0" Command="NavigationCommands.PreviousPage" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
           IsEnabled="{Binding CanGoToPreviousPage, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="Previous page" AutomationProperties.Name="Previous page" AutomationProperties.AutomationId="PreviewPreviousPage"/>
-         <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4,0" TextTrimming="CharacterEllipsis" AutomationProperties.AutomationId="PreviewPageNumber">
-          <TextBlock.Text><MultiBinding StringFormat="Page {0} of {1}"><Binding Path="PageNumber" RelativeSource="{RelativeSource TemplatedParent}"/><Binding Path="PageCount" RelativeSource="{RelativeSource TemplatedParent}"/></MultiBinding></TextBlock.Text>
-         </TextBlock>
+         <Label x:Name="PageNumber" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="4,0" Padding="0" AutomationProperties.AutomationId="PreviewPageNumber"
+          Content="{Binding Path=(AutomationProperties.Name), RelativeSource={RelativeSource Self}}">
+          <AutomationProperties.Name><MultiBinding StringFormat="Page {0} of {1}"><Binding Path="PageNumber" RelativeSource="{RelativeSource TemplatedParent}"/><Binding Path="PageCount" RelativeSource="{RelativeSource TemplatedParent}"/></MultiBinding></AutomationProperties.Name>
+         </Label>
          <Button Grid.Column="2" Content="›" Padding="8,2" Margin="0" Command="NavigationCommands.NextPage" CommandTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
           IsEnabled="{Binding CanGoToNextPage, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="Next page" AutomationProperties.Name="Next page" AutomationProperties.AutomationId="PreviewNextPage"/>
         </Grid>

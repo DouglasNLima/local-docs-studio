@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+The first pagination desktop runs at 640b999 both stop at page-counter accessibility: the visible TextBlock was excluded from control-view automation. The native Label correction now passes a reproducing managed-peer check for initial and final page names; actual desktop/installer revalidation is pending. Both 640b999 web runs pass, alongside native build, 800 core tests, integration and export-browser checks.
+
 Pagination update: Automatic, Continuous and Pages reading now preserve the complete native document, selection, original media and source. Seven hidden-HWND outcomes and 800 core tests pass locally; the 57-workflow desktop suite adds actual next/previous, distant preview Find, Undo and reading-mode persistence checks and awaits CI. The completed 230852b evidence below predates this change.
 
 Current product evidence: all four 230852b CI runs pass, including the expanded actual PDF Export-menu Unicode check in 56 built/installed/upgraded/reinstalled workflows. The downloaded PDF report retains CJK, Arabic and Hebrew characters on Windows CI; it does not certify shaping or reading order. Matching unsigned preview.171 packages and outstanding acceptance are recorded in the [engineering handover](engineering-handover.md).

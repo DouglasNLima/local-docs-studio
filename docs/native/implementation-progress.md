@@ -1,5 +1,7 @@
 # Native implementation progress
 
+The first pagination CI runs (640b999) exposed a visible page counter missing from UIA control view. The captured app had reached page 2 correctly. The counter is now a native Label with a bound accessible name; a focused assertion fails before and passes after this correction. Native build/core/integration/export-browser checks and both web runs pass at 640b999, but corrected desktop and installer checks await the follow-up run. Full failure logs and the screenshot are retained.
+
 Automatic native pagination now addresses the long-document initial-layout stall. Users can choose Continuous or Pages; distant preview navigation preserves exact selection and ignores obsolete requests. Page-sized media retain original images/vector/source and all diagram actions. The existing TextPattern is preserved by a native automation peer. Local Release, 800 core tests, seven pagination outcomes, the full native harness and static checks pass. A 57th real desktop workflow and reading-mode restart checks are added for isolated Windows CI; those runs are pending.
 
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
