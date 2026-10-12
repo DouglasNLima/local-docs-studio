@@ -1,5 +1,9 @@
 # Native implementation progress
 
+The diagnostic/evidence follow-up b373968 passed both native and both web CI runs before this wizard change.
+
+Visible installer-wizard coverage is now implemented for isolated Windows CI. It checks the explicit preview version and per-user default location, keyboard task selection, path/choice retention through Back, confirmed cancellation without installation, visible Install/Finish, the unchecked launch option, actual files/version/shortcuts/Open with registration, preservation and cleanup. The installer welcome page now states its preview version. Release builds and static checks pass; a local guard test proves this command refuses the active desktop before opening any installer. The actual wizard workflow is not yet executed and remains pending CI.
+
 Revision b1b500c passes native push 38245092255 and native PR 38245098298 on its second attempt, plus both web runs 38245098093/38245092183. Each completed native run passes 800 core tests, seven signature cases, seven combined update cases, 12 export-browser cases and 58 desktop workflows in built/installed/upgraded/reinstalled apps. Each web run passes 262 cases. The first native PR attempt failed the existing nested-details construction assertion; its cause remains unproven and its evidence is retained. The follow-up harness records timing, content/source predicates and collection counts without changing the 250 ms limit.
 
 Downloaded push evidence under artifacts/native/ci-b1b500c-push confirms all six PDF-decoration outcomes, 17-page wrapped formatting, actual Export-menu output, visible final-page search highlighting with keyboard focus in Find, preview.179 lifecycle success and 20 unchanged state files. Both package versions match SHA-256 records; the native window and exported PDF raster were inspected. Temporary certificates were removed and production trust stayed unchanged.

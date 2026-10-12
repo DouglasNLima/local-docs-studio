@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+The visible installer check runs on a separate MTA automation thread and only on disposable GitHub-hosted Windows runners. It refuses existing native registration, associations, shortcuts or default installation files, uses a unique reviewed destination, validates native UIA/MSAA choice states and keyboard actions, and cleans up only its own exact uninstaller. It complements the existing silent upgrade/lifecycle checks. No local foreground interaction is required to compile it or verify its execution guard. Actual wizard results remain pending CI.
+
 The PDF-decoration and Find-focus implementations pass both completed b1b500c native runs, including 58 workflows in every application context. The first PR attempt fails an existing layout assertion and remains recorded; no timing threshold was relaxed. The follow-up CI artefact selection retains installed-app highlight reports/screenshots and decorated PDF outputs.
 
 PDF strike-through and highlighting use the native layout engine's generated link rectangles to preserve exact wrapping and pagination. Per-export temporary targets map to bounded decoration records; one pass over the bounded, freshly generated PDF adds strokes and neutral multiply-blended highlight rectangles, removes temporary annotations/objects and restores real URI/bookmark links. The existing supplementary-character mapping correction shares that pass. No browser, private library API, source mutation or PDF-input processing is introduced.

@@ -1619,11 +1619,11 @@ internal static partial class NativeUiChecks
         try { if (previous is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(previous, true); }
         catch (ExternalException) { }
     }
-    private static void Wait(Func<bool> condition, string failure)
+    private static void Wait(Func<bool> condition, string failure, int seconds = 20)
     {
         var timer = Stopwatch.StartNew();
         Exception? lastObservationError = null;
-        while (timer.Elapsed < TimeSpan.FromSeconds(20))
+        while (timer.Elapsed < TimeSpan.FromSeconds(seconds))
         {
             // Retry a transient UIA observation within the original deadline, never the user action.
             try { if (condition()) return; }

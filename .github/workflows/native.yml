@@ -52,6 +52,9 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.1-preview.${{ github.run_number }}"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate visible installer wizard
+        timeout-minutes: 4
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard
       - name: Validate installation upgrade and uninstall lifecycle
         run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe"
       - name: Upload validation evidence
@@ -65,6 +68,7 @@ jobs:
             artifacts/native/validation/
             artifacts/native/ui/
             artifacts/native/site-browser/
+            artifacts/native/installer-wizard/
             artifacts/native/install-smoke/**/installer-results.json
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json

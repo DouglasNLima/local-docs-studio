@@ -66,4 +66,4 @@ Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait
 
 [Messages]
 english.WelcomeLabel1=Welcome to the [name] installation wizard
-english.WelcomeLabel2=Local Markdown, Mermaid, and documentation studio.%n%nThis internal preview installs alongside the existing Windows edition. Workspace documents and application state are preserved during uninstall.
+english.WelcomeLabel2=Version {#AppVersion}%n%nLocal Markdown, Mermaid, and documentation studio.%n%nThis internal preview installs alongside the existing Windows edition. Workspace documents and application state are preserved during uninstall.
