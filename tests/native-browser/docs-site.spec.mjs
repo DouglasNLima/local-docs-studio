@@ -3,6 +3,38 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 for (const mode of ['disk', 'static hosting']) {
+  test(`native code export retains text and accessible theme colours from ${mode}`, async ({ page }) => {
+    const errors = [];
+    const external = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('request', request => {
+      if (/^https?:/.test(request.url()) && !request.url().startsWith('http://127.0.0.1:')) external.push(request.url());
+    });
+    const open = relative => page.goto(mode === 'disk' ? pathToFileURL(path.resolve(relative)).href : '/' + relative);
+    await page.emulateMedia({ colorScheme: 'light' });
+    await open('artifacts/native/validation/native-html-syntax.html');
+    await expect(page.locator('.code-syntax-string')).toHaveCSS('color', 'rgb(22, 101, 52)');
+    expect(await page.locator('pre code').first().textContent()).toContain('\tvar label = "Café <img src=x onerror=run()> 😀";\n    return label + 42;');
+    await expect(page.locator('script,img,[onerror]')).toHaveCount(0);
+    await open('artifacts/native/validation/docs-site/index.html');
+    const string = page.locator('#content .code-syntax-string');
+    await expect(string).toHaveText('"Café <studio>"');
+    await expect(string).toHaveCSS('color', 'rgb(22, 101, 52)');
+    await page.locator('#themeToggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+    await page.locator('#themeToggle').click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect(string).toHaveCSS('color', 'rgb(166, 214, 158)');
+    await page.screenshot({ path: test.info().outputPath('native-code-site-dark.png'), fullPage: true });
+    await page.emulateMedia({ media: 'print' });
+    await expect(string).toHaveCSS('color', 'rgb(22, 101, 52)');
+    await page.emulateMedia({ media: 'screen', forcedColors: 'active' });
+    await expect(string).toHaveCSS('color', await page.locator('#content h1').evaluate(element => getComputedStyle(element).color));
+    await expect(string).toHaveText('"Café <studio>"');
+    expect(errors).toEqual([]);
+    expect(external).toEqual([]);
+  });
+
   test(`native artefact site retains supplied labels and front-matter priority from ${mode}`, async ({ page }) => {
     const errors = [];
     const external = [];

@@ -98,7 +98,7 @@ public sealed class DocsSiteExporter
         using var output = new MemoryStream(); long total = 0;
         using (var archive = new ZipArchive(output, ZipArchiveMode.Create, true))
         {
-            Add("index.html", Shell(options)); Add("assets/docs-site.css", Resource("site.css")); Add("assets/docs-site.js", Resource("site.js"));
+            Add("index.html", Shell(options)); Add("assets/docs-site.css", Resource("site.css") + "\n" + CodeSyntaxHtml.ThemeCss); Add("assets/docs-site.js", Resource("site.js"));
             Add("assets/docs-site-data.js", "window.__LENS_DOCS_SITE_DATA__ = " + indexJson + ";\n");
             Add("assets/search-index.json", indexJson); Add("site-manifest.json", JsonSerializer.Serialize(manifest, Json));
             Add("README.md", "# " + options.Title + "\n\nExported by Lens Docs Studio Native.\n\nOpen index.html directly, or copy the complete folder to GitHub Pages or another static host. Keep the assets folder beside index.html. No server, runtime build or external service is required.\n\nThis package contains rendered documentation, embedded local images and diagrams, navigation, local full-text search and light/dark/system themes. Original Markdown and private workspace state are not included.\n");

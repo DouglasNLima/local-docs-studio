@@ -116,7 +116,7 @@ The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Do
 
 Word and PDF retain HTTP, HTTPS and email links, including angle-bracket URLs such as `<https://example.org>` and email addresses such as `<review@example.org>`. PDF links remain clickable when their labels wrap. Unsupported external schemes and relative file links remain readable text in standalone Word/PDF exports.
 
-Word and PDF code blocks retain syntax colours for supported languages and preserve indentation as editable or selectable text. Word keeps tabs and line breaks without adding an extra final blank line. Unknown languages and blocks that exceed the colouring limit retain complete plain text. HTML code blocks currently use plain text without syntax colours.
+Word, PDF, HTML and rich-copy code blocks retain syntax colours for supported languages and preserve indentation as editable or selectable text. Word keeps tabs and line breaks without adding an extra final blank line. Unknown languages and blocks that exceed the colouring limit retain complete plain text. Exported Docs Sites adapt code colours to the chosen theme, printing and high-contrast preferences.
 
 Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
 

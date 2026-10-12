@@ -699,6 +699,14 @@ internal static partial class NativeUiChecks
                 contextClipboardSequence = GetClipboardSequenceNumber();
                 if (NativeUiClipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
                 var codeSavedSource = File.ReadAllText(source);
+                Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Coloured code copying did not complete.");
+                contextClipboardSequence = GetClipboardSequenceNumber();
+                var richCode = NativeUiClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Coloured code copying omitted Windows HTML Format.");
+                var codeHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(richCode));
+                if (codeHtml.QuerySelector("pre code")?.TextContent != contextCode
+                    || codeHtml.QuerySelector(".code-syntax-string")?.GetAttribute("style") != "color: #166534;")
+                    throw new IOException("Actual Windows rich copying lost code text, indentation or syntax colours.");
                 Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
                 var codeExport = Path.Combine(runRoot, "coloured-code.docx"); SaveThroughDialogue(codeExport, "Export DOCX");
                 Wait(() => File.Exists(codeExport) && Find(window, "Status").Name == "Exported coloured-code.docx", "Coloured Word export did not complete.");
@@ -712,7 +720,7 @@ internal static partial class NativeUiChecks
                 }
                 if (ReadEditorText(editor) != contextMarkdown || File.ReadAllText(source) != codeSavedSource)
                     throw new IOException("Coloured Word export changed editor or saved source.");
-                checks.Add("The native Export menu creates schema-valid Word code with editable Unicode, indentation and syntax colours while preserving editor and saved source");
+                checks.Add("Native rich copying and the Word Export menu retain editable Unicode, indentation and syntax colours while preserving editor and saved source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");

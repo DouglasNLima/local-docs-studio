@@ -6,6 +6,7 @@ using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
 using Markdig.Extensions.Mathematics;
 
 namespace LensDocsStudio.Core.Exports;
@@ -61,7 +62,8 @@ public sealed class HtmlExporter
                     "aria-label" => element.LocalName == "progress",
                     "open" => element.LocalName == "details",
                     "width" or "height" => element.LocalName == "img" && int.TryParse(attribute.Value, out var size) && size is > 0 and <= 8192,
-                    "style" => attribute.Value is "text-align: left;" or "text-align: center;" or "text-align: right;",
+                    "style" => attribute.Value is "text-align: left;" or "text-align: center;" or "text-align: right;"
+                        || element.LocalName == "span" && CodeSyntaxHtml.IsSafeStyle(attribute.Value),
                     _ => false
                 };
                 if (!allowed) element.RemoveAttribute(attribute.Name);
@@ -90,7 +92,20 @@ public sealed class HtmlExporter
                 if (!content.Diagrams.TryGetValue(obj.Span.Start, out var image)) throw new InvalidDataException("A Mermaid diagram could not be exported.");
                 renderer.Write("<figure><img alt=\"Mermaid diagram\" src=\"data:image/png;base64,").Write(Convert.ToBase64String(image.PngBytes)).Write("\"></figure>");
             }
-            else renderer.Write("<pre><code>").Write(WebUtility.HtmlEncode(obj.Lines.ToString())).Write("</code></pre>");
+            else
+            {
+                CodeSyntaxBlock? syntax = null;
+                content.CodeSyntax?.Blocks.TryGetValue(obj, out syntax);
+                renderer.Write("<pre><code>");
+                foreach (var segment in CodeSyntaxRuns.Read(obj.Lines.ToString(), syntax))
+                {
+                    if (segment.Role != CodeTokenRole.Plain)
+                        renderer.Write("<span class=\"").Write(CodeSyntaxHtml.Class(segment.Role)).Write("\" style=\"").Write(CodeSyntaxHtml.Style(segment.Role)).Write("\">");
+                    renderer.Write(WebUtility.HtmlEncode(segment.Text));
+                    if (segment.Role != CodeTokenRole.Plain) renderer.Write("</span>");
+                }
+                renderer.Write("</code></pre>");
+            }
         }
     }
     private sealed class LinkRenderer(ExportContent content) : HtmlObjectRenderer<LinkInline>

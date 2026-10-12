@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
+using AngleSharp.Html.Parser;
 using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
@@ -67,6 +68,9 @@ public sealed class CodeSyntaxExportTests
         var paragraph = Assert.Single(word.MainDocumentPart!.Document!.Body!.Elements<W.Paragraph>());
         Assert.Equal(code.Replace("\r\n", "\n"), ReadCode(paragraph));
         Assert.All(paragraph.Elements<W.Run>(), run => Assert.Null(run.RunProperties?.Color));
+        var html = new HtmlParser().ParseDocument(new HtmlExporter().Export(content));
+        Assert.Equal(code.Replace("\r\n", "\n"), html.QuerySelector("pre code")!.TextContent);
+        Assert.Empty(html.QuerySelectorAll("pre code span"));
     }
 
     [Fact]
@@ -87,6 +91,31 @@ public sealed class CodeSyntaxExportTests
     {
         var parsed = new MarkdownService().Parse("```csharp\r\n" + code + "\r\n```");
         return (new(parsed, new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()), parsed.Syntax.Descendants<FencedCodeBlock>().Single());
+    }
+
+    [Theory]
+    [InlineData("file")]
+    [InlineData("fragment")]
+    [InlineData("clipboard")]
+    public void Html_code_keeps_safe_token_colours_exact_text_and_no_active_markup(string format)
+    {
+        const string code = "public\tstring label = \"Café <img src=x onerror=run()> 😀\";\r\n    return label;";
+        var (content, block) = Prepare(code);
+        var text = block.Lines.ToString();
+        content = content with { CodeSyntax = new(new Dictionary<CodeBlock, CodeSyntaxBlock> { [block] = new(text,
+            [new(0, 6, CodeTokenRole.Keyword), new(text.IndexOf('"'), text.LastIndexOf('"') - text.IndexOf('"') + 1, CodeTokenRole.String)]) }, false) };
+        var html = format switch
+        {
+            "file" => new HtmlExporter().Export(content),
+            "fragment" => new HtmlExporter().RenderFragment(content),
+            _ => HtmlClipboardFormat.Decode(new ClipboardExporter().Export(content).Html)
+        };
+        var document = new HtmlParser().ParseDocument(html);
+        Assert.Equal(code.Replace("\r\n", "\n"), document.QuerySelector("pre code")!.TextContent);
+        Assert.Equal("color: #5B21B6;", document.QuerySelector(".code-syntax-keyword")!.GetAttribute("style"));
+        Assert.Equal("color: #166534;", document.QuerySelector(".code-syntax-string")!.GetAttribute("style"));
+        Assert.Empty(document.QuerySelectorAll("script,img,[onerror]"));
+        Assert.Equal("```csharp\r\n" + code + "\r\n```", content.Document.Source);
     }
 
     private static string ReadCode(W.Paragraph paragraph) => string.Concat(paragraph.Elements<W.Run>().SelectMany(run => run.ChildElements)

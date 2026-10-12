@@ -50,6 +50,12 @@ internal static class Program
             try { NativeWordSyntaxChecks.Run(syntaxOutput); Console.WriteLine("Native Word syntax checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--html-syntax")
+        {
+            var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
+            try { NativeHtmlSyntaxChecks.Run(syntaxOutput); Console.WriteLine("Native HTML syntax checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--diagram-contrast")
         {
             var contrastOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(contrastOutput);
@@ -273,6 +279,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native PDF syntax: " + ex.Message); }
         try { NativeWordSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Word syntax: " + ex.Message); }
+        try { NativeHtmlSyntaxChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native HTML syntax: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }

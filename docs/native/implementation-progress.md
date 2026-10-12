@@ -2,17 +2,17 @@
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
-All four 45b5d5d CI runs pass: 778 core tests, seven actual Windows signature checks, 55 workflows in built/installed/upgraded/reinstalled applications, eight exported-site cases and 262 browser cases. The simulated preview upgrade verifies installed versions and retained state/workspace bytes. Earlier certificate stalls and the 2ea009b Save-field observation failure remain recorded; the current bounded fixture and field-readiness checks pass. The link correction has six native outcomes and an inspected PDF. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
+All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven actual Windows signature checks, 55 workflows in built/installed/upgraded/reinstalled applications, eight exported-site cases and 262 browser cases. Downloaded PR evidence confirms the PDF results, preview.164 upgrade, 20 retained state files and certificate cleanup. Earlier certificate stalls and the 2ea009b Save-field observation failure remain recorded. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
 
 | Reference | Current value |
 |---|---|
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Word code colours using shared native tokens, editable tabs/exact line breaks and safe complete plain fallback; one actual Export-menu workflow added for CI |
-| Latest complete native CI | 45b5d5d, PR/push 38217770147/38217763979: 778 core tests, seven signature cases and 55 workflows in built, installed, upgraded and reinstalled applications |
-| Latest complete web CI | Both 45b5d5d runs 38217770149/38217763858: all 262 cases in 10.5/7.4 minutes |
-| Current validation | Word correction: clean Release build, all 788 core tests, ten focused core/five native Word outcomes, complete native harness (including PDF/preview checks; 40 corpus cases, zero failures) and static integrity pass. The new actual Export-menu workflow awaits CI; Word destination rendering for the new colours is unverified |
+| Latest implementation | HTML/CF_HTML syntax colours with inert source text and Docs Site dark/print/forced-colour styling; Word Export-menu workflow is running in CI |
+| Latest complete native CI | ade57cd, PR/push 38221902426/38221897008: 778 core tests, five PDF syntax outcomes, seven signature cases and 55 workflows in built, installed, upgraded and reinstalled applications |
+| Latest complete web CI | Both ade57cd runs 38221902441/38221897071: all 262 cases in 10.4/8.4 minutes |
+| Current validation | HTML correction: clean Release build, all 791 core tests, 13 focused export core cases, five native HTML outcomes, complete native harness (40 corpus cases, zero failures), all 12 Chromium/Edge exported-site cases and static integrity pass. Dark-site screenshots were inspected. Current HTML/rich-copy CI remains to complete |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Complete CI for the Word syntax/whitespace correction, including the new native Export-menu workflow. Local Release, all 788 core tests, five native Word outcomes, the complete native harness and static integrity pass. PDF correction ade57cd has completed local validation with inspected pages and is running CI. The docs-only 8b44f23 revision passes all four CI runs (native 38220244442/38220238385; web 38220244488/38220238388), with full logs retained under artifacts/native. The downloaded 45b5d5d result confirms matching upgraded versions, 20 preserved state files/workspace bytes and certificate cleanup. Earlier failed evidence remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Complete CI for Word revision 5db39a9, then the HTML/rich-copy correction. The latter adds real Windows CF_HTML assertions to the new coloured-code Export-menu workflow. Local Release, all 791 core tests, native integration, all 12 exported-site browser cases and static integrity pass. PDF correction ade57cd passes all four CI runs; full logs and downloaded PR evidence are retained under artifacts/native/ci-ade57cd-pr. Earlier failed evidence remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

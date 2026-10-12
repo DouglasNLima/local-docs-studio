@@ -18,6 +18,7 @@ internal static class NativeDocsSiteChecks
         File.WriteAllText(homePath, File.ReadAllText(homePath).Replace("![Native pixels](image.png)", "<figure data-image-figure><img src=\"image.png\" alt=\"Native pixels\"><figcaption>Figure caption &amp; source evidence</figcaption></figure>", StringComparison.Ordinal));
         File.AppendAllText(homePath, "\n<figure data-progress-bar data-progress-colour=\"blue\"><figcaption><span data-progress-label>Review progress</span><span data-progress-value>37%</span></figcaption><progress max=\"100\" value=\"37\">37%</progress></figure>\n");
         File.AppendAllText(homePath, "\n[[docs/start#evidence|Wiki evidence]]\n");
+        File.AppendAllText(homePath, "\n```csharp\npublic string Label()\n{\n    return \"Café <studio>\";\n}\n```\n");
         var path = Path.Combine(docs, "start.md"); File.WriteAllText(path, "# Saved content");
         File.WriteAllText(Path.Combine(state, "private.md"), "Private recovery must stay outside the site.");
         var pixels = BitmapSource.Create(2, 2, 96, 96, PixelFormats.Bgra32, null, new byte[] { 0, 0, 255, 255, 0, 255, 0, 255, 255, 0, 0, 255, 0, 0, 0, 255 }, 8);
