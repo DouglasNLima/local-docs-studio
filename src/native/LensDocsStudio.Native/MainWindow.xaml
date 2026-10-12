@@ -89,6 +89,8 @@
     <MenuItem Header="Copy rendered _text" Click="CopyPreview" AutomationProperties.AutomationId="CopyRenderedText"/>
     <MenuItem Header="Copy rendered _content" Click="CopyRenderedContent" AutomationProperties.AutomationId="CopyRenderedContent"/>
     <MenuItem Header="Copy _Markdown with images" Click="CopyMarkdownWithImages" AutomationProperties.AutomationId="CopyMarkdownWithImages"/>
+    <Separator/>
+    <MenuItem Header="_Settings…" InputGestureText="Ctrl+," Click="OpenSettings" AutomationProperties.AutomationId="OpenSettings"/>
    </MenuItem>
    <MenuItem Header="_Insert" AutomationProperties.AutomationId="InsertMenu">
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
@@ -205,7 +207,7 @@
      </StackPanel>
     </Border>
     <Grid x:Name="ContentGrid">
-     <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition Width="180"/></Grid.ColumnDefinitions>
+     <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineColumn" Width="180"/></Grid.ColumnDefinitions>
      <avalon:TextEditor x:Name="Editor" Grid.Column="0" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"
         IsReadOnly="{Binding ActiveDocument.IsSaving}"
         Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" Padding="14" BorderThickness="0"
@@ -232,7 +234,7 @@
      <FlowDocumentScrollViewer x:Name="Preview" Grid.Column="2" VerticalScrollBarVisibility="Auto" IsToolBarVisible="False"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
        AutomationProperties.Name="Document preview" AutomationProperties.AutomationId="DocumentPreview"/>
-     <DockPanel Grid.Column="3" Background="{DynamicResource PanelBrush}">
+     <DockPanel x:Name="OutlinePanel" Grid.Column="3" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
       <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" DisplayMemberPath="Title" SelectionChanged="OutlineSelected"
        AutomationProperties.Name="Document outline">

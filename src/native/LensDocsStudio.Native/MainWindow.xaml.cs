@@ -87,7 +87,7 @@ public partial class MainWindow : Window
     {
         await model.InitialiseAsync(startupPaths);
         WindowStateService.Restore(this, model.Preferences.Window);
-        ApplyTheme();
+        ApplyTheme(); ApplyReadingPreferences();
         SetLayout(model.Layout); BindActiveDocument(); QueuePreview(); Editor.Focus();
         InitialiseUpdates();
     }
@@ -494,6 +494,7 @@ public partial class MainWindow : Window
         var shift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
         switch (e.Key)
         {
+            case Key.OemComma: OpenSettings(sender, e); break;
             case Key.F: ShowFind(false); break;
             case Key.H: ShowFind(true); break;
             case Key.S: (shift ? model.SaveAsCommand : model.SaveCommand).Execute(null); break;

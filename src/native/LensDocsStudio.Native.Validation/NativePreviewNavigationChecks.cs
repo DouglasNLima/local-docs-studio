@@ -44,6 +44,16 @@ internal static class NativePreviewNavigationChecks
         var capture = new RenderTargetBitmap(640, 260, 96, 96, PixelFormats.Pbgra32); capture.Render(viewer);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
         using (var image = File.Create(Path.Combine(output, "native-preview-navigation.png"))) encoder.Save(image);
+        foreach (var zoom in new[] { 50d, 125d, 200d })
+        {
+            viewer.MinZoom = 50; viewer.MaxZoom = 200; viewer.Zoom = zoom; scrolling.ScrollToTop(); Layout();
+            task = PreviewNavigationService.BringIntoViewAsync(viewer, position);
+            frame = new DispatcherFrame(); task.ContinueWith(_ => viewer.Dispatcher.BeginInvoke(() => frame.Continue = false)); Dispatcher.PushFrame(frame);
+            task.GetAwaiter().GetResult(); Layout();
+            var zoomed = position.GetCharacterRect(LogicalDirection.Forward);
+            if (zoomed.IsEmpty || zoomed.Top < 0 || zoomed.Bottom > scrolling.ViewportHeight)
+                throw new IOException("Preview navigation lost visible selection at zoom " + zoom + ": " + zoomed);
+        }
         var oldPosition = position; var replacement = new FlowDocument(new Paragraph(new Run("New document"))); viewer.Document = replacement;
         PreviewNavigationService.BringIntoViewAsync(viewer, oldPosition).GetAwaiter().GetResult();
         task = PreviewNavigationService.BringIntoViewAsync(viewer, replacement.ContentStart);
@@ -52,7 +62,7 @@ internal static class NativePreviewNavigationChecks
         frame = new DispatcherFrame(); task.ContinueWith(_ => viewer.Dispatcher.BeginInvoke(() => frame.Continue = false)); Dispatcher.PushFrame(frame); task.GetAwaiter().GetResult();
         if (!new TextRange(viewer.Document.ContentStart, viewer.Document.ContentEnd).Text.Contains("Latest document", StringComparison.Ordinal)) throw new IOException("Stale preview navigation replaced the current document.");
         File.WriteAllText(Path.Combine(output, "native-preview-navigation.json"), JsonSerializer.Serialize(new { Passed = true,
-            Checks = new[] { "Hidden details target becomes visible after actual FlowDocument layout", "Exact selection and source survive scrolling", "Superseded document navigation is ignored" },
+            Checks = new[] { "Hidden details target becomes visible after actual FlowDocument layout", "Exact selection and source survive scrolling", "Superseded document navigation is ignored", "Navigation stays visible at 50%, 125% and 200% preview zoom" },
             BeforeRectangle = beforeRectangle.ToString(), VerticalOffset = visibleOffset, Rectangle = rectangle.ToString() }));
         void Layout() { viewer.Measure(new Size(640, 260)); viewer.Arrange(new Rect(0, 0, 640, 260)); viewer.UpdateLayout(); }
     }

@@ -9,7 +9,7 @@ using FlaUI.UIA3;
 
 namespace LensDocsStudio.Native.Validation;
 
-internal static class NativeUiChecks
+internal static partial class NativeUiChecks
 {
     public static int Run(string executable, string output)
     {
@@ -1217,6 +1217,7 @@ internal static class NativeUiChecks
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeMaths, "One Undo did not restore the source before the maths fixture.");
             checks.Add("Native maths has accessible drawing bounds, exact LaTeX context/plain copy and focused preview search, while preserving source and complete insertion Undo");
+            CheckSettings(window, editor, automation, app.ProcessId, state, output, source);
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -1226,6 +1227,8 @@ internal static class NativeUiChecks
             editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Session did not restore saved text.");
             checks.Add("Session restoration reopened the document");
+            CheckRestoredSettings(window, automation, app.ProcessId);
+            checks.Add("Native settings apply font, wrapping, indentation, preview zoom and outline choices, retain cancelled edits and survive restart without changing source or update consent");
             libraryWindow = OpenTemplateLibrary(window);
             Wait(() => Find(libraryWindow, "WordTemplateList").FindFirstDescendant(cf => cf.ByName("Renamed Café handbook")) is not null
                 && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The renamed and restored Word template did not survive application restart.");
@@ -1421,7 +1424,9 @@ internal static class NativeUiChecks
             Window? saveWindow = null;
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
-            var fileName = Find(saveWindow!, "1001").AsTextBox();
+            // The address control can share child ID 1001 with the filename input.
+            var fileName = (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))
+                ?? throw new IOException("The labelled Save filename field is unavailable.")).AsTextBox();
             var suggested = fileName.Text; var expected = Path.GetFileName(destination);
             try
             {
@@ -1449,7 +1454,7 @@ internal static class NativeUiChecks
             {
                 try
                 {
-                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName.Text, KeyboardFocus = fileName.Properties.HasKeyboardFocus.Value });
+                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName.Text, fileName.Name, fileName.AutomationId, KeyboardFocus = fileName.Properties.HasKeyboardFocus.Value });
                     File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }

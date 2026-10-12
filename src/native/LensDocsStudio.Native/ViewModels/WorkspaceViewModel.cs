@@ -39,7 +39,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         {
             var pending = await documents.ReadPendingWritesAsync();
             if (pending.Count != 0) Status = $"{pending.Count} interrupted saves are available in recovery.";
-            Preferences = await session.ReadAsync<UserPreferences>("preferences.json") ?? new();
+            Preferences = await session.ReadAsync<UserPreferences>("preferences.json", validate: WorkspaceSettings.ArePreferencesValid) ?? new();
             RefreshRecentPaths();
             Theme = Preferences.Theme;
             Layout = Preferences.Layout;
@@ -279,6 +279,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         try
         {
             var changed = update(Preferences);
+            if (!WorkspaceSettings.ArePreferencesValid(changed)) throw new ArgumentException("The selected preferences are unsupported.");
             await session.WriteAsync("preferences.json", changed);
             Preferences = changed;
         }
