@@ -2,14 +2,14 @@
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
-The allocation and diagram corrections pass all four a827668 CI runs: 766 core tests, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Corrected sequence activation bars, inherited label contrast and declared backgrounds have inspected native output; see the [diagram compatibility report](diagram-compatibility.md). The current change adds CI-only Windows signature verification using a disposable certificate. Its seven intended boundary checks compile; PowerShell parsing, static checks and the local-host refusal guard pass. Certificate actions await isolated CI execution.
+The allocation and diagram corrections pass all four a827668 CI runs: 766 core tests, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Corrected sequence activation bars, inherited label contrast and declared backgrounds have inspected native output; see the [diagram compatibility report](diagram-compatibility.md). Both initial facd03f native runs stalled in the new certificate step and were cancelled, with logs retained. The revised script uses the elevated disposable runner's machine root store, stage messages and a three-minute timeout; its seven intended verifier checks remain pending. PowerShell parsing, static checks and the local-host refusal guard pass.
 
 | Reference | Current value |
 |---|---|
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | CI-only disposable-certificate checks for the actual Windows verifier and publisher pinning |
+| Latest implementation | Bounded CI-only disposable-certificate checks for the actual Windows verifier and publisher pinning; stalled initial runs retained as cancelled |
 | Latest complete native CI | a827668, PR/push 38212823013/38212818771: 766 core tests and 55 workflows in built, installed and reinstalled applications |
 | Latest complete web CI | Both a827668 runs 38212822923/38212818765: all 262 cases |
 | Current validation | Clean Release build, PowerShell parsing, 50-module static checks and local-host refusal guard pass; actual certificate checks await isolated CI |
