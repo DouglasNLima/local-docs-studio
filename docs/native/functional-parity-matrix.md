@@ -4,6 +4,7 @@ Reference: docs/tool-guide.md, browser regression tests, registries/content.js a
 
 | User need / existing contract | Native design | Status |
 |---|---|---|
+| Reveal the visible search/navigation target | Shared deferred WPF text-position scrolling | Three native HWND checks reproduce and fix offscreen selection after details expansion, preserving source/selection and rejecting stale documents. Find, formula search, outline, fragments and history share the service. Stronger actual-viewport desktop assertion awaits CI |
 | Markdown/Mermaid/text open, save, Save as, UTF-8 | Native pickers, portable source, safe writes | In progress |
 | Real folder tree, create/rename/move/delete/reveal | Reviewed file moves, source-span link edits, Windows deletion and recovery | Partial: file creation/rename/deletion and snapshot recovery pass UI checks; folder moves and case-only renames remain |
 | Folder changes made outside the app | Debounced filesystem monitoring and in-place native tree reconciliation | Seven real filesystem/WPF checks pass for creation, rename, deletion, nested folders, retained selection/expansion, unchanged unsaved buffers, state exclusion and superseded/disposed refreshes. Corrects the missing tree refresh exposed in both f29f193 native runs; both native runs at 94119d5 pass all 35 built/installed/reinstalled workflows |

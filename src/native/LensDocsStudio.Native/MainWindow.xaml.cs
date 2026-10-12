@@ -199,7 +199,7 @@ public partial class MainWindow : Window
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
         if (Outline.SelectedItem is DocumentHeading heading && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-        { CaptureCurrentNavigation(); rendered.RevealSource(heading.SourceStart); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+        { CaptureCurrentNavigation(); rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
     }
     private async void Navigate(string reference)
     {
@@ -223,7 +223,7 @@ public partial class MainWindow : Window
             {
                 var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
                 if (target is not null && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                { CaptureCurrentNavigation(); rendered.RevealSource(target.SourceStart); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+                { CaptureCurrentNavigation(); rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
                 else model.Status = "The linked section was not found; the document remains open.";
             }
         });
@@ -253,7 +253,7 @@ public partial class MainWindow : Window
                 var match = rendered.Formulae.FirstOrDefault(formula => formula.Source.Contains(query, StringComparison.CurrentCultureIgnoreCase));
                 if (match is not null)
                 {
-                    Preview.Selection.Select(match.Element.ElementStart, match.Element.ElementEnd); match.Element.BringIntoView();
+                    Preview.Selection.Select(match.Element.ElementStart, match.Element.ElementEnd); _ = PreviewNavigationService.BringIntoViewAsync(Preview, match.Element.ElementStart);
                     model.Status = "Matching formula selected; its LaTeX source is available from the context menu.";
                 }
             }
@@ -275,7 +275,7 @@ public partial class MainWindow : Window
             if (index < 0) continue;
             var matchStart = pointer.GetPositionAtOffset(index)!;
             Preview.Selection.Select(matchStart, matchStart.GetPositionAtOffset(query.Length)!);
-            (matchStart.Parent as FrameworkContentElement)?.BringIntoView(); return true;
+            _ = PreviewNavigationService.BringIntoViewAsync(Preview, matchStart); return true;
         }
         model.Status = "No matches found."; return false;
     }

@@ -1161,6 +1161,12 @@ internal static class NativeUiChecks
             Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Native-details-needle-042"),
                 "Preview Find did not reveal and select text inside nested closed details.");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
+            Wait(() =>
+            {
+                var previewElement = Find(window, "DocumentPreview"); var viewport = previewElement.BoundingRectangle;
+                return previewElement.Patterns.Text.Pattern.GetSelection().SelectMany(range => range.GetBoundingRectangles())
+                    .Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && rectangle.Top >= viewport.Top && rectangle.Bottom <= viewport.Bottom);
+            }, "The selected hidden details match is outside the actual preview viewport.");
             if (Find(window, "DetailsToggle" + detailsStart).Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Expanded
                 || Find(window, "DetailsToggle" + nestedDetailsStart).Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Expanded
                 || editor.Patterns.Value.Pattern.Value.Value != insertedDetails)

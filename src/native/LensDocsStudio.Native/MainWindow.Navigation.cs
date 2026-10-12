@@ -1,6 +1,7 @@
 using System.Windows;
 using ICSharpCode.AvalonEdit.Document;
 using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Native.Rendering;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
 
@@ -48,7 +49,7 @@ public partial class MainWindow
             {
                 var nearest = rendered.SourceElements.Where(e => e.Key <= Editor.CaretOffset).OrderByDescending(e => e.Key).FirstOrDefault();
                 rendered.RevealSource(Editor.CaretOffset);
-                nearest.Value?.BringIntoView();
+                if (nearest.Value is { } element) await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
             }
             Editor.Focus();
         }
