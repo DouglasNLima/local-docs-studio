@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using System.Runtime.InteropServices;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -20,14 +21,14 @@ internal static class NativeUiClipboard
         return new Lifetime(thread, dispatcher);
     }
     public static void Clear() => Invoke(Clipboard.Clear);
-    public static string GetText() => Invoke(Clipboard.GetText);
+    public static string GetText() => Read(Clipboard.GetText);
     public static void SetText(string text) => Invoke(() => Clipboard.SetText(text));
-    public static bool ContainsData(string format) => Invoke(() => Clipboard.ContainsData(format));
-    public static object? GetData(string format) => Invoke(() => Transfer(Clipboard.GetData(format)));
-    public static BitmapSource? GetImage() => Invoke(() => (BitmapSource?)Transfer(Clipboard.GetImage()));
+    public static bool ContainsData(string format) => Read(() => Clipboard.ContainsData(format));
+    public static object? GetData(string format) => Read(() => Transfer(Clipboard.GetData(format)));
+    public static BitmapSource? GetImage() => Read(() => (BitmapSource?)Transfer(Clipboard.GetImage()));
     public static void SetImage(BitmapSource image)
     { var frozen = (BitmapSource)Transfer(image)!; Invoke(() => Clipboard.SetImage(frozen)); }
-    public static IDataObject? GetDataObject() => Invoke(() => Clipboard.GetDataObject() is { } value ? new ApartmentData(value) : null);
+    public static IDataObject? GetDataObject() => Read(() => Clipboard.GetDataObject() is { } value ? new ApartmentData(value) : null);
     public static void SetDataObject(object value, bool copy)
     {
         if (value is IDataObject data)
@@ -56,6 +57,16 @@ internal static class NativeUiClipboard
         }
         return value;
     }
+    internal static T Read<T>(Func<T> action)
+    {
+        for (var attempt = 0; ; attempt++)
+        {
+            try { return Invoke(action); }
+            // Another process may briefly hold OpenClipboard. Retry only this read,
+            // never a write or user action, and leave the owning STA free to pump.
+            catch (COMException ex) when (ex.HResult == unchecked((int)0x800401D0) && attempt < 4) { Thread.Sleep(50); }
+        }
+    }
     private static T Invoke<T>(Func<T> action) => (dispatcher ?? throw new InvalidOperationException("Start the validation clipboard apartment first.")).Invoke(action);
     private static void Invoke(Action action) => (dispatcher ?? throw new InvalidOperationException("Start the validation clipboard apartment first.")).Invoke(action);
     private sealed class Lifetime(Thread thread, Dispatcher owner) : IDisposable
@@ -70,14 +81,14 @@ internal static class NativeUiClipboard
     private sealed class ApartmentData(IDataObject inner) : IDataObject
     {
         public IDataObject Inner { get; } = inner;
-        public object? GetData(string format, bool autoConvert) => Invoke(() => Transfer(Inner.GetData(format, autoConvert)));
-        public object? GetData(string format) => Invoke(() => Transfer(Inner.GetData(format)));
-        public object? GetData(Type format) => Invoke(() => Transfer(Inner.GetData(format)));
-        public bool GetDataPresent(string format, bool autoConvert) => Invoke(() => Inner.GetDataPresent(format, autoConvert));
-        public bool GetDataPresent(string format) => Invoke(() => Inner.GetDataPresent(format));
-        public bool GetDataPresent(Type format) => Invoke(() => Inner.GetDataPresent(format));
-        public string[] GetFormats(bool autoConvert) => Invoke(() => Inner.GetFormats(autoConvert));
-        public string[] GetFormats() => Invoke(Inner.GetFormats);
+        public object? GetData(string format, bool autoConvert) => Read(() => Transfer(Inner.GetData(format, autoConvert)));
+        public object? GetData(string format) => Read(() => Transfer(Inner.GetData(format)));
+        public object? GetData(Type format) => Read(() => Transfer(Inner.GetData(format)));
+        public bool GetDataPresent(string format, bool autoConvert) => Read(() => Inner.GetDataPresent(format, autoConvert));
+        public bool GetDataPresent(string format) => Read(() => Inner.GetDataPresent(format));
+        public bool GetDataPresent(Type format) => Read(() => Inner.GetDataPresent(format));
+        public string[] GetFormats(bool autoConvert) => Read(() => Inner.GetFormats(autoConvert));
+        public string[] GetFormats() => Read(Inner.GetFormats);
         public void SetData(string format, object data, bool autoConvert) { var item = Transfer(data); Invoke(() => Inner.SetData(format, item, autoConvert)); }
         public void SetData(string format, object data) { var item = Transfer(data); Invoke(() => Inner.SetData(format, item)); }
         public void SetData(Type format, object data) { var item = Transfer(data); Invoke(() => Inner.SetData(format, item)); }

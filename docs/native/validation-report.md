@@ -4,6 +4,8 @@ Status: internal development preview. Local integration and substantial Windows 
 
 The validation client follows Microsoft's separate MTA/STA guidance. Focused in-memory checks pass for exact text/HTML/binary formats, cross-thread frozen image pixels, unchanged originals and owner-apartment data access without accessing the Windows clipboard. Evidence: artifacts/native/clipboard-apartments/native-clipboard-apartments.json. Both ce3cf9f native runs pass every built/installed/reinstalled workflow. Their native-ui-threading.json records actual apartments and UIA timeout settings; the earlier timeout's cause remains unproven.
 
+Native push 38225070353 at 5120f18 fails after reinstall when the harness reads copied review text: Windows returns CLIPBRD_E_CANT_OPEN (0x800401D0). First-install and upgraded workflows pass; the paired native PR 38225077407 passes all 56 workflows in every context, 791 core tests and all 12 export-browser cases. Both web runs pass 262 cases in 9.8/10.2 minutes. The failure log and full artefact are retained under artifacts/native/native-ci-5120f18-push-failure.log and ci-5120f18-push-failure; its after-reinstall screenshot was inspected. The holder/duration of clipboard contention is unknown. The adapter now retries only that read error, at most five attempts; five in-memory transfer/retry outcomes pass without Windows clipboard access. Actual corrected CI delivery remains pending.
+
 | Layer | Executed result and evidence |
 |---|---|
 | Build | .NET 10 Release build passes with zero warnings/errors, including the shell correction |

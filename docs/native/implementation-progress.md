@@ -9,10 +9,10 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Seven combined signed-manifest/download/Windows-verifier checks added to the existing disposable-certificate CI entry; locally built, not yet executed |
+| Latest implementation | Bounded validation clipboard-read retries after a retained CI failure; seven combined update-boundary checks are also committed locally and await CI |
 | Latest complete native CI | 5db39a9, PR/push 38223536303/38223531733: 788 core tests, Word/PDF syntax outcomes, seven signature cases and 56 workflows in built, installed, upgraded and reinstalled applications |
 | Latest complete web CI | Both 5db39a9 runs 38223536331/38223531687: all 262 cases in 10.2/10.1 minutes |
-| Current validation | HTML correction: clean Release build, all 791 core tests, 13 focused export core cases, five native HTML outcomes, complete native harness (40 corpus cases, zero failures), all 12 Chromium/Edge exported-site cases and static integrity pass. Dark-site screenshots were inspected. Current HTML/rich-copy CI remains to complete |
+| Current validation | Release and five in-memory clipboard transfer/retry outcomes pass. HTML revision 5120f18 has a successful native PR (791 core, 12 export-browser and 56 workflows in all four contexts) and both web runs pass 262 cases. Native push fails after-reinstall clipboard reading; corrected retry and combined update CI remain pending |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Complete HTML/rich-copy CI at 5120f18, then execute the combined update-boundary checks in CI. Word revision 5db39a9 passes all four runs, including 56 workflows in all four desktop contexts; full logs are retained under artifacts/native/*ci-5db39a9-*.log. The new update fixture builds cleanly but has not run; its actual Windows verification requires the already-guarded disposable runner certificate. Earlier failed evidence remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Push and monitor the clipboard-read correction together with the locally committed combined update-boundary fixture. Native push 38225070353 at 5120f18 failed CLIPBRD_E_CANT_OPEN while observing copied review text after reinstall; its log, full artefact and inspected screenshot are retained. PR 38225077407 and both web runs pass. The read retry passes five in-memory outcomes; the combined trust fixture builds but requires the guarded disposable CI certificate. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

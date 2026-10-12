@@ -47,3 +47,5 @@ Word, PDF, HTML and rich-copy code retain syntax colours and indentation. Five P
 These are implemented outcomes with stated evidence limits, not production certification. Detailed contracts and remaining gaps are in the functional parity matrix and validation report.
 
 Both 5db39a9 native CI runs pass all 56 workflows in built/installed/upgraded/reinstalled applications, including actual coloured Word export. A combined manifest/download/Windows-verifier fixture is now built for CI using disposable trust and in-memory release responses; its seven checks are not yet counted as passed. HTML/Windows rich-copy CI and production signed-upgrade certification remain separate.
+
+At 5120f18, the native PR passes all 56 workflows in every desktop context and all 12 export-browser cases. Native push fails a clipboard read during later review navigation after reinstall; the selected source is visible in the retained screenshot, but this does not prove clipboard delivery. Five in-memory apartment/retry outcomes now pass, including bounded recovery and propagation of unrelated errors. The new read retry and combined update fixture await CI; the failed run remains recorded.
