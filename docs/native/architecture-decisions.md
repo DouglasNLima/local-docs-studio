@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+The PDF-decoration and Find-focus implementations pass both completed b1b500c native runs, including 58 workflows in every application context. The first PR attempt fails an existing layout assertion and remains recorded; no timing threshold was relaxed. The follow-up CI artefact selection retains installed-app highlight reports/screenshots and decorated PDF outputs.
+
 PDF strike-through and highlighting use the native layout engine's generated link rectangles to preserve exact wrapping and pagination. Per-export temporary targets map to bounded decoration records; one pass over the bounded, freshly generated PDF adds strokes and neutral multiply-blended highlight rectangles, removes temporary annotations/objects and restores real URI/bookmark links. The existing supplementary-character mapping correction shares that pass. No browser, private library API, source mutation or PDF-input processing is introduced.
 
 Find has a separate native focus scope so the preview retains logical focus while the query accepts keyboard input. The reader enables inactive selection and uses the theme accent for selection. The desktop regression compares actual pixels inside the selected text rectangle with a collapsed selection while verifying that keyboard focus stays in Find. An unfocused hidden HWND cannot establish this visual result because WPF selection painting depends on its thread's focused text selection.

@@ -1,8 +1,8 @@
 # Native Windows engineering handover
 
-Status: available for internal preview with documented limitations. The pagination update at f981943 passes all four Windows/web CI runs. The current PDF-decoration and visible-selection additions pass local validation and await desktop CI. Production certification is incomplete. This report distinguishes implementation from evidence and does not authorise installation on the user's active desktop, merging, release publication or tag changes.
+Status: available for internal preview with documented limitations. The PDF-decoration and visible-selection update at b1b500c passes native push, native PR on its second attempt and both web CI runs. The first PR layout failure is retained; its cause remains unproven. Production certification is incomplete. This report distinguishes implementation from evidence and does not authorise installation on the user's active desktop, merging, release publication or tag changes.
 
-Automatic reading now uses native pages for long documents, with explicit Continuous/Pages choices, asynchronous distant navigation, preserved text automation and page-sized media. All 800 core tests and seven focused hidden-HWND pagination outcomes pass. The 57th desktop workflow checks page buttons, distant Find range/bounds, complete Undo and saved reading preferences; it passes in all four application contexts. A subsequent screenshot inspection identified missing visible selection, addressed by the current focus/highlight correction. Portable appearance exports use version 1.1 while retaining version 1.0 import compatibility.
+Automatic reading now uses native pages for long documents, with explicit Continuous/Pages choices, asynchronous distant navigation, preserved text automation and page-sized media. All 800 core tests and seven focused hidden-HWND pagination outcomes pass. The 57th desktop workflow checks page buttons, distant Find range/bounds, complete Undo and saved reading preferences; it passes in all four application contexts. A subsequent screenshot inspection identified missing visible selection, corrected and verified by actual pixel comparison while keyboard focus stays in Find. Portable appearance exports use version 1.1 while retaining version 1.0 import compatibility.
 
 ## Architecture and delivered workflows
 
@@ -24,11 +24,11 @@ The [parity matrix](functional-parity-matrix.md) records implementation, tested 
 
 The [diagram compatibility report](diagram-compatibility.md) records supported Mermaid forms and explicit unsupported input. The corpus contains 40 cases. Corrected background/label contrast and supported sequence activations preserve source. Unsupported forms produce a readable error/source fallback rather than claiming browser Mermaid equivalence.
 
-Exports retain editable or selectable content where supported. Code colours, Unicode, spacing, links, image budgets and safe metadata have focused checks. Revision 230852b adds checked PDF font fallback and repairs supplementary-character copy mappings in bounded, self-generated PDFs. Six local outcomes pass; emoji/CJK/combined rasters were inspected. Missing glyphs fail explicitly before output bytes reach the file store. PDF strike-through and neutral highlighting now retain selectable text, wrapped geometry and real links across 17 pages in six local outcomes; actual Export-menu validation is added for CI. Complex-script shaping, bidirectional layout, joined/colour emoji and broader Word/template fidelity remain limited. Native Word package/schema tests do not establish how every destination application renders a document.
+Exports retain editable or selectable content where supported. Code colours, Unicode, spacing, links, image budgets and safe metadata have focused checks. Revision 230852b adds checked PDF font fallback and repairs supplementary-character copy mappings in bounded, self-generated PDFs. Six local outcomes pass; emoji/CJK/combined rasters were inspected. Missing glyphs fail explicitly before output bytes reach the file store. PDF strike-through and neutral highlighting now retain selectable text, wrapped geometry and real links across 17 pages in six local outcomes; actual Export-menu validation passes in all four application contexts of both completed native runs, and the resulting PDF was inspected. Complex-script shaping, bidirectional layout, joined/colour emoji and broader Word/template fidelity remain limited. Native Word package/schema tests do not establish how every destination application renders a document.
 
 ## Installer and update status
 
-The self-contained x64 Inno installer and portable ZIP use distinct product, installation, state and association identities. Uninstall preserves user workspaces/state. CI exercises installation, a newer preview version, uninstall and reinstall; it compares binary/registration metadata and retained state hashes. Both preview versions come from the same source revision, so this is not historical schema migration.
+The self-contained x64 Inno installer and portable ZIP use distinct product, installation, state and association identities. Uninstall preserves user workspaces/state. CI exercises installation, a newer preview version, uninstall and reinstall; it compares binary/registration metadata and retained state hashes. Both preview versions come from the same source revision, so this is not historical schema migration. Lifecycle installation uses silent mode; direct wizard-page keyboard/accessibility validation remains an explicit follow-up.
 
 Update policy checks compatible releases, signed metadata, size/hash, actual Windows Authenticode/revocation and exact publisher identity. Users choose download and installation separately. Production trust is intentionally unconfigured. Seven isolated signature cases and seven combined discovery/download/final-verification cases pass with disposable CI trust; no downloaded fixture is executed and test certificates/private keys are removed. Production issuer/timestamp/revocation and a positive signed-installer upgrade require separate certification. See [update and packaging](update-and-packaging.md).
 
@@ -38,14 +38,15 @@ Update policy checks compatible releases, signed metadata, size/hash, actual Win
 |---|---|
 | Local pagination Release | Zero warnings/errors |
 | Core tests | 800 passed; artifacts/native/tests/native-pagination.trx |
-| Native pagination | Seven hidden-HWND outcomes; artifacts/native/pagination and validation/native-pagination.json; 57-workflow desktop suite passes both f981943 native runs; current 58-workflow suite pending |
+| Native pagination | Seven hidden-HWND outcomes; artifacts/native/pagination and validation/native-pagination.json; 58-workflow desktop suite passes both completed b1b500c native runs |
 | Full native harness | 40 diagram cases and export checks, zero failures; artifacts/native/validation |
 | PDF Unicode | Six outcomes pass; artifacts/native/pdf-unicode/native-pdf-unicode.json and inspected PNG |
 | Export browser checks | 12 Chromium/Edge cases from disk and static hosting, including theme/print/forced colours; latest completed 676523e CI also passes |
-| Complete native PR/push | f981943: 38240160401 / 38240154616; 800 core, seven signature, seven combined update, 12 export-browser and 57 desktop workflows in all four app contexts |
-| Complete web PR/push | f981943: 38240160524 / 38240154545; both pass |
+| Complete native PR/push | b1b500c: 38245098298 (attempt 2) / 38245092255; 800 core, seven signature, seven combined update, 12 export-browser and 58 desktop workflows in every app context |
+| Complete web PR/push | b1b500c: 38245098093 / 38245092183; 262 cases each |
 | Actual PDF export | Expanded Windows Export-menu Unicode check passes in all four native contexts; built-window screenshot and exported PDF raster inspected |
-| Downloaded current CI evidence | artifacts/native/ci-f981943-push; seven pagination outcomes, 57 desktop workflows, certificate cleanup, actual two-version upgrade with 20 preserved state files and package SHA-256 checks confirmed |
+| Downloaded current CI evidence | artifacts/native/ci-b1b500c-push; visible search highlight, actual decorated PDF, 58 desktop workflows, certificate cleanup, preview.179 upgrade with 20 preserved state files and package SHA-256 checks confirmed |
+| Package advisories | Fresh-cache NuGet query on 12 October 2026 reports no known vulnerabilities among 37 resolved versions, including transitive dependencies; inventory and lock hashes retained |
 | Scoped security review | Sealed sequential review at b45246e; two low-severity, user-assisted allocation findings subsequently corrected with bounded regression fixtures |
 
 The [validation report](validation-report.md) retains exact histories, failed/cancelled runs and limits. Local checks use hidden/windowless native fixtures. Actual keyboard, Windows clipboard, pickers, installer execution and certificate changes run only in isolated Windows CI. Earlier real Word/Excel checks used Office 16.0.20430.20092; new syntax-colour destination rendering has not been repeated in Office.
@@ -56,13 +57,15 @@ Performance evidence is fixture-specific. Earlier actual application samples obs
 
 Build from the repository root with dotnet build src/native/LensDocsStudio.Native.slnx -c Release. Packaging uses scripts/native/Build-NativePackage.ps1 with a fresh preview version and an installed Inno Setup compiler. Packaging requires development tools; normal self-contained execution does not use a developer build command.
 
-The inspected push artefact contains matching installers, portable ZIPs, version metadata, checksums and unsigned update metadata under artifacts/native/ci-f981943-push/packages/0.1.0-preview.177 and 0.1.1-preview.177. Metadata records exact source revision f981943f99b0fbad661d2041f1654440671573c3, sourceDirty false, selfContained true and signingRequested false. Do not run downloaded installers on the active desktop as part of these checks.
+The inspected push artefact contains matching installers, portable ZIPs, version metadata, checksums and unsigned update metadata under artifacts/native/ci-b1b500c-push/packages/0.1.0-preview.179 and 0.1.1-preview.179. Metadata records exact source revision b1b500cc5c5258a2bcf6bc663e359fc787636757, sourceDirty false, selfContained true and signingRequested false. Do not run downloaded installers on the active desktop as part of these checks.
+
+The inspected 0.1.1-preview.179 installer SHA-256 is BF4C8168D8EDF71CF4EADAE748521CB2BE0E121AB35977ED3990301606B0548E; the portable ZIP is 83B9CBCD998007CA4A0A6E308C2BC2AC091DADEFC6E233AEAE7AF226E80C93C0.
 
 - Branch: feature/native-wpf-rebuild.
-- Latest fully validated product commit: f981943, accessible native pagination. PDF-decoration/selection follow-up awaits CI.
+- Latest fully validated product commit: b1b500c, PDF decorations and visible Find highlighting. The subsequent layout-diagnostic and artefact-retention changes affect validation only.
 - Draft [PR 21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop.
-- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38240160401).
-- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38240160524).
+- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38245098298).
+- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38245098093).
 
 ## Remaining acceptance
 
