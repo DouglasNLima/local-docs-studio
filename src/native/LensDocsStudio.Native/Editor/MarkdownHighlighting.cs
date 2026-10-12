@@ -3,6 +3,7 @@ using System.Diagnostics;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Rendering;
 using LensDocsStudio.Native.Rendering;
+using LensDocsStudio.Core.Rendering;
 
 namespace LensDocsStudio.Native.Editor;
 

@@ -1,6 +1,7 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Markdig.Extensions.Alerts;
@@ -100,7 +101,7 @@ public sealed class DocxExporter
                         parent.Append(new W.Paragraph(Image(diagram))); break;
                     case CodeBlock code:
                         var cp = new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = codeStyle }));
-                        foreach (var line in code.Lines.ToString().Split('\n')) cp.Append(new W.Run(new W.RunProperties(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }), new W.Text(line.TrimEnd('\r')) { Space = SpaceProcessingModeValues.Preserve }, new W.Break()));
+                        CodeText(cp, code);
                         parent.Append(cp); break;
                     case ListBlock list:
                         while (usedNumbers.Contains(nextNumber)) nextNumber++;
@@ -259,6 +260,36 @@ public sealed class DocxExporter
                 if (formatting.HasFlag(MarkdownEmphasis.Highlight)) properties.Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "EDEDED" };
                 return new W.Run(properties, new W.Text(text) { Space = SpaceProcessingModeValues.Preserve });
             }
+            void CodeText(W.Paragraph paragraph, CodeBlock code)
+            {
+                CodeSyntaxBlock? syntax = null;
+                content.CodeSyntax?.Blocks.TryGetValue(code, out syntax);
+                var previous = '\0';
+                foreach (var segment in CodeSyntaxRuns.Read(code.Lines.ToString(), syntax))
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var properties = new W.RunProperties(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" });
+                    if (segment.Role != CodeTokenRole.Plain) properties.Color = new W.Color { Val = CodeSyntaxPalette.Hex(segment.Role) };
+                    var run = new W.Run(properties);
+                    for (var start = 0; start < segment.Text.Length;)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        var character = segment.Text[start];
+                        if (character is '\r' or '\n' or '\t')
+                        {
+                            if (character == '\t') run.Append(new W.TabChar());
+                            else if (character != '\n' || previous != '\r') run.Append(new W.Break());
+                            previous = character; start++; continue;
+                        }
+                        var end = start + 1;
+                        while (end < segment.Text.Length && segment.Text[end] is not ('\r' or '\n' or '\t')) end++;
+                        run.Append(new W.Text(segment.Text[start..end]) { Space = SpaceProcessingModeValues.Preserve });
+                        previous = segment.Text[end - 1]; start = end;
+                    }
+                    paragraph.Append(run);
+                }
+            }
+
             W.Run Image(ExportImage image)
             {
                 cancellationToken.ThrowIfCancellationRequested();

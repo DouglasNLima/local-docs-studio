@@ -4,34 +4,30 @@ using System.Text.RegularExpressions;
 using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
 using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Rendering;
-
-public enum CodeTokenRole { Plain, Comment, String, Keyword, Number, Name }
-public sealed record CodeSyntaxSpan(int Start, int Length, CodeTokenRole Role);
-public sealed record CodeSyntaxBlock(string Text, IReadOnlyList<CodeSyntaxSpan> Spans);
-public sealed record PreparedCodeSyntax(IReadOnlyDictionary<CodeBlock, CodeSyntaxBlock> Blocks, bool Limited);
 
 public static class CodeSyntaxService
 {
     public const int MaximumBlockCharacters = 32 * 1024;
     public const int MaximumLineCharacters = 4096;
     public const int MaximumDocumentCharacters = 1024 * 1024;
-    public const int MaximumBlockSpans = 1024;
+    public const int MaximumBlockSpans = CodeSyntaxBlock.MaximumSpans;
     public const int MaximumDocumentSpans = 16 * 1024;
     private const int MaximumColourAssignments = 4 * MaximumDocumentCharacters;
     private static readonly ConcurrentDictionary<string, Lazy<HighlightingRuleSet?>> Rules = new(StringComparer.Ordinal);
 
     // Only definitions bundled with the pinned AvalonEdit dependency are used.
     // Document text cannot supply definitions, expressions or resource locations.
-    public static PreparedCodeSyntax Prepare(ParsedDocument parsed, CancellationToken cancellationToken = default)
+    public static PreparedCodeSyntax Prepare(ParsedDocument parsed, CancellationToken cancellationToken = default, ContainerBlock? scope = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var blocks = new Dictionary<CodeBlock, CodeSyntaxBlock>();
         var characters = 0; var spanCount = 0; var assignments = 0; var limited = false;
         var watch = Stopwatch.StartNew();
-        foreach (var code in parsed.Syntax.Descendants<FencedCodeBlock>())
+        foreach (var code in (scope ?? parsed.Syntax).Descendants<FencedCodeBlock>())
         {
             cancellationToken.ThrowIfCancellationRequested();
             var definitionName = DefinitionName(code.Info);

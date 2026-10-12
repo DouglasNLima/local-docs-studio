@@ -17,7 +17,7 @@ public sealed class PdfExporter
     public byte[] Export(ExportContent content, CancellationToken cancellationToken = default)
     {
         content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
-        var codeSyntax = CodeSyntaxService.Prepare(content.Document, cancellationToken);
+        var codeSyntax = content.CodeSyntax ?? CodeSyntaxService.Prepare(content.Document, cancellationToken);
         var imageSources = new Dictionary<byte[], string>(ReferenceEqualityComparer.Instance);
         var document = new Document();
         document.Info.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";

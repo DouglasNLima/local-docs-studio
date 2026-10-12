@@ -1,12 +1,13 @@
 using System.Windows.Documents;
 using System.Windows.Media;
+using LensDocsStudio.Core.Rendering;
 
 namespace LensDocsStudio.Native.Rendering;
 
 public static class CodeSyntaxColours
 {
-    private static readonly Brush[] Light = Palette("#202124", "#466147", "#166534", "#5B21B6", "#92400E", "#075985");
-    private static readonly Brush[] Dark = Palette("#E8EAED", "#A3B89C", "#A6D69E", "#C7B3FF", "#E8C78F", "#91CDF2");
+    private static readonly Brush[] Light = Palette(false);
+    private static readonly Brush[] Dark = Palette(true);
 
     public static Brush For(CodeTokenRole role, bool dark) => (dark ? Dark : Light)[(int)role];
 
@@ -24,8 +25,8 @@ public static class CodeSyntaxColours
         if (position < text.Length) target.Add(new Run(text[position..]));
     }
 
-    private static Brush[] Palette(params string[] values) => values.Select(value =>
+    private static Brush[] Palette(bool dark) => Enum.GetValues<CodeTokenRole>().Select(role =>
     {
-        var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(value)); brush.Freeze(); return (Brush)brush;
+        var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#" + CodeSyntaxPalette.Hex(role, dark))); brush.Freeze(); return (Brush)brush;
     }).ToArray();
 }

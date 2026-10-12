@@ -667,7 +667,7 @@ internal static partial class NativeUiChecks
                 foreach (var theme in new[] { "Dark", "Light" })
                 {
                     Find(window, "ViewMenu").Click(); Find(window, theme + "Theme").Patterns.Invoke.Pattern.Invoke();
-                    var colour = ((System.Windows.Media.SolidColorBrush)LensDocsStudio.Native.Rendering.CodeSyntaxColours.For(LensDocsStudio.Native.Rendering.CodeTokenRole.String, theme == "Dark")).Color;
+                    var colour = ((System.Windows.Media.SolidColorBrush)LensDocsStudio.Native.Rendering.CodeSyntaxColours.For(LensDocsStudio.Core.Rendering.CodeTokenRole.String, theme == "Dark")).Color;
                     var expectedColour = colour.R << 16 | colour.G << 8 | colour.B;
                     int? observedColour = null;
                     try
@@ -698,6 +698,21 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(window, "Status").Name == "Code block Markdown source copied.", "The preview context command did not copy Markdown.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
                 if (NativeUiClipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
+                var codeSavedSource = File.ReadAllText(source);
+                Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
+                var codeExport = Path.Combine(runRoot, "coloured-code.docx"); SaveThroughDialogue(codeExport, "Export DOCX");
+                Wait(() => File.Exists(codeExport) && Find(window, "Status").Name == "Exported coloured-code.docx", "Coloured Word export did not complete.");
+                using (var codePackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(codeExport, false))
+                {
+                    var paragraph = codePackage.MainDocumentPart!.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Single();
+                    var stringRun = paragraph.Elements<DocumentFormat.OpenXml.Wordprocessing.Run>().Single(run => run.InnerText.Contains("Café", StringComparison.Ordinal));
+                    if (new DocumentFormat.OpenXml.Validation.OpenXmlValidator().Validate(codePackage).Any()
+                        || NativeWordSyntaxChecks.ReadCode(paragraph) != contextCode || stringRun.RunProperties?.Color?.Val?.Value != "166534")
+                        throw new IOException("The actual Word export lost editable code text, indentation or syntax colours.");
+                }
+                if (ReadEditorText(editor) != contextMarkdown || File.ReadAllText(source) != codeSavedSource)
+                    throw new IOException("Coloured Word export changed editor or saved source.");
+                checks.Add("The native Export menu creates schema-valid Word code with editable Unicode, indentation and syntax colours while preserving editor and saved source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");

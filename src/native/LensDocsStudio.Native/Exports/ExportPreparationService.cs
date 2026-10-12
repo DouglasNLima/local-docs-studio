@@ -73,6 +73,7 @@ public sealed class ExportPreparationService(MarkdownService markdown, DiagramSe
                     formula.Text, drawing.Width, drawing.Height);
             }
         }
-        return new(document, diagramImages, images) { Formulae = formulaImages };
+        var codeSyntax = markdownSourceOnly ? null : CodeSyntaxService.Prepare(document, cancellationToken, scope);
+        return new(document, diagramImages, images) { Formulae = formulaImages, CodeSyntax = codeSyntax };
     }
 }
