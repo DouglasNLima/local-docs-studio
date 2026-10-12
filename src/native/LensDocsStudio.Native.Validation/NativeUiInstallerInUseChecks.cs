@@ -93,7 +93,7 @@ internal static partial class NativeUiChecks
             checks.Add("Explicit fixture shutdown preserves the unsaved draft independently without writing its source");
             Write(new { passed = true, checks, sameApplicationSurvived = true, sourcePreserved = true, installedPayloadPreserved = true,
                 draftRetained = true, installationAttemptCancelled = true, applicationProcessId = started.Id,
-                setupExitCode = setupProcess.ExitCode, installerExitCode = launcher.ExitCode,
+                setupExited = setupProcess.HasExited, installerExitCode = launcher.ExitCode,
                 limitation = "Running-application cancellation on disposable hosted Windows; not power-loss or clean-machine certification." });
         }
         catch (Exception error)

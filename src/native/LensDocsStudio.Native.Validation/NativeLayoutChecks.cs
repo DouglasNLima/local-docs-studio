@@ -78,12 +78,14 @@ internal static class NativeLayoutChecks
             var initialCall = nestedWatch.Elapsed.TotalMilliseconds;
             Pump(task, dispatcher); input.Dispose(); construction.Dispose(); var inputAt = input.Milliseconds;
             var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
+            var constructionCpu = construction.ThreadCpuMilliseconds; var allocatedBytes = construction.AllocatedBytes;
             var completeText = result.ReadText().Contains(test.Last, StringComparison.Ordinal);
             var sourcePreserved = nested.Source == test.Source;
             var observation = JsonSerializer.Serialize(new
             {
                 test.Name, InputMilliseconds = inputAt, InitialCallMilliseconds = initialCall, ConstructionMilliseconds = elapsed,
                 MaximumInputGapMilliseconds = input.MaximumGapMilliseconds, ConstructionStages = construction.Stages,
+                ConstructionThreadCpuMilliseconds = constructionCpu, ConstructionAllocatedBytes = allocatedBytes,
                 OperationsBeforeInput = input.Operations,
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, CompleteText = completeText,
                 SourcePreserved = sourcePreserved,

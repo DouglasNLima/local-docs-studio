@@ -1,6 +1,6 @@
 # Native Windows engineering handover
 
-The latest verified internal-preview packages are `artifacts/native/ci-228f17b-push/packages/0.1.1-preview.221`, with the initial `0.1.0-preview.221` version alongside. All four CI runs at 228f17b pass. These packages are unsigned and production certification remains incomplete. These packages include failed-diagram recovery, the corrected editor selection and grouped details expansion, validated in all four desktop contexts. The additional installer-in-use scenario at 6831687 compiles and retains the local execution guard; its new GUI outcomes await CI.
+The latest verified internal-preview packages are `artifacts/native/ci-228f17b-push/packages/0.1.1-preview.221`, with the initial `0.1.0-preview.221` version alongside. All four CI runs at 228f17b pass. These packages are unsigned and production certification remains incomplete. These packages include failed-diagram recovery, the corrected editor selection and grouped details expansion, validated in all four desktop contexts. The additional installer-in-use scenario reaches its preservation assertions in CI at 1f14934 but fails during child exit-code reporting. Downloaded push evidence confirms intact draft/source and installation snapshots; reporting is corrected and the complete rerun is pending. Richer construction diagnostics are also locally validated without claiming the intermittent latency issue is fixed.
 
 ## Architecture and delivered workflows
 
