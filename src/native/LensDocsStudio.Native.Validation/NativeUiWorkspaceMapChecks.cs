@@ -53,14 +53,13 @@ internal static partial class NativeUiChecks
             Wait(() => Find(map, "MapDocuments").AsListBox().Items.Length == 1, "The map could not select the current document for its diagram.");
             Find(map, "MapSelectedDiagram").Patterns.Invoke.Pattern.Invoke();
             Window? diagram = null;
-            Wait(() => (diagram = automation.GetDesktop().FindAllChildren(cf => cf.ByProcessId(process))
-                .FirstOrDefault(element => element.Name.StartsWith("Workspace map ·", StringComparison.Ordinal))?.AsWindow()) is not null,
+            Wait(() => (diagram = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("WorkspaceMapDiagram")))?.AsWindow()) is not null,
                 "The selected workspace diagram did not open as a native drawing window.");
             Wait(() => diagram!.FindFirstDescendant(cf => cf.ByName("Mermaid diagram drawing"))?.BoundingRectangle.Width > 10,
                 "The workspace diagram has no native drawing bounds.");
             diagram!.CaptureToFile(Path.Combine(output, "native-workspace-map-diagram.png"));
             FocusWindow(diagram); Keyboard.Type(VirtualKeyShort.ESCAPE);
-            Wait(() => automation.GetDesktop().FindAllChildren(cf => cf.ByProcessId(process)).All(element => !element.Name.StartsWith("Workspace map ·", StringComparison.Ordinal)),
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("WorkspaceMapDiagram"))) is null,
                 "Escape did not close the native workspace diagram.");
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before, "Map navigation, copying or diagrams changed the original insertion Undo.");

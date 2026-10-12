@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Media;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.Workspace;
@@ -66,8 +67,9 @@ public partial class MainWindow
                 drawing = prepared;
             });
             if (drawing is null || diagramSvg is null || diagram is null) return;
-            new DiagramWindow(drawing, format => ExportDiagram(format, diagramSvg))
-            { Owner = this, Title = $"Workspace map · {diagram.Documents} documents · {diagram.Connections} connections" + (diagram.Limited ? " · limited view" : "") }.Show();
+            var viewer = new DiagramWindow(drawing, format => ExportDiagram(format, diagramSvg))
+            { Owner = this, Title = $"Workspace map · Documents: {diagram.Documents} · Connections: {diagram.Connections}" + (diagram.Limited ? " · limited view" : "") };
+            AutomationProperties.SetAutomationId(viewer, "WorkspaceMapDiagram"); viewer.Show();
             model.Status = diagram.Limited ? "Diagram limited to 60 documents and 240 connections. The map lists every scanned document." : "Workspace map diagram opened.";
         }
     }

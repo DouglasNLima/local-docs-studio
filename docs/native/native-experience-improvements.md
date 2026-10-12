@@ -1,5 +1,7 @@
 # Native experience improvements
 
+The 43457b1 desktop map run validates report copying, exact source selection and Back navigation. Its retained native diagram is correct, but direct desktop-child lookup misses the owned window. Stable automation identity and descendant discovery now cover that hierarchy; desktop/installed revalidation is pending.
+
 All four 8f5fde9 runs pass, including all 48 built/installed/reinstalled native workflows. The wiki-link TextPattern observation correction below is now verified. Workspace maps add eleven core cases and four native outcomes; all 680 core tests and complete native integration pass, with the 49th desktop workflow pending CI.
 
 Wiki desktop validation at 8289763 confirms completion but exposes an incorrect ordinary-tree hyperlink lookup. The retained screenshot shows the link; the harness now uses WPF TextPattern children. The corrected 48-workflow suite awaits CI.

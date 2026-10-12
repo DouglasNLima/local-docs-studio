@@ -2,6 +2,8 @@
 
 Reference: docs/tool-guide.md, browser regression tests, registries/content.js and the newer main image/navigation/template contracts. All rows start incomplete until validated outcomes are recorded.
 
+Map desktop checks at 43457b1 pass reports and source/document navigation before an incorrect owned-window lookup fails. Retained evidence shows the rendered diagram; the hierarchy/automation-identity correction awaits CI.
+
 Current validation: all four 8f5fde9 runs pass, including all 48 built/installed/reinstalled native workflows. Workspace maps add eleven core cases and four native outcomes; all 680 core tests, complete native integration and static integrity pass. The new 49th desktop workflow awaits CI.
 
 The 8289763 wiki desktop run passes completion insertion but its hyperlink observation queried the wrong WPF automation surface. A retained screenshot confirms rendering; TextPattern discovery now matches ordinary-link checks. Corrected desktop/installed validation remains pending.

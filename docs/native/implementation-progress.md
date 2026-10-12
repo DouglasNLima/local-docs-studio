@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Map CI at 43457b1 passes clipboard reports, exact source selection and document Back navigation, then fails a desktop-child-only diagram lookup. The retained screenshot shows the correct native diagram; owned windows appear beneath their owner in WPF automation. A stable map-window identifier and descendant discovery correct the observation; all 49 desktop workflows await revalidation.
+
 Current addition: View → Workspace map supplies searchable native document lists, incoming/outgoing Markdown and wiki links, exact source navigation and document history. Current saved-file drafts override disk source. Explicitly bounded scans retain partial/unreadable distinctions and exclude private state; diagram views use native zoom/SVG/PNG output and clipboard reports keep supplied metadata passive. A clean Release build, all 680 core tests, complete native integration and static integrity pass. Four map layouts and both diagram images were inspected. The new 49th desktop workflow awaits CI.
 
 All four runs at 8f5fde9 pass: native PR/push 38196246794/38196242726 and web PR/push 38196246796/38196242725. Both native runs pass all 48 workflows in built, installed and reinstalled apps, including wiki completion, preview navigation/Back, unresolved targets and complete Undo. The WPF TextPattern observation correction is verified. Evidence: artifacts/native/native-ci-8f5fde9-pr.log.
