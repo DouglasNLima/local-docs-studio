@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current implementation df281c0 passes both native and both web pipelines, including the corrected source-selection behaviour and all 60 desktop workflows in four contexts. Preview.215 packages have verified hashes, bundled runtime and unsigned metadata; the installer lifecycle preserves 20 state files. Exact reports and the inspected recovery screenshot are under artifacts/native/ci-df281c0-push. See the [handover](engineering-handover.md) for current artefacts and remaining acceptance; the entries below retain earlier revision outcomes.
+
 The new desktop check at 54c1245 exposed a real selection defect in both native CI runs: typing after Edit source replaced the previously selected insertion. The saved fixture was not overwritten; retained session/screenshot evidence shows the editor draft reduced to `X`. Source navigation now clears the old selection at its target. The original assertion is retained for the next CI run; no timeout or expected text was relaxed.
 
 Failed-diagram recovery is implemented with Copy source and Edit source, exact snapshot validation and automatic editor visibility. Fourteen focused native cases pass, including standalone/DevOps source mapping; the complete native harness passes 40 diagram/export cases with zero failures. All 832 core tests, static checks and Release build pass (zero warnings/errors). The 60th actual desktop workflow is implemented and awaiting CI; no local foreground input, clipboard or installation was used.
@@ -76,7 +78,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Continue the acceptance areas below using the validated b1b500c preview; see [engineering handover](engineering-handover.md). Both native and web runs pass. Downloaded current evidence confirms Unicode export, 20 preserved state files and certificate cleanup. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Continue the acceptance areas below using the verified df281c0 preview.215 packages; see [engineering handover](engineering-handover.md). Both native and both web runs pass. Downloaded evidence confirms the source-selection correction in all four desktop contexts, 20 preserved state files and unsigned package integrity. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

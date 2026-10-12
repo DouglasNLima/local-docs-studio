@@ -1,8 +1,8 @@
 # Functional parity matrix
 
-The first actual failed-diagram recovery checks (54c1245, both native runs) reveal that source navigation retained a previous selection. Moving to a source location now collapses that selection before keyboard input. The original clipboard/focus/insertion/Undo assertion remains unchanged and awaits the corrected CI run.
+The first actual failed-diagram recovery checks (54c1245, both native runs) revealed that source navigation retained a previous selection. Moving to a source location now collapses that selection before keyboard input. The unchanged clipboard/focus/insertion/Undo assertion passes in all four desktop contexts of both df281c0 native runs; both web runs also pass.
 
-Failed-diagram recovery now covers the web reference's Copy source and Edit source actions. Fourteen local native cases cover invalid/unknown/oversized diagrams, rejected native drawings, standalone Mermaid, DevOps containers and a valid control in both themes. Copy retains exact diagram code; editing targets the original fence and reveals the editor. The actual keyboard/clipboard workflow is included in the expanded 60-workflow desktop suite and awaits CI.
+Failed-diagram recovery now covers the web reference's Copy source and Edit source actions. Fourteen local and CI native cases cover invalid/unknown/oversized diagrams, rejected native drawings, standalone Mermaid, DevOps containers and a valid control in both themes. Copy retains exact diagram code; editing targets the original fence and reveals the editor. The expanded 60-workflow desktop suite passes after the selection correction. Earlier revision observations follow.
 
 All four 56b5161 CI runs pass, including the stronger visible-diagram paint check in all four application contexts. The intermittent closed-details delay described below remains unresolved; a passing sample does not establish its cause.
 

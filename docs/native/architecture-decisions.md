@@ -1,6 +1,6 @@
 # Native architecture decisions
 
-Source jumps use a zero-length editor selection at the target, preserving navigation history while clearing any old range. Updating AvalonEdit's caret alone retains selection; actual CI demonstrated that the next character then replaced that old range. This applies to diagram recovery, outline/source targets and double-click source navigation.
+Source jumps use a zero-length editor selection at the target, preserving navigation history while clearing any old range. Updating AvalonEdit's caret alone retains selection; actual CI demonstrated that the next character then replaced that old range. This applies to diagram recovery, outline/source targets and double-click source navigation. The unchanged actual keyboard regression passes in all four desktop contexts of both df281c0 native runs.
 
 Failed diagram previews retain accessible native Copy source and Edit source actions. The renderer supplies the fence's source offset; the window validates the active document and exact preview snapshot before navigating. Preview-only layout becomes Split so keyboard input reaches the original source. Copy uses the existing diagram-source path, and unavailable native drawings expose no image export actions. Standalone Mermaid and DevOps containers retain their existing source mapping; nothing rewrites the document or changes update trust.
 
