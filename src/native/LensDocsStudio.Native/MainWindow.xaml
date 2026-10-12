@@ -148,9 +148,9 @@
     <MenuItem x:Name="BackMenu" Header="Go _back" InputGestureText="Alt+Left" Click="NavigateBack" IsEnabled="False"/>
     <MenuItem x:Name="ForwardMenu" Header="Go _forward" InputGestureText="Alt+Right" Click="NavigateForward" IsEnabled="False"/>
     <Separator/>
-    <MenuItem Header="_Editor" Tag="Editor" Click="ChangeLayout"/>
-    <MenuItem Header="_Split" Tag="Split" Click="ChangeLayout"/>
-    <MenuItem Header="_Preview" Tag="Preview" Click="ChangeLayout"/>
+    <MenuItem Header="_Editor" Tag="Editor" Click="ChangeLayout" AutomationProperties.AutomationId="LayoutEditor"/>
+    <MenuItem Header="_Split" Tag="Split" Click="ChangeLayout" AutomationProperties.AutomationId="LayoutSplit"/>
+    <MenuItem Header="_Preview" Tag="Preview" Click="ChangeLayout" AutomationProperties.AutomationId="LayoutPreview"/>
     <Separator/>
     <MenuItem Header="_Light theme" Tag="Light" Click="ChangeTheme" AutomationProperties.AutomationId="LightTheme"/>
     <MenuItem Header="_Dark theme" Tag="Dark" Click="ChangeTheme" AutomationProperties.AutomationId="DarkTheme"/>

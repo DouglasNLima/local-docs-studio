@@ -19,6 +19,8 @@ See [native implementation progress](docs/native/implementation-progress.md), [f
 
 The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix identifies features still to be implemented.
 
+Native **Editor** layout keeps the outline current while pausing hidden diagram, image and document rendering. Returning to **Split** or **Preview** rebuilds the current preview. **Copy rendered text** explicitly prepares current edits even in Editor layout; intervening edits or clipboard changes prevent an obsolete copy. Find follows the visible editor or preview when changing single-pane layouts.
+
 Native wiki-style links support `[[document]]`, `[[folder/document#section|Label]]` and workspace completion with `Ctrl+Space`. Explicit paths take priority; duplicate short names report their matching paths. Navigation remains inside the selected workspace. Reviewed file moves preserve aliases, document review checks current target drafts, and Docs Site exports resolve links only among included documents. Standalone HTML, Word and read-only help retain readable labels.
 
 The native file tree refreshes when files or folders are created, renamed or deleted outside the app. Surviving folder controls retain expansion and selection. External edits flag conflicts without replacing unsaved editor text; the app's private recovery folder is excluded from the tree.

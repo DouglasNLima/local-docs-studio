@@ -8,6 +8,8 @@ Choose **File → Open document** to edit a Markdown or Mermaid file, or **Open 
 
 Use **Editor**, **Split** or **Preview** to choose your working layout. Drag the divider in Split to resize the editor and preview. The outline opens headings; double-click supported preview text to move to its source. **Alt+Left** and **Alt+Right** move through document navigation history.
 
+Editor layout keeps the outline current and pauses hidden preview rendering. Returning to Split or Preview renders your latest edits. Changing between single-pane layouts also sets the appropriate Find context.
+
 The native preview is a separate development edition. Its state and installation are kept apart from the browser product and legacy Windows shell.
 
 ## Editing, finding and replacing
@@ -75,6 +77,8 @@ The Insert menu also offers callouts, progress indicators and explicit anchors. 
 ## Copying and pasting
 
 **Edit → Copy rendered text** copies readable Unicode text, including original LaTeX for formulae. **Copy rendered content** supplies formatted HTML and text with embedded supported images and diagrams for applications such as Word.
+
+Copy rendered text prepares the current document even when its preview is hidden. If the document or clipboard changes during preparation, the app leaves the clipboard unchanged and asks you to copy again.
 
 **Copy Markdown with images** retains Markdown around local images and complete Mermaid blocks while supplying portable image representations. Attachment handling still depends on the destination application; live Azure DevOps workflows need separate validation.
 

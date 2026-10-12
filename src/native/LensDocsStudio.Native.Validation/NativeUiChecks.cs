@@ -1227,6 +1227,8 @@ internal static partial class NativeUiChecks
             CheckWorkspaceMap(window, editor, automation, app.ProcessId, output, source, renamedDocument);
             checks.Add("Native workspace map uses current drafts, copies a passive Markdown report, clears empty results and navigates exact source/document history; native diagrams and complete Undo preserve files");
             checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
+            CheckPreviewScheduling(window, editor, output, source);
+            checks.Add("Editor-only mode pauses hidden rendering, explicit text copy uses current edits and Undo, and Find follows Editor/Preview layout without changing source");
             CheckSettings(window, editor, automation, app.ProcessId, state, output, source);
             CheckSettingsTransfer(window, editor, automation, app.ProcessId, state, output, source, OpenThroughDialogue,
                 (path, title) => SaveThroughDialogue(path, title, absolutePath: true));
@@ -1289,6 +1291,7 @@ internal static partial class NativeUiChecks
         }
         catch (Exception ex)
         {
+            NativeUiFailureDiagnostics.Capture(launchedProcess, output);
             try { mainWindow?.CaptureToFile(Path.Combine(output, "native-ui-failure.png")); } catch { }
             try { File.WriteAllLines(Path.Combine(output, "native-ui-failure-controls.txt"), mainWindow!.FindAllDescendants().Select(e => $"{e.ControlType}: {e.AutomationId} — {e.Name}")); } catch { }
             try

@@ -142,6 +142,12 @@ internal static class Program
             try { NativePreviewNavigationChecks.Run(navigationOutput); Console.WriteLine("Native preview navigation passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--preview-scheduling")
+        {
+            var schedulingOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(schedulingOutput);
+            try { NativePreviewSchedulingChecks.Run(schedulingOutput); Console.WriteLine("Native preview scheduling passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -196,6 +202,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
+        try { NativePreviewSchedulingChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }

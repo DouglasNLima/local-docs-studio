@@ -40,6 +40,7 @@ public partial class MainWindow : Window
     private CancellationTokenSource? previewCancellation;
     private PreviewResult? rendered;
     private ParsedDocument? parsed;
+    private Guid? renderedDocumentId;
     private DocumentViewModel? displayedTab;
     private bool previewFocused;
     private bool searchPreview;
@@ -114,10 +115,13 @@ public partial class MainWindow : Window
     }
     private void TabChanged(object sender, SelectionChangedEventArgs e) { if (e.Source == DocumentTabs) { BindActiveDocument(); QueuePreview(); } }
     private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
-    private async Task UpdatePreviewAsync()
+    private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
-        if (model.ActiveDocument is not { } tab) { Preview.Document = new FlowDocument(); return; }
+        previewTimer.Stop();
+        if (model.ActiveDocument is not { } tab)
+        { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
         var text = tab.EditorDocument.Text;
+        var preparePreview = forcePreview || model.Layout != "Editor";
         var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
@@ -132,13 +136,21 @@ public partial class MainWindow : Window
             {
                 var source = markdown.Parse(text, standalone);
                 var results = new Dictionary<FencedCodeBlock, DiagramResult>();
-                foreach (var code in source.Syntax.Descendants<FencedCodeBlock>())
+                foreach (var code in preparePreview ? source.Syntax.Descendants<FencedCodeBlock>() : [])
                 {
                     cancellation.ThrowIfCancellationRequested();
                     if (code.Info is "mermaid" or "mmd") results[code] = diagrams.Render(code.Lines.ToString(), dark);
                 }
-                return (source, results, syntax: CodeSyntaxService.Prepare(source, cancellation));
+                return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
+            if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
+            if (!preparePreview)
+            {
+                parsed = prepared.source; rendered = null; renderedDocumentId = null;
+                Preview.Document = new FlowDocument(); Outline.ItemsSource = parsed.Headings;
+                model.PreviewStatus = "Preview paused in Editor layout";
+                return;
+            }
             var nativeDrawings = await StaWorker.RunAsync(() =>
             {
                 var drawings = new Dictionary<FencedCodeBlock, DrawingImage>();
@@ -161,10 +173,11 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
-            parsed = prepared.source; rendered = completed;
+            parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
             Preview.Document = rendered.Document;
             Outline.ItemsSource = parsed.Headings;
-            model.PreviewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
+                : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
@@ -193,17 +206,21 @@ public partial class MainWindow : Window
         for (var element = e.OriginalSource as DependencyObject; element is not null; element = LogicalTreeHelper.GetParent(element))
             if (element is TextElement { Tag: SourceReference source }) { JumpToSource(source.Start); break; }
     }
-    private void JumpToSource(int offset)
+    private void JumpToSource(int offset, bool focusEditor = true)
     {
         CaptureCurrentNavigation();
         Editor.CaretOffset = Math.Clamp(offset, 0, Editor.Document.TextLength);
-        Editor.ScrollToLine(Editor.Document.GetLineByOffset(Editor.CaretOffset).LineNumber); Editor.Focus();
+        Editor.ScrollToLine(Editor.Document.GetLineByOffset(Editor.CaretOffset).LineNumber);
+        if (focusEditor) Editor.Focus();
         VisitCurrentNavigation();
     }
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (Outline.SelectedItem is DocumentHeading heading && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-        { CaptureCurrentNavigation(); rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+        if (Outline.SelectedItem is not DocumentHeading heading) return;
+        if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
+        JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");
+        if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
+        { rendered.RevealSource(heading.SourceStart); _ = PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
     }
     private async void Navigate(string reference)
     {
@@ -226,8 +243,12 @@ public partial class MainWindow : Window
             if (fragment is not null)
             {
                 var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
-                if (target is not null && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                { CaptureCurrentNavigation(); rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+                if (target is not null)
+                {
+                    JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
+                    if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
+                    { rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
+                }
                 else model.Status = "The linked section was not found; the document remains open.";
             }
         });
@@ -428,9 +449,27 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or System.Runtime.InteropServices.ExternalException) { dialogs.Error(ex.Message); }
     }
-    private void CopyPreview(object sender, RoutedEventArgs e)
+    private async Task<string?> PreparePreviewTextAsync()
     {
-        try { Clipboard.SetText(rendered?.ReadText() ?? new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
+        if (model.ActiveDocument is not { } tab) return null;
+        var source = tab.EditorDocument.Text;
+        if (renderedDocumentId != tab.Id || parsed?.Source != source || rendered is null)
+            await UpdatePreviewAsync(forcePreview: true);
+        if (model.ActiveDocument != tab || tab.EditorDocument.Text != source || renderedDocumentId != tab.Id || parsed?.Source != source || rendered is null)
+        { model.Status = "Current preview text is unavailable. Wait for the preview to update and copy again."; return null; }
+        return rendered.ReadText();
+    }
+    private async void CopyPreview(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var sequence = NativeClipboardService.Sequence;
+            var text = await PreparePreviewTextAsync();
+            if (text is null) return;
+            if (NativeClipboardService.Sequence != sequence)
+            { model.Status = "The clipboard changed while text was being prepared. Copy again to replace it."; return; }
+            Clipboard.SetText(text); model.Status = "Preview text copied";
+        }
         catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
     }
     private async void CopyRenderedContent(object sender, RoutedEventArgs e) => await CopyDocumentAsync(false);
@@ -476,12 +515,19 @@ public partial class MainWindow : Window
     private async void ChangeLayout(object sender, RoutedEventArgs e) { SetLayout((string)((FrameworkElement)sender).Tag); await SavePreferences(); }
     private void SetLayout(string layout)
     {
+        var changed = model.Layout != layout;
         model.Layout = layout;
         EditorColumn.Width = layout == "Preview" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         SplitColumn.Width = layout == "Split" ? new GridLength(5) : new GridLength(0);
         Editor.Visibility = layout == "Preview" ? Visibility.Collapsed : Visibility.Visible;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
+        if (layout != "Split") previewFocused = layout == "Preview";
+        if (changed)
+        {
+            FindBar.Visibility = Visibility.Collapsed;
+            QueuePreview();
+        }
     }
     private async Task SavePreferences()
     {
