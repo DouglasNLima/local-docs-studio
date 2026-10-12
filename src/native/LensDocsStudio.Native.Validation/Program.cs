@@ -29,7 +29,8 @@ internal static class Program
             }
         }
         if (args.FirstOrDefault() == "--ui")
-            return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
+            return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui",
+                requireBundledRuntime: args.ElementAtOrDefault(3) == "--require-bundled-runtime");
         if (args.FirstOrDefault() == "--interrupted-save")
             return NativeUiChecks.RunInterruptedSave(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/interrupted-save");
         if (args.FirstOrDefault() == "--installer-wizard")

@@ -44,6 +44,12 @@ The web push passes 262 cases. Web PR attempt 1 records 261 passed tests and a C
 
 Diagram image copying now has stable automation identifiers. The pending desktop check uses keyboard activation at 175% and 35% zoom, compares every BGRA pixel/dimension with a separately prepared matching-palette reference, waits for actual window closure, checks clipboard persistence and retains edited/saved source. It saves native-ui-diagram-clipboard.json and native-diagram-clipboard.png in all four contexts. Release and static checks pass; actual clipboard execution has not occurred locally. External Office/Azure DevOps paste destinations remain separate.
 
+## Subsequent runtime and diagnostic work
+
+A loaded-runtime check is compiled but has not run in hosted CI. It captures the actual application executable and coreclr.dll/wpfgfx_cor3.dll module paths after editor/diagram readiness. Test-NativeInstaller.ps1 explicitly requires both loaded modules to belong to the installation directory. The normal built-app context records its framework runtime. Each context saves native-ui-runtime.json before any failed assertion. Release has zero warnings/errors, static/script checks pass and the new option still refuses local desktop execution. This does not claim that the hosted runner lacks an SDK.
+
+Three unchanged local processes ran hidden-HWND layout checks for the unresolved latency concern. All twelve table/quote/details/list cases pass exact content/source and the unchanged 250 ms input bound; maximum gap is 89.58 ms. Details component initialisation ranges from 10.77 to 15.67 ms. Samples and analysis.json are in artifacts/native/construction-cfe11e5. These do not reproduce the earlier pauses or establish a cause or fix.
+
 ## Security evidence
 
 The sealed b45246e..cf436b0 review is 475201d4-5562-4ffa-bc7a-166818c61152: all 101 changed inventory files and six supplemental source files reviewed with a fresh architecture model. One Low Word DOM allocation finding survives; the ContextColor hypothesis is rejected because the pinned Mermaid renderer removes the supplied paint forms before native conversion. A bounded original-build probe with 65,536 tabs allocated 12,416,296 cumulative managed bytes for a 6,142-byte DOCX under a 32,768-byte output limit. It did not measure peak memory or induce OOM. The subsequent 0c20f64 correction is regression-tested separately and does not alter that sealed result.

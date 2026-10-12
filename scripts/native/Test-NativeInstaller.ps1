@@ -76,7 +76,7 @@ function Run-Installer([string]$Path, [string]$Phase) {
 function Run-NativeUi([string]$Phase) {
     Push-Location $repo
     try {
-        & dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $Phase)
+        & dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $Phase) --require-bundled-runtime
         if ($LASTEXITCODE -ne 0) { throw "Installed application UI validation failed during $Phase." }
     } finally { Pop-Location }
     $checks.Add("${Phase}: installed application saved and restored UTF-8 source")

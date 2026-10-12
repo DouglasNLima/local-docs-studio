@@ -24,6 +24,8 @@ Exports preserve editable/selectable text where supported, with checked Unicode 
 
 ## Installation and update trust
 
+The next compiled validation requires installed, upgraded and reinstalled applications to load coreclr.dll and wpfgfx_cor3.dll from their own installation directory. It records actual executable/module paths in native-ui-runtime.json; the built-app context records its framework runtime. Hosted results remain pending. Package contents alone do not establish which runtime a running process selected, and this check does not replace SDK-free clean-machine certification.
+
 The self-contained x64 Inno installer and portable ZIP use separate product, state and association identities. CI covers visible wizard choices, Back/cancellation, installation, newer-preview replacement, uninstall/reinstall and reopening retained sessions. Twenty state files and workspace source are preserved. Both preview versions use the same source revision; this does not certify historical schema migration or an SDK-free machine.
 
 Signing is pluggable through an existing certificate or service adapter, with independently verified publisher pins. The user has configured neither identity nor provider. Both preview.227 installers report `NotSigned`, update envelopes contain no identity/signature, and unsigned updates cannot execute. Update operations cancel/reject stale selections and verify signed metadata, size/hash, Windows Authenticode and exact publisher before an authorised launch. Disposable CI certificates test trust paths and are removed afterwards; production trust remains empty.

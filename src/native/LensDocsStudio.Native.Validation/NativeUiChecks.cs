@@ -11,7 +11,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int Run(string executable, string output)
+    public static int Run(string executable, string output, bool requireBundledRuntime = false)
     {
         var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
@@ -19,7 +19,7 @@ internal static partial class NativeUiChecks
             try
             {
                 int result;
-                using (NativeUiClipboard.Start()) result = RunCore(executable, output);
+                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime);
                 completion.SetResult(result);
             }
             catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
@@ -27,7 +27,7 @@ internal static partial class NativeUiChecks
         thread.SetApartmentState(ApartmentState.MTA); thread.Start();
         return completion.Task.GetAwaiter().GetResult();
     }
-    private static int RunCore(string executable, string output)
+    private static int RunCore(string executable, string output, bool requireBundledRuntime)
     {
         output = Path.GetFullPath(output);
         Directory.CreateDirectory(output);
@@ -62,6 +62,10 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
             MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
+            CheckLoadedRuntime(launchedProcess!, executable, output, requireBundledRuntime);
+            checks.Add(requireBundledRuntime
+                ? "Installed application loads the .NET runtime and WPF graphics from its own package directory"
+                : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");
             CheckMinimumWindow(window, editor, output, source);
             checks.Add("Minimum-size native window retains visible Cancel and Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             CheckLargeEditorNavigation(window, editor, output, source);

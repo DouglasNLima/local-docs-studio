@@ -1,5 +1,7 @@
 # Native experience improvements
 
+The next installation check verifies that the running installed application uses its bundled .NET and WPF graphics modules after opening the editor and diagram preview. Build/static checks and local refusal pass; actual hosted outcomes are pending. This strengthens evidence for normal execution without development tools while keeping clean-machine certification explicitly separate.
+
 Diagram Copy image has stable native automation identifiers and a pending hosted regression for keyboard activation, full-resolution pixels at different zoom scales and clipboard retention after closing the drawing window. The check preserves edited/saved source; local compilation does not establish actual clipboard interoperability.
 
 The full files-in-use scenario passes in both 0c20f64 native CI runs: cancelling Setup preserves the same application, exact unsaved Unicode draft/baseline, source, installed files, shortcuts and registration. Preview.227 packages are verified unsigned internal builds and four desktop contexts pass. Historical reporting failures below remain as earlier evidence.

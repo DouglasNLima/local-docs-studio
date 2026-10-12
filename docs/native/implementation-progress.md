@@ -21,6 +21,10 @@ Full feature outcomes and limits remain in the [parity matrix](functional-parity
 
 ## Current engineering batch
 
+The next compiled check records the application's actual executable and loaded coreclr.dll/wpfgfx_cor3.dll after editor/diagram readiness. Installed, upgraded and reinstalled workflows explicitly require both modules to come from the installation directory; package metadata cannot disable the assertion. Release builds without warnings/errors, static checks and PowerShell parsing pass, and the new option refuses local desktop execution. Hosted results and SDK-free clean-machine certification remain pending.
+
+Three separate local processes rechecked the unresolved construction delay without changing source or timing bounds. All twelve nested cases preserve text/source and pass; maximum input gap is 89.58 ms. Details component initialisation takes 10.77–15.67 ms. Samples under artifacts/native/construction-cfe11e5 do not reproduce or explain the historical failure.
+
 The sealed b45246e..cf436b0 security review found a Low Word allocation issue: compressed output limits did not constrain per-tab in-memory objects. Commit 0c20f64 preflights at most 65,536 expanded code elements across the document before template/package construction. Paragraph/run formatting, text, tabs and breaks are counted; delimiter handling is shared with the writer to preserve CRLF across colour runs. Seven new regressions pass with all 839 core tests and the complete local native harness. Release has zero warnings/errors. All six desktop/Office/installer commands refuse local execution before arguments/paths; static and script checks pass.
 
 The next desktop regression activates diagram Copy image by keyboard at 175% and 35% zoom. A separate process compares every clipboard pixel and both dimensions with an independent matching-palette rendering, waits for the zoom window to close, then checks persistence and unchanged edited/saved Markdown. Compilation and static checks pass; no local clipboard interaction occurred. Actual hosted execution remains pending. This does not certify external Office or Azure DevOps paste behaviour.
