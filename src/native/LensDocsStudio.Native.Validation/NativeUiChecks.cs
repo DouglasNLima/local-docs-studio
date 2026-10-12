@@ -125,6 +125,8 @@ internal static partial class NativeUiChecks
             Find(window, "NavigateBack").Click();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Renamed%20document.md", StringComparison.Ordinal), "The open linked document did not receive the planned link update.");
             checks.Add("Native rename review saves unsaved linked content, moves the file, updates links and refreshes open editor text");
+            CheckCaseOnlyRename(window, editor, automation, app.ProcessId, source, renamedDocument);
+            checks.Add("Case-only rename reviews real filename/link changes, refreshes open drafts and history, and restores original spelling without changing document bytes");
             Find(window, "FileMenu").Click(); Find(window, "CreateWorkspaceFile").Patterns.Invoke.Pattern.Invoke();
             Window? createWindow = null;
             Wait(() => (createWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Create workspace file")))?.AsWindow()) is not null, "The workspace create-file dialogue did not open.");

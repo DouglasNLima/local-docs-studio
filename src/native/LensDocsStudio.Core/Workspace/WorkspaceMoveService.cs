@@ -12,7 +12,7 @@ public sealed record WorkspaceMoveJournal(int SchemaVersion, string Workspace, W
 public sealed record WorkspaceMoveResult(DocumentSnapshot Moved, IReadOnlyList<DocumentSnapshot> UpdatedDocuments);
 
 /// <summary>Plans source-preserving link edits and retains all original text before a multi-file move.</summary>
-public sealed class WorkspaceMoveService(DocumentStore documents, string recoveryDirectory)
+public sealed class WorkspaceMoveService(DocumentStore documents, string recoveryDirectory, string? excludedDirectory = null)
 {
     private readonly SemaphoreSlim gate = new(1, 1);
     private string RecoveryDirectory { get; } = Path.GetFullPath(recoveryDirectory);
@@ -21,12 +21,15 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
     {
         sourcePath = workspace.Resolve(Path.GetRelativePath(workspace.Root, sourcePath));
         var destination = workspace.Resolve(relativeDestination);
-        if (sourcePath.Equals(destination, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose a different document filename or folder.");
+        if (Path.GetDirectoryName(sourcePath)!.Equals(Path.GetDirectoryName(destination), StringComparison.OrdinalIgnoreCase))
+            destination = Path.Combine(Path.GetDirectoryName(sourcePath)!, Path.GetFileName(destination));
+        ValidatePublicPath(workspace, sourcePath); ValidatePublicPath(workspace, destination);
+        if (sourcePath.Equals(destination, StringComparison.OrdinalIgnoreCase) && !IsCaseOnlyRename(sourcePath, destination)) throw new IOException("Choose a different document filename or folder.");
         if (!WorkspaceService.IsDocument(destination)) throw new IOException("Keep a supported Markdown, Mermaid or text extension.");
-        if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("The destination already exists; no document will be replaced.");
+        if (DestinationCollides(sourcePath, destination)) throw new IOException("The destination already exists; no document will be replaced.");
         if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new IOException("Create the destination folder before moving the document.");
         var source = await documents.ReadAsync(sourcePath, cancellationToken);
-        var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken);
+        var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken, excludedDirectory: excludedDirectory);
         var wikiIndex = new WikiLinkIndex(Flatten(listing.Entries).Select(entry => Path.GetRelativePath(workspace.Root, entry.Path).Replace('\\', '/')));
         var warnings = listing.Warnings.ToList();
         var changes = new List<DocumentLinkChange>();
@@ -49,6 +52,7 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
                 try
                 {
                     var target = workspace.ResolveLink(path, link.Reference);
+                    ValidatePublicPath(workspace, target);
                     var pointsToMoved = target.Equals(sourcePath, StringComparison.OrdinalIgnoreCase);
                     if (!movingSource && !pointsToMoved) continue;
                     var fragment = link.Reference.Contains('#') ? "#" + link.Reference.Split('#', 2)[1] : "";
@@ -85,13 +89,12 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
         await gate.WaitAsync(cancellationToken);
         try
         {
-            workspace.Resolve(Path.GetRelativePath(workspace.Root, plan.Source.Path));
-            workspace.Resolve(Path.GetRelativePath(workspace.Root, plan.Destination));
-            if (File.Exists(plan.Destination) || Directory.Exists(plan.Destination)) throw new IOException("The destination appeared after planning; nothing was replaced.");
+            ValidatePublicPath(workspace, plan.Source.Path); ValidatePublicPath(workspace, plan.Destination);
+            if (DestinationCollides(plan.Source.Path, plan.Destination)) throw new IOException("The destination appeared after planning; nothing was replaced.");
             var changes = updateLinks ? plan.OtherDocuments : [];
             foreach (var snapshot in changes.Select(c => c.Original).Prepend(plan.Source))
             {
-                workspace.Resolve(Path.GetRelativePath(workspace.Root, snapshot.Path));
+                ValidatePublicPath(workspace, snapshot.Path);
                 if ((await documents.ReadAsync(snapshot.Path, cancellationToken)).Fingerprint != snapshot.Fingerprint)
                     throw new DocumentConflictException("A document changed after the move was planned: " + Path.GetRelativePath(workspace.Root, snapshot.Path));
             }
@@ -142,7 +145,8 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
                     try
                     {
                         WorkspacePath.RejectReparsePoints(plan.Source.Path); WorkspacePath.RejectReparsePoints(plan.Destination);
-                        if (File.Exists(plan.Source.Path) || (await documents.ReadAsync(plan.Destination)).Fingerprint != plan.Source.Fingerprint) restored = false;
+                        if (!IsCaseOnlyRename(plan.Source.Path, plan.Destination) && File.Exists(plan.Source.Path)
+                            || (await documents.ReadAsync(plan.Destination)).Fingerprint != plan.Source.Fingerprint) restored = false;
                         else File.Move(plan.Destination, plan.Source.Path, false);
                     }
                     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { restored = false; }
@@ -155,4 +159,21 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
     }
 
     private static IEnumerable<WorkspaceEntry> Flatten(IEnumerable<WorkspaceEntry> entries) => entries.SelectMany(e => e.IsDirectory ? Flatten(e.Children) : [e]);
+    private static bool IsCaseOnlyRename(string source, string destination) => source.Equals(destination, StringComparison.OrdinalIgnoreCase)
+        && !Path.GetFileName(source).Equals(Path.GetFileName(destination), StringComparison.Ordinal);
+    private static bool DestinationCollides(string source, string destination)
+    {
+        if (Directory.Exists(destination)) return true;
+        if (!File.Exists(destination)) return false;
+        if (!IsCaseOnlyRename(source, destination)) return true;
+        // On a case-insensitive volume File.Exists sees the source alias. An actual destination entry still collides.
+        return Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(destination)!, Path.GetFileName(destination))
+            .Any(path => Path.GetFileName(path).Equals(Path.GetFileName(destination), StringComparison.Ordinal));
+    }
+    private void ValidatePublicPath(WorkspacePath workspace, string path)
+    {
+        workspace.Resolve(Path.GetRelativePath(workspace.Root, path));
+        if (excludedDirectory is not null && (WorkspacePath.ContainsOrEquals(excludedDirectory, workspace.Root) || WorkspacePath.ContainsOrEquals(excludedDirectory, path)))
+            throw new IOException("Private application state is excluded from document moves.");
+    }
 }

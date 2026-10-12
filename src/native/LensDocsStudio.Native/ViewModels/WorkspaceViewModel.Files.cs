@@ -45,7 +45,7 @@ public partial class WorkspaceViewModel
             var relative = dialogs.WorkspacePathPrompt("Rename or move document", "Destination inside " + workspace.Root,
                 Path.GetRelativePath(workspace.Root, tab.FilePath), "Review changes");
             if (relative is null) return;
-            var mover = new WorkspaceMoveService(documents, Path.Combine(StateDirectory, "move-recovery"));
+            var mover = new WorkspaceMoveService(documents, Path.Combine(StateDirectory, "move-recovery"), StateDirectory);
             var plan = await mover.PlanAsync(workspace, tab.FilePath, relative, OperationToken);
             if (tab.SavedSnapshot?.Fingerprint != plan.Source.Fingerprint) throw new DocumentConflictException("This document changed externally. Reload it before moving it.");
             var updateLinks = dialogs.ReviewMove(workspace, plan);

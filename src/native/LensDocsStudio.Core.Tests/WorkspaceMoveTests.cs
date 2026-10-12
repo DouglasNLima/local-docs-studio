@@ -7,7 +7,7 @@ public sealed class WorkspaceMoveTests : IDisposable
 {
     private readonly string root = Path.Combine(Path.GetTempPath(), "lens-move-" + Guid.NewGuid().ToString("N"));
     private DocumentStore Store => new(Path.Combine(root, "state", "writes"));
-    private WorkspaceMoveService Service => new(Store, Path.Combine(root, "state", "moves"));
+    private WorkspaceMoveService Service => new(Store, Path.Combine(root, "state", "moves"), Path.Combine(root, "state"));
     public WorkspaceMoveTests() { Directory.CreateDirectory(Path.Combine(root, "docs")); Directory.CreateDirectory(Path.Combine(root, "reference")); }
 
     [Fact] public async Task Move_preserves_wikilink_aliases_and_retargets_exact_source_spans()
@@ -108,6 +108,64 @@ public sealed class WorkspaceMoveTests : IDisposable
         Assert.True(File.Exists(source)); Assert.False(File.Exists(plan.Destination));
         recovery.MarkReviewed(item.JournalPath);
         Assert.True(File.Exists(journalPath + ".reviewed.json")); Assert.Empty((await recovery.ReadAsync()).Items);
+    }
+    [Theory]
+    [InlineData(true)] [InlineData(false)]
+    public async Task Case_only_rename_keeps_actual_filename_bytes_and_reviewed_link_choice(bool updateLinks)
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); var home = Path.Combine(root, "README.md");
+        var bytes = DocumentSnapshot.Encode("# Guide\r\n\r\n[Next](next.md#details)\r\n", true);
+        await File.WriteAllBytesAsync(source, bytes);
+        const string incoming = "[Guide](docs/guide.md#intro) [[docs/guide|Wiki guide]] `[[docs/guide]]`";
+        await File.WriteAllTextAsync(home, incoming);
+        var plan = await Service.PlanAsync(new(root), source, "docs/GUIDE.md");
+        var result = await Service.ApplyAsync(new(root), plan, updateLinks);
+        Assert.Equal("GUIDE.md", Path.GetFileName(Assert.Single(Directory.GetFiles(Path.Combine(root, "docs")))));
+        Assert.Equal(bytes, await File.ReadAllBytesAsync(result.Moved.Path));
+        Assert.Equal(updateLinks ? "[Guide](docs/GUIDE.md#intro) [[docs/GUIDE.md|Wiki guide]] `[[docs/guide]]`" : incoming, await File.ReadAllTextAsync(home));
+        Assert.Empty(Directory.GetFiles(Path.Combine(root, "state", "moves"), "*.move.json"));
+    }
+    [Fact] public async Task Case_only_rename_rolls_back_filename_and_completed_links_after_a_late_failure()
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); var first = Path.Combine(root, "a.md"); var last = Path.Combine(root, "z.md");
+        await File.WriteAllTextAsync(source, "# Original"); const string incoming = "[Guide](docs/guide.md)";
+        await File.WriteAllTextAsync(first, incoming); await File.WriteAllTextAsync(last, incoming);
+        var plan = await Service.PlanAsync(new(root), source, "docs/GUIDE.md");
+        using (var locked = new FileStream(last, FileMode.Open, FileAccess.Read, FileShare.Read))
+            await Assert.ThrowsAsync<IOException>(() => Service.ApplyAsync(new(root), plan, true));
+        Assert.Equal("guide.md", Path.GetFileName(Assert.Single(Directory.GetFiles(Path.Combine(root, "docs")))));
+        Assert.Equal("# Original", await File.ReadAllTextAsync(source)); Assert.Equal(incoming, await File.ReadAllTextAsync(first)); Assert.Equal(incoming, await File.ReadAllTextAsync(last));
+        Assert.Empty(Directory.GetFiles(Path.Combine(root, "state", "moves"), "*.move.json"));
+    }
+    [Fact] public async Task Case_only_rename_refuses_unchanged_names_and_external_edits_before_commit()
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); await File.WriteAllTextAsync(source, "# Original");
+        await Assert.ThrowsAsync<IOException>(() => Service.PlanAsync(new(root), source, "docs/guide.md"));
+        var plan = await Service.PlanAsync(new(root), source, "docs/GUIDE.md");
+        await File.WriteAllTextAsync(source, "# External edits");
+        await Assert.ThrowsAsync<DocumentConflictException>(() => Service.ApplyAsync(new(root), plan, true));
+        Assert.Equal("guide.md", Path.GetFileName(Assert.Single(Directory.GetFiles(Path.Combine(root, "docs")))));
+        Assert.Equal("# External edits", await File.ReadAllTextAsync(source));
+    }
+    [Fact] public async Task Document_moves_exclude_private_state_from_source_destination_and_link_changes()
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); var hidden = Path.Combine(root, "state", "retained.md");
+        Directory.CreateDirectory(Path.GetDirectoryName(hidden)!);
+        await File.WriteAllTextAsync(source, "# Original"); await File.WriteAllTextAsync(hidden, "[Guide](../docs/guide.md)");
+        var plan = await Service.PlanAsync(new(root), source, "reference/guide.md"); Assert.Empty(plan.OtherDocuments);
+        await Assert.ThrowsAsync<IOException>(() => Service.PlanAsync(new(root), hidden, "reference/retained.md"));
+        await Assert.ThrowsAsync<IOException>(() => Service.PlanAsync(new(root), source, "state/guide.md"));
+        await Service.ApplyAsync(new(root), plan, true); Assert.Equal("[Guide](../docs/guide.md)", await File.ReadAllTextAsync(hidden));
+    }
+    [Fact] public async Task Rename_keeps_existing_parent_case_and_normalises_private_exclusion()
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); var state = Path.Combine(root, "state"); Directory.CreateDirectory(state);
+        await File.WriteAllTextAsync(source, "# Original"); await File.WriteAllTextAsync(Path.Combine(state, "private.md"), "[Guide](../docs/guide.md)");
+        var mover = new WorkspaceMoveService(Store, Path.Combine(state, "moves"), state + Path.DirectorySeparatorChar);
+        var plan = await mover.PlanAsync(new(root), source, "DOCS/GUIDE.md");
+        Assert.Equal(Path.Combine(root, "docs", "GUIDE.md"), plan.Destination); Assert.Empty(plan.OtherDocuments);
+        var listing = await new WorkspaceService().EnumerateAsync(new(root), excludedDirectory: state + Path.DirectorySeparatorChar);
+        Assert.DoesNotContain(listing.Entries, entry => entry.Path == state);
     }
     public void Dispose() => Directory.Delete(root, true);
 }

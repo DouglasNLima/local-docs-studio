@@ -38,7 +38,7 @@ Unsaved documents and edits are retained in separate recovery state. **File → 
 
 If another application changes a file, Lens Docs Studio flags the difference and keeps your editor text. Follow the conflict choices rather than assuming the version on disk is unchanged. **Reload from disk** asks about unsaved work and retains recovery where supported.
 
-Use **Rename or move document** to review affected links before applying a move. **Delete document** uses recoverable Windows deletion and retains a snapshot. Folder moves and case-only renames remain under development.
+Use **Rename or move document** to review affected links before applying a move, including a filename case change such as `Guide.md` to `GUIDE.md`. Existing destination entries are never replaced, and private application state is excluded from link updates. **Delete document** uses recoverable Windows deletion and retains a snapshot. Folder moves remain under development.
 
 ## Images and attachments
 

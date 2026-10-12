@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current addition: reviewed document moves now support filename case changes, retain the existing parent-folder spelling, update ordinary/wiki targets and reverse the actual filename plus completed writes on late failure. Moves exclude configured private native state; workspace enumeration normalises its exclusion path. A clean Release build, all 686 core tests, complete native integration and static integrity pass. Six added core cases cover both link-update choices, exact BOM/CRLF bytes, rollback, external edits, unchanged names and private-state boundaries. A 50th desktop workflow renames a real file to uppercase and back while checking linked tabs/history; it awaits CI together with the map-window lookup correction.
+
 Map CI at 43457b1 passes clipboard reports, exact source selection and document Back navigation, then fails a desktop-child-only diagram lookup. The retained screenshot shows the correct native diagram; owned windows appear beneath their owner in WPF automation. A stable map-window identifier and descendant discovery correct the observation; all 49 desktop workflows await revalidation.
 
 Current addition: View → Workspace map supplies searchable native document lists, incoming/outgoing Markdown and wiki links, exact source navigation and document history. Current saved-file drafts override disk source. Explicitly bounded scans retain partial/unreadable distinctions and exclude private state; diagram views use native zoom/SVG/PNG output and clipboard reports keep supplied metadata passive. A clean Release build, all 680 core tests, complete native integration and static integrity pass. Four map layouts and both diagram images were inspected. The new 49th desktop workflow awaits CI.
@@ -169,8 +171,8 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: certify the new workspace-map desktop/installed workflow, then continue folder moves/case-only renames and remaining parity. All four runs at 8f5fde9 pass all existing 48 desktop workflows and complete web checks.
+Next: certify workspace-map and case-only-rename desktop/installed workflows, then continue folder moves and remaining parity. All four runs at 8f5fde9 pass all existing 48 desktop workflows and complete web checks.
 
-Other gaps: folder moves/case-only rename, broader safe HTML/math semantics and export controls, incremental/large-document preview, full Word template fidelity and legacy pack migration, general legacy preference migration, live Azure DevOps attachments, accessibility and multi-monitor certification. Settings, help, Docs Site and the session-only artefact reader/review pack now have native desktop/installed coverage. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
+Other gaps: folder moves, broader safe HTML/math semantics and export controls, incremental/large-document preview, full Word template fidelity and legacy pack migration, general legacy preference migration, live Azure DevOps attachments, accessibility and multi-monitor certification. Settings, help, Docs Site and the session-only artefact reader/review pack now have native desktop/installed coverage. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 
 External acceptance prerequisites: a trusted production signing identity and clean Windows install/update certification. Fresh CI runner evidence does not establish SDK-free clean-machine or positive signed-upgrade certification.

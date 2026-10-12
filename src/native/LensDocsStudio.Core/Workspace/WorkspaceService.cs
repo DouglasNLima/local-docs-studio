@@ -11,6 +11,7 @@ public sealed class WorkspaceService
     public Task<WorkspaceListing> EnumerateAsync(WorkspacePath workspace, CancellationToken cancellationToken = default, bool includeImages = false, string? excludedDirectory = null) =>
         Task.Run(() =>
         {
+            var excluded = excludedDirectory is null ? null : Path.TrimEndingDirectorySeparator(Path.GetFullPath(excludedDirectory));
             var warnings = new List<string>();
             var count = 0;
             IReadOnlyList<WorkspaceEntry> Walk(string directory, int depth)
@@ -27,7 +28,7 @@ public sealed class WorkspaceService
                         var name = Path.GetFileName(entry);
                         if (name is ".git" or "node_modules" or "bin" or "obj" || (File.GetAttributes(entry) & FileAttributes.ReparsePoint) != 0) continue;
                         var folder = Directory.Exists(entry);
-                        if (folder && !entry.Equals(excludedDirectory, StringComparison.OrdinalIgnoreCase)) entries.Add(new(name, entry, true, Walk(entry, depth + 1)));
+                        if (folder && !entry.Equals(excluded, StringComparison.OrdinalIgnoreCase)) entries.Add(new(name, entry, true, Walk(entry, depth + 1)));
                         else if (!folder && (IsDocument(entry) || includeImages && IsRasterImage(entry))) entries.Add(new(name, entry, false, []));
                     }
                 }
