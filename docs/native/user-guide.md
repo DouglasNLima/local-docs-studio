@@ -84,6 +84,8 @@ Native preview tables provide context actions for copying the selected table and
 
 ## Templates, snippets and browser migration
 
+Browser **View → Export appearance settings** saves theme, layout and outline choices. Open **Edit → Settings → Import settings** here to review those choices before Apply; Cancel keeps your saved settings. Missing editor and preview choices stay as currently selected. Native **Export settings** saves all appearance choices shown in the dialogue for transfer or restoration, without documents, recent paths or update consent.
+
 **File → Create from template** opens bundled examples and generators. Filter by category or name, edit the labelled fields and inspect the generated source. Creation opens a new unsaved tab. **Insert → Built-in snippet** inserts one undoable source change.
 
 **File → Content library** manages your own templates, snippets and export profiles. Save a document as a template or selected source as a snippet from the File menu. Local raster images are embedded in the library copy; Mermaid remains editable. Referenced workspace documents still need their original files.

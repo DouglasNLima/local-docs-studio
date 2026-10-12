@@ -26,6 +26,13 @@ public partial class SettingsViewModel : ObservableObject
     public IReadOnlyList<int> IndentationSizes { get; } = Enumerable.Range(2, 7).ToArray();
     public bool CanEdit => !IsSaving;
     public event Action? Applied;
+    public WorkspaceSettings Current => new(Theme, Layout, new(FontFamily, FontSize, WordWrap, ShowLineNumbers, IndentationSize, ConvertTabsToSpaces), new(PreviewZoom), ShowOutline);
+    public void Import(ReadOnlyMemory<byte> bytes)
+    {
+        var imported = SettingsTransferFormat.Read(bytes, Current);
+        Read(imported);
+        Status = "Imported appearance choices are ready for review. Choose Apply to save, or Cancel to keep your current settings.";
+    }
 
     public SettingsViewModel(WorkspaceSettings initial, Func<WorkspaceSettings, Task> save)
     {
@@ -45,7 +52,7 @@ public partial class SettingsViewModel : ObservableObject
     }
     [RelayCommand(CanExecute = nameof(CanEdit))] private async Task ApplyAsync()
     {
-        var settings = new WorkspaceSettings(Theme, Layout, new(FontFamily, FontSize, WordWrap, ShowLineNumbers, IndentationSize, ConvertTabsToSpaces), new(PreviewZoom), ShowOutline);
+        var settings = Current;
         if (!settings.IsValid) { Status = "Choose valid settings before applying them."; return; }
         IsSaving = true;
         try { await save(settings); Status = "Settings saved."; Applied?.Invoke(); }

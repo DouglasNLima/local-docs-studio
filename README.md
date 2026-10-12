@@ -65,6 +65,8 @@ Native folder selection plus **F2** (or **File → Rename or move selected folde
 
 Case-only folder names such as `docs` → `Docs` use the same review, optional ordinary/wiki link updates and guarded rollback. The actual directory spelling changes while its files, binary assets and empty subfolders remain intact.
 
+Native **Edit → Settings → Import settings…** loads supported appearance choices for review before **Apply**. **Export settings…** saves the currently selected choices for transfer or restoration. The browser provides **View → Export appearance settings** for theme, layout and outline migration; native imports preserve unspecified editor/preview choices and unrelated update consent, documents and recent paths. See the [appearance settings transfer contract](docs/native/settings-transfer-format.md).
+
 The existing `<figure data-image-figure>` helper displays a native image and selectable caption. Recognised figures use the same workspace image checks, portable Save as, asset audit and source-preserving clipboard paths as Markdown images. HTML/Docs Site, Word and PDF exports retain the picture and caption. Recognition accepts one image with quoted `src`, optional `alt`/`title`, and an optional plain-text `figcaption`; additional attributes, nested caption markup and unsupported structures remain inert source.
 
 To add a caption, insert an image normally, place the caret in its standalone Markdown and choose **Insert → Image figure…**. The dialogue edits alternative text and caption while retaining the existing destination and title. Reopen it inside a recognised figure to update those labels. Each application is one undoable source edit. Images mixed into prose, lists or quotes must first be placed in their own top-level paragraph.

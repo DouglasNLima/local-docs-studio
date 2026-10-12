@@ -18,7 +18,7 @@ public partial class MainWindow
             model.Theme = updated.Theme; SetLayout(updated.Layout); ApplyReadingPreferences();
             if (themeChanged) { ApplyTheme(); QueuePreview(); }
             model.Status = "Settings saved.";
-        })) { Owner = this }.ShowDialog();
+        }), Path.Combine(model.StateDirectory, "export-recovery")) { Owner = this }.ShowDialog();
         if (editorFocus && Editor.IsVisible) Editor.Focus(); else if (previewFocus && Preview.IsVisible) Preview.Focus();
     }
 

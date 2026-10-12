@@ -22,7 +22,7 @@ internal static class NativeSettingsChecks
         foreach (var size in new[] { new Size(700, 750), new Size(560, 520) })
         {
             var saves = 0; var model = new SettingsViewModel(chosen, _ => { saves++; return Task.CompletedTask; });
-            var window = new SettingsWindow(model); var content = (Grid)window.Content; window.Content = null; content.DataContext = model;
+            var window = new SettingsWindow(model, Path.Combine(output, "settings-recovery")); var content = (Grid)window.Content; window.Content = null; content.DataContext = model;
             ThemeService.Apply(content.Resources, dark ? "Dark" : "Light");
             var surface = new Border { Background = (Brush)content.Resources["WindowBrush"], Child = content };
             System.Windows.Documents.TextElement.SetForeground(surface, (Brush)content.Resources["TextBrush"]);
@@ -64,6 +64,20 @@ internal static class NativeSettingsChecks
         if (!failed.Status.Contains("Fixture access failure", StringComparison.Ordinal) || !failed.CanEdit || failed.FontSize != 18)
             throw new IOException("A failed settings save lost edits or left controls disabled.");
 
+        var importSaves = 0;
+        var importedModel = new SettingsViewModel(chosen, _ => { importSaves++; return Task.CompletedTask; });
+        importedModel.Import(System.Text.Encoding.UTF8.GetBytes("""{"formatVersion":"lens-docs-studio-settings-1.0","theme":"Light","layout":"Editor","showOutline":true}"""));
+        var selectedImport = chosen with { Theme = "Light", Layout = "Editor", ShowOutline = true };
+        if (importedModel.Current != selectedImport || importSaves != 0 || !importedModel.Status.Contains("review", StringComparison.Ordinal))
+            throw new IOException("Imported settings were not staged privately for review or replaced absent editor choices.");
+        if (SettingsTransferFormat.Read(SettingsTransferFormat.Write(importedModel.Current), WorkspaceSettings.Default) != selectedImport || importSaves != 0)
+            throw new IOException("Exporting selected settings changed saved preferences or lost selected choices.");
+        try { importedModel.Import(System.Text.Encoding.UTF8.GetBytes("""{"formatVersion":"lens-docs-studio-settings-1.0","theme":"Unknown"}""")); throw new IOException("Invalid imported settings were accepted."); }
+        catch (InvalidDataException) { }
+        if (importedModel.Current != selectedImport || importSaves != 0) throw new IOException("A rejected import changed edited or saved settings.");
+        importedModel.ApplyCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+        if (importSaves != 1) throw new IOException("Applying imported settings did not save exactly once.");
+
         const string source = "# Café settings\r\n\tOriginal tab\r\n";
         var editor = new TextEditor { Text = source, WordWrap = true, ShowLineNumbers = true };
         var document = editor.Document; document.Insert(document.TextLength, "Unsaved change"); editor.Select(2, 4);
@@ -82,6 +96,7 @@ internal static class NativeSettingsChecks
             "Native settings bind and fit minimum/normal sizes in both themes with accessible readable inputs",
             "Defaults and Cancel keep preferences private until Apply",
             "Apply saves once and failed saves retain editable choices",
+            "Imported appearance choices remain private until Apply, exported choices round-trip, and invalid imports preserve current edits",
             "Actual editor font, wrap, line numbers and indentation change without altering source, selection or Undo/Redo" } }));
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject parent)

@@ -8,7 +8,7 @@
   <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}"><Setter Property="Margin" Value="0,8,0,0"/></Style>
  </Window.Resources>
  <Grid Margin="24">
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,16"/>
   <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,0" IsEnabled="{Binding CanEdit}">
    <StackPanel>
@@ -57,7 +57,11 @@
    </StackPanel>
   </ScrollViewer>
   <TextBlock Grid.Row="2" Text="{Binding Status}" TextWrapping="Wrap" Margin="0,16,0,14" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="SettingsStatus"/>
-  <DockPanel Grid.Row="3">
+  <WrapPanel Grid.Row="3" Margin="0,0,0,12" IsEnabled="{Binding CanEdit}">
+   <Button Content="Import settings…" Click="ImportSettings" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="SettingsImport"/>
+   <Button Content="Export settings…" Click="ExportSettings" Padding="12,6" AutomationProperties.AutomationId="SettingsExport" ToolTip="Save the appearance choices currently selected in this dialogue"/>
+  </WrapPanel>
+  <DockPanel Grid.Row="4">
    <Button DockPanel.Dock="Left" Content="Restore defaults" Command="{Binding ResetCommand}" Padding="12,6" AutomationProperties.AutomationId="SettingsReset"/>
    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
     <Button Content="Cancel" IsCancel="True" IsEnabled="{Binding CanEdit}" Padding="16,6" Margin="0,0,8,0" AutomationProperties.AutomationId="SettingsCancel"/>

@@ -1,5 +1,7 @@
 # Native experience improvements
 
+All four a06edf5 runs pass, including 51 native workflows before installation and after installation/reinstallation. Browser Word templates and case-only folder names now have complete CI coverage. Appearance settings transfer adds browser export, native private review/Cancel/Apply and portable restoration; 22 core cases and five native settings outcomes pass. Desktop workflow 52 is pending.
+
 Folder names can change case through the existing native review. All 704 core tests and native integration pass, including guarded rollback of directory spelling and earlier link writes. Workflow 51 now checks uppercase/back folder names with open tabs, history and retained assets; desktop revalidation is pending.
 
 Browser Word templates can now be explicitly transferred through Save template copy and native Word template library import. The browser retains its original record and current draft; native validation extracts supported reusable formatting into private state. The shared migration fixture covers semantic headings, headers and exclusion of original body content without browser-profile scanning.

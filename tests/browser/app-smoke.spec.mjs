@@ -4428,6 +4428,35 @@ test('Word export is a valid native DOCX package without interactive UI text', a
   await expect(page.locator('#exportTrust')).toHaveText(/Word ready: 1\/1 diagram rendered/);
 });
 
+test('appearance settings export transfers supported choices without documents or unrelated preferences', async ({ page }, testInfo) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('md-mmd-renderer.theme', 'dark');
+    localStorage.setItem('md-mmd-renderer.editorLayout', 'split');
+    localStorage.setItem('md-mmd-renderer.outline', 'true');
+    localStorage.setItem('private-test-path', 'C:\\Private\\confidential.md');
+    localStorage.setItem('private-test-token', 'test-secret-do-not-export');
+    localStorage.setItem('md-mmd-renderer.devopsMarkdownExport', 'true');
+  });
+  await gotoApp(page);
+  const source = '# Private unsaved draft\n\nKeep this content local.';
+  await page.locator('#editor').fill(source);
+  await expect(page.locator('#preview')).toContainText('Keep this content local.');
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export appearance settings' }).click()]);
+  expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe('lens-docs-studio-settings.json');
+  const payload = JSON.parse(await readFile(await download.path(), 'utf8'));
+  expect(payload).toEqual({ formatVersion: 'lens-docs-studio-settings-1.0', theme: 'Dark', layout: 'Split', showOutline: true });
+  await download.saveAs(testInfo.outputPath('browser-appearance-settings.json'));
+  await expect(page.locator('#editor')).toHaveValue(source);
+  expect(await page.evaluate(() => localStorage.getItem('md-mmd-renderer.devopsMarkdownExport'))).toBe('true');
+  expect(await page.evaluate(() => localStorage.getItem('private-test-token'))).toBe('test-secret-do-not-export');
+  await page.evaluate(() => localStorage.removeItem('md-mmd-renderer.theme'));
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  const [following] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export appearance settings' }).click()]);
+  expect(JSON.parse(await readFile(await following.path(), 'utf8')).theme).toBe('System');
+});
+
 test('Word template import stores manifests and tolerates missing optional parts', async ({ page }, testInfo) => {
   await gotoApp(page);
   const minimalPath = await writeWordTemplateFixture(testInfo, 'minimal-template.docx', {

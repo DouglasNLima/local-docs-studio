@@ -1228,6 +1228,9 @@ internal static partial class NativeUiChecks
             checks.Add("Native workspace map uses current drafts, copies a passive Markdown report, clears empty results and navigates exact source/document history; native diagrams and complete Undo preserve files");
             checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
             CheckSettings(window, editor, automation, app.ProcessId, state, output, source);
+            CheckSettingsTransfer(window, editor, automation, app.ProcessId, state, output, source, OpenThroughDialogue,
+                (path, title) => SaveThroughDialogue(path, title, absolutePath: true));
+            checks.Add("Portable settings export/import uses native file pickers, stages browser choices for Apply/Cancel, preserves source and update consent, and restores the exported appearance");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
