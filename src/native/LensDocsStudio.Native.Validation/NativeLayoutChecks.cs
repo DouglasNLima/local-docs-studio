@@ -73,15 +73,17 @@ internal static class NativeLayoutChecks
             var collectionsBefore = Enumerable.Range(0, GC.MaxGeneration + 1).Select(GC.CollectionCount).ToArray();
             var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew();
             using var input = new InputTrace(dispatcher, nestedWatch);
+            using var construction = new PreviewConstructionTrace(nestedWatch);
             var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { });
             var initialCall = nestedWatch.Elapsed.TotalMilliseconds;
-            Pump(task, dispatcher); input.Dispose(); var inputAt = input.Milliseconds;
+            Pump(task, dispatcher); input.Dispose(); construction.Dispose(); var inputAt = input.Milliseconds;
             var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
             var completeText = result.ReadText().Contains(test.Last, StringComparison.Ordinal);
             var sourcePreserved = nested.Source == test.Source;
             var observation = JsonSerializer.Serialize(new
             {
                 test.Name, InputMilliseconds = inputAt, InitialCallMilliseconds = initialCall, ConstructionMilliseconds = elapsed,
+                MaximumInputGapMilliseconds = input.MaximumGapMilliseconds, ConstructionStages = construction.Stages,
                 OperationsBeforeInput = input.Operations,
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, CompleteText = completeText,
                 SourcePreserved = sourcePreserved,
@@ -90,7 +92,7 @@ internal static class NativeLayoutChecks
             // Retain the exact failed observation too; a combined exception cannot distinguish
             // runner scheduling/collection delays from incomplete rendering or source loss.
             File.WriteAllText(Path.Combine(output, "native-nested-" + test.Name + "-construction.json"), observation);
-            if (inputAt < 0 || inputAt >= 250 || inputAt >= elapsed || !completeText
+            if (inputAt < 0 || inputAt >= 250 || input.MaximumGapMilliseconds >= 250 || inputAt >= elapsed || !completeText
                 || result.SourceElements.Count < 1000 || !sourcePreserved)
                 throw new IOException("Nested " + test.Name + " rendering delayed input or lost complete content/source mapping: " + observation);
             using var stop = new CancellationTokenSource(); var cancelledAt = -1d; var cancelWatch = Stopwatch.StartNew();
@@ -100,7 +102,8 @@ internal static class NativeLayoutChecks
             catch (OperationCanceledException) { }
             if (cancelledAt < 0 || cancelledAt >= 250) throw new IOException("Input cancellation was delayed by nested " + test.Name + " construction.");
             var viewport = InspectViewport(result, test.Last, output, test.Name);
-            nestedEvidence.Add(new { test.Name, InputMilliseconds = inputAt, ConstructionMilliseconds = elapsed, CancelInputMilliseconds = cancelledAt,
+            nestedEvidence.Add(new { test.Name, InputMilliseconds = inputAt, MaximumInputGapMilliseconds = input.MaximumGapMilliseconds,
+                ConstructionMilliseconds = elapsed, CancelInputMilliseconds = cancelledAt,
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, Viewport = viewport });
         }
         File.WriteAllText(Path.Combine(output, "native-nested-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = nestedEvidence }, new JsonSerializerOptions { WriteIndented = true }));
@@ -156,8 +159,13 @@ internal static class NativeLayoutChecks
     {
         private readonly Dispatcher dispatcher;
         private readonly Stopwatch watch;
+        private readonly DispatcherTimer timer;
+        private readonly DispatcherOperation queued;
         private readonly Dictionary<DispatcherOperation, double> started = [];
+        private double lastInput;
+        private bool disposed;
         public double Milliseconds { get; private set; } = -1;
+        public double MaximumGapMilliseconds { get; private set; }
         public List<object> Operations { get; } = [];
 
         public InputTrace(Dispatcher dispatcher, Stopwatch watch)
@@ -165,7 +173,15 @@ internal static class NativeLayoutChecks
             this.dispatcher = dispatcher; this.watch = watch;
             dispatcher.Hooks.OperationStarted += OnStarted;
             dispatcher.Hooks.OperationCompleted += OnCompleted;
-            dispatcher.BeginInvoke(DispatcherPriority.Input, () => Milliseconds = watch.Elapsed.TotalMilliseconds);
+            queued = dispatcher.BeginInvoke(DispatcherPriority.Input, ObserveInput);
+            timer = new DispatcherTimer(DispatcherPriority.Input, dispatcher) { Interval = TimeSpan.FromMilliseconds(16) };
+            timer.Tick += (_, _) => ObserveInput(); timer.Start();
+        }
+        private void ObserveInput()
+        {
+            var elapsed = watch.Elapsed.TotalMilliseconds;
+            MaximumGapMilliseconds = Math.Max(MaximumGapMilliseconds, elapsed - lastInput); lastInput = elapsed;
+            if (Milliseconds < 0) Milliseconds = elapsed;
         }
         private void OnStarted(object? sender, DispatcherHookEventArgs args)
         {
@@ -179,6 +195,9 @@ internal static class NativeLayoutChecks
         }
         public void Dispose()
         {
+            if (disposed) return;
+            disposed = true; timer.Stop(); queued.Abort();
+            MaximumGapMilliseconds = Math.Max(MaximumGapMilliseconds, watch.Elapsed.TotalMilliseconds - lastInput);
             dispatcher.Hooks.OperationStarted -= OnStarted;
             dispatcher.Hooks.OperationCompleted -= OnCompleted;
         }

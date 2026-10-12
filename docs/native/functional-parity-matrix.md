@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Responsiveness acceptance remains incomplete: a3ef323 native PR repeats the closed-details delay despite complete content/source. Native push has passed the new built desktop theme/zoom workflows, while packaging/lifecycle is still running. Opt-in construction phases and maximum-input-gap checks are locally validated; no latency fix is claimed. See the [validation report](validation-report.md).
+
 The browser diagram-theme control exposed a native parity gap: diagrams previously followed application light/dark appearance only. Six native choices now cover Auto, Lens, Default, Neutral, Forest and Dark, with saved settings and consistent export/clipboard/site palettes. All 832 core tests and twelve native pixel/export combinations pass locally. Native menus, visible palette identification and restart persistence have expanded desktop checks awaiting CI. Palette equivalents retain the native renderer; they do not imply browser pixel identity.
 
 Nested rich preview construction now inserts empty parent containers before filling their content. Nine cases cover the original paragraph/heading/table/code paths plus quotes, lists, callouts, open details and long links. Focused/full native checks and static checks pass locally. This corrects the table-cell timing failure in both d692aeb native runs; both native and both web c64f410 CI runs pass, with the 250 ms assertion unchanged.

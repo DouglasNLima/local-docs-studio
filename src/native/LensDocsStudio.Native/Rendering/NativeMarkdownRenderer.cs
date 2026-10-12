@@ -72,6 +72,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        PreviewConstructionEvents.Log.Stage("started");
         Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         foreground.Freeze(); surface.Freeze();
@@ -84,9 +85,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var warnings = new List<string>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
+        PreviewConstructionEvents.Log.Stage("document-ready");
         foreach (var block in parsed.Syntax)
             await Convert(block, document.Blocks);
         cancellationToken.ThrowIfCancellationRequested();
+        PreviewConstructionEvents.Log.Stage("completed");
         return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
 
         async ValueTask Cooperate()
@@ -227,17 +230,22 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
                 case DocumentDetailsBlock details:
+                    PreviewConstructionEvents.Log.Stage("details-start", details.Span.Start);
                     var detailsSection = new Section { BorderBrush = surface, BorderThickness = new Thickness(1), Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 12) };
                     Attach(detailsSection);
+                    PreviewConstructionEvents.Log.Stage("details-container-attached", details.Span.Start);
                     var toggle = new DetailsToggle { IsExpanded = details.InitiallyExpanded, Foreground = foreground, VerticalAlignment = VerticalAlignment.Center };
+                    PreviewConstructionEvents.Log.Stage("details-toggle-created", details.Span.Start);
                     System.Windows.Automation.AutomationProperties.SetName(toggle, details.Summary);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(toggle, "DetailsToggle" + details.Span.Start);
                     var detailsHeader = new Paragraph { FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) };
                     detailsHeader.Inlines.Add(new InlineUIContainer(toggle) { BaselineAlignment = BaselineAlignment.Center });
                     detailsHeader.Inlines.Add(new Run(details.Summary)); detailsSection.Blocks.Add(detailsHeader);
+                    PreviewConstructionEvents.Log.Stage("details-header-attached", details.Span.Start);
                     detailSections.Add(new(details.Span.Start, details.Span.End, toggle));
                     var detailsChildren = new List<WpfBlock>();
                     foreach (var child in details) detailsChildren.Add(await Convert(child, details.InitiallyExpanded ? detailsSection.Blocks : null));
+                    PreviewConstructionEvents.Log.Stage("details-children-ready", details.Span.Start);
                     void SynchroniseDetails()
                     {
                         foreach (var child in detailsChildren)
@@ -247,6 +255,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         }
                     }
                     toggle.Expanded += (_, _) => SynchroniseDetails(); toggle.Collapsed += (_, _) => SynchroniseDetails(); SynchroniseDetails();
+                    PreviewConstructionEvents.Log.Stage("details-synchronised", details.Span.Start);
                     result = detailsSection; break;
                 case DocumentImageFigureBlock figure:
                     var figureSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
