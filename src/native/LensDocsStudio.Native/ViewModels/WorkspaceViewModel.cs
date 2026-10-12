@@ -183,6 +183,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         try
         {
             var text = tab.EditorDocument.Text;
+            // Retain the draft before asset transfer or a destination failure that precedes the write journal.
+            await PersistSessionAsync();
             await using var transfer = tab.EffectivePath is { } source && tab.EffectiveWorkspace is { } sourceRoot &&
                 !string.Equals(source, path, StringComparison.OrdinalIgnoreCase)
                 ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken,

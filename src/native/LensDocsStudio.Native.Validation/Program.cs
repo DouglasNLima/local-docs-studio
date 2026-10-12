@@ -72,6 +72,12 @@ internal static class Program
             try { NativePaginationChecks.RunLargeBlocks(blockOutput); Console.WriteLine("Native large-block checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--save-recovery")
+        {
+            var recoveryOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/save-recovery"); Directory.CreateDirectory(recoveryOutput);
+            try { NativeSaveRecoveryChecks.Run(recoveryOutput); Console.WriteLine("Native save recovery checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--html-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -283,6 +289,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native asset persistence: " + ex.Message); }
+        try { NativeSaveRecoveryChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native save recovery: " + ex.Message); }
         try { NativePreviewChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview preparation: " + ex.Message); }
         try { NativeMarkdownChecks.Run(output, repository); }

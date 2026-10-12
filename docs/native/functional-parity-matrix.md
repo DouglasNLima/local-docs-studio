@@ -1,6 +1,8 @@
 # Functional parity matrix
 
-Installed-session continuity now has a CI-only check that reopens the exact state created before upgrade, then repeats after reinstall. It verifies all restored tab text and appearance controls, semantic session/preferences continuity and retained private/source files. Local compilation and the no-launch guard pass; actual lifecycle results remain pending. Existing preservation evidence alone did not establish that the upgraded process consumed its predecessor's session.
+Save recovery now retains the current editor draft before any asset transfer or destination write. Four local regression outcomes cover a locked destination before journal creation, fresh-model restoration, exact encoding/line-ending retry and failed recovery blocking source commit. The full native suite passes; process interruption and removable-drive certification remain open.
+
+Installed-session continuity passes in both 41d06d7 native CI runs. The upgraded and reinstalled applications reopen the exact original state and verify actual tab text/settings, semantic session/preferences continuity and retained private/source files. This supplements preservation hashes; it does not certify historical schemas or production-signed upgrades.
 
 Large individual blocks now preserve distant paginated navigation. Six hidden-HWND cases cover a 352 KB paragraph, table cell, quote, list item, code block and open details with complete source/text, exact selection and visible final targets. This corrects a reproduced jump from the target page back to the start of its parent paragraph. Existing pagination and full native checks pass; the expanded actual desktop Find/highlight/Undo case passes in all four contexts of both 2c16d47 native runs. Broader responsiveness and physical display certification remain open.
 

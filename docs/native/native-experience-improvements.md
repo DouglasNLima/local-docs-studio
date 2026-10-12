@@ -1,6 +1,8 @@
 # Native experience improvements
 
-The upgrade/reinstall validation now opens the installed application with its existing session and checks actual restored tabs and settings. This supplements file-retention checks with user-visible continuity; it compiles and is restricted to isolated Windows CI, with actual results still pending.
+Save preserves the latest editor draft independently before attempting destination writes, including failures that precede the source write journal. Four local checks establish recovery, retry with unchanged encoding and refusal to alter source when recovery is unavailable. This closes the gap before the periodic autosave runs.
+
+The upgrade/reinstall validation opens the installed application with its existing session and checks actual restored tabs and settings. This supplements file-retention checks with user-visible continuity and passes in both 41d06d7 native CI runs. Production trust and historical-schema certification remain separate.
 
 Finding text near the end of a paragraph that spans many pages now keeps that page visible. The old follow-up request to show the whole paragraph undid exact page navigation. Six native block cases and the existing pagination suite validate the correction while preserving source and selection; actual desktop Find highlighting and Undo coverage passes in all four contexts of both 2c16d47 native runs.
 
