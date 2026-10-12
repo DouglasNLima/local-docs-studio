@@ -68,6 +68,12 @@ internal static class Program
             try { NativePdfSyntaxChecks.Run(syntaxOutput); Console.WriteLine("Native PDF syntax checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--word-lists")
+        {
+            var listOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(listOutput);
+            try { NativeWordListChecks.Run(listOutput, Path.GetFullPath(args.ElementAtOrDefault(2) ?? ".")); Console.WriteLine("Native Word list checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--word-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -391,6 +397,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native PDF decorations: " + ex.Message); }
         try { NativeWordSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Word syntax: " + ex.Message); }
+        try { NativeWordListChecks.Run(output, repository); }
+        catch (Exception ex) { failures.Add("Native Word lists: " + ex.Message); }
         try { NativeHtmlSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native HTML syntax: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }

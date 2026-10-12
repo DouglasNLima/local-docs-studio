@@ -18,6 +18,8 @@ Native advantages include filesystem monitoring, Windows pickers/shell actions, 
 
 ## Parity and compatibility
 
+The later Word list correction is locally validated with 850 core tests, the complete native harness, static checks and zero Release warnings/errors. It fixes repeated continuation numbering, missing first-block markers and omitted empty items while preserving editable native numbering, styles and original image bytes. It bounds images/tables and respects direct template cell margins; code preflight includes list formatting. Eleven core regressions and actual native Mermaid/formula DOCX preparation pass. `artifacts/native/word-list-width-validation` retains the two generated DOCX files and report. This change is outside the b3a4d59 PDF CI and awaits its own hosted validation; actual Word layout/accessibility remains unverified.
+
 The subsequent PDF list correction passes local Release, 839 core tests, static checks and the full native harness. Actual PDF regressions retain one marker per item, nested/continuation alignment, wide/zero starts, formatting/links and table/image bounds. Ninety continuation paragraphs retain exact selectable word order over five pages. All seven fixture pages were inspected; evidence is in `artifacts/native/pdf-lists-regression`, `pdf-lists-exact` and `pdf-list-full-validation`. This change awaits its own hosted validation and is not part of the verified preview.232 package.
 
 The [parity matrix](functional-parity-matrix.md) distinguishes implemented, tested and unverified behaviour. The [diagram report](diagram-compatibility.md) records 40 corpus cases and another 56 catalogue/theme cases; unsupported syntax produces an explicit explanation. Native palette equivalents do not imply browser Mermaid pixel identity.
@@ -37,9 +39,9 @@ Signing is pluggable through an existing certificate or service adapter, with in
 | Evidence | Result and scope |
 |---|---|
 | Current local Release | Zero warnings/errors |
-| Current core tests | 839 passed; `artifacts/native/pdf-list-core/pdf-list-core.trx` |
+| Current core tests | 850 passed; `artifacts/native/word-lists-after/word-list-widths.trx` |
 | Failed-diagram recovery | 14 light/dark native cases; exact copy/source mapping, accessible controls and valid-render control; `artifacts/native/diagram-failures` |
-| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/pdf-list-full-validation` |
+| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-list-width-validation` |
 | Current static checks | Passed; web source unchanged |
 | Native CI at 56502e3 | PR 38307579534 and push 38307575579 attempt 2 pass; downloaded PR evidence verifies 839 core tests and 62 desktop workflows in built/installed/upgraded/reinstalled apps |
 | Web CI at 56502e3 | Push 38307575323 and PR 38307579564 pass all 262 cases on their first attempts |

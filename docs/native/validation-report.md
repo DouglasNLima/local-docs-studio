@@ -65,7 +65,15 @@ Five focused groups inspect actual selectable text, marker counts, glyph positio
 
 Release has zero warnings/errors, all 839 core tests pass (`artifacts/native/pdf-list-core/pdf-list-core.trx`), the complete native harness has 40 diagram cases and zero failures (`artifacts/native/pdf-list-full-validation`), and static checks pass. No local desktop interaction occurred. Hosted validation of the PDF change remains pending. Visual list hierarchy does not establish tagged PDF accessibility.
 
-## Subsequent runtime and diagnostic work
+## Subsequent Word list correction
+
+Seven original `DocxListTests` fail before the correction: continuation paragraphs advance numbering, headings/code lose the first marker, table/nested-only items lose their parent marker and empty items disappear. The retained failure record is `artifacts/native/word-lists-before/word-lists-before.trx`. Eleven final regressions pass after adding independent image/cell geometry, explicit template margins, narrow template tables and list-code allocation-boundary checks. Continuations use `w:numId=0`, the [Open XML override for inherited numbering](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.numberingid?view=openxml-3.0.1), rather than advancing the list. Styles, original table-width settings and image part bytes remain intact.
+
+Release builds with zero warnings/errors, all 850 core tests pass in `artifacts/native/word-lists-after/word-list-widths.trx`, and the complete native harness passes 40 diagram/export cases with zero failures in `artifacts/native/word-list-width-validation`; static checks pass. The new `--word-lists` check is also part of that harness. Its two actual DOCX files preserve 12 marked fixture items, unnumbered continuations and first-block native Mermaid/formula images, with valid package schemas and unchanged source. The initial custom-margin fixture used the wrong Open XML property types; the final successful build uses the actual numeric margin and enum types.
+
+These are structural/semantic checks. No local Office application was launched. Actual Word pagination, wide-marker positioning, template style-derived margins and screen-reader behaviour remain unverified, as does hosted CI for this subsequent change. The previous b3a4d59 CI covers the PDF correction only.
+
+## Runtime and diagnostic work
 
 The loaded-runtime check now passes in the 56502e3 native PR as recorded above. It captures the actual application executable and coreclr.dll/wpfgfx_cor3.dll module paths after editor/diagram readiness. Test-NativeInstaller.ps1 explicitly requires both loaded modules to belong to the installation directory. The normal built-app context records its framework runtime. Each context saves native-ui-runtime.json before any failed assertion. Release has zero warnings/errors, static/script checks pass and the new option still refuses local desktop execution. This does not claim that the hosted runner lacks an SDK.
 

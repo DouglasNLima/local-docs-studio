@@ -75,14 +75,16 @@ public sealed class DocxExporter
             settings.Settings.Append(new W.UpdateFieldsOnOpen { Val = true });
             main.Document.Save(); styles.Styles.Save(); numbering.Numbering.Save(); settings.Settings.Save();
 
-            void AppendBlock(OpenXmlCompositeElement parent, Block block, int? listId = null, int depth = 0, string? paragraphStyle = null)
+            void AppendBlock(OpenXmlCompositeElement parent, Block block, ListItemContext? listItem = null, string? paragraphStyle = null, long? containerWidth = null)
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                var availableWidth = containerWidth ?? widthEmu;
+                var textWidth = availableWidth - (listItem?.IndentTwips ?? 0) * 635L;
                 switch (block)
                 {
                     case Markdig.Extensions.Mathematics.MathBlock formula:
-                        parent.Append(new W.Paragraph(content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)
-                            ? Image(formulaImage) : Run(formula.Lines.ToString(), MarkdownEmphasis.None))); break;
+                        AppendParagraph(parent, new W.Paragraph(content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)
+                            ? Image(formulaImage) : Run(formula.Lines.ToString(), MarkdownEmphasis.None)), listItem, availableWidth); break;
                     case HeadingBlock heading:
                         var hp = Paragraph(heading.Inline, styleMap.Heading(heading.Level));
                         hp.ParagraphProperties!.KeepNext = new W.KeepNext();
@@ -92,19 +94,22 @@ public sealed class DocxExporter
                             hp.InsertAfter(new W.BookmarkStart { Id = bookmark.Id, Name = bookmark.Name }, hp.ParagraphProperties);
                             hp.Append(new W.BookmarkEnd { Id = bookmark.Id });
                         }
-                        parent.Append(hp); break;
+                        AppendParagraph(parent, hp, listItem, availableWidth); break;
                     case ParagraphBlock paragraph:
                         var p = Paragraph(paragraph.Inline, paragraphStyle ?? bodyStyle);
-                        if (listId.HasValue) p.ParagraphProperties!.NumberingProperties = new W.NumberingProperties(new W.NumberingLevelReference { Val = Math.Min(depth, 8) }, new W.NumberingId { Val = listId.Value });
-                        parent.Append(p); break;
+                        AppendParagraph(parent, p, listItem, availableWidth); break;
                     case FencedCodeBlock code when code.Info is "mermaid" or "mmd":
                         if (!content.Diagrams.TryGetValue(code.Span.Start, out var diagram)) throw new InvalidDataException("A Mermaid diagram could not be exported.");
-                        parent.Append(new W.Paragraph(Image(diagram))); break;
+                        AppendParagraph(parent, new W.Paragraph(Image(diagram)), listItem, availableWidth); break;
                     case CodeBlock code:
                         var cp = new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = codeStyle }));
                         CodeText(cp, code);
-                        parent.Append(cp); break;
+                        AppendParagraph(parent, cp, listItem, availableWidth); break;
                     case ListBlock list:
+                        EnsureListAnchor(parent, listItem, availableWidth);
+                        var depth = listItem is null ? 0 : listItem.Depth + 1;
+                        if (availableWidth - (depth + 1) * 360L * 635 < 720 * 635L)
+                            throw new IOException("The nested Word list leaves too little space for readable content.");
                         while (usedNumbers.Contains(nextNumber)) nextNumber++;
                         while (usedAbstracts.Contains(nextAbstract)) nextAbstract++;
                         var id = nextNumber++; var abstractId = nextAbstract++;
@@ -118,17 +123,36 @@ public sealed class DocxExporter
                             new W.PreviousParagraphProperties(new W.Indentation { Left = ((level + 1) * 360).ToString(), Hanging = "240" })) { LevelIndex = level });
                         numbering.Numbering.InsertBefore(definition, numbering.Numbering.Elements<W.NumberingInstance>().FirstOrDefault());
                         numbering.Numbering.Append(new W.NumberingInstance(new W.AbstractNumId { Val = abstractId }) { NumberID = id });
-                        foreach (var item in list.OfType<ListItemBlock>()) foreach (var child in item) AppendBlock(parent, child, id, listId.HasValue ? depth + 1 : depth, paragraphStyle);
+                        foreach (var item in list.OfType<ListItemBlock>())
+                        {
+                            var context = new ListItemContext(id, depth);
+                            foreach (var child in item) AppendBlock(parent, child, context, paragraphStyle, availableWidth);
+                            if (context.MarkerPending) AppendParagraph(parent, Paragraph(null, paragraphStyle ?? bodyStyle), context, availableWidth);
+                        }
                         break;
                     case Markdig.Extensions.Tables.Table table:
+                        EnsureListAnchor(parent, listItem, availableWidth);
                         var wt = new W.Table();
                         wt.Append(tableProperties?.CloneNode(true) ?? new W.TableProperties(new W.TableWidth { Width = "5000", Type = W.TableWidthUnitValues.Pct },
                             new W.TableBorders(new W.TopBorder { Val = W.BorderValues.Single, Size = 4 }, new W.LeftBorder { Val = W.BorderValues.Single, Size = 4 },
                                 new W.BottomBorder { Val = W.BorderValues.Single, Size = 4 }, new W.RightBorder { Val = W.BorderValues.Single, Size = 4 },
                                 new W.InsideHorizontalBorder { Val = W.BorderValues.Single, Size = 4 }, new W.InsideVerticalBorder { Val = W.BorderValues.Single, Size = 4 })));
                         wt.TableProperties!.TableStyle ??= new W.TableStyle { Val = styleMap.Table };
+                        var tableWidth = Math.Max(1, textWidth / 635);
+                        var requestedWidth = wt.TableProperties.TableWidth;
+                        if (long.TryParse(requestedWidth?.Width?.Value, System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var requested) && requested > 0)
+                            tableWidth = requestedWidth?.Type?.Value == W.TableWidthUnitValues.Pct
+                                ? Math.Max(1, tableWidth * Math.Min(5000, requested) / 5000) : Math.Min(tableWidth, requested);
+                        if (listItem is not null || availableWidth != widthEmu)
+                        {
+                            wt.TableProperties.TableWidth = new W.TableWidth { Width = tableWidth.ToString(System.Globalization.CultureInfo.InvariantCulture), Type = W.TableWidthUnitValues.Dxa };
+                            if (listItem is not null) wt.TableProperties.TableIndentation = new W.TableIndentation { Width = listItem.IndentTwips, Type = W.TableWidthUnitValues.Dxa };
+                        }
                         var columns = table.OfType<Markdig.Extensions.Tables.TableRow>().Select(r => r.Count).DefaultIfEmpty(1).Max();
-                        wt.Append(new W.TableGrid(Enumerable.Range(0, columns).Select(_ => new W.GridColumn { Width = (widthEmu / 635 / columns).ToString() })));
+                        var cellMargins = wt.TableProperties.TableCellMarginDefault;
+                        var horizontalCellMargins = CellMargin(cellMargins?.StartMargin ?? (OpenXmlElement?)cellMargins?.TableCellLeftMargin)
+                            + CellMargin(cellMargins?.EndMargin ?? (OpenXmlElement?)cellMargins?.TableCellRightMargin);
+                        wt.Append(new W.TableGrid(Enumerable.Range(0, columns).Select(_ => new W.GridColumn { Width = (tableWidth / columns).ToString(System.Globalization.CultureInfo.InvariantCulture) })));
                         foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                         {
                             var wr = new W.TableRow();
@@ -137,7 +161,7 @@ public sealed class DocxExporter
                             foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
                             {
                                 var wc = new W.TableCell();
-                                foreach (var child in cell) AppendBlock(wc, child);
+                                foreach (var child in cell) AppendBlock(wc, child, containerWidth: Math.Max(1, tableWidth / columns - horizontalCellMargins) * 635);
                                 if (!wc.Elements<W.Paragraph>().Any()) wc.Append(new W.Paragraph());
                                 var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
                                 var alignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment : null;
@@ -154,46 +178,87 @@ public sealed class DocxExporter
                         }
                         parent.Append(wt); break;
                     case DocumentDetailsBlock details:
-                        parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() },
-                            Run(details.Summary, MarkdownEmphasis.Bold)));
-                        foreach (var child in details) AppendBlock(parent, child, listId, depth, paragraphStyle);
+                        AppendParagraph(parent, new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() },
+                            Run(details.Summary, MarkdownEmphasis.Bold)), listItem, availableWidth);
+                        foreach (var child in details) AppendBlock(parent, child, listItem, paragraphStyle, availableWidth);
                         break;
                     case DocumentImageFigureBlock figure:
                         var picture = Paragraph(figure.Inline, bodyStyle);
                         if (figure.Caption.Length > 0) picture.ParagraphProperties!.KeepNext = new W.KeepNext();
-                        parent.Append(picture);
-                        if (figure.Caption.Length > 0) parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = styleMap.Caption }), Run(figure.Caption, MarkdownEmphasis.None)));
+                        AppendParagraph(parent, picture, listItem, availableWidth);
+                        if (figure.Caption.Length > 0) AppendParagraph(parent, new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = styleMap.Caption }), Run(figure.Caption, MarkdownEmphasis.None)), listItem, availableWidth);
                         break;
                     case DocumentProgressBlock progress:
-                        parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() }, Run(progress.Description, MarkdownEmphasis.None)));
+                        AppendParagraph(parent, new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() }, Run(progress.Description, MarkdownEmphasis.None)), listItem, availableWidth);
                         var progressTable = new W.Table(new W.TableProperties(new W.TableWidth { Type = W.TableWidthUnitValues.Pct, Width = "5000" },
                             new W.TableLayout { Type = W.TableLayoutValues.Fixed }, new W.TableCellMarginDefault(new W.TopMargin { Type = W.TableWidthUnitValues.Dxa, Width = "0" }, new W.BottomMargin { Type = W.TableWidthUnitValues.Dxa, Width = "0" })));
+                        if (listItem is not null)
+                        {
+                            progressTable.TableProperties!.TableWidth = new W.TableWidth { Type = W.TableWidthUnitValues.Dxa, Width = (textWidth / 635).ToString(System.Globalization.CultureInfo.InvariantCulture) };
+                            progressTable.TableProperties.TableIndentation = new W.TableIndentation { Width = listItem.IndentTwips, Type = W.TableWidthUnitValues.Dxa };
+                        }
                         var progressGrid = new W.TableGrid(); var progressRow = new W.TableRow(new W.TableRowProperties(new W.TableRowHeight { Val = 120, HeightType = W.HeightRuleValues.Exact }));
                         var fill = Math.Clamp((int)Math.Round(progress.Percentage * 50), 0, 5000);
                         foreach (var (amount, colour) in new[] { (fill, progress.ColourHex), (5000 - fill, "EDEDED") })
                         {
                             if (amount == 0) continue;
-                            progressGrid.Append(new W.GridColumn { Width = Math.Max(1, widthEmu / 635 * amount / 5000).ToString(System.Globalization.CultureInfo.InvariantCulture) });
+                            progressGrid.Append(new W.GridColumn { Width = Math.Max(1, textWidth / 635 * amount / 5000).ToString(System.Globalization.CultureInfo.InvariantCulture) });
                             progressRow.Append(new W.TableCell(new W.TableCellProperties(new W.TableCellWidth { Type = W.TableWidthUnitValues.Pct, Width = amount.ToString(System.Globalization.CultureInfo.InvariantCulture) },
                                 new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = colour }), new W.Paragraph(new W.ParagraphProperties(new W.SpacingBetweenLines { Before = "0", After = "0", Line = "20", LineRule = W.LineSpacingRuleValues.Exact }))));
                         }
                         progressTable.Append(progressGrid, progressRow); parent.Append(progressTable); break;
                     case HtmlBlock html:
-                        parent.Append(new W.Paragraph(new W.Run(new W.Text(html.Lines.ToString()) { Space = SpaceProcessingModeValues.Preserve }))); break;
+                        AppendParagraph(parent, new W.Paragraph(new W.Run(new W.Text(html.Lines.ToString()) { Space = SpaceProcessingModeValues.Preserve })), listItem, availableWidth); break;
                     case AlertBlock alert:
-                        parent.Append(new W.Paragraph(new W.ParagraphProperties { KeepNext = new W.KeepNext(), Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "F3F4F6" },
+                        AppendParagraph(parent, new W.Paragraph(new W.ParagraphProperties { KeepNext = new W.KeepNext(), Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "F3F4F6" },
                             ParagraphBorders = new W.ParagraphBorders(new W.LeftBorder { Val = W.BorderValues.Single, Color = "FF883E", Size = 12 }) },
-                            Run(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()), MarkdownEmphasis.Bold)));
-                        foreach (var child in alert) AppendBlock(parent, child, listId, depth);
+                            Run(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()), MarkdownEmphasis.Bold)), listItem, availableWidth);
+                        foreach (var child in alert) AppendBlock(parent, child, listItem, containerWidth: availableWidth);
                         break;
                     case QuoteBlock quote:
-                        foreach (var child in quote) AppendBlock(parent, child, listId, depth, styleMap.Quote);
+                        foreach (var child in quote) AppendBlock(parent, child, listItem, styleMap.Quote, availableWidth);
                         break;
                     case ContainerBlock container:
-                        foreach (var child in container) AppendBlock(parent, child, listId, depth, paragraphStyle); break;
+                        foreach (var child in container) AppendBlock(parent, child, listItem, paragraphStyle, availableWidth); break;
                     case ThematicBreakBlock:
-                        parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphBorders(new W.BottomBorder { Val = W.BorderValues.Single, Size = 4 })))); break;
+                        AppendParagraph(parent, new W.Paragraph(new W.ParagraphProperties(new W.ParagraphBorders(new W.BottomBorder { Val = W.BorderValues.Single, Size = 4 }))), listItem, availableWidth); break;
                 }
+            }
+            void AppendParagraph(OpenXmlCompositeElement parent, W.Paragraph paragraph, ListItemContext? listItem, long availableWidth)
+            {
+                if (listItem is not null)
+                {
+                    paragraph.ParagraphProperties ??= new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle });
+                    paragraph.ParagraphProperties.NumberingProperties = listItem.MarkerPending
+                        ? new W.NumberingProperties(new W.NumberingLevelReference { Val = Math.Min(listItem.Depth, 8) }, new W.NumberingId { Val = listItem.NumberingId })
+                        : new W.NumberingProperties(new W.NumberingId { Val = 0 }); // Explicitly suppress numbering inherited from a template style.
+                    paragraph.ParagraphProperties.Indentation = new W.Indentation { Left = listItem.IndentTwips.ToString(System.Globalization.CultureInfo.InvariantCulture), Hanging = listItem.MarkerPending ? "240" : "0" };
+                    listItem.MarkerPending = false;
+                    availableWidth -= listItem.IndentTwips * 635L;
+                }
+                foreach (var inline in paragraph.Descendants<DW.Inline>())
+                {
+                    if (inline.Extent is not { Cx.Value: > 0, Cy.Value: > 0 } extent || extent.Cx.Value <= availableWidth) continue;
+                    var height = Math.Max(1, (long)(extent.Cy.Value * ((double)availableWidth / extent.Cx.Value)));
+                    extent.Cx = availableWidth; extent.Cy = height;
+                    foreach (var shape in inline.Descendants<A.Extents>()) { shape.Cx = availableWidth; shape.Cy = height; }
+                }
+                parent.Append(paragraph);
+            }
+            void EnsureListAnchor(OpenXmlCompositeElement parent, ListItemContext? listItem, long availableWidth)
+            {
+                if (listItem?.MarkerPending != true) return;
+                var anchor = Paragraph(null, bodyStyle); anchor.ParagraphProperties!.KeepNext = new W.KeepNext();
+                AppendParagraph(parent, anchor, listItem, availableWidth);
+            }
+            long CellMargin(OpenXmlElement? margin)
+            {
+                if (margin is null) return 108; // Word's default horizontal cell margin, in twentieths of a point.
+                var type = margin.GetAttribute("type", margin.NamespaceUri).Value;
+                if (type == "nil") return 0;
+                return type == "dxa" && long.TryParse(margin.GetAttribute("w", margin.NamespaceUri).Value,
+                    System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out var value)
+                    ? Math.Min(value, widthEmu / 635) : 108;
             }
             W.Paragraph Paragraph(ContainerInline? inline, string style)
             {
@@ -316,6 +381,14 @@ public sealed class DocxExporter
         return stream.ToArray();
     }
 
+    private sealed class ListItemContext(int numberingId, int depth)
+    {
+        public int NumberingId { get; } = numberingId;
+        public int Depth { get; } = depth;
+        public int IndentTwips => (Depth + 1) * 360;
+        public bool MarkerPending { get; set; } = true;
+    }
+
     private static void ValidateCodeAllocation(ExportContent content, CancellationToken cancellationToken)
     {
         var remaining = content.AllocationLimits.MaximumWordCodeElements;
@@ -329,6 +402,8 @@ public sealed class DocxExporter
         {
             if (code is Markdig.Extensions.Mathematics.MathBlock or FencedCodeBlock { Info: "mermaid" or "mmd" }) continue;
             Reserve(3); // Paragraph, properties and style; charged across the whole document.
+            for (var ancestor = code.Parent; ancestor is not null; ancestor = ancestor.Parent)
+                if (ancestor is ListItemBlock) { Reserve(4); break; } // Numbering, level, id and indentation; continuation blocks use at most this many.
             CodeSyntaxBlock? syntax = null;
             content.CodeSyntax?.Blocks.TryGetValue(code, out syntax);
             var previous = '\0';
