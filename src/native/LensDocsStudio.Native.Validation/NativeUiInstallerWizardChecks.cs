@@ -74,13 +74,13 @@ internal static partial class NativeUiChecks
                 Wait(() => WizardText(wizard).Contains(version, StringComparison.Ordinal)
                     && WizardText(wizard).Contains("Workspace documents", StringComparison.Ordinal), "Welcome did not expose the version and preservation guidance.");
                 Capture(phase + "-welcome");
-                Next("Next >");
+                Next("Next");
                 var destinationEdit = DestinationEdit();
                 if (!string.Equals(Path.GetFullPath(destinationEdit.Text), originalDestination, StringComparison.OrdinalIgnoreCase))
                     throw new IOException("The wizard did not default to the isolated native per-user location.");
                 destinationEdit.Text = destination;
                 Wait(() => DestinationEdit().Text == destination, "The destination editor did not retain the reviewed path.");
-                Capture(phase + "-destination"); Next("Next >");
+                Capture(phase + "-destination"); Next("Next");
                 foreach (var task in new[] { "Create a Desktop shortcut", "Add Native Preview to Open with for Markdown and Mermaid files" })
                 {
                     var choice = Choice(task);
@@ -88,16 +88,16 @@ internal static partial class NativeUiChecks
                     choice.Focus(); Keyboard.Type(VirtualKeyShort.SPACE);
                     Wait(() => Checked(Choice(task)), "Keyboard selection did not enable the optional task: " + task);
                 }
-                Capture(phase + "-tasks"); Next("Next >");
+                Capture(phase + "-tasks"); Next("Next");
                 Wait(() => Button("Install") is not null && WizardText(wizard).Contains(destination, StringComparison.OrdinalIgnoreCase)
                     && WizardText(wizard).Contains("Create a Desktop shortcut", StringComparison.Ordinal), "Ready to Install did not reflect the reviewed path and chosen tasks.");
                 Capture(phase + "-ready");
                 if (cancel)
                 {
-                    Next("< Back");
+                    Next("Back");
                     if (!Checked(Choice("Create a Desktop shortcut")) || !Checked(Choice("Add Native Preview to Open with for Markdown and Mermaid files")))
                         throw new IOException("Back navigation discarded the selected tasks.");
-                    Next("< Back");
+                    Next("Back");
                     if (DestinationEdit().Text != destination) throw new IOException("Back navigation discarded the chosen destination.");
                     Next("Cancel");
                     Window? confirm = null;
@@ -189,7 +189,8 @@ internal static partial class NativeUiChecks
             .Where(element => element.Properties.ClassName.ValueOrDefault == "TWizardForm" && element.Name.Contains(WizardProduct, StringComparison.Ordinal))
             .Select(element => element.AsWindow()).SingleOrDefault();
         AutomationElement? Button(string name) => wizard!.FindAllDescendants(cf => cf.ByControlType(ControlType.Button))
-            .FirstOrDefault(element => !element.IsOffscreen && Label(element.Name) == name);
+            // Inno 6.7's modern buttons omit the arrows used by older wizard styles.
+            .FirstOrDefault(element => !element.IsOffscreen && Label(element.Name).Trim('<', '>', ' ') == name);
         void Next(string name)
         {
             AutomationElement? button = null;
@@ -231,7 +232,7 @@ internal static partial class NativeUiChecks
     private static bool Checked(AutomationElement element) => element.Patterns.Toggle.IsSupported
         ? element.Patterns.Toggle.Pattern.ToggleState.Value == ToggleState.On
         : element.Patterns.LegacyIAccessible.Pattern.State.Value.HasFlag(AccessibilityState.STATE_SYSTEM_CHECKED);
-    private static string Label(string value) => value.Replace("&", "", StringComparison.Ordinal).Trim();
+    private static string Label(string? value) => (value ?? "").Replace("&", "", StringComparison.Ordinal).Trim();
     private static string WizardText(Window wizard) => string.Join('\n', wizard.FindAllDescendants().Where(element => !element.IsOffscreen)
         .Select(element => element.Name + "\n" + (element.Patterns.Value.IsSupported ? element.Patterns.Value.Pattern.Value.Value : "")));
     private static string? RegistrySnapshot(string path)
