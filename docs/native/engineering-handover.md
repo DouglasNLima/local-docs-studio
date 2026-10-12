@@ -18,6 +18,8 @@ Native advantages include filesystem monitoring, Windows pickers/shell actions, 
 
 ## Parity and compatibility
 
+The subsequent PDF list correction passes local Release, 839 core tests, static checks and the full native harness. Actual PDF regressions retain one marker per item, nested/continuation alignment, wide/zero starts, formatting/links and table/image bounds. Ninety continuation paragraphs retain exact selectable word order over five pages. All seven fixture pages were inspected; evidence is in `artifacts/native/pdf-lists-regression`, `pdf-lists-exact` and `pdf-list-full-validation`. This change awaits its own hosted validation and is not part of the verified preview.230 package.
+
 The [parity matrix](functional-parity-matrix.md) distinguishes implemented, tested and unverified behaviour. The [diagram report](diagram-compatibility.md) records 40 corpus cases and another 56 catalogue/theme cases; unsupported syntax produces an explicit explanation. Native palette equivalents do not imply browser Mermaid pixel identity.
 
 Exports preserve editable/selectable text where supported, with checked Unicode font fallback, code colours, links and wrapped strike-through/highlighting. Missing PDF glyphs fail before output is committed. Complex-script shaping, bidirectional text, joined/colour emoji and broader Word/template fidelity remain limited. Package/schema validation cannot certify every destination application's rendering.

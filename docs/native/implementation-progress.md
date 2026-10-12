@@ -21,6 +21,8 @@ Full feature outcomes and limits remain in the [parity matrix](functional-parity
 
 ## Current engineering batch
 
+PDF export now keeps one marker per list item and applies a distinct indentation at each nested level. Continuation paragraphs, quotes, headings and code retain their item alignment; tables and images fit the remaining width. The original fixture reproduced three copies of `7.` and flat subitems. The corrected PDF, its nested/table variants and all five pagination pages were inspected. Release builds without warnings/errors, all 839 core tests, static checks and the full 40-case native harness pass locally. The focused regression also checks exact selectable word order across 90 continuation paragraphs. Hosted validation of this subsequent PDF change remains pending.
+
 The next compiled check records the application's actual executable and loaded coreclr.dll/wpfgfx_cor3.dll after editor/diagram readiness. Installed, upgraded and reinstalled workflows explicitly require both modules to come from the installation directory; package metadata cannot disable the assertion. Release builds without warnings/errors, static checks and PowerShell parsing pass, and the new option refuses local desktop execution. Hosted results and SDK-free clean-machine certification remain pending.
 
 Three separate local processes rechecked the unresolved construction delay without changing source or timing bounds. All twelve nested cases preserve text/source and pass; maximum input gap is 89.58 ms. Details component initialisation takes 10.77–15.67 ms. Samples under artifacts/native/construction-cfe11e5 do not reproduce or explain the historical failure.
