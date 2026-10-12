@@ -55,21 +55,21 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink).GetAwaiter().GetResult();
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink);
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax, Action<ExportTableSelection>? copyTable, Action<ExportTableSelection>? exportTableCsv,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink)
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink, Action<int>? editDiagramSource)
     {
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("started");
@@ -122,6 +122,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = new Paragraph(Formula(formula, formula.Lines.ToString(), true)) { Margin = new Thickness(0, 12, 0, 12) }; break;
                 case FencedCodeBlock code when diagrams.TryGetValue(code, out var diagram):
                     var panel = new StackPanel { Margin = new Thickness(0, 6, 0, 12) };
+                    var actions = new WrapPanel { Orientation = Orientation.Horizontal };
+                    var diagramFailure = diagram.Error;
                     PreviewMedia? diagramMedia = null;
                     if (diagram.Success)
                     {
@@ -133,28 +135,39 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DiagramPreview" + code.Span.Start);
                             if (diagram.Theme is { } theme) System.Windows.Automation.AutomationProperties.SetHelpText(image, "Diagram theme: " + theme);
                             panel.Children.Add(image);
-                            var actions = new WrapPanel { Orientation = Orientation.Horizontal };
-                            foreach (var format in new[] { "Zoom", "SVG", "PNG", "Copy source" })
-                            {
-                                var button = new Button { Content = format, Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
-                                System.Windows.Automation.AutomationProperties.SetAutomationId(button, "DiagramAction" + format.Replace(" ", "", StringComparison.Ordinal));
-                                button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
-                                actions.Children.Add(button);
-                            }
-                            panel.Children.Add(actions);
                             diagramMedia = new(image, image.MaxHeight, actions); media.Add(diagramMedia);
                         }
                         catch (Exception ex) when (ex is not OutOfMemoryException)
                         {
-                            warnings.Add("Native diagram rendering failed: " + ex.Message);
-                            panel.Children.Add(new TextBlock { Text = warnings[^1], TextWrapping = TextWrapping.Wrap, Foreground = foreground });
+                            diagramFailure = "Native diagram rendering failed: " + ex.Message;
                         }
                     }
-                    else
+                    if (diagramMedia is null)
                     {
-                        warnings.Add(diagram.Error!);
-                        panel.Children.Add(new TextBlock { Text = diagram.Error, TextWrapping = TextWrapping.Wrap, Foreground = foreground });
+                        diagramFailure ??= "The diagram could not be rendered. Edit its source and try again.";
+                        warnings.Add(diagramFailure);
+                        var error = new Label { Content = new TextBlock { Text = diagramFailure, TextWrapping = TextWrapping.Wrap },
+                            Padding = new Thickness(0), Foreground = foreground };
+                        System.Windows.Automation.AutomationProperties.SetName(error, diagramFailure);
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(error, "DiagramError" + code.Span.Start);
+                        panel.Children.Add(error);
                     }
+                    foreach (var format in diagramMedia is null ? new[] { "Copy source" } : new[] { "Zoom", "SVG", "PNG", "Copy source" })
+                    {
+                        var button = new Button { Content = format, Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(button, diagramMedia is null
+                            ? "DiagramErrorCopySource" + code.Span.Start : "DiagramAction" + format.Replace(" ", "", StringComparison.Ordinal));
+                        button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
+                        actions.Children.Add(button);
+                    }
+                    if (diagramMedia is null && editDiagramSource is not null)
+                    {
+                        var edit = new Button { Content = "Edit source", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(edit, "DiagramErrorEditSource" + code.Span.Start);
+                        edit.Click += (_, _) => editDiagramSource(code.Span.Start);
+                        actions.Children.Add(edit);
+                    }
+                    panel.Children.Add(actions);
                     var diagramHost = new BlockUIContainer(panel);
                     if (diagramMedia is not null) diagramMedia.Host = diagramHost;
                     result = diagramHost; break;

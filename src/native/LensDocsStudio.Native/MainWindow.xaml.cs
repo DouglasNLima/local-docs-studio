@@ -172,7 +172,7 @@ public partial class MainWindow : Window
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
-                target => NavigateWikiLink(tab.Id, prepared.source.Source, target));
+                target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);

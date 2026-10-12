@@ -101,6 +101,8 @@ internal static partial class NativeUiChecks
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
             CheckDiagramThemes(window, editor, state, output, source);
             checks.Add("Diagram theme menus persist all six choices, render fixed palettes independently of application appearance and retain source and update consent");
+            CheckDiagramFailureActions(window, editor, state, output, source);
+            checks.Add("Failed diagrams retain exact source copy, keyboard editing from Preview layout, source position and complete Undo without saving or changing update consent");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN);

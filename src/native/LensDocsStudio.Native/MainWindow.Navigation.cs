@@ -4,6 +4,7 @@ using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Rendering;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
+using LensDocsStudio.Native.ViewModels;
 
 namespace LensDocsStudio.Native;
 
@@ -11,6 +12,19 @@ public partial class MainWindow
 {
     private readonly NavigationHistory navigation = new();
     private bool restoringNavigation;
+    private async void EditDiagramSource(DocumentViewModel tab, string source, int offset)
+    {
+        if (model.ActiveDocument != tab || Editor.Document != tab.EditorDocument || tab.EditorDocument.Text != source
+            || offset < 0 || offset > source.Length)
+        {
+            model.Status = "The document changed. Wait for the current preview before editing its diagram source.";
+            return;
+        }
+        var revealEditor = model.Layout == "Preview";
+        if (revealEditor) SetLayout("Split");
+        JumpToSource(offset);
+        if (revealEditor) await SavePreferences();
+    }
     private NavigationLocation? CurrentNavigation() => displayedTab is null ? null :
         new(displayedTab.Id, displayedTab.FilePath, Editor.CaretOffset, Editor.VerticalOffset);
     private void CaptureCurrentNavigation()

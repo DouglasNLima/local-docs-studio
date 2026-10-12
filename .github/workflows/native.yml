@@ -81,6 +81,8 @@ jobs:
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-diagram-themes.json
             artifacts/native/install-smoke/**/native-diagram-forest-*.png
+            artifacts/native/install-smoke/**/native-ui-diagram-errors.json
+            artifacts/native/install-smoke/**/native-diagram-error.png
             artifacts/native/install-smoke/**/restored-session.json
             artifacts/native/install-smoke/**/restored-session.png
             artifacts/native/install-smoke/**/interrupted-save.json

@@ -1,5 +1,9 @@
 # Functional parity matrix
 
+Failed-diagram recovery now covers the web reference's Copy source and Edit source actions. Fourteen local native cases cover invalid/unknown/oversized diagrams, rejected native drawings, standalone Mermaid, DevOps containers and a valid control in both themes. Copy retains exact diagram code; editing targets the original fence and reveals the editor. The actual keyboard/clipboard workflow is included in the expanded 60-workflow desktop suite and awaits CI.
+
+All four 56b5161 CI runs pass, including the stronger visible-diagram paint check in all four application contexts. The intermittent closed-details delay described below remains unresolved; a passing sample does not establish its cause.
+
 Responsiveness acceptance remains incomplete: a3ef323 native PR repeats the closed-details delay despite complete content/source. Native push 38277636125 passes the complete desktop/installer lifecycle, including the new theme and zoom workflows; both web runs pass. Opt-in construction phases and maximum-input-gap checks are locally validated; no latency fix is claimed. See the [validation report](validation-report.md).
 
 The browser diagram-theme control exposed a native parity gap: diagrams previously followed application light/dark appearance only. Six native choices now cover Auto, Lens, Default, Neutral, Forest and Dark, with saved settings and consistent export/clipboard/site palettes. All 832 core tests and twelve native pixel/export combinations pass locally. Native menus, visible palette identification and restart persistence pass in the expanded desktop checks of native push 38277636125. Palette equivalents retain the native renderer; they do not imply browser pixel identity.

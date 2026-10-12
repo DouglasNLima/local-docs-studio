@@ -1,5 +1,7 @@
 # Native experience improvements
 
+An invalid diagram now offers keyboard-accessible Copy source and Edit source controls beside its explanation. Edit source reveals the editor from Preview layout and places the caret at the original fence; stale previews cannot navigate a changed document. Fourteen native source/control cases pass locally. Actual Windows clipboard, focus, caret typing, Undo and saved-file preservation are covered by a new desktop workflow pending CI.
+
 The recurring closed-details CI delay remains an open responsiveness issue. New phase diagnostics and periodic input measurements narrow investigation without changing the rendering behaviour or acceptance limit. The [validation report](validation-report.md) retains the failed observation and distinguishes it from passing local samples.
 
 Diagram colours can now stay fixed while the application follows Windows or changes between light/dark appearance. View → Diagram theme provides quick access; Settings adds the same six choices with Apply/Cancel and restart persistence. The selected palette also reaches copied diagrams and exported documents/sites without editing Markdown. Eighteen new core cases and twelve native pixel/export combinations pass locally; actual desktop/menu validation passes in native push 38277636125 and its complete installer lifecycle.
