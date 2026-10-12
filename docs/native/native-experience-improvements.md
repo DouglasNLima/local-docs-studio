@@ -1,9 +1,12 @@
 # Native experience improvements
 
+All four 8f5fde9 runs pass, including all 48 built/installed/reinstalled native workflows. The wiki-link TextPattern observation correction below is now verified. Workspace maps add eleven core cases and four native outcomes; all 680 core tests and complete native integration pass, with the 49th desktop workflow pending CI.
+
 Wiki desktop validation at 8289763 confirms completion but exposes an incorrect ordinary-tree hyperlink lookup. The retained screenshot shows the link; the harness now uses WPF TextPattern children. The corrected 48-workflow suite awaits CI.
 
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
+| Read-only workspace document map | High / low | Native searchable documents, incoming/outgoing links, unresolved filters and exact source selection use current saved-file drafts. Back/Forward, native diagrams and passive Markdown reports preserve source. Partial scans and bounded graph/report coverage remain explicit. Both themes and minimum client sizes were inspected; desktop copy/navigation/diagram/Undo validation awaits CI |
 | Unambiguous native wiki links and completion | High / low | Source-aware links expose readable aliases and full-path completion. Duplicate short names report candidate paths; navigation, reviewed moves and review stay workspace-scoped. Completion preserves one Undo/Redo and avoids literal code. Forty-seven core cases, four native outcomes and eight exported-browser cases pass; the 48th desktop workflow awaits CI |
 | Optional artefact review in native controls | Medium / low | Imported metadata supplies grouped, searchable items and exact evidence filters, with accessible controls and usable light/dark minimum-size layouts. Explicit review packs include current edits and safe rebuilt metadata; generic bundles stay generic and restart clears context. Twenty-four core cases, four native outcomes and eight disk/HTTP export-browser cases pass; both native runs at c22a1be pass all 47 built/installed/reinstalled workflows |
 | Offline native guide and readable narrow previews | High / low | F1 opens twelve bundled searchable topics in a separate read-only WPF window; Ctrl+F and Escape stay in that context. The guide follows themes and explains recovery, migration and update consent. Left-aligned paragraphs avoid stretched heading spaces; diagram actions wrap in narrow panes. Three core cases and four native outcomes pass; native PR at 888c3c5 passes all 45 built/installed/reinstalled workflows |

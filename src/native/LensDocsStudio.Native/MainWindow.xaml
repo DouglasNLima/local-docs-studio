@@ -140,6 +140,7 @@
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate" AutomationProperties.AutomationId="ClearWordTemplate"/>
    </MenuItem>
    <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
+    <MenuItem Header="Workspace _map…" Click="OpenWorkspaceMap" AutomationProperties.AutomationId="OpenWorkspaceMap"/>
     <MenuItem Header="Document _review…" Click="ReviewDocument" AutomationProperties.AutomationId="ReviewDocument"/>
     <MenuItem x:Name="ArtifactReaderMenu" Header="Artefact _bundle…" Click="OpenArtifactReader" IsEnabled="False" AutomationProperties.AutomationId="OpenArtifactReader"/>
     <Separator/>

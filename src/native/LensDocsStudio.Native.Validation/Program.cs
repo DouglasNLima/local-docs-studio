@@ -100,6 +100,12 @@ internal static class Program
             try { NativeArtifactChecks.Run(artifactOutput, args.ElementAtOrDefault(2)); Console.WriteLine("Native artefact integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--workspace-map")
+        {
+            var mapOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(mapOutput);
+            try { NativeWorkspaceMapChecks.Run(mapOutput); Console.WriteLine("Native workspace map integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--wikilinks")
         {
             var wikiOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(wikiOutput);
@@ -216,6 +222,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native artefacts: " + ex.Message); }
         try { NativeWikiLinkChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native wikilinks: " + ex.Message); }
+        try { NativeWorkspaceMapChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native workspace map: " + ex.Message); }
         try { NativeHelpChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native help: " + ex.Message); }
         try { NativeSettingsChecks.Run(output); }

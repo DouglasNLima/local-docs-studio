@@ -26,6 +26,10 @@ Save as retains known wiki targets inside the destination workspace. When linked
 
 **View → Document review** checks the current text, including unsaved edits, for document structure and local link/image issues. Selecting a supported result moves to its source.
 
+**View → Workspace map** shows the documents read from your open folder, with incoming and outgoing Markdown/wiki links from current saved-file drafts. Search titles or paths, filter documents without incoming links or with review notes, and use **Go to link source** to select the original reference. **Open document** participates in Back/Forward navigation. A changed source must be scanned again before using an old source position.
+
+**Workspace diagram** and **Selected diagram** open native diagrams with zoom and SVG/PNG export. Diagrams show up to 60 documents and 240 distinct connections; the native lists retain the scanned results. **Copy Markdown report** supplies portable diagram source and passive document/link tables. The scan reads up to 1,000 documents, 2 million characters per document, 16 million characters in total and 10,000 links. Unreadable or limited scans are labelled partial, and unconfirmed targets remain unchecked. Close and reopen the map to refresh it. It excludes private application state and never writes workspace documents.
+
 ## Saving, recovery and external changes
 
 **Ctrl+S** saves the current document. **Ctrl+Shift+S** saves a copy or chooses its first location. Local images and links are prepared for the destination before source is written.

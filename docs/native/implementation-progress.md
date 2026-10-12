@@ -1,5 +1,9 @@
 # Native implementation progress
 
+Current addition: View → Workspace map supplies searchable native document lists, incoming/outgoing Markdown and wiki links, exact source navigation and document history. Current saved-file drafts override disk source. Explicitly bounded scans retain partial/unreadable distinctions and exclude private state; diagram views use native zoom/SVG/PNG output and clipboard reports keep supplied metadata passive. A clean Release build, all 680 core tests, complete native integration and static integrity pass. Four map layouts and both diagram images were inspected. The new 49th desktop workflow awaits CI.
+
+All four runs at 8f5fde9 pass: native PR/push 38196246794/38196242726 and web PR/push 38196246796/38196242725. Both native runs pass all 48 workflows in built, installed and reinstalled apps, including wiki completion, preview navigation/Back, unresolved targets and complete Undo. The WPF TextPattern observation correction is verified. Evidence: artifacts/native/native-ci-8f5fde9-pr.log.
+
 Both native runs at 8289763 fail the new wiki preview lookup after successful completion insertion. The retained screenshot visibly contains the expected Renamed document.md link and a completed preview. The harness now reads WPF hyperlinks from TextPattern children, matching the already validated ordinary-link/anchor checks, instead of querying the ordinary automation tree. Product parsing and navigation are unchanged; the corrected 48-workflow suite awaits CI. Evidence: artifacts/native/ci-8289763-pr/ui/native-ui-failure.png and native-ci-8289763-pr-failure.log.
 
 Current addition: native wiki links preserve aliases and exact source spans, resolve only supplied workspace paths, report ambiguous names and navigate document sections/history. Native completion inserts full paths as one undoable edit, while code/HTML contexts remain literal. Reviewed file moves preserve labels and standalone Mermaid; document review uses current target drafts and excludes private state. Docs Site rewrites only included targets, and standalone/Word output keeps readable labels. A clean Release build, all 669 core tests, full native integration and eight exported-browser cases pass. Both native theme images were inspected. The new 48th desktop workflow covers completion, navigation/Back, missing targets and complete Undo; CI remains pending.
@@ -163,8 +167,8 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: certify the 43rd maths desktop/installed workflow, then continue artefact workflows, settings and remaining parity. All four runs at 1825cfd pass all existing 42 desktop workflows and complete web checks.
+Next: certify the new workspace-map desktop/installed workflow, then continue folder moves/case-only renames and remaining parity. All four runs at 8f5fde9 pass all existing 48 desktop workflows and complete web checks.
 
-Other gaps: folder moves/case-only rename, broader safe HTML/math semantics, incremental/large-document preview, Docs Site and artefact reader/review pack, full Word template fidelity and legacy pack migration, general preferences/migration/help, live Azure DevOps attachments, accessibility and multi-monitor certification. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
+Other gaps: folder moves/case-only rename, broader safe HTML/math semantics and export controls, incremental/large-document preview, full Word template fidelity and legacy pack migration, general legacy preference migration, live Azure DevOps attachments, accessibility and multi-monitor certification. Settings, help, Docs Site and the session-only artefact reader/review pack now have native desktop/installed coverage. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 
 External acceptance prerequisites: a trusted production signing identity and clean Windows install/update certification. Fresh CI runner evidence does not establish SDK-free clean-machine or positive signed-upgrade certification.
