@@ -126,5 +126,52 @@ public sealed class WorkspaceFolderMoveTests : IDisposable
         Assert.DoesNotContain(plan.Warnings, warning => warning.Contains("code.md", StringComparison.Ordinal));
         await Service.ApplyAsync(new(root), plan, true); Assert.Equal("<a href=\"docs/guide.md\">Guide</a>", await File.ReadAllTextAsync(html));
     }
+    [Theory] [InlineData(true)] [InlineData(false)]
+    public async Task Case_only_folder_rename_preserves_assets_empty_folders_and_optional_portable_link_updates(bool updateLinks)
+    {
+        Directory.CreateDirectory(Path.Combine(Source, "Empty"));
+        var guide = await Write("docs/Guide.md", "# Guide\r\n\r\n[Outside](../home.md) ![Local](asset.bin)\r\n");
+        await File.WriteAllBytesAsync(guide, DocumentSnapshot.Encode(await File.ReadAllTextAsync(guide), true));
+        var bytes = await File.ReadAllBytesAsync(guide); byte[] asset = [0, 128, 255];
+        await File.WriteAllBytesAsync(Path.Combine(Source, "asset.bin"), asset);
+        const string links = "[Guide](docs/Guide.md#guide) [[docs/Guide|Alias]] ![Asset](docs/asset.bin)";
+        var home = await Write("home.md", links);
+        var plan = await Service.PlanAsync(new(root), Source, "DOCS");
+        var result = await Service.ApplyAsync(new(root), plan, updateLinks);
+        var renamed = Path.Combine(root, "DOCS");
+        Assert.Contains(renamed, Directory.GetDirectories(root), StringComparer.Ordinal);
+        Assert.DoesNotContain(Source, Directory.GetDirectories(root), StringComparer.Ordinal);
+        Assert.True(Directory.Exists(Path.Combine(renamed, "Empty")));
+        Assert.Equal(asset, await File.ReadAllBytesAsync(Path.Combine(renamed, "asset.bin")));
+        Assert.Equal(bytes, await File.ReadAllBytesAsync(Path.Combine(renamed, "Guide.md")));
+        Assert.Contains(result.Documents, document => document.Path.Equals(Path.Combine(renamed, "Guide.md"), StringComparison.Ordinal) && document.Utf8Bom);
+        Assert.Equal(updateLinks ? "[Guide](DOCS/Guide.md#guide) [[DOCS/Guide.md|Alias]] ![Asset](DOCS/asset.bin)" : links, await File.ReadAllTextAsync(home));
+        Assert.Empty(Directory.GetFiles(Path.Combine(State, "moves"), "*.folder-move.json"));
+    }
+    [Fact] public async Task Failed_case_only_folder_move_restores_original_directory_spelling_and_completed_links()
+    {
+        await Write("docs/Guide.md", "# Guide\r\n");
+        const string firstText = "[Guide](docs/Guide.md)"; var first = await Write("a.md", firstText);
+        const string lastText = "[[docs/Guide|Guide]]"; var last = await Write("z.md", lastText);
+        var plan = await Service.PlanAsync(new(root), Source, "DOCS");
+        using (var locked = new FileStream(last, FileMode.Open, FileAccess.Read, FileShare.Read))
+            await Assert.ThrowsAsync<IOException>(() => Service.ApplyAsync(new(root), plan, true));
+        Assert.Contains(Source, Directory.GetDirectories(root), StringComparer.Ordinal);
+        Assert.DoesNotContain(Path.Combine(root, "DOCS"), Directory.GetDirectories(root), StringComparer.Ordinal);
+        Assert.Equal(firstText, await File.ReadAllTextAsync(first)); Assert.Equal(lastText, await File.ReadAllTextAsync(last));
+        Assert.Equal("# Guide\r\n", await File.ReadAllTextAsync(Path.Combine(Source, "Guide.md")));
+        Assert.Empty(Directory.GetFiles(Path.Combine(State, "moves"), "*.folder-move.json"));
+    }
+    [Fact] public async Task Case_only_folder_move_rejects_changed_assets_and_retains_parent_directory_spelling()
+    {
+        var guide = await Write("docs/Nested/Guide.md", "# Nested guide"); var parent = Path.GetDirectoryName(guide)!;
+        var plan = await Service.PlanAsync(new(root), parent, "DOCS/NESTED");
+        Assert.Equal(Path.Combine(Source, "NESTED"), plan.Destination);
+        await File.WriteAllTextAsync(guide, "# External guide");
+        await Assert.ThrowsAsync<DocumentConflictException>(() => Service.ApplyAsync(new(root), plan, true));
+        Assert.Contains(parent, Directory.GetDirectories(Source), StringComparer.Ordinal);
+        Assert.Equal("# External guide", await File.ReadAllTextAsync(guide));
+        await Assert.ThrowsAsync<IOException>(() => Service.PlanAsync(new(root), parent, "DOCS/Nested"));
+    }
     public void Dispose() => Directory.Delete(root, true);
 }

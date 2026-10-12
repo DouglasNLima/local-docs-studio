@@ -128,7 +128,7 @@ internal static partial class NativeUiChecks
             CheckCaseOnlyRename(window, editor, automation, app.ProcessId, source, renamedDocument);
             checks.Add("Case-only rename reviews real filename/link changes, refreshes open drafts and history, and restores original spelling without changing document bytes");
             CheckFolderMove(window, editor, automation, app.ProcessId, output, source);
-            checks.Add("Native folder F2 review preserves unsaved edits, binary assets and empty folders, updates incoming Markdown/wiki links in open tabs and relocates Back/Forward history");
+            checks.Add("Native folder F2 review preserves unsaved edits, assets and empty folders, updates ordinary/wiki links and history, and supports case-only folder names in both directions");
             Find(window, "FileMenu").Click(); Find(window, "CreateWorkspaceFile").Patterns.Invoke.Pattern.Invoke();
             Window? createWindow = null;
             Wait(() => (createWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Create workspace file")))?.AsWindow()) is not null, "The workspace create-file dialogue did not open.");

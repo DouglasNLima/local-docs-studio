@@ -144,7 +144,7 @@ public sealed class WorkspaceFolderMoveService(DocumentStore documents, string r
                     try
                     {
                         WorkspacePath.RejectReparsePoints(plan.Source); WorkspacePath.RejectReparsePoints(plan.Destination);
-                        if (Directory.Exists(plan.Source) || File.Exists(plan.Source) || !plan.Entries.SequenceEqual(await InventoryAsync(plan.Destination, CancellationToken.None))) restored = false;
+                        if (DestinationCollides(plan.Destination, plan.Source) || !plan.Entries.SequenceEqual(await InventoryAsync(plan.Destination, CancellationToken.None))) restored = false;
                         else Directory.Move(plan.Destination, plan.Source);
                     }
                     catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { restored = false; }
@@ -162,9 +162,9 @@ public sealed class WorkspaceFolderMoveService(DocumentStore documents, string r
     {
         ValidatePublicPath(workspace, source); ValidatePublicPath(workspace, destination);
         if (!Directory.Exists(source)) throw new IOException("The selected folder is no longer available.");
-        if (WorkspacePath.ContainsOrEquals(source, destination) || WorkspacePath.ContainsOrEquals(destination, source))
+        if (!IsCaseOnlyRename(source, destination) && (WorkspacePath.ContainsOrEquals(source, destination) || WorkspacePath.ContainsOrEquals(destination, source)))
             throw new IOException("Choose a separate destination outside the moved folder.");
-        if (File.Exists(destination) || Directory.Exists(destination)) throw new IOException("The destination already exists; folders are never merged or replaced.");
+        if (DestinationCollides(source, destination)) throw new IOException("The destination already exists; folders are never merged or replaced.");
         if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new IOException("Create the destination's parent folder before reviewing the move.");
         if (excludedDirectory is not null && WorkspacePath.ContainsOrEquals(source, excludedDirectory)) throw new IOException("A folder containing private application state cannot be moved.");
     }
@@ -172,6 +172,17 @@ public sealed class WorkspaceFolderMoveService(DocumentStore documents, string r
     {
         workspace.Resolve(Path.GetRelativePath(workspace.Root, path));
         if (excludedDirectory is not null && WorkspacePath.ContainsOrEquals(excludedDirectory, path)) throw new IOException("Private application state is excluded from folder moves.");
+    }
+    private static bool IsCaseOnlyRename(string source, string destination) => source.Equals(destination, StringComparison.OrdinalIgnoreCase)
+        && !Path.GetFileName(source).Equals(Path.GetFileName(destination), StringComparison.Ordinal);
+    private static bool DestinationCollides(string source, string destination)
+    {
+        if (File.Exists(destination)) return true;
+        if (!Directory.Exists(destination)) return false;
+        if (!IsCaseOnlyRename(source, destination)) return true;
+        // Directory.Exists sees the source alias on Windows; an actual destination entry still collides.
+        return Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(destination)!, Path.GetFileName(destination))
+            .Any(path => Path.GetFileName(path).Equals(Path.GetFileName(destination), StringComparison.Ordinal));
     }
     private static async Task<IReadOnlyList<FolderMoveEntry>> InventoryAsync(string root, CancellationToken cancellationToken)
     {

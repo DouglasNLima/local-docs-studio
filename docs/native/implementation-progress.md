@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current addition: case-only folder names now work through the existing move review and direct Windows rename. Four added cases verify exact directory spelling, both link-update choices, BOM/CRLF and binary/empty-folder preservation, late-write rollback, changed input and parent spelling. Release build, all 704 core tests and full native integration pass. Workflow 51 now adds uppercase/back folder renames with linked tabs/history and assets; its expanded desktop assertions await CI. Full browser migration regression is still running.
+
 Current addition: the browser's Save template copy retrieves original DOCX bytes for explicit native Word library import. It preserves current drafts, selection and stored records, disables copying for built-in defaults and reports missing originals. A shared source-only fixture verifies native semantic headings, retained headers, original-body exclusion and valid export packages. Release build, all 700 core tests, static integrity, all four new Chromium/Edge migration cases and the existing import/export cases pass. The export-menu screenshot was inspected. The complete 260-case browser suite is running; native folder CI is still pending.
 
 At d96e00c both native runs stop before folder movement because Unicode text injection omits the fixture's newline. The retained screenshot confirms the added text reached the editor on the preceding line. The fixture now sends an explicit Enter key, preserving its exact source assertion. Product movement is unchanged; corrected desktop validation is pending. Evidence: artifacts/native/native-ci-d96e00c-push-failure.log and ci-d96e00c-push/ui/native-ui-failure.png.
@@ -179,8 +181,8 @@ Current milestone: functional parity and Windows workflow certification. This re
 
 ## Remaining work
 
-Next: certify the 51-workflow folder-move suite and bounded wrapped-timeout observation, then complete case-only folder names and remaining parity. Browser Word-template migration now uses an explicit original DOCX copy and native library import. Native push at 5c26bac validates all 50 prior workflows before and after installation/reinstallation.
+Next: certify the expanded 51-workflow folder-move suite, then continue document/export fidelity and remaining parity. Browser Word-template migration uses an explicit original DOCX copy and native library import. Native push at 5c26bac validates all 50 prior workflows before and after installation/reinstallation.
 
-Other gaps: case-only folder renaming, broader safe HTML/math semantics and export controls, incremental/large-document preview, full Word template fidelity, general legacy preference migration, live Azure DevOps attachments, accessibility and multi-monitor certification. Settings, help, Docs Site and the session-only artefact reader/review pack have native desktop/installed coverage. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
+Other gaps: broader safe HTML/math semantics and export controls, incremental/large-document preview, full Word template fidelity, general legacy preference migration, live Azure DevOps attachments, accessibility and multi-monitor certification. Settings, help, Docs Site and the session-only artefact reader/review pack have native desktop/installed coverage. Draft images, recovery records and update-helper copies remain retained; automatic pruning is not implemented.
 
 External acceptance prerequisites: a trusted production signing identity and clean Windows install/update certification. Fresh CI runner evidence does not establish SDK-free clean-machine or positive signed-upgrade certification.

@@ -49,6 +49,20 @@ internal static partial class NativeUiChecks
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && File.ReadAllText(home) == expectedHome, "Folder move did not update incoming ordinary/wiki links and the existing open tab.");
         Find(owner, "NavigateForward").Click();
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Forward history lost the relocated folder document.");
+        CaseRename("renamed-folder", "RENAMED-FOLDER");
+        Find(owner, "NavigateBack").Click();
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome.Replace("renamed-folder", "RENAMED-FOLDER", StringComparison.Ordinal),
+            "Case-only folder rename did not update incoming references in the existing open tab.");
+        Find(owner, "NavigateForward").Click();
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Forward lost the case-renamed folder document.");
+        CaseRename("RENAMED-FOLDER", "renamed-folder");
+        Find(owner, "NavigateBack").Click();
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && File.ReadAllText(home) == expectedHome,
+            "Restoring folder case did not restore incoming link spelling and open source.");
+        Find(owner, "NavigateForward").Click();
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Restoring folder case lost its document history.");
+        if (!File.ReadAllBytes(Path.Combine(destination, "asset.bin")).SequenceEqual(asset) || !Directory.Exists(Path.Combine(destination, "empty")))
+            throw new IOException("Case-only folder renaming changed binary assets or empty folders.");
         OpenTreeFile(Path.GetFileName(originalSource), before);
         if (File.ReadAllText(originalSource) != originalSaved) throw new IOException("Folder movement changed an unrelated source document.");
         TreeItem TreeItem(string name) => Find(owner, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName(name)))?.AsTreeItem()
@@ -60,6 +74,22 @@ internal static partial class NativeUiChecks
                 "Folder monitoring did not reveal the file: " + name);
             FocusWindow(owner); item!.Select(); item.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == expected, "The native tree did not open the expected document: " + name);
+        }
+        void CaseRename(string currentName, string nextName)
+        {
+            FocusWindow(owner); var item = TreeItem(currentName); item.Select(); item.Focus(); Keyboard.Type(VirtualKeyShort.F2);
+            Window? path = null;
+            Wait(() => (path = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Rename or move folder")))?.AsWindow()) is not null,
+                "Case-only folder rename did not open the destination dialogue.");
+            Find(path!, "WorkspacePathInput").AsTextBox().Text = nextName; Find(path!, "ConfirmWorkspacePath").Patterns.Invoke.Pattern.Invoke();
+            Window? caseReview = null;
+            Wait(() => (caseReview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Review folder move")))?.AsWindow()) is not null,
+                "Case-only folder rename was rejected before review.");
+            Find(caseReview!, "ApplyFolderMove").Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(owner, "Status").Name.StartsWith("Moved folder " + nextName, StringComparison.Ordinal)
+                && Directory.EnumerateDirectories(root).Any(path => Path.GetFileName(path) == nextName)
+                && File.ReadAllText(home).Contains(nextName + "/folder-guide.md", StringComparison.Ordinal),
+                "Case-only folder rename did not change the actual directory entry and incoming links.");
         }
     }
 }

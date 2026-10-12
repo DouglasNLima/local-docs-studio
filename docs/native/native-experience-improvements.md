@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Folder names can change case through the existing native review. All 704 core tests and native integration pass, including guarded rollback of directory spelling and earlier link writes. Workflow 51 now checks uppercase/back folder names with open tabs, history and retained assets; desktop revalidation is pending.
+
 Browser Word templates can now be explicitly transferred through Save template copy and native Word template library import. The browser retains its original record and current draft; native validation extracts supported reusable formatting into private state. The shared migration fixture covers semantic headings, headers and exclusion of original body content without browser-profile scanning.
 
 Native push at 5c26bac passes all 50 built/installed/reinstalled workflows, including map and case-only rename. Folder moves add thirteen core cases and four native review outcomes; all 699 core tests and native integration pass. Workflow 51 and the wrapped UIA observation correction await CI.
