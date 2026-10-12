@@ -1,6 +1,5 @@
 using System.IO.Compression;
 using System.Text;
-using System.Text.RegularExpressions;
 using DocumentFormat.OpenXml.Packaging;
 using A = DocumentFormat.OpenXml.Drawing;
 using W = DocumentFormat.OpenXml.Wordprocessing;
@@ -58,6 +57,7 @@ public sealed partial class DocumentImportService
             _ => Enumerable.Empty<W.Paragraph>()
         });
         var hyperlinks = new WordHyperlinkReader(main, paragraphs, warnings, cancellationToken);
+        var paragraphStyles = new WordParagraphStyles(main.StyleDefinitionsPart?.Styles, warnings);
         string Run(W.Run run)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -102,14 +102,25 @@ public sealed partial class DocumentImportService
             }
             return text.ToString();
         }
-        string Paragraph(W.Paragraph paragraph)
+        string Paragraph(W.Paragraph paragraph, bool inTable = false)
         {
             cancellationToken.ThrowIfCancellationRequested();
+            var style = paragraphStyles.Read(paragraph);
+            if (style.IsCode && !paragraph.Descendants<A.Blip>().Any())
+            {
+                var literal = hyperlinks.Read(paragraph, run => string.Concat(run.ChildElements.Select(e => e switch
+                { W.Text text => text.Text, W.Break or W.CarriageReturn => "\n", W.TabChar => "\t", _ => "" })), literal: true);
+                var anchors = hyperlinks.CodeAnchors(paragraph);
+                if (inTable)
+                {
+                    warnings.Add("Word code blocks inside table cells were imported as literal text.");
+                    return anchors + HtmlMarkdownConverter.Escape(literal).Replace("\n", "<br>", StringComparison.Ordinal);
+                }
+                return (anchors.Length == 0 ? "" : anchors + "\n\n") + HtmlMarkdownConverter.Fence(literal);
+            }
+            if (style.IsCode) warnings.Add("A Word code-styled paragraph containing an image was imported as ordinary content.");
             var text = hyperlinks.Read(paragraph, Run);
-            var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
-            var styleName = main.StyleDefinitionsPart?.Styles?.Elements<W.Style>().FirstOrDefault(s => s.StyleId?.Value == styleId)?.StyleName?.Val?.Value ?? styleId ?? "";
-            var heading = HeadingStyle().Match(styleName);
-            var prefix = styleName.Equals("Title", StringComparison.OrdinalIgnoreCase) ? "# " : heading.Success ? new string('#', int.Parse(heading.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)) + " " : "";
+            var prefix = style.HeadingLevel > 0 ? new string('#', style.HeadingLevel) + " " : "";
             return prefix + text;
         }
         static string Emphasis(string value, string marker)
@@ -123,11 +134,11 @@ public sealed partial class DocumentImportService
         foreach (var element in main.Document?.Body?.ChildElements ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (element is W.Paragraph paragraph) output.Paragraph(paragraph, Paragraph(paragraph));
+            if (element is W.Paragraph paragraph) output.Paragraph(paragraph, Paragraph(paragraph), paragraphStyles.Read(paragraph).IsQuote);
             else if (element is W.Table table)
             {
                 var rows = table.Elements<W.TableRow>().Select(r => r.Elements<W.TableCell>().Select(c =>
-                    output.Cell(c.Elements<W.Paragraph>(), Paragraph)).ToArray()).ToArray();
+                    output.Cell(c.Elements<W.Paragraph>(), p => Paragraph(p, inTable: true), p => paragraphStyles.Read(p).IsQuote)).ToArray()).ToArray();
                 if (rows.Length == 0) continue;
                 var text = new StringBuilder();
                 text.AppendLine("| " + string.Join(" | ", rows[0]) + " |");
@@ -153,5 +164,4 @@ public sealed partial class DocumentImportService
         }
         return new(output.ToString(), [], ["PDF import extracts text only; it does not perform OCR or reconstruct images and page layout."]);
     }
-    [GeneratedRegex(@"^heading\s*([1-6])$", RegexOptions.IgnoreCase)] private static partial Regex HeadingStyle();
 }

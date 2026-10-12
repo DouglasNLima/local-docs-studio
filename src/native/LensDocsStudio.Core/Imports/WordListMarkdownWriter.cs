@@ -19,14 +19,15 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
         .Where(n => n.AbstractNumberId?.Value is not null).GroupBy(n => n.AbstractNumberId!.Value).ToDictionary(g => g.Key, g => g.First()) ?? [];
     private readonly HashSet<string> reported = [];
     private StringBuilder output = new();
+    private int? previousQuoteIndent;
 
-    public void Paragraph(W.Paragraph paragraph, string text)
+    public void Paragraph(W.Paragraph paragraph, string text, bool quote = false)
     {
         var properties = paragraph.ParagraphProperties;
         // numId=0 explicitly removes numbering, including inherited numbering.
         if (properties?.NumberingProperties?.NumberingId?.Val?.Value is not > 0)
         {
-            Block(text, Indent(properties?.Indentation));
+            Block(text, Indent(properties?.Indentation), quote);
             return;
         }
         var id = properties.NumberingProperties.NumberingId.Val.Value;
@@ -70,39 +71,42 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
         var marker = bullet ? suffix : value.ToString(CultureInfo.InvariantCulture) + suffix;
         var contentIndent = markerIndent + marker.Length + 1;
         frames.Add(new(id, level, wordIndent ?? 0, markerIndent, contentIndent, suffix));
-        Append(text, new string(' ', markerIndent) + marker + " ", contentIndent, separate: text.Length != 0);
+        Append(text, new string(' ', markerIndent) + marker + " ", contentIndent, separate: text.Length != 0, quote: quote);
     }
 
-    public void Block(string text, long? wordIndent)
+    public void Block(string text, long? wordIndent, bool quote = false)
     {
         var index = wordIndent is > 0 ? frames.FindLastIndex(f => f.WordIndent == wordIndent) : -1;
         if (index < 0) frames.Clear();
         else if (index < frames.Count - 1) frames.RemoveRange(index + 1, frames.Count - index - 1);
         var indent = index < 0 ? 0 : frames[index].ContentIndent;
-        Append(text, new string(' ', indent), indent, separate: true);
+        Append(text, new string(' ', indent), indent, separate: true, quote: quote, joinQuote: true);
     }
 
     // Pipe tables cannot contain Markdown block lists. Keep visible markers, but
     // isolate cell hierarchy so that it cannot become a continuation of a body item.
-    public string Cell(IEnumerable<W.Paragraph> paragraphs, Func<W.Paragraph, string> render)
+    public string Cell(IEnumerable<W.Paragraph> paragraphs, Func<W.Paragraph, string> render, Func<W.Paragraph, bool>? isQuote = null)
     {
         var savedFrames = frames.ToArray();
         var savedOutput = output;
-        frames.Clear(); output = new();
+        var savedQuote = previousQuoteIndent;
+        frames.Clear(); output = new(); previousQuoteIndent = null;
         try
         {
             foreach (var paragraph in paragraphs)
             {
                 if (paragraph.ParagraphProperties?.NumberingProperties?.NumberingId?.Val?.Value is > 0)
                     Warn("Word lists inside table cells were flattened to text with visible markers.");
-                Paragraph(paragraph, render(paragraph));
+                var quote = isQuote?.Invoke(paragraph) == true;
+                if (quote) Warn("Word quotes inside table cells were flattened to text with visible markers.");
+                Paragraph(paragraph, render(paragraph), quote);
             }
             return output.ToString().Trim().Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\n\n", "\n", StringComparison.Ordinal).Replace("\n", "<br>", StringComparison.Ordinal);
         }
-        finally { frames.Clear(); frames.AddRange(savedFrames); output = savedOutput; }
+        finally { frames.Clear(); frames.AddRange(savedFrames); output = savedOutput; previousQuoteIndent = savedQuote; }
     }
 
-    public override string ToString() => output.ToString();
+    public override string ToString() => output.ToString().Replace("\r\n", "\n", StringComparison.Ordinal);
 
     private (W.Level? Level, long Start) Definition(int id, int level)
     {
@@ -122,12 +126,20 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
         return result;
     }
 
-    private void Append(string text, string firstPrefix, int continuationIndent, bool separate)
+    private void Append(string text, string firstPrefix, int continuationIndent, bool separate, bool quote = false, bool joinQuote = false)
     {
+        if (quote && joinQuote && previousQuoteIndent == continuationIndent && output.Length >= Environment.NewLine.Length * 2)
+        {
+            // Replace the last blank separator with a quoted blank line, keeping
+            // consecutive Word quote paragraphs inside one Markdown quote block.
+            output.Length -= Environment.NewLine.Length;
+            output.Append(' ', continuationIndent).AppendLine(">");
+        }
         var lines = text.Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n');
-        output.Append(firstPrefix).AppendLine(lines[0]);
-        foreach (var line in lines.Skip(1)) output.Append(' ', continuationIndent).AppendLine(line);
+        output.Append(firstPrefix).Append(quote ? "> " : "").AppendLine(lines[0]);
+        foreach (var line in lines.Skip(1)) output.Append(' ', continuationIndent).Append(quote ? "> " : "").AppendLine(line);
         if (separate) output.AppendLine();
+        previousQuoteIndent = quote && separate ? continuationIndent : null;
     }
 
     private void Warn(string message) { if (reported.Add(message)) warnings.Add(message); }

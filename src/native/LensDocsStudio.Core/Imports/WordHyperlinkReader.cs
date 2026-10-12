@@ -56,7 +56,10 @@ internal sealed class WordHyperlinkReader
         }
     }
 
-    public string Read(W.Paragraph paragraph, Func<W.Run, string> renderRun)
+    public string CodeAnchors(W.Paragraph paragraph) => string.Concat(paragraph.Descendants<W.BookmarkStart>()
+        .Where(markers.ContainsKey).Select(marker => "<span data-doc-anchor id=\"" + markers[marker] + "\"></span>"));
+
+    public string Read(W.Paragraph paragraph, Func<W.Run, string> renderRun, bool literal = false)
     {
         var output = new StringBuilder();
         foreach (var element in paragraph.ChildElements) Append(element, output, 0, false);
@@ -73,11 +76,12 @@ internal sealed class WordHyperlinkReader
                     if (run.Elements<W.FieldCode>().Any() || run.Elements<W.FieldChar>().Any()) WarnField();
                     target.Append(renderRun(run)); return;
                 case W.BookmarkStart bookmark:
-                    if (markers.TryGetValue(bookmark, out var id)) target.Append("<span data-doc-anchor id=\"").Append(id).Append("\"></span>");
+                    if (!literal && markers.TryGetValue(bookmark, out var id)) target.Append("<span data-doc-anchor id=\"").Append(id).Append("\"></span>");
                     return;
                 case W.Hyperlink link:
                     var label = new StringBuilder();
                     foreach (var child in link.ChildElements) Append(child, label, depth + 1, true);
+                    if (literal) { Warn("Hyperlinks in a Word code block were retained as literal text."); target.Append(label); return; }
                     if (insideLink) { Warn("A nested Word hyperlink was retained as text inside its parent link."); target.Append(label); return; }
                     var destination = Destination(link);
                     if (destination is null || label.Length == 0) target.Append(label);

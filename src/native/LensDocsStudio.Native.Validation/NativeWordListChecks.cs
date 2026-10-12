@@ -86,6 +86,22 @@ internal static class NativeWordListChecks
             OrderedStarts = importedLists.Where(l => l.IsOrdered).Select(l => l.OrderedStart), ExactNativeImages = importedVisuals.Assets.Count,
             Limitation = "Direct Word numbering and matching continuation indents are checked. Style-inherited numbering, field/composite markers and full Word layout or formatting round trips remain unverified."
         }, new JsonSerializerOptions { WriteIndented = true }));
+
+        var originalCode = content.Document.Syntax.Descendants<CodeBlock>().ToArray();
+        var importedCode = importedDocument.Syntax.Descendants<CodeBlock>().ToArray();
+        var originalQuotes = content.Document.Syntax.Descendants<QuoteBlock>().ToArray();
+        var importedQuotes = importedDocument.Syntax.Descendants<QuoteBlock>().ToArray();
+        if (importedCode.Length != 1 || originalCode.Length != 1 || importedQuotes.Length != 1 || originalQuotes.Length != 1
+            || importedCode[0].Lines.ToString() != originalCode[0].Lines.ToString()
+            || importedCode[0].Parent is not ListItemBlock || importedQuotes[0].Parent is not ListItemBlock
+            || importedQuotes[0].Count != 2 || importedQuotes[0].Count != originalQuotes[0].Count)
+            throw new IOException("Native Word reimport changed literal code or quote paragraph boundaries inside a list.");
+        File.WriteAllText(Path.Combine(output, "native-word-block-import.json"), JsonSerializer.Serialize(new
+        {
+            Passed = true, CodeBlocks = importedCode.Length, QuoteBlocks = importedQuotes.Length, QuoteParagraphs = importedQuotes[0].Count,
+            LiteralCode = importedCode[0].Lines.ToString(), ListPlacementRetained = true,
+            Limitation = "Recognised paragraph styles are checked. Code language, nested quote depth, quote/list orientation and ambiguous template spacing styles are not reconstructed."
+        }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
     private static void Validate(WordprocessingDocument package)

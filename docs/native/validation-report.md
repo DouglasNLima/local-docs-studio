@@ -2,6 +2,12 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
+## Latest local work: Word code and quote import
+
+Seven of eight initial regressions failed because code and quote paragraphs became ordinary text; the control confirms that generic spacing styles should remain ordinary text. The correction passes all 897 core tests, a zero-warning/error Release build, static checks and the complete native harness with 40 diagram/export cases and zero failures. Fourteen new cases cover literal Unicode, punctuation, entities, tabs and backticks; list placement; grouped quote paragraphs; bounded/cyclic/default/inherited styles and outline overrides; safe bookmark placement; table-cell flattening; literal hyperlink labels; and unchanged embedded image bytes. The original failures are retained in `artifacts/native/word-blocks-before/word-blocks-before.trx`; the complete result is `word-blocks-after/word-blocks-all.trx`.
+
+The full native export/reimport fixture is under `word-blocks-full-validation`. After adding explicit assertions, the focused `word-blocks-native/native-word-block-import.json` passes with exact `CodeFirst\nCodeSecond` text, one code block and one two-paragraph quote, both inside list items. These checks run without a foreground application, clipboard or Office. CI for the preceding 0d9d54f revision does not contain this change. Recognised paragraph styles do not reconstruct code language, nested quote depth, quote/list orientation or ambiguous template spacing. Actual Word layout and complete formatting fidelity remain unverified.
+
 ## Latest completed CI: 4cbce1d
 
 Both native runs (PR 38314536658, push 38314532289) and both web runs (PR 38314536673, push 38314532459) pass on attempt 1. Each web log records 262 passing cases. Both downloaded native reports verify 868 core tests, 40 diagram/export cases, PDF/Word export groups, and Word reimport with six lists, 12 items, six continuations, exact starting values and two unchanged native image payloads. Four 62-check desktop contexts, three installed runtime origins, five wizard outcomes, four files-in-use assertions, 20 preserved state files, restored sessions and disposable-certificate cleanup pass.

@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Word code paragraphs now return as literal fenced code, and consecutive quote paragraphs remain one quote, including supported list placement. Fourteen new cases pass within 897 core tests; native export/reimport verifies exact code and quote boundaries. Style inheritance is bounded, generic spacing styles are not guessed to be code, and table/image fallbacks carry explicit notes. Code language and deeper quote structure remain outside the reconstructed semantics; this later change still needs its own CI.
+
 Imported Word links now retain supported web/email destinations and referenced internal bookmarks rather than becoming plain labels. Formatting and linked image bytes are covered by 15 new regressions, with all 883 core tests and the complete native harness passing locally. Unsupported targets and inert field results have explicit warnings; no document-provided link is fetched during import.
 
 Word import now keeps direct list starts, hierarchy and continuation paragraphs, and corrects heading-level demotion. The 868-test core suite and complete native harness pass in both 4cbce1d hosted runs; six prepared lists and both native image payloads survive reimport. Unsupported markers and flattened table-cell lists have explicit warnings. Full destination formatting remains incomplete; evidence is in the [validation report](validation-report.md).
