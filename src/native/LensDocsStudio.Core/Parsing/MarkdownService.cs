@@ -85,6 +85,7 @@ public sealed partial class MarkdownService
             DocumentSemanticInline semantic => semantic.Text,
             DocumentAnchorInline anchor => anchor.Text,
             LiteralInline literal => literal.Content.ToString(),
+            AutolinkInline link => link.Url,
             HtmlEntityInline entity => entity.Transcoded.ToString(),
             CodeInline code => code.Content,
             Markdig.Extensions.Mathematics.MathInline formula => formula.Content.ToString(),

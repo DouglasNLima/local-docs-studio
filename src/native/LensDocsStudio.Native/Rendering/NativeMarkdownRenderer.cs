@@ -279,6 +279,13 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         System.Windows.Automation.AutomationProperties.SetName(passive, semantic.Text);
                         target.Add(passive); break;
                     case LiteralInline literal: target.Add(new Run(literal.Content.ToString())); break;
+                    case AutolinkInline auto:
+                        var autoReference = MarkdownLinks.AutolinkReference(auto);
+                        var autoLink = new Hyperlink(new Run(auto.Url)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = autoReference };
+                        System.Windows.Automation.AutomationProperties.SetName(autoLink, auto.Url);
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(autoLink, "DocumentLink" + auto.Span.Start);
+                        autoLink.Click += (_, _) => navigate(autoReference);
+                        target.Add(autoLink); break;
                     case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
                     case CodeInline code: target.Add(new Run(code.Content) { FontFamily = new FontFamily("Consolas"), Background = surface }); break;
                     case MathInline formula: target.Add(Formula(formula, formula.Content.ToString(), formula.DelimiterCount == 2)); break;

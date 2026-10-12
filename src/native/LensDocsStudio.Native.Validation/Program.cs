@@ -32,6 +32,12 @@ internal static class Program
             try { NativeExportAllocationChecks.Run(allocationOutput); Console.WriteLine("Native export allocation checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--external-links")
+        {
+            var linkOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(linkOutput);
+            try { NativeExternalLinkChecks.Run(linkOutput); Console.WriteLine("Native external link checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--diagram-contrast")
         {
             var contrastOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(contrastOutput);
@@ -249,6 +255,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native performance observations: " + ex.Message); }
         try { NativeExportAllocationChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native export allocation: " + ex.Message); }
+        try { NativeExternalLinkChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native external links: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }

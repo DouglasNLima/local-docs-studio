@@ -2,17 +2,17 @@
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
-The allocation and diagram corrections pass all four a827668 CI runs: 766 core tests, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Corrected sequence activation bars, inherited label contrast and declared backgrounds have inspected native output; see the [diagram compatibility report](diagram-compatibility.md). Both initial facd03f native runs stalled in the new certificate step and were cancelled, with logs retained. The revised script uses the elevated disposable runner's machine root store, stage messages and a three-minute timeout; its seven intended verifier checks remain pending. PowerShell parsing, static checks and the local-host refusal guard pass.
+All four 0045689 CI runs pass: 766 core tests, seven actual Windows signature checks with certificate cleanup, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Initial facd03f certificate runs stalled and were cancelled, with logs retained; the revised elevated disposable machine-root fixture completes in seconds. The current link correction passes all 778 core tests and the full native harness locally, including six native link checks and an inspected PDF. Its CI remains pending. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
 
 | Reference | Current value |
 |---|---|
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Bounded CI-only disposable-certificate checks for the actual Windows verifier and publisher pinning; stalled initial runs retained as cancelled |
-| Latest complete native CI | a827668, PR/push 38212823013/38212818771: 766 core tests and 55 workflows in built, installed and reinstalled applications |
-| Latest complete web CI | Both a827668 runs 38212822923/38212818765: all 262 cases |
-| Current validation | Clean Release build, PowerShell parsing, 50-module static checks and local-host refusal guard pass; actual certificate checks await isolated CI |
+| Latest implementation | Native/Word/PDF autolink text preservation and real external PDF destinations; disposable Windows certificate checks pass their revised CI step |
+| Latest complete native CI | 0045689, PR/push 38215212276/38215207396: 766 core tests, seven signature cases and 55 workflows in built, installed and reinstalled applications |
+| Latest complete web CI | Both 0045689 runs 38215212191/38215207435: all 262 cases in 10.5 minutes |
+| Current validation | Clean Release build, all 778 core tests and complete native harness pass, including six external-link outcomes and inspected generated PDF; link correction awaits CI |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Execute the seven Windows trust checks in isolated CI, inspect certificate cleanup and correct any failure. No local certificate-store mutation is authorised by the current validation setup.
+1. Validate the autolink/PDF correction in CI and retain the completed Windows trust evidence. No local certificate-store mutation is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

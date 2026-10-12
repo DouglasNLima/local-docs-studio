@@ -218,6 +218,15 @@ public sealed class DocxExporter
                             if (semantic.Kind != DocumentInlineKind.StatusBadge) semanticRun.RunProperties!.RunFonts = new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" };
                             target.Append(semanticRun); break;
                         case LiteralInline literal: target.Append(Run(literal.Content.ToString(), formatting)); break;
+                        case AutolinkInline auto:
+                            var autoRun = Run(auto.Url, formatting);
+                            if (MarkdownLinks.ExternalUri(MarkdownLinks.AutolinkReference(auto)) is { } autoUri)
+                            {
+                                var autoRelationship = main.AddHyperlinkRelationship(autoUri, true);
+                                target.Append(new W.Hyperlink(autoRun) { Id = autoRelationship.Id });
+                            }
+                            else target.Append(autoRun);
+                            break;
                         case HtmlEntityInline entity: target.Append(Run(entity.Transcoded.ToString(), formatting)); break;
                         case CodeInline code: var run = Run(code.Content, formatting); run.RunProperties!.Append(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" }); target.Append(run); break;
                         case LineBreakInline line: target.Append(line.IsHard ? new W.Run(new W.Break()) : Run(" ", formatting)); break;
@@ -228,7 +237,7 @@ public sealed class DocxExporter
                         case LinkInline link when link.Url?.StartsWith('#') == true && bookmarks.TryGetValue(Uri.UnescapeDataString(link.Url[1..]), out var localBookmark):
                             var localLink = new W.Hyperlink { Anchor = localBookmark.Name, History = true };
                             Inlines(localLink, link, formatting); target.Append(localLink); break;
-                        case LinkInline link when Uri.TryCreate(link.Url, UriKind.Absolute, out var url) && url.Scheme is "https" or "http" or "mailto":
+                        case LinkInline link when MarkdownLinks.ExternalUri(link.Url) is { } url:
                             var relationship = main.AddHyperlinkRelationship(url, true);
                             var hyperlink = new W.Hyperlink { Id = relationship.Id };
                             Inlines(hyperlink, link, formatting); target.Append(hyperlink); break;

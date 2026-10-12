@@ -114,6 +114,8 @@ Use **File → Import DOCX, HTML or PDF** to create editable content from suppor
 
 The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Docs Site**. Exports are prepared separately from source. App-only search, outline and review controls are excluded from document output.
 
+Word and PDF retain HTTP, HTTPS and email links, including angle-bracket URLs such as `<https://example.org>` and email addresses such as `<review@example.org>`. PDF links remain clickable when their labels wrap. Unsupported external schemes and relative file links remain readable text in standalone Word/PDF exports.
+
 Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
 
 **File → Import Markdown bundle** extracts supported documents and assets into a new folder. An optional artefact manifest supplies display metadata for this import session. **View → Artefact bundle** filters imported items by group, title/path and supplied evidence label. Labels are displayed as supplied: candidate findings remain candidate findings. Invalid metadata produces an import note while valid documents remain available.

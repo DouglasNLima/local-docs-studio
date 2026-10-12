@@ -141,6 +141,11 @@ public sealed class PdfExporter
                         else semanticText.Font.Name = "Consolas";
                         break;
                     case LiteralInline literal: elements.AddText(literal.Content.ToString()); break;
+                    case AutolinkInline auto:
+                        if (MarkdownLinks.ExternalUri(MarkdownLinks.AutolinkReference(auto)) is { } autoUri)
+                            elements.AddHyperlink(autoUri.AbsoluteUri, HyperlinkType.Url).AddText(auto.Url);
+                        else elements.AddText(auto.Url);
+                        break;
                     case HtmlEntityInline entity: elements.AddText(entity.Transcoded.ToString()); break;
                     case CodeInline code: elements.AddFormattedText(code.Content).Font.Name = "Consolas"; break;
                     case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else elements.AddText(" "); break;
@@ -150,6 +155,8 @@ public sealed class PdfExporter
                         AddImage(elements, image); break;
                     case LinkInline link when link.Url?.StartsWith('#') == true && bookmarks.TryGetValue(Uri.UnescapeDataString(link.Url[1..]), out var bookmark):
                         Inlines(elements.AddHyperlink(bookmark).Elements, link); break;
+                    case LinkInline link when MarkdownLinks.ExternalUri(link.Url) is { } externalUri:
+                        Inlines(elements.AddHyperlink(externalUri.AbsoluteUri, HyperlinkType.Url).Elements, link); break;
                     case EmphasisInline emphasis:
                         var formatted = elements.AddFormattedText();
                         var formatting = MarkdownFormatting.Emphasis(emphasis);

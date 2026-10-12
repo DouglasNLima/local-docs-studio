@@ -7,6 +7,11 @@ public sealed record MarkdownLink(string Reference, bool IsImage, int Start, int
 
 public static class MarkdownLinks
 {
+    public static string AutolinkReference(AutolinkInline link) => link.IsEmail ? "mailto:" + link.Url : link.Url;
+
+    public static Uri? ExternalUri(string? reference) => reference is not null && !reference.Any(char.IsControl)
+        && Uri.TryCreate(reference, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" or "mailto" ? uri : null;
+
     public static IReadOnlyList<MarkdownLink> Read(string source) => new MarkdownService().Parse(source).Syntax.Descendants<LinkInline>()
         .Where(link => !string.IsNullOrEmpty(link.Url)).Select(link =>
         {
