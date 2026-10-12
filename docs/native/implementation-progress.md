@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
+
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
 All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven actual Windows signature checks, 55 workflows in built/installed/upgraded/reinstalled applications, eight exported-site cases and 262 browser cases. Downloaded PR evidence confirms the PDF results, preview.164 upgrade, 20 retained state files and certificate cleanup. Earlier certificate stalls and the 2ea009b Save-field observation failure remain recorded. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
@@ -9,10 +11,10 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Bounded validation clipboard-read retries after a retained CI failure; seven combined update-boundary checks are also committed locally and await CI |
-| Latest complete native CI | 5db39a9, PR/push 38223536303/38223531733: 788 core tests, Word/PDF syntax outcomes, seven signature cases and 56 workflows in built, installed, upgraded and reinstalled applications |
-| Latest complete web CI | Both 5db39a9 runs 38223536331/38223531687: all 262 cases in 10.2/10.1 minutes |
-| Current validation | Release and five in-memory clipboard transfer/retry outcomes pass. HTML revision 5120f18 has a successful native PR (791 core, 12 export-browser and 56 workflows in all four contexts) and both web runs pass 262 cases. Native push fails after-reinstall clipboard reading; corrected retry and combined update CI remain pending |
+| Latest implementation | Checked PDF font fallback, supplementary-character copy mapping and explicit missing-glyph failure |
+| Latest complete native CI | 676523e, PR/push 38227300924/38227294457: 791 core tests, seven signature cases, seven combined signed-update cases, 12 export-browser cases and 56 workflows in built, installed, upgraded and reinstalled applications |
+| Latest complete web CI | Both 676523e runs 38227300857/38227294505: all 262 cases in 7.2/10.6 minutes |
+| Current validation | PDF correction passes Release with no warnings/errors, 791 core tests, six focused Unicode outcomes, the full 40-case native corpus with zero failures and static checks. Its Windows CI remains pending |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +30,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Push and monitor the clipboard-read correction together with the locally committed combined update-boundary fixture. Native push 38225070353 at 5120f18 failed CLIPBRD_E_CANT_OPEN while observing copied review text after reinstall; its log, full artefact and inspected screenshot are retained. PR 38225077407 and both web runs pass. The read retry passes five in-memory outcomes; the combined trust fixture builds but requires the guarded disposable CI certificate. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Push and monitor the PDF Unicode correction. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

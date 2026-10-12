@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
+
 The native reconstruction keeps portable Markdown and real filesystem ownership while improving desktop workflows. At b45246e all 55 workflows pass in built, installed and reinstalled applications in both native CI runs, including distant wrapped-editor search, minimum-window controls, Editor-only scheduling and separated validation threads. Actual search/minimum-window screenshots and application timing samples have been inspected. Earlier failed runs and remaining limits are recorded in the validation report.
 
 | Improvement | Impact / risk | Implemented outcome and limit |
@@ -46,6 +48,6 @@ Word, PDF, HTML and rich-copy code retain syntax colours and indentation. Five P
 
 These are implemented outcomes with stated evidence limits, not production certification. Detailed contracts and remaining gaps are in the functional parity matrix and validation report.
 
-Both 5db39a9 native CI runs pass all 56 workflows in built/installed/upgraded/reinstalled applications, including actual coloured Word export. A combined manifest/download/Windows-verifier fixture is now built for CI using disposable trust and in-memory release responses; its seven checks are not yet counted as passed. HTML/Windows rich-copy CI and production signed-upgrade certification remain separate.
+Both 5db39a9 native CI runs pass all 56 workflows in built/installed/upgraded/reinstalled applications, including actual coloured Word export. A combined manifest/download/Windows-verifier fixture is now built for CI using disposable trust and in-memory release responses; its seven checks pass in both 676523e native runs. HTML/Windows rich-copy CI also passes; production signed-upgrade certification remains outstanding.
 
-At 5120f18, the native PR passes all 56 workflows in every desktop context and all 12 export-browser cases. Native push fails a clipboard read during later review navigation after reinstall; the selected source is visible in the retained screenshot, but this does not prove clipboard delivery. Five in-memory apartment/retry outcomes now pass, including bounded recovery and propagation of unrelated errors. The new read retry and combined update fixture await CI; the failed run remains recorded.
+At 5120f18, the native PR passes all 56 workflows in every desktop context and all 12 export-browser cases. Native push fails a clipboard read during later review navigation after reinstall; the selected source is visible in the retained screenshot, but this does not prove clipboard delivery. Five in-memory apartment/retry outcomes now pass, including bounded recovery and propagation of unrelated errors. The new read retry and combined update fixture pass both 676523e native runs; the earlier failed run remains recorded.

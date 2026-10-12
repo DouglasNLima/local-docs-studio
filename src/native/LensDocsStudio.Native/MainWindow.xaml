@@ -121,7 +121,7 @@
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument" AutomationProperties.AutomationId="ExportWord"/>
-    <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument"/>
+    <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument" AutomationProperties.AutomationId="ExportPdf"/>
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem x:Name="ArtifactReviewPackMenu" Header="Artefact _review pack…" Click="ExportArtifactReviewPack" IsEnabled="False" AutomationProperties.AutomationId="ExportArtifactReviewPack"/>

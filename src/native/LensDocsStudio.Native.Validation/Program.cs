@@ -50,6 +50,12 @@ internal static class Program
             try { NativeWordSyntaxChecks.Run(syntaxOutput); Console.WriteLine("Native Word syntax checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--pdf-unicode")
+        {
+            var unicodeOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(unicodeOutput);
+            try { NativePdfUnicodeChecks.Run(unicodeOutput); Console.WriteLine("Native PDF Unicode checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--html-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -277,6 +283,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native external links: " + ex.Message); }
         try { NativePdfSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native PDF syntax: " + ex.Message); }
+        try { NativePdfUnicodeChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native PDF Unicode: " + ex.Message); }
         try { NativeWordSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Word syntax: " + ex.Message); }
         try { NativeHtmlSyntaxChecks.Run(output); }

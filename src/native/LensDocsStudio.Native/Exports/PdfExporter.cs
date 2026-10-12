@@ -18,6 +18,7 @@ public sealed class PdfExporter
     {
         content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
         var codeSyntax = content.CodeSyntax ?? CodeSyntaxService.Prepare(content.Document, cancellationToken);
+        var fonts = new PdfFontFallback(cancellationToken);
         var imageSources = new Dictionary<byte[], string>(ReferenceEqualityComparer.Instance);
         var document = new Document();
         document.Info.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";
@@ -38,13 +39,24 @@ public sealed class PdfExporter
         var bookmarks = content.Document.Targets.ToDictionary(t => t.Id, t => "LensTarget" + t.SourceStart, StringComparer.Ordinal);
         var headingTargets = content.Document.Targets.Where(t => t.HeadingLevel > 0).ToDictionary(t => t.SourceStart);
         foreach (var block in content.Document.Syntax) Append(section.Elements, block);
-        var renderer = new PdfDocumentRenderer { Document = document };
+        using var pdf = new PdfSharp.Pdf.PdfDocument();
+        // Inspect the actual PDF glyph mapping too, including inherited bold/italic faces.
+        pdf.RenderEvents.RenderTextEvent += (_, args) =>
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            foreach (var pair in args.CodePointGlyphIndexPairs)
+                if (pair.GlyphIndex == 0) throw PdfFontFallback.MissingGlyph(pair.CodePoint);
+        };
+        var renderer = new PdfDocumentRenderer { Document = document, PdfDocument = pdf };
         cancellationToken.ThrowIfCancellationRequested();
         renderer.RenderDocument();
         cancellationToken.ThrowIfCancellationRequested();
         using var output = new BoundedExportStream(content.AllocationLimits.MaximumOutputBytes, cancellationToken);
         renderer.PdfDocument.Save(output, false);
-        return output.ToArray();
+        var bytes = output.ToArray();
+        return fonts.HasSupplementaryCharacters
+            ? PdfUnicodeText.PreserveSupplementaryCharacters(bytes, content.AllocationLimits.MaximumOutputBytes, cancellationToken)
+            : bytes;
 
         void Append(DocumentElements elements, MdBlock block, string? marker = null)
         {
@@ -54,13 +66,13 @@ public sealed class PdfExporter
                 case Markdig.Extensions.Mathematics.MathBlock formula:
                     var fp = elements.AddParagraph();
                     if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(fp.Elements, formulaImage);
-                    else fp.AddText(formula.Lines.ToString()); break;
+                    else fonts.AddText(fp.Elements, formula.Lines.ToString()); break;
                 case HeadingBlock heading:
                     var hp = elements.AddParagraph(); hp.Style = "Heading" + heading.Level;
                     if (headingTargets.TryGetValue(heading.Span.Start, out var headingTarget)) hp.AddBookmark(bookmarks[headingTarget.Id]);
                     Inlines(hp.Elements, heading.Inline); break;
                 case ParagraphBlock paragraph:
-                    var p = elements.AddParagraph(); if (marker is not null) p.AddText(marker);
+                    var p = elements.AddParagraph(); if (marker is not null) fonts.AddText(p.Elements, marker);
                     Inlines(p.Elements, paragraph.Inline); break;
                 case FencedCodeBlock code when code.Info is "mermaid" or "mmd":
                     if (!content.Diagrams.TryGetValue(code.Span.Start, out var diagram)) throw new InvalidDataException("A Mermaid diagram could not be exported.");
@@ -112,16 +124,16 @@ public sealed class PdfExporter
                     }
                     break;
                 case DocumentDetailsBlock details:
-                    var detailsLabel = elements.AddParagraph(details.Summary); detailsLabel.Format.Font.Bold = true; detailsLabel.Format.KeepWithNext = true;
+                    var detailsLabel = TextParagraph(elements, details.Summary); detailsLabel.Format.Font.Bold = true; detailsLabel.Format.KeepWithNext = true;
                     foreach (var child in details) Append(elements, child, marker);
                     break;
                 case DocumentImageFigureBlock figure:
                     var figureImage = elements.AddParagraph(); Inlines(figureImage.Elements, figure.Inline);
                     figureImage.Format.KeepWithNext = figure.Caption.Length > 0;
-                    if (figure.Caption.Length > 0) { var caption = elements.AddParagraph(figure.Caption); caption.Format.Font.Size = 9; }
+                    if (figure.Caption.Length > 0) { var caption = TextParagraph(elements, figure.Caption); caption.Format.Font.Size = 9; }
                     break;
                 case DocumentProgressBlock progress:
-                    var progressLabel = elements.AddParagraph(progress.Description); progressLabel.Format.KeepWithNext = true;
+                    var progressLabel = TextParagraph(elements, progress.Description); progressLabel.Format.KeepWithNext = true;
                     var progressTable = elements.AddTable();
                     var ratio = Math.Round(Math.Clamp(progress.Percentage / 100, 0, 1), 4);
                     var portions = new[] { (ratio, Color.Parse("#" + progress.ColourHex)), (1 - ratio, Colors.WhiteSmoke) }.Where(p => p.Item1 > 0).ToArray();
@@ -129,14 +141,14 @@ public sealed class PdfExporter
                     var progressRow = progressTable.AddRow(); progressRow.Height = Unit.FromPoint(6); progressRow.HeightRule = MigraDoc.DocumentObjectModel.Tables.RowHeightRule.Exactly;
                     for (var portionIndex = 0; portionIndex < portions.Length; portionIndex++) progressRow.Cells[portionIndex].Shading.Color = portions[portionIndex].Item2;
                     break;
-                case HtmlBlock html: elements.AddParagraph(html.Lines.ToString()); break;
+                case HtmlBlock html: TextParagraph(elements, html.Lines.ToString()); break;
                 case AlertBlock alert:
-                    var label = elements.AddParagraph(MarkdownFormatting.CalloutLabel(alert.Kind.ToString()));
+                    var label = TextParagraph(elements, MarkdownFormatting.CalloutLabel(alert.Kind.ToString()));
                     label.Format.Font.Bold = true; label.Format.KeepWithNext = true; label.Format.Shading.Color = Colors.WhiteSmoke;
                     foreach (var child in alert) Append(elements, child, marker);
                     break;
                 case ContainerBlock container: foreach (var child in container) Append(elements, child, marker); break;
-                case ThematicBreakBlock: elements.AddParagraph("—"); break;
+                case ThematicBreakBlock: TextParagraph(elements, "—"); break;
             }
         }
         void CodeText(ParagraphElements elements, string text, Color? colour = null)
@@ -154,7 +166,7 @@ public sealed class PdfExporter
                 // Explicit space characters preserve code indentation and alignment without
                 // replacing source spaces with non-breaking Unicode characters in the export.
                 if (spaces) elements.AddSpace(end - start);
-                else elements.AddText(text[start..end]);
+                else fonts.AddText(elements, text[start..end], "Consolas");
                 start = end;
             }
         }
@@ -168,24 +180,27 @@ public sealed class PdfExporter
                 {
                     case Markdig.Extensions.Mathematics.MathInline formula:
                         if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(elements, formulaImage);
-                        else elements.AddText(formula.Content.ToString()); break;
+                        else fonts.AddText(elements, formula.Content.ToString()); break;
                     case DocumentAnchorInline anchor:
-                        elements.AddBookmark(bookmarks[anchor.Id]); elements.AddText(anchor.Text); break;
+                        elements.AddBookmark(bookmarks[anchor.Id]); fonts.AddText(elements, anchor.Text); break;
                     case DocumentSemanticInline semantic:
-                        var semanticText = elements.AddFormattedText(semantic.Text);
+                        var semanticText = elements.AddFormattedText();
                         if (semantic.Kind == DocumentInlineKind.StatusBadge) semanticText.Bold = true;
                         else semanticText.Font.Name = "Consolas";
+                        fonts.AddText(semanticText.Elements, semantic.Text, semantic.Kind == DocumentInlineKind.StatusBadge ? "Segoe UI" : "Consolas");
                         break;
-                    case LiteralInline literal: elements.AddText(literal.Content.ToString()); break;
+                    case LiteralInline literal: fonts.AddText(elements, literal.Content.ToString()); break;
                     case AutolinkInline auto:
                         if (MarkdownLinks.ExternalUri(MarkdownLinks.AutolinkReference(auto)) is { } autoUri)
-                            elements.AddHyperlink(autoUri.AbsoluteUri, HyperlinkType.Url).AddText(auto.Url);
-                        else elements.AddText(auto.Url);
+                            fonts.AddText(elements.AddHyperlink(autoUri.AbsoluteUri, HyperlinkType.Url).Elements, auto.Url);
+                        else fonts.AddText(elements, auto.Url);
                         break;
-                    case HtmlEntityInline entity: elements.AddText(entity.Transcoded.ToString()); break;
-                    case CodeInline code: elements.AddFormattedText(code.Content).Font.Name = "Consolas"; break;
+                    case HtmlEntityInline entity: fonts.AddText(elements, entity.Transcoded.ToString()); break;
+                    case CodeInline code:
+                        var inlineCode = elements.AddFormattedText(); inlineCode.Font.Name = "Consolas";
+                        fonts.AddText(inlineCode.Elements, code.Content, "Consolas"); break;
                     case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else elements.AddText(" "); break;
-                    case Markdig.Extensions.TaskLists.TaskList task: elements.AddText(task.Checked ? "☑ " : "☐ "); break;
+                    case Markdig.Extensions.TaskLists.TaskList task: fonts.AddText(elements, task.Checked ? "☑ " : "☐ "); break;
                     case LinkInline { IsImage: true } link:
                         if (!content.Images.TryGetValue(link.Url ?? "", out var image)) throw new InvalidDataException("An image could not be exported.");
                         AddImage(elements, image); break;
@@ -206,10 +221,16 @@ public sealed class PdfExporter
                         Inlines(formatted.Elements, emphasis);
                         if (formatting.HasFlag(MarkdownEmphasis.Strike)) formatted.AddText("~~");
                         break;
-                    case HtmlInline html: elements.AddText(html.Tag); break;
+                    case HtmlInline html: fonts.AddText(elements, html.Tag); break;
                     case ContainerInline nested: Inlines(elements, nested); break;
                 }
             }
+        }
+        PdfParagraph TextParagraph(DocumentElements elements, string text)
+        {
+            var paragraph = elements.AddParagraph();
+            fonts.AddText(paragraph.Elements, text);
+            return paragraph;
         }
         void AddImage(ParagraphElements elements, ExportImage asset)
         {

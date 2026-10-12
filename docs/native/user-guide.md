@@ -114,6 +114,8 @@ Use **File → Import DOCX, HTML or PDF** to create editable content from suppor
 
 The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Docs Site**. Exports are prepared separately from source. App-only search, outline and review controls are excluded from document output.
 
+PDF uses supported Windows fonts to retain selectable characters, including simple emoji in monochrome. When no supported installed font contains a character, export identifies its Unicode code point and leaves the destination untouched; use another format or install the appropriate Windows language font. PDF complex-script shaping, bidirectional layout and joined/colour emoji remain limited. Markdown, HTML and Word retain portable Unicode source.
+
 Word and PDF retain HTTP, HTTPS and email links, including angle-bracket URLs such as `<https://example.org>` and email addresses such as `<review@example.org>`. PDF links remain clickable when their labels wrap. Unsupported external schemes and relative file links remain readable text in standalone Word/PDF exports.
 
 Word, PDF, HTML and rich-copy code blocks retain syntax colours for supported languages and preserve indentation as editable or selectable text. Word keeps tabs and line breaks without adding an extra final blank line. Unknown languages and blocks that exceed the colouring limit retain complete plain text. Exported Docs Sites adapt code colours to the chosen theme, printing and high-contrast preferences.

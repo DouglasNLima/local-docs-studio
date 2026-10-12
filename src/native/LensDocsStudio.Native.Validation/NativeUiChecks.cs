@@ -650,7 +650,7 @@ internal static partial class NativeUiChecks
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Context paste Undo did not restore the original document.");
                 checks.Add("Keyboard-opened editor context commands paste, copy, cut and format selected text with complete Undo");
 
-                const string contextCode = "const nativeContext = 'Café';\n  keepIndent();";
+                const string contextCode = "const nativeContext = 'Café 😀 🚀';\n  keepIndent();";
                 const string contextMarkdown = "```js\n" + contextCode + "\n```";
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 NativeUiClipboard.SetText(contextMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
@@ -718,9 +718,19 @@ internal static partial class NativeUiChecks
                         || NativeWordSyntaxChecks.ReadCode(paragraph) != contextCode || stringRun.RunProperties?.Color?.Val?.Value != "166534")
                         throw new IOException("The actual Word export lost editable code text, indentation or syntax colours.");
                 }
+                Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
+                var codePdf = Path.Combine(runRoot, "coloured-code.pdf"); SaveThroughDialogue(codePdf, "Export PDF");
+                Wait(() => File.Exists(codePdf) && Find(window, "Status").Name == "Exported coloured-code.pdf", "Coloured PDF export did not complete.");
+                using (var inspectedCode = UglyToad.PdfPig.PdfDocument.Open(codePdf))
+                {
+                    var selectable = string.Concat(inspectedCode.GetPages().SelectMany(page => page.Letters).Select(letter => letter.Value));
+                    if (!selectable.Contains("Café😀🚀", StringComparison.Ordinal) || !selectable.Contains("keepIndent();", StringComparison.Ordinal)
+                        || selectable.Contains('\0') || selectable.Contains('\uFFFD'))
+                        throw new IOException("The actual PDF export lost selectable Unicode code.");
+                }
                 if (ReadEditorText(editor) != contextMarkdown || File.ReadAllText(source) != codeSavedSource)
-                    throw new IOException("Coloured Word export changed editor or saved source.");
-                checks.Add("Native rich copying and the Word Export menu retain editable Unicode, indentation and syntax colours while preserving editor and saved source");
+                    throw new IOException("Coloured code export changed editor or saved source.");
+                checks.Add("Native rich copying and Word/PDF Export menus retain Unicode code while preserving editor and saved source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
