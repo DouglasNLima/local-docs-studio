@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Diagram Copy image has stable native automation identifiers and a pending hosted regression for keyboard activation, full-resolution pixels at different zoom scales and clipboard retention after closing the drawing window. The check preserves edited/saved source; local compilation does not establish actual clipboard interoperability.
+
 The full files-in-use scenario now passes in both cf436b0 native CI runs: cancelling Setup preserves the same application, exact unsaved Unicode draft/baseline, source, installed files, shortcuts and registration. Preview.225 packages are verified unsigned internal builds and four desktop contexts pass. Historical reporting failures below remain as earlier evidence.
 
 Word export now rejects code that would create excessive formatting objects before building the document, with a clear request to export fewer or smaller blocks. Ordinary editable Unicode, tabs, line breaks and syntax colours remain intact. Seven new allocation regressions pass with all 839 core tests and the complete native harness; hosted CI remains pending for this follow-up.

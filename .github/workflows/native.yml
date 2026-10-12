@@ -80,6 +80,8 @@ jobs:
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-diagram-themes.json
+            artifacts/native/install-smoke/**/native-ui-diagram-clipboard*.json
+            artifacts/native/install-smoke/**/native-diagram-clipboard*.png
             artifacts/native/install-smoke/**/native-diagram-forest-*.png
             artifacts/native/install-smoke/**/native-ui-diagram-errors.json
             artifacts/native/install-smoke/**/native-diagram-error.png

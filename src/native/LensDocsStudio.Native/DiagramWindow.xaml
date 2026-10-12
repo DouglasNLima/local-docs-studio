@@ -7,11 +7,11 @@
    <Button Content="100%" Click="ActualSize" Padding="12,6" Margin="0,0,12,0"/>
    <Slider x:Name="Zoom" Minimum="10" Maximum="400" Value="100" Width="180" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
    <TextBlock x:Name="ZoomLabel" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel"/>
-   <Button Content="Copy image" Click="CopyImage" Padding="12,6" Margin="0,0,8,0"/>
+   <Button Content="Copy image" Click="CopyImage" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="DiagramCopyImage"/>
    <Button Content="SVG…" Tag="SVG" Click="Export" Padding="12,6" Margin="0,0,8,0"/>
    <Button Content="PNG…" Tag="PNG" Click="Export" Padding="12,6"/>
   </WrapPanel>
-  <TextBlock x:Name="DiagramStatus" DockPanel.Dock="Bottom" Margin="16,10" Text="Ctrl+mouse wheel to zoom. Use the scroll bars to move around the diagram." TextWrapping="Wrap"/>
+  <TextBlock x:Name="DiagramStatus" DockPanel.Dock="Bottom" Margin="16,10" Text="Ctrl+mouse wheel to zoom. Use the scroll bars to move around the diagram." TextWrapping="Wrap" AutomationProperties.AutomationId="DiagramCopyStatus"/>
   <ScrollViewer x:Name="DiagramScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="DiagramMouseWheel" Padding="24" Background="{DynamicResource WindowBrush}">
    <Image x:Name="DiagramImage" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" AutomationProperties.Name="Mermaid diagram drawing">
     <Image.LayoutTransform><ScaleTransform x:Name="DiagramScale" ScaleX="1" ScaleY="1"/></Image.LayoutTransform>

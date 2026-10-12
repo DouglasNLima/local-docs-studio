@@ -97,8 +97,9 @@ internal static partial class NativeUiChecks
             Find(diagramWindow!, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
             Wait(() => Find(diagramWindow!, "DiagramZoomLabel").Name == "175%", "The native zoom did not change scale.");
             diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
-            diagramWindow.Close();
+            CheckDiagramImageCopy(window, diagramWindow, editor, source, output, automation, app.ProcessId);
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
+            checks.Add("Keyboard diagram copying retains exact native pixels across zoom levels and after closing the drawing window without changing source");
             CheckDiagramThemes(window, editor, state, output, source);
             checks.Add("Diagram theme menus persist all six choices, render fixed palettes independently of application appearance and retain source and update consent");
             CheckDiagramFailureActions(window, editor, state, output, source);
