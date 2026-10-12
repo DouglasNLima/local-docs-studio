@@ -17,7 +17,9 @@ internal static partial class NativeUiChecks
         const string homeText = "# Folder home\n\n[Guide](folder-move/folder-guide.md) [[folder-move/folder-guide|Wiki guide]]";
         File.WriteAllText(guide, guideText); File.WriteAllText(home, homeText); byte[] asset = [0, 128, 255, 1]; File.WriteAllBytes(Path.Combine(folder, "asset.bin"), asset);
         OpenTreeFile("folder-move-home.md", homeText); OpenTreeFile("folder-guide.md", guideText);
-        FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type("\nUnsaved folder edit.");
+        FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+        // Send the editor's Enter command; Unicode text injection does not insert a line feed on Windows.
+        Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Unsaved folder edit.");
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "The folder fixture did not retain its unsaved edit.");
         var selectedFolder = TreeItem("folder-move"); selectedFolder.Select(); selectedFolder.Focus(); Keyboard.Type(VirtualKeyShort.F2);
         Window? pathWindow = null;
