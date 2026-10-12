@@ -76,11 +76,11 @@ internal static partial class NativeUiChecks
         Find(reader, "OpenArtifactDocument").AsButton().Invoke();
         var document = Path.Combine(root, "findings", "candidate-risk.md"); var source = File.ReadAllText(document);
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == source, "The selected artefact document did not open.");
-        var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
+        var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string draft = "\n\nReviewer draft remains a candidate.\n";
         try
         {
-            System.Windows.Clipboard.SetText(draft); owned = GetClipboardSequenceNumber();
+            NativeUiClipboard.SetText(draft); owned = GetClipboardSequenceNumber();
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == source + draft, "The unsaved artefact review edit did not reach the editor.");

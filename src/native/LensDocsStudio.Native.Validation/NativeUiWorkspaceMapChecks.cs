@@ -10,12 +10,12 @@ internal static partial class NativeUiChecks
     private static void CheckWorkspaceMap(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string source, string target)
     {
         var before = ReadEditorText(editor); var saved = File.ReadAllText(source); var targetSaved = File.ReadAllText(target);
-        var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
+        var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string missing = "[Map missing](missing-map-target.md)";
         var fixture = "\n\n## Native map draft\n\n[[" + Path.GetFileName(target) + "|Map target]] " + missing;
         try
         {
-            System.Windows.Clipboard.SetText(fixture); owned = GetClipboardSequenceNumber();
+            NativeUiClipboard.SetText(fixture); owned = GetClipboardSequenceNumber();
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before + fixture, "The native map fixture did not reach the current draft.");
@@ -29,7 +29,7 @@ internal static partial class NativeUiChecks
             Find(map, "MapCopyReport").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(map, "MapStatus").Name.StartsWith("Workspace map report copied", StringComparison.Ordinal), "The native map did not copy its Markdown report.");
             owned = GetClipboardSequenceNumber();
-            var report = System.Windows.Clipboard.GetText();
+            var report = NativeUiClipboard.GetText();
             if (!report.StartsWith("# Documentation map", StringComparison.Ordinal) || !report.Contains("missing-map-target.md", StringComparison.Ordinal)
                 || !report.Contains("```mermaid", StringComparison.Ordinal)) throw new IOException("The copied workspace report lost its current links or diagram source.");
             map.CaptureToFile(Path.Combine(output, "native-workspace-map.png"));
@@ -42,7 +42,7 @@ internal static partial class NativeUiChecks
             Find(map, "MapGoToSource").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(owner, "Status").Name == "Selected the original link source.", "Map navigation did not select the original link source.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_C);
-            Wait(() => System.Windows.Clipboard.GetText() == missing, "Map source navigation did not retain the exact Markdown selection."); owned = GetClipboardSequenceNumber();
+            Wait(() => NativeUiClipboard.GetText() == missing, "Map source navigation did not retain the exact Markdown selection."); owned = GetClipboardSequenceNumber();
             map = OpenMap(); Find(map, "MapQuery").AsTextBox().Text = Path.GetFileName(target);
             Wait(() => Find(map, "MapDocuments").AsListBox().Items.Length == 1, "The map could not find its existing target document.");
             Find(map, "MapOpenDocument").Patterns.Invoke.Pattern.Invoke();

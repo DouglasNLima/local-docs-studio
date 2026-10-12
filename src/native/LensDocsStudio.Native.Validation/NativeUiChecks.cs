@@ -13,6 +13,22 @@ internal static partial class NativeUiChecks
 {
     public static int Run(string executable, string output)
     {
+        var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var thread = new Thread(() =>
+        {
+            try
+            {
+                int result;
+                using (NativeUiClipboard.Start()) result = RunCore(executable, output);
+                completion.SetResult(result);
+            }
+            catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
+        }) { IsBackground = true, Name = "Native UI Automation" };
+        thread.SetApartmentState(ApartmentState.MTA); thread.Start();
+        return completion.Task.GetAwaiter().GetResult();
+    }
+    private static int RunCore(string executable, string output)
+    {
         output = Path.GetFullPath(output);
         Directory.CreateDirectory(output);
         var runRoot = Path.Combine(output, "ui-" + Guid.NewGuid().ToString("N"));
@@ -28,6 +44,9 @@ internal static partial class NativeUiChecks
         var checks = new List<string>();
         var saveDialogueChecks = new List<object>();
         using var automation = new UIA3Automation();
+        File.WriteAllText(Path.Combine(output, "native-ui-threading.json"), JsonSerializer.Serialize(new {
+            AutomationApartment = Thread.CurrentThread.GetApartmentState().ToString(), ClipboardApartment = NativeUiClipboard.Apartment.ToString(),
+            TransactionTimeoutMilliseconds = automation.TransactionTimeout.TotalMilliseconds, ConnectionTimeoutMilliseconds = automation.ConnectionTimeout.TotalMilliseconds }));
         Application? app = null;
         Process? launchedProcess = null;
         Window? mainWindow = null;
@@ -171,13 +190,13 @@ internal static partial class NativeUiChecks
             FocusWindow(window);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "A new unsaved document did not open.");
-            var previousClipboard = System.Windows.Clipboard.GetDataObject();
+            var previousClipboard = NativeUiClipboard.GetDataObject();
             uint ownedClipboardSequence = 0;
             try
             {
                 var bitmap = System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96, System.Windows.Media.PixelFormats.Bgra32, null,
                     new byte[] { 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255 }, 8);
-                System.Windows.Clipboard.SetImage(bitmap);
+                NativeUiClipboard.SetImage(bitmap);
                 ownedClipboardSequence = GetClipboardSequenceNumber();
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("![pasted-image](assets/images/", StringComparison.Ordinal), "Clipboard image did not persist into the unsaved document.");
@@ -196,7 +215,7 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Back did not return from the image document.");
             var imageTab = window.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem).And(cf.ByName("Image document.md"))) ?? throw new InvalidOperationException("The image document tab is unavailable.");
             imageTab.Patterns.SelectionItem.Pattern.Select();
-            previousClipboard = System.Windows.Clipboard.GetDataObject(); ownedClipboardSequence = 0;
+            previousClipboard = NativeUiClipboard.GetDataObject(); ownedClipboardSequence = 0;
             try
             {
                 Find(window, "DocumentImage0").RightClick();
@@ -205,7 +224,7 @@ internal static partial class NativeUiChecks
                 copyImage!.Click();
                 Wait(() => Find(window, "Status").Name.StartsWith("Image copied.", StringComparison.Ordinal), "The rendered image was not copied to the Windows clipboard.");
                 ownedClipboardSequence = GetClipboardSequenceNumber();
-                if (System.Windows.Clipboard.GetImage() is not { PixelWidth: 2, PixelHeight: 2 }) throw new IOException("The clipboard does not contain the rendered image pixels.");
+                if (NativeUiClipboard.GetImage() is not { PixelWidth: 2, PixelHeight: 2 }) throw new IOException("The clipboard does not contain the rendered image pixels.");
                 FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The destination image draft did not open.");
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
@@ -284,13 +303,13 @@ internal static partial class NativeUiChecks
             { Keyboard.Type(line); Keyboard.Type(VirtualKeyShort.RETURN); }
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => File.ReadAllText(source).Contains("| Clipboard | Ready |", StringComparison.Ordinal), "The clipboard table fixture did not save.");
-            previousClipboard = System.Windows.Clipboard.GetDataObject(); ownedClipboardSequence = 0;
+            previousClipboard = NativeUiClipboard.GetDataObject(); ownedClipboardSequence = 0;
             try
             {
                 Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Rich clipboard preparation did not finish.");
                 ownedClipboardSequence = GetClipboardSequenceNumber();
-                var clipboard = System.Windows.Clipboard.GetDataObject()!;
+                var clipboard = NativeUiClipboard.GetDataObject()!;
                 var plain = clipboard.GetData(System.Windows.DataFormats.UnicodeText) as string ?? throw new IOException("The rich clipboard is missing Unicode text.");
                 var rich = clipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("The rich clipboard is missing native HTML Format data.");
                 var fragment = LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(rich);
@@ -309,7 +328,7 @@ internal static partial class NativeUiChecks
                 Find(window, "EditMenu").Click(); Find(window, "CopyMarkdownWithImages").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name.StartsWith("Markdown copied with embedded images.", StringComparison.Ordinal), "Markdown clipboard preparation did not finish.");
                 ownedClipboardSequence = GetClipboardSequenceNumber();
-                var sourceClipboard = System.Windows.Clipboard.GetDataObject()!;
+                var sourceClipboard = NativeUiClipboard.GetDataObject()!;
                 var sourcePlain = sourceClipboard.GetData(System.Windows.DataFormats.UnicodeText) as string ?? throw new IOException("Markdown copy has no Unicode source.");
                 var sourceHtml = sourceClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Markdown copy has no image carrier.");
                 var carrier = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(sourceHtml));
@@ -350,7 +369,7 @@ internal static partial class NativeUiChecks
                 mixed.SetData(System.Windows.DataFormats.Html, rich, false); mixed.SetData(System.Windows.DataFormats.UnicodeText, plain, false);
                 mixed.SetData(System.Windows.DataFormats.Bitmap, System.Windows.Media.Imaging.BitmapSource.Create(2, 2, 96, 96,
                     System.Windows.Media.PixelFormats.Bgra32, null, new byte[16], 8));
-                System.Windows.Clipboard.SetDataObject(mixed, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetDataObject(mixed, true); ownedClipboardSequence = GetClipboardSequenceNumber();
                 FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The rich paste target is not empty.");
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
@@ -369,7 +388,7 @@ internal static partial class NativeUiChecks
                     var decoded = LensDocsStudio.Native.Platform.NativeRasterService.Read(pixels);
                     if (decoded.PixelWidth <= 2 || decoded.PixelHeight <= 2) throw new IOException("Paste chose the fallback bitmap instead of the rich diagram image.");
                 }
-                System.Windows.Clipboard.SetText("Item,Value\nCSV,Portable"); ownedClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText("Item,Value\nCSV,Portable"); ownedClipboardSequence = GetClipboardSequenceNumber();
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
                 Find(window, "EditMenu").Click(); Find(window, "PasteSpecialMenu").Patterns.ExpandCollapse.Pattern.Expand();
                 Find(window, "PasteTable").Patterns.Invoke.Pattern.Invoke();
@@ -380,7 +399,7 @@ internal static partial class NativeUiChecks
                 var beforeFailedPaste = ReadEditorText(editor);
                 var invalidImage = new System.Windows.DataObject();
                 invalidImage.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Rejected image</p><img src='data:image/png;base64,AQID'>"), false);
-                System.Windows.Clipboard.SetDataObject(invalidImage, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetDataObject(invalidImage, true); ownedClipboardSequence = GetClipboardSequenceNumber();
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Window? pasteError = null;
@@ -393,7 +412,7 @@ internal static partial class NativeUiChecks
                     throw new IOException("An invalid clipboard image discarded the editor selection or changed the saved document.");
                 var literal = new System.Windows.DataObject(); literal.SetData(System.Windows.DataFormats.UnicodeText, "# Literal *source*", false);
                 literal.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Different rich text</p>"), false);
-                System.Windows.Clipboard.SetDataObject(literal, true); ownedClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetDataObject(literal, true); ownedClipboardSequence = GetClipboardSequenceNumber();
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# Literal *source*", "Ctrl+Shift+V did not choose literal clipboard text.");
@@ -595,18 +614,18 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeAnchor, "Anchor checks did not restore the original source.");
             checks.Add("Native anchors validate identifiers, retain links when labels change, navigate to empty targets and preserve complete Undo/Redo");
             var contextOriginal = ReadEditorText(editor);
-            var contextClipboard = System.Windows.Clipboard.GetDataObject(); uint contextClipboardSequence = 0;
+            var contextClipboard = NativeUiClipboard.GetDataObject(); uint contextClipboardSequence = 0;
             try
             {
                 const string contextText = "Context action — Café";
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(contextText); contextClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText(contextText); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextText, "The editor context menu did not paste into its selected text.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText("Clipboard replacement sentinel"); contextClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText("Clipboard replacement sentinel"); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextCopy");
-                Wait(() => System.Windows.Clipboard.GetText() == contextText, "The editor context Copy command lost selected Unicode text.");
+                Wait(() => NativeUiClipboard.GetText() == contextText, "The editor context Copy command lost selected Unicode text.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextCut"); contextClipboardSequence = GetClipboardSequenceNumber();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The editor context Cut command did not remove its selection.");
@@ -623,7 +642,7 @@ internal static partial class NativeUiChecks
                 const string contextCode = "const nativeContext = 'Café';\n  keepIndent();";
                 const string contextMarkdown = "```js\n" + contextCode + "\n```";
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(contextMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText(contextMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextMarkdown, "The code context fixture did not paste.");
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("const nativeContext", StringComparison.Ordinal), "The code context fixture did not render.");
@@ -662,12 +681,12 @@ internal static partial class NativeUiChecks
                 OpenCodeContext("CopyCodeBlock").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "Code copied as plain text.", "The preview context command did not copy code.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                if (System.Windows.Clipboard.GetText() != contextCode || System.Windows.Clipboard.ContainsData(System.Windows.DataFormats.Html))
+                if (NativeUiClipboard.GetText() != contextCode || NativeUiClipboard.ContainsData(System.Windows.DataFormats.Html))
                     throw new IOException("Copy code lost source content or added rendered HTML to plain code.");
                 OpenCodeContext("CopyCodeMarkdown").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "Code block Markdown source copied.", "The preview context command did not copy Markdown.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                if (System.Windows.Clipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
+                if (NativeUiClipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
@@ -675,16 +694,16 @@ internal static partial class NativeUiChecks
                     "| Selected | Value |\n|---|---|\n| Native table Café | =1+1 |\n| Identifier | 000123 |\n\nExcluded conclusion.";
                 var tableSavedSource = File.ReadAllText(source);
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(tableMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText(tableMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == tableMarkdown, "The table context fixture did not paste.");
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native table Café", StringComparison.Ordinal), "The table context fixture did not render.");
                 OpenPreviewContext("Native table Café", "CopyPreviewTable").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "Table copied as formatted content and tab-separated text.", "The native table context command did not copy its table.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                var tableClipboardHtml = System.Windows.Clipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Table copy did not publish Windows HTML Format.");
+                var tableClipboardHtml = NativeUiClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Table copy did not publish Windows HTML Format.");
                 var tableHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(tableClipboardHtml));
-                if (System.Windows.Clipboard.GetText() != "Selected\tValue\nNative table Café\t=1+1\nIdentifier\t000123"
+                if (NativeUiClipboard.GetText() != "Selected\tValue\nNative table Café\t=1+1\nIdentifier\t000123"
                     || tableHtml.QuerySelectorAll("table").Length != 1 || !tableHtml.QuerySelector("table")!.HasAttribute("x:str")
                     || tableHtml.Body!.TextContent.Contains("Excluded", StringComparison.Ordinal)
                     || tableHtml.QuerySelectorAll("td,th").Any(cell => !(cell.GetAttribute("style") ?? "").Contains("mso-number-format", StringComparison.Ordinal)))
@@ -705,7 +724,7 @@ internal static partial class NativeUiChecks
                 checks.Add("Native table context copy isolates one table with literal-cell HTML and Unicode TSV without changing source");
                 const string reviewSource = "# Review Café\n\n### Skipped\n\nColor and TODO remain.\n\n![](missing.png)\n\n[Missing](#absent)\n\n| A | B |\n|---|---|\n| One | Two | Extra |";
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(reviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                NativeUiClipboard.SetText(reviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == reviewSource, "The review fixture did not paste.");
                 Find(window, "ViewMenu").Click(); Find(window, "ReviewDocument").Patterns.Invoke.Pattern.Invoke();
                 Window? reviewWindow = null;
@@ -724,9 +743,9 @@ internal static partial class NativeUiChecks
                 Find(reviewWindow!, "ReviewGoToSource").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "TODO marker found.", "Review did not navigate to the selected note.");
                 EditorContext("EditorContextCopy");
-                Wait(() => System.Windows.Clipboard.GetText() == "TODO", "Review navigation did not select the exact TODO marker.");
+                Wait(() => NativeUiClipboard.GetText() == "TODO", "Review navigation did not select the exact TODO marker.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                if (System.Windows.Clipboard.GetText() != "TODO" || editor.Patterns.Value.Pattern.Value.Value != reviewSource || File.ReadAllText(source) != tableSavedSource)
+                if (NativeUiClipboard.GetText() != "TODO" || editor.Patterns.Value.Pattern.Value.Value != reviewSource || File.ReadAllText(source) != tableSavedSource)
                     throw new IOException("Review navigation lost the exact source selection or altered document content.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Document review validation did not restore the original source.");
@@ -738,13 +757,13 @@ internal static partial class NativeUiChecks
                 FocusWindow(window); reviewTargetItem!.Patterns.SelectionItem.Pattern.Select(); reviewTargetItem.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# Saved target", "The workspace review target did not open.");
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText("# New target"); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                NativeUiClipboard.SetText("# New target"); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == "# New target", "The unsaved target heading did not paste.");
                 sourceTab.Patterns.SelectionItem.Pattern.Select();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "The source tab did not return for workspace review.");
                 const string workspaceReviewSource = "# Workspace review\n\n[New](review-target.md#new-target) [Old](review-target.md#saved-target)";
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(workspaceReviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                NativeUiClipboard.SetText(workspaceReviewSource); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == workspaceReviewSource, "The workspace review source did not paste.");
                 Find(window, "ViewMenu").Click(); Find(window, "ReviewDocument").Patterns.Invoke.Pattern.Invoke(); reviewWindow = null;
                 Wait(() => (reviewWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document review")))?.AsWindow()) is not null,
@@ -757,7 +776,7 @@ internal static partial class NativeUiChecks
                 Find(reviewWindow!, "ReviewGoToSource").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name == "The linked section is missing from its workspace document.", "Workspace review did not navigate to the selected link.");
                 EditorContext("EditorContextCopy");
-                Wait(() => System.Windows.Clipboard.GetText() == "[Old](review-target.md#saved-target)", "Workspace review did not select the exact stale link.");
+                Wait(() => NativeUiClipboard.GetText() == "[Old](review-target.md#saved-target)", "Workspace review did not select the exact stale link.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
                 if (File.ReadAllText(reviewTargetPath) != "# Saved target" || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != workspaceReviewSource)
                     throw new IOException("Workspace review changed saved or edited documents.");
@@ -775,7 +794,7 @@ internal static partial class NativeUiChecks
                 var figureReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
                 var figureSource = "# Figure preview\n\n<figure data-image-figure>\n<img src=\"" + figureReference + "\" alt=\"Native figure pixels\">\n<figcaption>Figure 1 — Café &amp; evidence</figcaption>\n</figure>";
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(figureSource); contextClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText(figureSource); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == figureSource, "The figure source did not reach the native editor.");
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Figure 1 — Café & evidence", StringComparison.Ordinal),
@@ -783,7 +802,7 @@ internal static partial class NativeUiChecks
                 Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Figure clipboard preparation did not finish.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                var figureClipboard = System.Windows.Clipboard.GetDataObject()!;
+                var figureClipboard = NativeUiClipboard.GetDataObject()!;
                 var figureHtml = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(
                     figureClipboard.GetData(System.Windows.DataFormats.Html) as string ?? throw new IOException("Figure copying omitted native HTML.")));
                 var figureElement = figureHtml.QuerySelector("figure") ?? throw new IOException("Figure copying omitted its semantic container.");
@@ -811,7 +830,7 @@ internal static partial class NativeUiChecks
                 checks.Add("Native image figures expose selectable captions and copy real pixels with semantic HTML and unchanged source");
                 var figureEditOriginal = "# Figure editing\n\n![Original](<" + figureReference + "> \"Retained image title\")";
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-                System.Windows.Clipboard.SetText(figureEditOriginal); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
+                NativeUiClipboard.SetText(figureEditOriginal); contextClipboardSequence = GetClipboardSequenceNumber(); EditorContext("EditorContextPaste");
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == figureEditOriginal, "The standalone image fixture did not paste.");
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
                 Find(window, "InsertMenu").Click(); Find(window, "EditImageFigure").Patterns.Invoke.Pattern.Invoke();
@@ -855,16 +874,16 @@ internal static partial class NativeUiChecks
             finally
             {
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
-                { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
+                { if (contextClipboard is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(contextClipboard, true); }
             }
             var sourceBeforeLibraryImage = ReadEditorText(editor);
             var libraryImageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
             var libraryImageMarkdown = "![Library portable image](" + libraryImageReference + ")";
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            var beforeLibraryClipboard = System.Windows.Clipboard.GetDataObject(); uint libraryClipboardSequence = 0;
+            var beforeLibraryClipboard = NativeUiClipboard.GetDataObject(); uint libraryClipboardSequence = 0;
             try
             {
-                System.Windows.Clipboard.SetText("\n\n" + libraryImageMarkdown); libraryClipboardSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText("\n\n" + libraryImageMarkdown); libraryClipboardSequence = GetClipboardSequenceNumber();
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage + "\n\n" + libraryImageMarkdown,
                     "The portable-image fixture did not reach the document before library capture.");
@@ -872,7 +891,7 @@ internal static partial class NativeUiChecks
             finally
             {
                 if (libraryClipboardSequence != 0 && GetClipboardSequenceNumber() == libraryClipboardSequence)
-                { if (beforeLibraryClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(beforeLibraryClipboard, true); }
+                { if (beforeLibraryClipboard is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(beforeLibraryClipboard, true); }
             }
             var templateSource = ReadEditorText(editor); var templateSavedSource = File.ReadAllText(source);
             var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
@@ -1186,11 +1205,11 @@ internal static partial class NativeUiChecks
             checks.Add("Native details dialogue restores and edits Markdown; accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
             const string mathsFixture = "\n\n## Native maths UI\n\nNative formula $\\frac{x^2}{y_1}$ keeps its source.\n";
             var beforeMaths = ReadEditorText(editor);
-            var mathsClipboard = System.Windows.Clipboard.GetDataObject(); uint mathsSequence = 0;
+            var mathsClipboard = NativeUiClipboard.GetDataObject(); uint mathsSequence = 0;
             try
             {
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-                System.Windows.Clipboard.SetText(mathsFixture); mathsSequence = GetClipboardSequenceNumber();
+                NativeUiClipboard.SetText(mathsFixture); mathsSequence = GetClipboardSequenceNumber();
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeMaths + mathsFixture, "Literal maths fixture insertion changed source.");
                 var mathsStart = (beforeMaths + mathsFixture).IndexOf("$\\frac{x^2}{y_1}$", beforeMaths.Length, StringComparison.Ordinal);
@@ -1203,10 +1222,10 @@ internal static partial class NativeUiChecks
                 var formulaBounds = formulaImage.BoundingRectangle;
                 Mouse.Click(new System.Drawing.Point(formulaBounds.X + formulaBounds.Width / 2, formulaBounds.Y + formulaBounds.Height / 2), MouseButton.Right);
                 ContextAction("CopyFormulaSource").Patterns.Invoke.Pattern.Invoke();
-                Wait(() => System.Windows.Clipboard.GetText() == @"\frac{x^2}{y_1}", "Formula context copy changed the LaTeX source.");
+                Wait(() => NativeUiClipboard.GetText() == @"\frac{x^2}{y_1}", "Formula context copy changed the LaTeX source.");
                 mathsSequence = GetClipboardSequenceNumber();
                 Find(window, "EditMenu").Click(); Find(window, "CopyRenderedText").Patterns.Invoke.Pattern.Invoke();
-                Wait(() => System.Windows.Clipboard.GetText().Contains(@"Native formula \frac{x^2}{y_1} keeps its source.", StringComparison.Ordinal),
+                Wait(() => NativeUiClipboard.GetText().Contains(@"Native formula \frac{x^2}{y_1} keeps its source.", StringComparison.Ordinal),
                     "Copy rendered text lost the formula or surrounding prose.");
                 mathsSequence = GetClipboardSequenceNumber();
                 preview = Find(window, "DocumentPreview"); preview.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
@@ -1510,7 +1529,7 @@ internal static partial class NativeUiChecks
     {
         // Do not replace a clipboard update made by the user or another application during validation.
         if (ownedSequence == 0 || GetClipboardSequenceNumber() != ownedSequence) return;
-        try { if (previous is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(previous, true); }
+        try { if (previous is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(previous, true); }
         catch (ExternalException) { }
     }
     private static void Wait(Func<bool> condition, string failure)

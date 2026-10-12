@@ -10,11 +10,11 @@ internal static partial class NativeUiChecks
     private static void CheckWikiLinks(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string sourcePath, string targetPath)
     {
         var before = ReadEditorText(editor); var saved = File.ReadAllText(sourcePath); var targetSaved = File.ReadAllText(targetPath);
-        var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
+        var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         try
         {
             var targetName = Path.GetFileName(targetPath); var prefix = "\n\n[[" + targetName[..3];
-            System.Windows.Clipboard.SetText(prefix); owned = GetClipboardSequenceNumber();
+            NativeUiClipboard.SetText(prefix); owned = GetClipboardSequenceNumber();
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before + prefix, "The native wiki completion fixture did not reach the editor.");
@@ -39,7 +39,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before, "Undo did not restore source before the wiki fixture.");
             const string missing = "\n\n[[Missing native wiki target|Missing wiki target]]";
-            System.Windows.Clipboard.SetText(missing); owned = GetClipboardSequenceNumber();
+            NativeUiClipboard.SetText(missing); owned = GetClipboardSequenceNumber();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before + missing

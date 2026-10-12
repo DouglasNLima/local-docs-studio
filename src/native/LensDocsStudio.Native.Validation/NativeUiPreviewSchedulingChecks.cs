@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
     private static void CheckPreviewScheduling(Window window, AutomationElement editor, string output, string source)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllText(source);
-        var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
+        var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string marker = "Editor-only current preview fixture";
         var addition = "\n\n# " + marker + "\n\nCurrent selectable content.";
         try
@@ -17,17 +17,17 @@ internal static partial class NativeUiChecks
             Layout("Editor");
             Wait(() => Find(window, "PreviewStatus").Name == "Preview paused in Editor layout", "Editor layout did not pause preview rendering.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            System.Windows.Clipboard.SetText(addition); owned = GetClipboardSequenceNumber();
+            NativeUiClipboard.SetText(addition); owned = GetClipboardSequenceNumber();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == original + addition, "The editor-only fixture did not retain exact source.");
             Find(window, "EditMenu").Click(); Find(window, "CopyRenderedText").Patterns.Invoke.Pattern.Invoke();
-            Wait(() => System.Windows.Clipboard.GetText().Contains(marker, StringComparison.Ordinal), "Explicit text copying reused an obsolete hidden preview.");
+            Wait(() => NativeUiClipboard.GetText().Contains(marker, StringComparison.Ordinal), "Explicit text copying reused an obsolete hidden preview.");
             owned = GetClipboardSequenceNumber();
             window.CaptureToFile(Path.Combine(output, "native-editor-only-preview.png"));
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == original, "Preview text preparation damaged insertion Undo.");
             Find(window, "EditMenu").Click(); Find(window, "CopyRenderedText").Patterns.Invoke.Pattern.Invoke();
-            Wait(() => GetClipboardSequenceNumber() != owned && !System.Windows.Clipboard.GetText().Contains(marker, StringComparison.Ordinal),
+            Wait(() => GetClipboardSequenceNumber() != owned && !NativeUiClipboard.GetText().Contains(marker, StringComparison.Ordinal),
                 "Text copying after Undo retained removed preview content.");
             owned = GetClipboardSequenceNumber();
             Layout("Preview");
