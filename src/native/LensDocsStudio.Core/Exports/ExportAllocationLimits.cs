@@ -7,14 +7,14 @@ namespace LensDocsStudio.Core.Exports;
 /// <summary>Limits expanded resources before serialisation, including every repeated occurrence.</summary>
 public sealed record ExportAllocationLimits(long MaximumImageCharacters = 32 * 1024 * 1024,
     int MaximumHtmlCharacters = 32 * 1024 * 1024, long MaximumOutputBytes = 128 * 1024 * 1024,
-    int MaximumImageOccurrences = 4096)
+    int MaximumImageOccurrences = 4096, int MaximumWordCodeElements = 65_536)
 {
     public static ExportAllocationLimits Default { get; } = new();
     public static ExportAllocationLimits Clipboard { get; } = new(8 * 1024 * 1024, 8 * 1024 * 1024, 32 * 1024 * 1024);
 
     public void Validate(ExportContent content, ExportTableSelection? table = null, CancellationToken cancellationToken = default)
     {
-        if (MaximumImageCharacters < 1 || MaximumHtmlCharacters < 1 || MaximumOutputBytes < 1 || MaximumImageOccurrences < 1)
+        if (MaximumImageCharacters < 1 || MaximumHtmlCharacters < 1 || MaximumOutputBytes < 1 || MaximumImageOccurrences < 1 || MaximumWordCodeElements < 1)
             throw new ArgumentOutOfRangeException(nameof(ExportAllocationLimits));
         cancellationToken.ThrowIfCancellationRequested();
         ContainerBlock scope = table is null ? content.Document.Syntax : table.Resolve(content.Document);

@@ -19,6 +19,7 @@ public sealed class DocxExporter
     {
         cancellationToken.ThrowIfCancellationRequested();
         content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
+        ValidateCodeAllocation(content, cancellationToken);
         using var stream = new BoundedExportStream(content.AllocationLimits.MaximumOutputBytes, cancellationToken);
         if (template is not null) stream.Write(new DocxTemplateService().Prepare(template, cancellationToken).Bytes);
         using (var package = template is null
@@ -271,21 +272,16 @@ public sealed class DocxExporter
                     var properties = new W.RunProperties(new W.RunFonts { Ascii = "Consolas", HighAnsi = "Consolas" });
                     if (segment.Role != CodeTokenRole.Plain) properties.Color = new W.Color { Val = CodeSyntaxPalette.Hex(segment.Role) };
                     var run = new W.Run(properties);
-                    for (var start = 0; start < segment.Text.Length;)
+                    foreach (var element in ReadCodeElements(segment.Text, previous, cancellationToken))
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
-                        var character = segment.Text[start];
-                        if (character is '\r' or '\n' or '\t')
+                        switch (element.Kind)
                         {
-                            if (character == '\t') run.Append(new W.TabChar());
-                            else if (character != '\n' || previous != '\r') run.Append(new W.Break());
-                            previous = character; start++; continue;
+                            case CodeElementKind.Tab: run.Append(new W.TabChar()); break;
+                            case CodeElementKind.Break: run.Append(new W.Break()); break;
+                            default: run.Append(new W.Text(segment.Text.Substring(element.Start, element.Length)) { Space = SpaceProcessingModeValues.Preserve }); break;
                         }
-                        var end = start + 1;
-                        while (end < segment.Text.Length && segment.Text[end] is not ('\r' or '\n' or '\t')) end++;
-                        run.Append(new W.Text(segment.Text[start..end]) { Space = SpaceProcessingModeValues.Preserve });
-                        previous = segment.Text[end - 1]; start = end;
                     }
+                    if (segment.Text.Length > 0) previous = segment.Text[^1];
                     paragraph.Append(run);
                 }
             }
@@ -318,6 +314,58 @@ public sealed class DocxExporter
             }
         }
         return stream.ToArray();
+    }
+
+    private static void ValidateCodeAllocation(ExportContent content, CancellationToken cancellationToken)
+    {
+        var remaining = content.AllocationLimits.MaximumWordCodeElements;
+        void Reserve(int count)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            if (count > remaining) throw new IOException("Code formatting exceeds the Word export size limit. Export fewer or smaller code blocks.");
+            remaining -= count;
+        }
+        foreach (var code in content.Document.Syntax.Descendants<CodeBlock>())
+        {
+            if (code is Markdig.Extensions.Mathematics.MathBlock or FencedCodeBlock { Info: "mermaid" or "mmd" }) continue;
+            Reserve(3); // Paragraph, properties and style; charged across the whole document.
+            CodeSyntaxBlock? syntax = null;
+            content.CodeSyntax?.Blocks.TryGetValue(code, out syntax);
+            var previous = '\0';
+            foreach (var segment in CodeSyntaxRuns.Read(code.Lines.ToString(), syntax))
+            {
+                Reserve(segment.Role == CodeTokenRole.Plain ? 3 : 4); // Run, properties, font and optional colour.
+                foreach (var element in ReadCodeElements(segment.Text, previous, cancellationToken)) Reserve(1);
+                if (segment.Text.Length > 0) previous = segment.Text[^1];
+            }
+        }
+    }
+
+    private enum CodeElementKind { Text, Tab, Break }
+    private readonly record struct CodeElement(CodeElementKind Kind, int Start, int Length);
+
+    // The preflight and writer share delimiter handling, including CRLF split across colour runs.
+    private static IEnumerable<CodeElement> ReadCodeElements(string text, char previous, CancellationToken cancellationToken)
+    {
+        for (var start = 0; start < text.Length;)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var character = text[start];
+            if (character is '\r' or '\n' or '\t')
+            {
+                if (character == '\t') yield return new(CodeElementKind.Tab, start, 1);
+                else if (character != '\n' || previous != '\r') yield return new(CodeElementKind.Break, start, 1);
+                previous = character; start++; continue;
+            }
+            var end = start + 1;
+            while (end < text.Length && text[end] is not ('\r' or '\n' or '\t'))
+            {
+                if ((end & 4095) == 0) cancellationToken.ThrowIfCancellationRequested();
+                end++;
+            }
+            yield return new(CodeElementKind.Text, start, end - start);
+            previous = text[end - 1]; start = end;
+        }
     }
 
     private static IEnumerable<T> PartElements<T>(OpenXmlPart part, HashSet<OpenXmlPart> seen) where T : OpenXmlElement

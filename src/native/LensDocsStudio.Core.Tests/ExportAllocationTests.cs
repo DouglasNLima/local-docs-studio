@@ -2,6 +2,7 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
 using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 
@@ -87,6 +88,73 @@ public sealed class ExportAllocationTests
     {
         var content = Content("# Document") with { AllocationLimits = new(MaximumOutputBytes: 128) };
         Assert.Throws<IOException>(() => new DocxExporter().Export(content));
+    }
+
+    [Theory]
+    [InlineData("\t")]
+    [InlineData("x\t")]
+    [InlineData("x\n")]
+    public void Expanded_Word_code_is_rejected_before_template_processing_or_large_DOM_allocation(string unit)
+    {
+        var source = "```plain\n" + string.Concat(Enumerable.Repeat(unit, 131_072)) + "\n```";
+        var content = Content(source) with { AllocationLimits = new(MaximumOutputBytes: 32_768) };
+        // Warm the rejection path before measuring cumulative allocations, without constructing an oversized DOM.
+        Assert.Contains("Code formatting", Assert.Throws<IOException>(() => new DocxExporter().Export(content)).Message);
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        var error = Assert.Throws<IOException>(() => new DocxExporter().Export(content, [0x01]));
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+        Assert.Contains("Code formatting", error.Message);
+        Assert.True(allocated < 4 * 1024 * 1024, $"Rejected Word code allocated {allocated:N0} bytes.");
+        Assert.Equal(source, content.Document.Source);
+    }
+
+    [Fact]
+    public void Word_code_budget_accumulates_across_nested_blocks()
+    {
+        var block = "```plain\n" + new string('\t', 64) + "\n```";
+        var limits = new ExportAllocationLimits(MaximumWordCodeElements: 100);
+        Assert.NotEmpty(new DocxExporter().Export(Content(block) with { AllocationLimits = limits }));
+        var source = block + "\n\n> " + block.Replace("\n", "\n> ");
+        var content = Content(source) with { AllocationLimits = limits };
+        Assert.Equal(2, content.Document.Syntax.Descendants<CodeBlock>().Count());
+        Assert.Contains("Code formatting", Assert.Throws<IOException>(() => new DocxExporter().Export(content)).Message);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Word_code_budget_accepts_exact_actual_XML_boundary_and_rejects_one_element_less(bool highlighted)
+    {
+        var content = Content("```csharp\r\nCafé\tvalue\r\nこんにちは\r\n```");
+        var block = Assert.Single(content.Document.Syntax.Descendants<CodeBlock>());
+        var text = block.Lines.ToString();
+        if (highlighted) content = content with { CodeSyntax = new(new Dictionary<CodeBlock, CodeSyntaxBlock>
+        {
+            [block] = new(text, [new(0, text.IndexOf('\n'), CodeTokenRole.Keyword), new(text.IndexOf('\n'), 1, CodeTokenRole.Comment)])
+        }, false) };
+        var exporter = new DocxExporter();
+        using var ordinary = WordprocessingDocument.Open(new MemoryStream(exporter.Export(content)), false);
+        var expected = ordinary.MainDocumentPart!.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Single();
+        var count = expected.Descendants().Count() + 1;
+        var bounded = content with { AllocationLimits = new(MaximumWordCodeElements: count) };
+        using var word = WordprocessingDocument.Open(new MemoryStream(exporter.Export(bounded)), false);
+        Assert.Empty(new OpenXmlValidator().Validate(word));
+        Assert.Equal(expected.OuterXml, word.MainDocumentPart!.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Single().OuterXml);
+        var tooSmall = content with { AllocationLimits = new(MaximumWordCodeElements: count - 1) };
+        Assert.Contains("Code formatting", Assert.Throws<IOException>(() => exporter.Export(tooSmall)).Message);
+        Assert.Throws<OperationCanceledException>(() => exporter.Export(tooSmall, cancellationToken: new CancellationToken(true)));
+    }
+
+    [Fact]
+    public void Word_code_budget_does_not_charge_rendered_Mermaid_or_formula_text()
+    {
+        var content = Content("```mermaid\nflowchart LR\nA-->B\n```\n\n$$\nx^2\n$$") with { AllocationLimits = new(MaximumWordCodeElements: 1) };
+        var diagram = Assert.Single(content.Document.Syntax.Descendants<FencedCodeBlock>(), block => block.Info == "mermaid");
+        var formula = Assert.Single(DocumentMathematics.Read(content.Document.Syntax));
+        var image = new ExportImage(Png, 1, 1, "Rendered image");
+        content = content with { Diagrams = new Dictionary<int, ExportImage> { [diagram.Span.Start] = image },
+            Formulae = new Dictionary<int, ExportImage> { [formula.SourceStart] = image } };
+        Assert.NotEmpty(new DocxExporter().Export(content));
     }
 
     [Theory]

@@ -17,6 +17,17 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office")
+        {
+            // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
+                || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            {
+                Console.Error.WriteLine("Desktop and Office validation require a disposable GitHub-hosted Windows runner.");
+                return 1;
+            }
+        }
         if (args.FirstOrDefault() == "--ui")
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
         if (args.FirstOrDefault() == "--interrupted-save")

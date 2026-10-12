@@ -128,6 +128,8 @@ Word and PDF retain HTTP, HTTPS and email links, including angle-bracket URLs su
 
 Word, PDF, HTML and rich-copy code blocks retain syntax colours for supported languages and preserve indentation as editable or selectable text. Word keeps tabs and line breaks without adding an extra final blank line. Unknown languages and blocks that exceed the colouring limit retain complete plain text. Exported Docs Sites adapt code colours to the chosen theme, printing and high-contrast preferences.
 
+Word export also limits the combined formatting complexity of code blocks. If many tabs, line breaks or coloured sections exceed that limit, export stops before writing the destination and asks you to export fewer or smaller blocks. Your Markdown remains unchanged.
+
 Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
 
 **File → Import Markdown bundle** extracts supported documents and assets into a new folder. An optional artefact manifest supplies display metadata for this import session. **View → Artefact bundle** filters imported items by group, title/path and supplied evidence label. Labels are displayed as supplied: candidate findings remain candidate findings. Invalid metadata produces an import note while valid documents remain available.

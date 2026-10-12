@@ -1,6 +1,9 @@
 [CmdletBinding()]
 param([Parameter(Mandatory)][string]$Installer, [string]$UpgradeInstaller)
 $ErrorActionPreference = 'Stop'
+if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
+    throw 'Installer validation requires a disposable GitHub-hosted Windows runner.'
+}
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $Installer = (Resolve-Path -LiteralPath $Installer).Path
 if ($UpgradeInstaller) { $UpgradeInstaller = (Resolve-Path -LiteralPath $UpgradeInstaller).Path }

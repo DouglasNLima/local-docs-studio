@@ -1,5 +1,7 @@
 # Native update trust and packaging
 
+Desktop/Office validation commands and Test-NativeInstaller.ps1 refuse execution outside disposable GitHub-hosted Windows before processing arguments or paths. These operational checks prevent accidental local side effects; they are not an authorisation boundary. Six local refusal checks pass without changing environment markers, the clipboard, installations or certificate stores. Positive execution belongs to hosted CI.
+
 Status: internal preview implementation. Simulated preview upgrade validation passes. Production-signed updates, historical schema migration and SDK-free clean-machine certification remain outstanding.
 
 Confirmed signing configuration (12 October 2026): no Authenticode certificate, signing service, thumbprint or verified publisher has been established. Builds remain unsigned internal previews. Signing support must remain pluggable; no identity may be inferred or invented. Unsigned update execution remains blocked. This is the user's confirmed configuration, not a pending request for credentials.
