@@ -43,6 +43,8 @@ public sealed class DocumentPreview : FlowDocumentReader
         DefaultStyleKey = typeof(FlowDocumentReader);
         ViewingMode = FlowDocumentReaderViewingMode.Scroll;
         IsFindEnabled = false; IsPrintEnabled = false; IsTwoPageViewEnabled = false;
+        // Find keeps keyboard focus in the query box while revealing its preview match.
+        IsInactiveSelectionHighlightEnabled = true;
         Loaded += (_, _) => QueueFit();
         Unloaded += (_, _) => StopPagination();
         SizeChanged += (_, _) => QueueFit();

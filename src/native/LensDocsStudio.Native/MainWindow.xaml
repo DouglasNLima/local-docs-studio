@@ -211,7 +211,7 @@
      </StackPanel></DataTemplate></TabControl.ItemTemplate>
      <TabControl.ContentTemplate><DataTemplate><Grid Height="0"/></DataTemplate></TabControl.ContentTemplate>
     </TabControl>
-    <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8">
+    <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8" FocusManager.IsFocusScope="True">
      <WrapPanel>
       <TextBlock x:Name="FindContext" Text="Find in editor" VerticalAlignment="Center" Margin="0,0,8,0"/>
       <TextBox x:Name="FindText" Width="210" Padding="5" AutomationProperties.Name="Find text" KeyDown="FindKeyDown"/>

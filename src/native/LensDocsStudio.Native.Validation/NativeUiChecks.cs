@@ -734,6 +734,32 @@ internal static partial class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Code context validation did not restore the original source.");
                 checks.Add("Preview code exposes selectable syntax colours and context actions copy exact Unicode code and fenced Markdown through the Windows clipboard");
+                const string decorationMarkdown = "# PDF decoration workflow\n\nBeforePlain ~~Removed Café😀~~ AfterPlain. ==Marked== remains selectable.\n\n[==MarkedLink==](https://example.org/decorated)";
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                NativeUiClipboard.SetText(decorationMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
+                EditorContext("EditorContextPaste");
+                Wait(() => ReadEditorText(editor) == decorationMarkdown
+                    && Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("PDF decoration workflow", StringComparison.Ordinal),
+                    "The decoration export fixture did not retain source and a current native preview.");
+                window.CaptureToFile(Path.Combine(output, "native-pdf-decorations.png"));
+                Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
+                var decoratedPdf = Path.Combine(runRoot, "decorated-text.pdf"); SaveThroughDialogue(decoratedPdf, "Export PDF");
+                Wait(() => File.Exists(decoratedPdf) && Find(window, "Status").Name == "Exported decorated-text.pdf", "Decorated PDF export did not complete.");
+                using (var inspectedDecoration = UglyToad.PdfPig.PdfDocument.Open(decoratedPdf))
+                {
+                    var page = inspectedDecoration.GetPage(1); var words = page.GetWords().ToArray();
+                    if (!NativePdfDecorationChecks.Struck(page, words.Single(word => word.Text == "Removed"))
+                        || !NativePdfDecorationChecks.Highlighted(page, words.Single(word => word.Text == "Marked"))
+                        || !string.Concat(page.Letters.Select(letter => letter.Value)).Contains("Café😀", StringComparison.Ordinal)
+                        || !page.GetAnnotations().Select(annotation => annotation.Action).OfType<UglyToad.PdfPig.Actions.UriAction>()
+                            .Any(action => action.Uri == "https://example.org/decorated"))
+                        throw new IOException("The actual PDF export lost its visible decorations, selectable Unicode or working link.");
+                }
+                if (ReadEditorText(editor) != decorationMarkdown || File.ReadAllText(source) != codeSavedSource)
+                    throw new IOException("Decorated PDF export changed editor or saved source.");
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == contextOriginal, "Decorated export damaged complete insertion Undo.");
+                checks.Add("Native PDF Export retains actual strike-through/highlight geometry, selectable Unicode and hyperlinks while preserving source and complete Undo");
                 const string tableMarkdown = "# Excluded introduction\n\n| Other | Table |\n|---|---|\n| Excluded | row |\n\n" +
                     "| Selected | Value |\n|---|---|\n| Native table Café | =1+1 |\n| Identifier | 000123 |\n\nExcluded conclusion.";
                 var tableSavedSource = File.ReadAllText(source);

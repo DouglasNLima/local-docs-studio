@@ -7,17 +7,18 @@ using PdfSharp.Pdf.IO;
 
 namespace LensDocsStudio.Native.Exports;
 
-internal static partial class PdfUnicodeText
+internal static partial class PdfExportPostProcessing
 {
     // PDFsharp 6.2.4 writes supplementary code points as five/six hex digits in
     // ToUnicode ranges, instead of the required UTF-16BE surrogate pair.
     // Only process our bounded, freshly generated PDF; this is not a PDF importer.
-    public static byte[] PreserveSupplementaryCharacters(byte[] generated, long maximumBytes, CancellationToken cancellationToken)
+    public static byte[] Complete(byte[] generated, long maximumBytes, CancellationToken cancellationToken,
+        bool correctSupplementary, PdfTextDecorations? decorations)
     {
         using var input = new MemoryStream(generated, writable: false);
         using var pdf = PdfReader.Open(input, PdfDocumentOpenMode.Modify);
         var corrected = false;
-        foreach (var font in pdf.Internals.GetAllObjects().OfType<PdfDictionary>())
+        foreach (var font in correctSupplementary ? pdf.Internals.GetAllObjects().OfType<PdfDictionary>() : [])
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (font.Elements.GetName("/Type") != "/Font" || font.Elements.GetName("/Subtype") != "/Type0"
@@ -41,7 +42,8 @@ internal static partial class PdfUnicodeText
             map.Elements.SetInteger("/Length", stream.Value.Length);
             corrected = true;
         }
-        if (!corrected) return generated;
+        decorations?.Apply(pdf);
+        if (!corrected && decorations is null) return generated;
         cancellationToken.ThrowIfCancellationRequested();
         using var output = new BoundedExportStream(maximumBytes, cancellationToken);
         pdf.Save(output, false);

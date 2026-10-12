@@ -1,5 +1,6 @@
 using System.Text.Json;
 using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
@@ -43,6 +44,7 @@ internal static partial class NativeUiChecks
                     && range.GetBoundingRectangles().Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && preview.BoundingRectangle.Contains(rectangle)))
                     && !Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal);
             }, "Preview Find did not expose its exact final target inside the native page.");
+            CheckVisiblePreviewSelection(window, output, marker);
             window.CaptureToFile(Path.Combine(output, "native-paginated-preview-search.png"));
             Find(window, "CloseFind").Click();
             Layout("Editor"); FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
@@ -71,5 +73,44 @@ internal static partial class NativeUiChecks
                 "The reading-mode settings dialogue did not close.");
             if (Read().Preview?.ReadingMode != mode) throw new IOException("The selected reading mode was not saved.");
         }
+    }
+
+    private static void CheckVisiblePreviewSelection(Window window, string output, string marker)
+    {
+        var query = Find(window, "FindText"); query.Focus();
+        Wait(() => query.Properties.HasKeyboardFocus.Value, "Find did not retain keyboard focus in its query box.");
+        var range = Find(window, "DocumentPreview").Patterns.Text.Pattern.GetSelection()
+            .Single(range => range.GetText(-1).EndsWith(marker, StringComparison.Ordinal));
+        var bounds = range.GetBoundingRectangles().First(rectangle => rectangle.Width > 0 && rectangle.Height > 0);
+        var windowBounds = window.BoundingRectangle;
+        var region = System.Drawing.Rectangle.FromLTRB(bounds.Left - windowBounds.Left, bounds.Top - windowBounds.Top,
+            bounds.Right - windowBounds.Left, bounds.Bottom - windowBounds.Top);
+        // Native paint follows the focus notification; never focus the preview to make this pass.
+        Thread.Sleep(150);
+        using var selected = window.Capture();
+        var collapsed = range.Clone();
+        collapsed.MoveEndpointByRange(TextPatternRangeEndpoint.End, collapsed, TextPatternRangeEndpoint.Start);
+        collapsed.Select();
+        var changedPixels = 0;
+        try
+        {
+            Wait(() =>
+            {
+                using var plain = window.Capture(); changedPixels = 0;
+                for (var y = region.Top; y < region.Bottom; y++)
+                for (var x = region.Left; x < region.Right; x++)
+                {
+                    var left = selected.GetPixel(x, y); var right = plain.GetPixel(x, y);
+                    if (Math.Abs(left.R - right.R) + Math.Abs(left.G - right.G) + Math.Abs(left.B - right.B) > 6) changedPixels++;
+                }
+                return changedPixels > region.Width * region.Height / 5;
+            }, "The preview Find range has no visible highlight while the query retains keyboard focus.");
+            if (!query.Properties.HasKeyboardFocus.Value) throw new IOException("Checking preview selection moved focus away from Find.");
+        }
+        finally { range.Select(); }
+        Thread.Sleep(150);
+        File.WriteAllText(Path.Combine(output, "native-preview-selection.json"), JsonSerializer.Serialize(new
+        { passed = true, marker, bounds, changedPixels, focusRemainsInQuery = query.Properties.HasKeyboardFocus.Value },
+            new JsonSerializerOptions { WriteIndented = true }));
     }
 }

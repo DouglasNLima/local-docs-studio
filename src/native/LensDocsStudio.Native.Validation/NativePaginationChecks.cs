@@ -67,7 +67,11 @@ internal static class NativePaginationChecks
             var rectangle = target.GetCharacterRect(LogicalDirection.Forward);
             if (rectangle.IsEmpty || rectangle.Top < 0 || rectangle.Bottom > viewer.ActualHeight)
                 throw new IOException("The selected paginated target is outside the visible page: " + rectangle);
+            Pump(); Layout(viewer);
             Save(viewer, Path.Combine(output, "native-paginated-last-page.png"));
+            if (!viewer.IsInactiveSelectionHighlightEnabled) throw new IOException("Find selection highlighting is disabled when the reader loses focus.");
+            // WPF requires a previously focused text selection to render this highlight.
+            // Its actual pixels are checked by the isolated desktop workflow, not this unfocused HWND.
             var checks = new List<string> { "Long documents use native pages while retaining all 4,000 items",
                 "Asynchronous final-page navigation exposes the exact selectable target" };
 

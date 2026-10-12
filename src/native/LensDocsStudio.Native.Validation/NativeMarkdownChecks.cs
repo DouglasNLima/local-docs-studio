@@ -75,20 +75,26 @@ internal static class NativeMarkdownChecks
         File.WriteAllBytes(Path.Combine(output, "native-semantics.docx"), new DocxExporter().Export(content));
         using var inspected = UglyToad.PdfPig.PdfDocument.Open(pdf);
         var words = string.Join(" ", inspected.GetPages().SelectMany(p => p.GetWords()).Select(w => w.Text));
-        foreach (var expected in new[] { "Warning", "Before publishing", "7. Item seven", "0. Item zero", "~~Withdrawn~~", "Soft first soft second.",
+        foreach (var expected in new[] { "Warning", "Before publishing", "7. Item seven", "0. Item zero", "Withdrawn", "Soft first soft second.",
             "Ready & reviewed", "Ctrl + K", "F1", "Entities: A < B & C ©." })
             if (!words.Contains(expected, StringComparison.Ordinal)) throw new IOException("The PDF lost semantic fixture content: " + expected);
+        var emphasisPage = inspected.GetPages().Single(page => page.GetWords().Any(word => word.Text == "Withdrawn"));
+        var marked = emphasisPage.GetWords().Single(word => word.Text.TrimEnd('.') == "Marked");
+        var markedText = new UglyToad.PdfPig.Content.Word(marked.Letters.Take("Marked".Length).ToArray());
+        if (!NativePdfDecorationChecks.Struck(emphasisPage, emphasisPage.GetWords().Single(word => word.Text == "Withdrawn"))
+            || !NativePdfDecorationChecks.Highlighted(emphasisPage, markedText))
+            throw new IOException("The semantic PDF lost its actual strike-through or highlight geometry.");
         File.WriteAllText(Path.Combine(output, "native-semantics.json"), JsonSerializer.Serialize(new
         {
             Passed = true,
             Checks = new[] { "Callouts retain kind, formatted body and source mapping", "Ordered lists retain seven and zero starting values",
                 "Table columns retain left, centre and right alignment", "Independent emphasis retains strike, scripts, insertion and highlight",
                 "Soft and hard line breaks remain distinct", "Light and dark native pages render to actual images",
-                "PDF retains callout labels, ordered starts, soft lines and explicit deletion markers",
+                "PDF retains callout labels, ordered starts, soft lines and actual deletion/highlight geometry",
                 "Status badges retain selectable decoded text, neutral styling and source mapping",
                 "Keyboard shortcuts retain selectable text and monospace styling", "Preview and PDF retain decoded HTML entities and passive labels",
                 "Front matter stays separate from body text without changing source positions" },
-            PdfLimitation = "MigraDoc has no strikeout font property; PDF retains visible Markdown deletion markers. PDF highlight shading is not yet implemented.",
+            PdfDecorations = "Selectable deletion and highlight text retain visible native PDF decoration geometry.",
             PdfText = words
         }, new JsonSerializerOptions { WriteIndented = true }));
     }

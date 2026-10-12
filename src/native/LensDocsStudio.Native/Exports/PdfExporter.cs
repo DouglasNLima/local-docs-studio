@@ -19,6 +19,7 @@ public sealed class PdfExporter
         content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
         var codeSyntax = content.CodeSyntax ?? CodeSyntaxService.Prepare(content.Document, cancellationToken);
         var fonts = new PdfFontFallback(cancellationToken);
+        var decorations = new PdfTextDecorations(cancellationToken);
         var imageSources = new Dictionary<byte[], string>(ReferenceEqualityComparer.Instance);
         var document = new Document();
         document.Info.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";
@@ -54,8 +55,9 @@ public sealed class PdfExporter
         using var output = new BoundedExportStream(content.AllocationLimits.MaximumOutputBytes, cancellationToken);
         renderer.PdfDocument.Save(output, false);
         var bytes = output.ToArray();
-        return fonts.HasSupplementaryCharacters
-            ? PdfUnicodeText.PreserveSupplementaryCharacters(bytes, content.AllocationLimits.MaximumOutputBytes, cancellationToken)
+        return fonts.HasSupplementaryCharacters || decorations.HasDecorations
+            ? PdfExportPostProcessing.Complete(bytes, content.AllocationLimits.MaximumOutputBytes, cancellationToken,
+                fonts.HasSupplementaryCharacters, decorations.HasDecorations ? decorations : null)
             : bytes;
 
         void Append(DocumentElements elements, MdBlock block, string? marker = null)
@@ -170,7 +172,7 @@ public sealed class PdfExporter
                 start = end;
             }
         }
-        void Inlines(ParagraphElements elements, ContainerInline? container)
+        void Inlines(ParagraphElements elements, ContainerInline? container, MarkdownEmphasis inherited = MarkdownEmphasis.None, PdfTextLink? destination = null)
         {
             if (container is null) return;
             foreach (var inline in container)
@@ -179,35 +181,35 @@ public sealed class PdfExporter
                 switch (inline)
                 {
                     case Markdig.Extensions.Mathematics.MathInline formula:
-                        if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(elements, formulaImage);
-                        else fonts.AddText(elements, formula.Content.ToString()); break;
+                        if (content.Formulae.TryGetValue(formula.Span.Start, out var formulaImage)) AddImage(Target(), formulaImage);
+                        else fonts.AddText(Target(), formula.Content.ToString()); break;
                     case DocumentAnchorInline anchor:
-                        elements.AddBookmark(bookmarks[anchor.Id]); fonts.AddText(elements, anchor.Text); break;
+                        elements.AddBookmark(bookmarks[anchor.Id]); fonts.AddText(Target(), anchor.Text); break;
                     case DocumentSemanticInline semantic:
-                        var semanticText = elements.AddFormattedText();
+                        var semanticText = Target().AddFormattedText();
                         if (semantic.Kind == DocumentInlineKind.StatusBadge) semanticText.Bold = true;
                         else semanticText.Font.Name = "Consolas";
                         fonts.AddText(semanticText.Elements, semantic.Text, semantic.Kind == DocumentInlineKind.StatusBadge ? "Segoe UI" : "Consolas");
                         break;
-                    case LiteralInline literal: fonts.AddText(elements, literal.Content.ToString()); break;
+                    case LiteralInline literal: fonts.AddText(Target(), literal.Content.ToString()); break;
                     case AutolinkInline auto:
                         if (MarkdownLinks.ExternalUri(MarkdownLinks.AutolinkReference(auto)) is { } autoUri)
-                            fonts.AddText(elements.AddHyperlink(autoUri.AbsoluteUri, HyperlinkType.Url).Elements, auto.Url);
-                        else fonts.AddText(elements, auto.Url);
+                            fonts.AddText(decorations.Target(elements, inherited, new(autoUri.AbsoluteUri)), auto.Url);
+                        else fonts.AddText(Target(), auto.Url);
                         break;
-                    case HtmlEntityInline entity: fonts.AddText(elements, entity.Transcoded.ToString()); break;
+                    case HtmlEntityInline entity: fonts.AddText(Target(), entity.Transcoded.ToString()); break;
                     case CodeInline code:
-                        var inlineCode = elements.AddFormattedText(); inlineCode.Font.Name = "Consolas";
+                        var inlineCode = Target().AddFormattedText(); inlineCode.Font.Name = "Consolas";
                         fonts.AddText(inlineCode.Elements, code.Content, "Consolas"); break;
-                    case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else elements.AddText(" "); break;
-                    case Markdig.Extensions.TaskLists.TaskList task: fonts.AddText(elements, task.Checked ? "☑ " : "☐ "); break;
+                    case LineBreakInline line: if (line.IsHard) elements.AddLineBreak(); else Target().AddText(" "); break;
+                    case Markdig.Extensions.TaskLists.TaskList task: fonts.AddText(Target(), task.Checked ? "☑ " : "☐ "); break;
                     case LinkInline { IsImage: true } link:
                         if (!content.Images.TryGetValue(link.Url ?? "", out var image)) throw new InvalidDataException("An image could not be exported.");
-                        AddImage(elements, image); break;
+                        AddImage(Target(), image); break;
                     case LinkInline link when link.Url?.StartsWith('#') == true && bookmarks.TryGetValue(Uri.UnescapeDataString(link.Url[1..]), out var bookmark):
-                        Inlines(elements.AddHyperlink(bookmark).Elements, link); break;
+                        Inlines(elements, link, inherited, new(bookmark, Bookmark: true)); break;
                     case LinkInline link when MarkdownLinks.ExternalUri(link.Url) is { } externalUri:
-                        Inlines(elements.AddHyperlink(externalUri.AbsoluteUri, HyperlinkType.Url).Elements, link); break;
+                        Inlines(elements, link, inherited, new(externalUri.AbsoluteUri)); break;
                     case EmphasisInline emphasis:
                         var formatted = elements.AddFormattedText();
                         var formatting = MarkdownFormatting.Emphasis(emphasis);
@@ -216,15 +218,13 @@ public sealed class PdfExporter
                         if (formatting.HasFlag(MarkdownEmphasis.Underline)) formatted.Underline = Underline.Single;
                         if (formatting.HasFlag(MarkdownEmphasis.Subscript)) formatted.Subscript = true;
                         if (formatting.HasFlag(MarkdownEmphasis.Superscript)) formatted.Superscript = true;
-                        // MigraDoc has no strikeout font property; keep explicit Markdown deletion markers in PDF output.
-                        if (formatting.HasFlag(MarkdownEmphasis.Strike)) formatted.AddText("~~");
-                        Inlines(formatted.Elements, emphasis);
-                        if (formatting.HasFlag(MarkdownEmphasis.Strike)) formatted.AddText("~~");
+                        Inlines(formatted.Elements, emphasis, inherited | formatting, destination);
                         break;
-                    case HtmlInline html: fonts.AddText(elements, html.Tag); break;
-                    case ContainerInline nested: Inlines(elements, nested); break;
+                    case HtmlInline html: fonts.AddText(Target(), html.Tag); break;
+                    case ContainerInline nested: Inlines(elements, nested, inherited, destination); break;
                 }
             }
+            ParagraphElements Target() => decorations.Target(elements, inherited, destination);
         }
         PdfParagraph TextParagraph(DocumentElements elements, string text)
         {

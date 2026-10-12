@@ -1,8 +1,10 @@
 # Native implementation progress
 
-The first pagination CI runs (640b999) exposed a visible page counter missing from UIA control view. The captured app had reached page 2 correctly. The counter is now a native Label with a bound accessible name; a focused assertion fails before and passes after this correction. Native build/core/integration/export-browser checks and both web runs pass at 640b999, but corrected desktop and installer checks await the follow-up run. Full failure logs and the screenshot are retained.
+PDF strike-through and neutral highlighting now retain selectable text across nested emphasis, code, Unicode, links, tables, wrapped lines and pages. Six focused outcomes pass, including 250 deleted spans with 250 wrapped continuations and 250 highlights across 17 pages; first/last pages were inspected. Local Release has zero warnings/errors, all 800 core tests pass, the complete native harness has 40 diagram cases and zero failures, and static checks pass. The expanded 58-workflow desktop suite adds actual PDF Export-menu verification and awaits CI.
 
-Automatic native pagination now addresses the long-document initial-layout stall. Users can choose Continuous or Pages; distant preview navigation preserves exact selection and ignores obsolete requests. Page-sized media retain original images/vector/source and all diagram actions. The existing TextPattern is preserved by a native automation peer. Local Release, 800 core tests, seven pagination outcomes, the full native harness and static checks pass. A 57th real desktop workflow and reading-mode restart checks are added for isolated Windows CI; those runs are pending.
+Inspection of the successful pagination screenshot exposed an invisible Find selection while the search controls held focus. The reader now enables inactive selection, uses the theme accent and retains logical preview focus through a separate Find focus scope. The desktop test compares actual pixels in the selected range with a collapsed selection while keyboard focus stays in Find. This visual assertion awaits CI; unfocused hidden HWNDs cannot establish WPF selection painting.
+
+All four f981943 CI runs pass: native PR/push 38240160401/38240154616 and web PR/push 38240160524/38240154545. Each native run passes 800 core tests, seven signature cases, seven combined update cases, 12 export-browser cases and 57 workflows in built, installed, upgraded and reinstalled apps. Downloaded push evidence confirms preview.177 lifecycle success, 20 preserved state files and certificate cleanup; both package versions match their SHA-256 records.
 
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
 
@@ -15,10 +17,10 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Automatic native pagination, asynchronous distant navigation, page-sized media, preserved text automation and portable reading preferences |
-| Latest complete native CI | 230852b, PR/push 38230558112/38230551640: 791 core tests, seven signature cases, seven combined signed-update cases, 12 export-browser cases and 56 workflows in built, installed, upgraded and reinstalled applications |
-| Latest complete web CI | Both 230852b runs 38230558094/38230551635: all 262 cases in 10.7 minutes |
-| Current validation | Pagination passes Release with no warnings/errors, 800 core tests, seven focused outcomes, the full 40-case native corpus with zero failures and static checks. The expanded 57-workflow actual desktop suite awaits CI; the completed PDF revision passes 56 workflows in every desktop context |
+| Latest implementation | PDF strike-through/highlighting and visible Find selection; native pagination and reading preferences already pass complete CI |
+| Latest complete native CI | f981943, PR/push 38240160401/38240154616: 800 core tests, seven signature cases, seven combined update cases, 12 export-browser cases and 57 workflows in all four desktop contexts |
+| Latest complete web CI | Both f981943 runs 38240160524/38240154545 pass |
+| Current validation | Release, 800 core tests, six PDF decoration outcomes, seven pagination outcomes, complete native harness and static checks pass locally. The new 58-workflow desktop suite awaits CI |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -34,7 +36,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Continue the acceptance areas below using the validated 230852b preview; see [engineering handover](engineering-handover.md). Both native and web runs pass. Downloaded current evidence confirms Unicode export, 20 preserved state files and certificate cleanup. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Continue the acceptance areas below using the validated f981943 preview; see [engineering handover](engineering-handover.md). Both native and web runs pass. Downloaded current evidence confirms Unicode export, 20 preserved state files and certificate cleanup. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.
