@@ -2,7 +2,15 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest completed CI: cfe11e5
+## Latest verified native PR: 56502e3
+
+Native PR 38307579534, native push 38307575579 attempt 2 and web PR/push 38307579564/38307575323 pass. Both web logs record 262 passing cases on their first attempts. Downloaded preview.232 evidence matches exact clean PR merge `6fe047ecd37c80870badf08ea55f0fd2ef372196`, captured from GitHub for head `56502e3c3734a541236d370fb439f97581246310`. All four installer/ZIP hashes, unsigned metadata and runtime files pass independent read-only verification. No downloaded installer was executed locally.
+
+All 839 core tests, the 40-case diagram/export corpus, four 62-check desktop contexts, five wizard outcomes, four files-in-use assertions, 20 preserved lifecycle state files, restored sessions and test-certificate cleanup pass. The new runtime records show matching application executable paths and exactly one loaded `coreclr.dll` and `wpfgfx_cor3.dll` in every context. Installed/upgraded/reinstalled applications load both modules from their installation directory. The built-app context correctly records its framework runtime. `artifacts/native/ci-56502e3-pr/runtime-evidence-review.json` and `package-verification.json` retain the verification. This does not certify SDK-free Windows.
+
+Native push 38307575579 attempt 1 passed 11 exported-site tests but failed one while taking `native-site-light.png`: Chromium closed after 49 successful assertions, before the remaining assertions ran. The original log, trace and `failure-review.json` remain under `artifacts/native/ci-56502e3-push-failure`. Attempt 2 passes with source and assertions unchanged. No underlying browser-crash cause is established. The subsequent PDF correction below awaits its own CI.
+
+## Previous completed CI: cfe11e5
 
 All four runs pass: native PR 38304292939, native push 38304289265 attempt 2 and web PR/push 38304296486/38304289262. The initial push UIA acquisition failure is retained below. Downloaded PR evidence is under artifacts/native/ci-cfe11e5-pr. The clean package revision f1590a455cdb2e3ca0b31622ff5dd12c184fc334 matches the GitHub PR merge revision for head cfe11e5; evidence-review.json, source-verification.json and package-verification.json retain the checks below.
 
@@ -59,7 +67,7 @@ Release has zero warnings/errors, all 839 core tests pass (`artifacts/native/pdf
 
 ## Subsequent runtime and diagnostic work
 
-A loaded-runtime check is compiled but has not run in hosted CI. It captures the actual application executable and coreclr.dll/wpfgfx_cor3.dll module paths after editor/diagram readiness. Test-NativeInstaller.ps1 explicitly requires both loaded modules to belong to the installation directory. The normal built-app context records its framework runtime. Each context saves native-ui-runtime.json before any failed assertion. Release has zero warnings/errors, static/script checks pass and the new option still refuses local desktop execution. This does not claim that the hosted runner lacks an SDK.
+The loaded-runtime check now passes in the 56502e3 native PR as recorded above. It captures the actual application executable and coreclr.dll/wpfgfx_cor3.dll module paths after editor/diagram readiness. Test-NativeInstaller.ps1 explicitly requires both loaded modules to belong to the installation directory. The normal built-app context records its framework runtime. Each context saves native-ui-runtime.json before any failed assertion. Release has zero warnings/errors, static/script checks pass and the new option still refuses local desktop execution. This does not claim that the hosted runner lacks an SDK.
 
 Three unchanged local processes ran hidden-HWND layout checks for the unresolved latency concern. All twelve table/quote/details/list cases pass exact content/source and the unchanged 250 ms input bound; maximum gap is 89.58 ms. Details component initialisation ranges from 10.77 to 15.67 ms. Samples and analysis.json are in artifacts/native/construction-cfe11e5. These do not reproduce the earlier pauses or establish a cause or fix.
 

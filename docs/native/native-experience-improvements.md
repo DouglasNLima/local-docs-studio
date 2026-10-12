@@ -2,7 +2,7 @@
 
 PDF export preserves the hierarchy of nested lists and no longer repeats a number or bullet before each continuation paragraph. Wrapped text stays aligned with its item across page breaks; wide numbers have enough space, and images/tables fit the item width. Five actual-PDF regression groups and the full local native harness pass; all seven generated pages were visually inspected. Hosted validation of this change is pending.
 
-The next installation check verifies that the running installed application uses its bundled .NET and WPF graphics modules after opening the editor and diagram preview. Build/static checks and local refusal pass; actual hosted outcomes are pending. This strengthens evidence for normal execution without development tools while keeping clean-machine certification explicitly separate.
+The installation runtime check passes in native PR 38307579534: installed, upgraded and reinstalled applications use their bundled .NET and WPF graphics modules after opening the editor and diagram preview. All four desktop contexts pass 62 workflows; downloaded preview.232 packages and runtime reports are verified. This strengthens evidence for normal execution without development tools while keeping SDK-free clean-machine certification explicitly separate. The subsequent PDF correction awaits its own hosted validation.
 
 Diagram Copy image passes actual hosted keyboard activation at 175%/35% zoom in the built, installed, upgraded and reinstalled applications. All eight copies retain the same 471 × 149 pixels, survive closing the drawing window and preserve edited/saved source. The reinstalled PNG was inspected. Native PR cfe11e5 passes 61 workflows in each context; external Office/Azure DevOps destinations remain separate.
 
