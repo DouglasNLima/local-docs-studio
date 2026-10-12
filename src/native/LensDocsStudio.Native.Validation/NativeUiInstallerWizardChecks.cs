@@ -150,6 +150,8 @@ internal static partial class NativeUiChecks
                 }
                 wizard = null; wizardProcess.Dispose(); wizardProcess = null; launcher.Dispose(); launcher = null;
             }
+            CheckInstallerInUse(installer, destination, source, root, automation, startShortcut, desktopShortcut);
+            checks.Add("An installed application with an unsaved draft blocks Setup; cancelling preserves the live draft, source and installed payload");
             if (!File.ReadAllBytes(source).AsSpan().SequenceEqual(sourceBytes) || RegistrySnapshot(LegacyUninstallKey) != legacyBefore)
                 throw new IOException("The wizard changed workspace source or the existing shell registration.");
             checks.Add("Workspace bytes and the legacy product registration remain unchanged");

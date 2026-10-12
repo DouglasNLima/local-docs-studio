@@ -1,5 +1,7 @@
 # Native experience improvements
 
+A new installer validation scenario checks preservation of work when Setup is started while the installed application holds an unsaved draft. Cancellation must leave the application alive, retain exact draft/source/recovery data and leave all installed files, shortcuts and registration unchanged. This adds evidence coverage for existing behaviour; its actual GUI result still awaits CI.
+
 Opening a large collapsed section no longer attaches each paragraph separately to the visible document. Its complete body moves as one native section and retains typography while detached. The reproduced 1,200-paragraph expansion delay was 2.2 seconds; 18 local light/dark transitions now remain below 149 ms while preserving complete content, bold/italic/link formatting and source. These bounded observations cover expansion/collapse, not all pagination or the separate intermittent initial-toggle delay; CI validation is pending.
 
 Actual Edit source testing reproduced replacement of a previous selection when typing at the new location. Source navigation now collapses selection at the target, so returning to code cannot leave an unrelated range selected. Corrected desktop validation passes in all four contexts of both df281c0 native runs, retaining the original regression assertion and earlier failure evidence.
