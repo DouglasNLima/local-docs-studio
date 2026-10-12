@@ -2,17 +2,17 @@
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
-The allocation correction at 54b1392 passes all four CI runs: 749 core tests, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Subsequent visual inspection found missing sequence activation bars, unreadable inherited labels on custom node fills and transparent diagram backgrounds. The current correction addresses those cases, preserves authored source/explicit colours and exposes unsupported activation forms. All 766 core tests, six focused native colour/background cases and the complete native harness pass locally; diagram correction CI is pending. See the [diagram compatibility report](diagram-compatibility.md).
+The allocation and diagram corrections pass all four a827668 CI runs: 766 core tests, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Corrected sequence activation bars, inherited label contrast and declared backgrounds have inspected native output; see the [diagram compatibility report](diagram-compatibility.md). The current change adds CI-only Windows signature verification using a disposable certificate. Its seven intended boundary checks compile; PowerShell parsing, static checks and the local-host refusal guard pass. Certificate actions await isolated CI execution.
 
 | Reference | Current value |
 |---|---|
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Diagram inherited-label contrast, declared background pixels and source-preserving sequence activation adaptation |
-| Latest complete native CI | 54b1392, PR/push 38211131177/38211127394: 749 core tests and 55 workflows in built, installed and reinstalled applications |
-| Latest complete web CI | Both 54b1392 runs 38211131195/38211127392: all 262 cases |
-| Current validation | Clean Release build, 766 core tests, six focused diagram cases and full native integration pass locally; diagram correction CI pending |
+| Latest implementation | CI-only disposable-certificate checks for the actual Windows verifier and publisher pinning |
+| Latest complete native CI | a827668, PR/push 38212823013/38212818771: 766 core tests and 55 workflows in built, installed and reinstalled applications |
+| Latest complete web CI | Both a827668 runs 38212822923/38212818765: all 262 cases |
+| Current validation | Clean Release build, PowerShell parsing, 50-module static checks and local-host refusal guard pass; actual certificate checks await isolated CI |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Complete Windows CI for the diagram compatibility correction and inspect its native/installed evidence.
+1. Execute the seven Windows trust checks in isolated CI, inspect certificate cleanup and correct any failure. No local certificate-store mutation is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.
