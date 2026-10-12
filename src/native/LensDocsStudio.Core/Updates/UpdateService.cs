@@ -68,6 +68,7 @@ public sealed class UpdateService(UpdateTransport transport, UpdatePolicy policy
             }
             var result = new DownloadedUpdate(path, candidate);
             await VerifyAsync(result, environment, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             return result;
         }
         catch { if (File.Exists(path)) File.Delete(path); throw; }
@@ -82,6 +83,8 @@ public sealed class UpdateService(UpdateTransport transport, UpdatePolicy policy
         var hash = await SHA256.HashDataAsync(file, cancellationToken);
         if (!CryptographicOperations.FixedTimeEquals(hash, Convert.FromHexString(candidate.Manifest.Sha256))) throw new IOException("The installer checksum does not match its signed manifest.");
         await installerTrust.VerifyAsync(update.Path, policy.Trust.Publishers, cancellationToken);
+        // A completed external trust check cannot override a cancellation requested while it ran.
+        cancellationToken.ThrowIfCancellationRequested();
     }
     private UpdateCandidate Revalidate(UpdateCandidate candidate, UpdateEnvironment environment)
     {

@@ -12,7 +12,7 @@ namespace LensDocsStudio.Native.ViewModels;
 public partial class UpdatesViewModel : ObservableObject, IDisposable
 {
     private readonly WorkspaceViewModel workspace;
-    private readonly UpdateTransport transport = new();
+    private readonly UpdateTransport? transport;
     private readonly UpdateService service;
     private readonly Func<DownloadedUpdate, UpdateEnvironment, Task> install;
     private readonly DispatcherTimer timer = new() { Interval = TimeSpan.FromSeconds(10) };
@@ -36,16 +36,26 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
     public event Action<string>? UpdateAvailable;
     public UpdateEnvironment Environment => new(CurrentVersion, Channel, RuntimeInformation.ProcessArchitecture.ToString().ToLowerInvariant(), System.Environment.OSVersion.Version);
 
-    public UpdatesViewModel(WorkspaceViewModel workspace, Func<DownloadedUpdate, UpdateEnvironment, Task> install)
+    public UpdatesViewModel(WorkspaceViewModel workspace, Func<DownloadedUpdate, UpdateEnvironment, Task> install, UpdateService? updateService = null)
     {
         this.workspace = workspace; this.install = install;
         automaticChecks = workspace.Preferences.AutomaticUpdateChecks; channel = workspace.Preferences.UpdateChannel is "Preview" ? "Preview" : "Stable";
-        service = new(transport, new(UpdateTrustConfiguration.Embedded()), new AuthenticodeVerifier());
+        // An injected service remains owned by its composer; the default uses embedded production trust.
+        if (updateService is null)
+        {
+            transport = new();
+            service = new(transport, new(UpdateTrustConfiguration.Embedded()), new AuthenticodeVerifier());
+        }
+        else service = updateService;
         timer.Tick += async (_, _) => { timer.Interval = TimeSpan.FromHours(1); await CheckAsync(false); };
         timer.Start();
     }
     partial void OnAutomaticChecksChanged(bool value) => _ = SaveSettingsAsync();
-    partial void OnChannelChanged(string value) { Candidate = null; Downloaded = null; _ = SaveSettingsAsync(); }
+    partial void OnChannelChanged(string value)
+    {
+        // Changing away and back still abandons the old operation and its selection.
+        operation?.Cancel(); Candidate = null; Downloaded = null; _ = SaveSettingsAsync();
+    }
     partial void OnIsBusyChanged(bool value) => RefreshCommands();
     partial void OnCandidateChanged(UpdateCandidate? value)
     {
@@ -70,10 +80,11 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
         await RunAsync(async token =>
         {
             Status = "Checking for compatible native updates…";
+            var checkEnvironment = Environment;
             // Record the attempt even on network failure; automatic retries must not poll aggressively.
             await workspace.UpdatePreferencesAsync(p => p with { LastUpdateCheck = DateTimeOffset.UtcNow });
-            var checkEnvironment = Environment;
             var result = await service.CheckAsync(checkEnvironment, token);
+            token.ThrowIfCancellationRequested();
             if (Channel != checkEnvironment.Channel) return;
             Candidate = result; Downloaded = null;
             Status = result is null ? "No newer compatible native release was found." : result.Trusted ? "A verified native update is available." : "A compatible internal release is available for review. In-app installation requires configured signing identities.";
@@ -82,16 +93,23 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
     }
     [RelayCommand(CanExecute = nameof(CanDownload))] private Task DownloadAsync() => RunAsync(async token =>
     {
-        if (Candidate is null) return;
+        var selected = Candidate; var environment = Environment;
+        if (selected is null) return;
         Status = "Downloading the selected update…"; Progress = 0;
-        Downloaded = await service.DownloadAsync(Candidate, Environment, Path.Combine(workspace.StateDirectory, "update-cache"), new Progress<double>(value => Progress = value * 100), token);
+        var downloaded = await service.DownloadAsync(selected, environment, Path.Combine(workspace.StateDirectory, "update-cache"), new Progress<double>(value => Progress = value * 100), token);
+        token.ThrowIfCancellationRequested();
+        if (!ReferenceEquals(Candidate, selected) || Environment != environment) throw new OperationCanceledException(token);
+        Downloaded = downloaded;
         Status = "Download and publisher verified. Choose Install when you are ready to close this workspace.";
     });
     [RelayCommand(CanExecute = nameof(CanInstall))] private Task InstallAsync() => RunAsync(async token =>
     {
-        if (Downloaded is null) return;
-        await service.VerifyAsync(Downloaded, Environment, token);
-        await install(Downloaded, Environment);
+        var selected = Downloaded; var environment = Environment;
+        if (selected is null) return;
+        await service.VerifyAsync(selected, environment, token);
+        token.ThrowIfCancellationRequested();
+        if (!ReferenceEquals(Downloaded, selected) || Environment != environment) throw new OperationCanceledException(token);
+        await install(selected, environment);
     });
     [RelayCommand(CanExecute = nameof(CanOpenRelease))] private async Task IgnoreAsync()
     {
@@ -112,5 +130,5 @@ public partial class UpdatesViewModel : ObservableObject, IDisposable
         catch (Exception ex) when (ex is not OutOfMemoryException) { Status = ex.Message; }
         finally { operation.Dispose(); operation = null; IsBusy = false; }
     }
-    public void Dispose() { timer.Stop(); operation?.Cancel(); transport.Dispose(); }
+    public void Dispose() { timer.Stop(); operation?.Cancel(); transport?.Dispose(); }
 }

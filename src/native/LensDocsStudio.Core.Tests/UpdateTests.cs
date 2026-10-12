@@ -84,6 +84,29 @@ public sealed class UpdateTests : IDisposable
         Assert.Empty(Directory.EnumerateFiles(root, "*.exe", SearchOption.AllDirectories));
     }
     [Fact]
+    public async Task Cancellation_during_signature_verification_discards_the_download()
+    {
+        using var cancellation = new CancellationTokenSource();
+        using var transport = new UpdateTransport(new FakeHandler(installer));
+        var trust = new FakeTrust { AfterVerify = cancellation.Cancel };
+        var service = new UpdateService(transport, Policy, trust);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.DownloadAsync(Evaluate(Manifest)!, environment, root, cancellationToken: cancellation.Token));
+        Assert.Equal(1, trust.Checks);
+        Assert.Empty(Directory.EnumerateFiles(root, "*.exe", SearchOption.AllDirectories));
+    }
+    [Fact]
+    public async Task Cancellation_at_final_verification_does_not_accept_the_cached_installer()
+    {
+        using var cancellation = new CancellationTokenSource();
+        using var transport = new UpdateTransport(new FakeHandler(installer));
+        var trust = new FakeTrust(); var service = new UpdateService(transport, Policy, trust);
+        var downloaded = await service.DownloadAsync(Evaluate(Manifest)!, environment, root);
+        trust.AfterVerify = cancellation.Cancel;
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => service.VerifyAsync(downloaded, environment, cancellation.Token));
+        Assert.Equal(2, trust.Checks);
+        Assert.Equal(installer, await File.ReadAllBytesAsync(downloaded.Path));
+    }
+    [Fact]
     public async Task Redirects_to_unrelated_hosts_are_rejected()
     {
         using var transport = new UpdateTransport(new FakeHandler(installer) { Redirect = new Uri("https://example.com/installer.exe") });
@@ -109,8 +132,9 @@ public sealed class UpdateTests : IDisposable
     private sealed class FakeTrust : IInstallerTrustVerifier
     {
         public bool Reject { get; init; } public int Checks { get; private set; }
+        public Action? AfterVerify { get; set; }
         public Task VerifyAsync(string path, IReadOnlyList<PublisherIdentity> publishers, CancellationToken cancellationToken)
-        { Checks++; if (Reject) throw new IOException("Untrusted test publisher"); return Task.CompletedTask; }
+        { Checks++; if (Reject) throw new IOException("Untrusted test publisher"); AfterVerify?.Invoke(); return Task.CompletedTask; }
     }
     public void Dispose() { key.Dispose(); if (Directory.Exists(root)) Directory.Delete(root, true); }
 }

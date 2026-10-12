@@ -1,8 +1,8 @@
 # Native Windows engineering handover
 
-Current renderer hardening: inline trees and coloured code now share the preview's input/cancellation budget. Four new cases reproduce and correct blocked input and ignored cancellation within individual rich paragraphs/headings/table cells, preserving complete text, formatting and source mapping. Focused/full native validation, Release and static checks pass; its CI is pending. The earlier details cold-start observation is separate and remains unexplained.
+Current update hardening: channel changes cancel active operations and reject stale downloads or installation requests. Six isolated interaction cases and 36 update core cases pass; all 814 core tests, Release, full native integration and static checks pass, with CI pending. Interaction fixtures use inert bytes and mocked installer verification, leave embedded trust unchanged and launch no installer.
 
-Status: available for internal preview with documented limitations. Both native and both web CI runs pass at 300ab68, including all 812 core tests, 14 mocked signing-adapter outcomes, bounded session persistence, retained-session reopening and actual interruption recovery in built/reinstalled applications. The earlier c62ec4e PR details-input failure remains unexplained. The user confirms no production certificate, service or publisher identity is configured; unsigned update execution remains blocked. Production certification is incomplete. This report does not authorise installation on the user's active desktop, merging, release publication or tag changes.
+Status: available for internal preview with documented limitations. Both native and both web CI runs pass at f12fc1f, including all 812 core tests, four dense-inline construction/cancellation cases, 14 mocked signing-adapter outcomes, bounded session persistence, retained-session reopening and actual interruption recovery in built/reinstalled applications. The earlier c62ec4e PR details-input failure remains unexplained. The user confirms no production certificate, service or publisher identity is configured; unsigned update execution remains blocked. Production certification is incomplete. This report does not authorise installation on the user's active desktop, merging, release publication or tag changes.
 
 Automatic reading now uses native pages for long documents, with explicit Continuous/Pages choices, asynchronous distant navigation, preserved text automation and page-sized media. All 800 core tests and seven focused hidden-HWND pagination outcomes pass. The 57th desktop workflow checks page buttons, distant Find range/bounds, complete Undo and saved reading preferences; it passes in all four application contexts. A subsequent screenshot inspection identified missing visible selection, corrected and verified by actual pixel comparison while keyboard focus stays in Find. Portable appearance exports use version 1.1 while retaining version 1.0 import compatibility.
 
@@ -40,17 +40,18 @@ Update policy checks compatible releases, signed metadata, size/hash, actual Win
 
 | Evidence | Result and scope |
 |---|---|
-| Local Release | Current inline-rendering change: zero warnings/errors |
-| Core tests | 812 passed locally and in both 300ab68 native runs; artifacts/native/tests/native-session-all.trx |
-| Inline responsiveness | Four before/after cases; artifacts/native/inline-layout and validation/native-inline-layout.json. Local full harness passes; renderer CI pending |
+| Local Release | Current update-interaction change: zero warnings/errors |
+| Core tests | 814 passed locally; artifacts/native/tests/native-update-interactions-all.trx. Both f12fc1f native runs pass the earlier 812 cases |
+| Update interactions | Six view-model/service cases, including four reproduced failures and valid/unsigned controls; artifacts/native/update-interactions. Mocked installer verification; no launch |
+| Inline responsiveness | Four before/after cases; artifacts/native/inline-layout and validation/native-inline-layout.json. Both f12fc1f native CI runs pass |
 | Native pagination | Seven hidden-HWND outcomes; artifacts/native/pagination and validation/native-pagination.json; 58-workflow desktop suite passes both completed b1b500c native runs |
 | Full native harness | 40 diagram cases and export checks, zero failures; artifacts/native/validation |
 | PDF Unicode | Six outcomes pass; artifacts/native/pdf-unicode/native-pdf-unicode.json and inspected PNG |
 | Export browser checks | 12 Chromium/Edge cases from disk and static hosting, including theme/print/forced colours; both 300ab68 native CI runs pass |
-| Complete native PR/push | 300ab68: 38264945184 / 38264935943; core/signing/native/export/desktop suites, visible installer and retained/interrupted-session checks |
-| Complete web PR/push | 300ab68: 38264945154 / 38264935984; 262 cases each |
+| Complete native PR/push | f12fc1f: 38267310415 / 38267304912; core/signing/native/export/desktop suites, visible installer and retained/interrupted-session checks |
+| Complete web PR/push | f12fc1f: 38267310007 / 38267304939; 262 cases each |
 | Actual PDF export | Expanded Windows Export-menu Unicode check passes in all four native contexts; built-window screenshot and exported PDF raster inspected |
-| Downloaded current CI evidence | artifacts/native/ci-b1b500c-push; visible search highlight, actual decorated PDF, 58 desktop workflows, certificate cleanup, preview.179 upgrade with 20 preserved state files and package SHA-256 checks confirmed |
+| Downloaded reviewed CI evidence | artifacts/native/ci-300ab68-push; both actual interrupted-save reports pass, upgrade/reinstall restore ten documents and preserve 16 private/ten source files, both preview.197 packages match their hashes. Restored/recovered screenshots inspected; see evidence-review.json |
 | Package advisories | Fresh-cache NuGet query on 12 October 2026 reports no known vulnerabilities among 37 resolved versions, including transitive dependencies; inventory and lock hashes retained |
 | Scoped security review | Sealed sequential review at b45246e; two low-severity, user-assisted allocation findings subsequently corrected with bounded regression fixtures |
 
@@ -60,7 +61,7 @@ Performance evidence is fixture-specific. Earlier actual application samples obs
 
 ## Build artefacts and references
 
-The newest inspected packages are under artifacts/native/ci-8308c5d-push/packages/0.1.0-preview.195 and 0.1.1-preview.195. All four hashes match; version metadata records exact source 8308c5dad1af21da02b924d8b984bf2fb5043c2d, a clean tree, self-contained internal preview and signingProvider Unsigned. Windows reports NotSigned for both installers; both update manifests have no signing key/signature. The 0.1.1 installer SHA-256 is FC7B999D7923647A4AA0499C9D169DDDC9D84E562782BEAE54B1D0C4EE041AE9; its ZIP is A01AE49F4E3CB93846CBB823A4AD4524E98A0AC55630F15973DC90F13870B308. package-verification.json retains the exact read-only checks; neither installer was executed locally. These packages precede the session/inline fixes now under validation.
+The newest inspected packages are under artifacts/native/ci-300ab68-push/packages/0.1.0-preview.197 and 0.1.1-preview.197. All four hashes match; version metadata records exact source 300ab68532173f82afb2e67ccc6746508323d8db, a clean tree, self-contained internal preview and signingProvider Unsigned. Windows reports NotSigned for both installers; both update manifests have no signing key/signature. The 0.1.1 installer SHA-256 is AB4BC908DAF650D31895994CBB98DDD990D1081CAF6516B8F06FBBA4BE68A9AB; its ZIP is B4255D3513E0B1205862C172917354106372210B85CC7AA16428ED9E1D43BFDD. package-verification.json retains the exact read-only checks; neither installer was executed locally. These packages include bounded session persistence and precede the inline/update-interaction fixes.
 
 Build from the repository root with dotnet build src/native/LensDocsStudio.Native.slnx -c Release. Packaging uses scripts/native/Build-NativePackage.ps1 with a fresh preview version and an installed Inno Setup compiler. Packaging requires development tools; normal self-contained execution does not use a developer build command.
 
@@ -69,10 +70,10 @@ The inspected push artefact contains matching installers, portable ZIPs, version
 The inspected 0.1.1-preview.179 installer SHA-256 is BF4C8168D8EDF71CF4EADAE748521CB2BE0E121AB35977ED3990301606B0548E; the portable ZIP is 83B9CBCD998007CA4A0A6E308C2BC2AC091DADEFC6E233AEAE7AF226E80C93C0.
 
 - Branch: feature/native-wpf-rebuild.
-- Latest fully CI-validated commit: 300ab68, including bounded session persistence, optional signing adapters, actual interruption recovery and installed-session continuity. The inline-rendering follow-up is described above.
+- Latest fully CI-validated commit: f12fc1f, including inline-rendering cancellation, bounded session persistence, optional signing adapters and actual interruption recovery. The update-interaction follow-up is described above.
 - Draft [PR 21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop.
-- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38264945184).
-- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38264945154).
+- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38267310415).
+- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38267310007).
 
 ## Remaining acceptance
 

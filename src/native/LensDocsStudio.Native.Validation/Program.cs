@@ -74,6 +74,12 @@ internal static class Program
             try { NativePaginationChecks.RunLargeBlocks(blockOutput); Console.WriteLine("Native large-block checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--update-interactions")
+        {
+            var updateOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/update-interactions"); Directory.CreateDirectory(updateOutput);
+            try { NativeUpdateInteractionChecks.Run(updateOutput); Console.WriteLine("Native update interaction checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--inline-layout")
         {
             var inlineOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/inline-layout"); Directory.CreateDirectory(inlineOutput);
@@ -299,6 +305,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native asset persistence: " + ex.Message); }
         try { NativeSaveRecoveryChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native save recovery: " + ex.Message); }
+        try { NativeUpdateInteractionChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native update interactions: " + ex.Message); }
         try { NativePreviewChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview preparation: " + ex.Message); }
         try { NativeMarkdownChecks.Run(output, repository); }
