@@ -9,10 +9,10 @@ All four 45b5d5d CI runs pass: 778 core tests, seven actual Windows signature ch
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Simulated two-version installer upgrade checks with byte-preserved state, installed-version assertions and bounded Save dialogue readiness observation |
+| Latest implementation | PDF code syntax colours and explicit indentation preservation, with actual glyph/position checks and complete multi-page plain fallback |
 | Latest complete native CI | 45b5d5d, PR/push 38217770147/38217763979: 778 core tests, seven signature cases and 55 workflows in built, installed, upgraded and reinstalled applications |
 | Latest complete web CI | Both 45b5d5d runs 38217770149/38217763858: all 262 cases in 10.5/7.4 minutes |
-| Current validation | Clean Release build, all 778 core tests, complete native harness, five file-observation cases and static integrity pass. Both expanded Windows CI lifecycles pass; detailed logs are retained under artifacts/native |
+| Current validation | PDF correction: clean Release build, all 778 core tests, five actual-PDF outcomes, complete native harness (40 corpus cases, zero failures) and static integrity pass. All four docs-only 8b44f23 CI runs also pass; current PDF change awaits CI |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Continue the remaining acceptance checks. The downloaded 45b5d5d result confirms matching upgraded versions, 20 preserved state files/workspace bytes and certificate cleanup. Native push 38216456690 at 2ea009b remains recorded as failed. No local certificate-store mutation or foreground interaction is authorised by the current validation setup.
+1. Complete CI for the PDF syntax/spacing correction. Local Release, all 778 core tests, five focused outcomes, complete native harness and static integrity pass; the corrected coloured page and final 11-page fallback page were inspected. The docs-only 8b44f23 revision passes all four CI runs (native 38220244442/38220238385; web 38220244488/38220238388), with full logs retained under artifacts/native. The downloaded 45b5d5d result confirms matching upgraded versions, 20 preserved state files/workspace bytes and certificate cleanup. Native push 38216456690 at 2ea009b remains recorded as failed. No local certificate-store mutation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

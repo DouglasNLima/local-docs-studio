@@ -42,4 +42,6 @@ Angle-bracket URL/email text now survives native preview, heading/plain-text ext
 
 Installer validation now prepares two preview versions for an actual replacement installation in CI, verifies the installed binary/metadata/registration and preserves existing private state/workspace hashes through lifecycle phases. Five file-only checks pass locally; both 45b5d5d native CI runs pass the expanded lifecycle and all four desktop contexts. A retained installed-app failure exposed an immediate Save-input lookup; the harness now waits for that exact enabled control without repeating user actions or weakening saved-byte assertions.
 
+PDF code now retains the preview's light syntax colours and code indentation. Five local outcomes inspect actual glyph colours, selectable Unicode, line placement and complete plain fallbacks, including 800 rows over 11 pages. Corrected PDF pages were inspected. This closes the PDF code-colouring gap; Word/HTML colouring and PDF strikeout/highlight fidelity remain open.
+
 These are implemented outcomes with stated evidence limits, not production certification. Detailed contracts and remaining gaps are in the functional parity matrix and validation report.

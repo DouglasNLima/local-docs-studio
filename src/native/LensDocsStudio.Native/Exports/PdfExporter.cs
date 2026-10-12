@@ -1,5 +1,6 @@
 using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Native.Rendering;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Markdig.Extensions.Alerts;
@@ -16,6 +17,7 @@ public sealed class PdfExporter
     public byte[] Export(ExportContent content, CancellationToken cancellationToken = default)
     {
         content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
+        var codeSyntax = CodeSyntaxService.Prepare(content.Document, cancellationToken);
         var imageSources = new Dictionary<byte[], string>(ReferenceEqualityComparer.Instance);
         var document = new Document();
         document.Info.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";
@@ -64,8 +66,23 @@ public sealed class PdfExporter
                     if (!content.Diagrams.TryGetValue(code.Span.Start, out var diagram)) throw new InvalidDataException("A Mermaid diagram could not be exported.");
                     AddImage(elements.AddParagraph().Elements, diagram); break;
                 case CodeBlock code:
-                    var cp = elements.AddParagraph(code.Lines.ToString());
+                    var cp = elements.AddParagraph();
                     cp.Format.Font.Name = "Consolas"; cp.Format.Font.Size = 8; cp.Format.Shading.Color = Colors.WhiteSmoke;
+                    var codeText = code.Lines.ToString();
+                    if (codeSyntax.Blocks.TryGetValue(code, out var syntax) && syntax.Text == codeText)
+                    {
+                        var position = 0;
+                        foreach (var span in syntax.Spans)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+                            if (span.Start > position) CodeText(cp.Elements, codeText[position..span.Start]);
+                            var colour = ((System.Windows.Media.SolidColorBrush)CodeSyntaxColours.For(span.Role, false)).Color;
+                            CodeText(cp.Elements, codeText.Substring(span.Start, span.Length), Color.FromRgb(colour.R, colour.G, colour.B));
+                            position = span.Start + span.Length;
+                        }
+                        if (position < codeText.Length) CodeText(cp.Elements, codeText[position..]);
+                    }
+                    else CodeText(cp.Elements, codeText);
                     cp.Format.KeepTogether = false; break;
                 case ListBlock list:
                     var index = MarkdownFormatting.OrderedStart(list);
@@ -120,6 +137,25 @@ public sealed class PdfExporter
                     break;
                 case ContainerBlock container: foreach (var child in container) Append(elements, child, marker); break;
                 case ThematicBreakBlock: elements.AddParagraph("—"); break;
+            }
+        }
+        void CodeText(ParagraphElements elements, string text, Color? colour = null)
+        {
+            if (colour is { } foreground)
+            {
+                var formatted = elements.AddFormattedText(); formatted.Font.Color = foreground;
+                elements = formatted.Elements;
+            }
+            for (var start = 0; start < text.Length;)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var spaces = text[start] == ' '; var end = start + 1;
+                while (end < text.Length && (text[end] == ' ') == spaces) end++;
+                // Explicit space characters preserve code indentation and alignment without
+                // replacing source spaces with non-breaking Unicode characters in the export.
+                if (spaces) elements.AddSpace(end - start);
+                else elements.AddText(text[start..end]);
+                start = end;
             }
         }
         void Inlines(ParagraphElements elements, ContainerInline? container)

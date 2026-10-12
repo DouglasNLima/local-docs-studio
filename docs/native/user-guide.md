@@ -116,6 +116,8 @@ The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Do
 
 Word and PDF retain HTTP, HTTPS and email links, including angle-bracket URLs such as `<https://example.org>` and email addresses such as `<review@example.org>`. PDF links remain clickable when their labels wrap. Unsupported external schemes and relative file links remain readable text in standalone Word/PDF exports.
 
+PDF code blocks retain syntax colours for supported languages and preserve indentation as selectable text. Unknown languages and blocks that exceed the colouring limit retain complete plain text. Word and HTML code blocks currently use plain text without syntax colours.
+
 Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
 
 **File → Import Markdown bundle** extracts supported documents and assets into a new folder. An optional artefact manifest supplies display metadata for this import session. **View → Artefact bundle** filters imported items by group, title/path and supplied evidence label. Labels are displayed as supplied: candidate findings remain candidate findings. Invalid metadata produces an import note while valid documents remain available.
