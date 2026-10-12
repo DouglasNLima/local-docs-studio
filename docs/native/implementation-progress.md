@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Both d692aeb native CI runs fail the dense table-cell input-gap check (342/426 ms); both web runs pass and all six update-interaction cases pass within the native artefacts. The renderer now attaches empty containers to its private document before filling them, avoiding a final synchronous move of a complete rich subtree. Nine focused cases and full native integration pass locally; the unchanged 250 ms limit covers paragraphs, headings, tables, code, quotes, lists, callouts, open details and long link labels. Release has zero warnings/errors and static checks pass. CI for this attachment correction is pending.
+Both d692aeb native CI runs fail the dense table-cell input-gap check (342/426 ms); both web runs pass and all six update-interaction cases pass within the native artefacts. The renderer now attaches empty containers to its private document before filling them, avoiding a final synchronous move of a complete rich subtree. Nine focused cases and full native integration pass locally; the unchanged 250 ms limit covers paragraphs, headings, tables, code, quotes, lists, callouts, open details and long link labels. Release has zero warnings/errors and static checks pass. All four c64f410 CI runs pass: native PR/push 38272377336/38272371722 and web PR/push 38272377357/38272371725. Downloaded evidence confirms all nine cases, six update interactions and the complete installer lifecycle.
 
 Update operations now capture the selected candidate/environment, cancel when the channel changes and reject stale results before presenting a download or invoking installation. Cancellation is checked again after external signature verification, with failed-download cleanup. Four stale/cancelled interaction cases reproduced the fault; all six interaction cases and 36 update core cases pass after correction. All 814 core tests, Release (zero warnings/errors), full native integration and static checks pass locally. The new interaction checks use inert bytes, in-memory metadata keys and mocked installer trust; production trust stays empty. The six interactions also pass in both d692aeb native CI artefacts; those runs fail later on the renderer timing recorded above.
 
@@ -43,9 +43,9 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | PDF strike-through/highlighting and visible Find selection; native pagination and reading preferences already pass complete CI |
-| Latest complete native CI | b1b500c, push 38245092255 and PR 38245098298 attempt 2; 800 core, 12 export-browser and 58 desktop workflows in every application context; initial PR failure retained |
-| Latest complete web CI | Both b1b500c runs 38245098093/38245092183 pass 262 cases |
+| Latest implementation | c64f410: parent-first rich rendering, update selection/cancellation, bounded recovery and optional signing adapters |
+| Latest complete native CI | c64f410, PR 38272377336 and push 38272371722; 814 core, nine rich-construction cases, six update interactions, 12 export-browser and 58 desktop workflows in every application context, plus complete installer/recovery checks |
+| Latest complete web CI | Both c64f410 runs 38272377357/38272371725 pass 262 cases |
 | Current validation | Release, 800 core tests, six PDF decoration outcomes, seven pagination outcomes, complete native harness and static checks pass locally. The 58-workflow desktop suite passes in all four application contexts |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.

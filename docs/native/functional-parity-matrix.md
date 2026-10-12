@@ -1,6 +1,6 @@
 # Functional parity matrix
 
-Nested rich preview construction now inserts empty parent containers before filling their content. Nine cases cover the original paragraph/heading/table/code paths plus quotes, lists, callouts, open details and long links. Focused/full native checks and static checks pass locally. This corrects the table-cell timing failure in both d692aeb native runs; the follow-up CI is pending, with the 250 ms assertion unchanged.
+Nested rich preview construction now inserts empty parent containers before filling their content. Nine cases cover the original paragraph/heading/table/code paths plus quotes, lists, callouts, open details and long links. Focused/full native checks and static checks pass locally. This corrects the table-cell timing failure in both d692aeb native runs; both native and both web c64f410 CI runs pass, with the 250 ms assertion unchanged.
 
 Update channel changes now cancel current work and suppress stale downloads/installation requests, including changing away and back. Six native view-model/service scenarios and two new core cancellation regressions pass with mocked installer verification and inert bytes. The unsigned selection remains disabled, and valid selected updates still reach the authorised installation callback exactly once. All 814 core tests and full native integration pass locally; the six interactions also pass in both d692aeb CI artefacts, whose renderer timing failure is recorded above. Production signing remains unconfigured.
 
