@@ -1,6 +1,8 @@
 # Functional parity matrix
 
-Actual process-interruption coverage is implemented for rejected saves, restart recovery and explicit retry in built/reinstalled applications. The check compiles and rejects local execution; CI has not yet executed it. The c62ec4e PR run also exposes an unresolved 311.8 ms nested-details input delay, so responsiveness remains incomplete despite complete source/text in that sample.
+Signing remains deliberately unconfigured per the user's confirmed decision. Optional certificate-store and service-script adapters now require explicit publisher pins and independent Windows verification; unsigned packages cannot enable updater execution. Fourteen adapter-policy outcomes use mocked signature results, and all 34 update core tests pass. Production identity, actual provider signing and signed-upgrade certification remain unavailable.
+
+Actual process-interruption coverage passes in built/reinstalled applications in both be033af native CI runs: rejected saves, restart recovery and explicit retry retain the draft, baseline and exact source encoding. This does not certify power loss or removable drives. The earlier c62ec4e PR run exposed an unexplained 311.8 ms nested-details input delay; both be033af runs pass with additional diagnostics, while broad responsiveness certification remains incomplete.
 
 Save recovery now retains the current editor draft before any asset transfer or destination write. Four local regression outcomes cover a locked destination before journal creation, fresh-model restoration, exact encoding/line-ending retry and failed recovery blocking source commit. The full native suite passes; process interruption and removable-drive certification remain open.
 

@@ -1,6 +1,8 @@
 # Native experience improvements
 
-Recovery validation now includes an implemented CI-only application termination/restart scenario after a rejected save. It distinguishes durable state from normal-shutdown persistence and verifies the user's explicit retry. Local compilation/guard checks pass; actual desktop results remain pending.
+Release engineering can attach a future certificate or signing-service adapter without changing update consent or trust rules. The current unsigned preview remains restricted to release-page notifications; provider success cannot bypass Windows signature, exact publisher or timestamp checks. Fourteen mocked adapter-policy checks and 34 update core tests pass; no production identity is configured.
+
+Recovery validation includes a CI-only application termination/restart scenario after a rejected save. It distinguishes durable state from normal-shutdown persistence and verifies the user's explicit retry. It passes in built and reinstalled applications in both be033af native runs, with source/baseline/encoding assertions; power-loss and removable-drive certification remain separate.
 
 Save preserves the latest editor draft independently before attempting destination writes, including failures that precede the source write journal. Four local checks establish recovery, retry with unchanged encoding and refusal to alter source when recovery is unavailable. This closes the gap before the periodic autosave runs.
 
