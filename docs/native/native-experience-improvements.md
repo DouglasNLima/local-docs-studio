@@ -1,6 +1,6 @@
 # Native experience improvements
 
-The native reconstruction keeps portable Markdown and real filesystem ownership while improving desktop workflows. At ce3cf9f all 53 workflows pass in built, installed and reinstalled applications in both native CI runs, including Editor-only scheduling and separated validation threads. Minimum-window workflow 54 awaits CI. Earlier failed runs and remaining limits are recorded in the validation report.
+The native reconstruction keeps portable Markdown and real filesystem ownership while improving desktop workflows. At f7dc5a3 all 54 workflows pass in built, installed and reinstalled applications in both native CI runs, including minimum-window controls, Editor-only scheduling and separated validation threads. Long-editor workflow 55 awaits CI. Earlier failed runs and remaining limits are recorded in the validation report.
 
 | Improvement | Impact / risk | Implemented outcome and limit |
 |---|---|---|
@@ -27,7 +27,8 @@ The native reconstruction keeps portable Markdown and real filesystem ownership 
 | Portable local exports | High / medium | Independent DOCX/PDF/HTML, generic Markdown bundles and static Docs Sites include supported current content/assets, exclude private state and guard destination writes. Site search opens exact sections |
 | Passive optional artefact context | Medium / low | Session-only imported metadata, accessible filters and explicit safe rebuilt review packs preserve supplied evidence labels. Generic bundles omit metadata; restart clears it |
 | Native settings and offline help | High / low | Ctrl+, supplies durable appearance/reading preferences with Cancel and transfer; F1 provides twelve bundled searchable topics without changing source |
-| Windows appearance and placement | High / low | Fluent WPF controls, neutral themes, high-contrast colours and native placement persistence. Long statuses now retain Cancel/caret space; Find/Replace wraps at narrow widths. Four hidden native layouts pass bounds/accessibility-name/source checks, with inspected light/dark output. Actual desktop regression is pending; broad screen-reader, DPI and multi-monitor certification remains |
+| Windows appearance and placement | High / low | Fluent WPF controls, neutral themes, high-contrast colours and native placement persistence. Long statuses now retain Cancel/caret space; Find/Replace wraps at narrow widths. Four hidden native layouts pass bounds/accessibility-name/source checks, with inspected light/dark output. Both f7dc5a3 desktop runs pass; broad screen-reader, DPI and multi-monitor certification remains |
+| Distant editor navigation | High / low | Source/search/review/map targets are checked after wrapped virtual-line layout; stale source/documents/selections and superseded requests cannot scroll a replacement target. A 4.14 MB native fixture passes exact source/Undo and visible-position checks; real desktop search workflow 55 awaits CI |
 | Isolated per-user installation | High / medium | Self-contained Inno wizard, optional shortcuts/Open with, files-in-use handling and retained user data coexist with the old shell; fresh-runner lifecycle passes, SDK-free clean-machine certification remains |
 | Secure user-controlled updates | High / high | Product/channel/architecture policy, signed metadata, integrity/Authenticode checks and separate download/install consent. Production identities and positive signed-update certification remain external |
 

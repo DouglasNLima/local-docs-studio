@@ -160,6 +160,12 @@ internal static class Program
             try { NativeShellLayoutChecks.Run(shellOutput); Console.WriteLine("Native shell layout passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--performance")
+        {
+            var performanceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(performanceOutput);
+            try { NativePerformanceChecks.Run(performanceOutput); Console.WriteLine("Native performance observations passed correctness checks."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -220,6 +226,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native clipboard apartments: " + ex.Message); }
         try { NativeShellLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native shell layout: " + ex.Message); }
+        try { NativePerformanceChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native performance observations: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }
@@ -325,8 +333,10 @@ internal static class Program
         try
         {
             var sourcePath = Path.Combine(repository, "tests", "fixtures", "mixed.md");
+            var exportWatch = Stopwatch.StartNew();
             var content = new ExportPreparationService(parser, diagrams, native).Prepare(File.ReadAllText(sourcePath), sourcePath, Path.GetDirectoryName(sourcePath), false);
-            var docx = new DocxExporter().Export(content);
+            var prepareMilliseconds = exportWatch.Elapsed.TotalMilliseconds;
+            exportWatch.Restart(); var docx = new DocxExporter().Export(content); var docxMilliseconds = exportWatch.Elapsed.TotalMilliseconds;
             File.WriteAllBytes(Path.Combine(output, "mixed.docx"), docx);
             using (var package = WordprocessingDocument.Open(new MemoryStream(docx), false))
             {
@@ -334,7 +344,7 @@ internal static class Program
                 if (errors.Length != 0) throw new InvalidDataException(string.Join("; ", errors));
                 if (!package.MainDocumentPart!.ImageParts.Any()) throw new InvalidDataException("The DOCX has no rendered diagram image.");
             }
-            var pdf = new PdfExporter().Export(content);
+            exportWatch.Restart(); var pdf = new PdfExporter().Export(content); var pdfMilliseconds = exportWatch.Elapsed.TotalMilliseconds;
             File.WriteAllBytes(Path.Combine(output, "mixed.pdf"), pdf);
             if (!System.Text.Encoding.ASCII.GetString(pdf, 0, 5).Equals("%PDF-")) throw new InvalidDataException("The local PDF header is invalid.");
             using (var inspected = UglyToad.PdfPig.PdfDocument.Open(pdf))
@@ -346,7 +356,14 @@ internal static class Program
                 if (!pages.Any(p => p.NumberOfImages > 0)) throw new InvalidDataException("The PDF lost the Mermaid image.");
                 File.WriteAllText(Path.Combine(output, "pdf-inspection.json"), JsonSerializer.Serialize(new { Pages = pages.Length, Images = pages.Sum(p => p.NumberOfImages), Text = text }, new JsonSerializerOptions { WriteIndented = true }));
             }
-            File.WriteAllText(Path.Combine(output, "mixed.html"), new HtmlExporter().Export(content));
+            exportWatch.Restart(); var html = new HtmlExporter().Export(content); var htmlMilliseconds = exportWatch.Elapsed.TotalMilliseconds;
+            File.WriteAllText(Path.Combine(output, "mixed.html"), html);
+            File.WriteAllText(Path.Combine(output, "export-performance.json"), JsonSerializer.Serialize(new {
+                Fixture = "tests/fixtures/mixed.md", SourceBytes = new FileInfo(sourcePath).Length, ReadAndPrepareMilliseconds = prepareMilliseconds,
+                DocxMilliseconds = docxMilliseconds, PdfMilliseconds = pdfMilliseconds, HtmlMilliseconds = htmlMilliseconds,
+                DocxBytes = docx.Length, PdfBytes = pdf.Length, HtmlCharacters = html.Length,
+                Limitation = "Warm validation-process observations; export durations exclude file writes and separate schema/content validation."
+            }, new JsonSerializerOptions { WriteIndented = true }));
             Console.WriteLine($"Exports generated and DOCX schema validated: {docx.Length} DOCX bytes, {pdf.Length} PDF bytes.");
         }
         catch (Exception ex) { failures.Add("Export validation: " + ex.Message); }

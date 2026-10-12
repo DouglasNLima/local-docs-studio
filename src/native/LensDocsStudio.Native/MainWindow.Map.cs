@@ -3,6 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Media;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.Workspace;
+using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.Rendering;
 
@@ -46,7 +47,7 @@ public partial class MainWindow
                     CaptureCurrentNavigation();
                     if (model.Layout == "Preview") SetLayout("Split");
                     Editor.Select(navigation.Start, navigation.Length);
-                    Editor.ScrollToLine(Editor.Document.GetLineByOffset(navigation.Start).LineNumber); Editor.Focus(); VisitCurrentNavigation();
+                    if (await EditorNavigationService.BringIntoViewAsync(Editor, navigation.Start)) { Editor.Focus(); VisitCurrentNavigation(); }
                 }
                 model.Status = navigation.Length > 0 ? "Selected the original link source." : "Opened " + node.Path;
             });

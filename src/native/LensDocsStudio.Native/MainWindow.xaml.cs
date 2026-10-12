@@ -206,13 +206,15 @@ public partial class MainWindow : Window
         for (var element = e.OriginalSource as DependencyObject; element is not null; element = LogicalTreeHelper.GetParent(element))
             if (element is TextElement { Tag: SourceReference source }) { JumpToSource(source.Start); break; }
     }
-    private void JumpToSource(int offset, bool focusEditor = true)
+    private async void JumpToSource(int offset, bool focusEditor = true)
     {
         CaptureCurrentNavigation();
         Editor.CaretOffset = Math.Clamp(offset, 0, Editor.Document.TextLength);
-        Editor.ScrollToLine(Editor.Document.GetLineByOffset(Editor.CaretOffset).LineNumber);
+        var document = Editor.Document; var target = Editor.CaretOffset;
         if (focusEditor) Editor.Focus();
         VisitCurrentNavigation();
+        if (await EditorNavigationService.BringIntoViewAsync(Editor, target) && Editor.Document == document && Editor.CaretOffset == target)
+            CaptureCurrentNavigation();
     }
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
@@ -287,7 +289,7 @@ public partial class MainWindow : Window
         var text = Editor.Document.Text;
         var offset = text.IndexOf(query, Math.Min(Editor.SelectionStart + Editor.SelectionLength, text.Length), StringComparison.CurrentCultureIgnoreCase);
         if (offset < 0) offset = text.IndexOf(query, StringComparison.CurrentCultureIgnoreCase);
-        if (offset >= 0) { Editor.Select(offset, query.Length); Editor.ScrollToLine(Editor.Document.GetLineByOffset(offset).LineNumber); }
+        if (offset >= 0) { Editor.Select(offset, query.Length); _ = EditorNavigationService.BringIntoViewAsync(Editor, offset); }
         else model.Status = "No matches found.";
     }
     private bool FindPreview(TextPointer start, string query)

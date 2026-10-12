@@ -43,6 +43,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
         var checks = new List<string>();
         var saveDialogueChecks = new List<object>();
+        var performance = new List<object>();
         using var automation = new UIA3Automation();
         File.WriteAllText(Path.Combine(output, "native-ui-threading.json"), JsonSerializer.Serialize(new {
             AutomationApartment = Thread.CurrentThread.GetApartmentState().ToString(), ClipboardApartment = NativeUiClipboard.Apartment.ToString(),
@@ -52,6 +53,7 @@ internal static partial class NativeUiChecks
         Window? mainWindow = null;
         try
         {
+            var operationWatch = Stopwatch.StartNew();
             app = Launch(source);
             var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("Native window did not appear.");
             mainWindow = window;
@@ -59,8 +61,11 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
             checks.Add("Startup file opened through native controls");
+            MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
             CheckMinimumWindow(window, editor, output, source);
             checks.Add("Minimum-size native window retains visible Cancel and Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            CheckLargeEditorNavigation(window, editor, output, source);
+            checks.Add("Long wrapped editor Find reveals its final selected target, preserves insertion Undo and saved bytes, and resumes the original preview");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             var find = Find(window, "FindText").AsTextBox();
@@ -69,11 +74,14 @@ internal static partial class NativeUiChecks
             Keyboard.Type(VirtualKeyShort.RETURN);
             Keyboard.Type(VirtualKeyShort.ESCAPE);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            operationWatch.Restart();
             Keyboard.Type("\nNative UI validation — Café");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Native UI validation — Café", StringComparison.Ordinal), "Typing was captured by an inactive search control.");
+            MeasureOperation("Windows keyboard text delivery through exact editor observation", operationWatch);
             checks.Add("Editor search closes and keyboard input reaches the editor");
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            operationWatch.Restart(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             Wait(() => File.ReadAllText(source).Contains("Native UI validation — Café", StringComparison.Ordinal), "Save did not persist Unicode text.");
+            MeasureOperation("Save shortcut through observed UTF-8 file update", operationWatch);
             checks.Add("Ctrl+S persisted actual UTF-8 source");
             var preview = Find(window, "DocumentPreview");
             preview.Click();
@@ -200,8 +208,9 @@ internal static partial class NativeUiChecks
                     new byte[] { 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255, 62, 136, 255, 255 }, 8);
                 NativeUiClipboard.SetImage(bitmap);
                 ownedClipboardSequence = GetClipboardSequenceNumber();
-                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+                editor.Click(); operationWatch.Restart(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("![pasted-image](assets/images/", StringComparison.Ordinal), "Clipboard image did not persist into the unsaved document.");
+                MeasureOperation("Paste shortcut through persisted 2 by 2 image and source insertion", operationWatch);
             }
             finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
             var imageDocument = Path.Combine(runRoot, "Image document.md");
@@ -1348,6 +1357,18 @@ internal static partial class NativeUiChecks
             // FlaUI refreshes and disposes its Process instance while locating a window.
             // Keep our separately owned started process for the real shutdown exit code.
             return Application.Attach(launchedProcess.Id);
+        }
+        void MeasureOperation(string name, Stopwatch watch)
+        {
+            var elapsed = watch.Elapsed.TotalMilliseconds;
+            launchedProcess!.Refresh();
+            performance.Add(new { Operation = name, ElapsedMilliseconds = elapsed, ProcessId = launchedProcess.Id,
+                WorkingSetBytes = launchedProcess.WorkingSet64, PrivateBytes = launchedProcess.PrivateMemorySize64,
+                PeakWorkingSetBytes = launchedProcess.PeakWorkingSet64, ProcessCpuMilliseconds = launchedProcess.TotalProcessorTime.TotalMilliseconds });
+            File.WriteAllText(Path.Combine(output, "native-ui-performance.json"), JsonSerializer.Serialize(new {
+                Samples = performance, Environment.ProcessorCount,
+                Limitations = "Observed Windows workflow latency includes input delivery, UIA and 100 ms polling. First launch is of this fixture process, not a cold operating-system cache. Memory belongs to the actual tested application; no forced garbage collection or universal timing threshold is used."
+            }, new JsonSerializerOptions { WriteIndented = true }));
         }
         AutomationElement ContextAction(string id)
         {

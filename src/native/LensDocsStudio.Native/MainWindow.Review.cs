@@ -1,6 +1,7 @@
 using System.Windows;
 using LensDocsStudio.Core.Review;
 using LensDocsStudio.Core.Workspace;
+using LensDocsStudio.Native.Editor;
 
 namespace LensDocsStudio.Native;
 
@@ -35,7 +36,8 @@ public partial class MainWindow
             CaptureCurrentNavigation();
             if (model.Layout == "Preview") SetLayout("Split");
             Editor.Select(issue.Start, issue.Length);
-            Editor.ScrollToLine(Editor.Document.GetLineByOffset(issue.Start).LineNumber); Editor.Focus();
+            if (!await EditorNavigationService.BringIntoViewAsync(Editor, issue.Start)) return;
+            Editor.Focus();
             VisitCurrentNavigation();
             model.Status = issue.Message;
         });
