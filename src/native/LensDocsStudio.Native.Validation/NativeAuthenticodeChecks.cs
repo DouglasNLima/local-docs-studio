@@ -38,6 +38,7 @@ internal static class NativeAuthenticodeChecks
             limitation = "Disposable CI certificate trust only; production issuer, revocation, timestamp and signed-upgrade certification remain separate."
         }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine($"Native Authenticode: {checks.Count} checks passed.");
+        NativeUpdatePipelineChecks.Run(root, identity);
 
         void Reject(string label, string name, IReadOnlyList<PublisherIdentity> publishers, string expectedReason)
         {
