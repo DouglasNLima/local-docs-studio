@@ -1292,6 +1292,8 @@ internal static partial class NativeUiChecks
             checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
             CheckPreviewScheduling(window, editor, output, source);
             checks.Add("Editor-only mode pauses hidden rendering, explicit text copy uses current edits and Undo, and Find follows Editor/Preview layout without changing source");
+            CheckPagination(window, editor, automation, app.ProcessId, state, output, source);
+            checks.Add("Native pages navigate and find the last long-document item, preserve selection and complete Undo, and apply Automatic, Pages and Continuous reading without source or consent changes");
             CheckSettings(window, editor, automation, app.ProcessId, state, output, source);
             CheckSettingsTransfer(window, editor, automation, app.ProcessId, state, output, source, OpenThroughDialogue,
                 (path, title) => SaveThroughDialogue(path, title, absolutePath: true));

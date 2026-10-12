@@ -10,6 +10,8 @@ Use **Editor**, **Split** or **Preview** to choose your working layout. Drag the
 
 Editor layout keeps the outline current and pauses hidden preview rendering. Returning to Split or Preview renders your latest edits. Changing between single-pane layouts also sets the appropriate Find context.
 
+**Edit → Settings → Preview reading mode** offers **Automatic**, **Continuous** and **Pages**. Automatic uses native pages for long documents and a continuous view for smaller documents. In Pages, use the previous/next controls below the preview; Find, outline headings and document links can take you directly to a distant page. Images fit the page, and narrow diagram panels can scroll to their Zoom, export and source-copy controls. Reading mode and preview zoom never alter Markdown or export pagination. Continuous layout may take longer for very large documents.
+
 The native preview is a separate development edition. Its state and installation are kept apart from the browser product and legacy Windows shell.
 
 ## Editing, finding and replacing
@@ -132,7 +134,7 @@ Optional artefact review packs, broader template fidelity and some advanced expo
 
 ## Settings and keyboard shortcuts
 
-Open **Edit → Settings** with **Ctrl+,**. Choose theme, layout, outline visibility, editor font and size, wrapping, line numbers, indentation and preview zoom. **Apply** saves the choices on this device. **Restore defaults** can still be cancelled.
+Open **Edit → Settings** with **Ctrl+,**. Choose theme, layout, outline visibility, editor font and size, wrapping, line numbers, indentation, preview reading mode and zoom. **Apply** saves the choices on this device. **Restore defaults** can still be cancelled.
 
 Indentation options affect new typing; existing tabs, spaces, text, selection and Undo/Redo remain intact. Preview zoom ranges from 50% to 200% and does not change export sizes. **System** theme follows Windows; Windows high-contrast colours take precedence.
 

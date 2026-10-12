@@ -57,7 +57,7 @@ internal static class NativeShellLayoutChecks
                 var parsed = new MarkdownService().Parse(source);
                 var rendered = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, dark,
                     new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
-                ((FlowDocumentScrollViewer)window.FindName("Preview")).Document = rendered.Document;
+                ((DocumentPreview)window.FindName("Preview")).Document = rendered.Document;
                 ((ListBox)window.FindName("Outline")).ItemsSource = parsed.Headings;
                 ((FrameworkElement)window.FindName("FindBar")).Visibility = Visibility.Visible;
                 ((TextBox)window.FindName("ReplaceText")).Visibility = Visibility.Visible;

@@ -4,7 +4,7 @@ In the browser, choose **View → Export appearance settings**. In the native ed
 
 The browser exports its theme preference, editor layout and outline visibility. An unset browser theme maps to `System`. Native exports also include editor and preview choices. Browser-specific pane widths, focus modes, diagram zoom/themes, local handles, document drafts, recent paths, libraries and update consent are outside this appearance contract. Templates and snippets use the separate library migration; Word templates use original DOCX copies.
 
-Files are UTF-8 JSON, optionally with a UTF-8 BOM, limited to 64 KB and eight levels of nesting. The format version is exact:
+Files are UTF-8 JSON, optionally with a UTF-8 BOM, limited to 64 KB and eight levels of nesting. Native imports accept exact versions `lens-docs-studio-settings-1.0` and `lens-docs-studio-settings-1.1`. The unchanged browser exporter writes 1.0; native exports now write 1.1, adding preview reading mode. Older native versions that only support 1.0 reject a 1.1 file explicitly. A browser export remains:
 
 ```json
 {
@@ -27,5 +27,8 @@ Supported fields:
 | `editor.wordWrap`, `editor.showLineNumbers`, `editor.convertTabsToSpaces` | Boolean |
 | `editor.indentationSize` | Integer 2–8 |
 | `preview.zoom` | Integer 50–200 |
+| `preview.readingMode` | `Automatic`, `Continuous`, `Pages`; requires format version 1.1 |
+
+For example, a native 1.1 preview-only patch is `{"formatVersion":"lens-docs-studio-settings-1.1","preview":{"readingMode":"Pages"}}`. It retains the current zoom and other appearance choices. Legacy 1.0 imports retain the current reading mode. Existing saved native preferences without this field gain `Automatic` while retaining zoom and unrelated state.
 
 At least one appearance choice is required. Omitted fields retain the current editable values, including within `editor` and `preview`. Empty nested objects, nulls, duplicate names, unknown fields, malformed JSON and unsupported values are rejected before changing the dialogue. Import does not write preferences until Apply. Apply merges appearance into the latest preferences, preserving unrelated state and the existing durable settings backup. Native file exports use guarded writes and retain recovery for interrupted replacement.

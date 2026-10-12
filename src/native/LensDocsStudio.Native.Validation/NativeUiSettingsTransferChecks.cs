@@ -17,7 +17,7 @@ internal static partial class NativeUiChecks
         var backup = Path.Combine(output, "settings-" + Guid.NewGuid().ToString("N") + ".json");
         var browser = Path.Combine(output, "browser-settings-" + Guid.NewGuid().ToString("N") + ".json");
         var selectedTheme = original.Theme == "Dark" ? "Light" : "Dark";
-        File.WriteAllText(browser, JsonSerializer.Serialize(new { formatVersion = SettingsTransferFormat.FormatVersion, theme = selectedTheme, layout = "Editor", showOutline = true }));
+        File.WriteAllText(browser, JsonSerializer.Serialize(new { formatVersion = SettingsTransferFormat.LegacyFormatVersion, theme = selectedTheme, layout = "Editor", showOutline = true }));
         var expected = originalSettings with { Theme = selectedTheme, Layout = "Editor", ShowOutline = true };
         var settings = OpenSettingsWindow(owner, automation, process);
         Find(settings, "SettingsExport").Patterns.Invoke.Pattern.Invoke(); save(backup, "Export appearance settings");

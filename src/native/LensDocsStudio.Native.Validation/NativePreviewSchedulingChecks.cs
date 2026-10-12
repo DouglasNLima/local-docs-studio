@@ -30,7 +30,7 @@ internal static class NativePreviewSchedulingChecks
             var tab = model.ActiveDocument!;
             var editor = (TextEditor)window.FindName("Editor");
             var outline = (ListBox)window.FindName("Outline");
-            var preview = (FlowDocumentScrollViewer)window.FindName("Preview");
+            var preview = (LensDocsStudio.Native.Rendering.DocumentPreview)window.FindName("Preview");
             var source = "# Current heading\n\nBefore.\n\n## Target heading\n\n<details>\n<summary>Evidence</summary>\n\nHidden current text.\n</details>";
             tab.EditorDocument.Text = source;
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);

@@ -5,6 +5,49 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class SettingsTransferTests
 {
+    [Theory]
+    [InlineData("Automatic")]
+    [InlineData("Continuous")]
+    [InlineData("Pages")]
+    public void Reading_choices_round_trip_in_version_1_1_without_update_consent(string mode)
+    {
+        var settings = WorkspaceSettings.Default with { Preview = new(125, mode) };
+        var bytes = SettingsTransferFormat.Write(settings);
+        Assert.Contains("lens-docs-studio-settings-1.1", Encoding.UTF8.GetString(bytes));
+        Assert.Equal(settings, SettingsTransferFormat.Read(bytes, WorkspaceSettings.Default));
+        var preferences = new UserPreferences(AutomaticUpdateChecks: false, UpdateChannel: "Preview");
+        var applied = settings.ApplyTo(preferences);
+        Assert.Equal(mode, applied.Preview!.ReadingMode);
+        Assert.False(applied.AutomaticUpdateChecks);
+        Assert.Equal("Preview", applied.UpdateChannel);
+    }
+
+    [Fact]
+    public void Legacy_zoom_import_preserves_the_current_reading_choice()
+    {
+        var current = WorkspaceSettings.Default with { Preview = new(125, "Pages") };
+        var bytes = Encoding.UTF8.GetBytes("""{"formatVersion":"lens-docs-studio-settings-1.0","preview":{"zoom":150}}""");
+        Assert.Equal(new PreviewPreferences(150, "Pages"), SettingsTransferFormat.Read(bytes, current).Preview);
+    }
+
+    [Fact]
+    public void Reading_only_import_preserves_zoom_and_other_preferences()
+    {
+        var current = WorkspaceSettings.Default with { Preview = new(145), Theme = "Dark" };
+        var bytes = Encoding.UTF8.GetBytes("""{"formatVersion":"lens-docs-studio-settings-1.1","preview":{"readingMode":"Continuous"}}""");
+        Assert.Equal(current with { Preview = new(145, "Continuous") }, SettingsTransferFormat.Read(bytes, current));
+    }
+
+    [Theory]
+    [InlineData("lens-docs-studio-settings-1.0", "Pages")]
+    [InlineData("lens-docs-studio-settings-1.1", "Unknown")]
+    [InlineData("lens-docs-studio-settings-1.1", "pages")]
+    public void Unsupported_reading_mode_or_legacy_extension_is_rejected(string version, string mode)
+    {
+        var bytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(new { formatVersion = version, preview = new { readingMode = mode } });
+        Assert.Throws<InvalidDataException>(() => SettingsTransferFormat.Read(bytes, WorkspaceSettings.Default));
+    }
+
     [Fact] public void Native_appearance_round_trip_has_no_document_paths_recovery_or_update_consent()
     {
         var preferences = new UserPreferences(Theme: "Dark", Layout: "Editor", AutomaticUpdateChecks: false, UpdateChannel: "Preview",

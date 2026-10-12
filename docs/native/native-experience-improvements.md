@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Long documents now open as native pages by default, with selectable text, previous/next controls and asynchronous navigation to a distant Find or outline target. Settings also offer explicit Continuous or Pages reading. Seven hidden-HWND outcomes cover 4,000 items, stale navigation/selection protection, original image/vector retention and narrow light/dark diagram actions. The preview retains its native text automation interface. Local Release, 800 core tests and the full native harness pass; the new 57th actual desktop workflow is awaiting CI, so physical accessibility and installation-context evidence are not yet claimed for this change.
+
 The actual Windows PDF Export-menu Unicode workflow now passes in all desktop contexts of both 230852b native runs. Its native window and exported PDF were inspected, and the matching installer lifecycle retains 20 state files. This completes the current font/copy-mapping correction; it does not remove the complex-script or production-certification limits. See the [engineering handover](engineering-handover.md).
 
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.

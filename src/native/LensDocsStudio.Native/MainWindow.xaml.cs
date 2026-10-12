@@ -174,7 +174,7 @@ public partial class MainWindow : Window
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
-            Preview.Document = rendered.Document;
+            Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             Outline.ItemsSource = parsed.Headings;
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
                 : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
@@ -273,6 +273,7 @@ public partial class MainWindow : Window
         if (query.Length == 0) return;
         if (searchPreview)
         {
+            if (Preview.Document is null || Preview.Selection is null) { model.Status = "The preview is still updating."; return; }
             rendered?.ExpandDetails();
             var start = Preview.Selection.IsEmpty ? Preview.Document.ContentStart : Preview.Selection.End;
             if (!FindPreview(start, query) && !FindPreview(Preview.Document.ContentStart, query) && rendered is not null)
@@ -280,7 +281,7 @@ public partial class MainWindow : Window
                 var match = rendered.Formulae.FirstOrDefault(formula => formula.Source.Contains(query, StringComparison.CurrentCultureIgnoreCase));
                 if (match is not null)
                 {
-                    Preview.Selection.Select(match.Element.ElementStart, match.Element.ElementEnd); _ = PreviewNavigationService.BringIntoViewAsync(Preview, match.Element.ElementStart);
+                    _ = PreviewNavigationService.BringIntoViewAsync(Preview, match.Element.ElementStart, match.Element.ElementEnd);
                     model.Status = "Matching formula selected; its LaTeX source is available from the context menu.";
                 }
             }
@@ -301,8 +302,7 @@ public partial class MainWindow : Window
             var index = run.IndexOf(query, StringComparison.CurrentCultureIgnoreCase);
             if (index < 0) continue;
             var matchStart = pointer.GetPositionAtOffset(index)!;
-            Preview.Selection.Select(matchStart, matchStart.GetPositionAtOffset(query.Length)!);
-            _ = PreviewNavigationService.BringIntoViewAsync(Preview, matchStart); return true;
+            _ = PreviewNavigationService.BringIntoViewAsync(Preview, matchStart, matchStart.GetPositionAtOffset(query.Length)!); return true;
         }
         model.Status = "No matches found."; return false;
     }

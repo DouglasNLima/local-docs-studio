@@ -21,6 +21,8 @@ The native preview provides real folder workspaces, tabs, recent files/workspace
 
 Native **Editor** layout keeps the outline current while pausing hidden diagram, image and document rendering. Returning to **Split** or **Preview** rebuilds the current preview. **Copy rendered text** explicitly prepares current edits even in Editor layout; intervening edits or clipboard changes prevent an obsolete copy. Find follows the visible editor or preview when changing single-pane layouts.
 
+Native **Settings → Preview reading mode** offers Automatic, Continuous and Pages. Automatic uses native pages for long documents, with previous/next controls and direct navigation to Find results and headings. Page-sized images and scrollable diagram actions retain original source and export content. Native appearance exports use settings format 1.1 for this choice; existing 1.0 browser exports remain supported.
+
 Native wiki-style links support `[[document]]`, `[[folder/document#section|Label]]` and workspace completion with `Ctrl+Space`. Explicit paths take priority; duplicate short names report their matching paths. Navigation remains inside the selected workspace. Reviewed file moves preserve aliases, document review checks current target drafts, and Docs Site exports resolve links only among included documents. Standalone HTML, Word and read-only help retain readable labels.
 
 The native file tree refreshes when files or folders are created, renamed or deleted outside the app. Surviving folder controls retain expansion and selection. External edits flag conflicts without replacing unsaved editor text; the app's private recovery folder is excluded from the tree.

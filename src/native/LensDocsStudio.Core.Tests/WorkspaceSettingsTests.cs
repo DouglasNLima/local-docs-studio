@@ -33,6 +33,14 @@ public sealed class WorkspaceSettingsTests : IDisposable
         Assert.Equal(current.RecentDocuments, restored.RecentDocuments); Assert.Equal(current.RecentWorkspaces, restored.RecentWorkspaces); Assert.Equal(current.Window, restored.Window);
     }
 
+    [Fact] public void Earlier_saved_preview_zoom_gains_automatic_reading_without_losing_appearance_or_consent()
+    {
+        var original = JsonSerializer.Deserialize<UserPreferences>("""{"Theme":"Dark","Preview":{"Zoom":135},"AutomaticUpdateChecks":false,"UpdateChannel":"Preview"}""")!;
+        Assert.True(WorkspaceSettings.ArePreferencesValid(original));
+        Assert.Equal(new PreviewPreferences(135, "Automatic"), WorkspaceSettings.From(original).Preview);
+        Assert.Equal("Dark", original.Theme); Assert.False(original.AutomaticUpdateChecks); Assert.Equal("Preview", original.UpdateChannel);
+    }
+
     [Theory]
     [InlineData(9, 4, 100)] [InlineData(37, 4, 100)] [InlineData(14, 1, 100)] [InlineData(14, 9, 100)]
     [InlineData(14, 4, 49)] [InlineData(14, 4, 201)]

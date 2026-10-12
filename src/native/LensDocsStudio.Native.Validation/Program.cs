@@ -56,6 +56,12 @@ internal static class Program
             try { NativePdfUnicodeChecks.Run(unicodeOutput); Console.WriteLine("Native PDF Unicode checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--pagination")
+        {
+            var paginationOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(paginationOutput);
+            try { NativePaginationChecks.Run(paginationOutput); Console.WriteLine("Native pagination checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--html-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -271,6 +277,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
         try { NativePreviewSchedulingChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }
+        try { NativePaginationChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native preview pagination: " + ex.Message); }
         try { NativeClipboardApartmentChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native clipboard apartments: " + ex.Message); }
         try { NativeShellLayoutChecks.Run(output); }

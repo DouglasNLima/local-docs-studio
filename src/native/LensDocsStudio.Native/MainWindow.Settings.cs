@@ -27,6 +27,7 @@ public partial class MainWindow
         var settings = WorkspaceSettings.From(model.Preferences);
         EditorPreferenceService.Apply(Editor, settings.Editor);
         Preview.MinZoom = 50; Preview.MaxZoom = 200; Preview.Zoom = settings.Preview.Zoom;
+        Preview.ApplyReadingMode(settings.Preview.ReadingMode);
         OutlineColumn.Width = new GridLength(settings.ShowOutline ? 180 : 0);
         OutlinePanel.Visibility = settings.ShowOutline ? Visibility.Visible : Visibility.Collapsed;
     }

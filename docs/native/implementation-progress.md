@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Automatic native pagination now addresses the long-document initial-layout stall. Users can choose Continuous or Pages; distant preview navigation preserves exact selection and ignores obsolete requests. Page-sized media retain original images/vector/source and all diagram actions. The existing TextPattern is preserved by a native automation peer. Local Release, 800 core tests, seven pagination outcomes, the full native harness and static checks pass. A 57th real desktop workflow and reading-mode restart checks are added for isolated Windows CI; those runs are pending.
+
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
@@ -11,14 +13,14 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Checked PDF font fallback, supplementary-character copy mapping and explicit missing-glyph failure |
+| Latest implementation | Automatic native pagination, asynchronous distant navigation, page-sized media, preserved text automation and portable reading preferences |
 | Latest complete native CI | 230852b, PR/push 38230558112/38230551640: 791 core tests, seven signature cases, seven combined signed-update cases, 12 export-browser cases and 56 workflows in built, installed, upgraded and reinstalled applications |
 | Latest complete web CI | Both 230852b runs 38230558094/38230551635: all 262 cases in 10.7 minutes |
-| Current validation | PDF correction passes Release with no warnings/errors, 791 core tests, six focused Unicode outcomes, the full 40-case native corpus with zero failures and static checks. Both native CI runs pass all 56 workflows, including actual Unicode PDF export in every desktop context |
+| Current validation | Pagination passes Release with no warnings/errors, 800 core tests, seven focused outcomes, the full 40-case native corpus with zero failures and static checks. The expanded 57-workflow actual desktop suite awaits CI; the completed PDF revision passes 56 workflows in every desktop context |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
-The latest renderer change yields during nested lists, tables, quotes and details. Local first-input latency for a 4,000-item list improved from 322.6 ms to roughly 1–2 ms. Profiling identified mutable shared-brush tracking overhead; freezing those brushes reduced a diagnostic layout comparison from 2.1 seconds to 1.3 seconds. Final WPF layout remains synchronous and large-document certification is incomplete.
+Earlier renderer batching reduced construction-only first-input latency for a 4,000-item list from 322.6 ms to roughly 1–2 ms. Frozen brushes reduced a separate diagnostic layout comparison from 2.1 seconds to 1.3 seconds. Automatic pagination now bounds initial visible layout and resolves distant pages asynchronously. Continuous and individual-page layout remain synchronous; larger-block, real-desktop and broader performance certification remain incomplete.
 
 Editor-only layout now updates headings without preparing hidden diagrams, images, formulae or WPF document controls. Explicit rendered-text copying verifies the current document/source and clipboard sequence. Showing Split/Preview resumes rendering, and single-pane Find targets the visible control. Four native scheduling outcomes pass; workflow 53 passes actual clipboard, Undo and layout/search checks in both 9fddfd9 native runs. The actual Editor-only screenshot is retained in the PR run artefact.
 

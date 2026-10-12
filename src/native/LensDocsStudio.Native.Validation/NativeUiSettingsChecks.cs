@@ -25,6 +25,7 @@ internal static partial class NativeUiChecks
         var before = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
         var settings = OpenSettingsWindow(window, automation, process);
         Select("SettingsFont", "Consolas"); Select("SettingsFontSize", "18"); Select("SettingsIndentation", "2");
+        Select("SettingsReadingMode", "Pages");
         Find(settings, "SettingsWordWrap").AsCheckBox().IsChecked = false;
         Find(settings, "SettingsLineNumbers").AsCheckBox().IsChecked = false;
         Find(settings, "SettingsSpaces").AsCheckBox().IsChecked = true;
@@ -35,7 +36,7 @@ internal static partial class NativeUiChecks
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,
             "Applied settings did not close.");
         var after = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
-        if (after.Editor != new EditorPreferences("Consolas", 18, false, false, 2, true) || after.Preview != new PreviewPreferences(125) || after.ShowOutline
+        if (after.Editor != new EditorPreferences("Consolas", 18, false, false, 2, true) || after.Preview != new PreviewPreferences(125, "Pages") || after.ShowOutline
             || after.AutomaticUpdateChecks != before.AutomaticUpdateChecks || after.UpdateChannel != before.UpdateChannel
             || !after.RecentDocuments!.SequenceEqual(before.RecentDocuments!) || after.IgnoredVersion != before.IgnoredVersion
             || editor.Patterns.Value.Pattern.Value.Value != originalText || File.ReadAllText(source) != savedText)
@@ -50,7 +51,7 @@ internal static partial class NativeUiChecks
         if (WorkspaceSettings.From(cancelled) != WorkspaceSettings.From(after) || editor.Patterns.Value.Pattern.Value.Value != originalText)
             throw new IOException("Cancelling default settings changed saved preferences or document text.");
 
-        void Select(string id, string value) { var choice = Find(settings, id).AsComboBox(); choice.Select(value); choice.Collapse(); }
+        void Select(string id, string value) { var choice = Find(settings, id).AsComboBox(); choice.Focus(); choice.Select(value); choice.Collapse(); }
     }
 
     private static void CheckRestoredSettings(Window window, UIA3Automation automation, int process)
@@ -61,7 +62,8 @@ internal static partial class NativeUiChecks
             || Find(settings, "SettingsIndentation").AsComboBox().SelectedItem?.Text != "2"
             || Find(settings, "SettingsWordWrap").AsCheckBox().IsChecked != false || Find(settings, "SettingsLineNumbers").AsCheckBox().IsChecked != false
             || Find(settings, "SettingsSpaces").AsCheckBox().IsChecked != true || Find(settings, "SettingsOutline").AsCheckBox().IsChecked != false
-            || Find(settings, "SettingsZoom").Patterns.RangeValue.Pattern.Value != 125)
+            || Find(settings, "SettingsZoom").Patterns.RangeValue.Pattern.Value != 125
+            || Find(settings, "SettingsReadingMode").AsComboBox().SelectedItem?.Text != "Pages")
             throw new IOException("Native settings did not restore their exact values after restarting the application.");
         Find(settings, "SettingsCancel").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,

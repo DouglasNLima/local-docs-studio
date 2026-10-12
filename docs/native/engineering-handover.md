@@ -1,6 +1,8 @@
 # Native Windows engineering handover
 
-Status: available for internal preview with documented limitations. Product revision 230852b passes local validation and all four Windows/web CI runs. Production certification is incomplete. This report distinguishes implementation from evidence and does not authorise installation on the user's active desktop, merging, release publication or tag changes.
+Status: available for internal preview with documented limitations. The pagination update passes local validation and awaits Windows/web CI; the last fully inspected product evidence is revision 230852b. Production certification is incomplete. This report distinguishes implementation from evidence and does not authorise installation on the user's active desktop, merging, release publication or tag changes.
+
+Automatic reading now uses native pages for long documents, with explicit Continuous/Pages choices, asynchronous distant navigation, preserved text automation and page-sized media. All 800 core tests and seven focused hidden-HWND pagination outcomes pass. The new desktop workflow checks page buttons, distant Find selection, complete Undo and saved reading preferences; it awaits isolated CI. Portable appearance exports use version 1.1 while retaining version 1.0 import compatibility.
 
 ## Architecture and delivered workflows
 
@@ -34,8 +36,9 @@ Update policy checks compatible releases, signed metadata, size/hash, actual Win
 
 | Evidence | Result and scope |
 |---|---|
-| Local Release at 230852b | Zero warnings/errors |
-| Core tests | 791 passed; artifacts/native/tests/native-core-pdf-unicode.trx |
+| Local pagination Release | Zero warnings/errors |
+| Core tests | 800 passed; artifacts/native/tests/native-pagination.trx |
+| Native pagination | Seven hidden-HWND outcomes; artifacts/native/pagination and validation/native-pagination.json; expanded 57-workflow desktop suite pending CI |
 | Full native harness | 40 diagram cases and export checks, zero failures; artifacts/native/validation |
 | PDF Unicode | Six outcomes pass; artifacts/native/pdf-unicode/native-pdf-unicode.json and inspected PNG |
 | Export browser checks | 12 Chromium/Edge cases from disk and static hosting, including theme/print/forced colours; latest completed 676523e CI also passes |
@@ -47,7 +50,7 @@ Update policy checks compatible releases, signed metadata, size/hash, actual Win
 
 The [validation report](validation-report.md) retains exact histories, failed/cancelled runs and limits. Local checks use hidden/windowless native fixtures. Actual keyboard, Windows clipboard, pickers, installer execution and certificate changes run only in isolated Windows CI. Earlier real Word/Excel checks used Office 16.0.20430.20092; new syntax-colour destination rendering has not been repeated in Office.
 
-Performance evidence is fixture-specific. Earlier actual application samples observed 2.63 seconds launch-to-preview, 636 ms keyboard delivery/observation, 103 ms save and 124 ms small-image paste, including UIA polling overhead. A 1,001-file/4.14 MB fixture measured enumeration at 53–64 ms, reads at 5.6–11.3 ms, parsing at 180–517 ms and editor insertion/layout at 0.3–1.6 ms. Chunked native construction yields to input, but final large FlowDocument layout remains synchronous and can exceed one second. These are not universal latency or leak guarantees.
+Performance evidence is fixture-specific. Earlier actual application samples observed 2.63 seconds launch-to-preview, 636 ms keyboard delivery/observation, 103 ms save and 124 ms small-image paste, including UIA polling overhead. A 1,001-file/4.14 MB fixture measured enumeration at 53–64 ms, reads at 5.6–11.3 ms, parsing at 180–517 ms and editor insertion/layout at 0.3–1.6 ms. Chunked native construction yields to input, and automatic pagination now bounds initial visible layout. Product hidden-HWND samples for 4,000 items observed roughly 52–144 ms first input after attachment and 0.7–0.8 seconds distant navigation while input continued. Continuous/individual-page layout remains synchronous; oversized blocks and physical DPI certification remain open. These are not universal latency or leak guarantees.
 
 ## Build artefacts and references
 

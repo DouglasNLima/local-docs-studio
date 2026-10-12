@@ -3,10 +3,13 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
  xmlns:workspace="clr-namespace:LensDocsStudio.Native.ViewModels"
+ xmlns:rendering="clr-namespace:LensDocsStudio.Native.Rendering"
  Title="Lens Docs Studio · Native Preview" Width="1440" Height="900" MinWidth="860" MinHeight="540"
  Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
  PreviewKeyDown="WindowKeyDown" Closing="WindowClosing" Loaded="WindowLoaded">
  <Window.Resources>
+  <ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Rendering/DocumentPreview.xaml"/></ResourceDictionary.MergedDictionaries>
+
   <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
    <Setter Property="Padding" Value="10,5"/><Setter Property="Margin" Value="3"/>
    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
@@ -18,6 +21,7 @@
   <HierarchicalDataTemplate DataType="{x:Type workspace:WorkspaceEntryViewModel}" ItemsSource="{Binding Children}">
    <TextBlock Text="{Binding Name}" Margin="2,4" ToolTip="{Binding Path}"/>
   </HierarchicalDataTemplate>
+   </ResourceDictionary>
  </Window.Resources>
  <DockPanel>
   <Menu DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Padding="8,3" AutomationProperties.Name="Application menu">
@@ -241,7 +245,7 @@
       </avalon:TextEditor.ContextMenu>
      </avalon:TextEditor>
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
-     <FlowDocumentScrollViewer x:Name="Preview" Grid.Column="2" VerticalScrollBarVisibility="Auto" IsToolBarVisible="False"
+     <rendering:DocumentPreview x:Name="Preview" Grid.Column="2" Style="{StaticResource DocumentPreviewStyle}"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
        AutomationProperties.Name="Document preview" AutomationProperties.AutomationId="DocumentPreview"/>
      <DockPanel x:Name="OutlinePanel" Grid.Column="3" Background="{DynamicResource PanelBrush}">

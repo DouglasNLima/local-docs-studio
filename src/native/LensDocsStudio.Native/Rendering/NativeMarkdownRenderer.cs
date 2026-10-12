@@ -23,10 +23,17 @@ namespace LensDocsStudio.Native.Rendering;
 public sealed record SourceReference(int Start, int End, int Line);
 public sealed record PreviewDetails(int SourceStart, int SourceEnd, Expander Toggle);
 public sealed record PreviewMaths(string Source, InlineUIContainer Element);
+public sealed record PreviewMedia(Image Image, double ScrollMaximumHeight, FrameworkElement? Actions = null)
+{
+    public double ScrollMaximumWidth { get; } = Image.MaxWidth;
+    public BlockUIContainer? Host { get; set; }
+    public ScrollViewer? PageScroller { get; set; }
+}
 public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<int, TextElement> SourceElements, IReadOnlyList<string> Warnings)
 {
     public IReadOnlyList<PreviewDetails> Details { get; init; } = [];
     public IReadOnlyList<PreviewMaths> Formulae { get; init; } = [];
+    public IReadOnlyList<PreviewMedia> Media { get; init; } = [];
     public void RevealSource(int offset)
     { foreach (var section in Details) if (offset >= section.SourceStart && offset <= section.SourceEnd) section.Toggle.IsExpanded = true; }
     public void ExpandDetails() { foreach (var section in Details) section.Toggle.IsExpanded = true; }
@@ -73,13 +80,14 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var sourceElements = new Dictionary<int, TextElement>();
         var detailSections = new List<PreviewDetails>();
         var formulaSources = new List<PreviewMaths>();
+        var media = new List<PreviewMedia>();
         var warnings = new List<string>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
         foreach (var block in parsed.Syntax)
             document.Blocks.Add(await Convert(block));
         cancellationToken.ThrowIfCancellationRequested();
-        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly() };
+        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
 
         async ValueTask Cooperate()
         {
@@ -109,6 +117,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = new Paragraph(Formula(formula, formula.Lines.ToString(), true)) { Margin = new Thickness(0, 12, 0, 12) }; break;
                 case FencedCodeBlock code when diagrams.TryGetValue(code, out var diagram):
                     var panel = new StackPanel { Margin = new Thickness(0, 6, 0, 12) };
+                    PreviewMedia? diagramMedia = null;
                     if (diagram.Success)
                     {
                         try
@@ -126,6 +135,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                                 actions.Children.Add(button);
                             }
                             panel.Children.Add(actions);
+                            diagramMedia = new(image, image.MaxHeight, actions); media.Add(diagramMedia);
                         }
                         catch (Exception ex) when (ex is not OutOfMemoryException)
                         {
@@ -138,7 +148,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         warnings.Add(diagram.Error!);
                         panel.Children.Add(new TextBlock { Text = diagram.Error, TextWrapping = TextWrapping.Wrap, Foreground = foreground });
                     }
-                    result = new BlockUIContainer(panel); break;
+                    var diagramHost = new BlockUIContainer(panel);
+                    if (diagramMedia is not null) diagramMedia.Host = diagramHost;
+                    result = diagramHost; break;
                 case CodeBlock code:
                     var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
                     CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
@@ -309,6 +321,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             if (preparedImages is null || !preparedImages.TryGetValue(link.Url ?? "", out var preparedImage)) throw new IOException("The image was not prepared for preview.");
                             var bitmap = preparedImage.Pixels ?? throw new IOException(preparedImage.Error ?? "The image could not be prepared.");
                             var image = new Image { Source = bitmap, Stretch = Stretch.Uniform, MaxWidth = 720, MaxHeight = 720, ToolTip = alt, Focusable = true };
+                            media.Add(new(image, image.MaxHeight));
                             System.Windows.Automation.AutomationProperties.SetName(image, alt.Length == 0 ? "Document image" : alt);
                             System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DocumentImage" + link.Span.Start);
                             var menu = new ContextMenu();
@@ -351,6 +364,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             }
             var image = new Image { Source = drawing, Width = Math.Min(720, drawing.Width), Height = Math.Min(720 / drawing.Width, 1) * drawing.Height,
                 Stretch = Stretch.Uniform, HorizontalAlignment = HorizontalAlignment.Left, ToolTip = source, Focusable = true };
+            media.Add(new(image, image.MaxHeight));
             System.Windows.Automation.AutomationProperties.SetName(image, "Formula: " + source);
             System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DocumentFormula" + sourceStart);
             var copy = new MenuItem { Header = "Copy LaTeX source", IsEnabled = copyCode is not null };
