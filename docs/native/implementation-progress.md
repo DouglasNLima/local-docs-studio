@@ -2,7 +2,7 @@
 
 Current gate: internal preview hardening. The authorised work remains continuous; no merge or public release is authorised. The .NET 10/WPF application is separate from the preserved browser app and WinUI/WebView2 shell.
 
-All four 0045689 CI runs pass: 766 core tests, seven actual Windows signature checks with certificate cleanup, 55 built/installed/reinstalled workflows, eight exported-site cases and 262 browser cases. Initial facd03f certificate runs stalled and were cancelled, with logs retained; the revised elevated disposable machine-root fixture completes in seconds. The current link correction passes all 778 core tests and the full native harness locally, including six native link checks and an inspected PDF. Its CI remains pending. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
+All four 45b5d5d CI runs pass: 778 core tests, seven actual Windows signature checks, 55 workflows in built/installed/upgraded/reinstalled applications, eight exported-site cases and 262 browser cases. The simulated preview upgrade verifies installed versions and retained state/workspace bytes. Earlier certificate stalls and the 2ea009b Save-field observation failure remain recorded; the current bounded fixture and field-readiness checks pass. The link correction has six native outcomes and an inspected PDF. Corrected diagram output and exact supported forms are recorded in the [diagram compatibility report](diagram-compatibility.md).
 
 | Reference | Current value |
 |---|---|
@@ -10,9 +10,9 @@ All four 0045689 CI runs pass: 766 core tests, seven actual Windows signature ch
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
 | Latest implementation | Simulated two-version installer upgrade checks with byte-preserved state, installed-version assertions and bounded Save dialogue readiness observation |
-| Latest complete native CI | 0045689, PR/push 38215212276/38215207396: 766 core tests, seven signature cases and 55 workflows in built, installed and reinstalled applications |
-| Latest complete web CI | Both 0045689 runs 38215212191/38215207435: all 262 cases in 10.5 minutes |
-| Current validation | Clean Release build, all 778 core tests and complete native harness pass. Five installer file-observation checks, script parsing and static integrity pass. The expanded installer path and Save observation correction await Windows CI |
+| Latest complete native CI | 45b5d5d, PR/push 38217770147/38217763979: 778 core tests, seven signature cases and 55 workflows in built, installed, upgraded and reinstalled applications |
+| Latest complete web CI | Both 45b5d5d runs 38217770149/38217763858: all 262 cases in 10.5/7.4 minutes |
+| Current validation | Clean Release build, all 778 core tests, complete native harness, five file-observation cases and static integrity pass. Both expanded Windows CI lifecycles pass; detailed logs are retained under artifacts/native |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Validate the expanded installer upgrade and corrected Save observation in CI. Native push 38216456690 at 2ea009b failed while locating the Save filename field; preserve its evidence and do not count it as passed. No local certificate-store mutation or foreground interaction is authorised by the current validation setup.
+1. Continue the remaining acceptance checks. The downloaded 45b5d5d result confirms matching upgraded versions, 20 preserved state files/workspace bytes and certificate cleanup. Native push 38216456690 at 2ea009b remains recorded as failed. No local certificate-store mutation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.
