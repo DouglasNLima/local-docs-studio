@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Opening a large collapsed section no longer attaches each paragraph separately to the visible document. Its complete body moves as one native section and retains typography while detached. The reproduced 1,200-paragraph expansion delay was 2.2 seconds; 18 local light/dark transitions now remain below 149 ms while preserving complete content, bold/italic/link formatting and source. These bounded observations cover expansion/collapse, not all pagination or the separate intermittent initial-toggle delay; CI validation is pending.
+
 Actual Edit source testing reproduced replacement of a previous selection when typing at the new location. Source navigation now collapses selection at the target, so returning to code cannot leave an unrelated range selected. Corrected desktop validation passes in all four contexts of both df281c0 native runs, retaining the original regression assertion and earlier failure evidence.
 
 An invalid diagram now offers keyboard-accessible Copy source and Edit source controls beside its explanation. Edit source reveals the editor from Preview layout and places the caret at the original fence; stale previews cannot navigate a changed document. Fourteen native source/control cases pass locally and in CI. Actual Windows clipboard, focus, caret typing, Undo and saved-file preservation pass in the expanded 60-workflow desktop suite.

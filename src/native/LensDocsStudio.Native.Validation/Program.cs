@@ -116,6 +116,12 @@ internal static class Program
             try { NativeDiagramFailureChecks.Run(failureOutput); Console.WriteLine("Native diagram recovery checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--details-latency")
+        {
+            var detailsOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/details-latency"); Directory.CreateDirectory(detailsOutput);
+            try { NativeDetailsLatencyChecks.Run(detailsOutput); Console.WriteLine("Native details latency checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--diagram-themes")
         {
             var themeOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/diagram-themes"); Directory.CreateDirectory(themeOutput);
@@ -323,6 +329,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native diagram painting: " + ex.Message); }
         try { NativeDiagramFailureChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native diagram recovery: " + ex.Message); }
+        try { NativeDetailsLatencyChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native details expansion: " + ex.Message); }
         try { NativeSvgChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }

@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current details work fixes a reproduced later expansion stall, separately from initial construction. Grouping the body removed the 2.2-second delay for 1,200 paragraphs; retaining inherited typography also corrected the remaining dense-paragraph collapse delay. All 18 focused light/dark transitions and the full native harness pass locally. Release has zero warnings/errors. Evidence includes the failing baseline, intermediate result and final report under artifacts/native/details-latency; actual desktop/installed validation awaits CI.
+
 Current implementation df281c0 passes both native and both web pipelines, including the corrected source-selection behaviour and all 60 desktop workflows in four contexts. Preview.215 packages have verified hashes, bundled runtime and unsigned metadata; the installer lifecycle preserves 20 state files. Exact reports and the inspected recovery screenshot are under artifacts/native/ci-df281c0-push. See the [handover](engineering-handover.md) for current artefacts and remaining acceptance; the entries below retain earlier revision outcomes.
 
 The new desktop check at 54c1245 exposed a real selection defect in both native CI runs: typing after Edit source replaced the previously selected insertion. The saved fixture was not overwritten; retained session/screenshot evidence shows the editor draft reduced to `X`. Source navigation now clears the old selection at its target. The original assertion is retained for the next CI run; no timeout or expected text was relaxed.

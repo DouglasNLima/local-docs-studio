@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Large details expansion now moves one native body section with stable typography. A 1,200-paragraph fixture reproduced 2,155 ms input delay before the change. Eighteen light/dark expansion/collapse/reopen checks now pass locally, including dense formatting and table cells, with every numbered item, formatting/link counts and source retained; maximum observed first input is 148.2 ms against the unchanged 250 ms bound. Full native validation passes. Actual desktop/installed validation of this change awaits CI; the historical initial-toggle delay remains open.
+
 The first actual failed-diagram recovery checks (54c1245, both native runs) revealed that source navigation retained a previous selection. Moving to a source location now collapses that selection before keyboard input. The unchanged clipboard/focus/insertion/Undo assertion passes in all four desktop contexts of both df281c0 native runs; both web runs also pass.
 
 Failed-diagram recovery now covers the web reference's Copy source and Edit source actions. Fourteen local and CI native cases cover invalid/unknown/oversized diagrams, rejected native drawings, standalone Mermaid, DevOps containers and a valid control in both themes. Copy retains exact diagram code; editing targets the original fence and reveals the editor. The expanded 60-workflow desktop suite passes after the selection correction. Earlier revision observations follow.

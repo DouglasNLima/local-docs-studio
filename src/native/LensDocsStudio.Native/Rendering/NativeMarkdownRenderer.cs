@@ -256,16 +256,20 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     detailsHeader.Inlines.Add(new Run(details.Summary)); detailsSection.Blocks.Add(detailsHeader);
                     PreviewConstructionEvents.Log.Stage("details-header-attached", details.Span.Start);
                     detailSections.Add(new(details.Span.Start, details.Span.End, toggle));
-                    var detailsChildren = new List<WpfBlock>();
-                    foreach (var child in details) detailsChildren.Add(await Convert(child, details.InitiallyExpanded ? detailsSection.Blocks : null));
+                    // Move one body instead of repeatedly changing the displayed document.
+                    // Keep inherited typography stable while this body detaches.
+                    var detailsBody = new Section
+                    {
+                        FontFamily = detailsSection.FontFamily, FontSize = detailsSection.FontSize, Foreground = detailsSection.Foreground,
+                        FontStyle = detailsSection.FontStyle, FontWeight = detailsSection.FontWeight, FontStretch = detailsSection.FontStretch
+                    };
+                    if (details.InitiallyExpanded) detailsSection.Blocks.Add(detailsBody);
+                    foreach (var child in details) await Convert(child, detailsBody.Blocks);
                     PreviewConstructionEvents.Log.Stage("details-children-ready", details.Span.Start);
                     void SynchroniseDetails()
                     {
-                        foreach (var child in detailsChildren)
-                        {
-                            if (toggle.IsExpanded && !detailsSection.Blocks.Contains(child)) detailsSection.Blocks.Add(child);
-                            else if (!toggle.IsExpanded && detailsSection.Blocks.Contains(child)) detailsSection.Blocks.Remove(child);
-                        }
+                        if (toggle.IsExpanded && !detailsSection.Blocks.Contains(detailsBody)) detailsSection.Blocks.Add(detailsBody);
+                        else if (!toggle.IsExpanded && detailsSection.Blocks.Contains(detailsBody)) detailsSection.Blocks.Remove(detailsBody);
                     }
                     toggle.Expanded += (_, _) => SynchroniseDetails(); toggle.Collapsed += (_, _) => SynchroniseDetails(); SynchroniseDetails();
                     PreviewConstructionEvents.Log.Stage("details-synchronised", details.Span.Start);
