@@ -1,5 +1,7 @@
 # Native implementation progress
 
+The wizard rerun passed the reviewed destination, optional task and Back checks, then the confirmation test activated the default No response instead of Yes. The actual installer log and screenshots identify this as a second harness error. Yes now requires observed keyboard focus and Space activation; full wizard installation remains pending. Both failed native run pairs are retained in the validation report.
+
 Large-block navigation now retains the exact target page. A reproduced 352 KB paragraph selected its final phrase but returned to page 1; the parent-paragraph scroll request was responsible. Six focused native block cases, seven existing pagination cases and the full native harness pass after correction. The expanded desktop workflow verifies actual Find highlighting, focus, Undo and unchanged saved bytes for that paragraph; its CI run remains pending. See the validation report for retained before/after evidence and measured limits.
 
 The diagnostic/evidence follow-up b373968 passed both native and both web CI runs before this wizard change.

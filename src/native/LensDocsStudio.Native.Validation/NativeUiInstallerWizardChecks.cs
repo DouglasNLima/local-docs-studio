@@ -104,7 +104,11 @@ internal static partial class NativeUiChecks
                     Wait(() => (confirm = wizard.ModalWindows.FirstOrDefault()) is not null, "Cancel did not offer an exit confirmation.");
                     Capture("cancel-confirmation", confirm!);
                     var yes = confirm!.FindAllDescendants(cf => cf.ByControlType(ControlType.Button)).Single(element => Label(element.Name) == "Yes");
-                    yes.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);
+                    yes.Focus(); Wait(() => yes.Properties.HasKeyboardFocus.Value, "The exit confirmation cannot focus Yes.");
+                    Capture("cancel-confirmed-choice", confirm);
+                    // Enter can still activate the message box's default No button after
+                    // programmatic focus. Space activates the explicitly focused Yes button.
+                    Keyboard.Type(VirtualKeyShort.SPACE);
                     Wait(() => wizardProcess.HasExited, "The cancelled wizard did not exit.");
                     if (Directory.Exists(destination) || Directory.Exists(originalDestination) || RegistrySnapshot(NativeUninstallKey) is not null
                         || File.Exists(startShortcut) || File.Exists(desktopShortcut) || DefaultMarkdownAssociation() != markdownBefore)
