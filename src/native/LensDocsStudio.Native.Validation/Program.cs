@@ -130,6 +130,12 @@ internal static class Program
             try { NativeSettingsChecks.Run(settingsOutput); Console.WriteLine("Native settings integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--layout")
+        {
+            var layoutOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(layoutOutput);
+            try { NativeLayoutChecks.Run(layoutOutput); Console.WriteLine("Native layout integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--preview-navigation")
         {
             var navigationOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(navigationOutput);

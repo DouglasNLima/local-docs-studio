@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckCaseOnlyRename(Window owner, AutomationElement editor, UIA3Automation automation, int process, string source, string target)
     {
-        var before = editor.Patterns.Value.Pattern.Value.Value; var sourceSaved = File.ReadAllText(source); var targetSaved = File.ReadAllBytes(target);
+        var before = ReadEditorText(editor); var sourceSaved = File.ReadAllText(source); var targetSaved = File.ReadAllBytes(target);
         var originalName = Path.GetFileName(target); var upperName = Path.GetFileNameWithoutExtension(target).ToUpperInvariant() + Path.GetExtension(target);
         var originalReference = Uri.EscapeDataString(originalName); var upperReference = Uri.EscapeDataString(upperName);
         Find(owner, "NavigateForward").Click();

@@ -67,6 +67,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         cancellationToken.ThrowIfCancellationRequested();
         Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
+        foreground.Freeze(); surface.Freeze();
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity, TextAlignment = TextAlignment.Left };
         var sourceElements = new Dictionary<int, TextElement>();
@@ -74,24 +75,27 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var formulaSources = new List<PreviewMaths>();
         var warnings = new List<string>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
-        var batch = Stopwatch.StartNew(); var blocks = 0;
+        var batch = Stopwatch.StartNew(); var units = 0;
         foreach (var block in parsed.Syntax)
+            document.Blocks.Add(await Convert(block));
+        cancellationToken.ThrowIfCancellationRequested();
+        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly() };
+
+        async ValueTask Cooperate()
         {
-            document.Blocks.Add(Convert(block));
-            if (incremental && (++blocks % 32 == 0 || batch.ElapsedMilliseconds >= 8))
+            cancellationToken.ThrowIfCancellationRequested();
+            if (incremental && (++units % 32 == 0 || batch.ElapsedMilliseconds >= 8))
             {
-                // Keep the old preview visible while native objects are prepared in small batches.
-                // Input, cancellation and newer source edits can run between these batches.
+                // Large lists, tables and nested sections share the same input/cancellation budget.
+                // The current preview remains visible until this complete result is ready.
                 await Dispatcher.Yield(DispatcherPriority.Background);
                 cancellationToken.ThrowIfCancellationRequested(); batch.Restart();
             }
         }
-        cancellationToken.ThrowIfCancellationRequested();
-        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly() };
 
-        WpfBlock Convert(MdBlock block)
+        async ValueTask<WpfBlock> Convert(MdBlock block)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await Cooperate();
             WpfBlock result;
             switch (block)
             {
@@ -149,11 +153,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var label = MarkdownFormatting.CalloutLabel(alert.Kind.ToString());
                     callout.Blocks.Add(new Paragraph(new Run(label)) { FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) });
                     System.Windows.Automation.AutomationProperties.SetName(callout, label + " callout");
-                    foreach (var child in alert) callout.Blocks.Add(Convert(child));
+                    foreach (var child in alert) callout.Blocks.Add(await Convert(child));
                     result = callout; break;
                 case QuoteBlock quote:
                     var section = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0), Padding = new Thickness(12, 4, 4, 4) };
-                    foreach (var child in quote) section.Blocks.Add(Convert(child)); result = section;
+                    foreach (var child in quote) section.Blocks.Add(await Convert(child)); result = section;
                     break;
                 case ListBlock list:
                     var wl = new System.Windows.Documents.List { MarkerStyle = list.IsOrdered ? TextMarkerStyle.Decimal : TextMarkerStyle.Disc, Padding = new Thickness(24, 0, 0, 0) };
@@ -161,8 +165,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     if (list.IsOrdered) { wl.StartIndex = Math.Max(1, orderedStart); if (orderedStart == 0) wl.MarkerStyle = TextMarkerStyle.None; }
                     foreach (var item in list.OfType<ListItemBlock>())
                     {
+                        await Cooperate();
                         var li = new ListItem();
-                        foreach (var child in item) li.Blocks.Add(Convert(child));
+                        foreach (var child in item) li.Blocks.Add(await Convert(child));
                         if (list.IsOrdered && wl.MarkerStyle == TextMarkerStyle.None)
                         {
                             if (li.Blocks.FirstBlock is not Paragraph first)
@@ -179,10 +184,12 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var group = new TableRowGroup(); wt.RowGroups.Add(group);
                     foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                     {
+                        await Cooperate();
                         var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
                         var column = 0;
                         foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
                         {
+                            await Cooperate();
                             var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
                             wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
                             var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
@@ -190,7 +197,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
                             { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
                             if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
-                            foreach (var child in cell) wc.Blocks.Add(Convert(child));
+                            foreach (var child in cell) wc.Blocks.Add(await Convert(child));
                             wr.Cells.Add(wc);
                         }
                         group.Rows.Add(wr);
@@ -207,7 +214,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     detailsHeader.Inlines.Add(new InlineUIContainer(toggle) { BaselineAlignment = BaselineAlignment.Center });
                     detailsHeader.Inlines.Add(new Run(details.Summary)); detailsSection.Blocks.Add(detailsHeader);
                     detailSections.Add(new(details.Span.Start, details.Span.End, toggle));
-                    var detailsChildren = details.Select(Convert).ToArray();
+                    var detailsChildren = new List<WpfBlock>();
+                    foreach (var child in details) detailsChildren.Add(await Convert(child));
                     void SynchroniseDetails()
                     {
                         foreach (var child in detailsChildren)
@@ -237,7 +245,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = new Paragraph(new Run(html.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 12, Background = surface }; break;
                 case ContainerBlock container:
                     var nested = new Section();
-                    foreach (var child in container) nested.Blocks.Add(Convert(child)); result = nested; break;
+                    foreach (var child in container) nested.Blocks.Add(await Convert(child)); result = nested; break;
                 default: result = new Paragraph(new Run(parsed.Source.Substring(Math.Clamp(block.Span.Start, 0, parsed.Source.Length), Math.Clamp(block.Span.Length, 0, parsed.Source.Length - Math.Clamp(block.Span.Start, 0, parsed.Source.Length))))); break;
             }
             result.Tag = new SourceReference(block.Span.Start, block.Span.End, block.Line);

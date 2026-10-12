@@ -20,7 +20,7 @@ internal static partial class NativeUiChecks
 
     private static void CheckSettings(Window window, AutomationElement editor, UIA3Automation automation, int process, string state, string output, string source)
     {
-        var originalText = editor.Patterns.Value.Pattern.Value.Value; var savedText = File.ReadAllText(source);
+        var originalText = ReadEditorText(editor); var savedText = File.ReadAllText(source);
         var preferencePath = Path.Combine(state, "preferences.json");
         var before = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
         var settings = OpenSettingsWindow(window, automation, process);

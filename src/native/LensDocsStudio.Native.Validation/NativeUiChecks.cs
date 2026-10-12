@@ -305,7 +305,7 @@ internal static partial class NativeUiChecks
                 if (clipboardHtml.QuerySelectorAll("button,script").Length != 0 || plain.Contains("Copy source", StringComparison.Ordinal))
                     throw new IOException("The Windows clipboard leaked native preview controls.");
                 checks.Add("Native rich copy publishes Windows HTML Format and Unicode text with real embedded diagram pixels, table cells and no preview controls");
-                var originalMarkdown = editor.Patterns.Value.Pattern.Value.Value;
+                var originalMarkdown = ReadEditorText(editor);
                 Find(window, "EditMenu").Click(); Find(window, "CopyMarkdownWithImages").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name.StartsWith("Markdown copied with embedded images.", StringComparison.Ordinal), "Markdown clipboard preparation did not finish.");
                 ownedClipboardSequence = GetClipboardSequenceNumber();
@@ -355,7 +355,7 @@ internal static partial class NativeUiChecks
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The rich paste target is not empty.");
                 editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Wait(() => Find(window, "Status").Name.StartsWith("HTML pasted as Markdown.", StringComparison.Ordinal), "Formatted paste did not complete.");
-                var pasted = editor.Patterns.Value.Pattern.Value.Value;
+                var pasted = ReadEditorText(editor);
                 if (!pasted.Contains("Café", StringComparison.Ordinal) || !pasted.Contains("| Clipboard | Ready |", StringComparison.Ordinal) || !pasted.Contains("![Mermaid diagram]", StringComparison.Ordinal))
                     throw new IOException("Formatted paste lost text, table cells or diagram images when the clipboard also offered a bitmap.");
                 var pastedPath = Path.Combine(runRoot, "Rich clipboard document.md");
@@ -377,7 +377,7 @@ internal static partial class NativeUiChecks
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
                 Wait(() => File.ReadAllText(pastedPath).Contains("| CSV | Portable |", StringComparison.Ordinal), "The pasted CSV table did not save.");
                 checks.Add("Formatted Windows paste prefers HTML over a fallback bitmap, persists portable diagram pixels and exposes CSV table Paste Special");
-                var beforeFailedPaste = editor.Patterns.Value.Pattern.Value.Value;
+                var beforeFailedPaste = ReadEditorText(editor);
                 var invalidImage = new System.Windows.DataObject();
                 invalidImage.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Rejected image</p><img src='data:image/png;base64,AQID'>"), false);
                 System.Windows.Clipboard.SetDataObject(invalidImage, true); ownedClipboardSequence = GetClipboardSequenceNumber();
@@ -404,7 +404,7 @@ internal static partial class NativeUiChecks
                 Find(window, "InsertMenu").Click(); Find(window, "CalloutMenu").Patterns.ExpandCollapse.Pattern.Expand();
                 Find(window, "InsertNote").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> [!NOTE]", StringComparison.Ordinal), "The native callout menu did not insert a note.");
-                var insertedCallout = editor.Patterns.Value.Pattern.Value.Value;
+                var insertedCallout = ReadEditorText(editor);
                 const string calloutBody = "Review evidence.";
                 Keyboard.Type(calloutBody);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("> Review evidence.", StringComparison.Ordinal), "Callout typing did not replace only the selected body.");
@@ -414,7 +414,7 @@ internal static partial class NativeUiChecks
                 // placeholder state, then require the formatting action itself to undo in one step.
                 for (var typedUndo = 0; editor.Patterns.Value.Pattern.Value.Value != insertedCallout && typedUndo < calloutBody.Length + 1; typedUndo++)
                 {
-                    var beforeUndo = editor.Patterns.Value.Pattern.Value.Value;
+                    var beforeUndo = ReadEditorText(editor);
                     Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                     Wait(() => editor.Patterns.Value.Pattern.Value.Value != beforeUndo, "Undo did not change the typed callout body.");
                     if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeFailedPaste + "\n\n> [!NOTE]\n> ", StringComparison.Ordinal))
@@ -487,7 +487,7 @@ internal static partial class NativeUiChecks
             checks.Add("Native Docs Site options and Save dialogue create a portable workspace ZIP without private state");
             // AvalonEdit's outer automation element exposes Value; keyboard input belongs to its text area.
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            var beforeProgress = editor.Patterns.Value.Pattern.Value.Value;
+            var beforeProgress = ReadEditorText(editor);
             var progressWindow = OpenProgress(window);
             Find(progressWindow, "ProgressLabel").AsTextBox().Text = "Delivery & review";
             Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "101";
@@ -497,7 +497,7 @@ internal static partial class NativeUiChecks
             Find(progressWindow, "ProgressPercentage").AsTextBox().Text = "65";
             Find(progressWindow, "ApplyProgress").Patterns.Invoke.Pattern.Invoke();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("value=\"65\"", StringComparison.Ordinal), "The native progress editor did not insert its percentage.");
-            var insertedProgress = editor.Patterns.Value.Pattern.Value.Value;
+            var insertedProgress = ReadEditorText(editor);
             if (!insertedProgress.StartsWith(beforeProgress, StringComparison.Ordinal) || !insertedProgress.Contains("Delivery &amp; review", StringComparison.Ordinal))
                 throw new IOException("Progress insertion lost preceding source or escaped label text.");
             progressWindow = OpenProgress(window);
@@ -519,7 +519,7 @@ internal static partial class NativeUiChecks
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             const string bundleDraft = " Bundle-only unsaved text."; Keyboard.Type(bundleDraft);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith(bundleDraft, StringComparison.Ordinal), "The bundle draft did not reach the editor.");
-            var bundleSource = editor.Patterns.Value.Pattern.Value.Value;
+            var bundleSource = ReadEditorText(editor);
             Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             var bundlePath = Path.Combine(runRoot, "portable-documents.zip"); SaveThroughDialogue(bundlePath, "Export Markdown bundle");
             Wait(() => File.Exists(bundlePath) && Find(window, "Status").Name.StartsWith("Markdown bundle exported", StringComparison.Ordinal), "The native Markdown bundle did not finish.");
@@ -535,14 +535,14 @@ internal static partial class NativeUiChecks
             FocusWindow(window); editor.Click();
             for (var typingUndo = 0; editor.Patterns.Value.Pattern.Value.Value != beforeProgress && typingUndo <= bundleDraft.Length; typingUndo++)
             {
-                var previous = editor.Patterns.Value.Pattern.Value.Value; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                var previous = ReadEditorText(editor); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value != previous, "Undo did not restore the bundle-only draft.");
                 if (!editor.Patterns.Value.Pattern.Value.Value.StartsWith(beforeProgress, StringComparison.Ordinal)) throw new IOException("Undo changed the original document after bundle export.");
             }
             if (editor.Patterns.Value.Pattern.Value.Value != beforeProgress) throw new IOException("The bundle draft was not fully restored.");
             checks.Add("Native Markdown bundle exports unsaved source and portable assets without private state or source-file writes");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            var beforeAnchor = editor.Patterns.Value.Pattern.Value.Value;
+            var beforeAnchor = ReadEditorText(editor);
             var anchorWindow = OpenAnchor(window);
             Find(anchorWindow, "AnchorIdentifier").AsTextBox().Text = "invalid id";
             Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
@@ -553,14 +553,14 @@ internal static partial class NativeUiChecks
             anchorWindow.CaptureToFile(Path.Combine(output, "native-anchor-dialogue.png"));
             Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("data-doc-anchor>Named native position</span>", StringComparison.Ordinal), "The anchor was not inserted.");
-            var insertedAnchor = editor.Patterns.Value.Pattern.Value.Value;
+            var insertedAnchor = ReadEditorText(editor);
             anchorWindow = OpenAnchor(window);
             if (Find(anchorWindow, "AnchorIdentifier").AsTextBox().Text != "native-anchor" || !Find(anchorWindow, "AnchorIdentifier").Patterns.Value.Pattern.IsReadOnly.Value)
                 throw new IOException("Editing an anchor did not preserve its identifier.");
             Find(anchorWindow, "AnchorLabel").AsTextBox().Text = "";
             Find(anchorWindow, "ApplyAnchor").Patterns.Invoke.Pattern.Invoke();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("data-doc-anchor></span>", StringComparison.Ordinal), "The empty anchor edit did not apply.");
-            var emptyAnchorSource = editor.Patterns.Value.Pattern.Value.Value;
+            var emptyAnchorSource = ReadEditorText(editor);
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_K);
             Window? anchorLinkWindow = null;
@@ -594,7 +594,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeAnchor, "Anchor checks did not restore the original source.");
             checks.Add("Native anchors validate identifiers, retain links when labels change, navigate to empty targets and preserve complete Undo/Redo");
-            var contextOriginal = editor.Patterns.Value.Pattern.Value.Value;
+            var contextOriginal = ReadEditorText(editor);
             var contextClipboard = System.Windows.Clipboard.GetDataObject(); uint contextClipboardSequence = 0;
             try
             {
@@ -827,7 +827,7 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(window, "Status").Name == "Image figure updated." && new LensDocsStudio.Core.Parsing.MarkdownService().Parse(editor.Patterns.Value.Pattern.Value.Value)
                     .Syntax.OfType<LensDocsStudio.Core.Parsing.DocumentImageFigureBlock>().SingleOrDefault()?.Caption == "Caption Café & evidence",
                     "The figure dialogue did not apply the caption.");
-                var convertedFigure = editor.Patterns.Value.Pattern.Value.Value;
+                var convertedFigure = ReadEditorText(editor);
                 Find(window, "InsertMenu").Click(); Find(window, "EditImageFigure").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => (figureWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Image figure")))?.AsWindow()) is not null,
                     "The existing figure did not reopen for editing.");
@@ -836,7 +836,7 @@ internal static partial class NativeUiChecks
                 Find(figureWindow!, "FigureCaption").AsTextBox().Text = "Updated caption";
                 Find(figureWindow!, "ApplyImageFigure").AsButton().Invoke();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("<figcaption>Updated caption</figcaption>", StringComparison.Ordinal), "Caption editing did not replace the current figure.");
-                var updatedFigureSource = editor.Patterns.Value.Pattern.Value.Value;
+                var updatedFigureSource = ReadEditorText(editor);
                 var editedFigure = new LensDocsStudio.Core.Parsing.MarkdownService().Parse(updatedFigureSource).Syntax.OfType<LensDocsStudio.Core.Parsing.DocumentImageFigureBlock>().Single();
                 if (editedFigure.Image.Url != figureReference || editedFigure.Image.Title != "Retained image title" || File.ReadAllText(source) != tableSavedSource)
                     throw new IOException("Figure caption editing changed its destination, title or saved source.");
@@ -857,7 +857,7 @@ internal static partial class NativeUiChecks
                 if (contextClipboardSequence != 0 && GetClipboardSequenceNumber() == contextClipboardSequence)
                 { if (contextClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(contextClipboard, true); }
             }
-            var sourceBeforeLibraryImage = editor.Patterns.Value.Pattern.Value.Value;
+            var sourceBeforeLibraryImage = ReadEditorText(editor);
             var libraryImageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
             var libraryImageMarkdown = "![Library portable image](" + libraryImageReference + ")";
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
@@ -874,7 +874,7 @@ internal static partial class NativeUiChecks
                 if (libraryClipboardSequence != 0 && GetClipboardSequenceNumber() == libraryClipboardSequence)
                 { if (beforeLibraryClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(beforeLibraryClipboard, true); }
             }
-            var templateSource = editor.Patterns.Value.Pattern.Value.Value; var templateSavedSource = File.ReadAllText(source);
+            var templateSource = ReadEditorText(editor); var templateSavedSource = File.ReadAllText(source);
             var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
             var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
             Find(window, "ExportMenu").Click(); Find(window, "SelectWordTemplate").Patterns.Invoke.Pattern.Invoke();
@@ -996,7 +996,7 @@ internal static partial class NativeUiChecks
             Find(contentLibrary, "ContentLibraryFilter").AsTextBox().Text = "Reusable selected source";
             Find(contentLibrary, "UseContentEntry").AsButton().Invoke();
             Wait(() => Find(window, "Status").Name == "Inserted snippet: Reusable selected source", "The saved snippet did not insert into its original document.");
-            var withSnippet = editor.Patterns.Value.Pattern.Value.Value;
+            var withSnippet = ReadEditorText(editor);
             if (withSnippet == templateSource) throw new IOException("Snippet insertion did not change editor content.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == templateSource, "One Undo did not restore source before snippet insertion.");
@@ -1073,7 +1073,7 @@ internal static partial class NativeUiChecks
             Find(catalogueWindow, "CatalogueFilter").AsTextBox().Text = "Risks";
             Find(catalogueWindow, "UseCatalogueEntry").AsButton().Invoke();
             Wait(() => Find(window, "Status").Name == "Inserted snippet: Risks", "The built-in requirements snippet did not insert.");
-            var withBuiltInSnippet = editor.Patterns.Value.Pattern.Value.Value;
+            var withBuiltInSnippet = ReadEditorText(editor);
             if (!withBuiltInSnippet.Contains("| Risk | Likelihood | Impact | Mitigation |", StringComparison.Ordinal)) throw new IOException("The built-in snippet lost its editable table.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Built-in snippet Undo lost the original document.");
@@ -1106,7 +1106,7 @@ internal static partial class NativeUiChecks
             var encodedDetailsSummary = System.Net.WebUtility.HtmlEncode("Supporting evidence — Café");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains(encodedDetailsSummary, StringComparison.Ordinal)
                 && Find(window, "Status").Name == "Details section applied.", "The details dialogue did not insert its section.");
-            var insertedDetails = editor.Patterns.Value.Pattern.Value.Value;
+            var insertedDetails = ReadEditorText(editor);
             if (!insertedDetails.StartsWith(sourceBeforeLibraryImage, StringComparison.Ordinal)) throw new IOException("Details insertion lost preceding source.");
             var detailsStart = insertedDetails.IndexOf("<details data-details-block", sourceBeforeLibraryImage.Length, StringComparison.Ordinal);
             void WaitDetailsPreview(string summary)
@@ -1185,7 +1185,7 @@ internal static partial class NativeUiChecks
             if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
             checks.Add("Native details dialogue restores and edits Markdown; accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
             const string mathsFixture = "\n\n## Native maths UI\n\nNative formula $\\frac{x^2}{y_1}$ keeps its source.\n";
-            var beforeMaths = editor.Patterns.Value.Pattern.Value.Value;
+            var beforeMaths = ReadEditorText(editor);
             var mathsClipboard = System.Windows.Clipboard.GetDataObject(); uint mathsSequence = 0;
             try
             {

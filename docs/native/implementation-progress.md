@@ -1,5 +1,13 @@
 # Native implementation progress
 
+Current gate: internal preview hardening. At 5cb0aeb native PR run 38201352034 passes all 726 core tests and all 52 workflows in built, installed and reinstalled applications. Both web runs pass all 262 browser cases. Appearance migration, folder case changes and workspace maps therefore have complete workflow coverage. The paired native push fails an installed read-only UIA source snapshot with the previously identified wrapped COM timeout; the existing bounded observation retry now covers the remaining one-off snapshots without replaying actions.
+
+Current change: nested lists, tables, quotes and details share cancellable dispatcher batches. The 4,000-item list's first input improves from 322.6 ms to approximately 1–2 ms in local runs. Immutable shared brushes are frozen, reducing measured list layout from 2.1 seconds to 1.3 seconds in a diagnostic run. Actual hidden native viewers verify complete text/source mapping and visible final-target selection. Layout remains synchronous and its remaining delay is an open performance item; this does not establish large-document certification.
+
+Next executable work: finish responsiveness validation, push the renderer/observation changes and check Windows CI; continue measured layout/preview optimisation and remaining export/compatibility acceptance. Production signing, positive signed updates and SDK-free clean-machine certification remain external prerequisites. No merge or release is authorised.
+
+The entries below retain chronological evidence; pending statements describe their revision, not current status.
+
 At a06edf5 all four CI runs pass: native PR/push 38200279681/38200276401 and web PR/push 38200279670/38200276266. Both native runs validate all 51 workflows in built, installed and reinstalled apps, including case-only folder names. All 260 local browser cases pass in 9.3 minutes. Evidence: artifacts/native/native-ci-a06edf5-push.log and browser-template-migration.log.
 
 Current addition: browser appearance export and native Settings import/export provide explicit migration, private review before Apply, Cancel and portable restoration. Strict bounded JSON preserves omitted choices and rejects unsupported fields. Release build, all 726 core tests, focused Chromium/Edge export cases and five native settings outcomes pass; all four updated settings layouts were inspected. Desktop workflow 52 adds real pickers, browser import, Cancel/Apply, consent/source preservation and restore; CI is pending.

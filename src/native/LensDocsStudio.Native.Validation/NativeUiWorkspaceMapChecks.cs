@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckWorkspaceMap(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string source, string target)
     {
-        var before = editor.Patterns.Value.Pattern.Value.Value; var saved = File.ReadAllText(source); var targetSaved = File.ReadAllText(target);
+        var before = ReadEditorText(editor); var saved = File.ReadAllText(source); var targetSaved = File.ReadAllText(target);
         var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
         const string missing = "[Map missing](missing-map-target.md)";
         var fixture = "\n\n## Native map draft\n\n[[" + Path.GetFileName(target) + "|Map target]] " + missing;

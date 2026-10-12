@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckWikiLinks(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string sourcePath, string targetPath)
     {
-        var before = editor.Patterns.Value.Pattern.Value.Value; var saved = File.ReadAllText(sourcePath); var targetSaved = File.ReadAllText(targetPath);
+        var before = ReadEditorText(editor); var saved = File.ReadAllText(sourcePath); var targetSaved = File.ReadAllText(targetPath);
         var previous = System.Windows.Clipboard.GetDataObject(); uint owned = 0;
         try
         {

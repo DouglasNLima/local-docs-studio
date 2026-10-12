@@ -1,6 +1,11 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
@@ -11,6 +16,13 @@ namespace LensDocsStudio.Native.Validation;
 internal static class NativeLayoutChecks
 {
     public static void Run(string output)
+    {
+        var previous = SynchronizationContext.Current;
+        SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
+        try { Check(output); }
+        finally { SynchronizationContext.SetSynchronizationContext(previous); }
+    }
+    private static void Check(string output)
     {
         var source = string.Join("\n\n", Enumerable.Range(1, 1200).Select(i => $"Paragraph {i}: **Evidence** &amp; review remains selectable."));
         var parsed = new MarkdownService().Parse(source);
@@ -35,14 +47,83 @@ internal static class NativeLayoutChecks
         catch (OperationCanceledException) { }
         var beforeStart = renderer.RenderAsync(parsed, false, diagrams, _ => { }, (_, _) => { }, cancellationToken: new(true));
         if (!beforeStart.IsCanceled) throw new IOException("Already-cancelled native layout allocated a completed result.");
+        var oversized = new MarkdownService().Parse(string.Join("\n", Enumerable.Range(1, 4000).Select(index => $"- **word{index}**")));
+        var oversizedWatch = Stopwatch.StartNew(); var oversizedInput = -1d;
+        dispatcher.BeginInvoke(DispatcherPriority.Input, () => oversizedInput = oversizedWatch.Elapsed.TotalMilliseconds);
+        var oversizedPending = renderer.RenderAsync(oversized, false, diagrams, _ => { }, (_, _) => { });
+        Pump(oversizedPending, dispatcher);
+        var oversizedResult = oversizedPending.GetAwaiter().GetResult(); var oversizedTotal = oversizedWatch.Elapsed.TotalMilliseconds;
+        File.WriteAllText(Path.Combine(output, "native-large-block.json"), JsonSerializer.Serialize(new {
+            SourceCharacters = oversized.Source.Length, InputMilliseconds = oversizedInput, ConstructionMilliseconds = oversizedTotal,
+            Passed = oversizedInput >= 0 && oversizedInput < 250 && oversizedInput < oversizedTotal }, new JsonSerializerOptions { WriteIndented = true }));
+        if (oversizedInput < 0 || oversizedInput >= 250 || oversizedInput >= oversizedTotal)
+            throw new IOException("A single large list blocked dispatcher input for " + oversizedInput.ToString("F1", System.Globalization.CultureInfo.InvariantCulture) + " ms.");
+        if (!oversizedResult.ReadText().Contains("word4000", StringComparison.Ordinal) || oversizedResult.SourceElements.Count < 4000 || oversizedResult.Document.Blocks.Count != 1)
+            throw new IOException("Yielding inside a large list lost text or source mapping.");
+        var nestedCases = new[]
+        {
+            (Name: "table", Source: "| Row | Value |\n|---|---|\n" + string.Join("\n", Enumerable.Range(1, 1000).Select(index => $"| Row{index} | Value{index} |")), Last: "Value1000"),
+            (Name: "quote", Source: string.Join("\n>\n", Enumerable.Range(1, 1200).Select(index => $"> Quoted{index}")), Last: "Quoted1200"),
+            (Name: "details", Source: "<details>\n<summary>Large hidden section</summary>\n\n" + string.Join("\n\n", Enumerable.Range(1, 1200).Select(index => $"Hidden{index}")) + "\n\n</details>", Last: "Hidden1200"),
+            (Name: "list", Source: oversized.Source, Last: "word4000")
+        };
+        var nestedEvidence = new List<object>();
+        foreach (var test in nestedCases)
+        {
+            var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew(); var inputAt = -1d;
+            dispatcher.BeginInvoke(DispatcherPriority.Input, () => inputAt = nestedWatch.Elapsed.TotalMilliseconds);
+            var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { }); Pump(task, dispatcher);
+            var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
+            if (inputAt < 0 || inputAt >= 250 || inputAt >= elapsed || !result.ReadText().Contains(test.Last, StringComparison.Ordinal)
+                || result.SourceElements.Count < 1000 || nested.Source != test.Source)
+                throw new IOException("Nested " + test.Name + " rendering delayed input or lost complete content/source mapping.");
+            using var stop = new CancellationTokenSource(); var cancelledAt = -1d; var cancelWatch = Stopwatch.StartNew();
+            dispatcher.BeginInvoke(DispatcherPriority.Input, () => { cancelledAt = cancelWatch.Elapsed.TotalMilliseconds; stop.Cancel(); });
+            var stale = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { }, cancellationToken: stop.Token); Pump(stale, dispatcher);
+            try { stale.GetAwaiter().GetResult(); throw new IOException("Cancelled nested " + test.Name + " returned a stale preview."); }
+            catch (OperationCanceledException) { }
+            if (cancelledAt < 0 || cancelledAt >= 250) throw new IOException("Input cancellation was delayed by nested " + test.Name + " construction.");
+            var viewport = InspectViewport(result, test.Last, output, test.Name);
+            nestedEvidence.Add(new { test.Name, InputMilliseconds = inputAt, ConstructionMilliseconds = elapsed, CancelInputMilliseconds = cancelledAt,
+                SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, Viewport = viewport });
+        }
+        File.WriteAllText(Path.Combine(output, "native-nested-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = nestedEvidence }, new JsonSerializerOptions { WriteIndented = true }));
         File.WriteAllText(Path.Combine(output, "native-layout.json"), JsonSerializer.Serialize(new
         {
             Passed = true, SourceCharacters = source.Length, Blocks = rendered.Document.Blocks.Count,
             InputMilliseconds = inputMilliseconds, ConstructionMilliseconds = totalMilliseconds,
             Checks = new[] { "Input runs before a large native document finishes construction", "Batched rendering retains every paragraph, source span and decoded text",
-                "New input cancels obsolete native construction", "Cancellation before construction returns no document" },
-            Limitation = "Measures FlowDocument construction and dispatcher input scheduling, not final viewer pagination, scrolling or individual oversized block latency."
+                "New input cancels obsolete native construction", "Cancellation before construction returns no document",
+                "Large lists, tables, quotes and closed details yield within the input budget, retain complete source mapping and cancel obsolete work",
+                "Real hidden-HWND viewers lay out each large block and reveal its final target with selectable text" },
+            Limitation = "Hidden-HWND viewport timings cover these fixtures at 100% zoom; they do not certify all pagination/scrolling, displays or individual oversized paragraph/code-block latency."
         }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static object InspectViewport(PreviewResult result, string expected, string output, string name)
+    {
+        result.Document.Background = Brushes.White;
+        var viewer = new FlowDocumentScrollViewer { Document = result.Document, IsToolBarVisible = false, Background = Brushes.White };
+        using var host = new HwndSource(new HwndSourceParameters("Large native preview validation")
+            { Width = 640, Height = 300, WindowStyle = unchecked((int)0x80000000) });
+        var watch = Stopwatch.StartNew(); host.RootVisual = viewer; var attach = watch.Elapsed.TotalMilliseconds;
+        viewer.Measure(new Size(640, 300)); var measure = watch.Elapsed.TotalMilliseconds;
+        viewer.Arrange(new Rect(0, 0, 640, 300)); var arrange = watch.Elapsed.TotalMilliseconds;
+        viewer.UpdateLayout(); var initial = watch.Elapsed.TotalMilliseconds;
+        var last = result.SourceElements.MaxBy(item => item.Key).Value;
+        viewer.Selection.Select(last.ContentStart, last.ContentEnd);
+        watch.Restart(); var navigation = PreviewNavigationService.BringIntoViewAsync(viewer, last.ContentStart); Pump(navigation, viewer.Dispatcher);
+        navigation.GetAwaiter().GetResult(); Layout(); var elapsed = watch.Elapsed.TotalMilliseconds;
+        var rectangle = last.ContentStart.GetCharacterRect(LogicalDirection.Forward);
+        var scrolling = (ScrollViewer)viewer.Template.FindName("PART_ContentHost", viewer);
+        if (rectangle.IsEmpty || rectangle.Top < 0 || rectangle.Bottom > scrolling.ViewportHeight || !viewer.Selection.Text.Contains(expected, StringComparison.Ordinal))
+            throw new IOException("Large " + name + " preview could not reveal and select its final source target.");
+        var bitmap = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32); bitmap.Render(viewer);
+        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        using (var file = File.Create(Path.Combine(output, "native-large-" + name + ".png"))) encoder.Save(file);
+        return new { InitialLayoutMilliseconds = initial, AttachMilliseconds = attach, MeasureMilliseconds = measure - attach,
+            ArrangeMilliseconds = arrange - measure, UpdateLayoutMilliseconds = initial - arrange,
+            LastTargetMilliseconds = elapsed, scrolling.VerticalOffset, scrolling.ExtentHeight, scrolling.ViewportHeight };
+        void Layout() { viewer.Measure(new Size(640, 300)); viewer.Arrange(new Rect(0, 0, 640, 300)); viewer.UpdateLayout(); }
     }
     private static void Pump(Task task, Dispatcher dispatcher)
     {
