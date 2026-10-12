@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Word lists supplied by paragraph styles now retain their markers, hierarchy and continuation placement. Default/inherited styles, explicit overrides and linked numbering definitions have 14 new core cases; all 912 tests and the full native harness pass locally. Twelve actual DOCX items converted to inherited styles return exactly the same Markdown. The separate CRLF block assertion failure is reproduced and corrected; CI still needs to validate this batch, and the recurring details-construction delay remains unresolved.
+
 Word code paragraphs now return as literal fenced code, and consecutive quote paragraphs remain one quote, including supported list placement. Fourteen new cases pass within 897 core tests; native export/reimport verifies exact code and quote boundaries. Style inheritance is bounded, generic spacing styles are not guessed to be code, and table/image fallbacks carry explicit notes. Code language and deeper quote structure remain outside the reconstructed semantics; this later change still needs its own CI.
 
 Imported Word links retain supported web/email destinations and referenced internal bookmarks. Formatting and linked image bytes are covered by 15 new regressions, with all 883 core tests and the complete native harness passing in both 0d9d54f hosted runs. Unsupported targets and inert field results have explicit warnings; no document-provided link is fetched during import.

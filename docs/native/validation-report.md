@@ -8,7 +8,19 @@ Seven of eight initial regressions failed because code and quote paragraphs beca
 
 The full native export/reimport fixture is under `word-blocks-full-validation`. After adding explicit assertions, the focused `word-blocks-native/native-word-block-import.json` passes with exact `CodeFirst\nCodeSecond` text, one code block and one two-paragraph quote, both inside list items. These checks run without a foreground application, clipboard or Office. CI for the preceding 0d9d54f revision does not contain this change. Recognised paragraph styles do not reconstruct code language, nested quote depth, quote/list orientation or ambiguous template spacing. Actual Word layout and complete formatting fidelity remain unverified.
 
-## Latest completed CI: 0d9d54f
+## Subsequent 4adb0ad failure and correction
+
+Native PR 38318722662 and push 38318719792 fail on attempt 1. Both reach the Word block assertion after the 897 core tests; imported content is retained, but CRLF source text is compared with the importer's LF output. `artifacts/native/word-blocks-crlf-before` reproduces the failure using a separate CRLF fixture. The corrected probe compares exact text after this documented line-boundary conversion and writes expected/actual code plus block structure before reporting failure. The CRLF core regression and `word-blocks-crlf-after` pass. No content or structural assertion is removed.
+
+The push also fails native details construction with 728.273 ms first input/maximum gap. Stage records place 727.126 ms inside `DetailsToggle.InitializeComponent`; the sampled thread CPU does not increase during that interval. Text and source are complete. This localises the delay but does not establish its cause. The original logs, reports and artefacts are retained under `ci-4adb0ad-pr-failure` and `ci-4adb0ad-push-failure`. The 250 ms input bound is unchanged; no unchanged-source retry was requested.
+
+## Latest local work: inherited Word numbering
+
+Eight initial regressions fail under `artifacts/native/word-style-lists-before`. The correction passes 14 new cases for paragraph/default styles, inherited continuation indents, direct identifier/level/zero overrides, abstract style associations, marker overrides, headings, linked numbering styles, missing/wrong-type references and bounded/cyclic chains. The earlier code test now includes CRLF input. All 912 core tests pass in `word-style-lists-after/word-style-lists-final.trx`; Release builds with zero warnings/errors and static checks pass.
+
+The full native harness passes 40 diagram/export cases with zero failures in `word-style-lists-full-validation`. A schema-valid DOCX fixture replaces direct numbering on 12 prepared items with inherited styles. Reimport produces exactly the same Markdown, including six lists, code, quotes and continuation text, without warnings. The CRLF fixture also passes in `word-style-lists-crlf-validation`. This batch requires its own CI. Its mapping follows Microsoft's [paragraph-style level association](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.paragraphstyleidinlevel?view=openxml-3.0.1) and [numbering-style links](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.numberingstylelink?view=openxml-3.0.1). Field/composite markers and full Word formatting/layout remain separate limits.
+
+## Latest successful CI: 0d9d54f
 
 Both native runs (PR 38316619492, push 38316615302) and both web runs (PR 38316619495, push 38316615426) pass on attempt 1. Each web log records 262 passing cases. Both downloaded native reports verify 883 core tests, 40 diagram/export cases, all PDF/Word list groups and exact native-image reimport. Four 62-check desktop contexts, three installed runtime origins, five wizard outcomes, four files-in-use assertions, 20 preserved state files, restored sessions and disposable-certificate cleanup pass. This includes the supported hyperlink import change and all distinct completion notes, without an additional foreground tooltip-interaction claim.
 

@@ -91,17 +91,72 @@ internal static class NativeWordListChecks
         var importedCode = importedDocument.Syntax.Descendants<CodeBlock>().ToArray();
         var originalQuotes = content.Document.Syntax.Descendants<QuoteBlock>().ToArray();
         var importedQuotes = importedDocument.Syntax.Descendants<QuoteBlock>().ToArray();
-        if (importedCode.Length != 1 || originalCode.Length != 1 || importedQuotes.Length != 1 || originalQuotes.Length != 1
-            || importedCode[0].Lines.ToString() != originalCode[0].Lines.ToString()
-            || importedCode[0].Parent is not ListItemBlock || importedQuotes[0].Parent is not ListItemBlock
-            || importedQuotes[0].Count != 2 || importedQuotes[0].Count != originalQuotes[0].Count)
-            throw new IOException("Native Word reimport changed literal code or quote paragraph boundaries inside a list.");
+        // DOCX represents line boundaries as break elements; imported Markdown
+        // consistently uses LF regardless of the source checkout's line endings.
+        var expectedCode = originalCode.FirstOrDefault()?.Lines.ToString().Replace("\r\n", "\n", StringComparison.Ordinal);
+        var actualCode = importedCode.FirstOrDefault()?.Lines.ToString();
+        var listPlacement = importedCode.Length == 1 && importedQuotes.Length == 1
+            && importedCode[0].Parent is ListItemBlock && importedQuotes[0].Parent is ListItemBlock;
+        var blocksPassed = originalCode.Length == 1 && originalQuotes.Length == 1 && listPlacement
+            && actualCode == expectedCode && importedQuotes[0].Count == 2 && importedQuotes[0].Count == originalQuotes[0].Count;
         File.WriteAllText(Path.Combine(output, "native-word-block-import.json"), JsonSerializer.Serialize(new
         {
-            Passed = true, CodeBlocks = importedCode.Length, QuoteBlocks = importedQuotes.Length, QuoteParagraphs = importedQuotes[0].Count,
-            LiteralCode = importedCode[0].Lines.ToString(), ListPlacementRetained = true,
+            Passed = blocksPassed, CodeBlocks = importedCode.Length, QuoteBlocks = importedQuotes.Length, QuoteParagraphs = importedQuotes.FirstOrDefault()?.Count,
+            LiteralCode = actualCode, ExpectedCode = expectedCode, ListPlacementRetained = listPlacement,
             Limitation = "Recognised paragraph styles are checked. Code language, nested quote depth, quote/list orientation and ambiguous template spacing styles are not reconstructed."
         }, new JsonSerializerOptions { WriteIndented = true }));
+        if (!blocksPassed) throw new IOException("Native Word reimport changed literal code or quote paragraph boundaries inside a list.");
+        CheckStyleNumbering(bytes, imported.Markdown, output);
+    }
+
+    private static void CheckStyleNumbering(byte[] bytes, string expectedMarkdown, string output)
+    {
+        using var stream = new MemoryStream(); stream.Write(bytes);
+        var converted = 0;
+        using (var package = WordprocessingDocument.Open(stream, true))
+        {
+            var main = package.MainDocumentPart!; var styles = main.StyleDefinitionsPart!.Styles!;
+            var numbering = main.NumberingDefinitionsPart!.Numbering!;
+            var definitions = new Dictionary<(int Id, int Level), string>();
+            foreach (var paragraph in main.Document!.Body!.Elements<W.Paragraph>())
+            {
+                var properties = paragraph.ParagraphProperties;
+                if (properties?.NumberingProperties?.NumberingId?.Val?.Value is not > 0) continue;
+                var numberId = properties.NumberingProperties.NumberingId.Val.Value;
+                var level = properties.NumberingProperties.NumberingLevelReference?.Val?.Value ?? 0;
+                if (!definitions.TryGetValue((numberId, level), out var baseId))
+                {
+                    baseId = "ProbeList" + numberId + "Level" + level;
+                    var baseStyle = new W.Style(new W.StyleName { Val = baseId }, new W.StyleParagraphProperties(
+                        new W.NumberingProperties(new W.NumberingId { Val = numberId }))) { StyleId = baseId, Type = W.StyleValues.Paragraph };
+                    if (properties.Indentation is { } indent) baseStyle.StyleParagraphProperties!.Indentation = (W.Indentation)indent.CloneNode(true);
+                    styles.Append(baseStyle); definitions[(numberId, level)] = baseId;
+                    var abstractId = numbering.Elements<W.NumberingInstance>().Single(n => n.NumberID?.Value == numberId).AbstractNumId!.Val!.Value;
+                    numbering.Elements<W.AbstractNum>().Single(n => n.AbstractNumberId?.Value == abstractId).Elements<W.Level>()
+                        .Single(l => l.LevelIndex?.Value == level).ParagraphStyleIdInLevel = new() { Val = baseId };
+                }
+                var originalId = properties.ParagraphStyleId?.Val?.Value;
+                var name = styles.Elements<W.Style>().FirstOrDefault(s => s.StyleId?.Value == originalId)?.StyleName?.Val?.Value ?? originalId ?? "Normal";
+                var derivedId = "ProbeParagraph" + ++converted;
+                styles.Append(new W.Style(new W.StyleName { Val = name }, new W.BasedOn { Val = baseId }) { StyleId = derivedId, Type = W.StyleValues.Paragraph });
+                properties.ParagraphStyleId = new() { Val = derivedId };
+                properties.NumberingProperties.Remove(); properties.Indentation?.Remove();
+            }
+            Validate(package);
+        }
+        var styledBytes = stream.ToArray();
+        File.WriteAllBytes(Path.Combine(output, "native-word-style-lists.docx"), styledBytes);
+        var imported = new DocumentImportService().ImportDocx(styledBytes);
+        File.WriteAllText(Path.Combine(output, "native-word-style-lists-reimported.md"), imported.Markdown);
+        var parsed = new MarkdownService().Parse(imported.Markdown);
+        var passed = converted == 12 && imported.Markdown == expectedMarkdown && imported.Warnings.Count == 0;
+        File.WriteAllText(Path.Combine(output, "native-word-style-list-import.json"), JsonSerializer.Serialize(new
+        {
+            Passed = passed, StyledItems = converted, Lists = parsed.Syntax.Descendants<ListBlock>().Count(),
+            ExactMarkdown = imported.Markdown == expectedMarkdown, Warnings = imported.Warnings,
+            Limitation = "Schema-valid inherited paragraph numbering is checked. Field/composite markers and full Word layout or formatting are not certified."
+        }, new JsonSerializerOptions { WriteIndented = true }));
+        if (!passed) throw new IOException("Word style-inherited numbering changed list structure, code, quotes or continuation text.");
     }
 
     private static void Validate(WordprocessingDocument package)

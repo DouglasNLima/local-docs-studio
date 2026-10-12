@@ -1,6 +1,6 @@
 # Native Windows engineering handover
 
-The latest verified internal-preview packages are `artifacts/native/ci-0d9d54f-pr/packages/0.1.1-preview.240`, with `0.1.0-preview.240` alongside. Both native and both web 0d9d54f runs pass on their first attempts, including 883 core tests, 62 desktop checks in four contexts, the complete installer lifecycle, PDF/Word lists, reimport and supported hyperlinks. Packages identify exact clean PR merge 3edd446 and remain unsigned; push preview.239 independently matches clean 0d9d54f. The later code/quote import change passes 897 core tests and full local native validation and needs its own CI. Production acceptance remains incomplete.
+The latest verified internal-preview packages are `artifacts/native/ci-0d9d54f-pr/packages/0.1.1-preview.240`, with `0.1.0-preview.240` alongside. Both native and both web 0d9d54f runs pass on their first attempts, including 883 core tests, 62 desktop checks in four contexts, the complete installer lifecycle, PDF/Word lists, reimport and supported hyperlinks. Packages identify exact clean PR merge 3edd446 and remain unsigned; push preview.239 independently matches clean 0d9d54f. Later style-numbering and CRLF corrections pass 912 core tests and full local native validation and need their own CI. Production acceptance remains incomplete.
 
 ## Architecture and delivered workflows
 
@@ -17,6 +17,10 @@ Implemented workflows include:
 Native advantages include filesystem monitoring, Windows pickers/shell actions, source-preserving moves, independent recovery, selectable preview text, pagination and native accessibility exposure. Six persisted diagram palettes stay independent of application appearance and carry through rich exports. Settings transfer 1.2 retains 1.0/1.1 imports. The new recovery actions copy failed diagram code or reveal its source in the editor, rejecting stale preview navigation.
 
 ## Parity and compatibility
+
+The inherited-numbering batch passes all 912 core tests, the full native harness and a separate CRLF Word fixture, with zero Release warnings/errors and passing static checks. Fourteen new style-list cases reproduce/fix lost markers and hierarchy; one extra code case verifies CRLF conversion. The native report `word-style-lists-full-validation/native-word-style-list-import.json` checks 12 inherited items, six lists and exact Markdown including code/quotes/continuations. Hosted verification should require `-ExpectedCoreTests 912 -RequireWordStyles` as well as the previous PDF/Word switches. Source-only/field markers and full destination layout remain limited.
+
+The preceding 4adb0ad native runs failed a CRLF-versus-LF Word assertion, now reproduced and corrected. The push also retained a 728.273 ms details input delay, concentrated inside toggle initialisation with no sampled CPU increase. Failures are under `ci-4adb0ad-pr-failure` and `ci-4adb0ad-push-failure`; no timing bound is relaxed and no root cause is claimed. Preview.240 remains the latest fully verified package.
 
 The later code/quote import batch passes all 897 core tests (14 new cases), the full native harness, static checks and a zero-warning/error Release build. Recognised styles, bounded inheritance and direct outline overrides retain supported block semantics; code is literal, quotes stay grouped and list placement survives. Evidence is under `artifacts/native/word-blocks-after`, `word-blocks-full-validation` and `word-blocks-native`, with seven original failures retained in `word-blocks-before`. The native block report verifies exact code text and one two-paragraph quote within list items. This batch is later than 0d9d54f and requires its own CI; use `-RequireWordBlocks -ExpectedCoreTests 897` with the existing Word/PDF switches when reviewing that future run. Language, nested quote depth, quote/list orientation and ambiguous template styles remain limited.
 
@@ -45,9 +49,9 @@ Signing is pluggable through an existing certificate or service adapter, with in
 | Evidence | Result and scope |
 |---|---|
 | Current local Release | Zero warnings/errors |
-| Current core tests | 897 passed; `artifacts/native/word-blocks-after/word-blocks-all.trx` |
+| Current core tests | 912 passed; `artifacts/native/word-style-lists-after/word-style-lists-final.trx` |
 | Failed-diagram recovery | 14 light/dark native cases; exact copy/source mapping, accessible controls and valid-render control; `artifacts/native/diagram-failures` |
-| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-blocks-full-validation` |
+| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-style-lists-full-validation` |
 | Current static checks | Passed; web source unchanged |
 | Native CI at 0d9d54f | PR 38316619492 and push 38316615302 pass on attempt 1; both downloaded reports verify 883 core tests, PDF/Word lists, reimport and 62 desktop workflows in all four contexts |
 | Web CI at 0d9d54f | Push 38316615426 and PR 38316619495 pass all 262 cases on their first attempts |

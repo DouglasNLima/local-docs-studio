@@ -6,34 +6,29 @@ namespace LensDocsStudio.Core.Imports;
 
 // Word stores list items as sibling paragraphs. Keep their numbering and physical
 // continuation indents separate from the indentation required by Markdown markers.
-internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string> warnings)
+internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? styles, List<string> warnings)
 {
     private sealed record Frame(int NumberId, int Level, long WordIndent, int MarkerIndent, int ContentIndent, string Suffix);
     private readonly List<Frame> frames = [];
     private readonly Dictionary<(int Id, int Level), long> counters = [];
-    private readonly Dictionary<(int Id, int Level), (W.Level? Level, long Start)> resolved = [];
-    private readonly Dictionary<(int Id, int Level), W.Level?> abstractLevels = [];
-    private readonly Dictionary<int, W.NumberingInstance> instances = numbering?.Elements<W.NumberingInstance>()
-        .Where(n => n.NumberID?.Value is not null).GroupBy(n => n.NumberID!.Value).ToDictionary(g => g.Key, g => g.First()) ?? [];
-    private readonly Dictionary<int, W.AbstractNum> definitions = numbering?.Elements<W.AbstractNum>()
-        .Where(n => n.AbstractNumberId?.Value is not null).GroupBy(n => n.AbstractNumberId!.Value).ToDictionary(g => g.Key, g => g.First()) ?? [];
+    private readonly WordNumberingReader numberingReader = new(numbering, styles, warnings);
     private readonly HashSet<string> reported = [];
     private StringBuilder output = new();
     private int? previousQuoteIndent;
 
     public void Paragraph(W.Paragraph paragraph, string text, bool quote = false)
     {
-        var properties = paragraph.ParagraphProperties;
+        var properties = numberingReader.Read(paragraph);
         // numId=0 explicitly removes numbering, including inherited numbering.
-        if (properties?.NumberingProperties?.NumberingId?.Val?.Value is not > 0)
+        if (properties.NumberId is not > 0)
         {
-            Block(text, Indent(properties?.Indentation), quote);
+            Block(text, properties.WordIndent, quote);
             return;
         }
-        var id = properties.NumberingProperties.NumberingId.Val.Value;
-        var level = properties.NumberingProperties.NumberingLevelReference?.Val?.Value ?? 0;
+        var id = properties.NumberId.Value;
+        var level = properties.Level;
         if (level is < 0 or > 8) throw new InvalidDataException("The Word document contains an invalid list level.");
-        var (definition, start) = Definition(id, level);
+        var (definition, start) = numberingReader.Definition(id, level);
         var bullet = definition?.NumberingFormat?.Val?.Value == W.NumberFormatValues.Bullet;
         if (definition is null) Warn("A missing Word list definition was converted to decimal numbering.");
         else if (!bullet && definition.NumberingFormat?.Val?.Value != W.NumberFormatValues.Decimal)
@@ -51,12 +46,12 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
         {
             var child = (id, childLevel);
             if (!counters.ContainsKey(child)) continue;
-            var restart = Definition(id, childLevel).Level?.LevelRestart?.Val?.Value ?? childLevel;
+            var restart = numberingReader.Definition(id, childLevel).Level?.LevelRestart?.Val?.Value ?? childLevel;
             if (restart < 0 || restart > childLevel) restart = childLevel;
             if (restart > 0 && restart - 1 == level) counters.Remove(child);
         }
 
-        var wordIndent = Indent(properties.Indentation) ?? Indent(definition?.PreviousParagraphProperties?.Indentation);
+        var wordIndent = properties.WordIndent ?? Indent(definition?.PreviousParagraphProperties?.Indentation);
         while (frames.Count > 0 && frames[^1].Level > level) frames.RemoveAt(frames.Count - 1);
         var previous = frames.Count > 0 && frames[^1].Level == level ? frames[^1] : null;
         var markerIndent = previous?.MarkerIndent ?? (frames.Count > 0 ? frames[^1].ContentIndent : 0);
@@ -95,7 +90,7 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
         {
             foreach (var paragraph in paragraphs)
             {
-                if (paragraph.ParagraphProperties?.NumberingProperties?.NumberingId?.Val?.Value is > 0)
+                if (numberingReader.Read(paragraph).NumberId is > 0)
                     Warn("Word lists inside table cells were flattened to text with visible markers.");
                 var quote = isQuote?.Invoke(paragraph) == true;
                 if (quote) Warn("Word quotes inside table cells were flattened to text with visible markers.");
@@ -107,24 +102,6 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, List<string
     }
 
     public override string ToString() => output.ToString().Replace("\r\n", "\n", StringComparison.Ordinal);
-
-    private (W.Level? Level, long Start) Definition(int id, int level)
-    {
-        if (resolved.TryGetValue((id, level), out var cached)) return cached;
-        instances.TryGetValue(id, out var instance);
-        var levelOverride = instance?.Elements<W.LevelOverride>().FirstOrDefault(l => l.LevelIndex?.Value == level);
-        var abstractId = instance?.AbstractNumId?.Val?.Value ?? -1;
-        if (!abstractLevels.TryGetValue((abstractId, level), out var abstractLevel))
-        {
-            definitions.TryGetValue(abstractId, out var abstractNumber);
-            abstractLevel = abstractNumber?.Elements<W.Level>().FirstOrDefault(l => l.LevelIndex?.Value == level);
-            abstractLevels[(abstractId, level)] = abstractLevel;
-        }
-        var definition = levelOverride?.Level ?? abstractLevel;
-        var result = (definition, (long)(levelOverride?.StartOverrideNumberingValue?.Val?.Value ?? definition?.StartNumberingValue?.Val?.Value ?? 1));
-        resolved[(id, level)] = result;
-        return result;
-    }
 
     private void Append(string text, string firstPrefix, int continuationIndent, bool separate, bool quote = false, bool joinQuote = false)
     {

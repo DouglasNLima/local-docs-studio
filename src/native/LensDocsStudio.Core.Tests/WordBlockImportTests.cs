@@ -14,6 +14,7 @@ public sealed class WordBlockImportTests
     [Theory]
     [InlineData("````text\nCafé <tag> &copy;\n\t**literal**\n```\n````")]
     [InlineData("- ```text\n  First\n  \tSecond\n  ```\n\n  Continuation\n\n- Next")]
+    [InlineData("```text\r\nFirst\r\n\tSecond\r\n```")]
     public void Exported_code_blocks_reimport_with_literal_text_and_list_placement(string source)
     {
         var before = new MarkdownService().Parse(source);
@@ -21,7 +22,7 @@ public sealed class WordBlockImportTests
         var after = new MarkdownService().Parse(result.Markdown);
         var expected = Assert.Single(before.Syntax.Descendants<CodeBlock>());
         var actual = Assert.Single(after.Syntax.Descendants<CodeBlock>());
-        Assert.Equal(expected.Lines.ToString(), actual.Lines.ToString());
+        Assert.Equal(expected.Lines.ToString().Replace("\r\n", "\n", StringComparison.Ordinal), actual.Lines.ToString());
         Assert.Equal(expected.Parent?.GetType(), actual.Parent?.GetType());
         Assert.Equal(before.Syntax.Descendants<ListItemBlock>().Count(), after.Syntax.Descendants<ListItemBlock>().Count());
         Assert.Empty(result.Warnings);

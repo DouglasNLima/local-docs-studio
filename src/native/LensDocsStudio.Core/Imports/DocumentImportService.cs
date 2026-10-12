@@ -130,7 +130,7 @@ public sealed partial class DocumentImportService
             while (end > start && char.IsWhiteSpace(value[end - 1])) end--;
             return start == end ? value : value[..start] + marker + value[start..end] + marker + value[end..];
         }
-        var output = new WordListMarkdownWriter(main.NumberingDefinitionsPart?.Numbering, warnings);
+        var output = new WordListMarkdownWriter(main.NumberingDefinitionsPart?.Numbering, main.StyleDefinitionsPart?.Styles, warnings);
         foreach (var element in main.Document?.Body?.ChildElements ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
