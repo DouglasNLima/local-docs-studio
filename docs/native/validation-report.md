@@ -2,23 +2,28 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest completed CI: 0c20f64
+## Latest completed CI: cfe11e5
 
-All four runs pass: native PR/push 38300926460/38300922818 and web PR attempt 2/push 38300926434/38300922779. Downloaded push evidence is under artifacts/native/ci-0c20f64-push; its evidence-review.json and package-verification.json record the checks below. The initial web PR teardown crash and successful rerun are detailed separately below.
+All four runs pass: native PR 38304292939, native push 38304289265 attempt 2 and web PR/push 38304296486/38304289262. The initial push UIA acquisition failure is retained below. Downloaded PR evidence is under artifacts/native/ci-cfe11e5-pr. The clean package revision f1590a455cdb2e3ca0b31622ff5dd12c184fc334 matches the GitHub PR merge revision for head cfe11e5; evidence-review.json, source-verification.json and package-verification.json retain the checks below.
 
 | Evidence | Verified result |
 |---|---|
 | Core | 839 tests pass in the downloaded TRX |
 | Native corpus | 40 diagram/export cases, zero failures |
-| Desktop | 60 checks in each of built/installed/upgraded/reinstalled applications |
+| Desktop | 61 checks in each of built/installed/upgraded/reinstalled applications |
+| Diagram copying | Eight keyboard copies retain exact 471 × 149 pixels at 175%/35% zoom, survive closing the drawing window and preserve source; the reinstalled PNG was inspected |
 | Installer wizard | Five outcomes, including all four running-application preservation assertions |
-| Files in use | Cancel retains the same live application, exact unsaved Unicode draft/baseline, source, installed files/directories, shortcuts and registration; installation snapshots are identical and the retained editor screenshot was inspected |
+| Files in use | Cancel retains the same live application, exact unsaved Unicode draft/baseline, source, installed files/directories, shortcuts and registration; installation snapshots are identical |
 | Lifecycle | 20 state files and workspace source preserved; sessions reopen after same-source preview upgrade/reinstall |
 | Trust fixture | Both test certificate stores cleaned, no private-key export, source build and production trust unchanged |
-| Packages | Four preview.227 installer/ZIP hashes match exact clean revision metadata; bundled runtime confirmed, installers NotSigned, manifests without signing identity/signature, no local execution |
-| Details transitions | All 18 pass, maximum input 74.9417 ms with complete text, formatting and source |
+| Packages | Four preview.230 installer/ZIP hashes match exact clean PR merge metadata; bundled runtime confirmed, installers NotSigned, manifests without signing identity/signature, no local execution |
+| Details transitions | All 18 pass, maximum input 66.335 ms with complete text, formatting and source |
 
-Initial nested-details input/maximum gap is 65.6778 ms, initial call 65.4164 ms and total construction 139.5582 ms. These samples do not explain the historical 583 ms details or 360.6 ms table pauses. The 250 ms input bound is unchanged. The user has no configured production certificate/service/publisher; unsigned update execution remains blocked.
+Initial nested-details input/maximum gap is 54.676 ms, initial call 54.404 ms and total construction 117.8524 ms. These samples do not explain the historical 583 ms details or 360.6 ms table pauses. The 250 ms input bound is unchanged. The user has no configured production certificate/service/publisher; unsigned update execution remains blocked.
+
+The cfe11e5 push's first attempt fails in UIA ElementFromHandle/GetMainWindow with TimeoutException wrapping COM 0x80131505, before any workflow assertion. Its captured window shows workspace opening; the saved session retains the exact fixture. dotnet-dump 10.0.750501 reads the retained stacks: application thread 0x2448 is in WPF Dispatcher.GetMessage/ITfMessagePump.GetMessageW at capture. That snapshot does not establish the timeout's cause. The original log, inspected screenshot, dump, dump-analysis.log and failure-review.json remain under artifacts/native/ci-cfe11e5-push. One unchanged-source retry passes the complete workflow; no assertion or timeout was relaxed and no root-cause fix is claimed.
+
+The push retry's artefact 11772379399, created at 20:52:55 UTC, is retained under artifacts/native/ci-cfe11e5-push-attempt2. Its four preview.229 package hashes, clean cfe11e5 source, bundled runtime and unsigned metadata verify independently. Downloaded reports confirm 839 core tests, 40 corpus cases, four 61-check desktop/clipboard contexts, 20 retained state files, session restoration and certificate cleanup. The run retains two artefacts named native-validation; a name-only download selected the first attempt, so the successful evidence was fetched by its explicit artefact ID. evidence-review.json records this distinction.
 
 ## Word allocation correction: 0c20f64
 
@@ -40,9 +45,9 @@ Both native CI runs pass the correction and all desktop/installer stages; previe
 
 The web push passes 262 cases. Web PR attempt 1 records 261 passed tests and a Chromium process exit 3221225477 during browserContext.close for the preview context-menu test. All 17 assertions in that test's retained trace succeed; the errors belong to Close context, its fixture and After Hooks. The original log, trace and trace-analysis.json are under artifacts/native/web-ci-0c20f64-pr-failure. The web source and tests are unchanged since the prior green cf436b0 range. The failed-job rerun (attempt 2, same run ID) passes all 262 cases; the underlying browser crash cause is not established and assertions are unchanged. The complete rerun log is artifacts/native/web-ci-0c20f64-pr-retry.log.
 
-## Next hosted regression
+## Diagram clipboard regression
 
-Diagram image copying now has stable automation identifiers. The pending desktop check uses keyboard activation at 175% and 35% zoom, compares every BGRA pixel/dimension with a separately prepared matching-palette reference, waits for actual window closure, checks clipboard persistence and retains edited/saved source. It saves native-ui-diagram-clipboard.json and native-diagram-clipboard.png in all four contexts. Release and static checks pass; actual clipboard execution has not occurred locally. External Office/Azure DevOps paste destinations remain separate.
+Diagram image copying has stable automation identifiers. The cfe11e5 native PR passes keyboard activation at 175% and 35% zoom, every BGRA pixel/dimension against a separately prepared matching-palette reference, actual window closure, clipboard persistence and retained edited/saved source in all four contexts. All eight copies are 471 × 149 with pixel SHA-256 96AFA26F014EAF71EEA9C38029210B917D8519AEFE16F209B8BA59C07F2FCA29. Reports and PNGs are in the downloaded native-ui-diagram-clipboard.json/native-diagram-clipboard.png files; clipboard-review.json consolidates them. The reinstalled PNG was inspected. No local clipboard execution occurred. External Office/Azure DevOps paste destinations remain separate.
 
 ## Subsequent runtime and diagnostic work
 
