@@ -109,6 +109,9 @@ try {
     Run-Installer $(if ($UpgradeInstaller) { $UpgradeInstaller } else { $Installer }) 'reinstall'
     Restore-PreservedSession 'restored-after-reinstall'
     Run-NativeUi 'after-reinstall'
+    & dotnet run --project (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation') -c Release --no-build -- --interrupted-save (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root 'interrupted-save')
+    if ($LASTEXITCODE -ne 0) { throw 'The installed application failed interrupted-save recovery.' }
+    $checks.Add('reinstall: interrupted failed save restored exact draft and baseline in a new application process')
     Uninstall-Native 'final-uninstall'
     $defaultAfter = (Get-ItemProperty 'HKCU:\Software\Classes\.md' -ErrorAction SilentlyContinue).'(default)'
     $legacyAfter = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{E5D86651-4B27-4C59-B7D4-2EA98F2F8D26}_is1' -ErrorAction SilentlyContinue | ConvertTo-Json -Compress

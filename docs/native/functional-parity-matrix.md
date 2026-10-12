@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Actual process-interruption coverage is implemented for rejected saves, restart recovery and explicit retry in built/reinstalled applications. The check compiles and rejects local execution; CI has not yet executed it. The c62ec4e PR run also exposes an unresolved 311.8 ms nested-details input delay, so responsiveness remains incomplete despite complete source/text in that sample.
+
 Save recovery now retains the current editor draft before any asset transfer or destination write. Four local regression outcomes cover a locked destination before journal creation, fresh-model restoration, exact encoding/line-ending retry and failed recovery blocking source commit. The full native suite passes; process interruption and removable-drive certification remain open.
 
 Installed-session continuity passes in both 41d06d7 native CI runs. The upgraded and reinstalled applications reopen the exact original state and verify actual tab text/settings, semantic session/preferences continuity and retained private/source files. This supplements preservation hashes; it does not certify historical schemas or production-signed upgrades.

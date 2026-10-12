@@ -71,15 +71,18 @@ internal static class NativeLayoutChecks
         foreach (var test in nestedCases)
         {
             var collectionsBefore = Enumerable.Range(0, GC.MaxGeneration + 1).Select(GC.CollectionCount).ToArray();
-            var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew(); var inputAt = -1d;
-            dispatcher.BeginInvoke(DispatcherPriority.Input, () => inputAt = nestedWatch.Elapsed.TotalMilliseconds);
-            var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { }); Pump(task, dispatcher);
+            var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew();
+            using var input = new InputTrace(dispatcher, nestedWatch);
+            var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { });
+            var initialCall = nestedWatch.Elapsed.TotalMilliseconds;
+            Pump(task, dispatcher); input.Dispose(); var inputAt = input.Milliseconds;
             var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
             var completeText = result.ReadText().Contains(test.Last, StringComparison.Ordinal);
             var sourcePreserved = nested.Source == test.Source;
             var observation = JsonSerializer.Serialize(new
             {
-                test.Name, InputMilliseconds = inputAt, ConstructionMilliseconds = elapsed,
+                test.Name, InputMilliseconds = inputAt, InitialCallMilliseconds = initialCall, ConstructionMilliseconds = elapsed,
+                OperationsBeforeInput = input.Operations,
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, CompleteText = completeText,
                 SourcePreserved = sourcePreserved,
                 GarbageCollections = Enumerable.Range(0, GC.MaxGeneration + 1).Select(index => GC.CollectionCount(index) - collectionsBefore[index]).ToArray()
@@ -147,5 +150,37 @@ internal static class NativeLayoutChecks
         _ = task.ContinueWith(_ => dispatcher.BeginInvoke(DispatcherPriority.Send, () => frame.Continue = false), TaskScheduler.Default);
         timer.Start(); Dispatcher.PushFrame(frame); timer.Stop();
         if (expired) throw new TimeoutException("Native layout did not finish within the validation deadline.");
+    }
+
+    private sealed class InputTrace : IDisposable
+    {
+        private readonly Dispatcher dispatcher;
+        private readonly Stopwatch watch;
+        private readonly Dictionary<DispatcherOperation, double> started = [];
+        public double Milliseconds { get; private set; } = -1;
+        public List<object> Operations { get; } = [];
+
+        public InputTrace(Dispatcher dispatcher, Stopwatch watch)
+        {
+            this.dispatcher = dispatcher; this.watch = watch;
+            dispatcher.Hooks.OperationStarted += OnStarted;
+            dispatcher.Hooks.OperationCompleted += OnCompleted;
+            dispatcher.BeginInvoke(DispatcherPriority.Input, () => Milliseconds = watch.Elapsed.TotalMilliseconds);
+        }
+        private void OnStarted(object? sender, DispatcherHookEventArgs args)
+        {
+            if (Milliseconds < 0) started[args.Operation] = watch.Elapsed.TotalMilliseconds;
+        }
+        private void OnCompleted(object? sender, DispatcherHookEventArgs args)
+        {
+            if (started.Remove(args.Operation, out var start))
+                Operations.Add(new { Priority = args.Operation.Priority.ToString(), StartedMilliseconds = start,
+                    DurationMilliseconds = watch.Elapsed.TotalMilliseconds - start });
+        }
+        public void Dispose()
+        {
+            dispatcher.Hooks.OperationStarted -= OnStarted;
+            dispatcher.Hooks.OperationCompleted -= OnCompleted;
+        }
     }
 }

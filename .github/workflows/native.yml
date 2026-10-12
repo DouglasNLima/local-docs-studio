@@ -46,6 +46,9 @@ jobs:
         run: npx playwright test --config playwright.native-export.config.mjs
       - name: Validate native desktop workflows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
+      - name: Validate recovery after interrupted failed saves
+        timeout-minutes: 3
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --interrupted-save src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/interrupted-save
       - name: Build isolated self-contained preview versions
         run: |
           pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.0-preview.${{ github.run_number }}"
@@ -67,6 +70,7 @@ jobs:
             artifacts/native/authenticode/**/*.json
             artifacts/native/validation/
             artifacts/native/ui/
+            artifacts/native/interrupted-save/
             artifacts/native/site-browser/
             artifacts/native/installer-wizard/
             artifacts/native/install-smoke/**/installer-results.json
@@ -74,6 +78,9 @@ jobs:
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/restored-session.json
             artifacts/native/install-smoke/**/restored-session.png
+            artifacts/native/install-smoke/**/interrupted-save.json
+            artifacts/native/install-smoke/**/blocked-save.png
+            artifacts/native/install-smoke/**/recovered-draft.png
             artifacts/native/install-smoke/**/native-ui-failure*
             artifacts/native/install-smoke/**/native-save-dialogue-failure.png
             artifacts/native/install-smoke/**/native-save-dialogues.json

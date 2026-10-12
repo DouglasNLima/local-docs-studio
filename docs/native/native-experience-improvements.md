@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Recovery validation now includes an implemented CI-only application termination/restart scenario after a rejected save. It distinguishes durable state from normal-shutdown persistence and verifies the user's explicit retry. Local compilation/guard checks pass; actual desktop results remain pending.
+
 Save preserves the latest editor draft independently before attempting destination writes, including failures that precede the source write journal. Four local checks establish recovery, retry with unchanged encoding and refusal to alter source when recovery is unavailable. This closes the gap before the periodic autosave runs.
 
 The upgrade/reinstall validation opens the installed application with its existing session and checks actual restored tabs and settings. This supplements file-retention checks with user-visible continuity and passes in both 41d06d7 native CI runs. Production trust and historical-schema certification remain separate.
