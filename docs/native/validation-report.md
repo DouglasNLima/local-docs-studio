@@ -2,7 +2,15 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest verified native PR: 56502e3
+## Latest completed CI: b3a4d59
+
+Native PR 38310145934, native push 38310140757 and web PR/push 38310145715/38310140748 all pass on their first attempts. Both web logs record 262 passing tests. Downloaded PR preview.234 identifies clean merge `cbaf55eea7c5473f76b07df07b5487d8c2493c6a`, captured from GitHub for head `b3a4d59cc6b32dbe201b3109f54994fa49e0cdea`. Push preview.233 independently identifies that exact clean branch revision. All eight installer/ZIP hashes, unsigned metadata, sizes and bundled runtime entries are verified; no installer was executed locally.
+
+Both downloaded reports pass 839 core tests, the 40-case diagram/export corpus, four 62-check desktop contexts, installed runtime origins, five wizard outcomes, four files-in-use assertions, 20 preserved lifecycle state files, session restoration and disposable-certificate cleanup. The five PDF list outcome groups pass in both runs, including exact selectable word order across 90 continuation paragraphs on five pages. All seven hosted push PDF pages were rasterised and inspected, with page two also checked at higher resolution. Reports are under `artifacts/native/ci-b3a4d59-pr` and `ci-b3a4d59-push`; the latter includes `pdf-visual-review.json`.
+
+The later Word list correction is separately validated below and is not included in preview.234. Earlier transient failures remain retained; this passing batch does not establish their root causes or production certification.
+
+## Previous verified native PR: 56502e3
 
 Native PR 38307579534, native push 38307575579 attempt 2 and web PR/push 38307579564/38307575323 pass. Both web logs record 262 passing cases on their first attempts. Downloaded preview.232 evidence matches exact clean PR merge `6fe047ecd37c80870badf08ea55f0fd2ef372196`, captured from GitHub for head `56502e3c3734a541236d370fb439f97581246310`. All four installer/ZIP hashes, unsigned metadata and runtime files pass independent read-only verification. No downloaded installer was executed locally.
 
@@ -63,7 +71,7 @@ The actual pre-change PDF repeated `7.` for three paragraphs in one item and fla
 
 Five focused groups inspect actual selectable text, marker counts, glyph positions, bold/Unicode/link retention, zero/nine-digit starts, quote/heading/code first blocks, table-first/nested-only items, image bounds and exact word order across 90 continuation paragraphs on five pages. All seven fixture pages were rasterised and inspected. Evidence is under `artifacts/native/pdf-lists-regression`, with the final exact-word check under `artifacts/native/pdf-lists-exact`. The first tightened count mistakenly included words from the final prose paragraphs; scoping that count to item 41 corrects the test, while the independent whole-document word comparison remains exact. No production assertion was weakened.
 
-Release has zero warnings/errors, all 839 core tests pass (`artifacts/native/pdf-list-core/pdf-list-core.trx`), the complete native harness has 40 diagram cases and zero failures (`artifacts/native/pdf-list-full-validation`), and static checks pass. No local desktop interaction occurred. Hosted validation of the PDF change remains pending. Visual list hierarchy does not establish tagged PDF accessibility.
+Release has zero warnings/errors, all 839 core tests pass (`artifacts/native/pdf-list-core/pdf-list-core.trx`), the complete native harness has 40 diagram cases and zero failures (`artifacts/native/pdf-list-full-validation`), and static checks pass. No local desktop interaction occurred. Hosted validation of the PDF change now passes in both b3a4d59 native runs as recorded above. Visual list hierarchy does not establish tagged PDF accessibility.
 
 ## Subsequent Word list correction
 
