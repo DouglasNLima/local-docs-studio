@@ -70,13 +70,26 @@ internal static class NativeLayoutChecks
         var nestedEvidence = new List<object>();
         foreach (var test in nestedCases)
         {
+            var collectionsBefore = Enumerable.Range(0, GC.MaxGeneration + 1).Select(GC.CollectionCount).ToArray();
             var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew(); var inputAt = -1d;
             dispatcher.BeginInvoke(DispatcherPriority.Input, () => inputAt = nestedWatch.Elapsed.TotalMilliseconds);
             var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { }); Pump(task, dispatcher);
             var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
-            if (inputAt < 0 || inputAt >= 250 || inputAt >= elapsed || !result.ReadText().Contains(test.Last, StringComparison.Ordinal)
-                || result.SourceElements.Count < 1000 || nested.Source != test.Source)
-                throw new IOException("Nested " + test.Name + " rendering delayed input or lost complete content/source mapping.");
+            var completeText = result.ReadText().Contains(test.Last, StringComparison.Ordinal);
+            var sourcePreserved = nested.Source == test.Source;
+            var observation = JsonSerializer.Serialize(new
+            {
+                test.Name, InputMilliseconds = inputAt, ConstructionMilliseconds = elapsed,
+                SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, CompleteText = completeText,
+                SourcePreserved = sourcePreserved,
+                GarbageCollections = Enumerable.Range(0, GC.MaxGeneration + 1).Select(index => GC.CollectionCount(index) - collectionsBefore[index]).ToArray()
+            }, new JsonSerializerOptions { WriteIndented = true });
+            // Retain the exact failed observation too; a combined exception cannot distinguish
+            // runner scheduling/collection delays from incomplete rendering or source loss.
+            File.WriteAllText(Path.Combine(output, "native-nested-" + test.Name + "-construction.json"), observation);
+            if (inputAt < 0 || inputAt >= 250 || inputAt >= elapsed || !completeText
+                || result.SourceElements.Count < 1000 || !sourcePreserved)
+                throw new IOException("Nested " + test.Name + " rendering delayed input or lost complete content/source mapping: " + observation);
             using var stop = new CancellationTokenSource(); var cancelledAt = -1d; var cancelWatch = Stopwatch.StartNew();
             dispatcher.BeginInvoke(DispatcherPriority.Input, () => { cancelledAt = cancelWatch.Elapsed.TotalMilliseconds; stop.Cancel(); });
             var stale = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { }, cancellationToken: stop.Token); Pump(stale, dispatcher);
