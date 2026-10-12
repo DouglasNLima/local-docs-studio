@@ -46,10 +46,14 @@ jobs:
         run: npx playwright test --config playwright.native-export.config.mjs
       - name: Validate native desktop workflows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
-      - name: Build isolated self-contained installer and portable package
-        run: pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.0-preview.${{ github.run_number }}"
-      - name: Validate installed application and uninstall lifecycle
-        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe"
+      - name: Build isolated self-contained preview versions
+        run: |
+          pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.0-preview.${{ github.run_number }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version "0.1.1-preview.${{ github.run_number }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate installation upgrade and uninstall lifecycle
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe"
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -64,7 +68,7 @@ jobs:
             artifacts/native/install-smoke/**/installer-results.json
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
-            artifacts/native/install-smoke/**/native-ui-failure.png
+            artifacts/native/install-smoke/**/native-ui-failure*
             artifacts/native/install-smoke/**/native-save-dialogue-failure.png
             artifacts/native/install-smoke/**/native-save-dialogues.json
             artifacts/native/install-smoke/**/native-artefact-folder-failure.png

@@ -9,10 +9,10 @@ All four 0045689 CI runs pass: 766 core tests, seven actual Windows signature ch
 | Develop baseline | 2cc3b5680958c9c553dad23856e6010c158fccd7 |
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
-| Latest implementation | Native/Word/PDF autolink text preservation and real external PDF destinations; disposable Windows certificate checks pass their revised CI step |
+| Latest implementation | Simulated two-version installer upgrade checks with byte-preserved state, installed-version assertions and bounded Save dialogue readiness observation |
 | Latest complete native CI | 0045689, PR/push 38215212276/38215207396: 766 core tests, seven signature cases and 55 workflows in built, installed and reinstalled applications |
 | Latest complete web CI | Both 0045689 runs 38215212191/38215207435: all 262 cases in 10.5 minutes |
-| Current validation | Clean Release build, all 778 core tests and complete native harness pass, including six external-link outcomes and inspected generated PDF; link correction awaits CI |
+| Current validation | Clean Release build, all 778 core tests and complete native harness pass. Five installer file-observation checks, script parsing and static integrity pass. The expanded installer path and Save observation correction await Windows CI |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -28,7 +28,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Validate the autolink/PDF correction in CI and retain the completed Windows trust evidence. No local certificate-store mutation is authorised by the current validation setup.
+1. Validate the expanded installer upgrade and corrected Save observation in CI. Native push 38216456690 at 2ea009b failed while locating the Save filename field; preserve its evidence and do not count it as passed. No local certificate-store mutation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

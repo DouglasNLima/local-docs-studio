@@ -40,4 +40,6 @@ A CI-only disposable-certificate check validates the actual Windows verifier and
 
 Angle-bracket URL/email text now survives native preview, heading/plain-text extraction and Word/PDF export. External PDF links retain real HTTP/HTTPS/email destinations across wrapped lines. Unsupported schemes retain readable export labels without PDF or Word actions. Twelve core and six native cases pass, and the generated PDF was inspected; no destination was opened during validation.
 
+Installer validation now prepares two preview versions for an actual replacement installation in CI, verifies the installed binary/metadata/registration and preserves existing private state/workspace hashes through lifecycle phases. Five file-only checks pass locally; the actual expanded lifecycle is pending. A retained installed-app failure exposed an immediate Save-input lookup; the harness now waits for that exact enabled control without repeating user actions or weakening saved-byte assertions.
+
 These are implemented outcomes with stated evidence limits, not production certification. Detailed contracts and remaining gaps are in the functional parity matrix and validation report.

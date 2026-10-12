@@ -1494,12 +1494,15 @@ internal static partial class NativeUiChecks
             Window? saveWindow = null;
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
             FocusWindow(saveWindow!);
-            // The address control can share child ID 1001 with the filename input.
-            var fileName = (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))
-                ?? throw new IOException("The labelled Save filename field is unavailable.")).AsTextBox();
-            var suggested = fileName.Text; var expected = absolutePath ? Path.GetFullPath(destination) : Path.GetFileName(destination);
+            TextBox? fileName = null;
+            var suggested = ""; var expected = absolutePath ? Path.GetFullPath(destination) : Path.GetFileName(destination);
             try
             {
+                // The shell window can appear before its child controls. The address control
+                // can share child ID 1001, so wait for the enabled, explicitly labelled input.
+                Wait(() => (fileName = saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))?.AsTextBox())?.IsEnabled == true,
+                    "The labelled Save filename field did not become ready.");
+                suggested = fileName!.Text;
                 if (expectedFilename is not null)
                 {
                     // Windows may hide the selected file type's extension in the filename field.
@@ -1524,7 +1527,7 @@ internal static partial class NativeUiChecks
             {
                 try
                 {
-                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName.Text, fileName.Name, fileName.AutomationId, KeyboardFocus = fileName.Properties.HasKeyboardFocus.Value });
+                    saveDialogueChecks.Add(new { Title = title, Suggested = suggested, Expected = expected, Observed = fileName?.Text, Name = fileName?.Name, AutomationId = fileName?.AutomationId, KeyboardFocus = fileName?.Properties.HasKeyboardFocus.Value });
                     File.WriteAllText(Path.Combine(output, "native-save-dialogues.json"), JsonSerializer.Serialize(saveDialogueChecks, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 catch (Exception) { /* Diagnostic capture must not mask the original failure. */ }
