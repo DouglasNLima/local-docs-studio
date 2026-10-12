@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+Source jumps use a zero-length editor selection at the target, preserving navigation history while clearing any old range. Updating AvalonEdit's caret alone retains selection; actual CI demonstrated that the next character then replaced that old range. This applies to diagram recovery, outline/source targets and double-click source navigation.
+
 Failed diagram previews retain accessible native Copy source and Edit source actions. The renderer supplies the fence's source offset; the window validates the active document and exact preview snapshot before navigating. Preview-only layout becomes Split so keyboard input reaches the original source. Copy uses the existing diagram-source path, and unavailable native drawings expose no image export actions. Standalone Mermaid and DevOps containers retain their existing source mapping; nothing rewrites the document or changes update trust.
 
 Preview construction exposes disabled-by-default EventSource phase markers for diagnosing intermittent dispatcher delays. A bounded validation listener records phase names, source offsets and elapsed times, without document text or persistent telemetry. Nested-layout checks sample throughout construction so yielding once at the start cannot hide a later long pause. Rendering order, cancellation behaviour and the 250 ms acceptance limit remain unchanged.

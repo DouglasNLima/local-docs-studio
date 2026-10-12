@@ -1,5 +1,7 @@
 # Native implementation progress
 
+The new desktop check at 54c1245 exposed a real selection defect in both native CI runs: typing after Edit source replaced the previously selected insertion. The saved fixture was not overwritten; retained session/screenshot evidence shows the editor draft reduced to `X`. Source navigation now clears the old selection at its target. The original assertion is retained for the next CI run; no timeout or expected text was relaxed.
+
 Failed-diagram recovery is implemented with Copy source and Edit source, exact snapshot validation and automatic editor visibility. Fourteen focused native cases pass, including standalone/DevOps source mapping; the complete native harness passes 40 diagram/export cases with zero failures. All 832 core tests, static checks and Release build pass (zero warnings/errors). The 60th actual desktop workflow is implemented and awaiting CI; no local foreground input, clipboard or installation was used.
 
 All four 56b5161 runs pass: native PR/push 38281535734/38281531643 and web PR/push 38281535675/38281531500. Downloaded push evidence confirms the paint gate in light/dark across all four desktop contexts (eight accepted frames), complete installer/state restoration and 59 desktop workflows per context. Preview.211 package hashes, exact clean revision, bundled runtime and unsigned status are independently verified. The traced details sample records 78.7 ms first input/maximum gap; the historical intermittent latency remains open.

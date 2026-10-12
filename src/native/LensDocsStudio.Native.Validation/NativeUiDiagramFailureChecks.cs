@@ -38,7 +38,8 @@ internal static partial class NativeUiChecks
             Wait(() => edit.Properties.HasKeyboardFocus.Value, "Edit source cannot receive keyboard focus.");
             Keyboard.Type(VirtualKeyShort.SPACE);
             Wait(() => !editor.IsOffscreen && ReadPreferences().Layout == "Split", "Edit source did not reveal the editor from Preview layout.");
-            // Type without refocusing the editor: the action must restore both focus and the exact source position.
+            // Paste leaves the insertion selected. Navigation must collapse it, restore focus and retain the exact source position.
+            // Type without refocusing or clearing that selection in the harness.
             Keyboard.Type("X");
             Wait(() => ReadEditorText(editor) == fixture.Insert(target, "X"), "Edit source did not place keyboard input at the failed diagram's fence.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);

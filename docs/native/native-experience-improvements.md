@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Actual Edit source testing reproduced replacement of a previous selection when typing at the new location. Source navigation now collapses selection at the target, so returning to code cannot leave an unrelated range selected. The failing CI evidence is retained; corrected desktop validation is pending.
+
 An invalid diagram now offers keyboard-accessible Copy source and Edit source controls beside its explanation. Edit source reveals the editor from Preview layout and places the caret at the original fence; stale previews cannot navigate a changed document. Fourteen native source/control cases pass locally. Actual Windows clipboard, focus, caret typing, Undo and saved-file preservation are covered by a new desktop workflow pending CI.
 
 The recurring closed-details CI delay remains an open responsiveness issue. New phase diagnostics and periodic input measurements narrow investigation without changing the rendering behaviour or acceptance limit. The [validation report](validation-report.md) retains the failed observation and distinguishes it from passing local samples.

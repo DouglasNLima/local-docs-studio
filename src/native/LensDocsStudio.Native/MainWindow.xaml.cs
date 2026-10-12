@@ -210,7 +210,7 @@ public partial class MainWindow : Window
     private async void JumpToSource(int offset, bool focusEditor = true)
     {
         CaptureCurrentNavigation();
-        Editor.CaretOffset = Math.Clamp(offset, 0, Editor.Document.TextLength);
+        Editor.Select(Math.Clamp(offset, 0, Editor.Document.TextLength), 0);
         var document = Editor.Document; var target = Editor.CaretOffset;
         if (focusEditor) Editor.Focus();
         VisitCurrentNavigation();
