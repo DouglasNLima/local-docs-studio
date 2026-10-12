@@ -2,25 +2,25 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest completed CI: cf436b0
+## Latest completed CI: 0c20f64
 
-All four runs pass: native PR/push 38297012249/38297009197 and web PR/push 38297012123/38297009239. Downloaded push evidence is under artifacts/native/ci-cf436b0-push; its evidence-review.json and package-verification.json record the checks below.
+All four runs pass: native PR/push 38300926460/38300922818 and web PR attempt 2/push 38300926434/38300922779. Downloaded push evidence is under artifacts/native/ci-0c20f64-push; its evidence-review.json and package-verification.json record the checks below. The initial web PR teardown crash and successful rerun are detailed separately below.
 
 | Evidence | Verified result |
 |---|---|
-| Core | 832 tests pass in the downloaded TRX |
+| Core | 839 tests pass in the downloaded TRX |
 | Native corpus | 40 diagram/export cases, zero failures |
 | Desktop | 60 checks in each of built/installed/upgraded/reinstalled applications |
 | Installer wizard | Five outcomes, including all four running-application preservation assertions |
 | Files in use | Cancel retains the same live application, exact unsaved Unicode draft/baseline, source, installed files/directories, shortcuts and registration; installation snapshots are identical and the retained editor screenshot was inspected |
 | Lifecycle | 20 state files and workspace source preserved; sessions reopen after same-source preview upgrade/reinstall |
 | Trust fixture | Both test certificate stores cleaned, no private-key export, source build and production trust unchanged |
-| Packages | Four preview.225 installer/ZIP hashes match exact clean revision metadata; bundled runtime confirmed, installers NotSigned, manifests without signing identity/signature, no local execution |
-| Details transitions | All 18 pass, maximum input 106.4514 ms with complete text, formatting and source |
+| Packages | Four preview.227 installer/ZIP hashes match exact clean revision metadata; bundled runtime confirmed, installers NotSigned, manifests without signing identity/signature, no local execution |
+| Details transitions | All 18 pass, maximum input 74.9417 ms with complete text, formatting and source |
 
-Initial nested-details input is 64.9955 ms, component initialisation ends at 64.2663 ms and total construction is 151.5682 ms. These samples do not explain the historical 583 ms details or 360.6 ms table pauses. The 250 ms input bound is unchanged. The user has no configured production certificate/service/publisher; unsigned update execution remains blocked.
+Initial nested-details input/maximum gap is 65.6778 ms, initial call 65.4164 ms and total construction 139.5582 ms. These samples do not explain the historical 583 ms details or 360.6 ms table pauses. The 250 ms input bound is unchanged. The user has no configured production certificate/service/publisher; unsigned update execution remains blocked.
 
-## Later correction: 0c20f64
+## Word allocation correction: 0c20f64
 
 The Word exporter now preflights an aggregate limit of 65,536 code DOM elements before template/package allocation. This addresses a Low finding in the immutable cf436b0 review. Tabs, breaks, text spans and paragraph/run formatting share the budget across nested blocks; normal Unicode, syntax colours and CRLF remain intact.
 
@@ -36,9 +36,9 @@ The Word exporter now preflights an aggregate limit of 65,536 code DOM elements 
 
 The first focused run failed because its fixture counted a MathBlock as the sole FencedCodeBlock. native-word-code-budget-focused.trx retains the failure; selecting the Mermaid fence fixes the fixture without weakening the expected output. The full suite then passes.
 
-CI for this revision is in progress: native PR/push 38300926460/38300922818 and web PR/push 38300926434/38300922779. Local results do not substitute for those runs or certify a new installer package.
+Both native CI runs pass the correction and all desktop/installer stages; preview.227 packaging is independently verified. These results certify the recorded internal-preview fixtures, not production signing or SDK-free Windows.
 
-The web push passes. Web PR attempt 1 records 261 passed tests and a Chromium process exit 3221225477 during browserContext.close for the preview context-menu test. All 17 assertions in that test's retained trace succeed; the errors belong to Close context, its fixture and After Hooks. The original log, trace and trace-analysis.json are under artifacts/native/web-ci-0c20f64-pr-failure. The web source and tests are unchanged since the prior green cf436b0 range. A failed-job rerun (attempt 2, same run ID) is in progress; the underlying browser crash cause is not established and assertions are unchanged.
+The web push passes 262 cases. Web PR attempt 1 records 261 passed tests and a Chromium process exit 3221225477 during browserContext.close for the preview context-menu test. All 17 assertions in that test's retained trace succeed; the errors belong to Close context, its fixture and After Hooks. The original log, trace and trace-analysis.json are under artifacts/native/web-ci-0c20f64-pr-failure. The web source and tests are unchanged since the prior green cf436b0 range. The failed-job rerun (attempt 2, same run ID) passes all 262 cases; the underlying browser crash cause is not established and assertions are unchanged. The complete rerun log is artifacts/native/web-ci-0c20f64-pr-retry.log.
 
 ## Next hosted regression
 

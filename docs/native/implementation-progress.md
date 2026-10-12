@@ -2,7 +2,7 @@
 
 Current milestone: native internal preview with implemented workflows and growing acceptance evidence. Production is not ready. The separate .NET 10/WPF application preserves the web/PWA/GitHub Pages product and the legacy shell. The full authorised scope is in [the reconstruction brief](reconstruction-brief.txt); implementation and validation remain one continuous goal.
 
-The latest fully verified packages are unsigned preview.225 from cf436b0. Both native and both web CI runs pass. The later Word allocation correction is committed and pushed as 0c20f64; its CI is running. A separate diagram clipboard regression is compiled locally and awaits its own hosted run.
+The latest verified packages are unsigned preview.227 from 0c20f64, including the Word allocation correction and hosted-only test guards. Both native runs and the web push pass; the web PR passes on its second attempt after a Chromium teardown crash with all test assertions passing. Original failure evidence is retained. A separate diagram clipboard regression is compiled and committed as 9c07ab7 and awaits its own hosted run.
 
 ## Delivered and validated
 
@@ -13,7 +13,7 @@ The latest fully verified packages are unsigned preview.225 from cf436b0. Both n
 | Native preview | Markdown semantics, browser-free Mermaid, maths, images, code colours and source mapping; 40 diagram/export corpus cases and 56 catalogue/theme cases |
 | Editing and exports | Native editing/completion, image management, clipboard representations, supported imports, DOCX/PDF/HTML/ZIP/Docs Site exports, libraries and explicit migration |
 | Responsiveness | Cooperative nested construction, paginated reading and grouped details expansion; 18 transition checks retain full text/formatting; intermittent initial construction remains unresolved |
-| Desktop workflows | At cf436b0, 60 actual checks pass in built/installed/upgraded/reinstalled applications |
+| Desktop workflows | At 0c20f64, 60 actual checks pass in built/installed/upgraded/reinstalled applications |
 | Installer | Self-contained isolated per-user product; visible wizard, files-in-use cancellation, installation, same-source upgrade, uninstall and reinstall pass |
 | Update trust | User-controlled discovery/download/install, cancellation and final verification; pluggable signing, empty production trust and blocked unsigned execution |
 
@@ -27,9 +27,9 @@ The next desktop regression activates diagram Copy image by keyboard at 175% and
 
 ## Evidence and next executable work
 
-- Monitor 0c20f64 native PR/push 38300926460/38300922818 and web PR/push 38300926434/38300922779 through terminal results; inspect failures before changing assertions.
-- Download and verify the completed push artefact against the exact source revision, including package hashes/runtime, trust cleanup, desktop reports and installer preservation.
-- Push the compiled diagram clipboard regression after retaining the current run's result; validate the new 61st desktop workflow in all four application contexts.
+- All 0c20f64 runs now pass: native PR/push 38300926460/38300922818, web PR attempt 2/push 38300926434/38300922779. Logs and the original failed browser trace are retained.
+- Downloaded push evidence verifies four package hashes, exact clean source, bundled runtime, 839 core tests, four 60-check desktop reports, trust cleanup, five wizard outcomes and 20 preserved lifecycle state files. See artifacts/native/ci-0c20f64-push/evidence-review.json and package-verification.json.
+- Push and monitor the compiled diagram clipboard regression, validating the new 61st desktop workflow in all four contexts. Inspect failures before changing assertions.
 - Continue the remaining acceptance work below; passing focused checks do not establish the full brief.
 
 Current verified artefacts and hashes are in the [engineering handover](engineering-handover.md). Actual foreground/clipboard, Office, installer and certificate-store tests belong to disposable hosted Windows. Windowless native checks may run locally; no installed or personal application state is used.
