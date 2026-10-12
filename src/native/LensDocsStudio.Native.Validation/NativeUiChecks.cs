@@ -1235,6 +1235,23 @@ internal static partial class NativeUiChecks
             Wait(() => detailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == FlaUI.Core.Definitions.ExpandCollapseState.Collapsed,
                 "A new details section did not start collapsed.");
             if (detailsToggle.Name != "Supporting evidence — Café") throw new IOException("The native details expander lost its accessible summary.");
+            var detailsHeader = detailsToggle.FindFirstDescendant(cf => cf.ByName("Supporting evidence — Café"))
+                ?? throw new IOException("The native details header is unavailable to keyboard navigation.");
+            FocusWindow(window); detailsHeader.Focus();
+            Wait(() => detailsHeader.Properties.HasKeyboardFocus.Value, "The native details header did not acquire keyboard focus.");
+            Keyboard.Type(VirtualKeyShort.SPACE);
+            Wait(() => detailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == FlaUI.Core.Definitions.ExpandCollapseState.Expanded,
+                "Space did not expand the focused native details header.");
+            Keyboard.Type(VirtualKeyShort.SPACE);
+            Wait(() => detailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == FlaUI.Core.Definitions.ExpandCollapseState.Collapsed,
+                "Space did not collapse the focused native details header.");
+            if (!detailsHeader.Properties.HasKeyboardFocus.Value || ReadEditorText(editor) != insertedDetails)
+                throw new IOException("Toggling details with Space lost header focus or changed Markdown source.");
+            File.WriteAllText(Path.Combine(output, "native-details-keyboard.json"), JsonSerializer.Serialize(new
+            {
+                Passed = true, Summary = detailsToggle.Name, HeaderFocused = detailsHeader.Properties.HasKeyboardFocus.Value,
+                KeyboardExpands = true, KeyboardCollapses = true, SourcePreserved = true
+            }, new JsonSerializerOptions { WriteIndented = true }));
             detailsToggle.Patterns.ExpandCollapse.Pattern.Expand();
             try
             {
@@ -1283,7 +1300,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "The details fixture did not restore original source.");
             if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
-            checks.Add("Native details dialogue restores and edits Markdown; accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
+            checks.Add("Native details dialogue restores and edits Markdown; keyboard and accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
             const string mathsFixture = "\n\n## Native maths UI\n\nNative formula $\\frac{x^2}{y_1}$ keeps its source.\n";
             var beforeMaths = ReadEditorText(editor);
             var mathsClipboard = NativeUiClipboard.GetDataObject(); uint mathsSequence = 0;

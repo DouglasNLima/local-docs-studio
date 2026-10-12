@@ -58,6 +58,19 @@ internal static class NativeDetailsChecks
             rendered.ExpandDetails();
             if (!Text().Contains("Nested needle 042.", StringComparison.Ordinal) || !Text().Contains("After details.", StringComparison.Ordinal))
                 throw new IOException("Find/copy expansion lost nested or following content.");
+            foreach (var section in rendered.Details)
+            {
+                section.Toggle.ApplyTemplate();
+                var header = section.Toggle.Template.FindName("HeaderSite", section.Toggle) as System.Windows.Controls.Primitives.ToggleButton;
+                if (header is null || !header.Focusable || !header.IsTabStop)
+                    throw new IOException("The details header lost its native focusable toggle.");
+                var toggleProvider = new ToggleButtonAutomationPeer(header).GetPattern(PatternInterface.Toggle) as IToggleProvider;
+                if (toggleProvider is null) throw new IOException("The details header lost its native Toggle pattern.");
+                toggleProvider.Toggle();
+                if (section.Toggle.IsExpanded) throw new IOException("The header toggle did not collapse its containing details.");
+                toggleProvider.Toggle();
+                if (!section.Toggle.IsExpanded) throw new IOException("The header toggle did not restore its containing details.");
+            }
             var paginator = ((IDocumentPaginatorSource)rendered.Document).DocumentPaginator; paginator.PageSize = new Size(820, 820);
             var page = paginator.GetPage(0);
             System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Loaded);
@@ -67,6 +80,9 @@ internal static class NativeDetailsChecks
                 var arrow = section.Toggle.Template.FindName("Chevron", section.Toggle) as System.Windows.Shapes.Path;
                 if (arrow is null || arrow.ActualHeight < 10 || arrow.ActualWidth < 10 || arrow.Stroke is not SolidColorBrush)
                     throw new IOException("The native details arrow is clipped or unavailable.");
+                var header = section.Toggle.Template.FindName("HeaderSite", section.Toggle) as System.Windows.Controls.Primitives.ToggleButton;
+                if (header is null || header.ActualWidth < 28 || header.ActualHeight < 28)
+                    throw new IOException("The details header lost its native focusable toggle area.");
             }
             var capture = new RenderTargetBitmap(820, 820, 96, 96, PixelFormats.Pbgra32); capture.Render(paginator.GetPage(0).Visual);
             var imageEncoder = new PngBitmapEncoder(); imageEncoder.Frames.Add(BitmapFrame.Create(capture));
@@ -115,6 +131,7 @@ internal static class NativeDetailsChecks
         File.WriteAllText(Path.Combine(output, "native-details.json"), JsonSerializer.Serialize(new
         {
             Passed = true, Checks = new[] { "Native ExpandCollapse controls retain selectable summaries and independent nested states",
+                "Focusable native header toggles collapse and restore their details with a 28-pixel control area",
                 "Source navigation expands containing sections; find/copy can expose complete native text without changing Markdown",
                 "Light/dark native pages retain controls, image and diagram content", "Actual PDF/DOCX/HTML exports preserve complete closed-section content and both image assets",
                 "The details editor restores summary/body at normal/minimum light/dark sizes", "Details insertion selects editable markup and retains complete Undo/Redo" }, PdfText = text

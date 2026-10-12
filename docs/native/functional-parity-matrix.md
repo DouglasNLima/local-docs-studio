@@ -10,6 +10,8 @@ The Word export list correction passes 850 core tests and the complete native ha
 
 The table retains feature-specific evidence and explicit limits. Earlier run numbers identify the original proof for that feature; current aggregate CI does not certify broader untested behaviour. The [archived matrix](history/functional-parity-matrix-through-b3a4d59.md) preserves the previous chronological notes in full.
 
+The later details-template change preserves native expansion patterns and byte-identical light/dark pages. Three fresh local processes pass 12 nested construction cases, with maximum input gap 63.34 ms. This does not prove the recurring CI pause is fixed. A focused hosted keyboard assertion remains pending.
+
 | User need / existing contract | Native design | Status |
 |---|---|---|
 | Reveal the visible search/navigation target | Shared deferred WPF text-position scrolling | Three native HWND checks reproduce and fix offscreen selection after details expansion, preserving source/selection and rejecting stale documents. Find, formula search, outline, fragments and history share the service. Actual-viewport desktop assertion passes in the 52-workflow CI run at 5cb0aeb |

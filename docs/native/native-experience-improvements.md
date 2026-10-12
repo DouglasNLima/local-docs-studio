@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Details controls reuse a fixed in-memory template per WPF thread. Native expansion patterns, focusable header area and final light/dark pages are preserved; the pages match the prior PNG bytes. Three fresh local processes pass all 12 nested layout cases with a 63.34 ms maximum input gap. The intermittent CI delay is still not proven resolved, and the new hosted Space-key assertion awaits execution.
+
 Word lists supplied by paragraph styles now retain their markers, hierarchy and continuation placement. Default/inherited styles, explicit overrides and linked numbering definitions have 14 new core cases; all 912 tests and the full native harness pass locally. Twelve actual DOCX items converted to inherited styles return exactly the same Markdown. The separate CRLF block assertion failure is reproduced and corrected; CI still needs to validate this batch, and the recurring details-construction delay remains unresolved.
 
 Word code paragraphs now return as literal fenced code, and consecutive quote paragraphs remain one quote, including supported list placement. Fourteen new cases pass within 897 core tests; native export/reimport verifies exact code and quote boundaries. Style inheritance is bounded, generic spacing styles are not guessed to be code, and table/image fallbacks carry explicit notes. Code language and deeper quote structure remain outside the reconstructed semantics; this later change still needs its own CI.
