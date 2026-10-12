@@ -1256,6 +1256,18 @@ internal static partial class NativeUiChecks
             updateWindow!.CaptureToFile(Path.Combine(output, "native-updates.png"));
             updateWindow!.Close();
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates"))) is null, "The updates window did not close.");
+            var artefact = CheckArtifactWorkflow(window, editor, automation, app.ProcessId, runRoot, output,
+                OpenThroughDialogue, (destination, title) => SaveThroughDialogue(destination, title, absolutePath: true));
+            checks.Add("Native ZIP import opens its entry document; grouped evidence filters select a candidate and actual review/generic ZIP exports preserve unsaved source and supplied labels");
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
+            Wait(() => app.HasExited, "The artefact workspace did not close safely.");
+            if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("The artefact workspace failed during shutdown.");
+            app.Dispose(); launchedProcess.Dispose(); app = Launch(null);
+            window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new InvalidOperationException("The artefact workspace did not restore.");
+            mainWindow = window; editor = Find(window, "MarkdownEditor");
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == artefact.Source, "The imported document did not restore its saved source.");
+            CheckArtifactContextCleared(window, artefact.Root, artefact.Document, artefact.Source);
+            checks.Add("Restart restores imported source but clears optional artefact metadata, reader and review-pack actions; no raw manifest is persisted");
             window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
@@ -1421,7 +1433,7 @@ internal static partial class NativeUiChecks
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title))) is null,
                 "The native Open dialogue did not close after its Open command.");
         }
-        void SaveThroughDialogue(string destination, string title = "Save document", string? expectedFilename = null)
+        void SaveThroughDialogue(string destination, string title = "Save document", string? expectedFilename = null, bool absolutePath = false)
         {
             Window? saveWindow = null;
             Wait(() => (saveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName(title)))?.AsWindow()) is not null, "The native Save dialogue did not open.");
@@ -1429,7 +1441,7 @@ internal static partial class NativeUiChecks
             // The address control can share child ID 1001 with the filename input.
             var fileName = (saveWindow!.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Edit).And(cf.ByName("File name:")))
                 ?? throw new IOException("The labelled Save filename field is unavailable.")).AsTextBox();
-            var suggested = fileName.Text; var expected = Path.GetFileName(destination);
+            var suggested = fileName.Text; var expected = absolutePath ? Path.GetFullPath(destination) : Path.GetFileName(destination);
             try
             {
                 if (expectedFilename is not null)

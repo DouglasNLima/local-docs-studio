@@ -94,6 +94,10 @@ The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Do
 
 Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
 
+**File → Import Markdown bundle** extracts supported documents and assets into a new folder. An optional artefact manifest supplies display metadata for this import session. **View → Artefact bundle** filters imported items by group, title/path and supplied evidence label. Labels are displayed as supplied: candidate findings remain candidate findings. Invalid metadata produces an import note while valid documents remain available.
+
+Use **Export → Artefact review pack** to include a rebuilt safe manifest with current editor text and local assets. Generic Markdown bundles exclude the manifest. Docs Site exports may use safe title/order/group hints, with Markdown front matter taking precedence. Switching workspace or restarting clears artefact context; import the ZIP again to use its metadata.
+
 **Export → Export profiles** offers generic documentation, Azure DevOps Wiki Markdown and GitHub Pages Docs Site defaults. Applying a profile affects the current session. Save a reusable profile in the content library when needed. The Azure DevOps preset converts complete Mermaid fences in Markdown bundle entries while preserving other source and file encodings.
 
 Optional artefact review packs, broader template fidelity and some advanced export semantics remain under development. Inspect important exported documents in their intended destination before distribution.

@@ -22,6 +22,7 @@
     <ProjectReference Include="..\LensDocsStudio.Core\LensDocsStudio.Core.csproj" />
     <Content Include="..\..\..\tests\fixtures\azure-devops-markdown-fidelity.md" Link="Fixtures\azure-devops-markdown-fidelity.md" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\tests\fixtures\native-local-library.json" Link="Fixtures\native-local-library.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\tests\fixtures\artifact-bundles\**\*" Link="Fixtures\artifact-bundles\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -18,10 +18,13 @@ public partial class MainWindow
         {
             var result = await bundles.ImportAsync(picker.FileName, destination, model.OperationToken);
             await model.SetWorkspaceAsync(result.Root);
-            var first = Directory.EnumerateFiles(result.Root, "*", SearchOption.AllDirectories)
+            SetArtifactContext(result.ArtifactBundle is { } bundle ? new(result.Root, bundle) : null);
+            var first = result.ArtifactBundle is { EntryDocument.Length: > 0 } metadata ? new WorkspacePath(result.Root).Resolve(metadata.EntryDocument) : Directory.EnumerateFiles(result.Root, "*", SearchOption.AllDirectories)
                 .Where(WorkspaceService.IsDocument).OrderByDescending(p => Path.GetFileName(p).Equals("README.md", StringComparison.OrdinalIgnoreCase)).First();
             await model.OpenPathAsync(first);
-            model.Status = $"Imported {result.Documents} documents and {result.Assets} assets into a new folder.";
+            model.Status = $"Imported {result.Documents} documents and {result.Assets} assets into a new folder."
+                + (result.ArtifactBundle is not null ? " View → Artefact bundle shows supplied metadata." : "")
+                + (result.Warnings.Count > 0 ? " Import notes: " + string.Join(" ", result.Warnings) : "");
         });
     }
     private async void ExportBundle(object sender, RoutedEventArgs e)

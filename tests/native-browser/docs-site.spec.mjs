@@ -3,6 +3,35 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 for (const mode of ['disk', 'static hosting']) {
+  test(`native artefact site retains supplied labels and front-matter priority from ${mode}`, async ({ page }) => {
+    const errors = [];
+    const external = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('request', request => {
+      const url = request.url();
+      if (/^https?:/.test(url) && !url.startsWith('http://127.0.0.1:')) external.push(url);
+    });
+    const relative = 'artifacts/native/validation/artefact-site/index.html';
+    await page.goto(mode === 'disk' ? pathToFileURL(path.resolve(relative)).href : '/' + relative);
+    await expect(page.locator('#siteTitle')).toHaveText('Artefact review site');
+    await page.locator('#nav').getByRole('link', { name: 'Reviewer home', exact: true }).click();
+    await expect(page.locator('#docMeta')).toContainText('Local review');
+    await expect(page.locator('#docMeta')).toContainText('Evidence labels are displayed as supplied by the bundle.');
+    await expect(page.locator('#docMeta')).toContainText('Candidate findings remain candidate findings.');
+    await page.locator('#nav').getByRole('link', { name: 'Candidate Risk', exact: true }).click();
+    await expect(page.locator('#docMeta')).toContainText('candidate finding');
+    await expect(page.locator('#docMeta')).not.toContainText('confirmed finding');
+    await page.locator('#nav').getByRole('link', { name: 'Confirmed Control', exact: true }).click();
+    await expect(page.locator('#docMeta')).toContainText('confirmed finding');
+    await page.locator('#searchInput').fill('candidate finding');
+    await expect(page.locator('#searchResults .search-result')).not.toHaveCount(0);
+    await page.locator('#searchInput').fill('');
+    await page.locator('#nav').getByRole('link', { name: 'Candidate Risk', exact: true }).click();
+    await page.screenshot({ path: test.info().outputPath('native-artefact-site.png'), fullPage: true });
+    expect(errors).toEqual([]);
+    expect(external).toEqual([]);
+  });
+
   test(`native Docs Site navigation, search, images and themes work from ${mode}`, async ({ page }) => {
     const errors = [];
     const external = [];

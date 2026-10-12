@@ -37,11 +37,12 @@ internal static class DocsSiteSearch
             }
             Flush();
             Add(new(page.Id + "--page", page.Id, page.Title, page.Path, "", page.Title, 0,
-                Normalise(intro + " " + page.Metadata.Description + " " + string.Join(' ', page.Metadata.Tags) + " " + page.Metadata.NavigationGroup)));
+                Normalise(intro + " " + page.Metadata.Description + " " + string.Join(' ', page.Metadata.Tags) + " " + page.Metadata.NavigationGroup + " " + page.ArtifactKind + " " + page.EvidenceLevel)));
             for (var index = 0; index < sections.Count; index++)
             {
                 var section = sections[index];
-                Add(new(page.Id + "--section-" + index, page.Id, page.Title, page.Path, section.Id, section.Heading, section.Level, section.Text));
+                Add(new(page.Id + "--section-" + index, page.Id, page.Title, page.Path, section.Id, section.Heading, section.Level,
+                    Normalise(section.Text + " " + page.ArtifactKind + " " + page.EvidenceLevel)));
             }
             void Flush()
             {

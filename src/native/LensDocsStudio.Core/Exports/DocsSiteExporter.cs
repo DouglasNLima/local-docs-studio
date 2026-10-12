@@ -6,13 +6,18 @@ using System.Text.Json;
 using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Imports;
 
 namespace LensDocsStudio.Core.Exports;
 
 public sealed record DocsSiteOptions(string Title, string Description = "", string Theme = "system");
 public sealed record DocsSiteHeading(string Id, string Text, int Level);
 public sealed record DocsSitePage(string Id, string Path, string Title, DocumentMetadata Metadata, string Html,
-    IReadOnlyList<DocsSiteHeading> Headings, string SearchText, int DiagramTotal, bool GeneratedHome = false);
+    IReadOnlyList<DocsSiteHeading> Headings, string SearchText, int DiagramTotal, bool GeneratedHome = false)
+{
+    public string ArtifactKind { get; init; } = "";
+    public string EvidenceLevel { get; init; } = "";
+}
 public sealed record DocsSiteResult(byte[] Bytes, int SourcePages, int Pages, int Diagrams, IReadOnlyList<string> Warnings);
 
 /// <summary>Creates a portable static export. Its scripts are output assets, never a desktop runtime.</summary>
@@ -22,7 +27,7 @@ public sealed class DocsSiteExporter
     public const long MaximumOutputBytes = 256 * 1024 * 1024;
     private static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
 
-    public DocsSitePage PreparePage(string path, ExportContent content)
+    public DocsSitePage PreparePage(string path, ExportContent content, ArtifactBundle? artifactBundle = null)
     {
         path = ValidatePath(path);
         var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content));
@@ -37,14 +42,17 @@ public sealed class DocsSiteExporter
             foreach (var image in headingCopy.QuerySelectorAll("img")) image.ReplaceWith(html.CreateTextNode(image.GetAttribute("alt") ?? ""));
             return new DocsSiteHeading(id, headingCopy.TextContent.Trim(), h.LocalName[1] - '0');
         }).ToArray();
-        var metadata = content.Document.Metadata;
-        var title = metadata.Title.Length > 0 ? metadata.Title : headings.FirstOrDefault()?.Text ?? System.IO.Path.GetFileNameWithoutExtension(path);
+        var metadata = content.Document.Metadata; var artifact = artifactBundle?.Find(path);
+        var fallbackTitle = ArtifactBundleManifest.SafeExportText(artifact?.Title ?? "");
+        var title = metadata.Title.Length > 0 ? metadata.Title : fallbackTitle.Length > 0 ? fallbackTitle : headings.FirstOrDefault()?.Text ?? System.IO.Path.GetFileNameWithoutExtension(path);
+        metadata = metadata with { Order = metadata.Order ?? artifact?.Order,
+            NavigationGroup = metadata.NavigationGroup.Length > 0 ? metadata.NavigationGroup : artifact?.Group ?? "" };
         var id = "page-" + Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(path.ToUpperInvariant())))[..16];
         return new(id, path, title, metadata, html.Body.InnerHtml, headings, html.Body.TextContent,
-            content.Diagrams.Count);
+            content.Diagrams.Count) { ArtifactKind = ArtifactBundleManifest.SafeExportText(artifact?.Kind ?? ""), EvidenceLevel = artifact?.EvidenceLevel ?? "" };
     }
 
-    public DocsSiteResult Export(IReadOnlyList<DocsSitePage> sourcePages, DocsSiteOptions options, CancellationToken cancellationToken = default)
+    public DocsSiteResult Export(IReadOnlyList<DocsSitePage> sourcePages, DocsSiteOptions options, CancellationToken cancellationToken = default, ArtifactBundle? artifactBundle = null)
     {
         if (sourcePages.Count is 0 or > MaximumPages) throw new IOException("Choose between 1 and 1,000 documents for a Docs Site.");
         if (options.Title.Length is 0 or > 512 || options.Description.Length > 8192 || options.Theme is not ("system" or "light" or "dark"))
@@ -74,16 +82,17 @@ public sealed class DocsSiteExporter
         var records = pages.Select(p => new
         {
             p.Id, p.Path, p.Title, p.Html, p.Metadata.Description, p.Metadata.Order, p.Metadata.Tags, p.Metadata.Draft,
-            NavGroup = p.Metadata.NavigationGroup, ArtifactKind = "", EvidenceLevel = "", p.Headings,
+            NavGroup = p.Metadata.NavigationGroup, p.ArtifactKind, p.EvidenceLevel, p.Headings,
             p.DiagramTotal, DiagramErrors = 0, p.GeneratedHome
         }).ToArray();
         var entries = DocsSiteSearch.Build(pages, bodyBytes, cancellationToken);
-        var index = new { FormatVersion = "docs-site-2.0", options.Title, options.Description, DefaultTheme = options.Theme, HomePageId = home.Id, Pages = records, Entries = entries };
+        var artifactBundleMetadata = artifactBundle is null ? null : ArtifactBundleManifest.BuildSiteMetadata(artifactBundle, sourcePages.Select(page => page.Path));
+        var index = new { FormatVersion = "docs-site-2.0", options.Title, options.Description, DefaultTheme = options.Theme, HomePageId = home.Id, Pages = records, Entries = entries, ArtifactBundle = artifactBundleMetadata };
         var manifest = new { FormatVersion = "docs-site-2.0", Generator = "Lens Docs Studio Native", options.Title, options.Description, DefaultTheme = options.Theme,
             GeneratedAt = DateTimeOffset.UtcNow, SourcePageCount = sourcePages.Count, PageCount = pages.Count, DiagramTotal = pages.Sum(p => p.DiagramTotal), DiagramErrors = 0,
             HomePage = new { home.Id, home.Title, home.Path, Generated = home.GeneratedHome },
             Assets = new[] { "assets/docs-site.css", "assets/docs-site.js", "assets/docs-site-data.js", "assets/search-index.json" },
-            Pages = records.Select(p => new { p.Id, p.Path, p.Title, p.Description, p.Order, p.Tags, p.Draft, p.NavGroup, p.ArtifactKind, p.EvidenceLevel, p.Headings, Diagrams = p.DiagramTotal, p.DiagramErrors, p.GeneratedHome }) };
+            Pages = records.Select(p => new { p.Id, p.Path, p.Title, p.Description, p.Order, p.Tags, p.Draft, p.NavGroup, p.ArtifactKind, p.EvidenceLevel, p.Headings, Diagrams = p.DiagramTotal, p.DiagramErrors, p.GeneratedHome }), ArtifactBundle = artifactBundleMetadata };
         var indexJson = JsonSerializer.Serialize(index, Json);
         using var output = new MemoryStream(); long total = 0;
         using (var archive = new ZipArchive(output, ZipArchiveMode.Create, true))

@@ -3,7 +3,10 @@ using LensDocsStudio.Core.Workspace;
 
 namespace LensDocsStudio.Core.Imports;
 
-public sealed record BundleImportResult(string Root, int Documents, int Assets, IReadOnlyList<string> Warnings);
+public sealed record BundleImportResult(string Root, int Documents, int Assets, IReadOnlyList<string> Warnings)
+{
+    public ArtifactBundle? ArtifactBundle { get; init; }
+}
 
 public sealed class MarkdownBundleService
 {
@@ -22,6 +25,7 @@ public sealed class MarkdownBundleService
         Directory.CreateDirectory(stage);
         var warnings = new List<string>();
         var documents = 0; var assets = 0;
+        byte[]? manifest = null; var importedPaths = new List<string>();
         try
         {
             using var archive = ZipFile.OpenRead(archivePath);
@@ -41,8 +45,23 @@ public sealed class MarkdownBundleService
                 if (!names.Add(destination)) throw new InvalidDataException("The ZIP contains duplicate Windows paths.");
                 if (name.StartsWith("__MACOSX/", StringComparison.OrdinalIgnoreCase) || name.Split('/').Any(p => p is ".git" or "node_modules")) continue;
                 var document = WorkspaceService.IsDocument(name);
-                var metadata = name.Equals("lens-artifact-bundle.json", StringComparison.Ordinal);
+                var metadata = name.Equals(ArtifactBundleManifest.Filename, StringComparison.Ordinal);
                 if (!document && !IsAsset(name) && !metadata) { warnings.Add("Unsupported bundle entry skipped: " + name); continue; }
+                if (metadata)
+                {
+                    // Optional metadata stays in this import context, never workspace or recovery state.
+                    if (entry.Length > ArtifactBundleManifest.MaximumBytes) { warnings.Add("Artefact bundle manifest is too large."); continue; }
+                    try
+                    {
+                        using var metadataInput = entry.Open();
+                        var candidate = await ReadBoundedAsync(metadataInput, ArtifactBundleManifest.MaximumBytes, cancellationToken);
+                        if (candidate.LongLength != entry.Length || System.IO.Hashing.Crc32.HashToUInt32(candidate) != entry.Crc32)
+                            throw new InvalidDataException("The optional manifest failed its content check.");
+                        manifest = candidate;
+                    }
+                    catch (InvalidDataException) { warnings.Add("Artefact bundle manifest could not be read."); }
+                    continue;
+                }
                 if (entry.Length > MaxEntryBytes || entry.Length > MaxTotalBytes - total) throw new InvalidDataException("The bundle exceeds the import size limit.");
                 if (entry.Length > 1_000_000 && entry.CompressedLength > 0 && entry.Length / entry.CompressedLength > 1000)
                     throw new InvalidDataException("The bundle compression ratio exceeds the safety limit.");
@@ -54,12 +73,14 @@ public sealed class MarkdownBundleService
                 total += bytes.LongLength;
                 if (document) _ = Documents.DocumentSnapshot.FromBytes(destination, bytes);
                 await File.WriteAllBytesAsync(destination, bytes, cancellationToken);
-                if (document) documents++; else if (!metadata) assets++;
+                if (document) { documents++; importedPaths.Add(name); } else assets++;
             }
             if (documents == 0) throw new InvalidDataException("The bundle contains no supported Markdown, Mermaid or text documents.");
+            var metadataResult = manifest is null ? null : ArtifactBundleManifest.Parse(manifest, importedPaths);
+            if (metadataResult is not null) warnings.AddRange(metadataResult.Warnings);
             cancellationToken.ThrowIfCancellationRequested();
             Directory.Move(stage, newFolder);
-            return new(newFolder, documents, assets, warnings);
+            return new(newFolder, documents, assets, warnings) { ArtifactBundle = metadataResult?.Bundle };
         }
         finally
         {
@@ -118,6 +139,24 @@ public sealed class MarkdownBundleService
             }
         }
         return stream.ToArray();
+    }
+
+    public async Task<byte[]> ExportReviewPackAsync(WorkspacePath workspace, ArtifactBundle bundle, IReadOnlyDictionary<string, string>? editedDocuments = null,
+        CancellationToken cancellationToken = default, string? excludedDirectory = null)
+    {
+        var generic = await ExportAsync(workspace, editedDocuments, cancellationToken, excludedDirectory);
+        using var output = new MemoryStream(); await output.WriteAsync(generic, cancellationToken); output.Position = 0;
+        using (var archive = new ZipArchive(output, ZipArchiveMode.Update, true))
+        {
+            if (archive.Entries.Count >= MaxEntries) throw new IOException("The review pack needs space for its manifest within the 2,000-entry limit.");
+            var manifest = ArtifactBundleManifest.BuildReviewManifest(bundle, archive.Entries.Select(entry => entry.FullName));
+            if (archive.Entries.Sum(entry => entry.Length) + manifest.Length > MaxTotalBytes) throw new IOException("The review pack exceeds 256 MB.");
+            cancellationToken.ThrowIfCancellationRequested();
+            var entry = archive.CreateEntry(ArtifactBundleManifest.Filename, CompressionLevel.Optimal);
+            entry.LastWriteTime = new DateTimeOffset(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            using var target = entry.Open(); await target.WriteAsync(manifest, cancellationToken);
+        }
+        cancellationToken.ThrowIfCancellationRequested(); return output.ToArray();
     }
 
     private static IEnumerable<string> Files(IEnumerable<WorkspaceEntry> entries)

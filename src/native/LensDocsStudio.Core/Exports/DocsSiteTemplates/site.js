@@ -58,7 +58,8 @@
       if (/^(https?:|mailto:)/i.test(link.getAttribute('href'))) { link.target = '_blank'; link.rel = 'noopener noreferrer'; }
     }
     const metadata = document.getElementById('docMeta'); metadata.replaceChildren();
-    for (const text of [page.path, page.description, page.navGroup, page.draft ? 'Draft' : '', ...(page.tags || []).map(tag => '#' + tag)].filter(Boolean)) metadata.append(element('span', text));
+    for (const text of [page.path, page.description, page.navGroup, page.artifactKind, page.evidenceLevel, page.draft ? 'Draft' : '', ...(page.tags || []).map(tag => '#' + tag)].filter(Boolean)) metadata.append(element('span', text));
+    for (const note of data.artifactBundle?.notes || []) metadata.append(element('span', note));
     renderNavigation();
     let headingId = ''; try { headingId = decodeURIComponent(fragment); } catch { }
     const target = headingId ? Array.from(content.querySelectorAll('[id]')).find(node => node.id === headingId) : null;

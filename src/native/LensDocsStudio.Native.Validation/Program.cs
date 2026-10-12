@@ -94,6 +94,12 @@ internal static class Program
             try { NativeMathChecks.Run(mathsOutput); Console.WriteLine("Native maths integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--artefacts")
+        {
+            var artifactOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(artifactOutput);
+            try { NativeArtifactChecks.Run(artifactOutput, args.ElementAtOrDefault(2)); Console.WriteLine("Native artefact integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--help-guide")
         {
             var helpOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(helpOutput);
@@ -200,6 +206,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native details sections: " + ex.Message); }
         try { NativeMathChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native maths: " + ex.Message); }
+        try { NativeArtifactChecks.Run(output, repository); }
+        catch (Exception ex) { failures.Add("Native artefacts: " + ex.Message); }
         try { NativeHelpChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native help: " + ex.Message); }
         try { NativeSettingsChecks.Run(output); }

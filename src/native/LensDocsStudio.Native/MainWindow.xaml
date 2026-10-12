@@ -43,7 +43,7 @@
      </Style></MenuItem.ItemContainerStyle>
     </MenuItem>
     <MenuItem Header="Clear recent lists" Command="{Binding ClearRecentPathsCommand}"/>
-    <MenuItem Header="Import Markdown _bundle…" Click="ImportBundle"/>
+    <MenuItem Header="Import Markdown _bundle…" Click="ImportBundle" AutomationProperties.AutomationId="ImportMarkdownBundle"/>
     <MenuItem Header="Content _library…" Click="ManageContentLibrary" AutomationProperties.AutomationId="ManageContentLibrary"/>
     <MenuItem Header="Save document as template…" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveDocumentTemplate"/>
     <MenuItem Header="Save selection as snippet…" Tag="snippet" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveMarkdownSnippet"/>
@@ -123,6 +123,7 @@
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument"/>
     <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
+    <MenuItem x:Name="ArtifactReviewPackMenu" Header="Artefact _review pack…" Click="ExportArtifactReviewPack" IsEnabled="False" AutomationProperties.AutomationId="ExportArtifactReviewPack"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
     <MenuItem Header="Export _profiles" AutomationProperties.AutomationId="ExportProfilesMenu">
      <MenuItem x:Name="CurrentExportProfile" Header="Profile: Generic documentation (this session)" IsEnabled="False"/>
@@ -140,6 +141,7 @@
    </MenuItem>
    <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
     <MenuItem Header="Document _review…" Click="ReviewDocument" AutomationProperties.AutomationId="ReviewDocument"/>
+    <MenuItem x:Name="ArtifactReaderMenu" Header="Artefact _bundle…" Click="OpenArtifactReader" IsEnabled="False" AutomationProperties.AutomationId="OpenArtifactReader"/>
     <Separator/>
     <MenuItem x:Name="BackMenu" Header="Go _back" InputGestureText="Alt+Left" Click="NavigateBack" IsEnabled="False"/>
     <MenuItem x:Name="ForwardMenu" Header="Go _forward" InputGestureText="Alt+Right" Click="NavigateForward" IsEnabled="False"/>

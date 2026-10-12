@@ -51,6 +51,7 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid");
         Closed += (_, _) => completion.Dispose();
         WindowStateService.FitInitialWindow(this);
