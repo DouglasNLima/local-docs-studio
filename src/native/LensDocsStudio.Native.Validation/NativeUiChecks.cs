@@ -89,14 +89,18 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "FindContext").Name == "Find in preview", "Ctrl+F did not choose preview context.");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
             checks.Add("Ctrl+F targets the focused preview");
-            Find(window, "DiagramActionZoom").Click();
+            Find(window, "DiagramActionZoom").AsButton().Invoke();
             Window? diagramWindow = null;
-            Wait(() => (diagramWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Mermaid diagram")))?.AsWindow()) is not null, "The native diagram zoom window did not open.");
+            Wait(() => (diagramWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId)
+                .And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Window)).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null,
+                "The native diagram zoom window did not open.");
             Find(diagramWindow!, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
             Wait(() => Find(diagramWindow!, "DiagramZoomLabel").Name == "175%", "The native zoom did not change scale.");
             diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
             diagramWindow.Close();
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
+            CheckDiagramThemes(window, editor, state, output, source);
+            checks.Add("Diagram theme menus persist all six choices, render fixed palettes independently of application appearance and retain source and update consent");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN);

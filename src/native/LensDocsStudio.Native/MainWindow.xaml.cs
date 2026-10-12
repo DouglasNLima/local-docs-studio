@@ -126,6 +126,7 @@ public partial class MainWindow : Window
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
         var dark = ThemeService.IsDark(model.Theme);
+        var diagramTheme = CurrentDiagramTheme;
         var standalone = Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var acquired = false;
         try
@@ -139,7 +140,7 @@ public partial class MainWindow : Window
                 foreach (var code in preparePreview ? source.Syntax.Descendants<FencedCodeBlock>() : [])
                 {
                     cancellation.ThrowIfCancellationRequested();
-                    if (code.Info is "mermaid" or "mmd") results[code] = diagrams.Render(code.Lines.ToString(), dark);
+                    if (code.Info is "mermaid" or "mmd") results[code] = diagrams.Render(code.Lines.ToString(), dark, diagramTheme);
                 }
                 return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
@@ -484,11 +485,12 @@ public partial class MainWindow : Window
         { model.Status = "The preview is out of date. Wait for the updated table and copy again."; return; }
         var sourcePath = tab.EffectivePath; var workspace = tab.EffectiveWorkspace;
         var dark = ThemeService.IsDark(model.Theme);
+        var diagramTheme = CurrentDiagramTheme;
         var sequence = NativeClipboardService.Sequence;
         await model.RunAsync(async () =>
         {
             model.Status = markdownSource ? "Preparing Markdown and clipboard images…" : "Preparing formatted clipboard content…";
-            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken, markdownSource, table);
+            var content = await new Exports.ClipboardExportService().PrepareAsync(source, sourcePath, workspace, dark, model.OperationToken, markdownSource, table, diagramTheme);
             model.OperationToken.ThrowIfCancellationRequested();
             NativeClipboardService.WriteRendered(content, sequence);
             model.Status = table is not null ? "Table copied as formatted content and tab-separated text."

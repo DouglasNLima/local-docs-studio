@@ -158,7 +158,15 @@
     <Separator/>
     <MenuItem Header="_Light theme" Tag="Light" Click="ChangeTheme" AutomationProperties.AutomationId="LightTheme"/>
     <MenuItem Header="_Dark theme" Tag="Dark" Click="ChangeTheme" AutomationProperties.AutomationId="DarkTheme"/>
-    <MenuItem Header="_Windows theme" Tag="System" Click="ChangeTheme"/>
+    <MenuItem Header="_Windows theme" Tag="System" Click="ChangeTheme" AutomationProperties.AutomationId="WindowsTheme"/>
+    <MenuItem x:Name="DiagramThemeMenu" Header="_Diagram theme" AutomationProperties.AutomationId="DiagramThemeMenu">
+     <MenuItem Header="_Auto" Tag="Auto" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeAuto"/>
+     <MenuItem Header="_Lens" Tag="Lens" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeLens"/>
+     <MenuItem Header="_Default" Tag="Default" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeDefault"/>
+     <MenuItem Header="_Neutral" Tag="Neutral" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeNeutral"/>
+     <MenuItem Header="_Forest" Tag="Forest" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeForest"/>
+     <MenuItem Header="Dar_k" Tag="Dark" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeDark"/>
+    </MenuItem>
    </MenuItem>
    <MenuItem Header="_Help" AutomationProperties.AutomationId="HelpMenu"><MenuItem Header="Native _guide…" InputGestureText="F1" Click="OpenHelp" AutomationProperties.AutomationId="OpenHelp"/><Separator/><MenuItem Header="_Updates…" Click="OpenUpdates" AutomationProperties.AutomationId="UpdatesMenu"/><MenuItem Header="_About the native preview" Click="About"/></MenuItem>
   </Menu>

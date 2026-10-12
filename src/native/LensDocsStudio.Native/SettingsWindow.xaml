@@ -47,6 +47,12 @@
     <TextBlock Text="Indentation settings affect new typing. Existing tabs and spaces stay unchanged." TextWrapping="Wrap" Margin="0,8,0,18"/>
     <Separator/>
     <TextBlock Text="Preview" FontSize="18" FontWeight="SemiBold" Margin="0,18,0,8"/>
+    <DockPanel Margin="0,0,0,8">
+     <Label DockPanel.Dock="Left" Content="_Diagram theme" Target="{Binding ElementName=DiagramTheme}"/>
+     <ComboBox x:Name="DiagramTheme" ItemsSource="{Binding DiagramThemes}" SelectedItem="{Binding DiagramTheme}"
+      AutomationProperties.Name="Diagram theme" AutomationProperties.AutomationId="SettingsDiagramTheme"/>
+    </DockPanel>
+    <TextBlock Text="Auto follows the app. Other themes stay fixed in preview, copied diagrams and exports." TextWrapping="Wrap" Margin="0,0,0,12"/>
      <DockPanel Margin="0,0,0,8">
       <Label DockPanel.Dock="Left" Content="_Reading mode" Target="{Binding ElementName=ReadingMode}"/>
       <ComboBox x:Name="ReadingMode" ItemsSource="{Binding ReadingModes}" SelectedItem="{Binding PreviewReadingMode}"

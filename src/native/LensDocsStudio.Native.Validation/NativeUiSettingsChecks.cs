@@ -26,6 +26,7 @@ internal static partial class NativeUiChecks
         var settings = OpenSettingsWindow(window, automation, process);
         Select("SettingsFont", "Consolas"); Select("SettingsFontSize", "18"); Select("SettingsIndentation", "2");
         Select("SettingsReadingMode", "Pages");
+        Select("SettingsDiagramTheme", "Forest");
         Find(settings, "SettingsWordWrap").AsCheckBox().IsChecked = false;
         Find(settings, "SettingsLineNumbers").AsCheckBox().IsChecked = false;
         Find(settings, "SettingsSpaces").AsCheckBox().IsChecked = true;
@@ -36,7 +37,7 @@ internal static partial class NativeUiChecks
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,
             "Applied settings did not close.");
         var after = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
-        if (after.Editor != new EditorPreferences("Consolas", 18, false, false, 2, true) || after.Preview != new PreviewPreferences(125, "Pages") || after.ShowOutline
+        if (after.Editor != new EditorPreferences("Consolas", 18, false, false, 2, true) || after.Preview != new PreviewPreferences(125, "Pages", "Forest") || after.ShowOutline
             || after.AutomaticUpdateChecks != before.AutomaticUpdateChecks || after.UpdateChannel != before.UpdateChannel
             || !after.RecentDocuments!.SequenceEqual(before.RecentDocuments!) || after.IgnoredVersion != before.IgnoredVersion
             || editor.Patterns.Value.Pattern.Value.Value != originalText || File.ReadAllText(source) != savedText)
@@ -63,7 +64,8 @@ internal static partial class NativeUiChecks
             || Find(settings, "SettingsWordWrap").AsCheckBox().IsChecked != false || Find(settings, "SettingsLineNumbers").AsCheckBox().IsChecked != false
             || Find(settings, "SettingsSpaces").AsCheckBox().IsChecked != true || Find(settings, "SettingsOutline").AsCheckBox().IsChecked != false
             || Find(settings, "SettingsZoom").Patterns.RangeValue.Pattern.Value != 125
-            || Find(settings, "SettingsReadingMode").AsComboBox().SelectedItem?.Text != "Pages")
+            || Find(settings, "SettingsReadingMode").AsComboBox().SelectedItem?.Text != "Pages"
+            || Find(settings, "SettingsDiagramTheme").AsComboBox().SelectedItem?.Text != "Forest")
             throw new IOException("Native settings did not restore their exact values after restarting the application.");
         Find(settings, "SettingsCancel").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,

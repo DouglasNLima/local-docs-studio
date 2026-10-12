@@ -56,11 +56,12 @@ public partial class MainWindow
         {
             DrawingImage? drawing = null; string? diagramSvg = null; WorkspaceMapDiagram? diagram = null;
             var dark = ThemeService.IsDark(model.Theme);
+            var diagramTheme = CurrentDiagramTheme;
             await model.RunAsync(async () =>
             {
                 model.Status = "Rendering workspace map…";
                 diagram = WorkspaceMapService.Diagram(map, window.DiagramPath);
-                var result = await Task.Run(() => new DiagramService().Render(diagram.Source, dark), model.OperationToken);
+                var result = await Task.Run(() => new DiagramService().Render(diagram.Source, dark, diagramTheme), model.OperationToken);
                 if (!result.Success) throw new IOException(result.Error);
                 diagramSvg = result.Svg!;
                 var prepared = await StaWorker.RunAsync(() => new NativeSvgService().Render(diagramSvg), model.OperationToken);

@@ -17,7 +17,7 @@ internal static class NativeSettingsChecks
 {
     public static void Run(string output)
     {
-        var chosen = new WorkspaceSettings("Dark", "Preview", new("Consolas", 18, false, false, 2, true), new(125), false);
+        var chosen = new WorkspaceSettings("Dark", "Preview", new("Consolas", 18, false, false, 2, true), new(125, DiagramTheme: "Forest"), false);
         foreach (var dark in new[] { false, true })
         foreach (var size in new[] { new Size(700, 750), new Size(560, 520) })
         {
@@ -32,15 +32,16 @@ internal static class NativeSettingsChecks
             Layout();
             var font = (ComboBox)window.FindName("EditorFont"); var fontSize = (ComboBox)window.FindName("EditorSize");
             var zoom = (Slider)window.FindName("Zoom");
-            if ((string)font.SelectedItem != "Consolas" || (int)fontSize.SelectedItem != 18 || zoom.Value != 125)
+            var diagramTheme = (ComboBox)window.FindName("DiagramTheme");
+            if ((string)font.SelectedItem != "Consolas" || (int)fontSize.SelectedItem != 18 || zoom.Value != 125 || (string)diagramTheme.SelectedItem != "Forest")
                 throw new IOException("Saved reading preferences did not populate native settings controls.");
-            fontSize.SelectedItem = 20; zoom.Value = 150; Layout();
-            if (model.FontSize != 20 || model.PreviewZoom != 150 || saves != 0) throw new IOException("Settings controls saved before Apply or lost their bindings.");
+            fontSize.SelectedItem = 20; zoom.Value = 150; diagramTheme.SelectedItem = "Neutral"; Layout();
+            if (model.FontSize != 20 || model.PreviewZoom != 150 || model.DiagramTheme != "Neutral" || saves != 0) throw new IOException("Settings controls saved before Apply or lost their bindings.");
             var buttons = Descendants(content).OfType<Button>().ToArray();
             foreach (var button in buttons.Where(button => AutomationProperties.GetAutomationId(button).StartsWith("Settings", StringComparison.Ordinal)))
                 if (button.ActualHeight < 20 || button.TranslatePoint(new(0, button.ActualHeight), surface).Y > size.Height)
                     throw new IOException("Settings actions were clipped at the validated window size.");
-            foreach (var control in new FrameworkElement[] { font, fontSize, zoom, (ComboBox)window.FindName("Theme"), (ComboBox)window.FindName("Layout"), (ComboBox)window.FindName("Indentation") })
+            foreach (var control in new FrameworkElement[] { font, fontSize, zoom, diagramTheme, (ComboBox)window.FindName("Theme"), (ComboBox)window.FindName("Layout"), (ComboBox)window.FindName("Indentation") })
                 if (string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))) throw new IOException("A settings input has no accessible name.");
             foreach (var label in Descendants(content).OfType<Label>())
                 if (label.Foreground is not SolidColorBrush foreground || surface.Background is not SolidColorBrush background
@@ -49,7 +50,7 @@ internal static class NativeSettingsChecks
             var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
             using (var file = File.Create(Path.Combine(output, "native-settings-" + (dark ? "dark" : "light") + "-" + size.Width + ".png"))) encoder.Save(file);
             model.ResetCommand.Execute(null); Layout();
-            if (model.FontSize != 14 || model.PreviewZoom != 100 || model.Theme != "System" || saves != 0) throw new IOException("Restoring defaults persisted without Apply.");
+            if (model.FontSize != 14 || model.PreviewZoom != 100 || model.Theme != "System" || model.DiagramTheme != "Auto" || saves != 0) throw new IOException("Restoring defaults persisted without Apply.");
             host.RootVisual = null; surface.Child = null; window.Close();
             if (saves != 0) throw new IOException("Closing settings persisted cancelled changes.");
         }

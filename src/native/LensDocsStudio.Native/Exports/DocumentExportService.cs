@@ -9,10 +9,10 @@ namespace LensDocsStudio.Native.Exports;
 
 public sealed class DocumentExportService
 {
-    public Task<byte[]> ExportAsync(string format, string source, string? sourcePath, string? workspaceRoot, bool dark, byte[]? template, CancellationToken cancellationToken = default) =>
+    public Task<byte[]> ExportAsync(string format, string source, string? sourcePath, string? workspaceRoot, bool dark, byte[]? template, CancellationToken cancellationToken = default, string diagramTheme = "Auto") =>
         StaWorker.RunAsync(() =>
         {
-            var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark, cancellationToken);
+            var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark, cancellationToken, diagramTheme: diagramTheme);
             cancellationToken.ThrowIfCancellationRequested();
             return format switch
             {

@@ -9,11 +9,11 @@ public sealed class SettingsTransferTests
     [InlineData("Automatic")]
     [InlineData("Continuous")]
     [InlineData("Pages")]
-    public void Reading_choices_round_trip_in_version_1_1_without_update_consent(string mode)
+    public void Reading_choices_round_trip_in_current_version_without_update_consent(string mode)
     {
         var settings = WorkspaceSettings.Default with { Preview = new(125, mode) };
         var bytes = SettingsTransferFormat.Write(settings);
-        Assert.Contains("lens-docs-studio-settings-1.1", Encoding.UTF8.GetString(bytes));
+        Assert.Contains("lens-docs-studio-settings-1.2", Encoding.UTF8.GetString(bytes));
         Assert.Equal(settings, SettingsTransferFormat.Read(bytes, WorkspaceSettings.Default));
         var preferences = new UserPreferences(AutomaticUpdateChecks: false, UpdateChannel: "Preview");
         var applied = settings.ApplyTo(preferences);

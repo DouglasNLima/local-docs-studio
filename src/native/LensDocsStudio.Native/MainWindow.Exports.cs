@@ -24,11 +24,12 @@ public partial class MainWindow
         if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for a Docs Site."); return; }
         var edited = model.Documents.Where(d => d.FilePath is not null).ToDictionary(d => d.FilePath!, d => d.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
         var artifactBundle = ArtifactFor(root);
+        var diagramTheme = CurrentDiagramTheme;
         await model.RunAsync(async () =>
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             var result = await new DocsSiteExportService().ExportAsync(root, edited, model.StateDirectory, options.Options,
-                new Progress<string>(message => model.Status = message), model.OperationToken, artifactBundle);
+                new Progress<string>(message => model.Status = message), model.OperationToken, artifactBundle, diagramTheme);
             await WriteExportAsync(picker.FileName, result.Bytes, expected, model.OperationToken);
             model.Status = $"Docs Site exported: {result.SourcePages} documents, {result.Diagrams} diagrams."
                 + (result.Warnings.Count > 0 ? $" {result.Warnings.Count} links have targets outside this site." : "");
@@ -49,12 +50,13 @@ public partial class MainWindow
         var source = tab.EditorDocument.Text;
         var sourcePath = tab.EffectivePath;
         var workspaceRoot = tab.EffectiveWorkspace;
+        var diagramTheme = CurrentDiagramTheme;
 
         await model.RunAsync(async () =>
         {
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             model.Status = "Preparing " + format + " export…";
-            var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken);
+            var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken, diagramTheme);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
             model.Status = "Exported " + Path.GetFileName(picker.FileName);
         });

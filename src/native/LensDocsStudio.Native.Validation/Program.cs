@@ -104,6 +104,12 @@ internal static class Program
             try { NativePdfDecorationChecks.Run(decorationOutput); Console.WriteLine("Native PDF decoration checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--diagram-themes")
+        {
+            var themeOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/diagram-themes"); Directory.CreateDirectory(themeOutput);
+            try { NativeDiagramThemeChecks.Run(themeOutput); Console.WriteLine("Native diagram theme checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--diagram-contrast")
         {
             var contrastOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(contrastOutput);
@@ -299,6 +305,8 @@ internal static class Program
         var failures = new List<string>();
         try { NativeDiagramContrastChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native diagram label contrast: " + ex.Message); }
+        try { NativeDiagramThemeChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native diagram themes: " + ex.Message); }
         try { NativeSvgChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }

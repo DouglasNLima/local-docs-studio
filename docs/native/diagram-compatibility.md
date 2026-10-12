@@ -1,5 +1,7 @@
 # Native diagram compatibility
 
+Diagram themes now have native Auto, Lens, Default, Neutral, Forest and Dark choices. Auto preserves the existing light/dark Lens appearance; fixed choices ignore application theme changes. Default uses a lavender palette, Neutral greys and Forest greens. The same resolved palette is carried into preview, maps, SVG/PNG and document/clipboard/site images. Twelve light/dark application combinations retain exact exported image pixels across HTML, DOCX, PDF, clipboard representations and Docs Sites; source stays unchanged. These are native palette equivalents, not a claim of browser Mermaid pixel identity. Actual desktop/menu certification for this addition is pending CI.
+
 The desktop uses Mermaider 0.15.1 and SharpVectors through the native SVG adapter. It has no browser rendering fallback. The [fixture corpus](../../tests/fixtures/native-mermaid/compatibility.md) is checked in light and dark themes; the complete repository harness currently executes 40 diagram cases and retains SVG/PNG output under `artifacts/native/validation`. The catalogue contributes another 56 diagram/theme cases. Passing counts establish this corpus, not all Mermaid syntax.
 
 | Family | Inspected fixture outcome |

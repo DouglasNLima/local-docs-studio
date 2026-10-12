@@ -64,6 +64,8 @@ To add or edit a caption, put the caret inside a standalone Markdown image and c
 
 Write Mermaid inside a fenced `mermaid` block or open a standalone `.mmd` or `.mermaid` file. Supported diagrams render through bundled .NET components. **Zoom**, **SVG**, **PNG** and **Copy source** actions appear beside a rendered diagram.
 
+Choose **View → Diagram theme** or use **Edit → Settings → Diagram theme**. Auto follows the application appearance; Lens, Default, Neutral, Forest and Dark stay fixed. The choice is saved on this device. Diagrams keep the selected palette in previews, workspace maps, SVG/PNG, Word/PDF/HTML, clipboard content and Docs Sites. A Docs Site can use a different page theme without changing its diagram images. These are native palette equivalents; browser Mermaid layout and colours are not reproduced pixel for pixel. Markdown source is unchanged.
+
 The built-in catalogue includes examples for the supported diagram families. If a diagram cannot be rendered, its source and an explanation remain visible. Full compatibility with every browser Mermaid version is still being evaluated.
 
 Maths supports inline dollar delimiters, parenthesised LaTeX delimiters and display formulae. Fractions, roots, scripts, Greek symbols, sums, integrals and common matrix, cases and aligned expressions render offline. Right-click a formula to copy its original LaTeX.

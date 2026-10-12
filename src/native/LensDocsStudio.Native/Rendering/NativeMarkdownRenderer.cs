@@ -127,6 +127,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             var drawing = preparedDrawings is not null && preparedDrawings.TryGetValue(code, out var prepared) ? prepared : svg.Render(diagram.Svg!);
                             var image = new Image { Source = drawing, Stretch = Stretch.Uniform, MaxHeight = 900, HorizontalAlignment = HorizontalAlignment.Left };
                             System.Windows.Automation.AutomationProperties.SetName(image, "Mermaid diagram");
+                            System.Windows.Automation.AutomationProperties.SetAutomationId(image, "DiagramPreview" + code.Span.Start);
+                            if (diagram.Theme is { } theme) System.Windows.Automation.AutomationProperties.SetHelpText(image, "Diagram theme: " + theme);
                             panel.Children.Add(image);
                             var actions = new WrapPanel { Orientation = Orientation.Horizontal };
                             foreach (var format in new[] { "Zoom", "SVG", "PNG", "Copy source" })

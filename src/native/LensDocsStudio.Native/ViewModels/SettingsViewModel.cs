@@ -17,6 +17,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool convertTabsToSpaces;
     [ObservableProperty] private int previewZoom = 100;
     [ObservableProperty] private string previewReadingMode = "Automatic";
+    [ObservableProperty] private string diagramTheme = "Auto";
     [ObservableProperty] private bool showOutline = true;
     [ObservableProperty] private bool isSaving;
     [ObservableProperty] private string status = "Changes apply to this device when you choose Apply. Document text and undo history are retained.";
@@ -24,11 +25,12 @@ public partial class SettingsViewModel : ObservableObject
     public IReadOnlyList<string> Layouts => WorkspaceSettings.Layouts;
     public IReadOnlyList<string> Fonts => WorkspaceSettings.Fonts;
     public IReadOnlyList<string> ReadingModes => WorkspaceSettings.ReadingModes;
+    public IReadOnlyList<string> DiagramThemes => Core.Rendering.DiagramThemes.Choices;
     public IReadOnlyList<int> FontSizes { get; } = Enumerable.Range(10, 27).ToArray();
     public IReadOnlyList<int> IndentationSizes { get; } = Enumerable.Range(2, 7).ToArray();
     public bool CanEdit => !IsSaving;
     public event Action? Applied;
-    public WorkspaceSettings Current => new(Theme, Layout, new(FontFamily, FontSize, WordWrap, ShowLineNumbers, IndentationSize, ConvertTabsToSpaces), new(PreviewZoom, PreviewReadingMode), ShowOutline);
+    public WorkspaceSettings Current => new(Theme, Layout, new(FontFamily, FontSize, WordWrap, ShowLineNumbers, IndentationSize, ConvertTabsToSpaces), new(PreviewZoom, PreviewReadingMode, DiagramTheme), ShowOutline);
     public void Import(ReadOnlyMemory<byte> bytes)
     {
         var imported = SettingsTransferFormat.Read(bytes, Current);
@@ -46,6 +48,7 @@ public partial class SettingsViewModel : ObservableObject
         FontFamily = settings.Editor.FontFamily; FontSize = settings.Editor.FontSize; WordWrap = settings.Editor.WordWrap;
         ShowLineNumbers = settings.Editor.ShowLineNumbers; IndentationSize = settings.Editor.IndentationSize;
         ConvertTabsToSpaces = settings.Editor.ConvertTabsToSpaces; PreviewZoom = settings.Preview.Zoom; PreviewReadingMode = settings.Preview.ReadingMode;
+        DiagramTheme = settings.Preview.DiagramTheme;
     }
     partial void OnIsSavingChanged(bool value) { OnPropertyChanged(nameof(CanEdit)); ApplyCommand.NotifyCanExecuteChanged(); ResetCommand.NotifyCanExecuteChanged(); }
     [RelayCommand(CanExecute = nameof(CanEdit))] private void Reset()

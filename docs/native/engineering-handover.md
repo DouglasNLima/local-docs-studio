@@ -1,5 +1,7 @@
 # Native Windows engineering handover
 
+Diagram themes now offer six saved native choices with independent application appearance and matching image pixels through all rich export paths. All 832 core tests, twelve native theme combinations, the complete native harness and static checks pass locally. Settings transfer 1.2 retains 1.0/1.1 imports. Desktop menu/restart checks and a stricter zoom-window lookup await CI; the documentation-only 4849ccf push failure and paired PR success are retained in the validation report.
+
 Current renderer correction: d692aeb native PR/push 38270165917/38270156848 fail the table-cell input-gap assertion at 426/342 ms; both web runs pass. Empty WPF containers are now attached before cooperative population to avoid moving complete rich subtrees. Nine focused cases, Release (zero warnings/errors), full native integration and static checks pass locally; both native and both web c64f410 CI runs pass. Original failure artefacts and the unchanged 250 ms limit are retained. Existing details cold-start and later expansion latency are not claimed resolved.
 
 Current update hardening: channel changes cancel active operations and reject stale downloads or installation requests. Six isolated interaction cases and 36 update core cases pass; all 814 core tests, Release, full native integration and static checks pass locally. All six interactions also pass in both d692aeb CI artefacts. Interaction fixtures use inert bytes and mocked installer verification, leave embedded trust unchanged and launch no installer.

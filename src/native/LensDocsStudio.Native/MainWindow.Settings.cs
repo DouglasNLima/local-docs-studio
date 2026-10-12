@@ -14,9 +14,11 @@ public partial class MainWindow
         new SettingsWindow(new SettingsViewModel(settings, async updated =>
         {
             var themeChanged = model.Theme != updated.Theme;
+            var diagramThemeChanged = WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme != updated.Preview.DiagramTheme;
             await model.UpdatePreferencesAsync(updated.ApplyTo);
             model.Theme = updated.Theme; SetLayout(updated.Layout); ApplyReadingPreferences();
-            if (themeChanged) { ApplyTheme(); QueuePreview(); }
+            if (themeChanged) ApplyTheme();
+            if (themeChanged || diagramThemeChanged) QueuePreview();
             model.Status = "Settings saved.";
         }), Path.Combine(model.StateDirectory, "export-recovery")) { Owner = this }.ShowDialog();
         if (editorFocus && Editor.IsVisible) Editor.Focus(); else if (previewFocus && Preview.IsVisible) Preview.Focus();
@@ -28,6 +30,7 @@ public partial class MainWindow
         EditorPreferenceService.Apply(Editor, settings.Editor);
         Preview.MinZoom = 50; Preview.MaxZoom = 200; Preview.Zoom = settings.Preview.Zoom;
         Preview.ApplyReadingMode(settings.Preview.ReadingMode);
+        RefreshDiagramThemeChecks();
         OutlineColumn.Width = new GridLength(settings.ShowOutline ? 180 : 0);
         OutlinePanel.Visibility = settings.ShowOutline ? Visibility.Visible : Visibility.Collapsed;
     }
