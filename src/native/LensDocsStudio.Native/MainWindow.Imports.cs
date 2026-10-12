@@ -39,7 +39,8 @@ public partial class MainWindow
             }
             await model.SetWorkspaceAsync(folder);
             await model.OpenPathAsync(Path.Combine(folder, "document.md"));
-            model.Status = imported.Warnings.Count == 0 ? "Imported into a new portable workspace" : imported.Warnings[0];
+            model.Status = "Imported into a new portable workspace" + (imported.Warnings.Count == 0 ? ""
+                : ". " + string.Join(" ", imported.Warnings.Distinct(StringComparer.Ordinal)));
         });
     }
 }

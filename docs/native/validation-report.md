@@ -105,6 +105,8 @@ Fifteen core regressions cover links in paragraphs, lists and table cells, forma
 
 The mapping follows the documented [Word hyperlink relationship and anchor semantics](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.hyperlink?view=openxml-3.0.1). This is later than 4cbce1d and awaits its own hosted validation. File/relative relationship targets remain text with warnings; field-based hyperlinks retain their stored results. Code/quote block styling, style-inherited numbering and full Word/template fidelity remain incomplete. No Office application or downloaded installer was run locally.
 
+The native import completion message now includes every distinct conversion note instead of only the first. The existing status control binds both its visible text and tooltip to that message; preview rendering updates the separate PreviewStatus property. This change is source/build-verified. No local foreground import interaction was performed, and the existing 62 desktop checks do not specifically certify this tooltip interaction.
+
 ## Runtime and diagnostic work
 
 The loaded-runtime check now passes in the 56502e3 native PR as recorded above. It captures the actual application executable and coreclr.dll/wpfgfx_cor3.dll module paths after editor/diagram readiness. Test-NativeInstaller.ps1 explicitly requires both loaded modules to belong to the installation directory. The normal built-app context records its framework runtime. Each context saves native-ui-runtime.json before any failed assertion. Release has zero warnings/errors, static/script checks pass and the new option still refuses local desktop execution. This does not claim that the hosted runner lacks an SDK.

@@ -118,6 +118,8 @@ To move a browser template into this library, select it in the browser's **Expor
 
 Use **File → Import DOCX, HTML or PDF** to create editable content from supported input. Inspect the resulting text and warnings; document formats do not always map exactly to Markdown.
 
+Conversion notes appear in the status bar after import. Hover over a shortened status message to read the full text; repeated notes are shown once.
+
 Word import preserves supported heading levels and directly numbered lists, including nesting, starting values and matching continuation paragraphs. Web/email links and paired internal bookmarks retain their destinations; linked pictures remain linked. Unsupported number formats are simplified with a warning; lists inside table cells become text with visible markers. Unsupported or missing link targets remain text, and Word fields keep their stored results without being evaluated. File/relative links, field-based hyperlinks, style-inherited numbering and code/quote block styling may need manual correction. Imported diagram/formula pictures remain images rather than editable Mermaid or LaTeX source.
 
 The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Docs Site**. Exports are prepared separately from source. App-only search, outline and review controls are excluded from document output.
