@@ -25,10 +25,12 @@ internal static partial class NativeUiChecks
             Keyboard.Type(VirtualKeyShort.RETURN);
             var completed = before + "\n\n[[" + targetName + "]]";
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == completed, "Enter did not insert the full selected wiki path.");
-            var linkId = "WikiLink" + (before.Length + 2);
-            Wait(() => owner.FindFirstDescendant(cf => cf.ByAutomationId(linkId).And(cf.ByName(targetName))) is not null,
+            AutomationElement? wikiLink = null;
+            // WPF exposes document hyperlinks through TextPattern children, outside ordinary tree lookup.
+            Wait(() => (wikiLink = Find(owner, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
+                .FirstOrDefault(element => element.Properties.Name.ValueOrDefault == targetName)) is not null,
                 "The completed wikilink did not render as an accessible native link.");
-            Find(owner, linkId).Patterns.Invoke.Pattern.Invoke();
+            wikiLink!.Patterns.Invoke.Pattern.Invoke();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == targetSaved, "The native wikilink did not open its existing workspace document.");
             Find(owner, "NavigateBack").Click();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == completed, "Back navigation lost the unsaved wiki source.");
@@ -41,9 +43,10 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before + missing
-                && owner.FindFirstDescendant(cf => cf.ByAutomationId(linkId).And(cf.ByName("Missing wiki target"))) is not null,
+                && (wikiLink = Find(owner, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
+                    .FirstOrDefault(element => element.Properties.Name.ValueOrDefault == "Missing wiki target")) is not null,
                 "The unresolved wikilink did not render its current alias.");
-            Find(owner, linkId).Patterns.Invoke.Pattern.Invoke();
+            wikiLink!.Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(owner, "Status").Name.StartsWith("No workspace document matches this wikilink.", StringComparison.Ordinal),
                 "The unresolved wikilink did not report its missing workspace target.");
             if (editor.Patterns.Value.Pattern.Value.Value != before + missing) throw new IOException("An unresolved wiki target changed the active document.");

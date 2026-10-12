@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Wiki desktop validation at 8289763 confirms completion but exposes an incorrect ordinary-tree hyperlink lookup. The retained screenshot shows the link; the harness now uses WPF TextPattern children. The corrected 48-workflow suite awaits CI.
+
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
 | Unambiguous native wiki links and completion | High / low | Source-aware links expose readable aliases and full-path completion. Duplicate short names report candidate paths; navigation, reviewed moves and review stay workspace-scoped. Completion preserves one Undo/Redo and avoids literal code. Forty-seven core cases, four native outcomes and eight exported-browser cases pass; the 48th desktop workflow awaits CI |

@@ -2,6 +2,8 @@
 
 Reference: docs/tool-guide.md, browser regression tests, registries/content.js and the newer main image/navigation/template contracts. All rows start incomplete until validated outcomes are recorded.
 
+The 8289763 wiki desktop run passes completion insertion but its hyperlink observation queried the wrong WPF automation surface. A retained screenshot confirms rendering; TextPattern discovery now matches ordinary-link checks. Corrected desktop/installed validation remains pending.
+
 | User need / existing contract | Native design | Status |
 |---|---|---|
 | Reveal the visible search/navigation target | Shared deferred WPF text-position scrolling | Three native HWND checks reproduce and fix offscreen selection after details expansion, preserving source/selection and rejecting stale documents. Find, formula search, outline, fragments and history share the service. Stronger actual-viewport desktop assertion awaits CI |
