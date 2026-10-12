@@ -857,9 +857,19 @@ internal static class NativeUiChecks
             var libraryImageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.RelativeReference(source, renamedImage);
             var libraryImageMarkdown = "![Library portable image](" + libraryImageReference + ")";
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(libraryImageMarkdown);
-            Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith(libraryImageMarkdown, StringComparison.Ordinal),
-                "The portable-image fixture did not reach the document before library capture.");
+            var beforeLibraryClipboard = System.Windows.Clipboard.GetDataObject(); uint libraryClipboardSequence = 0;
+            try
+            {
+                System.Windows.Clipboard.SetText("\n\n" + libraryImageMarkdown); libraryClipboardSequence = GetClipboardSequenceNumber();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
+                Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage + "\n\n" + libraryImageMarkdown,
+                    "The portable-image fixture did not reach the document before library capture.");
+            }
+            finally
+            {
+                if (libraryClipboardSequence != 0 && GetClipboardSequenceNumber() == libraryClipboardSequence)
+                { if (beforeLibraryClipboard is null) System.Windows.Clipboard.Clear(); else System.Windows.Clipboard.SetDataObject(beforeLibraryClipboard, true); }
+            }
             var templateSource = editor.Patterns.Value.Pattern.Value.Value; var templateSavedSource = File.ReadAllText(source);
             var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
             var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
@@ -1021,12 +1031,8 @@ internal static class NativeUiChecks
                 || editor.Patterns.Value.Pattern.Value.Value != templateSource || !File.ReadAllBytes(browserLibraryPath).SequenceEqual(browserLibraryBytes))
                 throw new IOException("Library or profile actions changed persisted preferences, original JSON or source documents.");
             FocusWindow(window); editor.Click();
-            for (var undo = 0; undo < 4 && editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage; undo++)
-            {
-                var beforeUndo = editor.Patterns.Value.Pattern.Value.Value;
-                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-                Wait(() => editor.Patterns.Value.Pattern.Value.Value != beforeUndo, "The library fixture image insertion did not undo.");
-            }
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "One Undo did not restore source before the library fixture image paste.");
             if (editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage || File.ReadAllText(source) != templateSavedSource)
                 throw new IOException("The library fixture did not restore the original editor and saved source before shutdown.");
             Window OpenCatalogue(bool snippets = false)
