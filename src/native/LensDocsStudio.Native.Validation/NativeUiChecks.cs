@@ -1104,6 +1104,11 @@ internal static class NativeUiChecks
                 && Find(window, "Status").Name == "Details section applied.", "The details dialogue did not insert its section.");
             var insertedDetails = editor.Patterns.Value.Pattern.Value.Value;
             if (!insertedDetails.StartsWith(sourceBeforeLibraryImage, StringComparison.Ordinal)) throw new IOException("Details insertion lost preceding source.");
+            var detailsStart = insertedDetails.IndexOf("<details data-details-block", sourceBeforeLibraryImage.Length, StringComparison.Ordinal);
+            void WaitDetailsPreview(string summary)
+                => Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("DetailsToggle" + detailsStart))?.Name == summary,
+                    "The native details preview did not finish rendering: " + summary);
+            WaitDetailsPreview("Supporting evidence — Café");
             detailsWindow = OpenDetails(window);
             if (Find(detailsWindow, "DetailsSummary").AsTextBox().Text != "Supporting evidence — Café"
                 || Find(detailsWindow, "DetailsBody").AsTextBox().Text.Replace("\r\n", "\n") != detailsBody)
@@ -1112,22 +1117,38 @@ internal static class NativeUiChecks
             Find(detailsWindow, "ApplyDetails").AsButton().Invoke();
             var updatedDetails = insertedDetails.Replace(encodedDetailsSummary, "Updated supporting evidence", StringComparison.Ordinal);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == updatedDetails, "Editing a details summary changed its Markdown body or neighbouring source.");
+            WaitDetailsPreview("Updated supporting evidence");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "One Undo did not restore the complete details edit.");
+            WaitDetailsPreview("Supporting evidence — Café");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == updatedDetails, "Details edit Redo did not restore the entire section.");
+            WaitDetailsPreview("Updated supporting evidence");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "Details edit Undo failed before preview checks.");
-            var detailsStart = insertedDetails.IndexOf("<details data-details-block", sourceBeforeLibraryImage.Length, StringComparison.Ordinal);
-            Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("DetailsToggle" + detailsStart))?.Name == "Supporting evidence — Café",
-                "The native details preview did not finish updating after Undo.");
+            WaitDetailsPreview("Supporting evidence — Café");
             var detailsToggle = Find(window, "DetailsToggle" + detailsStart);
             Wait(() => detailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == FlaUI.Core.Definitions.ExpandCollapseState.Collapsed,
                 "A new details section did not start collapsed.");
             if (detailsToggle.Name != "Supporting evidence — Café") throw new IOException("The native details expander lost its accessible summary.");
             detailsToggle.Patterns.ExpandCollapse.Pattern.Expand();
-            Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Hidden native heading", StringComparison.Ordinal),
-                "Expanding details did not reveal its heading.");
+            try
+            {
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Hidden native heading", StringComparison.Ordinal),
+                    "Expanding details did not reveal its heading.");
+            }
+            catch
+            {
+                File.WriteAllText(Path.Combine(output, "native-details-automation.json"), JsonSerializer.Serialize(new
+                {
+                    Summary = Find(window, "DetailsToggle" + detailsStart).Name,
+                    State = Find(window, "DetailsToggle" + detailsStart).Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value.ToString(),
+                    PreviewText = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1),
+                    EditorSource = editor.Patterns.Value.Pattern.Value.Value,
+                    PreviewStatus = Find(window, "PreviewStatus").Name
+                }, new JsonSerializerOptions { WriteIndented = true }));
+                throw;
+            }
             var nestedDetailsStart = insertedDetails.IndexOf("<details>", detailsStart, StringComparison.Ordinal);
             var nestedDetailsToggle = Find(window, "DetailsToggle" + nestedDetailsStart);
             if (nestedDetailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Collapsed)
