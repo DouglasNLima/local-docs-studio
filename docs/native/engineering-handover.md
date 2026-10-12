@@ -1,6 +1,6 @@
 # Native Windows engineering handover
 
-The latest verified internal-preview packages are `artifacts/native/ci-0d9d54f-pr/packages/0.1.1-preview.240`, with `0.1.0-preview.240` alongside. Both native and both web 0d9d54f runs pass on their first attempts, including 883 core tests, 62 desktop checks in four contexts, the complete installer lifecycle, PDF/Word lists, reimport and supported hyperlinks. Packages identify exact clean PR merge 3edd446 and remain unsigned; push preview.239 independently matches clean 0d9d54f. Later style-numbering and CRLF corrections pass 912 core tests and full local native validation and need their own CI. Production acceptance remains incomplete.
+The latest verified internal-preview packages are `artifacts/native/ci-f86170d-pr/packages/0.1.1-preview.244`, with `0.1.0-preview.244` alongside. Both native and both web f86170d runs pass on their first attempts, including 912 core tests, 62 desktop checks in four contexts and the complete installer lifecycle. Packages identify exact clean PR merge 14bdb06 and remain unsigned; push preview.243 independently matches clean f86170d. Supported Word styles, code, quotes and the CRLF correction pass in both native runs. The later details-template mitigation and keyboard check need their own CI. Production acceptance remains incomplete.
 
 ## Architecture and delivered workflows
 
@@ -20,11 +20,11 @@ Native advantages include filesystem monitoring, Windows pickers/shell actions, 
 
 The subsequent details-template mitigation passes the full local native harness and focused native header checks; final light/dark pages are byte-identical to the preceding render. Three fresh process samples pass all 12 nested layout cases, maximum input gap 63.34 ms. Evidence is in `details-memory-template-validation`, `details-memory-template-final` and `details-memory-template-samples.json`. The fixed template cache is per WPF thread and accepts no document text. A hosted Space-key check is added to the existing details workflow, preserving the 62-check count and recording `native-details-keyboard.json` in every context. That keyboard check and the mitigation's effect on intermittent CI delays require hosted evidence; do not claim either from the local samples.
 
-The inherited-numbering batch passes all 912 core tests, the full native harness and a separate CRLF Word fixture, with zero Release warnings/errors and passing static checks. Fourteen new style-list cases reproduce/fix lost markers and hierarchy; one extra code case verifies CRLF conversion. The native report `word-style-lists-full-validation/native-word-style-list-import.json` checks 12 inherited items, six lists and exact Markdown including code/quotes/continuations. Hosted verification should require `-ExpectedCoreTests 912 -RequireWordStyles` as well as the previous PDF/Word switches. Source-only/field markers and full destination layout remain limited.
+The inherited-numbering batch passes all 912 core tests, the full native harness and a separate CRLF Word fixture, with zero Release warnings/errors and passing static checks. Fourteen new style-list cases reproduce/fix lost markers and hierarchy; one extra code case verifies CRLF conversion. The native report `word-style-lists-full-validation/native-word-style-list-import.json` checks 12 inherited items, six lists and exact Markdown including code/quotes/continuations. Both f86170d hosted runs and downloaded reports pass `-ExpectedCoreTests 912 -RequireWordStyles` with the previous PDF/Word switches. Source-only/field markers and full destination layout remain limited.
 
-The preceding 4adb0ad native runs failed a CRLF-versus-LF Word assertion, now reproduced and corrected. The push also retained a 728.273 ms details input delay, concentrated inside toggle initialisation with no sampled CPU increase. Failures are under `ci-4adb0ad-pr-failure` and `ci-4adb0ad-push-failure`; no timing bound is relaxed and no root cause is claimed. Preview.240 remains the latest fully verified package.
+The preceding 4adb0ad native runs failed a CRLF-versus-LF Word assertion, now reproduced and corrected. The push also retained a 728.273 ms details input delay, concentrated inside toggle initialisation with no sampled CPU increase. Failures are under `ci-4adb0ad-pr-failure` and `ci-4adb0ad-push-failure`; no timing bound is relaxed and no root cause is claimed. The later f86170d runs pass; preview.244 is now verified, without the subsequent template mitigation.
 
-The later code/quote import batch passes all 897 core tests (14 new cases), the full native harness, static checks and a zero-warning/error Release build. Recognised styles, bounded inheritance and direct outline overrides retain supported block semantics; code is literal, quotes stay grouped and list placement survives. Evidence is under `artifacts/native/word-blocks-after`, `word-blocks-full-validation` and `word-blocks-native`, with seven original failures retained in `word-blocks-before`. The native block report verifies exact code text and one two-paragraph quote within list items. This batch is later than 0d9d54f and requires its own CI; use `-RequireWordBlocks -ExpectedCoreTests 897` with the existing Word/PDF switches when reviewing that future run. Language, nested quote depth, quote/list orientation and ambiguous template styles remain limited.
+The later code/quote import batch passes all 897 core tests (14 new cases), the full native harness, static checks and a zero-warning/error Release build. Recognised styles, bounded inheritance and direct outline overrides retain supported block semantics; code is literal, quotes stay grouped and list placement survives. Evidence is under `artifacts/native/word-blocks-after`, `word-blocks-full-validation` and `word-blocks-native`, with seven original failures retained in `word-blocks-before`. The native block report verifies exact code text and one two-paragraph quote within list items. After correcting the CRLF probe, both f86170d hosted runs pass the block checks within 912 core tests. Language, nested quote depth, quote/list orientation and ambiguous template styles remain limited.
 
 The later Word hyperlink import correction passes 883 core tests (15 new link cases), the complete native harness, static checks and a zero-warning/error Release build. It retains supported external links, formatted labels, linked image bytes and paired internal bookmarks; missing/unsupported targets and inert fields have explicit warnings. Native output is in `artifacts/native/word-links-final-validation`; core results are in `word-links-after/word-links-final.trx`, with eight original failures retained in `word-links-before`. Both 0d9d54f native CI runs also pass these 883 tests and the full native harness. File/relative targets, field-based hyperlinks and full Word formatting remain incomplete.
 
@@ -44,7 +44,7 @@ Hosted validation confirms installed, upgraded and reinstalled applications load
 
 The self-contained x64 Inno installer and portable ZIP use separate product, state and association identities. CI covers visible wizard choices, Back/cancellation, installation, newer-preview replacement, uninstall/reinstall and reopening retained sessions. Twenty state files and workspace source are preserved. Both preview versions use the same source revision; this does not certify historical schema migration or an SDK-free machine.
 
-Signing is pluggable through an existing certificate or service adapter, with independently verified publisher pins. The user has configured neither identity nor provider. Both preview.240 installers report `NotSigned`, update envelopes contain no identity/signature, and unsigned updates cannot execute. Update operations cancel/reject stale selections and verify signed metadata, size/hash, Windows Authenticode and exact publisher before an authorised launch. Disposable CI certificates test trust paths and are removed afterwards; production trust remains empty.
+Signing is pluggable through an existing certificate or service adapter, with independently verified publisher pins. The user has configured neither identity nor provider. Both preview.244 installers report `NotSigned`, update envelopes contain no identity/signature, and unsigned updates cannot execute. Update operations cancel/reject stale selections and verify signed metadata, size/hash, Windows Authenticode and exact publisher before an authorised launch. Disposable CI certificates test trust paths and are removed afterwards; production trust remains empty.
 
 ## Validation and evidence
 
@@ -55,13 +55,13 @@ Signing is pluggable through an existing certificate or service adapter, with in
 | Failed-diagram recovery | 14 light/dark native cases; exact copy/source mapping, accessible controls and valid-render control; `artifacts/native/diagram-failures` |
 | Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-style-lists-full-validation` |
 | Current static checks | Passed; web source unchanged |
-| Native CI at 0d9d54f | PR 38316619492 and push 38316615302 pass on attempt 1; both downloaded reports verify 883 core tests, PDF/Word lists, reimport and 62 desktop workflows in all four contexts |
-| Web CI at 0d9d54f | Push 38316615426 and PR 38316619495 pass all 262 cases on their first attempts |
+| Native CI at f86170d | PR 38319856432 and push 38319852791 pass on attempt 1; both downloaded reports verify 912 core tests, all PDF/Word groups and 62 desktop workflows in all four contexts |
+| Web CI at f86170d | Push 38319852885 and PR 38319856463 pass all 262 cases on their first attempts |
 | Diagram paint gate | Eight light/dark frames in the four desktop contexts passed actual visible-node/label checks |
 | Current desktop addition | Recovery clipboard, keyboard focus/caret, selection collapse, Undo and saved-file preservation pass in all four contexts |
 | Diagram copying | Eight copies retain identical 471 × 149 pixels at 175%/35% zoom, persist after closing the drawing and preserve source; reinstalled PNG inspected |
-| Package verification | All eight preview.239/.240 hashes, exact clean revisions, runtime ZIP entries and unsigned metadata verified; `ci-0d9d54f-pr/package-verification.json` and push counterpart |
-| Loaded runtime | All four executable identities and both loaded modules match; installed/upgraded/reinstalled modules originate in the installation directory; `ci-0d9d54f-pr/runtime-evidence-review.json` and push counterpart |
+| Package verification | All eight preview.243/.244 hashes, exact clean revisions, runtime ZIP entries and unsigned metadata verified; `ci-f86170d-pr/package-verification.json` and push counterpart |
+| Loaded runtime | All four executable identities and both loaded modules match; installed/upgraded/reinstalled modules originate in the installation directory; `ci-f86170d-pr/runtime-evidence-review.json` and push counterpart |
 | Push retry verification | Preview.229 independently matches clean cfe11e5; downloaded core/corpus, four desktop/clipboard contexts, lifecycle and trust evidence pass; `ci-cfe11e5-push-attempt2/evidence-review.json` |
 | Installer files in use | All four preservation assertions and five wizard outcomes pass; exact snapshots retained and compared; `ci-cfe11e5-pr/evidence-review.json` |
 | Local test isolation | Five desktop/Office commands and installer script refuse before arguments/paths; `artifacts/native/desktop-test-guards.json` |
@@ -76,13 +76,13 @@ Responsiveness remains incomplete: the earlier a3ef323 PR measured a 583 ms clos
 
 Build with `dotnet build src/native/LensDocsStudio.Native.slnx -c Release`. Packaging uses `scripts/native/Build-NativePackage.ps1` and Inno Setup; normal self-contained execution does not require build tools.
 
-The latest verified installer is `artifacts/native/ci-0d9d54f-pr/packages/0.1.1-preview.240/LensDocsStudio.Native-0.1.1-preview.240-win-x64-Setup.exe` (58,867,368 bytes; SHA-256 `23D93D8815470D437D79303F4397A40860C12AE8FA4C368DB1DF7BDAF60CC232`). Its portable ZIP hash is `F39B2BCC887AE10052747AA131D5EEB362E22D17EB7AA91556B8E71B4B28D6F0`.
+The latest verified installer is `artifacts/native/ci-f86170d-pr/packages/0.1.1-preview.244/LensDocsStudio.Native-0.1.1-preview.244-win-x64-Setup.exe` (58,860,041 bytes; SHA-256 `6B91C0A18887BF6084287F733FA39F5DE27D8BD25026B830C438E48D8DBB711F`). Its portable ZIP hash is `C81FB2E847A04C3CD79A544FF528895215182B8C56012729A3565880FBEE566D`.
 
 - Branch: `feature/native-wpf-rebuild`.
-- Latest package-validated revision: PR merge `3edd4463ea94295455e2cdd4f5e5165997b38200` for branch head `0d9d54f82c5d4ffaa44d21e40c49f69361c7e8c7`.
+- Latest package-validated revision: PR merge `14bdb064fc09ccee80b8a875a0d081a6af92b289` for branch head `f86170d5ab4866e858996e58f0b6561caf7db459`.
 - Draft [PR 21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting `develop`.
-- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38316619492).
-- [Web push validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38316615426).
+- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38319856432).
+- [Web push validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38319852885).
 
 ## Remaining acceptance
 
