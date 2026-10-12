@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Typing and cancellation can interrupt preparation of a single densely formatted paragraph, heading, table cell or code block. Previously, block-level batching still left 308–341 ms gaps inside these rich inline trees and queued cancellation was ignored. The renderer now cooperates while constructing nested formatting and links; four focused cases and full native validation preserve complete text, appearance properties and source mapping. This does not establish physical typing latency on every machine.
+
 Recovery can no longer report a successful write that exceeds its own next-start read budget. Streaming avoids whole-session serialised buffers, and conversion/durable flushing run away from the editor dispatcher. Excessive state leaves the previous session and backup unchanged with an actionable error; unreadable legacy state is retained before replacement. Twelve focused regressions pass, including fresh-store recovery of multiple Unicode documents and their saved baselines. This is data-safety evidence, not a maximum-size performance certification.
 
 Release engineering can attach a future certificate or signing-service adapter without changing update consent or trust rules. The current unsigned preview remains restricted to release-page notifications; provider success cannot bypass Windows signature, exact publisher or timestamp checks. Fourteen mocked adapter-policy checks and 34 update core tests pass; no production identity is configured.

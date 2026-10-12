@@ -1,6 +1,8 @@
 # Native Windows engineering handover
 
-Status: available for internal preview with documented limitations. Both native and both web CI runs pass at 8308c5d, including 14 mocked signing-adapter outcomes, retained-session reopening and actual interruption recovery in built/reinstalled applications. The earlier c62ec4e PR details-input failure remains unexplained. The user confirms no production certificate, service or publisher identity is configured; unsigned update execution remains blocked. The subsequent session-persistence fix streams bounded JSON and safely retains oversized legacy state; 12 new regressions, all 812 core tests, Release, full native integration and static checks pass, with CI pending. Production certification is incomplete. This report does not authorise installation on the user's active desktop, merging, release publication or tag changes.
+Current renderer hardening: inline trees and coloured code now share the preview's input/cancellation budget. Four new cases reproduce and correct blocked input and ignored cancellation within individual rich paragraphs/headings/table cells, preserving complete text, formatting and source mapping. Focused/full native validation, Release and static checks pass; its CI is pending. The earlier details cold-start observation is separate and remains unexplained.
+
+Status: available for internal preview with documented limitations. Both native and both web CI runs pass at 300ab68, including all 812 core tests, 14 mocked signing-adapter outcomes, bounded session persistence, retained-session reopening and actual interruption recovery in built/reinstalled applications. The earlier c62ec4e PR details-input failure remains unexplained. The user confirms no production certificate, service or publisher identity is configured; unsigned update execution remains blocked. Production certification is incomplete. This report does not authorise installation on the user's active desktop, merging, release publication or tag changes.
 
 Automatic reading now uses native pages for long documents, with explicit Continuous/Pages choices, asynchronous distant navigation, preserved text automation and page-sized media. All 800 core tests and seven focused hidden-HWND pagination outcomes pass. The 57th desktop workflow checks page buttons, distant Find range/bounds, complete Undo and saved reading preferences; it passes in all four application contexts. A subsequent screenshot inspection identified missing visible selection, corrected and verified by actual pixel comparison while keyboard focus stays in Find. Portable appearance exports use version 1.1 while retaining version 1.0 import compatibility.
 
@@ -38,14 +40,15 @@ Update policy checks compatible releases, signed metadata, size/hash, actual Win
 
 | Evidence | Result and scope |
 |---|---|
-| Local pagination Release | Zero warnings/errors |
-| Core tests | 800 passed; artifacts/native/tests/native-pagination.trx |
+| Local Release | Current inline-rendering change: zero warnings/errors |
+| Core tests | 812 passed locally and in both 300ab68 native runs; artifacts/native/tests/native-session-all.trx |
+| Inline responsiveness | Four before/after cases; artifacts/native/inline-layout and validation/native-inline-layout.json. Local full harness passes; renderer CI pending |
 | Native pagination | Seven hidden-HWND outcomes; artifacts/native/pagination and validation/native-pagination.json; 58-workflow desktop suite passes both completed b1b500c native runs |
 | Full native harness | 40 diagram cases and export checks, zero failures; artifacts/native/validation |
 | PDF Unicode | Six outcomes pass; artifacts/native/pdf-unicode/native-pdf-unicode.json and inspected PNG |
-| Export browser checks | 12 Chromium/Edge cases from disk and static hosting, including theme/print/forced colours; latest completed 676523e CI also passes |
-| Complete native PR/push | b1b500c: 38245098298 (attempt 2) / 38245092255; 800 core, seven signature, seven combined update, 12 export-browser and 58 desktop workflows in every app context |
-| Complete web PR/push | b1b500c: 38245098093 / 38245092183; 262 cases each |
+| Export browser checks | 12 Chromium/Edge cases from disk and static hosting, including theme/print/forced colours; both 300ab68 native CI runs pass |
+| Complete native PR/push | 300ab68: 38264945184 / 38264935943; core/signing/native/export/desktop suites, visible installer and retained/interrupted-session checks |
+| Complete web PR/push | 300ab68: 38264945154 / 38264935984; 262 cases each |
 | Actual PDF export | Expanded Windows Export-menu Unicode check passes in all four native contexts; built-window screenshot and exported PDF raster inspected |
 | Downloaded current CI evidence | artifacts/native/ci-b1b500c-push; visible search highlight, actual decorated PDF, 58 desktop workflows, certificate cleanup, preview.179 upgrade with 20 preserved state files and package SHA-256 checks confirmed |
 | Package advisories | Fresh-cache NuGet query on 12 October 2026 reports no known vulnerabilities among 37 resolved versions, including transitive dependencies; inventory and lock hashes retained |
@@ -57,7 +60,7 @@ Performance evidence is fixture-specific. Earlier actual application samples obs
 
 ## Build artefacts and references
 
-The newest inspected packages are under artifacts/native/ci-2c16d47-pr/packages/0.1.0-preview.188 and 0.1.1-preview.188. Both 2c16d47 native and web runs pass, including the visible wizard and long-paragraph navigation. The PR merge commit be688146cfd18383675c25a09c2fc7883e41b3a5 has the exact same file tree as head 2c16d47; version metadata records that merge commit and a clean source tree. All four package hashes match. The latest installer SHA-256 is B6B929CAA0EEDD220F032ABAAC2458F685A37E229321FDD95953D0B2EF656361; its ZIP hash is 3343AE69F62CAEC089ADFAA99F5A3EAB70C9183E695EFBB5DB1E52DA1D6AEA3B. The earlier packages below remain retained evidence.
+The newest inspected packages are under artifacts/native/ci-8308c5d-push/packages/0.1.0-preview.195 and 0.1.1-preview.195. All four hashes match; version metadata records exact source 8308c5dad1af21da02b924d8b984bf2fb5043c2d, a clean tree, self-contained internal preview and signingProvider Unsigned. Windows reports NotSigned for both installers; both update manifests have no signing key/signature. The 0.1.1 installer SHA-256 is FC7B999D7923647A4AA0499C9D169DDDC9D84E562782BEAE54B1D0C4EE041AE9; its ZIP is A01AE49F4E3CB93846CBB823A4AD4524E98A0AC55630F15973DC90F13870B308. package-verification.json retains the exact read-only checks; neither installer was executed locally. These packages precede the session/inline fixes now under validation.
 
 Build from the repository root with dotnet build src/native/LensDocsStudio.Native.slnx -c Release. Packaging uses scripts/native/Build-NativePackage.ps1 with a fresh preview version and an installed Inno Setup compiler. Packaging requires development tools; normal self-contained execution does not use a developer build command.
 
@@ -66,10 +69,10 @@ The inspected push artefact contains matching installers, portable ZIPs, version
 The inspected 0.1.1-preview.179 installer SHA-256 is BF4C8168D8EDF71CF4EADAE748521CB2BE0E121AB35977ED3990301606B0548E; the portable ZIP is 83B9CBCD998007CA4A0A6E308C2BC2AC091DADEFC6E233AEAE7AF226E80C93C0.
 
 - Branch: feature/native-wpf-rebuild.
-- Latest fully validated product commit: 2c16d47 (including bb61e8f), exact large-block page navigation and visible installer validation. Subsequent session-restoration coverage is pending CI.
+- Latest fully CI-validated commit: 300ab68, including bounded session persistence, optional signing adapters, actual interruption recovery and installed-session continuity. The inline-rendering follow-up is described above.
 - Draft [PR 21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop.
-- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38245098298).
-- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38245098093).
+- [Native PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38264945184).
+- [Web PR validation](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38264945154).
 
 ## Remaining acceptance
 

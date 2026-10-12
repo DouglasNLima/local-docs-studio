@@ -1,6 +1,8 @@
 # Functional parity matrix
 
-Session recovery now enforces the same encoded-size budget on both read and write, retains oversized legacy files before fallback and prevents autosave after an unresolved read failure. JSON remains schema 1; the 512 MiB session budget includes current text and saved baselines. Twelve modest-budget regressions and all 812 core tests pass; maximum-budget responsiveness and this change's desktop CI remain unverified.
+Dense inline formatting now yields to input and cancellation within a single block. Four native cases cover full formatted paragraphs, headings, table cells and coloured code, retaining exact text, nested styles, links and source positions. Focused and full local native checks pass; actual desktop CI for this change is pending. Maximum observed dispatcher gaps are recorded in the validation report rather than treated as universal latency guarantees.
+
+Session recovery now enforces the same encoded-size budget on both read and write, retains oversized legacy files before fallback and prevents autosave after an unresolved read failure. JSON remains schema 1; the 512 MiB session budget includes current text and saved baselines. Twelve modest-budget regressions and all 812 core tests pass. Both native and both web CI runs pass at 300ab68, including desktop/installation/upgrade/reinstall and interrupted-save recovery; maximum-budget responsiveness remains unverified.
 
 Signing remains deliberately unconfigured per the user's confirmed decision. Optional certificate-store and service-script adapters now require explicit publisher pins and independent Windows verification; unsigned packages cannot enable updater execution. Fourteen adapter-policy outcomes use mocked signature results, and all 34 update core tests pass. Production identity, actual provider signing and signed-upgrade certification remain unavailable.
 

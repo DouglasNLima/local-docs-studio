@@ -108,11 +108,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             switch (block)
             {
                 case HeadingBlock heading:
-                    var hp = Paragraph(heading.Inline);
+                    var hp = await Paragraph(heading.Inline);
                     hp.FontSize = heading.Level switch { 1 => 30, 2 => 24, 3 => 20, _ => 17 };
                     hp.FontWeight = FontWeights.SemiBold; hp.Margin = new Thickness(0, 16, 0, 8); result = hp;
                     break;
-                case ParagraphBlock paragraph: result = Paragraph(paragraph.Inline); break;
+                case ParagraphBlock paragraph: result = await Paragraph(paragraph.Inline); break;
                 case MathBlock formula:
                     result = new Paragraph(Formula(formula, formula.Lines.ToString(), true)) { Margin = new Thickness(0, 12, 0, 12) }; break;
                 case FencedCodeBlock code when diagrams.TryGetValue(code, out var diagram):
@@ -154,7 +154,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 case CodeBlock code:
                     var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
                     CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
-                    CodeSyntaxColours.Add(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast);
+                    await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast, Cooperate);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(codeParagraph, "CodePreview" + code.Span.Start);
                     result = codeParagraph;
                     result.ContextMenu = CodeContextMenu.Create(code, parsed.Source, copyCode);
@@ -240,7 +240,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = detailsSection; break;
                 case DocumentImageFigureBlock figure:
                     var figureSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
-                    figureSection.Blocks.Add(Paragraph(figure.Inline));
+                    figureSection.Blocks.Add(await Paragraph(figure.Inline));
                     if (figure.Caption.Length > 0) figureSection.Blocks.Add(new Paragraph(new Run(figure.Caption)) { FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
                     result = figureSection; break;
                 case DocumentProgressBlock progress:
@@ -265,17 +265,18 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             return result;
         }
 
-        Paragraph Paragraph(ContainerInline? inline)
+        async ValueTask<Paragraph> Paragraph(ContainerInline? inline)
         {
             var result = new Paragraph { Margin = new Thickness(0, 4, 0, 10), LineHeight = 23 };
-            if (inline is not null) AddInlines(result.Inlines, inline);
+            if (inline is not null) await AddInlines(result.Inlines, inline);
             return result;
         }
-        void AddInlines(InlineCollection target, ContainerInline container)
+        async ValueTask AddInlines(InlineCollection target, ContainerInline container)
         {
             foreach (var inline in container)
             {
-                cancellationToken.ThrowIfCancellationRequested();
+                // A single paragraph or link label can contain thousands of formatted runs.
+                await Cooperate();
                 switch (inline)
                 {
                     case DocumentAnchorInline anchor:
@@ -312,7 +313,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         if (formatting.HasFlag(MarkdownEmphasis.Subscript)) { span.BaselineAlignment = BaselineAlignment.Subscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Superscript)) { span.BaselineAlignment = BaselineAlignment.Superscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Highlight)) span.Background = surface;
-                        AddInlines(span.Inlines, emphasis); target.Add(span); break;
+                        await AddInlines(span.Inlines, emphasis); target.Add(span); break;
                     case TaskList task: target.Add(new Run(task.Checked ? "☑ " : "☐ ")); break;
                     case LinkInline link when link.IsImage:
                         var alt = MarkdownService.InlineText(link);
@@ -345,11 +346,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         var hyperlink = new Hyperlink { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = link.Url };
                         System.Windows.Automation.AutomationProperties.SetName(hyperlink, MarkdownService.InlineText(link));
                         System.Windows.Automation.AutomationProperties.SetAutomationId(hyperlink, "DocumentLink" + link.Span.Start);
-                        AddInlines(hyperlink.Inlines, link);
+                        await AddInlines(hyperlink.Inlines, link);
                         hyperlink.Click += (_, _) => navigate(link.Url ?? "");
                         target.Add(hyperlink); break;
                     case HtmlInline html: target.Add(new Run(html.Tag)); break;
-                    case ContainerInline nested: AddInlines(target, nested); break;
+                    case ContainerInline nested: await AddInlines(target, nested); break;
                 }
             }
         }

@@ -12,17 +12,18 @@ public static class CodeSyntaxColours
     public static Brush For(CodeTokenRole role, bool dark) => (dark ? Dark : Light)[(int)role];
 
     public static void Add(InlineCollection target, string text, CodeSyntaxBlock? syntax, bool dark, bool highContrast)
+        => AddAsync(target, text, syntax, dark, highContrast).GetAwaiter().GetResult();
+
+    internal static async ValueTask AddAsync(InlineCollection target, string text, CodeSyntaxBlock? syntax, bool dark, bool highContrast, Func<ValueTask>? cooperate = null)
     {
-        if (syntax is null || syntax.Text != text || highContrast) { target.Add(new Run(text)); return; }
         var palette = dark ? Dark : Light;
-        var position = 0;
-        foreach (var span in syntax.Spans)
+        foreach (var token in CodeSyntaxRuns.Read(text, highContrast ? null : syntax))
         {
-            if (span.Start > position) target.Add(new Run(text[position..span.Start]));
-            target.Add(new Run(text.Substring(span.Start, span.Length)) { Foreground = palette[(int)span.Role] });
-            position = span.Start + span.Length;
+            if (cooperate is not null) await cooperate();
+            var run = new Run(token.Text);
+            if (token.Role != CodeTokenRole.Plain) run.Foreground = palette[(int)token.Role];
+            target.Add(run);
         }
-        if (position < text.Length) target.Add(new Run(text[position..]));
     }
 
     private static Brush[] Palette(bool dark) => Enum.GetValues<CodeTokenRole>().Select(role =>

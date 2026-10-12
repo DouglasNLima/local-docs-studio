@@ -74,6 +74,12 @@ internal static class Program
             try { NativePaginationChecks.RunLargeBlocks(blockOutput); Console.WriteLine("Native large-block checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--inline-layout")
+        {
+            var inlineOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/inline-layout"); Directory.CreateDirectory(inlineOutput);
+            try { NativeInlineLayoutChecks.Run(inlineOutput); Console.WriteLine("Native inline layout checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--save-recovery")
         {
             var recoveryOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/save-recovery"); Directory.CreateDirectory(recoveryOutput);
@@ -301,6 +307,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
+        try { NativeInlineLayoutChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native inline layout: " + ex.Message); }
         try { NativePreviewSchedulingChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }
         try { NativePaginationChecks.Run(output); }
