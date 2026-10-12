@@ -2,7 +2,13 @@
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest completed CI: b3a4d59
+## Latest completed CI: 6e572f6
+
+Both native runs (PR 38312511577, push 38312508340) and both web runs (PR 38312511565, push 38312508397) pass on attempt 1. The web logs each record 262 passing cases. Independently downloaded native reports verify 850 core tests, 40 diagram/export cases, all five PDF list groups and all three Word export groups. Four 62-check desktop contexts pass, including three installed contexts loading both runtime modules from their installation directory. Five wizard outcomes, four files-in-use assertions, 20 preserved state files, restored sessions and disposable-certificate cleanup also pass.
+
+Preview.236 matches exact clean PR merge `4958d3d06405faa33cd214dd04a995842475c969`, captured from GitHub for branch head `6e572f6af2a6af45d3b14841b4d15d21551d9416`; preview.235 matches that clean branch head. All eight package hashes, sizes, runtime ZIP entries and unsigned metadata pass. The latest installer SHA-256 is `65905429168E261D496F299D3A58137646B8D3228A555600ED2729B7CA09F6AE`; its ZIP is `EF10724152870A44853D9B5C32EFED0E710051C4BD630DD1BA5046C2772712F7`. Evidence is under `artifacts/native/ci-6e572f6-pr` and `ci-6e572f6-push`, including `package-verification.json` and `runtime-evidence-review.json`. No downloaded installer was executed locally. These builds include the Word export correction; the later reimport correction below is locally validated and awaits its own CI.
+
+## Previous completed CI: b3a4d59
 
 Native PR 38310145934, native push 38310140757 and web PR/push 38310145715/38310140748 all pass on their first attempts. Both web logs record 262 passing tests. Downloaded PR preview.234 identifies clean merge `cbaf55eea7c5473f76b07df07b5487d8c2493c6a`, captured from GitHub for head `b3a4d59cc6b32dbe201b3109f54994fa49e0cdea`. Push preview.233 independently identifies that exact clean branch revision. All eight installer/ZIP hashes, unsigned metadata, sizes and bundled runtime entries are verified; no installer was executed locally.
 
@@ -79,7 +85,17 @@ Seven original `DocxListTests` fail before the correction: continuation paragrap
 
 Release builds with zero warnings/errors, all 850 core tests pass in `artifacts/native/word-lists-after/word-list-widths.trx`, and the complete native harness passes 40 diagram/export cases with zero failures in `artifacts/native/word-list-width-validation`; static checks pass. The new `--word-lists` check is also part of that harness. Its two actual DOCX files preserve 12 marked fixture items, unnumbered continuations and first-block native Mermaid/formula images, with valid package schemas and unchanged source. The initial custom-margin fixture used the wrong Open XML property types; the final successful build uses the actual numeric margin and enum types.
 
-These are structural/semantic checks. No local Office application was launched. Actual Word pagination, wide-marker positioning, template style-derived margins and screen-reader behaviour remain unverified, as does hosted CI for this subsequent change. The previous b3a4d59 CI covers the PDF correction only.
+These are structural/semantic checks. Both 6e572f6 native runs now validate this export correction as recorded above. No local Office application was launched. Actual Word pagination, wide-marker positioning, template style-derived margins and screen-reader behaviour remain unverified. The previous b3a4d59 CI covers the PDF correction only.
+
+## Word list and heading reimport correction
+
+The exporter correction exposed a separate importer defect: any numbering properties, including the explicit `numId=0` override, became a new list item. Starts and levels were discarded. Seven initial round-trip regressions fail in `artifacts/native/word-import-before/word-import-before.trx`. An additional exact heading-level regression fails in `heading-before.trx`: Heading 1 through Heading 5 were demoted one level. The earlier substring assertions did not detect that error.
+
+The importer now reconstructs direct list levels, start overrides, restart/never-restart counters, matching continuation indents, first-block headings/tables/nested lists and empty items. Separate numbering instances remain separate Markdown lists. Headings retain levels 1–6. Unsupported formats/composite markers and lists flattened inside pipe-table cells produce warnings; invalid levels and numbers outside Markdown's nine-digit range are rejected without changing input. Numbering lookup caches and bounded level traversal avoid repeatedly scanning preceding lists; cell conversion retains its own output buffer instead of copying accumulated body text.
+
+All 868 core tests pass, including 18 new import cases, in `artifacts/native/word-import-after/word-import-heading-final.trx`; Release builds with zero warnings/errors. The full native harness passes 40 diagram/export cases with zero failures in `artifacts/native/word-import-heading-validation`; static checks pass. Its new probe reimports the two actual prepared DOCX files, checking six lists, 12 items, six continuation paragraphs, exact ordered starts, heading levels and both original native diagram/formula image payloads. The earlier native probe used `ContainerInline.ToString()` as text and failed its continuation assertion; the check now uses the existing `MarkdownService.InlineText` utility. Two expected Markdown restart fixtures needed blank lines before nested ordered lists starting above one. These fixture corrections did not relax item or counter assertions.
+
+The counter rules follow the documented [start override](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.startoverridenumberingvalue?view=openxml-3.0.1) and [level restart](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.levelrestart?view=openxml-3.0.1) semantics. Scope is direct numbering within Word's nine levels, not a complete Word round trip. Style-inherited numbering, linked styles and broader template fidelity remain unverified. The fixture still loses hyperlink destinations and code/quote block styling during import; readable text and this batch's list boundaries are retained. These local changes are later than the 6e572f6 CI build and require their own hosted run.
 
 ## Runtime and diagnostic work
 

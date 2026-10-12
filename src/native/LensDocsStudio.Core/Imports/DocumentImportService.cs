@@ -53,6 +53,7 @@ public sealed partial class DocumentImportService
         long retainedImageBytes = 0;
         string Paragraph(W.Paragraph paragraph)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var text = new StringBuilder();
             foreach (var run in paragraph.Descendants<W.Run>())
             {
@@ -99,30 +100,25 @@ public sealed partial class DocumentImportService
             var styleId = paragraph.ParagraphProperties?.ParagraphStyleId?.Val?.Value;
             var styleName = main.StyleDefinitionsPart?.Styles?.Elements<W.Style>().FirstOrDefault(s => s.StyleId?.Value == styleId)?.StyleName?.Val?.Value ?? styleId ?? "";
             var heading = HeadingStyle().Match(styleName);
-            var prefix = styleName.Equals("Title", StringComparison.OrdinalIgnoreCase) ? "# " : heading.Success ? new string('#', Math.Min(6, int.Parse(heading.Groups[1].Value) + 1)) + " " : "";
-            var number = paragraph.ParagraphProperties?.NumberingProperties;
-            if (number is not null)
-            {
-                var definitionId = main.NumberingDefinitionsPart?.Numbering?.Elements<W.NumberingInstance>().FirstOrDefault(n => n.NumberID?.Value == number.NumberingId?.Val?.Value)?.AbstractNumId?.Val?.Value;
-                var format = main.NumberingDefinitionsPart?.Numbering?.Elements<W.AbstractNum>().FirstOrDefault(n => n.AbstractNumberId?.Value == definitionId)?.Elements<W.Level>().FirstOrDefault()?.NumberingFormat?.Val;
-                prefix = format?.Value == W.NumberFormatValues.Bullet ? "- " : "1. ";
-            }
+            var prefix = styleName.Equals("Title", StringComparison.OrdinalIgnoreCase) ? "# " : heading.Success ? new string('#', int.Parse(heading.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture)) + " " : "";
             return prefix + text;
         }
-        var output = new StringBuilder();
+        var output = new WordListMarkdownWriter(main.NumberingDefinitionsPart?.Numbering, warnings);
         foreach (var element in main.Document?.Body?.ChildElements ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (element is W.Paragraph paragraph) output.AppendLine(Paragraph(paragraph)).AppendLine();
+            if (element is W.Paragraph paragraph) output.Paragraph(paragraph, Paragraph(paragraph));
             else if (element is W.Table table)
             {
                 var rows = table.Elements<W.TableRow>().Select(r => r.Elements<W.TableCell>().Select(c =>
-                    string.Join("<br>", c.Elements<W.Paragraph>().Select(Paragraph)).Replace("|", "\\|")).ToArray()).ToArray();
+                    output.Cell(c.Elements<W.Paragraph>(), Paragraph).Replace("|", "\\|")).ToArray()).ToArray();
                 if (rows.Length == 0) continue;
-                output.AppendLine("| " + string.Join(" | ", rows[0]) + " |");
-                output.AppendLine("| " + string.Join(" | ", rows[0].Select(_ => "---")) + " |");
-                foreach (var row in rows.Skip(1)) output.AppendLine("| " + string.Join(" | ", row) + " |");
-                output.AppendLine();
+                var text = new StringBuilder();
+                text.AppendLine("| " + string.Join(" | ", rows[0]) + " |");
+                text.AppendLine("| " + string.Join(" | ", rows[0].Select(_ => "---")) + " |");
+                foreach (var row in rows.Skip(1)) text.AppendLine("| " + string.Join(" | ", row) + " |");
+                var indent = table.GetFirstChild<W.TableProperties>()?.TableIndentation;
+                output.Block(text.ToString().TrimEnd('\r', '\n'), indent?.Type?.Value == W.TableWidthUnitValues.Dxa ? indent.Width?.Value : null);
             }
         }
         return new(output.ToString(), assets, warnings);

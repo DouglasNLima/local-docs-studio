@@ -48,4 +48,16 @@ public sealed class DocumentImportTests
         Assert.Contains("**Important**", result.Markdown);
         Assert.Contains("| Export | Ready |", result.Markdown);
     }
+
+    [Fact]
+    public void Word_reimport_retains_each_heading_level_including_list_headings()
+    {
+        var source = string.Join("\n\n", Enumerable.Range(1, 6).Select(level => new string('#', level) + " Heading" + level))
+            + "\n\n- ### NestedHeading\n\n  Continuation";
+        var bytes = new DocxExporter().Export(new(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()));
+        var result = new DocumentImportService().ImportDocx(bytes);
+        var parsed = new MarkdownService().Parse(result.Markdown);
+        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 3 }, parsed.Headings.Select(h => h.Level));
+        Assert.Equal(new[] { "Heading1", "Heading2", "Heading3", "Heading4", "Heading5", "Heading6", "NestedHeading" }, parsed.Headings.Select(h => h.Title));
+    }
 }

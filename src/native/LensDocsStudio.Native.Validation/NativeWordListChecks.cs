@@ -2,12 +2,14 @@ using System.Text.Json;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Validation;
 using LensDocsStudio.Core.Exports;
+using LensDocsStudio.Core.Imports;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Exports;
 using LensDocsStudio.Native.Rendering;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -54,6 +56,35 @@ internal static class NativeWordListChecks
             Paragraphs = paragraphs.Select(p => new { Text = p.InnerText, NumberingId = p.ParagraphProperties?.NumberingProperties?.NumberingId?.Val?.Value,
                 Level = p.ParagraphProperties?.NumberingProperties?.NumberingLevelReference?.Val?.Value, LeftIndent = p.ParagraphProperties?.Indentation?.Left?.Value }),
             Limitation = "Package semantics and native preparation are checked; actual Microsoft Word pagination, wide-marker layout and screen-reader behaviour remain unverified."
+        }, new JsonSerializerOptions { WriteIndented = true }));
+
+        var imported = new DocumentImportService().ImportDocx(bytes);
+        var importedDocument = new MarkdownService().Parse(imported.Markdown);
+        var importedLists = importedDocument.Syntax.Descendants<ListBlock>().ToArray();
+        var importedVisuals = new DocumentImportService().ImportDocx(visualBytes);
+        var importedVisualSyntax = new MarkdownService().Parse(importedVisuals.Markdown).Syntax;
+        File.WriteAllText(Path.Combine(output, "native-word-lists-reimported.md"), imported.Markdown);
+        File.WriteAllText(Path.Combine(output, "native-word-list-visuals-reimported.md"), importedVisuals.Markdown);
+        var expectedImages = visuals.Diagrams.Values.Concat(visuals.Formulae.Values).Select(i => i.PngBytes).ToArray();
+        if (importedLists.Length != 6 || importedLists.Sum(l => l.Count) != 12
+            || !content.Document.Headings.Select(h => h.Level).SequenceEqual(importedDocument.Headings.Select(h => h.Level))
+            || !importedLists.Where(l => l.IsOrdered).Select(l => l.OrderedStart).SequenceEqual(new[] { "7", "3", "0", "999999998" })
+            || imported.Warnings.Count != 0 || importedVisuals.Warnings.Count != 0
+            || importedVisualSyntax.Descendants<ListItemBlock>().Count() != 2 || importedVisuals.Assets.Count != 2
+            || expectedImages.Any(expected => !importedVisuals.Assets.Any(asset => expected.SequenceEqual(asset.Bytes))))
+            throw new IOException("Word reimport changed list hierarchy, starting numbers, item boundaries or native image bytes.");
+        foreach (var token in new[] { "ContinuationTop", "NestedContinuation", "DeepContinuation", "ContinuationAfterNested", "HeadingContinuation", "CodeContinuation" })
+        {
+            var continuation = importedLists.SelectMany(l => l.OfType<ListItemBlock>()).SelectMany(i => i.OfType<ParagraphBlock>())
+                .SingleOrDefault(p => MarkdownService.InlineText(p.Inline).StartsWith(token, StringComparison.Ordinal));
+            if (continuation?.Parent is not ListItemBlock parent || parent[0] == continuation)
+                throw new IOException("The reimported Word continuation '" + token + "' did not retain its parent item.");
+        }
+        File.WriteAllText(Path.Combine(output, "native-word-list-import.json"), JsonSerializer.Serialize(new
+        {
+            Passed = true, Lists = importedLists.Length, Items = importedLists.Sum(l => l.Count), Continuations = 6,
+            OrderedStarts = importedLists.Where(l => l.IsOrdered).Select(l => l.OrderedStart), ExactNativeImages = importedVisuals.Assets.Count,
+            Limitation = "Direct Word numbering and matching continuation indents are checked. Style-inherited numbering, field/composite markers and full Word layout or formatting round trips remain unverified."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
 
