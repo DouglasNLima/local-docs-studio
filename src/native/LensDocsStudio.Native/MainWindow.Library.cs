@@ -4,6 +4,7 @@ using LensDocsStudio.Core.Editing;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Library;
+using LensDocsStudio.Native.ViewModels;
 
 namespace LensDocsStudio.Native;
 
@@ -24,16 +25,31 @@ public partial class MainWindow
             if (window.ShowDialog() != true || window.SelectedEntry is not { } selected) return;
             if (selected.Profile is { } profile) { ApplyProfile(profile); return; }
             if (selected.Item is not { } item) return;
-            if (selected.Kind == LocalLibraryKind.Template) { await model.OpenLibraryTemplateAsync(item, model.OperationToken); return; }
-            if (tab is null || model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly)
-            { model.Status = "Open an editable document and choose the snippet again. Its insertion position was not available."; return; }
-            model.EnsureDraftWorkspace(tab);
-            var prepared = await new LibraryContentService().MaterialiseAsync(item.Content, tab.EffectivePath!, tab.EffectiveWorkspace!, model.OperationToken);
-            if (model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly)
-            { model.Status = "The document changed; the snippet was not applied. Choose it again."; return; }
-            EditorFormattingService.Apply(Editor, MarkdownEditService.PlanBlock(source!, start, length, prepared, prepared.Trim('\r', '\n')));
-            await model.PersistSessionAsync(); model.Status = "Inserted snippet: " + item.Label;
+            await ApplyLibraryContentAsync(selected.Kind, item, tab, source, start, length);
         });
+    }
+    private async void BrowseContentCatalogue(object sender, RoutedEventArgs e)
+    {
+        var tab = model.ActiveDocument; var source = tab?.EditorDocument.Text; var start = Editor.SelectionStart; var length = Editor.SelectionLength;
+        var snippets = sender is FrameworkElement { Tag: "snippet" };
+        await model.RunAsync(async () =>
+        {
+            var window = new ContentCatalogueWindow(snippets) { Owner = this };
+            if (window.ShowDialog() == true && window.SelectedItem is { } item)
+                await ApplyLibraryContentAsync(window.SelectedKind, item, tab, source, start, length);
+        });
+    }
+    private async Task ApplyLibraryContentAsync(LocalLibraryKind kind, LocalLibraryItem item, DocumentViewModel? tab, string? source, int start, int length)
+    {
+        if (kind == LocalLibraryKind.Template) { await model.OpenLibraryTemplateAsync(item, model.OperationToken); return; }
+        if (tab is null || model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly)
+        { model.Status = "Open an editable document and choose the snippet again. Its insertion position was not available."; return; }
+        model.EnsureDraftWorkspace(tab);
+        var prepared = await new LibraryContentService().MaterialiseAsync(item.Content, tab.EffectivePath!, tab.EffectiveWorkspace!, model.OperationToken);
+        if (model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly)
+        { model.Status = "The document changed; the snippet was not applied. Choose it again."; return; }
+        EditorFormattingService.Apply(Editor, MarkdownEditService.PlanBlock(source!, start, length, prepared, prepared.Trim('\r', '\n')));
+        await model.PersistSessionAsync(); model.Status = "Inserted snippet: " + item.Label;
     }
     private async void SaveLibraryContent(object sender, RoutedEventArgs e)
     {

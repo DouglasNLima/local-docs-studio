@@ -23,6 +23,7 @@
   <Menu DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Padding="8,3" AutomationProperties.Name="Application menu">
    <MenuItem Header="_File" AutomationProperties.AutomationId="FileMenu">
     <MenuItem Header="_New document" InputGestureText="Ctrl+N" Command="{Binding NewDocumentCommand}"/>
+    <MenuItem Header="Create from template…" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseContentCatalogue"/>
     <MenuItem Header="Create workspace file…" Command="{Binding CreateFileCommand}" AutomationProperties.AutomationId="CreateWorkspaceFile"/>
     <MenuItem Header="Create workspace folder…" Command="{Binding CreateFolderCommand}"/>
     <MenuItem Header="_Open document…" InputGestureText="Ctrl+O" Command="{Binding OpenDocumentCommand}"/>
@@ -90,6 +91,7 @@
     <MenuItem Header="Copy _Markdown with images" Click="CopyMarkdownWithImages" AutomationProperties.AutomationId="CopyMarkdownWithImages"/>
    </MenuItem>
    <MenuItem Header="_Insert" AutomationProperties.AutomationId="InsertMenu">
+    <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
     <MenuItem Header="Workspace document link…" InputGestureText="Ctrl+Shift+K" Click="InsertDocumentLink" AutomationProperties.AutomationId="DocumentLinkMenu"/>

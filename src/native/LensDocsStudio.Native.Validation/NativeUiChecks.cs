@@ -1029,6 +1029,63 @@ internal static class NativeUiChecks
             }
             if (editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage || File.ReadAllText(source) != templateSavedSource)
                 throw new IOException("The library fixture did not restore the original editor and saved source before shutdown.");
+            Window OpenCatalogue(bool snippets = false)
+            {
+                Find(window, snippets ? "InsertMenu" : "FileMenu").Click();
+                Find(window, snippets ? "BrowseSnippetCatalogue" : "BrowseContentCatalogue").Patterns.Invoke.Pattern.Invoke();
+                Window? catalogue = null;
+                Wait(() => (catalogue = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId)
+                    .And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Window)).And(cf.ByName("Templates and snippets")))?.AsWindow()) is not null,
+                    "The native content catalogue did not open.");
+                return catalogue!;
+            }
+            var catalogueWindow = OpenCatalogue();
+            Find(catalogueWindow, "CatalogueFilter").AsTextBox().Text = "Customer Release Notes";
+            Find(catalogueWindow, "CatalogueField-version").AsTextBox().Text = "v9.7.0";
+            Find(catalogueWindow, "CatalogueField-date").AsTextBox().Text = "2026-10-12";
+            var releaseEntry = LensDocsStudio.Core.Content.BuiltInContentCatalogue.Entries.Single(entry => entry.Id == "release/customer");
+            var generatedRelease = LensDocsStudio.Core.Content.BuiltInContentCatalogue.Generate(releaseEntry,
+                new Dictionary<string, string> { ["version"] = "v9.7.0", ["date"] = "2026-10-12" });
+            Wait(() => Find(catalogueWindow, "CataloguePreview").AsTextBox().Text == generatedRelease.Content,
+                "The native generator did not update its source preview from edited fields.");
+            catalogueWindow.CaptureToFile(Path.Combine(output, "native-content-catalogue.png"));
+            Find(catalogueWindow, "UseCatalogueEntry").AsButton().Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == generatedRelease.Content, "The built-in generator did not create its exact editable source.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            var generatedReleasePath = Path.Combine(runRoot, "Generated release.md"); SaveThroughDialogue(generatedReleasePath);
+            Wait(() => File.Exists(generatedReleasePath) && File.ReadAllText(generatedReleasePath) == generatedRelease.Content,
+                "The generated document did not save its editable source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Generator creation changed the previous document.");
+            editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            catalogueWindow = OpenCatalogue(true);
+            Find(catalogueWindow, "CatalogueCategory").AsComboBox().Select("Requirements"); Find(catalogueWindow, "CatalogueCategory").AsComboBox().Collapse();
+            Find(catalogueWindow, "CatalogueFilter").AsTextBox().Text = "Risks";
+            Find(catalogueWindow, "UseCatalogueEntry").AsButton().Invoke();
+            Wait(() => Find(window, "Status").Name == "Inserted snippet: Risks", "The built-in requirements snippet did not insert.");
+            var withBuiltInSnippet = editor.Patterns.Value.Pattern.Value.Value;
+            if (!withBuiltInSnippet.Contains("| Risk | Likelihood | Impact | Mitigation |", StringComparison.Ordinal)) throw new IOException("The built-in snippet lost its editable table.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Built-in snippet Undo lost the original document.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == withBuiltInSnippet, "Built-in snippet Redo lost its complete source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "The built-in snippet fixture did not restore original source.");
+            catalogueWindow = OpenCatalogue();
+            Find(catalogueWindow, "CatalogueCategory").AsComboBox().Select("Mermaid"); Find(catalogueWindow, "CatalogueCategory").AsComboBox().Collapse();
+            Find(catalogueWindow, "CatalogueFilter").AsTextBox().Text = "Sequence";
+            var generatedSequence = LensDocsStudio.Core.Content.BuiltInContentCatalogue.Generate(
+                LensDocsStudio.Core.Content.BuiltInContentCatalogue.Entries.Single(entry => entry.Id == "mermaid/sequence"));
+            Find(catalogueWindow, "UseCatalogueEntry").AsButton().Invoke();
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == generatedSequence.Content, "The Mermaid template did not create standalone diagram source.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+            var generatedDiagramPath = Path.Combine(runRoot, "Generated sequence.mmd"); SaveThroughDialogue(generatedDiagramPath);
+            Wait(() => File.Exists(generatedDiagramPath) && File.ReadAllText(generatedDiagramPath) == generatedSequence.Content,
+                "The generated Mermaid document did not save its standalone diagram type.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Mermaid template creation changed the original document.");
+            if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The built-in catalogue changed the original saved source.");
+            checks.Add("Native catalogue filters templates/snippets, generates and saves field-edited Markdown and standalone Mermaid in new tabs, and inserts snippets with complete Undo/Redo while retaining original source");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);

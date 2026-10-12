@@ -76,6 +76,12 @@ internal static class Program
             try { NativeLibraryContentChecks.Run(contentOutput); NativeContentLibraryChecks.Run(contentOutput); Console.WriteLine("Native library content integration passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--catalogue")
+        {
+            var catalogueOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(catalogueOutput);
+            try { NativeContentCatalogueChecks.Run(catalogueOutput); Console.WriteLine("Native content catalogue integration passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--workspace")
         {
             var workspaceOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(workspaceOutput);
@@ -158,6 +164,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native library content: " + ex.Message); }
         try { NativeContentLibraryChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native content library: " + ex.Message); }
+        try { NativeContentCatalogueChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native content catalogue: " + ex.Message); }
         var count = 0;
         foreach (var path in Directory.EnumerateFiles(Path.Combine(repository, "tests", "fixtures"), "*", SearchOption.AllDirectories)
             .Where(p => Path.GetExtension(p) is ".md" or ".mmd" or ".mermaid").Order())

@@ -2,6 +2,7 @@
 
 | Improvement | Impact / risk | Decision / evidence |
 |---|---|---|
+| Native document and diagram generators | High / low | One searchable chooser provides 32 templates/examples and 25 snippets, editable labelled fields and source preview. Templates open new tabs; snippets retain one-step Undo/Redo. Seventeen core cases and three native outcomes pass, including normal/minimum light/dark layouts and 56 diagram render cases. The 41st desktop workflow awaits CI |
 | Real folders, native pickers, tabs | High / low | Implement; preserve source files |
 | Reusable Word formatting library | High / medium | Native import/name/rename/copy/use controls, persistent private copies and reversible archive/restore. Sixteen core tests and three native layout/accessibility outcomes pass. Both native runs at 6f8b058 pass all 39 built/installed/reinstalled workflows, including exported bytes and library restart persistence |
 | Explicit library migration without replacing existing data | High / medium | Native category/search/source previews, JSON merge/export and reversible archive/restore preserve existing records. Templates open new tabs, snippets include needed definitions and form one Undo, and profile selection affects only the session. Core/native tests cover portable images, current source, new-tab/session preservation, default options and actual converted bundle contents. The 40th desktop workflow awaits CI; built-in catalogues remain |
