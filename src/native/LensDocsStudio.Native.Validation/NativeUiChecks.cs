@@ -1490,11 +1490,15 @@ internal static partial class NativeUiChecks
     private static void Wait(Func<bool> condition, string failure)
     {
         var timer = Stopwatch.StartNew();
+        Exception? lastObservationError = null;
         while (timer.Elapsed < TimeSpan.FromSeconds(20))
         {
-            try { if (condition()) return; } catch (Exception ex) when (ex is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException) { }
+            // Retry a transient UIA observation within the original deadline, never the user action.
+            try { if (condition()) return; }
+            catch (Exception ex) when (ex is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException
+                || ex is COMException && ex.HResult == unchecked((int)0x80131505)) { lastObservationError = ex; }
             Thread.Sleep(100);
         }
-        throw new InvalidOperationException(failure);
+        throw new InvalidOperationException(failure, lastObservationError);
     }
 }
