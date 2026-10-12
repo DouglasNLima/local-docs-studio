@@ -1,5 +1,7 @@
 # Native diagram compatibility
 
+Hyperlinked images now retain both their supported external destination and original image bytes through Word import. The focused core test uses an actual embedded PNG package; the full local native corpus still passes in `artifacts/native/word-links-final-validation`. This does not claim that Word images recover their original Mermaid/LaTeX source.
+
 The Word reimport probe now confirms exact native Mermaid/formula image bytes after DOCX export and import, retaining two list items and their continuations. The full local harness passes in `artifacts/native/word-import-heading-validation`, alongside 868 core tests. This does not recover Mermaid/LaTeX source from the rendered images or certify complete Word formatting.
 
 Invalid, oversized or unsupported diagrams, including native SVG conversion failures, retain a readable explanation with Copy source and Edit source. Editing reveals the original fence (or offset zero for standalone Mermaid); a changed document invalidates the old preview's navigation action. Fourteen local and CI native recovery cases pass across both themes, including DevOps containers and successful-render controls. Actual clipboard, editing, selection collapse and Undo pass in all four desktop contexts of both df281c0 native runs.

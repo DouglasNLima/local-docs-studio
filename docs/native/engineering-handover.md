@@ -18,6 +18,8 @@ Native advantages include filesystem monitoring, Windows pickers/shell actions, 
 
 ## Parity and compatibility
 
+The later Word hyperlink import correction passes 883 core tests (15 new link cases), the complete native harness, static checks and a zero-warning/error Release build. It retains supported external links, formatted labels, linked image bytes and paired internal bookmarks; missing/unsupported targets and inert fields have explicit warnings. Native output is in `artifacts/native/word-links-final-validation`; core results are in `word-links-after/word-links-final.trx`, with eight original failures retained in `word-links-before`. This change is later than 4cbce1d and requires its own CI. File/relative targets, field-based hyperlinks and full Word formatting remain incomplete.
+
 The subsequent Word reimport correction passes 868 core tests (18 new cases), a zero-warning/error Release build, static checks and the full 40-case native harness with zero failures. Evidence is in `artifacts/native/word-import-heading-validation` and `word-import-after/word-import-heading-final.trx`. It preserves direct list starts/levels/restarts/continuations, separate numbering instances, empty/first-block items and exact heading levels. Six actual fixture lists retain 12 items and six continuations; native diagram/formula image bytes are unchanged after import. Its hosted validation is separate from 6e572f6. Style-inherited numbering, hyperlink destinations and code/quote styling remain limited; do not claim complete Word round-trip fidelity.
 
 The Word export list correction passes 850 core tests and the complete native harness in both 6e572f6 hosted runs. It fixes repeated continuation numbering, missing first-block markers and omitted empty items while preserving editable native numbering, styles and original image bytes. It bounds images/tables and respects direct template cell margins; code preflight includes list formatting. Eleven core regressions and actual native Mermaid/formula DOCX preparation pass. `artifacts/native/word-list-width-validation` retains the original local files and report; both downloaded 6e572f6 evidence sets contain their own generated DOCX files. Actual Word layout/accessibility remains unverified.
@@ -41,9 +43,9 @@ Signing is pluggable through an existing certificate or service adapter, with in
 | Evidence | Result and scope |
 |---|---|
 | Current local Release | Zero warnings/errors |
-| Current core tests | 868 passed; `artifacts/native/word-import-after/word-import-heading-final.trx` |
+| Current core tests | 883 passed; `artifacts/native/word-links-after/word-links-final.trx` |
 | Failed-diagram recovery | 14 light/dark native cases; exact copy/source mapping, accessible controls and valid-render control; `artifacts/native/diagram-failures` |
-| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-import-heading-validation` |
+| Full local native harness | 40 diagram/export cases, zero failures; `artifacts/native/word-links-final-validation` |
 | Current static checks | Passed; web source unchanged |
 | Native CI at 6e572f6 | PR 38312511577 and push 38312508340 pass on attempt 1; both downloaded reports verify 850 core tests, PDF/Word list regressions and 62 desktop workflows in all four contexts |
 | Web CI at 6e572f6 | Push 38312508397 and PR 38312511565 pass all 262 cases on their first attempts |

@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Imported Word links now retain supported web/email destinations and referenced internal bookmarks rather than becoming plain labels. Formatting and linked image bytes are covered by 15 new regressions, with all 883 core tests and the complete native harness passing locally. Unsupported targets and inert field results have explicit warnings; no document-provided link is fetched during import.
+
 Word import now keeps direct list starts, hierarchy and continuation paragraphs, and corrects heading-level demotion. The 868-test core suite and complete native harness pass; six prepared lists and both native image payloads survive reimport. Unsupported markers and flattened table-cell lists have explicit warnings. Full destination formatting and the subsequent change's hosted validation remain incomplete; evidence is in the [validation report](validation-report.md).
 
 The native edition improves local document workflows through Windows controls, filesystem ownership and portable files. The outcomes below are implemented with the stated limits; they do not establish production certification. The [parity matrix](functional-parity-matrix.md) and [validation report](validation-report.md) carry the contracts and evidence.
