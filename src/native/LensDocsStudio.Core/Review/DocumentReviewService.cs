@@ -103,6 +103,7 @@ public sealed partial class DocumentReviewService
                 cancellationToken.ThrowIfCancellationRequested();
                 switch (inline)
                 {
+                    case WikiLinkInline wiki: links++; text.Append(wiki.Label); break;
                     case LinkInline link:
                         if (link.IsImage)
                         {

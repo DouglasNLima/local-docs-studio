@@ -20,6 +20,7 @@ public sealed partial class MarkdownService
     {
         var builder = new MarkdownPipelineBuilder().UseAdvancedExtensions().UsePreciseSourceLocation();
         builder.InlineParsers.Insert(0, new DocumentMathInlineParser());
+        builder.InlineParsers.Insert(0, new WikiLinkInlineParser());
         builder.BlockParsers.Insert(0, new DetailsBlockParser()); return builder.Build();
     }
 
@@ -34,7 +35,7 @@ public sealed partial class MarkdownService
             standalone.Span = new(0, Math.Max(0, source.Length - 1));
             standalone.Line = 0;
         }
-        if (!standaloneMermaid) { SafeInlineSemantics.Apply(syntax, source); SafeBlockSemantics.Apply(syntax, source); }
+        if (!standaloneMermaid) { WikiLinks.FlattenNestedLinks(syntax); SafeInlineSemantics.Apply(syntax, source); SafeBlockSemantics.Apply(syntax, source); }
         var targets = DocumentAnchors.Collect(syntax);
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();

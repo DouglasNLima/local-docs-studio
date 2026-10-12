@@ -30,7 +30,7 @@ public sealed class DocsSiteExporter
     public DocsSitePage PreparePage(string path, ExportContent content, ArtifactBundle? artifactBundle = null)
     {
         path = ValidatePath(path);
-        var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content));
+        var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content, preserveWikiLinks: true));
         var headingElements = html.Body!.QuerySelectorAll("h1,h2,h3,h4,h5,h6");
         var usedIds = new HashSet<string>(html.Body.QuerySelectorAll("[id]").Except(headingElements).Select(e => e.Id!), StringComparer.Ordinal);
         var headings = headingElements.Select(h =>
@@ -68,6 +68,7 @@ public sealed class DocsSiteExporter
             if (bodyBytes > MaximumOutputBytes / 3) throw new IOException("Rendered Docs Site content exceeds its size budget.");
         }
         var warnings = new List<string>();
+        var wikiIndex = new WikiLinkIndex(sourcePages.Select(page => page.Path));
         var pages = sourcePages.OrderBy(p => p.Metadata.Order ?? double.PositiveInfinity)
             .ThenBy(p => p.Metadata.NavigationGroup, StringComparer.OrdinalIgnoreCase).ThenBy(p => p.Title, StringComparer.OrdinalIgnoreCase)
             .ThenBy(p => p.Path, StringComparer.OrdinalIgnoreCase).Select(RewriteLinks).ToList();
@@ -129,6 +130,18 @@ public sealed class DocsSiteExporter
                     warnings.Add("Unresolved link in " + page.Path + ": " + href); continue;
                 }
                 anchor.SetAttribute("href", "#" + target.Id + (parts.Length == 2 ? "/" + Uri.EscapeDataString(Uri.UnescapeDataString(parts[1])) : ""));
+            }
+            foreach (var anchor in document.Body.QuerySelectorAll("a[data-wikilink-target]"))
+            {
+                var resolved = wikiIndex.Resolve(anchor.GetAttribute("data-wikilink-target")!, page.Path);
+                anchor.RemoveAttribute("data-wikilink-target");
+                if (resolved.Path is { } path && byPath.TryGetValue(path, out var linked))
+                    anchor.SetAttribute("href", "#" + linked.Id + (resolved.Fragment.Length > 0 ? "/" + Uri.EscapeDataString(resolved.Fragment) : ""));
+                else
+                {
+                    anchor.RemoveAttribute("href"); anchor.SetAttribute("title", resolved.Error ?? "The linked document is not included in this site.");
+                    warnings.Add("Unresolved wikilink in " + page.Path + ": " + anchor.TextContent);
+                }
             }
             return page with { Html = document.Body.InnerHtml };
         }

@@ -18,6 +18,12 @@ The editor keeps ordinary UTF-8 Markdown. **Ctrl+Z** and **Ctrl+Y** undo and red
 
 **Ctrl+Shift+K** opens the workspace document and heading picker. Inserted links remain portable Markdown. **Ctrl+Space** offers Mermaid suggestions inside diagram source.
 
+Wiki-style links use `[[document]]` or `[[folder/document#section|Label]]`. Type after `[[` or press **Ctrl+Space** there to choose a full workspace path. Completion is one undoable edit. Explicit root-relative paths take priority, then paths relative to the current document, then a unique filename. If a short name matches several documents, include its folder and extension.
+
+Wiki links open existing workspace documents and supported sections. Missing or ambiguous targets leave the current text unchanged and explain the problem. Document review checks wiki targets against current drafts; reviewed file moves update targets while retaining labels. Docs Site resolves links among exported documents; standalone document exports keep readable labels.
+
+Save as retains known wiki targets inside the destination workspace. When linked documents remain in another workspace, review the existing uncopied-link confirmation before saving the copy.
+
 **View → Document review** checks the current text, including unsaved edits, for document structure and local link/image issues. Selecting a supported result moves to its source.
 
 ## Saving, recovery and external changes

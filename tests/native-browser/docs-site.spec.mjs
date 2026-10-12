@@ -49,6 +49,9 @@ for (const mode of ['disk', 'static hosting']) {
     await expect(page.locator('#content img')).toHaveCount(2);
     await expect(page.locator('#content figure').filter({ has: page.getByRole('img', { name: 'Native pixels', exact: true }) }).locator('figcaption')).toHaveText('Figure caption & source evidence');
     await expect.poll(() => page.locator('#content img').evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0))).toBe(true);
+    await page.locator('#content').getByRole('link', { name: 'Wiki evidence', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Evidence', exact: true })).toBeFocused();
+    await page.locator('#content').getByRole('link', { name: 'Home', exact: true }).click();
     await page.locator('#content').getByRole('link', { name: 'Start here' }).click();
     await expect(page.locator('#content h1')).toHaveText('Getting started');
     await expect(page.getByRole('heading', { name: 'Evidence', exact: true })).toBeFocused();

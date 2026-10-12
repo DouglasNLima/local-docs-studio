@@ -1,6 +1,7 @@
 using System.Text.Json;
 using LensDocsStudio.Core.Documents;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Editing;
 
 namespace LensDocsStudio.Core.Workspace;
 
@@ -26,6 +27,7 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
         if (!Directory.Exists(Path.GetDirectoryName(destination))) throw new IOException("Create the destination folder before moving the document.");
         var source = await documents.ReadAsync(sourcePath, cancellationToken);
         var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken);
+        var wikiIndex = new WikiLinkIndex(Flatten(listing.Entries).Select(entry => Path.GetRelativePath(workspace.Root, entry.Path).Replace('\\', '/')));
         var warnings = listing.Warnings.ToList();
         var changes = new List<DocumentLinkChange>();
         var updatedSource = source.Text;
@@ -53,6 +55,23 @@ public sealed class WorkspaceMoveService(DocumentStore documents, string recover
                     replacements.Add((link, MarkdownLinks.RelativeReference(movingSource ? destination : path, pointsToMoved ? destination : target) + fragment));
                 }
                 catch (IOException) { warnings.Add("An out-of-workspace or unsupported link was left unchanged in " + Path.GetRelativePath(workspace.Root, path)); }
+            }
+            var wikiLinks = Path.GetExtension(path).ToLowerInvariant() is ".mmd" or ".mermaid" ? []
+                : await Task.Run(() => WikiLinks.Read(snapshot.Text), cancellationToken);
+            foreach (var wiki in wikiLinks)
+            {
+                var resolved = wikiIndex.Resolve(wiki.Target, Path.GetRelativePath(workspace.Root, path).Replace('\\', '/'));
+                if (resolved.Path is null)
+                {
+                    warnings.Add("An unresolved or ambiguous wikilink was left unchanged in " + Path.GetRelativePath(workspace.Root, path));
+                    continue;
+                }
+                var target = workspace.Resolve(resolved.Path);
+                var pointsToMoved = target.Equals(sourcePath, StringComparison.OrdinalIgnoreCase);
+                if (!movingSource && !pointsToMoved) continue;
+                var nextPath = Path.GetRelativePath(workspace.Root, pointsToMoved ? destination : target).Replace('\\', '/');
+                var reference = WikiLinkCompletionService.EscapeTarget(nextPath) + (resolved.Fragment.Length > 0 ? "#" + Uri.EscapeDataString(resolved.Fragment) : "");
+                replacements.Add((new(wiki.Target, false, wiki.TargetSpan.Start, wiki.TargetSpan.Length), reference));
             }
             var updated = MarkdownLinks.Rewrite(snapshot.Text, replacements);
             if (movingSource) updatedSource = updated;

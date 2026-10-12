@@ -52,7 +52,7 @@ public partial class MainWindow : Window
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
         InitialiseArtifactContext();
-        completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid");
+        completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
         WindowStateService.FitInitialWindow(this);
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
@@ -158,7 +158,8 @@ public partial class MainWindow : Window
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
-                selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae);
+                selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
+                target => NavigateWikiLink(tab.Id, prepared.source.Source, target));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed;
             Preview.Document = rendered.Document;

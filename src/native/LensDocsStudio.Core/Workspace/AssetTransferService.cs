@@ -1,5 +1,6 @@
 using LensDocsStudio.Core.Documents;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Editing;
 
 namespace LensDocsStudio.Core.Workspace;
 
@@ -7,7 +8,8 @@ namespace LensDocsStudio.Core.Workspace;
 public sealed class AssetTransferService
 {
     public async Task<PreparedAssetTransfer> PrepareAsync(string text, string sourcePath, WorkspacePath sourceWorkspace,
-        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default, bool forceCopyImages = false, bool preserveDocumentLinks = false)
+        string targetPath, WorkspacePath targetWorkspace, CancellationToken cancellationToken = default, bool forceCopyImages = false, bool preserveDocumentLinks = false,
+        string? excludedDirectory = null)
     {
         sourceWorkspace.Resolve(Path.GetRelativePath(sourceWorkspace.Root, sourcePath));
         targetWorkspace.Resolve(Path.GetRelativePath(targetWorkspace.Root, targetPath));
@@ -47,6 +49,33 @@ public sealed class AssetTransferService
                 }
                 var fragment = link.Reference.Contains('#') ? "#" + link.Reference.Split('#', 2)[1] : "";
                 changes.Add((link, MarkdownLinks.RelativeReference(targetPath, destination) + fragment));
+            }
+            if (!preserveDocumentLinks && Path.GetExtension(sourcePath).ToLowerInvariant() is not (".mmd" or ".mermaid"))
+            {
+                var wikiLinks = WikiLinks.Read(text);
+                if (wikiLinks.Count > 0)
+                {
+                    var listing = await new WorkspaceService().EnumerateAsync(sourceWorkspace, cancellationToken, excludedDirectory: excludedDirectory);
+                    IEnumerable<string> Paths(IEnumerable<WorkspaceEntry> entries)
+                    {
+                        foreach (var entry in entries)
+                            if (entry.IsDirectory) { foreach (var path in Paths(entry.Children)) yield return path; }
+                            else if (WorkspaceService.IsDocument(entry.Path)) yield return Path.GetRelativePath(sourceWorkspace.Root, entry.Path).Replace('\\', '/');
+                    }
+                    var index = new WikiLinkIndex(Paths(listing.Entries));
+                    foreach (var wiki in wikiLinks)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (wiki.Target.StartsWith('#')) continue;
+                        var result = index.Resolve(wiki.Target, Path.GetRelativePath(sourceWorkspace.Root, sourcePath).Replace('\\', '/'));
+                        if (result.Path is null) continue;
+                        var original = sourceWorkspace.Resolve(result.Path);
+                        if (!WorkspacePath.Contains(targetWorkspace.Root, original)) { transfer.UncopiedDocumentLinks.Add("[[" + wiki.Target + "]]"); continue; }
+                        var reference = WikiLinkCompletionService.EscapeTarget(Path.GetRelativePath(targetWorkspace.Root, original).Replace('\\', '/'))
+                            + (result.Fragment.Length > 0 ? "#" + Uri.EscapeDataString(result.Fragment) : "");
+                        changes.Add((new(wiki.Target, false, wiki.TargetSpan.Start, wiki.TargetSpan.Length), reference));
+                    }
+                }
             }
             transfer.Text = MarkdownLinks.Rewrite(text, changes);
             return transfer;

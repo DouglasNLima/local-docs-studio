@@ -11,6 +11,29 @@ public sealed class WorkspaceReviewTests : IDisposable
     private WorkspaceDocumentReviewService Service => new(new DocumentStore(Path.Combine(root, "recovery")), Path.Combine(Workspace, "state"));
     public WorkspaceReviewTests() { Directory.CreateDirectory(Workspace); Directory.CreateDirectory(Path.Combine(root, "outside")); }
 
+    [Fact] public async Task Wiki_review_checks_drafts_fragments_missing_and_ambiguous_targets_without_writes()
+    {
+        Directory.CreateDirectory(Path.Combine(Workspace, "one")); Directory.CreateDirectory(Path.Combine(Workspace, "two"));
+        var target = Path.Combine(Workspace, "Target.md"); await File.WriteAllTextAsync(target, "# Saved target");
+        await File.WriteAllTextAsync(Path.Combine(Workspace, "one", "Summary.md"), "# One");
+        await File.WriteAllTextAsync(Path.Combine(Workspace, "two", "Summary.md"), "# Two");
+        const string source = "# Source\r\n\r\n[[Target#new-heading|Current]] [[Target#saved-target|Old]] [[Missing]] [[Summary]] [[#source]]";
+        var result = await Service.AnalyseAsync(source, SourcePath, new(Workspace), new Dictionary<string, string> { [target] = "# New heading" });
+        Assert.Equal(5, result.Metrics.Links); Assert.Equal(3, result.Issues.Count); Assert.Equal(WorkspaceLinkReviewState.Complete, result.WorkspaceLinks);
+        Assert.Contains(result.Issues, issue => source.Substring(issue.Start, issue.Length) == "[[Target#saved-target|Old]]" && issue.Message.Contains("section is missing", StringComparison.Ordinal));
+        Assert.Contains(result.Issues, issue => issue.Message.Contains("ambiguous", StringComparison.Ordinal));
+        Assert.Contains(result.Issues, issue => issue.Message.Contains("No workspace document", StringComparison.Ordinal));
+        Assert.Equal("# Saved target", await File.ReadAllTextAsync(target)); Assert.False(File.Exists(SourcePath));
+    }
+
+    [Fact] public async Task Wiki_review_excludes_private_state_and_never_reads_external_targets()
+    {
+        Directory.CreateDirectory(Path.Combine(Workspace, "state")); await File.WriteAllTextAsync(Path.Combine(Workspace, "state", "secret.md"), "# Secret");
+        var result = await Service.AnalyseAsync("# Source\n\n[[state/secret]] [[file:///private.md]]", SourcePath, new(Workspace));
+        Assert.Equal(2, result.Issues.Count); Assert.DoesNotContain(result.Issues, issue => issue.Message.Contains("# Secret", StringComparison.Ordinal));
+        Assert.False(Directory.Exists(Path.Combine(root, "recovery")));
+    }
+
     [Fact]
     public async Task Workspace_review_resolves_encoded_paths_reference_links_and_named_targets_without_writes()
     {

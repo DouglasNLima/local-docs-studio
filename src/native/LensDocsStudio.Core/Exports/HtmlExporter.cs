@@ -21,12 +21,13 @@ public sealed class HtmlExporter
             "<title>" + title + "</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1.5rem;color:#202124;background:#fafafa}img{max-width:100%;height:auto}pre{white-space:pre-wrap;padding:1rem;background:#f3f4f6}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:.5rem}blockquote{border-left:3px solid #ff883e;margin-left:0;padding-left:1rem}a{color:#174ea6}.document-progress{margin:1rem 0}.document-progress progress{width:100%;accent-color:#FF883E}.progress-green progress{accent-color:#2F855A}.progress-blue progress{accent-color:#2563EB}.progress-amber progress{accent-color:#B7791F}.progress-red progress{accent-color:#C53030}.progress-neutral progress{accent-color:#64748B}</style></head><body>" +
             fragment + "</body></html>";
     }
-    public string RenderFragment(ExportContent content, ExportTableSelection? table = null, bool flattenDetails = false)
+    public string RenderFragment(ExportContent content, ExportTableSelection? table = null, bool flattenDetails = false, bool preserveWikiLinks = false)
     {
         using var writer = new StringWriter();
         var renderer = new HtmlRenderer(writer);
         renderer.ObjectRenderers.Insert(0, new CodeRenderer(content));
         renderer.ObjectRenderers.Insert(0, new LinkRenderer(content));
+        renderer.ObjectRenderers.Insert(0, new WikiRenderer(preserveWikiLinks));
         renderer.ObjectRenderers.Insert(0, new RawBlockRenderer());
         renderer.ObjectRenderers.Insert(0, new RawInlineRenderer());
         renderer.ObjectRenderers.Insert(0, new SemanticInlineRenderer());
@@ -52,6 +53,7 @@ public sealed class HtmlExporter
                     "type" => element.LocalName == "input" && attribute.Value == "checkbox",
                     "src" => element.LocalName == "img" && attribute.Value.StartsWith("data:image/png;base64,", StringComparison.Ordinal),
                     "href" => element.LocalName == "a" && SafeLink(attribute.Value),
+                    "data-wikilink-target" => preserveWikiLinks && element.LocalName == "a",
                     "max" or "value" => element.LocalName == "progress",
                     "aria-label" => element.LocalName == "progress",
                     "open" => element.LocalName == "details",
@@ -66,6 +68,15 @@ public sealed class HtmlExporter
     }
     private static bool SafeLink(string value) => !value.Any(char.IsControl) &&
         (!Uri.TryCreate(value, UriKind.Absolute, out var uri) || uri.Scheme is "http" or "https" or "mailto");
+    private sealed class WikiRenderer(bool preserve) : HtmlObjectRenderer<WikiLinkInline>
+    {
+        protected override void Write(HtmlRenderer renderer, WikiLinkInline obj)
+        {
+            if (preserve) renderer.Write("<a data-wikilink-target=\"").Write(WebUtility.HtmlEncode(obj.Target)).Write("\">");
+            renderer.Write(WebUtility.HtmlEncode(obj.Label));
+            if (preserve) renderer.Write("</a>");
+        }
+    }
     private sealed class CodeRenderer(ExportContent content) : HtmlObjectRenderer<FencedCodeBlock>
     {
         protected override void Write(HtmlRenderer renderer, FencedCodeBlock obj)

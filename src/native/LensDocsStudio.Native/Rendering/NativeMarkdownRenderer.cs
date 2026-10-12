@@ -48,21 +48,21 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae).GetAwaiter().GetResult();
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae);
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax, Action<ExportTableSelection>? copyTable, Action<ExportTableSelection>? exportTableCsv,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae)
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink)
     {
         cancellationToken.ThrowIfCancellationRequested();
         Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
@@ -306,6 +306,13 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         catch (Exception ex) when (ex is IOException or NotSupportedException or ArgumentException or System.Runtime.InteropServices.COMException)
                         { target.Add(new Run("[Image: " + alt + "]")); warnings.Add(ex.Message); }
                         break;
+                    case WikiLinkInline wiki:
+                        if (navigateWikiLink is null) { target.Add(new Run(wiki.Label)); break; }
+                        var wikiLink = new Hyperlink(new Run(wiki.Label)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = "[[" + wiki.Target + "]]" };
+                        System.Windows.Automation.AutomationProperties.SetName(wikiLink, wiki.Label);
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(wikiLink, "WikiLink" + wiki.Span.Start);
+                        wikiLink.Click += (_, _) => navigateWikiLink(wiki.Target);
+                        target.Add(wikiLink); break;
                     case LinkInline link:
                         var hyperlink = new Hyperlink { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = link.Url };
                         System.Windows.Automation.AutomationProperties.SetName(hyperlink, MarkdownService.InlineText(link));

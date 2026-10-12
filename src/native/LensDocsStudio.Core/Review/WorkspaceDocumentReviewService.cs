@@ -55,10 +55,38 @@ public sealed class WorkspaceDocumentReviewService(DocumentStore documents, stri
         var lineStarts = DocumentReviewService.SourceLines(source, cancellationToken);
         var targets = new Dictionary<string, Target>(StringComparer.OrdinalIgnoreCase);
         long characters = 0; var targetBudgetReached = false;
-        foreach (var link in prepared.Parsed.Syntax.Descendants<LinkInline>())
+        WikiLinkIndex? wikiIndex = null; var wikiScanIncomplete = false;
+        if (prepared.Parsed.Syntax.Descendants<WikiLinkInline>().Any())
+        {
+            var listing = await new WorkspaceService().EnumerateAsync(workspace, cancellationToken, excludedDirectory: excludedDirectory);
+            IEnumerable<string> Paths(IEnumerable<WorkspaceEntry> entries)
+            {
+                foreach (var entry in entries)
+                    if (entry.IsDirectory) { foreach (var path in Paths(entry.Children)) yield return path; }
+                    else if (WorkspaceService.IsDocument(entry.Path)) yield return Path.GetRelativePath(workspace.Root, entry.Path).Replace('\\', '/');
+            }
+            wikiIndex = new(Paths(listing.Entries).Append(Path.GetRelativePath(workspace.Root, sourcePath).Replace('\\', '/')));
+            wikiScanIncomplete = listing.Warnings.Count > 0; if (wikiScanIncomplete) complete = false;
+        }
+        foreach (var link in prepared.Parsed.Syntax.Descendants().OfType<Inline>().Where(node => node is LinkInline or WikiLinkInline))
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (link.IsImage || link.Url is not { Length: > 0 } reference || reference.StartsWith('#')) continue;
+            string reference;
+            if (link is WikiLinkInline wiki)
+            {
+                var resolved = wikiIndex!.Resolve(wiki.Target, Path.GetRelativePath(workspace.Root, sourcePath).Replace('\\', '/'));
+                if (resolved.Path is null)
+                {
+                    Add(wiki, resolved.Error ?? "This wikilink could not be resolved.",
+                        resolved.Candidates.Count > 0 ? "Choose an explicit workspace path: " + string.Join(", ", resolved.Candidates.Take(5))
+                            : "Choose an existing workspace document." + (wikiScanIncomplete ? " Some folders are unavailable." : ""), wikiScanIncomplete);
+                    continue;
+                }
+                reference = MarkdownLinks.RelativeReference(sourcePath, workspace.Resolve(resolved.Path))
+                    + (resolved.Fragment.Length > 0 ? "#" + Uri.EscapeDataString(resolved.Fragment) : "");
+            }
+            else if (link is LinkInline { IsImage: false, Url: { Length: > 0 } url } && !url.StartsWith('#')) reference = url;
+            else continue;
             if (Uri.TryCreate(reference, UriKind.Absolute, out var external))
             {
                 if (external.Scheme is not ("https" or "http" or "mailto"))
@@ -124,7 +152,7 @@ public sealed class WorkspaceDocumentReviewService(DocumentStore documents, stri
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.Text.DecoderFallbackException)
             { complete = false; return new(null, "The linked document could not be read safely and was not checked.", true); }
         }
-        void Add(LinkInline link, string message, string suggestion, bool uncheckedTarget)
+        void Add(Inline link, string message, string suggestion, bool uncheckedTarget)
         {
             if (uncheckedTarget) complete = false;
             if (issues.Count == DocumentReviewService.MaximumIssues) { limited = true; return; }

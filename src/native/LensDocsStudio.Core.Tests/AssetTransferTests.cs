@@ -9,6 +9,27 @@ public sealed class AssetTransferTests : IDisposable
     private readonly byte[] png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9l8AAAAASUVORK5CYII=");
     public AssetTransferTests() { Directory.CreateDirectory(Path.Combine(root, "source")); Directory.CreateDirectory(Path.Combine(root, "destination")); }
 
+    [Fact] public async Task Save_as_rebases_wiki_targets_in_one_workspace_but_preserves_aliases_and_self_sections()
+    {
+        var source = Path.Combine(root, "source", "draft.md"); var target = Path.Combine(root, "destination", "saved.md");
+        await File.WriteAllTextAsync(Path.Combine(root, "source", "guide.md"), "# Guide");
+        const string text = "[[ guide#intro | Friendly label ]]\r\n[[#self]]\r\n`[[guide]]`";
+        await using var prepared = await new AssetTransferService().PrepareAsync(text, source, new(root), target, new(root));
+        Assert.Equal("[[ source/guide.md#intro | Friendly label ]]\r\n[[#self]]\r\n`[[guide]]`", prepared.Text);
+        Assert.Empty(prepared.CreatedPaths); Assert.Empty(prepared.UncopiedDocumentLinks); Assert.False(File.Exists(target));
+    }
+
+    [Fact] public async Task Save_as_across_workspaces_reports_uncopied_wiki_documents_without_changing_source()
+    {
+        var sourceRoot = Path.Combine(root, "source"); var targetRoot = Path.Combine(root, "destination");
+        await File.WriteAllTextAsync(Path.Combine(sourceRoot, "guide.md"), "# Guide");
+        const string text = "[[guide|Friendly label]]";
+        await using var prepared = await new AssetTransferService().PrepareAsync(text, Path.Combine(sourceRoot, "draft.md"), new(sourceRoot),
+            Path.Combine(targetRoot, "saved.md"), new(targetRoot));
+        Assert.Equal(text, prepared.Text); Assert.Equal("[[guide]]", Assert.Single(prepared.UncopiedDocumentLinks));
+        Assert.Empty(prepared.CreatedPaths); Assert.Empty(Directory.GetFiles(targetRoot));
+    }
+
     [Fact] public async Task Save_as_copies_each_image_once_and_preserves_reference_style_and_unrelated_source()
     {
         var source = Path.Combine(root, "source", "draft.md"); var target = Path.Combine(root, "destination", "saved.md");
@@ -68,7 +89,7 @@ public sealed class AssetTransferTests : IDisposable
         var draftRoot = Path.Combine(root, "source");
         await File.WriteAllBytesAsync(Path.Combine(draftRoot, "image.png"), png);
         var targetRoot = stateInsideWorkspace ? root : Path.Combine(root, "destination");
-        const string ordinary = "[Guide](Renamed%20document.md#details)\n[Parent](../guide.md)\n";
+        const string ordinary = "[Guide](Renamed%20document.md#details)\n[Parent](../guide.md)\n[[Guide|Workspace link]]\n";
         await using var prepared = await new AssetTransferService().PrepareAsync(ordinary + "![Image](image.png)",
             Path.Combine(draftRoot, "Untitled.md"), new(draftRoot), Path.Combine(targetRoot, "saved.md"), new(targetRoot),
             forceCopyImages: true, preserveDocumentLinks: true);

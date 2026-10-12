@@ -10,6 +10,22 @@ public sealed class WorkspaceMoveTests : IDisposable
     private WorkspaceMoveService Service => new(Store, Path.Combine(root, "state", "moves"));
     public WorkspaceMoveTests() { Directory.CreateDirectory(Path.Combine(root, "docs")); Directory.CreateDirectory(Path.Combine(root, "reference")); }
 
+    [Fact] public async Task Move_preserves_wikilink_aliases_and_retargets_exact_source_spans()
+    {
+        var source = Path.Combine(root, "docs", "guide.md"); var home = Path.Combine(root, "README.md");
+        await File.WriteAllTextAsync(source, "# Guide\r\n\r\n[[next|Next page]]\r\n[[#intro|This section]]\r\n");
+        await File.WriteAllTextAsync(Path.Combine(root, "docs", "next.md"), "# Next");
+        var diagramPath = Path.Combine(root, "reference", "diagram.mmd"); const string diagram = "flowchart LR\nA[[guide]] --> B";
+        await File.WriteAllTextAsync(diagramPath, diagram);
+        await File.WriteAllTextAsync(home, "[[ docs/guide#intro | Friendly label ]] and `[[docs/guide]]`\n");
+        var plan = await Service.PlanAsync(new(root), source, "reference/moved guide.md");
+        Assert.Equal("[[ reference/moved guide.md#intro | Friendly label ]] and `[[docs/guide]]`\n", Assert.Single(plan.OtherDocuments).UpdatedText);
+        var moved = await Service.ApplyAsync(new(root), plan, true);
+        Assert.Equal("# Guide\r\n\r\n[[docs/next.md|Next page]]\r\n[[reference/moved guide.md#intro|This section]]\r\n", File.ReadAllText(moved.Moved.Path));
+        Assert.False(File.Exists(source)); Assert.Equal(plan.OtherDocuments[0].UpdatedText, File.ReadAllText(home));
+        Assert.Equal(diagram, File.ReadAllText(diagramPath));
+    }
+
     [Fact] public async Task Move_updates_incoming_links_and_rebases_source_images_without_reformatting_markdown()
     {
         var source = Path.Combine(root, "docs", "guide.md"); var home = Path.Combine(root, "README.md");
