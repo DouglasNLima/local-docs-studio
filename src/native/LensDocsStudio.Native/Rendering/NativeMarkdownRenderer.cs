@@ -85,7 +85,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
         foreach (var block in parsed.Syntax)
-            document.Blocks.Add(await Convert(block));
+            await Convert(block, document.Blocks);
         cancellationToken.ThrowIfCancellationRequested();
         return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
 
@@ -101,18 +101,20 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             }
         }
 
-        async ValueTask<WpfBlock> Convert(MdBlock block)
+        async ValueTask<WpfBlock> Convert(MdBlock block, BlockCollection? target = null)
         {
             await Cooperate();
+            var attached = false;
+            // Populate the private document in place. Attaching a completed rich subtree
+            // repeats its text-container work synchronously after the cooperative traversal.
+            void Attach(WpfBlock value) { target?.Add(value); attached = true; }
             WpfBlock result;
             switch (block)
             {
                 case HeadingBlock heading:
-                    var hp = await Paragraph(heading.Inline);
-                    hp.FontSize = heading.Level switch { 1 => 30, 2 => 24, 3 => 20, _ => 17 };
-                    hp.FontWeight = FontWeights.SemiBold; hp.Margin = new Thickness(0, 16, 0, 8); result = hp;
+                    result = await Paragraph(heading.Inline, target, heading.Level); attached = true;
                     break;
-                case ParagraphBlock paragraph: result = await Paragraph(paragraph.Inline); break;
+                case ParagraphBlock paragraph: result = await Paragraph(paragraph.Inline, target); attached = true; break;
                 case MathBlock formula:
                     result = new Paragraph(Formula(formula, formula.Lines.ToString(), true)) { Margin = new Thickness(0, 12, 0, 12) }; break;
                 case FencedCodeBlock code when diagrams.TryGetValue(code, out var diagram):
@@ -153,6 +155,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = diagramHost; break;
                 case CodeBlock code:
                     var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
+                    Attach(codeParagraph);
                     CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
                     await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast, Cooperate);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(codeParagraph, "CodePreview" + code.Span.Start);
@@ -162,24 +165,28 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 case AlertBlock alert:
                     var callout = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0),
                         Background = surface, Padding = new Thickness(12, 8, 12, 8), Margin = new Thickness(0, 8, 0, 12) };
+                    Attach(callout);
                     var label = MarkdownFormatting.CalloutLabel(alert.Kind.ToString());
                     callout.Blocks.Add(new Paragraph(new Run(label)) { FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) });
                     System.Windows.Automation.AutomationProperties.SetName(callout, label + " callout");
-                    foreach (var child in alert) callout.Blocks.Add(await Convert(child));
+                    foreach (var child in alert) await Convert(child, callout.Blocks);
                     result = callout; break;
                 case QuoteBlock quote:
                     var section = new Section { BorderBrush = new SolidColorBrush(Color.FromRgb(255, 136, 62)), BorderThickness = new Thickness(3, 0, 0, 0), Padding = new Thickness(12, 4, 4, 4) };
-                    foreach (var child in quote) section.Blocks.Add(await Convert(child)); result = section;
+                    Attach(section);
+                    foreach (var child in quote) await Convert(child, section.Blocks); result = section;
                     break;
                 case ListBlock list:
                     var wl = new System.Windows.Documents.List { MarkerStyle = list.IsOrdered ? TextMarkerStyle.Decimal : TextMarkerStyle.Disc, Padding = new Thickness(24, 0, 0, 0) };
                     var orderedStart = MarkdownFormatting.OrderedStart(list);
                     if (list.IsOrdered) { wl.StartIndex = Math.Max(1, orderedStart); if (orderedStart == 0) wl.MarkerStyle = TextMarkerStyle.None; }
+                    Attach(wl);
                     foreach (var item in list.OfType<ListItemBlock>())
                     {
                         await Cooperate();
                         var li = new ListItem();
-                        foreach (var child in item) li.Blocks.Add(await Convert(child));
+                        wl.ListItems.Add(li);
+                        foreach (var child in item) await Convert(child, li.Blocks);
                         if (list.IsOrdered && wl.MarkerStyle == TextMarkerStyle.None)
                         {
                             if (li.Blocks.FirstBlock is not Paragraph first)
@@ -187,17 +194,18 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             var marker = new Run(orderedStart++ + ". ");
                             if (first.Inlines.FirstInline is { } initial) first.Inlines.InsertBefore(initial, marker); else first.Inlines.Add(marker);
                         }
-                        wl.ListItems.Add(li);
                     }
                     result = wl; break;
                 case Markdig.Extensions.Tables.Table table:
                     var wt = new WpfTable { CellSpacing = 0, Margin = new Thickness(0, 8, 0, 12) };
                     wt.ContextMenu = TableContextMenu.Create(table, parsed.Source, copyTable, exportTableCsv);
+                    Attach(wt);
                     var group = new TableRowGroup(); wt.RowGroups.Add(group);
                     foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                     {
                         await Cooperate();
                         var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
+                        group.Rows.Add(wr);
                         var column = 0;
                         foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
                         {
@@ -209,16 +217,16 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
                             { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
                             if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
-                            foreach (var child in cell) wc.Blocks.Add(await Convert(child));
                             wr.Cells.Add(wc);
+                            foreach (var child in cell) await Convert(child, wc.Blocks);
                         }
-                        group.Rows.Add(wr);
                     }
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
                 case DocumentDetailsBlock details:
                     var detailsSection = new Section { BorderBrush = surface, BorderThickness = new Thickness(1), Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 12) };
+                    Attach(detailsSection);
                     var toggle = new DetailsToggle { IsExpanded = details.InitiallyExpanded, Foreground = foreground, VerticalAlignment = VerticalAlignment.Center };
                     System.Windows.Automation.AutomationProperties.SetName(toggle, details.Summary);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(toggle, "DetailsToggle" + details.Span.Start);
@@ -227,7 +235,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     detailsHeader.Inlines.Add(new Run(details.Summary)); detailsSection.Blocks.Add(detailsHeader);
                     detailSections.Add(new(details.Span.Start, details.Span.End, toggle));
                     var detailsChildren = new List<WpfBlock>();
-                    foreach (var child in details) detailsChildren.Add(await Convert(child));
+                    foreach (var child in details) detailsChildren.Add(await Convert(child, details.InitiallyExpanded ? detailsSection.Blocks : null));
                     void SynchroniseDetails()
                     {
                         foreach (var child in detailsChildren)
@@ -240,7 +248,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = detailsSection; break;
                 case DocumentImageFigureBlock figure:
                     var figureSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
-                    figureSection.Blocks.Add(await Paragraph(figure.Inline));
+                    Attach(figureSection);
+                    await Paragraph(figure.Inline, figureSection.Blocks);
                     if (figure.Caption.Length > 0) figureSection.Blocks.Add(new Paragraph(new Run(figure.Caption)) { FontSize = 13, Margin = new Thickness(0, 0, 0, 4) });
                     result = figureSection; break;
                 case DocumentProgressBlock progress:
@@ -257,17 +266,25 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = new Paragraph(new Run(html.Lines.ToString())) { FontFamily = new FontFamily("Consolas"), FontSize = 12, Background = surface }; break;
                 case ContainerBlock container:
                     var nested = new Section();
-                    foreach (var child in container) nested.Blocks.Add(await Convert(child)); result = nested; break;
+                    Attach(nested);
+                    foreach (var child in container) await Convert(child, nested.Blocks); result = nested; break;
                 default: result = new Paragraph(new Run(parsed.Source.Substring(Math.Clamp(block.Span.Start, 0, parsed.Source.Length), Math.Clamp(block.Span.Length, 0, parsed.Source.Length - Math.Clamp(block.Span.Start, 0, parsed.Source.Length))))); break;
             }
             result.Tag = new SourceReference(block.Span.Start, block.Span.End, block.Line);
             sourceElements[block.Span.Start] = result;
+            if (!attached) target?.Add(result);
             return result;
         }
 
-        async ValueTask<Paragraph> Paragraph(ContainerInline? inline)
+        async ValueTask<Paragraph> Paragraph(ContainerInline? inline, BlockCollection? target, int headingLevel = 0)
         {
             var result = new Paragraph { Margin = new Thickness(0, 4, 0, 10), LineHeight = 23 };
+            if (headingLevel > 0)
+            {
+                result.FontSize = headingLevel switch { 1 => 30, 2 => 24, 3 => 20, _ => 17 };
+                result.FontWeight = FontWeights.SemiBold; result.Margin = new Thickness(0, 16, 0, 8);
+            }
+            target?.Add(result);
             if (inline is not null) await AddInlines(result.Inlines, inline);
             return result;
         }
@@ -313,7 +330,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         if (formatting.HasFlag(MarkdownEmphasis.Subscript)) { span.BaselineAlignment = BaselineAlignment.Subscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Superscript)) { span.BaselineAlignment = BaselineAlignment.Superscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Highlight)) span.Background = surface;
-                        await AddInlines(span.Inlines, emphasis); target.Add(span); break;
+                        target.Add(span); await AddInlines(span.Inlines, emphasis); break;
                     case TaskList task: target.Add(new Run(task.Checked ? "☑ " : "☐ ")); break;
                     case LinkInline link when link.IsImage:
                         var alt = MarkdownService.InlineText(link);
@@ -346,9 +363,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         var hyperlink = new Hyperlink { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = link.Url };
                         System.Windows.Automation.AutomationProperties.SetName(hyperlink, MarkdownService.InlineText(link));
                         System.Windows.Automation.AutomationProperties.SetAutomationId(hyperlink, "DocumentLink" + link.Span.Start);
+                        target.Add(hyperlink);
                         await AddInlines(hyperlink.Inlines, link);
                         hyperlink.Click += (_, _) => navigate(link.Url ?? "");
-                        target.Add(hyperlink); break;
+                        break;
                     case HtmlInline html: target.Add(new Run(html.Tag)); break;
                     case ContainerInline nested: await AddInlines(target, nested); break;
                 }

@@ -25,14 +25,20 @@ internal static class NativeInlineLayoutChecks
     {
         const int count = 1500;
         var rich = string.Join(" ", Enumerable.Range(1, count).Select(i => $"**Bold{i}** [*Café{i}*](#entry-{i})"));
+        var richLabel = "[" + string.Join(" ", Enumerable.Range(1, count).Select(i => $"**Bold{i}** *Café{i}*")) + "](#one-target)";
         var plain = string.Join(" ", Enumerable.Range(1, count).Select(i => $"Bold{i} Café{i}"));
         var code = string.Join("\n", Enumerable.Range(1, 150).Select(i => $"var value{i} = \"Café\"; // retained"));
         var cases = new[]
         {
-            (Name: "paragraph", Source: rich, Expected: plain, Formatted: true),
-            (Name: "heading", Source: "# " + rich, Expected: plain, Formatted: true),
-            (Name: "table-cell", Source: "| Value |\n|---|\n| " + rich + " |", Expected: plain, Formatted: true),
-            (Name: "coloured-code", Source: "```csharp\n" + code + "\n```", Expected: code, Formatted: false)
+            (Name: "paragraph", Source: rich, Expected: plain, Formatted: true, Links: count),
+            (Name: "heading", Source: "# " + rich, Expected: plain, Formatted: true, Links: count),
+            (Name: "table-cell", Source: "| Value |\n|---|\n| " + rich + " |", Expected: plain, Formatted: true, Links: count),
+            (Name: "coloured-code", Source: "```csharp\n" + code + "\n```", Expected: code, Formatted: false, Links: 0),
+            (Name: "quote", Source: "> " + rich, Expected: plain, Formatted: true, Links: count),
+            (Name: "list-item", Source: "- " + rich, Expected: "\u2022\t" + plain, Formatted: true, Links: count),
+            (Name: "callout", Source: "> [!NOTE]\n> " + rich, Expected: plain, Formatted: true, Links: count),
+            (Name: "open-details", Source: "<details open>\n<summary>Dense content</summary>\n\n" + rich + "\n\n</details>", Expected: plain, Formatted: true, Links: count),
+            (Name: "long-link-label", Source: richLabel, Expected: plain, Formatted: true, Links: 1)
         };
         var outcomes = new List<object>(); var failures = new List<string>();
         var renderer = new NativeMarkdownRenderer(new NativeSvgService());
@@ -62,17 +68,20 @@ internal static class NativeInlineLayoutChecks
             }
             finally { timer.Stop(); queued.Abort(); }
 
-            var target = result.SourceElements.Values.OfType<Paragraph>().FirstOrDefault(paragraph =>
+            // Containers and their first paragraph may share a source offset. Inspect the
+            // actual document tree rather than the one-element-per-offset navigation index.
+            var target = Paragraphs(result.Document.Blocks).FirstOrDefault(paragraph =>
                 Read(paragraph) == item.Expected);
             var complete = target is not null;
             var inlines = target is null ? [] : Flatten(target.Inlines).ToArray();
             var links = inlines.OfType<Hyperlink>().ToArray();
             var formatting = item.Formatted
-                ? links.Length == count && inlines.OfType<Span>().Count(span => span.FontWeight == FontWeights.Bold) >= count
+                ? links.Length == item.Links && inlines.OfType<Span>().Count(span => span.FontWeight == FontWeights.Bold) >= count
                     && links.All(link => link.Inlines.OfType<Span>().Any(span => span.FontStyle == FontStyles.Italic))
                 : inlines.OfType<Run>().Count(run => run.ReadLocalValue(TextElement.ForegroundProperty) != DependencyProperty.UnsetValue) > 150;
             var sourcePreserved = parsed.Source == item.Source;
-            var sourceMapping = target?.Tag is SourceReference reference && reference.Start >= 0 && reference.End < item.Source.Length;
+            var sourceMapping = target?.Tag is SourceReference reference && reference.Start >= 0 && reference.End < item.Source.Length
+                && result.SourceElements.ContainsKey(reference.Start);
 
             using var stop = new CancellationTokenSource(); var cancelled = false; var cancelAt = -1d;
             var cancelWatch = Stopwatch.StartNew();
@@ -90,7 +99,13 @@ internal static class NativeInlineLayoutChecks
             outcomes.Add(new { item.Name, Passed = passed, SourceCharacters = item.Source.Length, Yielded = yielded,
                 InputMilliseconds = inputAt, MaximumInputGapMilliseconds = maximumGap, ConstructionMilliseconds = elapsed,
                 CompleteText = complete, Formatting = formatting, SourceMapping = sourceMapping, SourcePreserved = sourcePreserved,
-                Cancelled = cancelled, CancelInputMilliseconds = cancelAt });
+                Cancelled = cancelled, CancelInputMilliseconds = cancelAt,
+                TextMismatch = complete ? null : Paragraphs(result.Document.Blocks).Select(paragraph =>
+                {
+                    var text = Read(paragraph);
+                    return new { Length = text.Length, Start = text[..Math.Min(60, text.Length)],
+                        End = text[Math.Max(0, text.Length - 60)..], paragraph.Tag };
+                }).ToArray() });
             if (!passed) failures.Add(item.Name);
         }
         File.WriteAllText(Path.Combine(output, "native-inline-layout.json"), JsonSerializer.Serialize(new
@@ -102,6 +117,23 @@ internal static class NativeInlineLayoutChecks
     }
 
     private static string Read(Paragraph paragraph) => new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text.Replace("\r\n", "\n", StringComparison.Ordinal).TrimEnd('\n');
+    private static IEnumerable<Paragraph> Paragraphs(BlockCollection blocks)
+    {
+        foreach (var block in blocks)
+        {
+            if (block is Paragraph paragraph) yield return paragraph;
+            else if (block is Section section)
+                foreach (var child in Paragraphs(section.Blocks)) yield return child;
+            else if (block is System.Windows.Documents.List list)
+                foreach (var item in list.ListItems)
+                    foreach (var child in Paragraphs(item.Blocks)) yield return child;
+            else if (block is Table table)
+                foreach (var group in table.RowGroups)
+                    foreach (var row in group.Rows)
+                        foreach (var cell in row.Cells)
+                            foreach (var child in Paragraphs(cell.Blocks)) yield return child;
+        }
+    }
     private static IEnumerable<Inline> Flatten(InlineCollection values)
     {
         foreach (var value in values)

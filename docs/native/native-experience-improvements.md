@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Dense content now stays within the same cooperative construction path when nested in quotes, lists, callouts, tables or open details. Empty containers are inserted first and filled gradually, removing a final synchronous attachment that CI measured at 342–426 ms for a rich table cell. Nine focused cases pass locally with complete content and cancellation; the previous preview remains visible until the new document is complete. CI for this correction is pending.
+
 Changing an update channel or cancelling verification cannot bring back an abandoned download or pass a cleared selection to installation. Operations retain the originally reviewed selection and reject it if that selection changes before completion. Six isolated interaction outcomes include channel changes, a round trip, cancellation, a valid-selection control and unsigned rejection; all pass with no installer execution. User-requested cancellation remains authoritative even when an external verification finishes late.
 
 Typing and cancellation can interrupt preparation of a single densely formatted paragraph, heading, table cell or code block. Previously, block-level batching still left 308–341 ms gaps inside these rich inline trees and queued cancellation was ignored. The renderer now cooperates while constructing nested formatting and links; four focused cases and full native validation preserve complete text, appearance properties and source mapping. This does not establish physical typing latency on every machine.
