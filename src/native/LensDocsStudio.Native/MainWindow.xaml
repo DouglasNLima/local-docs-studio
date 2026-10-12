@@ -113,6 +113,7 @@
     <MenuItem Header="Code block" Tag="code" Click="Format" AutomationProperties.AutomationId="InsertCode"/>
     <MenuItem Header="Mermaid diagram" Tag="mermaid" Click="Format"/>
     <MenuItem Header="Progress indicator…" Click="InsertProgress" AutomationProperties.AutomationId="InsertProgress"/>
+    <MenuItem Header="Details section…" Click="EditDetails" AutomationProperties.AutomationId="EditDetails"/>
     <MenuItem Header="Document anchor…" Click="InsertAnchor" AutomationProperties.AutomationId="InsertAnchor"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">

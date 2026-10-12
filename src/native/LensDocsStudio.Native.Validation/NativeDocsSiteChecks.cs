@@ -26,6 +26,7 @@ internal static class NativeDocsSiteChecks
         edited[path] += "\n## Publishing\n\n" + string.Join(' ', Enumerable.Repeat("Background detail.", 35))
             + " release-ready-token remains searchable.\n\n```html\n<img src=x onerror=run()>\n```\n\n> ### Nested notes\n>\n> Local nested-section-token evidence.\n";
         edited[path] += "\n[Named target](#named-position) [Empty target](#empty-position)\n\nBefore <span id=named-position data-doc-anchor>Named destination</span> after.\n\nBefore <span id=empty-position data-doc-anchor></span>following text.\n";
+        edited[path] += "\n<details data-details-block>\n<summary>Deployment notes</summary>\n\n## Hidden deployment\n\n<details>\n<summary>Recovery checks</summary>\n\n### Recovery evidence\n\nDetails-search-token remains available inside two closed sections.\n</details>\n</details>\n";
         var result = new DocsSiteExportService().ExportAsync(root, edited, state, new("Native handbook", "Local documentation export")).GetAwaiter().GetResult();
         if (result.SourcePages != 2 || result.Diagrams != 1 || result.Warnings.Count != 0) throw new IOException("Native Docs Site lost documents or included private state.");
         var zipPath = Path.Combine(output, "native-docs-site.zip"); File.WriteAllBytes(zipPath, result.Bytes);

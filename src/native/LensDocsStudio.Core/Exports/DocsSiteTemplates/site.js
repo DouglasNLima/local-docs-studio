@@ -62,6 +62,8 @@
     renderNavigation();
     let headingId = ''; try { headingId = decodeURIComponent(fragment); } catch { }
     const target = headingId ? Array.from(content.querySelectorAll('[id]')).find(node => node.id === headingId) : null;
+    for (let ancestor = target?.parentElement; ancestor && ancestor !== content; ancestor = ancestor.parentElement)
+      if (ancestor.tagName === 'DETAILS') ancestor.open = true;
     if (target) target.tabIndex = -1;
     requestAnimationFrame(() => { (target || content).scrollIntoView({ block:'start' }); if (fragment) (target || content).focus({ preventScroll:true }); });
   }

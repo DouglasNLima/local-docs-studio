@@ -20,7 +20,14 @@ using WpfTable = System.Windows.Documents.Table;
 namespace LensDocsStudio.Native.Rendering;
 
 public sealed record SourceReference(int Start, int End, int Line);
-public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<int, TextElement> SourceElements, IReadOnlyList<string> Warnings);
+public sealed record PreviewDetails(int SourceStart, int SourceEnd, Expander Toggle);
+public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<int, TextElement> SourceElements, IReadOnlyList<string> Warnings)
+{
+    public IReadOnlyList<PreviewDetails> Details { get; init; } = [];
+    public void RevealSource(int offset)
+    { foreach (var section in Details) if (offset >= section.SourceStart && offset <= section.SourceEnd) section.Toggle.IsExpanded = true; }
+    public void ExpandDetails() { foreach (var section in Details) section.Toggle.IsExpanded = true; }
+}
 
 public sealed class NativeMarkdownRenderer(NativeSvgService svg)
 {
@@ -47,6 +54,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity };
         var sourceElements = new Dictionary<int, TextElement>();
+        var detailSections = new List<PreviewDetails>();
         var warnings = new List<string>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var blocks = 0;
@@ -62,7 +70,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             }
         }
         cancellationToken.ThrowIfCancellationRequested();
-        return new(document, sourceElements, warnings);
+        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly() };
 
         WpfBlock Convert(MdBlock block)
         {
@@ -171,6 +179,26 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
+                case DocumentDetailsBlock details:
+                    var detailsSection = new Section { BorderBrush = surface, BorderThickness = new Thickness(1), Padding = new Thickness(10, 6, 10, 6), Margin = new Thickness(0, 8, 0, 12) };
+                    var toggle = new DetailsToggle { IsExpanded = details.InitiallyExpanded, Foreground = foreground, VerticalAlignment = VerticalAlignment.Center };
+                    System.Windows.Automation.AutomationProperties.SetName(toggle, details.Summary);
+                    System.Windows.Automation.AutomationProperties.SetAutomationId(toggle, "DetailsToggle" + details.Span.Start);
+                    var detailsHeader = new Paragraph { FontWeight = FontWeights.SemiBold, Margin = new Thickness(0, 0, 0, 4) };
+                    detailsHeader.Inlines.Add(new InlineUIContainer(toggle) { BaselineAlignment = BaselineAlignment.Center });
+                    detailsHeader.Inlines.Add(new Run(details.Summary)); detailsSection.Blocks.Add(detailsHeader);
+                    detailSections.Add(new(details.Span.Start, details.Span.End, toggle));
+                    var detailsChildren = details.Select(Convert).ToArray();
+                    void SynchroniseDetails()
+                    {
+                        foreach (var child in detailsChildren)
+                        {
+                            if (toggle.IsExpanded && !detailsSection.Blocks.Contains(child)) detailsSection.Blocks.Add(child);
+                            else if (!toggle.IsExpanded && detailsSection.Blocks.Contains(child)) detailsSection.Blocks.Remove(child);
+                        }
+                    }
+                    toggle.Expanded += (_, _) => SynchroniseDetails(); toggle.Collapsed += (_, _) => SynchroniseDetails(); SynchroniseDetails();
+                    result = detailsSection; break;
                 case DocumentImageFigureBlock figure:
                     var figureSection = new Section { Margin = new Thickness(0, 8, 0, 12) };
                     figureSection.Blocks.Add(Paragraph(figure.Inline));

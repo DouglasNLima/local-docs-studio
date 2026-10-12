@@ -145,6 +145,11 @@ public sealed class DocxExporter
                             wt.Append(wr);
                         }
                         parent.Append(wt); break;
+                    case DocumentDetailsBlock details:
+                        parent.Append(new W.Paragraph(new W.ParagraphProperties(new W.ParagraphStyleId { Val = bodyStyle }) { KeepNext = new W.KeepNext() },
+                            Run(details.Summary, MarkdownEmphasis.Bold)));
+                        foreach (var child in details) AppendBlock(parent, child, listId, depth, paragraphStyle);
+                        break;
                     case DocumentImageFigureBlock figure:
                         var picture = Paragraph(figure.Inline, bodyStyle);
                         if (figure.Caption.Length > 0) picture.ParagraphProperties!.KeepNext = new W.KeepNext();

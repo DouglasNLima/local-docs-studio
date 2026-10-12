@@ -1092,6 +1092,67 @@ internal static class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Mermaid template creation changed the original document.");
             if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The built-in catalogue changed the original saved source.");
             checks.Add("Native catalogue filters templates/snippets, generates and saves field-edited Markdown and standalone Mermaid in new tabs, and inserts snippets with complete Undo/Redo while retaining original source");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            var detailsWindow = OpenDetails(window);
+            Find(detailsWindow, "DetailsSummary").AsTextBox().Text = "Supporting evidence — Café";
+            const string detailsBody = "## Hidden native heading\n\nRetained **bold** and [local guide](Second%20document.md).\n\n<details>\n<summary>Nested evidence</summary>\n\nNative-details-needle-042.\n</details>";
+            Find(detailsWindow, "DetailsBody").AsTextBox().Text = detailsBody;
+            detailsWindow.CaptureToFile(Path.Combine(output, "native-details-dialogue.png"));
+            Find(detailsWindow, "ApplyDetails").AsButton().Invoke();
+            var encodedDetailsSummary = System.Net.WebUtility.HtmlEncode("Supporting evidence — Café");
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains(encodedDetailsSummary, StringComparison.Ordinal)
+                && Find(window, "Status").Name == "Details section applied.", "The details dialogue did not insert its section.");
+            var insertedDetails = editor.Patterns.Value.Pattern.Value.Value;
+            if (!insertedDetails.StartsWith(sourceBeforeLibraryImage, StringComparison.Ordinal)) throw new IOException("Details insertion lost preceding source.");
+            detailsWindow = OpenDetails(window);
+            if (Find(detailsWindow, "DetailsSummary").AsTextBox().Text != "Supporting evidence — Café"
+                || Find(detailsWindow, "DetailsBody").AsTextBox().Text.Replace("\r\n", "\n") != detailsBody)
+                throw new IOException("The details dialogue did not restore the existing summary and Markdown body.");
+            Find(detailsWindow, "DetailsSummary").AsTextBox().Text = "Updated supporting evidence";
+            Find(detailsWindow, "ApplyDetails").AsButton().Invoke();
+            var updatedDetails = insertedDetails.Replace(encodedDetailsSummary, "Updated supporting evidence", StringComparison.Ordinal);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == updatedDetails, "Editing a details summary changed its Markdown body or neighbouring source.");
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "One Undo did not restore the complete details edit.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == updatedDetails, "Details edit Redo did not restore the entire section.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "Details edit Undo failed before preview checks.");
+            var detailsStart = insertedDetails.IndexOf("<details data-details-block", sourceBeforeLibraryImage.Length, StringComparison.Ordinal);
+            Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("DetailsToggle" + detailsStart))?.Name == "Supporting evidence — Café",
+                "The native details preview did not finish updating after Undo.");
+            var detailsToggle = Find(window, "DetailsToggle" + detailsStart);
+            Wait(() => detailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == FlaUI.Core.Definitions.ExpandCollapseState.Collapsed,
+                "A new details section did not start collapsed.");
+            if (detailsToggle.Name != "Supporting evidence — Café") throw new IOException("The native details expander lost its accessible summary.");
+            detailsToggle.Patterns.ExpandCollapse.Pattern.Expand();
+            Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Hidden native heading", StringComparison.Ordinal),
+                "Expanding details did not reveal its heading.");
+            var nestedDetailsStart = insertedDetails.IndexOf("<details>", detailsStart, StringComparison.Ordinal);
+            var nestedDetailsToggle = Find(window, "DetailsToggle" + nestedDetailsStart);
+            if (nestedDetailsToggle.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Collapsed)
+                throw new IOException("Expanding the outer section changed its nested section state.");
+            detailsToggle.Patterns.ExpandCollapse.Pattern.Collapse();
+            preview = Find(window, "DocumentPreview"); preview.Click();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            Wait(() => Find(window, "FindContext").Name == "Find in preview", "Details search did not target the focused preview.");
+            Find(window, "FindText").AsTextBox().Text = "Native-details-needle-042"; Keyboard.Type(VirtualKeyShort.RETURN);
+            Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Native-details-needle-042"),
+                "Preview Find did not reveal and select text inside nested closed details.");
+            Keyboard.Type(VirtualKeyShort.ESCAPE);
+            if (Find(window, "DetailsToggle" + detailsStart).Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Expanded
+                || Find(window, "DetailsToggle" + nestedDetailsStart).Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Expanded
+                || editor.Patterns.Value.Pattern.Value.Value != insertedDetails)
+                throw new IOException("Finding hidden details did not expand both ancestors without changing source.");
+            window.CaptureToFile(Path.Combine(output, "native-details-preview.png"));
+            FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "One Undo did not remove the complete inserted details section.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "Details insertion Redo changed source.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "The details fixture did not restore original source.");
+            if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
+            checks.Add("Native details dialogue restores and edits Markdown; accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Native application failed during shutdown: " + launchedProcess.ExitCode);
@@ -1211,6 +1272,15 @@ internal static class NativeUiChecks
             Wait(() => (progressWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Progress indicator")))?.AsWindow()) is not null,
                 "The native progress dialogue did not open.");
             return progressWindow!;
+        }
+        Window OpenDetails(Window mainWindow)
+        {
+            Find(mainWindow, "InsertMenu").Click(); Find(mainWindow, "EditDetails").Patterns.Invoke.Pattern.Invoke();
+            Window? detailsWindow = null;
+            Wait(() => (detailsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId)
+                .And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Window)).And(cf.ByName("Details section")))?.AsWindow()) is not null,
+                "The native details dialogue did not open.");
+            return detailsWindow!;
         }
         Window OpenTemplateLibrary(Window main)
         {

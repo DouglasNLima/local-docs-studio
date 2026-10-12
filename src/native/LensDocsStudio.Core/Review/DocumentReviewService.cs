@@ -87,6 +87,7 @@ public sealed partial class DocumentReviewService
                 }
                 if (block is Table) tables++;
                 if (block is DocumentImageFigureBlock figure) CountWords(figure.Caption);
+                if (block is DocumentDetailsBlock details) CountWords(details.Summary);
                 if (block is LeafBlock { Inline: { } inline })
                 {
                     var text = new System.Text.StringBuilder(); WalkInlines(inline, depth + 1, false, text); CountWords(text.ToString());

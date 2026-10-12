@@ -24,6 +24,8 @@ article h1 { font-size:2rem; line-height:1.25; }
 article h2,article h3 { margin-top:1.75rem; line-height:1.3; }
 article img { max-width:100%; height:auto; }
 .document-progress { margin:1rem 0; }
+.document-details { margin:1rem 0; border:1px solid var(--border); border-radius:6px; padding:.7rem 1rem; }
+.document-details > summary { cursor:pointer; font-weight:600; }
 .document-progress progress { width:100%; accent-color:#FF883E; }
 .progress-green progress { accent-color:#2F855A; } .progress-blue progress { accent-color:#2563EB; }
 .progress-amber progress { accent-color:#B7791F; } .progress-red progress { accent-color:#C53030; } .progress-neutral progress { accent-color:#64748B; }

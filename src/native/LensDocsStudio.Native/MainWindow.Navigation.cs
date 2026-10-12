@@ -47,6 +47,7 @@ public partial class MainWindow
             if (rendered is not null)
             {
                 var nearest = rendered.SourceElements.Where(e => e.Key <= Editor.CaretOffset).OrderByDescending(e => e.Key).FirstOrDefault();
+                rendered.RevealSource(Editor.CaretOffset);
                 nearest.Value?.BringIntoView();
             }
             Editor.Focus();

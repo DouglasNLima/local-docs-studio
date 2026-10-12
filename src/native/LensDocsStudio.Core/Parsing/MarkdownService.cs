@@ -15,7 +15,12 @@ public sealed record ParsedDocument(string Source, MarkdownDocument Syntax, IRea
 
 public sealed partial class MarkdownService
 {
-    public MarkdownPipeline Pipeline { get; } = new MarkdownPipelineBuilder().UseAdvancedExtensions().UsePreciseSourceLocation().Build();
+    public MarkdownPipeline Pipeline { get; } = CreatePipeline();
+    private static MarkdownPipeline CreatePipeline()
+    {
+        var builder = new MarkdownPipelineBuilder().UseAdvancedExtensions().UsePreciseSourceLocation();
+        builder.BlockParsers.Insert(0, new DetailsBlockParser()); return builder.Build();
+    }
 
     public ParsedDocument Parse(string source, bool standaloneMermaid = false)
     {

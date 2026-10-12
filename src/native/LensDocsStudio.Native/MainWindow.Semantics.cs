@@ -6,6 +6,26 @@ namespace LensDocsStudio.Native;
 
 public partial class MainWindow
 {
+    private async void EditDetails(object sender, RoutedEventArgs e)
+    {
+        if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
+        var source = tab.EditorDocument.Text; var start = Editor.SelectionStart; var length = Editor.SelectionLength;
+        if (source.Length > 4 * 1024 * 1024) { model.Status = "The details editor supports documents up to 4 million characters."; return; }
+        if (Path.GetExtension(tab.EffectivePath)?.ToLowerInvariant() is ".mmd" or ".mermaid")
+        { model.Status = "Add details sections to a Markdown document."; return; }
+        await model.RunAsync(async () =>
+        {
+            var document = await Task.Run(() => new LensDocsStudio.Core.Parsing.MarkdownService().Parse(source), model.OperationToken);
+            model.OperationToken.ThrowIfCancellationRequested();
+            if (Changed() || Editor.SelectionStart != start || Editor.SelectionLength != length)
+            { model.Status = "The document or selection changed; open the details editor again."; return; }
+            var window = new DetailsWindow(document, start, length) { Owner = this };
+            if (window.ShowDialog() != true || window.Edit is not { } edit) return;
+            if (Changed()) { model.Status = "The document changed; the details section was not applied. Open the editor again."; return; }
+            EditorFormattingService.Apply(Editor, edit); model.Status = "Details section applied.";
+        });
+        bool Changed() => model.ActiveDocument != tab || tab.EditorDocument.Text != source || tab.IsSaving || Editor.IsReadOnly;
+    }
     private async void EditImageFigure(object sender, RoutedEventArgs e)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;

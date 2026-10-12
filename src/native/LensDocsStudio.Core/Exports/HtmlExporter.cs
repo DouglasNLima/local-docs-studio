@@ -20,7 +20,7 @@ public sealed class HtmlExporter
             "<title>" + title + "</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1.5rem;color:#202124;background:#fafafa}img{max-width:100%;height:auto}pre{white-space:pre-wrap;padding:1rem;background:#f3f4f6}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:.5rem}blockquote{border-left:3px solid #ff883e;margin-left:0;padding-left:1rem}a{color:#174ea6}.document-progress{margin:1rem 0}.document-progress progress{width:100%;accent-color:#FF883E}.progress-green progress{accent-color:#2F855A}.progress-blue progress{accent-color:#2563EB}.progress-amber progress{accent-color:#B7791F}.progress-red progress{accent-color:#C53030}.progress-neutral progress{accent-color:#64748B}</style></head><body>" +
             fragment + "</body></html>";
     }
-    public string RenderFragment(ExportContent content, ExportTableSelection? table = null)
+    public string RenderFragment(ExportContent content, ExportTableSelection? table = null, bool flattenDetails = false)
     {
         using var writer = new StringWriter();
         var renderer = new HtmlRenderer(writer);
@@ -32,6 +32,7 @@ public sealed class HtmlExporter
         renderer.ObjectRenderers.Insert(0, new AnchorRenderer());
         renderer.ObjectRenderers.Insert(0, new ProgressRenderer());
         renderer.ObjectRenderers.Insert(0, new FigureRenderer());
+        renderer.ObjectRenderers.Insert(0, new DetailsRenderer(flattenDetails));
         new MarkdownService().Pipeline.Setup(renderer);
         renderer.Render(table is null ? content.Document.Syntax : table.Resolve(content.Document));
         // Generic Markdown attributes can carry event handlers or network-bearing styles.
@@ -50,6 +51,7 @@ public sealed class HtmlExporter
                     "href" => element.LocalName == "a" && SafeLink(attribute.Value),
                     "max" or "value" => element.LocalName == "progress",
                     "aria-label" => element.LocalName == "progress",
+                    "open" => element.LocalName == "details",
                     "style" => attribute.Value is "text-align: left;" or "text-align: center;" or "text-align: right;",
                     _ => false
                 };
@@ -94,6 +96,16 @@ public sealed class HtmlExporter
     private sealed class RawBlockRenderer : HtmlObjectRenderer<HtmlBlock>
     {
         protected override void Write(HtmlRenderer renderer, HtmlBlock obj) => renderer.Write("<pre>").Write(WebUtility.HtmlEncode(obj.Lines.ToString())).Write("</pre>");
+    }
+    private sealed class DetailsRenderer(bool flatten) : HtmlObjectRenderer<DocumentDetailsBlock>
+    {
+        protected override void Write(HtmlRenderer renderer, DocumentDetailsBlock obj)
+        {
+            if (flatten) renderer.Write("<section class=\"document-details\"><p><strong>").Write(WebUtility.HtmlEncode(obj.Summary)).Write("</strong></p>");
+            else renderer.Write(obj.InitiallyExpanded ? "<details class=\"document-details\" open><summary>" : "<details class=\"document-details\"><summary>")
+                .Write(WebUtility.HtmlEncode(obj.Summary)).Write("</summary>");
+            renderer.WriteChildren(obj); renderer.Write(flatten ? "</section>" : "</details>");
+        }
     }
     private sealed class FigureRenderer : HtmlObjectRenderer<DocumentImageFigureBlock>
     {

@@ -197,7 +197,7 @@ public partial class MainWindow : Window
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
         if (Outline.SelectedItem is DocumentHeading heading && rendered?.SourceElements.TryGetValue(heading.SourceStart, out var element) == true)
-        { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+        { CaptureCurrentNavigation(); rendered.RevealSource(heading.SourceStart); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(heading.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
     }
     private async void Navigate(string reference)
     {
@@ -221,7 +221,7 @@ public partial class MainWindow : Window
             {
                 var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
                 if (target is not null && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                { CaptureCurrentNavigation(); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
+                { CaptureCurrentNavigation(); rendered.RevealSource(target.SourceStart); element.BringIntoView(); Editor.CaretOffset = Math.Clamp(target.SourceStart, 0, Editor.Document.TextLength); VisitCurrentNavigation(); }
                 else model.Status = "The linked section was not found; the document remains open.";
             }
         });
@@ -244,6 +244,7 @@ public partial class MainWindow : Window
         if (query.Length == 0) return;
         if (searchPreview)
         {
+            rendered?.ExpandDetails();
             var start = Preview.Selection.IsEmpty ? Preview.Document.ContentStart : Preview.Selection.End;
             if (!FindPreview(start, query)) FindPreview(Preview.Document.ContentStart, query);
             return;
@@ -415,7 +416,7 @@ public partial class MainWindow : Window
     }
     private void CopyPreview(object sender, RoutedEventArgs e)
     {
-        try { Clipboard.SetText(new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
+        try { rendered?.ExpandDetails(); Clipboard.SetText(new TextRange(Preview.Document.ContentStart, Preview.Document.ContentEnd).Text); model.Status = "Preview text copied"; }
         catch (System.Runtime.InteropServices.ExternalException) { model.Status = "The clipboard is busy. Try copying again."; }
     }
     private async void CopyRenderedContent(object sender, RoutedEventArgs e) => await CopyDocumentAsync(false);
