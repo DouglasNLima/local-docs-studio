@@ -40,6 +40,8 @@ Save as retains known wiki targets inside the destination workspace. When linked
 
 Unsaved documents and edits are retained in separate recovery state. **File → Take snapshot** keeps a named point to review later under **Document snapshots**. Review restored drafts before saving them over an existing file.
 
+Recovery has a 512 MiB encoded JSON limit across open documents, including saved baselines, current text and metadata. If recovery exceeds that limit, the previous session and backup remain unchanged and the application reports the failure. Close already-saved tabs to reduce the total before retrying. A document save waits for successful recovery before changing source. Unreadable or oversized old state is retained separately before a previous version is restored; check the recovery warning before continuing.
+
 If another application changes a file, Lens Docs Studio flags the difference and keeps your editor text. Follow the conflict choices rather than assuming the version on disk is unchanged. **Reload from disk** asks about unsaved work and retains recovery where supported.
 
 Use **Rename or move document** to review affected links before applying a move, including a filename case change such as `Guide.md` to `GUIDE.md`. Existing destination entries are never replaced, and private application state is excluded from link updates. **Delete document** uses recoverable Windows deletion and retains a snapshot.

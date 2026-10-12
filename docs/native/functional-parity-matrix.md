@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Session recovery now enforces the same encoded-size budget on both read and write, retains oversized legacy files before fallback and prevents autosave after an unresolved read failure. JSON remains schema 1; the 512 MiB session budget includes current text and saved baselines. Twelve modest-budget regressions and all 812 core tests pass; maximum-budget responsiveness and this change's desktop CI remain unverified.
+
 Signing remains deliberately unconfigured per the user's confirmed decision. Optional certificate-store and service-script adapters now require explicit publisher pins and independent Windows verification; unsigned packages cannot enable updater execution. Fourteen adapter-policy outcomes use mocked signature results, and all 34 update core tests pass. Production identity, actual provider signing and signed-upgrade certification remain unavailable.
 
 Actual process-interruption coverage passes in built/reinstalled applications in both be033af native CI runs: rejected saves, restart recovery and explicit retry retain the draft, baseline and exact source encoding. This does not certify power loss or removable drives. The earlier c62ec4e PR run exposed an unexplained 311.8 ms nested-details input delay; both be033af runs pass with additional diagnostics, while broad responsiveness certification remains incomplete.
