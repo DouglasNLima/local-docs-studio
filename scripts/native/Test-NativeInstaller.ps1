@@ -78,6 +78,14 @@ function Run-NativeUi([string]$Phase) {
     } finally { Pop-Location }
     $checks.Add("${Phase}: installed application saved and restored UTF-8 source")
 }
+function Restore-PreservedSession([string]$Phase) {
+    & dotnet run --project (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation') -c Release --no-build -- --restore-installed-session (Join-Path $installDirectory 'LensDocsStudio.Native.exe') $preservedStateRoot (Join-Path $root $Phase)
+    if ($LASTEXITCODE -ne 0) { throw "The installed application could not restore the preserved session during $Phase." }
+    # The application has verified semantic continuity and all other file hashes.
+    # Its normal shutdown can rotate session/preferences backups and save viewport positions.
+    $script:preservedStateSnapshot = Get-StateSnapshot $preservedStateRoot
+    $checks.Add("${Phase}: installed application restored the actual previous tabs, text, settings and retained state")
+}
 function Uninstall-Native([string]$Phase) {
     $uninstaller = Join-Path $installDirectory 'unins000.exe'
     $process = Start-Process -FilePath $uninstaller -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART',('/LOG="' + (Join-Path $root ($Phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
@@ -96,9 +104,10 @@ try {
     $preservedStateRoot = Join-Path $firstLaunchRoots[0].FullName 'state'
     $preservedStateSnapshot = Get-StateSnapshot $preservedStateRoot
     if ($preservedStateSnapshot.Count -eq 0 -or -not $preservedStateSnapshot.ContainsKey('preferences.json')) { throw 'The initial UI run did not retain native preferences for preservation checks.' }
-    if ($UpgradeInstaller) { Run-Installer $UpgradeInstaller 'upgrade'; Run-NativeUi 'after-upgrade' }
+    if ($UpgradeInstaller) { Run-Installer $UpgradeInstaller 'upgrade'; Restore-PreservedSession 'restored-after-upgrade'; Run-NativeUi 'after-upgrade' }
     Uninstall-Native 'uninstall'
     Run-Installer $(if ($UpgradeInstaller) { $UpgradeInstaller } else { $Installer }) 'reinstall'
+    Restore-PreservedSession 'restored-after-reinstall'
     Run-NativeUi 'after-reinstall'
     Uninstall-Native 'final-uninstall'
     $defaultAfter = (Get-ItemProperty 'HKCU:\Software\Classes\.md' -ErrorAction SilentlyContinue).'(default)'
@@ -106,7 +115,7 @@ try {
     if ($defaultBefore -ne $defaultAfter -or $legacyBefore -ne $legacyAfter) { throw 'The legacy registration or Markdown default changed.' }
     $checks.Add('Existing shell registration and Markdown default preserved')
     @{ passed=$true; checks=$checks; installedVersions=$installedVersions; preservedStateFiles=$preservedStateSnapshot.Count; evidence=$root;
-        cleanMachineCertification=$false; upgradeTested=[bool]$UpgradeInstaller; productionSignedUpgrade=$false;
+        cleanMachineCertification=$false; upgradeTested=[bool]$UpgradeInstaller; productionSignedUpgrade=$false; sessionRestorationTested=$true;
         sameRevisionUpgrade=[bool]($UpgradeInstaller -and $upgradeIdentity.sourceRevision -eq $initialIdentity.sourceRevision);
         upgradeLimitation='Preview package replacement and preservation only; production signing, historical schema migration and SDK-free clean-machine certification remain separate.' } |
         ConvertTo-Json -Depth 5 | Set-Content (Join-Path $root 'installer-results.json')

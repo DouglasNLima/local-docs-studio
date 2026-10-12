@@ -72,6 +72,8 @@ jobs:
             artifacts/native/install-smoke/**/installer-results.json
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
+            artifacts/native/install-smoke/**/restored-session.json
+            artifacts/native/install-smoke/**/restored-session.png
             artifacts/native/install-smoke/**/native-ui-failure*
             artifacts/native/install-smoke/**/native-save-dialogue-failure.png
             artifacts/native/install-smoke/**/native-save-dialogues.json

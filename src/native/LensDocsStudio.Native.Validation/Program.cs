@@ -21,6 +21,8 @@ internal static class Program
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
         if (args.FirstOrDefault() == "--installer-wizard")
             return NativeUiChecks.RunInstallerWizard(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/installer-wizard");
+        if (args.FirstOrDefault() == "--restore-installed-session")
+            return NativeUiChecks.RunInstalledSession(args[1], args[2], args[3]);
         if (args.FirstOrDefault() == "--office")
             return OfficeClipboardChecks.Run(args.ElementAtOrDefault(1) ?? "artifacts/native/office");
         if (args.FirstOrDefault() == "--authenticode")
