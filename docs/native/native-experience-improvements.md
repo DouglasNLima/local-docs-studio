@@ -1,5 +1,7 @@
 # Native experience improvements
 
+The actual Windows PDF Export-menu Unicode workflow now passes in all desktop contexts of both 230852b native runs. Its native window and exported PDF were inspected, and the matching installer lifecycle retains 20 state files. This completes the current font/copy-mapping correction; it does not remove the complex-script or production-certification limits. See the [engineering handover](engineering-handover.md).
+
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
 
 The native reconstruction keeps portable Markdown and real filesystem ownership while improving desktop workflows. At b45246e all 55 workflows pass in built, installed and reinstalled applications in both native CI runs, including distant wrapped-editor search, minimum-window controls, Editor-only scheduling and separated validation threads. Actual search/minimum-window screenshots and application timing samples have been inspected. Earlier failed runs and remaining limits are recorded in the validation report.

@@ -15,7 +15,7 @@ dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- -
 pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version 0.1.0-preview.10
 ```
 
-See [native implementation progress](docs/native/implementation-progress.md), [functional parity](docs/native/functional-parity-matrix.md) and [validation evidence](docs/native/validation-report.md). Native state uses `%LOCALAPPDATA%/LensDocsStudio.Native`; the legacy shell's installation and state are preserved. GitHub Pages remains a separate static pipeline and requires no .NET build.
+See the [engineering handover](docs/native/engineering-handover.md), [native implementation progress](docs/native/implementation-progress.md), [functional parity](docs/native/functional-parity-matrix.md) and [validation evidence](docs/native/validation-report.md). Native state uses `%LOCALAPPDATA%/LensDocsStudio.Native`; the legacy shell's installation and state are preserved. GitHub Pages remains a separate static pipeline and requires no .NET build.
 
 The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix identifies features still to be implemented.
 

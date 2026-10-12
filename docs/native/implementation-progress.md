@@ -12,9 +12,9 @@ All four ade57cd CI runs pass: 778 core tests, five PDF syntax outcomes, seven a
 | Branch | feature/native-wpf-rebuild |
 | Draft PR | [21](https://github.com/DouglasNLima/local-docs-studio/pull/21), targeting develop |
 | Latest implementation | Checked PDF font fallback, supplementary-character copy mapping and explicit missing-glyph failure |
-| Latest complete native CI | 676523e, PR/push 38227300924/38227294457: 791 core tests, seven signature cases, seven combined signed-update cases, 12 export-browser cases and 56 workflows in built, installed, upgraded and reinstalled applications |
-| Latest complete web CI | Both 676523e runs 38227300857/38227294505: all 262 cases in 7.2/10.6 minutes |
-| Current validation | PDF correction passes Release with no warnings/errors, 791 core tests, six focused Unicode outcomes, the full 40-case native corpus with zero failures and static checks. Its Windows CI remains pending |
+| Latest complete native CI | 230852b, PR/push 38230558112/38230551640: 791 core tests, seven signature cases, seven combined signed-update cases, 12 export-browser cases and 56 workflows in built, installed, upgraded and reinstalled applications |
+| Latest complete web CI | Both 230852b runs 38230558094/38230551635: all 262 cases in 10.7 minutes |
+| Current validation | PDF correction passes Release with no warnings/errors, 791 core tests, six focused Unicode outcomes, the full 40-case native corpus with zero failures and static checks. Both native CI runs pass all 56 workflows, including actual Unicode PDF export in every desktop context |
 
 Implemented workflows include native folders/tabs/history, guarded UTF-8 saves, external-change handling, recovery/snapshots, reviewed file/folder moves with case-only names, portable images, native editing/search, rich clipboard/paste, imports/exports, reusable Word/content libraries, browser migration, source-aware review and workspace maps. Optional artefact metadata stays passive and session-only. The parity matrix records the remaining limits for each contract.
 
@@ -30,7 +30,7 @@ Native push 38202782258 at d86a5ac repeats a wrapped UIA editor-provider timeout
 
 Next executable work:
 
-1. Push and monitor the PDF Unicode correction. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
+1. Continue the acceptance areas below using the validated 230852b preview; see [engineering handover](engineering-handover.md). Both native and web runs pass. Downloaded current evidence confirms Unicode export, 20 preserved state files and certificate cleanup. The previous clipboard-read correction and combined update-boundary fixture pass all four 676523e runs; the downloaded PR report confirms seven combined trust outcomes, no executable launch, unchanged production trust and test-certificate cleanup. The earlier 5120f18 clipboard failure remains retained. No local certificate-store mutation, Office activation or foreground interaction is authorised by the current validation setup.
 2. Correct any further confirmed regressions. Preserve failed evidence and avoid counting cancelled or failed runs as passed.
 3. Continue measured responsiveness, supported export/diagram compatibility and accessibility acceptance; retain explicit unsupported forms and performance limits.
 4. Complete SDK-free clean-Windows and positive signed-update certification when the required environment and authorised production trust are available. Do not provision production identities or publish a release without the required authority.

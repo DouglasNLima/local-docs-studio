@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Current product evidence: all four 230852b CI runs pass, including the expanded actual PDF Export-menu Unicode check in 56 built/installed/upgraded/reinstalled workflows. The downloaded PDF report retains CJK, Arabic and Hebrew characters on Windows CI; it does not certify shaping or reading order. Matching unsigned preview.171 packages and outstanding acceptance are recorded in the [engineering handover](engineering-handover.md).
+
 Checked Windows font fallback and a final PDF glyph guard now prevent missing-character boxes. Six local PDF outcomes pass, including actual selectable emoji across formatting, code, tables and links; unsupported characters fail explicitly. Corrected emoji/CJK/combined pages were rasterised and inspected. Source remains unchanged. Complex-script shaping, bidirectional layout and joined/colour emoji remain separate fidelity limits.
 
 Reference: docs/tool-guide.md, browser regression tests, registries/content.js and the newer main image/navigation/template contracts. All rows start incomplete until validated outcomes are recorded.
