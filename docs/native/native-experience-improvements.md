@@ -34,4 +34,6 @@ The native reconstruction keeps portable Markdown and real filesystem ownership 
 
 An embedded browser and proprietary document store were rejected: neither meets the authorised native and portability requirements. WPF list subdivision into 128-item groups was measured and removed because it offered no useful layout improvement. Automatic recovery/image pruning remains deferred to avoid discarding recoverable user data.
 
+Repeated-image handling now preserves ordinary output without retaining duplicate imported Word assets or duplicate Word/PDF payloads. Explicit size/count limits stop excessive import/export work before publishing a destination; selected-table copy charges only its own images. A real alias package, schema-valid repeated Word images, actual PDF images and small-budget rejection/cancellation checks pass locally. Windows CI for this correction remains pending.
+
 These are implemented outcomes with stated evidence limits, not production certification. Detailed contracts and remaining gaps are in the functional parity matrix and validation report.

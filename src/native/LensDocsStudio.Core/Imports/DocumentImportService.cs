@@ -9,6 +9,8 @@ namespace LensDocsStudio.Core.Imports;
 
 public sealed record ImportedAsset(string Reference, byte[] Bytes, string SuggestedName);
 public sealed record ImportedDocument(string Markdown, IReadOnlyList<ImportedAsset> Assets, IReadOnlyList<string> Warnings);
+public sealed record WordImportLimits(long MaximumImageBytes = 32 * 1024 * 1024,
+    long MaximumTotalImageBytes = 64 * 1024 * 1024, int MaximumImages = 1024);
 
 public sealed partial class DocumentImportService
 {
@@ -21,7 +23,7 @@ public sealed partial class DocumentImportService
             cancellationToken.ThrowIfCancellationRequested();
             return Path.GetExtension(path).ToLowerInvariant() switch
             {
-                ".docx" => ImportDocx(bytes),
+                ".docx" => ImportDocx(bytes, cancellationToken),
                 ".html" or ".htm" => ImportHtml(new UTF8Encoding(false, true).GetString(bytes), cancellationToken),
                 ".pdf" => ImportPdf(bytes, Path.GetFileNameWithoutExtension(path), cancellationToken),
                 _ => throw new InvalidDataException("Select a DOCX, HTML or PDF document.")
@@ -31,8 +33,12 @@ public sealed partial class DocumentImportService
 
     public ImportedDocument ImportHtml(string html, CancellationToken cancellationToken = default) => new HtmlMarkdownConverter().Convert(html, cancellationToken);
 
-    public ImportedDocument ImportDocx(byte[] bytes)
+    public ImportedDocument ImportDocx(byte[] bytes, CancellationToken cancellationToken = default, WordImportLimits? limits = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        limits ??= new();
+        if (limits.MaximumImageBytes < 1 || limits.MaximumTotalImageBytes < 1 || limits.MaximumImages < 1)
+            throw new ArgumentOutOfRangeException(nameof(limits));
         using (var zip = new ZipArchive(new MemoryStream(bytes)))
         {
             if (zip.Entries.Count > 2000 || zip.Entries.Sum(e => e.Length) > 256 * 1024 * 1024 || zip.Entries.Any(e => e.Length > 32 * 1024 * 1024))
@@ -43,27 +49,48 @@ public sealed partial class DocumentImportService
         var main = package.MainDocumentPart ?? throw new InvalidDataException("The Word document has no body.");
         var assets = new List<ImportedAsset>(); var warnings = new List<string>();
         var imageReferences = new Dictionary<string, string>();
+        var partReferences = new Dictionary<Uri, string>();
+        long retainedImageBytes = 0;
         string Paragraph(W.Paragraph paragraph)
         {
             var text = new StringBuilder();
             foreach (var run in paragraph.Descendants<W.Run>())
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 var value = string.Concat(run.ChildElements.Select(e => e switch { W.Text t => t.Text, W.Break => "\n", W.TabChar => "\t", _ => "" }));
                 if (run.RunProperties?.Bold is { } bold && bold.Val?.Value != false) value = "**" + value + "**";
                 if (run.RunProperties?.Italic is { } italic && italic.Val?.Value != false) value = "*" + value + "*";
                 text.Append(value);
                 foreach (var blip in run.Descendants<A.Blip>())
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     var id = blip.Embed?.Value;
                     if (id is null) { warnings.Add("An external Word image was not fetched."); continue; }
                     if (!imageReferences.TryGetValue(id, out var reference))
                     {
                         if (main.GetPartById(id) is not ImagePart image || image.ContentType is not ("image/png" or "image/jpeg" or "image/gif" or "image/webp" or "image/bmp"))
                         { warnings.Add("An unsupported Word image was skipped."); continue; }
-                        using var imageStream = image.GetStream();
-                        using var data = new MemoryStream(); imageStream.CopyTo(data);
-                        reference = "assets/images/import-" + Guid.NewGuid().ToString("N") + ".png";
-                        assets.Add(new(reference, data.ToArray(), "word-image"));
+                        // Relationship aliases can resolve to the same package part. Retain that payload only once.
+                        if (!partReferences.TryGetValue(image.Uri, out reference))
+                        {
+                            if (assets.Count >= limits.MaximumImages) throw new InvalidDataException("The Word document contains too many images.");
+                            var remaining = Math.Min(limits.MaximumImageBytes, limits.MaximumTotalImageBytes - retainedImageBytes);
+                            using var imageStream = image.GetStream();
+                            using var data = new MemoryStream();
+                            var buffer = new byte[64 * 1024];
+                            while (true)
+                            {
+                                cancellationToken.ThrowIfCancellationRequested();
+                                var count = imageStream.Read(buffer, 0, (int)Math.Min(buffer.Length, remaining - data.Length + 1));
+                                if (count == 0) break;
+                                if (count > remaining - data.Length) throw new InvalidDataException("Word images exceed the import size limit.");
+                                data.Write(buffer, 0, count);
+                            }
+                            reference = "assets/images/import-" + Guid.NewGuid().ToString("N") + ".png";
+                            assets.Add(new(reference, data.ToArray(), "word-image"));
+                            retainedImageBytes += data.Length;
+                            partReferences.Add(image.Uri, reference);
+                        }
                         imageReferences[id] = reference;
                     }
                     text.Append("![Imported image](").Append(reference).Append(')');
@@ -85,6 +112,7 @@ public sealed partial class DocumentImportService
         var output = new StringBuilder();
         foreach (var element in main.Document?.Body?.ChildElements ?? [])
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (element is W.Paragraph paragraph) output.AppendLine(Paragraph(paragraph)).AppendLine();
             else if (element is W.Table table)
             {

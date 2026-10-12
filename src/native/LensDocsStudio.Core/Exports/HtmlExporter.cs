@@ -12,18 +12,20 @@ namespace LensDocsStudio.Core.Exports;
 
 public sealed class HtmlExporter
 {
-    public string Export(ExportContent content)
+    public string Export(ExportContent content, CancellationToken cancellationToken = default)
     {
-        var fragment = RenderFragment(content);
+        var fragment = RenderFragment(content, cancellationToken: cancellationToken);
         var title = WebUtility.HtmlEncode(content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation");
         return "<!doctype html>\n<html lang=\"en-GB\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">" +
             "<meta http-equiv=\"Content-Security-Policy\" content=\"default-src 'none'; img-src data:; style-src 'unsafe-inline'\">" +
             "<title>" + title + "</title><style>body{font:16px/1.6 system-ui,sans-serif;max-width:960px;margin:2rem auto;padding:0 1.5rem;color:#202124;background:#fafafa}img{max-width:100%;height:auto}pre{white-space:pre-wrap;padding:1rem;background:#f3f4f6}table{border-collapse:collapse;width:100%}th,td{border:1px solid #bbb;padding:.5rem}blockquote{border-left:3px solid #ff883e;margin-left:0;padding-left:1rem}a{color:#174ea6}.document-progress{margin:1rem 0}.document-progress progress{width:100%;accent-color:#FF883E}.progress-green progress{accent-color:#2F855A}.progress-blue progress{accent-color:#2563EB}.progress-amber progress{accent-color:#B7791F}.progress-red progress{accent-color:#C53030}.progress-neutral progress{accent-color:#64748B}</style></head><body>" +
             fragment + "</body></html>";
     }
-    public string RenderFragment(ExportContent content, ExportTableSelection? table = null, bool flattenDetails = false, bool preserveWikiLinks = false)
+    public string RenderFragment(ExportContent content, ExportTableSelection? table = null, bool flattenDetails = false, bool preserveWikiLinks = false,
+        CancellationToken cancellationToken = default)
     {
-        using var writer = new StringWriter();
+        content.AllocationLimits.Validate(content, table, cancellationToken);
+        using var writer = new BoundedExportWriter(content.AllocationLimits.MaximumHtmlCharacters, cancellationToken);
         var renderer = new HtmlRenderer(writer);
         renderer.ObjectRenderers.Insert(0, new CodeRenderer(content));
         renderer.ObjectRenderers.Insert(0, new LinkRenderer(content));
@@ -44,6 +46,7 @@ public sealed class HtmlExporter
         var fragment = new HtmlParser().ParseDocument(writer.ToString());
         foreach (var element in fragment.Body!.QuerySelectorAll("*"))
         {
+            cancellationToken.ThrowIfCancellationRequested();
             foreach (var attribute in element.Attributes.ToArray())
             {
                 var allowed = attribute.Name switch
@@ -64,6 +67,7 @@ public sealed class HtmlExporter
                 if (!allowed) element.RemoveAttribute(attribute.Name);
             }
         }
+        cancellationToken.ThrowIfCancellationRequested();
         return fragment.Body.InnerHtml;
     }
     private static bool SafeLink(string value) => !value.Any(char.IsControl) &&

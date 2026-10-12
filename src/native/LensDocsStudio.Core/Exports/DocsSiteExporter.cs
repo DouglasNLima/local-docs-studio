@@ -27,10 +27,10 @@ public sealed class DocsSiteExporter
     public const long MaximumOutputBytes = 256 * 1024 * 1024;
     private static readonly JsonSerializerOptions Json = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true };
 
-    public DocsSitePage PreparePage(string path, ExportContent content, ArtifactBundle? artifactBundle = null)
+    public DocsSitePage PreparePage(string path, ExportContent content, ArtifactBundle? artifactBundle = null, CancellationToken cancellationToken = default)
     {
         path = ValidatePath(path);
-        var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content, preserveWikiLinks: true));
+        var html = new HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content, preserveWikiLinks: true, cancellationToken: cancellationToken));
         var headingElements = html.Body!.QuerySelectorAll("h1,h2,h3,h4,h5,h6");
         var usedIds = new HashSet<string>(html.Body.QuerySelectorAll("[id]").Except(headingElements).Select(e => e.Id!), StringComparer.Ordinal);
         var headings = headingElements.Select(h =>

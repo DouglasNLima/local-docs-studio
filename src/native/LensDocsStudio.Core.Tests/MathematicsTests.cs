@@ -81,7 +81,9 @@ public sealed class MathematicsTests
         Assert.Equal("Formula x^2", site.Title); Assert.Equal(document.Headings[0].Anchor, site.Headings[0].Id); Assert.Equal("Formula x^2", site.Headings[0].Text);
         Assert.Equal(document.Source, new MarkdownClipboardExporter().Export(content).PlainText);
         using var word = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(content)), false);
-        Assert.Equal(2, word.MainDocumentPart!.ImageParts.Count()); Assert.Empty(new OpenXmlValidator().Validate(word));
+        Assert.Single(word.MainDocumentPart!.ImageParts);
+        Assert.Equal(new[] { "x^2", "a+b" }, word.MainDocumentPart.Document!.Descendants<DocumentFormat.OpenXml.Drawing.Wordprocessing.DocProperties>().Select(p => p.Description!.Value));
+        Assert.Empty(new OpenXmlValidator().Validate(word));
         Assert.All(word.MainDocumentPart.Document!.Descendants<DocumentFormat.OpenXml.Drawing.Wordprocessing.Extent>(), extent => Assert.Equal(60 * 9525, extent.Cx!.Value));
     }
 }

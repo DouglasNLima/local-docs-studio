@@ -35,7 +35,7 @@ public sealed class DocsSiteExportService
             if (bytes > DocumentStore.MaximumDocumentBytes || sourceBytes > 64 * 1024 * 1024) throw new IOException("Docs Site source exceeds the 32 MB per-document or 64 MB workspace limit.");
             progress?.Report($"Preparing Docs Site page {pages.Count + 1} of {files.Length}: {relative}");
             var page = await StaWorker.RunAsync(() => exporter.PreparePage(relative,
-                preparation.Prepare(source, file, workspace.Root, options.Theme == "dark", cancellationToken, 64 * 1024 * 1024), artifactBundle), cancellationToken);
+                preparation.Prepare(source, file, workspace.Root, options.Theme == "dark", cancellationToken, 64 * 1024 * 1024), artifactBundle, cancellationToken), cancellationToken);
             renderedBytes += Encoding.UTF8.GetByteCount(page.Html) + Encoding.UTF8.GetByteCount(page.SearchText);
             if (renderedBytes > DocsSiteExporter.MaximumOutputBytes / 3) throw new IOException("Rendered Docs Site content exceeds its size budget.");
             pages.Add(page);

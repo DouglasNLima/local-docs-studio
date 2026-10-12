@@ -17,13 +17,15 @@ public sealed class DocxExporter
     public byte[] Export(ExportContent content, byte[]? template = null, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        using var stream = new MemoryStream();
+        content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
+        using var stream = new BoundedExportStream(content.AllocationLimits.MaximumOutputBytes, cancellationToken);
         if (template is not null) stream.Write(new DocxTemplateService().Prepare(template, cancellationToken).Bytes);
         using (var package = template is null
             ? WordprocessingDocument.Create(stream, WordprocessingDocumentType.Document, true)
             : WordprocessingDocument.Open(stream, true))
         {
             var main = package.MainDocumentPart ?? package.AddMainDocumentPart();
+            var imageParts = new Dictionary<byte[], ImagePart>(ReferenceEqualityComparer.Instance);
             if (main.VbaProjectPart is not null) throw new InvalidDataException("Macro-enabled templates are not supported.");
             ValidateRelationships(main, new HashSet<OpenXmlPart>());
             main.Document ??= new W.Document(new W.Body());
@@ -73,6 +75,7 @@ public sealed class DocxExporter
 
             void AppendBlock(OpenXmlCompositeElement parent, Block block, int? listId = null, int depth = 0, string? paragraphStyle = null)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 switch (block)
                 {
                     case Markdig.Extensions.Mathematics.MathBlock formula:
@@ -200,6 +203,7 @@ public sealed class DocxExporter
             {
                 foreach (var inline in container)
                 {
+                    cancellationToken.ThrowIfCancellationRequested();
                     switch (inline)
                     {
                         case Markdig.Extensions.Mathematics.MathInline formula:
@@ -248,8 +252,13 @@ public sealed class DocxExporter
             }
             W.Run Image(ExportImage image)
             {
-                var part = main.AddImagePart(ImagePartType.Png);
-                using var data = new MemoryStream(image.PngBytes); part.FeedData(data);
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!imageParts.TryGetValue(image.PngBytes, out var part))
+                {
+                    part = main.AddImagePart(ImagePartType.Png);
+                    using var data = new MemoryStream(image.PngBytes, false); part.FeedData(data);
+                    imageParts.Add(image.PngBytes, part);
+                }
                 var cx = (long)((image.DisplayWidth > 0 ? image.DisplayWidth : image.PixelWidth) * 9525);
                 var cy = (long)((image.DisplayHeight > 0 ? image.DisplayHeight : image.PixelHeight) * 9525);
                 var scale = Math.Min(1, Math.Min((double)widthEmu / cx, (double)heightEmu / cy));

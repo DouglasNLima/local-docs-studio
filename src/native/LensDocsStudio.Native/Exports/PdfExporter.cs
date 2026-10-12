@@ -13,8 +13,10 @@ namespace LensDocsStudio.Native.Exports;
 
 public sealed class PdfExporter
 {
-    public byte[] Export(ExportContent content)
+    public byte[] Export(ExportContent content, CancellationToken cancellationToken = default)
     {
+        content.AllocationLimits.Validate(content, cancellationToken: cancellationToken);
+        var imageSources = new Dictionary<byte[], string>(ReferenceEqualityComparer.Instance);
         var document = new Document();
         document.Info.Title = content.Document.Headings.FirstOrDefault()?.Title ?? "Documentation";
         var normal = document.Styles[StyleNames.Normal]!;
@@ -35,13 +37,16 @@ public sealed class PdfExporter
         var headingTargets = content.Document.Targets.Where(t => t.HeadingLevel > 0).ToDictionary(t => t.SourceStart);
         foreach (var block in content.Document.Syntax) Append(section.Elements, block);
         var renderer = new PdfDocumentRenderer { Document = document };
+        cancellationToken.ThrowIfCancellationRequested();
         renderer.RenderDocument();
-        using var output = new MemoryStream();
+        cancellationToken.ThrowIfCancellationRequested();
+        using var output = new BoundedExportStream(content.AllocationLimits.MaximumOutputBytes, cancellationToken);
         renderer.PdfDocument.Save(output, false);
         return output.ToArray();
 
         void Append(DocumentElements elements, MdBlock block, string? marker = null)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             switch (block)
             {
                 case Markdig.Extensions.Mathematics.MathBlock formula:
@@ -122,6 +127,7 @@ public sealed class PdfExporter
             if (container is null) return;
             foreach (var inline in container)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 switch (inline)
                 {
                     case Markdig.Extensions.Mathematics.MathInline formula:
@@ -162,9 +168,15 @@ public sealed class PdfExporter
                 }
             }
         }
-        static void AddImage(ParagraphElements elements, ExportImage asset)
+        void AddImage(ParagraphElements elements, ExportImage asset)
         {
-            var image = elements.AddImage("base64:" + Convert.ToBase64String(asset.PngBytes));
+            cancellationToken.ThrowIfCancellationRequested();
+            if (!imageSources.TryGetValue(asset.PngBytes, out var source))
+            {
+                source = "base64:" + Convert.ToBase64String(asset.PngBytes);
+                imageSources.Add(asset.PngBytes, source);
+            }
+            var image = elements.AddImage(source);
             image.LockAspectRatio = true;
             var width = Math.Min(482, asset.DisplayWidth > 0 ? asset.DisplayWidth * 72 / 96 : asset.PixelWidth * 72d / 144);
             var height = width * asset.PixelHeight / asset.PixelWidth;

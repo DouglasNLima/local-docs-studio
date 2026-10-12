@@ -16,6 +16,6 @@ public sealed class ClipboardExportService
             if (markdownSource && table is not null) throw new IOException("Table copying uses formatted content.");
             var content = new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService()).Prepare(source, sourcePath, workspaceRoot, dark, cancellationToken, 16 * 1024 * 1024, markdownSource, table);
             cancellationToken.ThrowIfCancellationRequested();
-            return markdownSource ? new MarkdownClipboardExporter().Export(content, cancellationToken) : new ClipboardExporter().Export(content, table);
+            return markdownSource ? new MarkdownClipboardExporter().Export(content, cancellationToken) : new ClipboardExporter().Export(content, table, cancellationToken);
         }, cancellationToken);
 }

@@ -17,8 +17,8 @@ public sealed class DocumentExportService
             return format switch
             {
                 "DOCX" => new DocxExporter().Export(content, template, cancellationToken),
-                "PDF" => new PdfExporter().Export(content),
-                "HTML" => Encoding.UTF8.GetBytes(new HtmlExporter().Export(content)),
+                "PDF" => new PdfExporter().Export(content, cancellationToken),
+                "HTML" => Encoding.UTF8.GetBytes(new HtmlExporter().Export(content, cancellationToken)),
                 _ => throw new ArgumentException("Unsupported export format.")
             };
         }, cancellationToken);

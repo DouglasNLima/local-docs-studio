@@ -21,6 +21,12 @@ internal static class Program
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui");
         if (args.FirstOrDefault() == "--office")
             return OfficeClipboardChecks.Run(args.ElementAtOrDefault(1) ?? "artifacts/native/office");
+        if (args.FirstOrDefault() == "--export-allocation")
+        {
+            var allocationOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(allocationOutput);
+            try { NativeExportAllocationChecks.Run(allocationOutput); Console.WriteLine("Native export allocation checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--docs-site")
         {
             var siteOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation");
@@ -228,6 +234,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native shell layout: " + ex.Message); }
         try { NativePerformanceChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native performance observations: " + ex.Message); }
+        try { NativeExportAllocationChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native export allocation: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native Docs Site export: " + ex.Message); }
         try { NativeProgressChecks.Run(output); }

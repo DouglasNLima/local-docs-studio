@@ -7,4 +7,5 @@ public sealed record ExportContent(ParsedDocument Document, IReadOnlyDictionary<
     IReadOnlyDictionary<string, ExportImage> Images)
 {
     public IReadOnlyDictionary<int, ExportImage> Formulae { get; init; } = new Dictionary<int, ExportImage>();
+    public ExportAllocationLimits AllocationLimits { get; init; } = ExportAllocationLimits.Default;
 }
