@@ -1217,6 +1217,8 @@ internal static partial class NativeUiChecks
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeMaths, "One Undo did not restore the source before the maths fixture.");
             checks.Add("Native maths has accessible drawing bounds, exact LaTeX context/plain copy and focused preview search, while preserving source and complete insertion Undo");
+            CheckHelpGuide(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
             CheckSettings(window, editor, automation, app.ProcessId, state, output, source);
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Native application did not close safely.");

@@ -1,0 +1,131 @@
+# Lens Docs Studio native guide
+
+## Getting started
+
+Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.
+
+Choose **File → Open document** to edit a Markdown or Mermaid file, or **Open folder** to browse a documentation workspace. Files open in separate tabs. **File → New document** creates an unsaved document; **Create from template** offers bundled examples and generators.
+
+Use **Editor**, **Split** or **Preview** to choose your working layout. Drag the divider in Split to resize the editor and preview. The outline opens headings; double-click supported preview text to move to its source. **Alt+Left** and **Alt+Right** move through document navigation history.
+
+The native preview is a separate development edition. Its state and installation are kept apart from the browser product and legacy Windows shell.
+
+## Editing, finding and replacing
+
+The editor keeps ordinary UTF-8 Markdown. **Ctrl+Z** and **Ctrl+Y** undo and redo changes. Use **Ctrl+B** for bold and **Ctrl+I** for italic, or the Edit and Insert menus for lists, tables, links, code and document helpers.
+
+**Ctrl+F** searches the focused editor or preview. **Ctrl+H** opens editor replacement. Close the find bar with **Escape** to return to the previous view. Preview Find opens closed details sections when needed and brings the selected match into view.
+
+**Ctrl+Shift+K** opens the workspace document and heading picker. Inserted links remain portable Markdown. **Ctrl+Space** offers Mermaid suggestions inside diagram source.
+
+**View → Document review** checks the current text, including unsaved edits, for document structure and local link/image issues. Selecting a supported result moves to its source.
+
+## Saving, recovery and external changes
+
+**Ctrl+S** saves the current document. **Ctrl+Shift+S** saves a copy or chooses its first location. Local images and links are prepared for the destination before source is written.
+
+Unsaved documents and edits are retained in separate recovery state. **File → Take snapshot** keeps a named point to review later under **Document snapshots**. Review restored drafts before saving them over an existing file.
+
+If another application changes a file, Lens Docs Studio flags the difference and keeps your editor text. Follow the conflict choices rather than assuming the version on disk is unchanged. **Reload from disk** asks about unsaved work and retains recovery where supported.
+
+Use **Rename or move document** to review affected links before applying a move. **Delete document** uses recoverable Windows deletion and retains a snapshot. Folder moves and case-only renames remain under development.
+
+## Images and attachments
+
+Choose **Insert → Local image**, paste image pixels, or drop a supported image into the editor. Images are validated and saved as local assets before the Markdown selection changes. An image inserted before the first save stays with the recovered draft and is copied into the destination workspace when saved.
+
+**Insert → Image from URL** retrieves an image only after an explicit request. Preview does not automatically fetch remote image references.
+
+To add or edit a caption, put the caret inside a standalone Markdown image and choose **Insert → Image figure**. Alternative text, caption, destination and title remain editable. Each application is one undoable change.
+
+**File → Workspace images** lists local images and their references. Review the source locations before renaming or removing an asset.
+
+## Mermaid diagrams and maths
+
+Write Mermaid inside a fenced `mermaid` block or open a standalone `.mmd` or `.mermaid` file. Supported diagrams render through bundled .NET components. **Zoom**, **SVG**, **PNG** and **Copy source** actions appear beside a rendered diagram.
+
+The built-in catalogue includes examples for the supported diagram families. If a diagram cannot be rendered, its source and an explanation remain visible. Full compatibility with every browser Mermaid version is still being evaluated.
+
+Maths supports inline dollar delimiters, parenthesised LaTeX delimiters and display formulae. Fractions, roots, scripts, Greek symbols, sums, integrals and common matrix, cases and aligned expressions render offline. Right-click a formula to copy its original LaTeX.
+
+Unsupported or oversized formulae remain readable source. Each formula is limited to 4,096 characters, with at most 256 formulae and 32,768 formula characters per document. HTML, Word, PDF and rich clipboard output use high-resolution formula images; Markdown keeps the editable source.
+
+## Details, callouts and document helpers
+
+**Insert → Details section** creates or edits a plain summary, Markdown body and initial expansion state. Complete passive details sections render as native expanders. Nested headings, links, tables, images and diagrams keep their source positions.
+
+Expanding a section in preview does not edit Markdown. Word, PDF and rich clipboard exports retain the complete closed body. HTML and Docs Site exports keep interactive sections.
+
+The Insert menu also offers callouts, progress indicators and explicit anchors. Unsupported embedded HTML remains inert source; it is never executed as application UI.
+
+## Copying and pasting
+
+**Edit → Copy rendered text** copies readable Unicode text, including original LaTeX for formulae. **Copy rendered content** supplies formatted HTML and text with embedded supported images and diagrams for applications such as Word.
+
+**Copy Markdown with images** retains Markdown around local images and complete Mermaid blocks while supplying portable image representations. Attachment handling still depends on the destination application; live Azure DevOps workflows need separate validation.
+
+**Paste Special** offers plain text, table, code, quote, HTML, list, checklist, numbered list and Mermaid modes. **Ctrl+Shift+V** pastes literal text. Formatted HTML and spreadsheet cells can become editable Markdown. Review any warnings about merged cells or linked images.
+
+Native preview tables provide context actions for copying the selected table and exporting its cells as UTF-8 CSV. CSV preserves cell text; spreadsheet applications may infer their own value types when opening it.
+
+## Templates, snippets and browser migration
+
+**File → Create from template** opens bundled examples and generators. Filter by category or name, edit the labelled fields and inspect the generated source. Creation opens a new unsaved tab. **Insert → Built-in snippet** inserts one undoable source change.
+
+**File → Content library** manages your own templates, snippets and export profiles. Save a document as a template or selected source as a snippet from the File menu. Local raster images are embedded in the library copy; Mermaid remains editable. Referenced workspace documents still need their original files.
+
+To migrate a browser library, use **Create → Export local library** in the browser edition. In the native Content library, choose **Import JSON** and select that file. Compatible version 1.0 entries merge without replacing existing content. Repeated imports are detected and conflicting identifiers receive new values.
+
+Rename changes the library label. **Archive** hides an entry without deleting it; enable **Show archived** and choose **Restore** to bring it back. JSON export includes the entries in the selected active or archived collection. Browser profiles are not scanned, and browser settings or handles are not imported automatically.
+
+## Word templates
+
+**Export → Select Word template** applies supported formatting from a chosen DOCX to this session. The original file remains unchanged. Exports use fresh packages with validated styles, numbering, page layout and supported header/footer content.
+
+Unrelated template body text and personal package metadata are excluded. Templates with active fields, external resources or unsupported retained objects are rejected with an explanation. Page, section and date/time fields are supported.
+
+**Export → Word template library** keeps reusable templates in private native state. Import, rename, save a portable copy, archive and restore templates there. **Use default Word styles** clears the current selection.
+
+## Imports and exports
+
+Use **File → Import DOCX, HTML or PDF** to create editable content from supported input. Inspect the resulting text and warnings; document formats do not always map exactly to Markdown.
+
+The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Docs Site**. Exports are prepared separately from source. App-only search, outline and review controls are excluded from document output.
+
+Markdown bundles keep portable source and local assets. Docs Site exports produce static HTML, navigation, section search and local resources for browsing or static hosting. Local preview and export do not execute imported scripts.
+
+**Export → Export profiles** offers generic documentation, Azure DevOps Wiki Markdown and GitHub Pages Docs Site defaults. Applying a profile affects the current session. Save a reusable profile in the content library when needed. The Azure DevOps preset converts complete Mermaid fences in Markdown bundle entries while preserving other source and file encodings.
+
+Optional artefact review packs, broader template fidelity and some advanced export semantics remain under development. Inspect important exported documents in their intended destination before distribution.
+
+## Settings and keyboard shortcuts
+
+Open **Edit → Settings** with **Ctrl+,**. Choose theme, layout, outline visibility, editor font and size, wrapping, line numbers, indentation and preview zoom. **Apply** saves the choices on this device. **Restore defaults** can still be cancelled.
+
+Indentation options affect new typing; existing tabs, spaces, text, selection and Undo/Redo remain intact. Preview zoom ranges from 50% to 200% and does not change export sizes. **System** theme follows Windows; Windows high-contrast colours take precedence.
+
+| Action | Shortcut |
+| --- | --- |
+| New document | Ctrl+N |
+| Open document / folder | Ctrl+O / Ctrl+Shift+O |
+| Save / Save as | Ctrl+S / Ctrl+Shift+S |
+| Close document | Ctrl+W |
+| Find / Replace | Ctrl+F / Ctrl+H |
+| Bold / Italic | Ctrl+B / Ctrl+I |
+| Literal paste | Ctrl+Shift+V |
+| Workspace document link | Ctrl+Shift+K |
+| Mermaid suggestions | Ctrl+Space |
+| Back / Forward | Alt+Left / Alt+Right |
+| Rename or move document | F2 |
+| Settings | Ctrl+, |
+| Native guide | F1 |
+
+## Updates and privacy
+
+**Help → Updates** controls automatic checks and Stable or Preview channels. You can check manually, review release notes, postpone a version, or choose a verified download and installation when available. Checking public GitHub release metadata does not send local documents.
+
+Downloading and installing are separate user actions. Installation saves recovery state, asks about unsaved edits and closes the workspace before opening the wizard. Updates require compatible signed metadata, integrity checks and a trusted Windows publisher.
+
+Production signing identities are not yet configured for this internal preview, so untrusted downloaded installers cannot run through the app. Positive signed-upgrade and clean-machine certification remain outstanding.
+
+Native preferences and recovery are stored under `%LOCALAPPDATA%/LensDocsStudio.Native`. Source documents remain ordinary local files. Automatic release checks are optional; image retrieval and opening external links require explicit actions. The installed editor and preview use no embedded browser, JavaScript runtime or local server.

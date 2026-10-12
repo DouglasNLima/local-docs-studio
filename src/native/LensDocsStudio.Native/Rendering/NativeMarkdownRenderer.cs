@@ -68,7 +68,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
         Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
-            PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity };
+            PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity, TextAlignment = TextAlignment.Left };
         var sourceElements = new Dictionary<int, TextElement>();
         var detailSections = new List<PreviewDetails>();
         var formulaSources = new List<PreviewMaths>();
@@ -113,7 +113,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             var image = new Image { Source = drawing, Stretch = Stretch.Uniform, MaxHeight = 900, HorizontalAlignment = HorizontalAlignment.Left };
                             System.Windows.Automation.AutomationProperties.SetName(image, "Mermaid diagram");
                             panel.Children.Add(image);
-                            var actions = new StackPanel { Orientation = Orientation.Horizontal };
+                            var actions = new WrapPanel { Orientation = Orientation.Horizontal };
                             foreach (var format in new[] { "Zoom", "SVG", "PNG", "Copy source" })
                             {
                                 var button = new Button { Content = format, Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };

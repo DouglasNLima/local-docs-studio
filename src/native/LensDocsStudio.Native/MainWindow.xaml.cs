@@ -463,6 +463,7 @@ public partial class MainWindow : Window
     private void ApplyTheme()
     {
         ThemeService.Apply(Application.Current.Resources, model.Theme);
+        helpWindow?.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
@@ -485,6 +486,7 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None) { OpenHelp(sender, e); e.Handled = true; return; }
         if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
         { if (WorkspaceTree.IsKeyboardFocusWithin) _ = RenameTreeEntryAsync(); else model.MoveDocumentCommand.Execute(null); e.Handled = true; return; }
         if (e.Key == Key.Escape && FindBar.Visibility == Visibility.Visible) { HideFind(); e.Handled = true; return; }
