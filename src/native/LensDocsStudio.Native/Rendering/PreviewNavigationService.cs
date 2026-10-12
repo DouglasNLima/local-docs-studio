@@ -70,7 +70,8 @@ public static class PreviewNavigationService
                         if (viewer.Selection is not { } selection) return;
                         selection.Select(position, selectionEnd);
                     }
-                    ((FrameworkContentElement?)position.Paragraph ?? position.Parent as FrameworkContentElement)?.BringIntoView();
+                    // The exact text position already chose the page. Bringing its parent
+                    // paragraph into view would jump back to that paragraph's first page.
                     paged.UpdateLayout();
                     selected = true;
                 }, DispatcherPriority.Loaded);

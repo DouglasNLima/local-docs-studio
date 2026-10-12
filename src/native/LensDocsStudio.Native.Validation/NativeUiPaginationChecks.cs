@@ -18,40 +18,47 @@ internal static partial class NativeUiChecks
         UserPreferences Read() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencesPath))!;
         var originalPreferences = Read();
         var previousClipboard = NativeUiClipboard.GetDataObject(); uint owned = 0;
-        const string marker = "Item 4000";
-        var large = "# Paginated native reading\n\n" + string.Join('\n', Enumerable.Range(1, 4000)
-            .Select(index => $"- Item {index:D4}: Native documentation retains **portable text** and source-aware navigation."));
+        var fixtures = new[]
+        {
+            (Marker: "Item 4000", Name: "paginated", Content: "# Paginated native reading\n\n" + string.Join('\n', Enumerable.Range(1, 4000)
+                .Select(index => $"- Item {index:D4}: Native documentation retains **portable text** and source-aware navigation."))),
+            (Marker: "Final retained target.", Name: "single-block", Content: string.Concat(
+                Enumerable.Repeat("Native documentation preserves every word. ", 8192)) + "Final retained target.")
+        };
         try
         {
-            Layout("Editor"); FocusWindow(window); editor.Click();
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
-            NativeUiClipboard.SetText(large); owned = GetClipboardSequenceNumber();
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
-            Wait(() => ReadEditorText(editor) == large, "The paginated reading fixture did not retain exact editor source.");
-            Layout("Preview");
-            Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
-                && Find(window, "PreviewNextPage").IsEnabled, "Automatic reading did not expose native page navigation for the long document.");
-            Find(window, "PreviewNextPage").Patterns.Invoke.Pattern.Invoke();
-            Wait(() => Find(window, "PreviewPageNumber").Name.StartsWith("Page 2 of ", StringComparison.Ordinal), "Next page did not change the native reading page.");
-            Find(window, "PreviewPreviousPage").Patterns.Invoke.Pattern.Invoke();
-            Wait(() => Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal), "Previous page did not restore the first page.");
-            Find(window, "DocumentPreview").Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
-            Find(window, "FindText").AsTextBox().Text = marker; Find(window, "FindNext").Click();
-            Wait(() =>
+            foreach (var (marker, name, large) in fixtures)
             {
-                var preview = Find(window, "DocumentPreview");
-                return preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).EndsWith(marker, StringComparison.Ordinal)
-                    && range.GetBoundingRectangles().Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && preview.BoundingRectangle.Contains(rectangle)))
-                    && !Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal);
-            }, "Preview Find did not expose its exact final target inside the native page.");
-            CheckVisiblePreviewSelection(window, output, marker);
-            window.CaptureToFile(Path.Combine(output, "native-paginated-preview-search.png"));
-            Find(window, "CloseFind").Click();
-            Layout("Editor"); FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-            Wait(() => ReadEditorText(editor) == original, "Paged search or navigation damaged the source insertion's Undo.");
-            Layout("Split");
-            Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
-                && !PageControlsVisible(), "Automatic reading did not return to continuous preview for the restored small document.");
+                Layout("Editor"); FocusWindow(window); editor.Click();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
+                NativeUiClipboard.SetText(large); owned = GetClipboardSequenceNumber();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
+                Wait(() => ReadEditorText(editor) == large, "The paginated reading fixture did not retain exact editor source.");
+                Layout("Preview");
+                Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
+                    && Find(window, "PreviewNextPage").IsEnabled, "Automatic reading did not expose native page navigation for the long document.");
+                Find(window, "PreviewNextPage").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "PreviewPageNumber").Name.StartsWith("Page 2 of ", StringComparison.Ordinal), "Next page did not change the native reading page.");
+                Find(window, "PreviewPreviousPage").Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal), "Previous page did not restore the first page.");
+                Find(window, "DocumentPreview").Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+                Find(window, "FindText").AsTextBox().Text = marker; Find(window, "FindNext").Click();
+                Wait(() =>
+                {
+                    var preview = Find(window, "DocumentPreview");
+                    return preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).EndsWith(marker, StringComparison.Ordinal)
+                        && range.GetBoundingRectangles().Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && preview.BoundingRectangle.Contains(rectangle)))
+                        && !Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal);
+                }, "Preview Find did not expose its exact final target inside the native page.");
+                CheckVisiblePreviewSelection(window, output, marker, name == "paginated" ? "native-preview-selection" : "native-single-block-selection");
+                window.CaptureToFile(Path.Combine(output, "native-" + name + "-preview-search.png"));
+                Find(window, "CloseFind").Click();
+                Layout("Editor"); FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == original, "Paged search or navigation damaged the source insertion's Undo.");
+                Layout("Split");
+                Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
+                    && !PageControlsVisible(), "Automatic reading did not return to continuous preview for the restored small document.");
+            }
             ReadingMode("Pages"); Wait(PageControlsVisible, "Explicit pages did not expose native page controls for the small document.");
             ReadingMode("Continuous"); Wait(() => !PageControlsVisible(), "Continuous reading did not hide page controls.");
             ReadingMode(originalPreferences.Preview?.ReadingMode ?? "Automatic");
@@ -75,7 +82,7 @@ internal static partial class NativeUiChecks
         }
     }
 
-    private static void CheckVisiblePreviewSelection(Window window, string output, string marker)
+    private static void CheckVisiblePreviewSelection(Window window, string output, string marker, string evidenceName)
     {
         var query = Find(window, "FindText"); query.Focus();
         Wait(() => query.Properties.HasKeyboardFocus.Value, "Find did not retain keyboard focus in its query box.");
@@ -109,7 +116,7 @@ internal static partial class NativeUiChecks
         }
         finally { range.Select(); }
         Thread.Sleep(150);
-        File.WriteAllText(Path.Combine(output, "native-preview-selection.json"), JsonSerializer.Serialize(new
+        File.WriteAllText(Path.Combine(output, evidenceName + ".json"), JsonSerializer.Serialize(new
         { passed = true, marker, bounds, changedPixels, focusRemainsInQuery = query.Properties.HasKeyboardFocus.Value },
             new JsonSerializerOptions { WriteIndented = true }));
     }

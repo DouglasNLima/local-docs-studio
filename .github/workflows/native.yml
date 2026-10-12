@@ -79,6 +79,8 @@ jobs:
             artifacts/native/install-smoke/**/native-artefact-folder-controls.txt
             artifacts/native/install-smoke/**/native-preview-selection.json
             artifacts/native/install-smoke/**/native-paginated-preview-search.png
+            artifacts/native/install-smoke/**/native-single-block-selection.json
+            artifacts/native/install-smoke/**/native-single-block-preview-search.png
             artifacts/native/install-smoke/**/native-pdf-decorations.png
             artifacts/native/install-smoke/**/decorated-text.pdf
             artifacts/native/packages/*/*.exe

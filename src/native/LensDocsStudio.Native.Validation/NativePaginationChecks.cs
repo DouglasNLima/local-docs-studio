@@ -17,7 +17,7 @@ using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Validation;
 
-internal static class NativePaginationChecks
+internal static partial class NativePaginationChecks
 {
     public static void Run(string output)
     {

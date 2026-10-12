@@ -64,6 +64,12 @@ internal static class Program
             try { NativePaginationChecks.Run(paginationOutput); Console.WriteLine("Native pagination checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--large-blocks")
+        {
+            var blockOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/large-blocks"); Directory.CreateDirectory(blockOutput);
+            try { NativePaginationChecks.RunLargeBlocks(blockOutput); Console.WriteLine("Native large-block checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--html-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -287,6 +293,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }
         try { NativePaginationChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview pagination: " + ex.Message); }
+        try { NativePaginationChecks.RunLargeBlocks(output); }
+        catch (Exception ex) { failures.Add("Native large preview blocks: " + ex.Message); }
         try { NativeClipboardApartmentChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native clipboard apartments: " + ex.Message); }
         try { NativeShellLayoutChecks.Run(output); }

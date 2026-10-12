@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+Paged navigation uses the resolved TextPointer page and never follows it with a parent-paragraph BringIntoView. A single 352 KB paragraph demonstrated that the parent request returns to page 1 even when the correct final range is selected. Continuous scrolling retains its separate position-based adjustment. Six bounded block fixtures validate exact final-page visibility and unchanged content, and the existing stale-request/media/navigation checks still pass.
+
 The visible installer check runs on a separate MTA automation thread and only on disposable GitHub-hosted Windows runners. It refuses existing native registration, associations, shortcuts or default installation files, uses a unique reviewed destination, validates native UIA/MSAA choice states and keyboard actions, and cleans up only its own exact uninstaller. It complements the existing silent upgrade/lifecycle checks. No local foreground interaction is required to compile it or verify its execution guard. The first actual runs exposed an obsolete arrow suffix in the test button lookup; the corrected lookup matches Inno 6.7.1 and older labels. Actual complete wizard results remain pending CI.
 
 The PDF-decoration and Find-focus implementations pass both completed b1b500c native runs, including 58 workflows in every application context. The first PR attempt fails an existing layout assertion and remains recorded; no timing threshold was relaxed. The follow-up CI artefact selection retains installed-app highlight reports/screenshots and decorated PDF outputs.
