@@ -22,6 +22,9 @@ public sealed partial class NativeSvgService
         var xml = XDocument.Load(reader);
         var root = xml.Root ?? throw new InvalidDataException("The generated diagram is empty.");
         if (root.Name != XName.Get("svg", "http://www.w3.org/2000/svg")) throw new InvalidDataException("The generated drawing is not an SVG document.");
+        // Mermaider marks inherited node text with this token; literal authored colours must retain precedence.
+        var inheritedNodeLabels = root.Descendants().Where(e => e.Name.LocalName == "text"
+            && (string?)e.Attribute("fill") == "var(--_text)" && (string?)e.Parent?.Attribute("class") == "node").ToArray();
         var variables = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var style in root.Descendants().Where(e => e.Name.LocalName == "style"))
             foreach (Match match in Variable().Matches(style.Value)) variables[match.Groups[1].Value] = match.Groups[2].Value.Trim();
@@ -45,8 +48,59 @@ public sealed partial class NativeSvgService
                 element.Value = Variable().Replace(Resolve(element.Value, variables, 0), "");
             }
         }
+        foreach (var label in inheritedNodeLabels) EnsureNodeLabelContrast(label);
+        AddDeclaredBackground(root, variables);
         root.SetAttributeValue("font-family", "Segoe UI");
         return xml.ToString(SaveOptions.DisableFormatting);
+    }
+    private static void AddDeclaredBackground(XElement root, Dictionary<string, string> variables)
+    {
+        // CSS theme variables do not paint a WPF drawing. Keep exported labels readable on any destination surface.
+        if (root.Elements().Any(e => e.Name.LocalName == "rect" && (string?)e.Attribute("class") == "native-background")) return;
+        if (!variables.TryGetValue("--bg", out var value) || !TrySolidColour(Resolve(value, variables, 0), out var colour)) return;
+        var parts = ((string?)root.Attribute("viewBox") ?? "").Split([' ', ',', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != 4) return;
+        var bounds = new double[4];
+        for (var index = 0; index < bounds.Length; index++)
+            if (!double.TryParse(parts[index], NumberStyles.Float, CultureInfo.InvariantCulture, out bounds[index]) || !double.IsFinite(bounds[index])) return;
+        if (bounds[2] <= 0 || bounds[3] <= 0) return;
+        root.AddFirst(new XElement(root.Name.Namespace + "rect", new XAttribute("class", "native-background"),
+            new XAttribute("x", parts[0]), new XAttribute("y", parts[1]), new XAttribute("width", parts[2]), new XAttribute("height", parts[3]),
+            new XAttribute("fill", $"#{colour.R:X2}{colour.G:X2}{colour.B:X2}")));
+    }
+    private static void EnsureNodeLabelContrast(XElement label)
+    {
+        // Only a single opaque solid shape has an unambiguous background. Gradients and translucent shapes retain the renderer's colours.
+        var shapes = label.Parent!.Elements().Where(e => e.Name.LocalName is "rect" or "circle" or "ellipse" or "polygon" or "path").ToArray();
+        if (shapes.Length != 1 || shapes[0].Attribute("opacity") is not null || shapes[0].Attribute("fill-opacity") is not null
+            || !TrySolidColour((string?)shapes[0].Attribute("fill"), out var background)
+            || !TrySolidColour((string?)label.Attribute("fill"), out var foreground)) return;
+        if (Contrast(background, foreground) >= 4.5) return;
+        var dark = Color.FromRgb(0x20, 0x21, 0x24);
+        var light = Color.FromRgb(0xF3, 0xF4, 0xF6);
+        var darkContrast = Contrast(background, dark); var lightContrast = Contrast(background, light);
+        var replacement = darkContrast >= lightContrast ? "#202124" : "#F3F4F6";
+        if (Math.Max(darkContrast, lightContrast) < 4.5)
+            replacement = Contrast(background, Colors.Black) >= Contrast(background, Colors.White) ? "#000000" : "#FFFFFF";
+        label.SetAttributeValue("fill", replacement);
+    }
+    private static bool TrySolidColour(string? value, out Color colour)
+    {
+        colour = default;
+        if (string.IsNullOrWhiteSpace(value) || value.Contains('(') || value is "none" or "currentColor") return false;
+        try { colour = (Color)ColorConverter.ConvertFromString(value); return colour.A == 255; }
+        catch (FormatException) { return false; }
+        catch (ArgumentException) { return false; }
+    }
+    private static double Contrast(Color first, Color second)
+    {
+        static double Luminance(Color colour)
+        {
+            static double Channel(byte value) { var scaled = value / 255d; return scaled <= .04045 ? scaled / 12.92 : Math.Pow((scaled + .055) / 1.055, 2.4); }
+            return .2126 * Channel(colour.R) + .7152 * Channel(colour.G) + .0722 * Channel(colour.B);
+        }
+        var a = Luminance(first); var b = Luminance(second);
+        return (Math.Max(a, b) + .05) / (Math.Min(a, b) + .05);
     }
     private static void RejectExternalCss(string value)
     {

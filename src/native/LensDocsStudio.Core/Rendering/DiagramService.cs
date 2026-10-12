@@ -41,7 +41,7 @@ public sealed class DiagramService
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
         {
-            var svg = MermaidRenderer.RenderSvg(source, new RenderOptions
+            var svg = MermaidRenderer.RenderSvg(SequenceActivationSource.Prepare(source), new RenderOptions
             {
                 Bg = dark ? "#202124" : "#FAFAFA",
                 Fg = dark ? "#F3F4F6" : "#202124",

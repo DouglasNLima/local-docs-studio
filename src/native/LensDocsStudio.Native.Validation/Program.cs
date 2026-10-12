@@ -27,6 +27,12 @@ internal static class Program
             try { NativeExportAllocationChecks.Run(allocationOutput); Console.WriteLine("Native export allocation checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--diagram-contrast")
+        {
+            var contrastOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(contrastOutput);
+            try { NativeDiagramContrastChecks.Run(contrastOutput); Console.WriteLine("Native diagram contrast checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--docs-site")
         {
             var siteOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation");
@@ -214,6 +220,8 @@ internal static class Program
         var native = new NativeSvgService();
         var results = new List<object>();
         var failures = new List<string>();
+        try { NativeDiagramContrastChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native diagram label contrast: " + ex.Message); }
         try { NativeSvgChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }

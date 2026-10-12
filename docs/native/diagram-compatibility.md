@@ -1,0 +1,24 @@
+# Native diagram compatibility
+
+The desktop uses Mermaider 0.15.1 and SharpVectors through the native SVG adapter. It has no browser rendering fallback. The [fixture corpus](../../tests/fixtures/native-mermaid/compatibility.md) is checked in light and dark themes; the complete repository harness currently executes 40 diagram cases and retains SVG/PNG output under `artifacts/native/validation`. The catalogue contributes another 56 diagram/theme cases. Passing counts establish this corpus, not all Mermaid syntax.
+
+| Family | Inspected fixture outcome |
+|---|---|
+| Flowchart | Nested Workspace/Authoring subgraphs, multiline labels, decision shape, labelled edge, class colour and explicit node fill retain visible geometry and text |
+| Sequence | Participants, request/response arrows, note and activation bar retain their content; standalone activation adaptation is described below |
+| Class | Inheritance, property type/name and method labels are present |
+| Entity relationship | Workspace/document/asset labels, relationship labels and cardinality markers are present |
+| State | Initial state, forward transitions, revise loop and approval label are present |
+| Gantt | Draft/review bars, title, section and October date axis are present |
+| Pie | Verified/pending labels, 70/30 proportions and legend are present |
+| Mind map | Root, author/export branches and four leaf labels are present |
+
+Visual inspection exposed three defects beyond the earlier valid-SVG checks. Dark inherited text could disappear on an authored pale node fill; the adapter now selects contrasting neutral text only when the text colour is inherited and the node has one opaque solid shape. Explicit text colours, gradients and translucent shapes retain their authored/rendered colours. The target is 4.5:1 for this narrow inherited-text case, using the [W3C contrast calculation](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html); this is not a whole-application accessibility certification.
+
+SVG theme variables did not paint a background in WPF. The adapter now materialises an opaque declared background across the SVG viewBox, retaining margins and readable exported labels when pasted onto a different surface. SVGs without an opaque declared background retain transparency. Native checks inspect exact background pixels and verify that repeated preparation does not duplicate the background. Corrected nested-flowchart, sequence, class, entity, state and pie output was inspected, alongside the focused light/dark/mid-grey label PNGs.
+
+The pinned [sequence parser](https://github.com/nullean/mermaider/blob/71b64845570d633a94d29e85579c0a02786fece8/src/Mermaider/Parsing/SequenceParser.cs) recognises `+`/`-` message markers but ignores standalone `activate`/`deactivate` commands. The native adapter translates a standalone command immediately after a matching message into the supported marker, without changing saved Markdown or the displayed source. Blank lines/comments may intervene. Activation must match the message recipient; deactivation must match its sender. Existing shorthand remains supported. Seventeen core cases check geometry, labels, original CRLF source, six arrow forms and visible rejection of commands that cannot be represented.
+
+Separate activation commands before any matching message, after notes/blocks, with conflicting existing markers, or stacked on the same message cannot be represented by this adapter. They produce an explicit diagram error and preserve source. One command/actor per line is required. These are compatibility limits, not successful partial rendering. Broader sequence lifecycles, additional diagram families, dense layouts and destination-specific zoom/clipboard behaviour still require further acceptance work.
+
+Six focused native cases cover inherited/explicit text colours, class fills, mid-grey fallback and declared-background pixels. Evidence is `native-diagram-contrast.json` and `native-contrast-*.png` under `artifacts/native/diagram-contrast` or the complete validation directory. The complete local suite passes 766 core tests and 40 diagram/export cases after these corrections. Windows CI for the diagram correction is pending; the preceding allocation correction at 54b1392 passes both native and both browser CI runs.
