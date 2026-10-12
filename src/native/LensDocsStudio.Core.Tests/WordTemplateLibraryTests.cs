@@ -10,6 +10,29 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class WordTemplateLibraryTests : IDisposable
 {
+    [Fact] public async Task Browser_portable_original_import_retains_styles_and_headers_without_reusing_original_body()
+    {
+        Directory.CreateDirectory(root);
+        var source = Path.Combine(root, "Browser template.docx");
+        System.IO.Compression.ZipFile.CreateFromDirectory(Path.Combine(AppContext.BaseDirectory, "Fixtures", "native-word-template"), source);
+        var original = await File.ReadAllBytesAsync(source);
+        var imported = await Library.ImportAsync(source, "Browser handbook");
+        var reopened = new WordTemplateLibrary(Library.DirectoryPath);
+        var selected = Assert.Single((await reopened.ListAsync()).Entries);
+        Assert.Equal(imported.Record.Id, selected.Record.Id);
+        var prepared = await reopened.ReadAsync(selected);
+        var content = new ExportContent(new MarkdownService().Parse("# New handbook\n\nNew document body."), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>());
+        using var stream = new MemoryStream(new DocxExporter().Export(content, prepared.Bytes));
+        using var package = WordprocessingDocument.Open(stream, false);
+        Assert.Empty(new DocumentFormat.OpenXml.Validation.OpenXmlValidator().Validate(package));
+        var main = package.MainDocumentPart!;
+        Assert.Equal("Portable handbook header", Assert.Single(main.HeaderParts).Header!.InnerText);
+        Assert.Equal("PortableHeading1", main.Document!.Body!.Elements<W.Paragraph>().First().ParagraphProperties!.ParagraphStyleId!.Val!.Value);
+        Assert.DoesNotContain("Original template body", main.Document.InnerText);
+        Assert.Contains("New document body.", main.Document.InnerText);
+        Assert.Equal(original, await File.ReadAllBytesAsync(source));
+    }
+
     private readonly string root = Path.Combine(Path.GetTempPath(), "lens-template-library-" + Guid.NewGuid().ToString("N"));
     private WordTemplateLibrary Library => new(Path.Combine(root, "library"));
     private string PathFor(WordTemplateEntry entry, string name) => Path.Combine(Library.DirectoryPath, entry.Archived ? "archived" : "", entry.Record.Id.ToString("N"), name);

@@ -76,6 +76,7 @@ export function createAppController() {
       exportWordButton,
       wordTemplateSelect,
       wordTemplateImportButton,
+      wordTemplateCopyButton,
       wordTemplateSummary,
       exportPdfButton,
       exportMarkdownBundleButton,
@@ -602,11 +603,13 @@ export function createAppController() {
       dom: {
         wordTemplateInput,
         wordTemplateImportButton,
+        wordTemplateCopyButton,
         wordTemplateSelect,
         wordTemplateSummary,
       },
       callbacks: {
         closeOpenMenus,
+        downloadBlob,
         promptForText: promptDialog,
         setStatus,
       },

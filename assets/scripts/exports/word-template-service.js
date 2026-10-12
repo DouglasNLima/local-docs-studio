@@ -54,16 +54,19 @@ export function createWordTemplateService({
   const {
     wordTemplateInput,
     wordTemplateImportButton,
+    wordTemplateCopyButton,
     wordTemplateSelect,
     wordTemplateSummary,
   } = dom;
   const {
     closeOpenMenus,
+    downloadBlob,
     promptForText,
     setStatus,
   } = callbacks;
 
   let templates = [];
+  let savingCopy = false;
   let selectedTemplateId = localStorage.getItem(WORD_TEMPLATE_SELECTION_KEY) || DEFAULT_WORD_TEMPLATE_ID;
 
   async function initWordTemplates() {
@@ -76,6 +79,7 @@ export function createWordTemplateService({
   }
 
   function installWordTemplateHandlers() {
+    wordTemplateCopyButton?.addEventListener('click', saveSelectedTemplateCopy);
     wordTemplateImportButton?.addEventListener('click', () => {
       wordTemplateInput?.click();
     });
@@ -142,6 +146,30 @@ export function createWordTemplateService({
     return templates.map((template) => template.manifest);
   }
 
+  async function saveSelectedTemplateCopy() {
+    if (!selectedTemplateId || savingCopy) return;
+    const templateId = selectedTemplateId;
+    savingCopy = true;
+    renderWordTemplateOptions();
+    try {
+      const pack = await getStoredTemplate(templateId);
+      if (!(pack?.templateDocx instanceof Uint8Array) || !pack.templateDocx.byteLength) {
+        setStatus('The original Word template is unavailable. Import the original .docx again to save a copy.', 'warning');
+        return;
+      }
+      const stem = sanitiseFileName(String(pack.manifest.sourceFilename || pack.manifest.displayName || 'Word template').replace(/\.docx$/i, '')).slice(0, 180) || 'Word template';
+      downloadBlob(new Blob([pack.templateDocx], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), `${stem}.docx`);
+      setStatus('Word template copy prepared for download.', 'ok');
+      closeOpenMenus?.();
+    } catch (error) {
+      setStatus('The Word template copy could not be saved. Your stored template is unchanged.', 'danger');
+      console.error(error);
+    } finally {
+      savingCopy = false;
+      renderWordTemplateOptions();
+    }
+  }
+
   function renderWordTemplateOptions() {
     if (!wordTemplateSelect) return;
 
@@ -151,6 +179,7 @@ export function createWordTemplateService({
       ...templates.map(({ manifest }) => `<option value="${escapeHtml(manifest.id)}">${escapeHtml(manifest.displayName)}</option>`),
     ].join('');
     wordTemplateSelect.value = previous && templates.some((template) => template.manifest.id === previous) ? previous : DEFAULT_WORD_TEMPLATE_ID;
+    if (wordTemplateCopyButton) wordTemplateCopyButton.disabled = savingCopy || !wordTemplateSelect.value;
 
     if (wordTemplateSummary) {
       const selected = templates.find((template) => template.manifest.id === wordTemplateSelect.value);

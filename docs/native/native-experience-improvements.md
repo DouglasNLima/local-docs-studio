@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Browser Word templates can now be explicitly transferred through Save template copy and native Word template library import. The browser retains its original record and current draft; native validation extracts supported reusable formatting into private state. The shared migration fixture covers semantic headings, headers and exclusion of original body content without browser-profile scanning.
+
 Native push at 5c26bac passes all 50 built/installed/reinstalled workflows, including map and case-only rename. Folder moves add thirteen core cases and four native review outcomes; all 699 core tests and native integration pass. Workflow 51 and the wrapped UIA observation correction await CI.
 
 Case-only file renames now use the existing review, conflict checks, link updates and rollback. Six added core cases pass within all 686 core tests; the 50th desktop workflow checks filename spelling, linked tabs and history in both directions. CI remains pending.

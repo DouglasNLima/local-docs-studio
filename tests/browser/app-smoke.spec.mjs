@@ -4475,6 +4475,80 @@ test('Word template import stores manifests and tolerates missing optional parts
   expect(manifests.find((manifest) => manifest.displayName === 'Corporate Word Template')?.semanticStyleMapping.heading1).toBe('CorporateHeading1');
 });
 
+test('Word template copy preserves original bytes and selection across restart for native migration', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await expect(page.locator('#wordTemplateCopyButton')).toBeDisabled();
+  const parts = ['[Content_Types].xml', '_rels/.rels', 'word/document.xml', 'word/styles.xml', 'word/_rels/document.xml.rels', 'word/header1.xml'];
+  const templatePath = await writeZipFixture(testInfo, 'Portable handbook.docx', await Promise.all(parts.map(async (name) => ({
+    name, data: await readFile(fixturePath(`native-word-template/${name}`)),
+  }))));
+  await importWordTemplate(page, templatePath, 'Portable handbook');
+  const selected = await page.locator('#wordTemplateSelect').inputValue();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  await expect(page.locator('#wordTemplateCopyButton')).toBeEnabled();
+  const source = '# Migration working draft\n\nKeep this unsaved text.';
+  await page.locator('#editor').fill(source);
+  await expect(page.locator('#preview')).toContainText('Keep this unsaved text.');
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await attachViewportScreenshot(page, testInfo, 'word-template-copy-menu');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#wordTemplateCopyButton').click()]);
+  expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe('Portable handbook.docx');
+  const copiedPath = testInfo.outputPath('browser-template-copy.docx');
+  await download.saveAs(copiedPath);
+  expect(await readFile(copiedPath)).toEqual(await readFile(templatePath));
+  await expect(page.locator('#status')).toHaveText('Word template copy prepared for download.');
+  await expect(page.locator('#editor')).toHaveValue(source);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#wordTemplateSelect').selectOption('');
+  await expect(page.locator('#wordTemplateCopyButton')).toBeDisabled();
+  await page.locator('#wordTemplateSelect').selectOption(selected);
+  const secondCopy = await clickExportDownload(page, 'Save template copy');
+  expect(await readFile(secondCopy)).toEqual(await readFile(templatePath));
+});
+
+test('Word template copy reports missing original bytes without changing the stored template', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await importWordTemplate(page, await writeWordTemplateFixture(testInfo, 'damaged-template.docx'), 'Retained template');
+  const source = await page.locator('#editor').inputValue();
+  const selected = await page.locator('#wordTemplateSelect').inputValue();
+  const manifest = await page.evaluate(async (id) => {
+    const { idbRequest, idbTransactionDone } = await import('/assets/scripts/utils/idb.js');
+    const db = await idbRequest(indexedDB.open('local-docs-studio-word-templates', 1));
+    try {
+      const transaction = db.transaction('templates', 'readwrite');
+      const completed = idbTransactionDone(transaction);
+      const store = transaction.objectStore('templates');
+      const record = await idbRequest(store.get(id));
+      delete record.templateDocx;
+      store.put(record);
+      await completed;
+      return record.manifest;
+    } finally { db.close(); }
+  }, selected);
+  const downloads = [];
+  page.on('download', (download) => downloads.push(download));
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#wordTemplateCopyButton').click();
+  await expect(page.locator('#status')).toHaveText('The original Word template is unavailable. Import the original .docx again to save a copy.');
+  await expect(page.locator('#wordTemplateCopyButton')).toBeEnabled();
+  await expect(page.locator('#editor')).toHaveValue(source);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  expect(downloads).toHaveLength(0);
+  const retained = await page.evaluate(async (id) => {
+    const { idbRequest } = await import('/assets/scripts/utils/idb.js');
+    const db = await idbRequest(indexedDB.open('local-docs-studio-word-templates', 1));
+    try { return await idbRequest(db.transaction('templates', 'readonly').objectStore('templates').get(id)); }
+    finally { db.close(); }
+  }, selected);
+  expect(retained.manifest).toEqual(manifest);
+  expect(retained.parts['word/styles.xml']).toBeTruthy();
+  expect(retained.templateDocx).toBeUndefined();
+});
+
 test('Word export applies selected template parts and preserves default export fallback', async ({ page }, testInfo) => {
   await openFixture(page, 'mixed.md');
 

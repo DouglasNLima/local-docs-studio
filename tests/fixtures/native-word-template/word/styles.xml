@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:style w:type="paragraph" w:styleId="PortableHeading1"><w:name w:val="Heading 1"/><w:qFormat/><w:rPr><w:color w:val="315A73"/></w:rPr></w:style>
+  <w:style w:type="paragraph" w:styleId="PortableBody"><w:name w:val="Body Text"/><w:qFormat/></w:style>
+</w:styles>

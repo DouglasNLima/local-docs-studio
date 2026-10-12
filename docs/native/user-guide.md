@@ -100,6 +100,8 @@ Unrelated template body text and personal package metadata are excluded. Templat
 
 **Export → Word template library** keeps reusable templates in private native state. Import, rename, save a portable copy, archive and restore templates there. **Use default Word styles** clears the current selection.
 
+To move a browser template into this library, select it in the browser's **Export** menu and choose **Save template copy**. Import the downloaded DOCX here and choose **Use template**. The browser copy is the original source document, including its body and metadata; native import extracts supported reusable formatting. If the browser no longer has its original bytes, import your original DOCX there again or directly into the native library.
+
 ## Imports and exports
 
 Use **File → Import DOCX, HTML or PDF** to create editable content from supported input. Inspect the resulting text and warnings; document formats do not always map exactly to Markdown.
