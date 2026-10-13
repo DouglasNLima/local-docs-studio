@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Supported Word run formatting now includes document defaults, paragraph/character inheritance and direct overrides. Cycles terminate with readable text and a note; chains exceeding 64 levels fail safely. Other underline variants and double strike preserve their meaning through explicit simplification notes. The 1,035-test core suite and 40-case native corpus pass. Actual hosted fixture evidence remains pending; older per-feature results below stay scoped to their named revisions.
+
 Hosted native push 38354661411 verifies the DOCX correction in the actual application but fails installer discovery on a FlaUI-wrapped COM timeout; its installer lifecycle is skipped. The validation wait now recognises only the existing timeout HRESULTs when wrapped in `TimeoutException`, using the unchanged deadline and observation-only retries. Nine deterministic checks reproduce the missing wrapper case, verify readiness recovery, preserve persistent failures and reject unrelated errors. This changes validation only; it neither bypasses wizard assertions nor claims installation success. Original evidence is retained under `artifacts/native/ci-5976b24-push-failure`.
 
 Word import now retains direct strikethrough and single underline, including formatted links and table cells. Nine regression cases verify decoration semantics, explicit off values, double-strike conversion notes and the import text limit. Native WPF preview properties are independently checked; inherited run formatting and richer underline variants remain incomplete.

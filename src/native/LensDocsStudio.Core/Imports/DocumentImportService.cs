@@ -59,7 +59,8 @@ public sealed partial class DocumentImportService
         });
         var hyperlinks = new WordHyperlinkReader(main, paragraphs, warnings, cancellationToken, limits.MaximumTextCharacters);
         var paragraphStyles = new WordParagraphStyles(main.StyleDefinitionsPart?.Styles, warnings);
-        string Run(W.Run run)
+        var runStyles = new WordRunStyles(main.StyleDefinitionsPart?.Styles, warnings, cancellationToken);
+        string Run(W.Paragraph paragraph, W.Run run, bool isHeading)
         {
             cancellationToken.ThrowIfCancellationRequested();
             var text = new WordMarkdownBuilder(limits.MaximumTextCharacters);
@@ -71,14 +72,11 @@ public sealed partial class DocumentImportService
                 else if (child is W.TabChar) text.Append('\t');
             }
             var value = text.ToString();
-            if (run.RunProperties?.Bold is { } bold && bold.Val?.Value != false) value = Emphasis(value, "**");
-            if (run.RunProperties?.Italic is { } italic && italic.Val?.Value != false) value = Emphasis(value, "*");
-            if (run.RunProperties?.Strike is { } strike && strike.Val?.Value != false
-                || run.RunProperties?.DoubleStrike is { } doubleStrike && doubleStrike.Val?.Value != false)
-                value = Emphasis(value, "~~");
-            if (run.RunProperties?.DoubleStrike is { } doubleLine && doubleLine.Val?.Value != false)
-                warnings.Add("A Word double strikethrough was simplified to a single strikethrough.");
-            if (run.RunProperties?.Underline?.Val?.Value == W.UnderlineValues.Single) value = Emphasis(value, "++");
+            var format = runStyles.Read(paragraph, run, isHeading);
+            if (format.Bold) value = Emphasis(value, "**");
+            if (format.Italic) value = Emphasis(value, "*");
+            if (format.Strike || format.DoubleStrike) value = Emphasis(value, "~~");
+            if (format.Underline is { } underline && underline != W.UnderlineValues.None) value = Emphasis(value, "++");
             text = new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(value);
             foreach (var blip in run.Descendants<A.Blip>())
             {
@@ -161,7 +159,7 @@ public sealed partial class DocumentImportService
                 return code.Append('`', fenceLength).ToString();
             }
             if (style.IsCode) warnings.Add("A Word code-styled paragraph containing an image was imported as ordinary content.");
-            var text = hyperlinks.Read(paragraph, Run);
+            var text = hyperlinks.Read(paragraph, run => Run(paragraph, run, style.HeadingLevel > 0));
             var prefix = style.HeadingLevel > 0 ? new string('#', style.HeadingLevel) + " " : "";
             return new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(prefix).Append(text).ToString();
         }

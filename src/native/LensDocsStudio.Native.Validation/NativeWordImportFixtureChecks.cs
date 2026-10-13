@@ -53,6 +53,25 @@ internal static class NativeWordImportFixtureChecks
             var main = package.MainDocumentPart ?? throw new IOException("The Word import fixture has no main part.");
             var document = main.Document ?? throw new IOException("The Word import fixture has no document.");
             var body = document.Body ?? throw new IOException("The Word import fixture has no body.");
+            var styles = main.StyleDefinitionsPart?.Styles ?? throw new IOException("The Word import fixture has no styles.");
+            styles.Append(new W.Style(new W.StyleName { Val = "Imported strike base" }, new W.StyleRunProperties(new W.Strike()))
+                { StyleId = "ImportedStrikeBase", Type = W.StyleValues.Character },
+                new W.Style(new W.StyleName { Val = "Imported removed" }, new W.BasedOn { Val = "ImportedStrikeBase" })
+                { StyleId = "ImportedRemoved", Type = W.StyleValues.Character },
+                new W.Style(new W.StyleName { Val = "Imported underline base" },
+                    new W.StyleRunProperties(new W.Underline { Val = W.UnderlineValues.Single }))
+                { StyleId = "ImportedUnderlineBase", Type = W.StyleValues.Character },
+                new W.Style(new W.StyleName { Val = "Imported underline" }, new W.BasedOn { Val = "ImportedUnderlineBase" })
+                { StyleId = "ImportedUnderline", Type = W.StyleValues.Character });
+            foreach (var run in document.Descendants<W.Run>())
+            {
+                var text = string.Concat(run.Elements<W.Text>().Select(item => item.Text));
+                if (text is not ("Removed" or "underlined")) continue;
+                var properties = run.RunProperties ?? throw new IOException("The decoration fixture has no run properties.");
+                properties.RemoveAllChildren<W.Strike>(); properties.RemoveAllChildren<W.Underline>();
+                properties.PrependChild(new W.RunStyle { Val = text == "Removed" ? "ImportedRemoved" : "ImportedUnderline" });
+            }
+            styles.Save();
             var section = body.Elements<W.SectionProperties>().Single();
             var relationship = main.AddHyperlinkRelationship(new Uri("file:///C:/unread-fixture.docx"), true);
             body.InsertBefore(new W.Paragraph(new W.Hyperlink(new W.Run(new W.Text("Local destination"))) { Id = relationship.Id }), section);
@@ -81,7 +100,7 @@ internal static class NativeWordImportFixtureChecks
             Passed = true, Warnings = imported.Warnings, OriginalSha256 = Convert.ToHexString(SHA256.HashData(bytes)),
             ImageSha256 = Convert.ToHexString(SHA256.HashData(image)), ImportedImages = imported.Assets.Count, ImageDecoded = true,
             ImageWidth = decoded.PixelWidth, ImageHeight = decoded.PixelHeight,
-            Markdown = imported.Markdown, UnsupportedFileLinkRemoved = true, StoredFieldResultRetained = true
+            Markdown = imported.Markdown, UnsupportedFileLinkRemoved = true, StoredFieldResultRetained = true, InheritedRunStyles = true
         }, new JsonSerializerOptions { WriteIndented = true }));
         return new(path, bytes, image);
     }

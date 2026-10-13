@@ -122,7 +122,7 @@ To move a browser template into this library, select it in the browser's **Expor
 
 ## Imports and exports
 
-Direct Word strikethrough and single underline are retained as Markdown text decorations. Double strikethrough is simplified to single strikethrough with a conversion note. Other underline styles and inherited run formatting may need manual correction.
+Word bold, italic, strikethrough and underline can come from document defaults, paragraph styles, character styles or direct formatting. Direct on/off values override inherited formatting. Double strikethrough and other underline variants are simplified to single lines with conversion notes. Missing or cyclic styles keep readable text and notes; chains longer than 64 styles are rejected before output is created. Headings retain their structural appearance and code stays literal. Conditional table/numbering styling, complex-script properties and exact Word layout may need manual correction.
 
 Word import also limits generated text, because repeated links can expand a small DOCX substantially. If conversion exceeds the text limit, the app reports an error before creating the destination workspace. Your existing document and the original DOCX remain unchanged; split the Word document into smaller sections and import those separately.
 

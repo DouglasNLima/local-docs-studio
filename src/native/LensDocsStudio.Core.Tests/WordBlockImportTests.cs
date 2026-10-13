@@ -117,7 +117,8 @@ public sealed class WordBlockImportTests
         var result = new DocumentImportService().ImportDocx(stream.ToArray());
         Assert.Equal(png, Assert.Single(result.Assets).Bytes);
         Assert.True(Assert.Single(new MarkdownService().Parse(result.Markdown).Syntax.Descendants<LinkInline>()).IsImage);
-        Assert.Single(result.Warnings);
+        Assert.Equal(new[] { "A Word code-styled paragraph containing an image was imported as ordinary content.",
+            "A missing or incompatible Word run style was ignored." }, result.Warnings);
     }
 
     [Fact]

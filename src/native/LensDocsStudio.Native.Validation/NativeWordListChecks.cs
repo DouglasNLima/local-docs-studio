@@ -136,9 +136,14 @@ internal static class NativeWordListChecks
                         .Single(l => l.LevelIndex?.Value == level).ParagraphStyleIdInLevel = new() { Val = baseId };
                 }
                 var originalId = properties.ParagraphStyleId?.Val?.Value;
-                var name = styles.Elements<W.Style>().FirstOrDefault(s => s.StyleId?.Value == originalId)?.StyleName?.Val?.Value ?? originalId ?? "Normal";
+                var originalStyle = styles.Elements<W.Style>().FirstOrDefault(s => s.StyleId?.Value == originalId);
+                var name = originalStyle?.StyleName?.Val?.Value ?? originalId ?? "Normal";
                 var derivedId = "ProbeParagraph" + ++converted;
-                styles.Append(new W.Style(new W.StyleName { Val = name }, new W.BasedOn { Val = baseId }) { StyleId = derivedId, Type = W.StyleValues.Paragraph });
+                var derived = new W.Style(new W.StyleName { Val = name }, new W.BasedOn { Val = baseId })
+                    { StyleId = derivedId, Type = W.StyleValues.Paragraph };
+                // This fixture changes numbering ownership only; retain the source style's character formatting.
+                if (originalStyle?.StyleRunProperties is { } runProperties) derived.Append(runProperties.CloneNode(true));
+                styles.Append(derived);
                 properties.ParagraphStyleId = new() { Val = derivedId };
                 properties.NumberingProperties.Remove(); properties.Indentation?.Remove();
             }

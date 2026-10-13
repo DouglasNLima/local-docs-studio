@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Word import now preserves supported text formatting supplied by document defaults, paragraph and character styles as well as direct run properties. The native fixture verifies actual strike/underline rendering from inherited styles while retaining original source and image bytes. Twenty-four new core cases cover inheritance, overrides, context-sensitive cache reuse, cycles, depth and text budgets. All 1,035 core tests and 40 native corpus cases pass. See the [validation report](validation-report.md) for current outcomes; older pending statements below retain their historical scope.
+
 Hosted native push 38354661411 verifies the DOCX correction in the actual application but fails installer discovery on a FlaUI-wrapped COM timeout; its installer lifecycle is skipped. The validation wait now recognises only the existing timeout HRESULTs when wrapped in `TimeoutException`, using the unchanged deadline and observation-only retries. Nine deterministic checks reproduce the missing wrapper case, verify readiness recovery, preserve persistent failures and reject unrelated errors. This changes validation only; it neither bypasses wizard assertions nor claims installation success. Original evidence is retained under `artifacts/native/ci-5976b24-push-failure`.
 
 Importing Word documents now retains supported strikethrough and underline rather than silently removing these editing cues. They remain portable Markdown and render as native text decorations. Double strikethrough carries an explicit simplification note.
