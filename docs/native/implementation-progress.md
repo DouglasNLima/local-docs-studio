@@ -1,5 +1,7 @@
 # Native implementation progress
 
+The next import-fidelity slice preserves direct single strikethrough and single underline, including supported combinations with bold/italic, links and tables. Double strikethrough becomes single strikethrough with a conversion note; explicit off values remain plain text. Nine focused regressions pass after seven pre-fix failures and one passing off-state control. All 1,011 core tests pass, and the native Word preview verifies both actual WPF decorations and the retained image/source. Inherited run formatting and other underline styles remain outside this slice; final hosted validation is pending.
+
 DOCX text growth is reproduced and corrected. A 6,167-byte package expanded one shared hyperlink into 34,524,000 Markdown characters before the fix. Word import now bounds generated text at 33,554,432 UTF-16 characters before buffer growth, including intermediate links, escaped runs, code fences and streamed table content. Sixteen regressions and the existing suite pass (1,002 core tests); the local native corpus passes all 40 cases. The WPF app launched locally with isolated state, loaded an unchanged document and closed gracefully after readiness. The extended hosted import rejection/recovery check awaits CI. Mandatory workflows are unchanged. This does not resolve the earlier intermittent preview pause or production acceptance dependencies.
 
 ## Previous milestone evidence

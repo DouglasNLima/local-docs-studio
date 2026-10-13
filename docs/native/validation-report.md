@@ -1,5 +1,9 @@
 # Native validation report
 
+## Word text decorations: functional follow-up
+
+`word-decorations-before/before.trx` reproduces seven failures (strike/underline combinations, links, tables and double strike), with the explicit-off control passing. Nine cases now pass, including the generated-text boundary. All 1,011 core tests pass in `word-decorations-final-core/core.trx`, with none skipped. Release builds have zero warnings/errors. `word-decorations-final-preview/native-word-import-preview.json` verifies actual WPF strikethrough and underline alongside image bounds and source preservation. The common hosted Word fixture now also requires the decoration Markdown after actual import. Final hosted checks are pending; no mandatory CI checks were removed or relaxed.
+
 ## DOCX text growth: reproduced and locally corrected
 
 `artifacts/native/docx-text-growth-reproduced/before.trx` records a deterministic failure: 4,200 references to one 8,192-character path produce 34,524,000 Markdown characters from a 6,167-byte DOCX. The first fixture setup used an overly small uncompressed-size assertion; that setup failure is retained separately. The corrected reproduction reaches the importer and demonstrates the actual defect. Package limits applied only to stored XML/images, so repeated targets could amplify output without a generated-text bound.

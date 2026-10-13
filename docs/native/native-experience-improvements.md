@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Importing Word documents now retains supported strikethrough and underline rather than silently removing these editing cues. They remain portable Markdown and render as native text decorations. Double strikethrough carries an explicit simplification note.
+
 Excessive DOCX text expansion now produces a recoverable import error before creating destination files. Generated Markdown, intermediate links and tables are bounded independently of ZIP and image sizes. Existing tabs and source files remain available; the hosted desktop check verifies that a normal import succeeds immediately after rejection. Local core and native-render validation pass; the new hosted interaction is pending.
 
 The current change adds validation-only stack capture for the unresolved preview pause. A separate hidden helper observes validation input pulses and captures the owned process only after 300 ms, beyond the unchanged 250 ms acceptance limit. A deliberate windowless wait verifies the watched thread in a minimal dump; normal/idle input and unrelated process requests do not produce captures. Diagnostic failure preserves the original rendering exception. No application rendering behaviour has been changed or certified fixed; hosted diagnostic evidence remains pending.

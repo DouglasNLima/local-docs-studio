@@ -37,10 +37,17 @@ internal static class NativeWordImportPreviewChecks
             var result = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, false,
                 new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { },
                 preparedImages: new Dictionary<string, PreviewImage> { [reference] = new(pixels, null) });
+            var decorations = result.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines.OfType<Span>()).ToArray();
+            if (!decorations.Any(span => new TextRange(span.ContentStart, span.ContentEnd).Text == "Removed"
+                    && span.TextDecorations.Any(decoration => decoration.Location == TextDecorationLocation.Strikethrough))
+                || !decorations.Any(span => new TextRange(span.ContentStart, span.ContentEnd).Text == "underlined"
+                    && span.TextDecorations.Any(decoration => decoration.Location == TextDecorationLocation.Underline)))
+                throw new IOException("Imported Word decorations are missing from the native preview.");
             var viewer = new DocumentPreview { Style = (Style)styles["DocumentPreviewStyle"], Zoom = 125 };
             using var host = new HwndSource(new HwndSourceParameters("Imported Word preview validation")
                 { Width = 380, Height = 408, WindowStyle = unchecked((int)0x80000000) });
             host.RootVisual = viewer; viewer.SetPreview(result, parsed.Source.Length, "Pages"); Layout(); Pump(); Layout();
+            Capture("native-word-import-text.png");
             var peer = FrameworkElementAutomationPeer.CreatePeerForElement(viewer);
             var treeImages = CountTreeImages(peer, new HashSet<AutomationPeer>());
             var provider = peer.GetPattern(PatternInterface.Text) as ITextProvider
@@ -74,19 +81,24 @@ internal static class NativeWordImportPreviewChecks
             if (bounds.Width <= 0 || bounds.Height <= 0 || bounds.Left < -1 || bounds.Top < -1
                 || bounds.Right > viewer.ActualWidth + 1 || bounds.Bottom > bottom + 1 || parsed.Source != imported.Markdown)
                 throw new IOException("The imported Word image is clipped or its source changed.");
-            var bitmap = new RenderTargetBitmap(380, 408, 96, 96, PixelFormats.Pbgra32); bitmap.Render(viewer);
-            var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
-            using (var destination = File.Create(Path.Combine(output, "native-word-import-preview.png"))) encoder.Save(destination);
+            Capture("native-word-import-preview.png");
             File.WriteAllText(Path.Combine(output, "native-word-import-preview.json"), JsonSerializer.Serialize(new
             {
                 Passed = true, RegularTreeImagesBeforeTextChildren = treeImages, Embedded = embedded, ImagePage = viewer.PageNumber,
                 RawProviderSlots = rawChildren.Length, NullRawProviders = rawChildren.Count(child => child is null),
                 NativeImageWithinPageBounds = true, ImageBounds = bounds.ToString(), SourcePreserved = true,
+                ImportedStrikethroughAndUnderline = true,
                 Limitation = "Hidden HWND and native text-provider contract; actual visible desktop delivery is verified separately."
             }, new JsonSerializerOptions { WriteIndented = true }));
             host.RootVisual = null;
 
             void Layout() { viewer.Measure(new Size(380, 408)); viewer.Arrange(new Rect(0, 0, 380, 408)); viewer.UpdateLayout(); }
+            void Capture(string name)
+            {
+                var bitmap = new RenderTargetBitmap(380, 408, 96, 96, PixelFormats.Pbgra32); bitmap.Render(viewer);
+                var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                using var destination = File.Create(Path.Combine(output, name)); encoder.Save(destination);
+            }
         }
         finally { application.Resources = resources; SynchronizationContext.SetSynchronizationContext(context); }
     }

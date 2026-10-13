@@ -43,7 +43,7 @@ internal static class NativeWordImportFixtureChecks
         var bitmap = BitmapSource.Create(width, height, 96, 96, PixelFormats.Bgra32, null, pixels, width * 4);
         var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
         using var imageStream = new MemoryStream(); encoder.Save(imageStream); var image = imageStream.ToArray();
-        const string source = "# Imported Café\n\nPortable **bold** text and [guide](https://example.org/import).\n\n![Portable pixel](fixture.png)\n\n> Retained quote Ω.\n";
+        const string source = "# Imported Café\n\nPortable **bold** text and [guide](https://example.org/import).\n\n~~Removed~~ and ++underlined++.\n\n![Portable pixel](fixture.png)\n\n> Retained quote Ω.\n";
         var content = new ExportContent(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(),
             new Dictionary<string, ExportImage> { ["fixture.png"] = new(image, width, height, "Portable pixel") });
         using var buffer = new MemoryStream();
@@ -92,6 +92,7 @@ internal static class NativeWordImportFixtureChecks
         var quote = parsed.Syntax.Descendants<QuoteBlock>().SingleOrDefault()?.OfType<ParagraphBlock>().SingleOrDefault();
         if (!markdown.StartsWith("# Imported Café\n", StringComparison.Ordinal)
             || !markdown.Contains("Portable **bold** text", StringComparison.Ordinal)
+            || !markdown.Contains("~~Removed~~ and ++underlined++", StringComparison.Ordinal)
             || !markdown.Contains("[guide](https://example.org/import)", StringComparison.Ordinal)
             || quote is null || MarkdownService.InlineText(quote.Inline) != "Retained quote Ω."
             || !markdown.Contains("Local destination", StringComparison.Ordinal)

@@ -73,6 +73,12 @@ public sealed partial class DocumentImportService
             var value = text.ToString();
             if (run.RunProperties?.Bold is { } bold && bold.Val?.Value != false) value = Emphasis(value, "**");
             if (run.RunProperties?.Italic is { } italic && italic.Val?.Value != false) value = Emphasis(value, "*");
+            if (run.RunProperties?.Strike is { } strike && strike.Val?.Value != false
+                || run.RunProperties?.DoubleStrike is { } doubleStrike && doubleStrike.Val?.Value != false)
+                value = Emphasis(value, "~~");
+            if (run.RunProperties?.DoubleStrike is { } doubleLine && doubleLine.Val?.Value != false)
+                warnings.Add("A Word double strikethrough was simplified to a single strikethrough.");
+            if (run.RunProperties?.Underline?.Val?.Value == W.UnderlineValues.Single) value = Emphasis(value, "++");
             text = new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(value);
             foreach (var blip in run.Descendants<A.Blip>())
             {

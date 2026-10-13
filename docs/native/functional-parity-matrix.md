@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Word import now retains direct strikethrough and single underline, including formatted links and table cells. Nine regression cases verify decoration semantics, explicit off values, double-strike conversion notes and the import text limit. Native WPF preview properties are independently checked; inherited run formatting and richer underline variants remain incomplete.
+
 DOCX import growth correction: generated Markdown and intermediate text buffers now have a separate limit. A compact repeated-link regression reproduces the prior 34,524,000-character expansion; sixteen new core cases cover rejection, exact boundaries, tables, escaping, code fences and intact links/source bytes. The native desktop import check additionally requires rejection without changing the previous editor, input or destination, followed by successful ordinary import; hosted results are pending. Existing import fidelity limits remain.
 
 The current change adds validation-only stack capture for the unresolved preview pause. A separate hidden helper observes validation input pulses and captures the owned process only after 300 ms, beyond the unchanged 250 ms acceptance limit. A deliberate windowless wait verifies the watched thread in a minimal dump; normal/idle input and unrelated process requests do not produce captures. Diagnostic failure preserves the original rendering exception. No application rendering behaviour has been changed or certified fixed; hosted diagnostic evidence remains pending.
