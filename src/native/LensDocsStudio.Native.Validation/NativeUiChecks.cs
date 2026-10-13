@@ -476,6 +476,8 @@ internal static partial class NativeUiChecks
             finally { RestoreClipboard(previousClipboard, ownedClipboardSequence); }
             CheckInlineLabels(window, editor, automation, app.ProcessId, output, source);
             checks.Add("Native badge and keyboard-shortcut dialogues retain literal labels, validation and Cancel; status editing, preview text and horizontal rules preserve source with complete Undo and Redo");
+            CheckTableEditor(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("Native table grid supports keyboard cell edits, Cancel, row and column changes, retained alignment, existing/new tables and complete Undo/Redo without changing saved source");
             var completionFile = Find(window, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName("Completion.mmd")))
                 ?? throw new IOException("The standalone Mermaid completion fixture is unavailable in the native tree.");
             FocusWindow(window); completionFile.Patterns.SelectionItem.Pattern.Select(); completionFile.Focus(); Keyboard.Type(VirtualKeyShort.RETURN);

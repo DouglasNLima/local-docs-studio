@@ -20,6 +20,10 @@ The editor keeps ordinary UTF-8 Markdown. **Ctrl+Z** and **Ctrl+Y** undo and red
 
 **Insert → Status badge** offers Draft, Ready, Blocked, Deprecated, Beta and In review. Enter the label to display; its text stays literal, including punctuation. To change a badge, place the caret inside its source and choose the new status. **Insert → Keyboard shortcut** displays keys such as `Ctrl + Shift + K`; separate keys with `+` or commas and use `Plus` for the plus key. Both editors retain invalid input with an explanation, and Cancel leaves the document unchanged. **Insert → Horizontal rule** adds a separate Markdown divider. Each insertion or edit is one undoable change.
 
+**Insert → Table** opens a native grid. Place the caret inside an existing pipe table to edit it, or elsewhere to insert a new one; the editor context menu offers the same action. Cells contain Markdown, so links, emphasis, code and escaped characters remain editable. Use **F2** to edit a cell, **Tab** to move, and `<br>` for a displayed line break. Add, remove or move rows and columns with the labelled controls. The header stays first, and a column keeps its alignment when moved.
+
+Choose **Apply table** or **Ctrl+Enter** to apply the complete grid in one undoable change. **Cancel** leaves the document unchanged; applying an untouched existing table also preserves its exact source spacing. Existing supported tables inside lists and quotes retain their enclosing structure. Tables with extra cells or an unsupported structure are left intact with an explanation. The grid supports up to 4,096 total rows, 128 columns, 65,536 cells and one million cell characters; larger tables remain editable directly in Markdown.
+
 **Ctrl+F** searches the focused editor or preview. **Ctrl+H** opens editor replacement. Close the find bar with **Escape** to return to the previous view. Preview Find opens closed details sections when needed and brings the selected match into view.
 
 **Ctrl+Shift+K** opens the workspace document and heading picker. Inserted links remain portable Markdown. **Ctrl+Space** offers Mermaid suggestions inside diagram source.

@@ -105,7 +105,7 @@
     <MenuItem Header="Local image…" Click="InsertImage"/>
     <MenuItem Header="Image figure…" Click="EditImageFigure" AutomationProperties.AutomationId="EditImageFigure"/>
     <MenuItem Header="Image from URL…" Click="InsertRemoteImage" AutomationProperties.AutomationId="InsertRemoteImage"/>
-    <MenuItem Header="Table" Tag="table" Click="Format"/>
+    <MenuItem Header="Table…" Click="EditTable" AutomationProperties.AutomationId="EditTable"/>
     <MenuItem Header="Task list" Tag="task" Click="Format"/>
     <MenuItem Header="Bullet list" Tag="bullet" Click="Format"/>
     <MenuItem Header="Numbered list" Tag="numbered" Click="Format"/>
@@ -259,6 +259,7 @@
         <MenuItem Header="_Bold" Tag="bold" Click="Format" AutomationProperties.AutomationId="EditorContextBold"/>
         <MenuItem Header="_Italic" Tag="italic" Click="Format"/>
         <MenuItem Header="Document _link…" Click="InsertDocumentLink"/>
+        <MenuItem Header="Edit or insert _table…" Click="EditTable" AutomationProperties.AutomationId="EditorContextTable"/>
        </ContextMenu>
       </avalon:TextEditor.ContextMenu>
      </avalon:TextEditor>

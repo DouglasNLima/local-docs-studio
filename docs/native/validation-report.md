@@ -1,5 +1,13 @@
 # Native validation report
 
+## Native table grid: local evidence, hosted validation pending
+
+Eighteen new core cases cover exact unchanged source, edited cells, escaped pipes, links, alignment, LF/CRLF, list/quote containers, complete row/column operations, selection replacement, fenced examples, short/extra rows and atomic budget rejection. All 986 core tests pass in `artifacts/native/table-editing/table-edit-final-all.trx`; Release builds have zero warnings/errors. `table-edit-full-validation/validation-summary.json` records all 40 corpus cases with zero failures, and web static checks pass.
+
+Four hidden-HWND layouts in `table-editor-header/native-table-editor.json` verify actual DataGrid binding/events, private drafts, source/selection preservation, whole Undo/Redo, read-only retention, accessible naming, control bounds and complete header labels. The inspected 640-pixel image originally clipped the label despite a 64-pixel row header; a local content template and an ancestor-bounds assertion correct this. The corrected light layout was inspected. These local checks do not exercise foreground keyboard or actual dialog Cancel/Apply. The new 66th hosted workflow requires keyboard cell edits, cancellation, row/column actions, alignment, reopened/new tables, native preview text, complete Undo/Redo and unchanged saved bytes in built, installed, upgraded and reinstalled applications. Those outcomes remain pending; preview.266 below predates this source.
+
+All four documentation-only `16e676c` runs pass (native PR/push 38341089256/38341086390; web PR/push 38341089416/38341086388). Their logs and results are retained separately under `artifacts/native/ci-16e676c-*`; no new installer from that documentation-only revision has been independently certified.
+
 ## Verified installer discovery and previews .265/.266
 
 Both native runs at source head `ad7143c98cb35ef988a2add76dd4b47e35572199` pass: [PR 38338798578](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38338798578), with clean merge `2040ba39eac131c035407128dc412efb66b86613`, and [push 38338795379](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38338795379). Independently downloaded `artifacts/native/ci-ad7143c-{pr,push}` evidence verifies 968 core tests, 40 corpus cases, ten inline-editor cases and four 65-check desktop contexts per run. Workflow names and order match the corresponding preview.264 contexts. All 24 workspace phase reports and eight inline-label reports pass. Each lifecycle preserves 20 state files, restores two sessions and verifies three installed runtime origins.
