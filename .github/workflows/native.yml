@@ -80,6 +80,8 @@ jobs:
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
+            artifacts/native/install-smoke/**/native-paste-error-acknowledgement.json
+            artifacts/native/install-smoke/**/native-updates-command.json
             artifacts/native/install-smoke/**/native-details-keyboard.json
             artifacts/native/install-smoke/**/native-ui-word-import.json
             artifacts/native/install-smoke/**/native-ui-inline-labels.json
