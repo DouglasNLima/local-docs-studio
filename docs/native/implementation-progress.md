@@ -1,5 +1,9 @@
 # Native implementation progress
 
+DOCX text growth is reproduced and corrected. A 6,167-byte package expanded one shared hyperlink into 34,524,000 Markdown characters before the fix. Word import now bounds generated text at 33,554,432 UTF-16 characters before buffer growth, including intermediate links, escaped runs, code fences and streamed table content. Sixteen regressions and the existing suite pass (1,002 core tests); the local native corpus passes all 40 cases. The WPF app launched locally with isolated state, loaded an unchanged document and closed gracefully after readiness. The extended hosted import rejection/recovery check awaits CI. Mandatory workflows are unchanged. This does not resolve the earlier intermittent preview pause or production acceptance dependencies.
+
+## Previous milestone evidence
+
 The current change adds validation-only stack capture for the unresolved preview pause. A separate hidden helper observes validation input pulses and captures the owned process only after 300 ms, beyond the unchanged 250 ms acceptance limit. A deliberate windowless wait verifies the watched thread in a minimal dump; normal/idle input and unrelated process requests do not produce captures. Diagnostic failure preserves the original rendering exception. No application rendering behaviour has been changed or certified fixed; hosted diagnostic evidence remains pending.
 
 The native table grid now passes actual keyboard editing, Cancel/Apply, row/column operations, alignment, reopening/new insertion, native preview and whole Undo/Redo in all four preview.269 application contexts. It closes the fixed-example insertion gap against the web table editor. All 986 core tests, 40 corpus cases and four hidden grid layouts pass in the native push run. The parallel PR run fails a retained nested-details responsiveness check at 587.9933 ms; its source/content remain intact and the cause is unresolved. Production acceptance remains incomplete.

@@ -16,6 +16,17 @@ internal sealed record NativeWordImportFixture(string Path, byte[] Bytes, byte[]
 
 internal static class NativeWordImportFixtureChecks
 {
+    public static string WriteExcessiveTextFixture(string output)
+    {
+        var path = Path.Combine(output, "excessive-word-text.docx");
+        using var package = WordprocessingDocument.Create(path, DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
+        var main = package.AddMainDocumentPart();
+        var relationship = main.AddHyperlinkRelationship(new Uri("https://example.org/" + new string('a', 8192)), true);
+        main.Document = new W.Document(new W.Body(Enumerable.Range(0, 4200).Select(_ =>
+            new W.Paragraph(new W.Hyperlink(new W.Run(new W.Text("Go"))) { Id = relationship.Id }))));
+        return path;
+    }
+
     internal static readonly string[] ExpectedWarnings =
     [
         "An unsupported or missing Word hyperlink destination was retained as text.",

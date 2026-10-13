@@ -29,16 +29,23 @@ internal static partial class NativeUiChecks
             || !File.ReadAllBytes(originalDocument).SequenceEqual(originalBytes))
             throw new IOException("Cancelling Word import changed the previous document or created output.");
 
-        OpenImport(); var picker = FolderPicker();
-        FocusWindow(picker);
-        var folder = (picker.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByName("Folder:")))
-            ?? throw new IOException("The Word import destination field is unavailable.")).AsTextBox();
-        folder.Focus(); Wait(() => folder.Properties.HasKeyboardFocus.Value, "The import destination did not acquire keyboard focus.");
-        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(parent);
-        Wait(() => folder.Text == parent, "The import destination did not accept the chosen folder.");
-        picker.FindAllDescendants(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Select Folder")))
-            .Single(element => element.AutomationId != "DropDown").AsButton().Invoke();
-        Wait(() => CurrentFolderPicker() is null, "The Word import destination dialogue did not close.");
+        var excessive = NativeWordImportFixtureChecks.WriteExcessiveTextFixture(runRoot);
+        var excessiveBytes = File.ReadAllBytes(excessive);
+        OpenImport(excessive); SelectDestination();
+        const string limitMessage = "The Word document exceeds the imported text limit.";
+        Window? error = null;
+        Wait(() => (error = owner.ModalWindows.FirstOrDefault(window =>
+            window.FindFirstDescendant(cf => cf.ByName(limitMessage)) is not null)) is not null,
+            "Excessive Word text did not produce a recoverable error.");
+        (error!.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("OK")))
+            ?? throw new IOException("The Word text-limit error cannot be acknowledged.")).AsButton().Invoke();
+        Wait(() => owner.ModalWindows.Length == 0, "The Word text-limit error did not close.");
+        if (Directory.EnumerateFileSystemEntries(parent).Any() || ReadEditorText(editor) != originalText
+            || !File.ReadAllBytes(originalDocument).SequenceEqual(originalBytes)
+            || !File.ReadAllBytes(excessive).SequenceEqual(excessiveBytes))
+            throw new IOException("Rejected Word text growth changed a source document, editor or destination.");
+
+        OpenImport(); SelectDestination();
         Wait(() => Find(owner, "Status").Name.StartsWith("Imported into a new portable workspace", StringComparison.Ordinal),
             "Word import did not complete through the native application.");
         var root = Directory.GetDirectories(parent, "native-word-import-fixture-import-*").Single();
@@ -101,6 +108,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(output, "native-ui-word-import.json"), JsonSerializer.Serialize(new
         {
             Passed = true, CancelPreservedSource = true, OriginalDocxUnchanged = true, PreviousDocumentUnchanged = true,
+            ExcessiveTextRejected = true, RejectedImportPreservedEditorAndDestination = true, ImportAfterRejectionSucceeded = true,
             MarkdownMatchesSavedFile = true, Warnings = NativeWordImportFixtureChecks.ExpectedWarnings,
             Status = message, AccessibleTooltip = help, ExactImage = true, NativePreviewImage = true, CopiedWorkspacePortable = true,
             PreviewPages = previewPages,
@@ -114,10 +122,22 @@ internal static partial class NativeUiChecks
         bool ImageVisible() => PreviewImages().FirstOrDefault(image => image.Name == "Portable pixel") is { } image
             && image.BoundingRectangle.Width > 0 && image.BoundingRectangle.Height > 0 && !image.IsOffscreen;
 
-        void OpenImport()
+        void OpenImport(string? path = null)
         {
             Find(owner, "FileMenu").Click(); Find(owner, "ImportDocument").Patterns.Invoke.Pattern.Invoke();
-            open(fixture.Path, "Import document");
+            open(path ?? fixture.Path, "Import document");
+        }
+        void SelectDestination()
+        {
+            var picker = FolderPicker(); FocusWindow(picker);
+            var folder = (picker.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByName("Folder:")))
+                ?? throw new IOException("The Word import destination field is unavailable.")).AsTextBox();
+            folder.Focus(); Wait(() => folder.Properties.HasKeyboardFocus.Value, "The import destination did not acquire keyboard focus.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(parent);
+            Wait(() => folder.Text == parent, "The import destination did not accept the chosen folder.");
+            picker.FindAllDescendants(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Select Folder")))
+                .Single(element => element.AutomationId != "DropDown").AsButton().Invoke();
+            Wait(() => CurrentFolderPicker() is null, "The Word import destination dialogue did not close.");
         }
         Window? CurrentFolderPicker() => automation.GetDesktop()
             .FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Open documentation workspace")))?.AsWindow();

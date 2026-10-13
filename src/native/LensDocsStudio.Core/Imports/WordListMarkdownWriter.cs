@@ -1,19 +1,18 @@
 using System.Globalization;
-using System.Text;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace LensDocsStudio.Core.Imports;
 
 // Word stores list items as sibling paragraphs. Keep their numbering and physical
 // continuation indents separate from the indentation required by Markdown markers.
-internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? styles, List<string> warnings)
+internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? styles, List<string> warnings, int maximumCharacters)
 {
     private sealed record Frame(int NumberId, int Level, long WordIndent, int MarkerIndent, int ContentIndent, string Suffix);
     private readonly List<Frame> frames = [];
     private readonly Dictionary<(int Id, int Level), long> counters = [];
     private readonly WordNumberingReader numberingReader = new(numbering, styles, warnings);
     private readonly HashSet<string> reported = [];
-    private StringBuilder output = new();
+    private WordMarkdownBuilder output = new(maximumCharacters);
     private int? previousQuoteIndent;
 
     public void Paragraph(W.Paragraph paragraph, string text, bool quote = false)
@@ -85,7 +84,7 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? s
         var savedFrames = frames.ToArray();
         var savedOutput = output;
         var savedQuote = previousQuoteIndent;
-        frames.Clear(); output = new(); previousQuoteIndent = null;
+        frames.Clear(); output = new(maximumCharacters); previousQuoteIndent = null;
         try
         {
             foreach (var paragraph in paragraphs)
@@ -96,25 +95,40 @@ internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? s
                 if (quote) Warn("Word quotes inside table cells were flattened to text with visible markers.");
                 Paragraph(paragraph, render(paragraph), quote);
             }
-            return output.ToString().Trim().Replace("\r\n", "\n", StringComparison.Ordinal).Replace("\n\n", "\n", StringComparison.Ordinal).Replace("\n", "<br>", StringComparison.Ordinal);
+            var cell = new WordMarkdownBuilder(maximumCharacters);
+            var text = output.ToString().AsSpan().Trim();
+            for (var index = 0; index < text.Length; index++)
+            {
+                if (text[index] != '\n') cell.Append(text[index]);
+                else
+                {
+                    cell.Append("<br>");
+                    if (index + 1 < text.Length && text[index + 1] == '\n') index++;
+                }
+            }
+            return cell.ToString();
         }
         finally { frames.Clear(); frames.AddRange(savedFrames); output = savedOutput; previousQuoteIndent = savedQuote; }
     }
 
-    public override string ToString() => output.ToString().Replace("\r\n", "\n", StringComparison.Ordinal);
+    public override string ToString() => output.ToString();
 
     private void Append(string text, string firstPrefix, int continuationIndent, bool separate, bool quote = false, bool joinQuote = false)
     {
-        if (quote && joinQuote && previousQuoteIndent == continuationIndent && output.Length >= Environment.NewLine.Length * 2)
+        if (quote && joinQuote && previousQuoteIndent == continuationIndent && output.Length >= 2)
         {
             // Replace the last blank separator with a quoted blank line, keeping
             // consecutive Word quote paragraphs inside one Markdown quote block.
-            output.Length -= Environment.NewLine.Length;
+            output.RemoveLastNewLine();
             output.Append(' ', continuationIndent).AppendLine(">");
         }
-        var lines = text.Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n');
-        output.Append(firstPrefix).Append(quote ? "> " : "").AppendLine(lines[0]);
-        foreach (var line in lines.Skip(1)) output.Append(' ', continuationIndent).Append(quote ? "> " : "").AppendLine(line);
+        var first = true;
+        foreach (var line in text.AsSpan().EnumerateLines())
+        {
+            if (first) { output.Append(firstPrefix); first = false; }
+            else output.Append(' ', continuationIndent);
+            output.Append(quote ? "> " : "").AppendLine(line);
+        }
         if (separate) output.AppendLine();
         previousQuoteIndent = quote && separate ? continuationIndent : null;
     }

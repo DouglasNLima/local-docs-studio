@@ -122,6 +122,8 @@ To move a browser template into this library, select it in the browser's **Expor
 
 ## Imports and exports
 
+Word import also limits generated text, because repeated links can expand a small DOCX substantially. If conversion exceeds the text limit, the app reports an error before creating the destination workspace. Your existing document and the original DOCX remain unchanged; split the Word document into smaller sections and import those separately.
+
 Use **File → Import DOCX, HTML or PDF** to create editable content from supported input. Inspect the resulting text and warnings; document formats do not always map exactly to Markdown.
 
 Conversion notes appear in the status bar after import. Hover over a shortened status message to read the full text; repeated notes are shown once.

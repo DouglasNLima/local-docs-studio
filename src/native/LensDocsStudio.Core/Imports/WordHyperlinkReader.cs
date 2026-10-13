@@ -1,4 +1,3 @@
-using System.Text;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using LensDocsStudio.Core.Parsing;
@@ -14,10 +13,11 @@ internal sealed class WordHyperlinkReader
     private readonly HashSet<string> reported = [];
     private readonly List<string> warnings;
     private readonly CancellationToken cancellationToken;
+    private readonly int maximumCharacters;
 
-    public WordHyperlinkReader(MainDocumentPart main, IEnumerable<W.Paragraph> paragraphs, List<string> warnings, CancellationToken cancellationToken)
+    public WordHyperlinkReader(MainDocumentPart main, IEnumerable<W.Paragraph> paragraphs, List<string> warnings, CancellationToken cancellationToken, int maximumCharacters)
     {
-        this.warnings = warnings; this.cancellationToken = cancellationToken;
+        this.warnings = warnings; this.cancellationToken = cancellationToken; this.maximumCharacters = maximumCharacters;
         relationships = main.HyperlinkRelationships.ToDictionary(r => r.Id, StringComparer.Ordinal);
         var names = new Dictionary<string, (W.BookmarkStart Start, int Order)> (StringComparer.Ordinal);
         var duplicateNames = new HashSet<string>(StringComparer.Ordinal);
@@ -56,16 +56,24 @@ internal sealed class WordHyperlinkReader
         }
     }
 
-    public string CodeAnchors(W.Paragraph paragraph) => string.Concat(paragraph.Descendants<W.BookmarkStart>()
-        .Where(markers.ContainsKey).Select(marker => "<span data-doc-anchor id=\"" + markers[marker] + "\"></span>"));
+    public string CodeAnchors(W.Paragraph paragraph)
+    {
+        var output = new WordMarkdownBuilder(maximumCharacters);
+        foreach (var marker in paragraph.Descendants<W.BookmarkStart>().Where(markers.ContainsKey))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            output.Append("<span data-doc-anchor id=\"").Append(markers[marker]).Append("\"></span>");
+        }
+        return output.ToString();
+    }
 
     public string Read(W.Paragraph paragraph, Func<W.Run, string> renderRun, bool literal = false)
     {
-        var output = new StringBuilder();
+        var output = new WordMarkdownBuilder(maximumCharacters);
         foreach (var element in paragraph.ChildElements) Append(element, output, 0, false);
         return output.ToString();
 
-        void Append(OpenXmlElement element, StringBuilder target, int depth, bool insideLink)
+        void Append(OpenXmlElement element, WordMarkdownBuilder target, int depth, bool insideLink)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (depth > 64) throw new InvalidDataException("Word inline content exceeds the nesting limit.");
@@ -79,7 +87,7 @@ internal sealed class WordHyperlinkReader
                     if (!literal && markers.TryGetValue(bookmark, out var id)) target.Append("<span data-doc-anchor id=\"").Append(id).Append("\"></span>");
                     return;
                 case W.Hyperlink link:
-                    var label = new StringBuilder();
+                    var label = new WordMarkdownBuilder(maximumCharacters);
                     foreach (var child in link.ChildElements) Append(child, label, depth + 1, true);
                     if (literal) { Warn("Hyperlinks in a Word code block were retained as literal text."); target.Append(label); return; }
                     if (insideLink) { Warn("A nested Word hyperlink was retained as text inside its parent link."); target.Append(label); return; }

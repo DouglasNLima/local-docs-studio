@@ -9,7 +9,8 @@ namespace LensDocsStudio.Core.Imports;
 public sealed record ImportedAsset(string Reference, byte[] Bytes, string SuggestedName);
 public sealed record ImportedDocument(string Markdown, IReadOnlyList<ImportedAsset> Assets, IReadOnlyList<string> Warnings);
 public sealed record WordImportLimits(long MaximumImageBytes = 32 * 1024 * 1024,
-    long MaximumTotalImageBytes = 64 * 1024 * 1024, int MaximumImages = 1024);
+    long MaximumTotalImageBytes = 64 * 1024 * 1024, int MaximumImages = 1024,
+    int MaximumTextCharacters = 32 * 1024 * 1024);
 
 public sealed partial class DocumentImportService
 {
@@ -36,7 +37,7 @@ public sealed partial class DocumentImportService
     {
         cancellationToken.ThrowIfCancellationRequested();
         limits ??= new();
-        if (limits.MaximumImageBytes < 1 || limits.MaximumTotalImageBytes < 1 || limits.MaximumImages < 1)
+        if (limits.MaximumImageBytes < 1 || limits.MaximumTotalImageBytes < 1 || limits.MaximumImages < 1 || limits.MaximumTextCharacters < 1)
             throw new ArgumentOutOfRangeException(nameof(limits));
         using (var zip = new ZipArchive(new MemoryStream(bytes)))
         {
@@ -56,16 +57,23 @@ public sealed partial class DocumentImportService
             W.Table table => table.Elements<W.TableRow>().SelectMany(r => r.Elements<W.TableCell>()).SelectMany(c => c.Elements<W.Paragraph>()),
             _ => Enumerable.Empty<W.Paragraph>()
         });
-        var hyperlinks = new WordHyperlinkReader(main, paragraphs, warnings, cancellationToken);
+        var hyperlinks = new WordHyperlinkReader(main, paragraphs, warnings, cancellationToken, limits.MaximumTextCharacters);
         var paragraphStyles = new WordParagraphStyles(main.StyleDefinitionsPart?.Styles, warnings);
         string Run(W.Run run)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var text = new StringBuilder();
-            var value = string.Concat(run.ChildElements.Select(e => e switch { W.Text t => HtmlMarkdownConverter.Escape(t.Text), W.Break => "\n", W.TabChar => "\t", _ => "" }));
+            var text = new WordMarkdownBuilder(limits.MaximumTextCharacters);
+            foreach (var child in run.ChildElements)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (child is W.Text t) text.AppendEscaped(t.Text, cancellationToken);
+                else if (child is W.Break or W.CarriageReturn) text.Append('\n');
+                else if (child is W.TabChar) text.Append('\t');
+            }
+            var value = text.ToString();
             if (run.RunProperties?.Bold is { } bold && bold.Val?.Value != false) value = Emphasis(value, "**");
             if (run.RunProperties?.Italic is { } italic && italic.Val?.Value != false) value = Emphasis(value, "*");
-            text.Append(value);
+            text = new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(value);
             foreach (var blip in run.Descendants<A.Blip>())
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -98,7 +106,7 @@ public sealed partial class DocumentImportService
                     }
                     imageReferences[id] = reference;
                 }
-                text.Append("![").Append(HtmlMarkdownConverter.Escape(WordImageDescription.Read(blip)))
+                text.Append("![").AppendEscaped(WordImageDescription.Read(blip), cancellationToken)
                     .Append("](").Append(reference).Append(')');
             }
             return text.ToString();
@@ -109,20 +117,47 @@ public sealed partial class DocumentImportService
             var style = paragraphStyles.Read(paragraph);
             if (style.IsCode && !paragraph.Descendants<A.Blip>().Any())
             {
-                var literal = hyperlinks.Read(paragraph, run => string.Concat(run.ChildElements.Select(e => e switch
-                { W.Text text => text.Text, W.Break or W.CarriageReturn => "\n", W.TabChar => "\t", _ => "" })), literal: true);
+                var literal = hyperlinks.Read(paragraph, run =>
+                {
+                    var text = new WordMarkdownBuilder(limits.MaximumTextCharacters);
+                    foreach (var child in run.ChildElements)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (child is W.Text t) text.Append(t.Text);
+                        else if (child is W.Break or W.CarriageReturn) text.Append('\n');
+                        else if (child is W.TabChar) text.Append('\t');
+                    }
+                    return text.ToString();
+                }, literal: true);
                 var anchors = hyperlinks.CodeAnchors(paragraph);
+                var code = new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(anchors);
                 if (inTable)
                 {
                     warnings.Add("Word code blocks inside table cells were imported as literal text.");
-                    return anchors + HtmlMarkdownConverter.Escape(literal).Replace("\n", "<br>", StringComparison.Ordinal);
+                    var firstLine = true;
+                    foreach (var line in literal.AsSpan().EnumerateLines())
+                    {
+                        if (!firstLine) code.Append("<br>");
+                        code.AppendEscaped(line.ToString(), cancellationToken); firstLine = false;
+                    }
+                    return code.ToString();
                 }
-                return (anchors.Length == 0 ? "" : anchors + "\n\n") + HtmlMarkdownConverter.Fence(literal);
+                if (anchors.Length > 0) code.Append("\n\n");
+                literal = HtmlMarkdownConverter.Normalise(literal);
+                var fenceLength = 3; var ticks = 0;
+                foreach (var character in literal)
+                {
+                    ticks = character == '`' ? ticks + 1 : 0;
+                    fenceLength = Math.Max(fenceLength, ticks + 1);
+                }
+                code.Append('`', fenceLength).AppendLine().Append(literal);
+                if (!literal.EndsWith('\n')) code.AppendLine();
+                return code.Append('`', fenceLength).ToString();
             }
             if (style.IsCode) warnings.Add("A Word code-styled paragraph containing an image was imported as ordinary content.");
             var text = hyperlinks.Read(paragraph, Run);
             var prefix = style.HeadingLevel > 0 ? new string('#', style.HeadingLevel) + " " : "";
-            return prefix + text;
+            return new WordMarkdownBuilder(limits.MaximumTextCharacters).Append(prefix).Append(text).ToString();
         }
         static string Emphasis(string value, string marker)
         {
@@ -131,20 +166,33 @@ public sealed partial class DocumentImportService
             while (end > start && char.IsWhiteSpace(value[end - 1])) end--;
             return start == end ? value : value[..start] + marker + value[start..end] + marker + value[end..];
         }
-        var output = new WordListMarkdownWriter(main.NumberingDefinitionsPart?.Numbering, main.StyleDefinitionsPart?.Styles, warnings);
+        var output = new WordListMarkdownWriter(main.NumberingDefinitionsPart?.Numbering, main.StyleDefinitionsPart?.Styles, warnings, limits.MaximumTextCharacters);
         foreach (var element in main.Document?.Body?.ChildElements ?? [])
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (element is W.Paragraph paragraph) output.Paragraph(paragraph, Paragraph(paragraph), paragraphStyles.Read(paragraph).IsQuote);
             else if (element is W.Table table)
             {
-                var rows = table.Elements<W.TableRow>().Select(r => r.Elements<W.TableCell>().Select(c =>
-                    output.Cell(c.Elements<W.Paragraph>(), p => Paragraph(p, inTable: true), p => paragraphStyles.Read(p).IsQuote)).ToArray()).ToArray();
-                if (rows.Length == 0) continue;
-                var text = new StringBuilder();
-                text.AppendLine("| " + string.Join(" | ", rows[0]) + " |");
-                text.AppendLine("| " + string.Join(" | ", rows[0].Select(_ => "---")) + " |");
-                foreach (var row in rows.Skip(1)) text.AppendLine("| " + string.Join(" | ", row) + " |");
+                var text = new WordMarkdownBuilder(limits.MaximumTextCharacters);
+                var first = true;
+                foreach (var row in table.Elements<W.TableRow>())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var cells = 0; text.Append("| ");
+                    foreach (var cell in row.Elements<W.TableCell>())
+                    {
+                        if (cells++ > 0) text.Append(" | ");
+                        text.Append(output.Cell(cell.Elements<W.Paragraph>(), p => Paragraph(p, inTable: true), p => paragraphStyles.Read(p).IsQuote));
+                    }
+                    text.AppendLine(" |");
+                    if (first)
+                    {
+                        text.Append("| ");
+                        for (var cell = 0; cell < cells; cell++) text.Append(cell == 0 ? "---" : " | ---");
+                        text.AppendLine(" |"); first = false;
+                    }
+                }
+                if (first) continue;
                 var indent = table.GetFirstChild<W.TableProperties>()?.TableIndentation;
                 output.Block(text.ToString().TrimEnd('\r', '\n'), indent?.Type?.Value == W.TableWidthUnitValues.Dxa ? indent.Width?.Value : null);
             }
