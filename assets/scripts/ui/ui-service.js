@@ -676,6 +676,7 @@ export function createUiService({
     }
 
     function setStatus(message, tone = '') {
+      state.statusRevision = (state.statusRevision || 0) + 1;
       status.className = `status${tone ? ` ${tone}` : ''}`;
       status.textContent = message;
       if (tone === 'busy') {

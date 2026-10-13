@@ -1595,6 +1595,61 @@ test('a delayed draft lookup preserves edits made after the file becomes availab
   await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Edited while recovery is loading\n');
 });
 
+test('a queued preview retains the completed save confirmation and saved bytes', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#preview h1')).toHaveText('Opened');
+  await page.clock.pauseAt(new Date('2026-10-13T10:01:00Z'));
+  const saved = '# Saved before the queued preview\n';
+  await page.locator('#editor').fill(saved);
+  await page.locator('#saveButton').click();
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  // Advance past the old debounce to verify it cannot replay after saving; no wall-clock sleep.
+  await page.clock.runFor(250);
+  await expect(page.locator('#preview h1')).toHaveText('Saved before the queued preview');
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue(saved);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await page.clock.resume();
+  await page.locator('#editor').fill('# Next edit remains unsaved\n');
+  await expect(page.locator('#preview h1')).toHaveText('Next edit remains unsaved');
+  await expect(page.locator('#status')).toHaveText(/Rendered.*edited in the app/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+});
+
+test('an in-flight preview cannot replace a newer save confirmation or saved bytes', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#preview h1')).toHaveText('Opened');
+  await page.evaluate(async () => {
+    const { default: mermaid } = await import('/assets/vendor/mermaid-11.15.0.esm.min.js');
+    const original = mermaid.render;
+    mermaid.render = async function render(...args) {
+      mermaid.render = original;
+      window.__previewRenderHeld = true;
+      await new Promise((resolve) => { window.__releasePreviewRender = resolve; });
+      return original.apply(this, args);
+    };
+  });
+  const saved = '# Saved during an active preview\n\n```mermaid\nflowchart LR\n A --> B\n```\n';
+  await page.locator('#editor').fill(saved);
+  await expect.poll(() => page.evaluate(() => window.__previewRenderHeld)).toBe(true);
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await page.evaluate(() => window.__releasePreviewRender());
+  await expect(page.locator('#preview .mermaid svg')).toHaveCount(1);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue(saved);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+});
+
 test('a late draft lookup does not replace a newer save confirmation or its saved bytes', async ({ page }) => {
   await installMockFileSystemAccess(page);
   await page.addInitScript(() => {

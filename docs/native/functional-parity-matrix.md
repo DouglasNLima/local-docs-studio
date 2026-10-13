@@ -8,6 +8,8 @@ The next acceptance phase executes isolated native/Word Computer Use and represe
 
 ## Feature contracts
 
+Acceptance corrections add bounded PDF aggregation, attribute-free native line breaks, properly quoted TSV/CSV round-trips, Word decoded controls and field-dependent update requests. The separate web edition retains completed save feedback when an older in-flight render finishes; all 268 local browser cases pass. Actual native/Word and copied-package findings, remaining continuous-layout FAIL observations, original CI failures and final hosted evidence are recorded in the acceptance report rather than relabelling earlier feature rows.
+
 The web guide, catalogue and regressions define the reference outcomes. Rows retain each feature's original revision-specific proof; old test counts are not represented as current counts. Supported outcomes and stated limits remain the contract. The [earlier chronological matrix](history/functional-parity-matrix-through-7008751.md) retains original failures and pending statements.
 
 | User need / existing contract | Native design | Status |

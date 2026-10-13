@@ -63,6 +63,7 @@ export function createInitialState({ readStoredNumber }) {
     selectedTreeFolderPath: '',
     renderId: 0,
     debounceId: 0,
+    statusRevision: 0,
     fileCache: new Map(),
     savedContentCache: new Map(),
     dirtyPaths: new Set(),

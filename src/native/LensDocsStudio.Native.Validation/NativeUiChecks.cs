@@ -1380,7 +1380,18 @@ internal static partial class NativeUiChecks
             contentLibrary.Close();
             checks.Add("Native content library saves portable templates/snippets, merges browser JSON, renames/archives/restores, exports and survives restart; new tabs and snippet Undo preserve source while session profiles control actual bundle output");
             Find(window, "HelpMenu").Click();
-            Find(window, "UpdatesMenu").Click();
+            var updatesMenu = Find(window, "UpdatesMenu");
+            Wait(() => updatesMenu.IsEnabled && !updatesMenu.Properties.IsOffscreen.Value, "The Updates menu command did not become visible.");
+            File.WriteAllText(Path.Combine(output, "native-updates-command.json"), JsonSerializer.Serialize(new
+            {
+                updatesMenu.AutomationId, updatesMenu.Name, updatesMenu.IsEnabled,
+                Bounds = updatesMenu.BoundingRectangle.ToString(), InvokeSupported = updatesMenu.Patterns.Invoke.IsSupported,
+                Procedure = "Invoke the observed menu command once; wait for its window within the unchanged deadline."
+            }, new JsonSerializerOptions { WriteIndented = true }));
+            if (!updatesMenu.Patterns.Invoke.IsSupported) throw new IOException("The Updates menu has no supported automation command.");
+            // The retained failure left Help open: a popup-sensitive coordinate click never activated Updates.
+            // Use the same supported command pattern as other menu actions; do not retry the action or extend Wait.
+            updatesMenu.Patterns.Invoke.Pattern.Invoke();
             Window? updateWindow = null;
             Wait(() => (updateWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio updates")))?.AsWindow()) is not null, "The native updates window did not open.");
             var channel = Find(updateWindow!, "UpdateChannel").AsComboBox();
