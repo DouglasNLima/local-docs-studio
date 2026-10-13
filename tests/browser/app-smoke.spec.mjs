@@ -1595,6 +1595,49 @@ test('a delayed draft lookup preserves edits made after the file becomes availab
   await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Edited while recovery is loading\n');
 });
 
+test('a late draft lookup does not replace a newer save confirmation or its saved bytes', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.addInitScript(() => {
+    const originalGet = IDBObjectStore.prototype.get;
+    let held = false;
+    IDBObjectStore.prototype.get = function get(key) {
+      const request = originalGet.call(this, key);
+      if (this.name === 'drafts' && String(key).endsWith('::opened.md') && !held) {
+        held = true;
+        request.addEventListener('success', (event) => {
+          event.stopImmediatePropagation();
+          window.__draftLookupHeld = true;
+          window.__releaseDraftLookup = () => request.onsuccess.call(request, event);
+        }, { once: true });
+      }
+      return request;
+    };
+  });
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect.poll(() => page.evaluate(() => window.__draftLookupHeld)).toBe(true);
+  await page.locator('#editor').fill('# Saved during a delayed lookup\n');
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved during a delayed lookup\n');
+  const statusChanges = await page.evaluate(async () => {
+    const status = document.querySelector('#status');
+    const changes = [];
+    const observer = new MutationObserver(() => changes.push(status.textContent));
+    observer.observe(status, { childList: true, subtree: true });
+    window.__releaseDraftLookup();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    observer.disconnect();
+    return changes;
+  });
+  expect(statusChanges).toEqual([]);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue('# Saved during a delayed lookup\n');
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved during a delayed lookup\n');
+});
+
 test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
   await installMockFileSystemAccess(page);
   await gotoApp(page);

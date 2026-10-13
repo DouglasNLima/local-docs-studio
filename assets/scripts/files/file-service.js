@@ -937,8 +937,9 @@ export function createFileService({
         const loadedContent = editor.value;
         const recovered = await afterActiveFileLoaded?.(record, loadedContent);
         if (state.activePath !== record.path || !state.files.includes(record)) return;
-        // Recovery is asynchronous: retain edits made while its local lookup was pending.
-        if (recovered?.content !== undefined && recovered.content !== loadedContent && editor.value === loadedContent) {
+        // Newer edits already own rendering, scrolling and save feedback. The older lookup must not replay them.
+        if (editor.value !== loadedContent) return;
+        if (recovered?.content !== undefined && recovered.content !== loadedContent) {
           editor.value = recovered.content;
           state.fileCache.set(record.path, recovered.content);
           if (recovered.dirty) state.dirtyPaths.add(record.path);
