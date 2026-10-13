@@ -1,0 +1,61 @@
+name: Native Continuous viewer feasibility
+on:
+  push:
+    branches: ['spike/native-continuous-viewer']
+  pull_request:
+    branches: ['feature/native-wpf-rebuild']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: continuous-feasibility-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  feasibility:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Restore isolated locked dependencies
+        run: |
+          dotnet restore src/native/spikes/ContinuousViewer --locked-mode
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet restore src/native/spikes/ContinuousViewer.Tests --locked-mode
+      - name: Build the experimental harness only
+        id: build
+        run: dotnet build src/native/spikes/ContinuousViewer -c Release --no-restore
+      - name: Validate the complete logical model
+        run: dotnet test src/native/spikes/ContinuousViewer.Tests -c Release --no-restore --logger 'trx;LogFileName=continuous-model.trx' --results-directory artifacts/continuous/model
+      - name: Validate hidden native layout and contracts
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --validate artifacts/continuous/validation
+      - name: Validate real native keyboard mouse clipboard and UI Automation
+        timeout-minutes: 4
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --desktop artifacts/continuous/desktop
+      - name: Probe oversized blocks scroll anchors and resource release
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --stress artifacts/continuous/stress
+      - name: Verify complete-source DOCX PDF and HTML exports
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --exports artifacts/continuous/exports
+      - name: Observe the indivisible Unicode layout risk with its actual process exit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --cluster artifacts/continuous/cluster
+          $clusterExit = $LASTEXITCODE
+          @{ processExitCode = $clusterExit; scope = 'Actual native observation; failure is retained and prevents acceptance.' } | ConvertTo-Json | Set-Content -LiteralPath artifacts/continuous/cluster/process-exit.json
+          exit $clusterExit
+      - name: Record comparative cold and warm 250 ms observations
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: pwsh -NoProfile -File scripts/native/Measure-ContinuousViewer.ps1 -OutputDirectory artifacts/continuous/comparison
+      - name: Check unchanged static web integrity
+        if: ${{ !cancelled() }}
+        run: node tests/static/check-assets.mjs
+      - name: Upload all observations including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-continuous-feasibility
+          path: artifacts/continuous/
