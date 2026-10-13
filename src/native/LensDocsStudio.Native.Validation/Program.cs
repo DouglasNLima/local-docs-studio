@@ -77,7 +77,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--word-import-fixture")
         {
             var fixtureOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/word-import-fixture");
-            try { NativeWordImportFixtureChecks.Run(fixtureOutput); Console.WriteLine("Native Word import fixture passed."); return 0; }
+            try { var fixture = NativeWordImportFixtureChecks.Run(fixtureOutput); NativeWordImportPreviewChecks.Run(fixtureOutput, fixture); Console.WriteLine("Native Word import fixture passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
         if (args.FirstOrDefault() == "--word-syntax")
@@ -405,7 +405,7 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native Word syntax: " + ex.Message); }
         try { NativeWordListChecks.Run(output, repository); }
         catch (Exception ex) { failures.Add("Native Word lists: " + ex.Message); }
-        try { NativeWordImportFixtureChecks.Run(output); }
+        try { var fixture = NativeWordImportFixtureChecks.Run(output); NativeWordImportPreviewChecks.Run(output, fixture); }
         catch (Exception ex) { failures.Add("Native Word import fixture: " + ex.Message); }
         try { NativeHtmlSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native HTML syntax: " + ex.Message); }

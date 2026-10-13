@@ -59,7 +59,7 @@ internal static partial class NativeUiChecks
             Wait(() => (visible = ImageVisible()) || observation.Elapsed >= TimeSpan.FromSeconds(3),
                 "The Word import preview page could not be observed.", seconds: 10);
             pageObservations.Add(new { Page = label, ImageVisible = visible, ObservationMilliseconds = observation.Elapsed.TotalMilliseconds,
-                Images = owner.FindAllDescendants(cf => cf.ByControlType(ControlType.Image)).Select(image => new
+                Images = PreviewImages().Select(image => new
                 { image.AutomationId, image.Name, image.IsOffscreen, Bounds = image.BoundingRectangle.ToString() }).ToArray() });
             owner.CaptureToFile(Path.Combine(output, $"native-word-import-page-{page + 1}.png"));
             File.WriteAllText(Path.Combine(output, "native-word-import-pages.json"), JsonSerializer.Serialize(new { Pages = previewPages, Observations = pageObservations }));
@@ -107,7 +107,11 @@ internal static partial class NativeUiChecks
             OriginalSha256 = Convert.ToHexString(SHA256.HashData(fixture.Bytes)), ImageSha256 = Convert.ToHexString(SHA256.HashData(fixture.Image))
         }, new JsonSerializerOptions { WriteIndented = true }));
 
-        bool ImageVisible() => owner.FindFirstDescendant(cf => cf.ByControlType(ControlType.Image).And(cf.ByName("Portable pixel"))) is { } image
+        // Embedded document objects use TextPattern range children, as the native hyperlink checks do.
+        AutomationElement[] PreviewImages() => Find(owner, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
+            .Where(element => element.ControlType == ControlType.Image).ToArray();
+
+        bool ImageVisible() => PreviewImages().FirstOrDefault(image => image.Name == "Portable pixel") is { } image
             && image.BoundingRectangle.Width > 0 && image.BoundingRectangle.Height > 0 && !image.IsOffscreen;
 
         void OpenImport()
