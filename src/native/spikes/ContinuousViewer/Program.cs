@@ -42,7 +42,7 @@ internal static class Program
                 window.Closed += (_, _) => { loader.Dispose(); viewer.Dispose(); };
                 application.Run(window); return 0;
             }
-            Console.WriteLine("Experimental harness: --validate <output> | --measure <baseline|prototype> <fixture> <output> | --interactive <fixture> (disposable hosted Windows only)");
+            Console.WriteLine("Experimental harness: --validate | --stress | --exports | --cluster <output>; --measure <baseline|prototype> <fixture> <output>; --interactive <fixture> <synthetic-root> and --desktop <output> require disposable hosted Windows.");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }

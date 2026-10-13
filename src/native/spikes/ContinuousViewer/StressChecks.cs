@@ -52,6 +52,24 @@ internal static class StressChecks
             var source = FixtureCatalogue.All.Single(f => f.Name == "rich").Source;
             var model = LogicalDocument.Build(new MarkdownService().Parse(source)); viewer.SetDocument(model); HarnessSupport.Layout(viewer); HarnessSupport.Idle();
             var target = model.Parsed.Targets.Single(t => t.Id == "distant");
+            var internalLink = model.Pieces.SelectMany(p => p.Runs).First(r => r.Link == "#distant");
+            viewer.ActivateLinkAt(internalLink.Start); HarnessSupport.Idle();
+            var internalTarget = model.AtSource(target.SourceStart);
+            var peer = (VirtualDocumentPeer)UIElementAutomationPeer.CreatePeerForElement(viewer);
+            var internalVisible = peer.Range(internalTarget.Start, internalTarget.End).GetBoundingRectangles().Length > 0;
+            string? wikiActivation = null; viewer.LinkActivated += value => wikiActivation = value;
+            var wiki = model.Pieces.SelectMany(p => p.Runs).First(r => r.Link?.StartsWith("wiki:", StringComparison.Ordinal) == true);
+            viewer.ActivateLinkAt(wiki.Start);
+            var literalOffset = viewer.SourceAt(internalTarget.Start + 3);
+            observations.Add(new { name = "internal fragment / wiki callback / preview source mapping", internalVisible,
+                wikiActivation, mappedSourceOffset = literalOffset, exactLiteralMapping = source[literalOffset] == model.Text[internalTarget.Start + 3],
+                scope = "Actual native navigation and the same source-follow entry point; wiki activation is delegated to a host callback, with no external file opened." }); Save();
+            var targetAnchor = viewer.CaptureAnchor(); viewer.History(true); HarnessSupport.Layout(viewer); var previousAnchor = viewer.CaptureAnchor();
+            viewer.History(false); HarnessSupport.Layout(viewer); var restored = viewer.CaptureAnchor();
+            observations.Add(new { name = "navigation history and scroll restoration", previousPiece = previousAnchor.Piece,
+                restoredPiece = restored.Piece, expectedPiece = targetAnchor.Piece, restored = restored.Piece == targetAnchor.Piece }); Save();
+            var sourceFollow = viewer.NavigateAsync(source.IndexOf("First **item**", StringComparison.Ordinal)); HarnessSupport.Pump(sourceFollow);
+            observations.Add(new { name = "source-follow navigation entry point", visible = sourceFollow.Result, sourcePreserved = model.Parsed.Source == source }); Save();
             var navigate = viewer.NavigateAnchorAsync("#distant"); HarnessSupport.Pump(navigate);
             var expanded = model.Groups.All(g => viewer.IsExpanded(g.Id));
             var anchor = viewer.CaptureAnchor();
@@ -72,6 +90,24 @@ internal static class StressChecks
         var weak = ReleaseViewer(); HarnessSupport.Idle(); GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect();
         observations.Add(new { name = "resource release", viewerCollected = !weak.IsAlive, managedBytesAfterCollection = GC.GetTotalMemory(false),
             scope = "Explicit disposal and collection in the harness; no forced collection in interactive presentation." }); Save();
+        using (var viewer = new VirtualDocumentView())
+        using (var host = HarnessSupport.Host(viewer))
+        {
+            // The unchanged comparison fixture contains one initial heading. Append a separately labelled distant-heading variant.
+            var original = FixtureCatalogue.All.Single(f => f.Name == "large-4mb").Source;
+            var source = original + "\n## Distant heading\n\nRetained distant heading content.\n";
+            var model = LogicalDocument.Build(new MarkdownService().Parse(source)); viewer.SetDocument(model); HarnessSupport.Layout(viewer); HarnessSupport.Idle();
+            var target = model.Parsed.Targets.Single(t => t.Id == "distant-heading");
+            var watch = Stopwatch.StartNew(); var navigation = viewer.NavigateAnchorAsync("#distant-heading"); HarnessSupport.Pump(navigation); HarnessSupport.Layout(viewer);
+            var peer = (VirtualDocumentPeer)UIElementAutomationPeer.CreatePeerForElement(viewer);
+            var piece = model.AtSource(target.SourceStart); var bounds = peer.Range(piece.Start, piece.End).GetBoundingRectangles();
+            observations.Add(new { name = "4.14 MB derived distant-heading variant", sourceUtf8Bytes = System.Text.Encoding.UTF8.GetByteCount(source),
+                originalComparisonSourceUnchanged = original == FixtureCatalogue.All.Single(f => f.Name == "large-4mb").Source,
+                sourceStart = target.SourceStart, headings = model.Parsed.Headings.Count, visible = navigation.Result, actualBounds = bounds.Length > 0,
+                nativeContainers = VirtualDocumentView.Descendants<ListBoxItem>(viewer).Count(), navigationMilliseconds = watch.Elapsed.TotalMilliseconds }); Save();
+            HarnessSupport.Raster(viewer, Path.Combine(output, "large-distant-heading.png"));
+            if (!navigation.Result || bounds.Length == 0) throw new IOException("The distant heading in the separately labelled large document was not reached.");
+        }
         Console.WriteLine("Stress evidence retained; individual input failures remain failures.");
         void Save() => File.WriteAllText(Path.Combine(output, "stress.json"), JsonSerializer.Serialize(observations, new JsonSerializerOptions { WriteIndented = true }));
     }

@@ -74,6 +74,7 @@ internal static class ValidationHarness
                 Check(fixture.Name + ": expansion state is independent of recycled controls", viewer.Selection.Copy().UnicodeText == anchor);
             }
             if (fixture.Name is "rich" or "mixed") Check(fixture.Name + ": existing native image and Mermaid services produce real media", media.Result.Count >= 2);
+            if (fixture.Name == "rich") Check("rich: display maths uses a real frozen native formula drawing", model.Pieces.Any(p => p.Kind == PieceKind.Maths && media.Result.ContainsKey(p.Id)));
             // Export from the complete parsed source; never use realised controls as the export input.
             var exportTask = StaWorker.RunAsync(() => new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService())
                 .Prepare(model.Parsed.Source, Path.Combine(output, "synthetic.md"), output, false));
@@ -94,8 +95,11 @@ internal static class ValidationHarness
             var source = FixtureCatalogue.All.Single(f => f.Name == "large-4mb").Source;
             var watch = Stopwatch.StartNew(); var old = loader.LoadAsync(viewer, source);
             var current = loader.LoadAsync(viewer, "# Current\n\nRapid replacement is retained.");
-            HarnessSupport.Pump(Task.WhenAll(old, current));
-            Check("rapid document replacement: obsolete projection cannot commit", !old.Result && current.Result && viewer.Document!.Parsed.Source == "# Current\n\nRapid replacement is retained.", new { elapsedMilliseconds = watch.Elapsed.TotalMilliseconds });
+            HarnessSupport.Pump(current); var currentReadiness = watch.Elapsed.TotalMilliseconds;
+            HarnessSupport.Pump(old);
+            Check("rapid document replacement: obsolete projection cannot commit", !old.Result && current.Result && viewer.Document!.Parsed.Source == "# Current\n\nRapid replacement is retained.",
+                new { currentDocumentReadinessMilliseconds = currentReadiness, obsoleteCancellationCompletionMilliseconds = watch.Elapsed.TotalMilliseconds,
+                    limitation = "Markdig's active synchronous parse completes on its worker before cancellation can be observed; the obsolete document cannot commit." });
         }
         Console.WriteLine($"Hidden-HWND feasibility validation: {checks.Count} checks passed. Physical accessibility/OS clipboard remain separate gates.");
     }

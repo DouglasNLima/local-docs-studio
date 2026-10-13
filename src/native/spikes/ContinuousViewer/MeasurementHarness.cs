@@ -51,7 +51,7 @@ internal static class MeasurementHarness
     }
     private static void Prototype(ViewerFixture fixture, string output, Dictionary<string, object?> result, int repetition)
     {
-        var allocated = GC.GetTotalAllocatedBytes(); var watch = Stopwatch.StartNew();
+        var allocated = GC.GetTotalAllocatedBytes(); var watch = Stopwatch.StartNew(); var overall = Stopwatch.StartNew();
         // Background parsing/projection is timed separately from actual dispatcher layout.
         var modelTask = Task.Run(() => LogicalDocument.Build(new MarkdownService().Parse(fixture.Source)));
         HarnessSupport.Pump(modelTask); var model = modelTask.Result;
@@ -64,6 +64,7 @@ internal static class MeasurementHarness
         watch.Restart(); using var input = new InputProbe();
         result["firstLayoutInputMilliseconds"] = input.Measure(() => { viewer.SetDocument(model, media); HarnessSupport.Layout(viewer); });
         result["firstUsefulViewportMilliseconds"] = watch.Elapsed.TotalMilliseconds;
+        result["endToEndFirstUsefulViewportMilliseconds"] = overall.Elapsed.TotalMilliseconds;
         result["readinessScope"] = "Complete logical document and first useful hidden-HWND viewport; deferred visuals have not all been created.";
         result["logicalPieces"] = model.Pieces.Length; result["initialRealised"] = viewer.Realised.Count;
         result["completeText"] = model.Text.Contains(fixture.Last, StringComparison.Ordinal); result["sourcePreserved"] = model.Parsed.Source == fixture.Source;
@@ -93,7 +94,7 @@ internal static class MeasurementHarness
     }
     private static void Baseline(ViewerFixture fixture, string output, Dictionary<string, object?> result, int repetition)
     {
-        var allocated = GC.GetTotalAllocatedBytes(); var watch = Stopwatch.StartNew();
+        var allocated = GC.GetTotalAllocatedBytes(); var watch = Stopwatch.StartNew(); var overall = Stopwatch.StartNew();
         var parsed = new MarkdownService().Parse(fixture.Source);
         var diagrams = parsed.Syntax.Descendants<FencedCodeBlock>().Where(c => c.Info is "mermaid" or "mmd")
             .ToDictionary(c => c, c => new DiagramService().Render(c.Lines.ToString()));
@@ -109,6 +110,7 @@ internal static class MeasurementHarness
         watch.Restart(); using var input = new InputProbe();
         result["firstLayoutInputMilliseconds"] = input.Measure(() => { viewer.Document = rendered.Document; HarnessSupport.Layout(viewer); });
         result["firstUsefulViewportMilliseconds"] = watch.Elapsed.TotalMilliseconds;
+        result["endToEndFirstUsefulViewportMilliseconds"] = overall.Elapsed.TotalMilliseconds;
         result["allocatedThroughFirstViewportBytes"] = GC.GetTotalAllocatedBytes() - allocated;
         result["completeText"] = rendered.ReadText().Contains(fixture.Last, StringComparison.Ordinal); result["sourcePreserved"] = parsed.Source == fixture.Source;
         result["logicalPieces"] = rendered.SourceElements.Count;

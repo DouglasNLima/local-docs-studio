@@ -56,6 +56,12 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
         style.Setters.Add(new Setter(MarginProperty, new Thickness(0)));
         style.Setters.Add(new Setter(HorizontalContentAlignmentProperty, HorizontalAlignment.Stretch));
         style.Setters.Add(new Setter(FocusableProperty, false));
+        // Item focus/selection is an implementation detail; document selection alone supplies highlighting.
+        var content = new FrameworkElementFactory(typeof(ContentPresenter));
+        content.SetValue(ContentPresenter.ContentProperty, new TemplateBindingExtension(ContentControl.ContentProperty));
+        content.SetValue(ContentPresenter.ContentTemplateProperty, new TemplateBindingExtension(ContentControl.ContentTemplateProperty));
+        content.SetValue(HorizontalAlignmentProperty, new TemplateBindingExtension(HorizontalContentAlignmentProperty));
+        style.Setters.Add(new Setter(TemplateProperty, new ControlTemplate(typeof(ListBoxItem)) { VisualTree = content }));
         ItemContainerStyle = style;
         PreviewKeyDown += OnKey;
         PreviewMouseLeftButtonDown += OnDown;

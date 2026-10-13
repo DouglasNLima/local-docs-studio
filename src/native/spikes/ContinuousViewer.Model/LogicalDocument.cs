@@ -123,7 +123,10 @@ public sealed class LogicalDocument
                     var leafRuns = leaf.Inline is null ? new[] { new TextRun(0, leaf.Lines.ToString(), block.Span.Start, block.Span.End) } : Inline(leaf.Inline);
                     if (prefix.Length > 0) leafRuns = [new(0, prefix, block.Span.Start, block.Span.Start), .. leafRuns];
                     var images = leaf.Inline?.Descendants<LinkInline>().Where(l => l.IsImage).ToArray() ?? [];
-                    Emit(leafRuns, block, images.Length > 0 ? PieceKind.Image : context, level, ancestors, images.FirstOrDefault()?.Url);
+                    var formula = leaf.Inline?.OfType<MathInline>().FirstOrDefault();
+                    var displayFormula = formula is not null && leafRuns.Length == 1 && leafRuns[0].Text == formula.Content.ToString();
+                    Emit(leafRuns, block, images.Length > 0 ? PieceKind.Image : displayFormula ? PieceKind.Maths : context, level, ancestors,
+                        images.FirstOrDefault()?.Url ?? (displayFormula ? formula!.Content.ToString() : null));
                     break;
                 case ContainerBlock container:
                     foreach (var child in container) Walk(child, ancestors, context, level, ""); break;

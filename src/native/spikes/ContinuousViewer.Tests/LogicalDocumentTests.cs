@@ -54,6 +54,7 @@ public sealed class LogicalDocumentTests
         Assert.Contains("Café\tFirst\nSecond\t😀", model.Text, StringComparison.Ordinal);
         Assert.Contains("1. First item", model.Text, StringComparison.Ordinal);
         Assert.Contains("☑", model.Text, StringComparison.Ordinal); Assert.Contains("Wiki label", model.Text, StringComparison.Ordinal);
+        Assert.Contains(model.Pieces, p => p.Kind == PieceKind.Maths);
         var target = parsed.Targets.Single(t => t.Id == "distant"); Assert.Equal(PieceKind.Heading, model.AtSource(target.SourceStart).Kind);
         var selection = new LogicalSelection(model); selection.Set(0, model.Text.Length);
         Assert.Contains(fixture.Last, selection.Copy().UnicodeText, StringComparison.Ordinal);
