@@ -1,11 +1,21 @@
-# ADR: isolate a logical-document Continuous viewer experiment
+# ADR: reject the current Continuous RichTextBox hybrid for integration
 
-Status: experimental, feasibility decision pending. Base: `9c7454e`.
+Status: **NO-GO**, feasibility code `8224057`, based on native `9c7454e`. Recorded 13 October 2026. Evidence: [report](continuous-viewer-feasibility.md), executable and draft [PR 22](https://github.com/DouglasNLima/local-docs-studio/pull/22).
 
-The production Continuous FlowDocument renderer cannot bound synchronous bottomless formatting with application yields. Previous list subdivision and incremental attachment did not resolve it. An alternative must preserve full meaning, selection, source navigation, accessibility and exports before integration.
+## Context and experiment
 
-Prototype a recycling native WPF host with bounded text pieces and existing native media services. Keep original source and all semantic data in a portable complete logical model. Keep selection as logical grapheme offsets, expose complete logical UI Automation text ranges and derive realised visuals from that state. Split list/table/quote/details contents and oversized text rather than wrapping one unbounded FlowDocument in a virtualised container.
+Continuous FlowDocument performs synchronous bottomless formatting after cooperative construction. Earlier subdivision/incremental attachment did not resolve it. Replacement must bound native work while preserving meaning, selection, source navigation, clipboard, accessibility and exports.
 
-Candidate B, a TextFormatter/DrawingVisual surface, remains credible but requires substantially more glyph/hit-testing/interaction work. Native drawing speed is insufficient evidence for replacing a selectable accessible viewer. Candidate C reuses WPF shaping and media while testing the difficult document-level contracts directly.
+Assess recycling item host, DrawingVisual/TextFormatter and hybrid text/table/media. Build the hybrid as a separate WPF executable. Retain authoritative source/syntax, grapheme selection and TextPattern independently of visuals. Split large structures/text instead of retaining a global FlowDocument.
 
-The spike is a separate executable and workflow, excluded from production solution/package inputs. The current renderer, preference contracts and PR 21 are untouched. No merge, release or automatic presentation-engine switch occurs. Final acceptance requires equivalent cold/warm measured layout, bounded memory/container retention, actual distant navigation, cross-block copy and a declared accessibility scope. Integration, if justified, requires a separate review and regression stage.
+The prototype demonstrates distant navigation, normal bounded container retention, cross-block Unicode/RTF/HTML/Markdown transfer, actual Windows keyboard/mouse/clipboard and offscreen TextPattern. Established exports retain distant content. Local cold list median improves 701.14 → 148.38 ms.
+
+## Decision
+
+**Reject integration.** Valid 65,537-character indivisible grapheme bypasses the 512-character budget. Two disposable Windows processes terminate `0x80000003` before post-layout evidence. Warm large/rich input exceeds 250 ms; history/font restoration fails its anchor expectation. Full rich clipboard/physical accessibility equivalence remain unestablished.
+
+These are fundamental bounds/contracts. Faster first layout cannot justify replacement. Retain current renderer, solution, preferences, packages and PR 21. Experimental code stays reviewable/reproducible and excluded from production publishing.
+
+## Consequences
+
+Logical-document/selection/source/TextPattern separation is reusable evidence. A future native width-aware line/glyph surface needs height indexing and controlled shaping. Unicode-safe fragmentation, faithful hit/caret/clipboard geometry and reliable anchoring require proof before another implementation stage. TextFormatter's shared dependencies need an executable Unicode gate. No second complete renderer or automatic rollout starts here.
