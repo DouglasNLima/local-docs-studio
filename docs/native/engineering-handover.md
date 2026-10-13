@@ -1,5 +1,7 @@
 # Native Windows engineering handover
 
+For continuation, read the [current development handoff](continuation-handoff.md). It records verified baseline `23bcb83`, the DOCX text-growth correction, Word decorations, installer observation correction and successful previews .279/.280. The older milestone statements below are historical and do not supersede that handoff.
+
 The current change adds validation-only stack capture for the unresolved preview pause. A separate hidden helper observes validation input pulses and captures the owned process only after 300 ms, beyond the unchanged 250 ms acceptance limit. A deliberate windowless wait verifies the watched thread in a minimal dump; normal/idle input and unrelated process requests do not produce captures. Diagnostic failure preserves the original rendering exception. No application rendering behaviour has been changed or certified fixed; hosted diagnostic evidence remains pending.
 
 Current verified application source is 77be5707d5a67dfcb5525d699eeb2dee691985a2, including the native table grid. Preview.269 passes all four 66-check application contexts. Independently downloaded reports verify table keyboard editing, Cancel/Apply, row/column actions, alignment, reopened/new tables, native preview, whole Undo/Redo and unchanged saved files. The parallel PR run fails nested-details responsiveness at 587.9933 ms; original evidence is retained and the cause remains unresolved. This is an unsigned internal preview, with production acceptance incomplete.
