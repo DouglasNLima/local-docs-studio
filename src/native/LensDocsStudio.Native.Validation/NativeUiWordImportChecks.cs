@@ -45,9 +45,21 @@ internal static partial class NativeUiChecks
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == markdown, "The imported saved Markdown did not open in the editor.");
         Wait(() => Find(owner, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal),
             "The imported Word document did not render.");
-        Wait(() => owner.FindFirstDescendant(cf => cf.ByControlType(ControlType.Image).And(cf.ByName("Portable pixel"))) is { } image
-            && image.BoundingRectangle.Width > 0 && image.BoundingRectangle.Height > 0,
-            "The imported Word image is missing from the actual native preview.");
+        // Earlier settings checks deliberately retain page reading and 125% zoom.
+        // WPF exposes images on the current page; use the real page commands to reveal later content.
+        var previewPages = new List<string>();
+        for (var page = 0; page < 8; page++)
+        {
+            var label = owner.FindFirstDescendant(cf => cf.ByAutomationId("PreviewPageNumber"))?.Name ?? "Continuous";
+            previewPages.Add(label);
+            if (ImageVisible()) break;
+            var next = owner.FindFirstDescendant(cf => cf.ByAutomationId("PreviewNextPage"));
+            if (next?.IsEnabled != true) break;
+            next.Patterns.Invoke.Pattern.Invoke();
+            Wait(() => Find(owner, "PreviewPageNumber").Name != label, "Word import preview did not advance to its next page.");
+        }
+        File.WriteAllText(Path.Combine(output, "native-word-import-pages.json"), JsonSerializer.Serialize(new { Pages = previewPages }));
+        Wait(ImageVisible, "The imported Word image is missing from the actual native preview after page navigation.");
         NativeWordImportFixtureChecks.CheckMarkdown(markdown);
         var status = Find(owner, "Status");
         var message = status.Name;
@@ -81,8 +93,12 @@ internal static partial class NativeUiChecks
             Passed = true, CancelPreservedSource = true, OriginalDocxUnchanged = true, PreviousDocumentUnchanged = true,
             MarkdownMatchesSavedFile = true, Warnings = NativeWordImportFixtureChecks.ExpectedWarnings,
             Status = message, AccessibleTooltip = help, ExactImage = true, NativePreviewImage = true, CopiedWorkspacePortable = true,
+            PreviewPages = previewPages,
             OriginalSha256 = Convert.ToHexString(SHA256.HashData(fixture.Bytes)), ImageSha256 = Convert.ToHexString(SHA256.HashData(fixture.Image))
         }, new JsonSerializerOptions { WriteIndented = true }));
+
+        bool ImageVisible() => owner.FindFirstDescendant(cf => cf.ByControlType(ControlType.Image).And(cf.ByName("Portable pixel"))) is { } image
+            && image.BoundingRectangle.Width > 0 && image.BoundingRectangle.Height > 0 && !image.IsOffscreen;
 
         void OpenImport()
         {
