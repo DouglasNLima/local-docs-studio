@@ -86,6 +86,13 @@ internal static class Program
             try { NativeWorkspaceContextChecks.Run(contextOutput); Console.WriteLine("Native workspace context checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--window-discovery")
+        {
+            var discoveryOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/window-discovery");
+            Directory.CreateDirectory(discoveryOutput);
+            try { NativeWindowDiscoveryChecks.Run(discoveryOutput); Console.WriteLine("Native window discovery checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--word-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -377,7 +384,7 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview preparation: " + ex.Message); }
         try { NativeMarkdownChecks.Run(output, repository); }
         catch (Exception ex) { failures.Add("Native Markdown semantics: " + ex.Message); }
-        try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); }
+        try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); NativeWindowDiscoveryChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }

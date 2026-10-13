@@ -1,5 +1,18 @@
 # Native validation report
 
+## Verified preview.264 and installer discovery follow-up
+
+Native PR run [38336557154](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38336557154) succeeds at clean merge ef11793e56d0160ec53539117bccd56b9e172a2d for head b65ab03e998214445bc775fbbbc33215a86c9bb4. Downloaded artifacts/native/ci-b65ab03-pr/native-validation reports independently verify 968 core tests, 40 corpus cases, ten editor cases, all four 65-check desktop contexts, installed runtime origins, full installer lifecycle, 20 preserved state files, two restored sessions, five wizard outcomes and four files-in-use assertions. All twelve workspace phase reports and all four inline-label reports pass. Disposable certificates are removed and production trust unchanged.
+
+The reinstalled-app inline PNG was inspected: the preceding table retains its cells. Reports additionally verify literal labels, status editing, invalid-input retention, Cancel, shortcuts, horizontal rules, whole Undo/Redo and unchanged saved source. Both web logs (38336557216/38336553847) record 262 passed cases. All four preview.264 installer/ZIP hashes, sizes, clean revision and unsigned metadata pass; both ZIPs contain 529 entries and required native runtimes without explicitly checked browser payloads. The handover records exact paths and hashes. No installer was run locally.
+
+Native push run 38336553837 passes all 65 built-app workflows but fails before its first installer interaction: desktop-wide UIA FindAll times out with 0x80131505. The retained installer report has no completed wizard checks and installationStarted=false; cancel.log records Inno startup in per-user mode, but there is no captured wizard image proving visibility. Original evidence remains in ci-b65ab03-push-failure. The PR wizard and full lifecycle pass independently.
+
+The harness now locates the known native window class/caption using Win32 and attaches UIA only to that handle. It retains its prior match refusals, 40-second observation deadline and all five wizard outcomes. Four real hidden-HWND cases pass in wizard-discovery-local/native-window-discovery.json; the solution builds with zero warnings/errors. No foreground window, clipboard, Office, installer or certificate-store interaction occurred locally. Hosted confirmation of this later harness change remains pending.
+
+The 28 final brief conditions were reviewed against current source and evidence in artifacts/native/acceptance-audit-b65ab03.json. It explicitly does not establish production completion: signing, SDK-free clean Windows, physical accessibility/displays and external destination/failure scenarios remain open. Earlier pending statements below are historical; the verified preview.264 results supersede their inline/workspace pending status.
+
+
 ## Inline insertion follow-up
 
 Both first 701d9e2 native runs (PR 38335507067 and push 38335504052) fail in the new workflow's editor SetFocus call before the first Undo. The prior Cancel, invalid-input, initial badge, reopened label and status change assertions complete. Original logs, states and screenshots remain in ci-701d9e2-pr-failure and ci-701d9e2-push-failure. The inspected PR PNG shows the selected Beta source and rendered Reviewed label. The helper now uses the same actual editor click used by existing keyboard workflows, without retrying actions or changing complete Undo/Redo assertions. Both web runs 38335507073/38335504112 succeed.

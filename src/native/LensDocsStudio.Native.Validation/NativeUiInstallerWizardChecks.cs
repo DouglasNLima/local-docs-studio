@@ -57,6 +57,7 @@ internal static partial class NativeUiChecks
         var sourceBytes = File.ReadAllBytes(source);
         using var automation = new UIA3Automation();
         var checks = new List<string>(); Window? wizard = null; Process? launcher = null; Process? wizardProcess = null;
+        var discoveredWindows = new List<object>();
         var installationStarted = false;
         Exception? wizardFailure = null;
         try
@@ -71,6 +72,10 @@ internal static partial class NativeUiChecks
                 launcher = Process.Start(start) ?? throw new IOException("The installer could not be started.");
                 Wait(() => (wizard = FindWizard()) is not null, "The native installation wizard did not appear.", 40);
                 wizardProcess = Process.GetProcessById(wizard!.Properties.ProcessId.Value);
+                discoveredWindows.Add(new { Phase = phase, Method = "Win32 class and caption, then UIA from the matching handle",
+                    ProcessId = wizardProcess.Id, Class = wizard.Properties.ClassName.Value, Title = wizard.Name });
+                File.WriteAllText(Path.Combine(root, "wizard-discovery.json"), JsonSerializer.Serialize(discoveredWindows,
+                    new JsonSerializerOptions { WriteIndented = true }));
                 FocusWindow(wizard);
                 Wait(() => WizardText(wizard).Contains(version, StringComparison.Ordinal)
                     && WizardText(wizard).Contains("Workspace documents", StringComparison.Ordinal), "Welcome did not expose the version and preservation guidance.");
@@ -204,9 +209,13 @@ internal static partial class NativeUiChecks
             limitation = "GitHub-hosted Windows GUI and keyboard validation; physical screen-reader/DPI and SDK-free certification remain separate." }, new JsonSerializerOptions { WriteIndented = true }));
         Console.WriteLine("Native installer wizard: " + checks.Count + " checks passed."); return 0;
 
-        Window? FindWizard() => automation.GetDesktop().FindAllChildren(cf => cf.ByControlType(ControlType.Window))
-            .Where(element => element.Properties.ClassName.ValueOrDefault == "TWizardForm" && element.Name.Contains(WizardProduct, StringComparison.Ordinal))
-            .Select(element => element.AsWindow()).SingleOrDefault();
+        Window? FindWizard()
+        {
+            // Desktop-wide UIA enumeration timed out before it could return the installer.
+            // Resolve its exact class/caption through Win32, then query only that provider.
+            var handle = NativeWindowDiscovery.FindTopLevelWindows("TWizardForm", WizardProduct).SingleOrDefault();
+            return handle == 0 ? null : automation.FromHandle(handle).AsWindow();
+        }
         AutomationElement? Button(string name) => wizard!.FindAllDescendants(cf => cf.ByControlType(ControlType.Button))
             // Inno 6.7's modern buttons omit the arrows used by older wizard styles.
             .FirstOrDefault(element => !element.IsOffscreen && Label(element.Name).Trim('<', '>', ' ') == name);
