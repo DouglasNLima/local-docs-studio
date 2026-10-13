@@ -44,5 +44,5 @@ public partial class DocumentViewModel : ObservableObject
     }
 
     public RecoveredDocument Recovery() => new(Id, FilePath, EditorDocument.Text, SavedSnapshot?.Fingerprint,
-        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName);
+        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot);
 }

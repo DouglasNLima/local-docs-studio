@@ -80,6 +80,12 @@ internal static class Program
             try { var fixture = NativeWordImportFixtureChecks.Run(fixtureOutput); NativeWordImportPreviewChecks.Run(fixtureOutput, fixture); Console.WriteLine("Native Word import fixture passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--workspace-context")
+        {
+            var contextOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/workspace-context");
+            try { NativeWorkspaceContextChecks.Run(contextOutput); Console.WriteLine("Native workspace context checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--word-syntax")
         {
             var syntaxOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/validation"); Directory.CreateDirectory(syntaxOutput);
@@ -407,6 +413,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native Word lists: " + ex.Message); }
         try { var fixture = NativeWordImportFixtureChecks.Run(output); NativeWordImportPreviewChecks.Run(output, fixture); }
         catch (Exception ex) { failures.Add("Native Word import fixture: " + ex.Message); }
+        try { NativeWorkspaceContextChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native workspace context: " + ex.Message); }
         try { NativeHtmlSyntaxChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native HTML syntax: " + ex.Message); }
         try { NativeDocsSiteChecks.Run(output); }

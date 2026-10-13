@@ -58,6 +58,7 @@ internal static partial class NativeUiChecks
         using var automation = new UIA3Automation();
         var checks = new List<string>(); Window? wizard = null; Process? launcher = null; Process? wizardProcess = null;
         var installationStarted = false;
+        Exception? wizardFailure = null;
         try
         {
             foreach (var cancel in new[] { true, false })
@@ -158,6 +159,7 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
+            wizardFailure = error;
             if (wizard is not null) { try { Capture("failure"); } catch { } }
             File.WriteAllText(Path.Combine(root, "installer-wizard.json"), JsonSerializer.Serialize(new
             { passed = false, version, checks, error = error.ToString(), installationStarted }, new JsonSerializerOptions { WriteIndented = true }));
@@ -165,18 +167,29 @@ internal static partial class NativeUiChecks
         }
         finally
         {
-            if (wizardProcess is { HasExited: false }) wizardProcess.Kill(entireProcessTree: true);
-            if (launcher is { HasExited: false }) launcher.Kill(entireProcessTree: true);
-            wizardProcess?.Dispose(); launcher?.Dispose();
-            // Only remove this test's exact installation; never infer an uninstaller from registry data.
-            var uninstaller = Path.Combine(destination, "unins000.exe");
-            if (installationStarted && File.Exists(uninstaller))
+            try
             {
-                var cleanup = new ProcessStartInfo(uninstaller) { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
-                foreach (var argument in new[] { "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/LOG=" + Path.Combine(root, "cleanup.log") }) cleanup.ArgumentList.Add(argument);
-                using var process = Process.Start(cleanup) ?? throw new IOException("The test installation could not be removed.");
-                if (!process.WaitForExit(60000)) { process.Kill(entireProcessTree: true); throw new TimeoutException("Test installer cleanup exceeded its deadline."); }
-                if (process.ExitCode != 0) throw new IOException("Test installer cleanup failed: " + process.ExitCode);
+                if (wizardProcess is { HasExited: false }) { wizardProcess.Kill(entireProcessTree: true); wizardProcess.WaitForExit(10000); }
+                if (launcher is { HasExited: false }) { launcher.Kill(entireProcessTree: true); launcher.WaitForExit(10000); }
+                wizardProcess?.Dispose(); launcher?.Dispose();
+                // Only remove this test's exact installation; never infer an uninstaller from registry data.
+                var uninstaller = Path.Combine(destination, "unins000.exe");
+                if (installationStarted && File.Exists(uninstaller))
+                {
+                    var cleanup = new ProcessStartInfo(uninstaller) { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
+                    foreach (var argument in new[] { "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/LOG=" + Path.Combine(root, "cleanup.log") }) cleanup.ArgumentList.Add(argument);
+                    using var process = Process.Start(cleanup) ?? throw new IOException("The test installation could not be removed.");
+                    if (!process.WaitForExit(60000)) { process.Kill(entireProcessTree: true); throw new TimeoutException("Test installer cleanup exceeded its deadline."); }
+                    if (process.ExitCode != 0) throw new IOException("Test installer cleanup failed: " + process.ExitCode);
+                }
+            }
+            catch (Exception cleanupFailure)
+            {
+                File.WriteAllText(Path.Combine(root, "installer-cleanup-failure.json"), JsonSerializer.Serialize(new
+                { passed = false, primaryError = wizardFailure?.ToString(), cleanupError = cleanupFailure.ToString() }, new JsonSerializerOptions { WriteIndented = true }));
+                if (wizardFailure is not null)
+                    throw new AggregateException("The installer check and its cleanup both failed.", wizardFailure, cleanupFailure);
+                throw;
             }
         }
         if (RegistrySnapshot(NativeUninstallKey) is not null || RegistrySnapshot(@"Software\Classes\LensDocsStudio.Native.Document") is not null

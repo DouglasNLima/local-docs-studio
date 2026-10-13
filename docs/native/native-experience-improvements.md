@@ -1,6 +1,8 @@
 # Native experience improvements
 
-Word imports now retain supported image descriptions as literal alternative text, including empty descriptions and occurrence-specific labels for shared images. Local regressions and the decodable-image fixture pass. A pending hosted desktop workflow checks destination cancellation, unchanged originals, saved portable assets, native image preview and every conversion note in the status and its accessible tooltip; it is not yet certified by the earlier preview.246 evidence.
+Word image descriptions and the actual import workflow now pass in all four preview.256 application contexts. Destination cancellation, unchanged originals, saved portable assets, visible native image and complete status/tooltip warnings are verified. The inspected built-app PNG shows the image and quote on page 2.
+
+The current workspace correction retains each open tab's containing root after switching folders and saving, persists it as an optional schema-1 field and carries it into linked documents. A windowless reproduction demonstrated broken parent-relative images and links, without text or image-byte loss. Twelve new core regressions pass (936 total), as does the complete 40-case native harness. A new 64th hosted desktop workflow covers the draft, images, two-way links, Save and restart; hosted confirmation remains pending. Preview.256 predates this correction.
 
 Details controls reuse a fixed in-memory template per WPF thread. Native expansion patterns, focusable header area and final light/dark pages are preserved; the pages match the prior PNG bytes. Three fresh local processes pass all 12 nested layout cases with a 63.34 ms maximum input gap. The hosted Space-key assertion passes in all eight application contexts at 2af4471, preserving focus and source. Details maximum input gaps are 29.7557 ms (PR) and 28.9035 ms (push); these samples do not prove the intermittent delay eliminated.
 

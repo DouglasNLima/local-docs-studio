@@ -241,7 +241,7 @@ public partial class MainWindow : Window
                 if (model.ActiveDocument is not { FilePath: not null, WorkspaceRoot: not null } tab) throw new IOException("Open a workspace to follow relative links.");
                 var path = new WorkspacePath(tab.WorkspaceRoot).ResolveLink(tab.FilePath, reference);
                 if (!WorkspaceService.IsDocument(path)) throw new IOException("This link is not a supported document.");
-                await model.OpenPathAsync(path); BindActiveDocument(); await UpdatePreviewAsync();
+                await model.OpenPathAsync(path, tab.WorkspaceRoot); BindActiveDocument(); await UpdatePreviewAsync();
             }
             if (fragment is not null)
             {

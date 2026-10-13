@@ -2,7 +2,9 @@
 
 Current milestone: validated native internal preview. **Production is not ready; the reconstruction goal remains incomplete.** The full scope is in [the reconstruction brief](reconstruction-brief.txt). Earlier implementation records are retained in [history through 2af4471](history/implementation-progress-through-2af4471.md).
 
-The latest verified packages are unsigned 0.1.1-preview.246, built from clean PR merge `504cf6e34d53a4bfb58b7a2c2f9d78def7efa34d` for head `2af4471fcdd982fa4888b025bd1ad08f058d91c7`. Both native and both web runs pass on attempt 1. Downloaded evidence verifies 912 core tests, 40 diagram/export cases, four 62-check desktop contexts per native run, installed runtime origins and the complete installer lifecycle. Exact run IDs, package paths and hashes are in the [engineering handover](engineering-handover.md).
+The latest verified package is unsigned preview.256 at clean PR merge b75ea922eb1ed0365159c7a84d7d8506483174cb for head 5a95062114122b8f2d57608941ec35f26e49cc17. Downloaded native PR run 38329393419 verifies 924 core tests, 40 corpus cases and four 63-check desktop contexts, including actual Word import. Both web runs pass. Native push run 38329391482 fails on an installer UIA timeout followed by cleanup failure; that failure remains recorded.
+
+The current workspace correction retains each open tab's containing root after switching folders and saving, persists it as an optional schema-1 field and carries it into linked documents. A windowless reproduction demonstrated broken parent-relative images and links, without text or image-byte loss. Twelve new core regressions pass (936 total), as does the complete 40-case native harness. A new 64th hosted desktop workflow covers the draft, images, two-way links, Save and restart; hosted confirmation remains pending. Preview.256 predates this correction.
 
 ## Delivered and validated
 
@@ -12,15 +14,15 @@ The latest verified packages are unsigned 0.1.1-preview.246, built from clean PR
 | Data integrity | Conflict checks, independent recovery, snapshots, safe writes and failed-save restart/retry; simulated upgrade/reinstall preserves 20 state files and reopens sessions |
 | Native preview | Markdown semantics, browser-free Mermaid, maths, images, code colours, details and source mapping; diagram/export and catalogue/theme corpora |
 | Editing and exports | Native editing/completion, image management, clipboard formats, supported imports, DOCX/PDF/HTML/ZIP/Docs Site exports, libraries and explicit migration |
-| Desktop workflows | 62 actual checks in built, installed, upgraded and reinstalled applications in both current native runs |
+| Desktop workflows | 63 actual checks in built, installed, upgraded and reinstalled applications in the verified preview.256 PR run |
 | Installer | Isolated self-contained per-user product; visible wizard, files-in-use cancellation, installation, same-source upgrade, uninstall and reinstall |
 | Updates | User-controlled discovery/download/install, cancellation and final verification; pluggable signing, empty production trust and blocked unsigned execution |
 
-## Latest engineering result
+## Earlier engineering results leading to preview.256
 
 The pending Word desktop check now follows the existing hyperlink tests by obtaining embedded images through TextPattern range children. A hidden-HWND reproduction finds no image in ordinary tree traversal, then the correctly named image after requesting the text range's children; its inspected page 2 PNG and geometry preserve source. That verifies native peers and rendering, while remote UI Automation delivery remains pending. Earlier pagination-only probes and failures remain recorded in the validation report.
 
-The next change preserves Word image descriptions as literal Markdown alternative text, including explicit empty descriptions and different descriptions for a shared image. Twelve focused regressions pass; the corrected pre-fix fixture reproduced 11 failures with one unchanged fallback control. The complete local core suite passes 924 tests and the native harness passes all 40 corpus cases. A new 63rd desktop workflow exercises actual Word import, destination cancellation, all conversion warnings, image preview and portable saved output; hosted execution is pending. Preview.246 remains the latest independently verified package.
+The next change preserves Word image descriptions as literal Markdown alternative text, including explicit empty descriptions and different descriptions for a shared image. Twelve focused regressions pass; the corrected pre-fix fixture reproduced 11 failures with one unchanged fallback control. The complete local core suite passes 924 tests and the native harness passes all 40 corpus cases. A new 63rd desktop workflow exercises actual Word import, destination cancellation, all conversion warnings, image preview and portable saved output; hosted execution is pending. Preview.246 was the verified package before the subsequent preview.256 result above.
 
 The details toggle parses fixed application-owned XAML once per WPF thread. It preserves the native Expander/ToggleButton, bindings, geometry and accessibility. The full local harness and focused header checks pass; final light/dark PNGs match the preceding renders byte for byte. Three fresh local processes pass 12 nested construction cases, maximum input gap 63.34 ms. The hosted keyboard regression now passes in all eight application contexts, preserving header focus and Markdown through Space expansion/collapse. The hosted details cases record first input at 23.9392 ms (PR) and 20.2413 ms (push), with maximum input gaps of 29.7557 ms and 28.9035 ms respectively. The historical intermittent delay is not proven eliminated and the 250 ms construction-input bound is unchanged.
 

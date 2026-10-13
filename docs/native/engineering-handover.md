@@ -1,6 +1,10 @@
 # Native Windows engineering handover
 
-**Internal preview; production acceptance remains incomplete.** The latest verified package is 0.1.1-preview.246, built from clean PR merge `504cf6e34d53a4bfb58b7a2c2f9d78def7efa34d` for branch head `2af4471fcdd982fa4888b025bd1ad08f058d91c7`. Both native and both web CI runs pass on their first attempts. The remaining requirements below are open acceptance items, not passed checks.
+**Internal preview; production acceptance remains incomplete.** The latest verified package is 0.1.1-preview.256, built from clean PR merge `b75ea922eb1ed0365159c7a84d7d8506483174cb` for branch head `5a95062114122b8f2d57608941ec35f26e49cc17`. Native PR run 38329393419 passes, with independently reviewed 924 core tests, 40 corpus cases, four 63-check desktop contexts and complete installer lifecycle. Both web runs pass. The native push run fails during installer UIA observation and cleanup; its original evidence is retained. No aggregate pass or production certification is claimed.
+
+Current source fixes an independently reproduced loss of per-tab workspace context after folder switching and Save. The containing root now survives recovery and propagates through local links. All 936 core tests and 40 local native corpus cases pass. Actual switch/save/restart is a new 64th hosted workflow, still pending. The accompanying installer-harness timeout/diagnostic correction also needs hosted confirmation. Next: inspect those new results and each of the three workspace-context reports in every application context before replacing the verified package below.
+
+Latest installer: `artifacts/native/ci-5a95062-pr/packages/0.1.1-preview.256/LensDocsStudio.Native-0.1.1-preview.256-win-x64-Setup.exe`. SHA-256: `A72EDA7B3BDAD988C21C7F321A5C2EB8F9F0944F8FD4BC7987D365F09A490A27`. ZIP SHA-256: `7ED4370E3F3B1B40944832D1FB7079A278EA320C0494CA588CBA0B9E87DD6B1C`. Evidence: `artifacts/native/ci-5a95062-pr/{package-verification,runtime-evidence-review,package-runtime-inspection}.json`. This unsigned internal package predates the workspace correction. No downloaded installer was run locally.
 
 ## Architecture and implemented workflows
 
@@ -10,7 +14,7 @@ Implemented workflows cover portable UTF-8 documents and workspace assets; folde
 
 Windows improvements include native pickers and Explorer actions, filesystem monitoring, reviewed link-preserving moves, selectable preview text, paginated reading, native accessibility metadata and restored workspaces. Six persisted diagram palettes remain independent of application appearance. Failed diagrams expose native source-copy and edit actions. See the [parity matrix](functional-parity-matrix.md), [experience improvements](native-experience-improvements.md) and [architecture decisions](architecture-decisions.md) for feature-level contracts and limits.
 
-## Current verification
+## Earlier preview.246 verification
 
 The next source change preserves Word image descriptions. Local validation now passes 924 core tests and all 40 native corpus cases; the 12 new regressions reproduce 11 pre-fix failures plus one passing fallback control. A new 63rd actual desktop workflow covers Word import cancellation, complete warning exposure and portable saved image output, but awaits hosted execution. The package and downloaded CI evidence below remain preview.246 and do not yet certify this change. The later documentation-only c044a61 CI passed all four runs.
 

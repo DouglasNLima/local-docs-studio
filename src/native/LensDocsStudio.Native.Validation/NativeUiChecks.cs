@@ -1403,9 +1403,19 @@ internal static partial class NativeUiChecks
             window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
             CheckWordImport(window, editor, automation, app.ProcessId, runRoot, output, artefact.Document, OpenThroughDialogue);
             checks.Add("Native Word import cancellation preserves the previous document; completed import exposes every warning and creates unchanged-source, portable Markdown and image files");
+            var workspaceContext = CheckWorkspaceContextSwitch(window, editor, automation, app.ProcessId, runRoot, state, output, OpenThroughDialogue);
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
+            app.Dispose(); launchedProcess.Dispose(); app = Launch(null);
+            window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The retained workspace did not restore.");
+            mainWindow = window; editor = Find(window, "MarkdownEditor");
+            CheckRetainedWorkspaceContent(window, editor, workspaceContext, output, "after-restart", workspaceContext.Draft);
+            if (!RetainedContextSaved(workspaceContext)) throw new IOException("Restart lost the per-document workspace roots.");
+            checks.Add("Switching folders retains earlier drafts, native images and two-way links; saving and restarting preserves per-document workspace context and exact files");
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
+            Wait(() => app.HasExited, "The retained workspace application did not close.");
+            if (launchedProcess!.ExitCode != 0) throw new IOException("The retained workspace failed during shutdown.");
             RecordResult(new { Passed = true, Checks = checks, FixtureRoot = runRoot });
             Console.WriteLine("Native UI Automation: " + checks.Count + " checks passed.");
             return 0;
@@ -1663,8 +1673,11 @@ internal static partial class NativeUiChecks
         }
         throw new InvalidOperationException(failure, lastObservationError);
     }
-    private static bool IsObservationTimeout(Exception error) => error is COMException && error.HResult == unchecked((int)0x80131505)
-        || error is FlaUI.Core.Exceptions.PatternNotSupportedException { InnerException: COMException inner } && inner.HResult == unchecked((int)0x80131505);
+    private static bool IsObservationTimeout(Exception error) => error is COMException && TimeoutCode(error.HResult)
+        || error is FlaUI.Core.Exceptions.PatternNotSupportedException { InnerException: COMException inner } && TimeoutCode(inner.HResult);
+    // WPF and Win32 providers report different timeout HRESULTs. Retry only the
+    // observation within Wait's existing deadline, without repeating an input action.
+    private static bool TimeoutCode(int code) => code == unchecked((int)0x80131505) || code == unchecked((int)0x800705B4);
     private static string ReadEditorText(AutomationElement editor)
     {
         string? text = null;

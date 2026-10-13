@@ -15,9 +15,7 @@ public partial class WorkspaceViewModel
     public ObservableCollection<RecentPath> RecentDocuments { get; } = [];
     public ObservableCollection<RecentPath> RecentWorkspaces { get; } = [];
 
-    private string RootForDocument(string path) => WorkspaceRoot is not null &&
-        WorkspacePath.Contains(WorkspaceRoot, path)
-        ? WorkspaceRoot : Path.GetDirectoryName(path)!;
+    private string RootForDocument(string path, string? retainedRoot = null) => DocumentWorkspace.Resolve(path, WorkspaceRoot, retainedRoot);
 
     private void RefreshRecentPaths()
     {

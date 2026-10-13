@@ -56,7 +56,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey };
                     if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
                         tab.AssetWorkspace = recovered.AssetWorkspace;
-                    if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath);
+                    if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath, recovered.WorkspaceRoot);
                     if (baseline is not null)
                     {
                         try
@@ -122,13 +122,13 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     {
         if (dialogs.OpenDocument() is { } path) await RunAsync(() => OpenPathAsync(path));
     }
-    public async Task OpenPathAsync(string path)
+    public async Task OpenPathAsync(string path, string? sourceWorkspace = null)
     {
         path = Path.GetFullPath(path);
         var existing = Documents.FirstOrDefault(d => string.Equals(d.FilePath, path, StringComparison.OrdinalIgnoreCase));
         if (existing is not null) { ActiveDocument = existing; await RememberDocumentAsync(path); return; }
         var snapshot = await documents.ReadAsync(path);
-        var root = RootForDocument(path);
+        var root = RootForDocument(path, sourceWorkspace);
         var tab = new DocumentViewModel(snapshot.Text, snapshot) { WorkspaceRoot = root };
         Attach(tab); ActiveDocument = tab; Status = "Opened " + Path.GetFileName(path);
         await RememberDocumentAsync(path);
@@ -151,7 +151,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         Status = listing.Warnings.Count == 0 ? "Workspace opened" : string.Join(" ", listing.Warnings.Distinct());
         StartMonitoring(workspace.Root);
         foreach (var tab in Documents.Where(d => d.FilePath is not null))
-            tab.WorkspaceRoot = RootForDocument(tab.FilePath!);
+            tab.WorkspaceRoot = RootForDocument(tab.FilePath!, tab.WorkspaceRoot);
         await RememberWorkspaceAsync(workspace.Root);
     }
 
@@ -187,7 +187,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             await PersistSessionAsync();
             await using var transfer = tab.EffectivePath is { } source && tab.EffectiveWorkspace is { } sourceRoot &&
                 !string.Equals(source, path, StringComparison.OrdinalIgnoreCase)
-                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path)), OperationToken,
+                ? await new AssetTransferService().PrepareAsync(text, source, new(sourceRoot), path, new(RootForDocument(path, tab.WorkspaceRoot)), OperationToken,
                     forceCopyImages: tab.FilePath is null, preserveDocumentLinks: tab.FilePath is null, excludedDirectory: StateDirectory)
                 : new PreparedAssetTransfer(text);
             if (transfer.UncopiedDocumentLinks.Count != 0 && !dialogs.Confirm("Local images will be copied. These document links point into the previous workspace and may need updating in this copy:\n\n" +
@@ -197,7 +197,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             if (transfer.Text != text) tab.EditorDocument.Replace(0, tab.EditorDocument.TextLength, transfer.Text);
             tab.MarkSaved(saved);
             DocumentRelocated?.Invoke(tab.Id, saved.Path);
-            tab.WorkspaceRoot = RootForDocument(saved.Path);
+            tab.WorkspaceRoot = RootForDocument(saved.Path, tab.WorkspaceRoot);
             DocumentChanged?.Invoke(this, EventArgs.Empty);
             await RememberDocumentAsync(saved.Path);
             Status = "Saved " + Path.GetFileName(path);

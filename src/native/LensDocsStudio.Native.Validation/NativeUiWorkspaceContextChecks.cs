@@ -1,0 +1,117 @@
+using System.Text.Json;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
+using FlaUI.UIA3;
+using LensDocsStudio.Core.State;
+
+namespace LensDocsStudio.Native.Validation;
+
+internal static partial class NativeUiChecks
+{
+    private sealed record WorkspaceContextFixture(string First, string Second, string Source, string Target,
+        string Image, byte[] Pixels, string Original, string Draft, string TargetText, string State);
+
+    private static WorkspaceContextFixture CheckWorkspaceContextSwitch(Window owner, AutomationElement editor,
+        UIA3Automation automation, int process, string runRoot, string state, string output, Action<string, string> open)
+    {
+        var root = Path.Combine(runRoot, "retained-workspaces"); Directory.CreateDirectory(root);
+        var word = NativeWordImportFixtureChecks.Run(root);
+        var first = Path.Combine(root, "first"); var second = Path.Combine(root, "second");
+        foreach (var directory in new[] { Path.Combine(first, "docs"), Path.Combine(first, "other"), Path.Combine(first, "assets"), second })
+            Directory.CreateDirectory(directory);
+        var source = Path.Combine(first, "docs", "retained.md"); var target = Path.Combine(first, "other", "target.md");
+        var image = Path.Combine(first, "assets", "pixel.png");
+        const string original = "![Retained pixel](../assets/pixel.png)\n\n[Other retained document](../other/target.md)\n\n# Retained Café\n";
+        const string targetText = "![Retained pixel](../assets/pixel.png)\n\n[Return to retained source](../docs/retained.md)\n";
+        const string addition = "\nDraft Ω remains portable.\n";
+        File.WriteAllText(source, original); File.WriteAllText(target, targetText); File.WriteAllBytes(image, word.Image);
+        File.WriteAllText(Path.Combine(second, "index.md"), "# Other workspace\n");
+        var fixture = new WorkspaceContextFixture(first, second, source, target, image, word.Image, original, original + addition, targetText, state);
+        OpenFolder(first);
+        FocusWindow(owner); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_O); open(source, "Open");
+        Wait(() => ReadEditorText(editor) == original, "The retained workspace fixture did not open.");
+        editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(addition);
+        Wait(() => ReadEditorText(editor) == fixture.Draft, "The retained workspace draft was not entered exactly.");
+        OpenFolder(second);
+        CheckRetainedWorkspaceContent(owner, editor, fixture, output, "after-switch", original);
+        FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+        Wait(() => File.ReadAllText(source) == fixture.Draft && RetainedContextSaved(fixture),
+            "Saving the earlier tab lost its source, root or linked document context.");
+        CheckRetainedWorkspaceContent(owner, editor, fixture, output, "after-save", fixture.Draft);
+        return fixture;
+
+        void OpenFolder(string path)
+        {
+            FocusWindow(owner); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_O);
+            Window? picker = null;
+            Wait(() => (picker = CurrentPicker()) is not null, "The retained workspace folder dialogue did not open.");
+            FocusWindow(picker!);
+            var field = (picker!.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByName("Folder:")))
+                ?? throw new IOException("The workspace folder field is unavailable.")).AsTextBox();
+            field.Focus(); Wait(() => field.Properties.HasKeyboardFocus.Value, "The workspace folder field did not receive focus.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(path);
+            Wait(() => field.Text == path, "The workspace folder field did not retain the chosen path.");
+            picker.FindAllDescendants(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Select Folder")))
+                .Single(element => element.AutomationId != "DropDown").AsButton().Invoke();
+            Wait(() => CurrentPicker() is null && Find(owner, "Status").Name == "Workspace opened", "The selected workspace did not open.");
+        }
+        Window? CurrentPicker() => automation.GetDesktop()
+            .FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Open documentation workspace")))?.AsWindow();
+    }
+
+    private static void CheckRetainedWorkspaceContent(Window owner, AutomationElement editor, WorkspaceContextFixture fixture,
+        string output, string phase, string expectedSaved)
+    {
+        Wait(() => ReadEditorText(editor) == fixture.Draft, "The earlier tab did not retain its exact text: " + phase);
+        CheckImage(); Follow("Other retained document", fixture.TargetText);
+        CheckImage(); Follow("Return to retained source", fixture.Draft);
+        if (File.ReadAllText(fixture.Source) != expectedSaved || File.ReadAllText(fixture.Target) != fixture.TargetText
+            || !File.ReadAllBytes(fixture.Image).SequenceEqual(fixture.Pixels))
+            throw new IOException("Workspace navigation changed source or image bytes: " + phase);
+        owner.CaptureToFile(Path.Combine(output, "native-workspace-context-" + phase + ".png"));
+        File.WriteAllText(Path.Combine(output, "native-ui-workspace-context-" + phase + ".json"), JsonSerializer.Serialize(new
+        { Passed = true, Phase = phase, ExactEditorText = true, OriginalSavedText = expectedSaved == fixture.Original,
+            ExpectedSavedText = true, NativeImageVisible = true, LinkedImageVisible = true, TwoWayLinks = true, ImageBytesRetained = true,
+            Source = fixture.Source, ExpectedRoot = fixture.First, ActiveWorkspace = fixture.Second }, new JsonSerializerOptions { WriteIndented = true }));
+
+        AutomationElement[] Children() => Find(owner, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren();
+        void CheckImage()
+        {
+            // Image is the first block. Earlier tests retain Pages mode and editor
+            // synchronisation may have moved to the trailing draft paragraph.
+            for (var page = 0; page < 8; page++)
+            {
+                var previous = owner.FindFirstDescendant(cf => cf.ByAutomationId("PreviewPreviousPage"));
+                if (previous?.IsEnabled != true) break;
+                var label = Find(owner, "PreviewPageNumber").Name;
+                previous.Patterns.Invoke.Pattern.Invoke();
+                Wait(() => Find(owner, "PreviewPageNumber").Name != label, "The retained preview did not return to its first page.");
+            }
+            Wait(() => Children().FirstOrDefault(item => item.ControlType == ControlType.Image && item.Name == "Retained pixel")
+                is { IsOffscreen: false } image && image.BoundingRectangle.Width > 0 && image.BoundingRectangle.Height > 0,
+                "The retained image is missing from the native preview: " + phase);
+        }
+        void Follow(string label, string expected)
+        {
+            AutomationElement? link = null;
+            Wait(() => (link = Children().FirstOrDefault(item => item.ControlType == ControlType.Hyperlink && item.Name == label)) is not null,
+                "A retained workspace link is missing: " + label);
+            link!.Patterns.Invoke.Pattern.Invoke();
+            Wait(() => ReadEditorText(editor) == expected, "A retained workspace link did not open its target: " + label);
+        }
+    }
+
+    private static bool RetainedContextSaved(WorkspaceContextFixture fixture)
+    {
+        try
+        {
+            using var file = new FileStream(Path.Combine(fixture.State, "session.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            var session = JsonSerializer.Deserialize<SessionState>(file);
+            return session?.Workspace == fixture.Second && new[] { fixture.Source, fixture.Target }.All(path =>
+                session.Documents.SingleOrDefault(document => document.Path == path)?.WorkspaceRoot == fixture.First);
+        }
+        catch (IOException) { return false; }
+    }
+}
