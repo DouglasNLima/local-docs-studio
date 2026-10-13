@@ -34,12 +34,17 @@ public sealed class ClipboardExporter
         string Read(INode node)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            if (node is IText text) return text.TextContent;
+            if (node is IText text)
+            {
+                // Markdig writes a formatting newline after <br>; the break already supplies it.
+                return text.PreviousSibling is IElement { LocalName: "br" } && text.TextContent.StartsWith('\n')
+                    ? text.TextContent[1..] : text.TextContent;
+            }
             if (node is not IElement element) return string.Concat(node.ChildNodes.Select(Read));
             if (element.LocalName == "img") return "[" + (element.GetAttribute("alt") ?? "Image") + "]";
             if (element.LocalName == "input" && element.GetAttribute("type") == "checkbox") return element.HasAttribute("checked") ? "[x] " : "[ ] ";
             if (element.LocalName == "table") return "\n" + string.Join("\n", element.QuerySelectorAll("tr").Select(row =>
-                string.Join("\t", row.Children.Where(c => c.LocalName is "td" or "th").Select(cell => Read(cell).Trim())))) + "\n";
+                string.Join("\t", row.Children.Where(c => c.LocalName is "td" or "th").Select(cell => TsvCell(Read(cell).Trim()))))) + "\n";
             var children = string.Concat(element.ChildNodes.Select(Read));
             return element.LocalName switch
             {
@@ -47,10 +52,14 @@ public sealed class ClipboardExporter
                 "hr" => "\n---\n",
                 "li" => ListMarker(element) + children.Trim() + "\n",
                 "figcaption" => "\n" + children.TrimEnd(),
-                "p" or "div" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6" or "pre" or "blockquote" or "figure" => children.TrimEnd() + "\n\n",
+                "p" or "div" or "h1" or "h2" or "h3" or "h4" or "h5" or "h6" or "pre" or "blockquote" or "figure" => children.TrimEnd('\r', '\n') + "\n\n",
                 _ => children
             };
         }
-        return new(Read(html.Body!).Trim(), encoded);
+        // Tabs at row boundaries represent empty cells; only remove outer paragraph breaks.
+        return new(Read(html.Body!).Trim('\r', '\n'), encoded);
+
+        static string TsvCell(string value) => value.IndexOfAny(['\t', '\r', '\n', '"']) < 0 ? value
+            : "\"" + value.Replace("\"", "\"\"", StringComparison.Ordinal) + "\"";
     }
 }

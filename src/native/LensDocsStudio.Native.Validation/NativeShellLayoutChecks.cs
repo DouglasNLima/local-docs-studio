@@ -70,7 +70,7 @@ internal static class NativeShellLayoutChecks
                     { Width = (int)size.Width, Height = (int)size.Height, WindowStyle = unchecked((int)0x80000000) });
                 host.RootVisual = surface; surface.Measure(size); surface.Arrange(new Rect(size)); surface.UpdateLayout();
                 var prefix = "native-shell-" + (dark ? "dark" : "light") + "-" + size.Width;
-                foreach (var scale in new[] { 1d, 1.5, 2d })
+                foreach (var scale in new[] { 1d, 1.25, 1.5, 2d })
                 {
                     var bitmap = new RenderTargetBitmap((int)(size.Width * scale), (int)(size.Height * scale), 96 * scale, 96 * scale, PixelFormats.Pbgra32);
                     bitmap.Render(surface); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
@@ -92,7 +92,7 @@ internal static class NativeShellLayoutChecks
             finally { typeof(MainWindow).GetMethod("CompleteClose", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, null); }
         }
         File.WriteAllText(Path.Combine(output, "native-shell-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = checks,
-            Limitation = "Hidden native windows with 100/150/200% raster output; this does not certify physical monitor DPI changes or screen-reader speech." }, new JsonSerializerOptions { WriteIndented = true }));
+            Limitation = "Hidden native windows with 100/125/150/200% raster output; this does not certify physical monitor DPI changes or screen-reader speech." }, new JsonSerializerOptions { WriteIndented = true }));
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
     {

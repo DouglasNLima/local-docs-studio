@@ -2,9 +2,9 @@
 
 ## Current delivery record
 
-The [engineering delivery report](engineering-completion-report.md) is the current 28-condition acceptance record. Application baseline `7008751` passes both native and both web pipelines. Independently downloaded native evidence verifies 1,035 Core tests, 40 corpus cases, four 66-check desktop contexts, complete installer lifecycle, 20 preserved state files and bundled installed runtime origins per run. Both web runs pass 264 cases. Local Core validation with the two final shared-metadata regressions passes 1,037 cases. Preview .285/.286 package hashes, clean source revisions and unsigned metadata are checked.
+The [engineering acceptance report](engineering-completion-report.md) is the current 28-condition record. Delivered revision `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` passes four verified hosted runs: native push/PR `38371057232`/`38371063213` (1,037 Core tests, 40 corpus cases), web push/PR `38371057253`/`38371063230` (264 cases each). Branch-source preview .287 and PR-merge .288 retain distinct source/hash labels. Earlier `7008751`, 1,035-test and .285/.286 evidence below remains historical.
 
-The supported implementation is ready for unsigned internal preview. Production signing/trust, SDK-free Windows, physical accessibility/displays, real destination/historical-data/hardware scenarios and broader fidelity/performance remain explicitly limited. Unsigned update download/execution stays blocked; the unfinished protected scan is not claimed as completed. Final verification of the report/regression revision is recorded in the draft PR's latest checks.
+The next acceptance phase executes isolated native/Word Computer Use and representative persisted-workspace exports. Targeted PDF text budgets, multiline TSV/native breaks and Word control/prompt corrections pass 1,055 local Core tests and 40 native corpus cases. Read the report for final hosted revision checks, original failures, real destination findings and the continuous-layout input defect. Clean Windows, live Excel/Azure DevOps, physical accessibility/hardware and production signing remain explicitly limited. Unsigned updates stay blocked; historical protected scans remain unchanged.
 
 ## Implemented outcomes
 

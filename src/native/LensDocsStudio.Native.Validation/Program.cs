@@ -18,6 +18,18 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--layout")
+        {
+            var layoutOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/layout"); Directory.CreateDirectory(layoutOutput);
+            try { NativeLayoutChecks.Run(layoutOutput); Console.WriteLine("Native construction checks and continuous-layout observations completed."); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--acceptance-workflow")
+        {
+            var workflowOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/acceptance-workflow"); Directory.CreateDirectory(workflowOutput);
+            try { NativeAcceptanceWorkflowChecks.Run(workflowOutput); Console.WriteLine("Native persisted-workspace and export acceptance checks passed."); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--check-preview-stall-watch")
         {
             var stallOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/stall-watch");
@@ -395,6 +407,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native SVG safety: " + ex.Message); }
         try { NativeAssetChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native asset persistence: " + ex.Message); }
+        try { NativeAcceptanceWorkflowChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native acceptance workflow: " + ex.Message); }
         try { NativeSaveRecoveryChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native save recovery: " + ex.Message); }
         try { NativeUpdateInteractionChecks.Run(output); }

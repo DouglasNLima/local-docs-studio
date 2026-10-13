@@ -72,8 +72,13 @@ public sealed class DocxExporter
             var settings = main.DocumentSettingsPart ?? main.AddNewPart<DocumentSettingsPart>();
             settings.Settings ??= new W.Settings();
             settings.Settings.RemoveAllChildren<W.UpdateFieldsOnOpen>();
-            settings.Settings.Append(new W.UpdateFieldsOnOpen { Val = true });
+            // Word warns about external files even when this flag is set on a field-free document.
+            if (HasFields(main.Document) || main.HeaderParts.Any(part => HasFields(part.Header)) || main.FooterParts.Any(part => HasFields(part.Footer)))
+                settings.Settings.Append(new W.UpdateFieldsOnOpen { Val = true });
             main.Document.Save(); styles.Styles.Save(); numbering.Numbering.Save(); settings.Settings.Save();
+
+            static bool HasFields(OpenXmlElement? element) => element is not null
+                && (element.Descendants<W.SimpleField>().Any() || element.Descendants<W.FieldChar>().Any());
 
             void AppendBlock(OpenXmlCompositeElement parent, Block block, ListItemContext? listItem = null, string? paragraphStyle = null, long? containerWidth = null)
             {
@@ -314,7 +319,7 @@ public sealed class DocxExporter
                     }
                 }
             }
-            static W.Run Run(string text, MarkdownEmphasis formatting)
+            W.Run Run(string text, MarkdownEmphasis formatting)
             {
                 var properties = new W.RunProperties();
                 if (formatting.HasFlag(MarkdownEmphasis.Bold)) properties.Bold = new W.Bold();
@@ -324,7 +329,18 @@ public sealed class DocxExporter
                 if (formatting.HasFlag(MarkdownEmphasis.Subscript)) properties.VerticalTextAlignment = new W.VerticalTextAlignment { Val = W.VerticalPositionValues.Subscript };
                 if (formatting.HasFlag(MarkdownEmphasis.Superscript)) properties.VerticalTextAlignment = new W.VerticalTextAlignment { Val = W.VerticalPositionValues.Superscript };
                 if (formatting.HasFlag(MarkdownEmphasis.Highlight)) properties.Shading = new W.Shading { Val = W.ShadingPatternValues.Clear, Fill = "EDEDED" };
-                return new W.Run(properties, new W.Text(text) { Space = SpaceProcessingModeValues.Preserve });
+                if (text.IndexOfAny(['\r', '\n', '\t']) < 0)
+                    return new W.Run(properties, new W.Text(text) { Space = SpaceProcessingModeValues.Preserve });
+                // Decoded entities can carry controls too; Word ignores raw controls inside w:t.
+                var result = new W.Run(properties);
+                foreach (var element in ReadCodeElements(text, '\0', cancellationToken))
+                    switch (element.Kind)
+                    {
+                        case CodeElementKind.Tab: result.Append(new W.TabChar()); break;
+                        case CodeElementKind.Break: result.Append(new W.Break()); break;
+                        default: result.Append(new W.Text(text.Substring(element.Start, element.Length)) { Space = SpaceProcessingModeValues.Preserve }); break;
+                    }
+                return result;
             }
             void CodeText(W.Paragraph paragraph, CodeBlock code)
             {

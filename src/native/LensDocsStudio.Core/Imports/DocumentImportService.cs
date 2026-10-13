@@ -11,11 +11,14 @@ public sealed record ImportedDocument(string Markdown, IReadOnlyList<ImportedAss
 public sealed record WordImportLimits(long MaximumImageBytes = 32 * 1024 * 1024,
     long MaximumTotalImageBytes = 64 * 1024 * 1024, int MaximumImages = 1024,
     int MaximumTextCharacters = 32 * 1024 * 1024);
+public sealed record PdfImportLimits(int MaximumPages = 1000, int MaximumTextCharacters = 32 * 1024 * 1024,
+    int MaximumOutputBytes = 32 * 1024 * 1024, int MaximumPageTextCharacters = 2 * 1024 * 1024);
 
 public sealed partial class DocumentImportService
 {
     public async Task<ImportedDocument> ImportAsync(string path, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (new FileInfo(path).Length > 32 * 1024 * 1024) throw new IOException("Document import is limited to 32 MB.");
         var bytes = await File.ReadAllBytesAsync(path, cancellationToken);
         return await Task.Run(() =>
@@ -204,16 +207,37 @@ public sealed partial class DocumentImportService
         return new(output.ToString(), assets, warnings);
     }
 
-    public ImportedDocument ImportPdf(byte[] bytes, string name, CancellationToken cancellationToken = default)
+    public ImportedDocument ImportPdf(byte[] bytes, string name, CancellationToken cancellationToken = default, PdfImportLimits? limits = null)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        limits ??= new();
+        if (limits.MaximumPages < 1 || limits.MaximumTextCharacters < 1 || limits.MaximumOutputBytes < 1 || limits.MaximumPageTextCharacters < 1)
+            throw new ArgumentOutOfRangeException(nameof(limits));
+        if (bytes.Length > 32 * 1024 * 1024) throw new InvalidDataException("Document import is limited to 32 MB.");
+        var output = new PdfMarkdownBuilder(limits, cancellationToken);
+        output.Append("# "); output.Append(name); output.Append("\n\n");
         using var document = UglyToad.PdfPig.PdfDocument.Open(bytes);
-        if (document.NumberOfPages > 1000) throw new InvalidDataException("PDF text import is limited to 1,000 pages.");
-        var output = new StringBuilder("# " + name + "\n\n");
-        foreach (var page in document.GetPages())
+        if (document.NumberOfPages > limits.MaximumPages) throw new InvalidDataException("PDF text import exceeds its page limit.");
+        for (var number = 1; number <= document.NumberOfPages; number++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            output.Append("## Page ").Append(page.Number).Append("\n\n");
-            output.AppendLine(UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor.ContentOrderTextExtractor.GetText(page)).AppendLine();
+            var page = document.GetPage(number);
+            cancellationToken.ThrowIfCancellationRequested();
+            output.Append("## Page "); output.Append(page.Number.ToString(System.Globalization.CultureInfo.InvariantCulture)); output.Append("\n\n");
+            long pageCharacters = 0;
+            // PdfPig has already materialised this page. Bound extraction input, not dependency-internal allocations.
+            foreach (var letter in page.Letters)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                pageCharacters += letter.Value.Length;
+                if (pageCharacters > limits.MaximumPageTextCharacters || pageCharacters > output.RemainingCharacters)
+                    throw new InvalidDataException("The PDF page exceeds the imported text limit.");
+            }
+            cancellationToken.ThrowIfCancellationRequested();
+            var text = UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor.ContentOrderTextExtractor.GetText(page);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (text.Length > limits.MaximumPageTextCharacters) throw new InvalidDataException("The PDF page exceeds the imported text limit.");
+            output.Append(text); output.Append(Environment.NewLine); output.Append(Environment.NewLine);
         }
         return new(output.ToString(), [], ["PDF import extracts text only; it does not perform OCR or reconstruct images and page layout."]);
     }

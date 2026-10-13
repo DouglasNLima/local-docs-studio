@@ -11,6 +11,23 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class DocxTemplatePackageTests
 {
+    [Fact]
+    public void Documents_without_fields_do_not_request_a_Word_field_update_on_open()
+    {
+        using var package = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(Content())), false);
+        Assert.Empty(package.MainDocumentPart!.DocumentSettingsPart!.Settings!.Elements<W.UpdateFieldsOnOpen>());
+    }
+
+    [Fact]
+    public void Supported_template_page_fields_retain_their_update_request()
+    {
+        var template = Template((_, main) => Header(main, new W.Paragraph(new W.SimpleField(new W.Run(new W.Text("1"))) { Instruction = "PAGE" })));
+        using var package = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(Content(), template)), false);
+        Assert.True(Assert.Single(package.MainDocumentPart!.DocumentSettingsPart!.Settings!.Elements<W.UpdateFieldsOnOpen>()).Val!.Value);
+        Assert.Equal("PAGE", package.MainDocumentPart.HeaderParts.Single().Header!.Descendants<W.SimpleField>().Single().Instruction!.Value);
+        Assert.Empty(new OpenXmlValidator().Validate(package));
+    }
+
     private static readonly byte[] Png = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
     private static ExportContent Content(string source = "# New document\n\nPublic content.") => new(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>());
     private static byte[] Template(Action<WordprocessingDocument, MainDocumentPart> configure)

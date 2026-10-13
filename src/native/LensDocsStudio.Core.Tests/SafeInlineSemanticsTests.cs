@@ -14,6 +14,47 @@ public sealed class SafeInlineSemanticsTests
         + "Use <span data-shortcut><kbd>Ctrl</kbd> + <kbd>K</kbd></span> or <kbd>F1</kbd>.";
     private static ExportContent Content(string source) => new(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>());
 
+    [Fact]
+    public void Decoded_cell_newlines_and_tabs_are_real_Word_controls()
+    {
+        var content = Content("| Nome | Notas |\n|---|---|\n| Café | primeira&#10;segunda&#9;hoje |");
+        using var package = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(content)), false);
+        Assert.Empty(new OpenXmlValidator().Validate(package));
+        var cell = package.MainDocumentPart!.Document!.Descendants<W.TableCell>().Last();
+        Assert.Single(cell.Descendants<W.Break>()); Assert.Single(cell.Descendants<W.TabChar>());
+        Assert.Equal(new[] { "primeira", "segunda", "hoje" }, cell.Descendants<W.Text>().Select(t => t.Text));
+        Assert.Equal("| Nome | Notas |\n|---|---|\n| Café | primeira&#10;segunda&#9;hoje |", content.Document.Source);
+    }
+
+    [Theory]
+    [InlineData("<br>")]
+    [InlineData("<BR/>")]
+    [InlineData("<br />")]
+    public void Passive_inline_breaks_keep_their_source_and_export_as_real_line_breaks(string tag)
+    {
+        var source = "| Name | Notes |\n|---|---|\n| Café | First" + tag + "Second |";
+        var content = Content(source); var line = Assert.Single(content.Document.Syntax.Descendants<LineBreakInline>());
+        Assert.True(line.IsHard); Assert.Equal(tag, source.Substring(line.Span.Start, line.Span.Length));
+        Assert.Equal(source, content.Document.Source);
+        var html = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(new HtmlExporter().RenderFragment(content));
+        Assert.Single(html.QuerySelectorAll("td br"));
+        using var package = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(content)), false);
+        Assert.Empty(new OpenXmlValidator().Validate(package));
+        var document = package.MainDocumentPart!.Document!;
+        Assert.Single(document.Descendants<W.Break>());
+        Assert.DoesNotContain(tag, document.InnerText);
+    }
+
+    [Fact]
+    public void Break_attributes_and_code_examples_remain_literal_inert_content()
+    {
+        var content = Content("Before<br onclick='run()'>After and `<br>`.");
+        Assert.Empty(content.Document.Syntax.Descendants<LineBreakInline>());
+        var html = new HtmlExporter().RenderFragment(content);
+        Assert.DoesNotContain("<br", html); Assert.Contains("&lt;br", html);
+        Assert.Single(content.Document.Syntax.Descendants<CodeInline>());
+    }
+
     [Fact] public void Passive_snippets_retain_decoded_text_kind_and_exact_source_ranges()
     {
         var parsed = new MarkdownService().Parse(Snippets);

@@ -27,6 +27,13 @@ public static partial class SafeInlineSemantics
             var current = container.FirstChild;
             while (current is not null)
             {
+                // Table paste/import emits this passive line break; keep it native and attribute-free.
+                if (current is HtmlInline lineBreak && BreakTag().IsMatch(lineBreak.Tag))
+                {
+                    var following = current.NextSibling;
+                    current.ReplaceBy(new LineBreakInline { IsHard = true, Span = current.Span, Line = current.Line, Column = current.Column }, false);
+                    current = following; continue;
+                }
                 if (current is HtmlInline opening && TryRead(opening, source, out var semantic, out var last))
                 {
                     var following = last!.NextSibling; var remove = opening.NextSibling;
@@ -126,4 +133,5 @@ public static partial class SafeInlineSemantics
         }
     }
     [GeneratedRegex(@"^<\s*(/?)\s*(span|kbd)(?=[\s/>])", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)] private static partial Regex Tag();
+    [GeneratedRegex(@"^<br\s*/?>$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)] private static partial Regex BreakTag();
 }

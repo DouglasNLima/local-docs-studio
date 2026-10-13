@@ -71,7 +71,7 @@ public sealed partial class ClipboardPasteService
         void Cell()
         {
             if (++cells > 100000 || row.Count >= 256) throw new IOException("The pasted table exceeds its cell or column limit.");
-            row.Add(HtmlMarkdownConverter.Escape(cell.ToString()).Replace("\n", "<br>")); cell.Clear(); closed = false;
+            row.Add(HtmlMarkdownConverter.Escape(cell.ToString()).Replace("\n", "<br>").Replace("\t", "&#9;")); cell.Clear(); closed = false;
         }
         void Row()
         {

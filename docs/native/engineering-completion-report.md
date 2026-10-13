@@ -1,6 +1,6 @@
-# Native Windows engineering delivery
+# Native Windows preview acceptance and engineering delivery
 
-Recorded on 13 October 2026. This report is the current acceptance record for the original [reconstruction brief](reconstruction-brief.txt). It supersedes older milestone counts and pending statements; original failures remain in the validation history and retained artefacts.
+Recorded on 13 October 2026. This report adopts the completed reconstruction at `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` and records its next acceptance/hardening phase. The original [reconstruction brief](reconstruction-brief.txt), milestone revisions, failures and package identities remain historical evidence. Reconstruction is not being restarted.
 
 **The implemented edition is ready for an unsigned internal preview. Production readiness is not established.** The brief permits completion when all conditions are satisfied **or remaining blockers are explicitly identified with evidence**. The 28-condition audit below uses that exception openly: it does not turn incomplete production gates into passes. Engineering delivery includes implementation, ordinary defensive review, local and hosted validation, versioned installer/ZIP artefacts, a pushed branch and a draft PR. The final documentation/regression revision must retain successful mandatory CI before the goal is closed.
 
@@ -36,7 +36,67 @@ Updates use compatible GitHub release metadata with product/channel/version/arch
 
 The confirmed production signing configuration is empty: no certificate, service, thumbprint or verified publisher. Certificate-store and service adapters are pluggable, but no identity is invented or provisioned. `update-trust.json` still has no manifest keys or publishers. **Unsigned update download and execution remain blocked.** Current packages are `NotSigned` manual internal previews, with empty update-envelope identity/signature. Disposable hosted trust fixtures are removed after testing and never configure production trust or execute a production update. A positive production-signed upgrade remains unverified. See [update and packaging](update-and-packaging.md).
 
-## Exact validation evidence
+## Preview acceptance phase
+
+**Internal preview: supported within the recorded scope. Genuinely clean Windows: BLOCKED. Real external applications: PARTIAL. Production certification: BLOCKED.** Mandatory hosted checks for the acceptance corrections must succeed before this phase closes; the final revision/run references will be reconciled below.
+
+### Adopted delivery and independently checked package
+
+The four final delivery runs at `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` are verified successful: [native push 38371057232](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38371057232), [native PR 38371063213](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38371063213), [web push 38371057253](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38371057253) and [web PR 38371063230](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38371063230). Both native runs report 1,037 Core tests and 40 corpus cases; each web run reports 264 browser cases. These supersede the earlier 1,035-test baseline as the delivered hosted result, without changing that baseline's labels.
+
+The downloaded branch-source preview is `0.1.1-preview.287`, source `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55`, clean checkout, x64, self-contained, unsigned internal preview. Installer SHA-256: `3332AB0E708FDEE462B9039C8AC4E92EEB26BA0576DEF4335C7EB9A11A593A66`; portable ZIP: `1B88784184A2F0D868FE5DCFE72285B10E08A9E951386248DAB9B6C3D720C70F`. The native push `native-validation` artefact is ID `11799893618`, archive digest `sha256:82d7c8edc0a5a4d42a08c9899ae16943c17291a6dc8e178f97244135f16d9833`. Evidence is retained in `artifacts/native/ci-70a2a9d-push`; no local installer was executed.
+
+PR preview `.288` is a different checkout: merge `be4f05c2cd3fbcb5dab0e420d905b395f7a70e0c`. Its installer hash is `C0CBC35AF0635C60AEF0D42BFA378CB560F1E4861EFA54464819D1759F6866A2`, ZIP `6960259F0C759C7D74BCDFE3D56707EDE4028728A27BEA05D2623928E4861B1A`. It is not represented as the branch-source package.
+
+### Environment, procedure and actual acceptance results
+
+The available Windows desktop has .NET SDK 10.0.401, Node and development tools. Registry evidence reports build `26300.9550`, display version `26H2` and the stale product label `Windows 10 Home`; a supported Windows 11 release/image has not been independently established. No accessible disposable Windows VM/image was found. Running virtualisation services do not establish an available VM. Hosted Windows runners also contain development tools. **Neither environment is clean-machine certification.**
+
+The user authorised isolated manual native/Word/Excel checks with synthetic files, all test documents, temporary files, logs and native state under this worktree's ignored `acceptance/` directory. Startup state isolation was inspected before launch: `--state-directory` resolves before instance/session/recovery construction, the activation identity is scoped to that state root, and draft/library/update-cache paths derive from it. The existing verified native executable was used. No installation, uninstallation, update, system-setting, association or certificate operation was performed. Personal documents and unrelated Office sessions were not accessed. Office was launched only after checking that Word/Excel were absent; external field updates were declined and AutoSave was visibly off.
+
+| Requirement | Environment and procedure | Execution / final verdict | Observed result and evidence | Defect or limitation |
+|---|---|---|---|---|
+| Clean installation and 12-step lifecycle | Read-only package/environment preflight; inspected available VM tools | **BLOCKED**; lifecycle **NOT RUN** locally | `acceptance/preflight/pinned-287/preflight.json`: pinned bytes/identity PASS, environment BLOCKED; wrong hash/source controls rejected without creating or overwriting evidence | Disposable, supported Windows 11 image/snapshot without development tools required; hosted lifecycle remains its original narrower proof |
+| Native editing, tabs, nested workspace, save/restart | Computer Use on existing native build and synthetic Portuguese workspace | **PASS** for executed workflow | `acceptance/isolation-check.json`, `manual-edit-result.json`, screenshots and persisted `workspace/aceitacao.md`: literal Portuguese marker, observed Undo/Redo, exact saved bytes and restored document; nested guide/tab visible | Does not certify every possible folder or external-change sequence |
+| Clipboard image insertion | Copy synthetic preview pixels, paste into editor, inspect relative asset | **PARTIAL** while final save/copy/reopen evidence is being completed | Actual `Portable image inserted` status and `assets/images/pasted-image-*.png` reference under `acceptance/workspace`; original input retained in `acceptance/inputs` | File-picker/drag-drop modes retain hosted UIA proof; no new manual claim for those modes |
+| Portable workspace and representative output | New public-service integration check saves two nested Portuguese documents, bundles to another root, reopens and exports | **PASS** | `acceptance/validation/workflow-corrected/native-acceptance-workflow.json`: 13 checks; exact source/image bytes, repeated asset reuse, native Mermaid/line break, TSV/CSV, DOCX import/export, selectable PDF Unicode, HTML, Docs Site, SVG/PNG and synthetic template header/footer | Actual output files retained alongside original/copied workspaces; this is artefact validation, not destination pagination |
+| Manual DOCX/PDF export | Actual native export menu and Windows save dialogues | **PASS** for file generation | `acceptance/office/native-portuguese.docx` (40,753 bytes), `.pdf` (83,509 bytes), screenshots and DOCX inspection | Original DOCX cell-newline failure and unnecessary Word prompt retained; corrections described below |
+| Microsoft Word | Actual installed Word; open native exports, inspect headings/images/table/lists/pages, edit/save local synthetic copy | **PARTIAL** | `acceptance/word-save-result.json`, `office/portuguese-docx-inspection.json`, Word screenshots: heading style selected, two embedded images, table, numbered/bulleted lists and Portuguese text observed; saved edit verified by joining XML text runs | Corrected multiline/template reinspection is being completed; arbitrary templates and universal pagination remain unverified |
+| Microsoft Excel | Installed Office detected; attempted creation/launch of isolated synthetic workbook | **BLOCKED** live; local payloads **PASS** | `acceptance/office/excel-blocker.json`: automatic approval review rejected the combined command with “blocked by policy”; no Excel session launched. Native UI copy contains UnicodeText/HTML Format; baseline multiline TSV failure retained, corrected TSV/CSV round-trips pass | Do not promote local clipboard formats or historical Excel evidence to current live acceptance |
+| Azure DevOps | Local native clipboard/Markdown payload checks | **PARTIAL** locally; live destination **BLOCKED** | Bounded source/CF_HTML/image/export tests and persisted payloads; source remains editable | No authorised authenticated disposable work-item location available; attachment/paste fidelity unverified |
+| Accessibility and display | Hidden-HWND UIA/layout checks, light/dark themes and 100/125/150/200% raster output | **PARTIAL** | `native-shell-layout.json` and PNGs in current validation; existing keyboard/name/pattern/selection assertions preserved | Raster output is not actual DPI switching, multiple-monitor or physical screen-reader certification; system settings unchanged |
+| Recovery, updates and data integrity | Full Core/native suites, negative/cancelled operations and previously guarded hosted interruption/lifecycle checks | **PASS** within synthetic/automated scope | Current TRX/native reports plus revision-labelled hosted evidence; original input files preserved | Real historical schema fixtures, physical power loss and removable-drive failure remain **BLOCKED** by missing safe environment/data |
+
+Generated acceptance evidence is intentionally ignored, not published with private desktop screenshots. The report identifies exact local paths; new deterministic integration outputs are also produced by the standard native CI validation and uploaded with its normal artefact. Failed observations are retained in separate directories.
+
+### Confirmed corrections and regression evidence
+
+1. **PDF retained-text resource exhaustion:** a shared-content PDF can repeat decoded text across pages while staying within compressed-input/page-count limits. `ImportPdf` now checks cumulative characters and UTF-8 bytes before every retained append, bounds page text, and checks cancellation before input/parsing/page/extraction stages. Titles, headings and separators count towards the output budget. Ten small synthetic PDF regressions pass; original bytes remain unchanged. This closes the application aggregation finding; PdfPig's internal page allocations and non-cancellable parser calls are an explicit residual boundary.
+2. **Multiline table clipboard corruption:** actual native UI copy emitted an unquoted newline, splitting one table cell into rows. TSV now quotes newline/tab/quote-bearing cells, doubles quotes and retains empty edge cells. Paste retains embedded tabs and recognised attribute-free `<br>` becomes a typed native line break. Unknown HTML attributes and code examples stay inert/literal. A second copy and CSV round-trip verify actual cell values, not only generated Markdown. Original failures: `acceptance/regressions/tsv-original` and `paste-break-original`; 61 affected clipboard/inline cases pass.
+3. **DOCX decoded controls:** actual Word displayed `&#10;` cell content as one line. Decoded newlines/tabs now produce proper Word break/tab elements, retaining formatting. Original failure: `acceptance/regressions/word-cell-original`. The affected Word/export tests verify schema-valid output and exact controls.
+4. **Unnecessary Word confirmation:** even field-free exports requested field updates on open. The request is now emitted only for actual document/header/footer fields; supported template PAGE fields retain their update request. Original failure: `acceptance/regressions/word-field-prompt-original`; 250 affected Word/export cases pass.
+
+Current local validation of these corrections: Release build with zero warnings/errors, **1,055 Core tests passed, zero failed/skipped**, full native **40 corpus cases, zero failures**, and the 13-check representative workflow PASS. Evidence: `acceptance/tests/core-final/core.trx`, `acceptance/validation/word-and-workflow-corrected/validation-summary.json`, `native-acceptance-workflow.json` and artefacts. Static web checks pass for the existing 50 modules, 57 shell assets, 150 vendor assets and 56 dependency scans. Full web hosted results for the final revision remain mandatory.
+
+### Performance investigation and remaining product defects
+
+Original nested-details failure is retained exactly: run [38344048333](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38344048333), `ci-77be570-pr-failure/native-validation/validation/native-nested-details-construction.json`: input `587.9933 ms`, initial call `587.7282 ms`, construction `671.4819 ms`, complete text/source preserved. Toggle initialisation reached `319.1709 ms`, header attachment `587.3879 ms`; thread CPU and GC counters did not advance through those stages. Scheduling/waiting is a plausible inference, **not an established root cause**.
+
+One fresh-process `--layout` execution, with the original fixtures and unchanged 250 ms construction assertions, recorded details input `21.6582 ms`, maximum gap `32.3050 ms`, construction `150.2499 ms`. This did not reproduce the original stall and does not establish a fix. The initial invocation through `dotnet <dll>` was rejected by the existing diagnostic apphost guard; using the actual validation apphost corrected that procedure, without altering the guard.
+
+New instrumentation queues input before continuous viewer attachment/Measure/Arrange/UpdateLayout, then observes when it can run. In that fresh process, list first-layout input was **2,022.4487 ms**, table **771.3626 ms**, details **349.7660 ms**, quote **230.9251 ms**. The later full run recorded list **1,911.21 ms**, table **558.29 ms**, details **284.17 ms**, quote **329.08 ms**. This directly demonstrates continuous first-layout input delay; it is distinct from renderer construction. Per-viewport evidence now records a separate **FAIL** against 250 ms rather than presenting a successful construction result as layout acceptance. `PassedScope` names the unchanged construction/source/cancellation/navigation gates.
+
+**Remaining defect:** WPF continuous layout synchronously processes large blocks. Automatic mode already selects Pages for at least 1,000 source elements or 256 KiB; explicit Continuous remains a documented limitation. A speculative renderer rewrite or silent override of the requested mode is not justified by this phase. Original fixtures, thresholds, source/selection checks and failures remain intact; no sleeps or unchanged retry-until-pass were introduced. The intermittent details-construction cause remains unresolved separately.
+
+### Security assessment and residual certification
+
+A separate standard assessment of all **398 tracked `src/native` files** at adopted revision `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` completed: scan `4ffc7b82-e3ee-4441-b50a-c1b6fae9f12b`. Independent reviews covered workspace/reparse/ZIP boundaries, inert metadata/HTML, remote image consent, clipboard, resource budgets, recovery/writes, updates and operational test guards. One validated Medium finding, `csf_dcf4b7fff09128c9ad24f4d6`, concerns PDF aggregate text and is corrected above. Fresh pre-patch and candidate-patch reviews found no blocking bypass within that reported boundary; focused and full regressions pass.
+
+Canonical report: `C:/Users/dougl/.codex/state/plugins/codex-security/scans/MarkdownReader/70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55_20261013T101150Z_x5e8jq11/report.md`, with sealed coverage/findings/threat model and SARIF. The tool warned that working-tree contents changed during the scan; tracked native source was unchanged until scan completion, while untracked acceptance evidence was created. Its results remain for the original snapshot, not a scan certificate for the later patch. Derived fix evidence is `acceptance/regressions/pdf-fix-review.json`; canonical findings were not rewritten. Tool-reported usage: 58,262,867 total tokens, 58,109,632 input (56,735,488 cached), 153,235 output, 39,415 reasoning, four threads, `codex_rollout` source. This is returned telemetry, not a newly billed-token estimate.
+
+Daybreak access was unavailable; [protected access](https://chatgpt.com/cyber) remains separate. Frozen historical scan `36e5ad44-ba7f-4cc1-8f8d-b24b9b629856` for `cf436b0..840cf15` was not retargeted or claimed complete. No production signing identity exists, production trust stays empty, and unsigned update download/execution remains blocked.
+
+## Historical validation evidence through 7008751
 
 The application/browser baseline is branch revision `7008751a52cb9a782619e97aac27cd6bcc899bdf`. Native PR packages identify the actual checkout merge `22ce42192ecfbacbc5116c6a7498c67f608c2283`; that merge is not relabelled as the branch revision.
 
@@ -71,38 +131,38 @@ The earlier native PR run `38344048333` failed nested-details input at 587.9933 
 
 ## Original 28-condition acceptance audit
 
-“Proven” below always means the named tested scope. “Partial” or “unverified” is a remaining acceptance limitation, not a pass. Paths are relative to the workspace. Hosted baseline evidence roots are `artifacts/native/ci-7008751-{push,pr}`; they can be downloaded using the run references below.
+Statuses apply only to the stated scope: **PASS**, **FAIL**, **PARTIAL**, **BLOCKED**, **NOT RUN**. PARTIAL/BLOCKED are not passes. Current acceptance evidence is above; historical hosted roots `artifacts/native/ci-7008751-{push,pr}` and delivered roots `ci-70a2a9d-{push,pr}` retain their original revision labels.
 
-| # | Original condition | State, evidence and remaining scope |
-|---|---|---|
-| 1 | Genuine WPF desktop application | Proven: `UseWPF`/`net10.0-windows`, actual desktop processes and four-context `native-ui.json` reports |
-| 2 | No embedded browser hosts application UI | Implemented/inspected: native project dependencies and `package-runtime-inspection.json`; no known browser payload in checked archives |
-| 3 | No HTML/JavaScript runtime for editing/preview | Implemented/validated: native preview/corpus and checked package; independent HTML export is separate |
-| 4 | Installed execution without development tools/server | Bundled runtime origin proven in all installed contexts; SDK-free Windows certification remains unverified |
-| 5 | Essential existing workflows supported | Implemented and exercised; [feature matrix](functional-parity-matrix.md) records bounded import/render/export and destination fidelity limits |
-| 6 | Portable readable Markdown | Proven for fixtures: exact UTF-8 bytes, guarded saves and restored drafts in desktop/save-recovery reports |
-| 7 | Images/links survive workspace copying | Proven for fixtures: copied Word assets, relative links and per-tab roots in Word import/workspace-context reports |
-| 8 | Mermaid validated against real fixtures | Proven for documented 40-case corpus and catalogue/theme cases; unsupported forms remain explicit errors |
-| 9 | Imports/exports meet documented contracts | Supported byte/package/geometry/source contracts pass; full Office/PDF complex-script/destination fidelity remains partial |
-| 10 | Safe legacy-data migration | Explicit supported browser JSON/DOCX imports pass and preserve originals; actual historical native schemas/data remain unverified |
-| 11 | Feasible discovery improvements implemented | Implemented with [experience evidence](native-experience-improvements.md); broad responsiveness and physical accessibility limits remain |
-| 12 | Meaningful native Windows advantages | Proven in pickers, tabs, monitoring, reviewed moves, clipboard, selectable preview and recovery workflows |
-| 13 | Predictable keyboard/focus/selection/scroll | Automated supported workflows pass; physical screen-reader/display coverage and historical intermittent construction delays remain partial |
-| 14 | Safe unsaved edits/external changes | Conflict, independent recovery and actual process-interruption checks pass; physical power loss/removable-drive failure remains unverified |
-| 15 | Reproducible installer build | Repeatable isolated same-source process and independently checked hashes; bit-identical builds are not claimed |
-| 16 | Clean-machine installation validated | Unverified: hosted runners contain development tools; runtime-origin reports explicitly say `CleanMachineCertification: false` |
-| 17 | Uninstall preserves documents | Proven within hosted install/upgrade/uninstall/reinstall: 20 state files, workspace source and restored sessions |
-| 18 | Compatible GitHub release discovery | Implemented and fixture-validated by update policy/interaction reports; no public release published |
-| 19 | Non-interrupting notifications | Implemented and fixture-validated startup/periodic checks and persisted interval; no automatic installation |
-| 20 | Installation requires user authorisation | Explicit actions, unsaved handling and final verification pass; positive production execution remains unverified |
-| 21 | Update security/trust validated | Disposable/negative trust paths pass; production identity, pinned keys and positive signed upgrade are not established |
-| 22 | Failed updates preserve local state | Rejection/cancellation, failed downloads and installer fixture preservation pass; actual interrupted production-signed upgrade remains unverified |
-| 23 | Critical automated workflow coverage | Core, corpus, export, desktop, recovery, trust and installer suites pass in documented scope; no exhaustive-coverage claim |
-| 24 | Actual desktop GUI validation | Built/installed/upgraded/reinstalled UIA workflows and inspected PNGs pass; physical accessibility/Office/display acceptance remains separate |
-| 25 | Recorded build/CI results | Four successful baseline runs and independent downloaded reports below; final verification revision tracked by PR checks |
-| 26 | Existing web application functional | 264 Chromium/Edge cases and static integrity checks pass in both hosted runs; buildless publication preserved, deployment skipped on feature/PR |
-| 27 | No knowingly hidden critical regression | All discovered failures/limits are disclosed; no current critical regression established by ordinary review. Unfinished protected scan and unresolved timing cause are unclaimed |
-| 28 | Accurate implementation documentation | This audit/report, updated tracking documents, guide, handoff and draft PR distinguish implemented, tested, internal preview and production status |
+| # | Original condition | Verdict | Evidence and remaining scope |
+|---|---|---|---|
+| 1 | Genuine WPF desktop application | PASS | `UseWPF`/`net10.0-windows`, actual manual desktop and hosted four-context UIA reports |
+| 2 | No embedded browser hosts application UI | PASS | Native dependencies and checked runtime archives; web/legacy products remain separate |
+| 3 | No HTML/JavaScript runtime for editing/preview | PASS | Native corpus and actual selectable preview; HTML is an independent export |
+| 4 | Installed execution without development tools/server | PARTIAL | Bundled installed runtime origins verified on hosted runners; SDK-free machine unavailable |
+| 5 | Essential existing workflows supported | PASS | Existing supported suite plus representative persisted-workspace integration; bounded contracts retained |
+| 6 | Portable readable Markdown | PASS | Exact manual saved UTF-8 and bundle copied bytes; guarded saves/recovery |
+| 7 | Images/links survive workspace copying | PASS | Representative copied-root integration retains exact image/source bytes and exports; relative/wiki link fixtures retained |
+| 8 | Mermaid validated against real fixtures | PASS | 40 native corpus and 56 catalogue/theme cases; new real native export/preview; documented unsupported forms excluded |
+| 9 | Imports/exports meet documented contracts | PARTIAL | Supported artefact checks pass, reproduced table/Word defects corrected; destination/pagination/shaping limits remain |
+| 10 | Safe legacy-data migration | PARTIAL | Supported synthetic JSON/DOCX migrations preserve originals; representative historical data unavailable |
+| 11 | Feasible discovery improvements implemented | PASS | Targeted clipboard/control/prompt corrections with original failures and regressions; no redesign |
+| 12 | Meaningful native Windows advantages | PASS | Native pickers/tabs/clipboard/images/selectable preview plus reviewed moves/monitoring/recovery |
+| 13 | Predictable keyboard/focus/selection/scroll | PARTIAL | Supported UIA/selection gates pass; continuous layout input FAIL above; intermittent construction cause unresolved |
+| 14 | Safe unsaved edits/external changes | PARTIAL | Synthetic conflicts/recovery/process-interruption checks pass; physical hardware failure unverified |
+| 15 | Reproducible installer build | PASS | Repeatable isolated packaging and independently pinned artefact hashes; no bit-identical reproducibility claim |
+| 16 | Clean-machine installation validated | BLOCKED | Developer tools detected, no suitable disposable Windows image; local lifecycle NOT RUN |
+| 17 | Uninstall preserves documents | PASS | Hosted install/upgrade/uninstall/reinstall retains 20 state files, documents and restored sessions; no local uninstall |
+| 18 | Compatible GitHub release discovery | PASS | Product/channel/version/architecture eligibility fixtures; no legacy shell offered as WPF update |
+| 19 | Non-interrupting notifications | PASS | Startup/periodic/interval and notification fixtures; no automatic installation |
+| 20 | Installation requires user authorisation | PASS | Separate actions, cancellation, unsaved handling and final verification; production positive path separately blocked |
+| 21 | Update security/trust validated | PARTIAL | Disposable/negative verification passes; empty production pins, no genuine identity or positive signed upgrade |
+| 22 | Failed updates preserve local state | PARTIAL | Rejection/cancellation/download cleanup and installer fixtures pass; interrupted production-signed upgrade unavailable |
+| 23 | Critical automated workflow coverage | PASS | 1,055 local Core, 40 native corpus, additional persisted output workflow; full relevant hosted suites mandatory |
+| 24 | Actual desktop GUI validation | PARTIAL | Actual native/Word Computer Use and hosted UIA; live Excel/Azure DevOps and physical accessibility blocked |
+| 25 | Recorded build/CI results | PARTIAL | Exact delivered 70a runs reconciled; acceptance-fix final hosted revision must be verified before closure |
+| 26 | Existing web application functional | PARTIAL | Delivered 264 cases/run and current static checks pass; final hosted web suites pending |
+| 27 | No knowingly hidden critical regression | PASS | Independent scoped scan's Medium PDF finding corrected/reviewed/tested; parser/performance/external limitations explicit |
+| 28 | Accurate implementation documentation | PARTIAL | Current evidence/status audit updated; final commit/CI and PR reconciliation pending |
 
 ## Artefacts, branch, PR and Actions
 

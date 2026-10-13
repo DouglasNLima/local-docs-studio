@@ -9,6 +9,30 @@ namespace LensDocsStudio.Core.Tests;
 public sealed class TableClipboardTests
 {
     [Fact]
+    public void Selected_table_plain_clipboard_round_trip_preserves_newlines_tabs_quotes_and_empty_cells()
+    {
+        const string source = "| Nome | Notas | Vazio |\n|---|---|---|\n| Café | primeira&#10;segunda | |\n| Ação | disse &quot;Olá&quot;&#9;hoje | |";
+        var parsed = new MarkdownService().Parse(source);
+        var table = parsed.Syntax.Descendants<Table>().Single();
+        var result = new ClipboardExporter().Export(new(parsed, new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()),
+            new(table.Span.Start, table.Span.Length));
+        Assert.Equal("Nome\tNotas\tVazio\nCafé\t\"primeira\nsegunda\"\t\nAção\t\"disse \"\"Olá\"\"\thoje\"\t", result.PlainText);
+        var imported = new LensDocsStudio.Core.Imports.ClipboardPasteService().Convert(new(result.PlainText, ""),
+            LensDocsStudio.Core.Imports.PasteMode.Table);
+        var roundTrip = new MarkdownService().Parse(imported.Document.Markdown).Syntax.Descendants<Table>().Single();
+        Assert.Equal(3, roundTrip.Count);
+        Assert.All(roundTrip.OfType<TableRow>(), row => Assert.Equal(3, row.Count));
+        Assert.Contains("primeira<br>segunda", imported.Document.Markdown);
+        Assert.Contains("disse \"Olá\"", imported.Document.Markdown);
+        var exportedAgain = new ClipboardExporter().Export(new(new MarkdownService().Parse(imported.Document.Markdown),
+            new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>()));
+        Assert.Equal(result.PlainText, exportedAgain.PlainText);
+        var exportedHtml = new HtmlParser().ParseDocument(HtmlClipboardFormat.Decode(exportedAgain.Html));
+        Assert.Single(exportedHtml.QuerySelectorAll("tbody br"));
+        Assert.Equal(source, parsed.Source);
+    }
+
+    [Fact]
     public void Selected_table_copy_excludes_surrounding_content_and_keeps_literal_Excel_cells()
     {
         const string source = "# Private introduction\n\n| Other | Data |\n|---|---|\n| Excluded | row |\n\n" +

@@ -116,7 +116,9 @@ internal static class NativeLayoutChecks
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, Viewport = viewport });
         }
         stallWatch.Complete();
-        File.WriteAllText(Path.Combine(output, "native-nested-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = nestedEvidence }, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Path.Combine(output, "native-nested-layout.json"), JsonSerializer.Serialize(new { Passed = true,
+            PassedScope = "Construction, cancellation, source integrity and final-target navigation; continuous first-layout input acceptance is reported separately for each viewport.",
+            Cases = nestedEvidence }, new JsonSerializerOptions { WriteIndented = true }));
         File.WriteAllText(Path.Combine(output, "native-layout.json"), JsonSerializer.Serialize(new
         {
             Passed = true, SourceCharacters = source.Length, Blocks = rendered.Document.Blocks.Count,
@@ -134,10 +136,15 @@ internal static class NativeLayoutChecks
         var viewer = new FlowDocumentScrollViewer { Document = result.Document, IsToolBarVisible = false, Background = Brushes.White };
         using var host = new HwndSource(new HwndSourceParameters("Large native preview validation")
             { Width = 640, Height = 300, WindowStyle = unchecked((int)0x80000000) });
-        var watch = Stopwatch.StartNew(); host.RootVisual = viewer; var attach = watch.Elapsed.TotalMilliseconds;
+        var watch = Stopwatch.StartNew(); var inputAt = -1d;
+        var input = viewer.Dispatcher.BeginInvoke(DispatcherPriority.Input, () => inputAt = watch.Elapsed.TotalMilliseconds);
+        host.RootVisual = viewer; var attach = watch.Elapsed.TotalMilliseconds;
         viewer.Measure(new Size(640, 300)); var measure = watch.Elapsed.TotalMilliseconds;
         viewer.Arrange(new Rect(0, 0, 640, 300)); var arrange = watch.Elapsed.TotalMilliseconds;
         viewer.UpdateLayout(); var initial = watch.Elapsed.TotalMilliseconds;
+        // Observe first-layout responsiveness separately from the unchanged construction gate.
+        // A known continuous-view layout stall remains visible even when batched construction passes.
+        Pump(input.Task, viewer.Dispatcher); input.Task.GetAwaiter().GetResult();
         var last = result.SourceElements.MaxBy(item => item.Key).Value;
         viewer.Selection.Select(last.ContentStart, last.ContentEnd);
         watch.Restart(); var navigation = PreviewNavigationService.BringIntoViewAsync(viewer, last.ContentStart); Pump(navigation, viewer.Dispatcher);
@@ -151,6 +158,9 @@ internal static class NativeLayoutChecks
         using (var file = File.Create(Path.Combine(output, "native-large-" + name + ".png"))) encoder.Save(file);
         return new { InitialLayoutMilliseconds = initial, AttachMilliseconds = attach, MeasureMilliseconds = measure - attach,
             ArrangeMilliseconds = arrange - measure, UpdateLayoutMilliseconds = initial - arrange,
+            FirstLayoutInputMilliseconds = inputAt, FirstLayoutInputBudgetMilliseconds = 250,
+            FirstLayoutInputWithinBudget = inputAt >= 0 && inputAt < 250,
+            FirstLayoutInputAcceptance = inputAt >= 0 && inputAt < 250 ? "PASS" : "FAIL",
             LastTargetMilliseconds = elapsed, scrolling.VerticalOffset, scrolling.ExtentHeight, scrolling.ViewportHeight };
         void Layout() { viewer.Measure(new Size(640, 300)); viewer.Arrange(new Rect(0, 0, 640, 300)); viewer.UpdateLayout(); }
     }
