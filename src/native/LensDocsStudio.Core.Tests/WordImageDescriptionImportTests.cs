@@ -116,6 +116,38 @@ public sealed class WordImageDescriptionImportTests
         Assert.Equal("First  [Second](https://unrequested.invalid) Ω", MarkdownService.InlineText(image));
     }
 
+    [Theory]
+    [InlineData(4, true)]
+    [InlineData(64, false)]
+    public void Repeated_blips_with_shared_metadata_are_charged_to_the_generated_text_budget(int occurrences, bool fits)
+    {
+        var description = new string('x', 128);
+        using var stream = new MemoryStream(); stream.Write(Package(description)); stream.Position = 0;
+        using (var package = WordprocessingDocument.Open(stream, true))
+        {
+            var blip = package.MainDocumentPart!.Document!.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().Single();
+            // Deliberately malformed drawing content is still untrusted parser input; no schema validity is assumed.
+            for (var index = 1; index < occurrences; index++) blip.Parent!.AppendChild(blip.CloneNode(true));
+            package.MainDocumentPart.Document.Save();
+        }
+        var bytes = stream.ToArray(); var original = bytes.ToArray();
+        var limits = new WordImportLimits(MaximumImages: 1, MaximumTextCharacters: 4096);
+        if (fits)
+        {
+            var imported = new DocumentImportService().ImportDocx(bytes, limits: limits);
+            var images = Images(imported.Markdown);
+            Assert.Equal(occurrences, images.Length);
+            Assert.All(images, image => Assert.Equal(description, MarkdownService.InlineText(image)));
+            Assert.Equal(Payload, Assert.Single(imported.Assets).Bytes);
+        }
+        else
+        {
+            Assert.Equal("The Word document exceeds the imported text limit.",
+                Assert.Throws<InvalidDataException>(() => new DocumentImportService().ImportDocx(bytes, limits: limits)).Message);
+        }
+        Assert.Equal(original, bytes);
+    }
+
     private static LinkInline[] Images(string markdown) => new MarkdownService().Parse(markdown).Syntax.Descendants<LinkInline>().Where(link => link.IsImage).ToArray();
 
     private static byte[] Package(string description) => new DocxExporter().Export(new(new MarkdownService().Parse("![image](image.png)"),

@@ -4,20 +4,21 @@ Local Markdown, Mermaid, and documentation studio.
 
 ## Native Windows reconstruction
 
-The new browser-free Windows edition is being implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. It is an incomplete internal development preview, not a production release.
+The browser-free Windows edition is implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. Its installer-based unsigned internal preview is validated in the documented scope; production certification remains incomplete. See the [engineering delivery report](docs/native/engineering-completion-report.md) for the 28-condition audit and exact evidence.
 
 ```powershell
 dotnet build src/native/LensDocsStudio.Native.slnx -c Release
 dotnet run --project src/native/LensDocsStudio.Native
 dotnet test src/native/LensDocsStudio.Core.Tests
 dotnet run --project src/native/LensDocsStudio.Native.Validation -- artifacts/native/validation .
-dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
 pwsh -NoProfile -File scripts/native/Build-NativePackage.ps1 -Version 0.1.0-preview.10
 ```
 
+Actual desktop/clipboard/installer/certificate validation runs only on disposable hosted Windows; local interactive suite commands refuse execution. Unsigned updates remain blocked.
+
 See the [engineering handover](docs/native/engineering-handover.md), [native implementation progress](docs/native/implementation-progress.md), [functional parity](docs/native/functional-parity-matrix.md) and [validation evidence](docs/native/validation-report.md). Native state uses `%LOCALAPPDATA%/LensDocsStudio.Native`; the legacy shell's installation and state are preserved. GitHub Pages remains a separate static pipeline and requires no .NET build.
 
-The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix identifies features still to be implemented.
+The native preview provides real folder workspaces, tabs, recent files/workspaces, Back/Forward navigation and a document/heading link picker (`Ctrl+Shift+K`). Clipboard images can be inserted before the first save: they are retained with draft recovery and copied to relative workspace assets when saved. Save as rebases links within a workspace and copies local images when saving elsewhere. These workflows have native desktop regression coverage; the parity matrix records supported contracts and remaining limitations.
 
 Native **Editor** layout keeps the outline current while pausing hidden diagram, image and document rendering. Returning to **Split** or **Preview** rebuilds the current preview. **Copy rendered text** explicitly prepares current edits even in Editor layout; intervening edits or clipboard changes prevent an obsolete copy. Find follows the visible editor or preview when changing single-pane layouts.
 

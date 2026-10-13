@@ -1,5 +1,15 @@
 # Native architecture decisions
 
+## Current delivery record
+
+The [engineering delivery report](engineering-completion-report.md) is the current 28-condition acceptance record. Application baseline `7008751` passes both native and both web pipelines. Independently downloaded native evidence verifies 1,035 Core tests, 40 corpus cases, four 66-check desktop contexts, complete installer lifecycle, 20 preserved state files and bundled installed runtime origins per run. Both web runs pass 264 cases. Local Core validation with the two final shared-metadata regressions passes 1,037 cases. Preview .285/.286 package hashes, clean source revisions and unsigned metadata are checked.
+
+The supported implementation is ready for unsigned internal preview. Production signing/trust, SDK-free Windows, physical accessibility/displays, real destination/historical-data/hardware scenarios and broader fidelity/performance remain explicitly limited. Unsigned update download/execution stays blocked; the unfinished protected scan is not claimed as completed. Final verification of the report/regression revision is recorded in the draft PR's latest checks.
+
+## Design and revision-specific evidence
+
+The records below retain their recording revision and scope. Present-tense wording and pending outcomes in earlier milestone records are historical; the current report above supplies later verified outcomes without erasing the original failures.
+
 Word run formatting uses immutable cached style overlays: document defaults, paragraph inheritance, character inheritance and absolute direct formatting. Bold, italic and single strike use the [OOXML toggle rules](https://learn.microsoft.com/en-us/office/open-xml/word/how-to-remove-hidden-text-from-a-word-processing-document); [character style precedence](https://learn.microsoft.com/en-us/dotnet/api/documentformat.openxml.wordprocessing.runstyle) follows paragraph styles and precedes direct properties. Underline and double strike retain replacement semantics. Heading-level bold stays structural unless separately specified; literal code ignores presentation formatting. No font, stylesheet or URI is loaded from metadata. Lookup is cancellable and limited to 64 levels; cycles discard only inherited formatting with a conversion note. The pre-existing generated-text ceiling includes resulting Markdown markers. Table/numbering style presentation, complex-script formatting and exact Word destination layout remain outside this supported mapping.
 
 Hosted native push 38354661411 verifies the DOCX correction in the actual application but fails installer discovery on a FlaUI-wrapped COM timeout; its installer lifecycle is skipped. The validation wait now recognises only the existing timeout HRESULTs when wrapped in `TimeoutException`, using the unchanged deadline and observation-only retries. Nine deterministic checks reproduce the missing wrapper case, verify readiness recovery, preserve persistent failures and reject unrelated errors. This changes validation only; it neither bypasses wizard assertions nor claims installation success. Original evidence is retained under `artifacts/native/ci-5976b24-push-failure`.
