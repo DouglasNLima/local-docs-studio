@@ -32,6 +32,11 @@ jobs:
         run: pwsh -NoProfile -File scripts/native/Test-NativeAuthenticode.ps1
       - name: Validate native diagram corpus
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .
+      - name: Record Continuous input-budget observations (250 ms acceptance reported separately)
+        run: |
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --continuous-performance artifacts/native/validation/continuous-input
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --continuous-performance artifacts/native/validation/continuous-mixed mixed
       - name: Set up export validation tools
         uses: actions/setup-node@v4
         with:
@@ -110,6 +115,8 @@ jobs:
             artifacts/native/install-smoke/**/native-artefact-folder-failure.png
             artifacts/native/install-smoke/**/native-artefact-folder-controls.txt
             artifacts/native/install-smoke/**/native-preview-selection.json
+            artifacts/native/install-smoke/**/native-continuous-preview-selection.json
+            artifacts/native/install-smoke/**/native-continuous-preview-search.png
             artifacts/native/install-smoke/**/native-paginated-preview-search.png
             artifacts/native/install-smoke/**/native-single-block-selection.json
             artifacts/native/install-smoke/**/native-single-block-preview-search.png

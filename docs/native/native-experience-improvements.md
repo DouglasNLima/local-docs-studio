@@ -1,5 +1,7 @@
 # Native experience improvements
 
+The targeted [performance continuation](performance-and-responsiveness.md) reduces redundant native formatting elements and initial list allocations, adds exact source/RTF/formatting/stale-render regressions, and fixes a reproduced active-tab close selection race. Continuous list median input improves 923.42 → 727.88 ms on the named machine, but still fails 250 ms; mixed/4.14 MB and the original intermittent details failure remain unresolved. Existing delivery evidence below keeps its historical scope. New-build desktop proof is hosted; the optional local manual retest remains BLOCKED/NOT RUN.
+
 ## Current delivery record
 
 The [engineering acceptance report](engineering-completion-report.md) is the current 28-condition record. Delivered revision `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` passes four verified hosted runs: native push/PR `38371057232`/`38371063213` (1,037 Core tests, 40 corpus cases), web push/PR `38371057253`/`38371063230` (264 cases each). Branch-source preview .287 and PR-merge .288 retain distinct source/hash labels. Earlier `7008751`, 1,035-test and .285/.286 evidence below remains historical.

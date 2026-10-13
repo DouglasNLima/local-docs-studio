@@ -53,6 +53,26 @@ internal static partial class NativeUiChecks
                 CheckVisiblePreviewSelection(window, output, marker, name == "paginated" ? "native-preview-selection" : "native-single-block-selection");
                 window.CaptureToFile(Path.Combine(output, "native-" + name + "-preview-search.png"));
                 Find(window, "CloseFind").Click();
+                if (name == "paginated")
+                {
+                    ReadingMode("Continuous");
+                    Wait(() => !PageControlsVisible(), "Explicit Continuous was overridden for the 4,000-item document.");
+                    Find(window, "DocumentPreview").Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+                    Find(window, "FindText").AsTextBox().Text = marker; Find(window, "FindNext").Click();
+                    Wait(() =>
+                    {
+                        var continuous = Find(window, "DocumentPreview");
+                        return continuous.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).EndsWith(marker, StringComparison.Ordinal)
+                            && range.GetBoundingRectangles().Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0
+                                && continuous.BoundingRectangle.Contains(rectangle))) && !PageControlsVisible();
+                    }, "Continuous Find did not reveal and select the final list item.");
+                    CheckVisiblePreviewSelection(window, output, marker, "native-continuous-preview-selection");
+                    window.CaptureToFile(Path.Combine(output, "native-continuous-preview-search.png"));
+                    Find(window, "CloseFind").Click(); Layout("Split");
+                    Wait(() => !PageControlsVisible() && ReadEditorText(editor) == large,
+                        "Split layout changed the explicit Continuous mode or exact source.");
+                    ReadingMode("Automatic");
+                }
                 Layout("Editor"); FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == original, "Paged search or navigation damaged the source insertion's Undo.");
                 Layout("Split");

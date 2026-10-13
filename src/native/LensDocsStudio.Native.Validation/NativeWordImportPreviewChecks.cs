@@ -37,7 +37,7 @@ internal static class NativeWordImportPreviewChecks
             var result = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, false,
                 new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { },
                 preparedImages: new Dictionary<string, PreviewImage> { [reference] = new(pixels, null) });
-            var decorations = result.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines.OfType<Span>()).ToArray();
+            var decorations = result.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines).ToArray();
             if (!decorations.Any(span => new TextRange(span.ContentStart, span.ContentEnd).Text == "Removed"
                     && span.TextDecorations.Any(decoration => decoration.Location == TextDecorationLocation.Strikethrough))
                 || !decorations.Any(span => new TextRange(span.ContentStart, span.ContentEnd).Text == "underlined"

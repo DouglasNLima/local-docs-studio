@@ -76,8 +76,8 @@ internal static class NativeInlineLayoutChecks
             var inlines = target is null ? [] : Flatten(target.Inlines).ToArray();
             var links = inlines.OfType<Hyperlink>().ToArray();
             var formatting = item.Formatted
-                ? links.Length == item.Links && inlines.OfType<Span>().Count(span => span.FontWeight == FontWeights.Bold) >= count
-                    && links.All(link => link.Inlines.OfType<Span>().Any(span => span.FontStyle == FontStyles.Italic))
+                ? links.Length == item.Links && inlines.OfType<Run>().Count(run => run.FontWeight == FontWeights.Bold) >= count
+                    && links.All(link => Flatten(link.Inlines).OfType<Run>().Any(run => run.FontStyle == FontStyles.Italic))
                 : inlines.OfType<Run>().Count(run => run.ReadLocalValue(TextElement.ForegroundProperty) != DependencyProperty.UnsetValue) > 150;
             var sourcePreserved = parsed.Source == item.Source;
             var sourceMapping = target?.Tag is SourceReference reference && reference.Start >= 0 && reference.End < item.Source.Length

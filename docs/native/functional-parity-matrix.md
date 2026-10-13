@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+The [targeted performance continuation](performance-and-responsiveness.md) preserves the documented native content/selection/navigation contracts and adds explicit Continuous distant-target desktop coverage. Its measured list improvement remains above the unchanged 250 ms input budget; mixed/4.14 MB preview and intermittent details construction remain incomplete acceptance. Historical results below are not relabelled as performance certification.
+
 ## Current delivery record
 
 The [engineering acceptance report](engineering-completion-report.md) is the current 28-condition record. Delivered revision `70a2a9d0dc2c9fd1e4cebaf28c96015fde5d1a55` passes four verified hosted runs: native push/PR `38371057232`/`38371063213` (1,037 Core tests, 40 corpus cases), web push/PR `38371057253`/`38371063230` (264 cases each). Branch-source preview .287 and PR-merge .288 retain distinct source/hash labels. Earlier `7008751`, 1,035-test and .285/.286 evidence below remains historical.

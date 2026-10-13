@@ -39,7 +39,7 @@ internal static class NativeMarkdownChecks
             if (!cells.Select(c => c.TextAlignment).SequenceEqual(new[] { TextAlignment.Left, TextAlignment.Center, TextAlignment.Right }))
                 throw new IOException("Native table cells lost their column alignment.");
             var paragraph = result.Document.Blocks.OfType<Paragraph>().Single(p => Text(p).Contains("Withdrawn", StringComparison.Ordinal));
-            var spans = paragraph.Inlines.OfType<Span>().ToArray();
+            var spans = paragraph.Inlines.ToArray();
             var strike = spans.Single(s => Text(s) == "Withdrawn");
             if (strike.FontWeight != FontWeights.Normal || strike.FontStyle != FontStyles.Normal || !strike.TextDecorations.Any(d => d.Location == TextDecorationLocation.Strikethrough))
                 throw new IOException("Strikethrough incorrectly inherited bold/italic or lost its decoration.");

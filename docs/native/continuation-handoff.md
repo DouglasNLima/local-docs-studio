@@ -1,5 +1,11 @@
 # Native Windows development continuation handoff
 
+## Current targeted performance continuation
+
+Adopted acceptance baseline: `3dfda9fe6152b93bd9f6def2f68bd5e2d6d2635b`. The completed reconstruction remains adopted. The current [performance report](performance-and-responsiveness.md) records a measured literal-run optimisation, a reproduced WPF selected-tab close correction, unchanged 250 ms gates, exact samples and new source/formatting/switch/close/Continuous desktop regressions. Work is isolated in `C:\Users\dougl\.codex\worktrees\native-responsiveness\MarkdownReader`; the earlier worktree and evidence are retained. Push updates the existing branch/PR 21; no reconstruction, merge or release is intended.
+
+List median first-layout input improves 923.42 → 727.88 ms in four comparable pairs, with 14.05% lower allocation, but performance acceptance is **incomplete**. Mixed content and 4.14 MB background layout also fail. The original details-construction stall remains separately unresolved. Local Release/Core/native validation passes (1,057 Core/40 corpus); hosted continuation checks are pending. Inspect the current PR for final compatibility/CI revision and read the performance report before continuing; do not call a passing observation command or later non-reproduction a performance fix. New-build manual GUI is still BLOCKED by authorisation/NOT RUN; only genuine hosted Windows may execute the affected desktop/install contexts under existing guards.
+
 Recorded on 13 October 2026. The [engineering delivery report](engineering-completion-report.md) is the current acceptance record, including all 28 original conditions and evidence-backed residual gates. The [previous handoff](history/continuation-handoff-through-7008751.md) retains earlier state without superseding that report.
 
 ## Adopt the delivered state

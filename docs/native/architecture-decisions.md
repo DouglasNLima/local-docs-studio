@@ -1,5 +1,9 @@
 # Native architecture decisions
 
+## Targeted performance continuation
+
+The [performance report](performance-and-responsiveness.md) separates construction from real Continuous first layout and retains the 250 ms failure. Single-literal emphasis uses one styled native Run; complex/nested content keeps its existing Span tree. The complete-result commit, dispatcher affinity, source spans, one native List and reading-mode choice remain intact. An attached-construction prototype exceeded its bounded deadline through repeated growing-list invalidation and was removed; block virtualisation was not introduced without a correct contiguous selection/navigation model. This is a measured small optimisation, not a replacement renderer or a claim of full responsiveness. Selected-tab close ownership is captured before WPF collection notifications can clear its two-way selection binding.
+
 ## Current delivery record
 
 The [engineering delivery report](engineering-completion-report.md) is the current 28-condition acceptance record. Application baseline `7008751` passes both native and both web pipelines. Independently downloaded native evidence verifies 1,035 Core tests, 40 corpus cases, four 66-check desktop contexts, complete installer lifecycle, 20 preserved state files and bundled installed runtime origins per run. Both web runs pass 264 cases. Local Core validation with the two final shared-metadata regressions passes 1,037 cases. Preview .285/.286 package hashes, clean source revisions and unsigned metadata are checked.

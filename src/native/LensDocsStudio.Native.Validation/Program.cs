@@ -18,6 +18,17 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--continuous-performance")
+        {
+            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/performance/continuous"), args.ElementAtOrDefault(2)); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--literal-formatting")
+        {
+            var formattingOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/literal-formatting"); Directory.CreateDirectory(formattingOutput);
+            try { NativeLiteralFormattingChecks.Run(formattingOutput); Console.WriteLine("Native literal formatting checks passed."); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--layout")
         {
             var layoutOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/layout"); Directory.CreateDirectory(layoutOutput);
@@ -423,7 +434,7 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview stall diagnostics: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
-        try { NativeInlineLayoutChecks.Run(output); }
+        try { NativeLiteralFormattingChecks.Run(output); NativeInlineLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native inline layout: " + ex.Message); }
         try { NativePreviewSchedulingChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview scheduling: " + ex.Message); }

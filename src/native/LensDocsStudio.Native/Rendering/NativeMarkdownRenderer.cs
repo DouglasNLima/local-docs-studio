@@ -350,7 +350,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     case LineBreakInline line: if (line.IsHard) target.Add(new LineBreak()); else target.Add(new Run(" ")); break;
                     case EmphasisInline emphasis:
                         var formatting = MarkdownFormatting.Emphasis(emphasis);
-                        var span = new Span();
+                        // A single literal needs one native text element, rather than a
+                        // formatting container and a second element with identical text.
+                        var literalChild = emphasis.FirstChild as LiteralInline;
+                        var span = literalChild is not null && literalChild.NextSibling is null
+                            ? (System.Windows.Documents.Inline)new Run(literalChild.Content.ToString()) : new Span();
                         if (formatting.HasFlag(MarkdownEmphasis.Bold)) span.FontWeight = FontWeights.Bold;
                         if (formatting.HasFlag(MarkdownEmphasis.Italic)) span.FontStyle = FontStyles.Italic;
                         if (formatting.HasFlag(MarkdownEmphasis.Strike)) span.TextDecorations = TextDecorations.Strikethrough;
@@ -358,7 +362,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         if (formatting.HasFlag(MarkdownEmphasis.Subscript)) { span.BaselineAlignment = BaselineAlignment.Subscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Superscript)) { span.BaselineAlignment = BaselineAlignment.Superscript; span.FontSize = 11; }
                         if (formatting.HasFlag(MarkdownEmphasis.Highlight)) span.Background = surface;
-                        target.Add(span); await AddInlines(span.Inlines, emphasis); break;
+                        target.Add(span);
+                        if (span is Span containerSpan) await AddInlines(containerSpan.Inlines, emphasis);
+                        break;
                     case TaskList task: target.Add(new Run(task.Checked ? "☑ " : "☐ ")); break;
                     case LinkInline link when link.IsImage:
                         var alt = MarkdownService.InlineText(link);

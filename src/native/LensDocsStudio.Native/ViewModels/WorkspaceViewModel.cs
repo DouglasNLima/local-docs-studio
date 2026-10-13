@@ -245,8 +245,11 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             if (!await CanCloseAsync(tab)) return;
             tab.Edited -= OnEdited;
             if (tab.FilePath is null) DocumentRemoved?.Invoke(tab.Id);
+            var wasActive = ActiveDocument == tab;
             Documents.Remove(tab);
-            if (ActiveDocument == tab) ActiveDocument = Documents.LastOrDefault();
+            // Removing the selected row can synchronously clear the two-way WPF
+            // selection binding. Retain ownership before that notification.
+            if (wasActive) ActiveDocument = Documents.LastOrDefault();
             await PersistSessionAsync();
         });
     }

@@ -53,7 +53,7 @@ internal static class NativeDetailsLatencyChecks
                 var paragraph = result.SourceElements.Values.OfType<Paragraph>().First(element =>
                     new TextRange(element.ContentStart, element.ContentEnd).Text.Contains(expected[0] + " ", StringComparison.Ordinal));
                 var formatted = test.Name == "paragraphs" ? paragraph.Inlines.OfType<Run>().First()
-                    : paragraph.Inlines.OfType<Span>().First().Inlines.OfType<Run>().First();
+                    : paragraph.Inlines.OfType<Run>().First(run => run.FontWeight == FontWeights.Bold);
                 string Text() => new TextRange(result.Document.ContentStart, result.Document.ContentEnd).Text;
                 if (Text().Contains("Hidden final marker.", StringComparison.Ordinal))
                     throw new IOException("Collapsed details exposed hidden text before expansion.");
@@ -71,9 +71,9 @@ internal static class NativeDetailsLatencyChecks
                         && formatted.FontSize == result.Document.FontSize
                         && ((SolidColorBrush)formatted.Foreground).Color == ((SolidColorBrush)result.Document.Foreground).Color
                         && (test.Name == "paragraphs" || formatted.FontWeight == FontWeights.Bold
-                            && paragraph.Inlines.OfType<Span>().Count(span => span.FontWeight == FontWeights.Bold) == 2400
+                            && paragraph.Inlines.OfType<Run>().Count(run => run.FontWeight == FontWeights.Bold) == 2400
                             && paragraph.Inlines.OfType<Hyperlink>().Count() == 2400
-                            && paragraph.Inlines.OfType<Span>().Count(span => span.FontStyle == FontStyles.Italic) == 2400);
+                            && paragraph.Inlines.OfType<Run>().Count(run => run.FontStyle == FontStyles.Italic) == 2400);
                     checks.Add(new { test.Name, Dark = dark, Expanded = expanded, SourceCharacters = source.Length,
                         MutationMilliseconds = mutation, InputMilliseconds = inputAt, CompleteText = complete,
                         FormattingPreserved = formatting, VisibleMarkers = actual.Length,
