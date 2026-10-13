@@ -430,13 +430,14 @@ internal static partial class NativeUiChecks
                 Wait(() =>
                 {
                     pasteErrorObservations++;
-                    pasteError = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio")))?.AsWindow();
+                    pasteError = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId)
+                        .And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Window)).And(cf.ByName("Lens Docs Studio")))?.AsWindow();
                     acknowledge = pasteError?.FindFirstDescendant(cf => cf.ByName("OK").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button)));
                     return acknowledge is { IsEnabled: true } && !acknowledge.IsOffscreen;
                 }, "Invalid clipboard pixels did not report an accessible acknowledgement button.");
                 File.WriteAllText(Path.Combine(output, "native-paste-error-acknowledgement.json"), JsonSerializer.Serialize(new
                 {
-                    ProcessId = pasteError!.Properties.ProcessId.Value, Title = pasteError.Name,
+                    ProcessId = pasteError!.Properties.ProcessId.Value, Title = pasteError.Name, WindowType = pasteError.ControlType.ToString(),
                     Button = acknowledge!.Name, acknowledge.IsEnabled, acknowledge.IsOffscreen, Bounds = acknowledge.BoundingRectangle,
                     Observations = pasteErrorObservations, Procedure = "Observe the error window and ready acknowledgement together within the original deadline; invoke once."
                 }, new JsonSerializerOptions { WriteIndented = true }));
