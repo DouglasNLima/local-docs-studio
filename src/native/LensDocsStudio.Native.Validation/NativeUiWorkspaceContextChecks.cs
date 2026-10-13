@@ -25,7 +25,9 @@ internal static partial class NativeUiChecks
         var image = Path.Combine(first, "assets", "pixel.png");
         const string original = "![Retained pixel](../assets/pixel.png)\n\n[Other retained document](../other/target.md)\n\n# Retained Café\n";
         const string targetText = "![Retained pixel](../assets/pixel.png)\n\n[Return to retained source](../docs/retained.md)\n";
-        const string addition = "\nDraft Ω remains portable.\n";
+        // Keyboard.Type supplies the phrase; it does not synthesise Enter from LF.
+        // The source already ends with a line break, so this remains a separate paragraph.
+        const string addition = "Draft Ω remains portable.";
         File.WriteAllText(source, original); File.WriteAllText(target, targetText); File.WriteAllBytes(image, word.Image);
         File.WriteAllText(Path.Combine(second, "index.md"), "# Other workspace\n");
         var fixture = new WorkspaceContextFixture(first, second, source, target, image, word.Image, original, original + addition, targetText, state);
