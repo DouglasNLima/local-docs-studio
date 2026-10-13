@@ -1663,7 +1663,7 @@ internal static partial class NativeUiChecks
         try { if (previous is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(previous, true); }
         catch (ExternalException) { }
     }
-    private static void Wait(Func<bool> condition, string failure, int seconds = 20)
+    internal static void Wait(Func<bool> condition, string failure, int seconds = 20)
     {
         var timer = Stopwatch.StartNew();
         Exception? lastObservationError = null;
@@ -1678,6 +1678,7 @@ internal static partial class NativeUiChecks
         throw new InvalidOperationException(failure, lastObservationError);
     }
     private static bool IsObservationTimeout(Exception error) => error is COMException && TimeoutCode(error.HResult)
+        || error is TimeoutException { InnerException: COMException timeout } && TimeoutCode(timeout.HResult)
         || error is FlaUI.Core.Exceptions.PatternNotSupportedException { InnerException: COMException inner } && TimeoutCode(inner.HResult);
     // WPF and Win32 providers report different timeout HRESULTs. Retry only the
     // observation within Wait's existing deadline, without repeating an input action.

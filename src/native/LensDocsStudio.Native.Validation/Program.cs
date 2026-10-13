@@ -100,6 +100,12 @@ internal static class Program
             try { NativeWindowDiscoveryChecks.Run(discoveryOutput); Console.WriteLine("Native window discovery checks passed."); return 0; }
             catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
         }
+        if (args.FirstOrDefault() == "--observation-wait")
+        {
+            var observationOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/observation-wait");
+            try { NativeObservationWaitChecks.Run(observationOutput); Console.WriteLine("Native observation wait checks passed."); return 0; }
+            catch (Exception ex) { Console.Error.WriteLine(ex); return 1; }
+        }
         if (args.FirstOrDefault() == "--table-editor")
         {
             var tableOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/table-editor");
@@ -397,7 +403,7 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview preparation: " + ex.Message); }
         try { NativeMarkdownChecks.Run(output, repository); }
         catch (Exception ex) { failures.Add("Native Markdown semantics: " + ex.Message); }
-        try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); NativeWindowDiscoveryChecks.Run(output); NativeTableEditorChecks.Run(output); }
+        try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); NativeWindowDiscoveryChecks.Run(output); NativeObservationWaitChecks.Run(output); NativeTableEditorChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { PreviewStallWatchChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview stall diagnostics: " + ex.Message); }

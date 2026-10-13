@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Hosted native push 38354661411 verifies the DOCX correction in the actual application but fails installer discovery on a FlaUI-wrapped COM timeout; its installer lifecycle is skipped. The validation wait now recognises only the existing timeout HRESULTs when wrapped in `TimeoutException`, using the unchanged deadline and observation-only retries. Nine deterministic checks reproduce the missing wrapper case, verify readiness recovery, preserve persistent failures and reject unrelated errors. This changes validation only; it neither bypasses wizard assertions nor claims installation success. Original evidence is retained under `artifacts/native/ci-5976b24-push-failure`.
+
 Importing Word documents now retains supported strikethrough and underline rather than silently removing these editing cues. They remain portable Markdown and render as native text decorations. Double strikethrough carries an explicit simplification note.
 
 Excessive DOCX text expansion now produces a recoverable import error before creating destination files. Generated Markdown, intermediate links and tables are bounded independently of ZIP and image sizes. Existing tabs and source files remain available; the hosted desktop check verifies that a normal import succeeds immediately after rejection. Local core and native-render validation pass; the new hosted interaction is pending.
