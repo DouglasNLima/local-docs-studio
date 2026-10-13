@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text.Json;
 
@@ -20,11 +21,18 @@ internal static class NativeObservationWaitChecks
             if (attempts != 2) throw new IOException("The transient observation was not retried exactly once.");
             checks.Add($"Known timeout {code:X8}, wrapped={wrapped}, is retried as an observation");
         }
+        var win32Attempts = 0;
+        var win32Timeout = new Win32Exception(1460);
+        NativeUiChecks.Wait(() => { if (++win32Attempts == 1) throw win32Timeout; return true; }, "The Win32 provider did not become ready.", 1);
+        if (win32Attempts != 2) throw new IOException("The native Win32 timeout was not retried exactly once.");
+        checks.Add("Win32 ERROR_TIMEOUT (1460) is retried as an observation despite its generic HRESULT");
         foreach (var error in new Exception[]
         {
             new TimeoutException("Unrelated timeout"),
             new TimeoutException("Wrong provider error", new COMException("Access denied", unchecked((int)0x80070005))),
             new InvalidOperationException("Non-timeout wrapper", new COMException("Timeout", unchecked((int)0x80131505))),
+            new Win32Exception(5),
+            new Win32Exception(258),
             new ArgumentException("Invalid observation")
         })
         {
@@ -43,10 +51,21 @@ internal static class NativeObservationWaitChecks
             || !ReferenceEquals(deadlineError.InnerException, persistent) || observed < 2 || timer.Elapsed < TimeSpan.FromSeconds(1))
             throw new IOException("Persistent timeouts lost the original deadline failure or provider exception.");
         checks.Add("Persistent timeout fails at the original deadline and retains its last provider exception");
+        timer.Stop();
+        var win32Observed = 0; Exception? win32DeadlineError = null;
+        var win32Timer = Stopwatch.StartNew();
+        try { NativeUiChecks.Wait(() => { win32Observed++; throw win32Timeout; }, "Original Win32 observation deadline", 1); }
+        catch (Exception error) { win32DeadlineError = error; }
+        if (win32DeadlineError is not InvalidOperationException { Message: "Original Win32 observation deadline" }
+            || !ReferenceEquals(win32DeadlineError.InnerException, win32Timeout) || win32Observed < 2 || win32Timer.Elapsed < TimeSpan.FromSeconds(1))
+            throw new IOException("Persistent Win32 timeouts lost the original deadline failure or provider exception.");
+        checks.Add("Persistent Win32 ERROR_TIMEOUT fails at the original deadline and retains the provider exception");
+        win32Timer.Stop();
         File.WriteAllText(Path.Combine(output, "native-observation-wait.json"), JsonSerializer.Serialize(new
         {
             Passed = true, Checks = checks, DeadlineSeconds = 1, ElapsedMilliseconds = timer.Elapsed.TotalMilliseconds,
             PersistentAttempts = observed, InputActionsExecuted = 0,
+            Win32DeadlineSeconds = 1, Win32ElapsedMilliseconds = win32Timer.Elapsed.TotalMilliseconds, Win32PersistentAttempts = win32Observed,
             Limitation = "Injected provider observations; real installer provider readiness remains a hosted GUI check."
         }, new JsonSerializerOptions { WriteIndented = true }));
     }

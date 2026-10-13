@@ -1689,9 +1689,10 @@ internal static partial class NativeUiChecks
         throw new InvalidOperationException(failure, lastObservationError);
     }
     private static bool IsObservationTimeout(Exception error) => error is COMException && TimeoutCode(error.HResult)
+        || error is System.ComponentModel.Win32Exception { NativeErrorCode: 1460 }
         || error is TimeoutException { InnerException: COMException timeout } && TimeoutCode(timeout.HResult)
         || error is FlaUI.Core.Exceptions.PatternNotSupportedException { InnerException: COMException inner } && TimeoutCode(inner.HResult);
-    // WPF and Win32 providers report different timeout HRESULTs. Retry only the
+    // Win32Exception can retain ERROR_TIMEOUT with a generic HRESULT. Retry only the
     // observation within Wait's existing deadline, without repeating an input action.
     private static bool TimeoutCode(int code) => code == unchecked((int)0x80131505) || code == unchecked((int)0x800705B4);
     private static string ReadEditorText(AutomationElement editor)
