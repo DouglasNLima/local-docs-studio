@@ -425,10 +425,22 @@ internal static partial class NativeUiChecks
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
                 Window? pasteError = null;
-                Wait(() => (pasteError = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio")))?.AsWindow()) is not null,
-                    "Invalid clipboard pixels did not report an error.");
-                var acknowledge = pasteError!.FindFirstDescendant(cf => cf.ByName("OK").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))) ?? throw new IOException("The paste error has no accessible acknowledgement button.");
-                acknowledge.AsButton().Invoke();
+                AutomationElement? acknowledge = null;
+                var pasteErrorObservations = 0;
+                Wait(() =>
+                {
+                    pasteErrorObservations++;
+                    pasteError = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Lens Docs Studio")))?.AsWindow();
+                    acknowledge = pasteError?.FindFirstDescendant(cf => cf.ByName("OK").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button)));
+                    return acknowledge is { IsEnabled: true } && !acknowledge.IsOffscreen;
+                }, "Invalid clipboard pixels did not report an accessible acknowledgement button.");
+                File.WriteAllText(Path.Combine(output, "native-paste-error-acknowledgement.json"), JsonSerializer.Serialize(new
+                {
+                    ProcessId = pasteError!.Properties.ProcessId.Value, Title = pasteError.Name,
+                    Button = acknowledge!.Name, acknowledge.IsEnabled, acknowledge.IsOffscreen, Bounds = acknowledge.BoundingRectangle,
+                    Observations = pasteErrorObservations, Procedure = "Observe the error window and ready acknowledgement together within the original deadline; invoke once."
+                }, new JsonSerializerOptions { WriteIndented = true }));
+                acknowledge!.AsButton().Invoke();
                 Wait(() => window.IsEnabled, "The paste error did not close.");
                 if (editor.Patterns.Value.Pattern.Value.Value != beforeFailedPaste || File.ReadAllText(pastedPath) != beforeFailedPaste)
                     throw new IOException("An invalid clipboard image discarded the editor selection or changed the saved document.");
