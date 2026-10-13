@@ -17,6 +17,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--check-preview-stall-watch")
+        {
+            var stallOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/stall-watch");
+            try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
@@ -392,6 +399,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native Markdown semantics: " + ex.Message); }
         try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); NativeWindowDiscoveryChecks.Run(output); NativeTableEditorChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
+        try { PreviewStallWatchChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Native preview stall diagnostics: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }
         try { NativeInlineLayoutChecks.Run(output); }

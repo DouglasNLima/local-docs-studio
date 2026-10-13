@@ -68,15 +68,22 @@ internal static class NativeLayoutChecks
             (Name: "list", Source: oversized.Source, Last: "word4000")
         };
         var nestedEvidence = new List<object>();
+        using var stallWatch = new PreviewStallWatch(output);
         foreach (var test in nestedCases)
         {
             var collectionsBefore = Enumerable.Range(0, GC.MaxGeneration + 1).Select(GC.CollectionCount).ToArray();
             var nested = new MarkdownService().Parse(test.Source); var nestedWatch = Stopwatch.StartNew();
-            using var input = new InputTrace(dispatcher, nestedWatch);
+            stallWatch.Begin(test.Name);
+            using var input = new InputTrace(dispatcher, nestedWatch, stallWatch.Pulse);
             using var construction = new PreviewConstructionTrace(nestedWatch);
-            var task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { });
-            var initialCall = nestedWatch.Elapsed.TotalMilliseconds;
-            Pump(task, dispatcher); input.Dispose(); construction.Dispose(); var inputAt = input.Milliseconds;
+            Task<PreviewResult> task; double initialCall;
+            try
+            {
+                task = renderer.RenderAsync(nested, false, diagrams, _ => { }, (_, _) => { });
+                initialCall = nestedWatch.Elapsed.TotalMilliseconds; Pump(task, dispatcher);
+            }
+            finally { stallWatch.End(); }
+            input.Dispose(); construction.Dispose(); var inputAt = input.Milliseconds;
             var result = task.GetAwaiter().GetResult(); var elapsed = nestedWatch.Elapsed.TotalMilliseconds;
             var constructionCpu = construction.ThreadCpuMilliseconds; var allocatedBytes = construction.AllocatedBytes;
             var completeText = result.ReadText().Contains(test.Last, StringComparison.Ordinal);
@@ -108,6 +115,7 @@ internal static class NativeLayoutChecks
                 ConstructionMilliseconds = elapsed, CancelInputMilliseconds = cancelledAt,
                 SourceCharacters = test.Source.Length, SourceElements = result.SourceElements.Count, Viewport = viewport });
         }
+        stallWatch.Complete();
         File.WriteAllText(Path.Combine(output, "native-nested-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = nestedEvidence }, new JsonSerializerOptions { WriteIndented = true }));
         File.WriteAllText(Path.Combine(output, "native-layout.json"), JsonSerializer.Serialize(new
         {
@@ -163,6 +171,7 @@ internal static class NativeLayoutChecks
         private readonly Stopwatch watch;
         private readonly DispatcherTimer timer;
         private readonly DispatcherOperation queued;
+        private readonly Action? pulse;
         private readonly Dictionary<DispatcherOperation, double> started = [];
         private double lastInput;
         private bool disposed;
@@ -170,9 +179,9 @@ internal static class NativeLayoutChecks
         public double MaximumGapMilliseconds { get; private set; }
         public List<object> Operations { get; } = [];
 
-        public InputTrace(Dispatcher dispatcher, Stopwatch watch)
+        public InputTrace(Dispatcher dispatcher, Stopwatch watch, Action? pulse = null)
         {
-            this.dispatcher = dispatcher; this.watch = watch;
+            this.dispatcher = dispatcher; this.watch = watch; this.pulse = pulse;
             dispatcher.Hooks.OperationStarted += OnStarted;
             dispatcher.Hooks.OperationCompleted += OnCompleted;
             queued = dispatcher.BeginInvoke(DispatcherPriority.Input, ObserveInput);
@@ -181,6 +190,7 @@ internal static class NativeLayoutChecks
         }
         private void ObserveInput()
         {
+            pulse?.Invoke();
             var elapsed = watch.Elapsed.TotalMilliseconds;
             MaximumGapMilliseconds = Math.Max(MaximumGapMilliseconds, elapsed - lastInput); lastInput = elapsed;
             if (Milliseconds < 0) Milliseconds = elapsed;
