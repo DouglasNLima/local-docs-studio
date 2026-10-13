@@ -22,12 +22,14 @@ public sealed class LogicalSelection(LogicalDocument document)
     {
         var next = Document.Step(Focus, direction); Set(extend ? Anchor : next, next);
     }
-    public SelectionPayload Copy()
+    public SelectionPayload Copy(CancellationToken cancellation = default)
     {
+        cancellation.ThrowIfCancellationRequested();
         var plain = Document.Text[Start..End]; var html = new StringBuilder("<div>");
         var rtf = new StringBuilder("{\\rtf1\\ansi\\deff0\\uc1 "); var markdown = new StringBuilder();
         foreach (var piece in Document.Pieces.Where(p => p.End > Start && p.Start < End))
         {
+            cancellation.ThrowIfCancellationRequested();
             var cursor = Math.Max(Start, piece.Start); var limit = Math.Min(End, piece.End);
             foreach (var run in piece.Runs.Where(r => r.Start + r.Text.Length > cursor && r.Start < limit))
             {
@@ -46,6 +48,11 @@ public sealed class LogicalSelection(LogicalDocument document)
             var bold = style.HasFlag(MarkdownEmphasis.Bold); var italic = style.HasFlag(MarkdownEmphasis.Italic);
             if (bold) encoded = "<strong>" + encoded + "</strong>";
             if (italic) encoded = "<em>" + encoded + "</em>";
+            if (style.HasFlag(MarkdownEmphasis.Strike)) encoded = "<s>" + encoded + "</s>";
+            if (style.HasFlag(MarkdownEmphasis.Underline)) encoded = "<u>" + encoded + "</u>";
+            if (style.HasFlag(MarkdownEmphasis.Subscript)) encoded = "<sub>" + encoded + "</sub>";
+            if (style.HasFlag(MarkdownEmphasis.Superscript)) encoded = "<sup>" + encoded + "</sup>";
+            if (style.HasFlag(MarkdownEmphasis.Highlight)) encoded = "<mark>" + encoded + "</mark>";
             if (code) encoded = "<code>" + encoded + "</code>";
             if (link is not null && (link.StartsWith('#') || Uri.TryCreate(link, UriKind.Absolute, out var uri) && uri.Scheme is "http" or "https" or "mailto"))
                 encoded = "<a href=\"" + WebUtility.HtmlEncode(link) + "\">" + encoded + "</a>";
@@ -53,6 +60,8 @@ public sealed class LogicalSelection(LogicalDocument document)
             if (bold) rtf.Append("\\b "); if (italic) rtf.Append("\\i ");
             if (style.HasFlag(MarkdownEmphasis.Strike)) rtf.Append("\\strike ");
             if (style.HasFlag(MarkdownEmphasis.Underline)) rtf.Append("\\ul ");
+            if (style.HasFlag(MarkdownEmphasis.Subscript)) rtf.Append("\\sub ");
+            if (style.HasFlag(MarkdownEmphasis.Superscript)) rtf.Append("\\super ");
             foreach (var character in value)
                 if (character == '\n') rtf.Append("\\line "); else if (character == '\t') rtf.Append("\\tab ");
                 else if (character is '\\' or '{' or '}') rtf.Append('\\').Append(character);

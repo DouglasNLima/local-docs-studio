@@ -22,6 +22,7 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
     public IReadOnlyDictionary<int, PiecePresenter> Realised => realised;
     public IReadOnlyDictionary<int, ImageSource> Media { get; private set; } = new Dictionary<int, ImageSource>();
     public double MaximumMaterialisationMilliseconds { get; internal set; }
+    public double MaximumPieceLayoutMilliseconds { get; internal set; }
     public int PeakRealised { get; private set; }
     public long Materialisations { get; internal set; }
     public bool Dark { get; private set; }
@@ -33,6 +34,7 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
     private readonly Stack<ViewAnchor> back = [], forward = [];
     private readonly DispatcherTimer dragTimer;
     private int revision;
+    private int copyRevision;
     private bool dragging;
 
     public VirtualDocumentView()
@@ -79,7 +81,7 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
         Document = document; Media = media ?? new Dictionary<int, ImageSource>();
         Selection = new(document); Selection.Changed += LogicalSelectionChanged;
         foreach (var group in document.Groups.Where(g => g.InitiallyExpanded)) expanded.Add(group.Id);
-        MaximumMaterialisationMilliseconds = 0; Materialisations = 0; PeakRealised = 0;
+        MaximumMaterialisationMilliseconds = 0; MaximumPieceLayoutMilliseconds = 0; Materialisations = 0; PeakRealised = 0;
         RefreshItems(); Scroller?.ScrollToTop();
     }
     private void RefreshItems() => ItemsSource = Document?.Pieces.Where(p => p.Details.All(expanded.Contains)).ToArray();
@@ -120,7 +122,7 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
         cancellation.ThrowIfCancellationRequested(); if (request != revision || Document != document) return false;
         UpdateLayout();
         if (!realised.TryGetValue(piece.Id, out var presenter)) return false;
-        if (select) Selection!.Set(piece.Start, piece.End);
+        if (select) { Selection!.Set(piece.Start, piece.End); UpdateLayout(); }
         var top = presenter.TranslatePoint(new Point(), this).Y;
         return top < ActualHeight && top + presenter.ActualHeight > 0;
     }
@@ -185,7 +187,7 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
         switch (e.Key)
         {
             case Key.A when control: Selection.Set(0, Document.Text.Length); break;
-            case Key.C when control: CopyToClipboard(); break;
+            case Key.C when control: _ = CopyToClipboardAsync(); break;
             case Key.Left: Selection.Move(-1, shift); RevealFocus(); break;
             case Key.Right: Selection.Move(1, shift); RevealFocus(); break;
             case Key.Home: Selection.Set(shift ? Selection.Anchor : 0, 0); RevealFocus(); break;
@@ -209,11 +211,24 @@ public sealed class VirtualDocumentView : ListBox, IDisposable
     }
     public DataObject ClipboardObject()
     {
-        var payload = Selection!.Copy(); var data = new DataObject();
+        return MakeClipboardObject(Selection!.Copy());
+    }
+    private static DataObject MakeClipboardObject(SelectionPayload payload)
+    {
+        var data = new DataObject();
         data.SetData(DataFormats.UnicodeText, payload.UnicodeText); data.SetData(DataFormats.Rtf, payload.Rtf);
         data.SetData(DataFormats.Html, payload.CfHtml); data.SetData("text/markdown", payload.Markdown); return data;
     }
-    public void CopyToClipboard() => Clipboard.SetDataObject(ClipboardObject(), true);
+    public async Task<bool> CopyToClipboardAsync()
+    {
+        var document = Document; var selection = Selection;
+        if (document is null || selection is null) return false;
+        var request = ++copyRevision; var anchor = selection.Anchor; var focus = selection.Focus;
+        var sequence = ClipboardSequence.Read(); var snapshot = new LogicalSelection(document); snapshot.Set(anchor, focus);
+        var payload = await Task.Run(() => snapshot.Copy());
+        if (request != copyRevision || Document != document || Selection?.Anchor != anchor || Selection.Focus != focus || sequence != ClipboardSequence.Read()) return false;
+        Clipboard.SetDataObject(MakeClipboardObject(payload), true); return true;
+    }
     protected override AutomationPeer OnCreateAutomationPeer() => new VirtualDocumentPeer(this);
     public static IEnumerable<T> Descendants<T>(DependencyObject root) where T : DependencyObject
     {
@@ -354,12 +369,14 @@ public sealed class PiecePresenter : FrameworkElement
     protected override Visual GetVisualChild(int index) => index == 0 && presentation is not null ? presentation : throw new ArgumentOutOfRangeException(nameof(index));
     protected override Size MeasureOverride(Size availableSize)
     {
+        var watch = Stopwatch.StartNew();
         // Creating empty zero-height items until Loaded lets the panel walk the entire document.
         // Materialise synchronously inside the actual bounded item's first measure.
         FindViewer(); if (presentation is null && Piece is not null) Rebuild();
         var width = Math.Max(120, (viewer?.ActualWidth > 0 ? viewer.ActualWidth : HarnessSupport.Width) - 64);
         if (Piece?.Kind == PieceKind.TableRow) width = Math.Max(width, Piece.TableColumns * 140);
         presentation?.Measure(new Size(width, availableSize.Height));
+        if (viewer is not null) viewer.MaximumPieceLayoutMilliseconds = Math.Max(viewer.MaximumPieceLayoutMilliseconds, watch.Elapsed.TotalMilliseconds);
         return new Size(width, presentation?.DesiredSize.Height ?? 24);
     }
     protected override Size ArrangeOverride(Size finalSize) { presentation?.Arrange(new Rect(finalSize)); return finalSize; }

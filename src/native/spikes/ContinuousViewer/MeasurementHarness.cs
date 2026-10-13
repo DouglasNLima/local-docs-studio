@@ -81,6 +81,9 @@ internal static class MeasurementHarness
         result["scrollInputMilliseconds"] = scrollDelays;
         result["peakRealised"] = viewer.PeakRealised; result["totalMaterialisations"] = viewer.Materialisations;
         result["maximumMaterialisationMilliseconds"] = viewer.MaximumMaterialisationMilliseconds;
+        result["maximumPieceLayoutMilliseconds"] = viewer.MaximumPieceLayoutMilliseconds;
+        result["actualNativeItemContainers"] = VirtualDocumentView.Descendants<System.Windows.Controls.ListBoxItem>(viewer).Count();
+        result["actualVisualTreeNodes"] = VirtualDocumentView.Descendants<System.Windows.DependencyObject>(viewer).Count();
         input.Dispose(); result["worstDispatcherInputMilliseconds"] = input.Worst;
         result["inputAcceptance"] = (double)result["firstLayoutInputMilliseconds"]! < 250 && input.Worst < 250 && scrollDelays.Max() < 250 ? "PASS" : "FAIL";
         result["allocatedBytes"] = GC.GetTotalAllocatedBytes() - allocated;

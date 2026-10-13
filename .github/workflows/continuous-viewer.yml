@@ -25,6 +25,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet restore src/native/spikes/ContinuousViewer.Tests --locked-mode
       - name: Build the experimental harness only
+        id: build
         run: dotnet build src/native/spikes/ContinuousViewer -c Release --no-restore
       - name: Validate the complete logical model
         run: dotnet test src/native/spikes/ContinuousViewer.Tests -c Release --no-restore --logger 'trx;LogFileName=continuous-model.trx' --results-directory artifacts/continuous/model
@@ -34,8 +35,10 @@ jobs:
         timeout-minutes: 4
         run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --desktop artifacts/continuous/desktop
       - name: Record comparative cold and warm 250 ms observations
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: pwsh -NoProfile -File scripts/native/Measure-ContinuousViewer.ps1 -OutputDirectory artifacts/continuous/comparison
       - name: Check unchanged static web integrity
+        if: ${{ !cancelled() }}
         run: node tests/static/check-assets.mjs
       - name: Upload all observations including failures
         if: always()

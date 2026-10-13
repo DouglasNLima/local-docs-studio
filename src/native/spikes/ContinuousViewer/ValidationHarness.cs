@@ -50,6 +50,7 @@ internal static class ValidationHarness
             var target = fixture.Source.LastIndexOf(fixture.Last, StringComparison.Ordinal);
             var navigation = viewer.NavigateAsync(target, true); HarnessSupport.Pump(navigation); HarnessSupport.Layout(viewer);
             Check(fixture.Name + ": distant target is actually visible and selected", navigation.Result && viewer.Selection!.Copy().UnicodeText.Contains(fixture.Last, StringComparison.Ordinal), new { actual = viewer.Realised.Count, viewer.PeakRealised });
+            Check(fixture.Name + ": completed distant navigation exposes actual selection geometry", peer.GetSelection().Single().GetBoundingRectangles().Length > 0);
             if (model.Pieces.Length > 200) Check(fixture.Name + ": old visuals are recycled and target mappings are current", viewer.Realised.Count < 100 && !viewer.Realised.Keys.Intersect(initial).Any()
                 && viewer.Realised.Values.All(p => p.TextControl!.GetValue(System.Windows.Automation.AutomationProperties.AutomationIdProperty).ToString() == "LogicalPiece" + p.Piece!.Id));
             viewer.Selection!.Set(Math.Min(3, model.Text.Length), model.Text.Length - 1);

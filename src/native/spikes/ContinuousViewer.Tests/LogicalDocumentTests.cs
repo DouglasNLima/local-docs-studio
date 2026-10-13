@@ -66,4 +66,17 @@ public sealed class LogicalDocumentTests
         Assert.Throws<OperationCanceledException>(() => LogicalDocument.Build(parsed, new CancellationToken(true)));
         Assert.Equal("# Cancelled\n\nRetained source.", parsed.Source);
     }
+    [Fact]
+    public void ClipboardRetainsSupportedDecorationsAndCancellation()
+    {
+        var model = LogicalDocument.Build(new MarkdownService().Parse("**Bold** *italic* ~~strike~~ ++underlined++ H~2~ x^2^ ==marked=="));
+        var selection = new LogicalSelection(model); selection.Set(0, model.Text.Length); var copy = selection.Copy();
+        var html = HtmlClipboardFormat.Decode(copy.CfHtml);
+        Assert.Contains("<s>strike</s>", html, StringComparison.Ordinal);
+        Assert.Contains("<u>underlined</u>", html, StringComparison.Ordinal);
+        Assert.Contains("<sub>2</sub>", html, StringComparison.Ordinal);
+        Assert.Contains("<sup>2</sup>", html, StringComparison.Ordinal);
+        Assert.Contains("<mark>marked</mark>", html, StringComparison.Ordinal);
+        Assert.Throws<OperationCanceledException>(() => selection.Copy(new CancellationToken(true)));
+    }
 }
