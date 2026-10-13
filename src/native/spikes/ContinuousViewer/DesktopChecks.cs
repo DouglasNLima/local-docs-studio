@@ -65,11 +65,14 @@ internal static class DesktopChecks
                     Keyboard.Type(VirtualKeyShort.NEXT);
                     Check(fixtureName + ": physical scrolling preserves selection", text.GetSelection().Single().GetText(-1) == expected.Text);
                     (window.FindFirstDescendant(c => c.ByAutomationId("NavigateDistant")) ?? throw new IOException("Navigation control missing.")).Patterns.Invoke.Pattern.Invoke();
-                    Wait(() => text.GetSelection().Single().GetText(-1).Contains(last, StringComparison.Ordinal));
+                    var target = expected.AtSource(expected.Parsed.Source.LastIndexOf(last, StringComparison.Ordinal));
+                    var targetSelection = expected.Text[target.Start..target.End];
+                    // The previous whole-document selection also contains last; it is not navigation completion.
+                    Wait(() => text.GetSelection().Single().GetText(-1) == targetSelection && text.GetSelection().Single().GetBoundingRectangles().Length > 0);
                     Check(fixtureName + ": actual distant target has on-screen automation bounds", text.GetSelection().Single().GetBoundingRectangles().Length > 0);
                     window.CaptureToFile(Path.Combine(output, fixtureName + "-distant.png"));
                     // A physical drag spans two visible native pieces. Selection is read through the document TextPattern.
-                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
+                    viewer.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
                     var bounds = viewer.BoundingRectangle;
                     Mouse.MoveTo((int)bounds.Left + 50, (int)bounds.Top + 20); Mouse.Down();
                     Mouse.MoveTo((int)bounds.Left + 130, (int)bounds.Top + 110); Mouse.Up();

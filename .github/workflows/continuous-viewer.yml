@@ -34,6 +34,9 @@ jobs:
       - name: Validate real native keyboard mouse clipboard and UI Automation
         timeout-minutes: 4
         run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --desktop artifacts/continuous/desktop
+      - name: Probe oversized blocks scroll anchors and resource release
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --stress artifacts/continuous/stress
       - name: Record comparative cold and warm 250 ms observations
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: pwsh -NoProfile -File scripts/native/Measure-ContinuousViewer.ps1 -OutputDirectory artifacts/continuous/comparison

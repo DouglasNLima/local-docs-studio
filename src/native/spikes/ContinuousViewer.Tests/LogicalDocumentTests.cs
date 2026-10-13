@@ -79,4 +79,17 @@ public sealed class LogicalDocumentTests
         Assert.Contains("<mark>marked</mark>", html, StringComparison.Ordinal);
         Assert.Throws<OperationCanceledException>(() => selection.Copy(new CancellationToken(true)));
     }
+    [Theory]
+    [InlineData("cell")]
+    [InlineData("code")]
+    [InlineData("quote")]
+    [InlineData("list")]
+    public void DistantOffsetsInsideOversizedSemanticBlocksResolveTheFinalPiece(string kind)
+    {
+        var text = new string('a', 350000) + "Final retained target.";
+        var source = kind switch { "cell" => "| Content |\n|---|\n| " + text + " |", "code" => "```text\n" + text + "\n```", "quote" => "> " + text, _ => "- " + text };
+        var model = LogicalDocument.Build(new MarkdownService().Parse(source));
+        Assert.Equal(model.Pieces[^1], model.AtSource(source.LastIndexOf("Final retained target.", StringComparison.Ordinal)));
+        Assert.Contains("Final retained target.", string.Concat(model.Pieces[^1].Runs.Select(r => r.Text)), StringComparison.Ordinal);
+    }
 }

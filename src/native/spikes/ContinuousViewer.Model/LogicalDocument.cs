@@ -160,7 +160,19 @@ public sealed class LogicalDocument
         void Emit(IEnumerable<TextRun> input, Block block, PieceKind kind, int level, int[] ancestors, string? resource = null, int group = -1, CellSlice[]? cells = null)
         {
             var local = new StringBuilder(); var full = new List<TextRun>();
-            foreach (var run in input) { full.Add(run with { Start = local.Length }); local.Append(run.Text); }
+            foreach (var original in input)
+            {
+                var run = original;
+                // Markdig table literals may include cell-edge whitespace in Span while Content is trimmed.
+                // Verify an exact occurrence inside the parser-owned semantic span before claiming character precision.
+                if (run.Text.Length > 0 && run.SourceStart >= 0 && run.SourceEnd >= run.SourceStart && run.SourceEnd < parsed.Source.Length)
+                {
+                    var semanticSource = parsed.Source.AsSpan(run.SourceStart, run.SourceEnd - run.SourceStart + 1);
+                    var match = semanticSource.IndexOf(run.Text.AsSpan(), StringComparison.Ordinal);
+                    if (match >= 0) run = run with { SourceStart = run.SourceStart + match, SourceEnd = run.SourceStart + match + run.Text.Length - 1 };
+                }
+                full.Add(run with { Start = local.Length }); local.Append(run.Text);
+            }
             local.Append('\n');
             var value = local.ToString(); var boundaries = StringInfo.ParseCombiningCharacters(value);
             var position = 0;
