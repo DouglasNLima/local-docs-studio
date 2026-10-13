@@ -15,6 +15,10 @@ internal static partial class NativeUiChecks
         int process, string output, string sourcePath)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(sourcePath);
+        var originalTables = new MarkdownService().Parse(original).Syntax.Descendants<Markdig.Extensions.Tables.Table>().ToArray();
+        if (originalTables.Length != 1 || !original.EndsWith("| Clipboard | Ready |\n", StringComparison.Ordinal))
+            throw new IOException("The inline insertion fixture no longer ends with its reference table.");
+        var labelPrefix = original + "\n";
         End(); var cancelled = Badge("InsertReviewBadge");
         Find(cancelled, "WorkspacePathInput").AsTextBox().Text = "Cancelled label";
         Keyboard.Type(VirtualKeyShort.ESCAPE);
@@ -27,7 +31,7 @@ internal static partial class NativeUiChecks
         if (ReadEditorText(editor) != original) throw new IOException("Invalid label input changed source.");
         input.Text = "Ready & reviewed"; Find(badge, "ConfirmWorkspacePath").AsButton().Invoke();
         const string firstMarkup = "<span data-status-badge data-status-kind=\"review\" aria-label=\"Status: Ready &amp; reviewed\">Ready &amp; reviewed</span>";
-        Wait(() => ReadEditorText(editor) == original + firstMarkup, "The badge menu changed literal label text or surrounding source.");
+        Wait(() => ReadEditorText(editor) == labelPrefix + firstMarkup, "The badge menu changed literal label text or surrounding source.");
         CheckPreviewText("Ready & reviewed");
         var first = ReadEditorText(editor);
         // The command keeps the inserted span selected, allowing a later status choice to edit it.
@@ -36,7 +40,11 @@ internal static partial class NativeUiChecks
         if (changedInput.Text != "Ready & reviewed") throw new IOException("The badge editor did not restore its existing label.");
         changedInput.Text = "Reviewed"; Find(changed, "ConfirmWorkspacePath").AsButton().Invoke();
         const string secondMarkup = "<span data-status-badge data-status-kind=\"beta\" aria-label=\"Status: Reviewed\">Reviewed</span>";
-        Wait(() => ReadEditorText(editor) == original + secondMarkup, "Changing badge status nested or duplicated its source span.");
+        Wait(() => ReadEditorText(editor) == labelPrefix + secondMarkup, "Changing badge status nested or duplicated its source span.");
+        var retainedTable = new MarkdownService().Parse(ReadEditorText(editor)).Syntax.Descendants<Markdig.Extensions.Tables.Table>().Single();
+        if (!retainedTable.Descendants<ParagraphBlock>().Select(p => MarkdownService.InlineText(p.Inline))
+            .SequenceEqual(originalTables[0].Descendants<ParagraphBlock>().Select(p => MarkdownService.InlineText(p.Inline))))
+            throw new IOException("Badge insertion changed the preceding table's cells.");
         CheckPreviewText("Reviewed"); owner.CaptureToFile(Path.Combine(output, "native-inline-labels.png"));
         Undo(first); Undo(original); Redo(first); Undo(original);
 
@@ -45,7 +53,7 @@ internal static partial class NativeUiChecks
         if (keys.Name != "Shortcut keys") throw new IOException("Shortcut keys lack an accessible label.");
         keys.Text = "Ctrl, Shift + K"; Find(shortcut, "ConfirmWorkspacePath").AsButton().Invoke();
         const string shortcutMarkup = "<span data-shortcut aria-label=\"Keyboard shortcut Ctrl Shift K\"><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd></span>";
-        Wait(() => ReadEditorText(editor) == original + shortcutMarkup, "The keyboard shortcut menu changed keys or surrounding source.");
+        Wait(() => ReadEditorText(editor) == labelPrefix + shortcutMarkup, "The keyboard shortcut menu changed keys or surrounding source.");
         CheckPreviewText("Ctrl + Shift + K"); var shortcutSource = ReadEditorText(editor);
         Undo(original); Redo(shortcutSource); Undo(original);
 
@@ -59,7 +67,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(output, "native-ui-inline-labels.json"), JsonSerializer.Serialize(new
         { Passed = true, CancelPreservedSource = true, InvalidInputRetained = true, StatusKindAndLiteralLabel = true,
             ExistingBadgeReopened = true, ShortcutKeys = true, NativePreviewText = true, HorizontalRule = true,
-            CompleteUndoRedo = true, SavedSourceUnchanged = true }, new JsonSerializerOptions { WriteIndented = true }));
+            CompleteUndoRedo = true, SavedSourceUnchanged = true, PrecedingTableRetained = true }, new JsonSerializerOptions { WriteIndented = true }));
 
         void End() { FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); }
         Window Badge(string action)
@@ -73,7 +81,7 @@ internal static partial class NativeUiChecks
             Window? prompt = null; Wait(() => (prompt = Prompt(title)) is not null, "The inline label dialogue did not open: " + title); return prompt!;
         }
         void Undo(string expected)
-        { FocusWindow(owner); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(editor) == expected, "One Undo did not restore complete label source."); }
+        { FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(editor) == expected, "One Undo did not restore complete label source."); }
         void Redo(string expected)
         { Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); Wait(() => ReadEditorText(editor) == expected, "One Redo did not restore complete label source."); }
         void CheckPreviewText(string expected)

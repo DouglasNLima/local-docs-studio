@@ -44,6 +44,11 @@ public static class InlineLabelEditService
         if (start < 0 || length < 0 || (long)start + length > document.Source.Length) throw new ArgumentOutOfRangeException(nameof(start));
         var existing = Find(document, start, length, kind);
         start = existing?.Span.Start ?? start; length = existing?.Span.Length ?? length;
+        // A non-table line immediately after a pipe table can invalidate that paragraph's table.
+        // At this boundary start a separate paragraph, keeping in-cell edits inline.
+        if (existing is null && length == 0 && document.Syntax.Descendants<Markdig.Extensions.Tables.Table>().Any(table =>
+            start - table.Span.End is 2 or 3 && document.Source[(table.Span.End + 1)..start] is "\n" or "\r\n"))
+            return MarkdownEditService.PlanBlock(document.Source, start, length, snippet, snippet);
         return new(start, length, snippet, start, snippet.Length);
     }
 

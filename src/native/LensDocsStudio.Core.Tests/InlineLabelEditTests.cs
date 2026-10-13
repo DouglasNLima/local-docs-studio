@@ -124,6 +124,43 @@ public sealed class InlineLabelEditTests
     }
 
     [Theory]
+    [InlineData("\n", false)]
+    [InlineData("\r\n", false)]
+    [InlineData("\n", true)]
+    [InlineData("\r\n", true)]
+    public void Inserting_a_label_after_a_table_retains_its_rows_and_cells(string newline, bool shortcut)
+    {
+        var source = string.Join(newline, "# Document", "", "| Area | Status |", "|---|---|", "| Clipboard | Ready |", "");
+        var original = new MarkdownService().Parse(source);
+        var table = Assert.Single(original.Syntax.Descendants<Markdig.Extensions.Tables.Table>());
+        var edit = shortcut ? InlineLabelEditService.Shortcut(original, source.Length, 0, "Ctrl + K")
+            : InlineLabelEditService.Badge(original, source.Length, 0, "review", "Reviewed");
+        var result = Apply(source, edit); var document = new MarkdownService().Parse(result);
+        var after = Assert.Single(document.Syntax.Descendants<Markdig.Extensions.Tables.Table>());
+        Assert.Equal(table.Count, after.Count);
+        Assert.Equal(table.Descendants<ParagraphBlock>().Select(p => MarkdownService.InlineText(p.Inline)),
+            after.Descendants<ParagraphBlock>().Select(p => MarkdownService.InlineText(p.Inline)));
+        var label = Assert.Single(document.Syntax.Descendants<DocumentSemanticInline>());
+        Assert.Equal(shortcut ? "Ctrl + K" : "Reviewed", label.Text);
+        Assert.StartsWith(source + newline, result);
+        Assert.Equal(result[label.Span.Start..(label.Span.End + 1)], result.Substring(edit.SelectionStart, edit.SelectionLength));
+    }
+
+    [Fact]
+    public void Inserting_a_badge_inside_a_table_cell_keeps_the_edit_inline()
+    {
+        const string source = "| Status | Owner |\n|---|---|\n| Ready | Café |\n";
+        var start = source.IndexOf("Ready", StringComparison.Ordinal);
+        var edit = InlineLabelEditService.Badge(new MarkdownService().Parse(source), start, 5, "review", "Ready | reviewed");
+        var result = Apply(source, edit);
+        Assert.Equal(source.Remove(start, 5).Insert(start, edit.Replacement), result);
+        Assert.DoesNotContain('\n', edit.Replacement);
+        var table = Assert.Single(new MarkdownService().Parse(result).Syntax.Descendants<Markdig.Extensions.Tables.Table>());
+        Assert.Equal(2, table.Count);
+        Assert.Equal("Ready | reviewed", Assert.Single(table.Descendants<DocumentSemanticInline>()).Text);
+    }
+
+    [Theory]
     [InlineData("\n")]
     [InlineData("\r\n")]
     public void Horizontal_rules_create_a_real_block_and_retain_the_documents_line_endings(string newline)

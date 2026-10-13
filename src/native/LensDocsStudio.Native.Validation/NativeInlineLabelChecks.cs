@@ -11,29 +11,35 @@ internal static class NativeInlineLabelChecks
 {
     public static void Run(string output)
     {
-        const string source = "Before selected after\r\n";
+        const string inlineSource = "Before selected after\r\n";
         var checks = new List<string>();
-        foreach (var kind in new[] { "draft", "ready", "blocked", "deprecated", "beta", "review", "shortcut", "rule" })
+        foreach (var kind in new[] { "draft", "ready", "blocked", "deprecated", "beta", "review", "shortcut", "rule", "table-badge", "table-shortcut" })
         {
-            var editor = new TextEditor { Text = source }; editor.Document.UndoStack.ClearAll(); editor.Select(7, 8);
+            var afterTable = kind.StartsWith("table-", StringComparison.Ordinal);
+            var source = afterTable ? "| Area | Status |\r\n|---|---|\r\n| Clipboard | Ready |\r\n" : inlineSource;
+            var start = afterTable ? source.Length : 7; var length = afterTable ? 0 : 8;
+            var editor = new TextEditor { Text = source }; editor.Document.UndoStack.ClearAll(); editor.Select(start, length);
             var document = new MarkdownService().Parse(source);
             var edit = kind switch
             {
-                "shortcut" => InlineLabelEditService.Shortcut(document, 7, 8, "Ctrl + Shift + É"),
-                "rule" => new MarkdownEditService().Plan(source, 7, 8, "rule"),
-                _ => InlineLabelEditService.Badge(document, 7, 8, kind, "Café & *literal* Ω")
+                "shortcut" or "table-shortcut" => InlineLabelEditService.Shortcut(document, start, length, "Ctrl + Shift + É"),
+                "rule" => new MarkdownEditService().Plan(source, start, length, "rule"),
+                _ => InlineLabelEditService.Badge(document, start, length, afterTable ? "ready" : kind, "Café & *literal* Ω")
             };
             EditorFormattingService.Apply(editor, edit);
             var formatted = editor.Text;
-            if (formatted != source.Remove(7, 8).Insert(7, edit.Replacement)
+            if (formatted != source.Remove(start, length).Insert(start, edit.Replacement)
                 || editor.SelectionStart != edit.SelectionStart || editor.SelectionLength != edit.SelectionLength)
                 throw new IOException("Native label insertion changed surrounding source or selection: " + kind);
             if (kind != "rule")
             {
                 var semantic = new MarkdownService().Parse(formatted).Syntax.Descendants<DocumentSemanticInline>().Single();
-                if (semantic.Text != (kind == "shortcut" ? "Ctrl + Shift + É" : "Café & *literal* Ω"))
+                if (semantic.Text != (kind is "shortcut" or "table-shortcut" ? "Ctrl + Shift + É" : "Café & *literal* Ω"))
                     throw new IOException("Native label text was interpreted as markup: " + kind);
             }
+            if (afterTable && (new MarkdownService().Parse(formatted).Syntax.Descendants<Markdig.Extensions.Tables.Table>().Single().Count != 2
+                || !formatted.StartsWith(source + "\r\n", StringComparison.Ordinal)))
+                throw new IOException("Native label insertion changed its preceding table: " + kind);
             editor.Document.UndoStack.Undo();
             if (editor.Text != source) throw new IOException("One Undo did not restore native label source: " + kind);
             editor.Document.UndoStack.Redo();

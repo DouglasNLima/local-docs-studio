@@ -1,5 +1,13 @@
 # Native validation report
 
+## Inline insertion follow-up
+
+Both first 701d9e2 native runs (PR 38335507067 and push 38335504052) fail in the new workflow's editor SetFocus call before the first Undo. The prior Cancel, invalid-input, initial badge, reopened label and status change assertions complete. Original logs, states and screenshots remain in ci-701d9e2-pr-failure and ci-701d9e2-push-failure. The inspected PR PNG shows the selected Beta source and rendered Reviewed label. The helper now uses the same actual editor click used by existing keyboard workflows, without retrying actions or changing complete Undo/Redo assertions. Both web runs 38335507073/38335504112 succeed.
+
+That PNG also exposes a product defect: a badge immediately after the final table row causes the preceding table paragraph to render as text. Two LF/CRLF regressions fail before correction (inline-labels/inline-label-table-before.trx). New badges/shortcuts at that boundary now insert a separate paragraph. Five focused cases retain rows/cells, exact selection and line endings, including an in-cell control with a literal pipe. All 31 inline tests and the full 968-test core suite pass after correction (inline-label-table-after.trx and inline-label-table-all.trx).
+
+The full native harness passes 40 corpus cases with zero failures in inline-label-table-validation. Its ten AvalonEdit cases include actual table-boundary insertion with whole Undo/Redo and read-only retention. The Release solution builds without warnings/errors. Fresh hosted validation is required for the complete 65-workflow suite, including the earlier workspace-provider correction. Preview.259 remains the latest verified installer and predates these insertion changes.
+
 ## Verified preview.259 and pending inline insertion
 
 Native push run [38332285897](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38332285897) passes at clean source 51688aa7433dc4cdf29e837bf9df6456622224fe. Independently downloaded evidence in artifacts/native/ci-51688aa-push verifies 936 core tests, 40 corpus cases, four 64-check desktop contexts, installed runtime origins, complete installer lifecycle, 20 preserved state files, two restored sessions, five wizard outcomes and four files-in-use assertions. Disposable trust is removed and production trust unchanged. Both web runs 38332287455/38332285828 pass 262 cases.
