@@ -37,6 +37,16 @@ jobs:
       - name: Probe oversized blocks scroll anchors and resource release
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --stress artifacts/continuous/stress
+      - name: Verify complete-source DOCX PDF and HTML exports
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --exports artifacts/continuous/exports
+      - name: Observe the indivisible Unicode layout risk with its actual process exit
+        if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+        run: |
+          dotnet src/native/spikes/ContinuousViewer/bin/Release/net10.0-windows/ContinuousViewer.dll --cluster artifacts/continuous/cluster
+          $clusterExit = $LASTEXITCODE
+          @{ processExitCode = $clusterExit; scope = 'Actual native observation; failure is retained and prevents acceptance.' } | ConvertTo-Json | Set-Content -LiteralPath artifacts/continuous/cluster/process-exit.json
+          exit $clusterExit
       - name: Record comparative cold and warm 250 ms observations
         if: ${{ !cancelled() && steps.build.outcome == 'success' }}
         run: pwsh -NoProfile -File scripts/native/Measure-ContinuousViewer.ps1 -OutputDirectory artifacts/continuous/comparison

@@ -35,6 +35,7 @@ internal static class DesktopChecks
             {
                 var executable = Path.Combine(AppContext.BaseDirectory, "ContinuousViewer.exe");
                 using var app = FlaUI.Core.Application.Launch(executable, $"--interactive {fixtureName} \"{output}\"");
+                Func<object>? diagnostic = null;
                 try
                 {
                     var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The isolated spike window did not appear.");
@@ -42,6 +43,8 @@ internal static class DesktopChecks
                     Wait(() => status.Name == "Complete logical document; viewport virtualised");
                     var viewer = window.FindFirstDescendant(c => c.ByAutomationId("ContinuousDocument")) ?? throw new IOException("Document control missing.");
                     var text = viewer.Patterns.Text.Pattern;
+                    diagnostic = () => new { fixtureName, documentHasKeyboardFocus = viewer.Properties.HasKeyboardFocus.Value,
+                        observedSelection = text.GetSelection().Single().GetText(1000), visibleRanges = text.GetVisibleRanges().Select(r => r.GetText(1000)).ToArray() };
                     var expected = LogicalDocument.Build(new LensDocsStudio.Core.Parsing.MarkdownService().Parse(FixtureCatalogue.All.Single(f => f.Name == fixtureName).Source));
                     Check(fixtureName + ": real cross-process TextPattern reads offscreen logical content", text.DocumentRange.GetText(-1) == expected.Text);
                     var last = FixtureCatalogue.All.Single(f => f.Name == fixtureName).Last;
@@ -49,9 +52,12 @@ internal static class DesktopChecks
                     Check(fixtureName + ": cross-process search discovers never-materialised content", range is not null && range.GetText(-1) == last);
                     window.Focus(); viewer.Click();
                     Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
+                    Wait(() => text.GetSelection().Single().GetText(-1).Length == 0);
                     Keyboard.TypeSimultaneously(VirtualKeyShort.SHIFT, VirtualKeyShort.DOWN);
-                    Wait(() => text.GetSelection().Single().GetText(-1).Length > 0);
-                    Check(fixtureName + ": actual keyboard extends selection across native blocks", text.GetSelection().Single().GetText(-1) == expected.Text[..expected.Pieces[1].Start]);
+                    var expectedPrefix = expected.Text[..expected.Pieces[1].Start];
+                    Wait(() => text.GetSelection().Single().GetText(-1) == expectedPrefix);
+                    Check(fixtureName + ": actual keyboard extends selection across native blocks", text.GetSelection().Single().GetText(-1) == expectedPrefix,
+                        new { expectedPrefix, observed = text.GetSelection().Single().GetText(-1) });
                     Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.END);
                     Wait(() => text.GetSelection().Single().GetText(-1) == expected.Text);
                     Check(fixtureName + ": actual keyboard selects across the virtualised document", true);
@@ -79,6 +85,12 @@ internal static class DesktopChecks
                     Wait(() => text.GetSelection().Single().GetText(-1).Length > 0);
                     Check(fixtureName + ": physical mouse drag selects across controls", text.GetSelection().Single().GetText(-1).Contains('\n'));
                     window.CaptureToFile(Path.Combine(output, fixtureName + "-drag.png"));
+                }
+                catch (Exception error)
+                {
+                    File.WriteAllText(Path.Combine(output, fixtureName + "-failure.json"), JsonSerializer.Serialize(new
+                    { error = error.ToString(), observation = diagnostic?.Invoke() }, new JsonSerializerOptions { WriteIndented = true }));
+                    throw;
                 }
                 finally { if (!app.HasExited) app.Close(); }
             }

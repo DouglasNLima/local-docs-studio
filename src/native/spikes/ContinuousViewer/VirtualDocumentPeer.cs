@@ -106,10 +106,12 @@ public sealed class LogicalTextRange(VirtualDocumentPeer peer, LogicalDocument? 
         Current(); var rectangles = new List<double>();
         foreach (var presenter in peer.View.Realised.Values.Where(p => p.Piece is not null && p.Piece.Start < last && p.Piece.End > first).OrderBy(p => p.Piece!.Start))
         {
-            var rect = presenter.RangeRectangle(Math.Max(first, presenter.Piece!.Start), Math.Min(last, presenter.Piece.End));
-            rect.Intersect(new Rect(0, 0, peer.View.ActualWidth, peer.View.ActualHeight));
-            if (rect.IsEmpty) continue; var screen = peer.View.PointToScreen(rect.TopLeft);
-            rectangles.AddRange([screen.X, screen.Y, rect.Width, rect.Height]);
+            foreach (var original in presenter.RangeRectangles(Math.Max(first, presenter.Piece!.Start), Math.Min(last, presenter.Piece.End)))
+            {
+                var rect = original; rect.Intersect(new Rect(0, 0, peer.View.ActualWidth, peer.View.ActualHeight));
+                if (rect.IsEmpty) continue; var screen = peer.View.PointToScreen(rect.TopLeft);
+                rectangles.AddRange([screen.X, screen.Y, rect.Width, rect.Height]);
+            }
         }
         return [.. rectangles];
     }

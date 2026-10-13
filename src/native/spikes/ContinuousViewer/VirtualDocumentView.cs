@@ -393,18 +393,20 @@ public sealed class PiecePresenter : FrameworkElement
         }
         return Piece.End;
     }
-    public Rect RangeRectangle(int start, int end)
+    public IEnumerable<Rect> RangeRectangles(int start, int end)
     {
-        if (Piece is null || TextControl is null) return Rect.Empty;
-        var result = Rect.Empty;
+        if (Piece is null || TextControl is null) return [];
+        var lines = new Dictionary<(RichTextBox Owner, double Top), Rect>();
         foreach (var (offset, run, owner) in runs.Where(r => r.Offset < end && r.Offset + r.Run.Text.Length > start))
         {
-            var first = run.ContentStart.GetPositionAtOffset(Math.Max(0, start - offset))!.GetCharacterRect(LogicalDirection.Forward);
-            var last = run.ContentStart.GetPositionAtOffset(Math.Min(run.Text.Length - 1, end - offset - 1))!.GetCharacterRect(LogicalDirection.Forward);
-            if (first.IsEmpty || last.IsEmpty) continue; first.Union(last);
-            result.Union(new Rect(owner.TranslatePoint(first.TopLeft, viewer!), first.Size));
+            for (var character = Math.Max(0, start - offset); character < Math.Min(run.Text.Length, end - offset); character++)
+            {
+                var rect = run.ContentStart.GetPositionAtOffset(character)!.GetCharacterRect(LogicalDirection.Forward);
+                if (rect.IsEmpty) continue; var key = (owner, rect.Top);
+                var line = lines.GetValueOrDefault(key, Rect.Empty); line.Union(rect); lines[key] = line;
+            }
         }
-        return result;
+        return lines.Select(pair => new Rect(pair.Key.Owner.TranslatePoint(pair.Value.TopLeft, viewer!), pair.Value.Size)).OrderBy(rect => rect.Top).ThenBy(rect => rect.Left).ToArray();
     }
     private TextPointer? Pointer(int offset)
     {

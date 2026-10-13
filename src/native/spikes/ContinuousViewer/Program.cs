@@ -16,6 +16,8 @@ internal static class Program
             if (args.FirstOrDefault() == "--validate") { ValidationHarness.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/continuous/validation")); return 0; }
             if (args.FirstOrDefault() == "--desktop") { RequireHostedWindows(); DesktopChecks.Run(Path.GetFullPath(args[1])); return 0; }
             if (args.FirstOrDefault() == "--stress") { StressChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            if (args.FirstOrDefault() == "--exports") { ExportChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            if (args.FirstOrDefault() == "--cluster") { ClusterChecks.Run(Path.GetFullPath(args[1])); return 0; }
             if (args.FirstOrDefault() == "--measure")
             {
                 MeasurementHarness.Run(args[1], args[2], Path.GetFullPath(args[3])); return 0;
