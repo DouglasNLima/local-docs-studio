@@ -61,6 +61,21 @@ public sealed class SafeInlineSemanticsTests
         Assert.Single(parsed.Syntax.Descendants<CodeInline>()); Assert.Single(parsed.Syntax.Descendants<FencedCodeBlock>());
     }
 
+    [Fact] public void Entity_heavy_labels_keep_decoded_text_key_and_source_limits()
+    {
+        var oversizedLabel = "<span data-status-badge>" + string.Concat(Enumerable.Repeat("&amp;", 513)) + "</span>";
+        var oversizedKey = "<kbd>" + string.Concat(Enumerable.Repeat("&#42;", 65)) + "</kbd>";
+        var oversizedSource = "<span data-status-badge title=\"" + new string('x', 16384) + "\">Ready</span>";
+        foreach (var source in new[] { oversizedLabel, oversizedKey, oversizedSource })
+        {
+            var parsed = new MarkdownService().Parse(source);
+            Assert.Empty(parsed.Syntax.Descendants<DocumentSemanticInline>());
+            Assert.Equal(source, parsed.Source);
+        }
+        var tooManyKeys = "<span data-shortcut>" + string.Concat(Enumerable.Repeat("<kbd>K</kbd>", 9)) + "</span>";
+        Assert.DoesNotContain(new MarkdownService().Parse(tooManyKeys).Syntax.Descendants<DocumentSemanticInline>(), item => item.Kind == DocumentInlineKind.Shortcut);
+    }
+
     [Fact] public void Html_and_Word_exports_retain_passive_labels_shortcuts_and_decoded_entities()
     {
         var content = Content("# Research &amp; review\n\n" + Snippets + "\n\nA &lt; B; &#169; documentation.");

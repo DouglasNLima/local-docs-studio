@@ -17,6 +17,8 @@ public sealed class DocumentSemanticInline(DocumentInlineKind kind, string text,
 /// <summary>Maps recognised passive snippets to typed text; HTML attributes never reach native controls.</summary>
 public static partial class SafeInlineSemantics
 {
+    // A 512-character label may contain one entity node per character, plus key tags and separators.
+    private const int MaximumInlineNodes = 1024;
     public static void Apply(MarkdownDocument document, string source)
     {
         foreach (var block in document.Descendants<LeafBlock>()) if (block.Inline is { } inline) Convert(inline);
@@ -50,7 +52,7 @@ public static partial class SafeInlineSemantics
         var depth = 1; var count = 0;
         for (var cursor = opening.NextSibling; cursor is not null; cursor = cursor.NextSibling)
         {
-            if (++count > 256 || cursor.Span.End - opening.Span.Start > 16384) return false;
+            if (++count > MaximumInlineNodes || cursor.Span.End - opening.Span.Start > 16384) return false;
             if (cursor is not HtmlInline html) continue;
             var match = Tag().Match(html.Tag);
             if (!match.Success || !match.Groups[2].Value.Equals(tag, StringComparison.OrdinalIgnoreCase)) continue;
@@ -78,7 +80,7 @@ public static partial class SafeInlineSemantics
                 if (element.Children.Length != 0) return false;
                 kind = DocumentInlineKind.StatusBadge;
                 variant = (element.GetAttribute("data-status-kind") ?? "custom").ToLowerInvariant();
-                if (variant is not ("draft" or "ready" or "blocked" or "deprecated")) variant = "custom";
+                if (variant is not ("draft" or "ready" or "blocked" or "deprecated" or "beta" or "review")) variant = "custom";
             }
             else if (tag == "span" && element.HasAttribute("data-shortcut"))
             {
@@ -106,7 +108,7 @@ public static partial class SafeInlineSemantics
             if (depth > 32) return false;
             for (var current = start; current != stop; current = current?.NextSibling)
             {
-                if (current is null || ++nodes > 256) return false;
+                if (current is null || ++nodes > MaximumInlineNodes) return false;
                 switch (current)
                 {
                     case LiteralInline literal: result.Append(literal.Content.ToString()); break;

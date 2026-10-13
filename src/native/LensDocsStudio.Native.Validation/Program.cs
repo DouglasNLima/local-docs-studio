@@ -377,7 +377,7 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native preview preparation: " + ex.Message); }
         try { NativeMarkdownChecks.Run(output, repository); }
         catch (Exception ex) { failures.Add("Native Markdown semantics: " + ex.Message); }
-        try { NativeEditorChecks.Run(output); }
+        try { NativeEditorChecks.Run(output); NativeInlineLabelChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native editor formatting: " + ex.Message); }
         try { NativeLayoutChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native document layout: " + ex.Message); }

@@ -84,6 +84,7 @@ public sealed partial class MarkdownEditService
         }
         return action switch
         {
+            "rule" => Block("---"),
             "link" => Edit(start, length, "[" + (length == 0 ? "Link text" : selected.Replace("[", "\\[").Replace("]", "\\]")) + "](document.md)"),
             "code" => Block(HtmlMarkdownConverter.Fence(selected, "text")),
             "mermaid" => Block(HtmlMarkdownConverter.Fence(length == 0 ? "flowchart LR\n  A[Draft] --> B[Review]\n  B --> C[Publish]" : selected, "mermaid")),

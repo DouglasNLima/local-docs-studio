@@ -1,10 +1,12 @@
 # Native implementation progress
 
+Current source adds native Insert commands for all six status kinds, keyboard shortcut labels and horizontal rules, closing a concrete gap against the web guide. Labels remain passive portable text, existing spans can be edited, invalid input stays in the dialogue, Cancel preserves source, and each action uses one undo group. The Release solution builds without warnings; 963 core tests, the complete 40-case native rendering/export harness and eight windowless AvalonEdit insertion/selection/Undo/Redo/read-only cases pass. A new 65th desktop workflow covers the actual menus, dialogues and preview; hosted confirmation is pending. These commands are not in preview.259.
+
 Current milestone: validated native internal preview. **Production is not ready; the reconstruction goal remains incomplete.** The full scope is in [the reconstruction brief](reconstruction-brief.txt). Earlier implementation records are retained in [history through 2af4471](history/implementation-progress-through-2af4471.md).
 
-The latest verified package is unsigned preview.256 at clean PR merge b75ea922eb1ed0365159c7a84d7d8506483174cb for head 5a95062114122b8f2d57608941ec35f26e49cc17. Downloaded native PR run 38329393419 verifies 924 core tests, 40 corpus cases and four 63-check desktop contexts, including actual Word import. Both web runs pass. Native push run 38329391482 fails on an installer UIA timeout followed by cleanup failure; that failure remains recorded.
+The latest verified package is unsigned preview.259 at clean branch head 51688aa7433dc4cdf29e837bf9df6456622224fe. Downloaded native push run 38332285897 verifies 936 core tests, 40 corpus cases and four 64-check desktop contexts, including actual Word import and retained workspace images/links after switching folders, Save and restart. The full installer lifecycle passes with 20 preserved state files, two restored sessions and bundled installed runtimes. Both web runs pass 262 tests each. The parallel native PR run 38332288667 fails while observing the preview TextPattern after an upgraded application restarts; this failure remains recorded.
 
-The current workspace correction retains each open tab's containing root after switching folders and saving, persists it as an optional schema-1 field and carries it into linked documents. A windowless reproduction demonstrated broken parent-relative images and links, without text or image-byte loss. Twelve new core regressions pass (936 total), as does the complete 40-case native harness. A new 64th hosted desktop workflow covers the draft, images, two-way links, Save and restart; hosted confirmation remains pending. Preview.256 predates this correction.
+The workspace correction is included in preview.259. All twelve phase reports across the built, installed, upgraded and reinstalled applications pass exact draft/save, visible images, two-way links and retained roots. The upgraded application screenshot after restart was visually inspected. The PR failure occurs before its preview Text provider is available; the editor already contains the restored text. The harness now waits for preview completion and observes provider availability within its existing deadline, retaining every image/link assertion. This later harness correction awaits hosted confirmation.
 
 ## Delivered and validated
 
@@ -14,11 +16,11 @@ The current workspace correction retains each open tab's containing root after s
 | Data integrity | Conflict checks, independent recovery, snapshots, safe writes and failed-save restart/retry; simulated upgrade/reinstall preserves 20 state files and reopens sessions |
 | Native preview | Markdown semantics, browser-free Mermaid, maths, images, code colours, details and source mapping; diagram/export and catalogue/theme corpora |
 | Editing and exports | Native editing/completion, image management, clipboard formats, supported imports, DOCX/PDF/HTML/ZIP/Docs Site exports, libraries and explicit migration |
-| Desktop workflows | 63 actual checks in built, installed, upgraded and reinstalled applications in the verified preview.256 PR run |
+| Desktop workflows | 64 actual checks in built, installed, upgraded and reinstalled applications in verified preview.259; the new inline insertion workflow awaits hosted validation |
 | Installer | Isolated self-contained per-user product; visible wizard, files-in-use cancellation, installation, same-source upgrade, uninstall and reinstall |
 | Updates | User-controlled discovery/download/install, cancellation and final verification; pluggable signing, empty production trust and blocked unsigned execution |
 
-## Earlier engineering results leading to preview.256
+## Earlier investigation notes
 
 The first later workspace desktop probe (a66d3a5 PR run 38331665586) stops before switching folders because its typing helper does not emit the two supplied LF characters. Retained session bytes contain the exact Unicode phrase after unchanged saved text; the inspected screenshot agrees. The fixture now types that explicit phrase without assuming Enter events. All following exact-source, native-image, two-way-link and restart assertions remain required. This new GUI outcome is still pending; original failure evidence is retained.
 

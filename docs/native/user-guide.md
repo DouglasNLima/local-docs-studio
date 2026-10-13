@@ -18,6 +18,8 @@ The native preview is a separate development edition. Its state and installation
 
 The editor keeps ordinary UTF-8 Markdown. **Ctrl+Z** and **Ctrl+Y** undo and redo changes. Use **Ctrl+B** for bold and **Ctrl+I** for italic, or the Edit and Insert menus for lists, tables, links, code and document helpers.
 
+**Insert → Status badge** offers Draft, Ready, Blocked, Deprecated, Beta and In review. Enter the label to display; its text stays literal, including punctuation. To change a badge, place the caret inside its source and choose the new status. **Insert → Keyboard shortcut** displays keys such as `Ctrl + Shift + K`; separate keys with `+` or commas and use `Plus` for the plus key. Both editors retain invalid input with an explanation, and Cancel leaves the document unchanged. **Insert → Horizontal rule** adds a separate Markdown divider. Each insertion or edit is one undoable change.
+
 **Ctrl+F** searches the focused editor or preview. **Ctrl+H** opens editor replacement. Close the find bar with **Escape** to return to the previous view. Preview Find opens closed details sections when needed and brings the selected match into view.
 
 **Ctrl+Shift+K** opens the workspace document and heading picker. Inserted links remain portable Markdown. **Ctrl+Space** offers Mermaid suggestions inside diagram source.

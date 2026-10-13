@@ -1,6 +1,18 @@
 # Native validation report
 
-## Workspace context correction and preview.256 evidence
+## Verified preview.259 and pending inline insertion
+
+Native push run [38332285897](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38332285897) passes at clean source 51688aa7433dc4cdf29e837bf9df6456622224fe. Independently downloaded evidence in artifacts/native/ci-51688aa-push verifies 936 core tests, 40 corpus cases, four 64-check desktop contexts, installed runtime origins, complete installer lifecycle, 20 preserved state files, two restored sessions, five wizard outcomes and four files-in-use assertions. Disposable trust is removed and production trust unchanged. Both web runs 38332287455/38332285828 pass 262 cases.
+
+All twelve workspace-context reports pass across folder switching, Save and restart. The upgraded-app restart PNG was inspected: the retained source, Unicode draft, image and hyperlink remain present while the other workspace is selected. Package metadata, four hashes, sizes, unsigned signatures/envelopes and required native runtime entries pass independently. Preview.259 is the latest verified internal installer; the handover records its exact path and hash. No installer was executed locally.
+
+The parallel PR run 38332288667 passes built/first-launch workflows and the wizard but fails observing TextPattern after the upgraded app restarts. Original evidence in ci-51688aa-pr-failure records PatternNotSupportedException; the inspected screenshot shows the restored document/image/link. Restored editor text can precede asynchronous FlowDocument/provider readiness. The harness now waits for preview completion and treats temporary provider absence as an unsatisfied observation within the existing deadline; it does not repeat input actions or weaken final image/link checks. Hosted validation of this correction is pending.
+
+New inline insertion tests reproduce five boundary failures: long escaped badge labels and key labels cease to be recognised as complete semantic spans. Character-reference generation and a bounded 1,024-node allowance correct them while preserving source/decoded-text/key limits. All 26 focused edit tests pass; an additional parser-limit regression also passes in the complete 963-test core suite (inline-labels/inline-label-all.trx). The Release build has zero warnings/errors. The complete native harness passes 40 corpus cases with zero failures, and web static checks pass. Eight windowless AvalonEdit cases verify exact source/selection, whole Undo/Redo and read-only retention in inline-label-full-validation/native-inline-labels.json. The new 65th actual desktop workflow, including invalid input and Cancel, awaits hosted execution. These source changes are outside preview.259.
+
+The following sections retain historical failures and their then-pending conclusions; the verified results above supersede earlier workspace-pending statements.
+
+## Earlier workspace context correction and preview.256 evidence
 
 The first workspace UI probe in a66d3a5 PR run 38331665586 fails before switching folders: its Keyboard.Type input includes leading/trailing LF characters which do not appear in the retained draft. The exact Unicode phrase is present and the saved source is unchanged. Downloaded session bytes and the inspected screenshot prove `Actual == SavedText + "Draft Ω remains portable."`; the old expected value is two characters longer. Evidence and comparison remain under `artifacts/native/ci-a66d3a5-pr-failure`. The probe now types that explicit single phrase after the source's existing line break. Exact text, actual images/links, Save and restart assertions remain unchanged; this does not yet validate those later steps.
 
@@ -36,7 +48,7 @@ The new 63rd desktop workflow uses the actual File import command and both Windo
 
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
-## Latest successful CI: 2af4471
+## Earlier successful CI: 2af4471
 
 All four runs pass on attempt 1: native PR 38322046930, native push 38322043071, web PR 38322046933 and web push 38322043043. Both web logs record 262 passed cases, with static checks passing for 50 modules, 57 shell assets, 150 vendor assets and 56 runtime external-dependency scans. Each downloaded native TRX passes 912 core tests; the native corpus has 40 diagram/export cases and zero failures.
 

@@ -110,6 +110,16 @@
     <MenuItem Header="Bullet list" Tag="bullet" Click="Format"/>
     <MenuItem Header="Numbered list" Tag="numbered" Click="Format"/>
     <MenuItem Header="Blockquote" Tag="quote" Click="Format"/>
+    <MenuItem Header="Horizontal rule" Tag="rule" Click="Format" AutomationProperties.AutomationId="InsertHorizontalRule"/>
+    <MenuItem Header="Status badge" AutomationProperties.AutomationId="StatusBadgeMenu">
+     <MenuItem Header="Draft…" Tag="draft" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertDraftBadge"/>
+     <MenuItem Header="Ready…" Tag="ready" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertReadyBadge"/>
+     <MenuItem Header="Blocked…" Tag="blocked" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertBlockedBadge"/>
+     <MenuItem Header="Deprecated…" Tag="deprecated" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertDeprecatedBadge"/>
+     <MenuItem Header="Beta…" Tag="beta" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertBetaBadge"/>
+     <MenuItem Header="In review…" Tag="review" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertReviewBadge"/>
+    </MenuItem>
+    <MenuItem Header="Keyboard shortcut…" Tag="shortcut" Click="InsertInlineLabel" AutomationProperties.AutomationId="InsertKeyboardShortcut"/>
     <MenuItem Header="Callout" AutomationProperties.AutomationId="CalloutMenu">
      <MenuItem Header="Note" Tag="callout:NOTE" Click="Format" AutomationProperties.AutomationId="InsertNote"/>
      <MenuItem Header="Tip" Tag="callout:TIP" Click="Format"/>

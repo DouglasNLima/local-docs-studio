@@ -67,6 +67,8 @@ internal static partial class NativeUiChecks
         string output, string phase, string expectedSaved)
     {
         Wait(() => ReadEditorText(editor) == fixture.Draft, "The earlier tab did not retain its exact text: " + phase);
+        Wait(() => Find(owner, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal),
+            "The retained workspace preview did not finish after restoring its editor: " + phase);
         CheckImage(); Follow("Other retained document", fixture.TargetText);
         CheckImage(); Follow("Return to retained source", fixture.Draft);
         if (File.ReadAllText(fixture.Source) != expectedSaved || File.ReadAllText(fixture.Target) != fixture.TargetText
@@ -78,7 +80,15 @@ internal static partial class NativeUiChecks
             ExpectedSavedText = true, NativeImageVisible = true, LinkedImageVisible = true, TwoWayLinks = true, ImageBytesRetained = true,
             Source = fixture.Source, ExpectedRoot = fixture.First, ActiveWorkspace = fixture.Second }, new JsonSerializerOptions { WriteIndented = true }));
 
-        AutomationElement[] Children() => Find(owner, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren();
+        AutomationElement[] Children()
+        {
+            var text = Find(owner, "DocumentPreview").Patterns.Text;
+            if (!text.IsSupported) return [];
+            try { return text.Pattern.DocumentRange.GetChildren(); }
+            // Restored editor text can precede the asynchronous FlowDocument and
+            // its Text provider. Keep observing within the existing Wait deadline.
+            catch (FlaUI.Core.Exceptions.PatternNotSupportedException) { return []; }
+        }
         void CheckImage()
         {
             // Image is the first block. Earlier tests retain Pages mode and editor
