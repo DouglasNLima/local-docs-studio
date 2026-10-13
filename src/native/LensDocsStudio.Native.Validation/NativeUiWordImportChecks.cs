@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
 using FlaUI.Core.AutomationElements;
@@ -48,17 +49,26 @@ internal static partial class NativeUiChecks
         // Earlier settings checks deliberately retain page reading and 125% zoom.
         // WPF exposes images on the current page; use the real page commands to reveal later content.
         var previewPages = new List<string>();
+        var pageObservations = new List<object>();
         for (var page = 0; page < 8; page++)
         {
             var label = owner.FindFirstDescendant(cf => cf.ByAutomationId("PreviewPageNumber"))?.Name ?? "Continuous";
             previewPages.Add(label);
-            if (ImageVisible()) break;
+            // The page counter changes before asynchronous page layout exposes its visual children.
+            var observation = Stopwatch.StartNew(); var visible = false;
+            Wait(() => (visible = ImageVisible()) || observation.Elapsed >= TimeSpan.FromSeconds(3),
+                "The Word import preview page could not be observed.", seconds: 10);
+            pageObservations.Add(new { Page = label, ImageVisible = visible, ObservationMilliseconds = observation.Elapsed.TotalMilliseconds,
+                Images = owner.FindAllDescendants(cf => cf.ByControlType(ControlType.Image)).Select(image => new
+                { image.AutomationId, image.Name, image.IsOffscreen, Bounds = image.BoundingRectangle.ToString() }).ToArray() });
+            owner.CaptureToFile(Path.Combine(output, $"native-word-import-page-{page + 1}.png"));
+            File.WriteAllText(Path.Combine(output, "native-word-import-pages.json"), JsonSerializer.Serialize(new { Pages = previewPages, Observations = pageObservations }));
+            if (visible) break;
             var next = owner.FindFirstDescendant(cf => cf.ByAutomationId("PreviewNextPage"));
             if (next?.IsEnabled != true) break;
             next.Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(owner, "PreviewPageNumber").Name != label, "Word import preview did not advance to its next page.");
         }
-        File.WriteAllText(Path.Combine(output, "native-word-import-pages.json"), JsonSerializer.Serialize(new { Pages = previewPages }));
         Wait(ImageVisible, "The imported Word image is missing from the actual native preview after page navigation.");
         NativeWordImportFixtureChecks.CheckMarkdown(markdown);
         var status = Find(owner, "Status");
