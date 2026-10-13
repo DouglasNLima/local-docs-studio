@@ -1401,6 +1401,8 @@ internal static partial class NativeUiChecks
             CheckArtifactContextCleared(window, artefact.Root, artefact.Document, artefact.Source);
             checks.Add("Restart restores imported source but clears optional artefact metadata, reader and review-pack actions; no raw manifest is persisted");
             window.CaptureToFile(Path.Combine(output, "native-workspace.png"));
+            CheckWordImport(window, editor, automation, app.ProcessId, runRoot, output, artefact.Document, OpenThroughDialogue);
+            checks.Add("Native Word import cancellation preserves the previous document; completed import exposes every warning and creates unchanged-source, portable Markdown and image files");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);

@@ -12,6 +12,8 @@ Windows improvements include native pickers and Explorer actions, filesystem mon
 
 ## Current verification
 
+The next source change preserves Word image descriptions. Local validation now passes 924 core tests and all 40 native corpus cases; the 12 new regressions reproduce 11 pre-fix failures plus one passing fallback control. A new 63rd actual desktop workflow covers Word import cancellation, complete warning exposure and portable saved image output, but awaits hosted execution. The package and downloaded CI evidence below remain preview.246 and do not yet certify this change. The later documentation-only c044a61 CI passed all four runs.
+
 | Evidence | Verified scope |
 |---|---|
 | Core | 912 passed in each downloaded TRX |

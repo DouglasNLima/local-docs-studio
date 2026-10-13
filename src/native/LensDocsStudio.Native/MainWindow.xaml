@@ -51,7 +51,7 @@
     <MenuItem Header="Content _library…" Click="ManageContentLibrary" AutomationProperties.AutomationId="ManageContentLibrary"/>
     <MenuItem Header="Save document as template…" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveDocumentTemplate"/>
     <MenuItem Header="Save selection as snippet…" Tag="snippet" Click="SaveLibraryContent" AutomationProperties.AutomationId="SaveMarkdownSnippet"/>
-    <MenuItem Header="_Import DOCX, HTML or PDF…" Click="ImportDocument"/>
+    <MenuItem Header="_Import DOCX, HTML or PDF…" Click="ImportDocument" AutomationProperties.AutomationId="ImportDocument"/>
     <Separator/>
     <MenuItem Header="_Save" InputGestureText="Ctrl+S" Command="{Binding SaveCommand}"/>
     <MenuItem Header="Save _as…" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveAsCommand}"/>

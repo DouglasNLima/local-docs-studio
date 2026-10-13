@@ -98,7 +98,8 @@ public sealed partial class DocumentImportService
                     }
                     imageReferences[id] = reference;
                 }
-                text.Append("![Imported image](").Append(reference).Append(')');
+                text.Append("![").Append(HtmlMarkdownConverter.Escape(WordImageDescription.Read(blip)))
+                    .Append("](").Append(reference).Append(')');
             }
             return text.ToString();
         }

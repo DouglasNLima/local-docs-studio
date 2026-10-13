@@ -1,5 +1,13 @@
 # Native validation report
 
+## Word image descriptions and actual import workflow
+
+The importer previously replaced all Word image descriptions with `Imported image`. Twelve new cases cover Unicode, Markdown/HTML-like text, explicit empty descriptions, metadata/title fallbacks, floating images, shared image parts and line separators. The corrected pre-fix fixture produces 11 failures and one passing fallback control in `artifacts/native/word-image-description-before/word-image-description-before-corrected.trx`; the original fixture failure is also retained. After correction, all 12 focused cases and the complete 924-test core suite pass in `word-image-description-after`. The Release solution builds without warnings or errors, and `word-image-description-full-validation/validation-summary.json` records 40 corpus cases and no failures.
+
+The windowless Word import fixture generates and decodes an actual 16×12 PNG. Its DOCX preserves image bytes/descriptions, Unicode headings, emphasis, a safe link and quote. An unsupported file link stays text and a field stays its stored result, producing two separate notes. Initial invalid-image-fixture and quote-comparison diagnostics remain retained; the corrected fixture verifies parsed quote content and decoded pixels. These are structural and conversion checks, not Office layout or filesystem-access tracing.
+
+The new 63rd desktop workflow uses the actual File import command and both Windows pickers. It checks destination cancellation, unchanged DOCX and previous document, saved Markdown/assets, both conversion notes in status and accessible tooltip, actual native image preview and copied-workspace portability. Hosted execution is pending; no local foreground application, clipboard, Office, installer or certificate-store test ran. Preview.246 remains the independently verified installer. The intervening documentation-only c044a61 revision also passed all four CI runs (native 38324522855/38324519063; web 38324522902/38324519069).
+
 Status: internal preview; production acceptance is incomplete. This record separates the latest completed CI revision from later local work. Feature-specific scope is in the [parity matrix](functional-parity-matrix.md); package paths/hashes are in the [engineering handover](engineering-handover.md).
 
 ## Latest successful CI: 2af4471

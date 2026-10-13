@@ -81,6 +81,8 @@ jobs:
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
             artifacts/native/install-smoke/**/native-details-keyboard.json
+            artifacts/native/install-smoke/**/native-ui-word-import.json
+            artifacts/native/install-smoke/**/native-word-import.png
             artifacts/native/install-smoke/**/native-ui-diagram-themes.json
             artifacts/native/install-smoke/**/native-ui-diagram-clipboard*.json
             artifacts/native/install-smoke/**/native-diagram-clipboard*.png

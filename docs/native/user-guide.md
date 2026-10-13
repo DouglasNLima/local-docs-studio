@@ -120,6 +120,8 @@ Use **File → Import DOCX, HTML or PDF** to create editable content from suppor
 
 Conversion notes appear in the status bar after import. Hover over a shortened status message to read the full text; repeated notes are shown once.
 
+Embedded Word pictures keep their image bytes and supported descriptions as Markdown alternative text. Explicitly empty descriptions remain empty; missing descriptions fall back to available picture metadata or a generic label. Each picture occurrence keeps its own description even when the image bytes are shared.
+
 Word import preserves supported heading levels and lists supplied directly or through paragraph styles, including nesting, starting values and matching continuation paragraphs. Web/email links and paired internal bookmarks retain their destinations; linked pictures remain linked. Recognised code styles become literal code blocks, and consecutive quote paragraphs stay grouped, including supported placement inside lists. Code language and deeper quote structure may need manual correction; a generic spacing style is not treated as code. Unsupported number formats are simplified with a warning; lists and block styles inside table cells become text with explicit notes. Unsupported or missing link targets remain text, and Word fields keep their stored results without being evaluated. File/relative links and field-based hyperlinks may need manual correction. Imported diagram/formula pictures remain images rather than editable Mermaid or LaTeX source.
 
 The Export menu offers **Word**, **PDF**, **HTML**, **Markdown bundle** and **Docs Site**. Exports are prepared separately from source. App-only search, outline and review controls are excluded from document output.

@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Current source additionally preserves supported Word image descriptions, with 12 focused regressions, 924 total passing core tests and a passing local native harness. Actual Word import through both native pickers is a new 63rd desktop workflow awaiting hosted execution; the verified preview.246 evidence below still has 62 workflows.
+
 The web feature guide, regression tests and content catalogue define the functional reference. The native application preserves their useful outcomes with WPF controls and portable local files. Production acceptance remains incomplete.
 
 Latest verified packages: unsigned preview.246 at clean PR merge 504cf6e for head 2af4471. Both native and both web runs pass on their first attempts. Downloaded reports verify 912 core tests, 40 diagram/export cases, four 62-check desktop contexts per native run, installed runtime origins, restored sessions and 20 preserved state files. The details keyboard regression passes in all eight contexts. Exact evidence, package hashes and earlier failures are in the [validation report](validation-report.md) and [engineering handover](engineering-handover.md).
