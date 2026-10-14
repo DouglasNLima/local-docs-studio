@@ -16,13 +16,15 @@ internal sealed class NativeTestDisplay : IDisposable
         original = new Mode { Size = (short)Marshal.SizeOf<Mode>() };
         var available = EnumDisplaySettings(null, -1, ref original);
         var requested = original;
-        requested.Width = 1920; requested.Height = 1080; requested.Fields = 0x180000;
+        // Leave room for the largest requested application window, its frame and
+        // the hosted taskbar. A 1920-wide desktop cannot contain a centred 1920 window.
+        requested.Width = 2560; requested.Height = 1440; requested.Fields = 0x180000;
         var supported = available ? ChangeDisplaySettings(ref requested, 2) : -1;
         var applied = supported == 0 ? ChangeDisplaySettings(ref requested, 0) : supported;
         changed = applied == 0;
         File.WriteAllText(Path.Combine(output, "display.json"), JsonSerializer.Serialize(new {
-            Available = available, OriginalWidth = original.Width, OriginalHeight = original.Height, RequestedWidth = 1920,
-            RequestedHeight = 1080, TestResult = supported, ApplyResult = applied, TemporaryChange = changed, RegistryChanged = false }));
+            Available = available, OriginalWidth = original.Width, OriginalHeight = original.Height, RequestedWidth = requested.Width,
+            RequestedHeight = requested.Height, TestResult = supported, ApplyResult = applied, TemporaryChange = changed, RegistryChanged = false }));
     }
     public void Dispose() { if (changed) { ChangeDisplaySettings(ref original, 0); changed = false; } }
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

@@ -40,7 +40,9 @@ internal static partial class NativeUiChecks
                 // Logical viewport restoration can correctly retain the final source
                 // region after replacing this tab's text. Establish page one explicitly
                 // before testing the unchanged Next/Previous page contract.
-                var previewStart = Find(window, "DocumentPreview"); previewStart.Focus();
+                // FlowDocumentReader's container cannot accept UIA SetFocus. These
+                // text-only fixtures expose its real pointer surface without diagram actions.
+                var previewStart = Find(window, "DocumentPreview"); previewStart.Click();
                 var firstRange = previewStart.Patterns.Text.Pattern.DocumentRange.FindText(name == "paginated" ? "Paginated native reading" : "Native documentation", false, false)
                     ?? throw new IOException("The paginated fixture's first native text range is unavailable.");
                 firstRange.ScrollIntoView(true);
