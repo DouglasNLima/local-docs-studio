@@ -27,7 +27,8 @@ $checksumLines = @(Get-Content -LiteralPath (Join-Path $PackageDirectory 'SHA256
 if ($checksumLines.Count -ne 2 -or $checksumLines -notcontains "$installerHash  $prefix-Setup.exe" -or $checksumLines -notcontains "$zipHash  $prefix.zip") { throw 'SHA256SUMS does not identify both exact package files.' }
 if ((Get-AuthenticodeSignature -LiteralPath $installer).Status -ne 'NotSigned') { throw 'This verifier expects the declared unsigned internal installer.' }
 $installerVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($installer)
-if ($installerVersion.ProductName -ne 'Lens Docs Studio Native Preview' -or $installerVersion.ProductVersion -ne $ExpectedVersion) { throw 'Installer binary version or product identity is inconsistent.' }
+# Inno reserves fixed-width version-resource strings with trailing space padding.
+if ($installerVersion.ProductName.TrimEnd() -ne 'Lens Docs Studio Native Preview' -or $installerVersion.ProductVersion.TrimEnd() -ne $ExpectedVersion) { throw 'Installer binary version or product identity is inconsistent.' }
 $envelope = Get-Content -LiteralPath (Join-Path $PackageDirectory 'native-update.json') -Raw | ConvertFrom-Json
 if ($envelope.schemaVersion -ne 1 -or $envelope.keyId -ne '' -or $envelope.signature -ne '') { throw 'Unsigned preview update envelope unexpectedly contains a signing identity.' }
 $update = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($envelope.payload)) | ConvertFrom-Json
@@ -36,7 +37,7 @@ if ($update.productId -ne $metadata.product -or $update.version -ne $ExpectedVer
     $update.sha256 -ne $installerHash -or $update.releaseTag -ne "native-v$ExpectedVersion") { throw 'Update metadata does not describe the same installer.' }
 $required = @('LensDocsStudio.Native.exe','LensDocsStudio.Native.dll','LensDocsStudio.Core.dll','LensDocsStudio.Native.deps.json',
     'LensDocsStudio.Native.runtimeconfig.json','coreclr.dll','hostfxr.dll','hostpolicy.dll','PresentationFramework.dll','PresentationCore.dll',
-    'WindowsBase.dll','wpfgfx_cor3.dll','version.json','PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md','LICENSE')
+    'WindowsBase.dll','wpfgfx_cor3.dll','version.json','PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')
 $files = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::OrdinalIgnoreCase)
 $archive = [IO.Compression.ZipFile]::OpenRead($portable)
 try {
@@ -46,7 +47,7 @@ try {
         $name = $entry.FullName.Replace('\','/')
         if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or $files.ContainsKey($name) -or
             $name -match '(?i)WebView2|ContinuousViewer|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
-            ($name.EndsWith('.md') -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
+            ($name.EndsWith('.md') -and -not $name.StartsWith('licences/', [StringComparison]::OrdinalIgnoreCase) -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
         $stream = $entry.Open()
         try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)).ToLowerInvariant() } finally { $stream.Dispose() }
         $files.Add($name, [ordered]@{ path=$name; bytes=$entry.Length; sha256=$hash })
@@ -59,6 +60,19 @@ try {
         try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
     }
     if ((Read-ZipText 'version.json') -ne $metadataText) { throw 'Portable and installer-side version metadata differ.' }
+    $inspection = Join-Path (Split-Path -Parent ([IO.Path]::GetFullPath($OutputPath))) ('binary-inspection-' + [guid]::NewGuid().ToString('N'))
+    [IO.Directory]::CreateDirectory($inspection) | Out-Null
+    $binaryVersions = @{}
+    foreach ($name in 'LensDocsStudio.Native.dll','LensDocsStudio.Core.dll','LensDocsStudio.Native.exe') {
+        $entry = $archive.Entries | Where-Object { $_.FullName.Replace('\','/') -eq $name }
+        if ($entry.Length -gt 32MB) { throw 'Application identity binary exceeds the inspection budget.' }
+        $input = $entry.Open(); $path = Join-Path $inspection $name; $destination = [IO.File]::Open($path, [IO.FileMode]::CreateNew)
+        try { $input.CopyTo($destination) } finally { $input.Dispose(); $destination.Dispose() }
+        $version = [Diagnostics.FileVersionInfo]::GetVersionInfo($path).ProductVersion
+        if ($version -ne "$ExpectedVersion+$ExpectedSourceRevision") { throw 'Application binary version/source differs from package metadata.' }
+        $binaryVersions[$name] = $version
+    }
+    if ((Get-AuthenticodeSignature -LiteralPath (Join-Path $inspection 'LensDocsStudio.Native.exe')).Status -ne 'NotSigned') { throw 'Apphost signature differs from the declared unsigned package.' }
     $runtime = Read-ZipText 'LensDocsStudio.Native.runtimeconfig.json' | ConvertFrom-Json
     if ($runtime.runtimeOptions.tfm -ne 'net10.0' -or $runtime.runtimeOptions.framework -or $runtime.runtimeOptions.frameworks -or
         @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' -and $_.version -match '^10\.' }).Count -ne 1) { throw 'Portable package does not declare its included .NET 10 WPF runtime.' }
@@ -66,7 +80,7 @@ try {
 $report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceKind=$metadata.sourceKind;
     ciRunId=$metadata.ciRunId; installerSha256=$installerHash; portableSha256=$zipHash; signature='NotSigned';
     trustedUpdates='BLOCKED: no production signing identity'; cleanMachineCertification='BLOCKED: separate clean image required';
-    executionPerformed=$false; payload=@($files.Values | Sort-Object path) }
+    executionPerformed=$false; binaryVersions=$binaryVersions; payload=@($files.Values | Sort-Object path) }
 $parent = Split-Path -Parent ([IO.Path]::GetFullPath($OutputPath)); [IO.Directory]::CreateDirectory($parent) | Out-Null
 $report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 "Native preview package verification PASS: $ExpectedVersion ($ExpectedSourceRevision)"

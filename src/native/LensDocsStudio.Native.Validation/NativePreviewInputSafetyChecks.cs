@@ -4,6 +4,8 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Rendering;
@@ -41,10 +43,13 @@ internal static class NativePreviewInputSafetyChecks
             { Width = 640, Height = 300, WindowStyle = unchecked((int)0x80000000) });
         host.RootVisual = viewer;
         viewer.Measure(new Size(640, 300)); viewer.Arrange(new Rect(0, 0, 640, 300)); viewer.UpdateLayout();
+        var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32); capture.Render(viewer);
+        var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
+        using (var file = File.Create(Path.Combine(output, "production-preview.png"))) encoder.Save(file);
         if (parsed.Source != source || result.ReadText() != originalPreviewText
             || viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll)
             throw new IOException("Production layout changed the complete input or explicit reading choice.");
-        Write("AFTER native layout", true);
+        Write("AFTER native layout and raster", true);
         host.RootVisual = null;
         void Write(string stage, bool completed) => File.WriteAllText(Path.Combine(output, "input-safety.json"), JsonSerializer.Serialize(new
         {

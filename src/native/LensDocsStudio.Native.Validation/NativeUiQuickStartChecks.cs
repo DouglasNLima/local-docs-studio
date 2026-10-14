@@ -20,7 +20,7 @@ internal static partial class NativeUiChecks
             "Quick start did not open the offline guide.");
         Find(guide!, "CloseHelp").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Native guide"))) is null, "Quick-start help did not close.");
-        editor.Focus(); Keyboard.Type("Café");
+        FocusWindow(owner); editor.Click(); Keyboard.Type("Café");
         Wait(() => ReadEditorText(editor) == "Café" && !Visible("QuickStartHelp"), "Typing did not replace quick-start guidance without losing source.");
         Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
         Keyboard.Type(VirtualKeyShort.BACK);
