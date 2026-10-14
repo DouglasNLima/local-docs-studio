@@ -17,6 +17,14 @@ internal static partial class NativeUiChecks
         {
             using var contrast = highContrast ? new NativeTestHighContrast() : null;
             if (highContrast && !System.Windows.SystemParameters.HighContrast) throw new IOException("The hosted Windows high-contrast setting was not applied.");
+            if (highContrast)
+            {
+                var resources = new System.Windows.ResourceDictionary(); LensDocsStudio.Native.Platform.ThemeService.Apply(resources, "System");
+                var foreground = (System.Windows.Media.SolidColorBrush)resources["PressedTextBrush"];
+                var background = (System.Windows.Media.SolidColorBrush)resources["PressedBrush"];
+                if (foreground.Color != System.Windows.SystemColors.HighlightTextColor || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5)
+                    throw new IOException("Actual Windows high-contrast command press colours lost readable text and icon contrast.");
+            }
             using var display = new NativeTestDisplay(output);
             using var automation = new UIA3Automation();
             foreach (var theme in highContrast ? new[] { "System" } : new[] { "Light", "Dark" })

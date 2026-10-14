@@ -73,6 +73,16 @@ public partial class MainWindow
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
+        // An edit can retain the same selected span while replacing its contents.
+        // Reconcile that current input once the new immutable map is installed;
+        // it need not raise another SelectionChanged event.
+        if (BothPanesVisible && Editor.IsKeyboardFocusWithin)
+        {
+            if (DesktopState.SyncSelection && Editor.SelectionLength > 0)
+            { QueueFocusedSynchronisation("editor-selection"); return; }
+            if (DesktopState.FollowCaret)
+            { QueueFocusedSynchronisation("caret"); return; }
+        }
         var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0;
         if (offset > 0)
             Dispatcher.BeginInvoke(async () =>

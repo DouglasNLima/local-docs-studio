@@ -20,6 +20,10 @@ internal static class NativeToolbarChecks
             {
                 application.Resources = new ResourceDictionary();
                 ThemeService.Apply(application.Resources, theme);
+                var pressedForeground = (System.Windows.Media.SolidColorBrush)application.Resources["PressedTextBrush"];
+                var pressedBackground = (System.Windows.Media.SolidColorBrush)application.Resources["PressedBrush"];
+                if (NativeSyntaxChecks.Contrast(pressedForeground.Color, pressedBackground.Color) < 4.5)
+                    throw new IOException("Pressed command text and icons lost readable contrast in the " + theme + " theme.");
                 foreach (var file in new[] { "CommandIcons", "DesktopStyles" })
                     application.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/LensDocsStudio.Native;component/Resources/{file}.xaml") });
                 foreach (var width in new[] { 180d, 320d, 500d })

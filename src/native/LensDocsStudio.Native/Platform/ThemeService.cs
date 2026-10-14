@@ -36,6 +36,7 @@ public static class ThemeService
             ("HoverBrush", "#EDEDED", "#383C43"), ("PressedBrush", "#DDE1E6", "#454B55"),
             ("BorderBrush", "#D1D5DB", "#51545B"), ("AccentBrush", "#FF883E", "#FF883E") })
             resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(dark ? night : light));
+        resources["PressedTextBrush"] = resources["TextBrush"];
         if (SystemParameters.HighContrast)
         {
             resources["WindowBrush"] = SystemColors.WindowBrush; resources["PanelBrush"] = SystemColors.ControlBrush;
@@ -45,6 +46,7 @@ public static class ThemeService
             resources["MutedTextBrush"] = SystemColors.WindowTextBrush;
             resources["HoverBrush"] = SystemColors.ControlBrush;
             resources["PressedBrush"] = SystemColors.HighlightBrush;
+            resources["PressedTextBrush"] = SystemColors.HighlightTextBrush;
         }
         else resources["AccentTextBrush"] = new SolidColorBrush(Color.FromRgb(32, 33, 36));
         foreach (var key in new[] { "AccentFillColorDefaultBrush", "AccentFillColorSecondaryBrush", "AccentFillColorTertiaryBrush", "AccentFillColorSelectedTextBackgroundBrush", "SystemFillColorAttentionBrush" })
