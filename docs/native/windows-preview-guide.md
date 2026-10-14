@@ -4,7 +4,7 @@ Local Markdown, Mermaid, and documentation studio. This is an **unsigned interna
 
 ## Obtain and verify the package
 
-Use the exact successful branch-source Actions run, preview version and SHA-256 values in [windows-preview-readiness.md](windows-preview-readiness.md). GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
+Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [authoritative readiness report](https://github.com/DouglasNLima/local-docs-studio/blob/release/native-preview-readiness/docs/native/windows-preview-readiness.md). This source report is linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
 
 ```powershell
 gh run download <verified-run-id> --repo DouglasNLima/local-docs-studio --name native-validation --dir <new-empty-directory>
@@ -45,7 +45,7 @@ Press **F1** for the searchable offline guide. **Help → About the native previ
 
 - **Updates:** production Authenticode identity and manifest pins are absent. Trusted in-app download/execution of unsigned installers is blocked. This candidate is distributed as a CI artefact, so release discovery does not itself make it available. Obtain later previews through the same reviewed internal procedure.
 - **Performance:** Continuous's 250 ms input objective is not achieved. Large lists, tables, rich paragraphs and mixed documents have recorded delays; the 4.14 MB Continuous case has incomplete full-layout/navigation evidence. The intermittent 587.9933 ms details construction delay remains unresolved. Prefer Pages or Editor for those documents.
-- **Rendering:** the production FlowDocument viewer is used. The rejected PR 22 viewer is excluded. Mermaid supports the documented eight families and bounded syntax, not every browser Mermaid construct. See the bundled guide and [diagram compatibility](diagram-compatibility.md).
+- **Rendering:** the production FlowDocument viewer is used. The rejected PR 22 viewer is excluded. Mermaid supports the documented eight families and bounded syntax, not every browser Mermaid construct. See the bundled offline guide and [source diagram compatibility](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-wpf-rebuild/docs/native/diagram-compatibility.md).
 - **Fidelity:** PDF import extracts text only, without OCR or page reconstruction. DOCX/HTML conversion and template support are bounded. PDF complex-script shaping, bidirectional text, joined/colour emoji and tagged accessibility are unverified. Broader Word pagination/templates, live Excel paste and Azure DevOps destinations remain limited by prior acceptance scope.
 - **Certification:** clean-machine, physical accessibility/displays, hardware failure and production-signed upgrade certification remain outstanding. Use synthetic/copied documents in an approved evaluation environment and retain originals.
 
