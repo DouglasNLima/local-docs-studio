@@ -9,8 +9,10 @@
      <ControlTemplate TargetType="{x:Type rendering:DocumentPreview}">
       <DockPanel Background="{TemplateBinding Background}">
        <Border x:Name="ContinuousGuidance" DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="8" Visibility="Collapsed">
-        <TextBlock Text="Continuous can be slower for long or complex documents. Choose Pages in Settings for a more responsive preview."
-         TextWrapping="Wrap" FontSize="12" AutomationProperties.AutomationId="ContinuousGuidance"/>
+        <Label Content="Continuous can be slower for long or complex documents. Choose Pages in Settings for a more responsive preview."
+         Padding="0" FontSize="12" AutomationProperties.AutomationId="ContinuousGuidance" AutomationProperties.Name="{Binding Content, RelativeSource={RelativeSource Self}}">
+         <Label.ContentTemplate><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></Label.ContentTemplate>
+        </Label>
        </Border>
        <Border x:Name="PageControls" DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="3">
         <Grid>
