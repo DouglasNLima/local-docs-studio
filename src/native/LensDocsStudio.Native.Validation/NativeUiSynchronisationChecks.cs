@@ -107,7 +107,11 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
             Wait(() => ReadEditorText(editor) == fixture && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Café 😀 é", StringComparison.Ordinal),
                 "The surviving selection fixture did not restore its current preview.");
-            FocusEditor(); Nth(editor, "Café 😀 é", 1).Select(); Keyboard.Type("Résumé 😀");
+            FocusEditor(); Nth(editor, "Café 😀 é", 1).Select();
+            // Keyboard automation emits separate UTF-16 input events. Use the actual
+            // atomic text-paste command for this one-edit/one-Undo Unicode fixture.
+            NativeUiClipboard.SetText("Résumé 😀"); owned = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => ReadEditorText(editor) == fixture.Replace("Café 😀 é", "Résumé 😀", StringComparison.Ordinal)
                 && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Résumé 😀", StringComparison.Ordinal), "A valid source edit did not reach its current mapped preview.");
             Nth(editor, "Résumé 😀", 1).Select();
