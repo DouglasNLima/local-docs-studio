@@ -71,7 +71,11 @@ public partial class MainWindow
         menu.Items.Add(new Separator());
         Add("Rename…", "Document", safe => _ = MoveContextItemAsync(root, safe, directory), !isRoot);
         Add("Move…", "Folder", safe => _ = MoveContextItemAsync(root, safe, directory), !isRoot);
-        Add("Delete…", "Close", safe => _ = DeleteContextDocumentAsync(root, safe), !directory);
+        Add("Delete…", "Close", safe =>
+        {
+            if (directory) model.DeleteFolderCommand.Execute(new WorkspaceEntryViewModel(new(Path.GetFileName(safe), safe, true, [])));
+            else _ = DeleteContextDocumentAsync(root, safe);
+        }, !isRoot);
         Add("Refresh", "Refresh", _ => model.RefreshWorkspaceCommand.Execute(null));
         menu.IsOpen = true;
     }

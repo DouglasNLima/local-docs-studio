@@ -11,7 +11,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int Run(string executable, string output, bool requireBundledRuntime = false)
+    public static int Run(string executable, string output, bool requireBundledRuntime = false, bool desktopUxOnly = false)
     {
         var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
@@ -19,7 +19,7 @@ internal static partial class NativeUiChecks
             try
             {
                 int result;
-                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime);
+                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime, desktopUxOnly);
                 completion.SetResult(result);
             }
             catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
@@ -27,7 +27,7 @@ internal static partial class NativeUiChecks
         thread.SetApartmentState(ApartmentState.MTA); thread.Start();
         return completion.Task.GetAwaiter().GetResult();
     }
-    private static int RunCore(string executable, string output, bool requireBundledRuntime)
+    private static int RunCore(string executable, string output, bool requireBundledRuntime, bool desktopUxOnly)
     {
         output = Path.GetFullPath(output);
         Directory.CreateDirectory(output);
@@ -74,6 +74,15 @@ internal static partial class NativeUiChecks
             checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
             CheckMinimumWindow(window, editor, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            if (desktopUxOnly)
+            {
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
+                Wait(() => app.HasExited, "The desktop UX fixture did not close safely.");
+                if (launchedProcess!.ExitCode != 0) throw new IOException("The desktop UX fixture failed during shutdown.");
+                RecordResult(new { Passed = true, Scope = "Desktop UX controls and synchronisation", Checks = checks, FixtureRoot = runRoot });
+                Console.WriteLine("Native desktop UX: " + checks.Count + " checks passed.");
+                return 0;
+            }
             CheckLargeEditorNavigation(window, editor, output, source);
             checks.Add("Long wrapped editor Find reveals its final selected target, preserves insertion Undo and saved bytes, and resumes the original preview");
             FocusWindow(window); editor.Click();

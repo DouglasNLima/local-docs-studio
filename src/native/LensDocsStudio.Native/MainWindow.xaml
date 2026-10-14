@@ -327,13 +327,13 @@
      <Button Tag="table" Click="Format" ToolTip="Table" AutomationProperties.Name="Table" AutomationProperties.AutomationId="Formattable"><ui:CommandIcon Kind="Table"/></Button>
      <Button Tag="rule" Click="Format" ToolTip="Horizontal rule" AutomationProperties.Name="Horizontal rule" AutomationProperties.AutomationId="Formatrule"><ui:CommandIcon Kind="Rule"/></Button>
       </ToolBar>
-     <avalon:TextEditor x:Name="Editor" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"
+     <ui:MarkdownEditor x:Name="Editor" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"
         IsReadOnly="{Binding ActiveDocument.IsSaving}"
         Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" Padding="14" BorderThickness="0"
         HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" WordWrap="True"
         AllowDrop="True" PreviewDragOver="EditorDragOver" PreviewDrop="EditorDrop"
         GotKeyboardFocus="EditorFocused" AutomationProperties.Name="Markdown editor" AutomationProperties.AutomationId="MarkdownEditor">
-      <avalon:TextEditor.ContextMenu>
+      <ui:MarkdownEditor.ContextMenu>
        <ContextMenu AutomationProperties.Name="Editor actions" Opened="PrepareEditorContext">
         <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" AutomationProperties.AutomationId="EditorContextUndo"/>
         <MenuItem Header="_Redo" Command="ApplicationCommands.Redo"/>
@@ -348,8 +348,8 @@
         <MenuItem Header="Document _link…" Click="InsertDocumentLink"/>
         <MenuItem Header="Edit or insert _table…" Click="EditTable" AutomationProperties.AutomationId="EditorContextTable"/>
        </ContextMenu>
-      </avalon:TextEditor.ContextMenu>
-     </avalon:TextEditor>
+      </ui:MarkdownEditor.ContextMenu>
+     </ui:MarkdownEditor>
      </DockPanel>
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
      <DockPanel x:Name="PreviewPane" Grid.Column="2">

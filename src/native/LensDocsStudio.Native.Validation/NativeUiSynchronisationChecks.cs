@@ -32,23 +32,24 @@ internal static partial class NativeUiChecks
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
                 Wait(() => ReadPreferences().Preview?.ReadingMode == mode, "The explicit sync fixture reading mode did not persist.");
-                editor.Focus();
+                editor.Click();
+                var editorFocus = editor.Automation.FocusedElement();
                 var editorMatch = Nth(editor, "action", 3); editorMatch.Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(preview, "action", 3), TextPatternRangeEndpoint.Start) == 0
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.End, Nth(preview, "action", 3), TextPatternRangeEndpoint.End) == 0),
                     "Editor-to-preview sync selected the wrong repeated occurrence.");
-                if (!editor.Properties.HasKeyboardFocus.Value) throw new IOException("Editor-to-preview selection stole typing focus.");
+                if (!editor.Automation.Compare(editorFocus, editor.Automation.FocusedElement())) throw new IOException("Editor-to-preview selection stole typing focus.");
                 var selectedGeometry = preview.Patterns.Text.Pattern.GetSelection().SelectMany(range => range.GetBoundingRectangles()).ToArray();
                 if (!selectedGeometry.Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && preview.BoundingRectangle.Contains(rectangle)))
                     throw new IOException("The matching preview occurrence has no visible selection geometry.");
 
-                preview.Focus(); var previewMatch = Nth(preview, "action", 4); previewMatch.Select();
+                preview.Click(); var previewFocus = preview.Automation.FocusedElement(); var previewMatch = Nth(preview, "action", 4); previewMatch.Select();
                 Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(editor, "action", 4), TextPatternRangeEndpoint.Start) == 0),
                     "Preview-to-editor sync selected the wrong repeated occurrence.");
-                if (!preview.Properties.HasKeyboardFocus.Value) throw new IOException("Preview-to-editor selection stole keyboard focus.");
-                editor.Focus(); Nth(editor, "Café 😀 é", 1).Select();
+                if (!preview.Automation.Compare(previewFocus, preview.Automation.FocusedElement())) throw new IOException("Preview-to-editor selection stole keyboard focus.");
+                editor.Click(); Nth(editor, "Café 😀 é", 1).Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "Café 😀 é"),
                     "Unicode literal selection did not synchronise exactly.");
                 observations.Add(new { ReadingMode = mode, RepeatedEditorToPreview = true, RepeatedPreviewToEditor = true, UnicodeExact = true,
@@ -57,7 +58,7 @@ internal static partial class NativeUiChecks
             Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
             Wait(() => ReadPreferences().Desktop?.SyncSelection == false, "Disabling selection synchronisation did not persist.");
             var retained = preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray();
-            editor.Focus(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
+            editor.Click(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
             if (!preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).SequenceEqual(retained))
                 throw new IOException("Disabled synchronisation still changed the preview selection.");
             if (ReadEditorText(editor) != fixture || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Selection synchronisation changed source bytes.");
@@ -79,7 +80,7 @@ internal static partial class NativeUiChecks
                 var control = window.FindFirstDescendant(cf => cf.ByAutomationId("SyncSelectionControl"));
                 if (control is not null) control.AsCheckBox().IsChecked = false;
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(before.Preview?.ReadingMode ?? "Automatic"); reading.Collapse();
-                FocusWindow(window); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == original, "Synchronisation fixture replacement did not retain exact Undo.");
                 Find(window, "ToggleSidebar").AsButton().Invoke(); Find(window, "ToggleOutline").AsButton().Invoke();
             }
