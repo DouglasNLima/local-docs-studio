@@ -41,7 +41,7 @@ internal static partial class NativeUiChecks
         var document = Path.Combine(folder, "Recycle note.md"); var asset = Path.Combine(folder, "asset.bin");
         const string savedNote = "# Recycle note\n"; const string dirtyMarker = "Retained unsaved folder text.";
         byte[] assetBytes = [0, 42, 128, 255]; File.WriteAllText(document, savedNote); File.WriteAllBytes(asset, assetBytes);
-        Tree("Recycle note.md").AsTreeItem().DoubleClick();
+        Tree("Recycle candidate").AsTreeItem().Expand(); Tree("Recycle note.md").AsTreeItem().DoubleClick();
         Wait(() => ReadEditorText(editor) == savedNote, "The folder's actual source document did not open.");
         editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type(dirtyMarker);
         Wait(() => ReadEditorText(editor).Contains(dirtyMarker, StringComparison.Ordinal), "The folder's unsaved text did not reach its editor.");
@@ -83,8 +83,10 @@ internal static partial class NativeUiChecks
         void Open(string query, string expected)
         {
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_P);
-            var picker = Dialogue("Quick Open"); Find(picker, "CommandSearchQuery").AsTextBox().Text = query;
-            Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Quick Open did not isolate the tab fixture.");
+            var picker = Dialogue("Quick Open"); Find(picker, "CommandSearchQuery").AsTextBox().Text = query + ".md";
+            // Fuzzy matching legitimately finds 'B' within 'Tab C'. The exact filename
+            // must rank first and be the keyboard-confirmed result.
+            Wait(() => Find(picker, "CommandSearchResults").AsListBox().SelectedItem?.Name == query + ".md", "Quick Open did not rank the exact tab filename first.");
             Keyboard.Type(VirtualKeyShort.RETURN); Wait(() => ReadEditorText(editor).StartsWith(expected, StringComparison.Ordinal), "The tab fixture did not open.");
         }
         AutomationElement Tree(string name)

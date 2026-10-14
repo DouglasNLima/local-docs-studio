@@ -16,7 +16,7 @@
   </ResourceDictionary.MergedDictionaries>
   <ui:HeadingIndentConverter x:Key="HeadingIndent"/>
 
-  <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+  <Style TargetType="TreeViewItem" BasedOn="{StaticResource Desktop.WorkspaceItem}">
    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
    <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
    <Style.Triggers><DataTrigger Binding="{Binding IsVisible}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
@@ -381,7 +381,7 @@
       <TextBox x:Name="OutlineFilter" DockPanel.Dock="Top" Margin="10,0,10,10" Padding="6" TextChanged="OutlineFilterChanged" AutomationProperties.Name="Filter document headings"/>
       <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
        AutomationProperties.Name="Document outline">
-       <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
+       <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
       <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" Margin="{Binding Level, Converter={StaticResource HeadingIndent}}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
      </DockPanel>
