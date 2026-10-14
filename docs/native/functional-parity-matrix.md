@@ -1,6 +1,6 @@
 # Functional parity matrix
 
-The active desktop UX contracts and validation status are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md). Expanded synchronisation and packaging certification must finish before that goal closes; the reconstruction evidence below retains its original scope.
+Implemented desktop UX contracts, full regression/installation acceptance, visual evidence, packages and semantic limits are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md). [PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24) tracks final delivery checks; the reconstruction evidence below retains its original scope.
 
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 

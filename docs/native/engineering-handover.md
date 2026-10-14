@@ -1,6 +1,6 @@
 # Native Windows engineering handover
 
-For the active desktop UX goal, use [desktop-ux-modernisation.md](desktop-ux-modernisation.md) and [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24). The existing reconstruction and preview-readiness PRs remain separate and unchanged.
+For the implemented desktop UX experience, full acceptance, packages and bounded limits, use [desktop-ux-modernisation.md](desktop-ux-modernisation.md) and [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24), which tracks the final delivery head and mandatory checks. The existing reconstruction and preview-readiness PRs remain separate and unchanged.
 
 Read the [engineering delivery report](engineering-completion-report.md) for the current architecture, features, Windows improvements, parity/compatibility, installer/updater, exact tests, performance, limitations, packages, branch/PR, Actions and external prerequisites. Its table accounts for all 28 original acceptance conditions and distinguishes internal preview from production certification.
 

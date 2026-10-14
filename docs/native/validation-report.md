@@ -1,6 +1,6 @@
 # Native validation report
 
-For the active native desktop UX goal, use the authoritative [desktop modernisation report](desktop-ux-modernisation.md) and [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24). Its current certification and package status is separate from the revision-specific reconstruction evidence below.
+For native desktop UX acceptance, use the authoritative [desktop modernisation report](desktop-ux-modernisation.md) and [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24). The report records full native/web regressions, four 74-group desktop contexts, preserved state, independently verified packages and corrected visual acceptance. The PR tracks mandatory checks on the final delivery head. Reconstruction evidence below retains its original revision and scope.
 
 ## Current delivery record
 

@@ -1,6 +1,6 @@
 # Native implementation progress
 
-Native desktop modernisation is active on `feature/native-desktop-ux-modernisation` in [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24), targeting the verified preview-readiness base. Its authoritative feature, validation and delivery record is [desktop-ux-modernisation.md](desktop-ux-modernisation.md). The reconstruction delivery records below describe the earlier baseline.
+Native desktop modernisation is implemented on `feature/native-desktop-ux-modernisation` in [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24), targeting the verified preview-readiness base. Its authoritative feature, full regression, visual, package and installation evidence is [desktop-ux-modernisation.md](desktop-ux-modernisation.md). The PR tracks mandatory checks on the final delivery head. The reconstruction records below describe the earlier baseline.
 
 ## Current delivery record
 
