@@ -30,7 +30,7 @@
   <Setter Property="ToolBarTray.IsLocked" Value="True"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToolBar">
    <Grid Background="{TemplateBinding Background}" Margin="{TemplateBinding Padding}">
-    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="24"/></Grid.ColumnDefinitions>
     <ToolBarPanel x:Name="PART_ToolBarPanel" IsItemsHost="True" Margin="0,0,2,0"/>
     <ToggleButton x:Name="Overflow" Grid.Column="1" Width="24" BorderThickness="0" Background="{DynamicResource PanelBrush}" Foreground="{DynamicResource TextBrush}"
      IsChecked="{Binding IsOverflowOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ToolTip="More commands" AutomationProperties.Name="More commands">
@@ -42,16 +42,33 @@
      </Border>
     </Popup>
    </Grid>
-   <ControlTemplate.Triggers><Trigger Property="HasOverflowItems" Value="False"><Setter TargetName="Overflow" Property="Visibility" Value="Collapsed"/></Trigger></ControlTemplate.Triggers>
+   <ControlTemplate.Triggers><Trigger Property="HasOverflowItems" Value="False"><Setter TargetName="Overflow" Property="Visibility" Value="Hidden"/></Trigger></ControlTemplate.Triggers>
   </ControlTemplate></Setter.Value></Setter>
   <Style.Resources>
    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource Desktop.CommandButton}"/>
   </Style.Resources>
  </Style>
  <Style x:Key="Desktop.PanelHeading" TargetType="TextBlock">
+  <Setter Property="FontFamily" Value="Segoe UI"/>
   <Setter Property="FontSize" Value="11"/><Setter Property="FontWeight" Value="SemiBold"/>
   <Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/>
   <Setter Property="Margin" Value="12,12,12,6"/>
+ </Style>
+ <Style x:Key="Desktop.ToolbarCheckBox" TargetType="CheckBox">
+  <Setter Property="MinWidth" Value="32"/><Setter Property="MaxWidth" Value="36"/><Setter Property="MinHeight" Value="32"/>
+  <Setter Property="Margin" Value="2"/><Setter Property="Padding" Value="5"/>
+  <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+  <Setter Property="Focusable" Value="False"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="CheckBox">
+   <Border x:Name="Surface" Background="Transparent" BorderBrush="Transparent" BorderThickness="0,0,0,2" Padding="{TemplateBinding Padding}" CornerRadius="3">
+    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource HoverBrush}"/></Trigger>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter TargetName="Surface" Property="Background" Value="{DynamicResource WindowBrush}"/></Trigger>
+    <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.45"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
  </Style>
  <Style x:Key="Desktop.DocumentTabs" TargetType="TabControl">
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="TabControl">

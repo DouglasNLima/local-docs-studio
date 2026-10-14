@@ -55,6 +55,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     if (recovered.Path is not null && recovered.SavedFingerprint is not null)
                         baseline = new(recovered.Path, recovered.SavedText ?? recovered.Text, recovered.SavedFingerprint, recovered.Utf8Bom);
                     var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey, IsPinned = recovered.IsPinned };
+                    tab.PreviewSourceOffset = Math.Clamp(recovered.PreviewSourceOffset, 0, recovered.Text.Length);
                     if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
                         tab.AssetWorkspace = recovered.AssetWorkspace;
                     if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath, recovered.WorkspaceRoot);

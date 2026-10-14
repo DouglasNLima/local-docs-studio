@@ -71,6 +71,17 @@ public partial class MainWindow
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
+        var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0;
+        if (offset > 0)
+            Dispatcher.BeginInvoke(async () =>
+            {
+                if (!SyncCurrent || rendered != result || !Preview.IsVisible) return;
+                var pointer = result!.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
+                if (pointer is null) return;
+                var generation = ++syncGeneration; applyingSync = true;
+                try { await PreviewNavigationService.BringIntoViewAsync(Preview, pointer); }
+                finally { if (syncGeneration == generation) applyingSync = false; }
+            }, DispatcherPriority.Loaded);
     }
     private void CancelSynchronisation()
     {
@@ -93,6 +104,7 @@ public partial class MainWindow
     }
     private void EditorScrollChanged(object? sender, EventArgs e)
     {
+        if (!applyingSync && Editor.IsVisible) recoveryTimer.Start();
         if (!applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Editor.IsKeyboardFocusWithin || Editor.IsMouseOver)) QueueSynchronisation("editor-scroll");
     }
     private void PreviewSelectionChanged(object? sender, EventArgs e)
@@ -101,6 +113,7 @@ public partial class MainWindow
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)
     {
+        if (e.VerticalChange != 0 && !applyingSync && Preview.IsVisible) recoveryTimer.Start();
         if (e.VerticalChange != 0 && !applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Preview.IsKeyboardFocusWithin || Preview.IsMouseOver))
             QueueSynchronisation("preview-scroll");
     }

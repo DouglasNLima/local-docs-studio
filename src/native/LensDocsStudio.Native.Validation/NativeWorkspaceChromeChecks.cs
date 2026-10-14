@@ -45,9 +45,11 @@ internal static class NativeWorkspaceChromeChecks
             if (model.Documents.Count != 2 || !model.Documents.Contains(pinned) || model.ActiveDocument != active)
                 throw new IOException("Close others lost the protected pin or the surviving active document.");
             Complete(model.PersistSessionAsync());
+            active.PreviewSourceOffset = 5;
+            Complete(model.PersistSessionAsync());
             using var restored = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), new DesktopDialogs());
             Complete(restored.InitialiseAsync([]));
-            if (restored.Documents.Count != 2 || restored.Documents[0].Id != pinned.Id || !restored.Documents[0].IsPinned || restored.ActiveDocument?.Id != active.Id)
+            if (restored.Documents.Count != 2 || restored.Documents[0].Id != pinned.Id || !restored.Documents[0].IsPinned || restored.ActiveDocument?.Id != active.Id || restored.ActiveDocument.PreviewSourceOffset != 5)
                 throw new IOException("Restarted session state lost tab order, pin or active document.");
             for (var index = 0; index < paths.Length; index++)
                 if (!File.ReadAllBytes(paths[index]).SequenceEqual(snapshots[index])) throw new IOException("Workspace chrome changed document bytes.");

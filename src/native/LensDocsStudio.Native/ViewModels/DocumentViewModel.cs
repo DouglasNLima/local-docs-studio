@@ -24,6 +24,7 @@ public partial class DocumentViewModel : ObservableObject
     public string? EffectiveWorkspace => FilePath is null ? AssetWorkspace : WorkspaceRoot;
     public int CaretOffset { get; set; }
     public double VerticalOffset { get; set; }
+    public int PreviewSourceOffset { get; set; }
     public string Title => (Path.GetFileName(FilePath) ?? DisplayName ?? "Untitled.md") + (IsDirty ? " •" : "") + (ExternalChange ? " ⚠" : "");
     public string? WorkspaceRoot { get; set; }
     public event EventHandler? Edited;
@@ -46,5 +47,5 @@ public partial class DocumentViewModel : ObservableObject
     }
 
     public RecoveredDocument Recovery() => new(Id, FilePath, EditorDocument.Text, SavedSnapshot?.Fingerprint,
-        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot, IsPinned);
+        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot, IsPinned, PreviewSourceOffset);
 }

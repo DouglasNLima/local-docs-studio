@@ -16,6 +16,7 @@ internal static partial class NativeUiChecks
         const string fixture = "# Native sync fixture\n\naction **action** *action* [action](other.md) `action`\n\nCafé 😀 é action\n\nSoft\nbreak and hard  \nbreak.\n";
         var clipboard = NativeUiClipboard.GetDataObject(); uint owned = 0;
         var observations = new List<object>();
+        Exception? originalFailure = null;
         var preview = Find(window, "DocumentPreview");
         Find(window, "ToggleSidebar").AsButton().Invoke(); Find(window, "ToggleOutline").AsButton().Invoke();
         try
@@ -64,14 +65,27 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "native-selection-synchronisation.json"), JsonSerializer.Serialize(new {
                 Passed = true, Observations = observations, DisabledSettingRespected = true, SourceBytesPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
         }
+        catch (Exception error)
+        {
+            originalFailure = error;
+            window.CaptureToFile(Path.Combine(output, "native-selection-synchronisation-failure.png"));
+            File.WriteAllText(Path.Combine(output, "native-selection-synchronisation-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations }));
+            throw;
+        }
         finally
         {
-            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
-            var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(before.Preview?.ReadingMode ?? "Automatic"); reading.Collapse();
-            FocusWindow(window); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
-            Wait(() => ReadEditorText(editor) == original, "Synchronisation fixture replacement did not retain exact Undo.");
-            Find(window, "ToggleSidebar").AsButton().Invoke(); Find(window, "ToggleOutline").AsButton().Invoke();
-            RestoreClipboard(clipboard, owned);
+            try
+            {
+                var control = window.FindFirstDescendant(cf => cf.ByAutomationId("SyncSelectionControl"));
+                if (control is not null) control.AsCheckBox().IsChecked = false;
+                var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(before.Preview?.ReadingMode ?? "Automatic"); reading.Collapse();
+                FocusWindow(window); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == original, "Synchronisation fixture replacement did not retain exact Undo.");
+                Find(window, "ToggleSidebar").AsButton().Invoke(); Find(window, "ToggleOutline").AsButton().Invoke();
+            }
+            catch (Exception error) when (originalFailure is not null)
+            { File.WriteAllText(Path.Combine(output, "native-selection-synchronisation-cleanup.json"), JsonSerializer.Serialize(new { OriginalError = originalFailure.ToString(), CleanupError = error.ToString() })); }
+            finally { RestoreClipboard(clipboard, owned); }
         }
         UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
         FlaUI.Core.ITextRange Nth(AutomationElement pane, string text, int occurrence)

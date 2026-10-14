@@ -14,6 +14,8 @@ Right-click a document tab for closing, copy/reveal and pin actions. **Pinned ta
 
 The preview toolbar exposes **Automatic**, **Pages** and **Continuous** reading modes, zoom, Find and rendered copy. Three separate opt-in controls offer **Follow caret**, **Synchronise scroll** and **Synchronise selection** in Split layout. They preserve the originating pane's keyboard focus. Literal selections use source offsets, including repeated words; generated or transformed content is labelled as a semantic block highlight when exact text correspondence is unavailable. Turning one behaviour off does not disable the others.
 
+In the diagram window, hold **Space** and drag, or drag with the **middle mouse button**, to pan. **Ctrl+mouse wheel** zooms around the pointer. **F** fits the diagram, **Ctrl+0** selects Actual Size, **Home** resets the viewport and arrow keys pan. **Ctrl+C** copies the original drawing, independently of pan or zoom. SVG/PNG exports retain the original drawing.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.

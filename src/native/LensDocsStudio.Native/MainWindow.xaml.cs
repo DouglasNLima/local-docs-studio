@@ -99,6 +99,9 @@ public partial class MainWindow : Window
         if (displayedTab is null) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
+        if (renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+            && VisiblePreviewSource() is { } source)
+            displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
     }
     private void BindActiveDocument()
     {
@@ -187,6 +190,7 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
+            SaveViewport();
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             InstallSyncPreview(sourceVersion);
