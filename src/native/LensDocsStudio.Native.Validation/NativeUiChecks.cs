@@ -213,7 +213,9 @@ internal static partial class NativeUiChecks
             Wait(() => File.ReadAllText(createdPath) == "Created through the native workspace.", "The new file did not save its actual edited content.");
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            Keyboard.Type("\nUnsaved content retained before deletion.");
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Unsaved content retained before deletion.");
+            Wait(() => ReadEditorText(editor) == "Created through the native workspace.\nUnsaved content retained before deletion.",
+                "The deletion fixture did not receive its exact unsaved source, including the requested line break.");
             Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Patterns.Invoke.Pattern.Invoke();
             Window? deleteWindow = null;
             Wait(() => (deleteWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Delete document")))?.AsWindow()) is not null, "The deletion confirmation did not open.");
