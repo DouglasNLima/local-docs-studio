@@ -252,8 +252,11 @@
      <Button Command="{Binding RefreshWorkspaceCommand}" ToolTip="Refresh workspace" AutomationProperties.Name="Refresh workspace"><ui:CommandIcon Kind="Refresh"/></Button>
      <Button Click="OpenWorkspaceRootContext" ToolTip="Workspace actions" AutomationProperties.Name="Workspace actions"><ui:CommandIcon Kind="Folder"/></Button>
     </ToolBar>
-    <TextBox DockPanel.Dock="Top" Text="{Binding WorkspaceFilter, UpdateSourceTrigger=PropertyChanged}" Margin="10,4,10,10" Padding="6" ToolTip="Filter workspace filenames or relative paths"
-     AutomationProperties.Name="Filter workspace files" AutomationProperties.AutomationId="WorkspaceFilter"/>
+    <Grid DockPanel.Dock="Top" Margin="10,4,10,10">
+     <TextBox x:Name="WorkspaceFilterField" Text="{Binding WorkspaceFilter, UpdateSourceTrigger=PropertyChanged}" Padding="6" ToolTip="Filter workspace filenames or relative paths"
+      AutomationProperties.Name="Filter workspace files" AutomationProperties.AutomationId="WorkspaceFilter"/>
+     <TextBlock Text="Filter files…" DataContext="{Binding ElementName=WorkspaceFilterField}" Style="{StaticResource Desktop.FilterHint}"/>
+    </Grid>
     <TreeView x:Name="WorkspaceTree" ItemsSource="{Binding Entries}" BorderThickness="0" Background="Transparent"
       MouseDoubleClick="OpenTreeEntry" KeyDown="TreeKeyDown" PreviewMouseRightButtonDown="WorkspaceRightClicked" AutomationProperties.Name="Workspace files" AutomationProperties.AutomationId="WorkspaceTree"/>
    </DockPanel>
@@ -378,7 +381,10 @@
        <Button Click="ExpandOutlineGroups" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
        <Button Click="CollapseOutlineGroups" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
       </ToolBar>
-      <TextBox x:Name="OutlineFilter" DockPanel.Dock="Top" Margin="10,0,10,10" Padding="6" TextChanged="OutlineFilterChanged" AutomationProperties.Name="Filter document headings"/>
+      <Grid DockPanel.Dock="Top" Margin="10,0,10,10">
+       <TextBox x:Name="OutlineFilter" Padding="6" TextChanged="OutlineFilterChanged" ToolTip="Filter document headings" AutomationProperties.Name="Filter document headings"/>
+       <TextBlock Text="Filter headings…" DataContext="{Binding ElementName=OutlineFilter}" Style="{StaticResource Desktop.FilterHint}"/>
+      </Grid>
       <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
        AutomationProperties.Name="Document outline">
        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
