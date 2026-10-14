@@ -246,7 +246,7 @@
    <DockPanel x:Name="SidebarPanel" Grid.Column="0" Background="{DynamicResource PanelBrush}">
     <TextBlock DockPanel.Dock="Top" Text="WORKSPACE" FontSize="11" FontWeight="SemiBold" Margin="14,16,10,4"/>
     <TextBlock DockPanel.Dock="Top" Text="{Binding WorkspaceName}" ToolTip="{Binding WorkspaceRoot}" FontSize="13" FontWeight="SemiBold" Margin="12,0,12,12" TextTrimming="CharacterEllipsis"/>
-    <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Workspace commands">
+    <ToolBar x:Name="WorkspaceToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Workspace commands">
      <Button Command="{Binding ExpandWorkspaceCommand}" ToolTip="Expand all folders" AutomationProperties.Name="Expand all folders"><ui:CommandIcon Kind="Expand"/></Button>
      <Button Command="{Binding CollapseWorkspaceCommand}" ToolTip="Collapse all folders" AutomationProperties.Name="Collapse all folders"><ui:CommandIcon Kind="Collapse"/></Button>
      <Button Command="{Binding RefreshWorkspaceCommand}" ToolTip="Refresh workspace" AutomationProperties.Name="Refresh workspace"><ui:CommandIcon Kind="Refresh"/></Button>
@@ -377,7 +377,7 @@
      <GridSplitter x:Name="OutlineSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize outline"/>
      <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
-      <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Outline groups">
+      <ToolBar x:Name="OutlineToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Outline groups">
        <Button Click="ExpandOutlineGroups" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
        <Button Click="CollapseOutlineGroups" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
       </ToolBar>

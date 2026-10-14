@@ -39,13 +39,31 @@ internal static partial class NativeUiChecks
     private static void CheckDesktopSession(Window window, AutomationElement editor, UIA3Automation automation,
         int process, string state, string output, DesktopSessionExpectation expected)
     {
-        var preferences = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
-        var session = JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))!;
-        if (preferences.Desktop != expected.Preferences.Desktop || preferences.ShowOutline != expected.Preferences.ShowOutline
-            || preferences.Layout != expected.Preferences.Layout || preferences.Theme != expected.Preferences.Theme
-            || session.ActiveDocument != expected.Session.ActiveDocument
-            || !session.Documents.Select(document => (document.Id, document.IsPinned)).SequenceEqual(expected.Session.Documents.Select(document => (document.Id, document.IsPinned))))
-            throw new IOException("Restart lost desktop choices, tab order, pins or active document identity.");
+        UserPreferences? preferences = null; var observations = new List<object>();
+        // A hyperlink updates native editor text before its asynchronous session write
+        // completes. Observe the exact persisted contract within the existing deadline;
+        // never repeat the navigation action or accept a different final identity.
+        try
+        {
+            Wait(() =>
+            {
+                preferences = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+                var session = JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))!;
+                var matched = preferences.Desktop == expected.Preferences.Desktop && preferences.ShowOutline == expected.Preferences.ShowOutline
+                    && preferences.Layout == expected.Preferences.Layout && preferences.Theme == expected.Preferences.Theme
+                    && session.ActiveDocument == expected.Session.ActiveDocument
+                    && session.Documents.Select(document => (document.Id, document.IsPinned)).SequenceEqual(expected.Session.Documents.Select(document => (document.Id, document.IsPinned)));
+                observations.Add(new { Matched = matched, Active = session.ActiveDocument, ExpectedActive = expected.Session.ActiveDocument,
+                    preferences.Desktop, preferences.ShowOutline, preferences.Layout, preferences.Theme,
+                    Tabs = session.Documents.Select(document => new { document.Id, document.IsPinned }).ToArray() });
+                return matched;
+            }, "Restart lost desktop choices, tab order, pins or active document identity.");
+        }
+        finally
+        {
+            File.WriteAllText(Path.Combine(output, "native-desktop-restored-session-observations.json"), JsonSerializer.Serialize(new {
+                DeadlineSeconds = 20, InputActionsRepeated = 0, Expected = expected.Preferences.Desktop, Observations = observations }));
+        }
         if (window.FindFirstDescendant(cf => cf.ByAutomationId("WorkspaceTree"))?.IsOffscreen == false)
             throw new IOException("Restart did not apply the persisted hidden workspace panel.");
         foreach (var id in new[] { "FollowCaretControl", "SyncScrollControl", "SyncSelectionControl" })
@@ -62,6 +80,6 @@ internal static partial class NativeUiChecks
         window.CaptureToFile(Path.Combine(output, "native-desktop-restored-session.png"));
         File.WriteAllText(Path.Combine(output, "native-desktop-restored-session.json"), JsonSerializer.Serialize(new {
             Passed = true, SidebarHidden = true, IndependentSyncChoicesRestored = true, TabOrderPinsAndActiveRestored = true,
-            preferences.Desktop, preferences.ShowOutline, preferences.Layout, preferences.Theme, SourcePreserved = true }));
+            preferences!.Desktop, preferences.ShowOutline, preferences.Layout, preferences.Theme, SourcePreserved = true }));
     }
 }

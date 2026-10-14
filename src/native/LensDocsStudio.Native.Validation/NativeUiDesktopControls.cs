@@ -64,9 +64,14 @@ internal static partial class NativeUiChecks
         FocusWindow(window); Keyboard.Type(VirtualKeyShort.F11);
         Wait(() => window.BoundingRectangle.Height > bounds.Height + 5, "Full Screen did not reclaim the native window chrome.");
         window.CaptureToFile(Path.Combine(output, "native-full-screen.png"));
+        editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+        Wait(() => Visible("FindContext"), "Find did not open within Full Screen.");
         Find(window, "ViewMenu").Click(); Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("OpenWorkspaceMap"))?.IsOffscreen != false, "Escape did not close the menu in Full Screen.");
+        if (!Visible("FindContext")) throw new IOException("Menu Escape dismissed Find before its own command surface.");
         if (window.BoundingRectangle.Height <= bounds.Height + 5) throw new IOException("Menu Escape exited Full Screen before closing its own menu.");
+        Keyboard.Type(VirtualKeyShort.ESCAPE); Wait(() => !Visible("FindContext"), "Find Escape did not dismiss its own controls in Full Screen.");
+        if (window.BoundingRectangle.Height <= bounds.Height + 5) throw new IOException("Find Escape exited Full Screen before closing its own controls.");
         Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => Math.Abs(window.BoundingRectangle.Width - bounds.Width) < 3 && Math.Abs(window.BoundingRectangle.Height - bounds.Height) < 3,
             "Full Screen did not restore the original window dimensions.");

@@ -584,6 +584,8 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        // Native command surfaces consume Escape before Find and viewing modes.
+        if (e.Key == Key.Escape && CommandSurfaceOpen) return;
         if (HandleDesktopKey(e)) { e.Handled = true; return; }
         if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None) { OpenHelp(sender, e); e.Handled = true; return; }
         if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)

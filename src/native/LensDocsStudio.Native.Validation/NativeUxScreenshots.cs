@@ -47,9 +47,9 @@ internal static partial class NativeUiChecks
                     var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The screenshot window did not appear.");
                     Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The screenshot preview did not finish.");
                     window.Patterns.Transform.Pattern.Resize(size.Item1, size.Item2);
-                    window.Patterns.Transform.Pattern.Move(32, 32);
                     Wait(() => Math.Abs(window.BoundingRectangle.Width - size.Item1) < 3 && Math.Abs(window.BoundingRectangle.Height - size.Item2) < 3,
                         "The requested screenshot dimensions were not applied.");
+                    window.Patterns.Transform.Pattern.Move(0, 0);
                     Wait(() => automation.GetDesktop().BoundingRectangle.Contains(window.BoundingRectangle)
                         && window.BoundingRectangle.Contains(Find(window, "Status").BoundingRectangle)
                         && window.BoundingRectangle.Contains(Find(window, "DocumentPreview").BoundingRectangle),

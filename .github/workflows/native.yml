@@ -107,6 +107,7 @@ jobs:
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
             artifacts/native/install-smoke/**/native-desktop-restored-session.*
+            artifacts/native/install-smoke/**/native-desktop-restored-session-observations.json
             artifacts/native/install-smoke/**/native-minimum-window.*
             artifacts/native/install-smoke/**/native-minimum-overflow.png
             artifacts/native/install-smoke/**/native-focus-mode.png

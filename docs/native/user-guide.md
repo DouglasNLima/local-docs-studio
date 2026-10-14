@@ -8,7 +8,7 @@ Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both
 
 **Ctrl+Alt+B** toggles the workspace and **Ctrl+Alt+O** toggles the outline independently. Drag their dividers to resize them; visibility and width are private application preferences. The workspace header shows its name, with the full path in its tooltip.
 
-**F11** enters Full Screen and restores the previous window placement on exit. **Ctrl+Alt+Z** enters Focus Mode, preserving the chosen editor/preview layout and permanent panel preferences. **Escape** closes Find first, then exits Full Screen or Focus Mode. **Ctrl+Tab** and **Ctrl+Shift+Tab** switch open documents. The visible theme control offers System, Light and Dark.
+**F11** enters Full Screen and restores the previous window placement on exit. **Ctrl+Alt+Z** enters Focus Mode, preserving the chosen editor/preview layout and permanent panel preferences. **Escape** dismisses an open menu or drop-down, then Find, before leaving Full Screen or Focus Mode. **Ctrl+Tab** and **Ctrl+Shift+Tab** switch open documents. The visible theme control offers System, Light and Dark.
 
 Filter workspace files by name or relative path. Folder expansion and open documents survive filtering and refresh. Right-click a workspace item, or press **Shift+F10** on its selected row, for path, link, Explorer, reviewed rename/move and supported deletion actions. These actions use the clicked item. Deletion uses its existing confirmation and snapshots.
 
