@@ -6,7 +6,7 @@ Recorded 14 October 2026. **READY WITH RESTRICTIONS** for controlled internal ev
 
 Selected preview: **`0.1.1-preview.317`**, product `LensDocsStudio.Native`, clean **branch-source `dd6c4c33f1a6fa86206e76b2153afcc7b151a523`**, `release/native-preview-readiness`. Base: verified native `9c7454eeb892614af93881b762a1b6aecc3259d2`. Draft [PR 23](https://github.com/DouglasNLima/local-docs-studio/pull/23) targets `feature/native-wpf-rebuild`. PR 21 remains the reconstruction review; PR 22 remains Draft and isolated with its **NO-GO** decision. No experimental code, flag, executable or dependency is integrated.
 
-This report completion is a later documentation-only revision; its final head/checks are recorded in PR 23. Builds from that head retain their own source/version metadata. **Do not relabel `.317` as the report-only head or a PR merge checkout.**
+Following acceptance/report revisions change validation observations and evidence uploads; the production application and package inputs retain the selected candidate's behaviour. Their final head/checks are recorded in PR 23. Builds from later heads retain their own source/version metadata. **Do not relabel `.317` as a later head or PR merge checkout.**
 
 Build: Release, locked NuGet restore, `net10.0-windows`, `win-x64`, self-contained Core/WPF **10.0.13**, no trimming/single-file publishing/development symbols. Native C#/XAML/AvalonEdit and FlowDocument remain supported. Browser/PWA/Pages and the legacy Windows shell remain separate. Installed editing/preview require no embedded browser, JavaScript runtime, local server or development tools.
 
@@ -27,7 +27,7 @@ Separately verified **PR preview `.318`** is merge checkout **`5ab09e6ca945bdb28
 
 ## Verified acceptance
 
-Both native candidate runs and both web runs pass. [Web push 38523259663](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38523259663) and [web PR 38523263467](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38523263467) each verify 268 browser cases and static integrity; Pages deployment is skipped. Final report-only head validation is separately linked in PR 23, preserving these candidate identities.
+Both native candidate runs and both web runs pass. [Web push 38523259663](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38523259663) and [web PR 38523263467](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38523263467) each verify 268 browser cases and static integrity; Pages deployment is skipped. Follow-up head validation is separately linked in PR 23, preserving these candidate identities.
 
 | Gate | Status and actual scope |
 | --- | --- |
@@ -60,6 +60,10 @@ User-visible improvements: optional empty-draft entry points, informed explicit 
 Original failures remain preserved: `ede9dc3` native push/PR [38520515161](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38520515161) / [38520546519](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38520546519) used unsupported editor UIA SetFocus; the established window/click path retains assertions. `4c4e8f9` push/PR [38521236464](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38521236464) / [38521242074](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38521242074) exposed visible advice suppressed from UIA control view. A windowless regression reproduces it; the named Label passes locally and in every final desktop context. No deadline was increased. Earlier local `.20261014` remains a separately labelled `ede9dc3` packaging check; superseded partial runs are not acceptance passes.
 
 Evidence: `ci-dd6c4c3-push/{github-artifact.json,archive-verification.json,independent-package-verification.json,preflight/}` and extracted `evidence/{tests,validation,ui,input-safety,installer-wizard,install-smoke,package-controls,packages}`. Actual outputs/bytes, installed About/quick-start screenshots, source identities, runtime paths, preserved state and failure logs remain available. PR and earlier failure directories remain separate and immutable.
+
+Report revision `c0ceb162e14215d87077bed0cbe8a590e12e4beb` passes native push [38526798190](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38526798190) and both web runs [38526798247](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38526798247) / [38526805132](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38526805132). Its PR native [38526805079](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38526805079) fails after reinstall at a one-shot session-file root check, after exact restored text/images/two-way links and 67 other checks pass. Original artefact/log/dump remain in `artifacts/native/ci-c0ceb16-pr-failure`; no production root-loss cause is established because that assertion collapses I/O failures into false and retains no file snapshot. The thread-only dump has no managed heap, so it cannot recover that missing state.
+
+A deterministic windowless regression reproduces the same false result with valid roots held under an exclusive read lock (`0x80070020`). The follow-up observes **the identical workspace and both exact document roots** within the existing 20-second observation deadline, records every read/mismatch, repeats no input/save action and repairs no state. Lock release passes with unchanged bytes; persistent wrong roots still fail. All 14 observation checks and zero-warning build pass locally. Hosted follow-up results are recorded in PR 23; the original failure is not relabelled as a proven product defect or a pass. Independently downloaded branch `.319` remains source `c0ceb16`, distinct from selected `.317`.
 
 ## Security and remaining restrictions
 

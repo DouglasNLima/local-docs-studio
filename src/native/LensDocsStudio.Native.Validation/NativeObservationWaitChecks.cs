@@ -11,6 +11,8 @@ internal static class NativeObservationWaitChecks
     {
         Directory.CreateDirectory(output);
         var checks = new List<string>();
+        NativeUiChecks.CheckWorkspaceContextObservation(output);
+        checks.Add("Transient session read locks do not imply lost roots; persistent root mismatches still fail without changing bytes or input actions");
         foreach (var code in new[] { unchecked((int)0x80131505), unchecked((int)0x800705B4) })
         foreach (var wrapped in new[] { false, true })
         {
