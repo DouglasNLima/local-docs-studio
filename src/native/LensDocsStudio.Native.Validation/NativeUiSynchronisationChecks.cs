@@ -32,7 +32,7 @@ internal static partial class NativeUiChecks
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
                 Wait(() => ReadPreferences().Preview?.ReadingMode == mode, "The explicit sync fixture reading mode did not persist.");
-                editor.Click();
+                FocusEditor();
                 var editorFocus = editor.Automation.FocusedElement();
                 var editorMatch = Nth(editor, "action", 3); editorMatch.Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
@@ -55,7 +55,7 @@ internal static partial class NativeUiChecks
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(editor, "action", 4), TextPatternRangeEndpoint.Start) == 0),
                     "Preview-to-editor sync selected the wrong repeated occurrence.");
                 if (!preview.Automation.Compare(previewFocus, preview.Automation.FocusedElement())) throw new IOException("Preview-to-editor selection stole keyboard focus.");
-                editor.Click(); Nth(editor, "Café 😀 é", 1).Select();
+                FocusEditor(); Nth(editor, "Café 😀 é", 1).Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "Café 😀 é"),
                     "Unicode literal selection did not synchronise exactly.");
                 foreach (var pair in new[] {
@@ -64,7 +64,7 @@ internal static partial class NativeUiChecks
                     (Source: "Soft\nbreak and hard", Rendered: "Soft break and hard", Occurrence: 1)
                 })
                 {
-                    editor.Click(); Nth(editor, pair.Source, pair.Occurrence).Select();
+                    FocusEditor(); Nth(editor, pair.Source, pair.Occurrence).Select();
                     Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Rendered),
                         "Heading, formatted multiword or soft-break selection did not reach its exact rendered text.");
                     var rectangle = Nth(preview, pair.Rendered, 1).GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0);
@@ -74,7 +74,7 @@ internal static partial class NativeUiChecks
                         "Rendered heading, formatted multiword or soft-break selection lost its exact source endpoints.");
                     observations.Add(new { ReadingMode = mode, MultiwordSource = pair.Source, Rendered = pair.Rendered, BidirectionalExact = true });
                 }
-                editor.Click(); Nth(editor, "action", 5).Select();
+                FocusEditor(); Nth(editor, "action", 5).Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(preview, "action", 5), TextPatternRangeEndpoint.Start) == 0),
                     "Inline code selection lost its exact repeated occurrence.");
@@ -84,7 +84,7 @@ internal static partial class NativeUiChecks
             Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
             Wait(() => ReadPreferences().Desktop?.SyncSelection == false, "Disabling selection synchronisation did not persist.");
             var retained = preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray();
-            editor.Click(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
+            FocusEditor(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
             if (!preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).SequenceEqual(retained))
                 throw new IOException("Disabled synchronisation still changed the preview selection.");
             if (ReadEditorText(editor) != fixture || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Selection synchronisation changed source bytes.");
@@ -117,6 +117,11 @@ internal static partial class NativeUiChecks
             catch (Exception error) when (originalFailure is not null)
             { File.WriteAllText(Path.Combine(output, "native-selection-synchronisation-cleanup.json"), JsonSerializer.Serialize(new { OriginalError = originalFailure.ToString(), CleanupError = error.ToString() })); }
             finally { RestoreClipboard(clipboard, owned); }
+        }
+        void FocusEditor()
+        {
+            editor.Click(); editor.Focus();
+            Wait(() => editor.Properties.HasKeyboardFocus.Value, "The actual editor did not acquire typing focus before its selection input.");
         }
         UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
         FlaUI.Core.ITextRange Nth(AutomationElement pane, string text, int occurrence)

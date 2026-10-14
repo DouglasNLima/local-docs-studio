@@ -221,8 +221,10 @@ public partial class MainWindow : Window
         await model.RunAsync(async () => { await model.OpenPathAsync(entry.Path); opened = true; });
         if (opened) model.MoveDocumentCommand.Execute(null);
     }
-    private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = false;
-    private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = true;
+    private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e)
+    { CancelSynchronisation(); previewFocused = false; }
+    private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e)
+    { CancelSynchronisation(); previewFocused = true; }
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         previewFocused = true;
