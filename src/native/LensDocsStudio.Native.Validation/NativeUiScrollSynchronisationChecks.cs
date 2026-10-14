@@ -67,7 +67,15 @@ internal static partial class NativeUiChecks
             }
             Find(window, "SyncScrollControl").AsCheckBox().IsChecked = false;
             Find(window, "FollowCaretControl").AsCheckBox().IsChecked = true;
-            FocusEditor(); Range(editor, "Region 055").Select(); Keyboard.Type(VirtualKeyShort.RIGHT);
+            Wait(() => ReadPreferences().Desktop is { FollowCaret: true, SyncScroll: false, SyncSelection: false }, "Independent caret following did not become active.");
+            // AvalonEdit's UIA Select changes the selection without moving its caret.
+            // Use the actual source Find command and a caret key to exercise following.
+            FocusEditor(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+            Find(window, "FindText").AsTextBox().Text = "Region 055"; Find(window, "FindNext").AsButton().Invoke();
+            Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Region 055"), "The follow-caret fixture did not find its exact source heading.");
+            Find(window, "CloseFind").AsButton().Invoke(); Keyboard.Type(VirtualKeyShort.LEFT);
+            var expectedLine = fixture[..fixture.IndexOf("Region 055", StringComparison.Ordinal)].Count(character => character == '\n') + 1;
+            Wait(() => Find(window, "CaretStatus").Name.StartsWith($"Ln {expectedLine},", StringComparison.Ordinal), "The real caret did not move into the requested source region.");
             Wait(() => Visible(preview, "Region 055"), "Independent follow-caret did not reveal the current source block.");
             if (!ReadPreferences().Desktop!.FollowCaret || ReadPreferences().Desktop!.SyncScroll || ReadPreferences().Desktop!.SyncSelection)
                 throw new IOException("The independent follow-caret setting changed another synchronisation preference.");

@@ -164,7 +164,7 @@ public partial class MainWindow : Window
             if (!preparePreview)
             {
                 parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = null; renderedDocumentId = null;
-                Preview.Document = new FlowDocument(); RefreshOutline();
+                Preview.Document = new FlowDocument(); previewBeforeEditorStatus = null; RefreshOutline();
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
             }
@@ -195,8 +195,9 @@ public partial class MainWindow : Window
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             InstallSyncPreview(sourceVersion);
             RefreshOutline();
-            model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
-                : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
+            model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
@@ -560,7 +561,16 @@ public partial class MainWindow : Window
         if (changed)
         {
             FindBar.Visibility = Visibility.Collapsed;
-            QueuePreview();
+            if (SyncCurrent && !previewTimer.IsEnabled && previewGate.CurrentCount == 1)
+            {
+                // Native layout can reuse an unchanged completed preview. Hidden source
+                // edits still invalidate it through the normal preview scheduling path.
+                if (layout == "Editor")
+                { previewBeforeEditorStatus = model.PreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
+                else if (previewBeforeEditorStatus is { } status)
+                { model.PreviewStatus = status; previewBeforeEditorStatus = null; }
+            }
+            else { previewBeforeEditorStatus = null; QueuePreview(); }
         }
     }
     private async Task SavePreferences()

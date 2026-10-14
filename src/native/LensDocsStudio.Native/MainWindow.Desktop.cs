@@ -13,6 +13,7 @@ public partial class MainWindow
 {
     private bool focusMode;
     private bool fullScreen;
+    private string? previewBeforeEditorStatus;
     private WindowBounds? previousWindow;
     private WindowStyle previousStyle;
     private ResizeMode previousResize;

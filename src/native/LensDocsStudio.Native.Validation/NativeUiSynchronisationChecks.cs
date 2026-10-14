@@ -61,7 +61,9 @@ internal static partial class NativeUiChecks
                 foreach (var pair in new[] {
                     (Source: "Native sync fixture", Rendered: "Native sync fixture", Occurrence: 1),
                     (Source: "action **action** *action", Rendered: "action action action", Occurrence: 1),
-                    (Source: "Soft\nbreak and hard", Rendered: "Soft break and hard", Occurrence: 1)
+                    (Source: "Soft\nbreak and hard", Rendered: "Soft break and hard", Occurrence: 1),
+                    (Source: "hard  \nbreak.", Rendered: "hard\r\nbreak.", Occurrence: 1),
+                    (Source: "Café 😀 é action\n\nSoft", Rendered: "Café 😀 é action\r\nSoft", Occurrence: 1)
                 })
                 {
                     FocusEditor(); Nth(editor, pair.Source, pair.Occurrence).Select();
@@ -69,10 +71,11 @@ internal static partial class NativeUiChecks
                     Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Rendered),
                         "Heading, formatted multiword or soft-break selection did not reach its exact rendered text.");
                     if (!editor.Automation.Compare(sourceFocus, editor.Automation.FocusedElement())) throw new IOException("Formatted source selection lost its originating typing focus.");
-                    var rectangle = Nth(preview, pair.Rendered, 1).GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0);
+                    var renderedRange = RenderedRange(pair.Rendered);
+                    var rectangle = renderedRange.GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0);
                     Mouse.Click(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
                     var renderedFocus = preview.Automation.FocusedElement();
-                    Nth(preview, pair.Rendered, 1).Select();
+                    RenderedRange(pair.Rendered).Select();
                     Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Source),
                         "Rendered heading, formatted multiword or soft-break selection lost its exact source endpoints.");
                     if (!preview.Automation.Compare(renderedFocus, preview.Automation.FocusedElement())) throw new IOException("Formatted preview selection lost its originating keyboard focus.");
@@ -87,14 +90,40 @@ internal static partial class NativeUiChecks
             }
             Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
             Wait(() => ReadPreferences().Desktop?.SyncSelection == false, "Disabling selection synchronisation did not persist.");
-            var retained = preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray();
+            var retained = preview.Patterns.Text.Pattern.GetSelection().Single().Clone();
             FocusEditor(); Nth(editor, "action", 2).Select(); Thread.Sleep(180);
-            if (!preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).SequenceEqual(retained))
+            if (!RetainedSelection())
                 throw new IOException("Disabled synchronisation still changed the preview selection.");
+            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = true;
+            Layout("Editor"); Wait(() => preview.IsOffscreen, "Editor layout did not hide its native preview.");
+            FocusEditor(); Nth(editor, "action", 3).Select(); Thread.Sleep(180);
+            Layout("Split"); Wait(() => !preview.IsOffscreen, "Split layout did not restore the native preview.");
+            if (!RetainedSelection()) throw new IOException("Selection input while the preview was hidden changed its retained occurrence.");
+            FocusEditor(); Nth(editor, "action", 4).Select(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+            Wait(() => ReadEditorText(editor).Length == 0, "Selection cancellation did not activate its replacement tab.");
+            Thread.Sleep(180);
+            if (editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1).Length > 0))
+                throw new IOException("Stale selection synchronisation modified the replacement document.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+            Wait(() => ReadEditorText(editor) == fixture && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Café 😀 é", StringComparison.Ordinal),
+                "The surviving selection fixture did not restore its current preview.");
+            FocusEditor(); Nth(editor, "Café 😀 é", 1).Select(); Keyboard.Type("Résumé 😀");
+            Wait(() => ReadEditorText(editor) == fixture.Replace("Café 😀 é", "Résumé 😀", StringComparison.Ordinal)
+                && preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Résumé 😀", StringComparison.Ordinal), "A valid source edit did not reach its current mapped preview.");
+            Nth(editor, "Résumé 😀", 1).Select();
+            Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Résumé 😀"), "Selection used stale offsets after a valid Unicode source edit.");
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => ReadEditorText(editor) == fixture, "The mapped Unicode edit did not retain its exact Undo.");
+            Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
             if (ReadEditorText(editor) != fixture || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Selection synchronisation changed source bytes.");
             window.CaptureToFile(Path.Combine(output, "native-selection-synchronisation.png"));
             File.WriteAllText(Path.Combine(output, "native-selection-synchronisation.json"), JsonSerializer.Serialize(new {
-                Passed = true, Observations = observations, DisabledSettingRespected = true, SourceBytesPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
+                Passed = true, Observations = observations, DisabledSettingRespected = true, HiddenPaneRespected = true,
+                TabCancellation = true, ValidUnicodeEditRemapped = true, SourceBytesPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
+
+            bool RetainedSelection() => preview.Patterns.Text.Pattern.GetSelection() is { Length: 1 } selection
+                && selection[0].CompareEndpoints(TextPatternRangeEndpoint.Start, retained, TextPatternRangeEndpoint.Start) == 0
+                && selection[0].CompareEndpoints(TextPatternRangeEndpoint.End, retained, TextPatternRangeEndpoint.End) == 0;
         }
         catch (Exception error)
         {
@@ -113,6 +142,7 @@ internal static partial class NativeUiChecks
             {
                 var control = window.FindFirstDescendant(cf => cf.ByAutomationId("SyncSelectionControl"));
                 if (control is not null) control.AsCheckBox().IsChecked = false;
+                Layout("Split");
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(before.Preview?.ReadingMode ?? "Automatic"); reading.Collapse();
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == original, "Synchronisation fixture replacement did not retain exact Undo.");
@@ -126,6 +156,15 @@ internal static partial class NativeUiChecks
         {
             editor.Click(); editor.Focus();
             Wait(() => editor.Properties.HasKeyboardFocus.Value, "The actual editor did not acquire typing focus before its selection input.");
+        }
+        void Layout(string layout) => (window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByAutomationId("Layout" + layout)))
+            ?? throw new IOException("The native layout command is missing: " + layout)).AsButton().Invoke();
+        FlaUI.Core.ITextRange RenderedRange(string text)
+        {
+            var lines = text.Split("\r\n", StringSplitOptions.None);
+            var range = Nth(preview, lines[0], 1);
+            if (lines.Length > 1) range.MoveEndpointByRange(TextPatternRangeEndpoint.End, Nth(preview, lines[^1], 1), TextPatternRangeEndpoint.End);
+            return range;
         }
         UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
         FlaUI.Core.ITextRange Nth(AutomationElement pane, string text, int occurrence)

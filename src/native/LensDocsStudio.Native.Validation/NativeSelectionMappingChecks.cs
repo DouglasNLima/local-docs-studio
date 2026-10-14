@@ -23,12 +23,17 @@ internal static class NativeSelectionMappingChecks
                     throw new IOException($"Repeated-word selection mapping failed at source offset {start}.");
                 observations.Add(new { Dark = dark, SourceOffset = start, Length = length, ExactRoundTrip = true });
             }
-            foreach (var text in new[] { "Café", "😀", "é", "action **action** *action* [action" })
+            foreach (var text in new[] { "Café", "😀", "é", "action **action** *action* [action", "hard  \nbreak.", "Café 😀 é action\n\nSoft" })
             {
                 var start = source.IndexOf(text, StringComparison.Ordinal);
                 if (!preview.TextMap.TryPreviewRange(start, text.Length, out var from, out var to)
                     || !preview.TextMap.TrySourceRange(from!, to!, out var restored, out var length) || restored != start || length != text.Length)
                     throw new IOException("Formatted or Unicode selection boundaries lost their source offsets.");
+                var renderedText = new TextRange(from!, to!).Text;
+                if (text == "hard  \nbreak." && renderedText != "hard\r\nbreak."
+                    || text == "Café 😀 é action\n\nSoft" && renderedText != "Café 😀 é action\r\nSoft")
+                    throw new IOException("Hard-break or cross-paragraph native text lost its exact mapped boundaries: " + renderedText);
+                observations.Add(new { Dark = dark, Source = text, Rendered = renderedText, ExactRoundTrip = true });
             }
             var link = preview.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines.OfType<Hyperlink>()).Single();
             if (!preview.TextMap.TrySourceRange(link.ElementStart, link.ElementEnd, out var linkStart, out var linkLength)
