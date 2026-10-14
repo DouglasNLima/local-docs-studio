@@ -77,7 +77,7 @@ internal static partial class NativeUiChecks
             checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
             CheckScrollSynchronisation(window, editor, state, output, source);
             checks.Add("Native bidirectional semantic scroll, rapid input, independent caret following and tab cancellation preserve focus, caret and source");
-            CheckMinimumWindow(window, editor, output, source);
+            CheckMinimumWindow(window, editor, automation, app.ProcessId, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             if (desktopUxOnly)
             {
@@ -214,7 +214,9 @@ internal static partial class NativeUiChecks
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Unsaved content retained before deletion.");
-            Wait(() => ReadEditorText(editor) == "Created through the native workspace.\nUnsaved content retained before deletion.",
+            // A new file with no previous line break uses Windows' CRLF default.
+            const string deletedDraft = "Created through the native workspace.\r\nUnsaved content retained before deletion.";
+            Wait(() => ReadEditorText(editor) == deletedDraft,
                 "The deletion fixture did not receive its exact unsaved source, including the requested line break.");
             Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Patterns.Invoke.Pattern.Invoke();
             Window? deleteWindow = null;
@@ -227,7 +229,7 @@ internal static partial class NativeUiChecks
                 .Where(snapshot => snapshot.Document.Path == createdPath).ToArray();
             if (deletedSnapshots.Length != 2
                 || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == "Created through the native workspace.")
-                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == "Created through the native workspace.\nUnsaved content retained before deletion."))
+                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == deletedDraft))
                 throw new IOException("Deletion did not retain separate exact saved and unsaved source snapshots for its document.");
             checks.Add("Deleting a document uses the Windows shell and retains saved and unsaved source snapshots");
             Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Patterns.Invoke.Pattern.Invoke();
@@ -1474,6 +1476,7 @@ internal static partial class NativeUiChecks
             CheckWordImport(window, editor, automation, app.ProcessId, runRoot, output, artefact.Document, OpenThroughDialogue);
             checks.Add("Native Word import cancellation preserves the previous document; completed import exposes every warning and creates unchanged-source, portable Markdown and image files");
             var workspaceContext = CheckWorkspaceContextSwitch(window, editor, automation, app.ProcessId, runRoot, state, output, OpenThroughDialogue);
+            var desktopSession = PrepareDesktopSession(window, editor, automation, app.ProcessId, state);
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
@@ -1481,8 +1484,10 @@ internal static partial class NativeUiChecks
             window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The retained workspace did not restore.");
             mainWindow = window; editor = Find(window, "MarkdownEditor");
             CheckRetainedWorkspaceContent(window, editor, workspaceContext, output, "after-restart", workspaceContext.Draft);
+            CheckDesktopSession(window, editor, automation, app.ProcessId, state, output, desktopSession);
             ObserveRetainedContextSaved(workspaceContext, output);
             checks.Add("Switching folders retains earlier drafts, native images and two-way links; saving and restarting preserves per-document workspace context and exact files");
+            checks.Add("Actual process restart restores hidden panels, independent synchronisation choices, tab order, active identity and native pin actions without changing source");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "The retained workspace application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new IOException("The retained workspace failed during shutdown.");

@@ -2,12 +2,13 @@ using System.Text.Json;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
+using FlaUI.UIA3;
 
 namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    private static void CheckMinimumWindow(Window window, AutomationElement editor, string output, string source)
+    private static void CheckMinimumWindow(Window window, AutomationElement editor, UIA3Automation automation, int process, string output, string source)
     {
         var originalBounds = window.BoundingRectangle;
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
@@ -16,6 +17,24 @@ internal static partial class NativeUiChecks
             window.Patterns.Transform.Pattern.Resize(860, 540);
             Wait(() => window.BoundingRectangle.Width < originalBounds.Width && window.BoundingRectangle.Height < originalBounds.Height,
                 "The native window did not accept its smaller size.");
+            var commands = window.FindFirstDescendant(cf => cf.ByName("Application commands"))
+                ?? throw new IOException("The application toolbar is unavailable at minimum size.");
+            var more = commands.FindFirstDescendant(cf => cf.ByName("More commands"))
+                ?? throw new IOException("The actual native overflow command is unavailable.");
+            if (more.IsOffscreen || !window.BoundingRectangle.Contains(more.BoundingRectangle))
+                throw new IOException("The actual overflow command is clipped at minimum size.");
+            more.Click();
+            AutomationElement? settingsCommand = null;
+            Wait(() => (settingsCommand = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process).And(cf.ByAutomationId("ToolbarSettings")))
+                .FirstOrDefault(command => !command.IsOffscreen)) is not null, "Overflow did not expose its actual Settings command.");
+            window.CaptureToFile(Path.Combine(output, "native-minimum-overflow.png"));
+            settingsCommand!.AsButton().Invoke();
+            Window? settings = null;
+            Wait(() => (settings = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings")))?.AsWindow()) is not null,
+                "The actual overflow Settings command did not execute.");
+            Find(settings!, "SettingsCancel").AsButton().Invoke();
+            Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,
+                "The overflow Settings dialogue did not dismiss safely.");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_H);
@@ -43,7 +62,7 @@ internal static partial class NativeUiChecks
             if (!File.ReadAllBytes(source).AsSpan().SequenceEqual(saved)) throw new IOException("Minimum-window Find/Replace changed the saved file.");
             File.WriteAllText(Path.Combine(output, "native-minimum-window.json"), JsonSerializer.Serialize(new {
                 Passed = true, RequestedWidth = 860, RequestedHeight = 540, ActualBounds = bounds, Controls = controls,
-                SourceAndUndoPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
+                ActualOverflowCommandExecuted = true, SourceAndUndoPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
         }
         finally { window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height); }
     }

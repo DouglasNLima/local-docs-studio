@@ -56,12 +56,14 @@ internal static partial class NativeUiChecks
         Wait(() => !Visible("WorkspaceTree") && !Visible("ToggleSidebar"), "Focus Mode did not hide secondary chrome.");
         if (ReadPreferences().Desktop != beforeFocus.Desktop || ReadPreferences().ShowOutline != beforeFocus.ShowOutline)
             throw new IOException("Focus Mode overwrote permanent panel preferences.");
+        window.CaptureToFile(Path.Combine(output, "native-focus-mode.png"));
         Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => Visible("WorkspaceTree") && Visible("ToggleSidebar"), "Escape did not restore Focus Mode panels.");
         checks.Add("Focus Mode restores panel preferences and leaves the current layout intact");
 
         FocusWindow(window); Keyboard.Type(VirtualKeyShort.F11);
         Wait(() => window.BoundingRectangle.Height > bounds.Height + 5, "Full Screen did not reclaim the native window chrome.");
+        window.CaptureToFile(Path.Combine(output, "native-full-screen.png"));
         Find(window, "ViewMenu").Click(); Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("OpenWorkspaceMap"))?.IsOffscreen != false, "Escape did not close the menu in Full Screen.");
         if (window.BoundingRectangle.Height <= bounds.Height + 5) throw new IOException("Menu Escape exited Full Screen before closing its own menu.");
@@ -74,6 +76,7 @@ internal static partial class NativeUiChecks
         var picker = SearchWindow();
         Find(picker, "CommandSearchQuery").AsTextBox().Text = "Second";
         Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Quick Open did not filter workspace filenames.");
+        picker.CaptureToFile(Path.Combine(output, "native-quick-open.png"));
         Keyboard.Type(VirtualKeyShort.RETURN);
         Wait(() => ReadEditorText(editor).StartsWith("# Second document", StringComparison.Ordinal), "Quick Open did not activate its selected document.");
         FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
@@ -83,6 +86,7 @@ internal static partial class NativeUiChecks
         FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_P);
         picker = SearchWindow(); Find(picker, "CommandSearchQuery").AsTextBox().Text = "Toggle outline";
         Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Command Palette did not filter the actual panel action.");
+        picker.CaptureToFile(Path.Combine(output, "native-command-palette.png"));
         Keyboard.Type(VirtualKeyShort.RETURN); Wait(() => !ReadPreferences().ShowOutline, "Command Palette did not execute the outline toggle.");
         Find(window, "ToggleOutline").AsButton().Invoke(); Wait(() => ReadPreferences().ShowOutline, "Outline did not restore after the palette action.");
         checks.Add("Command Palette reuses an actual enabled native action");
