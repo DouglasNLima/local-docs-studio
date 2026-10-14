@@ -106,6 +106,8 @@ jobs:
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
+            artifacts/native/install-smoke/**/native-about.*
+            artifacts/native/install-smoke/**/native-quick-start.*
             artifacts/native/install-smoke/**/native-paste-error-acknowledgement.json
             artifacts/native/install-smoke/**/native-updates-command.json
             artifacts/native/install-smoke/**/native-details-keyboard.json

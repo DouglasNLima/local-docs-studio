@@ -178,7 +178,7 @@
      <MenuItem Header="Dar_k" Tag="Dark" IsCheckable="True" Click="ChangeDiagramTheme" AutomationProperties.AutomationId="DiagramThemeDark"/>
     </MenuItem>
    </MenuItem>
-   <MenuItem Header="_Help" AutomationProperties.AutomationId="HelpMenu"><MenuItem Header="Native _guide…" InputGestureText="F1" Click="OpenHelp" AutomationProperties.AutomationId="OpenHelp"/><Separator/><MenuItem Header="_Updates…" Click="OpenUpdates" AutomationProperties.AutomationId="UpdatesMenu"/><MenuItem Header="_About the native preview" Click="About"/></MenuItem>
+   <MenuItem Header="_Help" AutomationProperties.AutomationId="HelpMenu"><MenuItem Header="Native _guide…" InputGestureText="F1" Click="OpenHelp" AutomationProperties.AutomationId="OpenHelp"/><Separator/><MenuItem Header="_Updates…" Click="OpenUpdates" AutomationProperties.AutomationId="UpdatesMenu"/><MenuItem Header="_About the native preview" Click="About" AutomationProperties.AutomationId="AboutNativePreview"/></MenuItem>
   </Menu>
   <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,6">
    <DockPanel>

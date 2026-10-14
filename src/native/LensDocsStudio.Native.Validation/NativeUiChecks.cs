@@ -1360,6 +1360,8 @@ internal static partial class NativeUiChecks
             CheckWikiLinks(window, editor, automation, app.ProcessId, output, source, renamedDocument);
             checks.Add("Native workspace link completion inserts an unambiguous path; preview navigation and Back preserve drafts, missing targets explain the problem, and complete Undo restores saved/editor source");
             CheckHelpGuide(window, editor, automation, app.ProcessId, output, source);
+            CheckAbout(window, editor, automation, app.ProcessId, output, source, executable);
+            checks.Add("About displays the exact executable version and source revision without changing document state");
             CheckWorkspaceMap(window, editor, automation, app.ProcessId, output, source, renamedDocument);
             checks.Add("Native workspace map uses current drafts, copies a passive Markdown report, clears empty results and navigates exact source/document history; native diagrams and complete Undo preserve files");
             checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
