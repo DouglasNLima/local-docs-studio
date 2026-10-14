@@ -13,6 +13,8 @@ internal static class NativeObservationWaitChecks
         var checks = new List<string>();
         NativeUiChecks.CheckWorkspaceContextObservation(output);
         checks.Add("Transient session read locks do not imply lost roots; persistent root mismatches still fail without changing bytes or input actions");
+        NativeUiChecks.CheckDesktopStateObservation(output);
+        checks.Add("Locked/missing desktop state generations are observed within the original deadline; wrong choices and malformed JSON remain failures without input repetition");
         foreach (var code in new[] { unchecked((int)0x80131505), unchecked((int)0x800705B4) })
         foreach (var wrapped in new[] { false, true })
         {

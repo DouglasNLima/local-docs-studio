@@ -16,12 +16,15 @@ internal static partial class NativeUiChecks
         UIA3Automation automation, int process, string state)
     {
         var text = ReadEditorText(editor);
-        UserPreferences Preferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
-        SessionState Session() => JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))!;
+        UserPreferences? preferences = null;
+        SessionState? session = null;
         foreach (var id in new[] { "FollowCaretControl", "SyncScrollControl", "SyncSelectionControl" })
             Find(window, id).AsCheckBox().IsChecked = true;
-        if (Preferences().Desktop?.ShowSidebar != false) Find(window, "ToggleSidebar").AsButton().Invoke();
-        Wait(() => Preferences().Desktop is { ShowSidebar: false, FollowCaret: true, SyncScroll: true, SyncSelection: true },
+        Wait(() => (preferences = ReadDesktopState<UserPreferences>(state, "preferences.json")) is not null,
+            "The actual desktop preferences could not be observed.");
+        if (preferences!.Desktop?.ShowSidebar != false) Find(window, "ToggleSidebar").AsButton().Invoke();
+        Wait(() => (preferences = ReadDesktopState<UserPreferences>(state, "preferences.json")).Desktop is
+            { ShowSidebar: false, FollowCaret: true, SyncScroll: true, SyncSelection: true },
             "The actual desktop session choices did not persist independently.");
         var active = Find(window, "DocumentTabs").FindAllDescendants(cf => cf.ByControlType(ControlType.TabItem))
             .Single(tab => tab.Patterns.SelectionItem.Pattern.IsSelected.Value);
@@ -30,10 +33,14 @@ internal static partial class NativeUiChecks
         Wait(() => (pin = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("TabContextPin")))) is not null,
             "The active desktop session tab did not expose Pin.");
         pin!.AsMenuItem().Invoke();
-        Wait(() => Session().Documents.Any(document => document.Id == Session().ActiveDocument && document.IsPinned),
+        Wait(() =>
+        {
+            session = ReadDesktopState<SessionState>(state, "session.json");
+            return session.Documents.Any(document => document.Id == session.ActiveDocument && document.IsPinned);
+        },
             "The actual active desktop session pin did not persist.");
         if (ReadEditorText(editor) != text) throw new IOException("Preparing desktop preferences changed document text.");
-        return new(Preferences(), Session());
+        return new(preferences!, session!);
     }
 
     private static void CheckDesktopSession(Window window, AutomationElement editor, UIA3Automation automation,
@@ -47,8 +54,8 @@ internal static partial class NativeUiChecks
         {
             Wait(() =>
             {
-                preferences = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
-                var session = JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))!;
+                preferences = ReadDesktopState<UserPreferences>(state, "preferences.json");
+                var session = ReadDesktopState<SessionState>(state, "session.json");
                 var matched = preferences.Desktop == expected.Preferences.Desktop && preferences.ShowOutline == expected.Preferences.ShowOutline
                     && preferences.Layout == expected.Preferences.Layout && preferences.Theme == expected.Preferences.Theme
                     && session.ActiveDocument == expected.Session.ActiveDocument
@@ -81,5 +88,65 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(output, "native-desktop-restored-session.json"), JsonSerializer.Serialize(new {
             Passed = true, SidebarHidden = true, IndependentSyncChoicesRestored = true, TabOrderPinsAndActiveRestored = true,
             preferences!.Desktop, preferences.ShowOutline, preferences.Layout, preferences.Theme, SourcePreserved = true }));
+    }
+
+    private static T ReadDesktopState<T>(string state, string name)
+    {
+        // Observe a single immutable file generation without preventing the app's
+        // atomic replacement. Call only inside Wait: missing/locked generations
+        // are transient observations, while malformed JSON still fails immediately.
+        using var file = new FileStream(Path.Combine(state, name), FileMode.Open, FileAccess.Read,
+            FileShare.ReadWrite | FileShare.Delete);
+        return JsonSerializer.Deserialize<T>(file) ?? throw new JsonException("The observed desktop state was null: " + name);
+    }
+
+    internal static void CheckDesktopStateObservation(string output)
+    {
+        var root = Path.Combine(output, "desktop-state-observation"); Directory.CreateDirectory(root);
+        var path = Path.Combine(root, "preferences.json");
+        var expected = new UserPreferences(Desktop: new DesktopPreferences(ShowSidebar: false,
+            FollowCaret: true, SyncScroll: true, SyncSelection: true));
+        var original = JsonSerializer.SerializeToUtf8Bytes(expected); File.WriteAllBytes(path, original);
+        using var locked = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+        var lockedAttempts = 0;
+        Wait(() =>
+        {
+            if (++lockedAttempts == 2) locked.Dispose();
+            return ReadDesktopState<UserPreferences>(root, "preferences.json").Desktop == expected.Desktop;
+        }, "Locked desktop state did not become readable.", 1);
+        if (lockedAttempts != 2 || !File.ReadAllBytes(path).SequenceEqual(original))
+            throw new IOException("Observing a locked generation changed bytes or accepted the wrong state.");
+
+        var replacement = Path.Combine(root, "replacement.json"); File.Move(path, replacement);
+        var missingAttempts = 0;
+        Wait(() =>
+        {
+            if (++missingAttempts == 2) File.Move(replacement, path);
+            return ReadDesktopState<UserPreferences>(root, "preferences.json").Desktop == expected.Desktop;
+        }, "Missing desktop state did not become readable.", 1);
+        if (missingAttempts != 2 || !File.ReadAllBytes(path).SequenceEqual(original))
+            throw new IOException("Observing a missing generation changed bytes or accepted the wrong state.");
+
+        var wrong = JsonSerializer.SerializeToUtf8Bytes(expected with { Desktop = expected.Desktop! with { ShowSidebar = true } });
+        File.WriteAllBytes(path, wrong); Exception? mismatch = null; var mismatchAttempts = 0;
+        try
+        {
+            Wait(() => { mismatchAttempts++; return ReadDesktopState<UserPreferences>(root, "preferences.json").Desktop == expected.Desktop; },
+                "Persistent wrong desktop choices", 1);
+        }
+        catch (InvalidOperationException error) { mismatch = error; }
+        if (mismatch?.Message != "Persistent wrong desktop choices" || mismatchAttempts < 2 || !File.ReadAllBytes(path).SequenceEqual(wrong))
+            throw new IOException("The observer accepted or repaired persistently wrong desktop choices.");
+
+        File.WriteAllText(path, "{"); Exception? malformed = null; var malformedAttempts = 0;
+        try { Wait(() => { malformedAttempts++; ReadDesktopState<UserPreferences>(root, "preferences.json"); return true; }, "Malformed state", 1); }
+        catch (JsonException error) { malformed = error; }
+        if (malformed is null || malformedAttempts != 1 || File.ReadAllText(path) != "{")
+            throw new IOException("Malformed desktop state was swallowed, retried or repaired.");
+        File.WriteAllText(Path.Combine(output, "native-desktop-state-observation-regression.json"), JsonSerializer.Serialize(new {
+            Passed = true, LockedGenerationRetried = true, MissingGenerationRetried = true,
+            ExactStateAndBytesRetained = true, PersistentMismatchRejected = true, MalformedStateFailsImmediately = true,
+            ObservationDeadlineSeconds = 1, ProductionDeadlineSeconds = 20, InputActionsExecuted = 0,
+            lockedAttempts, missingAttempts, mismatchAttempts, malformedAttempts }));
     }
 }
