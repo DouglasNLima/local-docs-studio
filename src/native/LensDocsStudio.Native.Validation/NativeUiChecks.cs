@@ -72,6 +72,8 @@ internal static partial class NativeUiChecks
             checks.Add("Modern desktop controls retain independent panels, Focus Mode, Full Screen, Quick Open, actual palette actions, source selection and Undo");
             CheckSynchronisation(window, editor, state, output, source);
             checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
+            CheckScrollSynchronisation(window, editor, state, output, source);
+            checks.Add("Native bidirectional semantic scroll, rapid input, independent caret following and tab cancellation preserve focus, caret and source");
             CheckMinimumWindow(window, editor, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             if (desktopUxOnly)
