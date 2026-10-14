@@ -53,7 +53,8 @@ public partial class MainWindow
     }
     private async void PanelResized(object sender, DragCompletedEventArgs e)
     {
-        if (focusMode) return;
+        if (focusMode || e.Canceled || ReferenceEquals(sender, SidebarSplitter) && !SidebarPanel.IsVisible
+            || ReferenceEquals(sender, OutlineSplitter) && !OutlinePanel.IsVisible) return;
         var sidebar = Math.Clamp(SidebarColumn.ActualWidth, 150, 600);
         var outline = Math.Clamp(OutlineColumn.ActualWidth, 160, 600);
         var resizeSidebar = ReferenceEquals(sender, SidebarSplitter);

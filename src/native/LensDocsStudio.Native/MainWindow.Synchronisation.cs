@@ -37,6 +37,7 @@ public partial class MainWindow
         Preview.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged), true);
         Preview.LayoutUpdated += PreviewLayoutUpdated;
         Editor.PreviewMouseWheel += UserScrollInput; Preview.PreviewMouseWheel += UserScrollInput;
+        Editor.PreviewMouseDown += UserSelectionInput; Preview.PreviewMouseDown += UserSelectionInput;
         Closed += (_, _) =>
         {
             CancelSynchronisation(); syncTimer.Tick -= SyncTick;
@@ -45,6 +46,7 @@ public partial class MainWindow
             Preview.LayoutUpdated -= PreviewLayoutUpdated;
             Preview.RemoveHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(PreviewScrollChanged));
             Editor.PreviewMouseWheel -= UserScrollInput; Preview.PreviewMouseWheel -= UserScrollInput;
+            Editor.PreviewMouseDown -= UserSelectionInput; Preview.PreviewMouseDown -= UserSelectionInput;
             if (observedSelection is not null) observedSelection.Changed -= PreviewSelectionChanged;
         };
     }
@@ -90,10 +92,10 @@ public partial class MainWindow
     }
     private void UserScrollInput(object sender, MouseWheelEventArgs e)
     {
-        if (!applyingSync) return;
         CancelSynchronisation();
         if (DesktopState.SyncScroll && BothPanesVisible) QueueSynchronisation(ReferenceEquals(sender, Editor) ? "editor-scroll" : "preview-scroll");
     }
+    private void UserSelectionInput(object sender, MouseButtonEventArgs e) => CancelSynchronisation();
     private void EditorSelectionChanged(object? sender, EventArgs e)
     {
         if (!applyingSync && BothPanesVisible && DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin) QueueSynchronisation("editor-selection");

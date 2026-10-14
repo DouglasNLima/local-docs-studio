@@ -306,7 +306,7 @@
     <Grid x:Name="ContentGrid">
      <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineSplitterColumn" Width="5"/><ColumnDefinition x:Name="OutlineColumn" Width="240"/></Grid.ColumnDefinitions>
      <DockPanel x:Name="EditorPane" Grid.Column="0">
-      <ToolBar x:Name="FormattingToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Markdown formatting">
+      <ToolBar x:Name="FormattingToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.EditorToolbar}" AutomationProperties.Name="Markdown formatting">
 <Button ToolTip="Heading level" AutomationProperties.Name="Heading level" Click="OpenHeadingMenu"><ui:CommandIcon Kind="Heading"/></Button>
      <Button Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Undo (Ctrl+Z)" AutomationProperties.Name="Undo (Ctrl+Z)"><ui:CommandIcon Kind="Undo"/></Button>
      <Button Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Redo (Ctrl+Y)" AutomationProperties.Name="Redo (Ctrl+Y)"><ui:CommandIcon Kind="Redo"/></Button>
