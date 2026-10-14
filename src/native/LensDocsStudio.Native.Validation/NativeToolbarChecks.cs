@@ -56,14 +56,27 @@ internal static class NativeToolbarChecks
                     painted.Render(drawing);
                     var pixels = new byte[18 * 18 * 4]; painted.CopyPixels(pixels, 18 * 4, 0);
                     var ink = Enumerable.Range(0, 18 * 18).Count(index => pixels[index * 4 + 3] > 0);
+                    var toolbarPaint = new System.Windows.Media.Imaging.RenderTargetBitmap((int)width, 48, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                    toolbarPaint.Render(toolbar);
+                    var toolbarPixels = new byte[(int)width * 48 * 4]; toolbarPaint.CopyPixels(toolbarPixels, (int)width * 4, 0);
+                    var foreground = ((System.Windows.Media.SolidColorBrush)moreIcon.Foreground).Color;
+                    var iconPosition = moreIcon.TranslatePoint(new(), toolbar);
+                    var hostedInk = 0;
+                    for (var y = Math.Max(0, (int)iconPosition.Y); y < Math.Min(48, (int)(iconPosition.Y + moreIcon.ActualHeight)); y++)
+                    for (var x = Math.Max(0, (int)iconPosition.X); x < Math.Min((int)width, (int)(iconPosition.X + moreIcon.ActualWidth)); x++)
+                    {
+                        var pixel = (y * (int)width + x) * 4;
+                        if (toolbarPixels[pixel + 3] == 255 && Math.Abs(toolbarPixels[pixel] - foreground.B) < 30
+                            && Math.Abs(toolbarPixels[pixel + 1] - foreground.G) < 30 && Math.Abs(toolbarPixels[pixel + 2] - foreground.R) < 30) hostedInk++;
+                    }
                     var observation = new { Theme = theme, Width = width, ToolbarWidth = toolbar.ActualWidth, PanelWidth = panel.ActualWidth,
                         toolbar.HasOverflowItems, OverflowCount = overflow, MoreVisibility = more.Visibility.ToString(), MoreBounds = bounds.ToString(),
-                        MoreIconWidth = moreIcon.ActualWidth, MoreIconHeight = moreIcon.ActualHeight, MorePaintedPixels = ink,
+                        MoreIconWidth = moreIcon.ActualWidth, MoreIconHeight = moreIcon.ActualHeight, MorePaintedPixels = ink, MorePixelsInsideToolbar = hostedInk,
                         MoreGeometry = (moreIcon.TryFindResource("Icon.More") as System.Windows.Media.Geometry)?.Bounds.ToString(),
                         MoreForeground = moreIcon.Foreground.ToString(), MoreVisible = moreIcon.IsVisible };
                     cases.Add(observation);
-                    if (width < 320 && (overflow == 0 || !toolbar.HasOverflowItems || more.Visibility != Visibility.Visible || bounds.Right > width || bounds.Width < 20
-                        || moreIcon.ActualWidth < 12 || moreIcon.ActualHeight < 12 || ink < 6))
+                    if (width < 320 && overflow == 0 || overflow > 0 && (!toolbar.HasOverflowItems || more.Visibility != Visibility.Visible || bounds.Right > width || bounds.Width < 20
+                        || moreIcon.ActualWidth < 12 || moreIcon.ActualHeight < 12 || ink < 6 || hostedInk < 6))
                         throw new IOException("Native toolbar overflow did not retain its accessible command button: " + JsonSerializer.Serialize(observation));
                 }
             }

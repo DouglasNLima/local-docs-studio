@@ -23,6 +23,10 @@ internal static partial class NativeUiChecks
         FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
         if (ReadEditorText(editor) != original) throw new IOException("Normal close removed the pinned active document.");
         Open("Tab B", "# Tab B"); Open("Tab C", "# Tab C");
+        FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.TAB);
+        Wait(() => ReadEditorText(editor).StartsWith("# Tab B", StringComparison.Ordinal), "Ctrl+Shift+Tab did not activate the preceding source document.");
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.TAB);
+        Wait(() => ReadEditorText(editor).StartsWith("# Tab C", StringComparison.Ordinal), "Ctrl+Tab did not restore the next source document.");
         TabAction("Tab B.md", "Close tabs to the right");
         Wait(() => ReadEditorText(editor).StartsWith("# Tab B", StringComparison.Ordinal) && Tab("Tab C.md", false) is null,
             "Close to the right did not activate its surviving document.");
@@ -62,7 +66,7 @@ internal static partial class NativeUiChecks
             throw new IOException("Workspace or tab actions changed unrelated saved documents.");
         Wait(() => ReadEditorText(editor) == original, "Folder deletion did not restore the surviving active document.");
         File.WriteAllText(Path.Combine(output, "native-workspace-modernisation.json"), JsonSerializer.Serialize(new {
-            Passed = true, PinsPersisted = true, CloseRightSurvival = true, CloseOthersCancel = true, CloseIsNotDelete = true,
+            Passed = true, PinsPersisted = true, KeyboardTabSwitching = true, CloseRightSurvival = true, CloseOthersCancel = true, CloseIsNotDelete = true,
             FolderDeleteCancelPreservesEverything = true, ActualWindowsRecycle = true, SavedAndUnsavedSnapshots = true, UnrelatedBytesPreserved = true }));
 
         AutomationElement? Tab(string title, bool required = true)

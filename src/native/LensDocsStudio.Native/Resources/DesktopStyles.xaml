@@ -62,6 +62,22 @@
    </ControlTemplate.Triggers>
   </ControlTemplate></Setter.Value></Setter>
  </Style>
+ <Style x:Key="Desktop.OverflowButton" TargetType="ToggleButton">
+  <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+  <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+  <Setter Property="BorderBrush" Value="Transparent"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToggleButton">
+   <Border x:Name="Surface" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="3">
+    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+   </Border>
+   <ControlTemplate.Triggers>
+    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource HoverBrush}"/></Trigger>
+    <Trigger Property="IsChecked" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource HoverBrush}"/></Trigger>
+    <Trigger Property="IsPressed" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource PressedBrush}"/><Setter Property="Foreground" Value="{DynamicResource PressedTextBrush}"/></Trigger>
+    <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger>
+   </ControlTemplate.Triggers>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
  <Style x:Key="Desktop.Toolbar" TargetType="ToolBar">
   <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
   <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
@@ -71,7 +87,7 @@
    <Grid Background="{TemplateBinding Background}" Margin="{TemplateBinding Padding}">
     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="24"/></Grid.ColumnDefinitions>
     <ToolBarPanel x:Name="PART_ToolBarPanel" IsItemsHost="True" Margin="0,0,2,0"/>
-    <ToggleButton x:Name="Overflow" Grid.Column="1" Width="24" BorderThickness="0" Background="{DynamicResource PanelBrush}" Foreground="{DynamicResource TextBrush}"
+    <ToggleButton x:Name="Overflow" Grid.Column="1" Width="24" Style="{StaticResource Desktop.OverflowButton}"
      IsChecked="{Binding IsOverflowOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" ToolTip="More commands" AutomationProperties.Name="More commands">
      <ui:CommandIcon Kind="More"/>
     </ToggleButton>
