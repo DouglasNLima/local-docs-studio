@@ -23,17 +23,20 @@ public partial class MainWindow
     {
         var sidebar = DesktopState.ShowSidebar && !focusMode;
         var outline = model.Preferences.ShowOutline && !focusMode;
+        var widths = DesktopPanelSizing.Fit(ActualWidth > 0 ? ActualWidth : Width, model.Layout == "Split",
+            sidebar ? DesktopState.SidebarWidth : 0, outline ? DesktopState.OutlineWidth : 0);
         SidebarColumn.MinWidth = sidebar ? 150 : 0; SidebarColumn.MaxWidth = sidebar ? 600 : 0;
-        SidebarColumn.Width = new GridLength(sidebar ? DesktopState.SidebarWidth : 0);
+        SidebarColumn.Width = new GridLength(widths.Sidebar);
         SidebarPanel.Visibility = SidebarSplitter.Visibility = sidebar ? Visibility.Visible : Visibility.Collapsed;
         SidebarSplitterColumn.Width = new GridLength(sidebar ? 5 : 0);
         OutlineColumn.MinWidth = outline ? 160 : 0; OutlineColumn.MaxWidth = outline ? 600 : 0;
-        OutlineColumn.Width = new GridLength(outline ? DesktopState.OutlineWidth : 0);
+        OutlineColumn.Width = new GridLength(widths.Outline);
         OutlinePanel.Visibility = OutlineSplitter.Visibility = outline ? Visibility.Visible : Visibility.Collapsed;
         OutlineSplitterColumn.Width = new GridLength(outline ? 5 : 0);
         FormattingToolbar.Visibility = PrimaryToolbar.Visibility = focusMode ? Visibility.Collapsed : Visibility.Visible;
         PreviewToolbar.Visibility = focusMode ? Visibility.Collapsed : Visibility.Visible;
     }
+    private void DesktopWindowResized(object sender, SizeChangedEventArgs e) => ApplyPanels();
     private async Task PersistDesktop(Func<UserPreferences, UserPreferences> update)
     {
         try { await model.UpdatePreferencesAsync(update); }

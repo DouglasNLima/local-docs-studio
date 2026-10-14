@@ -76,13 +76,7 @@ public partial class MainWindow
         // An edit can retain the same selected span while replacing its contents.
         // Reconcile that current input once the new immutable map is installed;
         // it need not raise another SelectionChanged event.
-        if (BothPanesVisible && Editor.IsKeyboardFocusWithin)
-        {
-            if (DesktopState.SyncSelection && Editor.SelectionLength > 0)
-            { QueueFocusedSynchronisation("editor-selection"); return; }
-            if (DesktopState.FollowCaret)
-            { QueueFocusedSynchronisation("caret"); return; }
-        }
+        if (QueueCurrentEditorInput()) return;
         var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0;
         if (offset > 0)
             Dispatcher.BeginInvoke(async () =>
@@ -142,6 +136,15 @@ public partial class MainWindow
         // other pane cannot feed back, while fresh input supersedes viewport restoration.
         if (applyingSync) CancelSynchronisation();
         QueueSynchronisation(origin);
+    }
+    private bool QueueCurrentEditorInput()
+    {
+        if (!BothPanesVisible || !Editor.IsKeyboardFocusWithin) return false;
+        if (DesktopState.SyncSelection && Editor.SelectionLength > 0)
+        { QueueFocusedSynchronisation("editor-selection"); return true; }
+        if (DesktopState.FollowCaret)
+        { QueueFocusedSynchronisation("caret"); return true; }
+        return false;
     }
     private async void SyncTick(object? sender, EventArgs e)
     {

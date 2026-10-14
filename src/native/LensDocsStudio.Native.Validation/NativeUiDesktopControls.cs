@@ -31,6 +31,7 @@ internal static partial class NativeUiChecks
         checks.Add("Independent panel visibility persists without replacing source or preview");
 
         var sidebarWidth = ReadPreferences().Desktop!.SidebarWidth; var outlineWidth = ReadPreferences().Desktop!.OutlineWidth;
+        Find(window, "ToggleOutline").AsButton().Invoke(); Wait(() => !ReadPreferences().ShowOutline, "Independent resize did not hide the outline.");
         ResizePanel("Resize workspace", 40);
         Wait(() => ReadPreferences().Desktop!.SidebarWidth > sidebarWidth + 25, "Pointer resizing did not persist the workspace width.");
         var resizedSidebar = ReadPreferences().Desktop!.SidebarWidth;
@@ -38,6 +39,8 @@ internal static partial class NativeUiChecks
         Wait(() => Visible("WorkspaceTree") && Math.Abs(ReadPreferences().Desktop!.SidebarWidth - resizedSidebar) < 2,
             "Reopening the workspace lost its resized width.");
         ResizePanel("Resize workspace", -40);
+        Find(window, "ToggleOutline").AsButton().Invoke(); Wait(() => ReadPreferences().ShowOutline, "Independent resize did not restore the outline.");
+        Find(window, "ToggleSidebar").AsButton().Invoke(); Wait(() => ReadPreferences().Desktop?.ShowSidebar == false, "Independent resize did not hide the workspace.");
         ResizePanel("Resize outline", -40);
         Wait(() => ReadPreferences().Desktop!.OutlineWidth > outlineWidth + 25, "Pointer resizing did not persist the independent outline width.");
         var resizedOutline = ReadPreferences().Desktop!.OutlineWidth;
@@ -45,6 +48,7 @@ internal static partial class NativeUiChecks
         Wait(() => ReadPreferences().ShowOutline && Math.Abs(ReadPreferences().Desktop!.OutlineWidth - resizedOutline) < 2,
             "Reopening the outline lost its resized width.");
         ResizePanel("Resize outline", 40);
+        Find(window, "ToggleSidebar").AsButton().Invoke(); Wait(() => ReadPreferences().Desktop?.ShowSidebar == true, "Independent resize did not restore the workspace.");
         checks.Add("Pointer-driven independent panel widths persist through hide/reopen without changing source");
 
         var beforeFocus = ReadPreferences();

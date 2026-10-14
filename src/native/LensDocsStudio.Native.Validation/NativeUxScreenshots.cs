@@ -19,6 +19,7 @@ internal static partial class NativeUiChecks
             if (highContrast && !System.Windows.SystemParameters.HighContrast) throw new IOException("The hosted Windows high-contrast setting was not applied.");
             if (highContrast)
             {
+                _ = System.Windows.Application.Current ?? new System.Windows.Application { ShutdownMode = System.Windows.ShutdownMode.OnExplicitShutdown };
                 var resources = new System.Windows.ResourceDictionary(); LensDocsStudio.Native.Platform.ThemeService.Apply(resources, "System");
                 var foreground = (System.Windows.Media.SolidColorBrush)resources["PressedTextBrush"];
                 var background = (System.Windows.Media.SolidColorBrush)resources["PressedBrush"];

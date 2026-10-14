@@ -7,7 +7,7 @@
  xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
  Title="Lens Docs Studio · Native Preview" Width="1440" Height="900" MinWidth="860" MinHeight="540"
  Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
- PreviewKeyDown="WindowKeyDown" Closing="WindowClosing" Loaded="WindowLoaded">
+ PreviewKeyDown="WindowKeyDown" Closing="WindowClosing" Loaded="WindowLoaded" SizeChanged="DesktopWindowResized">
  <Window.Resources>
   <ResourceDictionary><ResourceDictionary.MergedDictionaries>
    <ResourceDictionary Source="Resources/CommandIcons.xaml"/>

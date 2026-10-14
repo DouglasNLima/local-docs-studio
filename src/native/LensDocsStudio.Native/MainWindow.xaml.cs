@@ -223,7 +223,7 @@ public partial class MainWindow : Window
         if (opened) model.MoveDocumentCommand.Execute(null);
     }
     private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e)
-    { CancelSynchronisation(); previewFocused = false; }
+    { CancelSynchronisation(); previewFocused = false; QueueCurrentEditorInput(); }
     private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e)
     { CancelSynchronisation(); previewFocused = true; }
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -557,6 +557,7 @@ public partial class MainWindow : Window
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         PreviewPane.Visibility = Preview.Visibility;
         CancelSynchronisation();
+        ApplyPanels();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
         {
