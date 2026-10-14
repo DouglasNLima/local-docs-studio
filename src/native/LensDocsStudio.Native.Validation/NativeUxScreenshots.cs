@@ -38,7 +38,20 @@ internal static partial class NativeUiChecks
                     var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The screenshot window did not appear.");
                     Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The screenshot preview did not finish.");
                     window.Patterns.Transform.Pattern.Resize(size.Item1, size.Item2);
-                    Wait(() => Math.Abs(window.BoundingRectangle.Width - size.Item1) < 3, "The screenshot width was not applied.");
+                    Wait(() => Math.Abs(window.BoundingRectangle.Width - size.Item1) < 3 && Math.Abs(window.BoundingRectangle.Height - size.Item2) < 3,
+                        "The requested screenshot dimensions were not applied.");
+                    Wait(() => window.BoundingRectangle.Contains(Find(window, "Status").BoundingRectangle)
+                        && window.BoundingRectangle.Contains(Find(window, "DocumentPreview").BoundingRectangle),
+                        "Native screenshot content did not finish layout inside the resized window.");
+                    if (revision != "c566144529c3c0e4393c1604544201b936e4a6a2")
+                    {
+                        var tabStrip = Find(window, "DocumentTabs");
+                        Wait(() => tabStrip.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem))
+                            .Where(tab => tab.Name == Path.GetFileName(paths[^1]))
+                            .SelectMany(tab => tab.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button)))
+                            .Any(button => button.Name == "Close document" && !button.IsOffscreen && tabStrip.BoundingRectangle.Contains(button.BoundingRectangle)),
+                            "The active tab's close command did not remain visible after resizing its overflow strip.");
+                    }
                     var screenshot = $"native-{(highContrast ? "high-contrast" : theme.ToLowerInvariant())}-{size.Item1}x{size.Item2}.png";
                     window.CaptureToFile(Path.Combine(output, screenshot));
                     if (paths.Any(path => !File.ReadAllText(path).StartsWith("# Documentation workspace\n", StringComparison.Ordinal)))

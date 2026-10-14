@@ -260,7 +260,7 @@
    <GridSplitter x:Name="SidebarSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize workspace"/>
    <DockPanel Grid.Column="2">
     <TabControl x:Name="DocumentTabs" Style="{StaticResource Desktop.DocumentTabs}" DockPanel.Dock="Top" ItemsSource="{Binding Documents}" SelectedItem="{Binding ActiveDocument}" Background="{DynamicResource WindowBrush}"
-       BorderThickness="0,0,0,1" Padding="0" AutomationProperties.Name="Open documents" SelectionChanged="TabChanged">
+       BorderThickness="0,0,0,1" Padding="0" AutomationProperties.Name="Open documents" SelectionChanged="TabChanged" SizeChanged="TabStripResized">
      <TabControl.ItemContainerStyle><Style TargetType="TabItem" BasedOn="{StaticResource Desktop.DocumentTab}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/><Setter Property="ToolTip" Value="{Binding FilePath}"/>
       <EventSetter Event="PreviewMouseDown" Handler="TabMouseDown"/>
       <EventSetter Event="PreviewKeyDown" Handler="TabContextKeyDown"/>

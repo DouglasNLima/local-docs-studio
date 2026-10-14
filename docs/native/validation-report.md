@@ -1,5 +1,7 @@
 # Native validation report
 
+For the active native desktop UX goal, use the authoritative [desktop modernisation report](desktop-ux-modernisation.md) and [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24). Its current certification and package status is separate from the revision-specific reconstruction evidence below.
+
 ## Current delivery record
 
 The [engineering delivery report](engineering-completion-report.md) is the current 28-condition acceptance record. Application baseline `7008751` passes both native and both web pipelines. Independently downloaded native evidence verifies 1,035 Core tests, 40 corpus cases, four 66-check desktop contexts, complete installer lifecycle, 20 preserved state files and bundled installed runtime origins per run. Both web runs pass 264 cases. Local Core validation with the two final shared-metadata regressions passes 1,037 cases. Preview .285/.286 package hashes, clean source revisions and unsigned metadata are checked.

@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+The active desktop UX contracts and validation status are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md). Expanded synchronisation and packaging certification must finish before that goal closes; the reconstruction evidence below retains its original scope.
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 The [targeted performance continuation](performance-and-responsiveness.md) preserves the documented native content/selection/navigation contracts and adds explicit Continuous distant-target desktop coverage. Its measured list improvement remains above the unchanged 250 ms input budget; mixed/4.14 MB preview and intermittent details construction remain incomplete acceptance. Historical results below are not relabelled as performance certification.

@@ -113,6 +113,15 @@ public partial class MainWindow
         e.Handled = true;
         OpenTabContext(tab, document);
     }
+    private void TabStripResized(object sender, SizeChangedEventArgs e)
+    {
+        var document = model.ActiveDocument;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (model.ActiveDocument == document && document is not null
+                && DocumentTabs.ItemContainerGenerator.ContainerFromItem(document) is TabItem tab) tab.BringIntoView();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
+    }
     private void TabContextKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key != Key.Apps && !(e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift)) return;

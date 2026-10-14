@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
@@ -33,7 +32,7 @@ internal static partial class NativeUiChecks
             foreach (var mode in new[] { "Continuous", "Pages" })
             {
                 var reading = Find(window, "PreviewReadingMode").AsComboBox(); reading.Select(mode); reading.Collapse();
-                editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
+                FocusEditor(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME);
                 var caret = Find(window, "CaretStatus").Name;
                 var previewStatus = Find(window, "PreviewStatus").Name;
                 var editorFocus = editor.Automation.FocusedElement();
@@ -49,12 +48,16 @@ internal static partial class NativeUiChecks
                 Mouse.Click(new System.Drawing.Point((int)(focusBox.Left + focusBox.Width / 2), (int)(focusBox.Top + focusBox.Height / 2)));
                 var previewFocus = preview.Automation.FocusedElement(); caret = Find(window, "CaretStatus").Name;
                 Range(preview, "Region 015").ScrollIntoView(true);
-                Wait(() => Visible(editor, "Region 015"), "Preview scrolling did not reveal its corresponding source region.");
+                Wait(() => Visible(preview, "Region 015"), "The native preview did not reveal its requested scroll target.");
+                var previewRegions = VisibleRegions(preview);
+                if (previewRegions.Length == 0) throw new IOException("The scrolled native preview has no visible semantic headings.");
+                var reverseAnchor = previewRegions[mode == "Pages" ? 0 : Math.Min(previewRegions.Length - 1, previewRegions.Length / 3)];
+                Wait(() => Visible(editor, reverseAnchor), "Preview scrolling did not reveal its corresponding visible source region.");
                 if (Find(window, "CaretStatus").Name != caret || !preview.Automation.Compare(previewFocus, preview.Automation.FocusedElement()))
                     throw new IOException("Preview scroll synchronisation moved the caret or stole keyboard focus.");
                 if (Find(window, "PreviewStatus").Name != previewStatus) throw new IOException("Scroll synchronisation rebuilt the preview.");
 
-                editor.Click();
+                FocusEditor();
                 foreach (var percent in new[] { 15d, 75d, 25d, 80d }) editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, percent);
                 Wait(() => VisibleRegions(editor).Length > 0, "Rapid scrolling left no visible source anchors.");
                 regions = VisibleRegions(editor); anchor = regions[Math.Min(regions.Length - 1, regions.Length / 3)];
@@ -64,7 +67,7 @@ internal static partial class NativeUiChecks
             }
             Find(window, "SyncScrollControl").AsCheckBox().IsChecked = false;
             Find(window, "FollowCaretControl").AsCheckBox().IsChecked = true;
-            editor.Click(); Range(editor, "Region 055").Select();
+            FocusEditor(); Range(editor, "Region 055").Select(); Keyboard.Type(VirtualKeyShort.RIGHT);
             Wait(() => Visible(preview, "Region 055"), "Independent follow-caret did not reveal the current source block.");
             if (!ReadPreferences().Desktop!.FollowCaret || ReadPreferences().Desktop!.SyncScroll || ReadPreferences().Desktop!.SyncSelection)
                 throw new IOException("The independent follow-caret setting changed another synchronisation preference.");
@@ -84,10 +87,17 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
-            primaryFailure = error; window.CaptureToFile(Path.Combine(output, "native-scroll-synchronisation-failure.png"));
+            primaryFailure = error;
             File.WriteAllText(Path.Combine(output, "native-scroll-synchronisation-failure.json"), JsonSerializer.Serialize(new {
-                Error = error.ToString(), Observations = observations, EditorVisible = VisibleRegions(editor), PreviewVisible = VisibleRegions(preview),
-                Caret = Find(window, "CaretStatus").Name }));
+                Error = error.ToString(), Observations = observations }));
+            try
+            {
+                window.CaptureToFile(Path.Combine(output, "native-scroll-synchronisation-failure.png"));
+                File.WriteAllText(Path.Combine(output, "native-scroll-synchronisation-geometry.json"), JsonSerializer.Serialize(new {
+                    EditorVisible = VisibleRegions(editor), PreviewVisible = VisibleRegions(preview), Caret = Find(window, "CaretStatus").Name }));
+            }
+            catch (Exception diagnosticError)
+            { File.WriteAllText(Path.Combine(output, "native-scroll-synchronisation-diagnostic-error.txt"), diagnosticError.ToString()); }
             throw;
         }
         finally
@@ -105,8 +115,14 @@ internal static partial class NativeUiChecks
             finally { RestoreClipboard(clipboard, owned); }
         }
         UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
-        string[] VisibleRegions(AutomationElement pane) => Regex.Matches(string.Join("\n", pane.Patterns.Text.Pattern.GetVisibleRanges().Select(range => range.GetText(-1))), @"Region \d{3}")
-            .Select(match => match.Value).Distinct().ToArray();
+        // AvalonEdit does not implement GetVisibleRanges. Its text ranges expose
+        // actual screen geometry, so inspect our distinct fixture headings directly.
+        string[] VisibleRegions(AutomationElement pane) => Enumerable.Range(1, 90).Select(index => $"Region {index:000}").Where(text => Visible(pane, text)).ToArray();
+        void FocusEditor()
+        {
+            editor.Click(); editor.Focus();
+            Wait(() => editor.Properties.HasKeyboardFocus.Value, "The actual editor did not acquire focus before its scrolling input.");
+        }
         FlaUI.Core.ITextRange Range(AutomationElement pane, string text) => pane.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing source region: " + text);
         bool Visible(AutomationElement pane, string text) => Range(pane, text).GetBoundingRectangles().Any(box => box.Width > 0 && box.Height > 0 && pane.BoundingRectangle.Contains(box));
     }

@@ -30,6 +30,23 @@ internal static partial class NativeUiChecks
         Wait(() => ReadPreferences().ShowOutline, "Outline did not reopen.");
         checks.Add("Independent panel visibility persists without replacing source or preview");
 
+        var sidebarWidth = ReadPreferences().Desktop!.SidebarWidth; var outlineWidth = ReadPreferences().Desktop!.OutlineWidth;
+        ResizePanel("Resize workspace", 40);
+        Wait(() => ReadPreferences().Desktop!.SidebarWidth > sidebarWidth + 25, "Pointer resizing did not persist the workspace width.");
+        var resizedSidebar = ReadPreferences().Desktop!.SidebarWidth;
+        Find(window, "ToggleSidebar").AsButton().Invoke(); Find(window, "ToggleSidebar").AsButton().Invoke();
+        Wait(() => Visible("WorkspaceTree") && Math.Abs(ReadPreferences().Desktop!.SidebarWidth - resizedSidebar) < 2,
+            "Reopening the workspace lost its resized width.");
+        ResizePanel("Resize workspace", -40);
+        ResizePanel("Resize outline", -40);
+        Wait(() => ReadPreferences().Desktop!.OutlineWidth > outlineWidth + 25, "Pointer resizing did not persist the independent outline width.");
+        var resizedOutline = ReadPreferences().Desktop!.OutlineWidth;
+        Find(window, "ToggleOutline").AsButton().Invoke(); Find(window, "ToggleOutline").AsButton().Invoke();
+        Wait(() => ReadPreferences().ShowOutline && Math.Abs(ReadPreferences().Desktop!.OutlineWidth - resizedOutline) < 2,
+            "Reopening the outline lost its resized width.");
+        ResizePanel("Resize outline", 40);
+        checks.Add("Pointer-driven independent panel widths persist through hide/reopen without changing source");
+
         var beforeFocus = ReadPreferences();
         FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.ALT, VirtualKeyShort.KEY_Z);
         Wait(() => !Visible("WorkspaceTree") && !Visible("ToggleSidebar"), "Focus Mode did not hide secondary chrome.");
@@ -104,6 +121,12 @@ internal static partial class NativeUiChecks
             Wait(() => (result = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("CommandSearchWindow")))?.AsWindow()) is not null,
                 "The native searchable command window did not appear.");
             return result!;
+        }
+        void ResizePanel(string name, int delta)
+        {
+            var divider = window.FindFirstDescendant(cf => cf.ByName(name)) ?? throw new IOException("The actual panel divider is unavailable: " + name);
+            var rectangle = divider.BoundingRectangle;
+            Mouse.DragHorizontally(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)), delta, MouseButton.Left);
         }
     }
 }

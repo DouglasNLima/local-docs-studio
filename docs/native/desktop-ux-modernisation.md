@@ -1,72 +1,67 @@
 # Native desktop UX modernisation
 
-This implementation starts from `c566144529c3c0e4393c1604544201b936e4a6a2` on `release/native-preview-readiness`. Work is isolated on `feature/native-desktop-ux-modernisation`. It preserves .NET 10, WPF, AvalonEdit, Markdig and the native FlowDocument preview. The web edition and the rejected Continuous viewer experiment remain separate.
+Work starts at verified revision `c566144529c3c0e4393c1604544201b936e4a6a2`, on `feature/native-desktop-ux-modernisation` in [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24). The goal remains active: expanded desktop certification, final packages and the completion audit are outstanding. This report supersedes intermediate notes without relabelling failures as passes.
 
-The baseline problems are wrapping document tabs, a verbose workspace header, a narrow outline, hidden formatting actions, inaccessible panel toggles and inconsistent command hierarchy. The work proceeds through visual foundation, workspace and tabs, productivity, independent source-aware synchronisation, viewing controls and final certification.
+## Implemented experience
 
-## Evidence and status
+Wrapping tabs, a verbose workspace path, cramped outline and hidden formatting commands were the original problems. Shared WPF resources now provide neutral surfaces, high-contrast text, restrained `#FF883E` indicators, consistent spacing, focus/disabled states and original vector command icons. Workspace, outline and search selections use neutral rows with compact indicators. Grouped toolbars reserve native overflow space; menus, keyboard commands, accessible names and tooltips remain available.
 
-- The unmodified Core baseline passed locally: 1,057 passed, zero failures and zero skipped tests.
-- Existing native validation at the exact base passed in [run 38530939885](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38530939885).
-- New-build desktop and installer validation runs only on disposable GitHub-hosted Windows. No new application is installed or exercised on the user's ordinary desktop.
-- Screenshot dimensions, theme, source identity and physical display bounds are recorded together. UI Automation evidence does not constitute physical accessibility or DPI certification.
-- The overall implementation remains active. Feature, synchronisation, package and final CI evidence will be recorded here as those checks complete.
+The original documentation-page artwork has an SVG source and transparent ICO frames at 16, 24, 32, 48, 64, 128 and 256 pixels. It is assigned to the EXE, main/dialogue windows, About and installer; shortcuts inherit the EXE icon. Package verification compares actual PE images with all authored frame hashes and checks dimensions/transparency. The built EXE passes; final installer inspection awaits packaging.
 
-The first implementation provides shared neutral shell styles, original vector command artwork, a seven-resolution ICO generated from its SVG source, application/executable/installer branding, grouped toolbars with native overflow, a single-row scrollable tab strip, independent resizable panels, a concise workspace name, a formatting toolbar, Quick Open, Command Palette, a quick theme menu, Full Screen, Focus Mode and a contextual Cancel control.
+| Area | Delivered behaviour |
+|---|---|
+| Panels | Independent toggles, bounded widths, hidden splitters and private persistence |
+| Workspace | Concise name/path tooltip, filename/path filter, retained nodes/expansion, expand/collapse/refresh, icons and edit indicators |
+| Context actions | Captured clicked-item paths, open/new tab, Explorer, path/Markdown copy, reviewed rename/move and confirmed recycling |
+| Tabs | One scrolling row, truncated titles/path tooltips, dirty indicators, close/middle-click, keyboard switching, context actions and persisted pins/order/active tab |
+| Outline | Heading indentation, tooltips, filter, current section, source navigation and optional keyboard group expansion |
+| Editing | Existing source commands exposed through compact formatting toolbar, six headings, lists/tasks/quotes/code/Mermaid/tables/images/links and grouped Undo/Redo |
+| Productivity | Keyboard-searchable Quick Open/Command Palette, fuzzy filename/path matching, shared actions and disabled states |
+| Viewing | Direct reading/zoom/search/copy, quick theme switch, restored Full Screen bounds, temporary Focus Mode and contextual busy cancellation |
+| Diagrams | Space+drag/middle pan, mouse-centred Ctrl+wheel zoom, bounded offsets, Fit/Actual Size/Reset and keyboard navigation |
 
-The local native solution builds without warnings. The expanded Core suite passes 1,075 tests. A separate headless WPF check verifies both mapping directions for all repeated occurrences, literal Unicode, links, inline code and emphasis. Formatting delimiters alone are rejected as exact literal selections, and pointers from another FlowDocument cannot map into the current result. Live synchronisation is still being implemented; these mapping checks establish its foundation.
+Pins require unpinning before normal close; bulk close skips pins and stops after a cancelled dirty prompt. Closing tabs never deletes files. Folder deletion reviews a bounded complete inventory, retains saved documentation and unsaved text in snapshots, stages/rechecks contents and uses the Windows Recycle Bin. Cancellation/failure restores the folder. Root mutation, workspace escapes, reparse traversal and private-state deletion are rejected.
 
-## Keyboard shortcuts
+## Shortcuts and focus
 
 | Shortcut | Action |
 |---|---|
-| Ctrl+P | Quick Open by workspace filename or relative path |
-| Ctrl+Shift+P | Command Palette |
-| Ctrl+Alt+B | Toggle workspace |
-| Ctrl+Alt+O | Toggle outline |
-| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous document |
-| F11 | Full Screen |
-| Ctrl+Alt+Z | Focus Mode |
-| Escape | Close search first, then exit Full Screen or Focus Mode |
+| Ctrl+P / Ctrl+Shift+P | Quick Open / Command Palette |
+| Ctrl+Alt+B / Ctrl+Alt+O | Workspace / outline toggle |
+| Ctrl+Tab / Ctrl+Shift+Tab | Next / previous tab |
+| F11 / Ctrl+Alt+Z | Full Screen / Focus Mode |
+| Escape | Dismiss Find, menus/dialogues, then Full Screen/Focus Mode in context order |
+| Diagram Space+drag / middle drag | Pan |
+| Diagram Ctrl+wheel / F / Home | Pointer zoom / Fit / Reset |
 
-The established shortcuts, including Ctrl+B for bold, Ctrl+I for italic, Ctrl+S to save and Ctrl+Shift+K for workspace links, remain available.
+Established shortcuts remain, including Ctrl+B, Ctrl+I, Ctrl+S and Ctrl+Shift+K. Toolbar formatting retains editor selection; searchable windows restore originating focus. New pane focus cancels pending synchronisation.
 
-Workspace filenames and relative paths can now be filtered without reading document contents or replacing surviving tree nodes. Expand/collapse all, refresh, file/folder icons, local edit indicators and full path tooltips share the new command surfaces. The workspace context menu uses the item actually clicked, validates its captured workspace before execution and reuses reviewed file/folder moves. File deletion retains the existing confirmation, snapshots, conflict handling and Windows recycling. Folder deletion reviews a complete bounded inventory, retains saved documentation and unsaved open text, isolates and verifies the folder, and sends its assets/empty subfolders to the Windows Recycle Bin. Cancellation restores the complete folder. Root mutation, workspace escapes, reparse traversal and deletion of private state are rejected.
+## Synchronisation and state
 
-Tabs provide middle-click close, close others, close to the right, copy/reveal and pins. Pinned tabs must be unpinned before normal closing, and bulk close skips pins. Each dirty-document prompt retains its existing save/cancel behaviour; a cancelled close ends the remaining bulk operation. Pin order and the active document are restored from private session state. Outline titles are indented by heading level, searchable and available in full through tooltips; caret navigation updates the current section without rebuilding the preview.
+Follow caret, scroll and selection are independent persisted opt-in choices. They operate in Split with both panes visible and retain the existing explicit Automatic/Pages/Continuous choice.
 
-Windowless workspace tests verify filtering, retained tree nodes/expansion, protected pins, active-document survival, session restoration and unchanged source bytes. Hosted visual evidence is available from [run 38548452142](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38548452142). Its temporary display change enabled the requested native screenshot sizes without changing persistent display settings. Review found active-tab visibility and dark overflow issues, corrected in the following checkpoint. Full native CI remains pending after correcting resource loading in headless shell construction.
+Events coalesce over 60 ms. Document identity/source versions reject stale renders; edits, tab/layout/mode/preferences, pointer input and pane focus cancel pending navigation. Programmatic feedback is suppressed. Selection and scroll reuse the immutable preview without reparsing/rebuilding it.
 
-## Private interface preferences
+Parser-bounded UTF-16 literal spans identify repeated occurrences, Unicode, emphasis, code and link labels. Endpoints cross bounded empty formatting gaps only. Reverse selections retain syntax between literal endpoints. Delimiters alone, generated markers, entities/transformed text, images and drawings use a declared semantic block highlight/selection. The preview adorner cannot change export formatting.
 
-`Desktop` adds sidebar visibility, bounded sidebar/outline widths and three independent opt-in synchronisation preferences. Missing desktop preferences use safe defaults. `ShowOutline`, theme, layout and reading mode keep their existing contracts. Focus Mode temporarily hides panels without rewriting these settings. Full Screen saves and restores native window placement, including the Windows monitor-placement fallback.
+Scroll aligns visible editor source positions with native text/block anchors, including the displayed page. It uses logical regions rather than overall percentages and keeps caret/focus unchanged. Unmappable positions use the nearest defensible block.
 
-## Boundaries
+Private `Desktop` settings store visibility, widths and independent sync choices with safe defaults. Existing outline/theme/layout/preview contracts remain. Focus Mode does not overwrite permanent visibility. Private sessions retain pins/order/active tab, caret/scroll and logical preview position; AvalonEdit version movement updates that position after edits. Preference changes merge with current state.
 
-UI operations must preserve source bytes, selection, undo history, draft recovery, relative links and image assets. Private interface settings remain in application state. Existing preferences load with safe defaults. Appearance changes merge into the latest preferences, preserving update consent and recent paths.
+Source bytes, LF/CRLF, Undo/Redo, images, relative links, drafts, snapshots and guarded saves retain existing contracts. UI state stays outside workspaces. The implementation remains .NET 10/WPF/AvalonEdit/Markdig/FlowDocument, without new dependencies, browsers or PR 22's renderer. The separate web edition remains buildless and compatible with GitHub Pages.
 
-Continuous mode retains its existing warning and performance boundary. An explicit reading choice is never silently changed. Synchronisation must use source spans and revision guards; generated or transformed content receives semantic highlighting when literal character correspondence cannot be established.
+## Evidence and outstanding certification
 
-## Live synchronisation rules
+- Baseline: 1,057 Core tests; exact base native [38530939885](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38530939885) passed.
+- Expanded local Core: 1,086 passed, none skipped. Release builds have zero warnings/errors. Windowless mapping, workspace/session and overflow checks pass.
+- Actual hosted controls and bidirectional repeated-word/Unicode selection in both reading modes passed at `5f15889` in [38560750881](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38560750881). Full native later failed an outdated help expectation, corrected to the actual 13-topic guide.
+- Broader `d716e3a` selection checks exposed focus sequencing after successful heading/formatted/soft-break checks. Pane cancellation and confirmed UIA focus correct that failure. Expanded bidirectional cases now pass both modes at `d430d35` in [38569082328](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38569082328).
+- That run also passes pins, close-to-right, active survival, dirty-prompt cancellation, actual complete-folder recycling, saved/unsaved snapshots and unrelated source preservation. Earlier folder input landed within a parent's expanded child bounds; the corrected test clicks the header and verifies the confirmation target.
+- Hosted baseline/current Light/Dark screenshots cover 860×540, 1280×800, 1440×900 and 1920×1080. Review corrected overflow clipping and broad blue selections. Actual temporary Windows high-contrast capture passes at `d430d35`; review found capture/layout timing and active-tab visibility after resizing, now corrected with stronger assertions. Final visual evidence remains pending. Restored disposable settings do not establish physical DPI/accessibility certification.
+- Web [38560750925](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38560750925) and [38560744378](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38560744378) passed. Final native/web runs must pass on the delivery revision.
 
-Follow caret, synchronise scroll and synchronise selection are three independent, persisted opt-in choices in the preview toolbar. They operate in Split layout when both document panes are visible. Reading mode and preview zoom are directly accessible beside them. An explicit Pages/Continuous choice is retained.
+Live scroll/caret/cancellation, pointer-anchor zoom, pointer panel resizing, full corpus/export/workflow regression, final visual inspection and installer lifecycle remain under certification. The `d430d35` scroll test failed an unsupported UIA `GetVisibleRanges` request. It now inspects actual heading-range screen geometry instead; [AvalonEdit's provider](https://raw.githubusercontent.com/icsharpcode/AvalonEdit/master/ICSharpCode.AvalonEdit/Editing/TextRangeProvider.cs) supports this observation. Primary/cleanup/diagnostic failures are preserved separately; assertions, timeouts and fixtures are not weakened to obtain passes.
 
-The implementation coalesces events over 60 ms, ignores programmatic feedback and cancels pending navigation when switching documents, layouts, modes or sync preferences. Active document identity and AvalonEdit source versions guard every request. Selection does not parse or rebuild the preview.
+Continuous retains its warning and unchanged 250 ms input budget. Compatibility is not performance acceptance; large/mixed-document and intermittent construction limits must be reported against final observations.
 
-Literal runs carry parser-bounded UTF-16 source spans. Both endpoints of a mappable selection retain their offsets, including repeated words, Unicode, inline emphasis, inline code and link labels. Source syntax between literal endpoints is preserved in a reverse source selection. Standalone formatting delimiters, entities/transformed labels, generated markers, drawings and other unmappable content use a declared semantic block selection/highlight. The preview's block highlight is an adorner, so it does not change document formatting or exported content.
-
-Scroll alignment uses visible AvalonEdit source positions and native preview text/block anchors. Only positions with already-valid WPF layout are inspected when reading viewport geometry; [WPF's TextPointer implementation](https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/TextPointer.cs) defines this guard. Pages navigation uses the displayed native page's text position. These are logical source regions rather than global scroll percentages. The existing native navigation services preserve editor selection/caret and keyboard focus.
-
-The live controls build successfully, and the local Core and literal mapping checks remain green. New hosted UIA checks compare exact repeated-occurrence range endpoints in both native reading modes, selected geometry, Unicode, retained focus, disabled synchronisation and source bytes. Their result is pending; live scroll stress, cancellation and full performance certification are still outstanding.
-
-## Viewing and restoration
-
-The diagram viewport now supports Space+drag and middle-button panning, pointer-anchored Ctrl+wheel zoom, bounded offsets, Fit, Actual Size and Reset. F fits, Home resets and arrow keys pan; Ctrl+C copies the original drawing. The viewport transform does not change the drawing used for SVG/PNG export or clipboard pixels. Six Core geometry tests verify pointer anchoring, pan bounds and rejected invalid scale.
-
-Private session entries now include a logical preview source position, restored through the current native source mappings. AvalonEdit version offset movement keeps an existing preview position meaningful after source edits. Tab pins, arrangement, active document, editor caret and editor scroll retain the existing recovery path.
-
-Actual hosted desktop controls passed in [run 38551560572](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38551560572): independent persisted panels, Focus Mode restoration, Full Screen dimensions, Quick Open, actual palette actions, clicked-item path copying, source formatting and exact Undo. The full run failed at the next synchronisation fixture because a control had moved into overflow. A dedicated windowless toolbar test exposed an overflow button laid out beyond the available width; fixed reserved space and compact sync toggles correct that defect. The new tests retain the primary failure separately from any cleanup failure.
-
-The local Core suite now passes 1,086 tests with zero skips. Five folder-removal tests cover exact assets, empty subfolders, document snapshots, recycle cancellation/rollback, changed/new files, root/escape rejection and private state. Real shell recycling still requires hosted UIA/lifecycle verification. The editor's automation peer now forwards focus to AvalonEdit's actual typing surface while retaining the existing Text/Value/Scroll providers. A focused hosted UX job provides earlier UIA feedback alongside the complete mandatory native suite.
-
-The focused hosted selection test verified the exact third occurrence from editor to preview with retained focus and visible selection geometry. It then exposed native hyperlink selection endpoints outside their literal Run. The mapper now normalises only bounded, empty formatting gaps, so the reverse selection addresses the label's source characters rather than selecting its complete Markdown link. A headless WPF regression checks actual Hyperlink element boundaries. The test is being rerun on the corrected source.
+Final installer/ZIP source, version, SHA-256 and independent lifecycle evidence are pending. Delivery remains an unsigned internal preview; production update trust, signing credentials, public releases, tags and merges are outside scope. Recommendation: **draft, certification in progress**.

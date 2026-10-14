@@ -65,13 +65,17 @@ internal static partial class NativeUiChecks
                 })
                 {
                     FocusEditor(); Nth(editor, pair.Source, pair.Occurrence).Select();
+                    var sourceFocus = editor.Automation.FocusedElement();
                     Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Rendered),
                         "Heading, formatted multiword or soft-break selection did not reach its exact rendered text.");
+                    if (!editor.Automation.Compare(sourceFocus, editor.Automation.FocusedElement())) throw new IOException("Formatted source selection lost its originating typing focus.");
                     var rectangle = Nth(preview, pair.Rendered, 1).GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0);
                     Mouse.Click(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
+                    var renderedFocus = preview.Automation.FocusedElement();
                     Nth(preview, pair.Rendered, 1).Select();
                     Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Source),
                         "Rendered heading, formatted multiword or soft-break selection lost its exact source endpoints.");
+                    if (!preview.Automation.Compare(renderedFocus, preview.Automation.FocusedElement())) throw new IOException("Formatted preview selection lost its originating keyboard focus.");
                     observations.Add(new { ReadingMode = mode, MultiwordSource = pair.Source, Rendered = pair.Rendered, BidirectionalExact = true });
                 }
                 FocusEditor(); Nth(editor, "action", 5).Select();
