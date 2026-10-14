@@ -8,6 +8,10 @@ Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both
 
 **F11** enters Full Screen and restores the previous window placement on exit. **Ctrl+Alt+Z** enters Focus Mode, preserving the chosen editor/preview layout and permanent panel preferences. **Escape** closes Find first, then exits Full Screen or Focus Mode. **Ctrl+Tab** and **Ctrl+Shift+Tab** switch open documents. The visible theme control offers System, Light and Dark.
 
+Filter workspace files by name or relative path. Folder expansion and open documents survive filtering and refresh. Right-click a workspace item, or press **Shift+F10** on its selected row, for path, link, Explorer, reviewed rename/move and supported deletion actions. These actions use the clicked item. Deletion uses its existing confirmation and snapshots.
+
+Right-click a document tab for closing, copy/reveal and pin actions. **Pinned tabs must be unpinned before closing**; bulk close retains pins and stops if a save/close prompt is cancelled. Middle-click closes an unpinned tab. Tab order and pins remain private application state. The outline filters heading titles, indents their hierarchy and follows the current source section.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.

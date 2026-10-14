@@ -14,6 +14,7 @@ public partial class DocumentViewModel : ObservableObject
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
     [ObservableProperty] private bool isSaving;
+    [ObservableProperty] private bool isPinned;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
     public string? RecoveryKey { get; set; }
     public bool IsEmptyDraft => FilePath is null && EditorDocument.TextLength == 0;
@@ -45,5 +46,5 @@ public partial class DocumentViewModel : ObservableObject
     }
 
     public RecoveredDocument Recovery() => new(Id, FilePath, EditorDocument.Text, SavedSnapshot?.Fingerprint,
-        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot);
+        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot, IsPinned);
 }

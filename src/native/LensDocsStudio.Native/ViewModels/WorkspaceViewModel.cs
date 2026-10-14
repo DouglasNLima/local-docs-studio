@@ -54,7 +54,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     DocumentSnapshot? baseline = null;
                     if (recovered.Path is not null && recovered.SavedFingerprint is not null)
                         baseline = new(recovered.Path, recovered.SavedText ?? recovered.Text, recovered.SavedFingerprint, recovered.Utf8Bom);
-                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey };
+                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey, IsPinned = recovered.IsPinned };
                     if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
                         tab.AssetWorkspace = recovered.AssetWorkspace;
                     if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath, recovered.WorkspaceRoot);
@@ -149,6 +149,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         if (!string.Equals(WorkspaceRoot, workspace.Root, StringComparison.OrdinalIgnoreCase)) Entries.Clear();
         WorkspaceRoot = workspace.Root;
         WorkspaceEntryViewModel.Reconcile(Entries, listing.Entries);
+        ApplyWorkspaceFilter();
         Status = listing.Warnings.Count == 0 ? "Workspace opened" : string.Join(" ", listing.Warnings.Distinct());
         StartMonitoring(workspace.Root);
         foreach (var tab in Documents.Where(d => d.FilePath is not null))
@@ -240,7 +241,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
 
     [RelayCommand] private async Task CloseDocumentAsync(DocumentViewModel? tab)
     {
-        if (tab is null) return;
+        if (tab is null || tab.IsPinned) return;
         await RunAsync(async () =>
         {
             if (!await CanCloseAsync(tab)) return;

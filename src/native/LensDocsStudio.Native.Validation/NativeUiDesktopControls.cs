@@ -63,6 +63,22 @@ internal static partial class NativeUiChecks
         Find(window, "ToggleOutline").AsButton().Invoke(); Wait(() => ReadPreferences().ShowOutline, "Outline did not restore after the palette action.");
         checks.Add("Command Palette reuses an actual enabled native action");
 
+        var tree = Find(window, "WorkspaceTree");
+        var selectedFile = tree.FindFirstDescendant(cf => cf.ByName(Path.GetFileName(source)).And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem)))
+            ?? throw new IOException("The active workspace document is missing from the tree.");
+        var targetPath = Path.Combine(Path.GetDirectoryName(source)!, "Second document.md");
+        var targetFile = tree.FindFirstDescendant(cf => cf.ByName("Second document.md").And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem)))
+            ?? throw new IOException("The context-menu target is missing from the tree.");
+        selectedFile.Click(); targetFile.RightClick();
+        AutomationElement? copyPath = null;
+        Wait(() => (copyPath = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("WorkspaceContextCopyabsolutepath")))) is not null,
+            "Right-click did not expose the workspace path action.");
+        copyPath!.AsMenuItem().Invoke();
+        Wait(() => NativeUiClipboard.GetDataObject()?.GetData(System.Windows.DataFormats.UnicodeText) as string == targetPath,
+            "Workspace context action copied a previously selected path instead of the right-clicked file.");
+        if (ReadEditorText(editor) != original) throw new IOException("Copying a workspace path activated or modified another document.");
+        checks.Add("Workspace right-click actions use the clicked item rather than an earlier selection");
+
         FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
         Find(window, "FindText").AsTextBox().Text = "Searchable"; Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.ESCAPE);
         Find(window, "FormatBold").AsButton().Invoke();

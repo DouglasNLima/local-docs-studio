@@ -59,7 +59,7 @@ public partial class MainWindow : Window
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
         Editor.TextArea.TextView.LineTransformers.Insert(0, editorHighlighting);
-        Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
+        Editor.TextArea.Caret.PositionChanged += (_, _) => { CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8"; HighlightCurrentHeading(); };
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
@@ -113,11 +113,21 @@ public partial class MainWindow : Window
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
     }
-    private void TabChanged(object sender, SelectionChangedEventArgs e) { if (e.Source == DocumentTabs) { BindActiveDocument(); QueuePreview(); } }
+    private void TabChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source != DocumentTabs) return;
+        BindActiveDocument(); QueuePreview();
+        var selected = model.ActiveDocument;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (model.ActiveDocument == selected && DocumentTabs.ItemContainerGenerator.ContainerFromItem(selected!) is TabItem item) item.BringIntoView();
+        }, DispatcherPriority.Loaded);
+    }
     private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
+        model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
         var text = tab.EditorDocument.Text;
@@ -148,7 +158,7 @@ public partial class MainWindow : Window
             if (!preparePreview)
             {
                 parsed = prepared.source; rendered = null; renderedDocumentId = null;
-                Preview.Document = new FlowDocument(); Outline.ItemsSource = parsed.Headings;
+                Preview.Document = new FlowDocument(); RefreshOutline();
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
             }
@@ -176,7 +186,7 @@ public partial class MainWindow : Window
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
-            Outline.ItemsSource = parsed.Headings;
+            RefreshOutline();
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
                 : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
         }
@@ -186,7 +196,12 @@ public partial class MainWindow : Window
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
-    private async void TreeKeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); } }
+    private async void TreeKeyDown(object sender, KeyEventArgs e)
+    {
+        if ((e.Key == Key.Apps || e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift) && WorkspaceTree.SelectedItem is WorkspaceEntryViewModel entry)
+        { e.Handled = true; OpenWorkspaceContext(Ancestor<TreeViewItem>(Keyboard.FocusedElement as DependencyObject) ?? (UIElement)WorkspaceTree, entry.Path, entry.IsDirectory); return; }
+        if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); }
+    }
     private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntryViewModel { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
     private async Task RenameTreeEntryAsync()
     {
@@ -219,6 +234,7 @@ public partial class MainWindow : Window
     }
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
+        if (updatingOutline) return;
         if (Outline.SelectedItem is not DocumentHeading heading) return;
         if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
         JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");

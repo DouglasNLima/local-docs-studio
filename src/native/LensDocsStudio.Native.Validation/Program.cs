@@ -34,6 +34,11 @@ internal static class Program
             try { NativeSelectionMappingChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--workspace-chrome")
+        {
+            try { NativeWorkspaceChromeChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--layout")
         {
             var layoutOutput = Path.GetFullPath(args.ElementAtOrDefault(1) ?? "artifacts/native/layout"); Directory.CreateDirectory(layoutOutput);
@@ -533,6 +538,8 @@ internal static class Program
         catch (Exception ex) { failures.Add("Native settings: " + ex.Message); }
         try { NativeSelectionMappingChecks.Run(output); }
         catch (Exception ex) { failures.Add("Selection mapping: " + ex.Message); }
+        try { NativeWorkspaceChromeChecks.Run(output); }
+        catch (Exception ex) { failures.Add("Workspace chrome: " + ex.Message); }
         try { NativePreviewNavigationChecks.Run(output); }
         catch (Exception ex) { failures.Add("Native preview navigation: " + ex.Message); }
         var count = 0;
