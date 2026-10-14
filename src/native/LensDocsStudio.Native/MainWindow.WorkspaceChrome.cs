@@ -101,6 +101,16 @@ public partial class MainWindow
         { if (!document.IsPinned) model.CloseDocumentCommand.Execute(document); e.Handled = true; return; }
         if (e.ChangedButton != MouseButton.Right) return;
         e.Handled = true;
+        OpenTabContext(tab, document);
+    }
+    private void TabContextKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Apps && !(e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift)) return;
+        if (sender is not TabItem { DataContext: DocumentViewModel document } tab) return;
+        e.Handled = true; OpenTabContext(tab, document);
+    }
+    private void OpenTabContext(TabItem tab, DocumentViewModel document)
+    {
         var menu = new ContextMenu { PlacementTarget = tab, Placement = PlacementMode.MousePoint };
         void Add(string title, string kind, Action action, bool enabled = true)
         {

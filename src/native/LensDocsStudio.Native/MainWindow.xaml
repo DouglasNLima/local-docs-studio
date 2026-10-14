@@ -263,6 +263,7 @@
        BorderThickness="0,0,0,1" Padding="0" AutomationProperties.Name="Open documents" SelectionChanged="TabChanged">
      <TabControl.ItemContainerStyle><Style TargetType="TabItem" BasedOn="{StaticResource Desktop.DocumentTab}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/><Setter Property="ToolTip" Value="{Binding FilePath}"/>
       <EventSetter Event="PreviewMouseDown" Handler="TabMouseDown"/>
+      <EventSetter Event="PreviewKeyDown" Handler="TabContextKeyDown"/>
      </Style></TabControl.ItemContainerStyle>
      <TabControl.ItemTemplate><DataTemplate><DockPanel>
       <Button DockPanel.Dock="Right" Padding="3" Margin="2,0" MinHeight="24" ToolTip="Close document" AutomationProperties.Name="Close document"
@@ -354,7 +355,7 @@
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
      <DockPanel x:Name="PreviewPane" Grid.Column="2">
       <ToolBar x:Name="PreviewToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Preview commands">
-       <ComboBox x:Name="ReadingModeControl" Width="104" SelectionChanged="ReadingModeChanged" ToolTip="Preview reading mode" AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="PreviewReadingMode"/>
+       <ComboBox x:Name="ReadingModeControl" Width="120" SelectionChanged="ReadingModeChanged" ToolTip="Preview reading mode" AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="PreviewReadingMode"/>
        <Button Tag="out" Click="PreviewZoomChanged" ToolTip="Zoom out" AutomationProperties.Name="Zoom out"><ui:CommandIcon Kind="ZoomOut"/></Button>
        <Button Tag="in" Click="PreviewZoomChanged" ToolTip="Zoom in" AutomationProperties.Name="Zoom in"><ui:CommandIcon Kind="ZoomIn"/></Button>
        <CheckBox x:Name="FollowCaretControl" Style="{StaticResource Desktop.ToolbarCheckBox}" Tag="caret" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Follow the editor caret in the preview" AutomationProperties.Name="Follow caret" AutomationProperties.AutomationId="FollowCaretControl"><ui:CommandIcon Kind="Focus"/></CheckBox>

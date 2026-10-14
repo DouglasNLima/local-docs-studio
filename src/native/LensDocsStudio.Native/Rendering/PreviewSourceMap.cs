@@ -42,11 +42,11 @@ public sealed class PreviewSourceMap
     }
     public bool TrySourceRange(TextPointer from, TextPointer to, out int start, out int length)
     {
-        var first = PreviewBoundary(from); var last = PreviewBoundary(to);
+        var first = PreviewBoundary(from, true); var last = PreviewBoundary(to, false);
         start = first ?? 0; length = last is not null && first is not null ? last.Value - first.Value : 0;
         return first is not null && last is not null && length >= 0;
     }
-    private int? PreviewBoundary(TextPointer position)
+    private int? PreviewBoundary(TextPointer position, bool startBoundary)
     {
         var low = 0; var high = literals.Length - 1;
         while (low <= high)
@@ -61,8 +61,16 @@ public sealed class PreviewSourceMap
                 return offset is >= 0 && offset <= literal.Source.Length ? literal.Source.Start + offset : null;
             }
         }
+        // Native/UIA selection can place endpoints outside transparent formatting elements.
+        // Skip only a bounded, empty structural gap; never cross visible/generated text.
+        if (startBoundary && low < literals.Length && EmptyFormattingGap(position, literals[low].Run.ContentStart))
+            return literals[low].Source.Start;
+        if (!startBoundary && high >= 0 && EmptyFormattingGap(literals[high].Run.ContentEnd, position))
+            return literals[high].Source.End;
         return null;
     }
+    private static bool EmptyFormattingGap(TextPointer from, TextPointer to)
+        => from.IsInSameDocument(to) && from.GetOffsetToPosition(to) is >= 0 and <= 128 && new TextRange(from, to).Text.Length == 0;
     public int? VisibleSource(double height)
     {
         var wanted = height / 3; var best = double.PositiveInfinity; int? source = null;

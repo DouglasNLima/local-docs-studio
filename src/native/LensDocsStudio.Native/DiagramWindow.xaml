@@ -3,9 +3,10 @@
  Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" PreviewKeyDown="DiagramKeyDown" PreviewKeyUp="DiagramKeyUp" Loaded="FitDiagram">
  <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
   <ResourceDictionary Source="Resources/CommandIcons.xaml"/><ResourceDictionary Source="Resources/DesktopStyles.xaml"/>
- </ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ </ResourceDictionary.MergedDictionaries>
+ </ResourceDictionary></Window.Resources>
  <DockPanel>
-  <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Diagram commands">
+  <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Diagram commands">
    <Button Content="Fit" Click="FitDiagram" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="DiagramFit"/>
    <Button Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>
    <Button Content="Reset" Click="ResetView" ToolTip="Reset View (Home)" AutomationProperties.AutomationId="DiagramReset"/>
@@ -16,7 +17,7 @@
    <Button Content="PNG…" Tag="PNG" Click="Export" Padding="12,6"/>
   </ToolBar>
   <TextBlock x:Name="DiagramStatus" DockPanel.Dock="Bottom" Margin="16,10" Text="Space+drag or middle-button drag to pan. Ctrl+mouse wheel zooms around the pointer. F fits; Home resets." TextWrapping="Wrap" AutomationProperties.AutomationId="DiagramCopyStatus"/>
-  <ScrollViewer x:Name="DiagramScroll" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="DiagramMouseWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost" Padding="24" Background="{DynamicResource WindowBrush}" AutomationProperties.AutomationId="DiagramViewport" AutomationProperties.Name="Diagram viewport">
+  <ScrollViewer x:Name="DiagramScroll" Focusable="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" PreviewMouseWheel="DiagramMouseWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost" Padding="24" Background="{DynamicResource WindowBrush}" AutomationProperties.AutomationId="DiagramViewport" AutomationProperties.Name="Diagram viewport">
    <Image x:Name="DiagramImage" Stretch="None" HorizontalAlignment="Left" VerticalAlignment="Top" AutomationProperties.Name="Mermaid diagram drawing">
     <Image.LayoutTransform><ScaleTransform x:Name="DiagramScale" ScaleX="1" ScaleY="1"/></Image.LayoutTransform>
    </Image>

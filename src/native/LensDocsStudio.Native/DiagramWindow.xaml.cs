@@ -47,6 +47,7 @@ public partial class DiagramWindow : Window
     }
     private void PanStarted(object sender, MouseButtonEventArgs e)
     {
+        if (e.ChangedButton is MouseButton.Left or MouseButton.Middle) DiagramScroll.Focus();
         if (e.ChangedButton != MouseButton.Middle && !(e.ChangedButton == MouseButton.Left && Keyboard.IsKeyDown(Key.Space))) return;
         panOrigin = e.GetPosition(DiagramScroll); panHorizontal = DiagramScroll.HorizontalOffset; panVertical = DiagramScroll.VerticalOffset;
         DiagramScroll.CaptureMouse(); DiagramScroll.Cursor = Cursors.SizeAll; e.Handled = true;
@@ -73,7 +74,8 @@ public partial class DiagramWindow : Window
         if (e.Key == Key.Escape) { if (panOrigin is not null) EndPan(); else Close(); e.Handled = true; return; }
         if (Keyboard.Modifiers == ModifierKeys.None)
         {
-            if (e.Key == Key.Space) { DiagramScroll.Cursor = Cursors.Hand; e.Handled = true; return; }
+            if (e.Key == Key.Space && Keyboard.FocusedElement is not System.Windows.Controls.Primitives.ButtonBase)
+            { DiagramScroll.Cursor = Cursors.Hand; e.Handled = true; return; }
             if (e.Key == Key.F) { FitDiagram(sender, e); e.Handled = true; return; }
             if (e.Key == Key.Home) { ResetView(sender, e); e.Handled = true; return; }
             if (Keyboard.FocusedElement is not Slider)

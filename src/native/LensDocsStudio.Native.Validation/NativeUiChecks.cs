@@ -76,6 +76,13 @@ internal static partial class NativeUiChecks
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             if (desktopUxOnly)
             {
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native UI fixture", StringComparison.Ordinal), "The original diagram preview did not resume.");
+                Find(window, "DiagramActionZoom").AsButton().Invoke();
+                Window? drawing = null;
+                Wait(() => (drawing = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "The diagram viewport did not open.");
+                CheckDiagramViewport(drawing!, output);
+                CheckDiagramImageCopy(window, drawing!, editor, source, output, automation, app.ProcessId);
+                checks.Add("Pointer-driven diagram pan, anchored zoom, Reset/Fit and viewport-independent clipboard pixels");
                 FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
                 Wait(() => app.HasExited, "The desktop UX fixture did not close safely.");
                 if (launchedProcess!.ExitCode != 0) throw new IOException("The desktop UX fixture failed during shutdown.");
@@ -116,6 +123,8 @@ internal static partial class NativeUiChecks
             Find(diagramWindow!, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
             Wait(() => Find(diagramWindow!, "DiagramZoomLabel").Name == "175%", "The native zoom did not change scale.");
             diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
+            CheckDiagramViewport(diagramWindow, output);
+            checks.Add("Native diagram Space/middle-button pan, pointer-centred zoom and Fit/Reset");
             CheckDiagramImageCopy(window, diagramWindow, editor, source, output, automation, app.ProcessId);
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
             checks.Add("Keyboard diagram copying retains exact native pixels across zoom levels and after closing the drawing window without changing source");

@@ -48,6 +48,12 @@
    <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource Desktop.CommandButton}"/>
   </Style.Resources>
  </Style>
+ <Style x:Key="Desktop.DiagramToolbarButton" TargetType="Button" BasedOn="{StaticResource Desktop.CommandButton}">
+  <Setter Property="Focusable" Value="True"/>
+ </Style>
+ <Style x:Key="Desktop.DiagramToolbar" TargetType="ToolBar" BasedOn="{StaticResource Desktop.Toolbar}">
+  <Style.Resources><Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource Desktop.DiagramToolbarButton}"/></Style.Resources>
+ </Style>
  <Style x:Key="Desktop.PanelHeading" TargetType="TextBlock">
   <Setter Property="FontFamily" Value="Segoe UI"/>
   <Setter Property="FontSize" Value="11"/><Setter Property="FontWeight" Value="SemiBold"/>

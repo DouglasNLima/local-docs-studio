@@ -130,6 +130,9 @@ public partial class MainWindow
         Add("Toggle outline", "Ctrl+Alt+O", () => ToggleOutline(sender, e));
         Add("Full Screen", "F11", () => ToggleFullScreen(sender, e));
         Add("Focus Mode", "Ctrl+Alt+Z", () => ToggleFocusMode(sender, e));
+        Add("Follow caret", DesktopState.FollowCaret ? "On" : "Off", () => FollowCaretControl.IsChecked = !FollowCaretControl.IsChecked);
+        Add("Synchronise scroll", DesktopState.SyncScroll ? "On" : "Off", () => SyncScrollControl.IsChecked = !SyncScrollControl.IsChecked);
+        Add("Synchronise selection", DesktopState.SyncSelection ? "On" : "Off", () => SyncSelectionControl.IsChecked = !SyncSelectionControl.IsChecked);
         Add("Settings", "Ctrl+,", () => OpenSettings(sender, e));
         Add("Find", "Ctrl+F", () => ShowFind(false));
         Add("Back", "Alt+Left", () => NavigateBack(sender, e), BackButton.IsEnabled);
@@ -138,6 +141,13 @@ public partial class MainWindow
             Add(layout + " layout", "", () => ChangeLayout(new Button { Tag = layout }, e));
         foreach (var theme in WorkspaceSettings.Themes)
             Add(theme + " theme", "", () => ChangeTheme(new Button { Tag = theme }, e));
+        foreach (var mode in WorkspaceSettings.ReadingModes)
+            Add(mode + " reading mode", "", () => ReadingModeControl.SelectedItem = mode);
+        for (var level = 1; level <= 6; level++)
+        {
+            var chosen = level;
+            Add("Heading " + chosen, "", () => Format(new Button { Tag = "heading:" + chosen }, e), edit);
+        }
         foreach (var action in new[] { "heading", "bold", "italic", "strike", "inline-code", "link", "task", "bullet", "numbered", "quote", "code", "mermaid", "table", "rule" })
             Add("Format: " + action.Replace('-', ' '), "", () => Format(new Button { Tag = action }, e), edit);
         Add("Insert workspace document link", "Ctrl+Shift+K", () => InsertDocumentLink(sender, e), edit);

@@ -30,6 +30,10 @@ internal static class NativeSelectionMappingChecks
                     || !preview.TextMap.TrySourceRange(from!, to!, out var restored, out var length) || restored != start || length != text.Length)
                     throw new IOException("Formatted or Unicode selection boundaries lost their source offsets.");
             }
+            var link = preview.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines.OfType<Hyperlink>()).Single();
+            if (!preview.TextMap.TrySourceRange(link.ElementStart, link.ElementEnd, out var linkStart, out var linkLength)
+                || linkStart != source.IndexOf("[action", StringComparison.Ordinal) + 1 || linkLength != 6)
+                throw new IOException("Native structural hyperlink selection boundaries did not map to their literal label.");
             if (preview.TextMap.TryPreviewRange(source.IndexOf("**", StringComparison.Ordinal), 2, out _, out _))
                 throw new IOException("Formatting delimiters claimed an exact literal selection.");
             var other = new FlowDocument(new Paragraph(new Run("action")));
