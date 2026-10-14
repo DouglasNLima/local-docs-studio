@@ -221,12 +221,18 @@ internal static partial class NativeUiChecks
             Wait(() => !File.Exists(createdPath) && Find(window, "Status").Name.StartsWith("Deleted created-from-ui.md", StringComparison.Ordinal), "The file was not removed through the Windows shell.");
             var snapshotStore = new LensDocsStudio.Core.State.DocumentSnapshotStore(state);
             var retainedSnapshots = snapshotStore.ListAsync().GetAwaiter().GetResult();
-            if (retainedSnapshots.Entries.Count != 2) throw new IOException("Deletion did not retain separate saved and unsaved source snapshots.");
+            var deletedSnapshots = retainedSnapshots.Entries.Select(entry => snapshotStore.ReadAsync(entry).GetAwaiter().GetResult())
+                .Where(snapshot => snapshot.Document.Path == createdPath).ToArray();
+            if (deletedSnapshots.Length != 2
+                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == "Created through the native workspace.")
+                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == "Created through the native workspace.\nUnsaved content retained before deletion."))
+                throw new IOException("Deletion did not retain separate exact saved and unsaved source snapshots for its document.");
             checks.Add("Deleting a document uses the Windows shell and retains saved and unsaved source snapshots");
             Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Patterns.Invoke.Pattern.Invoke();
             Window? snapshotsWindow = null;
             Wait(() => (snapshotsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document snapshots")))?.AsWindow()) is not null, "The native snapshot browser did not open.");
-            var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
+            var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.StartsWith("created-from-ui.md", StringComparison.Ordinal)
+                && i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
             retainedItem.Select();
             Wait(() => Find(snapshotsWindow!, "SnapshotSource").AsTextBox().Text.Contains("Unsaved content retained before deletion.", StringComparison.Ordinal) && Find(snapshotsWindow!, "RestoreSnapshot").IsEnabled, "The retained unsaved source did not appear.");
             Find(snapshotsWindow!, "RestoreSnapshot").AsButton().Invoke();

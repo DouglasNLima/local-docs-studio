@@ -82,6 +82,8 @@ The focused hosted UX suite passes at `c63ac63` in [38581680252](https://github.
 
 The complete native suite at that revision passes the new checks and long editor navigation, then its older preview-focus click hits the SVG export button at the pane's centre. The retained screenshot shows the resulting Save As dialogue. That test now targets actual selectable text before Ctrl+F; its context, source and keyboard assertions remain. Full regression and package/lifecycle results are still pending.
 
+At `bf4c8d0`, the focused suite passes again and the complete suite progresses through preview search/diagram/file workflows. An older deletion check assumes exactly two snapshots across the whole shared test state; the new folder checks correctly add separate records. The deletion assertion now requires exactly two records for its own source path and exact saved/unsaved text, and the browser selects that document's unsaved record explicitly. No recovery assertion was removed.
+
 Continuous retains its warning and unchanged 250 ms input budget. Downloaded `8c903a2` evidence verifies 1,086 Core/40 rendering cases and the persisted export workflow, but reports first-layout input of 811 ms for the list and 374 ms for the mixed fixture: both remain FAIL against 250 ms. Compatibility is not performance acceptance; final large/mixed-document and intermittent construction observations must retain this distinction.
 
 Final installer/ZIP source, version, SHA-256 and independent lifecycle evidence are pending. Delivery remains an unsigned internal preview; production update trust, signing credentials, public releases, tags and merges are outside scope. Recommendation: **draft, certification in progress**.
