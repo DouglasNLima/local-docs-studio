@@ -9,6 +9,8 @@ public static class EditorNavigationService
 {
     private sealed class PendingNavigation { public long Revision; }
     private static readonly ConditionalWeakTable<TextEditor, PendingNavigation> Pending = new();
+    public static void CancelPending(TextEditor editor)
+    { editor.VerifyAccess(); if (Pending.TryGetValue(editor, out var pending)) pending.Revision++; }
 
     public static async Task<bool> BringIntoViewAsync(TextEditor editor, int offset)
     {

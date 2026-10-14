@@ -70,6 +70,8 @@ At `8c903a2`, [38572216722](https://github.com/DouglasNLima/local-docs-studio/ac
 
 The outline test at `de14715` exposes a real focus defect: collapsing a group replaces its focused item container, so the subsequent Right-arrow command misses the outline. The correction retains outline focus and defers focus to its current replacement row, guarded by document/selection identity and current focus. It does not force preview layout.
 
+At `6640012`, the complete outline test passes before the edited-source selection test exposes a restoration race: focused-pane input could arrive while viewport restoration was suppressing feedback and be discarded. Focused selections/caret changes now supersede that restoration; programmatic changes in the other pane remain excluded by focus. Cancellation invalidates pending navigation in both viewers. A hidden native 4.14 MB editor fixture verifies explicit cancellation leaves viewport, selection and source intact, alongside existing stale/superseded navigation checks.
+
 Continuous retains its warning and unchanged 250 ms input budget. Downloaded `8c903a2` evidence verifies 1,086 Core/40 rendering cases and the persisted export workflow, but reports first-layout input of 811 ms for the list and 374 ms for the mixed fixture: both remain FAIL against 250 ms. Compatibility is not performance acceptance; final large/mixed-document and intermittent construction observations must retain this distinction.
 
 Final installer/ZIP source, version, SHA-256 and independent lifecycle evidence are pending. Delivery remains an unsigned internal preview; production update trust, signing credentials, public releases, tags and merges are outside scope. Recommendation: **draft, certification in progress**.

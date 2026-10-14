@@ -88,7 +88,7 @@ public partial class MainWindow
     private void CancelSynchronisation()
     {
         syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false;
-        PreviewNavigationService.CancelPending(Preview); semanticHighlight?.Show(null);
+        PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
     }
     private void UserScrollInput(object sender, MouseWheelEventArgs e)
     {
@@ -98,11 +98,11 @@ public partial class MainWindow
     private void UserSelectionInput(object sender, MouseButtonEventArgs e) => CancelSynchronisation();
     private void EditorSelectionChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && BothPanesVisible && DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin) QueueSynchronisation("editor-selection");
+        if (BothPanesVisible && DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin) QueueFocusedSynchronisation("editor-selection");
     }
     private void EditorCaretChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && BothPanesVisible && DesktopState.FollowCaret && Editor.IsKeyboardFocusWithin && (Editor.SelectionLength == 0 || !DesktopState.SyncSelection)) QueueSynchronisation("caret");
+        if (BothPanesVisible && DesktopState.FollowCaret && Editor.IsKeyboardFocusWithin && (Editor.SelectionLength == 0 || !DesktopState.SyncSelection)) QueueFocusedSynchronisation("caret");
     }
     private void EditorScrollChanged(object? sender, EventArgs e)
     {
@@ -111,7 +111,7 @@ public partial class MainWindow
     }
     private void PreviewSelectionChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && BothPanesVisible && DesktopState.SyncSelection && Preview.IsKeyboardFocusWithin) QueueSynchronisation("preview-selection");
+        if (BothPanesVisible && DesktopState.SyncSelection && Preview.IsKeyboardFocusWithin) QueueFocusedSynchronisation("preview-selection");
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)
     {
@@ -125,6 +125,13 @@ public partial class MainWindow
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
         if (!syncTimer.IsEnabled) syncTimer.Start();
+    }
+    private void QueueFocusedSynchronisation(string origin)
+    {
+        // Only the originating pane has keyboard focus. Programmatic changes in the
+        // other pane cannot feed back, while fresh input supersedes viewport restoration.
+        if (applyingSync) CancelSynchronisation();
+        QueueSynchronisation(origin);
     }
     private async void SyncTick(object? sender, EventArgs e)
     {
