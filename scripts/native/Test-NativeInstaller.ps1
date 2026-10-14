@@ -17,6 +17,7 @@ $installDirectory = Join-Path $root 'installed'
 New-Item -ItemType Directory -Path $root -Force | Out-Null
 $checks = [Collections.Generic.List[string]]::new()
 $installedVersions = [Collections.Generic.List[object]]::new()
+$shortcutIdentities = [Collections.Generic.List[object]]::new()
 $preservedStateRoot = $null
 $preservedStateSnapshot = $null
 $defaultBefore = (Get-ItemProperty 'HKCU:\Software\Classes\.md' -ErrorAction SilentlyContinue).'(default)'
@@ -60,6 +61,20 @@ function Run-Installer([string]$Path, [string]$Phase) {
     if ($process.ExitCode -ne 0) { throw "$Phase failed with exit code $($process.ExitCode)." }
     if (-not (Test-Path -LiteralPath $uninstallKey)) { throw 'The native uninstall registration is missing.' }
     if (-not (Test-Path -LiteralPath $shortcut) -or -not (Test-Path -LiteralPath $desktopShortcut)) { throw 'Installer shortcuts are missing.' }
+    $applicationPath = Join-Path $installDirectory 'LensDocsStudio.Native.exe'
+    $shortcutReader = New-Object -ComObject WScript.Shell
+    try {
+        foreach ($shortcutPath in $shortcut, $desktopShortcut) {
+            $link = $shortcutReader.CreateShortcut($shortcutPath)
+            try {
+                $iconParts = $link.IconLocation.Split(',')
+                $iconPath = [Environment]::ExpandEnvironmentVariables($iconParts[0].Trim('"'))
+                if ($link.TargetPath -ne $applicationPath -or ($iconPath -and $iconPath -ne $applicationPath) -or
+                    ($iconParts.Count -gt 1 -and $iconParts[-1].Trim() -ne '0')) { throw "${Phase}: shortcut target or icon does not use the verified native application." }
+                $shortcutIdentities.Add(@{ phase=$Phase; shortcut=$shortcutPath; target=$link.TargetPath; icon=$link.IconLocation; verifiedApplicationIcon=$true })
+            } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($link) }
+        }
+    } finally { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($shortcutReader) }
     $association = (Get-ItemProperty 'HKCU:\Software\Classes\LensDocsStudio.Native.Document\shell\open\command').'(default)'
     if (-not $association.Contains($installDirectory)) { throw 'Open with does not target the isolated native installation.' }
     $installedIdentity = Get-Content -LiteralPath (Join-Path $installDirectory 'version.json') -Raw | ConvertFrom-Json
@@ -120,7 +135,7 @@ try {
     $legacyAfter = Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{E5D86651-4B27-4C59-B7D4-2EA98F2F8D26}_is1' -ErrorAction SilentlyContinue | ConvertTo-Json -Compress
     if ($defaultBefore -ne $defaultAfter -or $legacyBefore -ne $legacyAfter) { throw 'The legacy registration or Markdown default changed.' }
     $checks.Add('Existing shell registration and Markdown default preserved')
-    @{ passed=$true; checks=$checks; installedVersions=$installedVersions; preservedStateFiles=$preservedStateSnapshot.Count; evidence=$root;
+    @{ passed=$true; checks=$checks; installedVersions=$installedVersions; shortcutIdentities=$shortcutIdentities; preservedStateFiles=$preservedStateSnapshot.Count; evidence=$root;
         cleanMachineCertification=$false; upgradeTested=[bool]$UpgradeInstaller; productionSignedUpgrade=$false; sessionRestorationTested=$true;
         sameRevisionUpgrade=[bool]($UpgradeInstaller -and $upgradeIdentity.sourceRevision -eq $initialIdentity.sourceRevision);
         upgradeLimitation='Preview package replacement and preservation only; production signing, historical schema migration and SDK-free clean-machine certification remain separate.' } |
