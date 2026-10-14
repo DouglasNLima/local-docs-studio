@@ -525,6 +525,7 @@ public partial class MainWindow : Window
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         SplitColumn.Width = layout == "Split" ? new GridLength(5) : new GridLength(0);
         Editor.Visibility = layout == "Preview" ? Visibility.Collapsed : Visibility.Visible;
+        EditorPane.Visibility = Editor.Visibility;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
@@ -540,6 +541,7 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        if (HandleDesktopKey(e)) { e.Handled = true; return; }
         if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None) { OpenHelp(sender, e); e.Handled = true; return; }
         if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
         { if (WorkspaceTree.IsKeyboardFocusWithin) _ = RenameTreeEntryAsync(); else model.MoveDocumentCommand.Execute(null); e.Handled = true; return; }
@@ -581,7 +583,7 @@ public partial class MainWindow : Window
             {
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
-                await model.UpdatePreferencesAsync(p => p with { Window = WindowStateService.Capture(this) });
+                await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });
                 CompleteClose();
             }
             catch (Exception ex) when (ex is not OutOfMemoryException) { dialogs.Error(ex.Message); }

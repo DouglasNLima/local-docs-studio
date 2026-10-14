@@ -16,7 +16,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     [ObservableProperty] private DocumentViewModel? activeDocument;
     [ObservableProperty] private string status = "Local Markdown, Mermaid, and documentation studio";
     [ObservableProperty] private string previewStatus = "Preview pending";
-    [ObservableProperty] private string? workspaceRoot;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(WorkspaceName))] private string? workspaceRoot;
+    public string WorkspaceName => WorkspaceRoot is null ? "Open a workspace" : Path.GetFileName(Path.TrimEndingDirectorySeparator(WorkspaceRoot));
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private string theme = "Light";
     [ObservableProperty] private string layout = "Split";

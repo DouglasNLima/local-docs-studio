@@ -1,5 +1,13 @@
 # Lens Docs Studio native guide
 
+The command toolbars expose frequent file, navigation, formatting and viewing actions. Narrow windows use native toolbar overflow. Open documents occupy one horizontal tab row; scroll the strip when it fills.
+
+Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both support text filtering, Up/Down, Enter and Escape. The palette runs the same actions as the application's menus and toolbars.
+
+**Ctrl+Alt+B** toggles the workspace and **Ctrl+Alt+O** toggles the outline independently. Drag their dividers to resize them; visibility and width are private application preferences. The workspace header shows its name, with the full path in its tooltip.
+
+**F11** enters Full Screen and restores the previous window placement on exit. **Ctrl+Alt+Z** enters Focus Mode, preserving the chosen editor/preview layout and permanent panel preferences. **Escape** closes Find first, then exits Full Screen or Focus Mode. **Ctrl+Tab** and **Ctrl+Shift+Tab** switch open documents. The visible theme control offers System, Light and Dark.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.

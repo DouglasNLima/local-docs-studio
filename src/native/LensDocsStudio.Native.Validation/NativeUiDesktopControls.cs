@@ -1,0 +1,86 @@
+using System.Text.Json;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
+using FlaUI.UIA3;
+using LensDocsStudio.Core.State;
+
+namespace LensDocsStudio.Native.Validation;
+
+internal static partial class NativeUiChecks
+{
+    private static void CheckDesktopControls(Window window, AutomationElement editor, UIA3Automation automation, int process, string state, string output, string source)
+    {
+        var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
+        var bounds = window.BoundingRectangle;
+        var checks = new List<string>();
+        string preferences = Path.Combine(state, "preferences.json");
+        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferences))!;
+        bool Visible(string id) => window.FindFirstDescendant(cf => cf.ByAutomationId(id)) is { IsOffscreen: false };
+
+        Find(window, "ToggleSidebar").AsButton().Invoke();
+        Wait(() => !Visible("WorkspaceTree") && ReadPreferences().Desktop?.ShowSidebar == false, "Workspace did not collapse and persist.");
+        if (!Visible("DocumentPreview")) throw new IOException("Hiding workspace also hid the preview.");
+        Find(window, "ToggleOutline").AsButton().Invoke();
+        Wait(() => !ReadPreferences().ShowOutline, "Outline visibility did not persist independently.");
+        Find(window, "ToggleSidebar").AsButton().Invoke();
+        Wait(() => Visible("WorkspaceTree") && ReadPreferences().Desktop?.ShowSidebar == true, "Workspace did not reopen.");
+        if (ReadPreferences().ShowOutline) throw new IOException("Reopening workspace also reopened the outline.");
+        Find(window, "ToggleOutline").AsButton().Invoke();
+        Wait(() => ReadPreferences().ShowOutline, "Outline did not reopen.");
+        checks.Add("Independent panel visibility persists without replacing source or preview");
+
+        var beforeFocus = ReadPreferences();
+        FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.ALT, VirtualKeyShort.KEY_Z);
+        Wait(() => !Visible("WorkspaceTree") && !Visible("ToggleSidebar"), "Focus Mode did not hide secondary chrome.");
+        if (ReadPreferences().Desktop != beforeFocus.Desktop || ReadPreferences().ShowOutline != beforeFocus.ShowOutline)
+            throw new IOException("Focus Mode overwrote permanent panel preferences.");
+        Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Wait(() => Visible("WorkspaceTree") && Visible("ToggleSidebar"), "Escape did not restore Focus Mode panels.");
+        checks.Add("Focus Mode restores panel preferences and leaves the current layout intact");
+
+        FocusWindow(window); Keyboard.Type(VirtualKeyShort.F11);
+        Wait(() => window.BoundingRectangle.Height > bounds.Height + 5, "Full Screen did not reclaim the native window chrome.");
+        Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Wait(() => Math.Abs(window.BoundingRectangle.Width - bounds.Width) < 3 && Math.Abs(window.BoundingRectangle.Height - bounds.Height) < 3,
+            "Full Screen did not restore the original window dimensions.");
+        checks.Add("F11 and Escape restore the original native window dimensions");
+
+        FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_P);
+        var picker = SearchWindow();
+        Find(picker, "CommandSearchQuery").AsTextBox().Text = "Second";
+        Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Quick Open did not filter workspace filenames.");
+        Keyboard.Type(VirtualKeyShort.RETURN);
+        Wait(() => ReadEditorText(editor).StartsWith("# Second document", StringComparison.Ordinal), "Quick Open did not activate its selected document.");
+        FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+        Wait(() => ReadEditorText(editor) == original, "Closing Quick Open's clean tab did not restore the surviving active document.");
+        checks.Add("Quick Open opens the filtered workspace document and active-tab survival retains source");
+
+        FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_P);
+        picker = SearchWindow(); Find(picker, "CommandSearchQuery").AsTextBox().Text = "Toggle outline";
+        Wait(() => Find(picker, "CommandSearchResults").AsListBox().Items.Length == 1, "Command Palette did not filter the actual panel action.");
+        Keyboard.Type(VirtualKeyShort.RETURN); Wait(() => !ReadPreferences().ShowOutline, "Command Palette did not execute the outline toggle.");
+        Find(window, "ToggleOutline").AsButton().Invoke(); Wait(() => ReadPreferences().ShowOutline, "Outline did not restore after the palette action.");
+        checks.Add("Command Palette reuses an actual enabled native action");
+
+        FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
+        Find(window, "FindText").AsTextBox().Text = "Searchable"; Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Find(window, "FormatBold").AsButton().Invoke();
+        Wait(() => ReadEditorText(editor) == original.Replace("Searchable", "**Searchable**", StringComparison.Ordinal), "Formatting toolbar did not wrap the active source selection.");
+        Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+        Wait(() => ReadEditorText(editor) == original, "Toolbar formatting did not retain one exact Undo.");
+        checks.Add("Formatting toolbar edits the active selection and groups one exact Undo");
+        if (!File.ReadAllBytes(source).SequenceEqual(saved) || ReadEditorText(editor) != original)
+            throw new IOException("Desktop controls changed saved or unsaved document content.");
+        window.CaptureToFile(Path.Combine(output, "native-desktop-controls.png"));
+        File.WriteAllText(Path.Combine(output, "native-desktop-controls.json"), JsonSerializer.Serialize(new { Passed = true, Checks = checks }));
+
+        Window SearchWindow()
+        {
+            Window? result = null;
+            Wait(() => (result = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("CommandSearchWindow")))?.AsWindow()) is not null,
+                "The native searchable command window did not appear.");
+            return result!;
+        }
+    }
+}

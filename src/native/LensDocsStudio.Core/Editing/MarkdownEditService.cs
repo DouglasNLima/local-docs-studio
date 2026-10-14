@@ -10,6 +10,12 @@ public sealed partial class MarkdownEditService
     public MarkdownEdit Plan(string source, int start, int length, string action)
     {
         if (start < 0 || length < 0 || (long)start + length > source.Length) throw new ArgumentOutOfRangeException(nameof(start));
+        var headingLevel = 2;
+        if (action.StartsWith("heading:", StringComparison.Ordinal))
+        {
+            if (!int.TryParse(action[8..], out headingLevel) || headingLevel is < 1 or > 6) throw new ArgumentException("Choose a heading level from 1 to 6.", nameof(action));
+            action = "heading";
+        }
         var selected = source.Substring(start, length);
         MarkdownEdit Edit(int offset, int count, string value, int selectionOffset = 0, int? selectionLength = null)
             => new(offset, count, value, offset + selectionOffset, selectionLength ?? value.Length);
@@ -50,7 +56,7 @@ public sealed partial class MarkdownEditService
             var lineEnd = source.IndexOf('\n', last); if (lineEnd < 0) lineEnd = source.Length;
             if (lineEnd > lineStart && source[lineEnd - 1] == '\r') lineEnd--;
             var parts = LineSeparators().Split(source[lineStart..lineEnd]);
-            var pattern = action switch { "heading" => @"^([ \t]*)##[ \t]+", "task" => @"^([ \t]*)[-*+] \[[ xX]\][ \t]+", "bullet" => @"^([ \t]*)[-*+][ \t]+", "numbered" => @"^([ \t]*)\d+[.)][ \t]+", _ => @"^([ \t]*)>[ \t]?" };
+            var pattern = action switch { "heading" => @"^([ \t]*)" + new string('#', headingLevel) + @"[ \t]+", "task" => @"^([ \t]*)[-*+] \[[ xX]\][ \t]+", "bullet" => @"^([ \t]*)[-*+][ \t]+", "numbered" => @"^([ \t]*)\d+[.)][ \t]+", _ => @"^([ \t]*)>[ \t]?" };
             var matcher = new Regex(pattern, RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
             var nonEmpty = parts.Where((_, index) => index % 2 == 0).Where(p => !string.IsNullOrWhiteSpace(p)).ToArray();
             var remove = nonEmpty.Length > 0 && nonEmpty.All(matcher.IsMatch); var number = 1;
@@ -67,7 +73,7 @@ public sealed partial class MarkdownEditService
                     if (action == "task" && matcher.IsMatch(line)) continue;
                     body = ExistingListPrefix().Replace(body, "", 1);
                 }
-                var marker = action switch { "heading" => "## ", "task" => "- [ ] ", "bullet" => "- ", "numbered" => number++ + ". ", _ => "> " };
+                var marker = action switch { "heading" => new string('#', headingLevel) + " ", "task" => "- [ ] ", "bullet" => "- ", "numbered" => number++ + ". ", _ => "> " };
                 parts[index] = line[..indent] + marker + body;
             }
             var replacement = string.Concat(parts);

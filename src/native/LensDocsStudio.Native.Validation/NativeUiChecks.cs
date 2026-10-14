@@ -68,8 +68,10 @@ internal static partial class NativeUiChecks
             checks.Add(requireBundledRuntime
                 ? "Installed application loads the .NET runtime and WPF graphics from its own package directory"
                 : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");
+            CheckDesktopControls(window, editor, automation, app.ProcessId, state, output, source);
+            checks.Add("Modern desktop controls retain independent panels, Focus Mode, Full Screen, Quick Open, actual palette actions, source selection and Undo");
             CheckMinimumWindow(window, editor, output, source);
-            checks.Add("Minimum-size native window retains visible Cancel and Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             CheckLargeEditorNavigation(window, editor, output, source);
             checks.Add("Long wrapped editor Find reveals its final selected target, preserves insertion Undo and saved bytes, and resumes the original preview");
             FocusWindow(window); editor.Click();

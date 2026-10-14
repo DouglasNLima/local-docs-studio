@@ -15,6 +15,7 @@ internal static partial class NativeUiChecks
         var observations = new List<object>();
         try
         {
+            using var display = new NativeTestDisplay(output);
             using var automation = new UIA3Automation();
             foreach (var theme in new[] { "Light", "Dark" })
             foreach (var size in new[] { (860, 540), (1280, 800), (1440, 900), (1920, 1080) })
@@ -29,7 +30,7 @@ internal static partial class NativeUiChecks
                 info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(workspace);
                 foreach (var path in paths) info.ArgumentList.Add(path);
                 using var process = Process.Start(info) ?? throw new IOException("The synthetic screenshot application did not start.");
-                using var app = FlaUI.Core.Application.Attach(process);
+                using var app = FlaUI.Core.Application.Attach(process.Id);
                 try
                 {
                     var window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The screenshot window did not appear.");

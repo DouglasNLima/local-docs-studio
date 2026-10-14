@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+ <title>Lens Docs Studio</title>
+ <desc>Original stacked documentation pages with a Lens orange folded corner and structured text.</desc>
+ <path d="M42,42 L150,42 L190,82 L190,232 L42,232 Z" fill="#B8C0CB"/>
+ <path d="M62,20 L158,20 L210,72 L210,216 L62,216 Z" fill="#25313F"/>
+ <path d="M158,20 L158,72 L210,72 Z" fill="#FF883E"/>
+ <path d="M86,100 L180,100 M86,126 L164,126 M86,152 L180,152" fill="none" stroke="#FAFAFA" stroke-width="12"/>
+ <path d="M86,182 L140,182" fill="none" stroke="#FF883E" stroke-width="12"/>
+</svg>

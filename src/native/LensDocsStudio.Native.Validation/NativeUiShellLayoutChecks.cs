@@ -23,7 +23,9 @@ internal static partial class NativeUiChecks
             Find(window, "FindText").AsTextBox().Text = "Searchable";
             Find(window, "ReplaceText").AsTextBox().Text = "Reviewed";
             var bounds = window.BoundingRectangle;
-            var controls = new[] { "CancelOperation", "FindNext", "ReplaceOne", "CloseFind" }
+            if (window.FindFirstDescendant(cf => cf.ByAutomationId("CancelOperation"))?.IsOffscreen == false)
+                throw new IOException("The idle status bar retained an inactive Cancel operation button.");
+            var controls = new[] { "FindNext", "ReplaceOne", "CloseFind" }
                 .Select(id => new { Id = id, Element = Find(window, id) })
                 .Select(item => new { item.Id, item.Element.Name, Bounds = item.Element.BoundingRectangle, item.Element.IsOffscreen }).ToArray();
             foreach (var control in controls)

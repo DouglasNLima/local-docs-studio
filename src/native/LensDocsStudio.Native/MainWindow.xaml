@@ -4,16 +4,13 @@
  xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
  xmlns:workspace="clr-namespace:LensDocsStudio.Native.ViewModels"
  xmlns:rendering="clr-namespace:LensDocsStudio.Native.Rendering"
+ xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
  Title="Lens Docs Studio · Native Preview" Width="1440" Height="900" MinWidth="860" MinHeight="540"
- Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
+ Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
  PreviewKeyDown="WindowKeyDown" Closing="WindowClosing" Loaded="WindowLoaded">
  <Window.Resources>
   <ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Rendering/DocumentPreview.xaml"/></ResourceDictionary.MergedDictionaries>
 
-  <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-   <Setter Property="Padding" Value="10,5"/><Setter Property="Margin" Value="3"/>
-   <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
-  </Style>
   <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
    <Setter Property="IsExpanded" Value="True"/>
    <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
@@ -68,6 +65,9 @@
     <MenuItem Header="E_xit" Click="Exit"/>
    </MenuItem>
    <MenuItem Header="_Edit" AutomationProperties.AutomationId="EditMenu">
+    <MenuItem Header="Command _Palette…" InputGestureText="Ctrl+Shift+P" Click="OpenCommandPalette"/>
+    <MenuItem Header="_Quick Open…" InputGestureText="Ctrl+P" Click="OpenQuickOpen"/>
+    <Separator/>
     <MenuItem Header="_Undo" Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}"/>
     <MenuItem Header="_Redo" Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}"/>
     <MenuItem Header="_Paste" Command="ApplicationCommands.Paste" CommandTarget="{Binding ElementName=Editor}"/>
@@ -155,6 +155,11 @@
     <MenuItem Header="Use _default Word styles" Click="ClearWordTemplate" AutomationProperties.AutomationId="ClearWordTemplate"/>
    </MenuItem>
    <MenuItem Header="_View" AutomationProperties.AutomationId="ViewMenu">
+    <MenuItem Header="Toggle _workspace" InputGestureText="Ctrl+Alt+B" Click="ToggleSidebar"/>
+    <MenuItem Header="Toggle _outline" InputGestureText="Ctrl+Alt+O" Click="ToggleOutline"/>
+    <MenuItem Header="_Full Screen" InputGestureText="F11" Click="ToggleFullScreen"/>
+    <MenuItem Header="_Focus Mode" InputGestureText="Ctrl+Alt+Z" Click="ToggleFocusMode"/>
+    <Separator/>
     <MenuItem Header="Workspace _map…" Click="OpenWorkspaceMap" AutomationProperties.AutomationId="OpenWorkspaceMap"/>
     <MenuItem Header="Document _review…" Click="ReviewDocument" AutomationProperties.AutomationId="ReviewDocument"/>
     <MenuItem x:Name="ArtifactReaderMenu" Header="Artefact _bundle…" Click="OpenArtifactReader" IsEnabled="False" AutomationProperties.AutomationId="OpenArtifactReader"/>
@@ -180,21 +185,34 @@
    </MenuItem>
    <MenuItem Header="_Help" AutomationProperties.AutomationId="HelpMenu"><MenuItem Header="Native _guide…" InputGestureText="F1" Click="OpenHelp" AutomationProperties.AutomationId="OpenHelp"/><Separator/><MenuItem Header="_Updates…" Click="OpenUpdates" AutomationProperties.AutomationId="UpdatesMenu"/><MenuItem Header="_About the native preview" Click="About" AutomationProperties.AutomationId="AboutNativePreview"/></MenuItem>
   </Menu>
-  <Border DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,6">
-   <DockPanel>
-    <StackPanel Orientation="Horizontal">
-     <Border Background="{DynamicResource AccentBrush}" Width="4" Height="25" Margin="0,0,10,0"/>
-     <TextBlock Text="Lens Docs Studio" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" Margin="0,0,22,0"/>
-     <Button x:Name="BackButton" Content="←" ToolTip="Back (Alt+Left)" Click="NavigateBack" IsEnabled="False" AutomationProperties.Name="Back" AutomationProperties.AutomationId="NavigateBack"/>
-     <Button x:Name="ForwardButton" Content="→" ToolTip="Forward (Alt+Right)" Click="NavigateForward" IsEnabled="False" AutomationProperties.Name="Forward" AutomationProperties.AutomationId="NavigateForward"/>
-     <Button Content="Open folder" Command="{Binding OpenFolderCommand}"/>
-     <Button Content="Save" Command="{Binding SaveCommand}" Background="{DynamicResource AccentBrush}" Foreground="{DynamicResource AccentTextBrush}" AutomationProperties.AutomationId="SaveDocument"/>
+  <Border x:Name="PrimaryToolbar" DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+   <DockPanel Background="{DynamicResource PanelBrush}">
+    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="12,0,10,0">
+     <Image Source="Resources/Brand/application.ico" Width="24" Height="24" Margin="0,0,8,0"/>
+     <TextBlock Text="Lens Docs Studio" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
     </StackPanel>
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-     <Button Content="Editor" Tag="Editor" Click="ChangeLayout"/>
-     <Button Content="Split" Tag="Split" Click="ChangeLayout"/>
-     <Button Content="Preview" Tag="Preview" Click="ChangeLayout"/>
-    </StackPanel>
+    <ToolBar Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Application commands">
+     <Button Click="ToggleSidebar" ToolTip="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.Name="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.AutomationId="ToggleSidebar"><ui:CommandIcon Kind="Sidebar"/></Button>
+     <Button Command="{Binding NewDocumentCommand}" ToolTip="New document (Ctrl+N)" AutomationProperties.Name="New document (Ctrl+N)"><ui:CommandIcon Kind="New"/></Button>
+     <Button Command="{Binding OpenDocumentCommand}" ToolTip="Open document (Ctrl+O)" AutomationProperties.Name="Open document (Ctrl+O)"><ui:CommandIcon Kind="Open"/></Button>
+     <Button Command="{Binding OpenFolderCommand}" ToolTip="Open workspace (Ctrl+Shift+O)" AutomationProperties.Name="Open workspace (Ctrl+Shift+O)"><ui:CommandIcon Kind="Folder"/></Button>
+     <Button Command="{Binding SaveCommand}" ToolTip="Save (Ctrl+S)" AutomationProperties.Name="Save (Ctrl+S)" AutomationProperties.AutomationId="SaveDocument"><ui:CommandIcon Kind="Save"/></Button>
+<Separator/>
+     <Button x:Name="BackButton" Click="NavigateBack" IsEnabled="False" ToolTip="Back (Alt+Left)" AutomationProperties.Name="Back (Alt+Left)" AutomationProperties.AutomationId="NavigateBack"><ui:CommandIcon Kind="Back"/></Button>
+     <Button x:Name="ForwardButton" Click="NavigateForward" IsEnabled="False" ToolTip="Forward (Alt+Right)" AutomationProperties.Name="Forward (Alt+Right)" AutomationProperties.AutomationId="NavigateForward"><ui:CommandIcon Kind="Forward"/></Button>
+     <Button Click="OpenQuickOpen" ToolTip="Quick Open (Ctrl+P)" AutomationProperties.Name="Quick Open (Ctrl+P)" AutomationProperties.AutomationId="QuickOpen"><ui:CommandIcon Kind="Search"/></Button>
+     <Button Click="OpenCommandPalette" ToolTip="Command Palette (Ctrl+Shift+P)" AutomationProperties.Name="Command Palette (Ctrl+Shift+P)" AutomationProperties.AutomationId="CommandPalette"><ui:CommandIcon Kind="Palette"/></Button>
+<Separator/>
+     <Button Tag="Editor" Click="ChangeLayout" ToolTip="Editor layout" AutomationProperties.Name="Editor layout" AutomationProperties.AutomationId="LayoutEditor"><ui:CommandIcon Kind="Editor"/></Button>
+     <Button Tag="Split" Click="ChangeLayout" ToolTip="Split layout" AutomationProperties.Name="Split layout" AutomationProperties.AutomationId="LayoutSplit"><ui:CommandIcon Kind="Split"/></Button>
+     <Button Tag="Preview" Click="ChangeLayout" ToolTip="Preview layout" AutomationProperties.Name="Preview layout" AutomationProperties.AutomationId="LayoutPreview"><ui:CommandIcon Kind="Preview"/></Button>
+<Separator/>
+     <Button Click="ToggleOutline" ToolTip="Toggle outline (Ctrl+Alt+O)" AutomationProperties.Name="Toggle outline (Ctrl+Alt+O)" AutomationProperties.AutomationId="ToggleOutline"><ui:CommandIcon Kind="Outline"/></Button>
+     <Button Click="OpenThemeMenu" ToolTip="Change theme" AutomationProperties.Name="Change theme" AutomationProperties.AutomationId="QuickTheme"><ui:CommandIcon Kind="Theme"/></Button>
+     <Button Click="ToggleFocusMode" ToolTip="Focus Mode (Ctrl+Alt+Z)" AutomationProperties.Name="Focus Mode (Ctrl+Alt+Z)" AutomationProperties.AutomationId="FocusMode"><ui:CommandIcon Kind="Focus"/></Button>
+     <Button Click="ToggleFullScreen" ToolTip="Full Screen (F11)" AutomationProperties.Name="Full Screen (F11)" AutomationProperties.AutomationId="FullScreen"><ui:CommandIcon Kind="FullScreen"/></Button>
+     <Button Click="OpenSettings" ToolTip="Settings (Ctrl+,)" AutomationProperties.Name="Settings (Ctrl+,)" AutomationProperties.AutomationId="ToolbarSettings"><ui:CommandIcon Kind="Settings"/></Button>
+    </ToolBar>
    </DockPanel>
   </Border>
   <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}">
@@ -205,28 +223,32 @@
      <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
      <TextBlock Grid.Column="1" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/>
      <TextBlock Grid.Column="2" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
-     <Button Grid.Column="3" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation"/>
+     <Button Grid.Column="3" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
+      <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
+       <DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+      </Style.Triggers></Style></Button.Style>
+     </Button>
     </Grid>
    </StatusBarItem>
   </StatusBar>
   <Grid>
-   <Grid.ColumnDefinitions><ColumnDefinition Width="230" MinWidth="150"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-   <DockPanel Grid.Column="0" Background="{DynamicResource PanelBrush}">
+   <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="230"/><ColumnDefinition x:Name="SidebarSplitterColumn" Width="5"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+   <DockPanel x:Name="SidebarPanel" Grid.Column="0" Background="{DynamicResource PanelBrush}">
     <TextBlock DockPanel.Dock="Top" Text="WORKSPACE" FontSize="11" FontWeight="SemiBold" Margin="14,16,10,4"/>
-    <TextBlock DockPanel.Dock="Top" Text="{Binding WorkspaceRoot, TargetNullValue='Open a folder to browse documents'}" FontSize="11" Margin="14,0,10,12" TextWrapping="Wrap"/>
+    <TextBlock DockPanel.Dock="Top" Text="{Binding WorkspaceName}" ToolTip="{Binding WorkspaceRoot}" FontSize="13" FontWeight="SemiBold" Margin="12,0,12,12" TextTrimming="CharacterEllipsis"/>
     <TreeView x:Name="WorkspaceTree" ItemsSource="{Binding Entries}" BorderThickness="0" Background="Transparent"
       MouseDoubleClick="OpenTreeEntry" KeyDown="TreeKeyDown" AutomationProperties.Name="Workspace files" AutomationProperties.AutomationId="WorkspaceTree"/>
    </DockPanel>
-   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
+   <GridSplitter x:Name="SidebarSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize workspace"/>
    <DockPanel Grid.Column="2">
-    <TabControl x:Name="DocumentTabs" DockPanel.Dock="Top" ItemsSource="{Binding Documents}" SelectedItem="{Binding ActiveDocument}" Background="{DynamicResource WindowBrush}"
+    <TabControl x:Name="DocumentTabs" Style="{StaticResource Desktop.DocumentTabs}" DockPanel.Dock="Top" ItemsSource="{Binding Documents}" SelectedItem="{Binding ActiveDocument}" Background="{DynamicResource WindowBrush}"
        BorderThickness="0,0,0,1" Padding="0" AutomationProperties.Name="Open documents" SelectionChanged="TabChanged">
-     <TabControl.ItemContainerStyle><Style TargetType="TabItem" BasedOn="{StaticResource {x:Type TabItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/><Setter Property="ToolTip" Value="{Binding FilePath}"/></Style></TabControl.ItemContainerStyle>
-     <TabControl.ItemTemplate><DataTemplate><StackPanel Orientation="Horizontal">
-      <TextBlock Text="{Binding Title}" VerticalAlignment="Center" Margin="7,3"/>
-      <Button Content="×" Padding="4,0" Margin="5,0,0,0" AutomationProperties.Name="Close document"
-       Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"/>
-     </StackPanel></DataTemplate></TabControl.ItemTemplate>
+     <TabControl.ItemContainerStyle><Style TargetType="TabItem" BasedOn="{StaticResource Desktop.DocumentTab}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/><Setter Property="ToolTip" Value="{Binding FilePath}"/></Style></TabControl.ItemContainerStyle>
+     <TabControl.ItemTemplate><DataTemplate><DockPanel>
+      <Button DockPanel.Dock="Right" Style="{StaticResource Desktop.CommandButton}" Padding="3" Margin="2,0" MinHeight="24" ToolTip="Close document" AutomationProperties.Name="Close document"
+       Command="{Binding DataContext.CloseDocumentCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}"><ui:CommandIcon Kind="Close" Width="14" Height="14"/></Button>
+      <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" MaxWidth="170" VerticalAlignment="Center" Margin="5,3"/>
+     </DockPanel></DataTemplate></TabControl.ItemTemplate>
      <TabControl.ContentTemplate><DataTemplate><Grid Height="0"/></DataTemplate></TabControl.ContentTemplate>
     </TabControl>
     <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8" FocusManager.IsFocusScope="True">
@@ -251,8 +273,31 @@
      </StackPanel>
     </Border>
     <Grid x:Name="ContentGrid">
-     <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineColumn" Width="180"/></Grid.ColumnDefinitions>
-     <avalon:TextEditor x:Name="Editor" Grid.Column="0" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"
+     <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineSplitterColumn" Width="5"/><ColumnDefinition x:Name="OutlineColumn" Width="240"/></Grid.ColumnDefinitions>
+     <DockPanel x:Name="EditorPane" Grid.Column="0">
+      <ToolBar x:Name="FormattingToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Markdown formatting">
+<Button ToolTip="Heading level" AutomationProperties.Name="Heading level" Click="OpenHeadingMenu"><ui:CommandIcon Kind="Heading"/></Button>
+     <Button Command="ApplicationCommands.Undo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Undo (Ctrl+Z)" AutomationProperties.Name="Undo (Ctrl+Z)"><ui:CommandIcon Kind="Undo"/></Button>
+     <Button Command="ApplicationCommands.Redo" CommandTarget="{Binding ElementName=Editor}" ToolTip="Redo (Ctrl+Y)" AutomationProperties.Name="Redo (Ctrl+Y)"><ui:CommandIcon Kind="Redo"/></Button>
+<Separator/>
+     <Button Tag="bold" Click="Format" ToolTip="Bold (Ctrl+B)" AutomationProperties.Name="Bold (Ctrl+B)" AutomationProperties.AutomationId="FormatBold"><ui:CommandIcon Kind="Bold"/></Button>
+     <Button Tag="italic" Click="Format" ToolTip="Italic (Ctrl+I)" AutomationProperties.Name="Italic (Ctrl+I)" AutomationProperties.AutomationId="FormatItalic"><ui:CommandIcon Kind="Italic"/></Button>
+     <Button Tag="strike" Click="Format" ToolTip="Strikethrough" AutomationProperties.Name="Strikethrough" AutomationProperties.AutomationId="FormatStrike"><ui:CommandIcon Kind="Strike"/></Button>
+     <Button Tag="inline-code" Click="Format" ToolTip="Inline code" AutomationProperties.Name="Inline code" AutomationProperties.AutomationId="FormatCode"><ui:CommandIcon Kind="Code"/></Button>
+     <Button Tag="link" Click="Format" ToolTip="Insert link" AutomationProperties.Name="Insert link" AutomationProperties.AutomationId="FormatLink"><ui:CommandIcon Kind="Link"/></Button>
+     <Button Click="InsertDocumentLink" ToolTip="Workspace document link (Ctrl+Shift+K)" AutomationProperties.Name="Workspace document link (Ctrl+Shift+K)" AutomationProperties.AutomationId="FormatDocumentLink"><ui:CommandIcon Kind="Document"/></Button>
+     <Button Click="InsertImage" ToolTip="Insert local image" AutomationProperties.Name="Insert local image" AutomationProperties.AutomationId="FormatImage"><ui:CommandIcon Kind="Image"/></Button>
+<Separator/>
+     <Button Tag="bullet" Click="Format" ToolTip="Bullet list" AutomationProperties.Name="Bullet list" AutomationProperties.AutomationId="Formatbullet"><ui:CommandIcon Kind="Bullet"/></Button>
+     <Button Tag="numbered" Click="Format" ToolTip="Numbered list" AutomationProperties.Name="Numbered list" AutomationProperties.AutomationId="Formatnumbered"><ui:CommandIcon Kind="Numbered"/></Button>
+     <Button Tag="task" Click="Format" ToolTip="Checklist" AutomationProperties.Name="Checklist" AutomationProperties.AutomationId="Formattask"><ui:CommandIcon Kind="Checklist"/></Button>
+     <Button Tag="quote" Click="Format" ToolTip="Quote" AutomationProperties.Name="Quote" AutomationProperties.AutomationId="Formatquote"><ui:CommandIcon Kind="Quote"/></Button>
+     <Button Tag="code" Click="Format" ToolTip="Code block" AutomationProperties.Name="Code block" AutomationProperties.AutomationId="Formatcode"><ui:CommandIcon Kind="Code"/></Button>
+     <Button Tag="mermaid" Click="Format" ToolTip="Mermaid block" AutomationProperties.Name="Mermaid block" AutomationProperties.AutomationId="Formatmermaid"><ui:CommandIcon Kind="Mermaid"/></Button>
+     <Button Tag="table" Click="Format" ToolTip="Table" AutomationProperties.Name="Table" AutomationProperties.AutomationId="Formattable"><ui:CommandIcon Kind="Table"/></Button>
+     <Button Tag="rule" Click="Format" ToolTip="Horizontal rule" AutomationProperties.Name="Horizontal rule" AutomationProperties.AutomationId="Formatrule"><ui:CommandIcon Kind="Rule"/></Button>
+      </ToolBar>
+     <avalon:TextEditor x:Name="Editor" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"
         IsReadOnly="{Binding ActiveDocument.IsSaving}"
         Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" Padding="14" BorderThickness="0"
         HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" WordWrap="True"
@@ -275,11 +320,13 @@
        </ContextMenu>
       </avalon:TextEditor.ContextMenu>
      </avalon:TextEditor>
+     </DockPanel>
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
      <rendering:DocumentPreview x:Name="Preview" Grid.Column="2" Style="{StaticResource DocumentPreviewStyle}"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
        AutomationProperties.Name="Document preview" AutomationProperties.AutomationId="DocumentPreview"/>
-     <DockPanel x:Name="OutlinePanel" Grid.Column="3" Background="{DynamicResource PanelBrush}">
+     <GridSplitter x:Name="OutlineSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize outline"/>
+     <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
       <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" DisplayMemberPath="Title" SelectionChanged="OutlineSelected"
        AutomationProperties.Name="Document outline">

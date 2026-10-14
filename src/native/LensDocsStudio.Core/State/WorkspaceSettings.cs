@@ -24,6 +24,7 @@ public sealed record WorkspaceSettings(string Theme, string Layout, EditorPrefer
         && DiagramThemes.Choices.Contains(Preview.DiagramTheme);
 
     public static bool ArePreferencesValid(UserPreferences preferences) => From(preferences).IsValid
+        && (preferences.Desktop?.IsValid ?? true)
         && preferences.UpdateChannel is "Stable" or "Preview";
 
     public UserPreferences ApplyTo(UserPreferences current)
