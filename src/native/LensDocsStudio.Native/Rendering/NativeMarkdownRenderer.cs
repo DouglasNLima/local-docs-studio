@@ -31,6 +31,7 @@ public sealed record PreviewMedia(Image Image, double ScrollMaximumHeight, Frame
 }
 public sealed record PreviewResult(FlowDocument Document, IReadOnlyDictionary<int, TextElement> SourceElements, IReadOnlyList<string> Warnings)
 {
+    public PreviewSourceMap TextMap { get; init; } = new([]);
     public IReadOnlyList<PreviewDetails> Details { get; init; } = [];
     public IReadOnlyList<PreviewMaths> Formulae { get; init; } = [];
     public IReadOnlyList<PreviewMedia> Media { get; init; } = [];
@@ -83,6 +84,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var formulaSources = new List<PreviewMaths>();
         var media = new List<PreviewMedia>();
         var warnings = new List<string>();
+        var literalSpans = new List<PreviewLiteral>();
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
         PreviewConstructionEvents.Log.Stage("document-ready");
@@ -90,7 +92,15 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             await Convert(block, document.Blocks);
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("completed");
-        return new(document, sourceElements, warnings) { Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
+        return new(document, sourceElements, warnings) { TextMap = new(literalSpans), Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
+
+        Run Literal(MarkdownObject node, string text)
+        {
+            var run = new Run(text);
+            if (LiteralSourceMapping.Locate(parsed.Source, node.Span.Start, node.Span.End, text) is { } span)
+                literalSpans.Add(new(run, span));
+            return run;
+        }
 
         async ValueTask Cooperate()
         {
@@ -336,16 +346,18 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         else { passive.FontFamily = new FontFamily("Consolas"); passive.ToolTip = "Keyboard shortcut: " + semantic.Text; }
                         System.Windows.Automation.AutomationProperties.SetName(passive, semantic.Text);
                         target.Add(passive); break;
-                    case LiteralInline literal: target.Add(new Run(literal.Content.ToString())); break;
+                    case LiteralInline literal: target.Add(Literal(literal, literal.Content.ToString())); break;
                     case AutolinkInline auto:
                         var autoReference = MarkdownLinks.AutolinkReference(auto);
-                        var autoLink = new Hyperlink(new Run(auto.Url)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = autoReference };
+                        var autoLink = new Hyperlink(Literal(auto, auto.Url)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = autoReference };
                         System.Windows.Automation.AutomationProperties.SetName(autoLink, auto.Url);
                         System.Windows.Automation.AutomationProperties.SetAutomationId(autoLink, "DocumentLink" + auto.Span.Start);
                         autoLink.Click += (_, _) => navigate(autoReference);
                         target.Add(autoLink); break;
                     case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
-                    case CodeInline code: target.Add(new Run(code.Content) { FontFamily = new FontFamily("Consolas"), Background = surface }); break;
+                    case CodeInline code:
+                        var codeRun = Literal(code, code.Content); codeRun.FontFamily = new FontFamily("Consolas"); codeRun.Background = surface;
+                        target.Add(codeRun); break;
                     case MathInline formula: target.Add(Formula(formula, formula.Content.ToString(), formula.DelimiterCount == 2)); break;
                     case LineBreakInline line: if (line.IsHard) target.Add(new LineBreak()); else target.Add(new Run(" ")); break;
                     case EmphasisInline emphasis:
@@ -354,7 +366,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         // formatting container and a second element with identical text.
                         var literalChild = emphasis.FirstChild as LiteralInline;
                         var span = literalChild is not null && literalChild.NextSibling is null
-                            ? (System.Windows.Documents.Inline)new Run(literalChild.Content.ToString()) : new Span();
+                            ? (System.Windows.Documents.Inline)Literal(literalChild, literalChild.Content.ToString()) : new Span();
                         if (formatting.HasFlag(MarkdownEmphasis.Bold)) span.FontWeight = FontWeights.Bold;
                         if (formatting.HasFlag(MarkdownEmphasis.Italic)) span.FontStyle = FontStyles.Italic;
                         if (formatting.HasFlag(MarkdownEmphasis.Strike)) span.TextDecorations = TextDecorations.Strikethrough;

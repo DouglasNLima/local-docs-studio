@@ -8,6 +8,8 @@ param(
     [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedZipSha256
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'NativeIconVerification.ps1')
+$sourceIcon = Join-Path $PSScriptRoot '../../src/native/LensDocsStudio.Native/Resources/Brand/application.ico'
 if (Test-Path -LiteralPath $OutputPath) { throw 'Verification output already exists; preserve it and choose a new path.' }
 $PackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).Path
 $metadataText = [IO.File]::ReadAllText((Join-Path $PackageDirectory 'version.json'))
@@ -73,6 +75,8 @@ try {
         $binaryVersions[$name] = $version
     }
     if ((Get-AuthenticodeSignature -LiteralPath (Join-Path $inspection 'LensDocsStudio.Native.exe')).Status -ne 'NotSigned') { throw 'Apphost signature differs from the declared unsigned package.' }
+    $applicationIcon = Test-NativeIconResources -BinaryPath (Join-Path $inspection 'LensDocsStudio.Native.exe') -SourceIcon $sourceIcon
+    $installerIcon = Test-NativeIconResources -BinaryPath $installer -SourceIcon $sourceIcon
     $runtime = Read-ZipText 'LensDocsStudio.Native.runtimeconfig.json' | ConvertFrom-Json
     if ($runtime.runtimeOptions.tfm -ne 'net10.0' -or $runtime.runtimeOptions.framework -or $runtime.runtimeOptions.frameworks -or
         @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' -and $_.version -match '^10\.' }).Count -ne 1) { throw 'Portable package does not declare its included .NET 10 WPF runtime.' }
@@ -80,7 +84,7 @@ try {
 $report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceKind=$metadata.sourceKind;
     ciRunId=$metadata.ciRunId; installerSha256=$installerHash; portableSha256=$zipHash; signature='NotSigned';
     trustedUpdates='BLOCKED: no production signing identity'; cleanMachineCertification='BLOCKED: separate clean image required';
-    executionPerformed=$false; binaryVersions=$binaryVersions; payload=@($files.Values | Sort-Object path) }
+    executionPerformed=$false; binaryVersions=$binaryVersions; applicationIcon=$applicationIcon; installerIcon=$installerIcon; payload=@($files.Values | Sort-Object path) }
 $parent = Split-Path -Parent ([IO.Path]::GetFullPath($OutputPath)); [IO.Directory]::CreateDirectory($parent) | Out-Null
 $report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
 "Native preview package verification PASS: $ExpectedVersion ($ExpectedSourceRevision)"

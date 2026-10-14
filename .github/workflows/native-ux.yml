@@ -1,0 +1,52 @@
+name: Validate native desktop UX
+on:
+  push:
+    branches: ['feature/native-desktop-ux-modernisation']
+  pull_request:
+    branches: ['release/native-preview-readiness']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-ux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  baseline:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build current validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Build verified baseline in isolation
+        run: |
+          git worktree add --detach artifacts/native/ux-base c566144529c3c0e4393c1604544201b936e4a6a2
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/ux-base/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Capture reproducible baseline on disposable Windows
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots artifacts/native/ux-base/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-baseline c566144529c3c0e4393c1604544201b936e4a6a2
+      - name: Capture current native shell
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-current ${{ github.sha }}
+      - name: Capture actual high contrast on the disposable desktop
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-high-contrast ${{ github.sha }} --high-contrast
+      - name: Exercise desktop UX controls and synchronisation
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-controls src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-controls
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-visual-evidence
+          path: |
+            artifacts/native/ux-baseline/*.png
+            artifacts/native/ux-baseline/*.json
+            artifacts/native/ux-current/*.png
+            artifacts/native/ux-current/*.json
+            artifacts/native/ux-controls/*.png
+            artifacts/native/ux-controls/*.json
+            artifacts/native/ux-high-contrast/*.png
+            artifacts/native/ux-high-contrast/*.json
+          retention-days: 14

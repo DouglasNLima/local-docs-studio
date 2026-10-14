@@ -32,14 +32,21 @@ public static class ThemeService
         }
         foreach (var (key, light, night) in new[] {
             ("WindowBrush", "#FAFAFA", "#202124"), ("PanelBrush", "#F3F4F6", "#292B2F"),
-            ("TextBrush", "#202124", "#F3F4F6"), ("BorderBrush", "#D1D5DB", "#51545B"), ("AccentBrush", "#FF883E", "#FF883E") })
+            ("TextBrush", "#202124", "#F3F4F6"), ("MutedTextBrush", "#56606C", "#B5BBC5"),
+            ("HoverBrush", "#EDEDED", "#383C43"), ("PressedBrush", "#DDE1E6", "#454B55"),
+            ("BorderBrush", "#D1D5DB", "#51545B"), ("AccentBrush", "#FF883E", "#FF883E") })
             resources[key] = new SolidColorBrush((Color)ColorConverter.ConvertFromString(dark ? night : light));
+        resources["PressedTextBrush"] = resources["TextBrush"];
         if (SystemParameters.HighContrast)
         {
             resources["WindowBrush"] = SystemColors.WindowBrush; resources["PanelBrush"] = SystemColors.ControlBrush;
             resources["TextBrush"] = SystemColors.WindowTextBrush; resources["BorderBrush"] = SystemColors.ActiveBorderBrush;
             resources["AccentBrush"] = SystemColors.HighlightBrush;
             resources["AccentTextBrush"] = SystemColors.HighlightTextBrush;
+            resources["MutedTextBrush"] = SystemColors.WindowTextBrush;
+            resources["HoverBrush"] = SystemColors.ControlBrush;
+            resources["PressedBrush"] = SystemColors.HighlightBrush;
+            resources["PressedTextBrush"] = SystemColors.HighlightTextBrush;
         }
         else resources["AccentTextBrush"] = new SolidColorBrush(Color.FromRgb(32, 33, 36));
         foreach (var key in new[] { "AccentFillColorDefaultBrush", "AccentFillColorSecondaryBrush", "AccentFillColorTertiaryBrush", "AccentFillColorSelectedTextBackgroundBrush", "SystemFillColorAttentionBrush" })

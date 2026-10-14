@@ -32,6 +32,7 @@ UninstallDisplayName={#AppName}
 UninstallDisplayIcon={app}\{#AppExeName}
 ChangesAssociations=yes
 WizardStyle=modern
+SetupIconFile=..\..\src\native\LensDocsStudio.Native\Resources\Brand\application.ico
 SetupLogging=yes
 AppMutex=Local\LensDocsStudio.Native.Running
 CloseApplications=no

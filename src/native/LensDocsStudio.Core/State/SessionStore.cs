@@ -2,13 +2,13 @@ using System.Text.Json;
 
 namespace LensDocsStudio.Core.State;
 
-public sealed record RecoveredDocument(Guid Id, string? Path, string Text, string? SavedFingerprint, bool Utf8Bom, int CaretOffset, double VerticalOffset, string? SavedText = null, string? AssetWorkspace = null, string? RecoveryKey = null, string? DisplayName = null, string? WorkspaceRoot = null);
+public sealed record RecoveredDocument(Guid Id, string? Path, string Text, string? SavedFingerprint, bool Utf8Bom, int CaretOffset, double VerticalOffset, string? SavedText = null, string? AssetWorkspace = null, string? RecoveryKey = null, string? DisplayName = null, string? WorkspaceRoot = null, bool IsPinned = false, int PreviewSourceOffset = 0);
 public sealed record SessionState(int SchemaVersion, string? Workspace, Guid? ActiveDocument, IReadOnlyList<RecoveredDocument> Documents);
 public sealed record WindowBounds(int Left, int Top, int Right, int Bottom, bool Maximised);
 public sealed record UserPreferences(string Theme = "System", string Layout = "Split", bool AutomaticUpdateChecks = true,
     string UpdateChannel = "Stable", DateTimeOffset? LastUpdateCheck = null, string? IgnoredVersion = null,
     string[]? RecentDocuments = null, string[]? RecentWorkspaces = null, WindowBounds? Window = null,
-    EditorPreferences? Editor = null, PreviewPreferences? Preview = null, bool ShowOutline = true);
+    EditorPreferences? Editor = null, PreviewPreferences? Preview = null, bool ShowOutline = true, DesktopPreferences? Desktop = null);
 
 public sealed class SessionStore
 {

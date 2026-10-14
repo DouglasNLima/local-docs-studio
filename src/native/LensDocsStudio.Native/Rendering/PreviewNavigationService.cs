@@ -14,6 +14,8 @@ public static class PreviewNavigationService
         public CancellationTokenSource? Pending;
     }
     private static readonly ConditionalWeakTable<FlowDocumentReader, NavigationState> States = new();
+    public static void CancelPending(FlowDocumentReader viewer)
+    { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
     public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null)
     {

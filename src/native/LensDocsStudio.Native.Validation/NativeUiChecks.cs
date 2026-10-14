@@ -11,7 +11,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int Run(string executable, string output, bool requireBundledRuntime = false)
+    public static int Run(string executable, string output, bool requireBundledRuntime = false, bool desktopUxOnly = false)
     {
         var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
@@ -19,7 +19,7 @@ internal static partial class NativeUiChecks
             try
             {
                 int result;
-                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime);
+                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime, desktopUxOnly);
                 completion.SetResult(result);
             }
             catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
@@ -27,7 +27,7 @@ internal static partial class NativeUiChecks
         thread.SetApartmentState(ApartmentState.MTA); thread.Start();
         return completion.Task.GetAwaiter().GetResult();
     }
-    private static int RunCore(string executable, string output, bool requireBundledRuntime)
+    private static int RunCore(string executable, string output, bool requireBundledRuntime, bool desktopUxOnly)
     {
         output = Path.GetFullPath(output);
         Directory.CreateDirectory(output);
@@ -60,6 +60,7 @@ internal static partial class NativeUiChecks
             var editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
+            Wait(() => Find(window, "CaretStatus").Name == "Ln 1, Col 1 · UTF-8", "The initial active document did not expose its exact caret and encoding status.");
             checks.Add("Startup file opened through native controls");
             MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
             CheckLoadedRuntime(launchedProcess!, executable, output, requireBundledRuntime);
@@ -68,8 +69,33 @@ internal static partial class NativeUiChecks
             checks.Add(requireBundledRuntime
                 ? "Installed application loads the .NET runtime and WPF graphics from its own package directory"
                 : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");
-            CheckMinimumWindow(window, editor, output, source);
-            checks.Add("Minimum-size native window retains visible Cancel and Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            CheckDesktopControls(window, editor, automation, app.ProcessId, state, output, source);
+            checks.Add("Modern desktop controls retain independent panels, Focus Mode, Full Screen, Quick Open, actual palette actions, source selection and Undo");
+            CheckWorkspaceModernisation(window, editor, automation, app.ProcessId, state, output, source);
+            CheckOutlineModernisation(window, editor, output, source);
+            checks.Add("Actual tab pinning, dirty close cancellation, active survival and confirmed Windows folder recycling retain source and recovery");
+            CheckSynchronisation(window, editor, state, output, source);
+            checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
+            CheckScrollSynchronisation(window, editor, state, output, source);
+            checks.Add("Native bidirectional semantic scroll, rapid input, independent caret following and tab cancellation preserve focus, caret and source");
+            CheckMinimumWindow(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            if (desktopUxOnly)
+            {
+                Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native UI fixture", StringComparison.Ordinal), "The original diagram preview did not resume.");
+                Find(window, "DiagramActionZoom").AsButton().Invoke();
+                Window? drawing = null;
+                Wait(() => (drawing = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "The diagram viewport did not open.");
+                CheckDiagramViewport(drawing!, output);
+                CheckDiagramImageCopy(window, drawing!, editor, source, output, automation, app.ProcessId);
+                checks.Add("Pointer-driven diagram pan, anchored zoom, Reset/Fit and viewport-independent clipboard pixels");
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
+                Wait(() => app.HasExited, "The desktop UX fixture did not close safely.");
+                if (launchedProcess!.ExitCode != 0) throw new IOException("The desktop UX fixture failed during shutdown.");
+                RecordResult(new { Passed = true, Scope = "Desktop UX controls and synchronisation", Checks = checks, FixtureRoot = runRoot });
+                Console.WriteLine("Native desktop UX: " + checks.Count + " checks passed.");
+                return 0;
+            }
             CheckLargeEditorNavigation(window, editor, output, source);
             checks.Add("Long wrapped editor Find reveals its final selected target, preserves insertion Undo and saved bytes, and resumes the original preview");
             FocusWindow(window); editor.Click();
@@ -90,7 +116,10 @@ internal static partial class NativeUiChecks
             MeasureOperation("Save shortcut through observed UTF-8 file update", operationWatch);
             checks.Add("Ctrl+S persisted actual UTF-8 source");
             var preview = Find(window, "DocumentPreview");
-            preview.Click();
+            var previewText = preview.Patterns.Text.Pattern.DocumentRange.FindText("Searchable", false, false)
+                ?? throw new IOException("The actual preview focus text is unavailable.");
+            var previewTextBounds = previewText.GetBoundingRectangles().First(rectangle => rectangle.Width > 0 && rectangle.Height > 0);
+            Mouse.Click(new System.Drawing.Point((int)(previewTextBounds.Left + previewTextBounds.Width / 2), (int)(previewTextBounds.Top + previewTextBounds.Height / 2)));
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(window, "FindContext").Name == "Find in preview", "Ctrl+F did not choose preview context.");
             Keyboard.Type(VirtualKeyShort.ESCAPE);
@@ -103,6 +132,8 @@ internal static partial class NativeUiChecks
             Find(diagramWindow!, "DiagramZoom").Patterns.RangeValue.Pattern.SetValue(175);
             Wait(() => Find(diagramWindow!, "DiagramZoomLabel").Name == "175%", "The native zoom did not change scale.");
             diagramWindow!.CaptureToFile(Path.Combine(output, "native-diagram.png"));
+            CheckDiagramViewport(diagramWindow, output);
+            checks.Add("Native diagram Space/middle-button pan, pointer-centred zoom and Fit/Reset");
             CheckDiagramImageCopy(window, diagramWindow, editor, source, output, automation, app.ProcessId);
             checks.Add("Mermaid opens in a native drawing window and zoom changes its scale");
             checks.Add("Keyboard diagram copying retains exact native pixels across zoom levels and after closing the drawing window without changing source");
@@ -183,7 +214,11 @@ internal static partial class NativeUiChecks
             Wait(() => File.ReadAllText(createdPath) == "Created through the native workspace.", "The new file did not save its actual edited content.");
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            Keyboard.Type("\nUnsaved content retained before deletion.");
+            Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Unsaved content retained before deletion.");
+            // A new file with no previous line break uses Windows' CRLF default.
+            const string deletedDraft = "Created through the native workspace.\r\nUnsaved content retained before deletion.";
+            Wait(() => ReadEditorText(editor) == deletedDraft,
+                "The deletion fixture did not receive its exact unsaved source, including the requested line break.");
             Find(window, "FileMenu").Click(); Find(window, "DeleteDocument").Patterns.Invoke.Pattern.Invoke();
             Window? deleteWindow = null;
             Wait(() => (deleteWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Delete document")))?.AsWindow()) is not null, "The deletion confirmation did not open.");
@@ -191,12 +226,18 @@ internal static partial class NativeUiChecks
             Wait(() => !File.Exists(createdPath) && Find(window, "Status").Name.StartsWith("Deleted created-from-ui.md", StringComparison.Ordinal), "The file was not removed through the Windows shell.");
             var snapshotStore = new LensDocsStudio.Core.State.DocumentSnapshotStore(state);
             var retainedSnapshots = snapshotStore.ListAsync().GetAwaiter().GetResult();
-            if (retainedSnapshots.Entries.Count != 2) throw new IOException("Deletion did not retain separate saved and unsaved source snapshots.");
+            var deletedSnapshots = retainedSnapshots.Entries.Select(entry => snapshotStore.ReadAsync(entry).GetAwaiter().GetResult())
+                .Where(snapshot => snapshot.Document.Path == createdPath).ToArray();
+            if (deletedSnapshots.Length != 2
+                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == "Created through the native workspace.")
+                || !deletedSnapshots.Any(snapshot => snapshot.Document.Text == deletedDraft))
+                throw new IOException("Deletion did not retain separate exact saved and unsaved source snapshots for its document.");
             checks.Add("Deleting a document uses the Windows shell and retains saved and unsaved source snapshots");
             Find(window, "FileMenu").Click(); Find(window, "BrowseSnapshots").Patterns.Invoke.Pattern.Invoke();
             Window? snapshotsWindow = null;
             Wait(() => (snapshotsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Document snapshots")))?.AsWindow()) is not null, "The native snapshot browser did not open.");
-            var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
+            var retainedItem = Find(snapshotsWindow!, "SnapshotList").AsListBox().Items.First(i => i.Name.StartsWith("created-from-ui.md", StringComparison.Ordinal)
+                && i.Name.Contains("unsaved editor text", StringComparison.Ordinal));
             retainedItem.Select();
             Wait(() => Find(snapshotsWindow!, "SnapshotSource").AsTextBox().Text.Contains("Unsaved content retained before deletion.", StringComparison.Ordinal) && Find(snapshotsWindow!, "RestoreSnapshot").IsEnabled, "The retained unsaved source did not appear.");
             Find(snapshotsWindow!, "RestoreSnapshot").AsButton().Invoke();
@@ -1436,6 +1477,7 @@ internal static partial class NativeUiChecks
             CheckWordImport(window, editor, automation, app.ProcessId, runRoot, output, artefact.Document, OpenThroughDialogue);
             checks.Add("Native Word import cancellation preserves the previous document; completed import exposes every warning and creates unchanged-source, portable Markdown and image files");
             var workspaceContext = CheckWorkspaceContextSwitch(window, editor, automation, app.ProcessId, runRoot, state, output, OpenThroughDialogue);
+            var desktopSession = PrepareDesktopSession(window, editor, automation, app.ProcessId, state);
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "Restored application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new InvalidOperationException("Restored application failed during shutdown: " + launchedProcess.ExitCode);
@@ -1443,8 +1485,10 @@ internal static partial class NativeUiChecks
             window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The retained workspace did not restore.");
             mainWindow = window; editor = Find(window, "MarkdownEditor");
             CheckRetainedWorkspaceContent(window, editor, workspaceContext, output, "after-restart", workspaceContext.Draft);
+            CheckDesktopSession(window, editor, automation, app.ProcessId, state, output, desktopSession);
             ObserveRetainedContextSaved(workspaceContext, output);
             checks.Add("Switching folders retains earlier drafts, native images and two-way links; saving and restarting preserves per-document workspace context and exact files");
+            checks.Add("Actual process restart restores hidden panels, independent synchronisation choices, tab order, active identity and native pin actions without changing source");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "The retained workspace application did not close.");
             if (launchedProcess!.ExitCode != 0) throw new IOException("The retained workspace failed during shutdown.");

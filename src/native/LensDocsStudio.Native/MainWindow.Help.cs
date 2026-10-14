@@ -9,7 +9,7 @@ public partial class MainWindow
     {
         var identity = (typeof(MainWindow).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Not recorded").Split('+', 2);
         var source = identity.ElementAtOrDefault(1) ?? "Not recorded";
-        MessageBox.Show(this, $"Lens Docs Studio — Native Preview\nLocal Markdown, Mermaid, and documentation studio.\n\nVersion: {identity[0]}\nSource: {source}\n\nInternal preview for controlled evaluation.\nSee PREVIEW-GUIDE.md for restrictions and Help → Updates for update availability and trust.", "About Lens Docs Studio");
+        new AboutWindow(identity[0], source) { Owner = this }.ShowDialog();
     }
     private HelpWindow? helpWindow;
     private void OpenHelp(object sender, RoutedEventArgs e)

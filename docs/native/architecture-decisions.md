@@ -1,5 +1,7 @@
 # Native architecture decisions
 
+Desktop UX modernisation preserves WPF/FlowDocument and the existing Core services. Shared vector/resources, focused window partials, private desktop/session state and parser-bounded source maps support the new controls and opt-in synchronisation without the rejected viewer or new dependencies. Its authoritative acceptance and limits are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md); [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24) tracks final delivery checks. Earlier records below retain their original scope.
+
 ## Targeted performance continuation
 
 The [performance report](performance-and-responsiveness.md) separates construction from real Continuous first layout and retains the 250 ms failure. Single-literal emphasis uses one styled native Run; complex/nested content keeps its existing Span tree. The complete-result commit, dispatcher affinity, source spans, one native List and reading-mode choice remain intact. An attached-construction prototype exceeded its bounded deadline through repeated growing-list invalidation and was removed; block virtualisation was not introduced without a correct contiguous selection/navigation model. This is a measured small optimisation, not a replacement renderer or a claim of full responsiveness. Selected-tab close ownership is captured before WPF collection notifications can clear its two-way selection binding.

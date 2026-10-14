@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Native desktop modernisation is implemented on `feature/native-desktop-ux-modernisation` in [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24), targeting the verified preview-readiness base. Its authoritative feature, full regression, visual, package and installation evidence is [desktop-ux-modernisation.md](desktop-ux-modernisation.md). The PR tracks mandatory checks on the final delivery head. The reconstruction records below describe the earlier baseline.
+
 ## Current delivery record
 
 The [engineering delivery report](engineering-completion-report.md) is the current 28-condition acceptance record. Application baseline `7008751` passes both native and both web pipelines. Independently downloaded native evidence verifies 1,035 Core tests, 40 corpus cases, four 66-check desktop contexts, complete installer lifecycle, 20 preserved state files and bundled installed runtime origins per run. Both web runs pass 264 cases. Local Core validation with the two final shared-metadata regressions passes 1,037 cases. Preview .285/.286 package hashes, clean source revisions and unsigned metadata are checked.

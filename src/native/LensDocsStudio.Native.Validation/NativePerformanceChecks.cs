@@ -88,6 +88,11 @@ internal static class NativePerformanceChecks
         var latest = EditorNavigationService.BringIntoViewAsync(editor, source.Length);
         Complete(Task.WhenAll(superseded, latest));
         if (superseded.GetAwaiter().GetResult() || !latest.GetAwaiter().GetResult()) throw new IOException("Superseded editor navigation displaced the latest request.");
+        var retainedOffset = editor.VerticalOffset; var retainedStart = editor.SelectionStart; var retainedLength = editor.SelectionLength;
+        var cancelled = EditorNavigationService.BringIntoViewAsync(editor, 0); EditorNavigationService.CancelPending(editor); Complete(cancelled);
+        if (cancelled.GetAwaiter().GetResult() || Math.Abs(editor.VerticalOffset - retainedOffset) > 0.01
+            || editor.SelectionStart != retainedStart || editor.SelectionLength != retainedLength || editor.Text != source)
+            throw new IOException("Explicit cancellation let pending editor navigation change its viewport or source selection.");
         var movedSelection = EditorNavigationService.BringIntoViewAsync(editor, source.Length); editor.Select(0, 8); Complete(movedSelection);
         if (movedSelection.GetAwaiter().GetResult() || editor.SelectionStart != 0 || editor.SelectionLength != 8 || editor.Text != source)
             throw new IOException("Editor navigation affected a subsequently changed selection.");
@@ -99,7 +104,7 @@ internal static class NativePerformanceChecks
             WorkspaceDocuments = 1001, SourceBytes = bytes, SourceCharacters = source.Length, Paragraphs = 20000,
             BaselineMemory = baseline, FilesystemAndParsing = samples, EditorInitialLayoutMilliseconds = initialLayoutMilliseconds,
             ProgrammaticEdits = edits, FinalMemory = finalMemory,
-            StaleSourceAndDocumentRejected = true, SupersededNavigationRejected = true, ChangedSelectionPreserved = true,
+            StaleSourceAndDocumentRejected = true, SupersededNavigationRejected = true, CancelledNavigationRejected = true, ChangedSelectionPreserved = true,
             Limitations = "Single-process fixture observations with warm operating-system caches after setup; no forced garbage collection. Memory includes the validation host and earlier checks. Programmatic native edits include visible layout, not OS keyboard delivery or application preview scheduling. No machine-independent latency threshold is claimed."
         }, new JsonSerializerOptions { WriteIndented = true }));
         void Layout()

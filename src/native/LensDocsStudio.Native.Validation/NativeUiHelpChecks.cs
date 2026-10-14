@@ -54,7 +54,9 @@ internal static partial class NativeUiChecks
             && Find(guide!, "HelpContent").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("No matching topics", StringComparison.Ordinal),
             "Empty help search retained stale topic content.");
         query.Text = "";
-        Wait(() => Find(guide!, "HelpTopics").AsListBox().Items.Length == 12, "Clearing help search did not restore all bundled topics.");
+        var expectedTopics = LensDocsStudio.Core.Content.NativeHelpGuide.Topics.Select(topic => topic.Title).Order(StringComparer.Ordinal).ToArray();
+        Wait(() => Find(guide!, "HelpTopics").AsListBox().Items.Select(item => item.Name).Order(StringComparer.Ordinal).SequenceEqual(expectedTopics),
+            "Clearing help search did not restore every exact bundled topic title.");
         Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Native guide"))) is null,
             "Escape did not close the native guide.");

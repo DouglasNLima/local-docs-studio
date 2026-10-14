@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+Implemented desktop UX contracts, full regression/installation acceptance, visual evidence, packages and semantic limits are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md). [PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24) tracks final delivery checks; the reconstruction evidence below retains its original scope.
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 The [targeted performance continuation](performance-and-responsiveness.md) preserves the documented native content/selection/navigation contracts and adds explicit Continuous distant-target desktop coverage. Its measured list improvement remains above the unchanged 250 ms input budget; mixed/4.14 MB preview and intermittent details construction remain incomplete acceptance. Historical results below are not relabelled as performance certification.

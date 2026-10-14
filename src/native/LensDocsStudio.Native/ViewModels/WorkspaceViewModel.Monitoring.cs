@@ -51,6 +51,7 @@ public partial class WorkspaceViewModel
                 catch (Exception ex) when (ex is IOException or UnauthorizedAccessException) { }
                 if (!disposed && ReferenceEquals(sender, watcher) && Documents.Contains(document) && document.FilePath == path)
                     document.ExternalChange = fingerprint is null || fingerprint != document.SavedSnapshot?.Fingerprint;
+                RefreshTreeIndicators();
             }
         });
     }
@@ -72,6 +73,7 @@ public partial class WorkspaceViewModel
             cancellation.Token.ThrowIfCancellationRequested();
             if (disposed || !ReferenceEquals(owner, watcher) || WorkspaceRoot != root) return;
             WorkspaceEntryViewModel.Reconcile(Entries, listing.Entries);
+            ApplyWorkspaceFilter();
             if (listing.Warnings.Count != 0) Status = string.Join(" ", listing.Warnings.Distinct());
         }
         catch (OperationCanceledException) { }

@@ -16,7 +16,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     [ObservableProperty] private DocumentViewModel? activeDocument;
     [ObservableProperty] private string status = "Local Markdown, Mermaid, and documentation studio";
     [ObservableProperty] private string previewStatus = "Preview pending";
-    [ObservableProperty] private string? workspaceRoot;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(WorkspaceName))] private string? workspaceRoot;
+    public string WorkspaceName => WorkspaceRoot is null ? "Open a workspace" : Path.GetFileName(Path.TrimEndingDirectorySeparator(WorkspaceRoot));
     [ObservableProperty] private bool isBusy;
     [ObservableProperty] private string theme = "Light";
     [ObservableProperty] private string layout = "Split";
@@ -53,7 +54,8 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
                     DocumentSnapshot? baseline = null;
                     if (recovered.Path is not null && recovered.SavedFingerprint is not null)
                         baseline = new(recovered.Path, recovered.SavedText ?? recovered.Text, recovered.SavedFingerprint, recovered.Utf8Bom);
-                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey };
+                    var tab = new DocumentViewModel(recovered.Text, baseline) { Id = recovered.Id, CaretOffset = recovered.CaretOffset, VerticalOffset = recovered.VerticalOffset, WorkspaceRoot = WorkspaceRoot, DisplayName = recovered.DisplayName, RecoveryKey = recovered.RecoveryKey, IsPinned = recovered.IsPinned };
+                    tab.PreviewSourceOffset = Math.Clamp(recovered.PreviewSourceOffset, 0, recovered.Text.Length);
                     if (recovered.AssetWorkspace is not null && string.Equals(Path.GetFullPath(recovered.AssetWorkspace), DraftWorkspace(recovered.Id), StringComparison.OrdinalIgnoreCase))
                         tab.AssetWorkspace = recovered.AssetWorkspace;
                     if (tab.FilePath is not null) tab.WorkspaceRoot = RootForDocument(tab.FilePath, recovered.WorkspaceRoot);
@@ -148,6 +150,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
         if (!string.Equals(WorkspaceRoot, workspace.Root, StringComparison.OrdinalIgnoreCase)) Entries.Clear();
         WorkspaceRoot = workspace.Root;
         WorkspaceEntryViewModel.Reconcile(Entries, listing.Entries);
+        ApplyWorkspaceFilter();
         Status = listing.Warnings.Count == 0 ? "Workspace opened" : string.Join(" ", listing.Warnings.Distinct());
         StartMonitoring(workspace.Root);
         foreach (var tab in Documents.Where(d => d.FilePath is not null))
@@ -239,7 +242,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
 
     [RelayCommand] private async Task CloseDocumentAsync(DocumentViewModel? tab)
     {
-        if (tab is null) return;
+        if (tab is null || tab.IsPinned) return;
         await RunAsync(async () =>
         {
             if (!await CanCloseAsync(tab)) return;

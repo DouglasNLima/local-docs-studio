@@ -9,6 +9,10 @@ public partial class WorkspaceEntryViewModel(WorkspaceEntry entry) : ObservableO
     [ObservableProperty] private string name = entry.Name;
     [ObservableProperty] private string path = entry.Path;
     public bool IsDirectory { get; } = entry.IsDirectory;
+    public string IconKind => IsDirectory ? "Folder" : "Document";
+    [ObservableProperty] private bool isExpanded = true;
+    [ObservableProperty] private bool isVisible = true;
+    [ObservableProperty] private string documentIndicator = "";
     public ObservableCollection<WorkspaceEntryViewModel> Children { get; } = new(entry.Children.Select(child => new WorkspaceEntryViewModel(child)));
 
     // Reuse surviving nodes so native folder expansion, selection and focus remain attached.

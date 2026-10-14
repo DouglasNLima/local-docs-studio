@@ -1,5 +1,25 @@
 # Lens Docs Studio native guide
 
+## Desktop workspace and synchronisation
+
+The command toolbars expose frequent file, navigation, formatting and viewing actions. Narrow windows use native toolbar overflow. Open documents occupy one horizontal tab row; scroll the strip when it fills.
+
+Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both support text filtering, Up/Down, Enter and Escape. The palette runs the same actions as the application's menus and toolbars.
+
+**Ctrl+Alt+B** toggles the workspace and **Ctrl+Alt+O** toggles the outline independently. Drag their dividers to resize them; visibility and width are private application preferences. The workspace header shows its name, with the full path in its tooltip.
+
+**F11** enters Full Screen and restores the previous window placement on exit. **Ctrl+Alt+Z** enters Focus Mode, preserving the chosen editor/preview layout and permanent panel preferences. **Escape** dismisses an open menu or drop-down, then Find, before leaving Full Screen or Focus Mode. **Ctrl+Tab** and **Ctrl+Shift+Tab** switch open documents. The visible theme control offers System, Light and Dark.
+
+Filter workspace files by name or relative path. Folder expansion and open documents survive filtering and refresh. Right-click a workspace item, or press **Shift+F10** on its selected row, for path, link, Explorer, reviewed rename/move and supported deletion actions. These actions use the clicked item. Deletion uses its existing confirmation and snapshots.
+
+Deleting a workspace folder first reviews its files and subfolders. Confirmed deletion retains documentation snapshots and unsaved open text, then recycles the complete folder with its assets. Cancelling recycling restores it. Use the Windows Recycle Bin to restore the complete folder, or Document snapshots to recover text. Links in documents outside the deleted folder remain unchanged. Workspace roots and private application state cannot be deleted through this action.
+
+Right-click a document tab for closing, copy/reveal and pin actions. **Pinned tabs must be unpinned before closing**; bulk close retains pins and stops if a save/close prompt is cancelled. Middle-click closes an unpinned tab. Tab order and pins remain private application state. The outline filters heading titles, indents their hierarchy and follows the current source section.
+
+The preview toolbar exposes **Automatic**, **Pages** and **Continuous** reading modes, zoom, Find and rendered copy. Three separate opt-in controls offer **Follow caret**, **Synchronise scroll** and **Synchronise selection** in Split layout. They preserve the originating pane's keyboard focus. Literal selections use source offsets, including repeated words; generated or transformed content is labelled as a semantic block highlight when exact text correspondence is unavailable. Turning one behaviour off does not disable the others.
+
+In the diagram window, hold **Space** and drag, or drag with the **middle mouse button**, to pan. **Ctrl+mouse wheel** zooms around the pointer. **F** fits the diagram, **Ctrl+0** selects Actual Size, **Home** resets the viewport and arrow keys pan. **Ctrl+C** copies the original drawing, independently of pan or zoom. SVG/PNG exports retain the original drawing.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.

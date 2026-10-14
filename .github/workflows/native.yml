@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
   workflow_dispatch:
 permissions:
   contents: read
@@ -106,6 +106,14 @@ jobs:
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
+            artifacts/native/install-smoke/**/native-desktop-restored-session.*
+            artifacts/native/install-smoke/**/native-desktop-restored-session-observations.json
+            artifacts/native/install-smoke/**/native-minimum-window.*
+            artifacts/native/install-smoke/**/native-minimum-overflow.png
+            artifacts/native/install-smoke/**/native-focus-mode.png
+            artifacts/native/install-smoke/**/native-full-screen.png
+            artifacts/native/install-smoke/**/native-quick-open.png
+            artifacts/native/install-smoke/**/native-command-palette.png
             artifacts/native/install-smoke/**/native-about.*
             artifacts/native/install-smoke/**/native-quick-start.*
             artifacts/native/install-smoke/**/native-paste-error-acknowledgement.json

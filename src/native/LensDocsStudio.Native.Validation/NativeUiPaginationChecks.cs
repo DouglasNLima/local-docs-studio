@@ -36,7 +36,19 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == large, "The paginated reading fixture did not retain exact editor source.");
                 Layout("Preview");
                 Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
-                    && Find(window, "PreviewNextPage").IsEnabled, "Automatic reading did not expose native page navigation for the long document.");
+                    && PageControlsVisible(), "Automatic reading did not expose native pages for the long document.");
+                // Logical viewport restoration can correctly retain the final source
+                // region after replacing this tab's text. Establish page one explicitly
+                // before testing the unchanged Next/Previous page contract.
+                // FlowDocumentReader's container cannot accept UIA SetFocus. These
+                // text-only fixtures expose its real pointer surface without diagram actions.
+                var previewStart = Find(window, "DocumentPreview"); previewStart.Click();
+                var firstRange = previewStart.Patterns.Text.Pattern.DocumentRange.FindText(name == "paginated" ? "Paginated native reading" : "Native documentation", false, false)
+                    ?? throw new IOException("The paginated fixture's first native text range is unavailable.");
+                firstRange.ScrollIntoView(true);
+                Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
+                    && Find(window, "PreviewPageNumber").Name.StartsWith("Page 1 of ", StringComparison.Ordinal)
+                    && Find(window, "PreviewNextPage").IsEnabled, "Automatic reading did not expose native page navigation at the explicitly requested first page.");
                 Find(window, "PreviewNextPage").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "PreviewPageNumber").Name.StartsWith("Page 2 of ", StringComparison.Ordinal), "Next page did not change the native reading page.");
                 Find(window, "PreviewPreviousPage").Patterns.Invoke.Pattern.Invoke();

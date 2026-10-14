@@ -52,6 +52,7 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        InitialiseSynchronisation();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
@@ -59,11 +60,11 @@ public partial class MainWindow : Window
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
         Editor.TextArea.TextView.LineTransformers.Insert(0, editorHighlighting);
-        Editor.TextArea.Caret.PositionChanged += (_, _) => CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
+        Editor.TextArea.Caret.PositionChanged += (_, _) => { UpdateCaretStatus(); HighlightCurrentHeading(); };
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { CancelSynchronisation(); BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -98,11 +99,15 @@ public partial class MainWindow : Window
         if (displayedTab is null) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
+        if (renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+            && VisiblePreviewSource() is { } source)
+            displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
     }
     private void BindActiveDocument()
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
+        CancelSynchronisation();
         Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
         Editor.IsEnabled = displayedTab is not null;
         if (displayedTab is not null)
@@ -110,17 +115,31 @@ public partial class MainWindow : Window
             Editor.CaretOffset = Math.Clamp(displayedTab.CaretOffset, 0, Editor.Document.TextLength);
             Editor.ScrollToVerticalOffset(displayedTab.VerticalOffset);
         }
+        UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
     }
-    private void TabChanged(object sender, SelectionChangedEventArgs e) { if (e.Source == DocumentTabs) { BindActiveDocument(); QueuePreview(); } }
+    private void UpdateCaretStatus() => CaretStatus.Text = displayedTab is null ? "UTF-8"
+        : $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
+    private void TabChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.Source != DocumentTabs) return;
+        BindActiveDocument(); QueuePreview();
+        var selected = model.ActiveDocument;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (model.ActiveDocument == selected && DocumentTabs.ItemContainerGenerator.ContainerFromItem(selected!) is TabItem item) item.BringIntoView();
+        }, DispatcherPriority.Loaded);
+    }
     private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
+        model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
         var text = tab.EditorDocument.Text;
+        var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";
         var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
@@ -147,8 +166,8 @@ public partial class MainWindow : Window
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             if (!preparePreview)
             {
-                parsed = prepared.source; rendered = null; renderedDocumentId = null;
-                Preview.Document = new FlowDocument(); Outline.ItemsSource = parsed.Headings;
+                parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = null; renderedDocumentId = null;
+                Preview.Document = new FlowDocument(); previewBeforeEditorStatus = null; RefreshOutline();
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
             }
@@ -174,11 +193,14 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
-            parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
+            SaveViewport();
+            parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
-            Outline.ItemsSource = parsed.Headings;
-            model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
-                : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            InstallSyncPreview(sourceVersion);
+            RefreshOutline();
+            var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
+            previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
+            model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
         }
         catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
@@ -186,7 +208,12 @@ public partial class MainWindow : Window
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
-    private async void TreeKeyDown(object sender, KeyEventArgs e) { if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); } }
+    private async void TreeKeyDown(object sender, KeyEventArgs e)
+    {
+        if ((e.Key == Key.Apps || e.Key == Key.F10 && Keyboard.Modifiers == ModifierKeys.Shift) && WorkspaceTree.SelectedItem is WorkspaceEntryViewModel entry)
+        { e.Handled = true; OpenWorkspaceContext(Ancestor<TreeViewItem>(Keyboard.FocusedElement as DependencyObject) ?? (UIElement)WorkspaceTree, entry.Path, entry.IsDirectory); return; }
+        if (e.Key == Key.Enter) { e.Handled = true; await OpenSelectedEntry(); }
+    }
     private Task OpenSelectedEntry() => WorkspaceTree.SelectedItem is WorkspaceEntryViewModel { IsDirectory: false } entry ? model.RunAsync(() => model.OpenPathAsync(entry.Path)) : Task.CompletedTask;
     private async Task RenameTreeEntryAsync()
     {
@@ -198,8 +225,10 @@ public partial class MainWindow : Window
         await model.RunAsync(async () => { await model.OpenPathAsync(entry.Path); opened = true; });
         if (opened) model.MoveDocumentCommand.Execute(null);
     }
-    private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = false;
-    private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e) => previewFocused = true;
+    private void EditorFocused(object sender, KeyboardFocusChangedEventArgs e)
+    { CancelSynchronisation(); previewFocused = false; QueueCurrentEditorInput(); }
+    private void PreviewFocused(object sender, KeyboardFocusChangedEventArgs e)
+    { CancelSynchronisation(); previewFocused = true; }
     private void OnPreviewMouseDown(object sender, MouseButtonEventArgs e)
     {
         previewFocused = true;
@@ -219,6 +248,7 @@ public partial class MainWindow : Window
     }
     private void OutlineSelected(object sender, SelectionChangedEventArgs e)
     {
+        if (updatingOutline) return;
         if (Outline.SelectedItem is not DocumentHeading heading) return;
         if (parsed?.Source != Editor.Document.Text) { model.Status = "The outline is updating. Select the heading again shortly."; QueuePreview(); return; }
         JumpToSource(heading.SourceStart, focusEditor: model.Layout == "Editor");
@@ -525,12 +555,26 @@ public partial class MainWindow : Window
         PreviewColumn.Width = layout == "Editor" ? new GridLength(0) : new GridLength(1, GridUnitType.Star);
         SplitColumn.Width = layout == "Split" ? new GridLength(5) : new GridLength(0);
         Editor.Visibility = layout == "Preview" ? Visibility.Collapsed : Visibility.Visible;
+        EditorPane.Visibility = Editor.Visibility;
+        EditorSplitter.Visibility = layout == "Split" ? Visibility.Visible : Visibility.Collapsed;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
+        PreviewPane.Visibility = Preview.Visibility;
+        CancelSynchronisation();
+        ApplyPanels();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
         {
             FindBar.Visibility = Visibility.Collapsed;
-            QueuePreview();
+            if (SyncCurrent && !previewTimer.IsEnabled && previewGate.CurrentCount == 1)
+            {
+                // Native layout can reuse an unchanged completed preview. Hidden source
+                // edits still invalidate it through the normal preview scheduling path.
+                if (layout == "Editor")
+                { previewBeforeEditorStatus = model.PreviewStatus; model.PreviewStatus = "Preview paused in Editor layout"; }
+                else if (previewBeforeEditorStatus is { } status)
+                { model.PreviewStatus = status; previewBeforeEditorStatus = null; }
+            }
+            else { previewBeforeEditorStatus = null; QueuePreview(); }
         }
     }
     private async Task SavePreferences()
@@ -540,6 +584,9 @@ public partial class MainWindow : Window
     }
     private void WindowKeyDown(object sender, KeyEventArgs e)
     {
+        // Native command surfaces consume Escape before Find and viewing modes.
+        if (e.Key == Key.Escape && CommandSurfaceOpen) return;
+        if (HandleDesktopKey(e)) { e.Handled = true; return; }
         if (e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None) { OpenHelp(sender, e); e.Handled = true; return; }
         if (e.Key == Key.F2 && Keyboard.Modifiers == ModifierKeys.None)
         { if (WorkspaceTree.IsKeyboardFocusWithin) _ = RenameTreeEntryAsync(); else model.MoveDocumentCommand.Execute(null); e.Handled = true; return; }
@@ -581,7 +628,7 @@ public partial class MainWindow : Window
             {
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
-                await model.UpdatePreferencesAsync(p => p with { Window = WindowStateService.Capture(this) });
+                await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });
                 CompleteClose();
             }
             catch (Exception ex) when (ex is not OutOfMemoryException) { dialogs.Error(ex.Message); }
