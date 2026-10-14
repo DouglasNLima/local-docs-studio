@@ -50,8 +50,11 @@ internal static partial class NativeUiChecks
                     Wait(() => Math.Abs(window.BoundingRectangle.Width - size.Item1) < 3 && Math.Abs(window.BoundingRectangle.Height - size.Item2) < 3,
                         "The requested screenshot dimensions were not applied.");
                     window.Patterns.Transform.Pattern.Move(0, 0);
+                    FocusWindow(window);
+                    FlaUI.Core.Input.Mouse.MoveTo(new System.Drawing.Point(size.Item1 / 2, size.Item2 / 2));
                     Wait(() => automation.GetDesktop().BoundingRectangle.Contains(window.BoundingRectangle)
                         && window.BoundingRectangle.Contains(Find(window, "Status").BoundingRectangle)
+                        && !display.TaskbarOverlaps(Find(window, "Status").BoundingRectangle)
                         && window.BoundingRectangle.Contains(Find(window, "DocumentPreview").BoundingRectangle),
                         "Native screenshot content did not finish layout inside the resized window.");
                     if (revision != "c566144529c3c0e4393c1604544201b936e4a6a2")
@@ -76,6 +79,7 @@ internal static partial class NativeUiChecks
                 }
                 finally { if (!process.HasExited) { process.Kill(); process.WaitForExit(10000); } }
             }
+            display.Complete();
             File.WriteAllText(Path.Combine(output, "screenshots.json"), JsonSerializer.Serialize(observations, new JsonSerializerOptions { WriteIndented = true }));
             return 0;
         }
