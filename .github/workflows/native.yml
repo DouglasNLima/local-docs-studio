@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
   workflow_dispatch:
 permissions:
   contents: read

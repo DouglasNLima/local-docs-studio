@@ -47,7 +47,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office" or "--preview-input-safety")
+        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office" or "--preview-input-safety" or "--ux-screenshots")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -58,6 +58,8 @@ internal static class Program
                 return 1;
             }
         }
+        if (args.FirstOrDefault() == "--ux-screenshots")
+            return NativeUiChecks.CaptureUxScreenshots(args[1], args[2], args[3]);
         if (args.FirstOrDefault() == "--preview-input-safety")
         {
             try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }
