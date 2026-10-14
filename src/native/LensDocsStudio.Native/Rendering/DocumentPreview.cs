@@ -11,6 +11,11 @@ namespace LensDocsStudio.Native.Rendering;
 /// <summary>Native reading modes with bounded first-page layout and page-sized media.</summary>
 public sealed class DocumentPreview : FlowDocumentReader
 {
+    private static readonly DependencyPropertyKey ShowContinuousGuidancePropertyKey = DependencyProperty.RegisterReadOnly(
+        nameof(ShowContinuousGuidance), typeof(bool), typeof(DocumentPreview), new PropertyMetadata(false));
+    public static readonly DependencyProperty ShowContinuousGuidanceProperty = ShowContinuousGuidancePropertyKey.DependencyProperty;
+    public bool ShowContinuousGuidance => (bool)GetValue(ShowContinuousGuidanceProperty);
+
     protected override AutomationPeer OnCreateAutomationPeer() => new DocumentPreviewAutomationPeer(this);
 
     private sealed class DocumentPreviewAutomationPeer(DocumentPreview owner) : FlowDocumentReaderAutomationPeer(owner)
@@ -59,6 +64,7 @@ public sealed class DocumentPreview : FlowDocumentReader
         {
             StopPagination();
             preview = result; sourceCharacters = characters; readingMode = preference;
+            UpdateGuidance();
             ViewingMode = ResolveMode();
             Document = result.Document;
         }
@@ -70,13 +76,18 @@ public sealed class DocumentPreview : FlowDocumentReader
     {
         if (!WorkspaceSettings.ReadingModes.Contains(preference)) throw new ArgumentException("Choose a supported reading mode.");
         readingMode = preference;
+        UpdateGuidance();
         ViewingMode = ResolveMode();
         QueueFit();
     }
 
     private FlowDocumentReaderViewingMode ResolveMode() => readingMode == "Pages"
-        || readingMode == "Automatic" && (sourceCharacters >= 256 * 1024 || preview?.SourceElements.Count >= 1000)
+        || readingMode == "Automatic" && IsPotentiallyExpensive
         ? FlowDocumentReaderViewingMode.Page : FlowDocumentReaderViewingMode.Scroll;
+
+    // These are the established Automatic-mode characteristics, not a latency prediction.
+    private bool IsPotentiallyExpensive => sourceCharacters >= 256 * 1024 || preview?.SourceElements.Count >= 1000;
+    private void UpdateGuidance() => SetValue(ShowContinuousGuidancePropertyKey, readingMode == "Continuous" && IsPotentiallyExpensive);
 
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
@@ -86,6 +97,7 @@ public sealed class DocumentPreview : FlowDocumentReader
         {
             StopPagination();
             if (preview?.Document != Document) { preview = null; sourceCharacters = 0; }
+            UpdateGuidance();
         }
         if (e.Property == DocumentProperty || e.Property == ViewingModeProperty || e.Property == ZoomProperty) QueueFit();
     }

@@ -1,0 +1,72 @@
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory)][string]$PackageDirectory,
+    [Parameter(Mandatory)][ValidatePattern('^\d+\.\d+\.\d+-preview\.\d+$')][string]$ExpectedVersion,
+    [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string]$ExpectedSourceRevision,
+    [Parameter(Mandatory)][string]$OutputPath,
+    [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedInstallerSha256,
+    [ValidatePattern('^[0-9a-fA-F]{64}$')][string]$ExpectedZipSha256
+)
+$ErrorActionPreference = 'Stop'
+if (Test-Path -LiteralPath $OutputPath) { throw 'Verification output already exists; preserve it and choose a new path.' }
+$PackageDirectory = (Resolve-Path -LiteralPath $PackageDirectory).Path
+$metadataText = [IO.File]::ReadAllText((Join-Path $PackageDirectory 'version.json'))
+$metadata = $metadataText | ConvertFrom-Json
+if ($metadata.schemaVersion -ne 1 -or $metadata.product -ne 'LensDocsStudio.Native' -or $metadata.version -ne $ExpectedVersion -or
+    $metadata.sourceRevision -ne $ExpectedSourceRevision -or $metadata.sourceDirty -ne $false -or $metadata.selfContained -ne $true -or
+    $metadata.internalPreview -ne $true -or $metadata.channel -ne 'Preview' -or $metadata.architecture -ne 'x64' -or
+    $metadata.minimumWindowsVersion -ne '10.0.17763' -or $metadata.signingRequested -ne $false -or $metadata.signingProvider -ne 'Unsigned' -or
+    $metadata.sourceKind -notin 'branch-source','pull-request-merge-checkout','local-source') { throw 'Preview version, source, target or unsigned identity does not match the expected package.' }
+$prefix = "LensDocsStudio.Native-$ExpectedVersion-win-x64"
+$installer = Join-Path $PackageDirectory "$prefix-Setup.exe"
+$portable = Join-Path $PackageDirectory "$prefix.zip"
+$installerHash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
+$zipHash = (Get-FileHash -LiteralPath $portable -Algorithm SHA256).Hash.ToLowerInvariant()
+if (($ExpectedInstallerSha256 -and $installerHash -ne $ExpectedInstallerSha256) -or ($ExpectedZipSha256 -and $zipHash -ne $ExpectedZipSha256)) { throw 'Independent SHA-256 pin does not match the package bytes.' }
+$checksumLines = @(Get-Content -LiteralPath (Join-Path $PackageDirectory 'SHA256SUMS.txt'))
+if ($checksumLines.Count -ne 2 -or $checksumLines -notcontains "$installerHash  $prefix-Setup.exe" -or $checksumLines -notcontains "$zipHash  $prefix.zip") { throw 'SHA256SUMS does not identify both exact package files.' }
+if ((Get-AuthenticodeSignature -LiteralPath $installer).Status -ne 'NotSigned') { throw 'This verifier expects the declared unsigned internal installer.' }
+$installerVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($installer)
+if ($installerVersion.ProductName -ne 'Lens Docs Studio Native Preview' -or $installerVersion.ProductVersion -ne $ExpectedVersion) { throw 'Installer binary version or product identity is inconsistent.' }
+$envelope = Get-Content -LiteralPath (Join-Path $PackageDirectory 'native-update.json') -Raw | ConvertFrom-Json
+if ($envelope.schemaVersion -ne 1 -or $envelope.keyId -ne '' -or $envelope.signature -ne '') { throw 'Unsigned preview update envelope unexpectedly contains a signing identity.' }
+$update = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($envelope.payload)) | ConvertFrom-Json
+if ($update.productId -ne $metadata.product -or $update.version -ne $ExpectedVersion -or $update.architecture -ne 'x64' -or
+    $update.channel -ne 'Preview' -or $update.assetName -ne "$prefix-Setup.exe" -or $update.size -ne (Get-Item -LiteralPath $installer).Length -or
+    $update.sha256 -ne $installerHash -or $update.releaseTag -ne "native-v$ExpectedVersion") { throw 'Update metadata does not describe the same installer.' }
+$required = @('LensDocsStudio.Native.exe','LensDocsStudio.Native.dll','LensDocsStudio.Core.dll','LensDocsStudio.Native.deps.json',
+    'LensDocsStudio.Native.runtimeconfig.json','coreclr.dll','hostfxr.dll','hostpolicy.dll','PresentationFramework.dll','PresentationCore.dll',
+    'WindowsBase.dll','wpfgfx_cor3.dll','version.json','PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md','LICENSE')
+$files = [Collections.Generic.Dictionary[string,object]]::new([StringComparer]::OrdinalIgnoreCase)
+$archive = [IO.Compression.ZipFile]::OpenRead($portable)
+try {
+    if ($archive.Entries.Count -gt 2000 -or ($archive.Entries | Measure-Object Length -Sum).Sum -gt 1GB) { throw 'Preview ZIP exceeds the package verification budget.' }
+    foreach ($entry in $archive.Entries) {
+        if ($entry.FullName.EndsWith('/')) { continue }
+        $name = $entry.FullName.Replace('\','/')
+        if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or $files.ContainsKey($name) -or
+            $name -match '(?i)WebView2|ContinuousViewer|(^|/)(spikes|tests|acceptance|obj|bin|node_modules)/|chrome|node\.exe|\.(pfx|pem|key|pdb|cs|csproj|slnx?|ps1|html)$' -or
+            ($name.EndsWith('.md') -and $name -notin 'PREVIEW-GUIDE.md','PREVIEW-RELEASE-NOTES.md','THIRD-PARTY-NOTICES.md')) { throw "Unexpected or unsafe preview payload entry: $name" }
+        $stream = $entry.Open()
+        try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)).ToLowerInvariant() } finally { $stream.Dispose() }
+        $files.Add($name, [ordered]@{ path=$name; bytes=$entry.Length; sha256=$hash })
+    }
+    foreach ($name in $required) { if (-not $files.ContainsKey($name) -or $files[$name].bytes -eq 0) { throw "Required native runtime or guidance is missing: $name" } }
+    function Read-ZipText([string]$Name) {
+        $entry = $archive.Entries | Where-Object { $_.FullName.Replace('\','/') -eq $Name }
+        if ($entry.Length -gt 1MB) { throw 'Package metadata exceeds its verification budget.' }
+        $reader = [IO.StreamReader]::new($entry.Open())
+        try { return $reader.ReadToEnd() } finally { $reader.Dispose() }
+    }
+    if ((Read-ZipText 'version.json') -ne $metadataText) { throw 'Portable and installer-side version metadata differ.' }
+    $runtime = Read-ZipText 'LensDocsStudio.Native.runtimeconfig.json' | ConvertFrom-Json
+    if ($runtime.runtimeOptions.tfm -ne 'net10.0' -or $runtime.runtimeOptions.framework -or $runtime.runtimeOptions.frameworks -or
+        @($runtime.runtimeOptions.includedFrameworks | Where-Object { $_.name -eq 'Microsoft.WindowsDesktop.App' -and $_.version -match '^10\.' }).Count -ne 1) { throw 'Portable package does not declare its included .NET 10 WPF runtime.' }
+} finally { $archive.Dispose() }
+$report = [ordered]@{ status='PASS'; version=$ExpectedVersion; sourceRevision=$ExpectedSourceRevision; sourceKind=$metadata.sourceKind;
+    ciRunId=$metadata.ciRunId; installerSha256=$installerHash; portableSha256=$zipHash; signature='NotSigned';
+    trustedUpdates='BLOCKED: no production signing identity'; cleanMachineCertification='BLOCKED: separate clean image required';
+    executionPerformed=$false; payload=@($files.Values | Sort-Object path) }
+$parent = Split-Path -Parent ([IO.Path]::GetFullPath($OutputPath)); [IO.Directory]::CreateDirectory($parent) | Out-Null
+$report | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $OutputPath -Encoding utf8NoBOM
+"Native preview package verification PASS: $ExpectedVersion ($ExpectedSourceRevision)"

@@ -57,6 +57,8 @@ internal static partial class NativeUiChecks
                 {
                     ReadingMode("Continuous");
                     Wait(() => !PageControlsVisible(), "Explicit Continuous was overridden for the 4,000-item document.");
+                    Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("ContinuousGuidance")) is { IsOffscreen: false },
+                        "Explicit Continuous has no non-blocking guidance for the large document.");
                     Find(window, "DocumentPreview").Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
                     Find(window, "FindText").AsTextBox().Text = marker; Find(window, "FindNext").Click();
                     Wait(() =>

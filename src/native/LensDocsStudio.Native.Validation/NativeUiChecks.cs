@@ -63,6 +63,8 @@ internal static partial class NativeUiChecks
             checks.Add("Startup file opened through native controls");
             MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
             CheckLoadedRuntime(launchedProcess!, executable, output, requireBundledRuntime);
+            CheckQuickStart(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("Empty-draft quick start exposes native workspace/document/help actions, yields to typing and preserves existing source");
             checks.Add(requireBundledRuntime
                 ? "Installed application loads the .NET runtime and WPF graphics from its own package directory"
                 : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");

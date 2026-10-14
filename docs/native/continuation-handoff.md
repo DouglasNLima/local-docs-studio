@@ -1,5 +1,7 @@
 # Native Windows development continuation handoff
 
+The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
+
 ## Current targeted performance continuation
 
 Adopted acceptance baseline: `3dfda9fe6152b93bd9f6def2f68bd5e2d6d2635b`. The completed reconstruction remains adopted. The current [performance report](performance-and-responsiveness.md) records a measured literal-run optimisation, a reproduced WPF selected-tab close correction, unchanged 250 ms gates, exact samples and new source/formatting/switch/close/Continuous desktop regressions. Work is isolated in `C:\Users\dougl\.codex\worktrees\native-responsiveness\MarkdownReader`; the earlier worktree and evidence are retained. Push updates the existing branch/PR 21; no reconstruction, merge or release is intended.

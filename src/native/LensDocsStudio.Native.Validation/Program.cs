@@ -47,7 +47,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office")
+        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office" or "--preview-input-safety")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -57,6 +57,11 @@ internal static class Program
                 Console.Error.WriteLine("Desktop and Office validation require a disposable GitHub-hosted Windows runner.");
                 return 1;
             }
+        }
+        if (args.FirstOrDefault() == "--preview-input-safety")
+        {
+            try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--ui")
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui",

@@ -238,6 +238,18 @@
       <Button Content="Close" Click="CloseFind" AutomationProperties.AutomationId="CloseFind"/>
      </WrapPanel>
     </Border>
+    <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12" AutomationProperties.AutomationId="QuickStart">
+     <Border.Style><Style TargetType="Border"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
+      <DataTrigger Binding="{Binding ActiveDocument.IsEmptyDraft}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+     </Style.Triggers></Style></Border.Style>
+     <StackPanel>
+      <TextBlock Text="Start with a workspace or document, or type below to create Markdown." TextWrapping="Wrap"/>
+      <TextBlock Text="Ctrl+S saves your work. Choose Split or Preview to read it; Insert adds local images and Export creates Word or PDF files. Help includes the guide and installed version." TextWrapping="Wrap" FontSize="12" Margin="0,4,0,6"/>
+      <WrapPanel><Button Content="Open workspace…" Command="{Binding OpenFolderCommand}" AutomationProperties.AutomationId="QuickStartWorkspace"/>
+       <Button Content="Open document…" Command="{Binding OpenDocumentCommand}" AutomationProperties.AutomationId="QuickStartDocument"/>
+       <Button Content="Native guide (F1)" Click="OpenHelp" AutomationProperties.AutomationId="QuickStartHelp"/></WrapPanel>
+     </StackPanel>
+    </Border>
     <Grid x:Name="ContentGrid">
      <Grid.ColumnDefinitions><ColumnDefinition x:Name="EditorColumn" Width="*"/><ColumnDefinition x:Name="SplitColumn" Width="5"/><ColumnDefinition x:Name="PreviewColumn" Width="*"/><ColumnDefinition x:Name="OutlineColumn" Width="180"/></Grid.ColumnDefinitions>
      <avalon:TextEditor x:Name="Editor" Grid.Column="0" ShowLineNumbers="True" FontFamily="Cascadia Code, Consolas" FontSize="14"

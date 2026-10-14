@@ -101,6 +101,26 @@ internal static partial class NativePaginationChecks
             if (result.ReadText() != before || parsed.Source != source) throw new IOException("Changing reading modes changed document content or source.");
             checks.Add("Explicit reading choices preserve source and complete preview content");
 
+            // Exercise both established cost characteristics without adding another large-layout timing test.
+            foreach (var (characters, elements) in new[] { (256 * 1024 - 1, 999), (256 * 1024, 1), (40, 1000) })
+            {
+                var probe = small with { SourceElements = Enumerable.Range(0, elements).ToDictionary(index => index, _ => (TextElement)small.Document.Blocks.FirstBlock) };
+                viewer.SetPreview(probe, characters, "Continuous"); Layout(viewer);
+                var expected = characters >= 256 * 1024 || elements >= 1000;
+                var guidance = (FrameworkElement)viewer.Template.FindName("ContinuousGuidance", viewer);
+                viewer.Selection!.Select(small.Document.ContentStart, small.Document.ContentEnd);
+                var selection = viewer.Selection.Text; var page = viewer.PageNumber;
+                viewer.ApplyReadingMode("Continuous"); Layout(viewer);
+                if (viewer.ShowContinuousGuidance != expected || guidance.IsVisible != expected
+                    || viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll || viewer.Selection.Text != selection || viewer.PageNumber != page)
+                    throw new IOException("Continuous guidance changed selection, position or explicit reading mode, or used the wrong document characteristics.");
+                viewer.ApplyReadingMode("Pages"); Layout(viewer);
+                if (viewer.ShowContinuousGuidance || guidance.IsVisible) throw new IOException("Continuous guidance remained visible in Pages.");
+            }
+            viewer.SetPreview(small, 40, "Automatic"); Layout(viewer);
+            if (viewer.ShowContinuousGuidance) throw new IOException("Continuous guidance survived a small replacement.");
+            checks.Add("Continuous guidance uses source characters or mapped-element counts, preserves selection and explicit mode, and clears in Pages or a small replacement");
+
             var drawing = new DrawingVisual();
             using (var dc = drawing.RenderOpen())
             {
