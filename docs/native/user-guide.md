@@ -4,6 +4,8 @@
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.
 
+An empty draft offers optional workspace, document and native-guide actions. Start typing to hide the strip; your document stays unchanged by the guidance. **Help → About the native preview** and **Help → Updates** show the installed version. The package includes `PREVIEW-GUIDE.md` with installation, verification and evaluation restrictions.
+
 Choose **File → Open document** to edit a Markdown or Mermaid file, or **Open folder** to browse a documentation workspace. Files open in separate tabs. **File → New document** creates an unsaved document; **Create from template** offers bundled examples and generators.
 
 Use **Editor**, **Split** or **Preview** to choose your working layout. Drag the divider in Split to resize the editor and preview. The outline opens headings; double-click supported preview text to move to its source. **Alt+Left** and **Alt+Right** move through document navigation history.
@@ -13,6 +15,8 @@ Editor layout keeps the outline current and pauses hidden preview rendering. Ret
 **Edit → Settings → Preview reading mode** offers **Automatic**, **Continuous** and **Pages**. Automatic uses native pages for long documents and a continuous view for smaller documents. In Pages, use the previous/next controls below the preview; Find, outline headings and document links can take you directly to a distant page. Images fit the page, and narrow diagram panels can scroll to their Zoom, export and source-copy controls. Reading mode and preview zoom never alter Markdown or export pagination. Continuous layout may take longer for very large documents.
 
 The native preview is a separate development edition. Its state and installation are kept apart from the browser product and legacy Windows shell.
+
+Continuous shows quiet guidance when the source has at least 262,144 characters or 1,000 mapped elements, the established Automatic-to-Pages characteristics. Pages is recommended for these cases; explicitly chosen Continuous remains available. This guidance is not a latency prediction or performance correction. Continuous's 250 ms objective and the intermittent details construction delay remain unresolved.
 
 ## Editing, finding and replacing
 

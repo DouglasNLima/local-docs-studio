@@ -1,5 +1,7 @@
 # Native Windows preview acceptance and engineering delivery
 
+The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
+
 ## Performance continuation after the accepted baseline
 
 The targeted continuation from `3dfda9fe6152b93bd9f6def2f68bd5e2d6d2635b` is recorded in [performance and responsiveness](performance-and-responsiveness.md). It removes redundant literal-formatting elements and corrects a reproduced selected-tab close race, with new source/selection/cancellation/desktop regressions. Four comparable local pairs improve list first-layout input from a 923.42 ms median to 727.88 ms and reduce initial allocation by 14.05%, but **Continuous still fails the unchanged 250 ms budget**. Mixed and 4.14 MB preview failures and the separate original 587.9933 ms details stall remain explicit. Local Release/Core/native validation passes (1,057 Core, 40 corpus, zero failures); all four implementation-revision pipelines at 58e5351 pass, with four 66-check desktop contexts, 13 persisted-workflow checks, full lifecycle and 268 web cases verified. The performance report pins the four CI references; the following documentation reconciliation keeps the same runtime code and its latest head/checks are on PR 21. The historical record below retains its original scope and package identities. New-build manual GUI remains BLOCKED/NOT RUN under the existing desktop authorisation.

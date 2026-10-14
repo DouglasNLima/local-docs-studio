@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
   pull_request:
-    branches: [develop]
+    branches: [develop, 'feature/native-wpf-rebuild']
   workflow_dispatch:
 permissions:
   contents: read
@@ -32,6 +32,16 @@ jobs:
         run: pwsh -NoProfile -File scripts/native/Test-NativeAuthenticode.ps1
       - name: Validate native diagram corpus
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .
+      - name: Probe production Unicode and malformed-input safety in isolated processes
+        timeout-minutes: 4
+        run: |
+          $results = @()
+          foreach ($fixture in 'ordinary','malformed','combining') {
+            & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --preview-input-safety "artifacts/native/input-safety/$fixture" $fixture
+            $results += @{ fixture=$fixture; exitCode=$LASTEXITCODE }
+          }
+          $results | ConvertTo-Json | Set-Content artifacts/native/input-safety/process-exits.json
+          if (@($results | Where-Object { $_.exitCode -ne 0 }).Count) { throw 'Production input-safety probe failed. Preserve evidence and investigate; no retry or threshold change.' }
       - name: Record Continuous input-budget observations (250 ms acceptance reported separately)
         run: |
           dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --continuous-performance artifacts/native/validation/continuous-input
@@ -65,6 +75,15 @@ jobs:
       - name: Validate visible installer wizard
         timeout-minutes: 4
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --installer-wizard "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" artifacts/native/installer-wizard
+      - name: Independently verify preview packages and negative controls
+        run: |
+          foreach ($base in '0.1.0','0.1.1') {
+            $version = "$base-preview.${{ github.run_number }}"
+            pwsh -NoProfile -File scripts/native/Test-NativePreviewPackage.ps1 -PackageDirectory "artifacts/native/packages/$version" -ExpectedVersion $version -ExpectedSourceRevision (git rev-parse HEAD) -OutputPath "artifacts/native/packages/$version/package-verification.json"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+          pwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}" -OutputDirectory artifacts/native/package-controls
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate installation upgrade and uninstall lifecycle
         run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe"
       - name: Upload validation evidence
@@ -74,6 +93,8 @@ jobs:
           name: native-validation
           path: |
             artifacts/native/tests/
+            artifacts/native/input-safety/
+            artifacts/native/package-controls/*.json
             artifacts/native/authenticode/**/*.json
             artifacts/native/signing-adapters/**/signing-adapters.json
             artifacts/native/validation/
@@ -85,6 +106,8 @@ jobs:
             artifacts/native/install-smoke/**/*.log
             artifacts/native/install-smoke/**/native-ui.json
             artifacts/native/install-smoke/**/native-ui-runtime.json
+            artifacts/native/install-smoke/**/native-about.*
+            artifacts/native/install-smoke/**/native-quick-start.*
             artifacts/native/install-smoke/**/native-paste-error-acknowledgement.json
             artifacts/native/install-smoke/**/native-updates-command.json
             artifacts/native/install-smoke/**/native-details-keyboard.json
@@ -94,6 +117,7 @@ jobs:
             artifacts/native/install-smoke/**/native-ui-table-editor.json
             artifacts/native/install-smoke/**/native-table-editor.png
             artifacts/native/install-smoke/**/native-ui-workspace-context-*.json
+            artifacts/native/install-smoke/**/native-workspace-context-session-observations.json
             artifacts/native/install-smoke/**/native-workspace-context-*.png
             artifacts/native/install-smoke/**/native-word-import.png
             artifacts/native/install-smoke/**/native-word-import-pages.json

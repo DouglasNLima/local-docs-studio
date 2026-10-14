@@ -14,6 +14,12 @@ $ErrorActionPreference = 'Stop'
 $signing = New-NativeSigningConfiguration -SigningThumbprint $SigningThumbprint -SignToolPath $SignToolPath -SigningProviderPath $SigningProviderPath `
     -ExpectedPublisherSubject $ExpectedPublisherSubject -ExpectedCertificateSha256 $ExpectedCertificateSha256 -TimestampUrl $TimestampUrl
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
+Push-Location $repo
+try {
+    $revision = (& git rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0 -or $revision -notmatch '^[0-9a-f]{40}$') { throw 'An exact Git source revision is required.' }
+    if (& git status --porcelain) { throw 'Preview packaging requires a clean source checkout. Commit changes before building.' }
+} finally { Pop-Location }
 $output = Join-Path $repo "artifacts/native/packages/$Version"
 if (Test-Path -LiteralPath $output) { throw "Package output already exists: $output. Use a new preview version to preserve existing evidence." }
 if (-not $IsccPath) {
@@ -25,17 +31,24 @@ $payload = Join-Path $output 'app'
 New-Item -ItemType Directory -Path $payload -Force | Out-Null
 Push-Location $repo
 try {
-    & dotnet publish src/native/LensDocsStudio.Native -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:Version=$Version -p:PublishSingleFile=false -p:PublishTrimmed=false -o $payload
+    & dotnet publish src/native/LensDocsStudio.Native -c Release -r win-x64 --self-contained true -p:RestoreLockedMode=true -p:Version=$Version -p:DebugType=None -p:DebugSymbols=false -p:PublishSingleFile=false -p:PublishTrimmed=false -o $payload
     if ($LASTEXITCODE -ne 0) { throw 'Self-contained native publish failed.' }
     $exe = Join-Path $payload 'LensDocsStudio.Native.exe'
     if (-not (Test-Path (Join-Path $payload 'coreclr.dll'))) { throw 'The package is missing its self-contained .NET runtime.' }
-    $forbidden = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object { $_.Name -match 'WebView2|chrome|node\.exe|index\.html' }
+    $forbidden = Get-ChildItem -LiteralPath $payload -Recurse -File | Where-Object { $_.Name -match 'WebView2|chrome|node\.exe|index\.html|ContinuousViewer|\.pdb$|\.(pfx|pem|key)$' }
     if ($forbidden) { throw 'A browser or web runtime was found in the native package.' }
     Invoke-NativeAuthenticodeSigning -FilePath $exe -Configuration $signing
     $metadata = [ordered]@{ schemaVersion=1; product='LensDocsStudio.Native'; version=$Version; channel='Preview'; architecture='x64'; minimumWindowsVersion='10.0.17763'; selfContained=$true; internalPreview=$true; signingRequested=($signing.Mode -ne 'Unsigned'); signingProvider=$signing.Mode; sourceRevision=(& git rev-parse HEAD).Trim(); sourceDirty=[bool](& git status --porcelain); builtAtUtc=[DateTimeOffset]::UtcNow.ToString('O') }
+    if ($metadata.sourceRevision -ne $revision -or $metadata.sourceDirty) { throw 'Source changed while publishing; discard this incomplete output and use a new version.' }
+    $metadata.sourceKind = if ($env:GITHUB_EVENT_NAME -eq 'pull_request') { 'pull-request-merge-checkout' } elseif ($env:GITHUB_ACTIONS -eq 'true') { 'branch-source' } else { 'local-source' }
+    $metadata.ciRunId = $env:GITHUB_RUN_ID
+    $metadata.ciRunAttempt = $env:GITHUB_RUN_ATTEMPT
+    $metadata.checkoutRef = $env:GITHUB_REF
     $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'version.json') -Encoding utf8NoBOM
     if (Test-Path -LiteralPath (Join-Path $repo 'LICENSE')) { Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination $payload }
     & (Join-Path $PSScriptRoot 'Write-NativeNotices.ps1') -PayloadDirectory $payload
+    Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-guide.md') -Destination (Join-Path $payload 'PREVIEW-GUIDE.md')
+    Copy-Item -LiteralPath (Join-Path $repo 'docs/native/windows-preview-release-notes.md') -Destination (Join-Path $payload 'PREVIEW-RELEASE-NOTES.md')
     & $IsccPath "/DAppVersion=$Version" "/DPackageSource=$payload" "/DOutputDir=$output" (Join-Path $repo 'installer/inno/LensDocsStudio.Native.iss')
     if ($LASTEXITCODE -ne 0) { throw 'Native installer compilation failed.' }
     $installer = Join-Path $output "LensDocsStudio.Native-$Version-win-x64-Setup.exe"

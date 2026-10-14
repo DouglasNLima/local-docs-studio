@@ -63,6 +63,8 @@ internal static partial class NativeUiChecks
             checks.Add("Startup file opened through native controls");
             MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
             CheckLoadedRuntime(launchedProcess!, executable, output, requireBundledRuntime);
+            CheckQuickStart(window, editor, automation, app.ProcessId, output, source);
+            checks.Add("Empty-draft quick start exposes native workspace/document/help actions, yields to typing and preserves existing source");
             checks.Add(requireBundledRuntime
                 ? "Installed application loads the .NET runtime and WPF graphics from its own package directory"
                 : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");
@@ -1358,6 +1360,8 @@ internal static partial class NativeUiChecks
             CheckWikiLinks(window, editor, automation, app.ProcessId, output, source, renamedDocument);
             checks.Add("Native workspace link completion inserts an unambiguous path; preview navigation and Back preserve drafts, missing targets explain the problem, and complete Undo restores saved/editor source");
             CheckHelpGuide(window, editor, automation, app.ProcessId, output, source);
+            CheckAbout(window, editor, automation, app.ProcessId, output, source, executable);
+            checks.Add("About displays the exact executable version and source revision without changing document state");
             CheckWorkspaceMap(window, editor, automation, app.ProcessId, output, source, renamedDocument);
             checks.Add("Native workspace map uses current drafts, copies a passive Markdown report, clears empty results and navigates exact source/document history; native diagrams and complete Undo preserve files");
             checks.Add("F1 opens the bundled native guide; focused topic search finds browser migration, clears empty results and closes without changing the document");
@@ -1439,7 +1443,7 @@ internal static partial class NativeUiChecks
             window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The retained workspace did not restore.");
             mainWindow = window; editor = Find(window, "MarkdownEditor");
             CheckRetainedWorkspaceContent(window, editor, workspaceContext, output, "after-restart", workspaceContext.Draft);
-            if (!RetainedContextSaved(workspaceContext)) throw new IOException("Restart lost the per-document workspace roots.");
+            ObserveRetainedContextSaved(workspaceContext, output);
             checks.Add("Switching folders retains earlier drafts, native images and two-way links; saving and restarting preserves per-document workspace context and exact files");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
             Wait(() => app.HasExited, "The retained workspace application did not close.");

@@ -101,6 +101,29 @@ internal static partial class NativePaginationChecks
             if (result.ReadText() != before || parsed.Source != source) throw new IOException("Changing reading modes changed document content or source.");
             checks.Add("Explicit reading choices preserve source and complete preview content");
 
+            // Exercise both established cost characteristics without adding another large-layout timing test.
+            foreach (var (characters, elements) in new[] { (256 * 1024 - 1, 999), (256 * 1024, 1), (40, 1000) })
+            {
+                var probe = small with { SourceElements = Enumerable.Range(0, elements).ToDictionary(index => index, _ => (TextElement)small.Document.Blocks.FirstBlock) };
+                viewer.SetPreview(probe, characters, "Continuous"); Layout(viewer);
+                var expected = characters >= 256 * 1024 || elements >= 1000;
+                var guidance = (FrameworkElement)viewer.Template.FindName("ContinuousGuidance", viewer);
+                viewer.Selection!.Select(small.Document.ContentStart, small.Document.ContentEnd);
+                var selection = viewer.Selection.Text; var page = viewer.PageNumber;
+                viewer.ApplyReadingMode("Continuous"); Layout(viewer);
+                if (viewer.ShowContinuousGuidance != expected || guidance.IsVisible != expected
+                    || viewer.ViewingMode != FlowDocumentReaderViewingMode.Scroll || viewer.Selection.Text != selection || viewer.PageNumber != page)
+                    throw new IOException("Continuous guidance changed selection, position or explicit reading mode, or used the wrong document characteristics.");
+                var readingPeer = FrameworkElementAutomationPeer.CreatePeerForElement(viewer);
+                var accessibleGuidance = PeerDescendants(readingPeer).Any(peer => peer.GetAutomationId() == "ContinuousGuidance" && peer.IsControlElement() && !peer.IsOffscreen());
+                if (accessibleGuidance != expected) throw new IOException("Visible Continuous guidance is absent from the reader's native automation tree.");
+                viewer.ApplyReadingMode("Pages"); Layout(viewer);
+                if (viewer.ShowContinuousGuidance || guidance.IsVisible) throw new IOException("Continuous guidance remained visible in Pages.");
+            }
+            viewer.SetPreview(small, 40, "Automatic"); Layout(viewer);
+            if (viewer.ShowContinuousGuidance) throw new IOException("Continuous guidance survived a small replacement.");
+            checks.Add("Continuous guidance uses source characters or mapped-element counts, preserves selection and explicit mode, and clears in Pages or a small replacement");
+
             var drawing = new DrawingVisual();
             using (var dc = drawing.RenderOpen())
             {
@@ -151,6 +174,15 @@ internal static partial class NativePaginationChecks
         if (peer.GetPattern(PatternInterface.Text) is not ITextProvider provider
             || !provider.DocumentRange.GetText(-1).Contains(expected, StringComparison.Ordinal))
             throw new IOException("The reading control does not expose its complete document through native text automation.");
+    }
+
+    private static IEnumerable<AutomationPeer> PeerDescendants(AutomationPeer parent)
+    {
+        foreach (var child in parent.GetChildren() ?? [])
+        {
+            yield return child;
+            foreach (var descendant in PeerDescendants(child)) yield return descendant;
+        }
     }
 
     private static void CheckAccessiblePageCounter(DocumentPreview viewer)

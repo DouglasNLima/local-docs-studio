@@ -10,12 +10,13 @@ public partial class DocumentViewModel : ObservableObject
     public Guid Id { get; init; } = Guid.NewGuid();
     public TextDocument EditorDocument { get; }
     public DocumentSnapshot? SavedSnapshot { get; private set; }
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? filePath;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(IsEmptyDraft))] private string? filePath;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
     [ObservableProperty] private bool isSaving;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
     public string? RecoveryKey { get; set; }
+    public bool IsEmptyDraft => FilePath is null && EditorDocument.TextLength == 0;
     public string? AssetWorkspace { get; set; }
     public string? EffectivePath => FilePath ?? (AssetWorkspace is null ? null : Path.Combine(AssetWorkspace,
         Path.GetExtension(DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid" ? "Untitled.mmd" : "Untitled.md"));
@@ -32,7 +33,7 @@ public partial class DocumentViewModel : ObservableObject
         FilePath = snapshot?.Path;
         EditorDocument = new TextDocument(text);
         IsDirty = snapshot is null ? text.Length != 0 : text != snapshot.Text;
-        EditorDocument.TextChanged += (_, _) => { IsDirty = SavedSnapshot is null || EditorDocument.Text != SavedSnapshot.Text; Edited?.Invoke(this, EventArgs.Empty); };
+        EditorDocument.TextChanged += (_, _) => { IsDirty = SavedSnapshot is null || EditorDocument.Text != SavedSnapshot.Text; OnPropertyChanged(nameof(IsEmptyDraft)); Edited?.Invoke(this, EventArgs.Empty); };
     }
 
     public void MarkSaved(DocumentSnapshot snapshot)

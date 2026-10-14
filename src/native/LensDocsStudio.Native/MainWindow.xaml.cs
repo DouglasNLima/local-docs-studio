@@ -589,5 +589,4 @@ public partial class MainWindow : Window
         });
     }
     private void Exit(object sender, RoutedEventArgs e) => Close();
-    private void About(object sender, RoutedEventArgs e) => MessageBox.Show(this, "Lens Docs Studio — Native Preview\nLocal Markdown, Mermaid, and documentation studio.\n\n.NET 10 · WPF · AvalonEdit · Markdig · Mermaider\n\nInternal development build. Functional parity, installation and production signing are still being validated.", "About Lens Docs Studio");
 }

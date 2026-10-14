@@ -115,15 +115,58 @@ internal static partial class NativeUiChecks
         }
     }
 
-    private static bool RetainedContextSaved(WorkspaceContextFixture fixture)
+    private static bool RetainedContextSaved(WorkspaceContextFixture fixture, List<object>? observations = null)
     {
         try
         {
             using var file = new FileStream(Path.Combine(fixture.State, "session.json"), FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             var session = JsonSerializer.Deserialize<SessionState>(file);
-            return session?.Workspace == fixture.Second && new[] { fixture.Source, fixture.Target }.All(path =>
+            var matches = session?.Workspace == fixture.Second && new[] { fixture.Source, fixture.Target }.All(path =>
                 session.Documents.SingleOrDefault(document => document.Path == path)?.WorkspaceRoot == fixture.First);
+            observations?.Add(new { Readable = true, Matches = matches, Workspace = session?.Workspace,
+                Roots = new[] { fixture.Source, fixture.Target }.Select(path => new { Path = path,
+                    Root = session?.Documents.SingleOrDefault(document => document.Path == path)?.WorkspaceRoot }).ToArray() });
+            return matches;
         }
-        catch (IOException) { return false; }
+        catch (IOException error)
+        { observations?.Add(new { Readable = false, Matches = false, Error = error.GetType().Name, error.HResult }); return false; }
+    }
+
+    private static void ObserveRetainedContextSaved(WorkspaceContextFixture fixture, string output)
+    {
+        var observations = new List<object>(); var passed = false;
+        try { Wait(() => RetainedContextSaved(fixture, observations), "Restart did not persist the exact per-document workspace roots."); passed = true; }
+        finally
+        {
+            File.WriteAllText(Path.Combine(output, "native-workspace-context-session-observations.json"), JsonSerializer.Serialize(new
+            { Passed = passed, DeadlineSeconds = 20, InputActionsExecuted = 0, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
+        }
+    }
+
+    internal static void CheckWorkspaceContextObservation(string output)
+    {
+        var root = Path.Combine(output, "workspace-context-observation"); Directory.CreateDirectory(root);
+        var fixture = new WorkspaceContextFixture(Path.Combine(root, "first"), Path.Combine(root, "second"),
+            Path.Combine(root, "first", "source.md"), Path.Combine(root, "first", "target.md"), "unused.png", [], "", "", "", root);
+        var state = new SessionState(1, fixture.Second, null, [
+            new RecoveredDocument(Guid.NewGuid(), fixture.Source, "", null, false, 0, 0, WorkspaceRoot: fixture.First),
+            new RecoveredDocument(Guid.NewGuid(), fixture.Target, "", null, false, 0, 0, WorkspaceRoot: fixture.First)]);
+        var path = Path.Combine(root, "session.json"); var original = JsonSerializer.SerializeToUtf8Bytes(state); File.WriteAllBytes(path, original);
+        using var locked = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
+        var observations = new List<object>();
+        if (RetainedContextSaved(fixture, observations)) throw new IOException("An exclusive state read lock did not reproduce the one-shot false result.");
+        var attempts = 0;
+        Wait(() => { if (++attempts == 2) locked.Dispose(); return RetainedContextSaved(fixture, observations); }, "Valid roots did not become readable after lock release.", 1);
+        if (attempts != 2 || !File.ReadAllBytes(path).SequenceEqual(original)) throw new IOException("Observing transient state changed bytes or repeated an input action.");
+        var wrong = state with { Documents = state.Documents.Select(document => document with { WorkspaceRoot = fixture.Second }).ToArray() };
+        var wrongBytes = JsonSerializer.SerializeToUtf8Bytes(wrong); File.WriteAllBytes(path, wrongBytes);
+        Exception? failure = null; var mismatches = 0;
+        try { Wait(() => { mismatches++; return RetainedContextSaved(fixture); }, "Persistent wrong workspace roots", 1); }
+        catch (InvalidOperationException error) { failure = error; }
+        if (failure?.Message != "Persistent wrong workspace roots" || mismatches < 2 || !File.ReadAllBytes(path).SequenceEqual(wrongBytes))
+            throw new IOException("Persistent mismatched roots were accepted or repaired by the observer.");
+        File.WriteAllText(Path.Combine(output, "native-workspace-context-observation-regression.json"), JsonSerializer.Serialize(new
+        { Passed = true, TransientReadFailureReproduced = true, RetainedBytes = true, PersistentMismatchRejected = true,
+            ObservationDeadlineSeconds = 1, ProductionDeadlineSeconds = 20, InputActionsExecuted = 0, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
