@@ -374,8 +374,12 @@
      <GridSplitter x:Name="OutlineSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize outline"/>
      <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>
+      <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Outline groups">
+       <Button Click="ExpandOutlineGroups" ToolTip="Expand all heading groups" AutomationProperties.Name="Expand all heading groups"><ui:CommandIcon Kind="Expand"/></Button>
+       <Button Click="CollapseOutlineGroups" ToolTip="Collapse all heading groups" AutomationProperties.Name="Collapse all heading groups"><ui:CommandIcon Kind="Collapse"/></Button>
+      </ToolBar>
       <TextBox x:Name="OutlineFilter" DockPanel.Dock="Top" Margin="10,0,10,10" Padding="6" TextChanged="OutlineFilterChanged" AutomationProperties.Name="Filter document headings"/>
-      <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected"
+      <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
        AutomationProperties.Name="Document outline">
        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
       <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" Margin="{Binding Level, Converter={StaticResource HeadingIndent}}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
