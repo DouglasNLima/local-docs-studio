@@ -60,6 +60,7 @@ internal static partial class NativeUiChecks
             var editor = Find(window, "MarkdownEditor");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Searchable", StringComparison.Ordinal), "Fixture text did not load.");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The initial native preview did not finish.");
+            Wait(() => Find(window, "CaretStatus").Name == "Ln 1, Col 1 · UTF-8", "The initial active document did not expose its exact caret and encoding status.");
             checks.Add("Startup file opened through native controls");
             MeasureOperation("Initial process launch through fixture text and Mermaid preview readiness", operationWatch);
             CheckLoadedRuntime(launchedProcess!, executable, output, requireBundledRuntime);

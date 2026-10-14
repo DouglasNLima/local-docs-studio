@@ -60,7 +60,7 @@ public partial class MainWindow : Window
         SystemEvents.UserPreferenceChanged += WindowsPreferenceChanged;
         Closed += (_, _) => SystemEvents.UserPreferenceChanged -= WindowsPreferenceChanged;
         Editor.TextArea.TextView.LineTransformers.Insert(0, editorHighlighting);
-        Editor.TextArea.Caret.PositionChanged += (_, _) => { CaretStatus.Text = $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8"; HighlightCurrentHeading(); };
+        Editor.TextArea.Caret.PositionChanged += (_, _) => { UpdateCaretStatus(); HighlightCurrentHeading(); };
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
@@ -115,9 +115,12 @@ public partial class MainWindow : Window
             Editor.CaretOffset = Math.Clamp(displayedTab.CaretOffset, 0, Editor.Document.TextLength);
             Editor.ScrollToVerticalOffset(displayedTab.VerticalOffset);
         }
+        UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
     }
+    private void UpdateCaretStatus() => CaretStatus.Text = displayedTab is null ? "UTF-8"
+        : $"Ln {Editor.TextArea.Caret.Line}, Col {Editor.TextArea.Caret.Column} · UTF-8";
     private void TabChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.Source != DocumentTabs) return;
