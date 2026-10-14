@@ -58,6 +58,26 @@ internal static partial class NativeUiChecks
                 editor.Click(); Nth(editor, "Café 😀 é", 1).Select();
                 Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "Café 😀 é"),
                     "Unicode literal selection did not synchronise exactly.");
+                foreach (var pair in new[] {
+                    (Source: "Native sync fixture", Rendered: "Native sync fixture", Occurrence: 1),
+                    (Source: "action **action** *action", Rendered: "action action action", Occurrence: 1),
+                    (Source: "Soft\nbreak and hard", Rendered: "Soft break and hard", Occurrence: 1)
+                })
+                {
+                    editor.Click(); Nth(editor, pair.Source, pair.Occurrence).Select();
+                    Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Rendered),
+                        "Heading, formatted multiword or soft-break selection did not reach its exact rendered text.");
+                    var rectangle = Nth(preview, pair.Rendered, 1).GetBoundingRectangles().First(box => box.Width > 0 && box.Height > 0);
+                    Mouse.Click(new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2)));
+                    Nth(preview, pair.Rendered, 1).Select();
+                    Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == pair.Source),
+                        "Rendered heading, formatted multiword or soft-break selection lost its exact source endpoints.");
+                    observations.Add(new { ReadingMode = mode, MultiwordSource = pair.Source, Rendered = pair.Rendered, BidirectionalExact = true });
+                }
+                editor.Click(); Nth(editor, "action", 5).Select();
+                Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
+                    && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(preview, "action", 5), TextPatternRangeEndpoint.Start) == 0),
+                    "Inline code selection lost its exact repeated occurrence.");
                 observations.Add(new { ReadingMode = mode, RepeatedEditorToPreview = true, RepeatedPreviewToEditor = true, UnicodeExact = true,
                     FocusPreserved = true, Geometry = selectedGeometry });
             }

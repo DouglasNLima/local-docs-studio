@@ -44,8 +44,9 @@ internal static partial class NativeUiChecks
             finally { Keyboard.Release(VirtualKeyShort.CONTROL); }
             Wait(() => Find(drawing, "DiagramZoomLabel").Name == "220%", "Ctrl+wheel did not change native diagram scale.");
             var imageAfter = image.BoundingRectangle;
-            var beforeCoordinate = (pointer.X - imageBefore.Left) / imageBefore.Width;
-            var afterCoordinate = (pointer.X - imageAfter.Left) / imageAfter.Width;
+            var beforeCoordinate = (pointer.X - imageBefore.Left) / (double)imageBefore.Width;
+            var afterCoordinate = (pointer.X - imageAfter.Left) / (double)imageAfter.Width;
+            if (beforeCoordinate is <= 0.05 or >= 0.95) throw new IOException("Pointer zoom fixture did not use an interior drawing anchor.");
             if (Math.Abs(beforeCoordinate - afterCoordinate) > 0.02) throw new IOException("Pointer-centred zoom moved its drawing anchor.");
             Find(drawing, "DiagramFit").AsButton().Invoke();
             Wait(() => !scroll.HorizontallyScrollable.Value && !scroll.VerticallyScrollable.Value, "Fit did not bring the complete drawing into the native viewport.");
