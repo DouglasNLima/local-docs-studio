@@ -34,6 +34,14 @@ internal static class NativeSelectionMappingChecks
             if (!preview.TextMap.TrySourceRange(link.ElementStart, link.ElementEnd, out var linkStart, out var linkLength)
                 || linkStart != source.IndexOf("[action", StringComparison.Ordinal) + 1 || linkLength != 6)
                 throw new IOException("Native structural hyperlink selection boundaries did not map to their literal label.");
+            var literals = preview.TextMap.Literals.ToArray();
+            var linkIndex = Array.FindIndex(literals, literal => literal.Source.Start == linkStart);
+            var normalStart = literals[linkIndex - 1].Run.ContentEnd;
+            var normalEnd = literals[linkIndex + 1].Run.ContentStart;
+            if (new TextRange(normalStart, normalEnd).Text != "action"
+                || !preview.TextMap.TrySourceRange(normalStart, normalEnd, out var normalSource, out var normalLength)
+                || normalSource != linkStart || normalLength != 6)
+                throw new IOException("Adjacent-run native selection boundaries included Markdown link syntax.");
             if (preview.TextMap.TryPreviewRange(source.IndexOf("**", StringComparison.Ordinal), 2, out _, out _))
                 throw new IOException("Formatting delimiters claimed an exact literal selection.");
             var other = new FlowDocument(new Paragraph(new Run("action")));

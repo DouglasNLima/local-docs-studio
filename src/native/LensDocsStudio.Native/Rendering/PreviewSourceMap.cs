@@ -58,6 +58,12 @@ public sealed class PreviewSourceMap
             else
             {
                 var offset = literal.Run.ContentStart.GetOffsetToPosition(position);
+                if (startBoundary && offset == literal.Source.Length && middle + 1 < literals.Length
+                    && EmptyFormattingGap(position, literals[middle + 1].Run.ContentStart))
+                    return literals[middle + 1].Source.Start;
+                if (!startBoundary && offset == 0 && middle > 0
+                    && EmptyFormattingGap(literals[middle - 1].Run.ContentEnd, position))
+                    return literals[middle - 1].Source.End;
                 return offset is >= 0 && offset <= literal.Source.Length ? literal.Source.Start + offset : null;
             }
         }
