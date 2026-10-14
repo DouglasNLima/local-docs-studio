@@ -64,7 +64,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { CancelSynchronisation(); BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -550,6 +550,7 @@ public partial class MainWindow : Window
         SplitColumn.Width = layout == "Split" ? new GridLength(5) : new GridLength(0);
         Editor.Visibility = layout == "Preview" ? Visibility.Collapsed : Visibility.Visible;
         EditorPane.Visibility = Editor.Visibility;
+        EditorSplitter.Visibility = layout == "Split" ? Visibility.Visible : Visibility.Collapsed;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
         PreviewPane.Visibility = Preview.Visibility;
         CancelSynchronisation();

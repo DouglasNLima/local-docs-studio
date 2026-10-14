@@ -43,8 +43,14 @@ internal static partial class NativeUiChecks
                 var selectedGeometry = preview.Patterns.Text.Pattern.GetSelection().SelectMany(range => range.GetBoundingRectangles()).ToArray();
                 if (!selectedGeometry.Any(rectangle => rectangle.Width > 0 && rectangle.Height > 0 && preview.BoundingRectangle.Contains(rectangle)))
                     throw new IOException("The matching preview occurrence has no visible selection geometry.");
+                observations.Add(new { ReadingMode = mode, Phase = "Editor to preview", EditorToPreview = true,
+                    EditorSelection = editor.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray(),
+                    FocusName = editor.Automation.FocusedElement().Name, FocusBounds = editor.Automation.FocusedElement().BoundingRectangle });
 
-                preview.Click(); var previewFocus = preview.Automation.FocusedElement(); var previewMatch = Nth(preview, "action", 4); previewMatch.Select();
+                // Focus actual literal text, rather than a blank area of the reader.
+                var focusRectangle = Nth(preview, "action", 3).GetBoundingRectangles().First(rectangle => rectangle.Width > 0 && rectangle.Height > 0);
+                Mouse.Click(new System.Drawing.Point((int)(focusRectangle.Left + focusRectangle.Width / 2), (int)(focusRectangle.Top + focusRectangle.Height / 2)));
+                var previewFocus = preview.Automation.FocusedElement(); var previewMatch = Nth(preview, "action", 4); previewMatch.Select();
                 Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(selected => selected.GetText(-1) == "action"
                     && selected.CompareEndpoints(TextPatternRangeEndpoint.Start, Nth(editor, "action", 4), TextPatternRangeEndpoint.Start) == 0),
                     "Preview-to-editor sync selected the wrong repeated occurrence.");
@@ -70,7 +76,11 @@ internal static partial class NativeUiChecks
         {
             originalFailure = error;
             window.CaptureToFile(Path.Combine(output, "native-selection-synchronisation-failure.png"));
-            File.WriteAllText(Path.Combine(output, "native-selection-synchronisation-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations }));
+            File.WriteAllText(Path.Combine(output, "native-selection-synchronisation-failure.json"), JsonSerializer.Serialize(new {
+                Error = error.ToString(), Observations = observations, EditorBounds = editor.BoundingRectangle, PreviewBounds = preview.BoundingRectangle,
+                FocusName = editor.Automation.FocusedElement().Name, FocusBounds = editor.Automation.FocusedElement().BoundingRectangle,
+                EditorSelection = editor.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray(),
+                PreviewSelection = preview.Patterns.Text.Pattern.GetSelection().Select(range => range.GetText(-1)).ToArray() }));
             throw;
         }
         finally

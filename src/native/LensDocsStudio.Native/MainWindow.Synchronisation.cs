@@ -100,7 +100,7 @@ public partial class MainWindow
     }
     private void EditorCaretChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && BothPanesVisible && DesktopState.FollowCaret && Editor.IsKeyboardFocusWithin && Editor.SelectionLength == 0) QueueSynchronisation("caret");
+        if (!applyingSync && BothPanesVisible && DesktopState.FollowCaret && Editor.IsKeyboardFocusWithin && (Editor.SelectionLength == 0 || !DesktopState.SyncSelection)) QueueSynchronisation("caret");
     }
     private void EditorScrollChanged(object? sender, EventArgs e)
     {
