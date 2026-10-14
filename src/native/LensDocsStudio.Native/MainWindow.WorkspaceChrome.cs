@@ -198,5 +198,14 @@ public partial class MainWindow
         if (e.Key is not (Key.Left or Key.Right) || Outline.SelectedItem is not DocumentHeading heading) return;
         if (e.Key == Key.Left) CollapsedOutlineSections.Add(heading.Anchor); else CollapsedOutlineSections.Remove(heading.Anchor);
         e.Handled = true; RefreshOutline();
+        // Replacing the filtered item collection removes its focused container.
+        // Keep subsequent group keys in the outline without forcing preview layout.
+        Outline.Focus();
+        var document = model.ActiveDocument;
+        Dispatcher.BeginInvoke(() =>
+        {
+            if (model.ActiveDocument == document && Outline.IsKeyboardFocusWithin && ReferenceEquals(Outline.SelectedItem, heading)
+                && Outline.ItemContainerGenerator.ContainerFromItem(heading) is ListBoxItem { IsVisible: true } row) row.Focus();
+        }, System.Windows.Threading.DispatcherPriority.Loaded);
     }
 }
