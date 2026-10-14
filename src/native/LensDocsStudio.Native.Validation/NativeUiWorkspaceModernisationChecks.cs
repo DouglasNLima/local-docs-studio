@@ -98,10 +98,17 @@ internal static partial class NativeUiChecks
         }
         void FolderDelete()
         {
-            Tree("Recycle candidate").RightClick(); AutomationElement? action = null;
+            // A parent TreeItem's UIA bounds include all expanded children. Click its
+            // actual header text so the input targets the reviewed folder itself.
+            var header = Tree("Recycle candidate").FindFirstDescendant(cf => cf.ByControlType(ControlType.Text).And(cf.ByName("Recycle candidate")))
+                ?? throw new IOException("The actual folder header has no accessible text target.");
+            header.RightClick(); AutomationElement? action = null;
             Wait(() => (action = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByAutomationId("WorkspaceContextDelete")))) is not null,
                 "The actual folder's delete context action is unavailable.");
             action!.AsMenuItem().Invoke();
+            var confirmation = Dialogue("Delete workspace folder");
+            if (!confirmation.FindAllDescendants(cf => cf.ByControlType(ControlType.Text)).Any(text => text.Name.StartsWith("Delete folder Recycle candidate?", StringComparison.Ordinal)))
+                throw new IOException("Folder deletion confirmation targets a different item from its actual clicked header.");
         }
         Window Dialogue(string title)
         {

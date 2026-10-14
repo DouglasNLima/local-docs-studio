@@ -8,16 +8,18 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int CaptureUxScreenshots(string executable, string output, string revision)
+    public static int CaptureUxScreenshots(string executable, string output, string revision, bool highContrast = false)
     {
         // The caller enforces the disposable-runner boundary before any process is launched.
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         var observations = new List<object>();
         try
         {
+            using var contrast = highContrast ? new NativeTestHighContrast() : null;
+            if (highContrast && !System.Windows.SystemParameters.HighContrast) throw new IOException("The hosted Windows high-contrast setting was not applied.");
             using var display = new NativeTestDisplay(output);
             using var automation = new UIA3Automation();
-            foreach (var theme in new[] { "Light", "Dark" })
+            foreach (var theme in highContrast ? new[] { "System" } : new[] { "Light", "Dark" })
             foreach (var size in new[] { (860, 540), (1280, 800), (1440, 900), (1920, 1080) })
             {
                 var run = Path.Combine(output, "synthetic-" + Guid.NewGuid().ToString("N"));
@@ -37,13 +39,13 @@ internal static partial class NativeUiChecks
                     Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "The screenshot preview did not finish.");
                     window.Patterns.Transform.Pattern.Resize(size.Item1, size.Item2);
                     Wait(() => Math.Abs(window.BoundingRectangle.Width - size.Item1) < 3, "The screenshot width was not applied.");
-                    var screenshot = $"native-{theme.ToLowerInvariant()}-{size.Item1}x{size.Item2}.png";
+                    var screenshot = $"native-{(highContrast ? "high-contrast" : theme.ToLowerInvariant())}-{size.Item1}x{size.Item2}.png";
                     window.CaptureToFile(Path.Combine(output, screenshot));
                     if (paths.Any(path => !File.ReadAllText(path).StartsWith("# Documentation workspace\n", StringComparison.Ordinal)))
                         throw new IOException("Screenshot capture changed a synthetic document.");
                     observations.Add(new { Theme = theme, RequestedWidth = size.Item1, RequestedHeight = size.Item2,
                         Bounds = window.BoundingRectangle, DesktopBounds = automation.GetDesktop().BoundingRectangle,
-                        Revision = revision, Screenshot = screenshot, PhysicalDpiCertified = false, AccessibilityCertified = false });
+                        Revision = revision, Screenshot = screenshot, HighContrast = highContrast, PhysicalDpiCertified = false, AccessibilityCertified = false });
                 }
                 finally { if (!process.HasExited) { process.Kill(); process.WaitForExit(10000); } }
             }

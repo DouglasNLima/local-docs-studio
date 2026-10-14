@@ -74,7 +74,7 @@ internal static class Program
             }
         }
         if (args.FirstOrDefault() == "--ux-screenshots")
-            return NativeUiChecks.CaptureUxScreenshots(args[1], args[2], args[3]);
+            return NativeUiChecks.CaptureUxScreenshots(args[1], args[2], args[3], args.ElementAtOrDefault(4) == "--high-contrast");
         if (args.FirstOrDefault() == "--ux-controls")
             return NativeUiChecks.Run(args[1], args[2], desktopUxOnly: true);
         if (args.FirstOrDefault() == "--preview-input-safety")
