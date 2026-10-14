@@ -115,7 +115,10 @@ internal static partial class NativeUiChecks
             MeasureOperation("Save shortcut through observed UTF-8 file update", operationWatch);
             checks.Add("Ctrl+S persisted actual UTF-8 source");
             var preview = Find(window, "DocumentPreview");
-            preview.Click();
+            var previewText = preview.Patterns.Text.Pattern.DocumentRange.FindText("Searchable", false, false)
+                ?? throw new IOException("The actual preview focus text is unavailable.");
+            var previewTextBounds = previewText.GetBoundingRectangles().First(rectangle => rectangle.Width > 0 && rectangle.Height > 0);
+            Mouse.Click(new System.Drawing.Point((int)(previewTextBounds.Left + previewTextBounds.Width / 2), (int)(previewTextBounds.Top + previewTextBounds.Height / 2)));
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
             Wait(() => Find(window, "FindContext").Name == "Find in preview", "Ctrl+F did not choose preview context.");
             Keyboard.Type(VirtualKeyShort.ESCAPE);

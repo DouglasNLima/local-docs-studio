@@ -62,12 +62,15 @@ internal static partial class NativeUiChecks
                             "The active tab's close command did not remain visible after resizing its overflow strip.");
                     }
                     var screenshot = $"native-{(highContrast ? "high-contrast" : theme.ToLowerInvariant())}-{size.Item1}x{size.Item2}.png";
+                    var overflowCommands = window.FindAllDescendants(cf => cf.ByName("More commands")).Select(command => new {
+                        command.IsOffscreen, Bounds = command.BoundingRectangle }).ToArray();
                     window.CaptureToFile(Path.Combine(output, screenshot));
                     if (paths.Any(path => !File.ReadAllText(path).StartsWith("# Documentation workspace\n", StringComparison.Ordinal)))
                         throw new IOException("Screenshot capture changed a synthetic document.");
                     observations.Add(new { Theme = theme, RequestedWidth = size.Item1, RequestedHeight = size.Item2,
                         Bounds = window.BoundingRectangle, DesktopBounds = automation.GetDesktop().BoundingRectangle,
-                        Revision = revision, Screenshot = screenshot, HighContrast = highContrast, PhysicalDpiCertified = false, AccessibilityCertified = false });
+                        Revision = revision, Screenshot = screenshot, HighContrast = highContrast, OverflowCommands = overflowCommands,
+                        PhysicalDpiCertified = false, AccessibilityCertified = false });
                 }
                 finally { if (!process.HasExited) { process.Kill(); process.WaitForExit(10000); } }
             }
