@@ -80,7 +80,11 @@ internal static partial class NativeUiChecks
         checks.Add("Workspace right-click actions use the clicked item rather than an earlier selection");
 
         FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_F);
-        Find(window, "FindText").AsTextBox().Text = "Searchable"; Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Wait(() => Find(window, "FindContext").Name == "Find in editor", "Toolbar fixture search did not target the editor.");
+        Find(window, "FindText").AsTextBox().Text = "Searchable"; Find(window, "FindNext").AsButton().Invoke();
+        Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Searchable"), "Toolbar fixture did not select its exact source word.");
+        Find(window, "CloseFind").AsButton().Invoke();
+        Wait(() => editor.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == "Searchable"), "Closing Find discarded the toolbar fixture's source selection.");
         Find(window, "FormatBold").AsButton().Invoke();
         Wait(() => ReadEditorText(editor) == original.Replace("Searchable", "**Searchable**", StringComparison.Ordinal), "Formatting toolbar did not wrap the active source selection.");
         Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);

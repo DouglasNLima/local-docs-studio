@@ -52,6 +52,7 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        InitialiseSynchronisation();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
         Closed += (_, _) => completion.Dispose();
@@ -103,6 +104,7 @@ public partial class MainWindow : Window
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
+        CancelSynchronisation();
         Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
         Editor.IsEnabled = displayedTab is not null;
         if (displayedTab is not null)
@@ -131,6 +133,7 @@ public partial class MainWindow : Window
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
         var text = tab.EditorDocument.Text;
+        var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";
         var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
         previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
@@ -157,7 +160,7 @@ public partial class MainWindow : Window
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             if (!preparePreview)
             {
-                parsed = prepared.source; rendered = null; renderedDocumentId = null;
+                parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = null; renderedDocumentId = null;
                 Preview.Document = new FlowDocument(); RefreshOutline();
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
@@ -184,8 +187,9 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
-            parsed = prepared.source; rendered = completed; renderedDocumentId = tab.Id;
+            parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
+            InstallSyncPreview(sourceVersion);
             RefreshOutline();
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout"
                 : rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
@@ -543,6 +547,8 @@ public partial class MainWindow : Window
         Editor.Visibility = layout == "Preview" ? Visibility.Collapsed : Visibility.Visible;
         EditorPane.Visibility = Editor.Visibility;
         Preview.Visibility = layout == "Editor" ? Visibility.Collapsed : Visibility.Visible;
+        PreviewPane.Visibility = Preview.Visibility;
+        CancelSynchronisation();
         if (layout != "Split") previewFocused = layout == "Preview";
         if (changed)
         {

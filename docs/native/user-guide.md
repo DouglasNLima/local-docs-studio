@@ -12,6 +12,8 @@ Filter workspace files by name or relative path. Folder expansion and open docum
 
 Right-click a document tab for closing, copy/reveal and pin actions. **Pinned tabs must be unpinned before closing**; bulk close retains pins and stops if a save/close prompt is cancelled. Middle-click closes an unpinned tab. Tab order and pins remain private application state. The outline filters heading titles, indents their hierarchy and follows the current source section.
 
+The preview toolbar exposes **Automatic**, **Pages** and **Continuous** reading modes, zoom, Find and rendered copy. Three separate opt-in controls offer **Follow caret**, **Synchronise scroll** and **Synchronise selection** in Split layout. They preserve the originating pane's keyboard focus. Literal selections use source offsets, including repeated words; generated or transformed content is labelled as a semantic block highlight when exact text correspondence is unavailable. Turning one behaviour off does not disable the others.
+
 ## Getting started
 
 Lens Docs Studio is a local Markdown, Mermaid, and documentation studio. This guide is bundled with the native Windows preview and works offline.

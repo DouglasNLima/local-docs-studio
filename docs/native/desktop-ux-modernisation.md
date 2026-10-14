@@ -46,3 +46,15 @@ Windowless workspace tests verify filtering, retained tree nodes/expansion, prot
 UI operations must preserve source bytes, selection, undo history, draft recovery, relative links and image assets. Private interface settings remain in application state. Existing preferences load with safe defaults. Appearance changes merge into the latest preferences, preserving update consent and recent paths.
 
 Continuous mode retains its existing warning and performance boundary. An explicit reading choice is never silently changed. Synchronisation must use source spans and revision guards; generated or transformed content receives semantic highlighting when literal character correspondence cannot be established.
+
+## Live synchronisation rules
+
+Follow caret, synchronise scroll and synchronise selection are three independent, persisted opt-in choices in the preview toolbar. They operate in Split layout when both document panes are visible. Reading mode and preview zoom are directly accessible beside them. An explicit Pages/Continuous choice is retained.
+
+The implementation coalesces events over 60 ms, ignores programmatic feedback and cancels pending navigation when switching documents, layouts, modes or sync preferences. Active document identity and AvalonEdit source versions guard every request. Selection does not parse or rebuild the preview.
+
+Literal runs carry parser-bounded UTF-16 source spans. Both endpoints of a mappable selection retain their offsets, including repeated words, Unicode, inline emphasis, inline code and link labels. Source syntax between literal endpoints is preserved in a reverse source selection. Standalone formatting delimiters, entities/transformed labels, generated markers, drawings and other unmappable content use a declared semantic block selection/highlight. The preview's block highlight is an adorner, so it does not change document formatting or exported content.
+
+Scroll alignment uses visible AvalonEdit source positions and native preview text/block anchors. Only positions with already-valid WPF layout are inspected when reading viewport geometry; [WPF's TextPointer implementation](https://github.com/dotnet/wpf/blob/main/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/TextPointer.cs) defines this guard. Pages navigation uses the displayed native page's text position. These are logical source regions rather than global scroll percentages. The existing native navigation services preserve editor selection/caret and keyboard focus.
+
+The live controls build successfully, and the local Core and literal mapping checks remain green. New hosted UIA checks compare exact repeated-occurrence range endpoints in both native reading modes, selected geometry, Unicode, retained focus, disabled synchronisation and source bytes. Their result is pending; live scroll stress, cancellation and full performance certification are still outstanding.

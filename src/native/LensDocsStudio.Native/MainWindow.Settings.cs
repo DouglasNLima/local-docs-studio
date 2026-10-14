@@ -30,6 +30,10 @@ public partial class MainWindow
         EditorPreferenceService.Apply(Editor, settings.Editor);
         Preview.MinZoom = 50; Preview.MaxZoom = 200; Preview.Zoom = settings.Preview.Zoom;
         Preview.ApplyReadingMode(settings.Preview.ReadingMode);
+        updatingSyncControls = true;
+        try { ReadingModeControl.ItemsSource = WorkspaceSettings.ReadingModes; ReadingModeControl.SelectedItem = settings.Preview.ReadingMode; }
+        finally { updatingSyncControls = false; }
+        RefreshSyncControls();
         RefreshDiagramThemeChecks();
         ApplyPanels();
     }

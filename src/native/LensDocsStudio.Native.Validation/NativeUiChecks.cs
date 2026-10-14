@@ -70,6 +70,8 @@ internal static partial class NativeUiChecks
                 : "Actual application process exposes its loaded .NET runtime and WPF graphics modules");
             CheckDesktopControls(window, editor, automation, app.ProcessId, state, output, source);
             checks.Add("Modern desktop controls retain independent panels, Focus Mode, Full Screen, Quick Open, actual palette actions, source selection and Undo");
+            CheckSynchronisation(window, editor, state, output, source);
+            checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
             CheckMinimumWindow(window, editor, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
             CheckLargeEditorNavigation(window, editor, output, source);

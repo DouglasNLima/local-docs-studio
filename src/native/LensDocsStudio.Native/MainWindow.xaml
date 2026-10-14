@@ -352,9 +352,24 @@
      </avalon:TextEditor>
      </DockPanel>
      <GridSplitter x:Name="EditorSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
-     <rendering:DocumentPreview x:Name="Preview" Grid.Column="2" Style="{StaticResource DocumentPreviewStyle}"
+     <DockPanel x:Name="PreviewPane" Grid.Column="2">
+      <ToolBar x:Name="PreviewToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Preview commands">
+       <ComboBox x:Name="ReadingModeControl" Width="104" SelectionChanged="ReadingModeChanged" ToolTip="Preview reading mode" AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="PreviewReadingMode"/>
+       <Button Tag="out" Click="PreviewZoomChanged" ToolTip="Zoom out" AutomationProperties.Name="Zoom out"><ui:CommandIcon Kind="ZoomOut"/></Button>
+       <Button Tag="in" Click="PreviewZoomChanged" ToolTip="Zoom in" AutomationProperties.Name="Zoom in"><ui:CommandIcon Kind="ZoomIn"/></Button>
+       <CheckBox x:Name="FollowCaretControl" Tag="caret" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Follow the editor caret in the preview" AutomationProperties.Name="Follow caret" AutomationProperties.AutomationId="FollowCaretControl"><ui:CommandIcon Kind="Focus"/></CheckBox>
+       <CheckBox x:Name="SyncScrollControl" Tag="scroll" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Synchronise source regions when either pane scrolls" AutomationProperties.Name="Synchronise scroll" AutomationProperties.AutomationId="SyncScrollControl"><ui:CommandIcon Kind="Sync"/></CheckBox>
+       <CheckBox x:Name="SyncSelectionControl" Tag="selection" Checked="SyncPreferenceChanged" Unchecked="SyncPreferenceChanged" ToolTip="Synchronise literal text selection in both directions" AutomationProperties.Name="Synchronise selection" AutomationProperties.AutomationId="SyncSelectionControl"><ui:CommandIcon Kind="Selection"/></CheckBox>
+       <Button Click="ToggleOutline" ToolTip="Toggle outline (Ctrl+Alt+O)" AutomationProperties.Name="Toggle outline"><ui:CommandIcon Kind="Outline"/></Button>
+       <Button Click="FindPreviewFromToolbar" ToolTip="Find in preview" AutomationProperties.Name="Find in preview"><ui:CommandIcon Kind="Search"/></Button>
+       <Button Click="CopyRenderedContent" ToolTip="Copy rendered content" AutomationProperties.Name="Copy rendered content"><ui:CommandIcon Kind="Document"/></Button>
+      </ToolBar>
+      <AdornerDecorator>
+     <rendering:DocumentPreview x:Name="Preview" Style="{StaticResource DocumentPreviewStyle}"
        Background="{DynamicResource WindowBrush}" GotKeyboardFocus="PreviewFocused" PreviewMouseDown="OnPreviewMouseDown"
        AutomationProperties.Name="Document preview" AutomationProperties.AutomationId="DocumentPreview"/>
+      </AdornerDecorator>
+     </DockPanel>
      <GridSplitter x:Name="OutlineSplitter" Grid.Column="3" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize outline"/>
      <DockPanel x:Name="OutlinePanel" Grid.Column="4" Background="{DynamicResource PanelBrush}">
       <TextBlock DockPanel.Dock="Top" Text="ON THIS PAGE" FontSize="11" FontWeight="SemiBold" Margin="12,16,5,10"/>

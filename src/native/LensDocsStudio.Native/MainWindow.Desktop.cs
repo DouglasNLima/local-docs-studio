@@ -31,6 +31,7 @@ public partial class MainWindow
         OutlinePanel.Visibility = OutlineSplitter.Visibility = outline ? Visibility.Visible : Visibility.Collapsed;
         OutlineSplitterColumn.Width = new GridLength(outline ? 5 : 0);
         FormattingToolbar.Visibility = PrimaryToolbar.Visibility = focusMode ? Visibility.Collapsed : Visibility.Visible;
+        PreviewToolbar.Visibility = focusMode ? Visibility.Collapsed : Visibility.Visible;
     }
     private async Task PersistDesktop(Func<UserPreferences, UserPreferences> update)
     {

@@ -136,7 +136,7 @@ public partial class MainWindow
     }
     private void HighlightCurrentHeading()
     {
-        if (parsed?.Source != Editor.Document.Text || !OutlinePanel.IsVisible) return;
+        if (parsed is null || parsedVersion is null || parsedDocumentId != model.ActiveDocument?.Id || Editor.Document.Version.CompareAge(parsedVersion) != 0 || !OutlinePanel.IsVisible) return;
         var heading = parsed.Headings.LastOrDefault(item => item.SourceStart <= Editor.CaretOffset);
         var wasUpdating = updatingOutline; updatingOutline = true;
         try { Outline.SelectedItem = heading; }
