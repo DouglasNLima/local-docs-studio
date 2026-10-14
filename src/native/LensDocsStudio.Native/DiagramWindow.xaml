@@ -10,7 +10,7 @@
    <Button Content="Fit" Click="FitDiagram" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="DiagramFit"/>
    <Button Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>
    <Button Content="Reset" Click="ResetView" ToolTip="Reset View (Home)" AutomationProperties.AutomationId="DiagramReset"/>
-   <Slider x:Name="Zoom" Minimum="10" Maximum="400" Value="100" Width="180" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
+   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="180" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
    <TextBlock x:Name="ZoomLabel" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel"/>
    <Button Content="Copy image" Click="CopyImage" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="DiagramCopyImage"/>
    <Button Content="SVG…" Tag="SVG" Click="Export" Padding="12,6" Margin="0,0,8,0"/>

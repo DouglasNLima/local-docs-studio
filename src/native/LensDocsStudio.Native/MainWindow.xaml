@@ -31,7 +31,7 @@
    </ResourceDictionary>
  </Window.Resources>
  <DockPanel>
-  <Menu DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Padding="8,3" AutomationProperties.Name="Application menu">
+  <Menu x:Name="ApplicationMenu" DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Padding="8,3" AutomationProperties.Name="Application menu">
    <MenuItem Header="_File" AutomationProperties.AutomationId="FileMenu">
     <MenuItem Header="_New document" InputGestureText="Ctrl+N" Command="{Binding NewDocumentCommand}"/>
     <MenuItem Header="Create from template…" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseContentCatalogue"/>
@@ -201,7 +201,7 @@
      <Image Source="Resources/Brand/application.ico" Width="24" Height="24" Margin="0,0,8,0"/>
      <TextBlock Text="Lens Docs Studio" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
     </StackPanel>
-    <ToolBar Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Application commands">
+    <ToolBar x:Name="ApplicationToolbar" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Application commands">
      <Button Click="ToggleSidebar" ToolTip="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.Name="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.AutomationId="ToggleSidebar"><ui:CommandIcon Kind="Sidebar"/></Button>
      <Button Command="{Binding NewDocumentCommand}" ToolTip="New document (Ctrl+N)" AutomationProperties.Name="New document (Ctrl+N)"><ui:CommandIcon Kind="New"/></Button>
      <Button Command="{Binding OpenDocumentCommand}" ToolTip="Open document (Ctrl+O)" AutomationProperties.Name="Open document (Ctrl+O)"><ui:CommandIcon Kind="Open"/></Button>

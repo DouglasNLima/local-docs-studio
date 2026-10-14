@@ -1,5 +1,7 @@
 # Lens Docs Studio native guide
 
+## Desktop workspace and synchronisation
+
 The command toolbars expose frequent file, navigation, formatting and viewing actions. Narrow windows use native toolbar overflow. Open documents occupy one horizontal tab row; scroll the strip when it fills.
 
 Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both support text filtering, Up/Down, Enter and Escape. The palette runs the same actions as the application's menus and toolbars.

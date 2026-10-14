@@ -29,7 +29,7 @@ public partial class DiagramWindow : Window
     private void FitDiagram(object sender, RoutedEventArgs e)
     {
         if (DiagramImage.Source is null || DiagramScroll.ViewportWidth <= 0 || DiagramScroll.ViewportHeight <= 0) return;
-        Zoom.Value = Math.Clamp(Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100, 10, 400);
+        Zoom.Value = Math.Clamp(Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100, Zoom.Minimum, Zoom.Maximum);
         DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
     }
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
@@ -39,7 +39,7 @@ public partial class DiagramWindow : Window
     {
         if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
         var point = e.GetPosition(DiagramScroll); var before = Zoom.Value / 100;
-        var next = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.1 : 1 / 1.1), 10, 400);
+        var next = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.1 : 1 / 1.1), Zoom.Minimum, Zoom.Maximum);
         var horizontal = DiagramViewportMath.ZoomOffset(DiagramScroll.HorizontalOffset, point.X, DiagramScroll.Padding.Left, before, next / 100);
         var vertical = DiagramViewportMath.ZoomOffset(DiagramScroll.VerticalOffset, point.Y, DiagramScroll.Padding.Top, before, next / 100);
         Zoom.Value = next; DiagramScroll.UpdateLayout();
@@ -88,7 +88,7 @@ public partial class DiagramWindow : Window
         switch (e.Key)
         {
             case Key.Add: case Key.OemPlus: Zoom.Value = Math.Min(400, Zoom.Value + 10); break;
-            case Key.Subtract: case Key.OemMinus: Zoom.Value = Math.Max(10, Zoom.Value - 10); break;
+            case Key.Subtract: case Key.OemMinus: Zoom.Value = Math.Max(Zoom.Minimum, Zoom.Value - 10); break;
             case Key.D0: Zoom.Value = 100; break;
             case Key.C: CopyImage(sender, e); break;
             default: return;

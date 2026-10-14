@@ -161,6 +161,10 @@ public partial class MainWindow
     private bool HandleDesktopKey(KeyEventArgs e)
     {
         var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (key == Key.Escape && (ApplicationMenu.Items.OfType<MenuItem>().Any(item => item.IsSubmenuOpen) || ReadingModeControl.IsDropDownOpen
+            || ApplicationToolbar.IsOverflowOpen
+            || FormattingToolbar.IsOverflowOpen || PreviewToolbar.IsOverflowOpen
+            || Ancestor<ContextMenu>(Keyboard.FocusedElement as DependencyObject) is not null)) return false;
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.F11) { ToggleFullScreen(this, e); return true; }
         if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Escape && FindBar.Visibility != Visibility.Visible)
         { if (fullScreen) { ToggleFullScreen(this, e); return true; } if (focusMode) { ToggleFocusMode(this, e); return true; } }

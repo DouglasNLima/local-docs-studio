@@ -41,6 +41,9 @@ internal static partial class NativeUiChecks
 
         FocusWindow(window); Keyboard.Type(VirtualKeyShort.F11);
         Wait(() => window.BoundingRectangle.Height > bounds.Height + 5, "Full Screen did not reclaim the native window chrome.");
+        Find(window, "ViewMenu").Click(); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("OpenWorkspaceMap"))?.IsOffscreen != false, "Escape did not close the menu in Full Screen.");
+        if (window.BoundingRectangle.Height <= bounds.Height + 5) throw new IOException("Menu Escape exited Full Screen before closing its own menu.");
         Keyboard.Type(VirtualKeyShort.ESCAPE);
         Wait(() => Math.Abs(window.BoundingRectangle.Width - bounds.Width) < 3 && Math.Abs(window.BoundingRectangle.Height - bounds.Height) < 3,
             "Full Screen did not restore the original window dimensions.");
