@@ -65,7 +65,7 @@ public partial class MainWindow
                 return null;
             }
             catch (ArgumentException error) { return error.Message; }
-        }, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram) { Owner = this };
+        }, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize) { Owner = this };
         window.Show();
     }
 }

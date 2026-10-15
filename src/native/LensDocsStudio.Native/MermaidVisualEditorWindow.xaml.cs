@@ -49,12 +49,15 @@ public partial class MermaidVisualEditorWindow : Window
     private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
 
     public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
-        bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null)
+        bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null, System.Windows.Media.FontFamily? sourceFont = null, double sourceFontSize = 14)
     {
         this.diagrams = diagrams; this.applyToDocument = applyToDocument; this.dark = dark; this.diagramTheme = diagramTheme;
         this.editSource = editSource; this.exportDiagram = exportDiagram; draft = new(source, diagrams);
         highContrast = SystemParameters.HighContrast; sourceHighlighting = new(dark);
         InitializeComponent();
+        // Match the owning editor before the first source measurement.
+        SourceEditor.FontFamily = sourceFont ?? new System.Windows.Media.FontFamily("Cascadia Code, Consolas");
+        SourceEditor.FontSize = sourceFontSize;
         WindowStateService.FitInitialWindow(this);
         InitialisePaletteDragging(); InitialiseConnectionGuide();
         SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
