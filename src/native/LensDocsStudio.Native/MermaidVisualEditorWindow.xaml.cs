@@ -188,22 +188,31 @@ public partial class MermaidVisualEditorWindow : Window
         if (!CanTransform || PropertiesPending) return;
         var selected = Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key).ToArray();
         var nodes = selected.Where(key => key.StartsWith("node:", StringComparison.Ordinal)).Select(key => key[5..]).ToArray();
-        if (nodes.Length > 0)
-        {
-            var connections = draft.Model.Edges.Count(edge => nodes.Contains(edge.Source.Id) || nodes.Contains(edge.Target.Id));
-            if (MessageBox.Show(this, $"Delete {nodes.Length} selected node(s) and their {connections} connection(s)?", "Delete nodes",
-                MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return;
-            await Execute(new DeleteMermaidNodes(nodes)); return;
-        }
-        if (selected.Length != 1) { Status.Text = "Select one connection or subgraph, or one or more nodes."; return; }
-        if (selected[0].StartsWith("edge-", StringComparison.Ordinal)) await Execute(new DeleteMermaidConnection(selected[0]));
-        else if (selected[0].StartsWith("group:", StringComparison.Ordinal))
+        var edges = selected.Where(key => key.StartsWith("edge-", StringComparison.Ordinal)).ToArray();
+        var groups = selected.Where(key => key.StartsWith("group:", StringComparison.Ordinal)).Select(key => key[6..]).ToArray();
+        if (selected.Length == 0) return;
+        if (selected.Length == 1 && groups.Length == 1)
         {
             var contents = DeleteGroupContents.IsChecked == true;
             if (MessageBox.Show(this, contents ? "Delete this subgraph, its descendant nodes and their connections?" : "Remove this subgraph and keep its members in the parent?",
                 "Delete subgraph", MessageBoxButton.OKCancel, MessageBoxImage.Question) == MessageBoxResult.OK)
-                await Execute(new DeleteMermaidSubgraph(selected[0][6..], contents));
+                await Execute(new DeleteMermaidSubgraph(groups[0], contents));
+            return;
         }
+        var incident = draft.Model.Edges.Where(edge => nodes.Contains(edge.Source.Id) || nodes.Contains(edge.Target.Id)).Select(edge => edge.Id).ToHashSet();
+        var connectionCount = incident.Concat(edges).Distinct().Count();
+        if (nodes.Length > 0 || groups.Length > 0)
+        {
+            var message = nodes.Length == 1 && groups.Length == 0
+                ? $"Delete this node and its {connectionCount} {(connectionCount == 1 ? "connection" : "connections")}?"
+                : $"Delete the selected {nodes.Length} {(nodes.Length == 1 ? "node" : "nodes")}, {connectionCount} {(connectionCount == 1 ? "connection" : "connections")} and {groups.Length} subgraph containers? Unselected group members will be kept.";
+            if (MessageBox.Show(this, message, "Delete selection", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return;
+        }
+        var operations = new List<MermaidEditOperation>();
+        operations.AddRange(edges.Where(id => !incident.Contains(id)).Select(id => new DeleteMermaidConnection(id)));
+        if (nodes.Length > 0) operations.Add(new DeleteMermaidNodes(nodes));
+        operations.AddRange(groups.OrderByDescending(id => draft.Model.Subgraph(id).Opening.Start).Select(id => new DeleteMermaidSubgraph(id)));
+        await ExecuteBatch(operations);
     }
     private async void Duplicate(object sender, RoutedEventArgs e)
     {
