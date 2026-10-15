@@ -25,11 +25,9 @@ internal static class NativeExportFeedbackChecks
             var saved = model.CompletedExport ?? throw new IOException("The successful saved output has no completion action.");
             if (saved.Path != path || model.ExportHistory.Entries.Count != 1 || !model.Status.StartsWith("Export completed — Café", StringComparison.Ordinal))
                 throw new IOException("The native export model lost its actual saved destination or completion status.");
-            var open = ExportShellService.OpenFile(saved); var reveal = ExportShellService.ShowInFolder(saved);
-            if (!open.UseShellExecute || open.FileName != path || open.Arguments.Length != 0 || open.ArgumentList.Count != 0
-                || !reveal.UseShellExecute || reveal.FileName != Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe")
-                || reveal.Arguments != "/select,\"" + path + "\"")
-                throw new IOException("Native export actions stopped delegating the exact file to its Windows association or quoted Explorer selection.");
+            var open = ExportShellService.OpenFile(saved);
+            if (!open.UseShellExecute || open.FileName != path || open.Arguments.Length != 0 || open.ArgumentList.Count != 0)
+                throw new IOException("Native export actions stopped delegating the exact file to its Windows association.");
             model.Status = "Newer operation";
             if (model.CompletedExport is not null || model.ExportHistory.Entries.Single() != saved) throw new IOException("A newer status did not dismiss only its current export actions.");
             Complete(model.RunAsync(async () =>
@@ -43,14 +41,18 @@ internal static class NativeExportFeedbackChecks
             try { Complete(new ExportShellService().InvokeAsync(model.ExportHistory, saved, false)); }
             catch (IOException) { rejected = true; }
             if (!rejected) throw new IOException("The native shell action did not reject its missing destination before process launch.");
+            rejected = false;
+            try { Complete(new ExportShellService().InvokeAsync(model.ExportHistory, saved, true)); }
+            catch (IOException) { rejected = true; }
+            if (!rejected) throw new IOException("The native folder-selection action did not reject its missing destination before invoking the shell.");
             var unsupported = saved with { Id = Guid.NewGuid(), Path = Path.Combine(root, "unsafe.cmd") };
             try { Complete(new ExportShellService().InvokeAsync(model.ExportHistory, unsupported, false)); throw new IOException("An unrecognised export reached the Windows shell."); }
             catch (IOException error) when (error.Message.StartsWith("This export is no longer", StringComparison.Ordinal)) { }
             File.WriteAllText(Path.Combine(output, "native-export-feedback.json"), JsonSerializer.Serialize(new {
-                Passed = true, ExactSavedDestination = true, WindowsFileAssociationDescriptor = true, QuotedExplorerSelectionDescriptor = true,
+                Passed = true, ExactSavedDestination = true, WindowsFileAssociationDescriptor = true,
                 NewStatusRetainsSessionHistory = true, CancellationCannotPublishSuccess = true,
                 MissingAndUnrecognisedOutputsRejectedBeforeShell = true,
-                Limitation = "Process descriptors and rejecting paths are exercised here without launching desktop apps; successful Explorer selection is exercised by hosted UIA." }));
+                Limitation = "The Open descriptor and rejecting paths are exercised here without launching desktop apps; successful native Shell folder selection is exercised by hosted UIA." }));
         }
         finally { SynchronizationContext.SetSynchronizationContext(previous); }
     }

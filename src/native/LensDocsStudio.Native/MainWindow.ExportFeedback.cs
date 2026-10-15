@@ -15,7 +15,7 @@ public partial class MainWindow
     {
         if (saved is null) return;
         try { await exportShell.InvokeAsync(model.ExportHistory, saved, reveal); }
-        catch (Exception error) when (error is IOException or UnauthorizedAccessException or Win32Exception or InvalidOperationException)
+        catch (Exception error) when (error is IOException or UnauthorizedAccessException or Win32Exception or InvalidOperationException or System.Runtime.InteropServices.COMException)
         { model.Status = "The exported file is unavailable or has changed. Export again, or check its location in Recent exports."; }
     }
     private void RecentExportsOpened(object sender, RoutedEventArgs e)

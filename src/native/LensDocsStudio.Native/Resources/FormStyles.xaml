@@ -3,6 +3,10 @@
  <Thickness x:Key="Form.FieldSpacing">0,0,0,16</Thickness>
  <Style x:Key="Form.Field" TargetType="StackPanel"><Setter Property="Margin" Value="{StaticResource Form.FieldSpacing}"/></Style>
  <Style x:Key="Form.Label" TargetType="Label"><Setter Property="Padding" Value="0,0,0,6"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
+ <Style x:Key="Form.TextInput" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}"><Setter Property="Padding" Value="8,5"/><Setter Property="MinHeight" Value="32"/></Style>
+ <Style x:Key="Form.ComboBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}"><Setter Property="Padding" Value="8,5"/><Setter Property="MinHeight" Value="32"/><Setter Property="HorizontalAlignment" Value="Stretch"/></Style>
+ <Style x:Key="Form.Slider" TargetType="Slider" BasedOn="{StaticResource {x:Type Slider}}"><Setter Property="MinHeight" Value="28"/></Style>
+ <Style x:Key="Form.CheckBox" TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}"><Setter Property="Margin" Value="0,4,0,6"/><Setter Property="MinHeight" Value="28"/></Style>
  <Style x:Key="Form.Help" TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/><Setter Property="Foreground" Value="{DynamicResource MutedTextBrush}"/><Setter Property="Margin" Value="0,6,0,0"/><Setter Property="FontSize" Value="12"/></Style>
  <Style x:Key="Form.Section" TargetType="TextBlock"><Setter Property="FontSize" Value="18"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Margin" Value="0,8,0,14"/></Style>
  <Style x:Key="Form.Action" TargetType="Button" BasedOn="{StaticResource Desktop.CommandButton}"><Setter Property="Focusable" Value="True"/><Setter Property="Padding" Value="12,6"/><Setter Property="Margin" Value="0,0,8,6"/></Style>

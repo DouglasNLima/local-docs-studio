@@ -11,12 +11,12 @@
     <TextBlock x:Name="ImageReference" TextTrimming="CharacterEllipsis" Margin="0,0,0,16" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.Name="Image location"/>
     <StackPanel Style="{StaticResource Form.Field}">
      <Label Content="_Alternative text" Target="{Binding ElementName=AlternativeText}" Style="{StaticResource Form.Label}"/>
-     <TextBox x:Name="AlternativeText" Padding="8" MaxLength="4096" AutomationProperties.Name="Image alternative text" AutomationProperties.AutomationId="FigureAlternativeText"/>
+     <TextBox x:Name="AlternativeText" Style="{StaticResource Form.TextInput}" MaxLength="4096" AutomationProperties.Name="Image alternative text" AutomationProperties.AutomationId="FigureAlternativeText"/>
      <TextBlock Text="Describe the image for readers who cannot see it." Style="{StaticResource Form.Help}"/>
     </StackPanel>
     <StackPanel Style="{StaticResource Form.Field}">
      <Label Content="_Caption" Target="{Binding ElementName=Caption}" Style="{StaticResource Form.Label}"/>
-     <TextBox x:Name="Caption" Padding="8" MaxLength="4096" AutomationProperties.Name="Image caption" AutomationProperties.AutomationId="FigureCaption"/>
+     <TextBox x:Name="Caption" Style="{StaticResource Form.TextInput}" MaxLength="4096" AutomationProperties.Name="Image caption" AutomationProperties.AutomationId="FigureCaption"/>
      <TextBlock Text="A caption appears beneath the image. Leave it empty to omit the caption." Style="{StaticResource Form.Help}"/>
     </StackPanel>
    </StackPanel>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using LensDocsStudio.Core.Exports;
 
 namespace LensDocsStudio.Native.Platform;
@@ -6,16 +7,29 @@ namespace LensDocsStudio.Native.Platform;
 public sealed class ExportShellService
 {
     public static ProcessStartInfo OpenFile(SavedExport saved) => new(saved.Path) { UseShellExecute = true };
-    public static ProcessStartInfo ShowInFolder(SavedExport saved)
-    {
-        var start = new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe")) { UseShellExecute = true };
-        start.Arguments = "/select,\"" + saved.Path + "\"";
-        return start;
-    }
     public async Task InvokeAsync(ExportSessionHistory history, SavedExport saved, bool reveal, CancellationToken cancellationToken = default)
     {
         await history.VerifyAsync(saved, cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
-        Process.Start(reveal ? ShowInFolder(saved) : OpenFile(saved));
+        if (reveal) await StaWorker.RunAsync(() => { Reveal(saved.Path); return true; }, cancellationToken);
+        else Process.Start(OpenFile(saved));
     }
+
+    private static void Reveal(string path)
+    {
+        Marshal.ThrowExceptionForHR(CoInitializeEx(IntPtr.Zero, 2));
+        IntPtr item = IntPtr.Zero;
+        try
+        {
+            Marshal.ThrowExceptionForHR(SHParseDisplayName(path, IntPtr.Zero, out item, 0, out _));
+            // With a zero count, the absolute item identifies the file to select in its parent folder.
+            Marshal.ThrowExceptionForHR(SHOpenFolderAndSelectItems(item, 0, IntPtr.Zero, 0));
+        }
+        finally { if (item != IntPtr.Zero) Marshal.FreeCoTaskMem(item); CoUninitialize(); }
+    }
+
+    [DllImport("ole32.dll")] private static extern int CoInitializeEx(IntPtr reserved, uint flags);
+    [DllImport("ole32.dll")] private static extern void CoUninitialize();
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)] private static extern int SHParseDisplayName(string name, IntPtr context, out IntPtr item, uint attributes, out uint actualAttributes);
+    [DllImport("shell32.dll")] private static extern int SHOpenFolderAndSelectItems(IntPtr item, uint count, IntPtr children, uint flags);
 }

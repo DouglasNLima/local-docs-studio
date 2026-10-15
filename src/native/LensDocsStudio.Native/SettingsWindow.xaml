@@ -9,8 +9,10 @@
    <ResourceDictionary Source="Resources/FormStyles.xaml"/>
   </ResourceDictionary.MergedDictionaries>
   <Style TargetType="Label" BasedOn="{StaticResource Form.Label}"/>
-  <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}"><Setter Property="Padding" Value="8,5"/><Setter Property="MinHeight" Value="32"/><Setter Property="HorizontalAlignment" Value="Stretch"/></Style>
-  <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}"><Setter Property="Margin" Value="0,4,0,6"/><Setter Property="MinHeight" Value="28"/></Style>
+  <Style TargetType="TextBox" BasedOn="{StaticResource Form.TextInput}"/>
+  <Style TargetType="ComboBox" BasedOn="{StaticResource Form.ComboBox}"/>
+  <Style TargetType="Slider" BasedOn="{StaticResource Form.Slider}"/>
+  <Style TargetType="CheckBox" BasedOn="{StaticResource Form.CheckBox}"/>
   </ResourceDictionary>
  </Window.Resources>
  <Grid Margin="24">

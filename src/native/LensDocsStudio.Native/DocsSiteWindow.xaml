@@ -11,15 +11,15 @@
     <TextBlock Text="Export the open workspace with navigation, search and embedded local images. Open the ZIP's index.html directly or publish its contents on GitHub Pages." Style="{StaticResource Form.Help}" Margin="0,0,0,16"/>
     <StackPanel Style="{StaticResource Form.Field}">
      <Label Content="Site _title" Target="{Binding ElementName=SiteTitle}" Style="{StaticResource Form.Label}"/>
-     <TextBox x:Name="SiteTitle" Padding="8" MaxLength="512" AutomationProperties.Name="Site title" AutomationProperties.AutomationId="DocsSiteTitle"/>
+     <TextBox x:Name="SiteTitle" Style="{StaticResource Form.TextInput}" MaxLength="512" AutomationProperties.Name="Site title" AutomationProperties.AutomationId="DocsSiteTitle"/>
     </StackPanel>
     <StackPanel Style="{StaticResource Form.Field}">
      <Label Content="_Description" Target="{Binding ElementName=SiteDescription}" Style="{StaticResource Form.Label}"/>
-     <TextBox x:Name="SiteDescription" Padding="8" MaxLength="8192" Height="76" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Site description"/>
+     <TextBox x:Name="SiteDescription" Style="{StaticResource Form.TextInput}" MaxLength="8192" Height="76" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Site description"/>
     </StackPanel>
     <StackPanel Style="{StaticResource Form.Field}">
      <Label Content="Default t_heme" Target="{Binding ElementName=SiteTheme}" Style="{StaticResource Form.Label}"/>
-     <ComboBox x:Name="SiteTheme" SelectedIndex="0" MinHeight="32" AutomationProperties.Name="Default site theme"><ComboBoxItem Content="System"/><ComboBoxItem Content="Light"/><ComboBoxItem Content="Dark"/></ComboBox>
+     <ComboBox x:Name="SiteTheme" Style="{StaticResource Form.ComboBox}" SelectedIndex="0" AutomationProperties.Name="Default site theme"><ComboBoxItem Content="System"/><ComboBoxItem Content="Light"/><ComboBoxItem Content="Dark"/></ComboBox>
      <TextBlock Text="Current edits to saved workspace documents are included. Save new drafts inside the workspace to include them. Private native state is excluded." Style="{StaticResource Form.Help}"/>
     </StackPanel>
    </StackPanel>
