@@ -54,7 +54,7 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); Capture("existing-light");
             if (polish)
             {
-                var source = Draft(); CaptureApplyHover("apply-hover-light");
+                var source = Draft(); CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
                 var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
                 var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
                 Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
@@ -175,7 +175,7 @@ internal static partial class NativeUiChecks
             if (!highContrast)
             {
                 var themeDraft = Draft(); ChangeApplicationTheme("Dark");
-                FocusWindow(visual!); Capture("live-dark-theme"); if (polish) CaptureApplyHover("apply-hover-dark");
+                FocusWindow(visual!); Capture("live-dark-theme"); if (polish) { CaptureApplyHover("apply-hover-dark"); CapturePrimaryFocus("apply-focus-dark"); }
                 Check(Draft() == themeDraft && ReadEditorText(editor) == original, "Live theme changes retain private and owning source");
                 ChangeApplicationTheme("Light"); FocusWindow(visual!);
             }
@@ -357,6 +357,13 @@ internal static partial class NativeUiChecks
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
+            void CapturePrimaryFocus(string name)
+            {
+                var before = Draft(); Find(visual!, "MermaidCancel").Focus(); Keyboard.Type(VirtualKeyShort.TAB);
+                Wait(() => Find(visual!, "MermaidApply").Properties.HasKeyboardFocus.Value, "Keyboard Tab did not reach the primary action.");
+                _ = DwmFlush(); Capture(name);
+                Check(Draft() == before, "Keyboard primary-action focus retains source in " + name);
+            }
             void CaptureApplyHover(string name)
             {
                 var before = Draft(); var bounds = Find(visual!, "MermaidApply").BoundingRectangle;
