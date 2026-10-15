@@ -104,8 +104,12 @@ public partial class MermaidVisualEditorWindow
         if (connectionSource is { } source && CanTransform)
         {
             connectionSource = null;
-            var index = draft.Model.Edges.Count;
-            if (await Execute(new AddMermaidConnection(source, id), "edge-" + index)) { EdgeLabel.Focus(); Status.Text = "Connection created. Set its optional label and type in Properties."; }
+            var existing = draft.Model.Edges.Select(edge => edge.Id).ToHashSet();
+            if (await Execute(new AddMermaidConnection(source, id)))
+            {
+                var created = draft.Model.Edges.Single(edge => !existing.Contains(edge.Id)); SelectElement(created.Id);
+                EdgeLabel.Focus(); Status.Text = "Connection created. Set its optional label and type in Properties.";
+            }
         }
         else SelectElement("node:" + id, Keyboard.Modifiers == ModifierKeys.Control);
     }

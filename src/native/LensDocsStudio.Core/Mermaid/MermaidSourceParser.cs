@@ -115,6 +115,8 @@ public sealed class MermaidSourceParser
                 error ??= "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.";
             if (styles.Count > MaximumElements) error ??= "The diagram exceeds the 500-statement styling budget for visual editing.";
             if (groups.Any(group => nodes.Any(node => node.Id == group.Id))) error ??= "Connections to subgraph IDs are protected.";
+            if (nodes.Any(node => node.Occurrences.Select(item => item.SubgraphId).Where(id => id is not null).Distinct().Count() > 1))
+                error ??= "A node belongs to more than one subgraph. Its membership is protected; resolve it in source mode.";
             if (styles.Where(style => style.Kind is "class" or "style").SelectMany(style => style.Targets).Any(target => nodes.All(node => node.Id != target.Id)))
                 error ??= "A class or style references an unknown node. Correct it in source mode.";
             var compatibility = error is null ? MermaidCompatibility.Editable : MermaidCompatibility.Protected;
@@ -149,7 +151,8 @@ public sealed class MermaidSourceParser
         for (var i = 0; i < text.Length; i++)
         {
             if (char.IsHighSurrogate(text[i])) { if (++i >= text.Length || !char.IsLowSurrogate(text[i])) throw new ArgumentException("Correct the incomplete Unicode character in source mode."); }
-            else if (char.IsLowSurrogate(text[i]) || char.IsControl(text[i]) && text[i] is not ('\r' or '\n' or '\t')) throw new ArgumentException("Remove unsupported control characters in source mode.");
+            else if (char.IsLowSurrogate(text[i]) || text[i] is '\ufffe' or '\uffff' || char.IsControl(text[i]) && text[i] is not ('\r' or '\n' or '\t'))
+                throw new ArgumentException("Remove unsupported control or XML text characters in source mode.");
         }
     }
     public static string DecodeLabel(string text)
@@ -160,7 +163,7 @@ public sealed class MermaidSourceParser
         text = WebUtility.HtmlDecode(text).Replace("\\n", "\n");
         text = Regex.Replace(text, @"#(\d+);", match => int.TryParse(match.Groups[1].Value, out var value) && System.Text.Rune.IsValid(value)
             ? char.ConvertFromUtf32(value) : match.Value, RegexOptions.None, TimeSpan.FromMilliseconds(50));
-        return text;
+        CheckUnicode(text); return text;
     }
     private static string NormaliseRawLabelLines(string text)
     {

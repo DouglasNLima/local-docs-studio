@@ -228,6 +228,30 @@ public sealed class MermaidVisualTests
         await Execute(draft, new UpdateMermaidNode("B", "Changed", FlowNodeShape.Process, "B"));
         Assert.Equal(source.Replace("B[Keep]", "B[\"Changed\"]", StringComparison.Ordinal), draft.Source);
     }
+    [Fact]
+    public async Task Parallel_connection_identities_and_selection_survive_deletion_reconnection_and_history()
+    {
+        var draft = new MermaidVisualDraft("flowchart LR\nA --> B\nA --> B\nB --> C\n"); draft.Select(["edge-2"]);
+        await Execute(draft, new DeleteMermaidConnection("edge-0"));
+        Assert.Equal(["edge-1", "edge-2"], draft.Model.Edges.Select(edge => edge.Id)); Assert.Equal(["edge-2"], draft.Selection);
+        draft.Undo(); Assert.Equal(["edge-0", "edge-1", "edge-2"], draft.Model.Edges.Select(edge => edge.Id));
+        draft.Redo(); await Execute(draft, new AddMermaidConnection("C", "A"));
+        Assert.Equal(["edge-1", "edge-2", "edge-3"], draft.Model.Edges.Select(edge => edge.Id));
+        await Execute(draft, new UpdateMermaidConnection("edge-2", "C", "A", "Changed", FlowConnectionType.Dotted));
+        Assert.Equal("Changed", draft.Model.Edge("edge-2").Label); Assert.Equal(["edge-2"], draft.Selection);
+        Assert.Equal("", draft.Model.Edge("edge-3").Label);
+    }
+    [Fact]
+    public async Task Invalid_xml_characters_and_ambiguous_group_membership_stay_protected_without_data_loss()
+    {
+        var parser = new MermaidSourceParser();
+        Assert.False(parser.Parse("flowchart TD\nA[\"#65535;\"]").CanEdit);
+        Assert.False(parser.Parse("flowchart TD\nA[\"#0;\"]").CanEdit);
+        const string source = "flowchart TD\nsubgraph First[First]\nA[Shared]\nend\nsubgraph Second[Second]\nA\nend\n";
+        var draft = new MermaidVisualDraft(source); Assert.False(draft.Model.CanEdit); Assert.Contains("more than one subgraph", draft.Model.Diagnostic);
+        var result = await draft.ExecuteAsync(new UpdateMermaidNode("A", "Changed", FlowNodeShape.Process, "A"));
+        Assert.False(result.Success); Assert.Equal(source, draft.Source);
+    }
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }
 }
