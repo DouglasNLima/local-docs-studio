@@ -90,7 +90,7 @@ internal static partial class NativeUiChecks
             }
             Select("node_B");
             Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("B", StringComparison.Ordinal), "The selected-node inspector did not finish its first meaningful layout.");
-            Capture("node-properties");
+            _ = DwmFlush(); Capture("node-properties");
             if (polish)
             {
                 var shapeSource = Draft(); Find(visual!, "MermaidNodeShape").AsComboBox().Select("Decision"); Click("MermaidUpdateNode");
