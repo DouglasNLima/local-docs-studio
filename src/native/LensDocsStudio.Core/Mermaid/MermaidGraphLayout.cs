@@ -30,7 +30,8 @@ public static class MermaidGraphLayout
                 else
                 {
                     var node = model.Node(member[5..]); var lines = node.Label.Split('\n');
-                    dimensions[member] = (190, Math.Clamp(44 + lines.Sum(line => Math.Max(1, (line.Length + 21) / 22)) * 17, 72, 150));
+                    dimensions[member] = (190, node.Shape is FlowNodeShape.Circle or FlowNodeShape.DoubleCircle ? 190
+                        : Math.Clamp(44 + lines.Sum(line => Math.Max(1, (line.Length + 21) / 22)) * 17, 72, 150));
                 }
             }
             var links = model.Edges.Select(edge => (From: DirectMember(edge.Source.Id), To: DirectMember(edge.Target.Id)))

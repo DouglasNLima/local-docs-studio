@@ -349,6 +349,7 @@ public partial class MermaidVisualEditorWindow : Window
     private void Shortcut(object sender, KeyEventArgs e)
     {
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; Apply(sender, e); return; }
+        if (e.Key == Key.F11) { ToggleFullScreen(); e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
@@ -372,7 +373,6 @@ public partial class MermaidVisualEditorWindow : Window
         else if (e.Key == Key.F) Fit(sender, e);
         else if (e.Key == Key.Home) ResetView(sender, e);
         else if (e.Key == Key.F4) { if (NodeProperties.IsVisible) NodeLabel.Focus(); else if (EdgeProperties.IsVisible) EdgeLabel.Focus(); else if (GroupProperties.IsVisible) GroupLabel.Focus(); }
-        else if (e.Key == Key.F11) ToggleFullScreen();
         else if (e.Key == Key.Escape) { connectionSource = null; Elements.UnselectAll(); Status.Text = "Selection cleared. The draft remains open."; }
         else if (e.Key == Key.Insert) InsertNode(Palette.Children.OfType<Button>().First(), e);
         else return;

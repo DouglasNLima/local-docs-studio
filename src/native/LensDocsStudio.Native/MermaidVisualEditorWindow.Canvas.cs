@@ -28,6 +28,11 @@ public partial class MermaidVisualEditorWindow
     {
         Palette.PreviewMouseLeftButtonDown += (_, e) => paletteStart = e.GetPosition(Palette);
         Palette.PreviewMouseLeftButtonUp += (_, _) => paletteStart = null;
+        DiagramCanvas.PreviewDragOver += (_, e) =>
+        {
+            e.Effects = CanTransform && !PropertiesPending && e.Data.GetDataPresent("Lens.MermaidElement") ? DragDropEffects.Copy : DragDropEffects.None;
+            e.Handled = true;
+        };
     }
 
     private void RebuildCanvas(bool layout)
@@ -265,7 +270,7 @@ public partial class MermaidVisualEditorWindow
     private async void CanvasDrop(object sender, DragEventArgs e)
     {
         if (!CanTransform || PropertiesPending || e.Data.GetData("Lens.MermaidElement") is not string text) return;
-        var point = e.GetPosition(DiagramCanvas); e.Handled = true;
+        var point = e.GetPosition(DiagramCanvas); e.Effects = DragDropEffects.Copy; e.Handled = true;
         var group = positions.Where(pair => pair.Key.StartsWith("group:", StringComparison.Ordinal) && Contains(pair.Value, point))
             .OrderBy(pair => pair.Value.Width * pair.Value.Height).Select(pair => pair.Key[6..]).FirstOrDefault();
         if (text == "Connection")
