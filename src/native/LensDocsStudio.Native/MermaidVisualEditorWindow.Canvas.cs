@@ -71,6 +71,7 @@ public partial class MermaidVisualEditorWindow
             button.PreviewMouseLeftButtonDown += async (_, e) =>
             {
                 e.Handled = true;
+                if (PropertiesPending) { SelectElement(key); return; }
                 if (e.ClickCount == 2) { SelectElement(key); BeginInlineEdit(node.Id); return; }
                 if (connectionSource is not null) { await PickNode(node.Id); return; }
                 SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
@@ -116,6 +117,7 @@ public partial class MermaidVisualEditorWindow
     }
     private async Task PickNode(string id)
     {
+        if (PropertiesPending) { UpdateCanvasSelection(); Status.Text = "Update or reset pending property changes before connecting nodes."; return; }
         if (connectionSource is { } source && CanTransform)
         {
             connectionSource = null;
@@ -259,6 +261,7 @@ public partial class MermaidVisualEditorWindow
 
     private void BeginInlineEdit(string id)
     {
+        if (PropertiesPending) { Status.Text = "Update or reset pending property changes before inline label editing."; return; }
         if (!CanTransform || !positions.TryGetValue("node:" + id, out var box)) return;
         if (inlineEditor is not null) DiagramCanvas.Children.Remove(inlineEditor);
         var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, MaxLength = 4096, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };

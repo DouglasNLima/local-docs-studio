@@ -422,7 +422,12 @@ public partial class MermaidVisualEditorWindow : Window
         else if (e.Key == Key.F) Fit(sender, e);
         else if (e.Key == Key.Home) ResetView(sender, e);
         else if (e.Key == Key.F4) { if (NodeProperties.IsVisible) NodeLabel.Focus(); else if (EdgeProperties.IsVisible) EdgeLabel.Focus(); else if (GroupProperties.IsVisible) GroupLabel.Focus(); }
-        else if (e.Key == Key.Escape) { connectionSource = null; Elements.UnselectAll(); Status.Text = "Selection cleared. The draft remains open."; }
+        else if (e.Key == Key.Escape)
+        {
+            connectionSource = null;
+            if (PropertiesPending) { UpdateCanvasSelection(); Status.Text = "Update or reset pending property changes before clearing selection."; }
+            else { Elements.UnselectAll(); Status.Text = "Selection cleared. The draft remains open."; }
+        }
         else if (e.Key == Key.Insert) InsertNode(Palette.Children.OfType<Button>().First(), e);
         else return;
         e.Handled = true;

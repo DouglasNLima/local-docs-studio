@@ -98,17 +98,39 @@ internal static partial class NativeUiChecks
                 Click("MermaidUndo"); AwaitSource(text => text == shapeSource);
                 Check(new MermaidSourceParser().Parse(Draft()).Node("B").Shape == FlowNodeShape.Rounded, "Shape inspector changes actual Mermaid geometry and Undo restores exact source");
             }
+            if (polish)
+            {
+                Find(visual!, "MermaidPort_B").AsButton().Invoke();
+                Wait(() => Find(visual!, "MermaidStatus").Name.StartsWith("Connection from B", StringComparison.Ordinal), "The pending-edit fixture did not enter real connection mode.");
+            }
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
             if (polish)
             {
+                var pendingSource = Draft(); var a = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                var b = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
+                Mouse.DragHorizontally(new(a.Left + a.Width / 2, a.Top + a.Height / 2), 35, MouseButton.Left);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("pending", StringComparison.OrdinalIgnoreCase), "The pending pointer operation did not return its guard feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidCanvas_node_B").BoundingRectangle == b && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "A pending connection/pointer drag retains inspector text, exact source and node positions");
+                Find(visual!, "MermaidCanvas_node_A").Focus(); Keyboard.Type(VirtualKeyShort.SPACE);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before connecting nodes", StringComparison.Ordinal), "Keyboard connection completion bypassed pending-property feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed", "Keyboard connection completion cannot discard pending inspector values");
+                Keyboard.Type(VirtualKeyShort.F2);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before inline label editing", StringComparison.Ordinal), "F2 did not enforce pending inspector protection.");
+                Check(visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidInlineLabel")) is null && Draft() == pendingSource && Find(visual, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "Inline label entry cannot replace unapplied inspector values");
+                Keyboard.Type(VirtualKeyShort.ESCAPE);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before clearing selection", StringComparison.Ordinal), "Escape did not retain pending-selection feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidSelectionSummary").Name.StartsWith("B", StringComparison.Ordinal) && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "Escape cancels connection mode while retaining pending properties and selection");
                 Capture("pending-properties");
                 Select("node_A");
                 Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed" && Find(visual!, "MermaidSelectionSummary").Name.Contains("B"), "Selection changes retain unapplied property text and selection");
                 if (!highContrast)
                 {
-                    var pendingSource = Draft(); var zoomBefore = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
+                    var themePendingSource = Draft(); var zoomBefore = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
                     ChangeApplicationTheme("Dark"); FocusWindow(visual!); Capture("pending-properties-dark");
-                    Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed" && Draft() == pendingSource && Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == zoomBefore,
+                    Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed" && Draft() == themePendingSource && Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == zoomBefore,
                         "Live theme updates retain pending inspector text, draft, selection and zoom");
                     ChangeApplicationTheme("Light"); FocusWindow(visual!);
                 }
