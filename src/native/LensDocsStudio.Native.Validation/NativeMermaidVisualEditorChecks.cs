@@ -74,6 +74,10 @@ internal static partial class NativeUiChecks
                 Click("MermaidZoomIn"); Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value > zoomValue, "Zoom in changes the native viewport scale");
                 Click("MermaidZoomOut"); Check(Math.Abs(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value - zoomValue) < .01, "Zoom out reverses the zoom-in scale without source changes");
                 Check(Draft() == source, "View commands leave Mermaid source byte-for-byte unchanged");
+                Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Source collapse and view commands retain the original multi-selection");
+                foreach (var selected in Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value)
+                    selected.Patterns.SelectionItem.Pattern.RemoveFromSelection();
+                Wait(() => Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 0, "The multi-selection fixture did not clear before the single-node scenario.");
             }
             Select("node_B"); Capture("node-properties");
             if (polish)
@@ -82,7 +86,6 @@ internal static partial class NativeUiChecks
                 AwaitSource(text => new MermaidSourceParser().Parse(text).Node("B").Shape == FlowNodeShape.Decision);
                 Click("MermaidUndo"); AwaitSource(text => text == shapeSource);
                 Check(new MermaidSourceParser().Parse(Draft()).Node("B").Shape == FlowNodeShape.Rounded, "Shape inspector changes actual Mermaid geometry and Undo restores exact source");
-                Select("node_B");
             }
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
             if (polish)
