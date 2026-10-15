@@ -31,6 +31,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
+      - name: Set up the test-only Python runtime
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
       - name: Run checks
         env:
           DEBUG: pw:browser,pw:webserver

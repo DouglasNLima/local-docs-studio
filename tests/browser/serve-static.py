@@ -1,5 +1,12 @@
 """Serve the unchanged static app for browser tests, including concurrent PWA caching."""
 
+import sys
+from time import perf_counter
+
+_started = perf_counter()
+if __name__ == "__main__":
+    print(f"Initialising browser fixtures with Python {sys.version.split()[0]}.", flush=True)
+
 import argparse
 import functools
 import http.server
@@ -28,6 +35,7 @@ class StaticHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    print(f"HTTP fixture modules loaded in {perf_counter() - _started:.3f} seconds.", flush=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=4173)
     args = parser.parse_args()

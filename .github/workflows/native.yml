@@ -57,6 +57,10 @@ jobs:
           npx playwright install chromium
       - name: Check native catalogue against the web reference
         run: node scripts/native/Sync-ContentCatalogue.mjs --check
+      - name: Set up the static export test runtime
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
       - name: Validate exported Docs Site on disk and static hosting
         env:
           LENS_TEST_PORT: '4183'
