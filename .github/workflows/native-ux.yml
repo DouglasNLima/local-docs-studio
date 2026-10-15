@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
+    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor']
   pull_request:
-    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
+    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,6 +11,37 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  mermaid-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build source-mapped native editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Exercise visual authoring, source preservation and conflicts on disposable Windows
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui
+      - name: Measure bounded Mermaid editing scenarios
+        if: always()
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-performance artifacts/native/mermaid-performance.json
+      - name: Exercise actual Windows high contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-high-contrast --high-contrast
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-mermaid-visual-evidence
+          path: |
+            artifacts/native/mermaid-performance.json
+            artifacts/native/mermaid-ui/*.png
+            artifacts/native/mermaid-ui/*.json
+            artifacts/native/mermaid-ui/*.txt
+            artifacts/native/mermaid-ui/*.md
+            artifacts/native/mermaid-high-contrast/*.png
+            artifacts/native/mermaid-high-contrast/*.json
+            artifacts/native/mermaid-high-contrast/*.txt
+          retention-days: 14
   baseline:
     runs-on: windows-latest
     timeout-minutes: 15

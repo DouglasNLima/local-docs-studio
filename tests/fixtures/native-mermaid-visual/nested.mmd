@@ -1,0 +1,13 @@
+flowchart TD
+    subgraph Pipeline[Pipeline]
+        A[Input]
+        subgraph Capture[Capture]
+            direction LR
+            B[Collect]
+            C[Validate]
+        end
+    end
+    D([Output])
+    A --> B
+    B --> C
+    C ==> D

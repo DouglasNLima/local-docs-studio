@@ -59,8 +59,15 @@ internal static class NativeDiagramFailureChecks
                 throw new IOException("Diagram recovery changed source or copied/navigated the wrong block.");
             if (test.Success)
             {
-                if (buttons.Length != 4 || result.Warnings.Count != 0 || panel.Children.OfType<Image>().Count() != 1 || editCalls != 0)
+                if (!buttons.Select(button => (string)button.Content).SequenceEqual(new[] { "Zoom", "SVG", "PNG", "Copy source", "Edit source" })
+                    || result.Warnings.Count != 0 || panel.Children.OfType<Image>().Count() != 1 || editCalls != 0)
                     throw new IOException("Valid diagrams lost their existing native image/export actions.");
+                var sourceAction = buttons.Single(button => (string)button.Content == "Edit source");
+                if (new ButtonAutomationPeer(sourceAction).GetPattern(PatternInterface.Invoke) is null || !sourceAction.Focusable || !sourceAction.IsTabStop)
+                    throw new IOException("A valid diagram's added source action lost native keyboard/automation access.");
+                sourceAction.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+                if (target != code.Span.Start || editCalls != 1 || parsed.Source != source)
+                    throw new IOException("A valid diagram's source action navigated to a different source block.");
             }
             else
             {

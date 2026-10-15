@@ -189,7 +189,8 @@ public partial class MainWindow : Window
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
-                target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset));
+                target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset),
+                offset => OpenMermaidVisualEditor(tab, prepared.source, sourceVersion, offset));
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
             SaveViewport();
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
@@ -542,6 +543,7 @@ public partial class MainWindow : Window
     {
         ThemeService.Apply(Application.Current.Resources, model.Theme);
         helpWindow?.ApplyTheme(model.Theme);
+        foreach (var editor in OwnedWindows.OfType<MermaidVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
@@ -627,6 +629,8 @@ public partial class MainWindow : Window
             IsEnabled = false;
             try
             {
+                  foreach (var visualEditor in OwnedWindows.OfType<MermaidVisualEditorWindow>().ToArray())
+                      if (!visualEditor.CloseForOwner()) return;
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
                 await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });

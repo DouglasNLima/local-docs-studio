@@ -1,0 +1,7 @@
+graph LR
+    Choice{Approved?}
+    Publish([Publish])
+    Revise(Retain draft)
+    Choice -->|Yes| Publish
+    Choice -.->|No| Revise
+    Revise --> Choice

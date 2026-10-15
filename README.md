@@ -6,6 +6,8 @@ Local Markdown, Mermaid, and documentation studio.
 
 The browser-free Windows edition is implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. Its installer-based unsigned internal preview is validated in the documented scope; production certification remains incomplete. See the [engineering delivery report](docs/native/engineering-completion-report.md) for the 28-condition audit and exact evidence.
 
+Native **Edit visually** and **Insert → Flowchart visually…** provide WPF Flowchart authoring with node, connection, subgraph and basic style commands. Edits use a private Mermaid source draft; Apply updates the intended Markdown block or standalone file in one Undo transaction, with stale-source protection. Temporary canvas positions are session-only. The [Mermaid visual editor report](docs/native/mermaid-visual-editor.md) defines the supported grammar, protected syntax and revision-specific validation.
+
 The latest native UX improvements, Word template compatibility, private-sample acceptance and verified preview identities are recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md).
 
 ```powershell

@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(13, NativeHelpGuide.Topics.Count);
-        Assert.Equal(13, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(14, NativeHelpGuide.Topics.Count);
+        Assert.Equal(14, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -16,6 +16,13 @@ public sealed class NativeHelpGuideTests
             Assert.Equal(topic.Title, heading.Title); Assert.Equal(topic.Anchor, heading.Anchor);
             Assert.True(topic.Source.Length > 400);
         }
+    }
+    [Fact] public void Mermaid_visual_authoring_has_an_independent_searchable_source_preservation_topic()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Mermaid visual authoring"));
+        Assert.Equal("mermaid-visual-authoring", topic.Anchor);
+        Assert.Contains("Edit visually", topic.Source); Assert.Contains("one ordinary Undo action", topic.Source);
+        Assert.Contains("positions last", topic.Source); Assert.Contains("protected", topic.Source);
     }
     [Fact] public void Topic_search_matches_body_text_without_changing_bundled_source()
     {

@@ -50,6 +50,7 @@ public sealed class DiagramService
                 Surface = colours.Surface, Border = colours.Border, Line = colours.Line,
                 Font = "Segoe UI",
                 MonoFont = "Consolas",
+                LayoutProvider = new MermaidEntityLayoutProvider(MermaidRenderer.LayoutProvider),
                 Limits = new ResourceLimits { MaxInputLength = 100_000, MaxElements = 500, RenderDeadline = TimeSpan.FromSeconds(3) }
             });
             return new(source, svg, null) { Theme = theme };

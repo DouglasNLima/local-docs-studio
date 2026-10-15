@@ -1,5 +1,12 @@
 # Functional parity matrix
 
+Native Flowchart visual authoring is delivered for the explicit bounded grammar in
+the [Mermaid editor report](mermaid-visual-editor.md): node/edge/style/group commands,
+private history, native interaction and source inspection, with guarded document
+Apply. Other families and protected syntax retain rendering/source workflows. The
+report owns current validation and preview readiness; [Draft PR 26](https://github.com/DouglasNLima/local-docs-studio/pull/26)
+tracks the final delivery head. Earlier parity claims below retain their scope.
+
 Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
 
 

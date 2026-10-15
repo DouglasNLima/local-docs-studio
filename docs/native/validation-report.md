@@ -1,5 +1,12 @@
 # Native validation report
 
+The [Mermaid visual editor report](mermaid-visual-editor.md) records the current
+source candidate, focused and complete regression totals, actual normal/high-contrast
+WPF authoring, source conflicts and one-Undo preservation, inspected captures,
+performance limits and independent unsigned package/lifecycle evidence.
+[Draft PR 26](https://github.com/DouglasNLima/local-docs-studio/pull/26) records checks
+on the final delivery head. Historical results below retain their original revision.
+
 Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
 
 

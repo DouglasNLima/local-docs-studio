@@ -4,7 +4,7 @@ Local Markdown, Mermaid, and documentation studio. This is an **unsigned interna
 
 ## Obtain and verify the package
 
-Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [authoritative readiness report](https://github.com/DouglasNLima/local-docs-studio/blob/release/native-preview-readiness/docs/native/windows-preview-readiness.md). This source report is linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
+Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [Mermaid editor delivery report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-visual-editor/docs/native/mermaid-visual-editor.md). This source report is linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
 
 ```powershell
 gh run download <verified-run-id> --repo DouglasNLima/local-docs-studio --name native-validation --dir <new-empty-directory>
@@ -29,6 +29,8 @@ The installer has no verified publisher. Windows may show publisher or SmartScre
 Uninstall through Windows **Installed apps**. Application binaries, shortcuts and optional native registrations are removed. Workspace documents, images and native settings, templates, snippets, snapshots and recovery state are retained. Retaining private state is intentional; uninstall is not a data-erasure operation.
 
 ## Start a synthetic workspace
+
+For visual diagram evaluation, open the offline **Native guide → Mermaid visual authoring** topic. Use **Edit visually** on a supported Flowchart, or **Insert → Flowchart visually…**. The editor's private draft has its own Undo/Redo; Apply changes the owning document in memory and ordinary Save writes it. Canvas drag positions last only for the session. Protected syntax remains available through Edit source. Evaluate with copies or synthetic files.
 
 1. Open the app. The empty-draft strip offers **Open workspace**, **Open document** and the offline **Native guide**. You can simply type; the strip disappears without changing your text.
 2. Choose **File → Open folder** for a copied/synthetic workspace; double-click a nested Markdown document. **Ctrl+O** opens an individual file, **Ctrl+N** creates a draft.

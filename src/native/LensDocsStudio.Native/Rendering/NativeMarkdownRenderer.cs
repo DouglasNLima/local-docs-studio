@@ -56,21 +56,21 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource).GetAwaiter().GetResult();
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null, Action<int>? editDiagramVisually = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, false, default, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource, editDiagramVisually).GetAwaiter().GetResult();
 
     public Task<PreviewResult> RenderAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings = null, Action<BitmapSource>? copyImage = null,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages = null, CancellationToken cancellationToken = default, Action<PreviewTextCopy>? copyCode = null, PreparedCodeSyntax? codeSyntax = null, Action<ExportTableSelection>? copyTable = null, Action<ExportTableSelection>? exportTableCsv = null,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null)
-        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource);
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae = null, Action<string>? navigateWikiLink = null, Action<int>? editDiagramSource = null, Action<int>? editDiagramVisually = null)
+        => RenderCoreAsync(parsed, dark, diagrams, navigate, exportDiagram, preparedDrawings, copyImage, preparedImages, true, cancellationToken, copyCode, codeSyntax, copyTable, exportTableCsv, preparedFormulae, navigateWikiLink, editDiagramSource, editDiagramVisually);
 
     private async Task<PreviewResult> RenderCoreAsync(ParsedDocument parsed, bool dark,
         IReadOnlyDictionary<FencedCodeBlock, DiagramResult> diagrams, Action<string> navigate, Action<string, string> exportDiagram,
         IReadOnlyDictionary<FencedCodeBlock, DrawingImage>? preparedDrawings, Action<BitmapSource>? copyImage,
         IReadOnlyDictionary<string, PreviewImage>? preparedImages, bool incremental, CancellationToken cancellationToken, Action<PreviewTextCopy>? copyCode, PreparedCodeSyntax? codeSyntax, Action<ExportTableSelection>? copyTable, Action<ExportTableSelection>? exportTableCsv,
-        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink, Action<int>? editDiagramSource)
+        IReadOnlyDictionary<int, PreviewFormula>? preparedFormulae, Action<string>? navigateWikiLink, Action<int>? editDiagramSource, Action<int>? editDiagramVisually)
     {
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("started");
@@ -85,6 +85,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var media = new List<PreviewMedia>();
         var warnings = new List<string>();
         var literalSpans = new List<PreviewLiteral>();
+        var visualTargets = editDiagramVisually is null || parsed.Source.Length > Editor.MermaidDocumentEditSession.MaximumDocumentCharacters
+            ? Array.Empty<Core.Mermaid.MermaidBlockSource>() : Core.Mermaid.MermaidBlockSource.Find(parsed, parsed.StandaloneMermaid);
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
         PreviewConstructionEvents.Log.Stage("document-ready");
@@ -170,10 +172,17 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
                         actions.Children.Add(button);
                     }
-                    if (diagramMedia is null && editDiagramSource is not null)
+                    if (editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)
+                        && new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).CanEdit)
+                    {
+                        var visual = new Button { Content = "Edit visually", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(visual, "DiagramEditVisually" + code.Span.Start);
+                        visual.Click += (_, _) => editDiagramVisually(code.Span.Start); actions.Children.Add(visual);
+                    }
+                    if (editDiagramSource is not null)
                     {
                         var edit = new Button { Content = "Edit source", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
-                        System.Windows.Automation.AutomationProperties.SetAutomationId(edit, "DiagramErrorEditSource" + code.Span.Start);
+                        System.Windows.Automation.AutomationProperties.SetAutomationId(edit, (diagramMedia is null ? "DiagramErrorEditSource" : "DiagramEditSource") + code.Span.Start);
                         edit.Click += (_, _) => editDiagramSource(code.Span.Start);
                         actions.Children.Add(edit);
                     }

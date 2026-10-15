@@ -11,7 +11,7 @@ public static class DiagramThemes
         return choice == "Auto" ? dark ? "Dark" : "Lens" : choice;
     }
 
-    internal static (string Background, string Foreground, string Accent, string? Surface, string? Border, string? Line) Colours(string theme) => theme switch
+    public static (string Background, string Foreground, string Accent, string? Surface, string? Border, string? Line) Colours(string theme) => theme switch
     {
         "Lens" => ("#FAFAFA", "#202124", "#FF883E", null, null, null),
         "Default" => ("#FFFFFF", "#1F2937", "#7C3AED", "#ECECFF", "#9370DB", "#4B5563"),
