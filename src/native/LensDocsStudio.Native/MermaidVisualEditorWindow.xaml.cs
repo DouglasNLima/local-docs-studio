@@ -42,7 +42,7 @@ public partial class MermaidVisualEditorWindow : Window
     private WindowStyle previousStyle;
     private WindowState previousState;
     private ResizeMode previousResize;
-    private record ElementChoice(string Key, string Description) { public override string ToString() => Description; }
+    private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
     private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
@@ -56,6 +56,8 @@ public partial class MermaidVisualEditorWindow : Window
         InitializeComponent();
         WindowStateService.FitInitialWindow(this);
         InitialisePaletteDragging();
+        SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
+        SourceEditor.TextArea.SelectionForeground = BrushResource("AccentTextBrush");
         foreach (var field in new[] { NodeId, NodeLabel, FillColour, StrokeColour, TextColour, EdgeLabel, GroupLabel })
             field.TextChanged += (_, _) => PropertiesChanged();
         foreach (var field in new[] { NodeShape, NodeGroup, NodeClass, EdgeSource, EdgeTarget, EdgeType, GroupDirection })
@@ -64,6 +66,8 @@ public partial class MermaidVisualEditorWindow : Window
         NodeShape.ItemsSource = Enum.GetValues<FlowNodeShape>(); EdgeType.ItemsSource = Enum.GetValues<FlowConnectionType>();
         SourceEditor.TextArea.TextView.LineTransformers.Add(sourceHighlighting);
         SourceEditor.Options.ConvertTabsToSpaces = false; SourceEditor.Options.EnableHyperlinks = false; SourceEditor.Options.EnableEmailHyperlinks = false;
+        updating = true;
+        try { SourceEditor.Text = draft.Source; } finally { updating = false; }
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
         Closed += (_, _) => { closed = true; connectionUpdate?.Abort(); lifetime.Cancel(); lifetime.Dispose(); };
@@ -74,6 +78,8 @@ public partial class MermaidVisualEditorWindow : Window
         var nextDark = ThemeService.IsDark(theme);
         if (closed || nextDark == dark && highContrast == SystemParameters.HighContrast) return;
         dark = nextDark; highContrast = SystemParameters.HighContrast; sourceHighlighting.Dark = dark;
+        SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
+        SourceEditor.TextArea.SelectionForeground = BrushResource("AccentTextBrush");
         SourceEditor.TextArea.TextView.Redraw();
         UpdateCanvasColours();
         if (!PropertiesPending && inlineEditor is null) { updating = true; try { ShowProperties(); } finally { updating = false; } }
@@ -85,15 +91,15 @@ public partial class MermaidVisualEditorWindow : Window
         updating = true;
         try
         {
-            SourceEditor.Text = draft.Source; Direction.SelectedItem = draft.Model.Direction;
-            choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" ")))
-                .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " → " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " · " + edge.Label))))
-                .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph · " + group.Label))).ToArray();
+            if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Direction.SelectedItem = draft.Model.Direction;
+            choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" "), node.Shape is FlowNodeShape.Decision or FlowNodeShape.Terminal or FlowNodeShape.Rounded or FlowNodeShape.Circle ? node.Shape.ToString() : "Process"))
+                .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
+                .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
             Elements.ItemsSource = choices;
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
-            Status.Text = draft.Model.Diagnostic ?? "Draft ready. Select a node or use the palette. Choose a connection port, then its destination. Middle-drag pans.";
+            Status.Text = draft.Model.Diagnostic ?? (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
         }
         finally { updating = false; }
     }
@@ -107,8 +113,12 @@ public partial class MermaidVisualEditorWindow : Window
         RedoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanRedo;
         DeleteButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.Count > 0;
         DuplicateButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
-        SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
+        SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid Visual Editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
+        ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
+        DraftIndicator.Text = busy ? "Validating..." : PropertiesPending ? "Pending properties" : SourcePending ? "Source unvalidated" : !draft.Model.CanEdit ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
+        RenderedPreviewButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && inlineEditor is null;
+        UpdateColourSwatches();
         ValidateSourceButton.IsEnabled = !busy && !PropertiesPending && inlineEditor is null;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
@@ -242,6 +252,7 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (!CanTransform || PropertiesPending) return;
         connectionSource = Selected?.StartsWith("node:", StringComparison.Ordinal) == true ? Selected[5..] : null;
+        UpdateCanvasSelection();
         Status.Text = connectionSource is null ? "Select a source node first, then choose Connection or its + port." : "Connection from " + connectionSource + ": select the destination node. Escape cancels.";
     }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -270,7 +281,8 @@ public partial class MermaidVisualEditorWindow : Window
     {
         propertyBaseline = null;
         NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = Visibility.Collapsed;
-        SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
+        InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
+        SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph to edit its properties." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
         if (Elements.SelectedItems.Count != 1 || Selected is not { } key) return;
         if (key.StartsWith("node:", StringComparison.Ordinal))
         {
@@ -413,11 +425,12 @@ public partial class MermaidVisualEditorWindow : Window
     private void SourceCollapsed(object sender, RoutedEventArgs e)
     {
         if (sender is not Expander { Parent: Grid grid }) return;
-        sourcePanelHeight = grid.RowDefinitions[2].ActualHeight; grid.RowDefinitions[2].Height = GridLength.Auto; grid.RowDefinitions[0].Height = new(1, GridUnitType.Star);
+        sourcePanelHeight = grid.RowDefinitions[2].ActualHeight; grid.RowDefinitions[2].Height = GridLength.Auto; grid.RowDefinitions[0].Height = new(1, GridUnitType.Star); SourceSplitter.IsEnabled = false;
     }
     private void SourceExpanded(object sender, RoutedEventArgs e)
     {
         if (sender is not Expander { Parent: Grid grid } || grid.ActualHeight <= 0) return;
+        SourceSplitter.IsEnabled = true;
         grid.RowDefinitions[2].Height = new(Math.Max(120, Math.Min(sourcePanelHeight, grid.ActualHeight * .55)));
         grid.RowDefinitions[0].Height = new(1, GridUnitType.Star);
     }

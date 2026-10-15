@@ -1,138 +1,100 @@
 <Window x:Class="LensDocsStudio.Native.MermaidVisualEditorWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:edit="http://icsharpcode.net/sharpdevelop/avalonedit"
- Title="Mermaid visual editor" Width="1280" Height="840" MinWidth="880" MinHeight="600" WindowStartupLocation="CenterOwner"
+ xmlns:edit="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Title="Mermaid Visual Editor" Width="1280" Height="840" MinWidth="880" MinHeight="600" WindowStartupLocation="CenterOwner"
+ FontFamily="Segoe UI" FontSize="12" UseLayoutRounding="True" SnapsToDevicePixels="True"
  Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
  AutomationProperties.AutomationId="MermaidVisualEditor" PreviewKeyDown="Shortcut">
- <Window.Resources>
-  <ResourceDictionary><ResourceDictionary.MergedDictionaries>
-   <ResourceDictionary Source="Resources/CommandIcons.xaml"/><ResourceDictionary Source="Resources/DesktopStyles.xaml"/>
-  </ResourceDictionary.MergedDictionaries>
-   <Style TargetType="Label"><Setter Property="Padding" Value="0,8,0,4"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
-   <Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/></Style>
-   <Style TargetType="TextBox"><Setter Property="Padding" Value="6,4"/><Setter Property="MaxLength" Value="4096"/></Style>
-   <Style TargetType="Button"><Setter Property="Padding" Value="9,5"/><Setter Property="Margin" Value="0,0,5,4"/></Style>
-   <Style TargetType="ComboBox"><Setter Property="MinHeight" Value="30"/></Style>
-   <Style x:Key="CanvasElement" TargetType="ToggleButton">
-    <Setter Property="Background" Value="Transparent"/><Setter Property="BorderBrush" Value="Transparent"/><Setter Property="BorderThickness" Value="1"/>
-    <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToggleButton">
-     <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="2">
-      <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-     </Border>
-     <ControlTemplate.Triggers>
-      <Trigger Property="IsChecked" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter Property="BorderThickness" Value="3"/></Trigger>
-      <Trigger Property="IsKeyboardFocused" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource TextBrush}"/></Trigger>
-     </ControlTemplate.Triggers>
-    </ControlTemplate></Setter.Value></Setter>
-   </Style>
-  </ResourceDictionary>
- </Window.Resources>
- <DockPanel Margin="12">
-  <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,8" AutomationProperties.Name="Visual editor commands">
-   <Button x:Name="UndoButton" Content="Undo" Click="Undo" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="MermaidUndo"/>
-   <Button x:Name="RedoButton" Content="Redo" Click="Redo" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="MermaidRedo"/>
-   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" AutomationProperties.AutomationId="MermaidDelete"/>
-   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" ToolTip="Duplicate selected nodes (Ctrl+D)" AutomationProperties.AutomationId="MermaidDuplicate"/>
-   <Button Content="Auto Layout" Click="AutoLayout" AutomationProperties.AutomationId="MermaidAutoLayout"/>
-   <Button Content="Fit" Click="Fit" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="MermaidFit"/>
-   <Button Content="100%" Click="ActualSize" AutomationProperties.AutomationId="MermaidActualSize"/>
-   <Button Content="Reset" Click="ResetView" AutomationProperties.AutomationId="MermaidReset"/>
-   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="100" VerticalAlignment="Center" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="MermaidZoom"/>
-   <TextBlock x:Name="ZoomLabel" Text="100%" Width="50" Margin="6,5"/>
-   <TextBlock Text="Direction" Margin="6,5"/>
-   <ComboBox x:Name="Direction" Width="65" SelectionChanged="DirectionChanged" AutomationProperties.Name="Diagram direction" AutomationProperties.AutomationId="MermaidDirection"/>
-   <Button Content="Rendered preview" Click="ShowRenderedPreview" AutomationProperties.AutomationId="MermaidRenderedPreview"/>
-  </WrapPanel>
-  <StackPanel DockPanel.Dock="Bottom">
-   <TextBlock x:Name="Status" TextWrapping="Wrap" Margin="0,8,0,6" AutomationProperties.AutomationId="MermaidStatus" AutomationProperties.LiveSetting="Polite"/>
-   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
-    <TextBlock Text="Drag positions last for this session. Mermaid controls layout after Apply or reopening." TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,12,0"/>
-    <StackPanel Grid.Column="1" Orientation="Horizontal">
-     <Button Content="Copy source" Click="CopySource" AutomationProperties.AutomationId="MermaidCopySource"/>
-     <Button x:Name="EditSourceButton" Content="Edit source" Click="EditOwningSource" AutomationProperties.AutomationId="MermaidEditSource"/>
-     <Button Content="Cancel" Click="Cancel" AutomationProperties.AutomationId="MermaidCancel"/>
-     <Button x:Name="ApplyButton" Content="Apply" Click="Apply" ToolTip="Apply as one document Undo action (Ctrl+Enter)" AutomationProperties.AutomationId="MermaidApply"/>
-    </StackPanel>
-   </Grid>
-  </StackPanel>
-  <Grid>
-   <Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="140"/><ColumnDefinition Width="5"/><ColumnDefinition Width="*" MinWidth="250"/><ColumnDefinition Width="5"/><ColumnDefinition Width="250" MinWidth="210"/></Grid.ColumnDefinitions>
-   <DockPanel Grid.Column="0" Margin="0,0,8,0">
-    <TextBlock DockPanel.Dock="Top" Text="Elements" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,8"/>
-    <WrapPanel x:Name="Palette" DockPanel.Dock="Top" PreviewMouseMove="PaletteDrag" AutomationProperties.Name="Insert diagram element">
-     <Button Content="Process" Tag="Process" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertProcess"/>
-     <Button Content="Decision" Tag="Decision" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertDecision"/>
-     <Button Content="Start/End" Tag="Terminal" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertTerminal"/>
-     <Button Content="Rounded" Tag="Rounded" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertRounded"/>
-     <Button Content="Circle" Tag="Circle" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertCircle"/>
-     <Button Content="Connection" Tag="Connection" Click="StartConnection" AutomationProperties.AutomationId="MermaidInsertConnection"/>
-     <Button Content="Subgraph" Tag="Subgraph" Click="InsertSubgraph" AutomationProperties.AutomationId="MermaidInsertSubgraph"/>
-    </WrapPanel>
-    <TextBlock DockPanel.Dock="Top" Text="Select an element below or on the canvas. Ctrl selects several nodes." TextWrapping="Wrap" Margin="0,4,0,8" Foreground="{DynamicResource MutedTextBrush}"/>
-    <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" DisplayMemberPath="Description"
-     AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements"/>
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/>
+ </ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <DockPanel>
+  <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,8">
+   <DockPanel><StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"><TextBlock x:Name="DraftIndicator" Text="Ready" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.AutomationId="MermaidDraftState"/></StackPanel>
+    <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid" Foreground="{DynamicResource AccentBrush}" Margin="0,0,8,0"/><TextBlock Text="Mermaid Visual Editor" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/><TextBlock Text=" / Flowchart" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center" Margin="4,0"/></StackPanel>
    </DockPanel>
-   <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
-   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="5"/><RowDefinition Height="190" MinHeight="32"/></Grid.RowDefinitions>
-    <ScrollViewer x:Name="Viewport" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
-     PreviewMouseWheel="CanvasWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost"
-     AutomationProperties.Name="Interactive Mermaid canvas. Use the element list for keyboard selection; middle-drag pans." AutomationProperties.AutomationId="MermaidViewport">
-     <Canvas x:Name="DiagramCanvas" Width="800" Height="600" Background="Transparent" AllowDrop="True" Drop="CanvasDrop" MouseLeftButtonDown="DeselectCanvas">
-      <Canvas.LayoutTransform><ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
-      <Canvas.ContextMenu><ContextMenu>
-       <MenuItem Header="Add process" Tag="Process" Click="InsertNode"/><MenuItem Header="Add decision" Tag="Decision" Click="InsertNode"/>
-       <MenuItem Header="Add subgraph" Click="InsertSubgraph"/><MenuItem Header="Connect selected node" Click="StartConnection"/>
-       <MenuItem Header="Delete selection" Click="Delete"/><Separator/><MenuItem Header="Fit to Window" Click="Fit"/>
-      </ContextMenu></Canvas.ContextMenu>
-     </Canvas>
-    </ScrollViewer>
-    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
-    <Expander x:Name="SourcePanel" Grid.Row="2" Header="Mermaid source" IsExpanded="True" Expanded="SourceExpanded" Collapsed="SourceCollapsed" Margin="0,8,0,0">
-     <DockPanel MinHeight="90">
-      <Button x:Name="ValidateSourceButton" DockPanel.Dock="Bottom" Content="Validate source changes" Click="ValidateSource" HorizontalAlignment="Left" AutomationProperties.AutomationId="MermaidValidateSource"/>
-      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" FontFamily="Consolas" FontSize="13" WordWrap="False" TextChanged="SourceChanged"
-       Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" AutomationProperties.Name="Mermaid draft source" AutomationProperties.AutomationId="MermaidDraftSource"/>
-     </DockPanel>
-    </Expander>
-   </Grid>
-   <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
-   <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10,0,0,0">
-    <StackPanel>
-     <TextBlock Text="Properties" FontWeight="SemiBold" FontSize="16"/>
-     <TextBlock x:Name="SelectionSummary" Text="Select a node, connection or subgraph." TextWrapping="Wrap" Margin="0,8,0,0" AutomationProperties.AutomationId="MermaidSelectionSummary"/>
-     <Button x:Name="ResetPropertiesButton" Content="Reset property changes" Click="ResetProperties" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidResetProperties"/>
-     <StackPanel x:Name="NodeProperties" Visibility="Collapsed">
-      <Label Content="Node _ID" Target="{Binding ElementName=NodeId}"/><TextBox x:Name="NodeId" MaxLength="128" AutomationProperties.AutomationId="MermaidNodeId"/>
-      <Label Content="Node _label" Target="{Binding ElementName=NodeLabel}"/><TextBox x:Name="NodeLabel" AcceptsReturn="True" MinHeight="66" TextWrapping="Wrap" AutomationProperties.AutomationId="MermaidNodeLabel"/>
-      <Label Content="_Shape" Target="{Binding ElementName=NodeShape}"/><ComboBox x:Name="NodeShape" AutomationProperties.Name="Node shape" AutomationProperties.AutomationId="MermaidNodeShape"/>
-      <Button Content="Update node" Click="UpdateNode" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidUpdateNode"/>
-      <Label Content="Subgraph membership"/><ComboBox x:Name="NodeGroup" AutomationProperties.Name="Node subgraph" AutomationProperties.AutomationId="MermaidNodeGroup"/>
-      <Button Content="Move node" Click="MoveNode" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidMoveNode"/>
-      <Label Content="Class defined in source"/><ComboBox x:Name="NodeClass" AutomationProperties.Name="Node class" AutomationProperties.AutomationId="MermaidNodeClass"/>
-      <Button x:Name="ClassButton" Content="Apply class" Click="ApplyClass" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidApplyClass"/>
-      <Label Content="Fill / stroke / text colour"/><TextBox x:Name="FillColour" Text="#FAFAFA" AutomationProperties.Name="Fill colour" AutomationProperties.AutomationId="MermaidFillColour"/>
-      <TextBox x:Name="StrokeColour" Text="#56606C" Margin="0,4" AutomationProperties.Name="Stroke colour"/>
-      <TextBox x:Name="TextColour" Text="#202124" AutomationProperties.Name="Text colour"/>
-      <Button Content="Apply colours" Click="ApplyStyle" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidApplyStyle"/>
-     </StackPanel>
-     <StackPanel x:Name="EdgeProperties" Visibility="Collapsed">
-      <Label Content="Source node"/><ComboBox x:Name="EdgeSource" AutomationProperties.Name="Connection source node" AutomationProperties.AutomationId="MermaidEdgeSource"/>
-      <Label Content="Destination node"/><ComboBox x:Name="EdgeTarget" AutomationProperties.Name="Connection destination node" AutomationProperties.AutomationId="MermaidEdgeTarget"/>
-      <Label Content="Connection label" Target="{Binding ElementName=EdgeLabel}"/><TextBox x:Name="EdgeLabel" AutomationProperties.AutomationId="MermaidEdgeLabel"/>
-      <Label Content="Connection type"/><ComboBox x:Name="EdgeType" AutomationProperties.Name="Connection type" AutomationProperties.AutomationId="MermaidEdgeType"/>
-      <Button Content="Update connection" Click="UpdateEdge" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidUpdateEdge"/>
-      <Button Content="Reverse direction" Click="ReverseEdge" AutomationProperties.AutomationId="MermaidReverseEdge"/>
-     </StackPanel>
-     <StackPanel x:Name="GroupProperties" Visibility="Collapsed">
-      <Label Content="Subgraph ID"/><TextBlock x:Name="GroupId"/>
-      <Label Content="Subgraph label" Target="{Binding ElementName=GroupLabel}"/><TextBox x:Name="GroupLabel" AutomationProperties.AutomationId="MermaidGroupLabel"/>
-      <TextBlock x:Name="GroupMembers" TextWrapping="Wrap" Margin="0,8"/>
-      <Label Content="Subgraph direction"/><ComboBox x:Name="GroupDirection" AutomationProperties.Name="Subgraph direction" AutomationProperties.AutomationId="MermaidGroupDirection"/>
-      <Button Content="Update subgraph" Click="UpdateGroup" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidUpdateGroup"/>
-      <CheckBox x:Name="DeleteGroupContents" Content="Also delete members and their connections" Margin="0,8" AutomationProperties.AutomationId="MermaidDeleteGroupContents"/>
-     </StackPanel>
+  </Border>
+  <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Visual editor commands" AutomationProperties.AutomationId="MermaidToolbar">
+<Button x:Name="UndoButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Undo" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="MermaidUndo"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Undo"/></StackPanel></Button>
+<Button x:Name="RedoButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Redo" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="MermaidRedo"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Redo"/></StackPanel></Button>
+<Separator/>
+<Button x:Name="DeleteButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Delete" ToolTip="Delete selection (Delete)" AutomationProperties.AutomationId="MermaidDelete"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Delete"/></StackPanel></Button>
+<Button x:Name="DuplicateButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="Duplicate" ToolTip="Duplicate selected nodes (Ctrl+D)" AutomationProperties.AutomationId="MermaidDuplicate"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Duplicate"/></StackPanel></Button>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="AutoLayout" ToolTip="Restore automatic layout; session positions are cleared" AutomationProperties.AutomationId="MermaidAutoLayout"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="AutoLayout"/><TextBlock Text="Auto layout" Margin="6,0,0,0" VerticalAlignment="Center"/></StackPanel></Button>
+<Separator/><StackPanel Orientation="Horizontal" Margin="6,0" VerticalAlignment="Center"><Label Content="_Direction" Target="{Binding ElementName=Direction}" Style="{StaticResource Form.Label}" Padding="0,0,6,0" VerticalAlignment="Center"/><ComboBox x:Name="Direction" Width="70" Style="{StaticResource Form.ComboBox}" SelectionChanged="DirectionChanged" ToolTip="Direction used by Mermaid automatic layout" AutomationProperties.Name="Diagram direction" AutomationProperties.AutomationId="MermaidDirection"/></StackPanel><Separator/>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="ZoomOut" ToolTip="Zoom out (Ctrl+mouse wheel)" AutomationProperties.AutomationId="MermaidZoomOut"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="ZoomOut"/></StackPanel></Button>
+<Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="80" VerticalAlignment="Center" ValueChanged="ZoomChanged" ToolTip="Canvas zoom; Ctrl+mouse wheel zooms around the pointer" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="MermaidZoom"/>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="ZoomIn" ToolTip="Zoom in (Ctrl+mouse wheel)" AutomationProperties.AutomationId="MermaidZoomIn"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="ZoomIn"/></StackPanel></Button>
+<TextBlock x:Name="ZoomLabel" Text="100%" MinWidth="42" VerticalAlignment="Center" TextAlignment="Center"/>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="Fit" ToolTip="Fit diagram to window (F)" AutomationProperties.AutomationId="MermaidFit"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Focus"/></StackPanel></Button>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="ActualSize" ToolTip="Actual size (Ctrl+0)" AutomationProperties.AutomationId="MermaidActualSize"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Selection"/></StackPanel></Button>
+<Button  Style="{StaticResource Mermaid.ToolbarButton}" Click="ResetView" ToolTip="Reset view (Home)" AutomationProperties.AutomationId="MermaidReset"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Refresh"/></StackPanel></Button>
+<Separator/>
+<Button x:Name="RenderedPreviewButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="ShowRenderedPreview" ToolTip="Open rendered preview" AutomationProperties.AutomationId="MermaidRenderedPreview"><StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Preview"/><TextBlock Text="Preview" Margin="6,0,0,0" VerticalAlignment="Center"/></StackPanel></Button></ToolBar>
+  <Border DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0" Padding="12,8">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <DockPanel Margin="0,0,12,0" VerticalAlignment="Center"><ui:CommandIcon Kind="Info" DockPanel.Dock="Left" Margin="0,0,8,0" Foreground="{DynamicResource MutedTextBrush}"/><TextBlock x:Name="Status" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" VerticalAlignment="Center" AutomationProperties.AutomationId="MermaidStatus" AutomationProperties.LiveSetting="Polite"/></DockPanel>
+    <StackPanel Grid.Column="1" Orientation="Horizontal">
+     <Button x:Name="EditSourceButton" Content="Edit source" Style="{StaticResource Form.Action}" Margin="0,0,12,0" Click="EditOwningSource" ToolTip="Open the owning document source; this draft stays open" AutomationProperties.AutomationId="MermaidEditSource"/>
+     <Button Content="Cancel" Style="{StaticResource Form.Action}" Margin="0" MinWidth="72" Click="Cancel" AutomationProperties.AutomationId="MermaidCancel"/>
+     <Button x:Name="ApplyButton" Content="Apply" Style="{StaticResource Mermaid.PrimaryAction}" Click="Apply" ToolTip="Apply changes as one document Undo action (Ctrl+Enter)" AutomationProperties.AutomationId="MermaidApply"/>
     </StackPanel>
-   </ScrollViewer>
+   </Grid>
+  </Border>
+  <Grid Margin="8,8,8,0">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="156"/><ColumnDefinition Width="7"/><ColumnDefinition Width="*" MinWidth="240"/><ColumnDefinition Width="7"/><ColumnDefinition Width="280" MinWidth="224"/></Grid.ColumnDefinitions>
+   <DockPanel Grid.Column="0" Background="{DynamicResource PanelBrush}" Margin="0,0,3,8">
+    <TextBlock DockPanel.Dock="Top" Text="ELEMENTS" Style="{StaticResource Desktop.PanelHeading}"/>
+    <UniformGrid x:Name="Palette" DockPanel.Dock="Top" Columns="2" Margin="6,2" PreviewMouseMove="PaletteDrag" AutomationProperties.Name="Insert diagram element">
+<Button Tag="Process" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertNode" ToolTip="Add process; drag to place on the canvas" AutomationProperties.Name="Process" AutomationProperties.AutomationId="MermaidInsertProcess"><StackPanel><ui:CommandIcon Kind="Process" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Process" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Decision" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertNode" ToolTip="Add decision; drag to place on the canvas" AutomationProperties.Name="Decision" AutomationProperties.AutomationId="MermaidInsertDecision"><StackPanel><ui:CommandIcon Kind="Decision" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Decision" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Terminal" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertNode" ToolTip="Add start/end; drag to place on the canvas" AutomationProperties.Name="Start/End" AutomationProperties.AutomationId="MermaidInsertTerminal"><StackPanel><ui:CommandIcon Kind="Terminal" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Start/End" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Rounded" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertNode" ToolTip="Add rounded; drag to place on the canvas" AutomationProperties.Name="Rounded" AutomationProperties.AutomationId="MermaidInsertRounded"><StackPanel><ui:CommandIcon Kind="Rounded" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Rounded" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Circle" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertNode" ToolTip="Add circle; drag to place on the canvas" AutomationProperties.Name="Circle" AutomationProperties.AutomationId="MermaidInsertCircle"><StackPanel><ui:CommandIcon Kind="Circle" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Circle" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Connection" Style="{StaticResource Mermaid.PaletteItem}" Click="StartConnection" ToolTip="Connect selected nodes" AutomationProperties.Name="Connection" AutomationProperties.AutomationId="MermaidInsertConnection"><StackPanel><ui:CommandIcon Kind="Connection" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Connection" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+<Button Tag="Subgraph" Style="{StaticResource Mermaid.PaletteItem}" Click="InsertSubgraph" ToolTip="Add subgraph; drag to place on the canvas" AutomationProperties.Name="Subgraph" AutomationProperties.AutomationId="MermaidInsertSubgraph"><StackPanel><ui:CommandIcon Kind="Subgraph" Width="28" Height="24" HorizontalAlignment="Center"/><TextBlock Text="Subgraph" TextAlignment="Center" Margin="0,5,0,0" FontSize="11"/></StackPanel></Button>
+</UniformGrid>
+    <TextBlock DockPanel.Dock="Top" Text="DIAGRAM" Style="{StaticResource Desktop.PanelHeading}"/>
+    <TextBlock DockPanel.Dock="Bottom" Text="Ctrl+click selects several nodes" Style="{StaticResource Form.Help}" Margin="10,8"/>
+    <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource Desktop.SelectionItem}" AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements">
+     <ListBox.ItemTemplate><DataTemplate><DockPanel ToolTip="{Binding Description}"><ui:CommandIcon Kind="{Binding Icon}" DockPanel.Dock="Left" Margin="0,0,7,0" Width="16" Height="16" Foreground="{DynamicResource MutedTextBrush}"/><TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DockPanel></DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+   </DockPanel>
+   <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+   <Grid Grid.Column="2" Margin="0,0,0,8"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="7"/><RowDefinition Height="190" MinHeight="40"/></Grid.RowDefinitions>
+    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+     <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"><DockPanel Margin="10,0"><TextBlock Text="CANVAS" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/><TextBlock Text="Session layout" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" ToolTip="Drag positions last for this session. Mermaid controls layout after Apply or reopening. Auto layout clears temporary positions."/></DockPanel></Border>
+     <ScrollViewer x:Name="Viewport" Grid.Row="1" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+      PreviewMouseWheel="CanvasWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost"
+      AutomationProperties.Name="Interactive Mermaid canvas. Use the element list for keyboard selection; middle-drag pans." AutomationProperties.AutomationId="MermaidViewport">
+      <Canvas x:Name="DiagramCanvas" Width="800" Height="600" Background="Transparent" AllowDrop="True" Drop="CanvasDrop" MouseLeftButtonDown="DeselectCanvas">
+       <Canvas.LayoutTransform><ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
+       <Canvas.ContextMenu><ContextMenu><MenuItem Header="Add process" Tag="Process" Click="InsertNode"/><MenuItem Header="Add decision" Tag="Decision" Click="InsertNode"/><MenuItem Header="Add subgraph" Click="InsertSubgraph"/><MenuItem Header="Connect selected node" Click="StartConnection"/><MenuItem Header="Delete selection" Click="Delete"/><Separator/><MenuItem Header="Fit to window" Click="Fit"/></ContextMenu></Canvas.ContextMenu>
+      </Canvas>
+     </ScrollViewer>
+    </Grid></Border>
+    <GridSplitter x:Name="SourceSplitter" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+    <Expander x:Name="SourcePanel" Grid.Row="2" Style="{StaticResource Mermaid.SourcePanel}" Header="Mermaid source" IsExpanded="True" Expanded="SourceExpanded" Collapsed="SourceCollapsed" AutomationProperties.AutomationId="MermaidSourcePanel">
+     <Border Background="{DynamicResource WindowBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1,0,1,1" Padding="4,8,4,4">
+      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" FontFamily="Consolas" FontSize="13" WordWrap="False" TextChanged="SourceChanged" Padding="2,2" LineNumbersForeground="{DynamicResource MutedTextBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" AutomationProperties.Name="Mermaid draft source" AutomationProperties.AutomationId="MermaidDraftSource"/>
+     </Border>
+    </Expander>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,3,5,0">
+     <Button x:Name="ValidateSourceButton" Style="{StaticResource Mermaid.ToolbarButton}" Click="ValidateSource" ToolTip="Validate source changes before continuing visually" AutomationProperties.AutomationId="MermaidValidateSource"><ui:CommandIcon Kind="Check"/></Button>
+     <Button Style="{StaticResource Mermaid.ToolbarButton}" Click="CopySource" ToolTip="Copy Mermaid draft source" AutomationProperties.AutomationId="MermaidCopySource"><ui:CommandIcon Kind="Copy"/></Button>
+    </StackPanel>
+   </Grid>
+   <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+   <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" Margin="3,0,0,8">
+    <StackPanel DockPanel.Dock="Top" Margin="12,12,12,8"><TextBlock Text="PROPERTIES" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}"/>
+     <TextBlock x:Name="SelectionSummary" Text="Select a node, connection or subgraph to edit its properties." TextWrapping="Wrap" Margin="0,8,0,0" FontWeight="SemiBold" AutomationProperties.AutomationId="MermaidSelectionSummary"/>
+     <Button x:Name="ResetPropertiesButton" Content="Reset property changes" Style="{StaticResource Mermaid.Action}" Click="ResetProperties" AutomationProperties.AutomationId="MermaidResetProperties"/>
+    </StackPanel>
+    <ScrollViewer x:Name="InspectorScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,12,12">
+     <StackPanel>
+      <StackPanel x:Name="InspectorEmpty" Margin="4,24"><ui:CommandIcon Kind="Selection" Width="32" Height="32" HorizontalAlignment="Left" Foreground="{DynamicResource MutedTextBrush}"/><TextBlock Text="Select an element on the canvas or in the diagram list. Its editable properties will appear here." Style="{StaticResource Form.Help}"/></StackPanel>
+<StackPanel x:Name="NodeProperties" Visibility="Collapsed"><TextBlock Text="IDENTITY" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Node _ID" Target="{Binding ElementName=NodeId}" Style="{StaticResource Form.Label}"/><TextBox x:Name="NodeId" Style="{StaticResource Form.TextInput}" AutomationProperties.Name="Node ID" AutomationProperties.AutomationId="MermaidNodeId" MaxLength="128"/></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Node _label" Target="{Binding ElementName=NodeLabel}" Style="{StaticResource Form.Label}"/><TextBox x:Name="NodeLabel" Style="{StaticResource Form.TextInput}" AutomationProperties.Name="Node label" AutomationProperties.AutomationId="MermaidNodeLabel" AcceptsReturn="True" MinHeight="64" MaxHeight="150" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/></StackPanel><TextBlock Text="APPEARANCE" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="_Shape" Target="{Binding ElementName=NodeShape}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="NodeShape" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Shape" AutomationProperties.AutomationId="MermaidNodeShape" /></StackPanel><Button  Content="Update node" Style="{StaticResource Mermaid.Action}" Click="UpdateNode" AutomationProperties.AutomationId="MermaidUpdateNode"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Class defined in source" Target="{Binding ElementName=NodeClass}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="NodeClass" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Class defined in source" AutomationProperties.AutomationId="MermaidNodeClass" /></StackPanel><Button x:Name="ClassButton" Content="Apply class" Style="{StaticResource Mermaid.Action}" Click="ApplyClass" AutomationProperties.AutomationId="MermaidApplyClass"/><TextBlock Text="COLOURS" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Fill" Target="{Binding ElementName=FillColour}" Style="{StaticResource Form.Label}"/><DockPanel><Border x:Name="FillSwatch" DockPanel.Dock="Left" Style="{StaticResource Mermaid.Swatch}"/><TextBox x:Name="FillColour" Style="{StaticResource Form.TextInput}" MaxLength="7" Text="#FAFAFA" AutomationProperties.Name="Fill colour" AutomationProperties.AutomationId="MermaidFillColour"/></DockPanel></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Stroke" Target="{Binding ElementName=StrokeColour}" Style="{StaticResource Form.Label}"/><DockPanel><Border x:Name="StrokeSwatch" DockPanel.Dock="Left" Style="{StaticResource Mermaid.Swatch}"/><TextBox x:Name="StrokeColour" Style="{StaticResource Form.TextInput}" MaxLength="7" Text="#FAFAFA" AutomationProperties.Name="Stroke colour" AutomationProperties.AutomationId="MermaidStrokeColour"/></DockPanel></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Text" Target="{Binding ElementName=TextColour}" Style="{StaticResource Form.Label}"/><DockPanel><Border x:Name="TextSwatch" DockPanel.Dock="Left" Style="{StaticResource Mermaid.Swatch}"/><TextBox x:Name="TextColour" Style="{StaticResource Form.TextInput}" MaxLength="7" Text="#FAFAFA" AutomationProperties.Name="Text colour" AutomationProperties.AutomationId="MermaidTextColour"/></DockPanel></StackPanel><TextBlock Text="Use six-digit hexadecimal colours, for example #FF883E." Style="{StaticResource Form.Help}"/><Button  Content="Apply colours" Style="{StaticResource Mermaid.Action}" Click="ApplyStyle" AutomationProperties.AutomationId="MermaidApplyStyle"/><TextBlock Text="STRUCTURE" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Subgraph membership" Target="{Binding ElementName=NodeGroup}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="NodeGroup" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Subgraph membership" AutomationProperties.AutomationId="MermaidNodeGroup" /></StackPanel><Button  Content="Move node" Style="{StaticResource Mermaid.Action}" Click="MoveNode" AutomationProperties.AutomationId="MermaidMoveNode"/></StackPanel><StackPanel x:Name="EdgeProperties" Visibility="Collapsed"><TextBlock Text="CONNECTION" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Source node" Target="{Binding ElementName=EdgeSource}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="EdgeSource" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Source node" AutomationProperties.AutomationId="MermaidEdgeSource" /></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Destination node" Target="{Binding ElementName=EdgeTarget}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="EdgeTarget" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Destination node" AutomationProperties.AutomationId="MermaidEdgeTarget" /></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Connection label" Target="{Binding ElementName=EdgeLabel}" Style="{StaticResource Form.Label}"/><TextBox x:Name="EdgeLabel" Style="{StaticResource Form.TextInput}" AutomationProperties.Name="Connection label" AutomationProperties.AutomationId="MermaidEdgeLabel" /></StackPanel><StackPanel Style="{StaticResource Form.Field}"><Label Content="Connection type" Target="{Binding ElementName=EdgeType}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="EdgeType" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Connection type" AutomationProperties.AutomationId="MermaidEdgeType" /></StackPanel><Button  Content="Update connection" Style="{StaticResource Mermaid.Action}" Click="UpdateEdge" AutomationProperties.AutomationId="MermaidUpdateEdge"/><Button  Content="Reverse direction" Style="{StaticResource Mermaid.Action}" Click="ReverseEdge" AutomationProperties.AutomationId="MermaidReverseEdge"/></StackPanel><StackPanel x:Name="GroupProperties" Visibility="Collapsed"><TextBlock Text="IDENTITY" Style="{StaticResource Mermaid.Section}"/><TextBlock Text="Subgraph ID" Style="{StaticResource Form.Help}"/><TextBlock x:Name="GroupId" FontWeight="SemiBold" Margin="0,4,0,16"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Subgraph label" Target="{Binding ElementName=GroupLabel}" Style="{StaticResource Form.Label}"/><TextBox x:Name="GroupLabel" Style="{StaticResource Form.TextInput}" AutomationProperties.Name="Subgraph label" AutomationProperties.AutomationId="MermaidGroupLabel" /></StackPanel><TextBlock Text="STRUCTURE" Style="{StaticResource Mermaid.Section}"/><StackPanel Style="{StaticResource Form.Field}"><Label Content="Subgraph direction" Target="{Binding ElementName=GroupDirection}" Style="{StaticResource Form.Label}"/><ComboBox x:Name="GroupDirection" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Subgraph direction" AutomationProperties.AutomationId="MermaidGroupDirection" /></StackPanel><TextBlock x:Name="GroupMembers" TextWrapping="Wrap" Style="{StaticResource Form.Help}"/><Button  Content="Update subgraph" Style="{StaticResource Mermaid.Action}" Click="UpdateGroup" AutomationProperties.AutomationId="MermaidUpdateGroup"/><CheckBox x:Name="DeleteGroupContents" Style="{StaticResource Form.CheckBox}" Margin="0,16,0,0" AutomationProperties.AutomationId="MermaidDeleteGroupContents"><TextBlock Text="Also delete members and their connections" TextWrapping="Wrap"/></CheckBox></StackPanel></StackPanel></ScrollViewer></DockPanel>
   </Grid>
  </DockPanel>
 </Window>
