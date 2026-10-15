@@ -158,6 +158,7 @@ public partial class MainWindow
             Add("Format: " + action.Replace('-', ' '), "", () => Format(new Button { Tag = action }, e), edit);
         Add("Insert workspace document link", "Ctrl+Shift+K", () => InsertDocumentLink(sender, e), edit);
         Add("Insert local image", "", () => InsertImage(sender, e), edit);
+        Add("Insert Flowchart visually", "", () => InsertFlowchart(sender, e), edit);
         foreach (var format in new[] { "HTML", "DOCX", "PDF" })
             Add("Export " + format, "", () => ExportDocument(new Button { Tag = format }, e), model.ActiveDocument is not null && !model.IsBusy);
         Add("Export Docs Site", "", () => ExportDocsSite(sender, e), model.WorkspaceRoot is not null && !model.IsBusy);

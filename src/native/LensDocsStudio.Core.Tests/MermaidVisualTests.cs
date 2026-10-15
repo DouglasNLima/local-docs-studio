@@ -184,6 +184,17 @@ public sealed class MermaidVisualTests
         Assert.Equal(Styled, draft.Source); Assert.False(draft.CanUndo);
     }
 
+    [Fact]
+    public async Task Escaped_labels_have_the_same_literal_text_in_the_established_svg_output()
+    {
+        const string label = "Café \"[x]|{y}\\z <literal> &";
+        var draft = new MermaidVisualDraft("flowchart TD\nA[Start]\n");
+        await Execute(draft, new UpdateMermaidNode("A", label, FlowNodeShape.Process, "A"));
+        var svg = System.Xml.Linq.XDocument.Parse(new DiagramService().Render(draft.Source).Svg!);
+        var text = string.Join(" ", svg.Descendants().Where(element => element.Name.LocalName == "text").Select(element => element.Value));
+        Assert.Contains(label, text);
+    }
+
     private static void AssertEditable(MermaidDiagramModel model) => Assert.True(model.CanEdit, model.Diagnostic);
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }

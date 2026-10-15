@@ -51,8 +51,31 @@ documents and recovery; discarded operations do not modify documents.
 - Source foundation: 32 focused Core tests passed locally on Windows/.NET 10.
 - Initial failures retained under ignored `artifacts/native/mermaid-tests/`; repairs
   cover first-reference semantics and literal entity decoding.
-- WPF canvas, Markdown target integration, native UIA, visual acceptance,
-  performance certification and package identity are pending subsequent milestones.
+- Native WPF canvas and properties are implemented: node and connection editing,
+  palette insertion/drop, connection ports, inline labels, group operations,
+  source inspection/validation, draft history, temporary dragging, deterministic
+  compound layout, zoom/PAN and fit/reset. These remain subject to real UIA and
+  visual acceptance; a successful build is not interaction certification.
+- Markdown Apply tracks the existing AvalonEdit version chain and owning tab,
+  rejecting overlapping edits or changed file identities. Unrelated surrounding
+  edits relocate the original block through actual changes, never text searches.
+  Standalone files use raw source; fenced/DevOps containers keep their wrappers.
+- The complete native solution builds locally with zero warnings. All 42 focused
+  Mermaid tests pass, including extracted SVG output for escaped literal labels.
+- Mermaider's first-occurrence semantics and numeric-escape rendering gap were
+  found by tests. The shared rendering service now decodes numeric escapes through
+  a layout-provider adapter **after** parsing and **before** existing layout/SVG
+  generation, preserving portable source and matching text measurement to output.
+- Indented tilde fences are targeted only where the established Markdown pipeline
+  recognises them as code; surrounding paragraph contexts that parse as prose do
+  not acquire invented diagram identities. Blockquote/list prefixes are protected.
+- Draft PR: https://github.com/DouglasNLima/local-docs-studio/pull/26.
+- The disposable Windows `mermaid-visual-editor` CI job exercises source/model
+  outcomes through real controls and records screenshots, failures and timings.
+  Its first run is pending; performance certification and package identity remain
+  outstanding. Initial foundation CI passed existing browser and desktop UX checks;
+  one branch native run failed starting the static export server, while the PR run
+  passed that check and continued. Historical failure evidence is retained in CI.
 - No new build has been installed or launched on the user's ordinary desktop.
 
 CI links, screenshots, package hashes and readiness findings will be recorded here
