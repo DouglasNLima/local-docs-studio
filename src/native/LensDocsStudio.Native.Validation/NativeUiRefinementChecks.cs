@@ -15,6 +15,9 @@ internal static partial class NativeUiChecks
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source); var root = Path.GetDirectoryName(source)!;
         var originalBounds = window.BoundingRectangle; var observations = new List<object>();
+        var displayOutput = Path.Combine(output, "refinement-display"); Directory.CreateDirectory(displayOutput);
+        using var display = new NativeTestDisplay(displayOutput);
+        window.Patterns.Transform.Pattern.Move(0, 0);
         var markdown = Path.Combine(root, "Refinement Markdown.MD"); var diagram = Path.Combine(root, "Refinement diagram.mmd");
         var plain = Path.Combine(root, "Refinement notes.txt");
         File.WriteAllText(markdown, "# Markdown identity\n"); File.WriteAllText(diagram, "flowchart LR\nA --> B\n"); File.WriteAllText(plain, "Plain text identity\n");
@@ -92,7 +95,8 @@ internal static partial class NativeUiChecks
         Wait(() => Find(window, "Status").Name.StartsWith("The exported file is unavailable or has changed", StringComparison.Ordinal), "A missing output did not fail gracefully before shell opening.");
         if (window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"))?.IsOffscreen == false) throw new IOException("A superseded export kept its success actions visible.");
         if (ReadEditorText(editor) != original || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Native refinements changed source or saved bytes.");
-        window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height); editor.Focus();
+        window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height);
+        window.Patterns.Transform.Pattern.Move(originalBounds.Left, originalBounds.Top); editor.Focus(); display.Complete();
         File.WriteAllText(Path.Combine(output, "native-refinement.json"), JsonSerializer.Serialize(new { Passed = true,
             Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
             WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));

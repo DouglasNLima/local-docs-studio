@@ -110,8 +110,12 @@ public partial class MainWindow
     }
     private void EditorScrollChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && Editor.IsVisible) recoveryTimer.Start();
-        if (!applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Editor.IsKeyboardFocusWithin || Editor.IsMouseOver)) QueueSynchronisation("editor-scroll");
+        if (Editor.IsVisible && (!applyingSync || Editor.IsKeyboardFocusWithin)) recoveryTimer.Start();
+        if (!BothPanesVisible || !DesktopState.SyncScroll) return;
+        // Fresh input in the focused pane must supersede an asynchronous alignment already
+        // running in the other pane. Hover-only events retain the feedback-loop guard.
+        if (Editor.IsKeyboardFocusWithin) QueueFocusedSynchronisation("editor-scroll");
+        else if (!applyingSync && Editor.IsMouseOver) QueueSynchronisation("editor-scroll");
     }
     private void PreviewSelectionChanged(object? sender, EventArgs e)
     {
@@ -119,9 +123,11 @@ public partial class MainWindow
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)
     {
-        if (e.VerticalChange != 0 && !applyingSync && Preview.IsVisible) recoveryTimer.Start();
-        if (e.VerticalChange != 0 && !applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Preview.IsKeyboardFocusWithin || Preview.IsMouseOver))
-            QueueSynchronisation("preview-scroll");
+        if (e.VerticalChange == 0) return;
+        if (Preview.IsVisible && (!applyingSync || Preview.IsKeyboardFocusWithin)) recoveryTimer.Start();
+        if (!BothPanesVisible || !DesktopState.SyncScroll) return;
+        if (Preview.IsKeyboardFocusWithin) QueueFocusedSynchronisation("preview-scroll");
+        else if (!applyingSync && Preview.IsMouseOver) QueueSynchronisation("preview-scroll");
     }
     private void QueueSynchronisation(string origin)
     {

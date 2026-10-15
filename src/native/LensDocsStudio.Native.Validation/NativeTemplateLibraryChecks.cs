@@ -40,7 +40,7 @@ internal static class NativeTemplateLibraryChecks
             }
             surface.UpdateLayout();
             var details = ((TextBlock)window.FindName("FormattingDetails")).Text;
-            if (!details.Contains("1 headers · 1 footers · 1 embedded", StringComparison.Ordinal)
+            if (!details.Contains("Headers: 1 · footers: 1", StringComparison.Ordinal) || !details.Contains("Embedded header/footer images: 1", StringComparison.Ordinal)
                 || ((TextBlock)window.FindName("SampleHeading")).Visibility != Visibility.Visible)
                 throw new IOException("The template library did not expose its actual retained formatting and native sample: " + details);
             var list = (ListBox)window.FindName("TemplateList"); var use = (Button)window.FindName("UseButton");

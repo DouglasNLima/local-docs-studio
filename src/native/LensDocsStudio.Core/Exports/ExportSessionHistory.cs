@@ -7,7 +7,7 @@ namespace LensDocsStudio.Core.Exports;
 public sealed record SavedExport(Guid Id, string Path, long Bytes, string Sha256, DateTimeOffset SavedAt)
 {
     public string Name => System.IO.Path.GetFileName(Path);
-    public string Details => Name + " · " + SavedAt.ToLocalTime().ToString("t");
+    public string Details => Name + " · " + SavedAt.ToLocalTime().ToString("HH:mm", System.Globalization.CultureInfo.GetCultureInfo("en-GB"));
 
     public static SavedExport FromSavedBytes(string path, byte[] bytes)
     {

@@ -35,6 +35,7 @@ internal static partial class NativeUiChecks
             if (more.IsOffscreen || !window.BoundingRectangle.Contains(more.BoundingRectangle))
                 throw new IOException("The actual overflow command is clipped at minimum size.");
             more.Click();
+            window.CaptureToFile(Path.Combine(output, "native-minimum-overflow.png"));
             if (settingsInOverflow)
                 Wait(() => (settingsCommand = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process).And(cf.ByAutomationId("ToolbarSettings")))
                     .FirstOrDefault(command => !command.IsOffscreen)) is not null, "Overflow did not expose its actual Settings command.");
@@ -48,7 +49,6 @@ internal static partial class NativeUiChecks
                 editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == original, "The overflowing formatting action did not retain one exact Undo.");
             }
-            window.CaptureToFile(Path.Combine(output, "native-minimum-overflow.png"));
             settingsCommand!.AsButton().Invoke();
             Window? settings = null;
             Wait(() => (settings = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings")))?.AsWindow()) is not null,

@@ -1072,7 +1072,8 @@ internal static partial class NativeUiChecks
             NameTemplate("Name Word template", "native-template", "Reusable Café");
             Wait(() => Find(libraryWindow, "WordTemplateStatus").Name.StartsWith("Imported Reusable Café.", StringComparison.Ordinal)
                 && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The native library did not import reusable template formatting.");
-            Wait(() => Find(libraryWindow, "WordTemplateFormatting").Name.Contains("1 headers · 1 footers · 1 embedded", StringComparison.Ordinal),
+            Wait(() => Find(libraryWindow, "WordTemplateFormatting").Name.Contains("Headers: 1 · footers: 1", StringComparison.Ordinal)
+                && Find(libraryWindow, "WordTemplateFormatting").Name.Contains("Embedded header/footer images: 1", StringComparison.Ordinal),
                 "The imported template did not expose its retained formatting and embedded resources.");
             if (!Find(libraryWindow, "WordTemplateStatus").Name.Contains(LensDocsStudio.Core.Exports.DocxTemplateService.AttachedTemplateWarning, StringComparison.Ordinal))
                 throw new IOException("The attached-template import did not show its safe omission warning.");

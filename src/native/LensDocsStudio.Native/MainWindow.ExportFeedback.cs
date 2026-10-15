@@ -21,11 +21,12 @@ public partial class MainWindow
     private void RecentExportsOpened(object sender, RoutedEventArgs e)
     {
         if (!ReferenceEquals(sender, e.Source) || sender is not MenuItem menu) return;
-        menu.Items.Clear();
-        if (model.ExportHistory.Entries.Count == 0) { menu.Items.Add(new MenuItem { Header = "No exports this session", IsEnabled = false }); return; }
+        var previous = menu.Items.Cast<object>().ToArray();
+        if (model.ExportHistory.Entries.Count == 0) menu.Items.Add(new MenuItem { Header = "No exports this session", IsEnabled = false });
         foreach (var saved in model.ExportHistory.Entries)
         {
-            var item = new MenuItem { Header = saved.Details, ToolTip = saved.Path };
+            var item = new MenuItem { Header = new TextBlock { Text = saved.Details, MaxWidth = 320, TextTrimming = TextTrimming.CharacterEllipsis }, ToolTip = saved.Path };
+            System.Windows.Automation.AutomationProperties.SetName(item, saved.Details);
             var open = new MenuItem { Header = "Open file" }; open.Click += async (_, _) => await UseExportAsync(saved, false);
             var reveal = new MenuItem { Header = "Show in folder" }; reveal.Click += async (_, _) => await UseExportAsync(saved, true);
             var copy = new MenuItem { Header = "Copy path" };
@@ -37,5 +38,7 @@ public partial class MainWindow
             };
             item.Items.Add(open); item.Items.Add(reveal); item.Items.Add(copy); menu.Items.Add(item);
         }
+        // Keep at least one child while refreshing an open native submenu, retaining its header role.
+        foreach (var old in previous) menu.Items.Remove(old);
     }
 }

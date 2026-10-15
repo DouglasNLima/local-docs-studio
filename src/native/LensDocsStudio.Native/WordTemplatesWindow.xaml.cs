@@ -62,9 +62,9 @@ public partial class WordTemplatesWindow : Window
             {
             if (cancellation.IsCancellationRequested || !ReferenceEquals(Selected, entry)) return;
             if (prepared.Summary is not { } summary) throw new InvalidDataException("The template formatting summary is unavailable.");
-            FormattingDetails.Text = $"{summary.StyleCount} styles · {summary.NumberingCount} numbering definitions\n"
+            FormattingDetails.Text = $"Styles: {summary.StyleCount} · numbering definitions: {summary.NumberingCount}\n"
                 + "Headings: " + (summary.HeadingStyles.Count == 0 ? "Default export heading styles" : string.Join(", ", summary.HeadingStyles))
-                + $"\nPage: {summary.PageSize}\nMargins: {summary.Margins}\n{summary.Headers} headers · {summary.Footers} footers · {summary.EmbeddedImages} embedded header/footer images";
+                + $"\nPage: {summary.PageSize}\nMargins: {summary.Margins}\nHeaders: {summary.Headers} · footers: {summary.Footers}\nEmbedded header/footer images: {summary.EmbeddedImages}";
             StyleDetails.Text = summary.Styles.Count == 0 ? "Default export styles will be used." : string.Join(" · ", summary.Styles)
                 + (summary.StyleCount > summary.Styles.Count ? " · Additional styles retained" : "");
             ApplySample(SampleHeading, summary.HeadingSample); ApplySample(SampleBody, summary.BodySample);
