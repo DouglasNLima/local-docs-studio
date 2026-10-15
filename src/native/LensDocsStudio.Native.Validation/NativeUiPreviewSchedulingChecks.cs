@@ -8,7 +8,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckPreviewScheduling(Window window, AutomationElement editor, string output, string source)
     {
-        var original = ReadEditorText(editor); var saved = File.ReadAllText(source);
+        var original = ReadEditorText(editor); var saved = ReadObservedText(source);
         var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string marker = "Editor-only current preview fixture";
         var addition = "\n\n# " + marker + "\n\nCurrent selectable content.";
@@ -39,7 +39,7 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "FindContext").Name == "Find in editor", "Editor-only layout searched its hidden preview.");
             Keyboard.Type(VirtualKeyShort.ESCAPE); Layout("Split");
             Wait(() => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal), "Split layout did not resume its preview.");
-            if (ReadEditorText(editor) != original || File.ReadAllText(source) != saved)
+            if (ReadEditorText(editor) != original || ReadObservedText(source) != saved)
                 throw new IOException("Preview scheduling, text copying or layout search changed the source.");
         }
         finally { RestoreClipboard(previous, owned); }

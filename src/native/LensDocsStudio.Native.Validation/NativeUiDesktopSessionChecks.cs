@@ -128,7 +128,11 @@ internal static partial class NativeUiChecks
             throw new IOException("Observing a missing generation changed bytes or accepted the wrong state.");
 
         var wrong = JsonSerializer.SerializeToUtf8Bytes(expected with { Desktop = expected.Desktop! with { ShowSidebar = true } });
-        File.WriteAllBytes(path, wrong); Exception? mismatch = null; var mismatchAttempts = 0;
+        File.WriteAllBytes(path, wrong);
+        using (var producer = new FileStream(path, FileMode.Open, FileAccess.ReadWrite, FileShare.Read))
+            if (ReadObservedText(path) != System.Text.Encoding.UTF8.GetString(wrong))
+                throw new IOException("The source-file observer failed to coexist with the application's writer sharing contract.");
+        Exception? mismatch = null; var mismatchAttempts = 0;
         try
         {
             Wait(() => { mismatchAttempts++; return ReadDesktopState<UserPreferences>(root, "preferences.json").Desktop == expected.Desktop; },
@@ -141,11 +145,12 @@ internal static partial class NativeUiChecks
         File.WriteAllText(path, "{"); Exception? malformed = null; var malformedAttempts = 0;
         try { Wait(() => { malformedAttempts++; ReadDesktopState<UserPreferences>(root, "preferences.json"); return true; }, "Malformed state", 1); }
         catch (JsonException error) { malformed = error; }
-        if (malformed is null || malformedAttempts != 1 || File.ReadAllText(path) != "{")
+        if (malformed is null || malformedAttempts != 1 || ReadObservedText(path) != "{")
             throw new IOException("Malformed desktop state was swallowed, retried or repaired.");
         File.WriteAllText(Path.Combine(output, "native-desktop-state-observation-regression.json"), JsonSerializer.Serialize(new {
             Passed = true, LockedGenerationRetried = true, MissingGenerationRetried = true,
             ExactStateAndBytesRetained = true, PersistentMismatchRejected = true, MalformedStateFailsImmediately = true,
+            TextObserverAllowsProducerWrites = true,
             ObservationDeadlineSeconds = 1, ProductionDeadlineSeconds = 20, InputActionsExecuted = 0,
             lockedAttempts, missingAttempts, mismatchAttempts, malformedAttempts }));
     }

@@ -126,8 +126,9 @@ public sealed class DocxExporter
                             new W.LevelText { Val = list.IsOrdered ? "%" + (level + 1) + "." : "•" },
                             new W.LevelJustification { Val = W.LevelJustificationValues.Left },
                             new W.PreviousParagraphProperties(new W.Indentation { Left = ((level + 1) * 360).ToString(), Hanging = "240" })) { LevelIndex = level });
-                        numbering.Numbering.InsertBefore(definition, numbering.Numbering.Elements<W.NumberingInstance>().FirstOrDefault());
-                        numbering.Numbering.Append(new W.NumberingInstance(new W.AbstractNumId { Val = abstractId }) { NumberID = id });
+                        // Word's optional cleanup marker must remain after every numbering definition/instance.
+                        numbering.Numbering.InsertBefore(definition, numbering.Numbering.ChildElements.FirstOrDefault(element => element is W.NumberingInstance or W.NumberingIdMacAtCleanup));
+                        numbering.Numbering.InsertBefore(new W.NumberingInstance(new W.AbstractNumId { Val = abstractId }) { NumberID = id }, numbering.Numbering.GetFirstChild<W.NumberingIdMacAtCleanup>());
                         foreach (var item in list.OfType<ListItemBlock>())
                         {
                             var context = new ListItemContext(id, depth);

@@ -192,6 +192,15 @@ public partial class MainWindow
                     var position = view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight / 3));
                     if (position is null) return;
                     offset = Editor.Document.GetOffset(position.Value.Line, position.Value.Column);
+                    // Prefer a section heading already visible above the scroll point. Its following
+                    // paragraph can start on the next printed page; keep that section identifiable.
+                    // Long paragraphs/code without a visible heading still use their exact source point.
+                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first)
+                    {
+                        var visibleStart = Editor.Document.GetOffset(first.Line, first.Column);
+                        var heading = parsed?.Headings.LastOrDefault(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= offset);
+                        if (heading is not null) offset = heading.SourceStart;
+                    }
                 }
                 result.RevealSource(offset);
                 var pointer = result.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;

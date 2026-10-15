@@ -76,6 +76,18 @@ internal static partial class NativeUiChecks
         Wait(() => Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem)).Any(item => item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal)),
             "The completed output is absent from session-scoped recent exports.");
         window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png")); Keyboard.Type(VirtualKeyShort.ESCAPE); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        Find(window, "RevealExportedFile").AsButton().Invoke();
+        Window? explorer = null;
+        Wait(() =>
+        {
+            explorer = automation.GetDesktop().FindAllChildren(cf => cf.ByControlType(ControlType.Window))
+                .Where(candidate => candidate.Properties.ProcessId.ValueOrDefault != process)
+                .FirstOrDefault(candidate => candidate.FindAllDescendants(cf => cf.ByControlType(ControlType.ListItem))
+                    .Any(item => (item.Name == "refinement-export.html" || item.Name == "refinement-export")
+                        && item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value))?.AsWindow();
+            return explorer is not null;
+        }, "Show in folder did not select the actual saved output in Windows Explorer.");
+        explorer!.CaptureToFile(Path.Combine(output, "native-refinement-export-revealed.png")); explorer.Close(); FocusWindow(window);
         File.Delete(exported); Find(window, "OpenExportedFile").AsButton().Invoke();
         Wait(() => Find(window, "Status").Name.StartsWith("The exported file is unavailable or has changed", StringComparison.Ordinal), "A missing output did not fail gracefully before shell opening.");
         if (window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"))?.IsOffscreen == false) throw new IOException("A superseded export kept its success actions visible.");
@@ -83,7 +95,7 @@ internal static partial class NativeUiChecks
         window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height); editor.Focus();
         File.WriteAllText(Path.Combine(output, "native-refinement.json"), JsonSerializer.Serialize(new { Passed = true,
             Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
-            WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
+            WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
 
         AutomationElement Tree(string name, string description)
         {

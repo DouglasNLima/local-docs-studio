@@ -9,22 +9,22 @@ internal static partial class NativeUiChecks
 {
     private static void CheckCaseOnlyRename(Window owner, AutomationElement editor, UIA3Automation automation, int process, string source, string target)
     {
-        var before = ReadEditorText(editor); var sourceSaved = File.ReadAllText(source); var targetSaved = File.ReadAllBytes(target);
+        var before = ReadEditorText(editor); var sourceSaved = ReadObservedText(source); var targetSaved = File.ReadAllBytes(target);
         var originalName = Path.GetFileName(target); var upperName = Path.GetFileNameWithoutExtension(target).ToUpperInvariant() + Path.GetExtension(target);
         var originalReference = Uri.EscapeDataString(originalName); var upperReference = Uri.EscapeDataString(upperName);
         Find(owner, "NavigateForward").Click();
-        Wait(() => editor.Patterns.Value.Pattern.Value.Value == File.ReadAllText(target), "Forward did not restore the document for case-only rename validation.");
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == ReadObservedText(target), "Forward did not restore the document for case-only rename validation.");
         Rename(upperName);
         Wait(() => Directory.EnumerateFiles(Path.GetDirectoryName(target)!).Any(path => Path.GetFileName(path) == upperName)
-            && File.ReadAllText(source).Contains(upperReference, StringComparison.Ordinal), "The case-only rename did not update the actual filename and incoming reference.");
+            && ReadObservedText(source).Contains(upperReference, StringComparison.Ordinal), "The case-only rename did not update the actual filename and incoming reference.");
         Find(owner, "NavigateBack").Click();
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == before.Replace(originalReference, upperReference, StringComparison.Ordinal),
             "Case-only rename did not refresh the affected open draft or navigation history.");
         Find(owner, "NavigateForward").Click();
-        Wait(() => editor.Patterns.Value.Pattern.Value.Value == File.ReadAllText(target), "Forward did not restore the case-renamed document.");
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == ReadObservedText(target), "Forward did not restore the case-renamed document.");
         Rename(originalName);
         Wait(() => Directory.EnumerateFiles(Path.GetDirectoryName(target)!).Any(path => Path.GetFileName(path) == originalName)
-            && File.ReadAllText(source) == sourceSaved, "Renaming the document back did not restore the original file/link spelling.");
+            && ReadObservedText(source) == sourceSaved, "Renaming the document back did not restore the original file/link spelling.");
         Find(owner, "NavigateBack").Click();
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == before, "Returning from the restored filename lost the source draft.");
         if (!File.ReadAllBytes(target).SequenceEqual(targetSaved)) throw new IOException("Case-only renaming changed document bytes.");

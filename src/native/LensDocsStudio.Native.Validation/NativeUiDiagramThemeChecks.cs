@@ -14,7 +14,7 @@ internal static partial class NativeUiChecks
             using var input = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
             return JsonSerializer.Deserialize<UserPreferences>(input)!;
         }
-        var before = Read(); var text = ReadEditorText(editor); var saved = File.ReadAllText(source);
+        var before = Read(); var text = ReadEditorText(editor); var saved = ReadObservedText(source);
         var imageId = "DiagramPreview" + text.IndexOf("```mermaid", StringComparison.Ordinal);
         var originalHelp = Find(window, imageId).Properties.HelpText.Value;
         var checks = new List<object>();
@@ -31,7 +31,7 @@ internal static partial class NativeUiChecks
         Appearance(before.Theme);
         Select(before.Preview?.DiagramTheme ?? "Auto", originalHelp["Diagram theme: ".Length..]);
         var after = Read();
-        if (ReadEditorText(editor) != text || File.ReadAllText(source) != saved || after.Theme != before.Theme
+        if (ReadEditorText(editor) != text || ReadObservedText(source) != saved || after.Theme != before.Theme
             || WorkspaceSettings.From(after).Preview != WorkspaceSettings.From(before).Preview
             || after.AutomaticUpdateChecks != before.AutomaticUpdateChecks || after.UpdateChannel != before.UpdateChannel)
             throw new IOException("Diagram theme selection changed source, unrelated preferences or update consent.");

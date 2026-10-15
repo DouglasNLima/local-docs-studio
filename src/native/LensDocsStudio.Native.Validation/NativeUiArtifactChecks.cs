@@ -51,7 +51,7 @@ internal static partial class NativeUiChecks
         Wait(() => Find(owner, "Status").Name.StartsWith("Imported ", StringComparison.Ordinal)
             && Find(owner, "Status").Name.Contains("Artefact bundle", StringComparison.Ordinal), "The artefact bundle did not import.");
         var root = Directory.GetDirectories(parent, "artefact-input-import-*").Single();
-        var home = File.ReadAllText(Path.Combine(root, "README.md"));
+        var home = ReadObservedText(Path.Combine(root, "README.md"));
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == home, "The imported entry document did not open.");
         if (File.Exists(Path.Combine(root, ArtifactBundleManifest.Filename))) throw new IOException("ZIP metadata was persisted as workspace content.");
         Find(owner, "ViewMenu").Click(); Find(owner, "OpenArtifactReader").Patterns.Invoke.Pattern.Invoke();
@@ -74,7 +74,7 @@ internal static partial class NativeUiChecks
         Wait(() => Find(reader, "OpenArtifactDocument").IsEnabled && Find(reader, "ArtifactStatus").Name.StartsWith("1 of ", StringComparison.Ordinal),
             "Artefact path search did not select the candidate document.");
         Find(reader, "OpenArtifactDocument").AsButton().Invoke();
-        var document = Path.Combine(root, "findings", "candidate-risk.md"); var source = File.ReadAllText(document);
+        var document = Path.Combine(root, "findings", "candidate-risk.md"); var source = ReadObservedText(document);
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == source, "The selected artefact document did not open.");
         var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string draft = "\n\nReviewer draft remains a candidate.\n";
@@ -110,7 +110,7 @@ internal static partial class NativeUiChecks
                 using var text = new StreamReader(zip.GetEntry("findings/candidate-risk.md")!.Open());
                 if (text.ReadToEnd() != source + draft) throw new IOException("Generic Markdown export lost unsaved source.");
             }
-            if (File.ReadAllText(document) != source || !originalArchive.SequenceEqual(SHA256.HashData(File.ReadAllBytes(input))))
+            if (ReadObservedText(document) != source || !originalArchive.SequenceEqual(SHA256.HashData(File.ReadAllBytes(input))))
                 throw new IOException("Artefact review or export changed the saved source or original archive.");
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == source, "One Undo did not restore the complete artefact review insertion.");
@@ -127,7 +127,7 @@ internal static partial class NativeUiChecks
         Find(owner, "ExportMenu").Click();
         if (Find(owner, "ExportArtifactReviewPack").IsEnabled) throw new IOException("Restart enabled review-pack export without an imported manifest.");
         Keyboard.Type(VirtualKeyShort.ESCAPE);
-        if (File.Exists(Path.Combine(root, ArtifactBundleManifest.Filename)) || File.ReadAllText(document) != source)
+        if (File.Exists(Path.Combine(root, ArtifactBundleManifest.Filename)) || ReadObservedText(document) != source)
             throw new IOException("Session restoration persisted artefact metadata or changed imported source.");
     }
 }

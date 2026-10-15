@@ -162,6 +162,7 @@ public sealed class DocxTemplateService
         if (attachedReferences.Count != references.Length || references.Length > 1
             || attachedReferences.Any(reference => reference.PartPath != settingsPart?.Uri.OriginalString)
             || references.Any(reference => reference is not W.AttachedTemplate || reference.Parent != settingsPart?.Settings
+                || reference.HasChildren || reference.GetAttributes().Any(attribute => attribute.NamespaceUri != RelationshipNamespace || attribute.LocalName != "id")
                 || reference.GetAttribute("id", RelationshipNamespace).Value != attachedReferences.Single().Id))
             throw new InvalidDataException("The attached Word template reference is missing, duplicated or inconsistent with its document settings relationship.");
         var pending = new Queue<OpenXmlPart>(); var seen = new HashSet<OpenXmlPart>(); pending.Enqueue(first);
@@ -172,12 +173,20 @@ public sealed class DocxTemplateService
             foreach (var relationship in part.ExternalRelationships)
                 if (part != settingsPart || relationship.RelationshipType != AttachedTemplateRelationship
                     || attachedReferences.Count != 1 || relationship.Id != attachedReferences[0].Id)
-                    throw new InvalidDataException("The Word template contains an unsupported external resource.");
+                    throw new InvalidDataException(ExternalResourceMessage(relationship.RelationshipType));
             foreach (var link in part.HyperlinkRelationships)
                 if (!link.Uri.IsAbsoluteUri || link.Uri.Scheme is not ("https" or "http" or "mailto")) throw new InvalidDataException("The Word template contains an unsafe hyperlink.");
             foreach (var child in part.Parts) pending.Enqueue(child.OpenXmlPart);
         }
     }
+
+    private static string ExternalResourceMessage(string type) => type switch
+    {
+        RelationshipNamespace + "/image" => "The Word template contains an external image. Use embedded static images instead.",
+        RelationshipNamespace + "/oleObject" => "The Word template contains an external OLE object. Active objects are not supported.",
+        RelationshipNamespace + "/aFChunk" or RelationshipNamespace + "/subDocument" => "The Word template contains external document content. Linked document retrieval is not supported.",
+        _ => "The Word template contains an unsupported external relationship type. Only passive attached-template metadata and supported ordinary hyperlinks are allowed."
+    };
 
     private static IEnumerable<string> RelationshipIds(OpenXmlElement root) => root.Descendants().Prepend(root)
         .SelectMany(element => element.GetAttributes()).Where(attribute => attribute.NamespaceUri == RelationshipNamespace)
@@ -285,7 +294,7 @@ public sealed class DocxTemplateService
                 }
                 else if (mode == "External")
                 {
-                    if (type != RelationshipNamespace + "/hyperlink") throw new InvalidDataException("The Word template contains an unsupported external resource.");
+                    if (type != RelationshipNamespace + "/hyperlink") throw new InvalidDataException(ExternalResourceMessage(type));
                     if (!Uri.TryCreate(target, UriKind.Absolute, out var uri) || uri.Scheme is not ("https" or "http" or "mailto"))
                         throw new InvalidDataException("The Word template contains an unsafe hyperlink.");
                 }

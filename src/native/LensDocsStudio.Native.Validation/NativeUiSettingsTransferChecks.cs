@@ -10,9 +10,9 @@ internal static partial class NativeUiChecks
     private static void CheckSettingsTransfer(Window owner, AutomationElement editor, UIA3Automation automation, int process,
         string state, string output, string source, Action<string, string> open, Action<string, string> save)
     {
-        var sourceText = ReadEditorText(editor); var savedSource = File.ReadAllText(source);
+        var sourceText = ReadEditorText(editor); var savedSource = ReadObservedText(source);
         var preferencesPath = Path.Combine(state, "preferences.json");
-        UserPreferences Read() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencesPath))!;
+        UserPreferences Read() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferencesPath))!;
         var original = Read(); var originalSettings = WorkspaceSettings.From(original);
         var backup = Path.Combine(output, "settings-" + Guid.NewGuid().ToString("N") + ".json");
         var browser = Path.Combine(output, "browser-settings-" + Guid.NewGuid().ToString("N") + ".json");
@@ -40,7 +40,7 @@ internal static partial class NativeUiChecks
             || !applied.RecentDocuments!.SequenceEqual(original.RecentDocuments!))
             throw new IOException("Applying imported appearance choices lost unrelated preferences or did not persist the reviewed settings.");
         settings = OpenSettingsWindow(owner, automation, process); Import(backup); Close("SettingsApply");
-        if (WorkspaceSettings.From(Read()) != originalSettings || ReadEditorText(editor) != sourceText || File.ReadAllText(source) != savedSource)
+        if (WorkspaceSettings.From(Read()) != originalSettings || ReadEditorText(editor) != sourceText || ReadObservedText(source) != savedSource)
             throw new IOException("Restoring exported settings did not recover the original appearance or changed source text.");
         void Import(string path)
         {

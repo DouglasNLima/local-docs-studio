@@ -24,7 +24,7 @@ internal static partial class NativeUiChecks
         var output = Path.Combine(root, "running-application"); Directory.CreateDirectory(output);
         var state = Path.Combine(output, "state"); Directory.CreateDirectory(state);
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(AutomaticUpdateChecks: false)));
-        var original = File.ReadAllText(source); var sourceBytes = File.ReadAllBytes(source);
+        var original = ReadObservedText(source); var sourceBytes = File.ReadAllBytes(source);
         const string addition = "Unsaved installer draft: Café and こんにちは.";
         var draft = original + addition;
         var installationBefore = SnapshotInstallation();

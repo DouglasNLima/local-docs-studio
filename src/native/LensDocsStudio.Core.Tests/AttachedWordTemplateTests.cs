@@ -105,6 +105,7 @@ public sealed class AttachedWordTemplateTests
     [InlineData("duplicate-reference")]
     [InlineData("nested-reference")]
     [InlineData("missing-relationship")]
+    [InlineData("unsupported-attribute")]
     public void Inconsistent_settings_references_are_rejected(string variant)
     {
         using var stream = new MemoryStream(); stream.Write(Template());
@@ -118,6 +119,7 @@ public sealed class AttachedWordTemplateTests
                 case "duplicate-reference": part.Settings.Append(reference.CloneNode(true)); break;
                 case "nested-reference": reference.Remove(); part.Settings.Append(new W.Compatibility(reference)); break;
                 case "missing-relationship": part.DeleteExternalRelationship("attached"); break;
+                case "unsupported-attribute": reference.SetAttribute(new OpenXmlAttribute("action", "", "open")); break;
             }
         }
         Assert.Throws<InvalidDataException>(() => new DocxTemplateService().Prepare(stream.ToArray()));
@@ -170,5 +172,93 @@ public sealed class AttachedWordTemplateTests
             document.MainDocumentPart!.AddExternalRelationship("http://schemas.openxmlformats.org/officeDocument/2006/relationships/" + type,
                 new Uri("https://example.invalid/active"), "unsafe");
         Assert.Throws<InvalidDataException>(() => new DocxTemplateService().Prepare(stream.ToArray()));
+    }
+
+    [Fact]
+    public void Attached_template_removal_preserves_actual_embedded_header_and_footer_pixels()
+    {
+        var pixels = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aX1sAAAAASUVORK5CYII=");
+        var content = Content("![Logo](logo.png)") with { Images = new Dictionary<string, ExportImage> { ["logo.png"] = new(pixels, 1, 1, "Retained logo") } };
+        using var imageSource = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(content)), false);
+        var drawing = imageSource.MainDocumentPart!.Document!.Descendants<W.Drawing>().Single();
+        using var stream = new MemoryStream(); stream.Write(Template());
+        using (var package = WordprocessingDocument.Open(stream, true))
+        {
+            var main = package.MainDocumentPart!; var id = 1u;
+            foreach (var part in new OpenXmlPart[] { main.HeaderParts.Single(), main.FooterParts.Single() })
+            {
+                var retained = (W.Drawing)drawing.CloneNode(true);
+                retained.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().Single().Embed = "logo";
+                retained.Descendants<DocumentFormat.OpenXml.Drawing.Wordprocessing.DocProperties>().Single().Id = id++;
+                var image = part.AddNewPart<ImagePart>("image/png", "logo"); using var data = new MemoryStream(pixels); image.FeedData(data);
+                part.RootElement!.Append(new W.Paragraph(new W.Run(retained)));
+            }
+        }
+        var prepared = new DocxTemplateService().Prepare(stream.ToArray());
+        Assert.Equal(2, prepared.Summary!.EmbeddedImages);
+        using var result = WordprocessingDocument.Open(new MemoryStream(prepared.Bytes), false);
+        foreach (var part in result.MainDocumentPart!.HeaderParts.Cast<OpenXmlPart>().Concat(result.MainDocumentPart.FooterParts))
+        {
+            var image = part.Parts.Single(pair => pair.OpenXmlPart is ImagePart).OpenXmlPart;
+            using var data = image.GetStream(); using var copy = new MemoryStream(); data.CopyTo(copy); Assert.Equal(pixels, copy.ToArray());
+        }
+        Assert.Empty(new OpenXmlValidator().Validate(result));
+    }
+
+    [Theory]
+    [InlineData("https://127.0.0.1:9/#Unsafe")]
+    [InlineData("file:///C:/unavailable/#Unsafe")]
+    [InlineData("\\\\invalid\\fonts#Unsafe")]
+    public void Formatting_samples_never_treat_imported_font_names_as_resource_locations(string untrustedFont)
+    {
+        using var stream = new MemoryStream(); stream.Write(Template());
+        using (var document = WordprocessingDocument.Open(stream, true))
+        {
+            var body = document.MainDocumentPart!.StyleDefinitionsPart!.Styles!.Elements<W.Style>().Single(style => style.StyleId == "Normal");
+            body.StyleRunProperties!.RunFonts = new W.RunFonts { Ascii = untrustedFont, HighAnsi = untrustedFont };
+            body.StyleRunProperties.FontSize = new W.FontSize { Val = "144" };
+        }
+        var prepared = new DocxTemplateService().Prepare(stream.ToArray());
+        Assert.Equal("Segoe UI", prepared.Summary!.BodySample.FontFamily);
+        Assert.Equal(36, prepared.Summary.BodySample.Points);
+    }
+
+    [Theory]
+    [InlineData("https://example.invalid/remote-font/#Unsafe")]
+    [InlineData("\\\\unavailable.invalid\\fonts#Unsafe")]
+    public void Overlong_resource_like_font_names_retain_the_existing_Word_schema_rejection(string untrustedFont)
+    {
+        using var stream = new MemoryStream(); stream.Write(Template());
+        using (var document = WordprocessingDocument.Open(stream, true))
+        {
+            var body = document.MainDocumentPart!.StyleDefinitionsPart!.Styles!.Elements<W.Style>().Single(style => style.StyleId == "Normal");
+            body.StyleRunProperties!.RunFonts = new W.RunFonts { Ascii = untrustedFont };
+        }
+        Assert.Throws<InvalidDataException>(() => new DocxTemplateService().Prepare(stream.ToArray()));
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Exported_lists_keep_Words_cleanup_marker_after_all_numbering_definitions(bool noExistingInstances)
+    {
+        using var stream = new MemoryStream(); stream.Write(Template());
+        using (var document = WordprocessingDocument.Open(stream, true))
+        {
+            var main = document.MainDocumentPart!;
+            if (noExistingInstances)
+            {
+                main.NumberingDefinitionsPart!.Numbering!.RemoveAllChildren<W.NumberingInstance>();
+                foreach (var paragraph in main.Document!.Descendants<W.ParagraphProperties>()) paragraph.RemoveAllChildren<W.NumberingProperties>();
+            }
+            main.NumberingDefinitionsPart!.Numbering!.Append(new W.NumberingIdMacAtCleanup { Val = 42 });
+        }
+        var prepared = new DocxTemplateService().Prepare(stream.ToArray());
+        using var result = WordprocessingDocument.Open(new MemoryStream(new DocxExporter().Export(Content("1. First list\n\nParagraph.\n\n- Another list"), prepared.Bytes)), false);
+        var numbering = result.MainDocumentPart!.NumberingDefinitionsPart!.Numbering!;
+        Assert.IsType<W.NumberingIdMacAtCleanup>(numbering.LastChild);
+        Assert.Equal(42, numbering.GetFirstChild<W.NumberingIdMacAtCleanup>()!.Val!.Value);
+        Assert.Equal(noExistingInstances ? 2 : 3, numbering.Elements<W.NumberingInstance>().Count());
+        Assert.Empty(new OpenXmlValidator().Validate(result));
     }
 }
