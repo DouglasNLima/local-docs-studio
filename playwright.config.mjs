@@ -3,6 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 const port = Number(process.env.LENS_TEST_PORT || 4173);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('LENS_TEST_PORT must be a port between 1024 and 65535.');
 const baseURL = `http://127.0.0.1:${port}`;
+const testBrowser = process.env.LENS_TEST_BROWSER;
+if (testBrowser && !['chromium', 'edge'].includes(testBrowser)) throw new Error('LENS_TEST_BROWSER must be chromium or edge.');
 
 export default defineConfig({
   testDir: './tests/browser',
@@ -33,5 +35,5 @@ export default defineConfig({
       name: 'edge',
       use: { ...devices['Desktop Edge'], channel: 'msedge' },
     },
-  ],
+  ].filter(project => !testBrowser || project.name === testBrowser),
 });
