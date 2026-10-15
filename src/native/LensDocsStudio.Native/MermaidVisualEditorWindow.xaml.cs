@@ -93,7 +93,7 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Direction.SelectedItem = draft.Model.Direction;
-            choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" "), node.Shape is FlowNodeShape.Decision or FlowNodeShape.Terminal or FlowNodeShape.Rounded or FlowNodeShape.Circle ? node.Shape.ToString() : "Process"))
+            choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" "), node.Shape.ToString()))
                 .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
             Elements.ItemsSource = choices;
@@ -127,6 +127,7 @@ public partial class MermaidVisualEditorWindow : Window
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
+        UpdateNodeButton.Visibility = NodeProperties.Visibility == Visibility.Visible && PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
         NodeClassField.Visibility = ClassButton.Visibility = NodeClass.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
     private async Task<bool> Execute(MermaidEditOperation operation, string? select = null)

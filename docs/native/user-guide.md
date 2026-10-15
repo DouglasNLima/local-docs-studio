@@ -123,6 +123,25 @@ To add or edit a caption, put the caret inside a standalone Markdown image and c
 
 Write Mermaid inside a fenced `mermaid` block or open a standalone `.mmd` or `.mermaid` file. Supported diagrams render through bundled .NET components. **Zoom**, **SVG**, **PNG** and **Copy source** actions appear beside a rendered diagram.
 
+In **Mermaid Visual Editor**, the Elements tiles show the supported shape vocabulary;
+click to insert or drag onto the canvas. The diagram list remains the keyboard and
+multi-selection alternative. Use the grouped toolbar for history, direction, layout,
+zoom and rendered preview; **More commands** holds commands that do not fit.
+
+Properties are grouped by the selected element. **Update node** stays above the
+scrolling fields and commits the pending node values together. Membership, class
+and colour actions retain their existing explicit behaviour. **Reset changes**
+appears while values are pending. Selection changes and document Apply remain
+blocked until those values are updated or explicitly reset. Colour swatches preview
+six-digit hexadecimal values; the validated source value remains authoritative.
+
+The tick in the **Mermaid source** header validates source changes; the adjacent copy
+icon copies the draft. A star marks source needing validation or protected source;
+its tooltip explains the state. Collapse the header to reclaim canvas space. The
+**Session layout** tooltip explains that manual positions are temporary. Apply and
+Cancel remain in the fixed footer; hover a shortened status to read its full message.
+
+
 Choose **View → Diagram theme** or use **Edit → Settings → Diagram theme**. Auto follows the application appearance; Lens, Default, Neutral, Forest and Dark stay fixed. The choice is saved on this device. Diagrams keep the selected palette in previews, workspace maps, SVG/PNG, Word/PDF/HTML, clipboard content and Docs Sites. A Docs Site can use a different page theme without changing its diagram images. These are native palette equivalents; browser Mermaid layout and colours are not reproduced pixel for pixel. Markdown source is unchanged.
 
 The built-in catalogue includes examples for the supported diagram families. If a diagram cannot be rendered, its source is preserved and the preview explains the problem. **Copy source** copies the diagram code; **Edit source** opens the editor at its fence, or at the beginning of a standalone Mermaid file, and clears any previous selection. From Preview layout, this switches to Split so you can correct the code immediately. If the document has changed since the preview was drawn, wait for the updated preview before using Edit source. Full compatibility with every browser Mermaid version is still being evaluated.

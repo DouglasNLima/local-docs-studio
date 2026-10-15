@@ -17,6 +17,7 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, ToggleButton> canvasElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Button> ports = new(StringComparer.Ordinal);
     private readonly Dictionary<string, System.Windows.Shapes.Path> connectionPaths = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, System.Windows.Shapes.Path> connectionHitPaths = new(StringComparer.Ordinal);
     private DispatcherOperation? connectionUpdate;
     private Point? dragStart, panStart;
     private Dictionary<string, MermaidLayoutBox>? dragged;
@@ -43,7 +44,7 @@ public partial class MermaidVisualEditorWindow
         if (layout) positions.Clear();
         foreach (var key in positions.Keys.Where(key => !arranged.ContainsKey(key)).ToArray()) positions.Remove(key);
         foreach (var (key, box) in arranged) if (!positions.ContainsKey(key) || key.StartsWith("group:", StringComparison.Ordinal)) positions[key] = box;
-        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); inlineEditor = null;
+        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
         foreach (var group in draft.Model.Subgraphs)
         {
             var key = "group:" + group.Id; if (!positions.TryGetValue(key, out var box)) continue;
@@ -145,10 +146,14 @@ public partial class MermaidVisualEditorWindow
             geometry.Freeze();
             if (!connectionPaths.TryGetValue(edge.Id, out var path))
             {
+                var hit = new System.Windows.Shapes.Path { Stroke = Brushes.Transparent, StrokeThickness = 12 };
+                hit.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; };
+                Panel.SetZIndex(hit, 4); DiagramCanvas.Children.Add(hit); connectionHitPaths.Add(edge.Id, hit);
                 path = new System.Windows.Shapes.Path { StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round, StrokeDashArray = edge.Type == FlowConnectionType.Dotted ? new DoubleCollection([3, 3]) : null };
                 path.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; }; Panel.SetZIndex(path, 5);
                 DiagramCanvas.Children.Add(path); connectionPaths.Add(edge.Id, path);
             }
+            connectionHitPaths[edge.Id].Data = geometry;
             path.Data = geometry; path.Stroke = colour; path.StrokeThickness = selected ? 3 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
             if (!canvasElements.TryGetValue(edge.Id, out var button))
             {

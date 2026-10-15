@@ -13,6 +13,8 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
     public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false) => Task.Run(() =>
     {
         Directory.CreateDirectory(Path.GetFullPath(output));
@@ -43,8 +45,9 @@ internal static partial class NativeUiChecks
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(root); info.ArgumentList.Add(path);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native application window did not appear.");
             var editor = Find(main, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "The visual authoring fixture did not load exactly.");
+            main.Patterns.Transform.Pattern.Resize(1280, 840);
             var offset = original.LastIndexOf("```mermaid", StringComparison.Ordinal); Open(offset);
-            Capture("existing-light");
+            Click("MermaidActualSize"); Capture("existing-light");
             if (polish)
             {
                 var source = Draft(); var toggle = Find(visual!, "MermaidSourceToggle");
@@ -166,7 +169,7 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "mermaid-before.md"), original); File.WriteAllText(Path.Combine(output, "mermaid-after.md"), expected);
             if (polish)
             {
-                Open(shiftedOffset);
+                Open(shiftedOffset); Select("node_Reviewed");
                 foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
                 {
                     visual!.Patterns.Transform.Pattern.Move(0, 0);
@@ -307,7 +310,7 @@ internal static partial class NativeUiChecks
         }
         finally { RestoreClipboard(clipboardBefore, clipboardOwned); if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "mermaid-ui.json"), JsonSerializer.Serialize(new
-        { Passed = passed, Checks = checks, Timings = timings, HighContrastRequested = highContrast, Error = error,
+        { Passed = passed, Checks = checks, Timings = timings, HighContrastRequested = highContrast, Dpi = GetDpiForSystem(), Error = error,
             Limitations = "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed." }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
