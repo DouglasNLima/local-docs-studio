@@ -131,8 +131,10 @@ zoom and rendered preview; **More commands** holds commands that do not fit.
 Properties are grouped by the selected element. **Update node** stays above the
 scrolling fields and commits the pending node values together. Membership, class
 and colour actions retain their existing explicit behaviour. **Reset changes**
-appears while values are pending. Selection changes and document Apply remain
-blocked until those values are updated or explicitly reset. Colour swatches preview
+appears while values are pending. Selection changes, node dragging, connection
+completion, inline label editing and document Apply wait until those values are
+updated or explicitly reset. Escape cancels connection mode while retaining pending
+properties and selection. Colour swatches preview
 six-digit hexadecimal values; the validated source value remains authoritative.
 
 The tick in the **Mermaid source** header validates source changes; the adjacent copy

@@ -1,5 +1,14 @@
 # Native validation report
 
+The native Mermaid editor visual integration is tracked in
+[Draft PR 27](https://github.com/DouglasNLima/local-docs-studio/pull/27) on
+`feature/native-mermaid-editor-visual-polish`, targeting verified PR 26 head
+`eb819398`. The [visual integration report](mermaid-editor-visual-polish.md) owns
+the shared-style decisions, inspected Windows captures, regression/package evidence
+and remaining physical certification limits. Core Mermaid source/guard contracts
+remain those in the original editor report. The installed preview and ancestor PRs
+are untouched; GUI and installer execution remains confined to disposable Windows CI.
+
 The [Mermaid visual editor report](mermaid-visual-editor.md) records the current
 source candidate, focused and complete regression totals, actual normal/high-contrast
 WPF authoring, source conflicts and one-Undo preservation, inspected captures,
