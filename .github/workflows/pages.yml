@@ -33,7 +33,7 @@ jobs:
 
       - name: Run checks
         env:
-          DEBUG: pw:browser
+          DEBUG: pw:browser,pw:webserver
         run: npm test
 
       - name: Retain browser failure evidence

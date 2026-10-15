@@ -3,12 +3,18 @@
 import argparse
 import functools
 import http.server
+import socketserver
 from pathlib import Path
 
 
 class TestServer(http.server.ThreadingHTTPServer):
     # Python 3.12 defaults to five pending connections. A cold PWA requests many modules.
     request_queue_size = 128
+
+    def server_bind(self):
+        # HTTPServer normally performs reverse DNS here; loopback fixture hosting needs no name lookup.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
 
 
 class StaticHandler(http.server.SimpleHTTPRequestHandler):
