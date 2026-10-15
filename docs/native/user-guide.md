@@ -128,7 +128,7 @@ Native preview tables provide context actions for copying the selected table and
 
 ## Templates, snippets and browser migration
 
-Browser **View → Export appearance settings** saves theme, layout and outline choices. Open **Edit → Settings → Import settings** here to review those choices before Apply; Cancel keeps your saved settings. Missing editor and preview choices stay as currently selected. Native **Export settings** saves all appearance choices shown in the dialogue for transfer or restoration, without documents, recent paths or update consent.
+Browser **View → Export appearance settings** saves theme, layout and outline choices. Open **Edit → Settings → Import settings** here to review those choices before Apply; Cancel keeps your saved settings. Missing editor and preview choices stay as currently selected. Native **Export settings** saves portable editor, preview, theme, layout and outline appearance choices for transfer or restoration, without desktop synchronisation preferences, documents, recent paths or update consent.
 
 **File → Create from template** opens bundled examples and generators. Filter by category or name, edit the labelled fields and inspect the generated source. Creation opens a new unsaved tab. **Insert → Built-in snippet** inserts one undoable source change.
 

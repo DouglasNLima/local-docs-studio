@@ -49,9 +49,17 @@ internal static partial class NativeUiChecks
         Find(settings, "SettingsCancel").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null, "Settings Cancel did not close the filtered dialogue.");
         if (WorkspaceSettings.From(ReadDesktopState<UserPreferences>(state, "preferences.json")) != WorkspaceSettings.From(preferences)) throw new IOException("Cancelling filtered settings saved staged edits.");
-        editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type("Refinement draft retained.");
         var draft = original + "Refinement draft retained.";
-        Wait(() => ReadEditorText(editor) == draft, "The workspace-close draft was not entered exactly.");
+        var previousClipboard = NativeUiClipboard.GetDataObject(); uint clipboardSequence = 0;
+        try
+        {
+            NativeUiClipboard.SetText("Refinement draft retained."); clipboardSequence = GetClipboardSequenceNumber();
+            editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
+            // A literal paste is one known Undo unit; simulated character typing intentionally has several units.
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
+            Wait(() => ReadEditorText(editor) == draft, "The workspace-close draft was not entered exactly.");
+        }
+        finally { RestoreClipboard(previousClipboard, clipboardSequence); }
         File.WriteAllText(Path.Combine(root, "Pending refinement.md"), "# Pending filesystem event\n");
         Find(window, "CloseWorkspace").AsButton().Invoke();
         Wait(() => ReadDesktopState<SessionState>(state, "session.json").Workspace is null
