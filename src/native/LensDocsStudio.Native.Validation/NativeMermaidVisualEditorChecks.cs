@@ -83,10 +83,10 @@ internal static partial class NativeUiChecks
                 "Fit did not contain the actual canvas after PAN."); Capture("source-and-canvas");
             if (!highContrast)
             {
-                var themeDraft = Draft(); FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "DarkTheme").AsMenuItem().Invoke();
+                var themeDraft = Draft(); ChangeApplicationTheme("Dark");
                 FocusWindow(visual!); Capture("live-dark-theme");
                 Check(Draft() == themeDraft && ReadEditorText(editor) == original, "Live theme changes retain private and owning source");
-                FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "LightTheme").AsMenuItem().Invoke(); FocusWindow(visual!);
+                ChangeApplicationTheme("Light"); FocusWindow(visual!);
             }
             var second = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1];
             var expected = original[..second.Body.Start] + valid + original[second.Body.End..];
@@ -119,7 +119,7 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "mermaid-before.md"), original); File.WriteAllText(Path.Combine(output, "mermaid-after.md"), expected);
             if (!highContrast)
             {
-                FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "DarkTheme").AsMenuItem().Invoke();
+                ChangeApplicationTheme("Dark");
                 Open(shiftedOffset); Select("node_Reviewed"); Capture("dark");
                 visual!.Patterns.Transform.Pattern.Resize(880, 600);
                 Wait(() => visual.BoundingRectangle.Width < 890 && visual.BoundingRectangle.Contains(Find(visual, "MermaidApply").BoundingRectangle), "Narrow-window Apply was clipped.");
@@ -186,6 +186,15 @@ internal static partial class NativeUiChecks
                 launch.ArgumentList.Add(root); launch.ArgumentList.Add(fixturePath);
                 app = Application.Launch(launch); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The additional Mermaid fixture did not start.");
                 editor = Find(main, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == text, "The additional fixture source did not load exactly.");
+            }
+            void ChangeApplicationTheme(string theme)
+            {
+                FocusWindow(main!);
+                // An owned editor may cover the owner's menu; activate its actual UIA pattern.
+                Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand();
+                Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId(theme + "Theme")) is not null, "The application theme menu did not expand.");
+                Find(main!, theme + "Theme").AsMenuItem().Invoke();
+                Wait(() => ReadObservedText(Path.Combine(state, "preferences.json")).Contains("\"" + theme + "\"", StringComparison.Ordinal), "The application theme was not applied and persisted.");
             }
             void OpenInsertion(bool editable = true)
             {
