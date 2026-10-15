@@ -50,7 +50,17 @@ internal static partial class NativeUiChecks
             Click("MermaidActualSize"); Capture("existing-light");
             if (polish)
             {
-                var source = Draft(); var toggle = Find(visual!, "MermaidSourceToggle");
+                var source = Draft();
+                var rows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                rows[0].Patterns.SelectionItem.Pattern.Select(); rows[1].Patterns.SelectionItem.Pattern.AddToSelection();
+                Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Real list multi-selection exposes both selected nodes");
+                Capture("multi-selection"); Click("MermaidDuplicate");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 4 && new MermaidSourceParser().Parse(text).Edges.Count == 2);
+                var duplicate = Draft(); Click("MermaidUndo"); AwaitSource(text => text == source);
+                Click("MermaidRedo"); AwaitSource(text => text == duplicate); Click("MermaidUndo"); AwaitSource(text => text == source);
+                Check(Draft() == source, "Multi-node duplication includes the internal connection and private Undo restores exact source");
+                Click("MermaidCopySource"); Check(NativeUiClipboard.GetText() == source, "Source-header copy emits the exact draft"); clipboardOwned = GetClipboardSequenceNumber();
+                var toggle = Find(visual!, "MermaidSourceToggle");
                 var beforeHeight = Find(visual!, "MermaidViewport").BoundingRectangle.Height;
                 toggle.Patterns.Toggle.Pattern.Toggle();
                 Wait(() => Find(visual!, "MermaidViewport").BoundingRectangle.Height > beforeHeight + 80, "Collapsing source did not reclaim canvas space.");
@@ -64,6 +74,14 @@ internal static partial class NativeUiChecks
                 Check(Draft() == source, "View commands leave Mermaid source byte-for-byte unchanged");
             }
             Select("node_B"); Capture("node-properties");
+            if (polish)
+            {
+                var shapeSource = Draft(); Find(visual!, "MermaidNodeShape").AsComboBox().Select("Decision"); Click("MermaidUpdateNode");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Node("B").Shape == FlowNodeShape.Decision);
+                Click("MermaidUndo"); AwaitSource(text => text == shapeSource);
+                Check(new MermaidSourceParser().Parse(Draft()).Node("B").Shape == FlowNodeShape.Rounded, "Shape inspector changes actual Mermaid geometry and Undo restores exact source");
+                Select("node_B");
+            }
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
             if (polish)
             {
@@ -178,6 +196,20 @@ internal static partial class NativeUiChecks
                     foreach (var id in new[] { "MermaidApply", "MermaidCancel", "MermaidViewport", "MermaidElements", "MermaidSelectionSummary" })
                         Check(visual.BoundingRectangle.Contains(Find(visual, id).BoundingRectangle), id + " remains contained at " + width + "x" + height);
                     Capture("responsive-" + width + "x" + height);
+                    if (width == 880)
+                    {
+                        var beforePreview = Draft();
+                        (visual.FindFirstDescendant(cf => cf.ByName("More commands")) ?? throw new IOException("The narrow native toolbar did not expose its overflow control.")).Patterns.Toggle.Pattern.Toggle();
+                        FlaUI.Core.AutomationElements.AutomationElement? previewCommand = null;
+                        Wait(() => (previewCommand = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidRenderedPreview")))) is { IsOffscreen: false }, "Native overflow did not reveal Rendered preview.");
+                        Capture("toolbar-overflow"); previewCommand!.AsButton().Invoke();
+                        Window? diagram = null;
+                        Wait(() => (diagram = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Overflow preview did not open the native rendered diagram.");
+                        diagram!.CaptureToFile(Path.Combine(output, "mermaid-overflow-rendered-preview.png")); diagram.Close();
+                        Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow"))) is null, "Native rendered preview did not close.");
+                        Check(Draft() == beforePreview, "Narrow toolbar overflow opens the existing native rendered preview without changing source");
+                        FocusWindow(visual);
+                    }
                 }
                 visual!.Patterns.Transform.Pattern.Resize(1280, 840); Click("MermaidCancel"); WaitClosed();
             }
