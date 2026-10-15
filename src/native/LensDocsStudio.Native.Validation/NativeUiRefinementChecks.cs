@@ -98,15 +98,24 @@ internal static partial class NativeUiChecks
         window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png")); Keyboard.Type(VirtualKeyShort.ESCAPE); Keyboard.Type(VirtualKeyShort.ESCAPE);
         Find(window, "RevealExportedFile").AsButton().Invoke();
         Window? explorer = null;
-        Wait(() =>
+        var shellObservations = new List<object>();
+        try { Wait(() =>
         {
-            explorer = automation.GetDesktop().FindAllChildren(cf => cf.ByControlType(ControlType.Window))
-                .Where(candidate => candidate.Properties.ProcessId.ValueOrDefault != process)
-                .FirstOrDefault(candidate => candidate.FindAllDescendants(cf => cf.ByControlType(ControlType.ListItem))
-                    .Any(item => (item.Name == "refinement-export-2.html" || item.Name == "refinement-export-2")
-                        && item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value))?.AsWindow();
+            shellObservations.Clear();
+            foreach (var candidate in automation.GetDesktop().FindAllChildren(cf => cf.ByControlType(ControlType.Window))
+                .Where(candidate => candidate.Properties.ProcessId.ValueOrDefault != process))
+            {
+                var items = candidate.FindAllDescendants(cf => cf.ByName("refinement-export-2.html").Or(cf.ByName("refinement-export-2")));
+                foreach (var item in items)
+                {
+                    var selected = item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value;
+                    shellObservations.Add(new { Window = candidate.Name, Item = item.Name, Type = item.ControlType.ToString(), Selected = selected });
+                    if (selected) { explorer = candidate.AsWindow(); return true; }
+                }
+            }
             return explorer is not null;
-        }, "Show in folder did not select the actual saved output in Windows Explorer.");
+        }, "Show in folder did not select the actual saved output in Windows Explorer."); }
+        finally { File.WriteAllText(Path.Combine(output, "native-refinement-shell-selection.json"), JsonSerializer.Serialize(new { Status = Find(window, "Status").Name, Observations = shellObservations })); }
         explorer!.CaptureToFile(Path.Combine(output, "native-refinement-export-revealed.png")); explorer.Close(); FocusWindow(window);
         File.Delete(exported); Find(window, "OpenExportedFile").AsButton().Invoke();
         Wait(() => Find(window, "Status").Name.StartsWith("The exported file is unavailable or has changed", StringComparison.Ordinal), "A missing output did not fail gracefully before shell opening.");
