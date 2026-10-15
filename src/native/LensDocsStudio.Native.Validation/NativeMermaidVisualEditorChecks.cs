@@ -46,6 +46,7 @@ internal static partial class NativeUiChecks
             Capture("existing-light"); Select("node_B"); Capture("node-properties");
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
             Check(!Find(visual!, "MermaidApply").IsEnabled, "Unapplied inspector text cannot be silently lost through Apply");
+            Check(!Find(visual!, "MermaidValidateSource").IsEnabled, "Source validation cannot discard pending inspector text");
             Click("MermaidUpdateNode"); AwaitSource(text => text.Contains("B(\"Review changed\")", StringComparison.Ordinal));
             Check(ReadEditorText(editor) == original, "Draft node editing leaves the owning Markdown untouched");
             Find(visual!, "MermaidNodeId").AsTextBox().Text = "Reviewed"; Click("MermaidUpdateNode");

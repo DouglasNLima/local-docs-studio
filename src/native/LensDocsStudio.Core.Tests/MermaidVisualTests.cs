@@ -252,6 +252,36 @@ public sealed class MermaidVisualTests
         var result = await draft.ExecuteAsync(new UpdateMermaidNode("A", "Changed", FlowNodeShape.Process, "A"));
         Assert.False(result.Success); Assert.Equal(source, draft.Source);
     }
+    [Fact]
+    public async Task Renaming_an_implicit_node_id_retains_its_original_visible_label()
+    {
+        var draft = new MermaidVisualDraft("flowchart LR\nA --> B\n");
+        await Execute(draft, new UpdateMermaidNode("A", "A", FlowNodeShape.Process, "Renamed"));
+        Assert.Equal("A", draft.Model.Node("Renamed").Label); Assert.Equal("Renamed", draft.Model.Edge("edge-0").Source.Id);
+        Assert.Equal("flowchart LR\nRenamed[\"A\"] --> B\n", draft.Source);
+    }
+    [Fact]
+    public async Task Shape_and_colour_edits_keep_label_syntax_and_unrelated_custom_style_properties()
+    {
+        const string source = "flowchart LR\n    A[Keep this <br> break] --> B[Other]\n    style A stroke-width:2px,fill:#112233,stroke-dasharray:4 2\n";
+        var draft = new MermaidVisualDraft(source); AssertEditable(draft.Model);
+        await Execute(draft, new UpdateMermaidNode("A", draft.Model.Node("A").Label, FlowNodeShape.Terminal, "A"));
+        Assert.Equal(source.Replace("A[Keep this <br> break]", "A([Keep this <br> break])", StringComparison.Ordinal), draft.Source);
+        await Execute(draft, new SetMermaidStyle("A", "#FAFAFA", "#123456", "#202124"));
+        Assert.Contains("    style A stroke-width:2px,fill:#112233,stroke-dasharray:4 2\n", draft.Source);
+        var parsed = Mermaider.MermaidRenderer.Parse(draft.Source);
+        Assert.Equal("2px", parsed.NodeStyles["A"]["stroke-width"]); Assert.Equal("4 2", parsed.NodeStyles["A"]["stroke-dasharray"]);
+        Assert.Equal("#FAFAFA", parsed.NodeStyles["A"]["fill"]);
+    }
+    [Fact]
+    public async Task Nested_direction_inherits_from_the_parent_and_group_rename_retains_its_spacing()
+    {
+        var draft = new MermaidVisualDraft("flowchart TD\nsubgraph Parent[Parent]\ndirection LR\nsubgraph Child [ Old label ]\nA[One]\nend\nend\n");
+        AssertEditable(draft.Model); Assert.Equal("LR", draft.Model.EffectiveDirection("Child")); Assert.Equal("TD", draft.Model.EffectiveDirection(null));
+        await Execute(draft, new RenameMermaidSubgraph("Child", "New label")); Assert.Contains("subgraph Child [New label]", draft.Source);
+        await Execute(draft, new ChangeMermaidDirection("BT", "Child")); Assert.Equal("BT", draft.Model.EffectiveDirection("Child"));
+        Assert.Equal("LR", draft.Model.EffectiveDirection("Parent"));
+    }
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }
 }

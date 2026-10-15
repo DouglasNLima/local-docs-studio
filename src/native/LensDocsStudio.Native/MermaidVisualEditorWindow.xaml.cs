@@ -96,6 +96,7 @@ public partial class MermaidVisualEditorWindow : Window
         DuplicateButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
         SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
+        ValidateSourceButton.IsEnabled = !busy && !PropertiesPending && inlineEditor is null;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
     }
@@ -180,8 +181,8 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void DirectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (!updating && Direction.SelectedItem is string direction && direction != draft.Model.Direction && await Execute(new ChangeMermaidDirection(direction)))
-            AutoLayout(sender, e);
+        if (!updating && Direction.SelectedItem is string direction && direction != draft.Model.Direction)
+            await Execute(new ChangeMermaidDirection(direction));
     }
     private async void Delete(object sender, RoutedEventArgs e)
     {
@@ -278,7 +279,7 @@ public partial class MermaidVisualEditorWindow : Window
         else
         {
             var group = draft.Model.Subgraph(key[6..]); GroupProperties.Visibility = Visibility.Visible;
-            GroupId.Text = group.Id; GroupLabel.Text = group.Label; GroupDirection.SelectedItem = group.Direction ?? draft.Model.Direction;
+            GroupId.Text = group.Id; GroupLabel.Text = group.Label; GroupDirection.SelectedItem = draft.Model.EffectiveDirection(group.Id);
             GroupMembers.Text = "Parent: " + (group.ParentId ?? "Root") + "\nMembers: " + string.Join(", ", draft.Model.Nodes.Where(node => node.SubgraphId == group.Id).Select(node => node.Id));
         }
         propertyBaseline = PropertyValues;
@@ -299,7 +300,8 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
-        if (busy) return; busy = true; UpdateActions(); var text = SourceEditor.Text;
+        if (busy || PropertiesPending || inlineEditor is not null) return;
+        busy = true; UpdateActions(); var text = SourceEditor.Text;
         try
         {
             var result = await draft.ValidateAndCommitAsync(text, lifetime.Token); if (closed) return;
@@ -338,13 +340,14 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private void CopySource(object sender, RoutedEventArgs e)
     {
+        if (SourceEditor.Text.Length == 0) { Status.Text = "The source draft is empty. Add Mermaid source before copying."; return; }
         try { Clipboard.SetText(SourceEditor.Text); Status.Text = "Mermaid draft source copied."; }
         catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Select the source and try again."; }
     }
     private void EditOwningSource(object sender, RoutedEventArgs e) { editSource?.Invoke(); Status.Text = "The owning document's source is available. This private draft remains open."; }
     private async void ShowRenderedPreview(object sender, RoutedEventArgs e)
     {
-        if (busy || SourcePending) return;
+        if (busy || SourcePending || PropertiesPending || inlineEditor is not null) return;
         busy = true; UpdateActions();
         try
         {

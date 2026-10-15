@@ -55,6 +55,12 @@ public sealed record MermaidDiagramModel(string Source, string Direction, Mermai
         .Select(style => (Start: style.Statement.Start, Name: style.Value))
         .Concat(Node(id).Occurrences.Where(item => item.ClassName is not null).Select(item => (Start: item.Span.Start, Name: item.ClassName!)))
         .OrderBy(item => item.Start).LastOrDefault().Name;
+    public string EffectiveDirection(string? groupId)
+    {
+        while (groupId is not null)
+        { var group = Subgraph(groupId); if (group.Direction is { } value) return value; groupId = group.ParentId; }
+        return Direction;
+    }
 }
 
 public sealed record MermaidDocumentPatch(MermaidSourceSpan Span, string Expected, string Replacement);

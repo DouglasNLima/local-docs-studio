@@ -40,11 +40,17 @@ public sealed class MermaidTransformationService
                         // Preserve the existing shape delimiters and spacing when only the label changes.
                         if (update.Shape == node.Shape && occurrence.LabelSpan is { } label)
                         { Replace(label, QuotedLabel(update.Label)); if (update.NewId != node.Id) Replace(occurrence.IdSpan, update.NewId); }
-                        else Replace(new(occurrence.Span.Start, occurrence.Span.Length - (occurrence.ClassName?.Length + 3 ?? 0)), NodeText(update.NewId, update.Label, update.Shape));
+                        else
+                        {
+                            var syntax = NodeDelimiters(update.Shape); var rawLabel = occurrence.LabelSpan!.Value.Read(model.Source);
+                            var text = update.Label == node.Label && !rawLabel.Contains(syntax.Close, StringComparison.Ordinal) && !rawLabel.Contains('\n')
+                                ? update.NewId + syntax.Open + rawLabel + syntax.Close : NodeText(update.NewId, update.Label, update.Shape);
+                            Replace(new(occurrence.Span.Start, occurrence.Span.Length - (occurrence.ClassName?.Length + 3 ?? 0)), text);
+                        }
                     }
                     else if (update.NewId != node.Id) Replace(occurrence.IdSpan, update.NewId);
                 }
-                if (declaration is null && (update.Label != node.Label || update.Shape != node.Shape))
+                if (declaration is null && (update.Label != node.Label || update.Shape != node.Shape || update.NewId != node.Id))
                 {
                     // Upgrade one bare reference in place, avoiding a second node identity or a global rewrite.
                     var first = node.Occurrences[0]; patches.RemoveAll(patch => patch.Span == first.IdSpan);
@@ -95,7 +101,13 @@ public sealed class MermaidTransformationService
             case RenameMermaidSubgraph rename:
             {
                 CheckLabel(rename.Label); var group = model.Subgraph(rename.Id);
-                if (rename.Label != group.Label) Replace(group.Heading, group.Id + "[" + EscapeLabel(rename.Label) + "]"); break;
+                if (rename.Label != group.Label)
+                {
+                    var heading = group.Heading.Read(model.Source); var opening = heading.IndexOf('[');
+                    if (opening >= 0) Replace(new(group.Heading.Start + opening + 1, group.Heading.Length - opening - 2), EscapeLabel(rename.Label));
+                    else Replace(group.Heading, group.Id + "[" + EscapeLabel(rename.Label) + "]");
+                }
+                break;
             }
             case MoveMermaidNode move:
             {
@@ -136,14 +148,14 @@ public sealed class MermaidTransformationService
                 if (!MermaidSourceParser.IsId(assign.ClassName) || !model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == assign.ClassName)))
                     throw new ArgumentException("Choose a class defined in this diagram's source.");
                 var existing = model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == assign.Id));
-                if (existing?.Targets.Count == 1) Replace(existing.Statement, "class " + assign.Id + " " + assign.ClassName);
+                if (existing?.Targets.Count == 1) Replace(new(existing.Statement.End - existing.Value.Length, existing.Value.Length), assign.ClassName);
                 else Add("class " + assign.Id + " " + assign.ClassName);
                 break;
             case SetMermaidStyle style:
                 model.Node(style.Id); CheckColour(style.Fill); CheckColour(style.Stroke); CheckColour(style.Colour);
                 var value = "style " + style.Id + " fill:" + style.Fill + ",stroke:" + style.Stroke + ",color:" + style.Colour;
-                var previous = model.Styles.LastOrDefault(item => item.Kind == "style" && item.Targets.Count == 1 && item.Targets[0].Id == style.Id);
-                if (previous is null) Add(value); else Replace(previous.Statement, value); break;
+                // An override keeps custom properties (width, dashes, fonts) and their original bytes.
+                Add(value); break;
             case AddMermaidClassDefinition definition:
                 if (!MermaidSourceParser.IsId(definition.ClassName) || model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == definition.ClassName)))
                     throw new ArgumentException("Choose a new class identifier.");
@@ -200,13 +212,17 @@ public sealed class MermaidTransformationService
     public static string NodeText(string id, string label, FlowNodeShape shape)
     {
         CheckLabel(label); CheckShape(shape);
-        var (open, close) = shape switch
+        var (open, close) = NodeDelimiters(shape);
+        return id + open + QuotedLabel(label) + close;
+    }
+    private static (string Open, string Close) NodeDelimiters(FlowNodeShape shape)
+    {
+        CheckShape(shape); return shape switch
         {
             FlowNodeShape.Decision => ("{", "}"), FlowNodeShape.Rounded => ("(", ")"), FlowNodeShape.Terminal => ("([", "])") ,
             FlowNodeShape.Circle => ("((", "))"), FlowNodeShape.DoubleCircle => ("(((", ")))"), FlowNodeShape.Subroutine => ("[[", "]]"),
             FlowNodeShape.Cylinder => ("[(", ")]"), FlowNodeShape.Hexagon => ("{{", "}}"), _ => ("[", "]")
         };
-        return id + open + QuotedLabel(label) + close;
     }
     public static string ConnectionToken(FlowConnectionType type) => type switch
     {

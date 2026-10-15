@@ -88,7 +88,7 @@
     <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
     <Expander x:Name="SourcePanel" Grid.Row="2" Header="Mermaid source" IsExpanded="True" Expanded="SourceExpanded" Collapsed="SourceCollapsed" Margin="0,8,0,0">
      <DockPanel MinHeight="90">
-      <Button DockPanel.Dock="Bottom" Content="Validate source changes" Click="ValidateSource" HorizontalAlignment="Left" AutomationProperties.AutomationId="MermaidValidateSource"/>
+      <Button x:Name="ValidateSourceButton" DockPanel.Dock="Bottom" Content="Validate source changes" Click="ValidateSource" HorizontalAlignment="Left" AutomationProperties.AutomationId="MermaidValidateSource"/>
       <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" FontFamily="Consolas" FontSize="13" WordWrap="False" TextChanged="SourceChanged"
        Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" AutomationProperties.Name="Mermaid draft source" AutomationProperties.AutomationId="MermaidDraftSource"/>
      </DockPanel>

@@ -249,7 +249,11 @@ public partial class MermaidVisualEditorWindow
         editor.Focus(); editor.SelectAll();
         UpdateActions(); Status.Text = "Edit the label, then press Enter to confirm or Escape to cancel. The node ID stays unchanged.";
     }
-    private void AutoLayout(object sender, RoutedEventArgs e) { RebuildCanvas(true); Status.Text = "Automatic layout restored from the semantic graph. No coordinates were written to source."; }
+    private void AutoLayout(object sender, RoutedEventArgs e)
+    {
+        if (inlineEditor is not null) { inlineEditor.Focus(); Status.Text = "Confirm or cancel the inline label before changing layout."; return; }
+        RebuildCanvas(true); Status.Text = "Automatic layout restored from the semantic graph. No coordinates were written to source.";
+    }
     private void Fit(object sender, RoutedEventArgs e)
     {
         if (Viewport is null || DiagramCanvas is null || Viewport.ViewportWidth <= 0 || Viewport.ViewportHeight <= 0) return;
