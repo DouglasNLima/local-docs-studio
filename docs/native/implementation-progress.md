@@ -1,12 +1,12 @@
 # Native implementation progress
 
-Native Mermaid visual authoring is implemented on `feature/native-mermaid-visual-editor`
-in [draft PR 26](https://github.com/DouglasNLima/local-docs-studio/pull/26), based on
-verified refinement commit `42c3fc6`. Its [editor report](mermaid-visual-editor.md)
-owns the supported grammar, source-preservation rules and current evidence. Core,
-normal/high-contrast authoring and browser checks have passed; final-revision full
-regression, package verification and evidence reconciliation are still in progress.
-Earlier preview-readiness statements below retain their original source revision.
+Native Mermaid visual authoring is delivered on `feature/native-mermaid-visual-editor`
+in [Draft PR 26](https://github.com/DouglasNLima/local-docs-studio/pull/26), based on
+verified refinement commit `42c3fc6`. The [editor delivery report](mermaid-visual-editor.md)
+owns the supported grammar, source-preservation contract, actual Windows evidence,
+package identities and bounded readiness recommendation. Its source candidate and
+later delivery audit are distinguished explicitly. Earlier preview statements below
+retain their original source revision.
 
 Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
 

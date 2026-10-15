@@ -1,0 +1,804 @@
+{
+  "schemaVersion": 1,
+  "candidateRevision": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+  "baselineRevision": "42c3fc614feb6db6f69a242312604e46ff76c238",
+  "branch": "feature/native-mermaid-visual-editor",
+  "draftPullRequest": "https://github.com/DouglasNLima/local-docs-studio/pull/26",
+  "authoringWorkflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38778919617",
+  "normalAuthoring": {
+    "Passed": true,
+    "Checks": [
+      "AvalonEdit history relocates the intended identical diagram after surrounding changes",
+      "One native document Undo restores the entire diagram and retains the independent surrounding edit",
+      "Native document Redo restores the applied source",
+      "A second Apply through an obsolete session is rejected",
+      "A closed owning tab cannot receive a visual Apply",
+      "An overlapping original-source edit rejects Apply",
+      "Rejected Apply preserves the externally edited in-memory source",
+      "Renamed unsaved-document identities are rejected without source loss",
+      "A switched active tab cannot redirect the owning-document edit",
+      "Visual Apply retains ordinary unsaved state and disk-conflict protection",
+      "Standalone Apply never saves a synthetic Markdown fence",
+      "Standalone source is restored exactly by one native Undo",
+      "Appending to a standalone diagram invalidates the original whole-file identity",
+      "Rejected standalone append preserves the independently added source",
+      "A surrounding outer fence cannot turn the tracked diagram into an editable literal code example",
+      "Rejected surrounding-syntax changes leave all source untouched",
+      "Fence-collision fixture is valid Mermaid independently of its Markdown wrapper",
+      "Valid Mermaid cannot prematurely close its owning Markdown fence",
+      "Fence-collision rejection preserves the complete owning Markdown",
+      "A document change during asynchronous final validation rejects the prepared edit",
+      "A rejected prepared edit never overwrites a newer document revision",
+      "Unapplied inspector text cannot be silently lost through Apply",
+      "Source validation cannot discard pending inspector text",
+      "Draft node editing leaves the owning Markdown untouched",
+      "Real canvas connection, label, deletion, Undo and Redo produce the expected semantic graph",
+      "Invalid direct source is retained and cannot overwrite the document",
+      "Live theme changes retain private and owning source",
+      "Apply retains ordinary unsaved-file behaviour",
+      "Applied portable source renders through the established diagram/export service",
+      "Cancel discards the draft without touching source or disk",
+      "Surrounding edits and visual Apply remain in memory until Save",
+      "Conflicting Apply preserves both the external source and private draft",
+      "Native clipboard paste modifies only the private Mermaid draft",
+      "Real standalone UIA Apply never inserts a synthetic fence",
+      "Escape cancels a real inline label edit in .md",
+      "Native palette drag-and-drop adds the intended semantic shape in .md",
+      "Node dragging keeps portable source byte-for-byte unchanged in .md",
+      "New flowchart uses the correct portable Markdown/raw representation for .md",
+      "Escape cancels a real inline label edit in .mermaid",
+      "Native palette drag-and-drop adds the intended semantic shape in .mermaid",
+      "Node dragging keeps portable source byte-for-byte unchanged in .mermaid",
+      "New flowchart uses the correct portable Markdown/raw representation for .mermaid",
+      "Unsupported chained source opens for protected inspection without destructive visual commands",
+      "Protected inspection leaves the owning source exact"
+    ],
+    "Timings": [
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 540.2558
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 330.7908
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 328.2618
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 250.6354
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 318.3676
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 419.8954
+      }
+    ],
+    "HighContrastRequested": false,
+    "Error": null,
+    "Limitations": "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed."
+  },
+  "actualHighContrastAuthoring": {
+    "Passed": true,
+    "Checks": [
+      "AvalonEdit history relocates the intended identical diagram after surrounding changes",
+      "One native document Undo restores the entire diagram and retains the independent surrounding edit",
+      "Native document Redo restores the applied source",
+      "A second Apply through an obsolete session is rejected",
+      "A closed owning tab cannot receive a visual Apply",
+      "An overlapping original-source edit rejects Apply",
+      "Rejected Apply preserves the externally edited in-memory source",
+      "Renamed unsaved-document identities are rejected without source loss",
+      "A switched active tab cannot redirect the owning-document edit",
+      "Visual Apply retains ordinary unsaved state and disk-conflict protection",
+      "Standalone Apply never saves a synthetic Markdown fence",
+      "Standalone source is restored exactly by one native Undo",
+      "Appending to a standalone diagram invalidates the original whole-file identity",
+      "Rejected standalone append preserves the independently added source",
+      "A surrounding outer fence cannot turn the tracked diagram into an editable literal code example",
+      "Rejected surrounding-syntax changes leave all source untouched",
+      "Fence-collision fixture is valid Mermaid independently of its Markdown wrapper",
+      "Valid Mermaid cannot prematurely close its owning Markdown fence",
+      "Fence-collision rejection preserves the complete owning Markdown",
+      "A document change during asynchronous final validation rejects the prepared edit",
+      "A rejected prepared edit never overwrites a newer document revision",
+      "Unapplied inspector text cannot be silently lost through Apply",
+      "Source validation cannot discard pending inspector text",
+      "Draft node editing leaves the owning Markdown untouched",
+      "Real canvas connection, label, deletion, Undo and Redo produce the expected semantic graph",
+      "Invalid direct source is retained and cannot overwrite the document",
+      "Apply retains ordinary unsaved-file behaviour",
+      "Applied portable source renders through the established diagram/export service",
+      "Cancel discards the draft without touching source or disk",
+      "Surrounding edits and visual Apply remain in memory until Save",
+      "Conflicting Apply preserves both the external source and private draft",
+      "Native clipboard paste modifies only the private Mermaid draft",
+      "Real standalone UIA Apply never inserts a synthetic fence",
+      "Escape cancels a real inline label edit in .md",
+      "Native palette drag-and-drop adds the intended semantic shape in .md",
+      "Node dragging keeps portable source byte-for-byte unchanged in .md",
+      "New flowchart uses the correct portable Markdown/raw representation for .md",
+      "Escape cancels a real inline label edit in .mermaid",
+      "Native palette drag-and-drop adds the intended semantic shape in .mermaid",
+      "Node dragging keeps portable source byte-for-byte unchanged in .mermaid",
+      "New flowchart uses the correct portable Markdown/raw representation for .mermaid",
+      "Unsupported chained source opens for protected inspection without destructive visual commands",
+      "Protected inspection leaves the owning source exact"
+    ],
+    "Timings": [
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 380.2129
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 330.0254
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 329.1031
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 250.2926
+      },
+      {
+        "Operation": "Open visual editor",
+        "Milliseconds": 375.1346
+      }
+    ],
+    "HighContrastRequested": true,
+    "Error": null,
+    "Limitations": "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed."
+  },
+  "performance": {
+    "Scenarios": [
+      {
+        "Fixture": "20 nodes",
+        "Nodes": 20,
+        "Connections": 19,
+        "Subgraphs": 0,
+        "SourceCharacters": 635,
+        "ParseMilliseconds": 108.4854,
+        "NativeLayoutMilliseconds": 19.5573,
+        "RenderMilliseconds": 223.4836,
+        "EditAndRenderMilliseconds": 35.5894,
+        "AllocatedProcessBytes": 1879712,
+        "Rendered": true,
+        "RenderError": null,
+        "EditAccepted": true,
+        "EditError": null,
+        "RenderingSkippedForProtection": false,
+        "SourcePreservedAfterRejection": true
+      },
+      {
+        "Fixture": "100 nodes",
+        "Nodes": 100,
+        "Connections": 99,
+        "Subgraphs": 0,
+        "SourceCharacters": 3355,
+        "ParseMilliseconds": 2.5572,
+        "NativeLayoutMilliseconds": 1.1559,
+        "RenderMilliseconds": 12.4354,
+        "EditAndRenderMilliseconds": 20.8798,
+        "AllocatedProcessBytes": 7781552,
+        "Rendered": true,
+        "RenderError": null,
+        "EditAccepted": true,
+        "EditError": null,
+        "RenderingSkippedForProtection": false,
+        "SourcePreservedAfterRejection": true
+      },
+      {
+        "Fixture": "300 nodes",
+        "Nodes": 300,
+        "Connections": 199,
+        "Subgraphs": 0,
+        "SourceCharacters": 8954,
+        "ParseMilliseconds": 7.8937,
+        "NativeLayoutMilliseconds": 5.1097,
+        "RenderMilliseconds": 61.3094,
+        "EditAndRenderMilliseconds": 51.8952,
+        "AllocatedProcessBytes": 20356224,
+        "Rendered": true,
+        "RenderError": null,
+        "EditAccepted": true,
+        "EditError": null,
+        "RenderingSkippedForProtection": false,
+        "SourcePreservedAfterRejection": true
+      },
+      {
+        "Fixture": "Dense connections",
+        "Nodes": 20,
+        "Connections": 190,
+        "Subgraphs": 0,
+        "SourceCharacters": 3542,
+        "ParseMilliseconds": 0.9587,
+        "NativeLayoutMilliseconds": 0.7411,
+        "RenderMilliseconds": 0.0592,
+        "EditAndRenderMilliseconds": 0.5846,
+        "AllocatedProcessBytes": 536352,
+        "Rendered": false,
+        "RenderError": "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.",
+        "EditAccepted": false,
+        "EditError": "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.",
+        "RenderingSkippedForProtection": true,
+        "SourcePreservedAfterRejection": true
+      },
+      {
+        "Fixture": "Nested groups",
+        "Nodes": 100,
+        "Connections": 99,
+        "Subgraphs": 20,
+        "SourceCharacters": 3935,
+        "ParseMilliseconds": 7.146,
+        "NativeLayoutMilliseconds": 8.1563,
+        "RenderMilliseconds": 40.4321,
+        "EditAndRenderMilliseconds": 20.1855,
+        "AllocatedProcessBytes": 11851592,
+        "Rendered": true,
+        "RenderError": null,
+        "EditAccepted": true,
+        "EditError": null,
+        "RenderingSkippedForProtection": false,
+        "SourcePreservedAfterRejection": true
+      },
+      {
+        "Fixture": "Long labels",
+        "Nodes": 20,
+        "Connections": 0,
+        "Subgraphs": 0,
+        "SourceCharacters": 14602,
+        "ParseMilliseconds": 1.6403,
+        "NativeLayoutMilliseconds": 0.2547,
+        "RenderMilliseconds": 9.3003,
+        "EditAndRenderMilliseconds": 11.5506,
+        "AllocatedProcessBytes": 5084448,
+        "Rendered": true,
+        "RenderError": null,
+        "EditAccepted": true,
+        "EditError": null,
+        "RenderingSkippedForProtection": false,
+        "SourcePreservedAfterRejection": true
+      }
+    ],
+    "ProcessorCount": 4,
+    "Runtime": ".NET 10.0.13",
+    "Limits": "100,000 characters; 300 nodes; 500 total elements; eight nested subgraphs; unchanged three-second renderer deadline.",
+    "Limitations": "Single-process observations include cold/warm runtime effects; these are source/model/layout/render measurements, not physical input or monitor certification. Renderer rejection within editing bounds remains a protected source/preview case."
+  },
+  "beforeMarkdown": "# Native visual authoring\r\n\r\n```mermaid\r\nflowchart LR\r\n    %% Preserve me\r\n    A[Write] -->|Next| B(Review)\r\n```\r\n\r\nMiddle paragraph.\r\n\r\n```mermaid\r\nflowchart LR\r\n    %% Preserve me\r\n    A[Write] -->|Next| B(Review)\r\n```\r\n\r\nAfter.\r\n",
+  "afterMarkdown": "# Native visual authoring\r\n\r\n```mermaid\r\nflowchart LR\r\n    %% Preserve me\r\n    A[Write] -->|Next| B(Review)\r\n```\r\n\r\nMiddle paragraph.\r\n\r\n```mermaid\r\nflowchart LR\r\n    Node1{\"Decision\"}\r\n    %% Preserve me\r\n    A[Write] -->|Next| Reviewed(\"Review changed\")\r\n    \r\n    Reviewed -->|Confirmed| Node1\r\n    subgraph Group1[Capture group]\r\n    Node1\r\n    end\r\n    style Node1 fill:#E8F3FA,stroke:#FF883E,color:#202124\r\n```\r\n\r\nAfter.\r\n",
+  "displayRestoration": [
+    {
+      "Restored": true,
+      "OriginalTaskbarState": 0,
+      "Errors": []
+    },
+    {
+      "Restored": true,
+      "OriginalTaskbarState": 0,
+      "Errors": []
+    }
+  ],
+  "screenshots": [
+    {
+      "path": "images/mermaid-visual-conflict.png",
+      "bytes": 75248,
+      "sha256": "db2e1be4ec3ffae16ba1b6b55bf490ced047e6a8a203ad292bbab7d9c78e1d40"
+    },
+    {
+      "path": "images/mermaid-visual-dark.png",
+      "bytes": 69359,
+      "sha256": "f4ab98248f27c61d35aab5c5b756ee747f3f76b09c4dfa85711e39e74efcd420"
+    },
+    {
+      "path": "images/mermaid-visual-high-contrast.png",
+      "bytes": 70594,
+      "sha256": "701933ac3b953729564a064e008b3aa364b594b77b85e58210de8856c94a4693"
+    },
+    {
+      "path": "images/mermaid-visual-light.png",
+      "bytes": 72724,
+      "sha256": "f51b1e520b317a292d14810a37dece1d160f6af49320f70dd9cbdae27ebe617c"
+    },
+    {
+      "path": "images/mermaid-visual-narrow.png",
+      "bytes": 54523,
+      "sha256": "bf5e024681cc57c2020c22d13c95930d42e40c01e2ee7fb11b3966192a02bfbf"
+    },
+    {
+      "path": "images/mermaid-visual-palette.png",
+      "bytes": 59879,
+      "sha256": "bf373376b06efc9909c11ef6b65911b777158bdde321e8693e909b5f0d5b8948"
+    }
+  ],
+  "nativeWorkflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38778919600",
+  "core": {
+    "total": 1220,
+    "passed": 1220,
+    "failed": 0,
+    "skipped": 0,
+    "focusedMermaid": 73
+  },
+  "renderingCorpus": {
+    "total": 60,
+    "passed": 60,
+    "originalCases": 40,
+    "addedVisualFixtureThemeCases": 20,
+    "expectedMalformedRejections": 4,
+    "failures": 0
+  },
+  "browser": {
+    "chromium": 134,
+    "edge": 134,
+    "totalPerWorkflow": 268,
+    "branchRun": "38778919629",
+    "pullRequestRun": "38778926874"
+  },
+  "persistedWorkflowChecks": [
+    "Nested Portuguese workspace save/reopen",
+    "Bundle byte-preserving round-trip to a different root",
+    "Repeated portable image bytes and export reuse",
+    "Native Mermaid preview and SVG/PNG export",
+    "Native pasted table line break",
+    "Quoted TSV and CSV round-trips",
+    "Schema-valid DOCX with images/line breaks",
+    "DOCX import",
+    "PDF selectable Unicode",
+    "HTML images and line breaks",
+    "Standalone Docs Site",
+    "Synthetic Word template header/footer",
+    "Original workspace preserved"
+  ],
+  "packages": [
+    {
+      "version": "0.1.0-preview.473",
+      "status": "PASS",
+      "sourceRevision": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+      "sourceKind": "branch-source",
+      "ciRunId": "38778919600",
+      "installerSha256": "8af433de2f7d1d58330586dfcedda3bc166ab1217665110ce6ec15b9c1f869f3",
+      "portableSha256": "3ac59b80d487bdf512bc15c32bbc8291fb19945c8e530685f4d0110b7005fadd",
+      "signature": "NotSigned",
+      "executionPerformed": false,
+      "binaryVersions": {
+        "LensDocsStudio.Core.dll": "0.1.0-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+        "LensDocsStudio.Native.dll": "0.1.0-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+        "LensDocsStudio.Native.exe": "0.1.0-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac"
+      },
+      "payloadFiles": 528,
+      "originalIconSha256": "39de61f63d5d89cbb5a494828bf8f4dabe9e7ae8e064564e6864c8d8067a4682",
+      "originalIconFrames": 7,
+      "mermaidEditor": {
+        "status": "PASS",
+        "executionPerformed": false,
+        "nativeTypes": [
+          "LensDocsStudio.Native.MermaidVisualEditorWindow",
+          "LensDocsStudio.Native.Editor.MermaidDocumentEditSession",
+          "LensDocsStudio.Native.Editor.MermaidSourceHighlighting"
+        ],
+        "coreTypes": [
+          "LensDocsStudio.Core.Mermaid.MermaidDiagramModel",
+          "LensDocsStudio.Core.Mermaid.MermaidSourceParser",
+          "LensDocsStudio.Core.Mermaid.MermaidTransformationService",
+          "LensDocsStudio.Core.Mermaid.MermaidVisualDraft",
+          "LensDocsStudio.Core.Mermaid.MermaidGraphLayout"
+        ],
+        "editorXaml": "mermaidvisualeditorwindow.baml",
+        "originalIcon": "resources/brand/application.ico"
+      }
+    },
+    {
+      "version": "0.1.1-preview.473",
+      "status": "PASS",
+      "sourceRevision": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+      "sourceKind": "branch-source",
+      "ciRunId": "38778919600",
+      "installerSha256": "2404b36aa4b1d37c962ca42ad99f1ad59697367727cb60eca7713fda10c862c6",
+      "portableSha256": "31517034d22c00cff7133b799e511204d286dec9d4e29ae35ab807ba96ef6077",
+      "signature": "NotSigned",
+      "executionPerformed": false,
+      "binaryVersions": {
+        "LensDocsStudio.Core.dll": "0.1.1-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+        "LensDocsStudio.Native.dll": "0.1.1-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+        "LensDocsStudio.Native.exe": "0.1.1-preview.473+36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac"
+      },
+      "payloadFiles": 528,
+      "originalIconSha256": "39de61f63d5d89cbb5a494828bf8f4dabe9e7ae8e064564e6864c8d8067a4682",
+      "originalIconFrames": 7,
+      "mermaidEditor": {
+        "status": "PASS",
+        "executionPerformed": false,
+        "nativeTypes": [
+          "LensDocsStudio.Native.MermaidVisualEditorWindow",
+          "LensDocsStudio.Native.Editor.MermaidDocumentEditSession",
+          "LensDocsStudio.Native.Editor.MermaidSourceHighlighting"
+        ],
+        "coreTypes": [
+          "LensDocsStudio.Core.Mermaid.MermaidDiagramModel",
+          "LensDocsStudio.Core.Mermaid.MermaidSourceParser",
+          "LensDocsStudio.Core.Mermaid.MermaidTransformationService",
+          "LensDocsStudio.Core.Mermaid.MermaidVisualDraft",
+          "LensDocsStudio.Core.Mermaid.MermaidGraphLayout"
+        ],
+        "editorXaml": "mermaidvisualeditorwindow.baml",
+        "originalIcon": "resources/brand/application.ico"
+      }
+    }
+  ],
+  "installation": {
+    "passed": true,
+    "preservedStateFiles": 22,
+    "installedVersions": [
+      {
+        "registration": "0.1.0-preview.473",
+        "phase": "install",
+        "binary": "0.1.0-preview.473",
+        "expected": "0.1.0-preview.473",
+        "metadata": "0.1.0-preview.473"
+      },
+      {
+        "registration": "0.1.1-preview.473",
+        "phase": "upgrade",
+        "binary": "0.1.1-preview.473",
+        "expected": "0.1.1-preview.473",
+        "metadata": "0.1.1-preview.473"
+      },
+      {
+        "registration": "0.1.1-preview.473",
+        "phase": "reinstall",
+        "binary": "0.1.1-preview.473",
+        "expected": "0.1.1-preview.473",
+        "metadata": "0.1.1-preview.473"
+      }
+    ],
+    "sessionRestorationTested": true,
+    "sameRevisionUpgrade": true,
+    "cleanMachineCertification": false,
+    "upgradeLimitation": "Preview package replacement and preservation only; production signing, historical schema migration and SDK-free clean-machine certification remain separate.",
+    "checks": [
+      "install: installed self-contained application, shortcuts and Open with registration",
+      "first-launch: installed application saved and restored UTF-8 source",
+      "upgrade: installed self-contained application, shortcuts and Open with registration",
+      "upgrade: preserved 22 existing native state files and workspace source byte-for-byte",
+      "restored-after-upgrade: installed application restored the actual previous tabs, text, settings and retained state",
+      "after-upgrade: installed application saved and restored UTF-8 source",
+      "uninstall: removed native installation and preserved workspace source",
+      "uninstall: preserved 22 existing native state files and workspace source byte-for-byte",
+      "reinstall: installed self-contained application, shortcuts and Open with registration",
+      "reinstall: preserved 22 existing native state files and workspace source byte-for-byte",
+      "restored-after-reinstall: installed application restored the actual previous tabs, text, settings and retained state",
+      "after-reinstall: installed application saved and restored UTF-8 source",
+      "reinstall: interrupted failed save restored exact draft and baseline in a new application process",
+      "final-uninstall: removed native installation and preserved workspace source",
+      "final-uninstall: preserved 22 existing native state files and workspace source byte-for-byte",
+      "Existing shell registration and Markdown default preserved"
+    ],
+    "verifiedShortcutIcons": 6
+  },
+  "desktopContexts": [
+    {
+      "phase": "after-reinstall",
+      "passed": true,
+      "checks": 75
+    },
+    {
+      "phase": "after-upgrade",
+      "passed": true,
+      "checks": 75
+    },
+    {
+      "phase": "first-launch",
+      "passed": true,
+      "checks": 75
+    },
+    {
+      "phase": "ui",
+      "passed": true,
+      "checks": 75
+    }
+  ],
+  "installedRuntime": [
+    {
+      "phase": "after-reinstall",
+      "passed": true,
+      "bundledRuntimeRequired": true,
+      "modules": [
+        {
+          "Name": "coreclr.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\coreclr.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        },
+        {
+          "Name": "wpfgfx_cor3.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\wpfgfx_cor3.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        }
+      ]
+    },
+    {
+      "phase": "after-upgrade",
+      "passed": true,
+      "bundledRuntimeRequired": true,
+      "modules": [
+        {
+          "Name": "coreclr.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\coreclr.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        },
+        {
+          "Name": "wpfgfx_cor3.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\wpfgfx_cor3.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        }
+      ]
+    },
+    {
+      "phase": "first-launch",
+      "passed": true,
+      "bundledRuntimeRequired": true,
+      "modules": [
+        {
+          "Name": "coreclr.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\coreclr.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        },
+        {
+          "Name": "wpfgfx_cor3.dll",
+          "LoadedPaths": [
+            "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\1aa63e080a0841ae83fe4105dd04325a\\installed\\wpfgfx_cor3.dll"
+          ],
+          "LoadedExactlyOnce": true,
+          "Bundled": true
+        }
+      ]
+    }
+  ],
+  "packageNegativeControls": {
+    "sourceRevision": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+    "checks": [
+      {
+        "rejected": true,
+        "name": "wrong-source",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "wrong-version",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "wrong-independent-hash",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "dirty-source",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "tampered-zip",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "excluded-experiment-with-recomputed-checksum",
+        "status": "PASS"
+      },
+      {
+        "rejected": true,
+        "name": "missing-editor-with-recomputed-checksum",
+        "status": "PASS"
+      }
+    ],
+    "status": "PASS",
+    "originalPackageUnchanged": true
+  },
+  "independentMetadata": [
+    {
+      "assembly": "LensDocsStudio.Native.dll",
+      "typeCount": 687,
+      "references": [
+        "System.Runtime",
+        "PresentationFramework",
+        "System.Text.RegularExpressions",
+        "System.ObjectModel",
+        "WindowsBase",
+        "System.Xaml",
+        "LensDocsStudio.Core",
+        "PresentationCore",
+        "System.Collections",
+        "System.ComponentModel",
+        "ICSharpCode.AvalonEdit",
+        "System.Threading",
+        "System.Runtime.InteropServices",
+        "Microsoft.Win32.SystemEvents",
+        "Markdig",
+        "System.Net.Http",
+        "System.Data.Common",
+        "CommunityToolkit.Mvvm",
+        "System.IO.FileSystem.Watcher",
+        "System.Linq",
+        "System.Collections.Concurrent",
+        "XamlMath.Shared",
+        "System.Xml.ReaderWriter",
+        "System.Xml.XDocument",
+        "SharpVectors.Converters.Wpf",
+        "System.Diagnostics.Tracing",
+        "System.Security.Cryptography",
+        "System.Diagnostics.Process",
+        "System.IO.Pipes",
+        "MigraDoc.DocumentObjectModel",
+        "PdfSharp-wpf",
+        "MigraDoc.Rendering-wpf",
+        "System.Memory",
+        "System.ComponentModel.TypeConverter",
+        "System.ComponentModel.Primitives",
+        "WpfMath",
+        "SharpVectors.Rendering.Wpf",
+        "System.Threading.Thread",
+        "Microsoft.Win32.Registry",
+        "Microsoft.Win32.Primitives",
+        "System.Text.Json",
+        "System.ComponentModel.EventBasedAsync",
+        "Microsoft.VisualBasic.Core"
+      ],
+      "rejectedContinuousViewerAbsent": true,
+      "browserOrScriptEngineReferencesAbsent": true,
+      "executionPerformed": false
+    },
+    {
+      "assembly": "LensDocsStudio.Core.dll",
+      "typeCount": 777,
+      "references": [
+        "System.Runtime",
+        "System.Text.RegularExpressions",
+        "Markdig",
+        "System.Collections",
+        "System.Threading",
+        "System.Net.Http",
+        "System.Net.Primitives",
+        "AngleSharp",
+        "System.Runtime.Numerics",
+        "System.Text.Json",
+        "System.Security.Cryptography",
+        "System.Text.Encoding.Extensions",
+        "Mermaider",
+        "System.Linq",
+        "DocumentFormat.OpenXml",
+        "System.IO.Compression",
+        "DocumentFormat.OpenXml.Framework",
+        "UglyToad.PdfPig",
+        "System.Memory",
+        "System.IO.Hashing",
+        "System.Xml.XDocument",
+        "System.Xml.ReaderWriter",
+        "System.ObjectModel",
+        "UglyToad.PdfPig.DocumentLayoutAnalysis",
+        "System.IO.Compression.ZipFile"
+      ],
+      "rejectedContinuousViewerAbsent": true,
+      "browserOrScriptEngineReferencesAbsent": true,
+      "executionPerformed": false
+    },
+    {
+      "assembly": "LensDocsStudio.Native.dll",
+      "typeCount": 687,
+      "references": [
+        "System.Runtime",
+        "PresentationFramework",
+        "System.Text.RegularExpressions",
+        "System.ObjectModel",
+        "WindowsBase",
+        "System.Xaml",
+        "LensDocsStudio.Core",
+        "PresentationCore",
+        "System.Collections",
+        "System.ComponentModel",
+        "ICSharpCode.AvalonEdit",
+        "System.Threading",
+        "System.Runtime.InteropServices",
+        "Microsoft.Win32.SystemEvents",
+        "Markdig",
+        "System.Net.Http",
+        "System.Data.Common",
+        "CommunityToolkit.Mvvm",
+        "System.IO.FileSystem.Watcher",
+        "System.Linq",
+        "System.Collections.Concurrent",
+        "XamlMath.Shared",
+        "System.Xml.ReaderWriter",
+        "System.Xml.XDocument",
+        "SharpVectors.Converters.Wpf",
+        "System.Diagnostics.Tracing",
+        "System.Security.Cryptography",
+        "System.Diagnostics.Process",
+        "System.IO.Pipes",
+        "MigraDoc.DocumentObjectModel",
+        "PdfSharp-wpf",
+        "MigraDoc.Rendering-wpf",
+        "System.Memory",
+        "System.ComponentModel.TypeConverter",
+        "System.ComponentModel.Primitives",
+        "WpfMath",
+        "SharpVectors.Rendering.Wpf",
+        "System.Threading.Thread",
+        "Microsoft.Win32.Registry",
+        "Microsoft.Win32.Primitives",
+        "System.Text.Json",
+        "System.ComponentModel.EventBasedAsync",
+        "Microsoft.VisualBasic.Core"
+      ],
+      "rejectedContinuousViewerAbsent": true,
+      "browserOrScriptEngineReferencesAbsent": true,
+      "executionPerformed": false
+    },
+    {
+      "assembly": "LensDocsStudio.Core.dll",
+      "typeCount": 777,
+      "references": [
+        "System.Runtime",
+        "System.Text.RegularExpressions",
+        "Markdig",
+        "System.Collections",
+        "System.Threading",
+        "System.Net.Http",
+        "System.Net.Primitives",
+        "AngleSharp",
+        "System.Runtime.Numerics",
+        "System.Text.Json",
+        "System.Security.Cryptography",
+        "System.Text.Encoding.Extensions",
+        "Mermaider",
+        "System.Linq",
+        "DocumentFormat.OpenXml",
+        "System.IO.Compression",
+        "DocumentFormat.OpenXml.Framework",
+        "UglyToad.PdfPig",
+        "System.Memory",
+        "System.IO.Hashing",
+        "System.Xml.XDocument",
+        "System.Xml.ReaderWriter",
+        "System.ObjectModel",
+        "UglyToad.PdfPig.DocumentLayoutAnalysis",
+        "System.IO.Compression.ZipFile"
+      ],
+      "rejectedContinuousViewerAbsent": true,
+      "browserOrScriptEngineReferencesAbsent": true,
+      "executionPerformed": false
+    }
+  ],
+  "retainedNativePullRequestFailure": {
+    "workflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38778926943",
+    "phase": "after-upgrade",
+    "completedChecks": 55,
+    "error": "Missing native control: SaveExportProfile",
+    "observation": "Export menu closed after physical submenu activation",
+    "validationCorrection": "Expand actual menu patterns and observe action readiness; existing save/profile/source/preference assertions and deadlines retained",
+    "screenshot": "images/mermaid-profile-menu-failure.png",
+    "screenshotSha256": "02312eb317a53bca6503abf4dae708e465f1552ad497878f793db939f272bd57"
+  }
+}

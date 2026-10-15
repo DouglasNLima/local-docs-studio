@@ -1199,10 +1199,18 @@ internal static partial class NativeUiChecks
             using (var entry = new StreamReader(archive.GetEntry("fixture.md")!.Open()))
                 if (entry.ReadToEnd() != LensDocsStudio.Core.Exports.DevOpsMarkdownExporter.Convert(templateSource, "fixture.md"))
                     throw new IOException("The profiled bundle did not retain the exact expected current Markdown source.");
-            Find(window, "ExportMenu").Click(); Find(window, "ExportProfilesMenu").Click(); Find(window, "SaveExportProfile").Patterns.Invoke.Pattern.Invoke();
+            Find(window, "ExportMenu").Patterns.ExpandCollapse.Pattern.Expand();
+            Find(window, "ExportProfilesMenu").Patterns.ExpandCollapse.Pattern.Expand();
+            Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("SaveExportProfile")) is not null,
+                "The export profiles submenu did not expose its save action.");
+            Find(window, "SaveExportProfile").Patterns.Invoke.Pattern.Invoke();
             NameLibraryEntry("Save export profile", "Profile name", "Native saved profile");
             Wait(() => Find(window, "Status").Name == "Saved export profile: Native saved profile", "The native export profile did not save to the library.");
-            Find(window, "ExportMenu").Click(); Find(window, "ExportProfilesMenu").Click(); Find(window, "GenericExportProfile").Patterns.Invoke.Pattern.Invoke();
+            Find(window, "ExportMenu").Patterns.ExpandCollapse.Pattern.Expand();
+            Find(window, "ExportProfilesMenu").Patterns.ExpandCollapse.Pattern.Expand();
+            Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("GenericExportProfile")) is not null,
+                "The export profiles submenu did not expose the generic profile.");
+            Find(window, "GenericExportProfile").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(window, "Status").Name == "Applied export profile: Generic documentation. Current session only.", "The generic export profile did not reset session overrides.");
             if (!File.ReadAllBytes(Path.Combine(state, "preferences.json")).SequenceEqual(preferencesBeforeProfile) || ReadObservedText(source) != templateSavedSource
                 || editor.Patterns.Value.Pattern.Value.Value != templateSource || !File.ReadAllBytes(browserLibraryPath).SequenceEqual(browserLibraryBytes))
