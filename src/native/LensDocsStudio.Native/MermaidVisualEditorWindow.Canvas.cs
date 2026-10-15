@@ -168,8 +168,7 @@ public partial class MermaidVisualEditorWindow
     private (Brush Fill, Brush Stroke, Brush Text) Colours(MermaidNode node, string fill, string stroke, string text)
     {
         if (SystemParameters.HighContrast) return (SystemColors.WindowBrush, SystemColors.WindowTextBrush, SystemColors.WindowTextBrush);
-        var className = draft.Model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == node.Id))?.Value
-            ?? node.Occurrences.LastOrDefault(item => item.ClassName is not null)?.ClassName;
+        var className = draft.Model.ClassForNode(node.Id);
         var values = draft.Model.Styles.Where(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == className))
             .Concat(draft.Model.Styles.Where(style => style.Kind == "style" && style.Targets.Any(target => target.Id == node.Id)));
         foreach (var value in values.SelectMany(style => style.Value.Split(',')))
@@ -207,9 +206,11 @@ public partial class MermaidVisualEditorWindow
             if (e.Key is not (Key.Enter or Key.Escape)) return; e.Handled = true;
             var text = editor.Text; DiagramCanvas.Children.Remove(editor); inlineEditor = null;
             if (e.Key == Key.Enter) await Execute(new UpdateMermaidNode(id, text, node.Shape, id), "node:" + id);
+            UpdateActions();
             Elements.Focus();
         };
         editor.Focus(); editor.SelectAll();
+        UpdateActions(); Status.Text = "Edit the label, then press Enter to confirm or Escape to cancel. The node ID stays unchanged.";
     }
     private void AutoLayout(object sender, RoutedEventArgs e) { RebuildCanvas(true); Status.Text = "Automatic layout restored from the semantic graph. No coordinates were written to source."; }
     private void Fit(object sender, RoutedEventArgs e)

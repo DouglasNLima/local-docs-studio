@@ -1,5 +1,22 @@
 # Lens Docs Studio native guide
 
+## Mermaid visual authoring
+
+Choose **Edit visually** beside a supported Flowchart preview, or **Insert →
+Flowchart visually** for a new diagram. The native editor offers nodes, connections,
+subgraphs, properties, source inspection and private Undo/Redo. Update edited
+properties before Apply; Reset property changes discards only those pending fields.
+Apply updates the owning document as one ordinary Undo action. Cancel leaves it
+unchanged; Save remains responsible for writing the file and checking disk changes.
+
+Use F2 to edit a node label (Enter confirms; Escape cancels), named + ports to start
+a connection, and the element list for keyboard selection. Middle-drag or
+Space+drag pans, Ctrl+wheel zooms, F fits and Home resets. Manual positions last for
+the editing session; Mermaid lays out the saved portable source. Unsupported or
+very dense graphs remain protected and available for source editing. See the
+[visual editor guide](mermaid-visual-editor.md) for the verified grammar, bounds,
+shortcuts and current certification evidence.
+
 ## Desktop workspace and synchronisation
 
 The application menu and command toolbar share a row when their measured widths fit; resizing to a narrower window moves the toolbar below the menu and retains native overflow commands. The document location below the tabs shows a short workspace-relative path, with the full saved path in its tooltip.

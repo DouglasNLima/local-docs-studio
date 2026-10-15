@@ -207,6 +207,27 @@ public sealed class MermaidVisualTests
         result = await draft.ExecuteBatchAsync([new AddMermaidNode("C", "New", FlowNodeShape.Process), new AddMermaidNode("A", "Duplicate", FlowNodeShape.Process)]);
         Assert.False(result.Success); Assert.Equal(Styled, draft.Source); Assert.False(draft.CanUndo); Assert.True(draft.CanRedo);
     }
+    [Fact]
+    public async Task Copied_basic_class_and_style_operations_preserve_semantics_and_reject_active_values_atomically()
+    {
+        var draft = new MermaidVisualDraft("flowchart TD\nA[Keep]\n");
+        var result = await draft.ExecuteBatchAsync([new AddMermaidClassDefinition("copied", "fill:#FAFAFA,stroke:#123456,stroke-width:2px"),
+            new AddMermaidNode("B", "Copied", FlowNodeShape.Process), new SetMermaidClass("B", "copied"), new SetMermaidStyleProperties("B", "color:#202124")]);
+        Assert.True(result.Success, result.Error); Assert.Equal("copied", draft.Model.ClassForNode("B"));
+        var before = draft.Source;
+        result = await draft.ExecuteBatchAsync([new AddMermaidNode("C", "Copy", FlowNodeShape.Process), new SetMermaidStyleProperties("C", "fill:url(https://example.invalid/x)")]);
+        Assert.False(result.Success); Assert.Equal(before, draft.Source); Assert.DoesNotContain(draft.Model.Nodes, node => node.Id == "C");
+        draft.Undo(); Assert.Equal("flowchart TD\nA[Keep]\n", draft.Source);
+    }
+    [Theory] [InlineData("\n")] [InlineData("\r\n")]
+    public async Task Physical_multiline_label_semantics_match_the_renderer_without_rewriting_source_line_endings(string newline)
+    {
+        var source = "flowchart LR" + newline + "    A[\"First line" + newline + "        second line\"] --> B[Keep]" + newline;
+        var draft = new MermaidVisualDraft(source); Assert.True(draft.Model.CanEdit, draft.Model.Diagnostic);
+        Assert.Equal("First line\nsecond line", draft.Model.Node("A").Label);
+        await Execute(draft, new UpdateMermaidNode("B", "Changed", FlowNodeShape.Process, "B"));
+        Assert.Equal(source.Replace("B[Keep]", "B[\"Changed\"]", StringComparison.Ordinal), draft.Source);
+    }
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }
 }

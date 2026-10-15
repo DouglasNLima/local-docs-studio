@@ -111,6 +111,9 @@ public sealed class MermaidSourceParser
             }).ToArray();
             if (nodes.Length > MaximumNodes || nodes.Length + edges.Count + groups.Count > MaximumElements)
                 error ??= "Visual editing supports at most 300 nodes and 500 total nodes, connections and subgraphs.";
+            if (edges.Count > Math.Max(100, nodes.Length * 4))
+                error ??= "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.";
+            if (styles.Count > MaximumElements) error ??= "The diagram exceeds the 500-statement styling budget for visual editing.";
             if (groups.Any(group => nodes.Any(node => node.Id == group.Id))) error ??= "Connections to subgraph IDs are protected.";
             if (styles.Where(style => style.Kind is "class" or "style").SelectMany(style => style.Targets).Any(target => nodes.All(node => node.Id != target.Id)))
                 error ??= "A class or style references an unknown node. Correct it in source mode.";
@@ -131,7 +134,7 @@ public sealed class MermaidSourceParser
 
     private static string RendererLabel(MermaidNode node, string source)
     {
-        var raw = node.Declaration?.LabelSpan?.Read(source) ?? node.Id;
+        var raw = NormaliseRawLabelLines(node.Declaration?.LabelSpan?.Read(source) ?? node.Id);
         if (raw.Length >= 2 && raw[0] == '"' && raw[^1] == '"') raw = raw[1..^1];
         return Regex.Replace(raw, "<br\\s*/?>", "\n", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50)).Replace("\\n", "\n");
     }
@@ -151,12 +154,22 @@ public sealed class MermaidSourceParser
     }
     public static string DecodeLabel(string text)
     {
+        text = NormaliseRawLabelLines(text);
         if (text.Length >= 2 && text[0] == '"' && text[^1] == '"') text = text[1..^1];
         text = Regex.Replace(text, "<br\\s*/?>", "\n", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50));
         text = WebUtility.HtmlDecode(text).Replace("\\n", "\n");
         text = Regex.Replace(text, @"#(\d+);", match => int.TryParse(match.Groups[1].Value, out var value) && System.Text.Rune.IsValid(value)
             ? char.ConvertFromUtf32(value) : match.Value, RegexOptions.None, TimeSpan.FromMilliseconds(50));
         return text;
+    }
+    private static string NormaliseRawLabelLines(string text)
+    {
+        // Mermaider trims physical input lines before joining multiline labels. Match its
+        // semantic view without normalising or rewriting a single byte of the saved source.
+        var lines = text.Split('\n'); if (lines.Length == 1) return text;
+        lines[0] = lines[0].TrimEnd(); lines[^1] = lines[^1].TrimStart();
+        for (var index = 1; index < lines.Length - 1; index++) lines[index] = lines[index].Trim();
+        return string.Join('\n', lines);
     }
     private static MermaidOccurrence ReadNode(string text, ref int position, MermaidSourceSpan statement, string? scope)
     {

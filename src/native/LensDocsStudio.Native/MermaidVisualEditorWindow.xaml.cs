@@ -35,10 +35,15 @@ public partial class MermaidVisualEditorWindow : Window
         : EdgeProperties.Visibility == Visibility.Visible ? new EdgeValues(EdgeSource.SelectedItem as string, EdgeTarget.SelectedItem as string, EdgeLabel.Text, EdgeType.SelectedItem is FlowConnectionType type ? type : FlowConnectionType.Directed)
         : GroupProperties.Visibility == Visibility.Visible ? new GroupValues(GroupLabel.Text, GroupDirection.SelectedItem as string) : null;
     private bool PropertiesPending => propertyBaseline is not null && !Equals(propertyBaseline, PropertyValues);
+    private double sourcePanelHeight = 190;
+    private bool fullScreen;
+    private WindowStyle previousStyle;
+    private WindowState previousState;
+    private ResizeMode previousResize;
     private record ElementChoice(string Key, string Description) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
-    private bool CanTransform => !busy && !SourcePending && draft.Model.CanEdit;
+    private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
 
     public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, string?> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null)
@@ -88,7 +93,7 @@ public partial class MermaidVisualEditorWindow : Window
         RedoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanRedo;
         DeleteButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.Count > 0;
         DuplicateButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
-        SourceEditor.IsReadOnly = busy || PropertiesPending; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending || PropertiesPending ? " •" : "");
+        SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
@@ -102,7 +107,11 @@ public partial class MermaidVisualEditorWindow : Window
         {
             var result = await draft.ExecuteBatchAsync(operations, lifetime.Token);
             if (closed) return false;
-            if (result.Success) { if (select is not null) draft.Select([select]); Refresh(); }
+            if (result.Success)
+            {
+                if (select is not null) draft.Select([select]);
+                Refresh(operations.Any(operation => operation is AddMermaidNode or DeleteMermaidNodes or AddMermaidSubgraph or DeleteMermaidSubgraph or MoveMermaidNode or ChangeMermaidDirection));
+            }
             else Status.Text = result.Error;
             return result.Success;
         }
@@ -198,9 +207,10 @@ public partial class MermaidVisualEditorWindow : Window
     private async void Duplicate(object sender, RoutedEventArgs e)
     {
         if (!CanTransform || PropertiesPending) return;
-        var nodes = Elements.SelectedItems.OfType<ElementChoice>().Where(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal)).Select(choice => draft.Model.Node(choice.Key[5..])).ToArray();
-        foreach (var node in nodes)
-        { var id = MermaidTransformationService.UniqueId(draft.Model); if (!await Execute(new AddMermaidNode(id, node.Label, node.Shape, node.SubgraphId), "node:" + id)) break; }
+        var ids = Elements.SelectedItems.OfType<ElementChoice>().Where(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal)).Select(choice => choice.Key[5..]).ToHashSet();
+        if (ids.Count == 0) return;
+        var selected = new MermaidSourceParser().Parse(CopiedSource(ids));
+        await InsertCopiedGraph(selected, true);
     }
     private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Undo(); Refresh(true); } }
     private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Redo(); Refresh(true); } }
@@ -213,18 +223,20 @@ public partial class MermaidVisualEditorWindow : Window
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (updating) return;
-        if (PropertiesPending)
+        if (PropertiesPending || inlineEditor is not null)
         {
             updating = true;
             try { Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice); }
             finally { updating = false; }
-            UpdateCanvasSelection(); Status.Text = "Update the current properties or reset their changes before selecting another element."; return;
+            UpdateCanvasSelection(); Status.Text = inlineEditor is null ? "Update the current properties or reset their changes before selecting another element." : "Press Enter to confirm the inline label, or Escape to cancel it."; return;
         }
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
         ShowProperties(); UpdateCanvasSelection(); UpdateActions();
     }
     private void SelectElement(string key, bool extend = false)
     {
+        if (PropertiesPending || inlineEditor is not null)
+        { UpdateCanvasSelection(); inlineEditor?.Focus(); Status.Text = "Confirm or reset the current element's pending edits before changing selection."; return; }
         var choice = choices.FirstOrDefault(item => item.Key == key); if (choice is null) return;
         if (!extend) Elements.SelectedItems.Clear();
         if (extend && Elements.SelectedItems.Contains(choice)) Elements.SelectedItems.Remove(choice); else Elements.SelectedItems.Add(choice);
@@ -242,8 +254,7 @@ public partial class MermaidVisualEditorWindow : Window
             NodeId.Text = node.Id; NodeLabel.Text = node.Label; NodeShape.SelectedItem = node.Shape;
             NodeGroup.ItemsSource = new[] { "(Root)" }.Concat(draft.Model.Subgraphs.Select(group => group.Id)); NodeGroup.SelectedItem = node.SubgraphId ?? "(Root)";
             NodeClass.ItemsSource = draft.Model.Styles.Where(style => style.Kind == "classDef").SelectMany(style => style.Targets).Select(target => target.Id).Distinct().ToArray();
-            NodeClass.SelectedItem = draft.Model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == node.Id))?.Value
-                ?? node.Occurrences.LastOrDefault(item => item.ClassName is not null)?.ClassName;
+            NodeClass.SelectedItem = draft.Model.ClassForNode(node.Id);
             var palette = DiagramThemes.Colours(DiagramThemes.ResolveName(diagramTheme, dark));
             var colours = Colours(node, palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
             FillColour.Text = Hex(colours.Fill); StrokeColour.Text = Hex(colours.Stroke); TextColour.Text = Hex(colours.Text);
@@ -305,12 +316,12 @@ public partial class MermaidVisualEditorWindow : Window
     private void Cancel(object sender, RoutedEventArgs e) { discard = true; Close(); }
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
-        if (!discard && (draft.IsDirty || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft? The document will keep its current source.",
+        if (!discard && (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null) && MessageBox.Show(this, "Discard this visual editor's unsaved draft? The document will keep its current source.",
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) e.Cancel = true;
     }
     public bool CloseForOwner()
     {
-        if ((draft.IsDirty || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft before closing the application?",
+        if ((draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null) && MessageBox.Show(this, "Discard this visual editor's unsaved draft before closing the application?",
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return false;
         discard = true; Close(); return true;
     }
@@ -339,6 +350,14 @@ public partial class MermaidVisualEditorWindow : Window
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; Apply(sender, e); return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
+        if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
+        {
+            if (e.Key == Key.Left) Viewport.ScrollToHorizontalOffset(Viewport.HorizontalOffset - 40);
+            else if (e.Key == Key.Right) Viewport.ScrollToHorizontalOffset(Viewport.HorizontalOffset + 40);
+            else if (e.Key == Key.Up) Viewport.ScrollToVerticalOffset(Viewport.VerticalOffset - 40);
+            else Viewport.ScrollToVerticalOffset(Viewport.VerticalOffset + 40);
+            e.Handled = true; return;
+        }
         var control = Keyboard.Modifiers == ModifierKeys.Control;
         if (control && e.Key == Key.Z) Undo(sender, e);
         else if (control && e.Key == Key.Y) Redo(sender, e);
@@ -351,38 +370,103 @@ public partial class MermaidVisualEditorWindow : Window
         else if (e.Key == Key.F2 && Selected?.StartsWith("node:", StringComparison.Ordinal) == true) BeginInlineEdit(Selected[5..]);
         else if (e.Key == Key.F) Fit(sender, e);
         else if (e.Key == Key.Home) ResetView(sender, e);
+        else if (e.Key == Key.F4) { if (NodeProperties.IsVisible) NodeLabel.Focus(); else if (EdgeProperties.IsVisible) EdgeLabel.Focus(); else if (GroupProperties.IsVisible) GroupLabel.Focus(); }
+        else if (e.Key == Key.F11) ToggleFullScreen();
         else if (e.Key == Key.Escape) { connectionSource = null; Elements.UnselectAll(); Status.Text = "Selection cleared. The draft remains open."; }
         else if (e.Key == Key.Insert) InsertNode(Palette.Children.OfType<Button>().First(), e);
         else return;
         e.Handled = true;
     }
+    private void ToggleFullScreen()
+    {
+        if (!fullScreen) { previousStyle = WindowStyle; previousState = WindowState; previousResize = ResizeMode; WindowStyle = WindowStyle.None; ResizeMode = ResizeMode.NoResize; WindowState = WindowState.Maximized; }
+        else { WindowStyle = previousStyle; ResizeMode = previousResize; WindowState = previousState; }
+        fullScreen = !fullScreen;
+    }
+    private void SourceCollapsed(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Expander { Parent: Grid grid }) return;
+        sourcePanelHeight = grid.RowDefinitions[2].ActualHeight; grid.RowDefinitions[2].Height = GridLength.Auto; grid.RowDefinitions[0].Height = new(1, GridUnitType.Star);
+    }
+    private void SourceExpanded(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Expander { Parent: Grid grid } || grid.ActualHeight <= 0) return;
+        grid.RowDefinitions[2].Height = new(Math.Max(120, Math.Min(sourcePanelHeight, grid.ActualHeight * .55)));
+        grid.RowDefinitions[0].Height = new(1, GridUnitType.Star);
+    }
     private void CopyNodes()
     {
         var ids = Elements.SelectedItems.OfType<ElementChoice>().Where(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal)).Select(choice => choice.Key[5..]).ToHashSet();
         if (ids.Count == 0) return;
+        var text = CopiedSource(ids);
+        try { Clipboard.SetText(text); Status.Text = "Selected nodes, styles and internal connections copied as portable Mermaid source."; }
+        catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Try copying again."; }
+    }
+    private string CopiedSource(ISet<string> ids)
+    {
+        var classes = ids.Select(draft.Model.ClassForNode).Where(name => name is not null).ToHashSet();
         var text = "flowchart " + draft.Model.Direction + draft.Model.NewLine
             + string.Join(draft.Model.NewLine, draft.Model.Nodes.Where(node => ids.Contains(node.Id)).Select(node => MermaidTransformationService.NodeText(node.Id, node.Label, node.Shape))
                 .Concat(draft.Model.Edges.Where(edge => ids.Contains(edge.Source.Id) && ids.Contains(edge.Target.Id))
                     .Select(edge => edge.Source.Id + " " + MermaidTransformationService.ConnectionToken(edge.Type) + (edge.Label.Length == 0 ? "" : "|" + MermaidTransformationService.EscapeLabel(edge.Label) + "|") + " " + edge.Target.Id)));
-        try { Clipboard.SetText(text); Status.Text = "Selected nodes and their internal connections copied as Mermaid source."; }
-        catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Try copying again."; }
+        foreach (var style in draft.Model.Styles)
+        {
+            if (style.Kind == "classDef")
+            { if (style.Targets.Any(target => classes.Contains(target.Id))) text += draft.Model.NewLine + style.Statement.Read(draft.Source); }
+            else
+            {
+                var targets = style.Targets.Where(target => ids.Contains(target.Id)).Select(target => target.Id).ToArray();
+                if (targets.Length > 0) text += draft.Model.NewLine + style.Kind + " " + string.Join(',', targets) + " " + style.Value;
+            }
+        }
+        foreach (var node in draft.Model.Nodes.Where(node => ids.Contains(node.Id)))
+            if (draft.Model.ClassForNode(node.Id) is { } className)
+                text += draft.Model.NewLine + "class " + node.Id + " " + className;
+        return text;
     }
     private async void PasteNodes()
     {
-        if (!CanTransform) return;
+        if (!CanTransform || PropertiesPending) return;
         try
         {
             var copied = new MermaidSourceParser().Parse(Clipboard.GetText());
             if (!copied.CanEdit || copied.Subgraphs.Count != 0) { Status.Text = "Paste a supported Flowchart containing nodes and separate connections. Use source mode for subgraphs."; return; }
-            var map = new Dictionary<string, string>();
-            foreach (var node in copied.Nodes)
-            {
-                var id = MermaidTransformationService.UniqueId(draft.Model); map[node.Id] = id;
-                if (!await Execute(new AddMermaidNode(id, node.Label, node.Shape))) return;
-            }
-            foreach (var edge in copied.Edges) if (!await Execute(new AddMermaidConnection(map[edge.Source.Id], map[edge.Target.Id], edge.Label, edge.Type))) return;
-            foreach (var pair in map) SelectElement("node:" + pair.Value, true);
+            await InsertCopiedGraph(copied, false);
         }
         catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Try pasting again."; }
+    }
+    private async Task InsertCopiedGraph(MermaidDiagramModel copied, bool keepGroups)
+    {
+        if (!copied.CanEdit) { Status.Text = copied.Diagnostic; return; }
+        var used = draft.Model.Nodes.Select(node => node.Id).Concat(draft.Model.Subgraphs.Select(group => group.Id)).ToHashSet();
+        var classNames = draft.Model.Styles.Where(style => style.Kind == "classDef").SelectMany(style => style.Targets).Select(target => target.Id).ToHashSet();
+        var classMap = new Dictionary<string, string>(); var map = new Dictionary<string, string>(); var operations = new List<MermaidEditOperation>();
+        foreach (var definition in copied.Styles.Where(style => style.Kind == "classDef"))
+        {
+            var name = definition.Targets[0].Id;
+            var existing = draft.Model.Styles.LastOrDefault(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == name));
+            if (existing?.Value == definition.Value) { classMap[name] = name; continue; }
+            var newName = existing is null ? name : Allocate(classNames, "CopiedClass"); classMap[name] = newName; classNames.Add(newName);
+            operations.Add(new AddMermaidClassDefinition(newName, definition.Value));
+        }
+        foreach (var node in copied.Nodes)
+        {
+            var id = Allocate(used, "Node"); map[node.Id] = id;
+            operations.Add(new AddMermaidNode(id, node.Label, node.Shape, keepGroups ? draft.Model.Node(node.Id).SubgraphId : null));
+        }
+        foreach (var edge in copied.Edges) operations.Add(new AddMermaidConnection(map[edge.Source.Id], map[edge.Target.Id], edge.Label, edge.Type));
+        foreach (var style in copied.Styles.Where(style => style.Kind is "class" or "style"))
+            foreach (var target in style.Targets)
+            {
+                if (style.Kind == "class") operations.Add(new SetMermaidClass(map[target.Id], classMap.GetValueOrDefault(style.Value, style.Value)));
+                else operations.Add(new SetMermaidStyleProperties(map[target.Id], style.Value));
+            }
+        if (await ExecuteBatch(operations))
+        {
+            Elements.UnselectAll(); foreach (var pair in map) SelectElement("node:" + pair.Value, true);
+            Status.Text = "Copied nodes, supported styles and connections inserted as one visual Undo action.";
+        }
+        static string Allocate(ISet<string> names, string prefix)
+        { for (var index = 1; ; index++) { var id = prefix + index; if (names.Add(id)) return id; } }
     }
 }

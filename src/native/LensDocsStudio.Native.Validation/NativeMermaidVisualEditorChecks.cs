@@ -60,8 +60,12 @@ internal static partial class NativeUiChecks
             Click("MermaidUndo"); AwaitSource(text => text == connected);
             Check(new MermaidSourceParser().Parse(Draft()).Edges.Count == 2, "Real canvas connection, label, deletion, Undo and Redo produce the expected semantic graph");
             Click("MermaidInsertSubgraph"); AwaitSource(text => text.Contains("subgraph Group1", StringComparison.Ordinal)); Capture("subgraph-properties");
+            Find(visual!, "MermaidGroupLabel").AsTextBox().Text = "Capture group"; Click("MermaidUpdateGroup");
+            AwaitSource(text => text.Contains("subgraph Group1[Capture group]", StringComparison.Ordinal));
             Select("node_Node1"); Find(visual!, "MermaidNodeGroup").AsComboBox().Select("Group1"); Click("MermaidMoveNode");
             AwaitSource(text => new MermaidSourceParser().Parse(text).Node("Node1").SubgraphId == "Group1");
+            Find(visual!, "MermaidFillColour").AsTextBox().Text = "#E8F3FA"; Click("MermaidApplyStyle");
+            AwaitSource(text => text.Contains("style Node1 fill:#E8F3FA", StringComparison.Ordinal));
             var valid = Draft(); var sourceEditor = Find(visual!, "MermaidDraftSource");
             sourceEditor.Patterns.Value.Pattern.SetValue("flowchart TD\nA -->"); Click("MermaidValidateSource");
             Wait(() => Find(visual!, "MermaidStatus").Name.Contains("retained", StringComparison.Ordinal), "Invalid source did not retain its diagnostic and draft.");
@@ -73,7 +77,9 @@ internal static partial class NativeUiChecks
             var bounds = viewport.BoundingRectangle; var before = scroll.HorizontalScrollPercent.Value;
             Mouse.DragHorizontally(new(bounds.Left + bounds.Width * 2 / 3, bounds.Top + bounds.Height / 2), -100, MouseButton.Middle);
             Wait(() => scroll.HorizontalScrollPercent.Value > before, "Middle-button PAN did not move the actual canvas.");
-            Click("MermaidFit"); Capture("source-and-canvas");
+            Click("MermaidFit");
+            Wait(() => zoom.Patterns.RangeValue.Pattern.Value.Value < 400 && !scroll.HorizontallyScrollable.Value && !scroll.VerticallyScrollable.Value,
+                "Fit did not contain the actual canvas after PAN."); Capture("source-and-canvas");
             var second = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1];
             var expected = original[..second.Body.Start] + valid + original[second.Body.End..];
             Click("MermaidApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "Apply did not replace only the second identical block.");
@@ -103,7 +109,73 @@ internal static partial class NativeUiChecks
             Click("MermaidCancel"); WaitClosed();
             main.CaptureToFile(Path.Combine(output, "mermaid-main-preview.png"));
             File.WriteAllText(Path.Combine(output, "mermaid-before.md"), original); File.WriteAllText(Path.Combine(output, "mermaid-after.md"), expected);
+            if (!highContrast)
+            {
+                FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "DarkTheme").AsMenuItem().Invoke();
+                Open(shiftedOffset); Select("node_Reviewed"); Capture("dark");
+                visual!.Patterns.Transform.Pattern.Resize(880, 600);
+                Wait(() => visual.BoundingRectangle.Width < 890 && visual.BoundingRectangle.Contains(Find(visual, "MermaidApply").BoundingRectangle), "Narrow-window Apply was clipped.");
+                Capture("narrow"); visual.Patterns.Transform.Pattern.Resize(1440, 900);
+                Wait(() => visual.BoundingRectangle.Width > 1400 && automation.GetDesktop().BoundingRectangle.Contains(visual.BoundingRectangle), "The wide editor was clipped by the hosted desktop.");
+                Click("MermaidFit"); Capture("wide"); Click("MermaidCancel"); WaitClosed();
+            }
+            LaunchDocument("Standalone.mmd", "flowchart TD\r\nA[Input] --> B[Output]\r\n");
+            Open(0); Select("node_A");
+            var rawBefore = ReadEditorText(editor); Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Standalone changed"; Click("MermaidUpdateNode");
+            AwaitSource(text => text.Contains("Standalone changed", StringComparison.Ordinal));
+            Find(visual!, "MermaidElements").Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_C);
+            Wait(() => NativeUiClipboard.GetText().Contains("Standalone changed", StringComparison.Ordinal), "Selected-node copy did not emit actual portable Mermaid source."); clipboardOwned = GetClipboardSequenceNumber();
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+            AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 3);
+            Check(ReadEditorText(editor) == rawBefore, "Native clipboard paste modifies only the private Mermaid draft");
+            var rawAfter = Draft(); Capture("standalone");
+            Click("MermaidApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == rawAfter, "Standalone visual Apply did not update raw source.");
+            Check(!rawAfter.Contains("```", StringComparison.Ordinal), "Real standalone UIA Apply never inserts a synthetic fence");
+            FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+            Wait(() => ReadEditorText(editor) == rawBefore, "Standalone UIA Undo did not restore its complete source.");
+
+            foreach (var extension in new[] { ".md", ".mermaid" })
+            {
+                LaunchDocument("Empty" + extension, ""); OpenInsertion(); Capture("empty-new" + extension.Replace('.', '-'));
+                Click("MermaidInsertProcess"); AwaitSource(text => text.Contains("Node1[", StringComparison.Ordinal));
+                Find(visual!, "MermaidElements").Focus(); Keyboard.Type(VirtualKeyShort.F2);
+                var inline = Find(visual!, "MermaidInlineLabel").AsTextBox(); inline.Text = "Cancelled label"; Keyboard.Type(VirtualKeyShort.ESCAPE);
+                Check(!Draft().Contains("Cancelled label", StringComparison.Ordinal), "Escape cancels a real inline label edit in " + extension);
+                Find(visual!, "MermaidElements").Focus(); Keyboard.Type(VirtualKeyShort.F2); Find(visual!, "MermaidInlineLabel").AsTextBox().Text = "Keyboard label";
+                Keyboard.Type(VirtualKeyShort.RETURN); AwaitSource(text => text.Contains("Node1[\"Keyboard label\"]", StringComparison.Ordinal)); Capture("inline-label-result" + extension.Replace('.', '-'));
+                Click("MermaidDuplicate"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
+                Click("MermaidUndo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 1);
+                Click("MermaidRedo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
+                var inserted = Draft(); Click("MermaidApply"); WaitClosed();
+                Wait(() => ReadEditorText(editor).Contains("Keyboard label", StringComparison.Ordinal), "New flowchart insertion did not update the document.");
+                Check(extension == ".md" ? ReadEditorText(editor).StartsWith("```mermaid", StringComparison.Ordinal) : ReadEditorText(editor) == inserted,
+                    "New flowchart uses the correct portable Markdown/raw representation for " + extension);
+                FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == "", "New flowchart insertion was not one coherent document Undo.");
+            }
+            const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\n";
+            LaunchDocument("Protected.mmd", protectedSource); OpenInsertion(false); Capture("protected-source");
+            Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
+                "Unsupported chained source opens for protected inspection without destructive visual commands");
+            Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
             Record(true, null); return 0;
+
+            void LaunchDocument(string name, string text)
+            {
+                if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); }
+                var fixturePath = Path.Combine(root, name); File.WriteAllText(fixturePath, text);
+                var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+                launch.ArgumentList.Add("--state-directory"); launch.ArgumentList.Add(Path.Combine(root, "state-" + name.Replace('.', '-')));
+                launch.ArgumentList.Add(root); launch.ArgumentList.Add(fixturePath);
+                app = Application.Launch(launch); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The additional Mermaid fixture did not start.");
+                editor = Find(main, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == text, "The additional fixture source did not load exactly.");
+            }
+            void OpenInsertion(bool editable = true)
+            {
+                FocusWindow(main!); Find(main!, "InsertMenu").Click(); Find(main!, "InsertFlowchart").AsMenuItem().Invoke();
+                Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Insert Flowchart did not open the native editor.");
+                if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The new diagram did not become editable.");
+            }
 
             void Open(int blockOffset)
             {

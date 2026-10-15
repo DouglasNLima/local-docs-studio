@@ -71,8 +71,8 @@
     <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" DisplayMemberPath="Description"
      AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements"/>
    </DockPanel>
-   <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
-   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="5"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+   <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
+   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="5"/><RowDefinition Height="190" MinHeight="32"/></Grid.RowDefinitions>
     <ScrollViewer x:Name="Viewport" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
      PreviewMouseWheel="CanvasWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost"
      AutomationProperties.Name="Interactive Mermaid canvas. Use the element list for keyboard selection; middle-drag pans." AutomationProperties.AutomationId="MermaidViewport">
@@ -85,16 +85,16 @@
       </ContextMenu></Canvas.ContextMenu>
      </Canvas>
     </ScrollViewer>
-    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
-    <Expander x:Name="SourcePanel" Grid.Row="2" Header="Mermaid source" IsExpanded="True" Margin="0,8,0,0">
-     <DockPanel Height="160">
+    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
+    <Expander x:Name="SourcePanel" Grid.Row="2" Header="Mermaid source" IsExpanded="True" Expanded="SourceExpanded" Collapsed="SourceCollapsed" Margin="0,8,0,0">
+     <DockPanel MinHeight="90">
       <Button DockPanel.Dock="Bottom" Content="Validate source changes" Click="ValidateSource" HorizontalAlignment="Left" AutomationProperties.AutomationId="MermaidValidateSource"/>
       <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" FontFamily="Consolas" FontSize="13" WordWrap="False" TextChanged="SourceChanged"
        Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" AutomationProperties.Name="Mermaid draft source" AutomationProperties.AutomationId="MermaidDraftSource"/>
      </DockPanel>
     </Expander>
    </Grid>
-   <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}"/>
+   <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="{DynamicResource BorderBrush}"/>
    <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="10,0,0,0">
     <StackPanel>
      <TextBlock Text="Properties" FontWeight="SemiBold" FontSize="16"/>

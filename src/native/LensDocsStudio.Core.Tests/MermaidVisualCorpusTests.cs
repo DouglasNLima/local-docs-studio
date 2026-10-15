@@ -65,4 +65,15 @@ public sealed class MermaidVisualCorpusTests
         var excessive = new MermaidSourceParser().Parse(source + "\nExtra[Over limit]\n");
         Assert.Equal(count < 300, excessive.CanEdit);
     }
+
+    [Fact]
+    public async Task Dense_graphs_are_protected_before_repeated_renderer_validation()
+    {
+        var source = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, 20).Select(index => $"Node{index}[Node {index}]")) + "\n"
+            + string.Join('\n', Enumerable.Range(0, 20).SelectMany(from => Enumerable.Range(from + 1, 19 - from).Select(to => $"Node{from} --> Node{to}")));
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.Protected, draft.Model.Compatibility);
+        Assert.Contains("dense graph", draft.Model.Diagnostic); Assert.Equal(20, draft.Model.Nodes.Count); Assert.Equal(190, draft.Model.Edges.Count);
+        var result = await draft.ExecuteAsync(new UpdateMermaidNode("Node0", "Changed", FlowNodeShape.Process, "Node0"));
+        Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+    }
 }

@@ -51,6 +51,10 @@ public sealed record MermaidDiagramModel(string Source, string Direction, Mermai
         ?? throw new ArgumentException("Select an existing connection.");
     public MermaidSubgraph Subgraph(string id) => Subgraphs.FirstOrDefault(group => group.Id == id)
         ?? throw new ArgumentException("Select an existing subgraph.");
+    public string? ClassForNode(string id) => Styles.Where(style => style.Kind == "class" && style.Targets.Any(target => target.Id == id))
+        .Select(style => (Start: style.Statement.Start, Name: style.Value))
+        .Concat(Node(id).Occurrences.Where(item => item.ClassName is not null).Select(item => (Start: item.Span.Start, Name: item.ClassName!)))
+        .OrderBy(item => item.Start).LastOrDefault().Name;
 }
 
 public sealed record MermaidDocumentPatch(MermaidSourceSpan Span, string Expected, string Replacement);

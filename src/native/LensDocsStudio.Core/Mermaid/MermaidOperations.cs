@@ -14,6 +14,8 @@ public sealed record DeleteMermaidSubgraph(string Id, bool DeleteContents = fals
 public sealed record ChangeMermaidDirection(string Direction, string? SubgraphId = null) : MermaidEditOperation;
 public sealed record SetMermaidClass(string Id, string ClassName) : MermaidEditOperation;
 public sealed record SetMermaidStyle(string Id, string Fill, string Stroke, string Colour) : MermaidEditOperation;
+public sealed record AddMermaidClassDefinition(string ClassName, string Properties) : MermaidEditOperation;
+public sealed record SetMermaidStyleProperties(string Id, string Properties) : MermaidEditOperation;
 
 /// <summary>Plans exact edits against the verified source. It never serialises the entire graph.</summary>
 public sealed class MermaidTransformationService
@@ -142,6 +144,12 @@ public sealed class MermaidTransformationService
                 var value = "style " + style.Id + " fill:" + style.Fill + ",stroke:" + style.Stroke + ",color:" + style.Colour;
                 var previous = model.Styles.LastOrDefault(item => item.Kind == "style" && item.Targets.Count == 1 && item.Targets[0].Id == style.Id);
                 if (previous is null) Add(value); else Replace(previous.Statement, value); break;
+            case AddMermaidClassDefinition definition:
+                if (!MermaidSourceParser.IsId(definition.ClassName) || model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == definition.ClassName)))
+                    throw new ArgumentException("Choose a new class identifier.");
+                CheckStyleProperties(definition.Properties); Add("classDef " + definition.ClassName + " " + definition.Properties.TrimEnd(';')); break;
+            case SetMermaidStyleProperties properties:
+                model.Node(properties.Id); CheckStyleProperties(properties.Properties); Add("style " + properties.Id + " " + properties.Properties.TrimEnd(';')); break;
             default: throw new ArgumentException("Choose a supported visual editing command.");
         }
         return patches;
@@ -233,5 +241,26 @@ public sealed class MermaidTransformationService
     {
         if (value.Length != 7 || value[0] != '#' || value[1..].Any(character => !Uri.IsHexDigit(character)))
             throw new ArgumentException("Use a six-digit hexadecimal colour such as #FAFAFA.");
+    }
+    private static void CheckStyleProperties(string value)
+    {
+        if (value.Length is 0 or > 512) throw new ArgumentException("Copied styles support at most 512 characters.");
+        foreach (var property in value.TrimEnd(';').Split(',', StringSplitOptions.TrimEntries))
+        {
+            var parts = property.Split(':', 2, StringSplitOptions.TrimEntries);
+            if (parts.Length != 2) throw new ArgumentException("This copied style is protected. Paste it in source mode to retain it.");
+            if (parts[0] is "fill" or "stroke" or "color") CheckColour(parts[1]);
+            else if (parts[0] is "stroke-width" or "font-size")
+            {
+                var number = parts[1].EndsWith("px", StringComparison.Ordinal) ? parts[1][..^2] : parts[1];
+                if (!double.TryParse(number, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out var size) || size is < 0 or > 64)
+                    throw new ArgumentException("Copied numeric style values must be between 0 and 64 pixels.");
+            }
+            else if (parts[0] == "stroke-dasharray")
+            { if (parts[1].Length > 32 || parts[1].Any(character => !char.IsAsciiDigit(character) && character is not (' ' or '.'))) throw new ArgumentException("This dash pattern is protected. Use source mode."); }
+            else if (parts[0] == "font-weight")
+            { if (parts[1] is not ("normal" or "bold" or "400" or "600" or "700")) throw new ArgumentException("This font weight is protected. Use source mode."); }
+            else throw new ArgumentException("This copied style uses a protected property. Use source mode to retain it.");
+        }
     }
 }
