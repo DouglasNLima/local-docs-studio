@@ -1,5 +1,9 @@
 # Native Mermaid visual editor
 
+The subsequent [visual integration report](mermaid-editor-visual-polish.md) records
+the Lens design-system integration in Draft PR 27. The source/authoring contract
+and historical verification below remain the reference for supported semantics.
+
 Implementation branch: `feature/native-mermaid-visual-editor`, based on verified
 `42c3fc614feb6db6f69a242312604e46ff76c238` and targeting `feature/native-ux-refinement`
 in [Draft PR 26](https://github.com/DouglasNLima/local-docs-studio/pull/26).

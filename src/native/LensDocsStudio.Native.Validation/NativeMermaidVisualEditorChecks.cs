@@ -13,17 +13,21 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast) => Task.Run(() =>
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern uint GetDpiForSystem();
+    [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
+    private static extern int DwmFlush();
+    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false) => Task.Run(() =>
     {
         Directory.CreateDirectory(Path.GetFullPath(output));
         using var clipboard = NativeUiClipboard.Start();
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var display = new NativeTestDisplay(output);
-        var result = MermaidVisualEditorCore(executable, output, highContrast);
+        var result = MermaidVisualEditorCore(executable, output, highContrast, polish);
         if (result == 0) display.Complete(); return result;
     }).GetAwaiter().GetResult();
 
-    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast)
+    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast, bool polish)
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         var root = Path.Combine(output, "fixture-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -31,6 +35,7 @@ internal static partial class NativeUiChecks
         const string block = "```mermaid\r\nflowchart LR\r\n    %% Preserve me\r\n    A[Write] -->|Next| B(Review)\r\n```\r\n";
         const string original = "# Native visual authoring\r\n\r\n" + block + "\r\nMiddle paragraph.\r\n\r\n" + block + "\r\nAfter.\r\n";
         File.WriteAllText(path, original); var diskBefore = File.ReadAllBytes(path);
+        var firstFrames = 0;
         var checks = new List<string>(); var timings = new List<object>();
         using var automation = new UIA3Automation { TransactionTimeout = TimeSpan.FromSeconds(3), ConnectionTimeout = TimeSpan.FromSeconds(3) };
         Application? app = null; Window? main = null; Window? visual = null;
@@ -42,9 +47,94 @@ internal static partial class NativeUiChecks
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(root); info.ArgumentList.Add(path);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native application window did not appear.");
             var editor = Find(main, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "The visual authoring fixture did not load exactly.");
+            main.Patterns.Transform.Pattern.Resize(1280, 840);
             var offset = original.LastIndexOf("```mermaid", StringComparison.Ordinal); Open(offset);
-            Capture("existing-light"); Select("node_B"); Capture("node-properties");
+            Click("MermaidActualSize");
+            Wait(() => Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Actual size did not settle before comparison capture.");
+            _ = DwmFlush(); Capture("existing-light");
+            if (polish)
+            {
+                var source = Draft(); CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
+                var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
+                Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
+                Wait(() => Find(visual!, "MermaidSelectionSummary").Name.Contains("Next", StringComparison.Ordinal), "The broad connection pointer target did not select its actual inspector.");
+                Check(Draft() == source, "A pointer offset from the thin connection line selects its inspector without changing source");
+                var rows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                rows[0].Patterns.SelectionItem.Pattern.Select(); rows[1].Patterns.SelectionItem.Pattern.AddToSelection();
+                Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Real list multi-selection exposes both selected nodes");
+                Capture("multi-selection"); Click("MermaidDuplicate");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 4 && new MermaidSourceParser().Parse(text).Edges.Count == 2);
+                var duplicate = Draft(); Click("MermaidUndo"); AwaitSource(text => text == source);
+                Click("MermaidRedo"); AwaitSource(text => text == duplicate); Click("MermaidUndo"); AwaitSource(text => text == source);
+                Check(Draft() == source, "Multi-node duplication includes the internal connection and private Undo restores exact source");
+                Click("MermaidCopySource");
+                Wait(() => NativeUiClipboard.GetText() == source, "Source-header copy did not place the exact draft on the actual clipboard.");
+                Check(true, "Source-header copy emits the exact draft"); clipboardOwned = GetClipboardSequenceNumber();
+                var toggle = Find(visual!, "MermaidSourceToggle");
+                var beforeHeight = Find(visual!, "MermaidViewport").BoundingRectangle.Height;
+                toggle.Patterns.Toggle.Pattern.Toggle();
+                Wait(() => Find(visual!, "MermaidViewport").BoundingRectangle.Height > beforeHeight + 80, "Collapsing source did not reclaim canvas space.");
+                Capture("collapsed-source");
+                toggle.Patterns.Toggle.Pattern.Toggle();
+                Wait(() => Find(visual!, "MermaidViewport").BoundingRectangle.Height < beforeHeight + 5, "Expanding source did not restore the workspace split.");
+                Check(Draft() == source, "Source collapse and expansion preserve the exact draft");
+                var zoomValue = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
+                Click("MermaidZoomIn"); Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value > zoomValue, "Zoom in changes the native viewport scale");
+                Click("MermaidZoomOut"); Check(Math.Abs(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value - zoomValue) < .01, "Zoom out reverses the zoom-in scale without source changes");
+                Check(Draft() == source, "View commands leave Mermaid source byte-for-byte unchanged");
+                Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Source collapse and view commands retain the original multi-selection");
+                foreach (var selected in Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value)
+                    selected.Patterns.SelectionItem.Pattern.RemoveFromSelection();
+                Wait(() => Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 0, "The multi-selection fixture did not clear before the single-node scenario.");
+            }
+            Select("node_B");
+            Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("B", StringComparison.Ordinal), "The selected-node inspector did not finish its first meaningful layout.");
+            _ = DwmFlush(); Capture("node-properties");
+            if (polish)
+            {
+                var shapeSource = Draft(); Find(visual!, "MermaidNodeShape").AsComboBox().Select("Decision"); Click("MermaidUpdateNode");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Node("B").Shape == FlowNodeShape.Decision);
+                Click("MermaidUndo"); AwaitSource(text => text == shapeSource);
+                Check(new MermaidSourceParser().Parse(Draft()).Node("B").Shape == FlowNodeShape.Rounded, "Shape inspector changes actual Mermaid geometry and Undo restores exact source");
+            }
+            if (polish)
+            {
+                Find(visual!, "MermaidPort_B").AsButton().Invoke();
+                Wait(() => Find(visual!, "MermaidStatus").Name.StartsWith("Connection from B", StringComparison.Ordinal), "The pending-edit fixture did not enter real connection mode.");
+            }
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
+            if (polish)
+            {
+                var pendingSource = Draft(); var a = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                var b = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
+                Mouse.DragHorizontally(new(a.Left + a.Width / 2, a.Top + a.Height / 2), 35, MouseButton.Left);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("pending", StringComparison.OrdinalIgnoreCase), "The pending pointer operation did not return its guard feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidCanvas_node_B").BoundingRectangle == b && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "A pending connection/pointer drag retains inspector text, exact source and node positions");
+                Find(visual!, "MermaidCanvas_node_A").Focus(); Keyboard.Type(VirtualKeyShort.SPACE);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before connecting nodes", StringComparison.Ordinal), "Keyboard connection completion bypassed pending-property feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed", "Keyboard connection completion cannot discard pending inspector values");
+                Keyboard.Type(VirtualKeyShort.F2);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before inline label editing", StringComparison.Ordinal), "F2 did not enforce pending inspector protection.");
+                Check(visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidInlineLabel")) is null && Draft() == pendingSource && Find(visual, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "Inline label entry cannot replace unapplied inspector values");
+                Keyboard.Type(VirtualKeyShort.ESCAPE);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("before clearing selection", StringComparison.Ordinal), "Escape did not retain pending-selection feedback.");
+                Check(Draft() == pendingSource && Find(visual!, "MermaidSelectionSummary").Name.StartsWith("B", StringComparison.Ordinal) && Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed",
+                    "Escape cancels connection mode while retaining pending properties and selection");
+                Capture("pending-properties");
+                Select("node_A");
+                Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed" && Find(visual!, "MermaidSelectionSummary").Name.Contains("B"), "Selection changes retain unapplied property text and selection");
+                if (!highContrast)
+                {
+                    var themePendingSource = Draft(); var zoomBefore = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
+                    ChangeApplicationTheme("Dark"); FocusWindow(visual!); Capture("pending-properties-dark");
+                    Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Review changed" && Draft() == themePendingSource && Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == zoomBefore,
+                        "Live theme updates retain pending inspector text, draft, selection and zoom");
+                    ChangeApplicationTheme("Light"); FocusWindow(visual!);
+                }
+            }
             Check(!Find(visual!, "MermaidApply").IsEnabled, "Unapplied inspector text cannot be silently lost through Apply");
             Check(!Find(visual!, "MermaidValidateSource").IsEnabled, "Source validation cannot discard pending inspector text");
             Click("MermaidUpdateNode"); AwaitSource(text => text.Contains("B(\"Review changed\")", StringComparison.Ordinal));
@@ -52,10 +142,27 @@ internal static partial class NativeUiChecks
             Find(visual!, "MermaidNodeId").AsTextBox().Text = "Reviewed"; Click("MermaidUpdateNode");
             AwaitSource(text => text.Contains("Reviewed(\"Review changed\")", StringComparison.Ordinal));
             Click("MermaidInsertDecision"); AwaitSource(text => text.Contains("Node1{", StringComparison.Ordinal));
-            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke(); Find(visual!, "MermaidCanvas_node_Node1").Click();
+            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke();
+            if (polish)
+            {
+                Wait(() => Find(visual!, "MermaidStatus").Name.StartsWith("Connection from Reviewed", StringComparison.Ordinal), "The connection preview did not enter destination mode.");
+                var beforeConnection = Draft(); var destination = Find(visual!, "MermaidCanvas_node_Node1").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(destination.Right + 24, destination.Top - 24));
+                _ = Draft(); _ = DwmFlush(); Capture("creating-connection");
+                Check(Draft() == beforeConnection, "The visible temporary connection guide retains the exact draft before destination selection");
+            }
+            Find(visual!, "MermaidCanvas_node_Node1").Click();
             AwaitSource(text => text.Contains("Reviewed --> Node1", StringComparison.Ordinal));
             Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Confirmed"; Click("MermaidUpdateEdge");
             AwaitSource(text => text.Contains("-->|Confirmed|", StringComparison.Ordinal)); Capture("edge-properties");
+            if (polish)
+            {
+                Click("MermaidReverseEdge");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Any(edge => edge.Source.Id == "Node1" && edge.Target.Id == "Reviewed" && edge.Label == "Confirmed"));
+                Click("MermaidReverseEdge");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Any(edge => edge.Source.Id == "Reviewed" && edge.Target.Id == "Node1" && edge.Label == "Confirmed"));
+                Check(true, "Connection inspector reverses actual endpoints and retains the label");
+            }
             var connected = Draft(); Click("MermaidDelete"); AwaitSource(text => !text.Contains("Confirmed", StringComparison.Ordinal));
             Click("MermaidUndo"); AwaitSource(text => text == connected); Click("MermaidRedo"); AwaitSource(text => !text.Contains("Confirmed", StringComparison.Ordinal));
             Click("MermaidUndo"); AwaitSource(text => text == connected);
@@ -65,6 +172,21 @@ internal static partial class NativeUiChecks
             AwaitSource(text => text.Contains("subgraph Group1[Capture group]", StringComparison.Ordinal));
             Select("node_Node1"); Find(visual!, "MermaidNodeGroup").AsComboBox().Select("Group1"); Click("MermaidMoveNode");
             AwaitSource(text => new MermaidSourceParser().Parse(text).Node("Node1").SubgraphId == "Group1");
+            if (polish)
+            {
+                var safe = Draft(); Find(visual!, "MermaidFillColour").AsTextBox().Text = "#GGGGGG"; Click("MermaidApplyStyle");
+                Wait(() => Find(visual!, "MermaidResetProperties").IsEnabled, "Rejected colour validation did not return to an editable inspector.");
+                Check(!Find(visual!, "MermaidApply").IsEnabled, "Invalid pending colours cannot enable document Apply");
+                Check(Draft() == safe, "Invalid hexadecimal colour keeps exact source and pending inspector protection");
+                Click("MermaidResetProperties"); Check(Draft() == safe && Find(visual!, "MermaidApply").IsEnabled, "Explicit property reset restores the validated draft");
+                var fill = Find(visual!, "MermaidFillColour").AsTextBox(); fill.Focus();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type("#11223344");
+                Wait(() => fill.Text == "#11223344", "Keyboard colour input was truncated instead of retaining the complete invalid value.");
+                Check(true, "Keyboard colour input retains an invalid long value instead of truncating it to an accepted prefix");
+                Click("MermaidApplyStyle"); Wait(() => Find(visual!, "MermaidResetProperties").IsEnabled, "Long colour validation did not return to the inspector.");
+                Check(Draft() == safe && !Find(visual!, "MermaidApply").IsEnabled, "Invalid long colour is rejected without source mutation");
+                Click("MermaidResetProperties");
+            }
             Find(visual!, "MermaidFillColour").AsTextBox().Text = "#E8F3FA"; Click("MermaidApplyStyle");
             AwaitSource(text => text.Contains("style Node1 fill:#E8F3FA", StringComparison.Ordinal));
             var valid = Draft(); var sourceEditor = Find(visual!, "MermaidDraftSource");
@@ -84,7 +206,7 @@ internal static partial class NativeUiChecks
             if (!highContrast)
             {
                 var themeDraft = Draft(); ChangeApplicationTheme("Dark");
-                FocusWindow(visual!); Capture("live-dark-theme");
+                FocusWindow(visual!); Capture("live-dark-theme"); if (polish) { CaptureApplyHover("apply-hover-dark"); CapturePrimaryFocus("apply-focus-dark"); }
                 Check(Draft() == themeDraft && ReadEditorText(editor) == original, "Live theme changes retain private and owning source");
                 ChangeApplicationTheme("Light"); FocusWindow(visual!);
             }
@@ -117,6 +239,35 @@ internal static partial class NativeUiChecks
             Click("MermaidCancel"); WaitClosed();
             main.CaptureToFile(Path.Combine(output, "mermaid-main-preview.png"));
             File.WriteAllText(Path.Combine(output, "mermaid-before.md"), original); File.WriteAllText(Path.Combine(output, "mermaid-after.md"), expected);
+            if (polish)
+            {
+                Open(shiftedOffset); Select("node_Reviewed");
+                foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
+                {
+                    visual!.Patterns.Transform.Pattern.Move(0, 0);
+                    visual.Patterns.Transform.Pattern.Resize(width, height);
+                    Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3, "Requested Mermaid editor dimensions did not settle.");
+                    foreach (var id in new[] { "MermaidApply", "MermaidCancel", "MermaidViewport", "MermaidElements", "MermaidSelectionSummary" })
+                        Check(visual.BoundingRectangle.Contains(Find(visual, id).BoundingRectangle), id + " remains contained at " + width + "x" + height);
+                    Capture("responsive-" + width + "x" + height);
+                    if (width == 880)
+                    {
+                        var beforePreview = Draft();
+                        (visual.FindFirstDescendant(cf => cf.ByName("More commands")) ?? throw new IOException("The narrow native toolbar did not expose its overflow control.")).Patterns.Toggle.Pattern.Toggle();
+                        FlaUI.Core.AutomationElements.AutomationElement? previewCommand = null;
+                        Wait(() => (previewCommand = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidRenderedPreview")))) is { IsOffscreen: false }, "Native overflow did not reveal Rendered preview.");
+                        Check(automation.GetDesktop().BoundingRectangle.Contains(previewCommand!.BoundingRectangle), "Native overflow command is completely contained by the disposable desktop");
+                        automation.GetDesktop().CaptureToFile(Path.Combine(output, "mermaid-toolbar-overflow.png")); previewCommand.AsButton().Invoke();
+                        Window? diagram = null;
+                        Wait(() => (diagram = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Overflow preview did not open the native rendered diagram.");
+                        diagram!.CaptureToFile(Path.Combine(output, "mermaid-overflow-rendered-preview.png")); diagram.Close();
+                        Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow"))) is null, "Native rendered preview did not close.");
+                        Check(Draft() == beforePreview, "Narrow toolbar overflow opens the existing native rendered preview without changing source");
+                        FocusWindow(visual);
+                    }
+                }
+                visual!.Patterns.Transform.Pattern.Resize(1280, 840); Click("MermaidCancel"); WaitClosed();
+            }
             if (!highContrast)
             {
                 ChangeApplicationTheme("Dark");
@@ -175,6 +326,23 @@ internal static partial class NativeUiChecks
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
+            if (polish)
+            {
+                foreach (var count in new[] { 20, 100, 300 })
+                {
+                    var graph = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, count).Select(index => $"N{index}[Node {index}]"))
+                        + "\n" + string.Join('\n', Enumerable.Range(0, Math.Min(count - 1, 199)).Select(index => $"N{index} --> N{index + 1}"));
+                    LaunchDocument("Canvas-" + count + ".mmd", graph);
+                    var watch = Stopwatch.StartNew(); OpenInsertion(); Click("MermaidFit");
+                    timings.Add(new { Operation = "Native canvas " + count + " nodes", Milliseconds = watch.Elapsed.TotalMilliseconds });
+                    Check(Draft() == graph && Find(visual!, "MermaidElements").Patterns.Selection.IsSupported, "Native " + count + "-node canvas retains exact source and accessible list");
+                    Capture("canvas-" + count); Click("MermaidCancel"); WaitClosed();
+                }
+                var complex = File.ReadAllText("tests/fixtures/native-mermaid-visual/complex.mmd");
+                LaunchDocument("Complex.mmd", complex); OpenInsertion(); Click("MermaidFit"); Capture("complex");
+                Check(Draft() == complex, "Complex nested and styled diagram is preserved through the native canvas");
+                Click("MermaidCancel"); WaitClosed();
+            }
             Record(true, null); return 0;
 
             void LaunchDocument(string name, string text)
@@ -200,7 +368,9 @@ internal static partial class NativeUiChecks
             {
                 FocusWindow(main!); Find(main!, "InsertMenu").Click(); Find(main!, "InsertFlowchart").AsMenuItem().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Insert Flowchart did not open the native editor.");
+                if (polish) Capture("first-frame-insertion-" + ++firstFrames);
                 if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The new diagram did not become editable.");
+                if (polish) CaptureMeaningful("first-meaningful-insertion-" + firstFrames);
             }
 
             void Open(int blockOffset)
@@ -208,7 +378,9 @@ internal static partial class NativeUiChecks
                 FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Edit visually action was not available.");
                 var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
+                if (polish) Capture("first-frame-existing-" + ++firstFrames);
                 Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable.");
+                if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
@@ -216,6 +388,28 @@ internal static partial class NativeUiChecks
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
+            void CapturePrimaryFocus(string name)
+            {
+                var before = Draft(); Find(visual!, "MermaidCancel").Focus(); Keyboard.Type(VirtualKeyShort.TAB);
+                Wait(() => Find(visual!, "MermaidApply").Properties.HasKeyboardFocus.Value, "Keyboard Tab did not reach the primary action.");
+                _ = DwmFlush(); Capture(name);
+                Check(Draft() == before, "Keyboard primary-action focus retains source in " + name);
+            }
+            void CaptureApplyHover(string name)
+            {
+                var before = Draft(); var bounds = Find(visual!, "MermaidApply").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2));
+                _ = Draft(); _ = DwmFlush(); Capture(name);
+                Check(Draft() == before, "Primary-action hover retains the exact draft in " + name);
+                var canvas = Find(visual!, "MermaidViewport").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(canvas.Left + 12, canvas.Top + 12));
+            }
+            void CaptureMeaningful(string name)
+            {
+                Wait(() => Find(visual!, "MermaidDraftSource").BoundingRectangle.Height > 0 && Draft().Length > 0, "The source panel did not finish its initial native layout.");
+                // Observe the compositor after real layout; never delay the application to mask painting.
+                _ = DwmFlush(); Capture(name);
+            }
             void Capture(string name) { visual!.CaptureToFile(Path.Combine(output, "mermaid-" + name + ".png")); }
             void Check(bool condition, string description) { if (!condition) throw new IOException(description); checks.Add(description); }
         }
@@ -227,7 +421,7 @@ internal static partial class NativeUiChecks
         }
         finally { RestoreClipboard(clipboardBefore, clipboardOwned); if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "mermaid-ui.json"), JsonSerializer.Serialize(new
-        { Passed = passed, Checks = checks, Timings = timings, HighContrastRequested = highContrast, Error = error,
+        { Passed = passed, Checks = checks, Timings = timings, HighContrastRequested = highContrast, Dpi = GetDpiForSystem(), Error = error,
             Limitations = "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed." }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }

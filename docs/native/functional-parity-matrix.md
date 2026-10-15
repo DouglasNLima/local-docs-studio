@@ -1,5 +1,14 @@
 # Functional parity matrix
 
+The native Mermaid editor visual integration is tracked in
+[Draft PR 27](https://github.com/DouglasNLima/local-docs-studio/pull/27) on
+`feature/native-mermaid-editor-visual-polish`, targeting verified PR 26 head
+`eb819398`. The [visual integration report](mermaid-editor-visual-polish.md) owns
+the shared-style decisions, inspected Windows captures, regression/package evidence
+and remaining physical certification limits. Core Mermaid source/guard contracts
+remain those in the original editor report. The installed preview and ancestor PRs
+are untouched; GUI and installer execution remains confined to disposable Windows CI.
+
 Native Flowchart visual authoring is delivered for the explicit bounded grammar in
 the [Mermaid editor report](mermaid-visual-editor.md): node/edge/style/group commands,
 private history, native interaction and source inspection, with guarded document

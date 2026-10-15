@@ -17,6 +17,7 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, ToggleButton> canvasElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Button> ports = new(StringComparer.Ordinal);
     private readonly Dictionary<string, System.Windows.Shapes.Path> connectionPaths = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, System.Windows.Shapes.Path> connectionHitPaths = new(StringComparer.Ordinal);
     private DispatcherOperation? connectionUpdate;
     private Point? dragStart, panStart;
     private Dictionary<string, MermaidLayoutBox>? dragged;
@@ -43,7 +44,7 @@ public partial class MermaidVisualEditorWindow
         if (layout) positions.Clear();
         foreach (var key in positions.Keys.Where(key => !arranged.ContainsKey(key)).ToArray()) positions.Remove(key);
         foreach (var (key, box) in arranged) if (!positions.ContainsKey(key) || key.StartsWith("group:", StringComparison.Ordinal)) positions[key] = box;
-        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); inlineEditor = null;
+        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
         foreach (var group in draft.Model.Subgraphs)
         {
             var key = "group:" + group.Id; if (!positions.TryGetValue(key, out var box)) continue;
@@ -61,8 +62,8 @@ public partial class MermaidVisualEditorWindow
             var grid = new Grid();
             grid.Children.Add(new System.Windows.Shapes.Path { Data = NodeGeometry(node.Shape, box.Width - 10, box.Height - 10),
                 Stretch = Stretch.Fill, Fill = fill, Stroke = stroke, StrokeThickness = 1.5, Margin = new(3) });
-            grid.Children.Add(new TextBlock { Text = node.Label, TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis,
-                Foreground = text, Margin = new(node.Shape is FlowNodeShape.Decision or FlowNodeShape.Hexagon ? 30 : 14, 8, 14, 8), VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Center, MaxHeight = box.Height - 20 });
+            grid.Children.Add(new TextBlock { Text = node.Label, FontSize = 13, TextWrapping = TextWrapping.Wrap, TextTrimming = TextTrimming.CharacterEllipsis,
+                Foreground = text, Margin = new(node.Shape is FlowNodeShape.Decision or FlowNodeShape.Hexagon ? 30 : 14, 8, node.Shape is FlowNodeShape.Decision or FlowNodeShape.Hexagon ? 30 : 14, 8), VerticalAlignment = VerticalAlignment.Center, TextAlignment = TextAlignment.Center, MaxHeight = box.Height - 20 });
             var button = ElementButton(key, "Node " + node.Id + ": " + node.Label + ", " + node.Shape, grid, box);
             AutomationProperties.SetHelpText(button, "Select to edit properties. F2 edits the label. Dragging changes this session's view only. Use its connection port to connect nodes.");
             Panel.SetZIndex(button, 20);
@@ -70,6 +71,7 @@ public partial class MermaidVisualEditorWindow
             button.PreviewMouseLeftButtonDown += async (_, e) =>
             {
                 e.Handled = true;
+                if (PropertiesPending) { SelectElement(key); return; }
                 if (e.ClickCount == 2) { SelectElement(key); BeginInlineEdit(node.Id); return; }
                 if (connectionSource is not null) { await PickNode(node.Id); return; }
                 SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
@@ -87,19 +89,19 @@ public partial class MermaidVisualEditorWindow
                 {
                     positions[id] = original with { X = Math.Max(0, original.X + delta.X), Y = Math.Max(0, original.Y + delta.Y) };
                     Canvas.SetLeft(canvasElements[id], positions[id].X); Canvas.SetTop(canvasElements[id], positions[id].Y);
-                    if (ports.TryGetValue(id, out var port)) { Canvas.SetLeft(port, positions[id].X + positions[id].Width - 15); Canvas.SetTop(port, positions[id].CentreY - 12); }
+                    if (ports.TryGetValue(id, out var port)) { Canvas.SetLeft(port, positions[id].X + positions[id].Width - 16); Canvas.SetTop(port, positions[id].CentreY - 16); }
                 }
                 QueueConnections(); e.Handled = true;
             };
             button.PreviewMouseLeftButtonUp += (_, e) => { dragStart = null; dragged = null; button.ReleaseMouseCapture(); e.Handled = true; };
             button.LostMouseCapture += (_, _) => { dragStart = null; dragged = null; };
-            var portButton = new Button { Content = "+", Width = 24, Height = 24, Padding = new(0), Margin = new(0), ToolTip = "Connect from " + node.Id, IsEnabled = draft.Model.CanEdit };
+            var portButton = ConnectionPort(node.Id, button);
             AutomationProperties.SetName(portButton, "Connect from node " + node.Id); AutomationProperties.SetAutomationId(portButton, "MermaidPort_" + node.Id);
-            portButton.Click += (_, e) => { SelectElement(key); connectionSource = node.Id; Status.Text = "Connection from " + node.Id + ": choose a destination node. Escape cancels."; e.Handled = true; };
-            Canvas.SetLeft(portButton, box.X + box.Width - 15); Canvas.SetTop(portButton, box.CentreY - 12); Panel.SetZIndex(portButton, 30);
+            portButton.Click += (_, e) => { SelectElement(key); connectionSource = node.Id; UpdateCanvasSelection(); Status.Text = "Connection from " + node.Id + ": choose a destination node. Escape cancels."; e.Handled = true; };
+            Canvas.SetLeft(portButton, box.X + box.Width - 16); Canvas.SetTop(portButton, box.CentreY - 16); Panel.SetZIndex(portButton, 30);
             DiagramCanvas.Children.Add(portButton); ports[key] = portButton;
         }
-        UpdateCanvasSelection(); UpdateExtent();
+        AddConnectionGuide(); UpdateCanvasSelection(); UpdateExtent();
     }
     private ToggleButton ElementButton(string key, string name, object content, MermaidLayoutBox box)
     {
@@ -115,6 +117,7 @@ public partial class MermaidVisualEditorWindow
     }
     private async Task PickNode(string id)
     {
+        if (PropertiesPending) { UpdateCanvasSelection(); Status.Text = "Update or reset pending property changes before connecting nodes."; return; }
         if (connectionSource is { } source && CanTransform)
         {
             connectionSource = null;
@@ -132,7 +135,7 @@ public partial class MermaidVisualEditorWindow
         foreach (var edge in draft.Model.Edges)
         {
             if (!positions.TryGetValue("node:" + edge.Source.Id, out var from) || !positions.TryGetValue("node:" + edge.Target.Id, out var to)) continue;
-            var selected = draft.Selection.Contains(edge.Id); var colour = BrushResource(selected ? "AccentBrush" : "TextBrush");
+            var selected = draft.Selection.Contains(edge.Id); var colour = BrushResource(selected ? "AccentBrush" : "MutedTextBrush");
             var start = Boundary(from, to); var end = Boundary(to, from); var geometry = new StreamGeometry();
             using (var drawing = geometry.Open())
             {
@@ -145,11 +148,15 @@ public partial class MermaidVisualEditorWindow
             geometry.Freeze();
             if (!connectionPaths.TryGetValue(edge.Id, out var path))
             {
-                path = new System.Windows.Shapes.Path { StrokeDashArray = edge.Type == FlowConnectionType.Dotted ? new DoubleCollection([3, 3]) : null };
+                var hit = new System.Windows.Shapes.Path { Stroke = Brushes.Transparent, StrokeThickness = 12 };
+                hit.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; };
+                Panel.SetZIndex(hit, 4); DiagramCanvas.Children.Add(hit); connectionHitPaths.Add(edge.Id, hit);
+                path = new System.Windows.Shapes.Path { StrokeStartLineCap = PenLineCap.Round, StrokeEndLineCap = PenLineCap.Round, StrokeLineJoin = PenLineJoin.Round, StrokeDashArray = edge.Type == FlowConnectionType.Dotted ? new DoubleCollection([3, 3]) : null };
                 path.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; }; Panel.SetZIndex(path, 5);
                 DiagramCanvas.Children.Add(path); connectionPaths.Add(edge.Id, path);
             }
-            path.Data = geometry; path.Stroke = colour; path.StrokeThickness = selected ? 4 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
+            connectionHitPaths[edge.Id].Data = geometry;
+            path.Data = geometry; path.Stroke = colour; path.StrokeThickness = selected ? 3 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
             if (!canvasElements.TryGetValue(edge.Id, out var button))
             {
                 var label = new TextBlock { Text = edge.Label.Length == 0 ? "·" : edge.Label, MaxWidth = 200, TextWrapping = TextWrapping.Wrap,
@@ -158,7 +165,7 @@ public partial class MermaidVisualEditorWindow
                     label, new(0, 0, Math.Clamp(20 + edge.Label.Length * 7, 36, 200), 34));
                 button.ToolTip = edge.Source.Id + " → " + edge.Target.Id; button.Click += (_, _) => SelectElement(edge.Id); Panel.SetZIndex(button, 10);
             }
-            Canvas.SetLeft(button, (start.X + end.X) / 2 - 18); Canvas.SetTop(button, (start.Y + end.Y) / 2 - 12);
+            Canvas.SetLeft(button, (start.X + end.X) / 2 - button.Width / 2); Canvas.SetTop(button, (start.Y + end.Y) / 2 - button.Height / 2);
         }
         UpdateCanvasSelection();
     }
@@ -183,15 +190,17 @@ public partial class MermaidVisualEditorWindow
     }
     private void UpdateCanvasSelection()
     {
+        UpdateConnectionGuide();
         synchronisingCanvasSelection = true;
         try
         {
             foreach (var (key, button) in canvasElements) button.IsChecked = draft.Selection.Contains(key);
+            foreach (var (key, port) in ports) port.Tag = draft.Selection.Contains(key) || connectionSource == key[5..] || canvasElements[key].IsMouseOver;
             foreach (var edge in draft.Model.Edges)
                 if (connectionPaths.TryGetValue(edge.Id, out var path))
                 {
-                    var selected = draft.Selection.Contains(edge.Id); path.Stroke = BrushResource(selected ? "AccentBrush" : "TextBrush");
-                    path.StrokeThickness = selected ? 4 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
+                    var selected = draft.Selection.Contains(edge.Id); path.Stroke = BrushResource(selected ? "AccentBrush" : "MutedTextBrush");
+                    path.StrokeThickness = selected ? 3 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
                 }
         }
         finally { synchronisingCanvasSelection = false; }
@@ -252,9 +261,10 @@ public partial class MermaidVisualEditorWindow
 
     private void BeginInlineEdit(string id)
     {
+        if (PropertiesPending) { Status.Text = "Update or reset pending property changes before inline label editing."; return; }
         if (!CanTransform || !positions.TryGetValue("node:" + id, out var box)) return;
         if (inlineEditor is not null) DiagramCanvas.Children.Remove(inlineEditor);
-        var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };
+        var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, MaxLength = 4096, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };
         inlineEditor = editor; AutomationProperties.SetName(editor, "Edit label for node " + id); AutomationProperties.SetAutomationId(editor, "MermaidInlineLabel");
         Canvas.SetLeft(editor, box.X + 8); Canvas.SetTop(editor, box.CentreY - 20); Panel.SetZIndex(editor, 50); DiagramCanvas.Children.Add(editor);
         editor.PreviewKeyDown += async (_, e) =>
