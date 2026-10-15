@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor']
   workflow_dispatch:
 permissions:
   contents: read
