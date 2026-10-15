@@ -11,6 +11,7 @@ public sealed class MermaidVisualTests
     public async Task Rename_changes_only_the_requested_label_span()
     {
         var draft = new MermaidVisualDraft(Styled); AssertEditable(draft.Model);
+        Assert.Equal("Flowchart", draft.Model.DiagramType);
         Assert.Equal("LR", draft.Model.Direction); Assert.Equal(2, draft.Model.Nodes.Count);
         Assert.Equal("Success", Assert.Single(draft.Model.Edges).Label);
         await Execute(draft, new UpdateMermaidNode("B", "Review", FlowNodeShape.Process, "B"));

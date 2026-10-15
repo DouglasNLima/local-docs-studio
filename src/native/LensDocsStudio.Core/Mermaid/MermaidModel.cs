@@ -32,6 +32,7 @@ public sealed record MermaidDiagramModel(string Source, string Direction, Mermai
     IReadOnlyList<MermaidStyle> Styles, IReadOnlyList<MermaidProtectedRegion> ProtectedRegions,
     MermaidCompatibility Compatibility, string? Diagnostic)
 {
+    public string DiagramType { get; init; } = "Flowchart";
     public bool CanEdit => Compatibility == MermaidCompatibility.Editable;
     public string NewLine => Source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
     public string Indentation

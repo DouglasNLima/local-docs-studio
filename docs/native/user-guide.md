@@ -13,9 +13,17 @@ Use F2 to edit a node label (Enter confirms; Escape cancels), named + ports to s
 a connection, and the element list for keyboard selection. Middle-drag or
 Space+drag pans, Ctrl+wheel zooms, F fits and Home resets. Manual positions last for
 the editing session; Mermaid lays out the saved portable source. Unsupported or
-very dense graphs remain protected and available for source editing. See the
-[visual editor guide](mermaid-visual-editor.md) for the verified grammar, bounds,
-shortcuts and current certification evidence.
+very dense graphs remain protected and available for source editing. Editing covers
+`flowchart` and `graph`, five directions, common node shapes, separate connections
+and named subgraphs. Keep connections outside groups when moving nodes between
+them. Chained connections, edge IDs, interactions, configuration directives and
+HTML label markup beyond line breaks stay protected.
+
+The visual editor supports up to 300 nodes, 500 total elements, eight nested
+subgraphs, 100,000 diagram characters and documents up to 4 million characters.
+Source-only mode also protects graphs with more than 100 connections and more
+than four connections per node. Other Mermaid families keep their existing
+[rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## Desktop workspace and synchronisation
 

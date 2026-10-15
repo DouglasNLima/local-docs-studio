@@ -19,7 +19,7 @@ public sealed class MermaidSourceParser
         var occurrences = new List<MermaidOccurrence>(); var edges = new List<MermaidEdge>();
         var groups = new List<MermaidSubgraph>(); var styles = new List<MermaidStyle>();
         var protectedRegions = new List<MermaidProtectedRegion>(); var stack = new Stack<GroupDraft>();
-        string direction = "TD"; MermaidSourceSpan directionSpan = default; string? error = null;
+        string direction = "TD"; MermaidSourceSpan directionSpan = default; string? error = null; var diagramType = "Unknown";
         var header = false;
         try
         {
@@ -39,9 +39,10 @@ public sealed class MermaidSourceParser
                 if (!header)
                 {
                     var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+                    if (words.Length > 0) diagramType = words[0] is "flowchart" or "graph" ? "Flowchart" : words[0];
                     if (words.Length > 0 && words[0] is not ("flowchart" or "graph"))
                         return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Protected,
-                            "This diagram family is available in source/preview mode. Visual editing supports Flowcharts only.");
+                            "This diagram family is available in source/preview mode. Visual editing supports Flowcharts only.") { DiagramType = diagramType };
                     if (words.Length != 2 || !IsDirection(words[1]))
                         throw new ArgumentException("Visual editing supports flowchart and graph with TD, TB, BT, LR or RL direction.");
                     direction = words[1]; directionSpan = new(statement.End - direction.Length, direction.Length); header = true; continue;
@@ -135,10 +136,10 @@ public sealed class MermaidSourceParser
                     || edges.Where((edge, index) => graph.Edges[index].Source != edge.Source.Id || graph.Edges[index].Target != edge.Target.Id).Any())
                 { error = "The source adapter and Mermaid parser disagree. This diagram is protected; use Edit source."; compatibility = MermaidCompatibility.Protected; }
             }
-            return new(source, direction, directionSpan, nodes, edges, groups.OrderBy(group => group.Opening.Start).ToArray(), styles, protectedRegions, compatibility, error);
+            return new(source, direction, directionSpan, nodes, edges, groups.OrderBy(group => group.Opening.Start).ToArray(), styles, protectedRegions, compatibility, error) { DiagramType = diagramType };
         }
         catch (Exception ex) when (ex is ArgumentException or MermaidParseException)
-        { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Invalid, ex.Message); }
+        { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Invalid, ex.Message) { DiagramType = diagramType }; }
     }
 
     private static string RendererLabel(MermaidNode node, string source)
