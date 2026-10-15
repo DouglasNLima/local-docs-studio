@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-desktop-ux-modernisation']
+    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
   pull_request:
-    branches: ['release/native-preview-readiness']
+    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
   workflow_dispatch:
 permissions:
   contents: read

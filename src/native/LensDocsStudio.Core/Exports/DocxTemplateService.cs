@@ -1,6 +1,8 @@
 using System.IO.Compression;
 using System.IO.Hashing;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using LensDocsStudio.Core.Imports;
@@ -17,6 +19,8 @@ public sealed class DocxTemplateService
     private const long MaximumExpandedBytes = 128L * 1024 * 1024;
     private const string WordNamespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
     private const string RelationshipNamespace = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+    private const string AttachedTemplateRelationship = RelationshipNamespace + "/attachedTemplate";
+    public const string AttachedTemplateWarning = "Safely ignored the attached Word template reference. Its target was not opened or copied.";
     private static readonly HashSet<string> SafeSettings = new(StringComparer.Ordinal)
     {
         "zoom", "proofState", "defaultTabStop", "autoHyphenation", "consecutiveHyphenLimit", "hyphenationZone", "doNotHyphenateCaps",
@@ -47,14 +51,15 @@ public sealed class DocxTemplateService
 
     public PreparedWordTemplate Prepare(byte[] bytes, CancellationToken cancellationToken = default)
     {
-        ValidateArchive(bytes, cancellationToken);
+        var attachedReferences = ValidateArchive(bytes, cancellationToken);
         using var input = new MemoryStream(bytes, false);
         using var source = WordprocessingDocument.Open(input, false, new OpenSettings { AutoSave = false, MaxCharactersInPart = 16 * 1024 * 1024 });
         var original = source.MainDocumentPart ?? throw new InvalidDataException("The Word template has no document part.");
         if (source.DocumentType != WordprocessingDocumentType.Document) throw new InvalidDataException("Select an ordinary .docx template document without macros.");
-        ValidateRelationships(original, cancellationToken);
+        ValidateRelationships(original, attachedReferences, cancellationToken);
         var originalBody = original.Document?.Body ?? throw new InvalidDataException("The Word template has no document body.");
         var warnings = new List<string>();
+        if (attachedReferences.Count != 0) warnings.Add(AttachedTemplateWarning);
         using var output = new MemoryStream();
         using (var target = WordprocessingDocument.Create(output, WordprocessingDocumentType.Document, true))
         {
@@ -65,7 +70,7 @@ public sealed class DocxTemplateService
             if (original.DocumentSettingsPart?.Settings is { } settings)
             {
                 var safe = new W.Settings(settings.ChildElements.Where(element => element.NamespaceUri == WordNamespace && SafeSettings.Contains(element.LocalName)).Select(element => element.CloneNode(true)));
-                if (safe.ChildElements.Count != settings.ChildElements.Count) warnings.Add("Unsupported document settings were omitted from the template.");
+                if (safe.ChildElements.Count != settings.ChildElements.Count - settings.Elements<W.AttachedTemplate>().Count()) warnings.Add("Unsupported document settings were omitted from the template.");
                 ValidateMarkup(safe); RejectUnresolvedRelationships(safe);
                 main.AddNewPart<DocumentSettingsPart>().Settings = safe;
             }
@@ -143,14 +148,26 @@ public sealed class DocxTemplateService
         return new(output.ToArray(), warnings);
     }
 
-    private static void ValidateRelationships(OpenXmlPart first, CancellationToken cancellationToken)
+    private static void ValidateRelationships(MainDocumentPart first, IReadOnlyList<(string PartPath, string Id)> attachedReferences, CancellationToken cancellationToken)
     {
+        // Only the actual document settings part may contain one passive attached-template reference.
+        // Compare identities without resolving, normalising or opening the untrusted external target.
+        var settingsPart = first.DocumentSettingsPart;
+        var references = settingsPart?.Settings?.Descendants().Where(element => element.LocalName == "attachedTemplate").ToArray() ?? [];
+        if (attachedReferences.Count != references.Length || references.Length > 1
+            || attachedReferences.Any(reference => reference.PartPath != settingsPart?.Uri.OriginalString)
+            || references.Any(reference => reference is not W.AttachedTemplate || reference.Parent != settingsPart?.Settings
+                || reference.GetAttribute("id", RelationshipNamespace).Value != attachedReferences.Single().Id))
+            throw new InvalidDataException("The attached Word template reference is missing, duplicated or inconsistent with its document settings relationship.");
         var pending = new Queue<OpenXmlPart>(); var seen = new HashSet<OpenXmlPart>(); pending.Enqueue(first);
         while (pending.TryDequeue(out var part))
         {
             cancellationToken.ThrowIfCancellationRequested(); if (!seen.Add(part)) continue;
             if (part is VbaProjectPart) throw new InvalidDataException("Macro-enabled templates are not supported.");
-            if (part.ExternalRelationships.Any()) throw new InvalidDataException("Templates with external resources or attached remote templates are not supported.");
+            foreach (var relationship in part.ExternalRelationships)
+                if (part != settingsPart || relationship.RelationshipType != AttachedTemplateRelationship
+                    || attachedReferences.Count != 1 || relationship.Id != attachedReferences[0].Id)
+                    throw new InvalidDataException("The Word template contains an unsupported external resource.");
             foreach (var link in part.HyperlinkRelationships)
                 if (!link.Uri.IsAbsoluteUri || link.Uri.Scheme is not ("https" or "http" or "mailto")) throw new InvalidDataException("The Word template contains an unsafe hyperlink.");
             foreach (var child in part.Parts) pending.Enqueue(child.OpenXmlPart);
@@ -204,13 +221,14 @@ public sealed class DocxTemplateService
         }
     }
 
-    private static void ValidateArchive(byte[] bytes, CancellationToken cancellationToken)
+    private static IReadOnlyList<(string PartPath, string Id)> ValidateArchive(byte[] bytes, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         if (bytes.Length > MaximumBytes) throw new InvalidDataException("The Word template exceeds 32 MB.");
         using var stream = new MemoryStream(bytes, false); using var zip = new ZipArchive(stream, ZipArchiveMode.Read);
         if (zip.Entries.Count > 1024) throw new InvalidDataException("The Word template exceeds 1,024 package entries.");
         var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase); var buffer = new byte[65536]; long total = 0;
+        var attachedReferences = new List<(string PartPath, string Id)>();
         foreach (var entry in zip.Entries)
         {
             cancellationToken.ThrowIfCancellationRequested(); var name = entry.FullName;
@@ -225,6 +243,48 @@ public sealed class DocxTemplateService
                 checksum.Append(buffer.AsSpan(0, read));
             }
             if (actual != entry.Length || checksum.GetCurrentHashAsUInt32() != entry.Crc32) throw new InvalidDataException("A Word template entry failed its size or checksum check.");
+            if (name.EndsWith(".rels", StringComparison.OrdinalIgnoreCase)) ValidateRelationshipMetadata(entry);
+        }
+        return attachedReferences;
+
+        void ValidateRelationshipMetadata(ZipArchiveEntry entry)
+        {
+            XNamespace packageRelationships = "http://schemas.openxmlformats.org/package/2006/relationships";
+            XDocument metadata;
+            try
+            {
+                using var source = entry.Open();
+                using var reader = XmlReader.Create(source, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 16 * 1024 * 1024 });
+                metadata = XDocument.Load(reader);
+            }
+            catch (XmlException) { throw new InvalidDataException("The Word template contains malformed relationship XML."); }
+            if (metadata.Root?.Name != packageRelationships + "Relationships") throw new InvalidDataException("The Word template contains malformed relationship metadata.");
+            var ids = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var relationship in metadata.Root.Elements())
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                var id = (string?)relationship.Attribute("Id"); var type = (string?)relationship.Attribute("Type");
+                var target = (string?)relationship.Attribute("Target"); var mode = (string?)relationship.Attribute("TargetMode");
+                if (relationship.Name != packageRelationships + "Relationship" || string.IsNullOrWhiteSpace(id) || !ids.Add(id)
+                    || string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(target) || mode is not (null or "Internal" or "External")
+                    || relationship.HasElements || relationship.Attributes().Any(attribute => !attribute.IsNamespaceDeclaration
+                        && (attribute.Name.NamespaceName.Length != 0 || attribute.Name.LocalName is not ("Id" or "Type" or "Target" or "TargetMode"))))
+                    throw new InvalidDataException("The Word template contains missing, duplicated or malformed relationship metadata.");
+                try { XmlConvert.VerifyNCName(id); }
+                catch (XmlException) { throw new InvalidDataException("The Word template contains a malformed relationship identifier."); }
+                if (type == AttachedTemplateRelationship)
+                {
+                    var marker = entry.FullName.LastIndexOf("/_rels/", StringComparison.Ordinal);
+                    if (mode != "External" || marker < 0) throw new InvalidDataException("An attached Word template relationship is outside its supported settings context.");
+                    attachedReferences.Add(("/" + entry.FullName[..marker] + "/" + entry.FullName[(marker + 7)..^5], id));
+                }
+                else if (mode == "External")
+                {
+                    if (type != RelationshipNamespace + "/hyperlink") throw new InvalidDataException("The Word template contains an unsupported external resource.");
+                    if (!Uri.TryCreate(target, UriKind.Absolute, out var uri) || uri.Scheme is not ("https" or "http" or "mailto"))
+                        throw new InvalidDataException("The Word template contains an unsafe hyperlink.");
+                }
+            }
         }
     }
 }
