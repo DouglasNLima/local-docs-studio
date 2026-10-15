@@ -54,7 +54,7 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); Capture("existing-light");
             if (polish)
             {
-                var source = Draft();
+                var source = Draft(); CaptureApplyHover("apply-hover-light");
                 var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
                 var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
                 Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
@@ -175,7 +175,7 @@ internal static partial class NativeUiChecks
             if (!highContrast)
             {
                 var themeDraft = Draft(); ChangeApplicationTheme("Dark");
-                FocusWindow(visual!); Capture("live-dark-theme");
+                FocusWindow(visual!); Capture("live-dark-theme"); if (polish) CaptureApplyHover("apply-hover-dark");
                 Check(Draft() == themeDraft && ReadEditorText(editor) == original, "Live theme changes retain private and owning source");
                 ChangeApplicationTheme("Light"); FocusWindow(visual!);
             }
@@ -357,6 +357,15 @@ internal static partial class NativeUiChecks
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
+            void CaptureApplyHover(string name)
+            {
+                var before = Draft(); var bounds = Find(visual!, "MermaidApply").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2));
+                _ = Draft(); _ = DwmFlush(); Capture(name);
+                Check(Draft() == before, "Primary-action hover retains the exact draft in " + name);
+                var canvas = Find(visual!, "MermaidViewport").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(canvas.Left + 12, canvas.Top + 12));
+            }
             void CaptureMeaningful(string name)
             {
                 Wait(() => Find(visual!, "MermaidDraftSource").BoundingRectangle.Height > 0 && Draft().Length > 0, "The source panel did not finish its initial native layout.");
