@@ -1,5 +1,8 @@
 # Native architecture decisions
 
+Native UX refinement is in progress on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25), based on the verified modernised native edition. The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records its current implementation, real private DOCX acceptance, regression results, preserved failures and pending hosted/package gates. Earlier delivery claims below retain their original revision and do not certify this refinement.
+
+
 Desktop UX modernisation preserves WPF/FlowDocument and the existing Core services. Shared vector/resources, focused window partials, private desktop/session state and parser-bounded source maps support the new controls and opt-in synchronisation without the rejected viewer or new dependencies. Its authoritative acceptance and limits are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md); [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24) tracks final delivery checks. Earlier records below retain their original scope.
 
 ## Targeted performance continuation

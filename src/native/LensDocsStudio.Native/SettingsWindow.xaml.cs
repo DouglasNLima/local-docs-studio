@@ -72,6 +72,7 @@ public partial class SettingsWindow : Window
         await Transfer(async token =>
         {
             var bytes = SettingsTransferFormat.Write(model.Current);
+            if (!Path.GetExtension(picker.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .json extension for an appearance-settings export.");
             if (File.Exists(picker.FileName) && new FileInfo(picker.FileName).Length > SettingsTransferFormat.MaximumBytes)
                 throw new IOException("The existing destination exceeds 64 KB. Choose a new settings filename.");
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token);

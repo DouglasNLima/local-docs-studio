@@ -24,23 +24,16 @@ internal static partial class NativeUiChecks
         Tree(Path.GetFileName(markdown), "Markdown document"); Tree(Path.GetFileName(diagram), "Mermaid diagram"); Tree(Path.GetFileName(plain), "Plain-text document");
         var renamed = Path.ChangeExtension(diagram, ".MERMAID"); File.Move(diagram, renamed); Tree(Path.GetFileName(renamed), "Mermaid diagram");
         editor.Focus(); Wait(() => editor.Properties.HasKeyboardFocus.Value, "The editor did not receive focus before adaptive resizing.");
-        foreach (var width in new[] { 860, 1280, 1120, 1160, 1280, 860, 1280 })
+        var frameWidth = window.BoundingRectangle.Width - Find(window, "AdaptiveApplicationHeader").BoundingRectangle.Width;
+        var lower = 860; var upper = 1280;
+        if (CheckWidth(lower) || !CheckWidth(upper)) throw new IOException("The actual adaptive header did not provide both required row modes.");
+        while (upper - lower > 1)
         {
-            window.Patterns.Transform.Pattern.Resize(width, width == 860 ? 540 : 800);
-            Wait(() => Math.Abs(window.BoundingRectangle.Width - width) < 3, "The adaptive-header size was not applied.");
-            var expected = width >= 1160 ? "Menu and commands share one row" : "Commands are below the menu";
-            Wait(() => Find(window, "AdaptiveApplicationHeader").Properties.HelpText.ValueOrDefault == expected, "The actual adaptive header did not expose its measured row mode.");
-            if (!editor.Properties.HasKeyboardFocus.Value || ReadEditorText(editor) != original) throw new IOException("Header reflow lost typing focus or changed source.");
-            var menu = Find(window, "ApplicationMenu").BoundingRectangle; var toolbar = Find(window, "ApplicationToolbar").BoundingRectangle;
-            if (width >= 1160 ? toolbar.Left < menu.Right || toolbar.Top > menu.Bottom : toolbar.Top < menu.Bottom)
-                throw new IOException("The on-screen native menu and toolbar overlap after reflow.");
-            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.KEY_F);
-            Wait(() => Find(window, "FileMenu").Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == ExpandCollapseState.Expanded,
-                "Alt+F lost native menu access after reflow.");
-            Keyboard.Type(VirtualKeyShort.ESCAPE); editor.Focus();
-            if (width is 860 or 1280) window.CaptureToFile(Path.Combine(output, "native-refinement-header-" + width + ".png"));
-            observations.Add(new { Width = width, Header = expected, Menu = menu, Toolbar = toolbar, KeyboardMenu = true, SourceAndFocusRetained = true });
+            var middle = (lower + upper) / 2;
+            if (CheckWidth(middle)) upper = middle; else lower = middle;
         }
+        foreach (var width in new[] { lower, upper, upper + 1, lower, upper, 1280, 860, 1280 })
+            if (CheckWidth(width, true) != (width >= upper)) throw new IOException("The native header did not retain its measured one-pixel transition in both directions.");
         window.CaptureToFile(Path.Combine(output, "native-refinement-file-icons.png"));
         var preferences = ReadDesktopState<UserPreferences>(state, "preferences.json");
         var settings = OpenSettingsWindow(window, automation, process);
@@ -99,7 +92,37 @@ internal static partial class NativeUiChecks
         window.Patterns.Transform.Pattern.Move(originalBounds.Left, originalBounds.Top); editor.Focus(); display.Complete();
         File.WriteAllText(Path.Combine(output, "native-refinement.json"), JsonSerializer.Serialize(new { Passed = true,
             Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
+            LastTwoRowWidth = lower, FirstSingleRowWidth = upper,
             WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
+
+        bool CheckWidth(int width, bool keyboard = false)
+        {
+            window.Patterns.Transform.Pattern.Resize(width, width == 860 ? 540 : 800);
+            bool single = false;
+            System.Drawing.Rectangle menu = default, toolbar = default;
+            Wait(() =>
+            {
+                var header = Find(window, "AdaptiveApplicationHeader");
+                if (Math.Abs(window.BoundingRectangle.Width - width) >= 3
+                    || Math.Abs(header.BoundingRectangle.Width - (window.BoundingRectangle.Width - frameWidth)) >= 2) return false;
+                var mode = header.Properties.HelpText.ValueOrDefault;
+                if (mode is not ("Menu and commands share one row" or "Commands are below the menu")) return false;
+                single = mode == "Menu and commands share one row";
+                menu = Find(window, "ApplicationMenu").BoundingRectangle; toolbar = Find(window, "ApplicationToolbar").BoundingRectangle;
+                return single ? toolbar.Left >= menu.Right && toolbar.Top <= menu.Bottom : toolbar.Top >= menu.Bottom;
+            }, "The adaptive header did not finish a non-overlapping layout at the actual requested width: " + width);
+            if (!editor.Properties.HasKeyboardFocus.Value || ReadEditorText(editor) != original) throw new IOException("Header reflow lost typing focus or changed source.");
+            if (keyboard)
+            {
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.KEY_F);
+                Wait(() => Find(window, "FileMenu").Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == ExpandCollapseState.Expanded,
+                    "Alt+F lost native menu access after reflow.");
+                Keyboard.Type(VirtualKeyShort.ESCAPE); editor.Focus();
+            }
+            if (width is 860 or 1280) window.CaptureToFile(Path.Combine(output, "native-refinement-header-" + width + ".png"));
+            observations.Add(new { Width = width, SingleRow = single, Menu = menu, Toolbar = toolbar, KeyboardMenu = keyboard, SourceAndFocusRetained = true });
+            return single;
+        }
 
         AutomationElement Tree(string name, string description)
         {

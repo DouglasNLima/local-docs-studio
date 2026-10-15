@@ -45,6 +45,7 @@ public partial class MainWindow
         if (model.WorkspaceRoot is not { } root || ArtifactFor(root) is not { } bundle) return;
         var picker = new SaveFileDialog { Title = "Export artefact review pack", Filter = "Artefact review ZIP|*.zip", FileName = "artefact-review-pack.zip", AddExtension = true, DefaultExt = ".zip" };
         if (picker.ShowDialog(this) != true) return;
+        if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for an artefact review pack."); return; }
         var edited = model.Documents.Where(document => document.FilePath is not null).ToDictionary(document => document.FilePath!, document => document.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
         await model.RunAsync(async () =>
         {

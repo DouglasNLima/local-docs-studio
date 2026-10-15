@@ -47,6 +47,7 @@ jobs:
             artifacts/native/ux-current/*.json
             artifacts/native/ux-controls/*.png
             artifacts/native/ux-controls/*.json
+            artifacts/native/ux-controls/refinement-display/*.json
             artifacts/native/ux-high-contrast/*.png
             artifacts/native/ux-high-contrast/*.json
           retention-days: 14

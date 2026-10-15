@@ -1,5 +1,8 @@
 # Functional parity matrix
 
+Native UX refinement is in progress on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25), based on the verified modernised native edition. The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records its current implementation, real private DOCX acceptance, regression results, preserved failures and pending hosted/package gates. Earlier delivery claims below retain their original revision and do not certify this refinement.
+
+
 Implemented desktop UX contracts, full regression/installation acceptance, visual evidence, packages and semantic limits are in [desktop-ux-modernisation.md](desktop-ux-modernisation.md). [PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24) tracks final delivery checks; the reconstruction evidence below retains its original scope.
 
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
