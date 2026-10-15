@@ -26,7 +26,7 @@
    <Grid.ColumnDefinitions><ColumnDefinition Width="2*" MinWidth="180"/><ColumnDefinition Width="16"/><ColumnDefinition Width="3*" MinWidth="240"/></Grid.ColumnDefinitions>
    <ListBox x:Name="TemplateList" SelectionChanged="SelectionChanged" HorizontalContentAlignment="Stretch"
     ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Saved Word templates" AutomationProperties.AutomationId="WordTemplateList">
-    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Name}"/></Style></ListBox.ItemContainerStyle>
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="Padding" Value="0"/><Setter Property="AutomationProperties.Name" Value="{Binding Name}"/></Style></ListBox.ItemContainerStyle>
     <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8"><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Details}" Style="{StaticResource Form.Help}"/></StackPanel></DataTemplate></ListBox.ItemTemplate>
    </ListBox>
    <ScrollViewer x:Name="InspectionPanel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,10,0">
