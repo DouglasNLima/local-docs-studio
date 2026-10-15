@@ -1,5 +1,13 @@
 # Native architecture decisions
 
+The [Mermaid visual editor](mermaid-visual-editor.md) adds a Core source lexer
+checked against Mermaider's semantic parser, exact patches, stable session edge
+identities and private history. Native WPF controls provide the interactive canvas;
+SVG geometry never supplies editing semantics. Apply follows the owning AvalonEdit
+version chain and replaces only its tracked body. A per-render layout adapter
+decodes portable numeric label escapes after parsing, before existing layout/SVG
+generation. No browser runtime, server or proprietary layout format is introduced.
+
 Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
 
 

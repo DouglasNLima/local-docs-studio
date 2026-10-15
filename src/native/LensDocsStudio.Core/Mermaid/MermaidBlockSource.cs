@@ -5,6 +5,8 @@ namespace LensDocsStudio.Core.Mermaid;
 
 public sealed record MermaidBlockSource(MermaidSourceSpan Container, MermaidSourceSpan Body, string Source, bool Standalone)
 {
+    public bool ContainerEndsWithLineBreak { get; init; } = true;
+    public bool IsInsertion { get; init; }
     public static IReadOnlyList<MermaidBlockSource> Find(ParsedDocument document, bool standalone = false)
     {
         var source = document.Source;
@@ -27,7 +29,9 @@ public sealed record MermaidBlockSource(MermaidSourceSpan Container, MermaidSour
                 || trimmed.StartsWith(":::mermaid", StringComparison.OrdinalIgnoreCase) || trimmed.StartsWith("::: mermaid", StringComparison.OrdinalIgnoreCase))) continue;
             if (!(closing.All(character => character == '`') || closing.All(character => character == '~') || closing == ":::")) continue;
             var body = new MermaidSourceSpan(bodyStart, closingLine - bodyStart);
-            found.Add(new(new(openingLine, closingEnd - openingLine), body, body.Read(source), false));
+            var hasNewline = closingEnd < source.Length;
+            found.Add(new(new(openingLine, closingEnd + (hasNewline ? 1 : 0) - openingLine), body, body.Read(source), false)
+            { ContainerEndsWithLineBreak = hasNewline });
         }
         return found;
     }
@@ -45,11 +49,14 @@ public sealed record MermaidBlockSource(MermaidSourceSpan Container, MermaidSour
                 var delta = change.Inserted - change.Removed;
                 container = container with { Start = container.Start + delta }; body = body with { Start = body.Start + delta };
             }
-            else if (change.Offset < container.End || change.Offset == container.Start)
+            else if (change.Offset < container.End || change.Offset == container.Start
+                || change.Offset == container.End && (Standalone || !ContainerEndsWithLineBreak))
                 throw new ArgumentException("This diagram or its fence changed while the visual editor was open. Copy the draft, reload the current diagram, or cancel.");
         }
         if (body.Start < 0 || body.End > currentSource.Length || body.Read(currentSource) != Source)
             throw new ArgumentException("The original diagram is no longer at its tracked source location. The draft was not applied.");
+        if (!Standalone && !IsInsertion && container.Start > 0 && currentSource[container.Start - 1] is not ('\n' or '\r'))
+            throw new ArgumentException("The opening Mermaid container is no longer at the start of a line. Reopen the current source.");
         return body;
     }
     public string Replacement(string draft)

@@ -16,7 +16,7 @@ public partial class MermaidVisualEditorWindow : Window
 {
     private readonly MermaidVisualDraft draft;
     private readonly DiagramService diagrams;
-    private readonly Func<string, string?> applyToDocument;
+    private readonly Func<string, CancellationToken, Task<string?>> applyToDocument;
     private readonly Action? editSource;
     private readonly Action<string, string>? exportDiagram;
     private readonly bool dark;
@@ -45,7 +45,7 @@ public partial class MermaidVisualEditorWindow : Window
     private bool SourcePending => SourceEditor.Text != draft.Source;
     private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
 
-    public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, string?> applyToDocument,
+    public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null)
     {
         this.diagrams = diagrams; this.applyToDocument = applyToDocument; this.dark = dark; this.diagramTheme = diagramTheme;
@@ -315,12 +315,13 @@ public partial class MermaidVisualEditorWindow : Window
         {
             var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme), lifetime.Token);
             if (closed) return; if (!result.Success) { Status.Text = result.Error; return; }
-            var error = applyToDocument(source);
+            var error = await applyToDocument(source, lifetime.Token); if (closed) return;
             if (error is not null) { Status.Text = error; return; }
             discard = true; Close();
         }
         catch (OperationCanceledException) { }
         catch (ArgumentException ex) { Status.Text = ex.Message; }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "The diagram could not be applied: " + ex.Message[..Math.Min(ex.Message.Length, 300)]; }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
     private void Cancel(object sender, RoutedEventArgs e) { discard = true; Close(); }

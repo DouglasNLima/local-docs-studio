@@ -11,6 +11,7 @@ public sealed record ParsedDocument(string Source, MarkdownDocument Syntax, IRea
 {
     public DocumentMetadata Metadata { get; init; } = new();
     public IReadOnlyList<DocumentTarget> Targets { get; init; } = [];
+    public bool StandaloneMermaid { get; init; }
 }
 
 public sealed partial class MarkdownService
@@ -39,7 +40,7 @@ public sealed partial class MarkdownService
         var targets = DocumentAnchors.Collect(syntax);
         var headings = syntax.Descendants<HeadingBlock>().Select(h =>
             new DocumentHeading(InlineText(h.Inline), h.GetAttributes().Id ?? "", h.Level, h.Span.Start, h.Line)).ToArray();
-        return new(source, syntax, headings) { Metadata = frontMatter.Metadata, Targets = targets };
+        return new(source, syntax, headings) { Metadata = frontMatter.Metadata, Targets = targets, StandaloneMermaid = standaloneMermaid };
     }
 
     public string ToSafeHtml(string source) => Markdown.ToHtml(NormaliseDevOps(FrontMatterService.HideHeader(source, FrontMatterService.Read(source).BodyStart)),

@@ -58,4 +58,19 @@ public sealed class MermaidBlockSourceTests
         // A visual action must use recognised syntax rather than inventing a text-match identity.
         Assert.Empty(MermaidBlockSource.Find(new MarkdownService().Parse("Before\r\n\r\n  ~~~~mmd\r\nflowchart TD\r\nA --> B\r\n  ~~~~\r\nAfter")));
     }
+    [Fact]
+    public void Closing_newlines_standalone_appends_and_merged_opening_lines_are_part_of_source_identity()
+    {
+        const string raw = "flowchart TD\nA --> B\n";
+        var standalone = Assert.Single(MermaidBlockSource.Find(new MarkdownService().Parse(raw, true), true));
+        Assert.Throws<ArgumentException>(() => standalone.Relocate(raw + "B --> C\n", [new(raw.Length, 0, 8)]));
+        const string source = "Before\n\n```mermaid\n" + raw + "```\nAfter";
+        var block = Assert.Single(MermaidBlockSource.Find(new MarkdownService().Parse(source)));
+        var closingNewline = source.IndexOf("```\nAfter", StringComparison.Ordinal) + 3;
+        Assert.Throws<ArgumentException>(() => block.Relocate(source.Remove(closingNewline, 1), [new(closingNewline, 1, 0)]));
+        Assert.Throws<ArgumentException>(() => block.Relocate(source.Remove(6, 2), [new(6, 2, 0)]));
+        const string eofSource = "```mermaid\n" + raw + "```";
+        var eof = Assert.Single(MermaidBlockSource.Find(new MarkdownService().Parse(eofSource)));
+        Assert.Throws<ArgumentException>(() => eof.Relocate(eofSource + "tail", [new(eofSource.Length, 0, 4)]));
+    }
 }

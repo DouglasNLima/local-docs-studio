@@ -85,6 +85,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var media = new List<PreviewMedia>();
         var warnings = new List<string>();
         var literalSpans = new List<PreviewLiteral>();
+        var visualTargets = editDiagramVisually is null || parsed.Source.Length > Editor.MermaidDocumentEditSession.MaximumDocumentCharacters
+            ? Array.Empty<Core.Mermaid.MermaidBlockSource>() : Core.Mermaid.MermaidBlockSource.Find(parsed, parsed.StandaloneMermaid);
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
         var batch = Stopwatch.StartNew(); var units = 0;
         PreviewConstructionEvents.Log.Stage("document-ready");
@@ -170,7 +172,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         button.Click += (_, _) => exportDiagram(format, format == "Copy source" ? diagram.Source : diagram.Svg!);
                         actions.Children.Add(button);
                     }
-                    if (editDiagramVisually is not null && new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).CanEdit)
+                    if (editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)
+                        && new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).CanEdit)
                     {
                         var visual = new Button { Content = "Edit visually", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
                         System.Windows.Automation.AutomationProperties.SetAutomationId(visual, "DiagramEditVisually" + code.Span.Start);

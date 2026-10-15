@@ -47,6 +47,24 @@ internal static class NativeMermaidDocumentChecks
         new MermaidDocumentEditSession(standalone, rawTarget).Apply(raw.Replace("Keep", "Changed", StringComparison.Ordinal), true);
         Check(!standalone.EditorDocument.Text.Contains("```", StringComparison.Ordinal), "Standalone Apply never saves a synthetic Markdown fence");
         standalone.EditorDocument.UndoStack.Undo(); Check(standalone.EditorDocument.Text == raw, "Standalone source is restored exactly by one native Undo");
+        var appended = new DocumentViewModel(raw); var appendedSession = new MermaidDocumentEditSession(appended, rawTarget);
+        appended.EditorDocument.Insert(appended.EditorDocument.TextLength, "B --> C\r\n"); var appendedText = appended.EditorDocument.Text;
+        Reject(() => appendedSession.Apply(raw.Replace("Keep", "Changed", StringComparison.Ordinal), true), "Appending to a standalone diagram invalidates the original whole-file identity");
+        Check(appended.EditorDocument.Text == appendedText, "Rejected standalone append preserves the independently added source");
+        var wrapped = new DocumentViewModel(source); var wrappedSession = new MermaidDocumentEditSession(wrapped, target);
+        wrapped.EditorDocument.Insert(0, "````text\r\n"); var wrappedText = wrapped.EditorDocument.Text;
+        Reject(() => wrappedSession.Apply(draft, true), "A surrounding outer fence cannot turn the tracked diagram into an editable literal code example");
+        Check(wrapped.EditorDocument.Text == wrappedText, "Rejected surrounding-syntax changes leave all source untouched");
+        const string collision = "flowchart TD\nA[\"First\n```\nLast\"]\n";
+        Check(new MermaidSourceParser().Parse(collision).CanEdit, "Fence-collision fixture is valid Mermaid independently of its Markdown wrapper");
+        var fenced = new DocumentViewModel(source); var fencedSession = new MermaidDocumentEditSession(fenced, target);
+        Reject(() => fencedSession.Apply(collision, true), "Valid Mermaid cannot prematurely close its owning Markdown fence");
+        Check(fenced.EditorDocument.Text == source, "Fence-collision rejection preserves the complete owning Markdown");
+        var preparedOwner = new DocumentViewModel(source); var preparedSession = new MermaidDocumentEditSession(preparedOwner, target);
+        var prepared = preparedSession.PrepareAsync(draft).GetAwaiter().GetResult(); preparedOwner.EditorDocument.Insert(0, "Changed during validation\r\n");
+        var raced = preparedOwner.EditorDocument.Text;
+        Reject(() => preparedSession.Commit(prepared, true), "A document change during asynchronous final validation rejects the prepared edit");
+        Check(preparedOwner.EditorDocument.Text == raced, "A rejected prepared edit never overwrites a newer document revision");
         return checks;
 
         void Check(bool passed, string message) { if (!passed) throw new IOException(message); checks.Add(message); }

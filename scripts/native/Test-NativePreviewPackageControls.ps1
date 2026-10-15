@@ -42,6 +42,22 @@ $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Ob
 }
 $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
 Reject 'excluded-experiment-with-recomputed-checksum' @{PackageDirectory=$copy} 'Unexpected or unsafe preview payload'
+$archive = [IO.Compression.ZipFile]::Open($zip.FullName, [IO.Compression.ZipArchiveMode]::Update)
+try {
+    $archive.GetEntry('ContinuousViewer.dll').Delete()
+    $coreStream = $archive.GetEntry('LensDocsStudio.Core.dll').Open(); $coreBytes = [IO.MemoryStream]::new()
+    try { $coreStream.CopyTo($coreBytes) } finally { $coreStream.Dispose() }
+    try {
+        $archive.GetEntry('LensDocsStudio.Native.dll').Delete()
+        $replacement = $archive.CreateEntry('LensDocsStudio.Native.dll').Open()
+        try { $coreBytes.Position = 0; $coreBytes.CopyTo($replacement) } finally { $replacement.Dispose() }
+    } finally { $coreBytes.Dispose() }
+} finally { $archive.Dispose() }
+$sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Object {
+    if ($_.EndsWith($zip.Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $zip.Name } else { $_ }
+}
+$sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+Reject 'missing-editor-with-recomputed-checksum' @{PackageDirectory=$copy} 'native Mermaid editor type is missing'
 @{ status='PASS'; checks=$checks; sourceRevision=$metadata.sourceRevision; originalPackageUnchanged=$true } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'negative-controls.json') -Encoding utf8NoBOM
 "Native preview package negative controls PASS: $($checks.Count)"
