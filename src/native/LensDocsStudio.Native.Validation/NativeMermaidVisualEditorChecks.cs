@@ -148,6 +148,10 @@ internal static partial class NativeUiChecks
                 AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
                 Check(new MermaidSourceParser().Parse(Draft()).Node("Node2").Shape == FlowNodeShape.Decision, "Native palette drag-and-drop adds the intended semantic shape in " + extension);
                 Capture("palette-drop" + extension.Replace('.', '-'));
+                var beforeDrag = Draft(); var draggedNode = Find(visual!, "MermaidCanvas_node_Node2").BoundingRectangle;
+                Mouse.DragHorizontally(new(draggedNode.Left + draggedNode.Width / 2, draggedNode.Top + draggedNode.Height / 2), 55, MouseButton.Left);
+                Wait(() => Find(visual!, "MermaidCanvas_node_Node2").BoundingRectangle.Left > draggedNode.Left + 30, "Native element dragging did not move its real canvas control.");
+                Check(Draft() == beforeDrag, "Node dragging keeps portable source byte-for-byte unchanged in " + extension);
                 Click("MermaidDuplicate"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 3);
                 Click("MermaidUndo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
                 Click("MermaidRedo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 3);

@@ -5,6 +5,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Rendering;
 
@@ -15,7 +16,8 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, MermaidLayoutBox> positions = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ToggleButton> canvasElements = new(StringComparer.Ordinal);
     private readonly Dictionary<string, Button> ports = new(StringComparer.Ordinal);
-    private readonly List<UIElement> edgeVisuals = [];
+    private readonly Dictionary<string, System.Windows.Shapes.Path> connectionPaths = new(StringComparer.Ordinal);
+    private DispatcherOperation? connectionUpdate;
     private Point? dragStart, panStart;
     private Dictionary<string, MermaidLayoutBox>? dragged;
     private Point panOffsets;
@@ -41,7 +43,7 @@ public partial class MermaidVisualEditorWindow
         if (layout) positions.Clear();
         foreach (var key in positions.Keys.Where(key => !arranged.ContainsKey(key)).ToArray()) positions.Remove(key);
         foreach (var (key, box) in arranged) if (!positions.ContainsKey(key) || key.StartsWith("group:", StringComparison.Ordinal)) positions[key] = box;
-        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); edgeVisuals.Clear(); inlineEditor = null;
+        DiagramCanvas.Children.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); inlineEditor = null;
         foreach (var group in draft.Model.Subgraphs)
         {
             var key = "group:" + group.Id; if (!positions.TryGetValue(key, out var box)) continue;
@@ -87,7 +89,7 @@ public partial class MermaidVisualEditorWindow
                     Canvas.SetLeft(canvasElements[id], positions[id].X); Canvas.SetTop(canvasElements[id], positions[id].Y);
                     if (ports.TryGetValue(id, out var port)) { Canvas.SetLeft(port, positions[id].X + positions[id].Width - 15); Canvas.SetTop(port, positions[id].CentreY - 12); }
                 }
-                DrawConnections(); UpdateExtent(); e.Handled = true;
+                QueueConnections(); e.Handled = true;
             };
             button.PreviewMouseLeftButtonUp += (_, e) => { dragStart = null; dragged = null; button.ReleaseMouseCapture(); e.Handled = true; };
             button.LostMouseCapture += (_, _) => { dragStart = null; dragged = null; };
@@ -127,8 +129,6 @@ public partial class MermaidVisualEditorWindow
     }
     private void DrawConnections()
     {
-        foreach (var visual in edgeVisuals) DiagramCanvas.Children.Remove(visual); edgeVisuals.Clear();
-        foreach (var key in canvasElements.Keys.Where(key => key.StartsWith("edge-", StringComparison.Ordinal)).ToArray()) canvasElements.Remove(key);
         foreach (var edge in draft.Model.Edges)
         {
             if (!positions.TryGetValue("node:" + edge.Source.Id, out var from) || !positions.TryGetValue("node:" + edge.Target.Id, out var to)) continue;
@@ -143,18 +143,30 @@ public partial class MermaidVisualEditorWindow
                 if (edge.Type == FlowConnectionType.Bidirectional) Arrow(drawing, start, end);
             }
             geometry.Freeze();
-            var path = new System.Windows.Shapes.Path { Data = geometry, Stroke = colour, StrokeThickness = selected ? 4 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5,
-                StrokeDashArray = edge.Type == FlowConnectionType.Dotted ? new DoubleCollection([3, 3]) : null };
-            path.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; }; Panel.SetZIndex(path, 5);
-            DiagramCanvas.Children.Add(path); edgeVisuals.Add(path);
-            var label = new TextBlock { Text = edge.Label.Length == 0 ? "·" : edge.Label, MaxWidth = 200, TextWrapping = TextWrapping.Wrap,
-                Padding = new(5, 2, 5, 2), Background = BrushResource("WindowBrush"), Foreground = BrushResource("TextBrush") };
-            var button = ElementButton(edge.Id, "Connection " + edge.Source.Id + " to " + edge.Target.Id + ": " + edge.Label + ", " + edge.Type,
-                label, new((start.X + end.X) / 2 - 18, (start.Y + end.Y) / 2 - 12, Math.Clamp(20 + edge.Label.Length * 7, 36, 200), 34));
-            button.ToolTip = edge.Source.Id + " → " + edge.Target.Id; button.Click += (_, _) => SelectElement(edge.Id);
-            Panel.SetZIndex(button, 10); edgeVisuals.Add(button);
+            if (!connectionPaths.TryGetValue(edge.Id, out var path))
+            {
+                path = new System.Windows.Shapes.Path { StrokeDashArray = edge.Type == FlowConnectionType.Dotted ? new DoubleCollection([3, 3]) : null };
+                path.MouseLeftButtonDown += (_, e) => { SelectElement(edge.Id); e.Handled = true; }; Panel.SetZIndex(path, 5);
+                DiagramCanvas.Children.Add(path); connectionPaths.Add(edge.Id, path);
+            }
+            path.Data = geometry; path.Stroke = colour; path.StrokeThickness = selected ? 4 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
+            if (!canvasElements.TryGetValue(edge.Id, out var button))
+            {
+                var label = new TextBlock { Text = edge.Label.Length == 0 ? "·" : edge.Label, MaxWidth = 200, TextWrapping = TextWrapping.Wrap,
+                    Padding = new(5, 2, 5, 2), Background = BrushResource("WindowBrush"), Foreground = BrushResource("TextBrush") };
+                button = ElementButton(edge.Id, "Connection " + edge.Source.Id + " to " + edge.Target.Id + ": " + edge.Label + ", " + edge.Type,
+                    label, new(0, 0, Math.Clamp(20 + edge.Label.Length * 7, 36, 200), 34));
+                button.ToolTip = edge.Source.Id + " → " + edge.Target.Id; button.Click += (_, _) => SelectElement(edge.Id); Panel.SetZIndex(button, 10);
+            }
+            Canvas.SetLeft(button, (start.X + end.X) / 2 - 18); Canvas.SetTop(button, (start.Y + end.Y) / 2 - 12);
         }
         UpdateCanvasSelection();
+    }
+    private void QueueConnections()
+    {
+        if (connectionUpdate?.Status == DispatcherOperationStatus.Pending || closed) return;
+        connectionUpdate = Dispatcher.InvokeAsync(() =>
+        { connectionUpdate = null; if (!closed) { DrawConnections(); UpdateExtent(); } }, DispatcherPriority.Render);
     }
     private static void Arrow(StreamGeometryContext drawing, Point tip, Point other)
     {
@@ -172,7 +184,16 @@ public partial class MermaidVisualEditorWindow
     private void UpdateCanvasSelection()
     {
         synchronisingCanvasSelection = true;
-        try { foreach (var (key, button) in canvasElements) button.IsChecked = draft.Selection.Contains(key); }
+        try
+        {
+            foreach (var (key, button) in canvasElements) button.IsChecked = draft.Selection.Contains(key);
+            foreach (var edge in draft.Model.Edges)
+                if (connectionPaths.TryGetValue(edge.Id, out var path))
+                {
+                    var selected = draft.Selection.Contains(edge.Id); path.Stroke = BrushResource(selected ? "AccentBrush" : "TextBrush");
+                    path.StrokeThickness = selected ? 4 : edge.Type == FlowConnectionType.Thick ? 3 : 1.5;
+                }
+        }
         finally { synchronisingCanvasSelection = false; }
     }
     private void UpdateExtent()

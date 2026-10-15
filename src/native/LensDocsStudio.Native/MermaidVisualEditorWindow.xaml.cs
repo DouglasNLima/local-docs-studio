@@ -63,7 +63,7 @@ public partial class MermaidVisualEditorWindow : Window
         SourceEditor.Options.ConvertTabsToSpaces = false; SourceEditor.Options.EnableHyperlinks = false; SourceEditor.Options.EnableEmailHyperlinks = false;
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; lifetime.Cancel(); lifetime.Dispose(); };
+        Closed += (_, _) => { closed = true; connectionUpdate?.Abort(); lifetime.Cancel(); lifetime.Dispose(); };
         Loaded += (_, _) => { Refresh(true); Fit(this, new()); };
     }
 
