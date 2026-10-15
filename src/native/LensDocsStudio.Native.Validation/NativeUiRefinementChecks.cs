@@ -91,11 +91,24 @@ internal static partial class NativeUiChecks
         Wait(() =>
         {
             var recent = Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem));
-            return recent.Any(item => item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal))
-                && recent.Any(item => item.Name.StartsWith("refinement-export-2.html", StringComparison.Ordinal));
+            return recent.Any(item => !item.IsOffscreen && item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal))
+                && recent.Any(item => !item.IsOffscreen && item.Name.StartsWith("refinement-export-2.html", StringComparison.Ordinal));
         },
             "The completed output is absent from session-scoped recent exports.");
-        window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png")); Keyboard.Type(VirtualKeyShort.ESCAPE); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        var latest = Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem))
+            .Single(item => item.Name.StartsWith("refinement-export-2.html", StringComparison.Ordinal));
+        latest.AsMenuItem().Expand();
+        Wait(() => latest.FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem)).Count(item => !item.IsOffscreen && item.IsEnabled) == 3,
+            "The recent export did not expose visible Open, Show in folder and Copy path actions.");
+        window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png"));
+        previousClipboard = NativeUiClipboard.GetDataObject(); clipboardSequence = 0;
+        try
+        {
+            latest.FindFirstDescendant(cf => cf.ByName("Copy path"))!.AsMenuItem().Invoke();
+            Wait(() => NativeUiClipboard.GetText() == exported, "Recent exports did not copy the exact verified output path.");
+            clipboardSequence = GetClipboardSequenceNumber();
+        }
+        finally { RestoreClipboard(previousClipboard, clipboardSequence); }
         Find(window, "RevealExportedFile").AsButton().Invoke();
         Window? explorer = null;
         var shellObservations = new List<object>();
@@ -127,7 +140,7 @@ internal static partial class NativeUiChecks
             Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
             LastTwoRowWidth = lower, FirstSingleRowWidth = upper,
             WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualSavePickerCancellation = true,
-            SequentialExportReplacement = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
+            SequentialExportReplacement = true, VisibleRecentExportActionsAndCopiedPath = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
 
         bool CheckWidth(int width, bool keyboard = false)
         {

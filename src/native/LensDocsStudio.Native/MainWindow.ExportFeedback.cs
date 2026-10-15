@@ -18,10 +18,18 @@ public partial class MainWindow
         catch (Exception error) when (error is IOException or UnauthorizedAccessException or Win32Exception or InvalidOperationException or System.Runtime.InteropServices.COMException)
         { model.Status = "The exported file is unavailable or has changed. Export again, or check its location in Recent exports."; }
     }
-    private void RecentExportsOpened(object sender, RoutedEventArgs e)
+    private void InitialiseExportFeedback()
     {
-        if (!ReferenceEquals(sender, e.Source) || sender is not MenuItem menu) return;
-        var previous = menu.Items.Cast<object>().ToArray();
+        var history = (System.Collections.Specialized.INotifyCollectionChanged)model.ExportHistory.Entries;
+        history.CollectionChanged += Changed;
+        Closed += (_, _) => history.CollectionChanged -= Changed;
+        RefreshRecentExports();
+        void Changed(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => RefreshRecentExports();
+    }
+    private void RefreshRecentExports()
+    {
+        var menu = RecentExportsMenu;
+        menu.Items.Clear();
         if (model.ExportHistory.Entries.Count == 0) menu.Items.Add(new MenuItem { Header = "No exports this session", IsEnabled = false });
         foreach (var saved in model.ExportHistory.Entries)
         {
@@ -38,7 +46,5 @@ public partial class MainWindow
             };
             item.Items.Add(open); item.Items.Add(reveal); item.Items.Add(copy); menu.Items.Add(item);
         }
-        // Keep at least one child while refreshing an open native submenu, retaining its header role.
-        foreach (var old in previous) menu.Items.Remove(old);
     }
 }

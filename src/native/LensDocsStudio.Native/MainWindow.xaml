@@ -147,7 +147,7 @@
     <MenuItem Header="Document anchor…" Click="InsertAnchor" AutomationProperties.AutomationId="InsertAnchor"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
-    <MenuItem Header="_Recent exports" SubmenuOpened="RecentExportsOpened" AutomationProperties.AutomationId="RecentExportsMenu"><MenuItem Header="No exports this session" IsEnabled="False"/></MenuItem>
+    <MenuItem x:Name="RecentExportsMenu" Header="_Recent exports" AutomationProperties.AutomationId="RecentExportsMenu"><MenuItem Header="No exports this session" IsEnabled="False"/></MenuItem>
     <Separator/>
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument" AutomationProperties.AutomationId="ExportWord"/>
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument" AutomationProperties.AutomationId="ExportPdf"/>

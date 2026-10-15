@@ -52,6 +52,7 @@ public partial class MainWindow : Window
     {
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
+        InitialiseExportFeedback();
         InitialiseSynchronisation();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
