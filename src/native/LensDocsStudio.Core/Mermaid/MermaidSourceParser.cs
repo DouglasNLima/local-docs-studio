@@ -39,7 +39,10 @@ public sealed class MermaidSourceParser
                 if (!header)
                 {
                     var words = text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
-                    if (words.Length != 2 || words[0] is not ("flowchart" or "graph") || !IsDirection(words[1]))
+                    if (words.Length > 0 && words[0] is not ("flowchart" or "graph"))
+                        return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Protected,
+                            "This diagram family is available in source/preview mode. Visual editing supports Flowcharts only.");
+                    if (words.Length != 2 || !IsDirection(words[1]))
                         throw new ArgumentException("Visual editing supports flowchart and graph with TD, TB, BT, LR or RL direction.");
                     direction = words[1]; directionSpan = new(statement.End - direction.Length, direction.Length); header = true; continue;
                 }
@@ -114,6 +117,10 @@ public sealed class MermaidSourceParser
             if (edges.Count > Math.Max(100, nodes.Length * 4))
                 error ??= "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.";
             if (styles.Count > MaximumElements) error ??= "The diagram exceeds the 500-statement styling budget for visual editing.";
+            if (nodes.SelectMany(node => node.Occurrences).Any(item => item.LabelSpan is { } span && HasUnsupportedMarkup(span.Read(source)))
+                || edges.Any(edge => edge.LabelSpan is { } span && HasUnsupportedMarkup(span.Read(source)))
+                || groups.Any(group => HasUnsupportedMarkup(group.Heading.Read(source))))
+                error ??= "HTML label markup beyond br line breaks is protected. Use source mode, or numeric escapes for literal angle brackets.";
             if (groups.Any(group => nodes.Any(node => node.Id == group.Id))) error ??= "Connections to subgraph IDs are protected.";
             if (nodes.Any(node => node.Occurrences.Select(item => item.SubgraphId).Where(id => id is not null).Distinct().Count() > 1))
                 error ??= "A node belongs to more than one subgraph. Its membership is protected; resolve it in source mode.";
@@ -174,6 +181,11 @@ public sealed class MermaidSourceParser
         lines[0] = lines[0].TrimEnd(); lines[^1] = lines[^1].TrimStart();
         for (var index = 1; index < lines.Length - 1; index++) lines[index] = lines[index].Trim();
         return string.Join('\n', lines);
+    }
+    private static bool HasUnsupportedMarkup(string text)
+    {
+        var withoutBreaks = Regex.Replace(text, "<br\\s*/?>", "", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50));
+        return Regex.IsMatch(withoutBreaks, @"</?[A-Za-z][^>]*>", RegexOptions.None, TimeSpan.FromMilliseconds(50));
     }
     private static MermaidOccurrence ReadNode(string text, ref int position, MermaidSourceSpan statement, string? scope)
     {

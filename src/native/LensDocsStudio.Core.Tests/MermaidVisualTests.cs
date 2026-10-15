@@ -282,6 +282,15 @@ public sealed class MermaidVisualTests
         await Execute(draft, new ChangeMermaidDirection("BT", "Child")); Assert.Equal("BT", draft.Model.EffectiveDirection("Child"));
         Assert.Equal("LR", draft.Model.EffectiveDirection("Parent"));
     }
+    [Theory]
+    [InlineData("sequenceDiagram\nA->>B: Continue")]
+    [InlineData("flowchart TD\nA[\"<span>Retain source</span>\"]")]
+    public async Task Other_families_and_unverified_label_markup_are_explicitly_protected(string source)
+    {
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.Protected, draft.Model.Compatibility);
+        Assert.False((await draft.ExecuteAsync(new AddMermaidNode("New", "New", FlowNodeShape.Process))).Success);
+        Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+    }
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }
 }
