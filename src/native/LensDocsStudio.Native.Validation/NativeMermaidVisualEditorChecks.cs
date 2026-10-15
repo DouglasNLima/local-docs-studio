@@ -142,7 +142,16 @@ internal static partial class NativeUiChecks
             Find(visual!, "MermaidNodeId").AsTextBox().Text = "Reviewed"; Click("MermaidUpdateNode");
             AwaitSource(text => text.Contains("Reviewed(\"Review changed\")", StringComparison.Ordinal));
             Click("MermaidInsertDecision"); AwaitSource(text => text.Contains("Node1{", StringComparison.Ordinal));
-            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke(); if (polish) Capture("creating-connection"); Find(visual!, "MermaidCanvas_node_Node1").Click();
+            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke();
+            if (polish)
+            {
+                Wait(() => Find(visual!, "MermaidStatus").Name.StartsWith("Connection from Reviewed", StringComparison.Ordinal), "The connection preview did not enter destination mode.");
+                var beforeConnection = Draft(); var destination = Find(visual!, "MermaidCanvas_node_Node1").BoundingRectangle;
+                Mouse.MoveTo(new System.Drawing.Point(destination.Right + 24, destination.Top - 24));
+                _ = Draft(); _ = DwmFlush(); Capture("creating-connection");
+                Check(Draft() == beforeConnection, "The visible temporary connection guide retains the exact draft before destination selection");
+            }
+            Find(visual!, "MermaidCanvas_node_Node1").Click();
             AwaitSource(text => text.Contains("Reviewed --> Node1", StringComparison.Ordinal));
             Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Confirmed"; Click("MermaidUpdateEdge");
             AwaitSource(text => text.Contains("-->|Confirmed|", StringComparison.Ordinal)); Capture("edge-properties");
