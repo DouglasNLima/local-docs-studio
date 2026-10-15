@@ -18,7 +18,7 @@
   <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,14"/>
   <StackPanel Grid.Row="1" Margin="0,0,0,16">
    <Label Content="_Search settings" Target="{Binding ElementName=SettingsSearch}"/>
-   <TextBox x:Name="SettingsSearch" Padding="8,6" TextChanged="SearchChanged" AutomationProperties.Name="Search settings" AutomationProperties.AutomationId="SettingsSearch" ToolTip="Find theme, reading mode, zoom, indentation, synchronisation or workspace panels"/>
+   <TextBox x:Name="SettingsSearch" MaxLength="256" Padding="8,6" TextChanged="SearchChanged" AutomationProperties.Name="Search settings" AutomationProperties.AutomationId="SettingsSearch" ToolTip="Find theme, reading mode, zoom, indentation, synchronisation or workspace panels"/>
   </StackPanel>
   <ScrollViewer x:Name="SettingsScroller" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,0" IsEnabled="{Binding CanEdit}">
    <StackPanel>

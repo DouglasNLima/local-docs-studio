@@ -36,6 +36,7 @@ internal static class NativeToolbarChecks
                     throw new IOException("Pressed command text and icons lost readable contrast in the " + theme + " theme.");
                 foreach (var file in new[] { "CommandIcons", "DesktopStyles" })
                     application.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/LensDocsStudio.Native;component/Resources/{file}.xaml") });
+                VerifyFileIcons(application, theme, output);
                 foreach (var width in new[] { 180d, 320d, 500d })
                 {
                     var toolbar = new ToolBar { Style = (Style)application.Resources["Desktop.Toolbar"] };
@@ -86,5 +87,42 @@ internal static class NativeToolbarChecks
             application.Resources = resources; Directory.CreateDirectory(output);
             File.WriteAllText(Path.Combine(output, "native-toolbar-layout.json"), JsonSerializer.Serialize(cases, new JsonSerializerOptions { WriteIndented = true }));
         }
+    }
+    private static void VerifyFileIcons(Application application, string theme, string output)
+    {
+        var atlas = new StackPanel { Background = (System.Windows.Media.Brush)application.Resources["WindowBrush"] };
+        var foreground = (System.Windows.Media.Brush)application.Resources["TextBrush"];
+        var observations = new List<object>();
+        foreach (var size in new[] { 16, 20 })
+        {
+            var signatures = new Dictionary<string, byte[]>();
+            var row = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(12, 8, 12, 8) }; atlas.Children.Add(row);
+            foreach (var kind in new[] { "Markdown", "Mermaid", "PlainText", "Folder", "Document" })
+            {
+                var icon = new CommandIcon { Kind = kind, Width = size, Height = size, Foreground = foreground, Margin = new Thickness(4, 0, 8, 0) };
+                var cell = new StackPanel { Orientation = Orientation.Horizontal, Width = 122 }; cell.Children.Add(icon);
+                cell.Children.Add(new TextBlock { Text = kind, Foreground = foreground, VerticalAlignment = VerticalAlignment.Center }); row.Children.Add(cell);
+            }
+            atlas.Measure(new(650, 120)); atlas.Arrange(new Rect(0, 0, 650, 120)); atlas.UpdateLayout();
+            foreach (var icon in row.Children.OfType<StackPanel>().Select(cell => (CommandIcon)cell.Children[0]))
+            {
+                var bitmap = new System.Windows.Media.Imaging.RenderTargetBitmap(size, size, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+                var visual = new System.Windows.Media.DrawingVisual();
+                using (var drawing = visual.RenderOpen()) drawing.DrawRectangle(new System.Windows.Media.VisualBrush(icon), null, new Rect(0, 0, size, size));
+                bitmap.Render(visual); var pixels = new byte[size * size * 4]; bitmap.CopyPixels(pixels, size * 4, 0);
+                var ink = Enumerable.Range(0, size * size).Count(index => pixels[index * 4 + 3] > 0);
+                if (ink < 20) throw new IOException("A workspace file icon has no legible native geometry at " + size + " pixels: " + icon.Kind);
+                signatures.Add(icon.Kind, pixels); observations.Add(new { icon.Kind, Size = size, PaintedPixels = ink });
+            }
+            foreach (var first in signatures)
+            foreach (var second in signatures.Where(pair => string.CompareOrdinal(pair.Key, first.Key) > 0))
+                if (first.Value.SequenceEqual(second.Value)) throw new IOException("Monochrome workspace file identities are indistinguishable: " + first.Key + "/" + second.Key);
+        }
+        atlas.Measure(new(650, 120)); atlas.Arrange(new Rect(0, 0, 650, 120)); atlas.UpdateLayout();
+        var capture = new System.Windows.Media.Imaging.RenderTargetBitmap(650, 120, 96, 96, System.Windows.Media.PixelFormats.Pbgra32); capture.Render(atlas);
+        var encoder = new System.Windows.Media.Imaging.PngBitmapEncoder(); encoder.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(capture));
+        Directory.CreateDirectory(output);
+        using (var file = File.Create(Path.Combine(output, "native-file-icons-" + theme.ToLowerInvariant() + ".png"))) encoder.Save(file);
+        File.WriteAllText(Path.Combine(output, "native-file-icons-" + theme.ToLowerInvariant() + ".json"), JsonSerializer.Serialize(new { Passed = true, Monochrome = true, Icons = observations }));
     }
 }

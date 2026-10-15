@@ -64,6 +64,7 @@ public partial class ContentLibraryWindow : Window
         UseButton.Content = Kind.SelectedIndex switch { 1 => "Insert snippet", 2 => "Apply profile", _ => "Create document" };
         ArchiveButton.Content = Archived.IsChecked == true ? "Restore" : "Archive";
         Progress.Visibility = busy ? Visibility.Visible : Visibility.Collapsed; CancelButton.IsEnabled = busy;
+        CancelButton.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
     }
     private async Task Run(Func<CancellationToken, Task> action)
     {

@@ -19,7 +19,9 @@
    <Button Content="Ignore version" Command="{Binding IgnoreCommand}" Padding="10,6" Margin="0,0,6,6"/>
    <Button Content="Download" Command="{Binding DownloadCommand}" Padding="10,6" Margin="0,0,6,6" AutomationProperties.AutomationId="DownloadUpdate"/>
    <Button Content="Install…" Command="{Binding InstallCommand}" Padding="10,6" Margin="0,0,6,6" AutomationProperties.AutomationId="InstallUpdate"/>
-   <Button Content="Cancel operation" Command="{Binding CancelCommand}" IsEnabled="{Binding IsBusy}" Padding="10,6" Margin="0,0,6,6"/>
+   <Button Content="Cancel operation" Command="{Binding CancelCommand}" IsEnabled="{Binding IsBusy}" Padding="10,6" Margin="0,0,6,6">
+    <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Button.Style>
+   </Button>
    <Button Content="Later" Click="Postpone" Padding="10,6" Margin="0,0,6,6"/>
   </WrapPanel>
  </Grid>

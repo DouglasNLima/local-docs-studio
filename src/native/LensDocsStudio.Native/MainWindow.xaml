@@ -254,13 +254,18 @@
    <Grid.ColumnDefinitions><ColumnDefinition x:Name="SidebarColumn" Width="230"/><ColumnDefinition x:Name="SidebarSplitterColumn" Width="5"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
    <DockPanel x:Name="SidebarPanel" Grid.Column="0" Background="{DynamicResource PanelBrush}">
     <TextBlock DockPanel.Dock="Top" Text="WORKSPACE" FontSize="11" FontWeight="SemiBold" Margin="14,16,10,4"/>
-    <TextBlock DockPanel.Dock="Top" Text="{Binding WorkspaceName}" ToolTip="{Binding WorkspaceRoot}" FontSize="13" FontWeight="SemiBold" Margin="12,0,12,12" TextTrimming="CharacterEllipsis"/>
+    <DockPanel DockPanel.Dock="Top" Margin="10,0,8,8">
+     <Button DockPanel.Dock="Right" Command="{Binding CloseWorkspaceCommand}" Width="26" Height="26" MinHeight="26" Padding="4" ToolTip="Close workspace · keep open documents and unsaved changes" AutomationProperties.Name="Close workspace" AutomationProperties.AutomationId="CloseWorkspace">
+      <Button.Style><Style TargetType="Button" BasedOn="{StaticResource Desktop.CommandButton}"><Style.Triggers><DataTrigger Binding="{Binding WorkspaceRoot}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Button.Style>
+      <ui:CommandIcon Kind="CloseWorkspace" Width="16" Height="16"/>
+     </Button>
+     <TextBlock Text="{Binding WorkspaceName}" ToolTip="{Binding WorkspaceRoot}" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center" Margin="2,0,4,0" TextTrimming="CharacterEllipsis"/>
+    </DockPanel>
     <ToolBar x:Name="WorkspaceToolbar" DockPanel.Dock="Top" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Workspace commands">
      <Button Command="{Binding ExpandWorkspaceCommand}" ToolTip="Expand all folders" AutomationProperties.Name="Expand all folders"><ui:CommandIcon Kind="Expand"/></Button>
      <Button Command="{Binding CollapseWorkspaceCommand}" ToolTip="Collapse all folders" AutomationProperties.Name="Collapse all folders"><ui:CommandIcon Kind="Collapse"/></Button>
      <Button Command="{Binding RefreshWorkspaceCommand}" ToolTip="Refresh workspace" AutomationProperties.Name="Refresh workspace"><ui:CommandIcon Kind="Refresh"/></Button>
      <Button Click="OpenWorkspaceRootContext" ToolTip="Workspace actions" AutomationProperties.Name="Workspace actions"><ui:CommandIcon Kind="Folder"/></Button>
-     <Button Command="{Binding CloseWorkspaceCommand}" ToolTip="Close workspace · keep open documents and unsaved changes" AutomationProperties.Name="Close workspace" AutomationProperties.AutomationId="CloseWorkspace"><ui:CommandIcon Kind="CloseWorkspace"/></Button>
     </ToolBar>
     <Grid DockPanel.Dock="Top" Margin="10,4,10,10">
      <TextBox x:Name="WorkspaceFilterField" Text="{Binding WorkspaceFilter, UpdateSourceTrigger=PropertyChanged}" Padding="6" ToolTip="Filter workspace filenames or relative paths"
