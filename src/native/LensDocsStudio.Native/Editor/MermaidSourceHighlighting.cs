@@ -7,6 +7,7 @@ namespace LensDocsStudio.Native.Editor;
 
 public sealed partial class MermaidSourceHighlighting(bool dark) : DocumentColorizingTransformer
 {
+    public bool Dark { get; set; } = dark;
     protected override void ColorizeLine(DocumentLine line)
     {
         if (System.Windows.SystemParameters.HighContrast || line.Length > 4096) return;
@@ -16,7 +17,7 @@ public sealed partial class MermaidSourceHighlighting(bool dark) : DocumentColor
             foreach (Match match in Tokens().Matches(text).Cast<Match>().Take(256))
                 ChangeLinePart(line.Offset + match.Index, line.Offset + match.Index + match.Length,
                     visual => visual.TextRunProperties.SetForegroundBrush(new SolidColorBrush((Color)ColorConverter.ConvertFromString(
-                        match.Value.StartsWith("%%", StringComparison.Ordinal) ? dark ? "#9BA8A5" : "#567065" : dark ? "#9CC4EF" : "#245585"))));
+                        match.Value.StartsWith("%%", StringComparison.Ordinal) ? Dark ? "#9BA8A5" : "#567065" : Dark ? "#9CC4EF" : "#245585"))));
         }
         catch (RegexMatchTimeoutException) { }
     }

@@ -81,6 +81,13 @@ internal static partial class NativeUiChecks
             Click("MermaidFit");
             Wait(() => zoom.Patterns.RangeValue.Pattern.Value.Value < 400 && !scroll.HorizontallyScrollable.Value && !scroll.VerticallyScrollable.Value,
                 "Fit did not contain the actual canvas after PAN."); Capture("source-and-canvas");
+            if (!highContrast)
+            {
+                var themeDraft = Draft(); FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "DarkTheme").AsMenuItem().Invoke();
+                FocusWindow(visual!); Capture("live-dark-theme");
+                Check(Draft() == themeDraft && ReadEditorText(editor) == original, "Live theme changes retain private and owning source");
+                FocusWindow(main); Find(main, "ViewMenu").Click(); Find(main, "LightTheme").AsMenuItem().Invoke(); FocusWindow(visual!);
+            }
             var second = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1];
             var expected = original[..second.Body.Start] + valid + original[second.Body.End..];
             Click("MermaidApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "Apply did not replace only the second identical block.");

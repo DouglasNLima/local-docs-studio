@@ -543,6 +543,7 @@ public partial class MainWindow : Window
     {
         ThemeService.Apply(Application.Current.Resources, model.Theme);
         helpWindow?.ApplyTheme(model.Theme);
+        foreach (var editor in OwnedWindows.OfType<MermaidVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];

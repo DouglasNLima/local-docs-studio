@@ -19,7 +19,9 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly Func<string, CancellationToken, Task<string?>> applyToDocument;
     private readonly Action? editSource;
     private readonly Action<string, string>? exportDiagram;
-    private readonly bool dark;
+    private bool dark;
+    private bool highContrast;
+    private readonly MermaidSourceHighlighting sourceHighlighting;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
     private bool updating, busy, closed, discard;
@@ -50,6 +52,7 @@ public partial class MermaidVisualEditorWindow : Window
     {
         this.diagrams = diagrams; this.applyToDocument = applyToDocument; this.dark = dark; this.diagramTheme = diagramTheme;
         this.editSource = editSource; this.exportDiagram = exportDiagram; draft = new(source, diagrams);
+        highContrast = SystemParameters.HighContrast; sourceHighlighting = new(dark);
         InitializeComponent();
         WindowStateService.FitInitialWindow(this);
         InitialisePaletteDragging();
@@ -59,12 +62,22 @@ public partial class MermaidVisualEditorWindow : Window
             field.SelectionChanged += (_, _) => PropertiesChanged();
         Direction.ItemsSource = GroupDirection.ItemsSource = new[] { "TD", "TB", "BT", "LR", "RL" };
         NodeShape.ItemsSource = Enum.GetValues<FlowNodeShape>(); EdgeType.ItemsSource = Enum.GetValues<FlowConnectionType>();
-        SourceEditor.TextArea.TextView.LineTransformers.Add(new MermaidSourceHighlighting(dark));
+        SourceEditor.TextArea.TextView.LineTransformers.Add(sourceHighlighting);
         SourceEditor.Options.ConvertTabsToSpaces = false; SourceEditor.Options.EnableHyperlinks = false; SourceEditor.Options.EnableEmailHyperlinks = false;
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
         Closed += (_, _) => { closed = true; connectionUpdate?.Abort(); lifetime.Cancel(); lifetime.Dispose(); };
         Loaded += (_, _) => { Refresh(true); Fit(this, new()); };
+    }
+    public void ApplyTheme(string theme)
+    {
+        var nextDark = ThemeService.IsDark(theme);
+        if (closed || nextDark == dark && highContrast == SystemParameters.HighContrast) return;
+        dark = nextDark; highContrast = SystemParameters.HighContrast; sourceHighlighting.Dark = dark;
+        SourceEditor.TextArea.TextView.Redraw();
+        UpdateCanvasColours();
+        if (!PropertiesPending && inlineEditor is null) { updating = true; try { ShowProperties(); } finally { updating = false; } }
+        UpdateActions();
     }
 
     private void Refresh(bool layout = false)

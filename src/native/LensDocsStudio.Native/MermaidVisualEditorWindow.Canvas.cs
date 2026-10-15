@@ -202,6 +202,25 @@ public partial class MermaidVisualEditorWindow
         DiagramCanvas.Height = Math.Max(400, positions.Values.Select(box => box.Y + box.Height + 80).DefaultIfEmpty(400).Max());
     }
     private Brush BrushResource(string key) => (Brush)FindResource(key);
+    private void UpdateCanvasColours()
+    {
+        var palette = DiagramThemes.Colours(DiagramThemes.ResolveName(diagramTheme, dark));
+        foreach (var (key, button) in canvasElements)
+        {
+            button.Foreground = BrushResource("TextBrush");
+            if (key.StartsWith("node:", StringComparison.Ordinal) && button.Content is Grid grid)
+            {
+                var colours = Colours(draft.Model.Node(key[5..]), palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
+                var shape = grid.Children.OfType<System.Windows.Shapes.Path>().Single(); shape.Fill = colours.Fill; shape.Stroke = colours.Stroke;
+                grid.Children.OfType<TextBlock>().Single().Foreground = colours.Text;
+            }
+            else if (button.Content is Border group)
+            { group.Background = BrushResource("PanelBrush"); group.BorderBrush = BrushResource("BorderBrush"); }
+            else if (button.Content is TextBlock label)
+            { label.Background = BrushResource("WindowBrush"); label.Foreground = BrushResource("TextBrush"); }
+        }
+        UpdateCanvasSelection();
+    }
     private (Brush Fill, Brush Stroke, Brush Text) Colours(MermaidNode node, string fill, string stroke, string text)
     {
         if (SystemParameters.HighContrast) return (SystemColors.WindowBrush, SystemColors.WindowTextBrush, SystemColors.WindowTextBrush);
