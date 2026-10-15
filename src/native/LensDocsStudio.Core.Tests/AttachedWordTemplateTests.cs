@@ -48,6 +48,11 @@ public sealed class AttachedWordTemplateTests
         var prepared = new DocxTemplateService().Prepare(bytes);
         Assert.Equal(original, bytes);
         Assert.Contains(DocxTemplateService.AttachedTemplateWarning, prepared.Warnings);
+        Assert.NotNull(prepared.Summary);
+        Assert.True(prepared.Summary.StyleCount > 0);
+        Assert.NotEmpty(prepared.Summary.HeadingStyles);
+        Assert.Equal(1, prepared.Summary.NumberingCount);
+        Assert.Equal(1, prepared.Summary.Headers); Assert.Equal(1, prepared.Summary.Footers);
         Assert.All(prepared.Warnings, warning => Assert.DoesNotContain(target, warning));
         using var source = WordprocessingDocument.Open(new MemoryStream(bytes), false);
         using var result = WordprocessingDocument.Open(new MemoryStream(prepared.Bytes), false);

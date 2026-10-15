@@ -19,6 +19,7 @@
   <Style TargetType="TreeViewItem" BasedOn="{StaticResource Desktop.WorkspaceItem}">
    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
    <Setter Property="AutomationProperties.Name" Value="{Binding Name}"/>
+   <Setter Property="AutomationProperties.HelpText" Value="{Binding FileTypeDescription}"/>
    <Style.Triggers><DataTrigger Binding="{Binding IsVisible}" Value="False"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers>
   </Style>
   <HierarchicalDataTemplate DataType="{x:Type workspace:WorkspaceEntryViewModel}" ItemsSource="{Binding Children}">
@@ -31,6 +32,7 @@
    </ResourceDictionary>
  </Window.Resources>
  <DockPanel>
+  <ui:AdaptiveHeaderPanel x:Name="ApplicationHeader" DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" AutomationProperties.AutomationId="AdaptiveApplicationHeader">
   <Menu x:Name="ApplicationMenu" DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" Padding="8,3" AutomationProperties.Name="Application menu">
    <MenuItem Header="_File" AutomationProperties.AutomationId="FileMenu">
     <MenuItem Header="_New document" InputGestureText="Ctrl+N" Command="{Binding NewDocumentCommand}"/>
@@ -39,6 +41,7 @@
     <MenuItem Header="Create workspace folder…" Command="{Binding CreateFolderCommand}"/>
     <MenuItem Header="_Open document…" InputGestureText="Ctrl+O" Command="{Binding OpenDocumentCommand}"/>
     <MenuItem Header="Open _folder…" InputGestureText="Ctrl+Shift+O" Command="{Binding OpenFolderCommand}"/>
+    <MenuItem Header="Close _workspace" Command="{Binding CloseWorkspaceCommand}" AutomationProperties.AutomationId="CloseWorkspaceMenu"><MenuItem.Icon><ui:CommandIcon Kind="CloseWorkspace"/></MenuItem.Icon></MenuItem>
     <MenuItem Header="Recent _documents" ItemsSource="{Binding RecentDocuments}" AutomationProperties.AutomationId="RecentDocuments">
      <MenuItem.ItemTemplate><DataTemplate><TextBlock Text="{Binding Path}"/></DataTemplate></MenuItem.ItemTemplate>
      <MenuItem.ItemContainerStyle><Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
@@ -144,9 +147,11 @@
     <MenuItem Header="Document anchor…" Click="InsertAnchor" AutomationProperties.AutomationId="InsertAnchor"/>
    </MenuItem>
    <MenuItem Header="E_xport" AutomationProperties.AutomationId="ExportMenu">
+    <MenuItem Header="_Recent exports" SubmenuOpened="RecentExportsOpened" AutomationProperties.AutomationId="RecentExportsMenu"><MenuItem Header="No exports this session" IsEnabled="False"/></MenuItem>
+    <Separator/>
     <MenuItem Header="_Word document…" Tag="DOCX" Click="ExportDocument" AutomationProperties.AutomationId="ExportWord"/>
     <MenuItem Header="_PDF document…" Tag="PDF" Click="ExportDocument" AutomationProperties.AutomationId="ExportPdf"/>
-    <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument"/>
+    <MenuItem Header="_HTML document…" Tag="HTML" Click="ExportDocument" AutomationProperties.AutomationId="ExportHtml"/>
     <MenuItem Header="Markdown _bundle…" Click="ExportBundle" AutomationProperties.AutomationId="ExportMarkdownBundle"/>
     <MenuItem x:Name="ArtifactReviewPackMenu" Header="Artefact _review pack…" Click="ExportArtifactReviewPack" IsEnabled="False" AutomationProperties.AutomationId="ExportArtifactReviewPack"/>
     <MenuItem Header="Docs _Site…" Click="ExportDocsSite" AutomationProperties.AutomationId="ExportDocsSite"/>
@@ -197,10 +202,7 @@
   </Menu>
   <Border x:Name="PrimaryToolbar" DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
    <DockPanel Background="{DynamicResource PanelBrush}">
-    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" Margin="12,0,10,0">
-     <Image Source="Resources/Brand/application.ico" Width="24" Height="24" Margin="0,0,8,0"/>
-     <TextBlock Text="Lens Docs Studio" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center"/>
-    </StackPanel>
+    <Image DockPanel.Dock="Left" Source="Resources/Brand/application.ico" Width="24" Height="24" Margin="10,0,6,0" ToolTip="Lens Docs Studio · Local Markdown, Mermaid, and documentation studio"/>
     <ToolBar x:Name="ApplicationToolbar" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Application commands">
      <Button Click="ToggleSidebar" ToolTip="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.Name="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.AutomationId="ToggleSidebar"><ui:CommandIcon Kind="Sidebar"/></Button>
      <Button Command="{Binding NewDocumentCommand}" ToolTip="New document (Ctrl+N)" AutomationProperties.Name="New document (Ctrl+N)"><ui:CommandIcon Kind="New"/></Button>
@@ -225,15 +227,22 @@
     </ToolBar>
    </DockPanel>
   </Border>
+  </ui:AdaptiveHeaderPanel>
   <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource PanelBrush}">
    <StatusBar.ItemsPanel><ItemsPanelTemplate><Grid/></ItemsPanelTemplate></StatusBar.ItemsPanel>
    <StatusBarItem HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
     <Grid>
-     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
      <TextBlock Text="{Binding Status}" ToolTip="{Binding Status}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" AutomationProperties.AutomationId="Status" AutomationProperties.LiveSetting="Polite"/>
-     <TextBlock Grid.Column="1" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="220" AutomationProperties.AutomationId="PreviewStatus"/>
-     <TextBlock Grid.Column="2" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
-     <Button Grid.Column="3" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
+     <StackPanel Grid.Column="1" Orientation="Horizontal" AutomationProperties.AutomationId="ExportCompletionActions">
+      <StackPanel.Style><Style TargetType="StackPanel"><Setter Property="Visibility" Value="Visible"/><Style.Triggers><DataTrigger Binding="{Binding CompletedExport}" Value="{x:Null}"><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+      <Button Content="Open file" Click="OpenCompletedExport" ToolTip="Open the successfully exported file in its registered Windows application" AutomationProperties.HelpText="{Binding CompletedExport.Path}" AutomationProperties.AutomationId="OpenExportedFile" Margin="0,0,4,0" Padding="8,3"/>
+      <Button Content="Show in folder" Click="RevealCompletedExport" ToolTip="Select the exported file in File Explorer" AutomationProperties.HelpText="{Binding CompletedExport.Path}" AutomationProperties.AutomationId="RevealExportedFile" Margin="0,0,4,0" Padding="8,3"/>
+      <Button Command="{Binding DismissExportCommand}" ToolTip="Dismiss export actions" AutomationProperties.Name="Dismiss export actions" Padding="5,3" Margin="0,0,8,0"><ui:CommandIcon Kind="Close" Width="12" Height="12"/></Button>
+     </StackPanel>
+     <TextBlock Grid.Column="2" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="180" AutomationProperties.AutomationId="PreviewStatus"/>
+     <TextBlock Grid.Column="3" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
+     <Button Grid.Column="4" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
       <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
        <DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
       </Style.Triggers></Style></Button.Style>
@@ -251,14 +260,26 @@
      <Button Command="{Binding CollapseWorkspaceCommand}" ToolTip="Collapse all folders" AutomationProperties.Name="Collapse all folders"><ui:CommandIcon Kind="Collapse"/></Button>
      <Button Command="{Binding RefreshWorkspaceCommand}" ToolTip="Refresh workspace" AutomationProperties.Name="Refresh workspace"><ui:CommandIcon Kind="Refresh"/></Button>
      <Button Click="OpenWorkspaceRootContext" ToolTip="Workspace actions" AutomationProperties.Name="Workspace actions"><ui:CommandIcon Kind="Folder"/></Button>
+     <Button Command="{Binding CloseWorkspaceCommand}" ToolTip="Close workspace · keep open documents and unsaved changes" AutomationProperties.Name="Close workspace" AutomationProperties.AutomationId="CloseWorkspace"><ui:CommandIcon Kind="CloseWorkspace"/></Button>
     </ToolBar>
     <Grid DockPanel.Dock="Top" Margin="10,4,10,10">
      <TextBox x:Name="WorkspaceFilterField" Text="{Binding WorkspaceFilter, UpdateSourceTrigger=PropertyChanged}" Padding="6" ToolTip="Filter workspace filenames or relative paths"
       AutomationProperties.Name="Filter workspace files" AutomationProperties.AutomationId="WorkspaceFilter"/>
      <TextBlock Text="Filter files…" DataContext="{Binding ElementName=WorkspaceFilterField}" Style="{StaticResource Desktop.FilterHint}"/>
     </Grid>
-    <TreeView x:Name="WorkspaceTree" ItemsSource="{Binding Entries}" BorderThickness="0" Background="Transparent"
+    <Grid><TreeView x:Name="WorkspaceTree" ItemsSource="{Binding Entries}" BorderThickness="0" Background="Transparent"
       MouseDoubleClick="OpenTreeEntry" KeyDown="TreeKeyDown" PreviewMouseRightButtonDown="WorkspaceRightClicked" AutomationProperties.Name="Workspace files" AutomationProperties.AutomationId="WorkspaceTree"/>
+     <StackPanel Margin="14,10" VerticalAlignment="Top">
+      <StackPanel.Style><Style TargetType="StackPanel"><Style.Triggers><DataTrigger Binding="{Binding WorkspaceEmptyMessage}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></StackPanel.Style>
+      <TextBlock Text="{Binding WorkspaceEmptyMessage}" TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.AutomationId="WorkspaceEmptyState"/>
+      <Button Content="Open workspace…" Command="{Binding OpenFolderCommand}" HorizontalAlignment="Left" Margin="0,12,0,0" Padding="8,5">
+       <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers><DataTrigger Binding="{Binding WorkspaceRoot}" Value="{x:Null}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers></Style></Button.Style>
+      </Button>
+      <Button Content="Clear filter" Command="{Binding ClearWorkspaceFilterCommand}" HorizontalAlignment="Left" Margin="0,12,0,0" Padding="8,5">
+       <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Style.Triggers><DataTrigger Binding="{Binding WorkspaceFilter}" Value=""><Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Button.Style>
+      </Button>
+     </StackPanel>
+    </Grid>
    </DockPanel>
    <GridSplitter x:Name="SidebarSplitter" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Background="{DynamicResource BorderBrush}" DragCompleted="PanelResized" AutomationProperties.Name="Resize workspace"/>
    <DockPanel Grid.Column="2">
@@ -285,6 +306,7 @@
      </DockPanel></DataTemplate></TabControl.ItemTemplate>
      <TabControl.ContentTemplate><DataTemplate><Grid Height="0"/></DataTemplate></TabControl.ContentTemplate>
     </TabControl>
+    <TextBlock DockPanel.Dock="Top" Text="{Binding ActiveDocument.Location}" ToolTip="{Binding ActiveDocument.FilePath}" Margin="12,4" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" TextTrimming="CharacterEllipsis" AutomationProperties.Name="Document location" AutomationProperties.AutomationId="DocumentLocation"/>
     <Border x:Name="FindBar" DockPanel.Dock="Top" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" Padding="8" FocusManager.IsFocusScope="True">
      <WrapPanel>
       <TextBlock x:Name="FindContext" Text="Find in editor" VerticalAlignment="Center" Margin="0,0,8,0"/>
@@ -385,11 +407,18 @@
        <TextBox x:Name="OutlineFilter" Padding="6" TextChanged="OutlineFilterChanged" ToolTip="Filter document headings" AutomationProperties.Name="Filter document headings"/>
        <TextBlock Text="Filter headings…" DataContext="{Binding ElementName=OutlineFilter}" Style="{StaticResource Desktop.FilterHint}"/>
       </Grid>
-      <ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
+      <Grid><ListBox x:Name="Outline" BorderThickness="0" Background="Transparent" SelectionChanged="OutlineSelected" KeyDown="OutlineKeyDown"
        AutomationProperties.Name="Document outline">
        <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}"><Setter Property="AutomationProperties.Name" Value="{Binding Title}"/></Style></ListBox.ItemContainerStyle>
       <ListBox.ItemTemplate><DataTemplate><TextBlock Text="{Binding Title}" ToolTip="{Binding Title}" Margin="{Binding Level, Converter={StaticResource HeadingIndent}}" TextTrimming="CharacterEllipsis"/></DataTemplate></ListBox.ItemTemplate>
       </ListBox>
+       <TextBlock TextWrapping="Wrap" Margin="14,10" VerticalAlignment="Top" Foreground="{DynamicResource MutedTextBrush}">
+        <TextBlock.Style><Style TargetType="TextBlock"><Setter Property="Visibility" Value="Collapsed"/><Setter Property="Text" Value="No headings match this filter."/><Style.Triggers>
+         <DataTrigger Binding="{Binding HasItems, ElementName=Outline}" Value="False"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+         <DataTrigger Binding="{Binding Text, ElementName=OutlineFilter}" Value=""><Setter Property="Text" Value="Add Markdown headings to navigate this document."/></DataTrigger>
+        </Style.Triggers></Style></TextBlock.Style>
+       </TextBlock>
+      </Grid>
      </DockPanel>
     </Grid>
    </DockPanel>

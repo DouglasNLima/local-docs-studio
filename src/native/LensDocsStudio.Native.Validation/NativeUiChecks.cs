@@ -80,6 +80,9 @@ internal static partial class NativeUiChecks
             checks.Add("Native bidirectional semantic scroll, rapid input, independent caret following and tab cancellation preserve focus, caret and source");
             CheckMinimumWindow(window, editor, automation, app.ProcessId, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            CheckRefinement(window, editor, automation, app.ProcessId, state, output, source,
+                (destination, title) => SaveThroughDialogue(destination, title, absolutePath: true));
+            checks.Add("Native refinement retains measured header geometry/keyboard focus, file identities, filtered Settings drafts, closed-workspace context and guarded export history/actions");
             if (desktopUxOnly)
             {
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native UI fixture", StringComparison.Ordinal), "The original diagram preview did not resume.");
@@ -574,7 +577,7 @@ internal static partial class NativeUiChecks
             Find(siteWindow!, "DocsSiteTitle").AsTextBox().Text = "Native UI documentation";
             Find(siteWindow!, "ConfirmDocsSite").Patterns.Invoke.Pattern.Invoke();
             var sitePath = Path.Combine(runRoot, "documentation-site.zip"); SaveThroughDialogue(sitePath, "Save Docs Site");
-            Wait(() => File.Exists(sitePath) && Find(window, "Status").Name.StartsWith("Docs Site exported:", StringComparison.Ordinal), "The native Docs Site ZIP did not finish exporting.");
+            Wait(() => File.Exists(sitePath) && ExportCompleted(window, sitePath), "The native Docs Site ZIP did not finish exporting with matching completion actions.");
             using (var siteZip = System.IO.Compression.ZipFile.OpenRead(sitePath))
             {
                 var manifestEntry = siteZip.GetEntry("site-manifest.json") ?? throw new IOException("The exported site manifest is missing.");
@@ -623,7 +626,7 @@ internal static partial class NativeUiChecks
             var bundleSource = ReadEditorText(editor);
             Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             var bundlePath = Path.Combine(runRoot, "portable-documents.zip"); SaveThroughDialogue(bundlePath, "Export Markdown bundle");
-            Wait(() => File.Exists(bundlePath) && Find(window, "Status").Name.StartsWith("Markdown bundle exported", StringComparison.Ordinal), "The native Markdown bundle did not finish.");
+            Wait(() => File.Exists(bundlePath) && ExportCompleted(window, bundlePath), "The native Markdown bundle did not finish with matching completion actions.");
             using (var archive = System.IO.Compression.ZipFile.OpenRead(bundlePath))
             {
                 if (archive.Entries.Any(entry => entry.FullName.StartsWith("state/", StringComparison.OrdinalIgnoreCase))
@@ -780,7 +783,7 @@ internal static partial class NativeUiChecks
                     throw new IOException("Actual Windows rich copying lost code text, indentation or syntax colours.");
                 Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
                 var codeExport = Path.Combine(runRoot, "coloured-code.docx"); SaveThroughDialogue(codeExport, "Export DOCX");
-                Wait(() => File.Exists(codeExport) && Find(window, "Status").Name == "Exported coloured-code.docx", "Coloured Word export did not complete.");
+                Wait(() => File.Exists(codeExport) && ExportCompleted(window, codeExport), "Coloured Word export did not complete.");
                 using (var codePackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(codeExport, false))
                 {
                     var paragraph = codePackage.MainDocumentPart!.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Single();
@@ -791,7 +794,7 @@ internal static partial class NativeUiChecks
                 }
                 Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
                 var codePdf = Path.Combine(runRoot, "coloured-code.pdf"); SaveThroughDialogue(codePdf, "Export PDF");
-                Wait(() => File.Exists(codePdf) && Find(window, "Status").Name == "Exported coloured-code.pdf", "Coloured PDF export did not complete.");
+                Wait(() => File.Exists(codePdf) && ExportCompleted(window, codePdf), "Coloured PDF export did not complete.");
                 using (var inspectedCode = UglyToad.PdfPig.PdfDocument.Open(codePdf))
                 {
                     var selectable = string.Concat(inspectedCode.GetPages().SelectMany(page => page.Letters).Select(letter => letter.Value));
@@ -815,7 +818,7 @@ internal static partial class NativeUiChecks
                 window.CaptureToFile(Path.Combine(output, "native-pdf-decorations.png"));
                 Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
                 var decoratedPdf = Path.Combine(runRoot, "decorated-text.pdf"); SaveThroughDialogue(decoratedPdf, "Export PDF");
-                Wait(() => File.Exists(decoratedPdf) && Find(window, "Status").Name == "Exported decorated-text.pdf", "Decorated PDF export did not complete.");
+                Wait(() => File.Exists(decoratedPdf) && ExportCompleted(window, decoratedPdf), "Decorated PDF export did not complete.");
                 using (var inspectedDecoration = UglyToad.PdfPig.PdfDocument.Open(decoratedPdf))
                 {
                     var page = inspectedDecoration.GetPage(1); var words = page.GetWords().ToArray();
@@ -855,7 +858,7 @@ internal static partial class NativeUiChecks
                 OpenPreviewContext("Native table Café", "ExportPreviewTableCsv").Patterns.Invoke.Pattern.Invoke();
                 var csvPath = Path.Combine(runRoot, "fixture-table-2.csv");
                 SaveThroughDialogue(csvPath, "Export table CSV", "fixture-table-2.csv");
-                Wait(() => Find(window, "Status").Name == "Table exported as UTF-8 CSV.", "The native table CSV command did not finish.");
+                Wait(() => ExportCompleted(window, csvPath), "The native table CSV command did not finish.");
                 if (!File.ReadAllBytes(csvPath).SequenceEqual(System.Text.Encoding.UTF8.GetBytes("Selected,Value\r\nNative table Café,=1+1\r\nIdentifier,000123"))
                     || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
                     throw new IOException("Native table CSV lost its selected cells, encoding or unchanged source.");
@@ -1035,20 +1038,20 @@ internal static partial class NativeUiChecks
                 { if (beforeLibraryClipboard is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(beforeLibraryClipboard, true); }
             }
             var templateSource = ReadEditorText(editor); var templateSavedSource = File.ReadAllText(source);
-            var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
+            var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels, attachedTemplate: true);
             var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
             Find(window, "ExportMenu").Click(); Find(window, "SelectWordTemplate").Patterns.Invoke.Pattern.Invoke();
             OpenThroughDialogue(templatePath, "Select Word template");
             Wait(() => Find(window, "Status").Name.StartsWith("Word template selected: native-template.docx", StringComparison.Ordinal), "The native Word template did not validate and select.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var templateExport = Path.Combine(runRoot, "template-export.docx"); SaveThroughDialogue(templateExport, "Export DOCX");
-            Wait(() => File.Exists(templateExport) && Find(window, "Status").Name == "Exported template-export.docx", "Word export with the selected native template did not complete.");
+            Wait(() => File.Exists(templateExport) && ExportCompleted(window, templateExport), "Word export with the selected native template did not complete.");
             NativeWordTemplateChecks.Check(File.ReadAllBytes(templateExport), templatePixels);
             Find(window, "ExportMenu").Click(); Find(window, "ClearWordTemplate").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(window, "Status").Name == "Default Word styles selected", "The native Word template did not clear.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var defaultExport = Path.Combine(runRoot, "default-export.docx"); SaveThroughDialogue(defaultExport, "Export DOCX");
-            Wait(() => File.Exists(defaultExport) && Find(window, "Status").Name == "Exported default-export.docx", "Default Word export did not complete after clearing the template.");
+            Wait(() => File.Exists(defaultExport) && ExportCompleted(window, defaultExport), "Default Word export did not complete after clearing the template.");
             using (var defaultPackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(defaultExport, false))
             {
                 if (defaultPackage.MainDocumentPart!.HeaderParts.Any() || defaultPackage.MainDocumentPart.FooterParts.Any()
@@ -1061,11 +1064,19 @@ internal static partial class NativeUiChecks
             checks.Add("Native Word template selection and export preserve heading styles, header/footer/logo and source files while excluding private template content; clearing restores default output");
             var libraryWindow = OpenTemplateLibrary(window);
             if (Find(libraryWindow, "UseLibraryTemplate").IsEnabled) throw new IOException("An empty Word template library enabled selection.");
+            if (Find(libraryWindow, "WordTemplateEmptyState").IsOffscreen || !Find(libraryWindow, "ImportEmptyLibraryTemplate").IsEnabled)
+                throw new IOException("The native empty template library has no visible primary import action.");
+            libraryWindow.CaptureToFile(Path.Combine(output, "native-refinement-template-empty.png"));
             Find(libraryWindow, "ImportLibraryTemplate").AsButton().Invoke();
             OpenThroughDialogue(templatePath, "Import Word template to library");
             NameTemplate("Name Word template", "native-template", "Reusable Café");
             Wait(() => Find(libraryWindow, "WordTemplateStatus").Name.StartsWith("Imported Reusable Café.", StringComparison.Ordinal)
                 && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The native library did not import reusable template formatting.");
+            Wait(() => Find(libraryWindow, "WordTemplateFormatting").Name.Contains("1 headers · 1 footers · 1 embedded", StringComparison.Ordinal),
+                "The imported template did not expose its retained formatting and embedded resources.");
+            if (!Find(libraryWindow, "WordTemplateStatus").Name.Contains(LensDocsStudio.Core.Exports.DocxTemplateService.AttachedTemplateWarning, StringComparison.Ordinal))
+                throw new IOException("The attached-template import did not show its safe omission warning.");
+            libraryWindow.CaptureToFile(Path.Combine(output, "native-refinement-template-import-warning.png"));
             Find(libraryWindow, "RenameLibraryTemplate").AsButton().Invoke();
             NameTemplate("Rename Word template", "Reusable Café", "Renamed Café handbook");
             Wait(() => Find(libraryWindow, "WordTemplateStatus").Name == "Template renamed.", "The library rename did not complete.");
@@ -1093,7 +1104,7 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "Status").Name == "Word template selected: Renamed Café handbook", "The stored library template was not selected.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var libraryExport = Path.Combine(runRoot, "library-export.docx"); SaveThroughDialogue(libraryExport, "Export DOCX");
-            Wait(() => File.Exists(libraryExport) && Find(window, "Status").Name == "Exported library-export.docx", "Word export did not use the library template.");
+            Wait(() => File.Exists(libraryExport) && ExportCompleted(window, libraryExport), "Word export did not use the library template.");
             NativeWordTemplateChecks.Check(File.ReadAllBytes(libraryExport), templatePixels);
             if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
                 throw new IOException("The Word template library changed source documents or the imported original.");

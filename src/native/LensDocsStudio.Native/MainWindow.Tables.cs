@@ -55,7 +55,7 @@ public partial class MainWindow
             { dialogs.Error("Use the .csv extension for a table export."); return; }
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, model.OperationToken);
             await WriteExportAsync(picker.FileName, result.Bytes, expected, model.OperationToken);
-            model.Status = "Table exported as UTF-8 CSV.";
+            await model.CompleteExportAsync(picker.FileName, result.Bytes, "Table exported as UTF-8 CSV");
         });
     }
 }

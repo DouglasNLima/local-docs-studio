@@ -7,9 +7,10 @@ namespace LensDocsStudio.Native.ViewModels;
 public partial class WorkspaceEntryViewModel(WorkspaceEntry entry) : ObservableObject
 {
     [ObservableProperty] private string name = entry.Name;
-    [ObservableProperty] private string path = entry.Path;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IconKind))] [NotifyPropertyChangedFor(nameof(FileTypeDescription))] private string path = entry.Path;
     public bool IsDirectory { get; } = entry.IsDirectory;
-    public string IconKind => IsDirectory ? "Folder" : "Document";
+    public string IconKind => WorkspaceFileIdentity.FromPath(Path, IsDirectory).IconKind;
+    public string FileTypeDescription => WorkspaceFileIdentity.FromPath(Path, IsDirectory).Description;
     [ObservableProperty] private bool isExpanded = true;
     [ObservableProperty] private bool isVisible = true;
     [ObservableProperty] private string documentIndicator = "";

@@ -60,6 +60,7 @@ jobs:
       - name: Validate exported Docs Site on disk and static hosting
         env:
           LENS_TEST_PORT: '4183'
+          DEBUG: 'pw:webserver'
         run: npx playwright test --config playwright.native-export.config.mjs
       - name: Validate native desktop workflows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
@@ -109,6 +110,7 @@ jobs:
             artifacts/native/install-smoke/**/native-desktop-restored-session.*
             artifacts/native/install-smoke/**/native-desktop-restored-session-observations.json
             artifacts/native/install-smoke/**/native-minimum-window.*
+            artifacts/native/install-smoke/**/native-refinement*
             artifacts/native/install-smoke/**/native-minimum-overflow.png
             artifacts/native/install-smoke/**/native-focus-mode.png
             artifacts/native/install-smoke/**/native-full-screen.png

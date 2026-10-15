@@ -30,6 +30,19 @@ internal static class NativeTemplateLibraryChecks
             System.Windows.Documents.TextElement.SetForeground(surface, (Brush)content.Resources["TextBrush"]);
             using var host = new HwndSource(new HwndSourceParameters("Native template library validation") { Width = 760, Height = 580, WindowStyle = unchecked((int)0x80000000) });
             host.RootVisual = surface; surface.Measure(new Size(760, 580)); surface.Arrange(new Rect(0, 0, 760, 580)); surface.UpdateLayout();
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            while (((TextBlock)window.FindName("FormattingDetails")).Text == "Inspecting retained formatting…")
+            {
+                if (watch.Elapsed > TimeSpan.FromSeconds(5)) throw new IOException("The native template formatting summary did not complete.");
+                var frame = new System.Windows.Threading.DispatcherFrame();
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Background, () => frame.Continue = false);
+                System.Windows.Threading.Dispatcher.PushFrame(frame);
+            }
+            surface.UpdateLayout();
+            var details = ((TextBlock)window.FindName("FormattingDetails")).Text;
+            if (!details.Contains("1 headers · 1 footers · 1 embedded", StringComparison.Ordinal)
+                || ((TextBlock)window.FindName("SampleHeading")).Visibility != Visibility.Visible)
+                throw new IOException("The template library did not expose its actual retained formatting and native sample: " + details);
             var list = (ListBox)window.FindName("TemplateList"); var use = (Button)window.FindName("UseButton");
             if (list.SelectedItem is not WordTemplateEntry selected || selected.Record.Id != first.Record.Id || !use.IsEnabled
                 || !((Button)window.FindName("ArchiveButton")).IsEnabled || ((Button)window.FindName("CancelButton")).IsEnabled)

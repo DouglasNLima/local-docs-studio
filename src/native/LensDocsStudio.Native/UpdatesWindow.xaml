@@ -4,9 +4,10 @@
  <Grid Margin="24">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <StackPanel Grid.Row="0"><TextBlock Text="Application updates" FontSize="24" FontWeight="SemiBold"/><TextBlock Text="{Binding CurrentVersion, StringFormat='Installed version: {0}'}" Margin="0,8,0,16"/></StackPanel>
-  <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
+  <StackPanel Grid.Row="1" Margin="0,0,0,16">
    <CheckBox Content="Check automatically while the app is running" IsChecked="{Binding AutomaticChecks}" IsEnabled="{Binding CanCheck}" VerticalAlignment="Center" AutomationProperties.AutomationId="AutomaticUpdateChecks"/>
-   <ComboBox ItemsSource="{Binding Channels}" SelectedItem="{Binding Channel}" IsEnabled="{Binding CanCheck}" Width="100" Margin="16,0,0,0" AutomationProperties.Name="Update channel" AutomationProperties.AutomationId="UpdateChannel"/>
+   <Label Content="Release _channel" Target="{Binding ElementName=ChannelChoice}" Padding="0,10,0,6"/>
+   <ComboBox x:Name="ChannelChoice" ItemsSource="{Binding Channels}" SelectedItem="{Binding Channel}" IsEnabled="{Binding CanCheck}" MinHeight="32" AutomationProperties.Name="Update channel" AutomationProperties.AutomationId="UpdateChannel"/>
   </StackPanel>
   <TextBlock Grid.Row="2" Text="{Binding AvailableVersion}" FontSize="18" FontWeight="SemiBold"/>
   <TextBlock Grid.Row="3" Text="{Binding TrustSummary}" TextWrapping="Wrap" Margin="0,8,0,12"/>

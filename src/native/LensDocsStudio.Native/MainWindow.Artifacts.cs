@@ -52,7 +52,7 @@ public partial class MainWindow
             model.Status = "Preparing artefact review pack…";
             var bytes = await bundles.ExportReviewPackAsync(new(root), bundle, edited, model.OperationToken, model.StateDirectory);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
-            model.Status = "Artefact review pack exported with current source and supplied evidence labels. Candidate findings remain candidate findings.";
+            await model.CompleteExportAsync(picker.FileName, bytes, "Current source and supplied evidence labels included. Candidate findings remain candidate findings");
         });
     }
 }

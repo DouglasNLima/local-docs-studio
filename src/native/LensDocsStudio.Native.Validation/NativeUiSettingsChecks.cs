@@ -9,6 +9,14 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
+    private static bool ExportCompleted(Window window, string path)
+    {
+        var open = window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"));
+        var reveal = window.FindFirstDescendant(cf => cf.ByAutomationId("RevealExportedFile"));
+        return Find(window, "Status").Name.StartsWith("Export completed — " + Path.GetFileName(path), StringComparison.Ordinal)
+            && open is { IsEnabled: true, IsOffscreen: false } && reveal is { IsEnabled: true, IsOffscreen: false }
+            && open.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path) && reveal.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path);
+    }
     private static Window OpenSettingsWindow(Window owner, UIA3Automation automation, int process)
     {
         FocusWindow(owner); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.OEM_COMMA);

@@ -9,6 +9,18 @@ public partial class WorkspaceViewModel
     private CancellationTokenSource? treeRefresh;
     private bool disposed;
 
+    private void StopMonitoring()
+    {
+        var previous = watcher; watcher = null;
+        treeRefresh?.Cancel(); treeRefresh = null;
+        if (previous is null) return;
+        previous.EnableRaisingEvents = false;
+        previous.Changed -= OnFileChanged; previous.Created -= OnFileChanged;
+        previous.Deleted -= OnFileChanged; previous.Renamed -= OnFileChanged;
+        previous.Error -= OnMonitoringError;
+        previous.Dispose();
+    }
+
     private void StartMonitoring(string root)
     {
         watcher = new FileSystemWatcher(root)

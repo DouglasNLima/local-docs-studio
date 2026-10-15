@@ -10,7 +10,10 @@ using W = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace LensDocsStudio.Core.Exports;
 
-public sealed record PreparedWordTemplate(byte[] Bytes, IReadOnlyList<string> Warnings);
+public sealed record PreparedWordTemplate(byte[] Bytes, IReadOnlyList<string> Warnings)
+{
+    public WordTemplateSummary? Summary { get; init; }
+}
 
 /// <summary>Extracts supported formatting into a new package without retaining the source document.</summary>
 public sealed class DocxTemplateService
@@ -61,6 +64,7 @@ public sealed class DocxTemplateService
         var warnings = new List<string>();
         if (attachedReferences.Count != 0) warnings.Add(AttachedTemplateWarning);
         using var output = new MemoryStream();
+        WordTemplateSummary summary;
         using (var target = WordprocessingDocument.Create(output, WordprocessingDocumentType.Document, true))
         {
             var main = target.AddMainDocumentPart(); var body = new W.Body(); main.Document = new W.Document(body);
@@ -120,6 +124,7 @@ public sealed class DocxTemplateService
             var validation = new DocumentFormat.OpenXml.Validation.OpenXmlValidator(FileFormatVersions.Microsoft365) { MaxNumberOfErrors = 1 };
             if (validation.Validate(target, cancellationToken).FirstOrDefault() is { } invalid)
                 throw new InvalidDataException("The retained Word template structure is invalid: " + invalid.Description);
+            summary = WordTemplateSummary.Inspect(main);
 
             void Copy(OpenXmlPart? part, Func<OpenXmlPart> create)
             {
@@ -145,7 +150,7 @@ public sealed class DocxTemplateService
             }
         }
         cancellationToken.ThrowIfCancellationRequested();
-        return new(output.ToArray(), warnings);
+        return new(output.ToArray(), warnings) { Summary = summary };
     }
 
     private static void ValidateRelationships(MainDocumentPart first, IReadOnlyList<(string PartPath, string Id)> attachedReferences, CancellationToken cancellationToken)

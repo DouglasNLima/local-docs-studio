@@ -18,15 +18,17 @@ public partial class ContentLibraryWindow : Window
 {
     private readonly LocalLibraryStore store;
     private readonly string exportRecovery;
+    private readonly Func<string, byte[], Task>? exportCompleted;
     private LocalLibrarySnapshot snapshot;
     private CancellationTokenSource? operation;
     private bool ready, busy, closeRequested;
     public ContentLibraryEntry? SelectedEntry { get; private set; }
     private ContentLibraryEntry? Selected => Entries.SelectedItem as ContentLibraryEntry;
 
-    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template)
+    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template, Func<string, byte[], Task>? exportCompleted = null)
     {
         this.store = store; this.snapshot = snapshot; this.exportRecovery = exportRecovery;
+        this.exportCompleted = exportCompleted;
         InitializeComponent(); WindowStateService.FitInitialWindow(this); Kind.SelectedIndex = (int)kind;
         ready = true; Populate();
         Closing += (_, e) => { if (busy) { closeRequested = true; operation?.Cancel(); e.Cancel = true; } };
@@ -95,6 +97,8 @@ public partial class ContentLibraryWindow : Window
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token);
             var bytes = await Task.Run(() => LocalLibraryFormat.Write(archived ? snapshot.State.Archived : snapshot.State.Active), token);
             await new ExportFileStore(exportRecovery).WriteAsync(picker.FileName, bytes, expected, token);
+            token.ThrowIfCancellationRequested();
+            if (exportCompleted is not null) await exportCompleted(picker.FileName, bytes);
             Status.Text = "Exported all " + (archived ? "archived" : "active") + " templates, snippets and profiles to " + Path.GetFileName(picker.FileName) + ".";
         });
     }

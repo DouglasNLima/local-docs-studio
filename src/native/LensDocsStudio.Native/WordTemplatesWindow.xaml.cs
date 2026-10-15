@@ -11,8 +11,10 @@ public partial class WordTemplatesWindow : Window
     private readonly WordTemplateLibrary library;
     private readonly string exportRecovery;
     private readonly Guid? currentId;
+    private readonly Func<string, byte[], Task>? exportCompleted;
     private IReadOnlyList<string> warnings = [];
     private CancellationTokenSource? operation;
+    private CancellationTokenSource? inspection;
     private bool busy, closeRequested;
     public byte[]? SelectedBytes { get; private set; }
     public Guid? SelectedId { get; private set; }
@@ -20,12 +22,14 @@ public partial class WordTemplatesWindow : Window
     public string CurrentName { get; private set; }
     private WordTemplateEntry? Selected => TemplateList.SelectedItem as WordTemplateEntry;
 
-    public WordTemplatesWindow(WordTemplateLibrary library, WordTemplateListing listing, string exportRecovery, Guid? currentId, string currentName)
+    public WordTemplatesWindow(WordTemplateLibrary library, WordTemplateListing listing, string exportRecovery, Guid? currentId, string currentName, Func<string, byte[], Task>? exportCompleted = null)
     {
         this.library = library; this.exportRecovery = exportRecovery; this.currentId = currentId; CurrentName = currentName;
+        this.exportCompleted = exportCompleted;
         InitializeComponent(); WindowStateService.FitInitialWindow(this); CurrentStyles.Text = "Current styles: " + currentName;
         Populate(listing, currentId); SetControls();
         Closing += (_, e) => { if (busy) { closeRequested = true; operation?.Cancel(); e.Cancel = true; } };
+        Closed += (_, _) => inspection?.Cancel();
     }
     private void Populate(WordTemplateListing listing, Guid? selectedId)
     {
@@ -34,19 +38,66 @@ public partial class WordTemplatesWindow : Window
         ShowSelection();
     }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e) { if (LibraryStatus is not null) { ShowSelection(); SetControls(); } }
-    private void ShowSelection()
+    private async void ShowSelection()
     {
+        inspection?.Cancel();
         LibraryStatus.Text = string.Join("\n", warnings.Take(3).Concat(Selected?.Record.Warnings ?? []));
+        var empty = TemplateList.Items.Count == 0;
+        LibraryEmptyState.Visibility = empty ? Visibility.Visible : Visibility.Collapsed;
+        TemplateList.Visibility = InspectionPanel.Visibility = empty ? Visibility.Collapsed : Visibility.Visible;
+        EmptyTitle.Text = Archived.IsChecked == true ? "No archived templates" : "Start your formatting library";
         if (TemplateList.Items.Count == 0) LibraryStatus.Text = (Archived.IsChecked == true ? "No archived templates." : "Import a DOCX to keep its reusable formatting here.")
             + (LibraryStatus.Text.Length == 0 ? "" : "\n" + LibraryStatus.Text);
+        if (Selected is not { } entry) return;
+        InspectionTitle.Text = entry.Name;
+        InspectionSource.Text = entry.Details;
+        InspectionWarnings.Text = entry.Record.Warnings.Length == 0 ? "No import warnings. Only supported reusable formatting is retained." : string.Join("\n\n", entry.Record.Warnings);
+        FormattingDetails.Text = "Inspecting retained formatting…"; StyleDetails.Text = "";
+        SampleHeading.Visibility = SampleBody.Visibility = Visibility.Hidden;
+        using var cancellation = new CancellationTokenSource(); inspection = cancellation;
+        try
+        {
+            var prepared = await Task.Run(() => library.ReadAsync(entry, cancellation.Token), cancellation.Token);
+            await Dispatcher.InvokeAsync(() =>
+            {
+            if (cancellation.IsCancellationRequested || !ReferenceEquals(Selected, entry)) return;
+            if (prepared.Summary is not { } summary) throw new InvalidDataException("The template formatting summary is unavailable.");
+            FormattingDetails.Text = $"{summary.StyleCount} styles · {summary.NumberingCount} numbering definitions\n"
+                + "Headings: " + (summary.HeadingStyles.Count == 0 ? "Default export heading styles" : string.Join(", ", summary.HeadingStyles))
+                + $"\nPage: {summary.PageSize}\nMargins: {summary.Margins}\n{summary.Headers} headers · {summary.Footers} footers · {summary.EmbeddedImages} embedded header/footer images";
+            StyleDetails.Text = summary.Styles.Count == 0 ? "Default export styles will be used." : string.Join(" · ", summary.Styles)
+                + (summary.StyleCount > summary.Styles.Count ? " · Additional styles retained" : "");
+            ApplySample(SampleHeading, summary.HeadingSample); ApplySample(SampleBody, summary.BodySample);
+            });
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception error) when (error is not OutOfMemoryException)
+        {
+            await Dispatcher.InvokeAsync(() =>
+            {
+                if (!cancellation.IsCancellationRequested && ReferenceEquals(Selected, entry))
+                    FormattingDetails.Text = "This template could not be inspected. Refresh the library or import the original DOCX again.";
+            });
+        }
+        finally { await Dispatcher.InvokeAsync(() => { if (ReferenceEquals(inspection, cancellation)) inspection = null; }); }
+    }
+    private static void ApplySample(TextBlock text, WordTemplateTextSample sample)
+    {
+        text.FontFamily = new System.Windows.Media.FontFamily(sample.FontFamily);
+        text.FontSize = sample.Points * 96 / 72;
+        text.FontWeight = sample.Bold ? FontWeights.Bold : FontWeights.Normal;
+        text.FontStyle = sample.Italic ? FontStyles.Italic : FontStyles.Normal;
+        text.Visibility = Visibility.Visible;
     }
     private void SetControls()
     {
         ImportButton.IsEnabled = RefreshButton.IsEnabled = Archived.IsEnabled = DefaultButton.IsEnabled = TemplateList.IsEnabled = !busy;
+        EmptyImportButton.IsEnabled = !busy;
         RenameButton.IsEnabled = CopyButton.IsEnabled = ArchiveButton.IsEnabled = !busy && Selected is not null;
         UseButton.IsEnabled = !busy && Selected is { Archived: false };
         ArchiveButton.Content = Archived.IsChecked == true ? "Restore" : "Archive";
         CancelButton.IsEnabled = busy; Progress.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
+        CancelButton.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
     }
     private async Task<bool> Run(Func<CancellationToken, Task> action)
     {
@@ -54,7 +105,11 @@ public partial class WordTemplatesWindow : Window
         busy = true; operation = new CancellationTokenSource(); SetControls();
         try { await action(operation.Token); return true; }
         catch (OperationCanceledException) { LibraryStatus.Text = "Operation cancelled. Existing templates are retained."; return false; }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { LibraryStatus.Text = ex.Message; return false; }
+        catch (Exception ex) when (ex is not OutOfMemoryException)
+        {
+            LibraryStatus.Text = ex is InvalidDataException ? ex.Message : "The template operation failed. Check that the selected file is available and try again. Existing templates and the original document are retained.";
+            return false;
+        }
         finally
         {
             operation.Dispose(); operation = null; busy = false; SetControls();
@@ -119,6 +174,8 @@ public partial class WordTemplatesWindow : Window
             if (!Path.GetExtension(picker.FileName).Equals(".docx", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .docx extension for a Word template copy.");
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token); var prepared = await library.ReadAsync(entry, token);
             await new ExportFileStore(exportRecovery).WriteAsync(picker.FileName, prepared.Bytes, expected, token);
+            token.ThrowIfCancellationRequested();
+            if (exportCompleted is not null) await exportCompleted(picker.FileName, prepared.Bytes);
             LibraryStatus.Text = "Saved reusable formatting to " + Path.GetFileName(picker.FileName) + ".";
         });
     }

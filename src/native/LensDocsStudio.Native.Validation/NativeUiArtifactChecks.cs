@@ -87,7 +87,7 @@ internal static partial class NativeUiChecks
             var review = Path.Combine(runRoot, "actual-artefact-review.zip");
             Find(owner, "ExportMenu").Click(); Find(owner, "ExportArtifactReviewPack").Patterns.Invoke.Pattern.Invoke();
             save(review, "Export artefact review pack");
-            Wait(() => File.Exists(review) && Find(owner, "Status").Name.StartsWith("Artefact review pack exported", StringComparison.Ordinal),
+            Wait(() => File.Exists(review) && ExportCompleted(owner, review),
                 "The artefact review pack did not finish exporting.");
             using (var zip = ZipFile.OpenRead(review))
             {
@@ -102,7 +102,7 @@ internal static partial class NativeUiChecks
             var generic = Path.Combine(runRoot, "actual-generic-review.zip");
             Find(owner, "ExportMenu").Click(); Find(owner, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             save(generic, "Export Markdown bundle");
-            Wait(() => File.Exists(generic) && Find(owner, "Status").Name.StartsWith("Markdown bundle exported", StringComparison.Ordinal),
+            Wait(() => File.Exists(generic) && ExportCompleted(owner, generic),
                 "Generic Markdown bundle export did not finish.");
             using (var zip = ZipFile.OpenRead(generic))
             {

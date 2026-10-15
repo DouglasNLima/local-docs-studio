@@ -472,12 +472,14 @@ public partial class MainWindow : Window
             var extension = format.ToLowerInvariant();
             var dialog = new SaveFileDialog { Filter = format + " diagram|*." + extension, FileName = "diagram." + extension };
             if (dialog.ShowDialog(this) != true) return;
+            if (!Path.GetExtension(dialog.FileName).Equals("." + extension, StringComparison.OrdinalIgnoreCase))
+            { model.Status = "Use the ." + extension + " extension for this diagram export."; return; }
             await model.RunAsync(async () =>
             {
                 var expected = await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(dialog.FileName, model.OperationToken);
                 var bytes = format == "SVG" ? System.Text.Encoding.UTF8.GetBytes(svg.Prepare(value)) : NativeSvgService.ToPng(svg.Render(value));
                 await WriteExportAsync(dialog.FileName, bytes, expected, model.OperationToken);
-                model.Status = format + " diagram exported";
+                await model.CompleteExportAsync(dialog.FileName, bytes);
             });
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or System.Runtime.InteropServices.ExternalException) { dialogs.Error(ex.Message); }

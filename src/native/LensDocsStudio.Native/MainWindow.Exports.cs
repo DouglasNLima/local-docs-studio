@@ -31,8 +31,8 @@ public partial class MainWindow
             var result = await new DocsSiteExportService().ExportAsync(root, edited, model.StateDirectory, options.Options,
                 new Progress<string>(message => model.Status = message), model.OperationToken, artifactBundle, diagramTheme);
             await WriteExportAsync(picker.FileName, result.Bytes, expected, model.OperationToken);
-            model.Status = $"Docs Site exported: {result.SourcePages} documents, {result.Diagrams} diagrams."
-                + (result.Warnings.Count > 0 ? $" {result.Warnings.Count} links have targets outside this site." : "");
+            await model.CompleteExportAsync(picker.FileName, result.Bytes, $"{result.SourcePages} documents, {result.Diagrams} diagrams"
+                + (result.Warnings.Count > 0 ? $"; {result.Warnings.Count} links have targets outside this site" : ""));
         });
     }
 
@@ -58,7 +58,7 @@ public partial class MainWindow
             model.Status = "Preparing " + format + " export…";
             var bytes = await exports.ExportAsync(format, source, sourcePath, workspaceRoot, ThemeService.IsDark(model.Theme), wordTemplate, model.OperationToken, diagramTheme);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
-            model.Status = "Exported " + Path.GetFileName(picker.FileName);
+            await model.CompleteExportAsync(picker.FileName, bytes);
         });
     }
 
@@ -85,7 +85,7 @@ public partial class MainWindow
         {
             var library = new WordTemplateLibrary(Path.Combine(model.StateDirectory, "word-templates"));
             var listing = await Task.Run(() => library.ListAsync(cancellationToken: model.OperationToken), model.OperationToken);
-            var window = new WordTemplatesWindow(library, listing, Path.Combine(model.StateDirectory, "export-recovery"), wordTemplateId, wordTemplateName) { Owner = this };
+            var window = new WordTemplatesWindow(library, listing, Path.Combine(model.StateDirectory, "export-recovery"), wordTemplateId, wordTemplateName, (path, bytes) => model.CompleteExportAsync(path, bytes)) { Owner = this };
             var selected = window.ShowDialog(); wordTemplateName = window.CurrentName;
             if (selected != true) return;
             wordTemplate = window.SelectedBytes; wordTemplateId = window.SelectedId; wordTemplateName = window.SelectedName;

@@ -1,0 +1,109 @@
+using System.Text.Json;
+using FlaUI.Core.AutomationElements;
+using FlaUI.Core.Definitions;
+using FlaUI.Core.Input;
+using FlaUI.Core.WindowsAPI;
+using FlaUI.UIA3;
+using LensDocsStudio.Core.State;
+
+namespace LensDocsStudio.Native.Validation;
+
+internal static partial class NativeUiChecks
+{
+    private static void CheckRefinement(Window window, AutomationElement editor, UIA3Automation automation, int process,
+        string state, string output, string source, Action<string, string> save)
+    {
+        var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source); var root = Path.GetDirectoryName(source)!;
+        var originalBounds = window.BoundingRectangle; var observations = new List<object>();
+        var markdown = Path.Combine(root, "Refinement Markdown.MD"); var diagram = Path.Combine(root, "Refinement diagram.mmd");
+        var plain = Path.Combine(root, "Refinement notes.txt");
+        File.WriteAllText(markdown, "# Markdown identity\n"); File.WriteAllText(diagram, "flowchart LR\nA --> B\n"); File.WriteAllText(plain, "Plain text identity\n");
+        Tree(Path.GetFileName(markdown), "Markdown document"); Tree(Path.GetFileName(diagram), "Mermaid diagram"); Tree(Path.GetFileName(plain), "Plain-text document");
+        var renamed = Path.ChangeExtension(diagram, ".MERMAID"); File.Move(diagram, renamed); Tree(Path.GetFileName(renamed), "Mermaid diagram");
+        editor.Focus(); Wait(() => editor.Properties.HasKeyboardFocus.Value, "The editor did not receive focus before adaptive resizing.");
+        foreach (var width in new[] { 860, 1280, 1120, 1160, 1280, 860, 1280 })
+        {
+            window.Patterns.Transform.Pattern.Resize(width, width == 860 ? 540 : 800);
+            Wait(() => Math.Abs(window.BoundingRectangle.Width - width) < 3, "The adaptive-header size was not applied.");
+            var expected = width >= 1160 ? "Menu and commands share one row" : "Commands are below the menu";
+            Wait(() => Find(window, "AdaptiveApplicationHeader").Properties.HelpText.ValueOrDefault == expected, "The actual adaptive header did not expose its measured row mode.");
+            if (!editor.Properties.HasKeyboardFocus.Value || ReadEditorText(editor) != original) throw new IOException("Header reflow lost typing focus or changed source.");
+            var menu = Find(window, "ApplicationMenu").BoundingRectangle; var toolbar = Find(window, "ApplicationToolbar").BoundingRectangle;
+            if (width >= 1160 ? toolbar.Left < menu.Right || toolbar.Top > menu.Bottom : toolbar.Top < menu.Bottom)
+                throw new IOException("The on-screen native menu and toolbar overlap after reflow.");
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.KEY_F);
+            Wait(() => Find(window, "FileMenu").Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value == ExpandCollapseState.Expanded,
+                "Alt+F lost native menu access after reflow.");
+            Keyboard.Type(VirtualKeyShort.ESCAPE); editor.Focus();
+            if (width is 860 or 1280) window.CaptureToFile(Path.Combine(output, "native-refinement-header-" + width + ".png"));
+            observations.Add(new { Width = width, Header = expected, Menu = menu, Toolbar = toolbar, KeyboardMenu = true, SourceAndFocusRetained = true });
+        }
+        window.CaptureToFile(Path.Combine(output, "native-refinement-file-icons.png"));
+        var preferences = ReadDesktopState<UserPreferences>(state, "preferences.json");
+        var settings = OpenSettingsWindow(window, automation, process);
+        Find(settings, "SettingsSearch").AsTextBox().Text = "reading";
+        Wait(() => !Find(settings, "SettingsReadingMode").IsOffscreen && settings.FindFirstDescendant(cf => cf.ByAutomationId("SettingsFont"))?.IsOffscreen != false,
+            "Settings search did not isolate its existing reading-mode control.");
+        Find(settings, "SettingsReadingMode").AsComboBox().Select("Pages");
+        Find(settings, "SettingsSearch").AsTextBox().Text = "zoom";
+        Find(settings, "SettingsZoom").Patterns.RangeValue.Pattern.SetValue(135);
+        Find(settings, "SettingsSearch").AsTextBox().Text = "reading";
+        if (Find(settings, "SettingsReadingMode").AsComboBox().SelectedItem?.Text != "Pages") throw new IOException("Filtering lost an unsaved settings choice.");
+        settings.CaptureToFile(Path.Combine(output, "native-refinement-settings-search.png"));
+        Find(settings, "SettingsCancel").AsButton().Invoke();
+        Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null, "Settings Cancel did not close the filtered dialogue.");
+        if (WorkspaceSettings.From(ReadDesktopState<UserPreferences>(state, "preferences.json")) != WorkspaceSettings.From(preferences)) throw new IOException("Cancelling filtered settings saved staged edits.");
+        editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END); Keyboard.Type("Refinement draft retained.");
+        var draft = original + "Refinement draft retained.";
+        Wait(() => ReadEditorText(editor) == draft, "The workspace-close draft was not entered exactly.");
+        File.WriteAllText(Path.Combine(root, "Pending refinement.md"), "# Pending filesystem event\n");
+        Find(window, "CloseWorkspace").AsButton().Invoke();
+        Wait(() => ReadDesktopState<SessionState>(state, "session.json").Workspace is null
+            && Find(window, "WorkspaceTree").FindAllDescendants(cf => cf.ByControlType(ControlType.TreeItem)).Length == 0,
+            "Workspace closure did not clear and persist the visible workspace.");
+        var closed = ReadDesktopState<SessionState>(state, "session.json");
+        if (ReadEditorText(editor) != draft || !closed.Documents.Any(document => document.Path == source && document.Text == draft && document.WorkspaceRoot == root))
+            throw new IOException("Workspace closure lost an open draft or its retained document context.");
+        window.CaptureToFile(Path.Combine(output, "native-refinement-workspace-closed.png"));
+        OpenFolder(root); Tree(Path.GetFileName(markdown), "Markdown document");
+        editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+        Wait(() => ReadEditorText(editor) == original, "Workspace close/reopen changed the retained draft's Undo history.");
+        Find(window, "ExportMenu").Click(); Find(window, "ExportHtml").AsMenuItem().Invoke();
+        var exported = Path.Combine(root, "refinement-export.html"); save(exported, "Export HTML");
+        Wait(() => File.Exists(exported) && ExportCompleted(window, exported), "Export feedback did not identify its actual successfully saved destination.");
+        window.CaptureToFile(Path.Combine(output, "native-refinement-export-completed.png"));
+        Find(window, "ExportMenu").Click(); Find(window, "RecentExportsMenu").AsMenuItem().Expand();
+        Wait(() => Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem)).Any(item => item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal)),
+            "The completed output is absent from session-scoped recent exports.");
+        window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png")); Keyboard.Type(VirtualKeyShort.ESCAPE); Keyboard.Type(VirtualKeyShort.ESCAPE);
+        File.Delete(exported); Find(window, "OpenExportedFile").AsButton().Invoke();
+        Wait(() => Find(window, "Status").Name.StartsWith("The exported file is unavailable or has changed", StringComparison.Ordinal), "A missing output did not fail gracefully before shell opening.");
+        if (window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"))?.IsOffscreen == false) throw new IOException("A superseded export kept its success actions visible.");
+        if (ReadEditorText(editor) != original || !File.ReadAllBytes(source).SequenceEqual(saved)) throw new IOException("Native refinements changed source or saved bytes.");
+        window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height); editor.Focus();
+        File.WriteAllText(Path.Combine(output, "native-refinement.json"), JsonSerializer.Serialize(new { Passed = true,
+            Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
+            WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
+
+        AutomationElement Tree(string name, string description)
+        {
+            AutomationElement? item = null;
+            Wait(() => (item = Find(window, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(ControlType.TreeItem).And(cf.ByName(name))))?.Properties.HelpText.ValueOrDefault == description,
+                "The monitored workspace did not expose its correct accessible file type: " + name);
+            return item!;
+        }
+        void OpenFolder(string path)
+        {
+            FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_O);
+            Window? picker = null;
+            Wait(() => (picker = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Open documentation workspace")))?.AsWindow()) is not null,
+                "The workspace reopen dialogue did not appear.");
+            FocusWindow(picker!);
+            var field = picker!.FindFirstDescendant(cf => cf.ByControlType(ControlType.Edit).And(cf.ByName("Folder:")))!.AsTextBox();
+            field.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type(path);
+            Wait(() => field.Text == path, "The workspace reopen folder field lost its chosen path.");
+            picker.FindAllDescendants(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Select Folder"))).Single(element => element.AutomationId != "DropDown").AsButton().Invoke();
+            Wait(() => ReadDesktopState<SessionState>(state, "session.json").Workspace == path || Find(window, "Status").Name == "Workspace opened", "The selected workspace did not reopen.");
+        }
+    }
+}

@@ -22,7 +22,8 @@ internal static class NativeSettingsChecks
         foreach (var size in new[] { new Size(700, 750), new Size(560, 520) })
         {
             var saves = 0; var model = new SettingsViewModel(chosen, _ => { saves++; return Task.CompletedTask; });
-            var window = new SettingsWindow(model, Path.Combine(output, "settings-recovery")); var content = (Grid)window.Content; window.Content = null; content.DataContext = model;
+            var window = new SettingsWindow(model, Path.Combine(output, "settings-recovery")); var content = (Grid)window.Content; window.Content = null;
+            NameScope.SetNameScope(content, NameScope.GetNameScope(window)); content.DataContext = model;
             ThemeService.Apply(content.Resources, dark ? "Dark" : "Light");
             var surface = new Border { Background = (Brush)content.Resources["WindowBrush"], Child = content };
             System.Windows.Documents.TextElement.SetForeground(surface, (Brush)content.Resources["TextBrush"]);
@@ -44,11 +45,26 @@ internal static class NativeSettingsChecks
             foreach (var control in new FrameworkElement[] { font, fontSize, zoom, diagramTheme, (ComboBox)window.FindName("Theme"), (ComboBox)window.FindName("Layout"), (ComboBox)window.FindName("Indentation") })
                 if (string.IsNullOrWhiteSpace(AutomationProperties.GetName(control))) throw new IOException("A settings input has no accessible name.");
             foreach (var label in Descendants(content).OfType<Label>())
+            {
                 if (label.Foreground is not SolidColorBrush foreground || surface.Background is not SolidColorBrush background
                     || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5) throw new IOException("A settings label lost readable contrast.");
+                if (label.Target is not FrameworkElement target || target.TranslatePoint(new(), content).Y < label.TranslatePoint(new(0, label.ActualHeight), content).Y - 0.5
+                    || Math.Abs(target.TranslatePoint(new(), content).X - label.TranslatePoint(new(), content).X) > 1)
+                    throw new IOException("A settings label overlaps its control or has a misaligned control edge: " + label.Content
+                        + " label=" + new Rect(label.TranslatePoint(new(), content), label.RenderSize)
+                        + " target=" + (label.Target is FrameworkElement input ? new Rect(input.TranslatePoint(new(), content), input.RenderSize).ToString() : "missing"));
+            }
+            var search = (TextBox)window.FindName("SettingsSearch");
+            search.Text = "diagram"; Layout();
+            if (!diagramTheme.IsVisible || font.IsVisible || model.FontSize != 20 || model.PreviewZoom != 150 || saves != 0)
+                throw new IOException("Settings search lost staged values, failed to filter, or saved without Apply.");
+            search.Text = "no-such-setting"; Layout();
+            if (((TextBlock)window.FindName("NoSettingsMatches")).Visibility != Visibility.Visible) throw new IOException("Settings search has no empty-result guidance.");
+            search.Text = "Preview"; Layout();
             var capture = new RenderTargetBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32); capture.Render(surface);
             var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
             using (var file = File.Create(Path.Combine(output, "native-settings-" + (dark ? "dark" : "light") + "-" + size.Width + ".png"))) encoder.Save(file);
+            search.Text = ""; Layout();
             model.ResetCommand.Execute(null); Layout();
             if (model.FontSize != 14 || model.PreviewZoom != 100 || model.Theme != "System" || model.DiagramTheme != "Auto" || saves != 0) throw new IOException("Restoring defaults persisted without Apply.");
             host.RootVisual = null; surface.Child = null; window.Close();

@@ -127,6 +127,7 @@ public partial class MainWindow
         var commands = new List<DesktopAction>();
         void Add(string title, string shortcut, Action action, bool enabled = true) => commands.Add(new(title, shortcut, action, enabled));
         Add("Open workspace", "Ctrl+Shift+O", () => model.OpenFolderCommand.Execute(null), model.OpenFolderCommand.CanExecute(null));
+        Add("Close workspace", "Keep open documents", () => model.CloseWorkspaceCommand.Execute(null), model.CloseWorkspaceCommand.CanExecute(null));
         Add("Open document", "Ctrl+O", () => model.OpenDocumentCommand.Execute(null), model.OpenDocumentCommand.CanExecute(null));
         Add("New document", "Ctrl+N", () => model.NewDocumentCommand.Execute(null), model.NewDocumentCommand.CanExecute(null));
         Add("Save document", "Ctrl+S", () => model.SaveCommand.Execute(null), model.SaveCommand.CanExecute(null));

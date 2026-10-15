@@ -7,6 +7,12 @@ namespace LensDocsStudio.Native.ViewModels;
 public partial class SettingsViewModel : ObservableObject
 {
     private readonly Func<WorkspaceSettings, Task> save;
+    private readonly DesktopPreferences desktop;
+    [ObservableProperty] private bool showWorkspace = true;
+    [ObservableProperty] private bool followCaret;
+    [ObservableProperty] private bool synchroniseScroll;
+    [ObservableProperty] private bool synchroniseSelection;
+    public DesktopPreferences CurrentDesktop => desktop with { ShowSidebar = ShowWorkspace, FollowCaret = FollowCaret, SyncScroll = SynchroniseScroll, SyncSelection = SynchroniseSelection };
     [ObservableProperty] private string theme = "System";
     [ObservableProperty] private string layout = "Split";
     [ObservableProperty] private string fontFamily = "Cascadia Code, Consolas";
@@ -38,9 +44,14 @@ public partial class SettingsViewModel : ObservableObject
         Status = "Imported appearance choices are ready for review. Choose Apply to save, or Cancel to keep your current settings.";
     }
 
-    public SettingsViewModel(WorkspaceSettings initial, Func<WorkspaceSettings, Task> save)
+    public SettingsViewModel(WorkspaceSettings initial, Func<WorkspaceSettings, Task> save, DesktopPreferences? desktop = null)
     {
-        this.save = save; Read(initial);
+        this.save = save; this.desktop = desktop ?? new(); Read(initial); ReadDesktop(this.desktop);
+    }
+    private void ReadDesktop(DesktopPreferences value)
+    {
+        ShowWorkspace = value.ShowSidebar; FollowCaret = value.FollowCaret;
+        SynchroniseScroll = value.SyncScroll; SynchroniseSelection = value.SyncSelection;
     }
     private void Read(WorkspaceSettings settings)
     {
@@ -54,6 +65,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanEdit))] private void Reset()
     {
         Read(WorkspaceSettings.Default); Status = "Default appearance settings selected. Choose Apply to save them, or Cancel to keep your current settings.";
+        ReadDesktop(new());
     }
     [RelayCommand(CanExecute = nameof(CanEdit))] private async Task ApplyAsync()
     {

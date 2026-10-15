@@ -51,12 +51,52 @@ internal static class NativeWorkspaceChromeChecks
             Complete(restored.InitialiseAsync([]));
             if (restored.Documents.Count != 2 || restored.Documents[0].Id != pinned.Id || !restored.Documents[0].IsPinned || restored.ActiveDocument?.Id != active.Id || restored.ActiveDocument.PreviewSourceOffset != 5)
                 throw new IOException("Restarted session state lost tab order, pin or active document.");
+            restored.Dispose();
+            var iconPath = Path.Combine(workspace, "icon.md"); File.WriteAllText(iconPath, "# Icon fixture");
+            WaitUntil(() => model.Entries.Any(entry => entry.Path == iconPath));
+            var mutableIcon = model.Entries.Single(entry => entry.Path == iconPath);
+            var notifications = new List<string?>(); mutableIcon.PropertyChanged += (_, change) => notifications.Add(change.PropertyName);
+            mutableIcon.Path = Path.ChangeExtension(iconPath, ".TXT");
+            if (mutableIcon.IconKind != "PlainText" || !notifications.Contains("IconKind") || !notifications.Contains("FileTypeDescription"))
+                throw new IOException("Mutable file paths did not notify their file-type identity.");
+            mutableIcon.Path = iconPath;
+            var diagramPath = Path.ChangeExtension(iconPath, ".MMD"); File.Move(iconPath, diagramPath);
+            WaitUntil(() => model.Entries.Any(entry => entry.Path == diagramPath && entry.IconKind == "Mermaid") && model.Entries.All(entry => entry.Path != iconPath));
+            Complete(model.RefreshWorkspaceCommand.ExecuteAsync(null));
+            if (model.Entries.Single(entry => entry.Path == diagramPath).IconKind != "Mermaid") throw new IOException("Refreshing lost the renamed diagram identity.");
+            var retainedDocuments = model.Documents.ToArray(); var retainedRoot = active.WorkspaceRoot; var retainedSnapshot = active.SavedSnapshot;
+            File.WriteAllBytes(Path.Combine(workspace, "image.png"), [1, 2, 3, 4]);
+            active.EditorDocument.Text += "\r\nUnsaved text with ![relative image](image.png)";
+            var retainedText = active.EditorDocument.Text; model.WorkspaceFilter = "Café";
+            File.WriteAllText(Path.Combine(workspace, "pending.md"), "# Pending watcher event");
+            Complete(model.CloseWorkspaceCommand.ExecuteAsync(null));
+            Complete(Task.Delay(500)); // Let already queued filesystem notifications and debounce continuations run.
+            if (model.WorkspaceRoot is not null || model.Entries.Count != 0 || model.WorkspaceFilter.Length != 0 || model.CloseWorkspaceCommand.CanExecute(null)
+                || !model.Documents.SequenceEqual(retainedDocuments) || model.ActiveDocument != active || !active.IsDirty || active.EditorDocument.Text != retainedText
+                || active.WorkspaceRoot != retainedRoot || active.SavedSnapshot != retainedSnapshot
+                || typeof(WorkspaceViewModel).GetField("watcher", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.GetValue(model) is not null)
+                throw new IOException("Closing a workspace lost document context or left monitoring/tree state active.");
+            using var closedRestored = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), new DesktopDialogs());
+            Complete(closedRestored.InitialiseAsync([]));
+            if (closedRestored.WorkspaceRoot is not null || closedRestored.Entries.Count != 0 || closedRestored.ActiveDocument?.Id != active.Id
+                || closedRestored.ActiveDocument.EditorDocument.Text != retainedText || !closedRestored.ActiveDocument.IsDirty || closedRestored.ActiveDocument.WorkspaceRoot != retainedRoot
+                || !closedRestored.RecentWorkspaces.Any(recent => recent.Path == workspace))
+                throw new IOException("Restarting after workspace closure lost drafts, document roots or recent-workspace history.");
+            Complete(model.SetWorkspaceAsync(workspace));
+            if (!model.Entries.Any() || model.ActiveDocument != active || active.EditorDocument.Text != retainedText) throw new IOException("Reopening a workspace lost the retained draft.");
+            Complete(model.CloseWorkspaceCommand.ExecuteAsync(null));
+            var other = Path.Combine(root, "Other"); Directory.CreateDirectory(other); File.WriteAllText(Path.Combine(other, "other.md"), "# Other workspace");
+            Complete(model.SetWorkspaceAsync(other));
+            if (model.Entries.Single().Name != "other.md" || active.WorkspaceRoot != retainedRoot || active.EditorDocument.Text != retainedText)
+                throw new IOException("Opening another workspace changed the previous document's context.");
             for (var index = 0; index < paths.Length; index++)
                 if (!File.ReadAllBytes(paths[index]).SequenceEqual(snapshots[index])) throw new IOException("Workspace chrome changed document bytes.");
             Directory.CreateDirectory(output);
             File.WriteAllText(Path.Combine(output, "native-workspace-chrome.json"), JsonSerializer.Serialize(new {
                 Passed = true, FilteringPreservesNodes = true, ExpansionRetained = true, ActiveDocumentRetained = true,
-                PinsSurviveCloseOthers = true, PinsAndTabOrderRestored = true, SourceBytesPreserved = true }));
+                PinsSurviveCloseOthers = true, PinsAndTabOrderRestored = true, SourceBytesPreserved = true,
+                MutableAndExternallyRenamedIcons = true, CloseStopsMonitoringAndPendingRefresh = true,
+                CloseRetainsTabsDraftsAndAssets = true, ClosedSessionRestored = true, WorkspaceReopenAndSwitch = true }));
         }
         finally { SynchronizationContext.SetSynchronizationContext(previous); }
     }
@@ -70,5 +110,14 @@ internal static class NativeWorkspaceChromeChecks
             Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, () => frame.Continue = false); Dispatcher.PushFrame(frame);
         }
         task.GetAwaiter().GetResult();
+    }
+    private static void WaitUntil(Func<bool> predicate)
+    {
+        var watch = Stopwatch.StartNew();
+        while (!predicate())
+        {
+            if (watch.Elapsed > TimeSpan.FromSeconds(5)) throw new TimeoutException("The workspace filesystem identity did not reconcile.");
+            Complete(Task.Delay(20));
+        }
     }
 }

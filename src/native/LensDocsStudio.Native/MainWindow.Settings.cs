@@ -11,16 +11,20 @@ public partial class MainWindow
     {
         var settings = WorkspaceSettings.From(model.Preferences) with { Theme = model.Theme, Layout = model.Layout };
         var editorFocus = Editor.IsKeyboardFocusWithin; var previewFocus = Preview.IsKeyboardFocusWithin;
-        new SettingsWindow(new SettingsViewModel(settings, async updated =>
+        SettingsViewModel? settingsModel = null;
+        settingsModel = new SettingsViewModel(settings, async updated =>
         {
             var themeChanged = model.Theme != updated.Theme;
             var diagramThemeChanged = WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme != updated.Preview.DiagramTheme;
-            await model.UpdatePreferencesAsync(updated.ApplyTo);
+            var desktop = settingsModel!.CurrentDesktop;
+            await model.UpdatePreferencesAsync(current => updated.ApplyTo(current) with { Desktop = (current.Desktop ?? new()) with {
+                ShowSidebar = desktop.ShowSidebar, FollowCaret = desktop.FollowCaret, SyncScroll = desktop.SyncScroll, SyncSelection = desktop.SyncSelection } });
             model.Theme = updated.Theme; SetLayout(updated.Layout); ApplyReadingPreferences();
             if (themeChanged) ApplyTheme();
             if (themeChanged || diagramThemeChanged) QueuePreview();
             model.Status = "Settings saved.";
-        }), Path.Combine(model.StateDirectory, "export-recovery")) { Owner = this }.ShowDialog();
+        }, model.Preferences.Desktop);
+        new SettingsWindow(settingsModel, Path.Combine(model.StateDirectory, "export-recovery"), (path, bytes) => model.CompleteExportAsync(path, bytes)) { Owner = this }.ShowDialog();
         if (editorFocus && Editor.IsVisible) Editor.Focus(); else if (previewFocus && Preview.IsVisible) Preview.Focus();
     }
 

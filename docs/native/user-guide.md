@@ -2,6 +2,10 @@
 
 ## Desktop workspace and synchronisation
 
+The application menu and command toolbar share a row when their measured widths fit; resizing to a narrower window moves the toolbar below the menu and retains native overflow commands. The document location below the tabs shows a short workspace-relative path, with the full saved path in its tooltip.
+
+Markdown files use a page with a Markdown cue; Mermaid files use connected diagram nodes; plain-text files use a lined page. Their shapes remain distinct without colour. **File → Close workspace**, the workspace toolbar and Command Palette detach the folder tree and stop its monitoring. Open tabs, unsaved text, recovery, document roots, relative images and recent-workspace history remain available. Open another folder whenever needed.
+
 The command toolbars expose frequent file, navigation, formatting and viewing actions. Narrow windows use native toolbar overflow. Open documents occupy one horizontal tab row; scroll the strip when it fills.
 
 Use **Ctrl+P** for Quick Open and **Ctrl+Shift+P** for the Command Palette. Both support text filtering, Up/Down, Enter and Escape. The palette runs the same actions as the application's menus and toolbars.
@@ -142,9 +146,13 @@ Unrelated template body text and personal package metadata are excluded. Templat
 
 **Export → Word template library** keeps reusable templates in private native state. Import, rename, save a portable copy, archive and restore templates there. **Use default Word styles** clears the current selection.
 
+The library shows retained styles, headings, numbering, page settings, header/footer resources and import notes. Its native typography sample is illustrative; it is not a complete page-fidelity preview and does not import the original body or cover design. Ordinary DOCX files with one consistent external attached-template reference are supported: the untrusted target is never opened, and both its relationship and settings reference are omitted with a warning. Other unsafe external resources remain blocked.
+
 To move a browser template into this library, select it in the browser's **Export** menu and choose **Save template copy**. Import the downloaded DOCX here and choose **Use template**. The browser copy is the original source document, including its body and metadata; native import extracts supported reusable formatting. If the browser no longer has its original bytes, import your original DOCX there again or directly into the native library.
 
 ## Imports and exports
+
+Successful file exports offer **Open file** and **Show in folder** in the status area. Files open only when you choose an action, using the registered Windows application. The app checks that the saved output remains present and unchanged before opening, revealing or copying its path. **Export → Recent exports** holds up to ten outputs for this session; newer status events dismiss the current actions. Missing, changed, failed and cancelled outputs never receive a new success action.
 
 Word bold, italic, strikethrough and underline can come from document defaults, paragraph styles, character styles or direct formatting. Direct on/off values override inherited formatting. Double strikethrough and other underline variants are simplified to single lines with conversion notes. Missing or cyclic styles keep readable text and notes; chains longer than 64 styles are rejected before output is created. Headings retain their structural appearance and code stays literal. Conditional table/numbering styling, complex-script properties and exact Word layout may need manual correction.
 
@@ -183,6 +191,8 @@ Optional artefact review packs, broader template fidelity and some advanced expo
 ## Settings and keyboard shortcuts
 
 Open **Edit → Settings** with **Ctrl+,**. Choose theme, layout, outline visibility, editor font and size, wrapping, line numbers, indentation, preview reading mode and zoom. **Apply** saves the choices on this device. **Restore defaults** can still be cancelled.
+
+Use **Search settings** to find reading mode, zoom, line numbers, indentation, workspace panels or synchronisation. Filtering keeps staged choices intact. Workspace visibility and the three independent synchronisation controls use the existing desktop preferences; Apply saves them and Cancel keeps the previous values. Appearance-settings transfer continues to carry its established appearance fields, excluding private desktop navigation and synchronisation choices.
 
 Indentation options affect new typing; existing tabs, spaces, text, selection and Undo/Redo remain intact. Preview zoom ranges from 50% to 200% and does not change export sizes. **System** theme follows Windows; Windows high-contrast colours take precedence.
 

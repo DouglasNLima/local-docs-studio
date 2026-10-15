@@ -11,6 +11,8 @@ using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
 using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Native.Controls;
+using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.Rendering;
 using LensDocsStudio.Native.ViewModels;
@@ -34,7 +36,7 @@ internal static class NativeShellLayoutChecks
     {
         var checks = new List<object>();
         foreach (var dark in new[] { false, true })
-        foreach (var size in new[] { new Size(860, 540), new Size(1280, 780) })
+        foreach (var size in new[] { new Size(860, 540), new Size(1280, 780), new Size(1280, 800), new Size(1440, 900), new Size(1920, 1080) })
         {
             application.Resources = new ResourceDictionary();
             ThemeService.Apply(application.Resources, dark ? "Dark" : "Light");
@@ -69,6 +71,13 @@ internal static class NativeShellLayoutChecks
                 using var host = new HwndSource(new HwndSourceParameters("Native shell layout validation")
                     { Width = (int)size.Width, Height = (int)size.Height, WindowStyle = unchecked((int)0x80000000) });
                 host.RootVisual = surface; surface.Measure(size); surface.Arrange(new Rect(size)); surface.UpdateLayout();
+                var header = (AdaptiveHeaderPanel)window.FindName("ApplicationHeader");
+                var menu = (Menu)window.FindName("ApplicationMenu"); var toolbar = (ToolBar)window.FindName("ApplicationToolbar");
+                var menuBounds = new Rect(menu.TranslatePoint(new(), surface), menu.RenderSize);
+                var toolbarBounds = new Rect(toolbar.TranslatePoint(new(), surface), toolbar.RenderSize);
+                if (header.IsSingleRow != (size.Width >= 1280) || header.IsSingleRow && (toolbarBounds.Left < menuBounds.Right || toolbarBounds.Top > menuBounds.Bottom)
+                    || !header.IsSingleRow && toolbarBounds.Top < menuBounds.Bottom || toolbarBounds.Right > size.Width)
+                    throw new IOException("The measured application menu/toolbar layout overlaps, clips or chose an unexpected row count.");
                 var prefix = "native-shell-" + (dark ? "dark" : "light") + "-" + size.Width;
                 foreach (var scale in new[] { 1d, 1.25, 1.5, 2d })
                 {
@@ -86,7 +95,25 @@ internal static class NativeShellLayoutChecks
                         || control.Bounds.Right > size.Width || control.Bounds.Bottom > size.Height || control.AccessibleName != control.Label || !control.IsEnabled)
                         throw new IOException("Native " + control.Label + " is clipped, disabled or inaccessible at " + size + ": " + control.Bounds);
                 if (editor.Text != source) throw new IOException("Native layout changed the source.");
-                checks.Add(new { Theme = dark ? "Dark" : "Light", Width = size.Width, Height = size.Height, Controls = bounds });
+                var receiptPath = Path.Combine(state, "example.docx"); Directory.CreateDirectory(state); File.WriteAllBytes(receiptPath, [1, 2, 3]);
+                var receipt = SavedExport.FromSavedBytes(receiptPath, [1, 2, 3]); model.ExportHistory.Remember(receipt); model.CompletedExport = receipt;
+                surface.Measure(size); surface.Arrange(new Rect(size)); surface.UpdateLayout();
+                foreach (var button in Descendants(surface).OfType<Button>().Where(button => button.Content is "Open file" or "Show in folder"))
+                {
+                    var rect = new Rect(button.TranslatePoint(new(), surface), button.RenderSize);
+                    if (rect.Width < 45 || rect.Height < 20 || !new Rect(size).Contains(rect)) throw new IOException("Export completion actions are clipped or inaccessible.");
+                }
+                var transition = header.SingleRowRequiredWidth;
+                var transitions = new List<object>();
+                foreach (var available in new[] { transition - 1, transition, transition + 1, transition - 1, transition + 1 })
+                {
+                    // Exercise explicit child constraints without asking the fixed-width HWND's parent to reapply its own width.
+                    header.Measure(new(available, double.PositiveInfinity)); header.Arrange(new(0, 0, available, header.DesiredSize.Height));
+                    if (header.IsSingleRow != (available >= transition)) throw new IOException($"The adaptive header did not reflow at its measured boundary in both directions: available={available}, original required={transition}, current required={header.SingleRowRequiredWidth}, actual={header.ActualWidth}, single={header.IsSingleRow}.");
+                    transitions.Add(new { Available = available, header.IsSingleRow });
+                }
+                checks.Add(new { Theme = dark ? "Dark" : "Light", Width = size.Width, Height = size.Height, Controls = bounds,
+                    SingleRow = size.Width >= 1280, Menu = menuBounds, Toolbar = toolbarBounds, RequiredWidth = transition, Transitions = transitions });
                 host.RootVisual = null; surface.Child = null;
             }
             finally { typeof(MainWindow).GetMethod("CompleteClose", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, null); }

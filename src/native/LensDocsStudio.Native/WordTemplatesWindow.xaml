@@ -1,36 +1,75 @@
 <Window x:Class="LensDocsStudio.Native.WordTemplatesWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- Title="Word template library" Width="760" Height="580" MinWidth="600" MinHeight="420" WindowStartupLocation="CenterOwner"
+ xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Title="Word template library" Width="880" Height="680" MinWidth="640" MinHeight="520" WindowStartupLocation="CenterOwner"
  Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+  <ResourceDictionary Source="Resources/DesktopStyles.xaml"/>
+  <ResourceDictionary Source="Resources/FormStyles.xaml"/>
+ </ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
  <Grid Margin="22">
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <StackPanel>
-   <TextBlock Text="Word templates" FontSize="22" FontWeight="SemiBold" Margin="0,0,0,8"/>
-   <TextBlock Text="Keep reusable formatting from your own DOCX files. Original files remain unchanged." TextWrapping="Wrap" Margin="0,0,0,8"/>
+   <TextBlock Text="Word templates" FontSize="22" FontWeight="SemiBold"/>
+   <TextBlock Text="Reusable styles and page formatting for your exported documents." Style="{StaticResource Form.Help}"/>
   </StackPanel>
-  <TextBlock x:Name="CurrentStyles" Grid.Row="1" TextWrapping="Wrap" Margin="0,0,0,14" AutomationProperties.AutomationId="CurrentWordTemplate"/>
-  <WrapPanel Grid.Row="2" Margin="0,0,0,10">
-   <Button x:Name="ImportButton" Content="Import…" Click="Import" Padding="12,6" Margin="0,0,6,6" AutomationProperties.AutomationId="ImportLibraryTemplate"/>
-   <Button x:Name="RenameButton" Content="Rename…" Click="Rename" Padding="12,6" Margin="0,0,6,6" AutomationProperties.AutomationId="RenameLibraryTemplate"/>
-   <Button x:Name="CopyButton" Content="Save copy…" Click="SaveCopy" Padding="12,6" Margin="0,0,6,6" AutomationProperties.AutomationId="CopyLibraryTemplate"/>
-   <Button x:Name="ArchiveButton" Content="Archive" Click="ArchiveOrRestore" Padding="12,6" Margin="0,0,6,6" AutomationProperties.AutomationId="ArchiveLibraryTemplate"/>
-   <Button x:Name="RefreshButton" Content="Refresh" Click="Refresh" Padding="12,6" Margin="0,0,12,6" AutomationProperties.AutomationId="RefreshWordTemplates"/>
+  <TextBlock x:Name="CurrentStyles" Grid.Row="1" TextWrapping="Wrap" Margin="0,12,0,14" AutomationProperties.AutomationId="CurrentWordTemplate"/>
+  <WrapPanel Grid.Row="2" Margin="0,0,0,6">
+   <Button x:Name="ImportButton" Content="Import template…" Click="Import" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ImportLibraryTemplate"/>
+   <Button x:Name="RenameButton" Content="Rename…" Click="Rename" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="RenameLibraryTemplate"/>
+   <Button x:Name="CopyButton" Content="Save copy…" Click="SaveCopy" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="CopyLibraryTemplate"/>
+   <Button x:Name="ArchiveButton" Content="Archive" Click="ArchiveOrRestore" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ArchiveLibraryTemplate"/>
+   <Button x:Name="RefreshButton" Content="Refresh" Click="Refresh" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="RefreshWordTemplates"/>
    <CheckBox x:Name="Archived" Content="Show archived" Checked="ViewChanged" Unchecked="ViewChanged" VerticalAlignment="Center" Margin="0,0,0,6" AutomationProperties.AutomationId="ShowArchivedTemplates"/>
   </WrapPanel>
-  <ListBox x:Name="TemplateList" Grid.Row="3" SelectionChanged="SelectionChanged" HorizontalContentAlignment="Stretch"
-   ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Saved Word templates" AutomationProperties.AutomationId="WordTemplateList">
-   <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Name}"/></Style></ListBox.ItemContainerStyle>
-   <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8"><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Details}" TextWrapping="Wrap" Margin="0,4,0,0"/></StackPanel></DataTemplate></ListBox.ItemTemplate>
-  </ListBox>
+  <Grid Grid.Row="3">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="2*" MinWidth="180"/><ColumnDefinition Width="16"/><ColumnDefinition Width="3*" MinWidth="240"/></Grid.ColumnDefinitions>
+   <ListBox x:Name="TemplateList" SelectionChanged="SelectionChanged" HorizontalContentAlignment="Stretch"
+    ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="Saved Word templates" AutomationProperties.AutomationId="WordTemplateList">
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding Name}"/></Style></ListBox.ItemContainerStyle>
+    <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="8"><TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextWrapping="Wrap"/><TextBlock Text="{Binding Details}" Style="{StaticResource Form.Help}"/></StackPanel></DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <ScrollViewer x:Name="InspectionPanel" Grid.Column="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,10,0">
+    <StackPanel>
+     <TextBlock x:Name="InspectionTitle" FontSize="18" FontWeight="SemiBold" TextWrapping="Wrap"/>
+     <TextBlock x:Name="InspectionSource" Style="{StaticResource Form.Help}"/>
+     <TextBlock Text="Retained formatting" Style="{StaticResource Form.Section}" Margin="0,16,0,8"/>
+     <TextBlock x:Name="FormattingDetails" TextWrapping="Wrap" AutomationProperties.AutomationId="WordTemplateFormatting"/>
+     <TextBlock Text="Formatting sample" Style="{StaticResource Form.Section}" Margin="0,18,0,8"/>
+     <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="14" CornerRadius="4">
+      <StackPanel AutomationProperties.AutomationId="WordTemplateFormattingSample">
+       <TextBlock x:Name="SampleHeading" Text="A clear document heading" TextWrapping="Wrap" Margin="0,0,0,10"/>
+       <TextBlock x:Name="SampleBody" Text="Your Markdown becomes a document with reusable typography and page settings." TextWrapping="Wrap"/>
+       <TextBlock Text="1. A numbered list item" Margin="0,10,0,0" TextWrapping="Wrap"/>
+      </StackPanel>
+     </Border>
+     <TextBlock Text="Illustrative typography only. This is not a complete page-fidelity preview. Original body content and cover-page designs are not imported. Unsupported fonts use a local fallback in this sample." Style="{StaticResource Form.Help}"/>
+     <Expander Header="Detected styles" Margin="0,16,0,0"><TextBlock x:Name="StyleDetails" TextWrapping="Wrap" Margin="0,8"/></Expander>
+     <TextBlock Text="Import notes" Style="{StaticResource Form.Section}" Margin="0,16,0,6"/>
+     <TextBlock x:Name="InspectionWarnings" TextWrapping="Wrap" AutomationProperties.AutomationId="WordTemplateWarnings"/>
+    </StackPanel>
+   </ScrollViewer>
+   <Border x:Name="LibraryEmptyState" Grid.ColumnSpan="3" Background="{DynamicResource PanelBrush}" CornerRadius="6" Padding="24" AutomationProperties.AutomationId="WordTemplateEmptyState">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+     <StackPanel MaxWidth="420" VerticalAlignment="Center" HorizontalAlignment="Center">
+      <ui:CommandIcon Kind="Document" Width="40" Height="40" HorizontalAlignment="Left" Margin="0,0,0,14" Foreground="{DynamicResource MutedTextBrush}"/>
+      <TextBlock x:Name="EmptyTitle" Text="Start your formatting library" FontSize="20" FontWeight="SemiBold" TextWrapping="Wrap"/>
+      <TextBlock Text="Import an ordinary Word document to reuse its styles, numbering, page layout and supported headers and footers." Style="{StaticResource Form.Help}"/>
+      <Button x:Name="EmptyImportButton" Content="Import template…" Click="Import" Style="{StaticResource Form.PrimaryAction}" HorizontalAlignment="Left" Margin="0,18,0,8" AutomationProperties.AutomationId="ImportEmptyLibraryTemplate"/>
+      <TextBlock Text="DOCX · up to 32 MB · no Microsoft Word required. The original document remains unchanged." Style="{StaticResource Form.Help}"/>
+     </StackPanel>
+    </ScrollViewer>
+   </Border>
+  </Grid>
   <StackPanel Grid.Row="4" Margin="0,10,0,12">
-   <ProgressBar x:Name="Progress" Height="3" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,0,8" AutomationProperties.Name="Word template operation"/>
-   <ScrollViewer MaxHeight="84" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="LibraryStatus" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="WordTemplateStatus"/></ScrollViewer>
+   <ProgressBar x:Name="Progress" Style="{StaticResource Form.Progress}" Visibility="Collapsed" AutomationProperties.Name="Word template operation"/>
+   <ScrollViewer MaxHeight="64" VerticalScrollBarVisibility="Auto"><TextBlock x:Name="LibraryStatus" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="WordTemplateStatus"/></ScrollViewer>
   </StackPanel>
   <WrapPanel Grid.Row="5" HorizontalAlignment="Right">
-   <Button x:Name="CancelButton" Content="Cancel operation" IsEnabled="False" Click="CancelOperation" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="CancelTemplateOperation"/>
-   <Button Content="Close" IsCancel="True" Padding="12,6" Margin="0,0,8,0"/>
-   <Button x:Name="DefaultButton" Content="Use default styles" Click="UseDefault" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="DefaultLibraryTemplate"/>
-   <Button x:Name="UseButton" Content="Use template" IsDefault="True" Click="UseSelected" Padding="12,6" AutomationProperties.AutomationId="UseLibraryTemplate"/>
+   <Button x:Name="CancelButton" Content="Cancel operation" Visibility="Collapsed" Click="CancelOperation" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="CancelTemplateOperation"/>
+   <Button Content="Close" IsCancel="True" Style="{StaticResource Form.Action}"/>
+   <Button x:Name="DefaultButton" Content="Use default styles" Click="UseDefault" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="DefaultLibraryTemplate"/>
+   <Button x:Name="UseButton" Content="Use template" IsDefault="True" Click="UseSelected" Style="{StaticResource Form.PrimaryAction}" AutomationProperties.AutomationId="UseLibraryTemplate"/>
   </WrapPanel>
  </Grid>
 </Window>

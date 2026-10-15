@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Native.Platform;
@@ -11,11 +12,13 @@ public partial class SettingsWindow : Window
 {
     private readonly SettingsViewModel model;
     private readonly string exportRecovery;
+    private readonly Func<string, byte[], Task>? exportCompleted;
     private CancellationTokenSource? transfer;
     private bool closeRequested;
-    public SettingsWindow(SettingsViewModel model, string exportRecovery)
+    public SettingsWindow(SettingsViewModel model, string exportRecovery, Func<string, byte[], Task>? exportCompleted = null)
     {
         this.model = model; this.exportRecovery = exportRecovery;
+        this.exportCompleted = exportCompleted;
         InitializeComponent(); DataContext = model; WindowStateService.FitInitialWindow(this);
         var applied = false;
         model.Applied += () => { applied = true; DialogResult = true; };
@@ -25,6 +28,26 @@ public partial class SettingsWindow : Window
             if (transfer is not null) { closeRequested = true; transfer.Cancel(); }
         };
         Loaded += (_, _) => Theme.Focus();
+    }
+    private void SearchChanged(object sender, TextChangedEventArgs e)
+    {
+        if (SettingsSections is null) return;
+        var terms = SettingsSearch.Text.Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+        var count = 0;
+        foreach (var section in SettingsSections.Children.OfType<StackPanel>())
+        {
+            var matches = 0;
+            foreach (var field in section.Children.OfType<FrameworkElement>().Where(field => field.Tag is string))
+            {
+                var keywords = section.Tag + " " + field.Tag;
+                var visible = terms.All(term => keywords.Contains(term, StringComparison.CurrentCultureIgnoreCase));
+                field.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
+                if (visible) matches++;
+            }
+            section.Visibility = matches == 0 ? Visibility.Collapsed : Visibility.Visible; count += matches;
+        }
+        NoSettingsMatches.Visibility = count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        SettingsScroller.ScrollToTop();
     }
     private async void ImportSettings(object sender, RoutedEventArgs e)
     {
@@ -53,6 +76,8 @@ public partial class SettingsWindow : Window
                 throw new IOException("The existing destination exceeds 64 KB. Choose a new settings filename.");
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token);
             await new ExportFileStore(exportRecovery).WriteAsync(picker.FileName, bytes, expected, token);
+            token.ThrowIfCancellationRequested();
+            if (exportCompleted is not null) await exportCompleted(picker.FileName, bytes);
             model.Status = "Selected appearance choices exported. Device settings are saved only when you choose Apply.";
         });
     }
