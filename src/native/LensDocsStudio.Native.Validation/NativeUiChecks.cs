@@ -1192,7 +1192,8 @@ internal static partial class NativeUiChecks
                 "The profiled Docs Site dialogue did not cancel.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             var profiledBundle = Path.Combine(runRoot, "profile-bundle.zip"); SaveThroughDialogue(profiledBundle, "Export Markdown bundle");
-            Wait(() => File.Exists(profiledBundle) && Find(window, "Status").Name.EndsWith("Azure DevOps Mermaid formatting applied.", StringComparison.Ordinal),
+            Wait(() => File.Exists(profiledBundle) && ExportCompleted(window, profiledBundle)
+                && Find(window, "Status").Name.EndsWith("Azure DevOps Mermaid formatting applied.", StringComparison.Ordinal),
                 "The selected profile did not affect the actual Markdown bundle.");
             using (var archive = System.IO.Compression.ZipFile.OpenRead(profiledBundle))
             using (var entry = new StreamReader(archive.GetEntry("fixture.md")!.Open()))

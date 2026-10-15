@@ -42,7 +42,7 @@ public partial class MainWindow
             var bytes = await bundles.ExportAsync(new WorkspacePath(root), edited, model.OperationToken, model.StateDirectory, activeExportProfile?.DevopsMarkdownExport == true);
             await WriteExportAsync(picker.FileName, bytes, expected, model.OperationToken);
             await model.CompleteExportAsync(picker.FileName, bytes, "Current editor text and portable assets included"
-                + (activeExportProfile?.DevopsMarkdownExport == true ? "; Azure DevOps Mermaid formatting applied" : ""));
+                + (activeExportProfile?.DevopsMarkdownExport == true ? "; Azure DevOps Mermaid formatting applied." : "."));
         });
     }
 }
