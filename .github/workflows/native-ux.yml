@@ -23,6 +23,9 @@ jobs:
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Exercise visual authoring, source preservation and conflicts on disposable Windows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui
+      - name: Measure bounded Mermaid editing scenarios
+        if: always()
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-performance artifacts/native/mermaid-performance.json
       - name: Exercise actual Windows high contrast
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-high-contrast --high-contrast
       - uses: actions/upload-artifact@v4
@@ -30,6 +33,7 @@ jobs:
         with:
           name: native-mermaid-visual-evidence
           path: |
+            artifacts/native/mermaid-performance.json
             artifacts/native/mermaid-ui/*.png
             artifacts/native/mermaid-ui/*.json
             artifacts/native/mermaid-ui/*.txt

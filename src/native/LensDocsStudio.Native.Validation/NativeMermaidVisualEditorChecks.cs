@@ -15,9 +15,12 @@ internal static partial class NativeUiChecks
 {
     public static int RunMermaidVisualEditor(string executable, string output, bool highContrast) => Task.Run(() =>
     {
+        Directory.CreateDirectory(Path.GetFullPath(output));
         using var clipboard = NativeUiClipboard.Start();
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
-        return MermaidVisualEditorCore(executable, output, highContrast);
+        using var display = new NativeTestDisplay(output);
+        var result = MermaidVisualEditorCore(executable, output, highContrast);
+        if (result == 0) display.Complete(); return result;
     }).GetAwaiter().GetResult();
 
     private static int MermaidVisualEditorCore(string executable, string output, bool highContrast)
@@ -34,6 +37,7 @@ internal static partial class NativeUiChecks
         var clipboardBefore = NativeUiClipboard.GetDataObject(); uint clipboardOwned = 0;
         try
         {
+            checks.AddRange(NativeMermaidDocumentChecks.Run());
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(root); info.ArgumentList.Add(path);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native application window did not appear.");

@@ -71,6 +71,7 @@ public partial class MermaidVisualEditorWindow : Window
                 .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " → " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " · " + edge.Label))))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph · " + group.Label))).ToArray();
             Elements.ItemsSource = choices;
+            Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
             Status.Text = draft.Model.Diagnostic ?? "Draft ready. Select a node or use the palette. Choose a connection port, then its destination. Middle-drag pans.";
