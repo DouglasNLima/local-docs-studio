@@ -22,12 +22,12 @@ jobs:
       - name: Build source-mapped native editor and validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Exercise visual authoring, source preservation and conflicts on disposable Windows
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui --polish
       - name: Measure bounded Mermaid editing scenarios
         if: always()
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-performance artifacts/native/mermaid-performance.json
       - name: Exercise actual Windows high contrast
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-high-contrast --high-contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-high-contrast --high-contrast --polish
       - uses: actions/upload-artifact@v4
         if: always()
         with:

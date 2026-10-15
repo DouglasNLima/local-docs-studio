@@ -25,6 +25,7 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
     private bool updating, busy, closed, discard;
+    private bool sourceValidationFailed;
     private string? connectionSource;
     private IReadOnlyList<ElementChoice> choices = [];
     private object? propertyBaseline;
@@ -55,7 +56,7 @@ public partial class MermaidVisualEditorWindow : Window
         highContrast = SystemParameters.HighContrast; sourceHighlighting = new(dark);
         InitializeComponent();
         WindowStateService.FitInitialWindow(this);
-        InitialisePaletteDragging();
+        InitialisePaletteDragging(); InitialiseConnectionGuide();
         SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
         SourceEditor.TextArea.SelectionForeground = BrushResource("AccentTextBrush");
         foreach (var field in new[] { NodeId, NodeLabel, FillColour, StrokeColour, TextColour, EdgeLabel, GroupLabel })
@@ -116,12 +117,17 @@ public partial class MermaidVisualEditorWindow : Window
         SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid Visual Editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
-        DraftIndicator.Text = busy ? "Validating..." : PropertiesPending ? "Pending properties" : SourcePending ? "Source unvalidated" : !draft.Model.CanEdit ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
+        DraftIndicator.Text = busy ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : !draft.Model.CanEdit ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
         RenderedPreviewButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && inlineEditor is null;
+        SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit ? Visibility.Visible : Visibility.Collapsed;
+        SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
+        AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
         ValidateSourceButton.IsEnabled = !busy && !PropertiesPending && inlineEditor is null;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
+        UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
+        NodeClassField.Visibility = ClassButton.Visibility = NodeClass.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
     }
     private async Task<bool> Execute(MermaidEditOperation operation, string? select = null)
         => await ExecuteBatch([operation], select);
@@ -320,8 +326,8 @@ public partial class MermaidVisualEditorWindow : Window
     private void SourceChanged(object? sender, EventArgs e)
     {
         if (updating || Status is null) return;
-        connectionSource = null;
-        UpdateActions(); Status.Text = SourcePending ? "Source draft changed. Validate it before continuing visually or applying. Your text is retained if validation fails." : "Source matches the visual draft.";
+        connectionSource = null; sourceValidationFailed = false;
+        UpdateCanvasSelection(); UpdateActions(); Status.Text = SourcePending ? "Source draft changed. Validate it before continuing visually or applying. Your text is retained if validation fails." : "Source matches the visual draft.";
     }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
@@ -330,6 +336,7 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             var result = await draft.ValidateAndCommitAsync(text, lifetime.Token); if (closed) return;
+            sourceValidationFailed = !result.Success;
             if (result.Success) Refresh(true); else Status.Text = result.Error + " Your source draft has been retained; correct it or use Undo within the source panel.";
         }
         catch (OperationCanceledException) { }

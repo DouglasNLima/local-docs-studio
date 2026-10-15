@@ -14,7 +14,7 @@
   <Setter Property="Margin" Value="0,20,0,10"/><Setter Property="TextWrapping" Value="Wrap"/>
  </Style>
  <Style x:Key="Mermaid.PaletteItem" TargetType="Button" BasedOn="{StaticResource Form.Action}">
-  <Setter Property="Margin" Value="2"/><Setter Property="Padding" Value="4,8"/><Setter Property="MinHeight" Value="66"/>
+  <Setter Property="Margin" Value="2"/><Setter Property="Padding" Value="4,5"/><Setter Property="MinHeight" Value="56"/>
   <Setter Property="Background" Value="{DynamicResource WindowBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
   <Setter Property="HorizontalContentAlignment" Value="Stretch"/><Setter Property="Cursor" Value="Hand"/>
  </Style>
@@ -54,8 +54,8 @@
    <Grid><Grid.RowDefinitions><RowDefinition Height="40"/><RowDefinition Height="*"/></Grid.RowDefinitions>
     <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"/>
     <ToggleButton x:Name="HeaderSite" IsChecked="{Binding IsExpanded, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" HorizontalAlignment="Left" Padding="10,6" Background="Transparent" BorderThickness="0" Foreground="{TemplateBinding Foreground}" AutomationProperties.Name="Expand or collapse Mermaid source" AutomationProperties.AutomationId="MermaidSourceToggle">
-     <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border x:Name="Surface" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" Padding="{TemplateBinding Padding}" CornerRadius="4"><StackPanel Orientation="Horizontal"><Path Data="M1,1 L5,5 9,1" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" Width="10" Height="6" Margin="0,0,8,0" VerticalAlignment="Center"/><ContentPresenter VerticalAlignment="Center"/></StackPanel></Border>
-      <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource HoverBrush}"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger></ControlTemplate.Triggers>
+     <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border x:Name="Surface" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" Padding="{TemplateBinding Padding}" CornerRadius="4"><StackPanel Orientation="Horizontal"><Path x:Name="Chevron" RenderTransformOrigin="0.5,0.5" Data="M1,1 L5,5 9,1" Stroke="{TemplateBinding Foreground}" StrokeThickness="1.4" Width="10" Height="6" Margin="0,0,8,0" VerticalAlignment="Center"/><ContentPresenter VerticalAlignment="Center"/></StackPanel></Border>
+      <ControlTemplate.Triggers><Trigger Property="IsChecked" Value="False"><Setter TargetName="Chevron" Property="RenderTransform"><Setter.Value><RotateTransform Angle="-90"/></Setter.Value></Setter></Trigger><Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Surface" Property="Background" Value="{DynamicResource HoverBrush}"/></Trigger><Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="Surface" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger></ControlTemplate.Triggers>
      </ControlTemplate></ToggleButton.Template><ContentPresenter Content="{TemplateBinding Header}"/>
     </ToggleButton>
     <ContentPresenter x:Name="Body" Grid.Row="1" ContentSource="Content"/>

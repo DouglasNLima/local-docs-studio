@@ -99,7 +99,7 @@ public partial class MermaidVisualEditorWindow
             Canvas.SetLeft(portButton, box.X + box.Width - 16); Canvas.SetTop(portButton, box.CentreY - 16); Panel.SetZIndex(portButton, 30);
             DiagramCanvas.Children.Add(portButton); ports[key] = portButton;
         }
-        UpdateCanvasSelection(); UpdateExtent();
+        AddConnectionGuide(); UpdateCanvasSelection(); UpdateExtent();
     }
     private ToggleButton ElementButton(string key, string name, object content, MermaidLayoutBox box)
     {
@@ -183,6 +183,7 @@ public partial class MermaidVisualEditorWindow
     }
     private void UpdateCanvasSelection()
     {
+        UpdateConnectionGuide();
         synchronisingCanvasSelection = true;
         try
         {
