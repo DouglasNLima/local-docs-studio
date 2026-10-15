@@ -59,7 +59,9 @@ internal static partial class NativeUiChecks
                 var duplicate = Draft(); Click("MermaidUndo"); AwaitSource(text => text == source);
                 Click("MermaidRedo"); AwaitSource(text => text == duplicate); Click("MermaidUndo"); AwaitSource(text => text == source);
                 Check(Draft() == source, "Multi-node duplication includes the internal connection and private Undo restores exact source");
-                Click("MermaidCopySource"); Check(NativeUiClipboard.GetText() == source, "Source-header copy emits the exact draft"); clipboardOwned = GetClipboardSequenceNumber();
+                Click("MermaidCopySource");
+                Wait(() => NativeUiClipboard.GetText() == source, "Source-header copy did not place the exact draft on the actual clipboard.");
+                Check(true, "Source-header copy emits the exact draft"); clipboardOwned = GetClipboardSequenceNumber();
                 var toggle = Find(visual!, "MermaidSourceToggle");
                 var beforeHeight = Find(visual!, "MermaidViewport").BoundingRectangle.Height;
                 toggle.Patterns.Toggle.Pattern.Toggle();
