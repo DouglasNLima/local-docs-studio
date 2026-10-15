@@ -2,6 +2,7 @@ using System.Windows;
 using ICSharpCode.AvalonEdit.Document;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.State;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -64,7 +65,7 @@ public partial class MainWindow
                 return null;
             }
             catch (ArgumentException error) { return error.Message; }
-        }, ThemeService.IsDark(model.Theme), CurrentDiagramTheme, editSource, ExportDiagram) { Owner = this };
+        }, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram) { Owner = this };
         window.Show();
     }
 }

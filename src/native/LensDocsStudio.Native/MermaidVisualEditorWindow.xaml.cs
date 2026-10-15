@@ -280,7 +280,7 @@ public partial class MermaidVisualEditorWindow : Window
             NodeClass.ItemsSource = draft.Model.Styles.Where(style => style.Kind == "classDef").SelectMany(style => style.Targets).Select(target => target.Id).Distinct().ToArray();
             NodeClass.SelectedItem = draft.Model.ClassForNode(node.Id);
             var palette = DiagramThemes.Colours(DiagramThemes.ResolveName(diagramTheme, dark));
-            var colours = Colours(node, palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
+            var colours = Colours(node, palette.Surface ?? palette.Background, palette.Border ?? palette.Accent, palette.Foreground);
             FillColour.Text = Hex(colours.Fill); StrokeColour.Text = Hex(colours.Stroke); TextColour.Text = Hex(colours.Text);
         }
         else if (key.StartsWith("edge-", StringComparison.Ordinal))

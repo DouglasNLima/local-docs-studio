@@ -57,7 +57,7 @@ public partial class MermaidVisualEditorWindow
         {
             var key = "node:" + node.Id; if (!positions.TryGetValue(key, out var box)) continue;
             var palette = DiagramThemes.Colours(DiagramThemes.ResolveName(diagramTheme, dark));
-            var (fill, stroke, text) = Colours(node, palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
+            var (fill, stroke, text) = Colours(node, palette.Surface ?? palette.Background, palette.Border ?? palette.Accent, palette.Foreground);
             var grid = new Grid();
             grid.Children.Add(new System.Windows.Shapes.Path { Data = NodeGeometry(node.Shape, box.Width - 10, box.Height - 10),
                 Stretch = Stretch.Fill, Fill = fill, Stroke = stroke, StrokeThickness = 1.5, Margin = new(3) });
@@ -210,7 +210,7 @@ public partial class MermaidVisualEditorWindow
             button.Foreground = BrushResource("TextBrush");
             if (key.StartsWith("node:", StringComparison.Ordinal) && button.Content is Grid grid)
             {
-                var colours = Colours(draft.Model.Node(key[5..]), palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
+                var colours = Colours(draft.Model.Node(key[5..]), palette.Surface ?? palette.Background, palette.Border ?? palette.Accent, palette.Foreground);
                 var shape = grid.Children.OfType<System.Windows.Shapes.Path>().Single(); shape.Fill = colours.Fill; shape.Stroke = colours.Stroke;
                 grid.Children.OfType<TextBlock>().Single().Foreground = colours.Text;
             }
