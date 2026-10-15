@@ -253,11 +253,16 @@ public sealed class MermaidTransformationService
             else if (parts[0] is "stroke-width" or "font-size")
             {
                 var number = parts[1].EndsWith("px", StringComparison.Ordinal) ? parts[1][..^2] : parts[1];
-                if (!double.TryParse(number, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out var size) || size is < 0 or > 64)
+                if (!double.TryParse(number, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out var size) || !double.IsFinite(size) || size is < 0 or > 64)
                     throw new ArgumentException("Copied numeric style values must be between 0 and 64 pixels.");
             }
             else if (parts[0] == "stroke-dasharray")
-            { if (parts[1].Length > 32 || parts[1].Any(character => !char.IsAsciiDigit(character) && character is not (' ' or '.'))) throw new ArgumentException("This dash pattern is protected. Use source mode."); }
+            {
+                var numbers = parts[1].Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                if (parts[1].Length > 32 || numbers.Length is 0 or > 8 || numbers.Any(number =>
+                    !double.TryParse(number, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out var size)
+                    || !double.IsFinite(size) || size is < 0 or > 64)) throw new ArgumentException("This dash pattern is protected. Use source mode.");
+            }
             else if (parts[0] == "font-weight")
             { if (parts[1] is not ("normal" or "bold" or "400" or "600" or "700")) throw new ArgumentException("This font weight is protected. Use source mode."); }
             else throw new ArgumentException("This copied style uses a protected property. Use source mode to retain it.");
