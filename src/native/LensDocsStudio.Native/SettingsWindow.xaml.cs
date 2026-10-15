@@ -13,12 +13,14 @@ public partial class SettingsWindow : Window
     private readonly SettingsViewModel model;
     private readonly string exportRecovery;
     private readonly Func<string, byte[], Task>? exportCompleted;
+    private readonly Action? exportStarting;
     private CancellationTokenSource? transfer;
     private bool closeRequested;
-    public SettingsWindow(SettingsViewModel model, string exportRecovery, Func<string, byte[], Task>? exportCompleted = null)
+    public SettingsWindow(SettingsViewModel model, string exportRecovery, Func<string, byte[], Task>? exportCompleted = null, Action? exportStarting = null)
     {
         this.model = model; this.exportRecovery = exportRecovery;
         this.exportCompleted = exportCompleted;
+        this.exportStarting = exportStarting;
         InitializeComponent(); DataContext = model; WindowStateService.FitInitialWindow(this);
         var applied = false;
         model.Applied += () => { applied = true; DialogResult = true; };
@@ -66,13 +68,14 @@ public partial class SettingsWindow : Window
     private async void ExportSettings(object sender, RoutedEventArgs e)
     {
         if (!model.CanEdit) return;
+        exportStarting?.Invoke();
         var picker = new SaveFileDialog { Title = "Export appearance settings", Filter = "Lens appearance settings|*.json",
             FileName = "lens-docs-studio-settings.json", DefaultExt = ".json", AddExtension = true, OverwritePrompt = true };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { model.Status = "Settings export cancelled."; return; }
         await Transfer(async token =>
         {
             var bytes = SettingsTransferFormat.Write(model.Current);
-            if (!Path.GetExtension(picker.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .json extension for an appearance-settings export.");
+            if (!Path.GetExtension(picker.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .json extension when exporting appearance settings.");
             if (File.Exists(picker.FileName) && new FileInfo(picker.FileName).Length > SettingsTransferFormat.MaximumBytes)
                 throw new IOException("The existing destination exceeds 64 KB. Choose a new settings filename.");
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token);

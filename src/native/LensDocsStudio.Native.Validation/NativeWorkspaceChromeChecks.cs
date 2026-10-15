@@ -89,6 +89,20 @@ internal static class NativeWorkspaceChromeChecks
             Complete(model.SetWorkspaceAsync(other));
             if (model.Entries.Single().Name != "other.md" || active.WorkspaceRoot != retainedRoot || active.EditorDocument.Text != retainedText)
                 throw new IOException("Opening another workspace changed the previous document's context.");
+            var many = Path.Combine(root, "Many documents"); Directory.CreateDirectory(many);
+            var manyPaths = Enumerable.Range(1, 256).Select(index => Path.Combine(many, $"Document {index:000}.md")).ToArray();
+            foreach (var path in manyPaths) File.WriteAllText(path, "# " + Path.GetFileNameWithoutExtension(path) + "\n");
+            Complete(model.SetWorkspaceAsync(many));
+            if (model.Entries.Count != manyPaths.Length) throw new IOException("The many-file workspace did not enumerate completely.");
+            Complete(model.CloseWorkspaceCommand.ExecuteAsync(null)); Complete(Task.Delay(500));
+            if (model.WorkspaceRoot is not null || model.Entries.Count != 0 || !model.Documents.SequenceEqual(retainedDocuments) || active.EditorDocument.Text != retainedText)
+                throw new IOException("Closing the many-file workspace repopulated its tree or lost retained document state.");
+            foreach (var path in manyPaths)
+                if (File.ReadAllText(path) != "# " + Path.GetFileNameWithoutExtension(path) + "\n") throw new IOException("Workspace closure mutated a many-file source.");
+            var empty = Path.Combine(root, "Empty workspace"); Directory.CreateDirectory(empty); Complete(model.SetWorkspaceAsync(empty));
+            if (model.Entries.Count != 0 || !model.CloseWorkspaceCommand.CanExecute(null) || model.WorkspaceEmptyMessage.Length == 0)
+                throw new IOException("An empty workspace lost its closure action or useful empty state.");
+            Complete(model.CloseWorkspaceCommand.ExecuteAsync(null));
             for (var index = 0; index < paths.Length; index++)
                 if (!File.ReadAllBytes(paths[index]).SequenceEqual(snapshots[index])) throw new IOException("Workspace chrome changed document bytes.");
             Directory.CreateDirectory(output);
@@ -96,6 +110,7 @@ internal static class NativeWorkspaceChromeChecks
                 Passed = true, FilteringPreservesNodes = true, ExpansionRetained = true, ActiveDocumentRetained = true,
                 PinsSurviveCloseOthers = true, PinsAndTabOrderRestored = true, SourceBytesPreserved = true,
                 MutableAndExternallyRenamedIcons = true, CloseStopsMonitoringAndPendingRefresh = true,
+                ManyFileCount = manyPaths.Length, ManyAndEmptyWorkspaceClosure = true,
                 CloseRetainsTabsDraftsAndAssets = true, ClosedSessionRestored = true, WorkspaceReopenAndSwitch = true }));
         }
         finally { SynchronizationContext.SetSynchronizationContext(previous); }

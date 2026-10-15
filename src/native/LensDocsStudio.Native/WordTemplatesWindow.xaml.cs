@@ -12,6 +12,7 @@ public partial class WordTemplatesWindow : Window
     private readonly string exportRecovery;
     private readonly Guid? currentId;
     private readonly Func<string, byte[], Task>? exportCompleted;
+    private readonly Action? exportStarting;
     private IReadOnlyList<string> warnings = [];
     private CancellationTokenSource? operation;
     private CancellationTokenSource? inspection;
@@ -22,10 +23,12 @@ public partial class WordTemplatesWindow : Window
     public string CurrentName { get; private set; }
     private WordTemplateEntry? Selected => TemplateList.SelectedItem as WordTemplateEntry;
 
-    public WordTemplatesWindow(WordTemplateLibrary library, WordTemplateListing listing, string exportRecovery, Guid? currentId, string currentName, Func<string, byte[], Task>? exportCompleted = null)
+    public WordTemplatesWindow(WordTemplateLibrary library, WordTemplateListing listing, string exportRecovery, Guid? currentId, string currentName,
+        Func<string, byte[], Task>? exportCompleted = null, Action? exportStarting = null)
     {
         this.library = library; this.exportRecovery = exportRecovery; this.currentId = currentId; CurrentName = currentName;
         this.exportCompleted = exportCompleted;
+        this.exportStarting = exportStarting;
         InitializeComponent(); WindowStateService.FitInitialWindow(this); CurrentStyles.Text = "Current styles: " + currentName;
         Populate(listing, currentId); SetControls();
         Closing += (_, e) => { if (busy) { closeRequested = true; operation?.Cancel(); e.Cancel = true; } };
@@ -165,10 +168,11 @@ public partial class WordTemplatesWindow : Window
     private async void SaveCopy(object sender, RoutedEventArgs e)
     {
         if (Selected is not { } entry) return;
+        exportStarting?.Invoke();
         var invalid = Path.GetInvalidFileNameChars(); var filename = string.Concat(entry.Name.Select(character => invalid.Contains(character) ? '_' : character)).Trim(' ', '.');
         var picker = new SaveFileDialog { Title = "Save Word template copy", Filter = "Word template document|*.docx", DefaultExt = ".docx", AddExtension = true,
             FileName = (filename.Length == 0 ? "Word template" : filename) + ".docx" };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { LibraryStatus.Text = "Template copy cancelled."; return; }
         await Run(async token =>
         {
             if (!Path.GetExtension(picker.FileName).Equals(".docx", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .docx extension for a Word template copy.");

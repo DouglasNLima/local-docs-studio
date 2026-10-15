@@ -24,7 +24,8 @@ public partial class MainWindow
             if (themeChanged || diagramThemeChanged) QueuePreview();
             model.Status = "Settings saved.";
         }, model.Preferences.Desktop);
-        new SettingsWindow(settingsModel, Path.Combine(model.StateDirectory, "export-recovery"), (path, bytes) => model.CompleteExportAsync(path, bytes)) { Owner = this }.ShowDialog();
+        new SettingsWindow(settingsModel, Path.Combine(model.StateDirectory, "export-recovery"),
+            (path, bytes) => model.CompleteExportAsync(path, bytes), () => model.DismissExportCommand.Execute(null)) { Owner = this }.ShowDialog();
         if (editorFocus && Editor.IsVisible) Editor.Focus(); else if (previewFocus && Preview.IsVisible) Preview.Focus();
     }
 

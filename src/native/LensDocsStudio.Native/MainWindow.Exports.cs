@@ -16,11 +16,12 @@ public partial class MainWindow
     private async void ExportDocsSite(object sender, RoutedEventArgs e)
     {
         if (model.WorkspaceRoot is not { } root) { dialogs.Error("Open a workspace folder before exporting a Docs Site."); return; }
+        model.DismissExportCommand.Execute(null);
         var options = new DocsSiteWindow(Path.GetFileName(root), recentDocsSiteOptions ?? activeExportProfile?.DocsSite) { Owner = this };
-        if (options.ShowDialog() != true) return;
+        if (options.ShowDialog() != true) { model.Status = "Docs Site export cancelled."; return; }
         recentDocsSiteOptions = new(options.Options.Title, options.Options.Description, options.Options.Theme);
         var picker = new SaveFileDialog { Title = "Save Docs Site", Filter = "Docs Site ZIP|*.zip", FileName = "documentation-site.zip", AddExtension = true, DefaultExt = ".zip" };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { model.Status = "Docs Site export cancelled."; return; }
         if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for a Docs Site."); return; }
         var edited = model.Documents.Where(d => d.FilePath is not null).ToDictionary(d => d.FilePath!, d => d.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
         var artifactBundle = ArtifactFor(root);
@@ -39,12 +40,13 @@ public partial class MainWindow
     private async void ExportDocument(object sender, RoutedEventArgs e)
     {
         if (model.ActiveDocument is not { } tab) return;
+        model.DismissExportCommand.Execute(null);
         var format = (string)((FrameworkElement)sender).Tag;
         var extension = format.ToLowerInvariant();
         var picker = new SaveFileDialog { Title = "Export " + format, Filter = format + " document|*." + extension,
             FileName = Path.GetFileNameWithoutExtension(tab.FilePath ?? "document") + "." + extension,
             AddExtension = true, DefaultExt = "." + extension };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { model.Status = format + " export cancelled."; return; }
         if (!Path.GetExtension(picker.FileName).Equals("." + extension, StringComparison.OrdinalIgnoreCase))
         { dialogs.Error("Use the ." + extension + " extension for this export."); return; }
         var source = tab.EditorDocument.Text;
@@ -85,7 +87,8 @@ public partial class MainWindow
         {
             var library = new WordTemplateLibrary(Path.Combine(model.StateDirectory, "word-templates"));
             var listing = await Task.Run(() => library.ListAsync(cancellationToken: model.OperationToken), model.OperationToken);
-            var window = new WordTemplatesWindow(library, listing, Path.Combine(model.StateDirectory, "export-recovery"), wordTemplateId, wordTemplateName, (path, bytes) => model.CompleteExportAsync(path, bytes)) { Owner = this };
+            var window = new WordTemplatesWindow(library, listing, Path.Combine(model.StateDirectory, "export-recovery"), wordTemplateId, wordTemplateName,
+                (path, bytes) => model.CompleteExportAsync(path, bytes), () => model.DismissExportCommand.Execute(null)) { Owner = this };
             var selected = window.ShowDialog(); wordTemplateName = window.CurrentName;
             if (selected != true) return;
             wordTemplate = window.SelectedBytes; wordTemplateId = window.SelectedId; wordTemplateName = window.SelectedName;

@@ -469,9 +469,10 @@ public partial class MainWindow : Window
         {
             if (format == "Zoom") { new DiagramWindow(svg.Render(value), selected => ExportDiagram(selected, value)) { Owner = this }.Show(); return; }
             if (format == "Copy source") { Clipboard.SetText(value); model.Status = "Diagram source copied"; return; }
+            model.DismissExportCommand.Execute(null);
             var extension = format.ToLowerInvariant();
             var dialog = new SaveFileDialog { Filter = format + " diagram|*." + extension, FileName = "diagram." + extension };
-            if (dialog.ShowDialog(this) != true) return;
+            if (dialog.ShowDialog(this) != true) { model.Status = "Diagram export cancelled."; return; }
             if (!Path.GetExtension(dialog.FileName).Equals("." + extension, StringComparison.OrdinalIgnoreCase))
             { model.Status = "Use the ." + extension + " extension for this diagram export."; return; }
             await model.RunAsync(async () =>

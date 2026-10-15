@@ -19,16 +19,19 @@ public partial class ContentLibraryWindow : Window
     private readonly LocalLibraryStore store;
     private readonly string exportRecovery;
     private readonly Func<string, byte[], Task>? exportCompleted;
+    private readonly Action? exportStarting;
     private LocalLibrarySnapshot snapshot;
     private CancellationTokenSource? operation;
     private bool ready, busy, closeRequested;
     public ContentLibraryEntry? SelectedEntry { get; private set; }
     private ContentLibraryEntry? Selected => Entries.SelectedItem as ContentLibraryEntry;
 
-    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template, Func<string, byte[], Task>? exportCompleted = null)
+    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template,
+        Func<string, byte[], Task>? exportCompleted = null, Action? exportStarting = null)
     {
         this.store = store; this.snapshot = snapshot; this.exportRecovery = exportRecovery;
         this.exportCompleted = exportCompleted;
+        this.exportStarting = exportStarting;
         InitializeComponent(); WindowStateService.FitInitialWindow(this); Kind.SelectedIndex = (int)kind;
         ready = true; Populate();
         Closing += (_, e) => { if (busy) { closeRequested = true; operation?.Cancel(); e.Cancel = true; } };
@@ -88,10 +91,11 @@ public partial class ContentLibraryWindow : Window
     }
     private async void Export(object sender, RoutedEventArgs e)
     {
+        exportStarting?.Invoke();
         var archived = Archived.IsChecked == true;
         var picker = new SaveFileDialog { Title = "Export content library", Filter = "Lens Docs Studio library|*.json", DefaultExt = ".json", AddExtension = true,
             FileName = archived ? "lens-docs-studio-archived-library.json" : "lens-docs-studio-library.json" };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { Status.Text = "Library export cancelled."; return; }
         await Run(async token =>
         {
             if (!Path.GetExtension(picker.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .json extension for a library export.");

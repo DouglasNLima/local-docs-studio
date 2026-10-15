@@ -21,7 +21,8 @@ public partial class MainWindow
         await model.RunAsync(async () =>
         {
             var store = ContentLibrary; var snapshot = await Task.Run(() => store.ReadAsync(model.OperationToken), model.OperationToken);
-            var window = new ContentLibraryWindow(store, snapshot, Path.Combine(model.StateDirectory, "export-recovery"), kind, (path, bytes) => model.CompleteExportAsync(path, bytes)) { Owner = this };
+            var window = new ContentLibraryWindow(store, snapshot, Path.Combine(model.StateDirectory, "export-recovery"), kind,
+                (path, bytes) => model.CompleteExportAsync(path, bytes), () => model.DismissExportCommand.Execute(null)) { Owner = this };
             if (window.ShowDialog() != true || window.SelectedEntry is not { } selected) return;
             if (selected.Profile is { } profile) { ApplyProfile(profile); return; }
             if (selected.Item is not { } item) return;

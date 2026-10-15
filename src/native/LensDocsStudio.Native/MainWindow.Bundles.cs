@@ -30,8 +30,9 @@ public partial class MainWindow
     private async void ExportBundle(object sender, RoutedEventArgs e)
     {
         if (model.WorkspaceRoot is not { } root) { dialogs.Error("Open a workspace folder before exporting a Markdown bundle."); return; }
+        model.DismissExportCommand.Execute(null);
         var picker = new SaveFileDialog { Title = "Export Markdown bundle", Filter = "ZIP bundle|*.zip", FileName = "documentation.zip", AddExtension = true };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { model.Status = "Markdown bundle export cancelled."; return; }
         if (!Path.GetExtension(picker.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase)) { dialogs.Error("Use the .zip extension for a Markdown bundle."); return; }
         var edited = model.Documents.Where(d => d.FilePath is not null).ToDictionary(d => d.FilePath!, d => d.EditorDocument.Text, StringComparer.OrdinalIgnoreCase);
         await model.RunAsync(async () =>

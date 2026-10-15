@@ -68,8 +68,24 @@ internal static partial class NativeUiChecks
         var exported = Path.Combine(root, "refinement-export.html"); save(exported, "Export HTML");
         Wait(() => File.Exists(exported) && ExportCompleted(window, exported), "Export feedback did not identify its actual successfully saved destination.");
         window.CaptureToFile(Path.Combine(output, "native-refinement-export-completed.png"));
+        Find(window, "ExportMenu").Click(); Find(window, "ExportHtml").AsMenuItem().Invoke();
+        Window? cancelledSave = null;
+        Wait(() => (cancelledSave = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Export HTML")))?.AsWindow()) is not null,
+            "The cancellation fixture did not open its native Save dialogue.");
+        cancelledSave!.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName("Cancel")))!.AsButton().Invoke();
+        Wait(() => Find(window, "Status").Name == "HTML export cancelled."
+            && window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"))?.IsOffscreen != false,
+            "A cancelled native Save dialogue retained an earlier success action.");
+        Find(window, "ExportMenu").Click(); Find(window, "ExportHtml").AsMenuItem().Invoke();
+        exported = Path.Combine(root, "refinement-export-2.html"); save(exported, "Export HTML");
+        Wait(() => File.Exists(exported) && ExportCompleted(window, exported), "The second sequential export did not replace its completion destination.");
         Find(window, "ExportMenu").Click(); Find(window, "RecentExportsMenu").AsMenuItem().Expand();
-        Wait(() => Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem)).Any(item => item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal)),
+        Wait(() =>
+        {
+            var recent = Find(window, "RecentExportsMenu").FindAllDescendants(cf => cf.ByControlType(ControlType.MenuItem));
+            return recent.Any(item => item.Name.StartsWith("refinement-export.html", StringComparison.Ordinal))
+                && recent.Any(item => item.Name.StartsWith("refinement-export-2.html", StringComparison.Ordinal));
+        },
             "The completed output is absent from session-scoped recent exports.");
         window.CaptureToFile(Path.Combine(output, "native-refinement-recent-exports.png")); Keyboard.Type(VirtualKeyShort.ESCAPE); Keyboard.Type(VirtualKeyShort.ESCAPE);
         Find(window, "RevealExportedFile").AsButton().Invoke();
@@ -79,7 +95,7 @@ internal static partial class NativeUiChecks
             explorer = automation.GetDesktop().FindAllChildren(cf => cf.ByControlType(ControlType.Window))
                 .Where(candidate => candidate.Properties.ProcessId.ValueOrDefault != process)
                 .FirstOrDefault(candidate => candidate.FindAllDescendants(cf => cf.ByControlType(ControlType.ListItem))
-                    .Any(item => (item.Name == "refinement-export.html" || item.Name == "refinement-export")
+                    .Any(item => (item.Name == "refinement-export-2.html" || item.Name == "refinement-export-2")
                         && item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value))?.AsWindow();
             return explorer is not null;
         }, "Show in folder did not select the actual saved output in Windows Explorer.");
@@ -93,7 +109,8 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(output, "native-refinement.json"), JsonSerializer.Serialize(new { Passed = true,
             Header = observations, AccessibleFileTypesAndExternalRename = true, SettingsSearchStagesAndCancels = true,
             LastTwoRowWidth = lower, FirstSingleRowWidth = upper,
-            WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
+            WorkspaceClosePreservesDraftRootsAndUndo = true, ExportDestinationAndHistory = true, ActualSavePickerCancellation = true,
+            SequentialExportReplacement = true, ActualExplorerSelection = true, MissingExportRejectedBeforeShell = true }, new JsonSerializerOptions { WriteIndented = true }));
 
         bool CheckWidth(int width, bool keyboard = false)
         {
