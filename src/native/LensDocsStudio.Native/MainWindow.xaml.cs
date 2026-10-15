@@ -53,6 +53,7 @@ public partial class MainWindow : Window
         this.model = model; this.dialogs = dialogs; this.startupPaths = startupPaths;
         InitializeComponent(); DataContext = model;
         InitialiseExportFeedback();
+        DocumentTabs.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler(TabStripViewportChanged));
         InitialiseSynchronisation();
         InitialiseArtifactContext();
         completion = new(Editor, () => Path.GetExtension(model.ActiveDocument?.FilePath)?.ToLowerInvariant() is ".mmd" or ".mermaid", WikiCompletionCatalogue);
@@ -126,11 +127,7 @@ public partial class MainWindow : Window
     {
         if (e.Source != DocumentTabs) return;
         BindActiveDocument(); QueuePreview();
-        var selected = model.ActiveDocument;
-        Dispatcher.BeginInvoke(() =>
-        {
-            if (model.ActiveDocument == selected && DocumentTabs.ItemContainerGenerator.ContainerFromItem(selected!) is TabItem item) item.BringIntoView();
-        }, DispatcherPriority.Loaded);
+        QueueActiveTabVisibility();
     }
     private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)

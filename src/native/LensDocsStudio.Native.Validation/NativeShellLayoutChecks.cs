@@ -29,7 +29,7 @@ internal static class NativeShellLayoutChecks
         var resources = application.Resources;
         var shutdownMode = application.ShutdownMode;
         application.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-        try { RunCases(output, application); }
+        try { RunCases(output, application); CheckActiveTabVisibility(output, application); }
         finally { application.Resources = resources; application.ShutdownMode = shutdownMode; }
     }
     private static void RunCases(string output, Application application)
@@ -120,6 +120,52 @@ internal static class NativeShellLayoutChecks
         }
         File.WriteAllText(Path.Combine(output, "native-shell-layout.json"), JsonSerializer.Serialize(new { Passed = true, Cases = checks,
             Limitation = "Hidden native windows with 100/125/150/200% raster output; this does not certify physical monitor DPI changes or screen-reader speech." }, new JsonSerializerOptions { WriteIndented = true }));
+    }
+    private static void CheckActiveTabVisibility(string output, Application application)
+    {
+        application.Resources = new ResourceDictionary(); ThemeService.Apply(application.Resources, "Light");
+        var state = Path.Combine(output, "tabs-" + Guid.NewGuid().ToString("N"));
+        var dialogs = new DesktopDialogs();
+        using var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(state, "writes")), new SessionStore(state), new WorkspaceService(), dialogs);
+        for (var index = 1; index <= 9; index++)
+        {
+            model.NewDocumentCommand.Execute(null);
+            model.ActiveDocument!.DisplayName = $"Note {index} — draft.md";
+        }
+        var active = model.ActiveDocument!; active.DisplayName = "Document 9 — working notes.md"; active.EditorDocument.Text = "# Retained source";
+        var version = active.EditorDocument.Version;
+        var window = new MainWindow(model, dialogs, []);
+        try
+        {
+            var content = (DockPanel)window.Content; window.Content = null; content.DataContext = model;
+            var surface = new Border { Child = content }; surface.Resources.MergedDictionaries.Add(window.Resources);
+            using var host = new HwndSource(new HwndSourceParameters("Native active tab validation") { Width = 1440, Height = 900, WindowStyle = unchecked((int)0x80000000) });
+            host.RootVisual = surface;
+            var observations = new List<object>();
+            var previousWidth = 0;
+            foreach (var width in new[] { 1440, 860, 1280, 1280, 860, 1920, 1280 })
+            {
+                if (width == previousWidth)
+                    foreach (var document in model.Documents.Take(8)) document.DisplayName = "A much longer documentation filename.md";
+                var size = new Size(width, 800); surface.Measure(size); surface.Arrange(new Rect(size)); surface.UpdateLayout();
+                var frame = new System.Windows.Threading.DispatcherFrame();
+                System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, () => frame.Continue = false);
+                System.Windows.Threading.Dispatcher.PushFrame(frame); surface.UpdateLayout();
+                var tabs = (TabControl)window.FindName("DocumentTabs");
+                var viewer = Descendants(tabs).OfType<ScrollViewer>().First();
+                var tab = (TabItem)tabs.ItemContainerGenerator.ContainerFromItem(active);
+                var close = Descendants(tab).OfType<Button>().Single(button => System.Windows.Automation.AutomationProperties.GetName(button) == "Close document");
+                var bounds = new Rect(close.TranslatePoint(new(), viewer), close.RenderSize);
+                observations.Add(new { Width = width, viewer.ViewportWidth, viewer.ExtentWidth, viewer.HorizontalOffset, CloseBounds = bounds });
+                if (bounds.Left < 0 || bounds.Right > viewer.ViewportWidth + 0.1 || bounds.Width < 15 || !close.IsVisible
+                    || model.ActiveDocument != active || active.EditorDocument.Version != version)
+                    throw new IOException("The active tab close action was clipped after viewport/header extent changes: " + JsonSerializer.Serialize(observations[^1]));
+                previousWidth = width;
+            }
+            File.WriteAllText(Path.Combine(output, "native-active-tab-visibility.json"), JsonSerializer.Serialize(new { Passed = true, Cases = observations }));
+            host.RootVisual = null; surface.Child = null;
+        }
+        finally { typeof(MainWindow).GetMethod("CompleteClose", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, null); }
     }
     private static IEnumerable<DependencyObject> Descendants(DependencyObject root)
     {

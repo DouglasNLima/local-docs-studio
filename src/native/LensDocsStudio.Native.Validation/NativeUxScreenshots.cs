@@ -81,6 +81,27 @@ internal static partial class NativeUiChecks
                         Revision = revision, Screenshot = screenshot, HighContrast = highContrast, OverflowCommands = overflowCommands,
                         PhysicalDpiCertified = false, AccessibilityCertified = false });
                 }
+                catch
+                {
+                    try
+                    {
+                    var failed = app.GetMainWindow(automation, TimeSpan.FromSeconds(2));
+                    failed?.CaptureToFile(Path.Combine(output, "native-screenshot-failure.png"));
+                    if (failed is not null)
+                    {
+                        var strip = Find(failed, "DocumentTabs");
+                        File.WriteAllText(Path.Combine(output, "native-screenshot-failure-tabs.json"), JsonSerializer.Serialize(new {
+                            Strip = strip.BoundingRectangle,
+                            Tabs = strip.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem))
+                                .Select(tab => new { tab.Name, tab.IsOffscreen, Bounds = tab.BoundingRectangle,
+                                    Buttons = tab.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))
+                                        .Select(button => new { button.Name, button.IsOffscreen, Bounds = button.BoundingRectangle }).ToArray() }).ToArray()
+                        }));
+                    }
+                    }
+                    catch (Exception diagnostic) { File.WriteAllText(Path.Combine(output, "native-screenshot-failure-capture.txt"), diagnostic.ToString()); }
+                    throw;
+                }
                 finally { if (!process.HasExited) { process.Kill(); process.WaitForExit(10000); } }
             }
             display.Complete();
