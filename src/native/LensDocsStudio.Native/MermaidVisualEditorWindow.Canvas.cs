@@ -261,7 +261,7 @@ public partial class MermaidVisualEditorWindow
     {
         if (!CanTransform || !positions.TryGetValue("node:" + id, out var box)) return;
         if (inlineEditor is not null) DiagramCanvas.Children.Remove(inlineEditor);
-        var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };
+        var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, MaxLength = 4096, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };
         inlineEditor = editor; AutomationProperties.SetName(editor, "Edit label for node " + id); AutomationProperties.SetAutomationId(editor, "MermaidInlineLabel");
         Canvas.SetLeft(editor, box.X + 8); Canvas.SetTop(editor, box.CentreY - 20); Panel.SetZIndex(editor, 50); DiagramCanvas.Children.Add(editor);
         editor.PreviewKeyDown += async (_, e) =>

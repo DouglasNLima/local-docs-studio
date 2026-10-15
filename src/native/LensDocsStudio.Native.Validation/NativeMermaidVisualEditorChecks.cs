@@ -132,6 +132,13 @@ internal static partial class NativeUiChecks
                 Check(!Find(visual!, "MermaidApply").IsEnabled, "Invalid pending colours cannot enable document Apply");
                 Check(Draft() == safe, "Invalid hexadecimal colour keeps exact source and pending inspector protection");
                 Click("MermaidResetProperties"); Check(Draft() == safe && Find(visual!, "MermaidApply").IsEnabled, "Explicit property reset restores the validated draft");
+                var fill = Find(visual!, "MermaidFillColour").AsTextBox(); fill.Focus();
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.Type("#11223344");
+                Wait(() => fill.Text == "#11223344", "Keyboard colour input was truncated instead of retaining the complete invalid value.");
+                Check(true, "Keyboard colour input retains an invalid long value instead of truncating it to an accepted prefix");
+                Click("MermaidApplyStyle"); Wait(() => Find(visual!, "MermaidResetProperties").IsEnabled, "Long colour validation did not return to the inspector.");
+                Check(Draft() == safe && !Find(visual!, "MermaidApply").IsEnabled, "Invalid long colour is rejected without source mutation");
+                Click("MermaidResetProperties");
             }
             Find(visual!, "MermaidFillColour").AsTextBox().Text = "#E8F3FA"; Click("MermaidApplyStyle");
             AwaitSource(text => text.Contains("style Node1 fill:#E8F3FA", StringComparison.Ordinal));
