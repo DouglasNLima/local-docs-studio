@@ -196,6 +196,17 @@ public sealed class MermaidVisualTests
     }
 
     private static void AssertEditable(MermaidDiagramModel model) => Assert.True(model.CanEdit, model.Diagnostic);
+    [Fact]
+    public async Task Compound_property_edits_are_atomic_and_one_undo_restores_the_whole_draft()
+    {
+        var draft = new MermaidVisualDraft(Styled);
+        var result = await draft.ExecuteBatchAsync([new UpdateMermaidNode("B", "Updated", FlowNodeShape.Decision, "Output"),
+            new SetMermaidClass("Output", "control"), new SetMermaidStyle("Output", "#FAFAFA", "#123456", "#202124")]);
+        Assert.True(result.Success, result.Error); Assert.Contains("class Output control", draft.Source);
+        draft.Undo(); Assert.Equal(Styled, draft.Source); Assert.False(draft.CanUndo);
+        result = await draft.ExecuteBatchAsync([new AddMermaidNode("C", "New", FlowNodeShape.Process), new AddMermaidNode("A", "Duplicate", FlowNodeShape.Process)]);
+        Assert.False(result.Success); Assert.Equal(Styled, draft.Source); Assert.False(draft.CanUndo); Assert.True(draft.CanRedo);
+    }
     private static async Task Execute(MermaidVisualDraft draft, MermaidEditOperation operation)
     { var result = await draft.ExecuteAsync(operation); Assert.True(result.Success, result.Error); AssertEditable(draft.Model); }
 }

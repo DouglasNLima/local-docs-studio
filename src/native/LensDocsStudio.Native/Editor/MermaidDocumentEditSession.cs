@@ -9,12 +9,13 @@ public sealed class MermaidDocumentEditSession(DocumentViewModel owner, MermaidB
 {
     private readonly ITextSourceVersion version = owner.EditorDocument.Version;
     private readonly string? path = owner.EffectivePath;
+    private readonly string? displayName = owner.DisplayName;
     public DocumentViewModel Owner { get; } = owner;
     public MermaidBlockSource Target { get; } = target;
     public void Apply(string draft, bool ownerIsOpen)
     {
         if (!ownerIsOpen) throw new ArgumentException("The owning document has been closed. Copy the draft into an open document or cancel.");
-        if (Owner.IsSaving || Owner.EffectivePath != path) throw new ArgumentException("The owning file is being saved or its identity changed. Reopen the current diagram.");
+        if (Owner.IsSaving || Owner.EffectivePath != path || Owner.DisplayName != displayName) throw new ArgumentException("The owning file is being saved or its identity changed. Reopen the current diagram.");
         var changes = version.GetChangesTo(Owner.EditorDocument.Version)
             .Select(change => new MermaidSourceChange(change.Offset, change.RemovalLength, change.InsertionLength));
         var span = Target.Relocate(Owner.EditorDocument.Text, changes);
@@ -22,4 +23,6 @@ public sealed class MermaidDocumentEditSession(DocumentViewModel owner, MermaidB
         if (span.Read(Owner.EditorDocument.Text) == replacement) return;
         using (Owner.EditorDocument.RunUpdate()) Owner.EditorDocument.Replace(span.Start, span.Length, replacement);
     }
+    public int SourceOffset() => Target.Relocate(Owner.EditorDocument.Text, version.GetChangesTo(Owner.EditorDocument.Version)
+        .Select(change => new MermaidSourceChange(change.Offset, change.RemovalLength, change.InsertionLength))).Start;
 }

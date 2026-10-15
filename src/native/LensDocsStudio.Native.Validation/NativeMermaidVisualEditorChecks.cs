@@ -41,12 +41,13 @@ internal static partial class NativeUiChecks
             var offset = original.LastIndexOf("```mermaid", StringComparison.Ordinal); Open(offset);
             Capture("existing-light"); Select("node_B"); Capture("node-properties");
             Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review changed";
+            Check(!Find(visual!, "MermaidApply").IsEnabled, "Unapplied inspector text cannot be silently lost through Apply");
             Click("MermaidUpdateNode"); AwaitSource(text => text.Contains("B(\"Review changed\")", StringComparison.Ordinal));
             Check(ReadEditorText(editor) == original, "Draft node editing leaves the owning Markdown untouched");
             Find(visual!, "MermaidNodeId").AsTextBox().Text = "Reviewed"; Click("MermaidUpdateNode");
             AwaitSource(text => text.Contains("Reviewed(\"Review changed\")", StringComparison.Ordinal));
             Click("MermaidInsertDecision"); AwaitSource(text => text.Contains("Node1{", StringComparison.Ordinal));
-            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke(); Select("node_Node1");
+            Click("MermaidFit"); Find(visual!, "MermaidPort_Reviewed").AsButton().Invoke(); Find(visual!, "MermaidCanvas_node_Node1").Click();
             AwaitSource(text => text.Contains("Reviewed --> Node1", StringComparison.Ordinal));
             Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Confirmed"; Click("MermaidUpdateEdge");
             AwaitSource(text => text.Contains("-->|Confirmed|", StringComparison.Ordinal)); Capture("edge-properties");

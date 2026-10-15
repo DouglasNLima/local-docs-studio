@@ -18,7 +18,12 @@ public partial class MainWindow
         var standalone = IsStandaloneMermaid(tab);
         var target = MermaidBlockSource.Find(parsedDocument, standalone).SingleOrDefault(block => offset >= block.Container.Start && offset < block.Container.End);
         if (target is null) { model.Status = "This Mermaid container cannot be mapped safely. Use Edit source."; return; }
-        OpenVisualDraft(tab, new(tab, target), target.Source, () => EditDiagramSource(tab, tab.EditorDocument.Text, Math.Clamp(target.Body.Start, 0, tab.EditorDocument.TextLength)));
+        var session = new MermaidDocumentEditSession(tab, target);
+        OpenVisualDraft(tab, session, target.Source, () =>
+        {
+            try { EditDiagramSource(tab, tab.EditorDocument.Text, session.SourceOffset()); }
+            catch (ArgumentException error) { model.Status = error.Message; }
+        });
     }
     private void InsertFlowchart(object sender, RoutedEventArgs e)
     {

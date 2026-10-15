@@ -36,7 +36,7 @@
    <Button Content="Fit" Click="Fit" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="MermaidFit"/>
    <Button Content="100%" Click="ActualSize" AutomationProperties.AutomationId="MermaidActualSize"/>
    <Button Content="Reset" Click="ResetView" AutomationProperties.AutomationId="MermaidReset"/>
-   <Slider x:Name="Zoom" Minimum="10" Maximum="400" Value="100" Width="100" VerticalAlignment="Center" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="MermaidZoom"/>
+   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="100" VerticalAlignment="Center" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="MermaidZoom"/>
    <TextBlock x:Name="ZoomLabel" Text="100%" Width="50" Margin="6,5"/>
    <TextBlock Text="Direction" Margin="6,5"/>
    <ComboBox x:Name="Direction" Width="65" SelectionChanged="DirectionChanged" AutomationProperties.Name="Diagram direction" AutomationProperties.AutomationId="MermaidDirection"/>
@@ -99,6 +99,7 @@
     <StackPanel>
      <TextBlock Text="Properties" FontWeight="SemiBold" FontSize="16"/>
      <TextBlock x:Name="SelectionSummary" Text="Select a node, connection or subgraph." TextWrapping="Wrap" Margin="0,8,0,0" AutomationProperties.AutomationId="MermaidSelectionSummary"/>
+     <Button x:Name="ResetPropertiesButton" Content="Reset property changes" Click="ResetProperties" Margin="0,8,0,4" AutomationProperties.AutomationId="MermaidResetProperties"/>
      <StackPanel x:Name="NodeProperties" Visibility="Collapsed">
       <Label Content="Node _ID" Target="{Binding ElementName=NodeId}"/><TextBox x:Name="NodeId" MaxLength="128" AutomationProperties.AutomationId="MermaidNodeId"/>
       <Label Content="Node _label" Target="{Binding ElementName=NodeLabel}"/><TextBox x:Name="NodeLabel" AcceptsReturn="True" MinHeight="66" TextWrapping="Wrap" AutomationProperties.AutomationId="MermaidNodeLabel"/>

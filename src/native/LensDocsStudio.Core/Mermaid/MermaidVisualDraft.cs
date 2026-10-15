@@ -29,11 +29,31 @@ public sealed class MermaidVisualDraft
     public void Select(IEnumerable<string> selection)
     { Selection = selection.Distinct(StringComparer.Ordinal).Take(MermaidSourceParser.MaximumElements).ToArray(); history[index] = new(Source, Selection); }
     public async Task<MermaidDraftResult> ExecuteAsync(MermaidEditOperation operation, CancellationToken cancellationToken = default)
+        => await ExecuteBatchAsync([operation], cancellationToken);
+    public async Task<MermaidDraftResult> ExecuteBatchAsync(IReadOnlyList<MermaidEditOperation> operations, CancellationToken cancellationToken = default)
     {
         try
         {
-            var changes = transformations.Plan(Model, operation);
-            return await ValidateAndCommitAsync(MermaidPatches.Apply(Source, changes), cancellationToken);
+            if (operations.Count > MermaidSourceParser.MaximumElements) return new(false, "The edit exceeds the bounded operation limit.");
+            var original = Model; var generation = ++revision;
+            var candidate = await Task.Run(() =>
+            {
+                var current = original;
+                foreach (var operation in operations)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var changes = transformations.Plan(current, operation);
+                    foreach (var patch in changes)
+                        if (current.ProtectedRegions.Any(region => patch.Span.Start < region.Span.End && patch.Span.End > region.Span.Start))
+                            throw new ArgumentException("A protected source region would be changed. Use Edit source.");
+                    current = parser.Parse(MermaidPatches.Apply(current.Source, changes), cancellationToken);
+                    if (!current.CanEdit) break;
+                }
+                return current;
+            }, cancellationToken);
+            if (generation != revision) return new(false, "A newer draft superseded this operation.");
+            if (!candidate.CanEdit) return new(false, candidate.Diagnostic);
+            return await ValidateAndCommitAsync(candidate.Source, cancellationToken);
         }
         catch (ArgumentException ex) { return new(false, ex.Message); }
     }

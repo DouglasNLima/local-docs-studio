@@ -93,11 +93,12 @@ public sealed class MermaidTransformationService
             case RenameMermaidSubgraph rename:
             {
                 CheckLabel(rename.Label); var group = model.Subgraph(rename.Id);
-                Replace(group.Heading, group.Id + "[" + EscapeLabel(rename.Label) + "]"); break;
+                if (rename.Label != group.Label) Replace(group.Heading, group.Id + "[" + EscapeLabel(rename.Label) + "]"); break;
             }
             case MoveMermaidNode move:
             {
                 var node = model.Node(move.Id); if (move.SubgraphId is not null) model.Subgraph(move.SubgraphId);
+                if (node.SubgraphId == move.SubgraphId && node.Occurrences.Select(item => item.SubgraphId).Where(id => id is not null).Distinct().Count() <= 1) break;
                 if (node.Occurrences.Any(item => item.SubgraphId is not null && model.Edges.Any(edge => edge.Statement == item.Statement)))
                     throw new ArgumentException("Move this node's connections outside subgraphs in source mode first. Its existing membership is preserved.");
                 var declarations = node.Occurrences.Where(item => !model.Edges.Any(edge => edge.Statement == item.Statement)).ToArray();

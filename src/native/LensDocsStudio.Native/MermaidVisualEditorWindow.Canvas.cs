@@ -215,7 +215,7 @@ public partial class MermaidVisualEditorWindow
     private void Fit(object sender, RoutedEventArgs e)
     {
         if (Viewport is null || DiagramCanvas is null || Viewport.ViewportWidth <= 0 || Viewport.ViewportHeight <= 0) return;
-        Zoom.Value = Math.Clamp(Math.Min(Viewport.ViewportWidth / DiagramCanvas.Width, Viewport.ViewportHeight / DiagramCanvas.Height) * 100, 10, 400);
+        Zoom.Value = Math.Clamp(Math.Min(Viewport.ViewportWidth / DiagramCanvas.Width, Viewport.ViewportHeight / DiagramCanvas.Height) * 100, 1, 400);
         Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0);
     }
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
@@ -227,7 +227,7 @@ public partial class MermaidVisualEditorWindow
         if (Keyboard.Modifiers != ModifierKeys.Control) return; e.Handled = true;
         var pointer = e.GetPosition(Viewport); var scale = Zoom.Value / 100;
         var x = (Viewport.HorizontalOffset + pointer.X) / scale; var y = (Viewport.VerticalOffset + pointer.Y) / scale;
-        Zoom.Value = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.15 : 1 / 1.15), 10, 400); Viewport.UpdateLayout();
+        Zoom.Value = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.15 : 1 / 1.15), 1, 400); Viewport.UpdateLayout();
         Viewport.ScrollToHorizontalOffset(x * Zoom.Value / 100 - pointer.X); Viewport.ScrollToVerticalOffset(y * Zoom.Value / 100 - pointer.Y);
     }
     private void PanStarted(object sender, MouseButtonEventArgs e)

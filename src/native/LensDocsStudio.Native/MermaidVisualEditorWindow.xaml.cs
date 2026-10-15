@@ -8,6 +8,7 @@ using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Rendering;
+using LensDocsStudio.Native.Platform;
 
 namespace LensDocsStudio.Native;
 
@@ -24,6 +25,16 @@ public partial class MermaidVisualEditorWindow : Window
     private bool updating, busy, closed, discard;
     private string? connectionSource;
     private IReadOnlyList<ElementChoice> choices = [];
+    private object? propertyBaseline;
+    private record NodeValues(string Id, string Label, FlowNodeShape Shape, string? Group, string? Class, string Fill, string Stroke, string Colour);
+    private record EdgeValues(string? Source, string? Target, string Label, FlowConnectionType Type);
+    private record GroupValues(string Label, string? Direction);
+    private NodeValues ReadNodeValues() => new(NodeId.Text, NodeLabel.Text, NodeShape.SelectedItem is FlowNodeShape shape ? shape : FlowNodeShape.Process,
+        NodeGroup.SelectedItem as string, NodeClass.SelectedItem as string, FillColour.Text, StrokeColour.Text, TextColour.Text);
+    private object? PropertyValues => NodeProperties.Visibility == Visibility.Visible ? ReadNodeValues()
+        : EdgeProperties.Visibility == Visibility.Visible ? new EdgeValues(EdgeSource.SelectedItem as string, EdgeTarget.SelectedItem as string, EdgeLabel.Text, EdgeType.SelectedItem is FlowConnectionType type ? type : FlowConnectionType.Directed)
+        : GroupProperties.Visibility == Visibility.Visible ? new GroupValues(GroupLabel.Text, GroupDirection.SelectedItem as string) : null;
+    private bool PropertiesPending => propertyBaseline is not null && !Equals(propertyBaseline, PropertyValues);
     private record ElementChoice(string Key, string Description) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
@@ -35,6 +46,11 @@ public partial class MermaidVisualEditorWindow : Window
         this.diagrams = diagrams; this.applyToDocument = applyToDocument; this.dark = dark; this.diagramTheme = diagramTheme;
         this.editSource = editSource; this.exportDiagram = exportDiagram; draft = new(source, diagrams);
         InitializeComponent();
+        WindowStateService.FitInitialWindow(this);
+        foreach (var field in new[] { NodeId, NodeLabel, FillColour, StrokeColour, TextColour, EdgeLabel, GroupLabel })
+            field.TextChanged += (_, _) => PropertiesChanged();
+        foreach (var field in new[] { NodeShape, NodeGroup, NodeClass, EdgeSource, EdgeTarget, EdgeType, GroupDirection })
+            field.SelectionChanged += (_, _) => PropertiesChanged();
         Direction.ItemsSource = GroupDirection.ItemsSource = new[] { "TD", "TB", "BT", "LR", "RL" };
         NodeShape.ItemsSource = Enum.GetValues<FlowNodeShape>(); EdgeType.ItemsSource = Enum.GetValues<FlowConnectionType>();
         SourceEditor.TextArea.TextView.LineTransformers.Add(new MermaidSourceHighlighting(dark));
@@ -65,20 +81,25 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (SourceEditor is null) return;
         var canEdit = CanTransform;
-        Palette.IsEnabled = Direction.IsEnabled = NodeProperties.IsEnabled = EdgeProperties.IsEnabled = GroupProperties.IsEnabled = canEdit;
-        ApplyButton.IsEnabled = canEdit; UndoButton.IsEnabled = !busy && !SourcePending && draft.CanUndo;
-        RedoButton.IsEnabled = !busy && !SourcePending && draft.CanRedo;
-        DeleteButton.IsEnabled = canEdit && Elements.SelectedItems.Count > 0;
-        DuplicateButton.IsEnabled = canEdit && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
-        SourceEditor.IsReadOnly = busy; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending ? " •" : "");
+        NodeProperties.IsEnabled = EdgeProperties.IsEnabled = GroupProperties.IsEnabled = canEdit;
+        Palette.IsEnabled = Direction.IsEnabled = canEdit && !PropertiesPending;
+        ApplyButton.IsEnabled = canEdit && !PropertiesPending; UndoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanUndo;
+        RedoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanRedo;
+        DeleteButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.Count > 0;
+        DuplicateButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
+        SourceEditor.IsReadOnly = busy || PropertiesPending; Title = "Mermaid visual editor" + (draft.IsDirty || SourcePending || PropertiesPending ? " •" : "");
+        ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
+        foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
     }
     private async Task<bool> Execute(MermaidEditOperation operation, string? select = null)
+        => await ExecuteBatch([operation], select);
+    private async Task<bool> ExecuteBatch(IReadOnlyList<MermaidEditOperation> operations, string? select = null)
     {
         if (!CanTransform) return false; busy = true; UpdateActions(); Status.Text = "Validating diagram draft…";
         try
         {
-            var result = await draft.ExecuteAsync(operation, lifetime.Token);
+            var result = await draft.ExecuteBatchAsync(operations, lifetime.Token);
             if (closed) return false;
             if (result.Success) { if (select is not null) draft.Select([select]); Refresh(); }
             else Status.Text = result.Error;
@@ -90,35 +111,41 @@ public partial class MermaidVisualEditorWindow : Window
     private async void InsertNode(object sender, RoutedEventArgs e)
     {
         var tag = sender is FrameworkElement element ? element.Tag as string : null;
-        if (!CanTransform || !Enum.TryParse<FlowNodeShape>(tag, out var shape)) return;
+        if (!CanTransform || PropertiesPending || !Enum.TryParse<FlowNodeShape>(tag, out var shape)) return;
         var id = MermaidTransformationService.UniqueId(draft.Model);
         await Execute(new AddMermaidNode(id, shape == FlowNodeShape.Terminal ? "Start / End" : shape.ToString(), shape), "node:" + id);
     }
     private async void InsertSubgraph(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform) return;
+        if (!CanTransform || PropertiesPending) return;
         var id = MermaidTransformationService.UniqueId(draft.Model, "Group");
         await Execute(new AddMermaidSubgraph(id, "New subgraph", Selected?.StartsWith("group:", StringComparison.Ordinal) == true ? Selected[6..] : null), "group:" + id);
     }
     private async void UpdateNode(object sender, RoutedEventArgs e)
+        => await CommitNodeProperties();
+    private async Task CommitNodeProperties(string? force = null)
     {
-        if (Selected?.StartsWith("node:", StringComparison.Ordinal) != true || NodeShape.SelectedItem is not FlowNodeShape shape) return;
-        await Execute(new UpdateMermaidNode(Selected[5..], NodeLabel.Text, shape, NodeId.Text), "node:" + NodeId.Text);
+        if (Selected?.StartsWith("node:", StringComparison.Ordinal) != true || propertyBaseline is not NodeValues before) return;
+        var next = ReadNodeValues(); var operations = new List<MermaidEditOperation>();
+        if (next.Id != before.Id || next.Label != before.Label || next.Shape != before.Shape)
+            operations.Add(new UpdateMermaidNode(before.Id, next.Label, next.Shape, next.Id));
+        if (next.Group != before.Group || force == "group") operations.Add(new MoveMermaidNode(next.Id, next.Group == "(Root)" ? null : next.Group));
+        if (next.Class is { } className && (next.Class != before.Class || force == "class")) operations.Add(new SetMermaidClass(next.Id, className));
+        if (next.Fill != before.Fill || next.Stroke != before.Stroke || next.Colour != before.Colour || force == "style")
+            operations.Add(new SetMermaidStyle(next.Id, next.Fill, next.Stroke, next.Colour));
+        await ExecuteBatch(operations, "node:" + next.Id);
     }
     private async void MoveNode(object sender, RoutedEventArgs e)
     {
-        if (Selected?.StartsWith("node:", StringComparison.Ordinal) != true) return;
-        await Execute(new MoveMermaidNode(Selected[5..], NodeGroup.SelectedItem as string is { } group && group != "(Root)" ? group : null));
+        await CommitNodeProperties("group");
     }
     private async void ApplyClass(object sender, RoutedEventArgs e)
     {
-        if (Selected?.StartsWith("node:", StringComparison.Ordinal) == true && NodeClass.SelectedItem is string className)
-            await Execute(new SetMermaidClass(Selected[5..], className));
+        await CommitNodeProperties("class");
     }
     private async void ApplyStyle(object sender, RoutedEventArgs e)
     {
-        if (Selected?.StartsWith("node:", StringComparison.Ordinal) == true)
-            await Execute(new SetMermaidStyle(Selected[5..], FillColour.Text, StrokeColour.Text, TextColour.Text));
+        await CommitNodeProperties("style");
     }
     private async void UpdateEdge(object sender, RoutedEventArgs e)
     {
@@ -128,14 +155,17 @@ public partial class MermaidVisualEditorWindow : Window
     private async void ReverseEdge(object sender, RoutedEventArgs e)
     {
         if (Selected is not { } id || !id.StartsWith("edge-", StringComparison.Ordinal)) return;
-        var edge = draft.Model.Edge(id); await Execute(new UpdateMermaidConnection(id, edge.Target.Id, edge.Source.Id, edge.Label, edge.Type));
+        if (EdgeSource.SelectedItem is string source && EdgeTarget.SelectedItem is string target && EdgeType.SelectedItem is FlowConnectionType type)
+            await Execute(new UpdateMermaidConnection(id, target, source, EdgeLabel.Text, type));
     }
     private async void UpdateGroup(object sender, RoutedEventArgs e)
     {
         if (Selected?.StartsWith("group:", StringComparison.Ordinal) != true) return;
         var id = Selected[6..];
-        if (await Execute(new RenameMermaidSubgraph(id, GroupLabel.Text)) && GroupDirection.SelectedItem is string direction)
-            await Execute(new ChangeMermaidDirection(direction, id));
+        var operations = new List<MermaidEditOperation> { new RenameMermaidSubgraph(id, GroupLabel.Text) };
+        if (propertyBaseline is GroupValues before && GroupDirection.SelectedItem is string direction && direction != before.Direction)
+            operations.Add(new ChangeMermaidDirection(direction, id));
+        await ExecuteBatch(operations);
     }
     private async void DirectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -144,7 +174,7 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void Delete(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform) return;
+        if (!CanTransform || PropertiesPending) return;
         var selected = Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key).ToArray();
         var nodes = selected.Where(key => key.StartsWith("node:", StringComparison.Ordinal)).Select(key => key[5..]).ToArray();
         if (nodes.Length > 0)
@@ -166,22 +196,29 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void Duplicate(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform) return;
+        if (!CanTransform || PropertiesPending) return;
         var nodes = Elements.SelectedItems.OfType<ElementChoice>().Where(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal)).Select(choice => draft.Model.Node(choice.Key[5..])).ToArray();
         foreach (var node in nodes)
         { var id = MermaidTransformationService.UniqueId(draft.Model); if (!await Execute(new AddMermaidNode(id, node.Label, node.Shape, node.SubgraphId), "node:" + id)) break; }
     }
-    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending) { draft.Undo(); Refresh(true); } }
-    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending) { draft.Redo(); Refresh(true); } }
+    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Undo(); Refresh(true); } }
+    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Redo(); Refresh(true); } }
     private void StartConnection(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform) return;
+        if (!CanTransform || PropertiesPending) return;
         connectionSource = Selected?.StartsWith("node:", StringComparison.Ordinal) == true ? Selected[5..] : null;
         Status.Text = connectionSource is null ? "Select a source node first, then choose Connection or its + port." : "Connection from " + connectionSource + ": select the destination node. Escape cancels.";
     }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (updating) return;
+        if (PropertiesPending)
+        {
+            updating = true;
+            try { Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice); }
+            finally { updating = false; }
+            UpdateCanvasSelection(); Status.Text = "Update the current properties or reset their changes before selecting another element."; return;
+        }
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
         ShowProperties(); UpdateCanvasSelection(); UpdateActions();
     }
@@ -194,6 +231,7 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private void ShowProperties()
     {
+        propertyBaseline = null;
         NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = Visibility.Collapsed;
         SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
         if (Elements.SelectedItems.Count != 1 || Selected is not { } key) return;
@@ -205,6 +243,9 @@ public partial class MermaidVisualEditorWindow : Window
             NodeClass.ItemsSource = draft.Model.Styles.Where(style => style.Kind == "classDef").SelectMany(style => style.Targets).Select(target => target.Id).Distinct().ToArray();
             NodeClass.SelectedItem = draft.Model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == node.Id))?.Value
                 ?? node.Occurrences.LastOrDefault(item => item.ClassName is not null)?.ClassName;
+            var palette = DiagramThemes.Colours(DiagramThemes.ResolveName(diagramTheme, dark));
+            var colours = Colours(node, palette.Surface ?? (dark ? "#303339" : "#F8F9FB"), palette.Border ?? palette.Accent, palette.Foreground);
+            FillColour.Text = Hex(colours.Fill); StrokeColour.Text = Hex(colours.Stroke); TextColour.Text = Hex(colours.Text);
         }
         else if (key.StartsWith("edge-", StringComparison.Ordinal))
         {
@@ -218,10 +259,20 @@ public partial class MermaidVisualEditorWindow : Window
             GroupId.Text = group.Id; GroupLabel.Text = group.Label; GroupDirection.SelectedItem = group.Direction ?? draft.Model.Direction;
             GroupMembers.Text = "Parent: " + (group.ParentId ?? "Root") + "\nMembers: " + string.Join(", ", draft.Model.Nodes.Where(node => node.SubgraphId == group.Id).Select(node => node.Id));
         }
+        propertyBaseline = PropertyValues;
+        static string Hex(System.Windows.Media.Brush brush) => brush is System.Windows.Media.SolidColorBrush solid ? $"#{solid.Color.R:X2}{solid.Color.G:X2}{solid.Color.B:X2}" : "#FAFAFA";
     }
+    private void PropertiesChanged()
+    {
+        if (updating || SourceEditor is null) return;
+        UpdateActions(); if (PropertiesPending) Status.Text = "Properties changed. Update the selected element to include these values in the draft, or reset the property changes.";
+    }
+    private void ResetProperties(object sender, RoutedEventArgs e)
+    { updating = true; try { ShowProperties(); } finally { updating = false; } UpdateActions(); Status.Text = "Unapplied property changes reset."; }
     private void SourceChanged(object? sender, EventArgs e)
     {
         if (updating || Status is null) return;
+        connectionSource = null;
         UpdateActions(); Status.Text = SourcePending ? "Source draft changed. Validate it before continuing visually or applying. Your text is retained if validation fails." : "Source matches the visual draft.";
     }
     private async void ValidateSource(object sender, RoutedEventArgs e)
@@ -237,7 +288,7 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void Apply(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
+        if (!CanTransform || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
         try
         {
             var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme), lifetime.Token);
@@ -253,12 +304,12 @@ public partial class MermaidVisualEditorWindow : Window
     private void Cancel(object sender, RoutedEventArgs e) { discard = true; Close(); }
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
-        if (!discard && (draft.IsDirty || SourcePending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft? The document will keep its current source.",
+        if (!discard && (draft.IsDirty || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft? The document will keep its current source.",
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) e.Cancel = true;
     }
     public bool CloseForOwner()
     {
-        if ((draft.IsDirty || SourcePending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft before closing the application?",
+        if ((draft.IsDirty || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard this visual editor's unsaved draft before closing the application?",
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return false;
         discard = true; Close(); return true;
     }
