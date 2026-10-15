@@ -6,6 +6,8 @@ Local Markdown, Mermaid, and documentation studio.
 
 The browser-free Windows edition is implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. Its installer-based unsigned internal preview is validated in the documented scope; production certification remains incomplete. See the [engineering delivery report](docs/native/engineering-completion-report.md) for the 28-condition audit and exact evidence.
 
+The latest native UX improvements, Word template compatibility, private-sample acceptance and verified preview identities are recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md).
+
 ```powershell
 dotnet build src/native/LensDocsStudio.Native.slnx -c Release
 dotnet run --project src/native/LensDocsStudio.Native
@@ -674,6 +676,7 @@ npm test
 - `pwsh -NoLogo -NoProfile -File scripts/windows/Prepare-WindowsGitHubRelease.ps1 -DryRun` prepares the GitHub Release ZIP artefact set, checksum, release notes, and draft prerelease `gh release create` command without publishing.
 - `npm run test:browser` runs Chromium and Microsoft Edge smoke tests for app load, legacy redirect, rendering, Mermaid errors, editor layout/autocomplete, image assets, PDF print HTML, PDF text import, Markdown bundle import/export, artefact bundle round-trip certification, export packages, theme, maximisation, and mobile layout.
 - Microsoft Edge must be installed locally for the `edge` Playwright project. The GitHub Actions workflow runs on `windows-latest`, where Edge is available.
+- CI isolates Chromium and Edge in separate Windows jobs and requires both through the aggregate `Test static app` check. Local `npm test` runs both projects; `LENS_TEST_BROWSER=chromium` or `edge` selects one project for focused validation.
 - Playwright starts the static test server in `tests/browser/serve-static.py`. It uses persistent HTTP connections and a larger connection queue for concurrent module/PWA requests. Set `LENS_TEST_PORT` if another local project uses port 4173. CI retains traces and screenshots for failed browser checks; there is still no production server or build step.
 
 ## Browser Support
