@@ -15,6 +15,8 @@ internal static partial class NativeUiChecks
 {
     [System.Runtime.InteropServices.DllImport("user32.dll")]
     private static extern uint GetDpiForSystem();
+    [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
+    private static extern int DwmFlush();
     public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false) => Task.Run(() =>
     {
         Directory.CreateDirectory(Path.GetFullPath(output));
@@ -47,10 +49,17 @@ internal static partial class NativeUiChecks
             var editor = Find(main, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "The visual authoring fixture did not load exactly.");
             main.Patterns.Transform.Pattern.Resize(1280, 840);
             var offset = original.LastIndexOf("```mermaid", StringComparison.Ordinal); Open(offset);
-            Click("MermaidActualSize"); Capture("existing-light");
+            Click("MermaidActualSize");
+            Wait(() => Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Actual size did not settle before comparison capture.");
+            _ = DwmFlush(); Capture("existing-light");
             if (polish)
             {
                 var source = Draft();
+                var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
+                Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
+                Wait(() => Find(visual!, "MermaidSelectionSummary").Name.Contains("Next", StringComparison.Ordinal), "The broad connection pointer target did not select its actual inspector.");
+                Check(Draft() == source, "A pointer offset from the thin connection line selects its inspector without changing source");
                 var rows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
                 rows[0].Patterns.SelectionItem.Pattern.Select(); rows[1].Patterns.SelectionItem.Pattern.AddToSelection();
                 Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Real list multi-selection exposes both selected nodes");
@@ -79,7 +88,9 @@ internal static partial class NativeUiChecks
                     selected.Patterns.SelectionItem.Pattern.RemoveFromSelection();
                 Wait(() => Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 0, "The multi-selection fixture did not clear before the single-node scenario.");
             }
-            Select("node_B"); Capture("node-properties");
+            Select("node_B");
+            Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("B", StringComparison.Ordinal), "The selected-node inspector did not finish its first meaningful layout.");
+            Capture("node-properties");
             if (polish)
             {
                 var shapeSource = Draft(); Find(visual!, "MermaidNodeShape").AsComboBox().Select("Decision"); Click("MermaidUpdateNode");
@@ -214,7 +225,8 @@ internal static partial class NativeUiChecks
                         (visual.FindFirstDescendant(cf => cf.ByName("More commands")) ?? throw new IOException("The narrow native toolbar did not expose its overflow control.")).Patterns.Toggle.Pattern.Toggle();
                         FlaUI.Core.AutomationElements.AutomationElement? previewCommand = null;
                         Wait(() => (previewCommand = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidRenderedPreview")))) is { IsOffscreen: false }, "Native overflow did not reveal Rendered preview.");
-                        Capture("toolbar-overflow"); previewCommand!.AsButton().Invoke();
+                        Check(automation.GetDesktop().BoundingRectangle.Contains(previewCommand!.BoundingRectangle), "Native overflow command is completely contained by the disposable desktop");
+                        automation.GetDesktop().CaptureToFile(Path.Combine(output, "mermaid-toolbar-overflow.png")); previewCommand.AsButton().Invoke();
                         Window? diagram = null;
                         Wait(() => (diagram = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Overflow preview did not open the native rendered diagram.");
                         diagram!.CaptureToFile(Path.Combine(output, "mermaid-overflow-rendered-preview.png")); diagram.Close();
@@ -327,6 +339,7 @@ internal static partial class NativeUiChecks
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Insert Flowchart did not open the native editor.");
                 if (polish) Capture("first-frame-insertion-" + ++firstFrames);
                 if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The new diagram did not become editable.");
+                if (polish) CaptureMeaningful("first-meaningful-insertion-" + firstFrames);
             }
 
             void Open(int blockOffset)
@@ -336,6 +349,7 @@ internal static partial class NativeUiChecks
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
                 Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable.");
+                if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
@@ -343,6 +357,12 @@ internal static partial class NativeUiChecks
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
+            void CaptureMeaningful(string name)
+            {
+                Wait(() => Find(visual!, "MermaidDraftSource").BoundingRectangle.Height > 0 && Draft().Length > 0, "The source panel did not finish its initial native layout.");
+                // Observe the compositor after real layout; never delay the application to mask painting.
+                _ = DwmFlush(); Capture(name);
+            }
             void Capture(string name) { visual!.CaptureToFile(Path.Combine(output, "mermaid-" + name + ".png")); }
             void Check(bool condition, string description) { if (!condition) throw new IOException(description); checks.Add(description); }
         }
