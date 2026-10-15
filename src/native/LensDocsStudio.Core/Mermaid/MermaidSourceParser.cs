@@ -144,6 +144,7 @@ public sealed class MermaidSourceParser
     { FlowNodeShape.Process => "Rectangle", FlowNodeShape.Decision => "Diamond", FlowNodeShape.Terminal => "Stadium", _ => shape.ToString() };
     public static bool IsDirection(string text) => text is "TD" or "TB" or "BT" or "LR" or "RL";
     public static bool IsId(string text) => text.Length is > 0 and <= 128 && (char.IsLetter(text[0]) || text[0] == '_')
+        && text[^1] != '-' && !text.Contains("--", StringComparison.Ordinal)
         && text.All(character => char.IsLetterOrDigit(character) || character is '_' or '-')
         && text is not ("end" or "subgraph" or "graph" or "flowchart" or "direction" or "class" or "classDef" or "style" or "click" or "default");
     public static void CheckUnicode(string text)
@@ -202,7 +203,7 @@ public sealed class MermaidSourceParser
     {
         var start = position;
         while (position < text.Length && (char.IsLetterOrDigit(text[position]) || text[position] == '_'
-            || text[position] == '-' && position + 1 < text.Length && char.IsLetterOrDigit(text[position + 1]))) position++;
+            || text[position] == '-' && position + 1 < text.Length && (char.IsLetterOrDigit(text[position + 1]) || text[position + 1] == '_'))) position++;
         return text[start..position];
     }
     private static FlowConnectionType ReadConnection(string text, ref int position)

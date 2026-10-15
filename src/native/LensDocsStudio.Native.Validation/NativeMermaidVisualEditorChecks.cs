@@ -143,9 +143,14 @@ internal static partial class NativeUiChecks
                 Check(!Draft().Contains("Cancelled label", StringComparison.Ordinal), "Escape cancels a real inline label edit in " + extension);
                 Find(visual!, "MermaidElements").Focus(); Keyboard.Type(VirtualKeyShort.F2); Find(visual!, "MermaidInlineLabel").AsTextBox().Text = "Keyboard label";
                 Keyboard.Type(VirtualKeyShort.RETURN); AwaitSource(text => text.Contains("Node1[\"Keyboard label\"]", StringComparison.Ordinal)); Capture("inline-label-result" + extension.Replace('.', '-'));
-                Click("MermaidDuplicate"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
-                Click("MermaidUndo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 1);
-                Click("MermaidRedo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
+                var paletteDecision = Find(visual!, "MermaidInsertDecision"); var dragOrigin = paletteDecision.BoundingRectangle;
+                Mouse.DragHorizontally(new(dragOrigin.Left + dragOrigin.Width / 2, dragOrigin.Top + dragOrigin.Height / 2), 500, MouseButton.Left);
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
+                Check(new MermaidSourceParser().Parse(Draft()).Node("Node2").Shape == FlowNodeShape.Decision, "Native palette drag-and-drop adds the intended semantic shape in " + extension);
+                Capture("palette-drop" + extension.Replace('.', '-'));
+                Click("MermaidDuplicate"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 3);
+                Click("MermaidUndo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 2);
+                Click("MermaidRedo"); AwaitSource(text => new MermaidSourceParser().Parse(text).Nodes.Count == 3);
                 var inserted = Draft(); Click("MermaidApply"); WaitClosed();
                 Wait(() => ReadEditorText(editor).Contains("Keyboard label", StringComparison.Ordinal), "New flowchart insertion did not update the document.");
                 Check(extension == ".md" ? ReadEditorText(editor).StartsWith("```mermaid", StringComparison.Ordinal) : ReadEditorText(editor) == inserted,

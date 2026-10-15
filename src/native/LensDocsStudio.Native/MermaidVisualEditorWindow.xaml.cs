@@ -52,6 +52,7 @@ public partial class MermaidVisualEditorWindow : Window
         this.editSource = editSource; this.exportDiagram = exportDiagram; draft = new(source, diagrams);
         InitializeComponent();
         WindowStateService.FitInitialWindow(this);
+        InitialisePaletteDragging();
         foreach (var field in new[] { NodeId, NodeLabel, FillColour, StrokeColour, TextColour, EdgeLabel, GroupLabel })
             field.TextChanged += (_, _) => PropertiesChanged();
         foreach (var field in new[] { NodeShape, NodeGroup, NodeClass, EdgeSource, EdgeTarget, EdgeType, GroupDirection })

@@ -22,6 +22,13 @@ public partial class MermaidVisualEditorWindow
     private bool dragging;
     private TextBox? inlineEditor;
     private bool synchronisingCanvasSelection;
+    private Point? paletteStart;
+
+    private void InitialisePaletteDragging()
+    {
+        Palette.PreviewMouseLeftButtonDown += (_, e) => paletteStart = e.GetPosition(Palette);
+        Palette.PreviewMouseLeftButtonUp += (_, _) => paletteStart = null;
+    }
 
     private void RebuildCanvas(bool layout)
     {
@@ -247,20 +254,45 @@ public partial class MermaidVisualEditorWindow
     private void DeselectCanvas(object sender, MouseButtonEventArgs e) { if (e.OriginalSource == DiagramCanvas) { Elements.UnselectAll(); e.Handled = true; } }
     private void PaletteDrag(object sender, MouseEventArgs e)
     {
-        if (e.LeftButton != MouseButtonState.Pressed || !CanTransform) return;
+        if (e.LeftButton != MouseButtonState.Pressed || !CanTransform || paletteStart is not { } origin) return;
+        var delta = e.GetPosition(Palette) - origin;
+        if (Math.Abs(delta.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(delta.Y) < SystemParameters.MinimumVerticalDragDistance) return;
         var current = e.OriginalSource as DependencyObject;
         while (current is not null && current is not Button) current = VisualTreeHelper.GetParent(current);
-        if (current is Button { Tag: string shape } && Enum.TryParse<FlowNodeShape>(shape, out _))
-            DragDrop.DoDragDrop((DependencyObject)sender, new DataObject("Lens.MermaidShape", shape), DragDropEffects.Copy);
+        if (current is Button { Tag: string shape } && (Enum.TryParse<FlowNodeShape>(shape, out _) || shape is "Subgraph" or "Connection"))
+        { paletteStart = null; DragDrop.DoDragDrop((DependencyObject)sender, new DataObject("Lens.MermaidElement", shape), DragDropEffects.Copy); }
     }
     private async void CanvasDrop(object sender, DragEventArgs e)
     {
-        if (!CanTransform || e.Data.GetData("Lens.MermaidShape") is not string text || !Enum.TryParse<FlowNodeShape>(text, out var shape)) return;
-        var point = e.GetPosition(DiagramCanvas); var id = MermaidTransformationService.UniqueId(draft.Model);
-        if (await Execute(new AddMermaidNode(id, shape.ToString(), shape), "node:" + id))
+        if (!CanTransform || PropertiesPending || e.Data.GetData("Lens.MermaidElement") is not string text) return;
+        var point = e.GetPosition(DiagramCanvas); e.Handled = true;
+        var group = positions.Where(pair => pair.Key.StartsWith("group:", StringComparison.Ordinal) && Contains(pair.Value, point))
+            .OrderBy(pair => pair.Value.Width * pair.Value.Height).Select(pair => pair.Key[6..]).FirstOrDefault();
+        if (text == "Connection")
+        {
+            var target = positions.FirstOrDefault(pair => pair.Key.StartsWith("node:", StringComparison.Ordinal) && Contains(pair.Value, point)).Key;
+            if (target is null) { Status.Text = "Drop the connection on an existing node; no node has been created."; return; }
+            connectionSource ??= Selected?.StartsWith("node:", StringComparison.Ordinal) == true ? Selected[5..] : null;
+            if (connectionSource is null) { SelectElement(target); StartConnection(this, e); }
+            else await PickNode(target[5..]);
+            return;
+        }
+        if (text == "Subgraph")
+        {
+            var groupId = MermaidTransformationService.UniqueId(draft.Model, "Group");
+            if (await Execute(new AddMermaidSubgraph(groupId, "New subgraph", group), "group:" + groupId))
+            {
+                var key = "group:" + groupId; var box = positions[key]; positions[key] = box with { X = Math.Max(0, point.X), Y = Math.Max(0, point.Y) };
+                Canvas.SetLeft(canvasElements[key], positions[key].X); Canvas.SetTop(canvasElements[key], positions[key].Y); UpdateExtent();
+            }
+            return;
+        }
+        if (!Enum.TryParse<FlowNodeShape>(text, out var shape)) return;
+        var id = MermaidTransformationService.UniqueId(draft.Model);
+        if (await Execute(new AddMermaidNode(id, shape.ToString(), shape, group), "node:" + id))
         {
             var box = positions["node:" + id]; positions["node:" + id] = box with { X = Math.Max(0, point.X), Y = Math.Max(0, point.Y) }; RebuildCanvas(false);
         }
-        e.Handled = true;
+        static bool Contains(MermaidLayoutBox box, Point position) => position.X >= box.X && position.X <= box.X + box.Width && position.Y >= box.Y && position.Y <= box.Y + box.Height;
     }
 }

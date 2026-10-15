@@ -64,8 +64,8 @@
      <Button Content="Start/End" Tag="Terminal" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertTerminal"/>
      <Button Content="Rounded" Tag="Rounded" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertRounded"/>
      <Button Content="Circle" Tag="Circle" Click="InsertNode" AutomationProperties.AutomationId="MermaidInsertCircle"/>
-     <Button Content="Connection" Click="StartConnection" AutomationProperties.AutomationId="MermaidInsertConnection"/>
-     <Button Content="Subgraph" Click="InsertSubgraph" AutomationProperties.AutomationId="MermaidInsertSubgraph"/>
+     <Button Content="Connection" Tag="Connection" Click="StartConnection" AutomationProperties.AutomationId="MermaidInsertConnection"/>
+     <Button Content="Subgraph" Tag="Subgraph" Click="InsertSubgraph" AutomationProperties.AutomationId="MermaidInsertSubgraph"/>
     </WrapPanel>
     <TextBlock DockPanel.Dock="Top" Text="Select an element below or on the canvas. Ctrl selects several nodes." TextWrapping="Wrap" Margin="0,4,0,8" Foreground="{DynamicResource MutedTextBrush}"/>
     <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" DisplayMemberPath="Description"
