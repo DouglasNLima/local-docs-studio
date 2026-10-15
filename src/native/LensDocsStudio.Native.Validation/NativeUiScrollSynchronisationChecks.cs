@@ -11,7 +11,7 @@ internal static partial class NativeUiChecks
     private static void CheckScrollSynchronisation(Window window, AutomationElement editor, string state, string output, string source)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
-        var prior = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+        var prior = JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))!;
         var fixture = "# Native scrolling fixture\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
             $"## Region {index:000}\n\nPortable source region {index:000} keeps **formatted content** and local document context.\n\n"
             + (index % 15 == 0 ? "| Item | Detail |\n|---|---|\n| One | Native table |\n| Two | More content |\n| Three | Different height |\n\n" : "")));
@@ -122,7 +122,7 @@ internal static partial class NativeUiChecks
             { File.WriteAllText(Path.Combine(output, "native-scroll-synchronisation-cleanup.json"), JsonSerializer.Serialize(new { Error = error.ToString() })); }
             finally { RestoreClipboard(clipboard, owned); }
         }
-        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))!;
         // AvalonEdit does not implement GetVisibleRanges. Its text ranges expose
         // actual screen geometry, so inspect our distinct fixture headings directly.
         string[] VisibleRegions(AutomationElement pane) => Enumerable.Range(1, 90).Select(index => $"Region {index:000}").Where(text => Visible(pane, text)).ToArray();

@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckFolderMove(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string originalSource)
     {
-        var root = Path.GetDirectoryName(originalSource)!; var before = ReadEditorText(editor); var originalSaved = File.ReadAllText(originalSource);
+        var root = Path.GetDirectoryName(originalSource)!; var before = ReadEditorText(editor); var originalSaved = ReadObservedText(originalSource);
         var folder = Path.Combine(root, "folder-move"); var destination = Path.Combine(root, "renamed-folder");
         Directory.CreateDirectory(Path.Combine(folder, "empty"));
         var guide = Path.Combine(folder, "folder-guide.md"); var home = Path.Combine(root, "folder-move-home.md");
@@ -40,13 +40,13 @@ internal static partial class NativeUiChecks
         Find(review, "ApplyFolderMove").Patterns.Invoke.Pattern.Invoke();
         Wait(() => Find(owner, "Status").Name.StartsWith("Moved folder renamed-folder", StringComparison.Ordinal)
             && !Directory.Exists(folder) && Directory.Exists(destination), "The reviewed folder did not move as a complete native operation.");
-        if (File.ReadAllText(Path.Combine(destination, "folder-guide.md")) != guideText + "\nUnsaved folder edit."
+        if (ReadObservedText(Path.Combine(destination, "folder-guide.md")) != guideText + "\nUnsaved folder edit."
             || !File.ReadAllBytes(Path.Combine(destination, "asset.bin")).SequenceEqual(asset) || !Directory.Exists(Path.Combine(destination, "empty")))
             throw new IOException("The folder move lost saved edits, binary assets or empty folders.");
         Find(owner, "NavigateBack").Click();
         var expectedHome = homeText.Replace("folder-move/folder-guide", "renamed-folder/folder-guide", StringComparison.Ordinal)
             .Replace("[[renamed-folder/folder-guide|", "[[renamed-folder/folder-guide.md|", StringComparison.Ordinal);
-        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && File.ReadAllText(home) == expectedHome, "Folder move did not update incoming ordinary/wiki links and the existing open tab.");
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && ReadObservedText(home) == expectedHome, "Folder move did not update incoming ordinary/wiki links and the existing open tab.");
         Find(owner, "NavigateForward").Click();
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Forward history lost the relocated folder document.");
         CaseRename("renamed-folder", "RENAMED-FOLDER");
@@ -57,14 +57,14 @@ internal static partial class NativeUiChecks
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Forward lost the case-renamed folder document.");
         CaseRename("RENAMED-FOLDER", "renamed-folder");
         Find(owner, "NavigateBack").Click();
-        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && File.ReadAllText(home) == expectedHome,
+        Wait(() => editor.Patterns.Value.Pattern.Value.Value == expectedHome && ReadObservedText(home) == expectedHome,
             "Restoring folder case did not restore incoming link spelling and open source.");
         Find(owner, "NavigateForward").Click();
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == guideText + "\nUnsaved folder edit.", "Restoring folder case lost its document history.");
         if (!File.ReadAllBytes(Path.Combine(destination, "asset.bin")).SequenceEqual(asset) || !Directory.Exists(Path.Combine(destination, "empty")))
             throw new IOException("Case-only folder renaming changed binary assets or empty folders.");
         OpenTreeFile(Path.GetFileName(originalSource), before);
-        if (File.ReadAllText(originalSource) != originalSaved) throw new IOException("Folder movement changed an unrelated source document.");
+        if (ReadObservedText(originalSource) != originalSaved) throw new IOException("Folder movement changed an unrelated source document.");
         TreeItem TreeItem(string name) => Find(owner, "WorkspaceTree").FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TreeItem).And(cf.ByName(name)))?.AsTreeItem()
             ?? throw new IOException("The expected native tree entry is unavailable: " + name);
         void OpenTreeFile(string name, string expected)
@@ -88,7 +88,7 @@ internal static partial class NativeUiChecks
             Find(caseReview!, "ApplyFolderMove").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(owner, "Status").Name.StartsWith("Moved folder " + nextName, StringComparison.Ordinal)
                 && Directory.EnumerateDirectories(root).Any(path => Path.GetFileName(path) == nextName)
-                && File.ReadAllText(home).Contains(nextName + "/folder-guide.md", StringComparison.Ordinal),
+                && ReadObservedText(home).Contains(nextName + "/folder-guide.md", StringComparison.Ordinal),
                 "Case-only folder rename did not change the actual directory entry and incoming links.");
         }
     }

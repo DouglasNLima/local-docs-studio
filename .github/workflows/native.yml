@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
   workflow_dispatch:
 permissions:
   contents: read
@@ -57,9 +57,14 @@ jobs:
           npx playwright install chromium
       - name: Check native catalogue against the web reference
         run: node scripts/native/Sync-ContentCatalogue.mjs --check
+      - name: Set up the static export test runtime
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
       - name: Validate exported Docs Site on disk and static hosting
         env:
           LENS_TEST_PORT: '4183'
+          DEBUG: 'pw:webserver'
         run: npx playwright test --config playwright.native-export.config.mjs
       - name: Validate native desktop workflows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ui
@@ -109,6 +114,8 @@ jobs:
             artifacts/native/install-smoke/**/native-desktop-restored-session.*
             artifacts/native/install-smoke/**/native-desktop-restored-session-observations.json
             artifacts/native/install-smoke/**/native-minimum-window.*
+            artifacts/native/install-smoke/**/native-refinement*
+            artifacts/native/install-smoke/**/refinement-display/*.json
             artifacts/native/install-smoke/**/native-minimum-overflow.png
             artifacts/native/install-smoke/**/native-focus-mode.png
             artifacts/native/install-smoke/**/native-full-screen.png

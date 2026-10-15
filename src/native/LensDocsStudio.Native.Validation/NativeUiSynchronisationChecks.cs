@@ -12,7 +12,7 @@ internal static partial class NativeUiChecks
     private static void CheckSynchronisation(Window window, AutomationElement editor, string state, string output, string source)
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
-        var before = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+        var before = JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))!;
         const string fixture = "# Native sync fixture\n\naction **action** *action* [action](other.md) `action`\n\nCafé 😀 é action\n\nSoft\nbreak and hard  \nbreak.\n";
         var clipboard = NativeUiClipboard.GetDataObject(); uint owned = 0;
         var observations = new List<object>();
@@ -170,7 +170,7 @@ internal static partial class NativeUiChecks
             if (lines.Length > 1) range.MoveEndpointByRange(TextPatternRangeEndpoint.End, Nth(preview, lines[^1], 1), TextPatternRangeEndpoint.End);
             return range;
         }
-        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))!;
         FlaUI.Core.ITextRange Nth(AutomationElement pane, string text, int occurrence)
         {
             var remaining = pane.Patterns.Text.Pattern.DocumentRange.Clone();

@@ -39,7 +39,7 @@ internal static partial class NativeUiChecks
         OpenFolder(second);
         CheckRetainedWorkspaceContent(owner, editor, fixture, output, "after-switch", original);
         FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-        Wait(() => File.ReadAllText(source) == fixture.Draft && RetainedContextSaved(fixture),
+        Wait(() => ReadObservedText(source) == fixture.Draft && RetainedContextSaved(fixture),
             "Saving the earlier tab lost its source, root or linked document context.");
         CheckRetainedWorkspaceContent(owner, editor, fixture, output, "after-save", fixture.Draft);
         return fixture;
@@ -71,7 +71,7 @@ internal static partial class NativeUiChecks
             "The retained workspace preview did not finish after restoring its editor: " + phase);
         CheckImage(); Follow("Other retained document", fixture.TargetText);
         CheckImage(); Follow("Return to retained source", fixture.Draft);
-        if (File.ReadAllText(fixture.Source) != expectedSaved || File.ReadAllText(fixture.Target) != fixture.TargetText
+        if (ReadObservedText(fixture.Source) != expectedSaved || ReadObservedText(fixture.Target) != fixture.TargetText
             || !File.ReadAllBytes(fixture.Image).SequenceEqual(fixture.Pixels))
             throw new IOException("Workspace navigation changed source or image bytes: " + phase);
         owner.CaptureToFile(Path.Combine(output, "native-workspace-context-" + phase + ".png"));

@@ -33,6 +33,10 @@ internal static partial class NativeUiChecks
             {
                 var run = Path.Combine(output, "synthetic-" + Guid.NewGuid().ToString("N"));
                 var workspace = Path.Combine(run, "Documentation"); Directory.CreateDirectory(workspace);
+                Directory.CreateDirectory(Path.Combine(workspace, "00 - Guides"));
+                File.WriteAllText(Path.Combine(workspace, "01 - Markdown.md"), "# Markdown document\n");
+                File.WriteAllText(Path.Combine(workspace, "02 - Mermaid.mmd"), "flowchart LR\nA --> B\n");
+                File.WriteAllText(Path.Combine(workspace, "03 - Notes.txt"), "Plain text document\n");
                 var state = Path.Combine(run, "private-state"); Directory.CreateDirectory(state);
                 File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(Theme: theme, AutomaticUpdateChecks: false)));
                 var paths = Enumerable.Range(1, 9).Select(index => Path.Combine(workspace, $"Document {index} — working notes.md")).ToArray();
@@ -76,6 +80,27 @@ internal static partial class NativeUiChecks
                         Bounds = window.BoundingRectangle, DesktopBounds = automation.GetDesktop().BoundingRectangle,
                         Revision = revision, Screenshot = screenshot, HighContrast = highContrast, OverflowCommands = overflowCommands,
                         PhysicalDpiCertified = false, AccessibilityCertified = false });
+                }
+                catch
+                {
+                    try
+                    {
+                    var failed = app.GetMainWindow(automation, TimeSpan.FromSeconds(2));
+                    failed?.CaptureToFile(Path.Combine(output, "native-screenshot-failure.png"));
+                    if (failed is not null)
+                    {
+                        var strip = Find(failed, "DocumentTabs");
+                        File.WriteAllText(Path.Combine(output, "native-screenshot-failure-tabs.json"), JsonSerializer.Serialize(new {
+                            Strip = strip.BoundingRectangle,
+                            Tabs = strip.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem))
+                                .Select(tab => new { tab.Name, tab.IsOffscreen, Bounds = tab.BoundingRectangle,
+                                    Buttons = tab.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button))
+                                        .Select(button => new { button.Name, button.IsOffscreen, Bounds = button.BoundingRectangle }).ToArray() }).ToArray()
+                        }));
+                    }
+                    }
+                    catch (Exception diagnostic) { File.WriteAllText(Path.Combine(output, "native-screenshot-failure-capture.txt"), diagnostic.ToString()); }
+                    throw;
                 }
                 finally { if (!process.HasExited) { process.Kill(); process.WaitForExit(10000); } }
             }

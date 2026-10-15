@@ -1,5 +1,8 @@
 # Native Windows development continuation handoff
 
+Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
+
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 ## Current targeted performance continuation

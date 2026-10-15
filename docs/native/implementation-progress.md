@@ -1,5 +1,8 @@
 # Native implementation progress
 
+Native UX refinement is delivered on feature/native-ux-refinement in [draft PR 25](https://github.com/DouglasNLima/local-docs-studio/pull/25). The authoritative [refinement and Word-template report](ux-refinement-and-word-templates.md) records the accepted application candidate, real private DOCX acceptance, complete native/web/visual CI, preserved failures, independently verified preview packages and bounded readiness. Earlier delivery claims below retain their original revision; the linked report owns acceptance of this refinement.
+
+
 Native desktop modernisation is implemented on `feature/native-desktop-ux-modernisation` in [draft PR 24](https://github.com/DouglasNLima/local-docs-studio/pull/24), targeting the verified preview-readiness base. Its authoritative feature, full regression, visual, package and installation evidence is [desktop-ux-modernisation.md](desktop-ux-modernisation.md). The PR tracks mandatory checks on the final delivery head. The reconstruction records below describe the earlier baseline.
 
 ## Current delivery record

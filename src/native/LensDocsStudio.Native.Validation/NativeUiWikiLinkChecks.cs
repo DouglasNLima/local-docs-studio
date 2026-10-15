@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckWikiLinks(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string sourcePath, string targetPath)
     {
-        var before = ReadEditorText(editor); var saved = File.ReadAllText(sourcePath); var targetSaved = File.ReadAllText(targetPath);
+        var before = ReadEditorText(editor); var saved = ReadObservedText(sourcePath); var targetSaved = ReadObservedText(targetPath);
         var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         try
         {
@@ -52,7 +52,7 @@ internal static partial class NativeUiChecks
             if (editor.Patterns.Value.Pattern.Value.Value != before + missing) throw new IOException("An unresolved wiki target changed the active document.");
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before, "Unresolved wiki insertion Undo changed the original source.");
-            if (File.ReadAllText(sourcePath) != saved || File.ReadAllText(targetPath) != targetSaved)
+            if (ReadObservedText(sourcePath) != saved || ReadObservedText(targetPath) != targetSaved)
                 throw new IOException("Wiki completion, navigation or Undo changed a saved source document.");
         }
         finally { RestoreClipboard(previous, owned); }

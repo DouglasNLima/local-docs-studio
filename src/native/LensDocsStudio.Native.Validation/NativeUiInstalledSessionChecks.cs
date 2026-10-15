@@ -31,7 +31,7 @@ internal static partial class NativeUiChecks
     {
         executable = Path.GetFullPath(executable); state = Path.GetFullPath(state); output = Path.GetFullPath(output);
         var fixture = Directory.GetParent(state)!.FullName;
-        using var priorRun = JsonDocument.Parse(File.ReadAllText(Path.Combine(fixture, "native-ui.json")));
+        using var priorRun = JsonDocument.Parse(ReadObservedText(Path.Combine(fixture, "native-ui.json")));
         if (!priorRun.RootElement.GetProperty("Passed").GetBoolean()
             || !string.Equals(priorRun.RootElement.GetProperty("FixtureRoot").GetString(), fixture, StringComparison.OrdinalIgnoreCase))
             throw new IOException("Restore validation requires a completed, isolated native UI fixture.");
@@ -99,9 +99,9 @@ internal static partial class NativeUiChecks
             app?.Dispose(); started?.Dispose();
         }
 
-        SessionState ReadSession() => JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))
+        SessionState ReadSession() => JsonSerializer.Deserialize<SessionState>(ReadObservedText(Path.Combine(state, "session.json")))
             ?? throw new IOException("The preserved session is empty.");
-        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))
+        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))
             ?? throw new IOException("The preserved preferences are empty.");
         void Write(object value) => File.WriteAllText(Path.Combine(output, "restored-session.json"), JsonSerializer.Serialize(value, new JsonSerializerOptions { WriteIndented = true }));
         static string Canonical(SessionState session) => JsonSerializer.Serialize(session with

@@ -21,11 +21,11 @@
    </Grid>
   </Grid>
   <ScrollViewer Grid.Row="4" MaxHeight="115" VerticalScrollBarVisibility="Auto" Margin="0,10,0,12"><TextBlock x:Name="AuditStatus" TextWrapping="Wrap" AutomationProperties.AutomationId="AssetAuditStatus"/></ScrollViewer>
-  <StackPanel Grid.Row="5" Orientation="Horizontal" HorizontalAlignment="Right">
+  <WrapPanel Grid.Row="5" HorizontalAlignment="Right">
    <Button x:Name="RenameButton" Content="Rename or move…" Click="Rename" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="RenameAsset"/>
    <Button x:Name="RemoveButton" Content="Remove unreferenced image…" Click="Remove" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="RemoveUnusedAsset"/>
    <Button Content="Refresh" Click="Refresh" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="RefreshAssets"/>
    <Button Content="Close" IsCancel="True" Padding="14,6" AutomationProperties.AutomationId="CloseAssets"/>
-  </StackPanel>
+  </WrapPanel>
  </Grid>
 </Window>

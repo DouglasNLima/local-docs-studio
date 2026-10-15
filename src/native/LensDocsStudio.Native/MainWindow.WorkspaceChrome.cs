@@ -113,12 +113,20 @@ public partial class MainWindow
         e.Handled = true;
         OpenTabContext(tab, document);
     }
-    private void TabStripResized(object sender, SizeChangedEventArgs e)
+    private bool tabVisibilityQueued;
+    private void TabStripResized(object sender, SizeChangedEventArgs e) => QueueActiveTabVisibility();
+    private void TabStripViewportChanged(object sender, ScrollChangedEventArgs e)
     {
-        var document = model.ActiveDocument;
+        if (e.ViewportWidthChange != 0 || e.ExtentWidthChange != 0) QueueActiveTabVisibility();
+    }
+    private void QueueActiveTabVisibility()
+    {
+        if (tabVisibilityQueued || closing) return;
+        tabVisibilityQueued = true;
         Dispatcher.BeginInvoke(() =>
         {
-            if (model.ActiveDocument == document && document is not null
+            tabVisibilityQueued = false;
+            if (!closing && model.ActiveDocument is { } document
                 && DocumentTabs.ItemContainerGenerator.ContainerFromItem(document) is TabItem tab) tab.BringIntoView();
         }, System.Windows.Threading.DispatcherPriority.Loaded);
     }

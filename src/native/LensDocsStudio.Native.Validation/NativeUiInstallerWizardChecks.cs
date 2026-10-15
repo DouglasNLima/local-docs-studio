@@ -37,7 +37,7 @@ internal static partial class NativeUiChecks
     {
         installer = Path.GetFullPath(installer); output = Path.GetFullPath(output);
         if (!File.Exists(installer)) throw new FileNotFoundException("The native installer is missing.", installer);
-        using var identity = JsonDocument.Parse(File.ReadAllText(Path.Combine(Path.GetDirectoryName(installer)!, "version.json")));
+        using var identity = JsonDocument.Parse(ReadObservedText(Path.Combine(Path.GetDirectoryName(installer)!, "version.json")));
         if (identity.RootElement.GetProperty("product").GetString() != "LensDocsStudio.Native")
             throw new IOException("Wizard validation requires the isolated native product.");
         var version = identity.RootElement.GetProperty("version").GetString()!;
@@ -142,7 +142,7 @@ internal static partial class NativeUiChecks
                                 throw new IOException("Finish launched the installed application despite the unchecked launch choice.");
                             }
                     }
-                    using var installed = JsonDocument.Parse(File.ReadAllText(Path.Combine(destination, "version.json")));
+                    using var installed = JsonDocument.Parse(ReadObservedText(Path.Combine(destination, "version.json")));
                     using var registration = Registry.CurrentUser.OpenSubKey(NativeUninstallKey);
                     using var association = Registry.CurrentUser.OpenSubKey(@"Software\Classes\LensDocsStudio.Native.Document\shell\open\command");
                     if (!File.Exists(installedExe) || installed.RootElement.GetProperty("version").GetString() != version

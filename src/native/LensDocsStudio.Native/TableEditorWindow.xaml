@@ -21,8 +21,8 @@
    <Button x:Name="RemoveColumn" Content="Remove column" Tag="remove-column" Click="ChangeStructure" Margin="0,0,6,6" Padding="10,5" AutomationProperties.AutomationId="TableRemoveColumn"/>
    <Button x:Name="ColumnLeft" Content="Column left" Tag="column-left" Click="ChangeStructure" Margin="0,0,6,6" Padding="10,5" AutomationProperties.AutomationId="TableColumnLeft"/>
    <Button x:Name="ColumnRight" Content="Column right" Tag="column-right" Click="ChangeStructure" Margin="0,0,6,6" Padding="10,5" AutomationProperties.AutomationId="TableColumnRight"/>
-   <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-    <Label Content="Column _alignment" Target="{Binding ElementName=Alignment}"/>
+   <StackPanel Margin="0,0,0,6">
+    <Label Content="Column _alignment" Target="{Binding ElementName=Alignment}" Padding="0,0,0,6"/>
     <ComboBox x:Name="Alignment" Width="110" SelectionChanged="ChangeAlignment" AutomationProperties.Name="Table column alignment" AutomationProperties.AutomationId="TableAlignment">
      <ComboBoxItem Content="Default"/><ComboBoxItem Content="Left"/><ComboBoxItem Content="Centre"/><ComboBoxItem Content="Right"/>
     </ComboBox>

@@ -9,6 +9,14 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
+    private static bool ExportCompleted(Window window, string path)
+    {
+        var open = window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"));
+        var reveal = window.FindFirstDescendant(cf => cf.ByAutomationId("RevealExportedFile"));
+        return Find(window, "Status").Name.StartsWith("Export completed — " + Path.GetFileName(path), StringComparison.Ordinal)
+            && open is { IsEnabled: true, IsOffscreen: false } && reveal is { IsEnabled: true, IsOffscreen: false }
+            && open.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path) && reveal.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path);
+    }
     private static Window OpenSettingsWindow(Window owner, UIA3Automation automation, int process)
     {
         FocusWindow(owner); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.OEM_COMMA);
@@ -20,9 +28,9 @@ internal static partial class NativeUiChecks
 
     private static void CheckSettings(Window window, AutomationElement editor, UIA3Automation automation, int process, string state, string output, string source)
     {
-        var originalText = ReadEditorText(editor); var savedText = File.ReadAllText(source);
+        var originalText = ReadEditorText(editor); var savedText = ReadObservedText(source);
         var preferencePath = Path.Combine(state, "preferences.json");
-        var before = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
+        var before = JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferencePath))!;
         var settings = OpenSettingsWindow(window, automation, process);
         Select("SettingsFont", "Consolas"); Select("SettingsFontSize", "18"); Select("SettingsIndentation", "2");
         Select("SettingsReadingMode", "Pages");
@@ -36,11 +44,11 @@ internal static partial class NativeUiChecks
         Find(settings, "SettingsApply").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,
             "Applied settings did not close.");
-        var after = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
+        var after = JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferencePath))!;
         if (after.Editor != new EditorPreferences("Consolas", 18, false, false, 2, true) || after.Preview != new PreviewPreferences(125, "Pages", "Forest") || after.ShowOutline
             || after.AutomaticUpdateChecks != before.AutomaticUpdateChecks || after.UpdateChannel != before.UpdateChannel
             || !after.RecentDocuments!.SequenceEqual(before.RecentDocuments!) || after.IgnoredVersion != before.IgnoredVersion
-            || editor.Patterns.Value.Pattern.Value.Value != originalText || File.ReadAllText(source) != savedText)
+            || editor.Patterns.Value.Pattern.Value.Value != originalText || ReadObservedText(source) != savedText)
             throw new IOException("Applying reading settings lost source, recent paths or update consent, or failed to persist the chosen values.");
         settings = OpenSettingsWindow(window, automation, process);
         Find(settings, "SettingsReset").AsButton().Invoke();
@@ -48,7 +56,7 @@ internal static partial class NativeUiChecks
         Find(settings, "SettingsCancel").AsButton().Invoke();
         Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings"))) is null,
             "Cancelled settings did not close.");
-        var cancelled = JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencePath))!;
+        var cancelled = JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferencePath))!;
         if (WorkspaceSettings.From(cancelled) != WorkspaceSettings.From(after) || editor.Patterns.Value.Pattern.Value.Value != originalText)
             throw new IOException("Cancelling default settings changed saved preferences or document text.");
 

@@ -15,7 +15,7 @@ internal static partial class NativeUiChecks
     {
         var original = ReadEditorText(editor); var saved = File.ReadAllBytes(source);
         var preferencesPath = Path.Combine(state, "preferences.json");
-        UserPreferences Read() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferencesPath))!;
+        UserPreferences Read() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferencesPath))!;
         var originalPreferences = Read();
         var previousClipboard = NativeUiClipboard.GetDataObject(); uint owned = 0;
         var fixtures = new[]

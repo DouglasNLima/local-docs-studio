@@ -15,6 +15,7 @@ public partial class MainWindow
     private readonly DispatcherTimer syncTimer = new(DispatcherPriority.Background) { Interval = TimeSpan.FromMilliseconds(60) };
     private string? pendingSync;
     private bool applyingSync;
+    private string? applyingSyncOrigin;
     private long syncGeneration;
     private TextSelection? observedSelection;
     private PreviewSemanticAnchors? syncAnchors;
@@ -84,14 +85,14 @@ public partial class MainWindow
                 if (!SyncCurrent || rendered != result || !Preview.IsVisible) return;
                 var pointer = result!.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
                 if (pointer is null) return;
-                var generation = ++syncGeneration; applyingSync = true;
+                var generation = ++syncGeneration; applyingSync = true; applyingSyncOrigin = "restore-preview";
                 try { await PreviewNavigationService.BringIntoViewAsync(Preview, pointer); }
-                finally { if (syncGeneration == generation) applyingSync = false; }
+                finally { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }
             }, DispatcherPriority.Loaded);
     }
     private void CancelSynchronisation()
     {
-        syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false;
+        syncGeneration++; syncTimer.Stop(); pendingSync = null; applyingSync = false; applyingSyncOrigin = null;
         PreviewNavigationService.CancelPending(Preview); EditorNavigationService.CancelPending(Editor); semanticHighlight?.Show(null);
     }
     private void UserScrollInput(object sender, MouseWheelEventArgs e)
@@ -110,8 +111,12 @@ public partial class MainWindow
     }
     private void EditorScrollChanged(object? sender, EventArgs e)
     {
-        if (!applyingSync && Editor.IsVisible) recoveryTimer.Start();
-        if (!applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Editor.IsKeyboardFocusWithin || Editor.IsMouseOver)) QueueSynchronisation("editor-scroll");
+        if (Editor.IsVisible && (!applyingSync || Editor.IsKeyboardFocusWithin)) recoveryTimer.Start();
+        if (!BothPanesVisible || !DesktopState.SyncScroll) return;
+        // Fresh input in the focused pane must supersede an asynchronous alignment already
+        // running in the other pane. Hover-only events retain the feedback-loop guard.
+        if (Editor.IsKeyboardFocusWithin && (!applyingSync || applyingSyncOrigin is not ("preview-scroll" or "preview-selection"))) QueueFocusedSynchronisation("editor-scroll");
+        else if (!applyingSync && Editor.IsMouseOver) QueueSynchronisation("editor-scroll");
     }
     private void PreviewSelectionChanged(object? sender, EventArgs e)
     {
@@ -119,9 +124,11 @@ public partial class MainWindow
     }
     private void PreviewScrollChanged(object sender, ScrollChangedEventArgs e)
     {
-        if (e.VerticalChange != 0 && !applyingSync && Preview.IsVisible) recoveryTimer.Start();
-        if (e.VerticalChange != 0 && !applyingSync && BothPanesVisible && DesktopState.SyncScroll && (Preview.IsKeyboardFocusWithin || Preview.IsMouseOver))
-            QueueSynchronisation("preview-scroll");
+        if (e.VerticalChange == 0) return;
+        if (Preview.IsVisible && (!applyingSync || Preview.IsKeyboardFocusWithin)) recoveryTimer.Start();
+        if (!BothPanesVisible || !DesktopState.SyncScroll) return;
+        if (Preview.IsKeyboardFocusWithin && (!applyingSync || applyingSyncOrigin is not ("editor-scroll" or "editor-selection" or "caret" or "restore-preview"))) QueueFocusedSynchronisation("preview-scroll");
+        else if (!applyingSync && Preview.IsMouseOver) QueueSynchronisation("preview-scroll");
     }
     private void QueueSynchronisation(string origin)
     {
@@ -151,7 +158,7 @@ public partial class MainWindow
         syncTimer.Stop(); var origin = pendingSync; pendingSync = null;
         if (origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
-        applyingSync = true;
+        applyingSync = true; applyingSyncOrigin = origin;
         try
         {
             if (origin == "preview-selection" && DesktopState.SyncSelection && Preview.Selection is { IsEmpty: false } selection)
@@ -192,6 +199,15 @@ public partial class MainWindow
                     var position = view.GetPositionFloor(new Point(0, view.VerticalOffset + view.ActualHeight / 3));
                     if (position is null) return;
                     offset = Editor.Document.GetOffset(position.Value.Line, position.Value.Column);
+                    // Prefer a section heading already visible above the scroll point. Its following
+                    // paragraph can start on the next printed page; keep that section identifiable.
+                    // Long paragraphs/code without a visible heading still use their exact source point.
+                    if (view.GetPositionFloor(new Point(0, view.VerticalOffset)) is { } first)
+                    {
+                        var visibleStart = Editor.Document.GetOffset(first.Line, first.Column);
+                        var heading = parsed?.Headings.LastOrDefault(candidate => candidate.SourceStart >= visibleStart && candidate.SourceStart <= offset);
+                        if (heading is not null) offset = heading.SourceStart;
+                    }
                 }
                 result.RevealSource(offset);
                 var pointer = result.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
@@ -204,7 +220,7 @@ public partial class MainWindow
         {
             if (!Dispatcher.HasShutdownStarted)
             {
-                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) applyingSync = false; }, DispatcherPriority.Background); }
+                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }, DispatcherPriority.Background); }
                 catch (TaskCanceledException) when (Dispatcher.HasShutdownStarted) { }
             }
         }

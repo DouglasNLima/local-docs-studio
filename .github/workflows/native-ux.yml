@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-desktop-ux-modernisation']
+    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement']
   pull_request:
-    branches: ['release/native-preview-readiness']
+    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation']
   workflow_dispatch:
 permissions:
   contents: read
@@ -25,11 +25,11 @@ jobs:
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Build verified baseline in isolation
         run: |
-          git worktree add --detach artifacts/native/ux-base c566144529c3c0e4393c1604544201b936e4a6a2
+          git worktree add --detach artifacts/native/ux-base 5a373a412e86b93ea8af1b9e5b867250e3d23ee1
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet build artifacts/native/ux-base/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Capture reproducible baseline on disposable Windows
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots artifacts/native/ux-base/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-baseline c566144529c3c0e4393c1604544201b936e4a6a2
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots artifacts/native/ux-base/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-baseline 5a373a412e86b93ea8af1b9e5b867250e3d23ee1
       - name: Capture current native shell
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-current ${{ github.sha }}
       - name: Capture actual high contrast on the disposable desktop
@@ -47,6 +47,7 @@ jobs:
             artifacts/native/ux-current/*.json
             artifacts/native/ux-controls/*.png
             artifacts/native/ux-controls/*.json
+            artifacts/native/ux-controls/refinement-display/*.json
             artifacts/native/ux-high-contrast/*.png
             artifacts/native/ux-high-contrast/*.json
           retention-days: 14

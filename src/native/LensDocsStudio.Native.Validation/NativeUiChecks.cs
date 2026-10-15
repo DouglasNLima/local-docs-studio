@@ -80,6 +80,9 @@ internal static partial class NativeUiChecks
             checks.Add("Native bidirectional semantic scroll, rapid input, independent caret following and tab cancellation preserve focus, caret and source");
             CheckMinimumWindow(window, editor, automation, app.ProcessId, output, source);
             checks.Add("Minimum-size native window hides idle Cancel and retains visible Find/Replace controls, working replacement/Close, exact Undo and unchanged saved source");
+            CheckRefinement(window, editor, automation, app.ProcessId, state, output, source,
+                (destination, title) => SaveThroughDialogue(destination, title, absolutePath: true));
+            checks.Add("Native refinement retains measured header geometry/keyboard focus, file identities, filtered Settings drafts, closed-workspace context and guarded export history/actions");
             if (desktopUxOnly)
             {
                 Wait(() => Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Native UI fixture", StringComparison.Ordinal), "The original diagram preview did not resume.");
@@ -112,7 +115,7 @@ internal static partial class NativeUiChecks
             MeasureOperation("Windows keyboard text delivery through exact editor observation", operationWatch);
             checks.Add("Editor search closes and keyboard input reaches the editor");
             operationWatch.Restart(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => File.ReadAllText(source).Contains("Native UI validation — Café", StringComparison.Ordinal), "Save did not persist Unicode text.");
+            Wait(() => ReadObservedText(source).Contains("Native UI validation — Café", StringComparison.Ordinal), "Save did not persist Unicode text.");
             MeasureOperation("Save shortcut through observed UTF-8 file update", operationWatch);
             checks.Add("Ctrl+S persisted actual UTF-8 source");
             var preview = Find(window, "DocumentPreview");
@@ -153,7 +156,7 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("[Second document](Second%20document.md)", StringComparison.Ordinal), "The inserted document link was not portable Markdown.");
             FocusWindow(window);
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => File.ReadAllText(source).Contains("Second%20document.md", StringComparison.Ordinal), "The inserted link was not saved.");
+            Wait(() => ReadObservedText(source).Contains("Second%20document.md", StringComparison.Ordinal), "The inserted link was not saved.");
             AutomationElement? documentLink = null;
             // WPF exposes FlowDocument hyperlinks through UIA TextPattern ranges.
             Wait(() => (documentLink = Find(window, "DocumentPreview").Patterns.Text.Pattern.DocumentRange.GetChildren()
@@ -170,7 +173,7 @@ internal static partial class NativeUiChecks
             checks.Add("Alt+Left, Alt+Right and native buttons navigate document history");
             Wait(() =>
             {
-                var preferences = JsonSerializer.Deserialize<LensDocsStudio.Core.State.UserPreferences>(File.ReadAllText(Path.Combine(state, "preferences.json")))!;
+                var preferences = JsonSerializer.Deserialize<LensDocsStudio.Core.State.UserPreferences>(ReadObservedText(Path.Combine(state, "preferences.json")))!;
                 return preferences.RecentDocuments?.Contains(source) == true && preferences.RecentDocuments.Contains(linkedDocument) && preferences.RecentWorkspaces?.Contains(runRoot) == true;
             }, "Recent documents and workspaces were not persisted.");
             checks.Add("Recent document and workspace paths persist in isolated native preferences");
@@ -193,8 +196,8 @@ internal static partial class NativeUiChecks
             Wait(() => (reviewMoveWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Review document move")))?.AsWindow()) is not null, "The move was not reviewed again after saving linked documents.");
             Find(reviewMoveWindow!, "ApplyDocumentMove").AsButton().Invoke();
             var renamedDocument = Path.Combine(runRoot, "Renamed document.md");
-            Wait(() => File.Exists(renamedDocument) && !File.Exists(linkedDocument) && File.ReadAllText(source).Contains("Renamed%20document.md", StringComparison.Ordinal), "Renaming did not update the actual file and its incoming Markdown link.");
-            if (!File.ReadAllText(source).Contains("Unsaved linked-document changes must survive the move.", StringComparison.Ordinal)) throw new IOException("The linked document lost its unsaved changes during the move.");
+            Wait(() => File.Exists(renamedDocument) && !File.Exists(linkedDocument) && ReadObservedText(source).Contains("Renamed%20document.md", StringComparison.Ordinal), "Renaming did not update the actual file and its incoming Markdown link.");
+            if (!ReadObservedText(source).Contains("Unsaved linked-document changes must survive the move.", StringComparison.Ordinal)) throw new IOException("The linked document lost its unsaved changes during the move.");
             Find(window, "NavigateBack").Click();
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("Renamed%20document.md", StringComparison.Ordinal), "The open linked document did not receive the planned link update.");
             checks.Add("Native rename review saves unsaved linked content, moves the file, updates links and refreshes open editor text");
@@ -211,7 +214,7 @@ internal static partial class NativeUiChecks
             Wait(() => File.Exists(createdPath) && editor.Patterns.Value.Pattern.Value.Value.Length == 0, "The native create-file workflow did not create and open the file.");
             FocusWindow(window); editor.Click(); Keyboard.Type("Created through the native workspace.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => File.ReadAllText(createdPath) == "Created through the native workspace.", "The new file did not save its actual edited content.");
+            Wait(() => ReadObservedText(createdPath) == "Created through the native workspace.", "The new file did not save its actual edited content.");
             checks.Add("Create workspace file creates a real Markdown file and saves native editor content");
             editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.Type("Unsaved content retained before deletion.");
@@ -245,7 +248,7 @@ internal static partial class NativeUiChecks
             if (File.Exists(createdPath)) throw new IOException("Inspecting and restoring a snapshot unexpectedly recreated a workspace file.");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             SaveThroughDialogue(createdPath);
-            Wait(() => File.Exists(createdPath) && File.ReadAllText(createdPath).Contains("Unsaved content retained before deletion.", StringComparison.Ordinal), "The recovered source did not save to its explicitly chosen destination.");
+            Wait(() => File.Exists(createdPath) && ReadObservedText(createdPath).Contains("Unsaved content retained before deletion.", StringComparison.Ordinal), "The recovered source did not save to its explicitly chosen destination.");
             checks.Add("Snapshot browser recovers unsaved text into a new draft and Save recreates only the chosen file");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
             var sourceTab = window.FindFirstDescendant(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem).And(cf.ByName("fixture.md"))) ?? throw new InvalidOperationException("The original document tab is unavailable.");
@@ -271,7 +274,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             SaveThroughDialogue(imageDocument);
             Wait(() => File.Exists(imageDocument), "The document containing the pasted image was not saved.");
-            var imageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(imageDocument)).Single(l => l.IsImage).Reference;
+            var imageReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(ReadObservedText(imageDocument)).Single(l => l.IsImage).Reference;
             if (!imageReference.StartsWith("assets/images/", StringComparison.Ordinal)) throw new IOException("The saved image still relies on a private draft folder.");
             var imagePath = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(imageDocument, imageReference);
             if (!File.Exists(imagePath) || new FileInfo(imagePath).Length < 50) throw new IOException("Saving the unsaved document did not persist its portable image.");
@@ -297,7 +300,7 @@ internal static partial class NativeUiChecks
                 var copiedDocument = Path.Combine(runRoot, "Copied image document.md");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(copiedDocument);
                 Wait(() => File.Exists(copiedDocument), "The copied image document was not saved.");
-                var copiedReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(copiedDocument)).Single(l => l.IsImage).Reference;
+                var copiedReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(ReadObservedText(copiedDocument)).Single(l => l.IsImage).Reference;
                 var copiedPath = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(copiedDocument, copiedReference);
                 if (copiedPath.Equals(imagePath, StringComparison.OrdinalIgnoreCase) || !File.Exists(copiedPath) || !File.Exists(imagePath))
                     throw new IOException("Copying the image did not retain independent portable assets for both documents.");
@@ -332,8 +335,8 @@ internal static partial class NativeUiChecks
             if (Find(imageReviewWindow!, "AssetMoveDocuments").AsListBox().Items.Length != 1) throw new IOException("The image move did not identify the exact affected document.");
             Find(imageReviewWindow!, "ApplyAssetMove").AsButton().Invoke();
             var renamedImage = Path.Combine(runRoot, "assets", "images", "renamed-ui.png");
-            Wait(() => File.Exists(renamedImage) && !File.Exists(imagePath) && File.ReadAllText(imageDocument).Contains("assets/images/renamed-ui.png", StringComparison.Ordinal), "The image rename did not update its file and Markdown reference.");
-            if (!File.ReadAllText(imageDocument).Contains("Unsaved image document text must survive rename.", StringComparison.Ordinal)) throw new IOException("Renaming an image discarded an unsaved edit.");
+            Wait(() => File.Exists(renamedImage) && !File.Exists(imagePath) && ReadObservedText(imageDocument).Contains("assets/images/renamed-ui.png", StringComparison.Ordinal), "The image rename did not update its file and Markdown reference.");
+            if (!ReadObservedText(imageDocument).Contains("Unsaved image document text must survive rename.", StringComparison.Ordinal)) throw new IOException("Renaming an image discarded an unsaved edit.");
             checks.Add("Native image manager shows unsaved references and reviewed rename preserves text while updating the real image and Markdown path");
             Wait(() => (assetsWindow = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByName("Workspace images")))?.AsWindow()) is not null, "The image audit did not refresh after rename.");
             Find(assetsWindow!, "AssetFilter").AsTextBox().Text = "unused-ui.png";
@@ -355,7 +358,7 @@ internal static partial class NativeUiChecks
             var recoveredImageDocument = Path.Combine(runRoot, "Recovered image.md");
             FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(recoveredImageDocument);
             Wait(() => File.Exists(recoveredImageDocument), "The recovered image document was not saved.");
-            var restoredReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(recoveredImageDocument)).Single(l => l.IsImage).Reference;
+            var restoredReference = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(ReadObservedText(recoveredImageDocument)).Single(l => l.IsImage).Reference;
             var restoredImage = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(recoveredImageDocument, restoredReference);
             if (!unusedBytes.SequenceEqual(File.ReadAllBytes(restoredImage)) || File.Exists(unusedImage)) throw new IOException("Image recovery did not preserve exact bytes at the explicitly chosen destination.");
             checks.Add("Unused image removal uses Windows recycling and the snapshot browser restores identical bytes into an explicitly saved portable document");
@@ -367,7 +370,7 @@ internal static partial class NativeUiChecks
             foreach (var line in new[] { "| Area | Status |", "|---|---|", "| Clipboard | Ready |" })
             { Keyboard.Type(line); Keyboard.Type(VirtualKeyShort.RETURN); }
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => File.ReadAllText(source).Contains("| Clipboard | Ready |", StringComparison.Ordinal), "The clipboard table fixture did not save.");
+            Wait(() => ReadObservedText(source).Contains("| Clipboard | Ready |", StringComparison.Ordinal), "The clipboard table fixture did not save.");
             previousClipboard = NativeUiClipboard.GetDataObject(); ownedClipboardSequence = 0;
             try
             {
@@ -410,7 +413,7 @@ internal static partial class NativeUiChecks
                 var sourcePastePath = Path.Combine(runRoot, "Markdown clipboard document.md");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(sourcePastePath);
                 Wait(() => File.Exists(sourcePastePath), "The Markdown clipboard document did not save.");
-                var savedMarkdown = File.ReadAllText(sourcePastePath);
+                var savedMarkdown = ReadObservedText(sourcePastePath);
                 var sourcePasteLink = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(savedMarkdown).Single(l => l.IsImage);
                 if (savedMarkdown.Replace(sourcePasteLink.Reference, sourceImage, StringComparison.Ordinal) != sourcePlain)
                     throw new IOException("Markdown paste changed source outside the saved image destination.");
@@ -445,7 +448,7 @@ internal static partial class NativeUiChecks
                 var pastedPath = Path.Combine(runRoot, "Rich clipboard document.md");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); SaveThroughDialogue(pastedPath);
                 Wait(() => File.Exists(pastedPath), "The formatted paste document did not save.");
-                var pastedLinks = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(File.ReadAllText(pastedPath)).Where(link => link.IsImage).ToArray();
+                var pastedLinks = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(ReadObservedText(pastedPath)).Where(link => link.IsImage).ToArray();
                 if (pastedLinks.Length != 1) throw new IOException("Formatted paste did not retain the single diagram image.");
                 var pastedImage = new LensDocsStudio.Core.Workspace.WorkspacePath(runRoot).ResolveLink(pastedPath, pastedLinks[0].Reference);
                 using (var pixels = File.OpenRead(pastedImage))
@@ -459,7 +462,7 @@ internal static partial class NativeUiChecks
                 Find(window, "PasteTable").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("| CSV | Portable |", StringComparison.Ordinal), "Paste Special did not convert the CSV table.");
                 Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-                Wait(() => File.ReadAllText(pastedPath).Contains("| CSV | Portable |", StringComparison.Ordinal), "The pasted CSV table did not save.");
+                Wait(() => ReadObservedText(pastedPath).Contains("| CSV | Portable |", StringComparison.Ordinal), "The pasted CSV table did not save.");
                 checks.Add("Formatted Windows paste prefers HTML over a fallback bitmap, persists portable diagram pixels and exposes CSV table Paste Special");
                 var beforeFailedPaste = ReadEditorText(editor);
                 var invalidImage = new System.Windows.DataObject();
@@ -486,7 +489,7 @@ internal static partial class NativeUiChecks
                 }, new JsonSerializerOptions { WriteIndented = true }));
                 acknowledge!.AsButton().Invoke();
                 Wait(() => window.IsEnabled, "The paste error did not close.");
-                if (editor.Patterns.Value.Pattern.Value.Value != beforeFailedPaste || File.ReadAllText(pastedPath) != beforeFailedPaste)
+                if (editor.Patterns.Value.Pattern.Value.Value != beforeFailedPaste || ReadObservedText(pastedPath) != beforeFailedPaste)
                     throw new IOException("An invalid clipboard image discarded the editor selection or changed the saved document.");
                 var literal = new System.Windows.DataObject(); literal.SetData(System.Windows.DataFormats.UnicodeText, "# Literal *source*", false);
                 literal.SetData(System.Windows.DataFormats.Html, LensDocsStudio.Core.Exports.HtmlClipboardFormat.Encode("<p>Different rich text</p>"), false);
@@ -565,7 +568,7 @@ internal static partial class NativeUiChecks
             Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidCompletion"))) is not null,
                 "The diagram could not be completed for site export.");
             Keyboard.Type(VirtualKeyShort.RETURN); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
-            Wait(() => File.ReadAllText(Path.Combine(runRoot, "Completion.mmd")).StartsWith("flowchart TD", StringComparison.Ordinal), "The completed diagram did not save before export.");
+            Wait(() => ReadObservedText(Path.Combine(runRoot, "Completion.mmd")).StartsWith("flowchart TD", StringComparison.Ordinal), "The completed diagram did not save before export.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W); sourceTab.Patterns.SelectionItem.Pattern.Select();
             Find(window, "ExportMenu").Click(); Find(window, "ExportDocsSite").Patterns.Invoke.Pattern.Invoke();
             Window? siteWindow = null;
@@ -574,7 +577,7 @@ internal static partial class NativeUiChecks
             Find(siteWindow!, "DocsSiteTitle").AsTextBox().Text = "Native UI documentation";
             Find(siteWindow!, "ConfirmDocsSite").Patterns.Invoke.Pattern.Invoke();
             var sitePath = Path.Combine(runRoot, "documentation-site.zip"); SaveThroughDialogue(sitePath, "Save Docs Site");
-            Wait(() => File.Exists(sitePath) && Find(window, "Status").Name.StartsWith("Docs Site exported:", StringComparison.Ordinal), "The native Docs Site ZIP did not finish exporting.");
+            Wait(() => File.Exists(sitePath) && ExportCompleted(window, sitePath), "The native Docs Site ZIP did not finish exporting with matching completion actions.");
             using (var siteZip = System.IO.Compression.ZipFile.OpenRead(sitePath))
             {
                 var manifestEntry = siteZip.GetEntry("site-manifest.json") ?? throw new IOException("The exported site manifest is missing.");
@@ -616,21 +619,21 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             checks.Add("Native progress dialogue validates input, reopens an existing indicator and preserves complete Undo/Redo actions");
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == beforeProgress, "Progress source was not restored before bundle export.");
-            var savedBeforeBundle = File.ReadAllText(source);
+            var savedBeforeBundle = ReadObservedText(source);
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             const string bundleDraft = " Bundle-only unsaved text."; Keyboard.Type(bundleDraft);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value.EndsWith(bundleDraft, StringComparison.Ordinal), "The bundle draft did not reach the editor.");
             var bundleSource = ReadEditorText(editor);
             Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             var bundlePath = Path.Combine(runRoot, "portable-documents.zip"); SaveThroughDialogue(bundlePath, "Export Markdown bundle");
-            Wait(() => File.Exists(bundlePath) && Find(window, "Status").Name.StartsWith("Markdown bundle exported", StringComparison.Ordinal), "The native Markdown bundle did not finish.");
+            Wait(() => File.Exists(bundlePath) && ExportCompleted(window, bundlePath), "The native Markdown bundle did not finish with matching completion actions.");
             using (var archive = System.IO.Compression.ZipFile.OpenRead(bundlePath))
             {
                 if (archive.Entries.Any(entry => entry.FullName.StartsWith("state/", StringComparison.OrdinalIgnoreCase))
                     || !archive.Entries.Any(entry => entry.FullName.StartsWith("assets/images/", StringComparison.OrdinalIgnoreCase)))
                     throw new IOException("The Markdown bundle included private state or lost portable assets.");
                 using var reader = new StreamReader((archive.GetEntry("fixture.md") ?? throw new IOException("The bundle source is missing.")).Open());
-                if (reader.ReadToEnd() != bundleSource || File.ReadAllText(source) != savedBeforeBundle)
+                if (reader.ReadToEnd() != bundleSource || ReadObservedText(source) != savedBeforeBundle)
                     throw new IOException("The Markdown bundle lost current edits or changed the saved source.");
             }
             FocusWindow(window); editor.Click();
@@ -755,7 +758,7 @@ internal static partial class NativeUiChecks
                         File.WriteAllText(Path.Combine(output, "native-theme-colour-" + theme.ToLowerInvariant() + ".json"),
                             JsonSerializer.Serialize(new { Theme = theme, Expected = expectedColour, Observed = observedColour }));
                     }
-                    Wait(() => File.ReadAllText(Path.Combine(state, "preferences.json")).Contains("\"" + theme + "\"", StringComparison.Ordinal), "The chosen theme was not persisted.");
+                    Wait(() => ReadObservedText(Path.Combine(state, "preferences.json")).Contains("\"" + theme + "\"", StringComparison.Ordinal), "The chosen theme was not persisted.");
                     if (editor.Patterns.Value.Pattern.Value.Value != contextMarkdown) throw new IOException("Changing the native theme altered editor source.");
                     window.CaptureToFile(Path.Combine(output, "native-theme-" + theme.ToLowerInvariant() + ".png"));
                 }
@@ -769,7 +772,7 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(window, "Status").Name == "Code block Markdown source copied.", "The preview context command did not copy Markdown.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
                 if (NativeUiClipboard.GetText() != contextMarkdown) throw new IOException("Copy code Markdown lost its original fences or source line endings.");
-                var codeSavedSource = File.ReadAllText(source);
+                var codeSavedSource = ReadObservedText(source);
                 Find(window, "EditMenu").Click(); Find(window, "CopyRenderedContent").Patterns.Invoke.Pattern.Invoke();
                 Wait(() => Find(window, "Status").Name.StartsWith("Rendered content copied as HTML", StringComparison.Ordinal), "Coloured code copying did not complete.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
@@ -780,7 +783,7 @@ internal static partial class NativeUiChecks
                     throw new IOException("Actual Windows rich copying lost code text, indentation or syntax colours.");
                 Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
                 var codeExport = Path.Combine(runRoot, "coloured-code.docx"); SaveThroughDialogue(codeExport, "Export DOCX");
-                Wait(() => File.Exists(codeExport) && Find(window, "Status").Name == "Exported coloured-code.docx", "Coloured Word export did not complete.");
+                Wait(() => File.Exists(codeExport) && ExportCompleted(window, codeExport), "Coloured Word export did not complete.");
                 using (var codePackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(codeExport, false))
                 {
                     var paragraph = codePackage.MainDocumentPart!.Document!.Body!.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>().Single();
@@ -791,7 +794,7 @@ internal static partial class NativeUiChecks
                 }
                 Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
                 var codePdf = Path.Combine(runRoot, "coloured-code.pdf"); SaveThroughDialogue(codePdf, "Export PDF");
-                Wait(() => File.Exists(codePdf) && Find(window, "Status").Name == "Exported coloured-code.pdf", "Coloured PDF export did not complete.");
+                Wait(() => File.Exists(codePdf) && ExportCompleted(window, codePdf), "Coloured PDF export did not complete.");
                 using (var inspectedCode = UglyToad.PdfPig.PdfDocument.Open(codePdf))
                 {
                     var selectable = string.Concat(inspectedCode.GetPages().SelectMany(page => page.Letters).Select(letter => letter.Value));
@@ -799,7 +802,7 @@ internal static partial class NativeUiChecks
                         || selectable.Contains('\0') || selectable.Contains('\uFFFD'))
                         throw new IOException("The actual PDF export lost selectable Unicode code.");
                 }
-                if (ReadEditorText(editor) != contextMarkdown || File.ReadAllText(source) != codeSavedSource)
+                if (ReadEditorText(editor) != contextMarkdown || ReadObservedText(source) != codeSavedSource)
                     throw new IOException("Coloured code export changed editor or saved source.");
                 checks.Add("Native rich copying and Word/PDF Export menus retain Unicode code while preserving editor and saved source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
@@ -815,7 +818,7 @@ internal static partial class NativeUiChecks
                 window.CaptureToFile(Path.Combine(output, "native-pdf-decorations.png"));
                 Find(window, "ExportMenu").Click(); Find(window, "ExportPdf").Patterns.Invoke.Pattern.Invoke();
                 var decoratedPdf = Path.Combine(runRoot, "decorated-text.pdf"); SaveThroughDialogue(decoratedPdf, "Export PDF");
-                Wait(() => File.Exists(decoratedPdf) && Find(window, "Status").Name == "Exported decorated-text.pdf", "Decorated PDF export did not complete.");
+                Wait(() => File.Exists(decoratedPdf) && ExportCompleted(window, decoratedPdf), "Decorated PDF export did not complete.");
                 using (var inspectedDecoration = UglyToad.PdfPig.PdfDocument.Open(decoratedPdf))
                 {
                     var page = inspectedDecoration.GetPage(1); var words = page.GetWords().ToArray();
@@ -826,14 +829,14 @@ internal static partial class NativeUiChecks
                             .Any(action => action.Uri == "https://example.org/decorated"))
                         throw new IOException("The actual PDF export lost its visible decorations, selectable Unicode or working link.");
                 }
-                if (ReadEditorText(editor) != decorationMarkdown || File.ReadAllText(source) != codeSavedSource)
+                if (ReadEditorText(editor) != decorationMarkdown || ReadObservedText(source) != codeSavedSource)
                     throw new IOException("Decorated PDF export changed editor or saved source.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == contextOriginal, "Decorated export damaged complete insertion Undo.");
                 checks.Add("Native PDF Export retains actual strike-through/highlight geometry, selectable Unicode and hyperlinks while preserving source and complete Undo");
                 const string tableMarkdown = "# Excluded introduction\n\n| Other | Table |\n|---|---|\n| Excluded | row |\n\n" +
                     "| Selected | Value |\n|---|---|\n| Native table Café | =1+1 |\n| Identifier | 000123 |\n\nExcluded conclusion.";
-                var tableSavedSource = File.ReadAllText(source);
+                var tableSavedSource = ReadObservedText(source);
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
                 NativeUiClipboard.SetText(tableMarkdown); contextClipboardSequence = GetClipboardSequenceNumber();
                 EditorContext("EditorContextPaste");
@@ -849,15 +852,15 @@ internal static partial class NativeUiChecks
                     || tableHtml.Body!.TextContent.Contains("Excluded", StringComparison.Ordinal)
                     || tableHtml.QuerySelectorAll("td,th").Any(cell => !(cell.GetAttribute("style") ?? "").Contains("mso-number-format", StringComparison.Ordinal)))
                     throw new IOException("Native table copy lost its selected-table boundary or literal-cell clipboard contract.");
-                if (File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
+                if (ReadObservedText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
                     throw new IOException("Native table copying changed saved or edited source.");
                 window.CaptureToFile(Path.Combine(output, "native-table-copy.png"));
                 OpenPreviewContext("Native table Café", "ExportPreviewTableCsv").Patterns.Invoke.Pattern.Invoke();
                 var csvPath = Path.Combine(runRoot, "fixture-table-2.csv");
                 SaveThroughDialogue(csvPath, "Export table CSV", "fixture-table-2.csv");
-                Wait(() => Find(window, "Status").Name == "Table exported as UTF-8 CSV.", "The native table CSV command did not finish.");
+                Wait(() => ExportCompleted(window, csvPath), "The native table CSV command did not finish.");
                 if (!File.ReadAllBytes(csvPath).SequenceEqual(System.Text.Encoding.UTF8.GetBytes("Selected,Value\r\nNative table Café,=1+1\r\nIdentifier,000123"))
-                    || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
+                    || ReadObservedText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != tableMarkdown)
                     throw new IOException("Native table CSV lost its selected cells, encoding or unchanged source.");
                 checks.Add("Native table CSV context action and Save dialogue retain selected UTF-8 cells, table numbering and unchanged source");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
@@ -886,7 +889,7 @@ internal static partial class NativeUiChecks
                 EditorContext("EditorContextCopy");
                 Wait(() => NativeUiClipboard.GetText() == "TODO", "Review navigation did not select the exact TODO marker.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                if (NativeUiClipboard.GetText() != "TODO" || editor.Patterns.Value.Pattern.Value.Value != reviewSource || File.ReadAllText(source) != tableSavedSource)
+                if (NativeUiClipboard.GetText() != "TODO" || editor.Patterns.Value.Pattern.Value.Value != reviewSource || ReadObservedText(source) != tableSavedSource)
                     throw new IOException("Review navigation lost the exact source selection or altered document content.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Document review validation did not restore the original source.");
@@ -919,7 +922,7 @@ internal static partial class NativeUiChecks
                 EditorContext("EditorContextCopy");
                 Wait(() => NativeUiClipboard.GetText() == "[Old](review-target.md#saved-target)", "Workspace review did not select the exact stale link.");
                 contextClipboardSequence = GetClipboardSequenceNumber();
-                if (File.ReadAllText(reviewTargetPath) != "# Saved target" || File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != workspaceReviewSource)
+                if (ReadObservedText(reviewTargetPath) != "# Saved target" || ReadObservedText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != workspaceReviewSource)
                     throw new IOException("Workspace review changed saved or edited documents.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == contextOriginal, "Workspace review did not restore its source fixture.");
@@ -963,7 +966,7 @@ internal static partial class NativeUiChecks
                     if (actualFigure.PixelWidth != expectedFigure.PixelWidth || actualFigure.PixelHeight != expectedFigure.PixelHeight || !actualData.SequenceEqual(expectedData))
                         throw new IOException("Native figure copying changed its pixels.");
                 }
-                if (File.ReadAllText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != figureSource)
+                if (ReadObservedText(source) != tableSavedSource || editor.Patterns.Value.Pattern.Value.Value != figureSource)
                     throw new IOException("Figure preview or copying changed saved or edited source.");
                 window.CaptureToFile(Path.Combine(output, "native-image-figure.png"));
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
@@ -998,7 +1001,7 @@ internal static partial class NativeUiChecks
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value.Contains("<figcaption>Updated caption</figcaption>", StringComparison.Ordinal), "Caption editing did not replace the current figure.");
                 var updatedFigureSource = ReadEditorText(editor);
                 var editedFigure = new LensDocsStudio.Core.Parsing.MarkdownService().Parse(updatedFigureSource).Syntax.OfType<LensDocsStudio.Core.Parsing.DocumentImageFigureBlock>().Single();
-                if (editedFigure.Image.Url != figureReference || editedFigure.Image.Title != "Retained image title" || File.ReadAllText(source) != tableSavedSource)
+                if (editedFigure.Image.Url != figureReference || editedFigure.Image.Title != "Retained image title" || ReadObservedText(source) != tableSavedSource)
                     throw new IOException("Figure caption editing changed its destination, title or saved source.");
                 FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => editor.Patterns.Value.Pattern.Value.Value == convertedFigure, "Caption edit Undo did not restore the previous figure.");
@@ -1034,21 +1037,21 @@ internal static partial class NativeUiChecks
                 if (libraryClipboardSequence != 0 && GetClipboardSequenceNumber() == libraryClipboardSequence)
                 { if (beforeLibraryClipboard is null) NativeUiClipboard.Clear(); else NativeUiClipboard.SetDataObject(beforeLibraryClipboard, true); }
             }
-            var templateSource = ReadEditorText(editor); var templateSavedSource = File.ReadAllText(source);
-            var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels);
+            var templateSource = ReadEditorText(editor); var templateSavedSource = ReadObservedText(source);
+            var templatePixels = File.ReadAllBytes(renamedImage); var templateBytes = NativeWordTemplateChecks.Create(templatePixels, attachedTemplate: true);
             var templatePath = Path.Combine(runRoot, "native-template.docx"); File.WriteAllBytes(templatePath, templateBytes);
             Find(window, "ExportMenu").Click(); Find(window, "SelectWordTemplate").Patterns.Invoke.Pattern.Invoke();
             OpenThroughDialogue(templatePath, "Select Word template");
             Wait(() => Find(window, "Status").Name.StartsWith("Word template selected: native-template.docx", StringComparison.Ordinal), "The native Word template did not validate and select.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var templateExport = Path.Combine(runRoot, "template-export.docx"); SaveThroughDialogue(templateExport, "Export DOCX");
-            Wait(() => File.Exists(templateExport) && Find(window, "Status").Name == "Exported template-export.docx", "Word export with the selected native template did not complete.");
+            Wait(() => File.Exists(templateExport) && ExportCompleted(window, templateExport), "Word export with the selected native template did not complete.");
             NativeWordTemplateChecks.Check(File.ReadAllBytes(templateExport), templatePixels);
             Find(window, "ExportMenu").Click(); Find(window, "ClearWordTemplate").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(window, "Status").Name == "Default Word styles selected", "The native Word template did not clear.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var defaultExport = Path.Combine(runRoot, "default-export.docx"); SaveThroughDialogue(defaultExport, "Export DOCX");
-            Wait(() => File.Exists(defaultExport) && Find(window, "Status").Name == "Exported default-export.docx", "Default Word export did not complete after clearing the template.");
+            Wait(() => File.Exists(defaultExport) && ExportCompleted(window, defaultExport), "Default Word export did not complete after clearing the template.");
             using (var defaultPackage = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(defaultExport, false))
             {
                 if (defaultPackage.MainDocumentPart!.HeaderParts.Any() || defaultPackage.MainDocumentPart.FooterParts.Any()
@@ -1056,16 +1059,25 @@ internal static partial class NativeUiChecks
                     || new DocumentFormat.OpenXml.Validation.OpenXmlValidator().Validate(defaultPackage).Any())
                     throw new IOException("Clearing the native Word template retained its formatting or produced an invalid package.");
             }
-            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
+            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || ReadObservedText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
                 throw new IOException("Template selection or Word export changed original source files.");
             checks.Add("Native Word template selection and export preserve heading styles, header/footer/logo and source files while excluding private template content; clearing restores default output");
             var libraryWindow = OpenTemplateLibrary(window);
             if (Find(libraryWindow, "UseLibraryTemplate").IsEnabled) throw new IOException("An empty Word template library enabled selection.");
+            if (Find(libraryWindow, "WordTemplateEmptyState").IsOffscreen || !Find(libraryWindow, "ImportEmptyLibraryTemplate").IsEnabled)
+                throw new IOException("The native empty template library has no visible primary import action.");
+            libraryWindow.CaptureToFile(Path.Combine(output, "native-refinement-template-empty.png"));
             Find(libraryWindow, "ImportLibraryTemplate").AsButton().Invoke();
             OpenThroughDialogue(templatePath, "Import Word template to library");
             NameTemplate("Name Word template", "native-template", "Reusable Café");
             Wait(() => Find(libraryWindow, "WordTemplateStatus").Name.StartsWith("Imported Reusable Café.", StringComparison.Ordinal)
                 && Find(libraryWindow, "UseLibraryTemplate").IsEnabled, "The native library did not import reusable template formatting.");
+            Wait(() => Find(libraryWindow, "WordTemplateFormatting").Name.Contains("Headers: 1 · footers: 1", StringComparison.Ordinal)
+                && Find(libraryWindow, "WordTemplateFormatting").Name.Contains("Embedded header/footer images: 1", StringComparison.Ordinal),
+                "The imported template did not expose its retained formatting and embedded resources.");
+            if (!Find(libraryWindow, "WordTemplateStatus").Name.Contains(LensDocsStudio.Core.Exports.DocxTemplateService.AttachedTemplateWarning, StringComparison.Ordinal))
+                throw new IOException("The attached-template import did not show its safe omission warning.");
+            libraryWindow.CaptureToFile(Path.Combine(output, "native-refinement-template-import-warning.png"));
             Find(libraryWindow, "RenameLibraryTemplate").AsButton().Invoke();
             NameTemplate("Rename Word template", "Reusable Café", "Renamed Café handbook");
             Wait(() => Find(libraryWindow, "WordTemplateStatus").Name == "Template renamed.", "The library rename did not complete.");
@@ -1093,9 +1105,9 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "Status").Name == "Word template selected: Renamed Café handbook", "The stored library template was not selected.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportWord").Patterns.Invoke.Pattern.Invoke();
             var libraryExport = Path.Combine(runRoot, "library-export.docx"); SaveThroughDialogue(libraryExport, "Export DOCX");
-            Wait(() => File.Exists(libraryExport) && Find(window, "Status").Name == "Exported library-export.docx", "Word export did not use the library template.");
+            Wait(() => File.Exists(libraryExport) && ExportCompleted(window, libraryExport), "Word export did not use the library template.");
             NativeWordTemplateChecks.Check(File.ReadAllBytes(libraryExport), templatePixels);
-            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || File.ReadAllText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
+            if (editor.Patterns.Value.Pattern.Value.Value != templateSource || ReadObservedText(source) != templateSavedSource || !File.ReadAllBytes(templatePath).SequenceEqual(templateBytes))
                 throw new IOException("The Word template library changed source documents or the imported original.");
             Find(window, "FileMenu").Click(); Find(window, "SaveDocumentTemplate").Patterns.Invoke.Pattern.Invoke();
             NameLibraryEntry("Save document template", "Template name", "Native reusable source");
@@ -1142,7 +1154,7 @@ internal static partial class NativeUiChecks
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             var createdFromLibrary = Path.Combine(runRoot, "Library created.md"); SaveThroughDialogue(createdFromLibrary);
             Wait(() => File.Exists(createdFromLibrary), "The template-created document did not save.");
-            var createdSource = File.ReadAllText(createdFromLibrary);
+            var createdSource = ReadObservedText(createdFromLibrary);
             if (!createdSource.Contains("Native UI validation — Café", StringComparison.Ordinal) || !createdSource.Contains("```mermaid", StringComparison.Ordinal)
                 || createdSource.Contains("data:image/", StringComparison.Ordinal)) throw new IOException("The template-created document lost editable source or failed to materialise images.");
             var createdImages = LensDocsStudio.Core.Parsing.MarkdownLinks.Read(createdSource).Where(link => link.IsImage).ToArray();
@@ -1180,7 +1192,8 @@ internal static partial class NativeUiChecks
                 "The profiled Docs Site dialogue did not cancel.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportMarkdownBundle").Patterns.Invoke.Pattern.Invoke();
             var profiledBundle = Path.Combine(runRoot, "profile-bundle.zip"); SaveThroughDialogue(profiledBundle, "Export Markdown bundle");
-            Wait(() => File.Exists(profiledBundle) && Find(window, "Status").Name.EndsWith("Azure DevOps Mermaid formatting applied.", StringComparison.Ordinal),
+            Wait(() => File.Exists(profiledBundle) && ExportCompleted(window, profiledBundle)
+                && Find(window, "Status").Name.EndsWith("Azure DevOps Mermaid formatting applied.", StringComparison.Ordinal),
                 "The selected profile did not affect the actual Markdown bundle.");
             using (var archive = System.IO.Compression.ZipFile.OpenRead(profiledBundle))
             using (var entry = new StreamReader(archive.GetEntry("fixture.md")!.Open()))
@@ -1191,13 +1204,13 @@ internal static partial class NativeUiChecks
             Wait(() => Find(window, "Status").Name == "Saved export profile: Native saved profile", "The native export profile did not save to the library.");
             Find(window, "ExportMenu").Click(); Find(window, "ExportProfilesMenu").Click(); Find(window, "GenericExportProfile").Patterns.Invoke.Pattern.Invoke();
             Wait(() => Find(window, "Status").Name == "Applied export profile: Generic documentation. Current session only.", "The generic export profile did not reset session overrides.");
-            if (!File.ReadAllBytes(Path.Combine(state, "preferences.json")).SequenceEqual(preferencesBeforeProfile) || File.ReadAllText(source) != templateSavedSource
+            if (!File.ReadAllBytes(Path.Combine(state, "preferences.json")).SequenceEqual(preferencesBeforeProfile) || ReadObservedText(source) != templateSavedSource
                 || editor.Patterns.Value.Pattern.Value.Value != templateSource || !File.ReadAllBytes(browserLibraryPath).SequenceEqual(browserLibraryBytes))
                 throw new IOException("Library or profile actions changed persisted preferences, original JSON or source documents.");
             FocusWindow(window); editor.Click();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "One Undo did not restore source before the library fixture image paste.");
-            if (editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage || File.ReadAllText(source) != templateSavedSource)
+            if (editor.Patterns.Value.Pattern.Value.Value != sourceBeforeLibraryImage || ReadObservedText(source) != templateSavedSource)
                 throw new IOException("The library fixture did not restore the original editor and saved source before shutdown.");
             Window OpenCatalogue(bool snippets = false)
             {
@@ -1223,7 +1236,7 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == generatedRelease.Content, "The built-in generator did not create its exact editable source.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             var generatedReleasePath = Path.Combine(runRoot, "Generated release.md"); SaveThroughDialogue(generatedReleasePath);
-            Wait(() => File.Exists(generatedReleasePath) && File.ReadAllText(generatedReleasePath) == generatedRelease.Content,
+            Wait(() => File.Exists(generatedReleasePath) && ReadObservedText(generatedReleasePath) == generatedRelease.Content,
                 "The generated document did not save its editable source.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Generator creation changed the previous document.");
@@ -1250,11 +1263,11 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == generatedSequence.Content, "The Mermaid template did not create standalone diagram source.");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
             var generatedDiagramPath = Path.Combine(runRoot, "Generated sequence.mmd"); SaveThroughDialogue(generatedDiagramPath);
-            Wait(() => File.Exists(generatedDiagramPath) && File.ReadAllText(generatedDiagramPath) == generatedSequence.Content,
+            Wait(() => File.Exists(generatedDiagramPath) && ReadObservedText(generatedDiagramPath) == generatedSequence.Content,
                 "The generated Mermaid document did not save its standalone diagram type.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.LEFT);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "Mermaid template creation changed the original document.");
-            if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The built-in catalogue changed the original saved source.");
+            if (ReadObservedText(source) != templateSavedSource) throw new IOException("The built-in catalogue changed the original saved source.");
             checks.Add("Native catalogue filters templates/snippets, generates and saves field-edited Markdown and standalone Mermaid in new tabs, and inserts snippets with complete Undo/Redo while retaining original source");
             FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
             var detailsWindow = OpenDetails(window);
@@ -1359,7 +1372,7 @@ internal static partial class NativeUiChecks
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == insertedDetails, "Details insertion Redo changed source.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == sourceBeforeLibraryImage, "The details fixture did not restore original source.");
-            if (File.ReadAllText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
+            if (ReadObservedText(source) != templateSavedSource) throw new IOException("The details workflow changed saved source.");
             checks.Add("Native details dialogue restores and edits Markdown; keyboard and accessible nested expanders and preview Find reveal hidden text without source changes, with complete insertion/edit Undo and Redo");
             const string mathsFixture = "\n\n## Native maths UI\n\nNative formula $\\frac{x^2}{y_1}$ keeps its source.\n";
             var beforeMaths = ReadEditorText(editor);
@@ -1391,7 +1404,7 @@ internal static partial class NativeUiChecks
                 Find(window, "FindText").AsTextBox().Text = @"\frac{x^2}{y_1}"; Keyboard.Type(VirtualKeyShort.RETURN);
                 Wait(() => Find(window, "Status").Name.StartsWith("Matching formula selected", StringComparison.Ordinal), "Preview Find did not locate native LaTeX source.");
                 Keyboard.Type(VirtualKeyShort.ESCAPE); window.CaptureToFile(Path.Combine(output, "native-maths-preview.png"));
-                if (editor.Patterns.Value.Pattern.Value.Value != beforeMaths + mathsFixture || File.ReadAllText(source) != templateSavedSource)
+                if (editor.Patterns.Value.Pattern.Value.Value != beforeMaths + mathsFixture || ReadObservedText(source) != templateSavedSource)
                     throw new IOException("Native formula preview, copy or search changed source.");
             }
             finally { RestoreClipboard(mathsClipboard, mathsSequence); }
@@ -1455,7 +1468,7 @@ internal static partial class NativeUiChecks
             var channel = Find(updateWindow!, "UpdateChannel").AsComboBox();
             channel.Select("Preview");
             channel.Collapse();
-            Wait(() => File.ReadAllText(Path.Combine(state, "preferences.json")).Contains("\"Preview\"", StringComparison.Ordinal), "Update channel preference was not persisted.");
+            Wait(() => ReadObservedText(Path.Combine(state, "preferences.json")).Contains("\"Preview\"", StringComparison.Ordinal), "Update channel preference was not persisted.");
             if (Find(updateWindow!, "DownloadUpdate").IsEnabled || Find(updateWindow!, "InstallUpdate").IsEnabled) throw new InvalidOperationException("Untrusted update actions were enabled.");
             checks.Add("Native update preferences persist and untrusted installation actions stay disabled");
             updateWindow!.CaptureToFile(Path.Combine(output, "native-updates.png"));
@@ -1718,6 +1731,14 @@ internal static partial class NativeUiChecks
         AutomationElement? element = null;
         Wait(() => (element = window.FindFirstDescendant(cf => cf.ByAutomationId(id))) is not null, "Missing native control: " + id);
         return element!;
+    }
+    private static string ReadObservedText(string path)
+    {
+        // Observe without denying the application's exclusive writer access. Exact content/status
+        // assertions and existing deadlines decide readiness; an observation must not cause a save failure.
+        using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var reader = new StreamReader(file, System.Text.Encoding.UTF8, true);
+        return reader.ReadToEnd();
     }
     private static void FocusWindow(Window window)
     {

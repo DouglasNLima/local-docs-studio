@@ -9,7 +9,7 @@ internal static partial class NativeUiChecks
 {
     private static void CheckWorkspaceMap(Window owner, AutomationElement editor, UIA3Automation automation, int process, string output, string source, string target)
     {
-        var before = ReadEditorText(editor); var saved = File.ReadAllText(source); var targetSaved = File.ReadAllText(target);
+        var before = ReadEditorText(editor); var saved = ReadObservedText(source); var targetSaved = ReadObservedText(target);
         var previous = NativeUiClipboard.GetDataObject(); uint owned = 0;
         const string missing = "[Map missing](missing-map-target.md)";
         var fixture = "\n\n## Native map draft\n\n[[" + Path.GetFileName(target) + "|Map target]] " + missing;
@@ -63,7 +63,7 @@ internal static partial class NativeUiChecks
                 "Escape did not close the native workspace diagram.");
             FocusWindow(owner); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => editor.Patterns.Value.Pattern.Value.Value == before, "Map navigation, copying or diagrams changed the original insertion Undo.");
-            if (File.ReadAllText(source) != saved || File.ReadAllText(target) != targetSaved) throw new IOException("Read-only workspace map actions changed saved source.");
+            if (ReadObservedText(source) != saved || ReadObservedText(target) != targetSaved) throw new IOException("Read-only workspace map actions changed saved source.");
         }
         finally { RestoreClipboard(previous, owned); }
         Window OpenMap()

@@ -15,7 +15,7 @@ internal static partial class NativeUiChecks
         var bounds = window.BoundingRectangle;
         var checks = new List<string>();
         string preferences = Path.Combine(state, "preferences.json");
-        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(File.ReadAllText(preferences))!;
+        UserPreferences ReadPreferences() => JsonSerializer.Deserialize<UserPreferences>(ReadObservedText(preferences))!;
         bool Visible(string id) => window.FindFirstDescendant(cf => cf.ByAutomationId(id)) is { IsOffscreen: false };
 
         Find(window, "ToggleSidebar").AsButton().Invoke();

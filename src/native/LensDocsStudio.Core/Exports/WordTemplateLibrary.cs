@@ -10,7 +10,7 @@ public sealed record WordTemplateRecord(int SchemaVersion, Guid Id, string Name,
 public sealed record WordTemplateEntry(WordTemplateRecord Record, string Fingerprint, bool Archived)
 {
     public string Name => Record.Name;
-    public string Details => Record.SourceName + " · " + Record.ImportedAt.ToLocalTime().ToString("g") + " · " + Record.Bytes.ToString("N0") + " bytes";
+    public string Details => Record.SourceName + " · " + Record.ImportedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm", System.Globalization.CultureInfo.GetCultureInfo("en-GB")) + " · " + Record.Bytes.ToString("N0") + " bytes";
 }
 public sealed record WordTemplateListing(IReadOnlyList<WordTemplateEntry> Entries, IReadOnlyList<string> Warnings);
 

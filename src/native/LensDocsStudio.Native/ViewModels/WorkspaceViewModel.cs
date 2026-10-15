@@ -16,9 +16,9 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     [ObservableProperty] private DocumentViewModel? activeDocument;
     [ObservableProperty] private string status = "Local Markdown, Mermaid, and documentation studio";
     [ObservableProperty] private string previewStatus = "Preview pending";
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(WorkspaceName))] private string? workspaceRoot;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(WorkspaceName))] [NotifyCanExecuteChangedFor(nameof(CloseWorkspaceCommand))] private string? workspaceRoot;
     public string WorkspaceName => WorkspaceRoot is null ? "Open a workspace" : Path.GetFileName(Path.TrimEndingDirectorySeparator(WorkspaceRoot));
-    [ObservableProperty] private bool isBusy;
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(CloseWorkspaceCommand))] private bool isBusy;
     [ObservableProperty] private string theme = "Light";
     [ObservableProperty] private string layout = "Split";
     private FileSystemWatcher? watcher;
@@ -145,8 +145,7 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
     {
         var workspace = new WorkspacePath(path);
         var listing = await workspaces.EnumerateAsync(workspace, operation?.Token ?? default, excludedDirectory: StateDirectory);
-        treeRefresh?.Cancel();
-        watcher?.Dispose();
+        StopMonitoring();
         if (!string.Equals(WorkspaceRoot, workspace.Root, StringComparison.OrdinalIgnoreCase)) Entries.Clear();
         WorkspaceRoot = workspace.Root;
         WorkspaceEntryViewModel.Reconcile(Entries, listing.Entries);
@@ -312,5 +311,5 @@ public partial class WorkspaceViewModel(DocumentStore documents, SessionStore se
             operationGate.Release();
         }
     }
-    public void Dispose() { disposed = true; treeRefresh?.Cancel(); watcher?.Dispose(); operation?.Cancel(); }
+    public void Dispose() { disposed = true; StopMonitoring(); operation?.Cancel(); }
 }

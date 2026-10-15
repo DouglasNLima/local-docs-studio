@@ -10,7 +10,7 @@ public partial class DocumentViewModel : ObservableObject
     public Guid Id { get; init; } = Guid.NewGuid();
     public TextDocument EditorDocument { get; }
     public DocumentSnapshot? SavedSnapshot { get; private set; }
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(IsEmptyDraft))] private string? filePath;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(IsEmptyDraft))] [NotifyPropertyChangedFor(nameof(Location))] private string? filePath;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
     [ObservableProperty] private bool isSaving;
@@ -26,7 +26,10 @@ public partial class DocumentViewModel : ObservableObject
     public double VerticalOffset { get; set; }
     public int PreviewSourceOffset { get; set; }
     public string Title => (Path.GetFileName(FilePath) ?? DisplayName ?? "Untitled.md") + (IsDirty ? " •" : "") + (ExternalChange ? " ⚠" : "");
-    public string? WorkspaceRoot { get; set; }
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Location))] private string? workspaceRoot;
+    public string Location => FilePath is null ? "Unsaved document" : WorkspaceRoot is { } root && Core.Workspace.WorkspacePath.Contains(root, FilePath)
+        ? Path.GetFileName(Path.TrimEndingDirectorySeparator(root)) + " / " + Path.GetRelativePath(root, FilePath).Replace('\\', '/')
+        : Path.GetFileName(Path.GetDirectoryName(FilePath)) + " / " + Path.GetFileName(FilePath);
     public event EventHandler? Edited;
 
     public DocumentViewModel(string text, DocumentSnapshot? snapshot = null)

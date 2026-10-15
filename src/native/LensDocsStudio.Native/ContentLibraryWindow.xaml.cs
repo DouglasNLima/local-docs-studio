@@ -18,15 +18,20 @@ public partial class ContentLibraryWindow : Window
 {
     private readonly LocalLibraryStore store;
     private readonly string exportRecovery;
+    private readonly Func<string, byte[], Task>? exportCompleted;
+    private readonly Action? exportStarting;
     private LocalLibrarySnapshot snapshot;
     private CancellationTokenSource? operation;
     private bool ready, busy, closeRequested;
     public ContentLibraryEntry? SelectedEntry { get; private set; }
     private ContentLibraryEntry? Selected => Entries.SelectedItem as ContentLibraryEntry;
 
-    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template)
+    public ContentLibraryWindow(LocalLibraryStore store, LocalLibrarySnapshot snapshot, string exportRecovery, LocalLibraryKind kind = LocalLibraryKind.Template,
+        Func<string, byte[], Task>? exportCompleted = null, Action? exportStarting = null)
     {
         this.store = store; this.snapshot = snapshot; this.exportRecovery = exportRecovery;
+        this.exportCompleted = exportCompleted;
+        this.exportStarting = exportStarting;
         InitializeComponent(); WindowStateService.FitInitialWindow(this); Kind.SelectedIndex = (int)kind;
         ready = true; Populate();
         Closing += (_, e) => { if (busy) { closeRequested = true; operation?.Cancel(); e.Cancel = true; } };
@@ -62,6 +67,7 @@ public partial class ContentLibraryWindow : Window
         UseButton.Content = Kind.SelectedIndex switch { 1 => "Insert snippet", 2 => "Apply profile", _ => "Create document" };
         ArchiveButton.Content = Archived.IsChecked == true ? "Restore" : "Archive";
         Progress.Visibility = busy ? Visibility.Visible : Visibility.Collapsed; CancelButton.IsEnabled = busy;
+        CancelButton.Visibility = busy ? Visibility.Visible : Visibility.Collapsed;
     }
     private async Task Run(Func<CancellationToken, Task> action)
     {
@@ -85,16 +91,19 @@ public partial class ContentLibraryWindow : Window
     }
     private async void Export(object sender, RoutedEventArgs e)
     {
+        exportStarting?.Invoke();
         var archived = Archived.IsChecked == true;
         var picker = new SaveFileDialog { Title = "Export content library", Filter = "Lens Docs Studio library|*.json", DefaultExt = ".json", AddExtension = true,
             FileName = archived ? "lens-docs-studio-archived-library.json" : "lens-docs-studio-library.json" };
-        if (picker.ShowDialog(this) != true) return;
+        if (picker.ShowDialog(this) != true) { Status.Text = "Library export cancelled."; return; }
         await Run(async token =>
         {
             if (!Path.GetExtension(picker.FileName).Equals(".json", StringComparison.OrdinalIgnoreCase)) throw new IOException("Use the .json extension for a library export.");
             var expected = await ExportFileStore.ReadExistingAsync(picker.FileName, token);
             var bytes = await Task.Run(() => LocalLibraryFormat.Write(archived ? snapshot.State.Archived : snapshot.State.Active), token);
             await new ExportFileStore(exportRecovery).WriteAsync(picker.FileName, bytes, expected, token);
+            token.ThrowIfCancellationRequested();
+            if (exportCompleted is not null) await exportCompleted(picker.FileName, bytes);
             Status.Text = "Exported all " + (archived ? "archived" : "active") + " templates, snippets and profiles to " + Path.GetFileName(picker.FileName) + ".";
         });
     }

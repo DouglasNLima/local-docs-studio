@@ -1,14 +1,27 @@
 """Serve the unchanged static app for browser tests, including concurrent PWA caching."""
 
+import sys
+from time import perf_counter
+
+_started = perf_counter()
+if __name__ == "__main__":
+    print(f"Initialising browser fixtures with Python {sys.version.split()[0]}.", flush=True)
+
 import argparse
 import functools
 import http.server
+import socketserver
 from pathlib import Path
 
 
 class TestServer(http.server.ThreadingHTTPServer):
     # Python 3.12 defaults to five pending connections. A cold PWA requests many modules.
     request_queue_size = 128
+
+    def server_bind(self):
+        # HTTPServer normally performs reverse DNS here; loopback fixture hosting needs no name lookup.
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[:2]
 
 
 class StaticHandler(http.server.SimpleHTTPRequestHandler):
@@ -22,6 +35,7 @@ class StaticHandler(http.server.SimpleHTTPRequestHandler):
 
 
 if __name__ == "__main__":
+    print(f"HTTP fixture modules loaded in {perf_counter() - _started:.3f} seconds.", flush=True)
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=4173)
     args = parser.parse_args()

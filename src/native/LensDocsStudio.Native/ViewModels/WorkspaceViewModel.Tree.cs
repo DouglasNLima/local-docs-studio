@@ -5,7 +5,21 @@ namespace LensDocsStudio.Native.ViewModels;
 
 public partial class WorkspaceViewModel
 {
+    private bool CanCloseWorkspace => WorkspaceRoot is not null && !IsBusy;
+    [RelayCommand(CanExecute = nameof(CanCloseWorkspace))]
+    private Task CloseWorkspaceAsync() => RunAsync(async () =>
+    {
+        StopMonitoring();
+        WorkspaceRoot = null; Entries.Clear(); WorkspaceFilter = "";
+        ApplyWorkspaceFilter();
+        // Document roots and asset contexts belong to tabs, independently of the visible workspace.
+        await PersistSessionAsync();
+        Status = "Workspace closed. Open documents and unsaved changes are retained.";
+    });
+
     [ObservableProperty] private string workspaceFilter = "";
+    [ObservableProperty] private string workspaceEmptyMessage = "Open a folder to browse local Markdown, Mermaid and text files.";
+    [RelayCommand] private void ClearWorkspaceFilter() => WorkspaceFilter = "";
     partial void OnWorkspaceFilterChanged(string value) => ApplyWorkspaceFilter();
     public void ApplyWorkspaceFilter()
     {
@@ -19,6 +33,8 @@ public partial class WorkspaceViewModel
             return entry.IsVisible;
         }
         foreach (var entry in Entries) Visit(entry);
+        WorkspaceEmptyMessage = WorkspaceRoot is null ? "Open a folder to browse local Markdown, Mermaid and text files."
+            : Entries.Any(entry => entry.IsVisible) ? "" : terms.Length > 0 ? "No files match this filter." : "This workspace has no supported documents yet. Create a Markdown or Mermaid file to begin.";
         RefreshTreeIndicators();
     }
     public void RefreshTreeIndicators()

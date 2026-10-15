@@ -19,15 +19,36 @@ internal static partial class NativeUiChecks
                 "The native window did not accept its smaller size.");
             var commands = window.FindFirstDescendant(cf => cf.ByName("Application commands"))
                 ?? throw new IOException("The application toolbar is unavailable at minimum size.");
-            var more = commands.FindFirstDescendant(cf => cf.ByName("More commands"))
-                ?? throw new IOException("The actual native overflow command is unavailable.");
+            var more = commands.FindFirstDescendant(cf => cf.ByName("More commands"));
+            AutomationElement? settingsCommand = null;
+            var settingsInOverflow = more is { IsOffscreen: false };
+            if (!settingsInOverflow)
+            {
+                // Compact branding lets all application commands fit at this width. Exercise
+                // genuine formatting overflow, while requiring Settings to remain directly visible.
+                settingsCommand = commands.FindFirstDescendant(cf => cf.ByAutomationId("ToolbarSettings"));
+                if (settingsCommand is null || settingsCommand.IsOffscreen || !window.BoundingRectangle.Contains(settingsCommand.BoundingRectangle))
+                    throw new IOException("The fitting application toolbar lost its directly visible Settings command.");
+                more = Find(window, "FormattingToolbar").FindFirstDescendant(cf => cf.ByName("More commands"));
+            }
+            if (more is null) throw new IOException("The actual native overflow command is unavailable.");
             if (more.IsOffscreen || !window.BoundingRectangle.Contains(more.BoundingRectangle))
                 throw new IOException("The actual overflow command is clipped at minimum size.");
             more.Click();
-            AutomationElement? settingsCommand = null;
-            Wait(() => (settingsCommand = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process).And(cf.ByAutomationId("ToolbarSettings")))
-                .FirstOrDefault(command => !command.IsOffscreen)) is not null, "Overflow did not expose its actual Settings command.");
             window.CaptureToFile(Path.Combine(output, "native-minimum-overflow.png"));
+            if (settingsInOverflow)
+                Wait(() => (settingsCommand = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process).And(cf.ByAutomationId("ToolbarSettings")))
+                    .FirstOrDefault(command => !command.IsOffscreen)) is not null, "Overflow did not expose its actual Settings command.");
+            else
+            {
+                AutomationElement? rule = null;
+                Wait(() => (rule = automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(process).And(cf.ByAutomationId("Formatrule")))
+                    .FirstOrDefault(command => !command.IsOffscreen)) is not null, "Formatting overflow lost its actual horizontal-rule command.");
+                rule!.AsButton().Invoke();
+                Wait(() => ReadEditorText(editor) != original && ReadEditorText(editor).Contains("---", StringComparison.Ordinal), "The actual overflowing horizontal-rule command did not edit Markdown.");
+                editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == original, "The overflowing formatting action did not retain one exact Undo.");
+            }
             settingsCommand!.AsButton().Invoke();
             Window? settings = null;
             Wait(() => (settings = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(process).And(cf.ByName("Settings")))?.AsWindow()) is not null,
@@ -62,7 +83,8 @@ internal static partial class NativeUiChecks
             if (!File.ReadAllBytes(source).AsSpan().SequenceEqual(saved)) throw new IOException("Minimum-window Find/Replace changed the saved file.");
             File.WriteAllText(Path.Combine(output, "native-minimum-window.json"), JsonSerializer.Serialize(new {
                 Passed = true, RequestedWidth = 860, RequestedHeight = 540, ActualBounds = bounds, Controls = controls,
-                ActualOverflowCommandExecuted = true, SourceAndUndoPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
+                ActualOverflowCommandExecuted = true, SettingsInOverflow = settingsInOverflow, SettingsExecuted = true,
+                SourceAndUndoPreserved = true }, new JsonSerializerOptions { WriteIndented = true }));
         }
         finally { window.Patterns.Transform.Pattern.Resize(originalBounds.Width, originalBounds.Height); }
     }

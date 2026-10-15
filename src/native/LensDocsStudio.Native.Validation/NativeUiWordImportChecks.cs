@@ -49,7 +49,7 @@ internal static partial class NativeUiChecks
         Wait(() => Find(owner, "Status").Name.StartsWith("Imported into a new portable workspace", StringComparison.Ordinal),
             "Word import did not complete through the native application.");
         var root = Directory.GetDirectories(parent, "native-word-import-fixture-import-*").Single();
-        var document = Path.Combine(root, "document.md"); var markdown = File.ReadAllText(document);
+        var document = Path.Combine(root, "document.md"); var markdown = ReadObservedText(document);
         Wait(() => editor.Patterns.Value.Pattern.Value.Value == markdown, "The imported saved Markdown did not open in the editor.");
         Wait(() => Find(owner, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal),
             "The imported Word document did not render.");
@@ -101,7 +101,7 @@ internal static partial class NativeUiChecks
             Directory.CreateDirectory(Path.GetDirectoryName(destination)!); File.Copy(source, destination, false);
         }
         var copiedDocument = Path.Combine(copy, "document.md");
-        if (File.ReadAllText(copiedDocument) != markdown
+        if (ReadObservedText(copiedDocument) != markdown
             || !File.ReadAllBytes(new WorkspacePath(copy).ResolveLink(copiedDocument, imageReference)).SequenceEqual(fixture.Image))
             throw new IOException("The imported image or source stopped resolving after copying the workspace.");
         owner.CaptureToFile(Path.Combine(output, "native-word-import.png"));

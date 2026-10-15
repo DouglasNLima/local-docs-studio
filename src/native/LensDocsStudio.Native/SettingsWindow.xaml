@@ -4,81 +4,110 @@
  Title="Settings" Width="700" Height="750" MinWidth="560" MinHeight="520" WindowStartupLocation="CenterOwner"
  Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
  <Window.Resources>
-  <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}"><Setter Property="Padding" Value="8,5"/><Setter Property="MinWidth" Value="160"/></Style>
-  <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}"><Setter Property="Margin" Value="0,8,0,0"/></Style>
+  <ResourceDictionary><ResourceDictionary.MergedDictionaries>
+   <ResourceDictionary Source="Resources/DesktopStyles.xaml"/>
+   <ResourceDictionary Source="Resources/FormStyles.xaml"/>
+  </ResourceDictionary.MergedDictionaries>
+  <Style TargetType="Label" BasedOn="{StaticResource Form.Label}"/>
+  <Style TargetType="TextBox" BasedOn="{StaticResource Form.TextInput}"/>
+  <Style TargetType="ComboBox" BasedOn="{StaticResource Form.ComboBox}"/>
+  <Style TargetType="Slider" BasedOn="{StaticResource Form.Slider}"/>
+  <Style TargetType="CheckBox" BasedOn="{StaticResource Form.CheckBox}"/>
+  </ResourceDictionary>
  </Window.Resources>
  <Grid Margin="24">
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,16"/>
-  <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,0" IsEnabled="{Binding CanEdit}">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <TextBlock Text="Settings" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,14"/>
+  <StackPanel Grid.Row="1" Margin="0,0,0,16">
+   <Label Content="_Search settings" Target="{Binding ElementName=SettingsSearch}"/>
+   <TextBox x:Name="SettingsSearch" MaxLength="256" Padding="8,6" TextChanged="SearchChanged" AutomationProperties.Name="Search settings" AutomationProperties.AutomationId="SettingsSearch" ToolTip="Find theme, reading mode, zoom, indentation, synchronisation or workspace panels"/>
+  </StackPanel>
+  <ScrollViewer x:Name="SettingsScroller" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,12,0" IsEnabled="{Binding CanEdit}">
    <StackPanel>
-    <TextBlock Text="Appearance" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,8"/>
-    <Grid>
-     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-     <StackPanel>
-      <Label Content="_Theme" Target="{Binding ElementName=Theme}"/>
-      <ComboBox x:Name="Theme" ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" AutomationProperties.Name="Theme" AutomationProperties.AutomationId="SettingsTheme"/>
+    <TextBlock x:Name="NoSettingsMatches" Text="No matching settings. Try a shorter term or clear the search." TextWrapping="Wrap" Visibility="Collapsed" AutomationProperties.LiveSetting="Polite"/>
+    <StackPanel x:Name="SettingsSections">
+     <StackPanel Tag="Appearance">
+      <TextBlock Text="Appearance" Style="{StaticResource Form.Section}"/>
+      <StackPanel Tag="Theme light dark system" Style="{StaticResource Form.Field}">
+       <Label Content="_Theme" Target="{Binding ElementName=Theme}"/>
+       <ComboBox x:Name="Theme" ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" AutomationProperties.Name="Theme" AutomationProperties.AutomationId="SettingsTheme"/>
+       <TextBlock Text="System follows Windows, including high-contrast settings." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
+      <StackPanel Tag="Layout editor split preview" Style="{StaticResource Form.Field}">
+       <Label Content="_Layout" Target="{Binding ElementName=Layout}"/>
+       <ComboBox x:Name="Layout" ItemsSource="{Binding Layouts}" SelectedItem="{Binding Layout}" AutomationProperties.Name="Layout" AutomationProperties.AutomationId="SettingsLayout"/>
+      </StackPanel>
      </StackPanel>
-     <StackPanel Grid.Column="2">
-      <Label Content="_Layout" Target="{Binding ElementName=Layout}"/>
-      <ComboBox x:Name="Layout" ItemsSource="{Binding Layouts}" SelectedItem="{Binding Layout}" AutomationProperties.Name="Layout" AutomationProperties.AutomationId="SettingsLayout"/>
+     <StackPanel Tag="Editor">
+      <TextBlock Text="Editor" Style="{StaticResource Form.Section}"/>
+      <StackPanel Tag="Font family typography" Style="{StaticResource Form.Field}">
+       <Label Content="_Font" Target="{Binding ElementName=EditorFont}"/>
+       <ComboBox x:Name="EditorFont" ItemsSource="{Binding Fonts}" SelectedItem="{Binding FontFamily}" AutomationProperties.Name="Editor font" AutomationProperties.AutomationId="SettingsFont"/>
+      </StackPanel>
+      <StackPanel Tag="Font size typography" Style="{StaticResource Form.Field}">
+       <Label Content="Font _size" Target="{Binding ElementName=EditorSize}"/>
+       <ComboBox x:Name="EditorSize" ItemsSource="{Binding FontSizes}" SelectedItem="{Binding FontSize}" AutomationProperties.Name="Editor font size" AutomationProperties.AutomationId="SettingsFontSize"/>
+      </StackPanel>
+      <StackPanel Tag="Word wrap line numbers" Style="{StaticResource Form.Field}">
+       <CheckBox Content="_Wrap long lines" IsChecked="{Binding WordWrap}" AutomationProperties.AutomationId="SettingsWordWrap"/>
+       <CheckBox Content="Show line _numbers" IsChecked="{Binding ShowLineNumbers}" AutomationProperties.AutomationId="SettingsLineNumbers"/>
+      </StackPanel>
+      <StackPanel Tag="Indentation width tabs spaces" Style="{StaticResource Form.Field}">
+       <Label Content="_Indentation width" Target="{Binding ElementName=Indentation}"/>
+       <ComboBox x:Name="Indentation" ItemsSource="{Binding IndentationSizes}" SelectedItem="{Binding IndentationSize}" AutomationProperties.Name="Indentation width" AutomationProperties.AutomationId="SettingsIndentation"/>
+       <CheckBox Content="Insert spaces when pressing _Tab" IsChecked="{Binding ConvertTabsToSpaces}" AutomationProperties.AutomationId="SettingsSpaces" Margin="0,8,0,0"/>
+       <TextBlock Text="Affects new typing. Existing tabs and spaces stay unchanged." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
      </StackPanel>
-    </Grid>
-    <CheckBox Content="Show document _outline" IsChecked="{Binding ShowOutline}" AutomationProperties.AutomationId="SettingsOutline"/>
-    <TextBlock Text="System follows Windows, including high-contrast settings." TextWrapping="Wrap" Margin="0,8,0,18"/>
-    <Separator/>
-    <TextBlock Text="Editor" FontSize="18" FontWeight="SemiBold" Margin="0,18,0,8"/>
-    <Grid>
-     <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="18"/><ColumnDefinition Width="160"/></Grid.ColumnDefinitions>
-     <StackPanel>
-      <Label Content="_Font" Target="{Binding ElementName=EditorFont}"/>
-      <ComboBox x:Name="EditorFont" ItemsSource="{Binding Fonts}" SelectedItem="{Binding FontFamily}" AutomationProperties.Name="Editor font" AutomationProperties.AutomationId="SettingsFont"/>
+     <StackPanel Tag="Preview">
+      <TextBlock Text="Preview" Style="{StaticResource Form.Section}"/>
+      <StackPanel Tag="Diagram theme mermaid auto" Style="{StaticResource Form.Field}">
+       <Label Content="_Diagram theme" Target="{Binding ElementName=DiagramTheme}"/>
+       <ComboBox x:Name="DiagramTheme" ItemsSource="{Binding DiagramThemes}" SelectedItem="{Binding DiagramTheme}" AutomationProperties.Name="Diagram theme" AutomationProperties.AutomationId="SettingsDiagramTheme"/>
+       <TextBlock Text="Auto follows the app. Other themes stay fixed in preview, copied diagrams and exports." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
+      <StackPanel Tag="Reading mode pages continuous automatic" Style="{StaticResource Form.Field}">
+       <Label Content="_Reading mode" Target="{Binding ElementName=ReadingMode}"/>
+       <ComboBox x:Name="ReadingMode" ItemsSource="{Binding ReadingModes}" SelectedItem="{Binding PreviewReadingMode}" AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="SettingsReadingMode"/>
+       <TextBlock Text="Automatic uses pages for long documents. Continuous keeps one scrolling view; large documents may pause during layout." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
+      <StackPanel Tag="Zoom percentage" Style="{StaticResource Form.Field}">
+       <DockPanel><TextBlock DockPanel.Dock="Right" Text="{Binding PreviewZoom, StringFormat={}{0}%}" VerticalAlignment="Center" AutomationProperties.AutomationId="SettingsZoomValue"/><Label Content="_Zoom" Target="{Binding ElementName=Zoom}"/></DockPanel>
+       <Slider x:Name="Zoom" Minimum="50" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding PreviewZoom}" MinHeight="28" AutomationProperties.Name="Preview zoom" AutomationProperties.AutomationId="SettingsZoom"/>
+       <TextBlock Text="Changes the native preview only. Export sizes stay unchanged." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
      </StackPanel>
-     <StackPanel Grid.Column="2">
-      <Label Content="Font _size" Target="{Binding ElementName=EditorSize}"/>
-      <ComboBox x:Name="EditorSize" ItemsSource="{Binding FontSizes}" SelectedItem="{Binding FontSize}" AutomationProperties.Name="Editor font size" AutomationProperties.AutomationId="SettingsFontSize"/>
+     <StackPanel Tag="Workspace panels synchronisation synchronization">
+      <TextBlock Text="Workspace and synchronisation" Style="{StaticResource Form.Section}"/>
+      <StackPanel Tag="Workspace sidebar panels outline" Style="{StaticResource Form.Field}">
+       <CheckBox Content="Show _workspace panel" IsChecked="{Binding ShowWorkspace}" AutomationProperties.AutomationId="SettingsWorkspace"/>
+       <CheckBox Content="Show document _outline" IsChecked="{Binding ShowOutline}" AutomationProperties.AutomationId="SettingsOutline"/>
+      </StackPanel>
+      <StackPanel Tag="Follow caret scroll selection sync" Style="{StaticResource Form.Field}">
+       <CheckBox Content="Follow editor _caret in preview" IsChecked="{Binding FollowCaret}" AutomationProperties.AutomationId="SettingsFollowCaret"/>
+       <CheckBox Content="Synchronise _scroll" IsChecked="{Binding SynchroniseScroll}" AutomationProperties.AutomationId="SettingsSyncScroll"/>
+       <CheckBox Content="Synchronise se_lection" IsChecked="{Binding SynchroniseSelection}" AutomationProperties.AutomationId="SettingsSyncSelection"/>
+       <TextBlock Text="Independent, opt-in controls for visible Split panes. Other viewing modes keep their own navigation." Style="{StaticResource Form.Help}"/>
+      </StackPanel>
      </StackPanel>
-    </Grid>
-    <CheckBox Content="_Wrap long lines" IsChecked="{Binding WordWrap}" AutomationProperties.AutomationId="SettingsWordWrap"/>
-    <CheckBox Content="Show line _numbers" IsChecked="{Binding ShowLineNumbers}" AutomationProperties.AutomationId="SettingsLineNumbers"/>
-    <Label Content="_Indentation width" Target="{Binding ElementName=Indentation}" Margin="0,8,0,0"/>
-    <ComboBox x:Name="Indentation" ItemsSource="{Binding IndentationSizes}" SelectedItem="{Binding IndentationSize}" HorizontalAlignment="Left" AutomationProperties.Name="Indentation width" AutomationProperties.AutomationId="SettingsIndentation"/>
-    <CheckBox Content="Insert spaces when pressing _Tab" IsChecked="{Binding ConvertTabsToSpaces}" AutomationProperties.AutomationId="SettingsSpaces"/>
-    <TextBlock Text="Indentation settings affect new typing. Existing tabs and spaces stay unchanged." TextWrapping="Wrap" Margin="0,8,0,18"/>
-    <Separator/>
-    <TextBlock Text="Preview" FontSize="18" FontWeight="SemiBold" Margin="0,18,0,8"/>
-    <DockPanel Margin="0,0,0,8">
-     <Label DockPanel.Dock="Left" Content="_Diagram theme" Target="{Binding ElementName=DiagramTheme}"/>
-     <ComboBox x:Name="DiagramTheme" ItemsSource="{Binding DiagramThemes}" SelectedItem="{Binding DiagramTheme}"
-      AutomationProperties.Name="Diagram theme" AutomationProperties.AutomationId="SettingsDiagramTheme"/>
-    </DockPanel>
-    <TextBlock Text="Auto follows the app. Other themes stay fixed in preview, copied diagrams and exports." TextWrapping="Wrap" Margin="0,0,0,12"/>
-     <DockPanel Margin="0,0,0,8">
-      <Label DockPanel.Dock="Left" Content="_Reading mode" Target="{Binding ElementName=ReadingMode}"/>
-      <ComboBox x:Name="ReadingMode" ItemsSource="{Binding ReadingModes}" SelectedItem="{Binding PreviewReadingMode}"
-       AutomationProperties.Name="Preview reading mode" AutomationProperties.AutomationId="SettingsReadingMode"/>
-     </DockPanel>
-     <TextBlock Text="Automatic uses pages for long documents. Continuous keeps one scrolling view." TextWrapping="Wrap" Margin="0,0,0,12"/>
-    <DockPanel>
-     <Label DockPanel.Dock="Left" Content="_Zoom" Target="{Binding ElementName=Zoom}"/>
-     <TextBlock DockPanel.Dock="Right" Text="{Binding PreviewZoom, StringFormat={}{0}%}" MinWidth="46" TextAlignment="Right" VerticalAlignment="Center" Margin="12,0,0,0" AutomationProperties.AutomationId="SettingsZoomValue"/>
-     <Slider x:Name="Zoom" Minimum="50" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding PreviewZoom}" VerticalAlignment="Center" AutomationProperties.Name="Preview zoom" AutomationProperties.AutomationId="SettingsZoom"/>
-    </DockPanel>
-    <TextBlock Text="Zoom changes the native preview only. Export sizes stay unchanged." TextWrapping="Wrap" Margin="0,8,0,16"/>
-    <TextBlock Text="Update checks and release channels are available from Help → Updates." TextWrapping="Wrap" Margin="0,0,0,12"/>
+     <StackPanel Tag="Updates release channel">
+      <TextBlock Text="Updates" Style="{StaticResource Form.Section}"/>
+      <TextBlock Tag="Updates automatic release channel" Text="Update checks and release channels are available from Help → Updates." Style="{StaticResource Form.Help}"/>
+     </StackPanel>
+    </StackPanel>
    </StackPanel>
   </ScrollViewer>
-  <TextBlock Grid.Row="2" Text="{Binding Status}" TextWrapping="Wrap" Margin="0,16,0,14" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="SettingsStatus"/>
-  <WrapPanel Grid.Row="3" Margin="0,0,0,12" IsEnabled="{Binding CanEdit}">
-   <Button Content="Import settings…" Click="ImportSettings" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="SettingsImport"/>
-   <Button Content="Export settings…" Click="ExportSettings" Padding="12,6" AutomationProperties.AutomationId="SettingsExport" ToolTip="Save the appearance choices currently selected in this dialogue"/>
+  <ScrollViewer Grid.Row="3" MaxHeight="56" VerticalScrollBarVisibility="Auto"><TextBlock Text="{Binding Status}" Style="{StaticResource Form.Validation}" AutomationProperties.AutomationId="SettingsStatus"/></ScrollViewer>
+  <WrapPanel Grid.Row="4" Margin="0,0,0,6" IsEnabled="{Binding CanEdit}">
+   <Button Content="Import settings…" Click="ImportSettings" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SettingsImport"/>
+   <Button Content="Export settings…" Click="ExportSettings" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SettingsExport" ToolTip="Save the appearance choices currently selected in this dialogue"/>
   </WrapPanel>
-  <DockPanel Grid.Row="4">
-   <Button DockPanel.Dock="Left" Content="Restore defaults" Command="{Binding ResetCommand}" Padding="12,6" AutomationProperties.AutomationId="SettingsReset"/>
-   <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-    <Button Content="Cancel" IsCancel="True" IsEnabled="{Binding CanEdit}" Padding="16,6" Margin="0,0,8,0" AutomationProperties.AutomationId="SettingsCancel"/>
-    <Button Content="Apply" IsDefault="True" Command="{Binding ApplyCommand}" Padding="16,6" AutomationProperties.AutomationId="SettingsApply"/>
-   </StackPanel>
+  <DockPanel Grid.Row="5">
+   <Button DockPanel.Dock="Left" Content="Restore defaults" Command="{Binding ResetCommand}" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SettingsReset"/>
+   <WrapPanel HorizontalAlignment="Right">
+    <Button Content="Cancel" IsCancel="True" IsEnabled="{Binding CanEdit}" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SettingsCancel"/>
+    <Button Content="Apply" IsDefault="True" Command="{Binding ApplyCommand}" Style="{StaticResource Form.PrimaryAction}" AutomationProperties.AutomationId="SettingsApply"/>
+   </WrapPanel>
   </DockPanel>
  </Grid>
 </Window>

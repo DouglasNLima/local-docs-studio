@@ -18,7 +18,7 @@ internal static partial class NativeUiChecks
         var second = Path.Combine(root, "Tab B.md"); var third = Path.Combine(root, "Tab C.md");
         File.WriteAllText(second, "# Tab B\n"); File.WriteAllText(third, "# Tab C\n");
         TabAction(Path.GetFileName(source), "Pin");
-        Wait(() => JsonSerializer.Deserialize<SessionState>(File.ReadAllText(Path.Combine(state, "session.json")))!.Documents.Any(document => document.Path == source && document.IsPinned),
+        Wait(() => JsonSerializer.Deserialize<SessionState>(ReadObservedText(Path.Combine(state, "session.json")))!.Documents.Any(document => document.Path == source && document.IsPinned),
             "The actual pinned tab did not persist.");
         FocusWindow(window); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
         if (ReadEditorText(editor) != original) throw new IOException("Normal close removed the pinned active document.");
@@ -51,7 +51,7 @@ internal static partial class NativeUiChecks
         Wait(() => ReadEditorText(editor).Contains(dirtyMarker, StringComparison.Ordinal), "The folder's unsaved text did not reach its editor.");
         FolderDelete(); prompt = Dialogue("Delete workspace folder"); Button(prompt, "Cancel").AsButton().Invoke();
         Wait(() => window.FindFirstDescendant(cf => cf.ByAutomationId("CancelOperation"))?.IsOffscreen != false, "Cancelled folder deletion did not finish its operation.");
-        if (!Directory.Exists(folder) || File.ReadAllText(document) != savedNote || !File.ReadAllBytes(asset).SequenceEqual(assetBytes)
+        if (!Directory.Exists(folder) || ReadObservedText(document) != savedNote || !File.ReadAllBytes(asset).SequenceEqual(assetBytes)
             || !ReadEditorText(editor).Contains(dirtyMarker, StringComparison.Ordinal))
             throw new IOException("Cancelling folder deletion lost source, assets or an unsaved draft.");
         FolderDelete(); prompt = Dialogue("Delete workspace folder"); prompt.CaptureToFile(Path.Combine(output, "native-folder-delete-confirmation.png"));
@@ -62,7 +62,7 @@ internal static partial class NativeUiChecks
         if (!retained.Any(snapshot => snapshot.Document.Text.Contains(dirtyMarker, StringComparison.Ordinal))
             || !retained.Any(snapshot => snapshot.Document.Text == savedNote))
             throw new IOException("Folder deletion did not retain both saved source and its unsaved open text.");
-        if (!File.ReadAllBytes(source).SequenceEqual(saved) || File.ReadAllText(second) != "# Tab B\n" || !File.Exists(third))
+        if (!File.ReadAllBytes(source).SequenceEqual(saved) || ReadObservedText(second) != "# Tab B\n" || !File.Exists(third))
             throw new IOException("Workspace or tab actions changed unrelated saved documents.");
         Wait(() => ReadEditorText(editor) == original, "Folder deletion did not restore the surviving active document.");
         File.WriteAllText(Path.Combine(output, "native-workspace-modernisation.json"), JsonSerializer.Serialize(new {

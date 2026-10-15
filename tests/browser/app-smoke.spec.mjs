@@ -55,6 +55,7 @@ async function waitForAppReady(page) {
 async function gotoApp(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
+  await expect(page.locator('.topbar')).toHaveCSS('display', 'flex');
 }
 
 async function openFixture(page, name) {

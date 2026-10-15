@@ -13,7 +13,7 @@ internal static class NativeWordTemplateChecks
     private static ExportContent Content(string source, byte[] pixels) => new(new MarkdownService().Parse(source), new Dictionary<int, ExportImage>(),
         new Dictionary<string, ExportImage> { ["logo.png"] = new(pixels, 1, 1, "Template logo") });
 
-    internal static byte[] Create(byte[] pixels)
+    internal static byte[] Create(byte[] pixels, bool attachedTemplate = false)
     {
         using var document = new MemoryStream(); document.Write(new DocxExporter().Export(Content("![Logo](logo.png)", pixels)));
         using (var package = WordprocessingDocument.Open(document, true))
@@ -36,6 +36,13 @@ internal static class NativeWordTemplateChecks
             main.AddNewPart<WordprocessingCommentsPart>().Comments = new W.Comments(new W.Comment(new W.Paragraph(new W.Run(new W.Text("Private template comment")))) { Author = "Private original author", Id = "1" });
             var custom = main.AddCustomXmlPart(CustomXmlPartType.CustomXml); using var customData = new MemoryStream(System.Text.Encoding.UTF8.GetBytes("<private>Private template metadata</private>")); custom.FeedData(customData);
             package.PackageProperties.Creator = "Private original author";
+            if (attachedTemplate)
+            {
+                var settings = main.DocumentSettingsPart!;
+                settings.Settings!.Append(new W.AttachedTemplate { Id = "passive-template" });
+                settings.AddExternalRelationship("http://schemas.openxmlformats.org/officeDocument/2006/relationships/attachedTemplate",
+                    new Uri("https://example.invalid/unavailable-template.dotx"), "passive-template");
+            }
         }
         return document.ToArray();
     }
@@ -46,6 +53,8 @@ internal static class NativeWordTemplateChecks
         var errors = new OpenXmlValidator().Validate(package).Select(error => error.Description).ToArray();
         if (errors.Length > 0) throw new IOException("The template export failed schema validation: " + string.Join("; ", errors));
         var main = package.MainDocumentPart!;
+        if (main.DocumentSettingsPart?.ExternalRelationships.Any() == true || main.DocumentSettingsPart?.Settings?.Descendants<W.AttachedTemplate>().Any() == true)
+            throw new IOException("The generated Word export retained an external attached-template reference.");
         if (main.Document!.InnerText.Contains("Private template", StringComparison.Ordinal) || main.WordprocessingCommentsPart is not null || main.CustomXmlParts.Any()
             || package.PackageProperties.Creator == "Private original author") throw new IOException("The Word export retained unrelated template content.");
         var section = main.Document.Body!.Elements<W.SectionProperties>().Single();

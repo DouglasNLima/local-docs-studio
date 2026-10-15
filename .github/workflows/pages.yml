@@ -11,8 +11,12 @@ concurrency:
 
 jobs:
   test:
-    name: Test static app
+    name: Test static app (${{ matrix.browser }})
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, edge]
     permissions:
       contents: read
     steps:
@@ -31,23 +35,41 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium
 
+      - name: Set up the test-only Python runtime
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
       - name: Run checks
         env:
-          DEBUG: pw:browser
+          DEBUG: pw:browser,pw:webserver
+          LENS_TEST_BROWSER: ${{ matrix.browser }}
         run: npm test
 
       - name: Retain browser failure evidence
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-failure-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          name: browser-failure-evidence-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: test-results/
           if-no-files-found: ignore
           retention-days: 14
 
+  test-summary:
+    name: Test static app
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Require both browser projects
+        env:
+          LENS_BROWSER_RESULT: ${{ needs.test.result }}
+        run: test "$LENS_BROWSER_RESULT" = success
+
   deploy:
     name: Deploy to GitHub Pages
-    needs: test
+    needs: test-summary
     if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
     runs-on: windows-latest
     permissions:
