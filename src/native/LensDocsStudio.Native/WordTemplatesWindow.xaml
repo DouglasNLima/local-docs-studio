@@ -49,7 +49,9 @@
      <TextBlock x:Name="InspectionWarnings" TextWrapping="Wrap" AutomationProperties.AutomationId="WordTemplateWarnings"/>
     </StackPanel>
    </ScrollViewer>
-   <Border x:Name="LibraryEmptyState" Grid.ColumnSpan="3" Background="{DynamicResource PanelBrush}" CornerRadius="6" Padding="24" AutomationProperties.AutomationId="WordTemplateEmptyState">
+   <GroupBox x:Name="LibraryEmptyState" Grid.ColumnSpan="3" Background="{DynamicResource PanelBrush}" Padding="24" BorderThickness="0"
+    AutomationProperties.Name="Word template library empty state" AutomationProperties.AutomationId="WordTemplateEmptyState">
+    <GroupBox.Template><ControlTemplate TargetType="GroupBox"><Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}"><ContentPresenter/></Border></ControlTemplate></GroupBox.Template>
     <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
      <StackPanel MaxWidth="420" VerticalAlignment="Center" HorizontalAlignment="Center">
       <ui:CommandIcon Kind="Document" Width="40" Height="40" HorizontalAlignment="Left" Margin="0,0,0,14" Foreground="{DynamicResource MutedTextBrush}"/>
@@ -59,7 +61,7 @@
       <TextBlock Text="DOCX · up to 32 MB · no Microsoft Word required. The original document remains unchanged." Style="{StaticResource Form.Help}"/>
      </StackPanel>
     </ScrollViewer>
-   </Border>
+   </GroupBox>
   </Grid>
   <StackPanel Grid.Row="4" Margin="0,10,0,12">
    <ProgressBar x:Name="Progress" Style="{StaticResource Form.Progress}" Visibility="Collapsed" AutomationProperties.Name="Word template operation"/>
