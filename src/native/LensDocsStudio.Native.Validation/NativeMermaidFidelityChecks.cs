@@ -79,7 +79,9 @@ internal static class NativeMermaidFidelityChecks
         try
         {
             wideViewer.Show(); wideViewer.UpdateLayout();
-            ((Button)wideViewer.FindName("DiagramFit")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            var fitButton = ((DockPanel)wideViewer.Content).Children.OfType<ToolBar>().Single().Items.OfType<Button>()
+                .Single(button => AutomationProperties.GetAutomationId(button) == "DiagramFit");
+            fitButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             wideViewer.UpdateLayout();
             var zoom = (Slider)wideViewer.FindName("Zoom"); var viewport = (ScrollViewer)wideViewer.FindName("DiagramScroll");
             Check(zoom.Value is > 0 and < 1 && viewport.ScrollableWidth < 1 && viewport.ScrollableHeight < 1,
