@@ -1,0 +1,47 @@
+flowchart LR
+    subgraph Platform[Synthetic platform]
+        subgraph Inputs[Input services]
+            A1[Source one]
+            A2[Source two]
+            A3[Source three]
+            A4[Source four]
+            A5[Source five]
+        end
+        subgraph Workers[Processing services]
+            B1[Worker one]
+            B2[Worker two]
+            B3{Validation}
+            B4[Worker four]
+            B5[Worker five]
+        end
+    end
+    subgraph Outputs[Output services]
+        C1[(Store one)]
+        C2[(Store two)]
+        C3[Report]
+        C4[Audit]
+        C5[Archive]
+    end
+    D1[Review one]
+    D2[Review two]
+    D3[Review three]
+    D4[Review four]
+    D5[Review five]
+    A1 -->|Event| B1
+    A2 --> B2
+    A3 --> B3
+    A4 --> B4
+    A5 --> B5
+    B1 --> C1
+    B2 --> C2
+    B3 -->|Pass| C3
+    B3 -.->|Context| C4
+    B4 --> C4
+    B5 --> C5
+    C1 --> D1
+    C2 --> D2
+    C3 --> D3
+    C4 --> D4
+    C5 --> D5
+    classDef highlighted fill:#FFF1E8,stroke:#FF883E,color:#202124
+    class B3 highlighted

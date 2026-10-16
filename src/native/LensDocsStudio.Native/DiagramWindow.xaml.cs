@@ -32,18 +32,23 @@ public partial class DiagramWindow : Window
         Zoom.Value = Math.Clamp(Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100, Zoom.Minimum, Zoom.Maximum);
         DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
     }
+    private void FitWidth(object sender, RoutedEventArgs e)
+    {
+        if (DiagramImage.Source is null || DiagramScroll.ViewportWidth <= 48) return;
+        Zoom.Value = Math.Clamp((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width * 100, Zoom.Minimum, Zoom.Maximum);
+        DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
+    }
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void ResetView(object sender, RoutedEventArgs e)
     { EndPan(); Zoom.Value = 100; DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0); }
     private void DiagramMouseWheel(object sender, MouseWheelEventArgs e)
     {
         if ((Keyboard.Modifiers & ModifierKeys.Control) == 0) return;
-        var point = e.GetPosition(DiagramScroll); var before = Zoom.Value / 100;
-        var next = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.1 : 1 / 1.1), Zoom.Minimum, Zoom.Maximum);
-        var horizontal = DiagramViewportMath.ZoomOffset(DiagramScroll.HorizontalOffset, point.X, DiagramScroll.Padding.Left, before, next / 100);
-        var vertical = DiagramViewportMath.ZoomOffset(DiagramScroll.VerticalOffset, point.Y, DiagramScroll.Padding.Top, before, next / 100);
-        Zoom.Value = next; DiagramScroll.UpdateLayout();
-        DiagramScroll.ScrollToHorizontalOffset(horizontal); DiagramScroll.ScrollToVerticalOffset(vertical); e.Handled = true;
+        var point = e.GetPosition(DiagramScroll); var anchor = e.GetPosition(DiagramImage);
+        Zoom.Value = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.1 : 1 / 1.1), Zoom.Minimum, Zoom.Maximum);
+        DiagramScroll.UpdateLayout(); var after = DiagramImage.TranslatePoint(anchor, DiagramScroll);
+        DiagramScroll.ScrollToHorizontalOffset(DiagramScroll.HorizontalOffset + after.X - point.X);
+        DiagramScroll.ScrollToVerticalOffset(DiagramScroll.VerticalOffset + after.Y - point.Y); e.Handled = true;
     }
     private void PanStarted(object sender, MouseButtonEventArgs e)
     {

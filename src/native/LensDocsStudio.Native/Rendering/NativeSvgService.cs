@@ -118,13 +118,7 @@ public sealed partial class NativeSvgService
     {
         lock (drawings) if (drawings.TryGetValue(generatedSvg, out var cached)) return cached;
         var svg = Prepare(generatedSvg);
-        using var text = new StringReader(svg);
-        using var reader = new FileSvgReader(new WpfDrawingSettings { IncludeRuntime = false, TextAsGeometry = true });
-        var drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
-        if (drawing.Bounds.IsEmpty || drawing.Bounds.Width < 1 || drawing.Bounds.Height < 1) throw new InvalidDataException("The diagram has no visible geometry.");
-        drawing.Freeze();
-        var image = new DrawingImage(drawing);
-        image.Freeze();
+        var image = RenderPrepared(svg);
         if (generatedSvg.Length <= 2_000_000)
         {
             lock (drawings)
@@ -138,6 +132,17 @@ public sealed partial class NativeSvgService
             }
         }
         return image;
+    }
+
+    // Only callers which have passed Prepare may use this conversion. Runtime metadata is inert;
+    // TextAsGeometry and the active-content rejection remain identical to the document preview.
+    internal static DrawingImage RenderPrepared(string safeSvg, bool identities = false)
+    {
+        using var text = new StringReader(safeSvg);
+        using var reader = new FileSvgReader(new WpfDrawingSettings { IncludeRuntime = identities, TextAsGeometry = true });
+        var drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
+        if (drawing.Bounds.IsEmpty || drawing.Bounds.Width < 1 || drawing.Bounds.Height < 1) throw new InvalidDataException("The diagram has no visible geometry.");
+        drawing.Freeze(); var image = new DrawingImage(drawing); image.Freeze(); return image;
     }
 
     public static byte[] ToPng(ImageSource source, double scale = 2)

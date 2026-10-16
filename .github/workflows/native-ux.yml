@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-mermaid-preview-fidelity']
   pull_request:
-    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor']
+    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,6 +21,8 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Build source-mapped native editor and validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Compare canonical geometry and normalised native drawing pixels
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-fidelity artifacts/native/mermaid-fidelity
       - name: Exercise visual authoring, source preservation and conflicts on disposable Windows
         run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui --polish
       - name: Measure bounded Mermaid editing scenarios
@@ -33,6 +35,7 @@ jobs:
         with:
           name: native-mermaid-visual-evidence
           path: |
+            artifacts/native/mermaid-fidelity/
             artifacts/native/mermaid-performance.json
             artifacts/native/mermaid-ui/*.png
             artifacts/native/mermaid-ui/*.json

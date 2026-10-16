@@ -7,6 +7,7 @@ public sealed record DiagramResult(string Source, string? Svg, string? Error)
 {
     public bool Success => Svg is not null;
     public string? Theme { get; init; }
+    public PositionedGraph? FlowchartLayout { get; init; }
 }
 
 public sealed class DiagramService
@@ -15,12 +16,14 @@ public sealed class DiagramService
     private readonly Dictionary<(string Source, string Theme), DiagramResult> cache = new();
     private readonly Queue<(string Source, string Theme)> order = new();
     private int cachedCharacters;
-    public DiagramResult Render(string source, bool dark = false, string theme = "Auto")
+    public DiagramResult Render(string source, bool dark = false, string theme = "Auto", CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var resolvedTheme = DiagramThemes.ResolveName(theme, dark);
         if (source.Length > 100_000) return new(source, null, "The diagram exceeds the 100,000-character rendering limit.");
         lock (gate) if (cache.TryGetValue((source, resolvedTheme), out var existing)) return existing;
-        var result = RenderUncached(source, resolvedTheme);
+        var result = RenderUncached(source, resolvedTheme, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         var cost = source.Length + (result.Svg?.Length ?? 0);
         if (cost <= 4_000_000)
         {
@@ -37,25 +40,35 @@ public sealed class DiagramService
         }
         return result;
     }
-    private static DiagramResult RenderUncached(string source, string theme)
+    private static DiagramResult RenderUncached(string source, string theme, CancellationToken cancellationToken)
     {
         if (System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
         {
             var colours = DiagramThemes.Colours(theme);
-            var svg = MermaidRenderer.RenderSvg(SequenceActivationSource.Prepare(source), new RenderOptions
+            var layout = new MermaidEntityLayoutProvider(MermaidRenderer.LayoutProvider);
+            var options = new RenderOptions
             {
                 Bg = colours.Background, Fg = colours.Foreground, Accent = colours.Accent,
                 Surface = colours.Surface, Border = colours.Border, Line = colours.Line,
                 Font = "Segoe UI",
                 MonoFont = "Consolas",
-                LayoutProvider = new MermaidEntityLayoutProvider(MermaidRenderer.LayoutProvider),
+                LayoutProvider = layout,
                 Limits = new ResourceLimits { MaxInputLength = 100_000, MaxElements = 500, RenderDeadline = TimeSpan.FromSeconds(3) }
-            });
-            return new(source, svg, null) { Theme = theme };
+            };
+            var prepared = SequenceActivationSource.Prepare(source);
+            string svg;
+            if (cancellationToken.CanBeCanceled)
+            {
+                using var output = new MemoryStream();
+                MermaidRenderer.RenderSvgAsync(prepared, output, options, cancellationToken).GetAwaiter().GetResult();
+                svg = System.Text.Encoding.UTF8.GetString(output.ToArray());
+            }
+            else svg = MermaidRenderer.RenderSvg(prepared, options);
+            return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart };
         }
-        catch (Exception ex) when (ex is not OutOfMemoryException)
+        catch (Exception ex) when (ex is not (OutOfMemoryException or OperationCanceledException))
         {
             return new(source, null, "Diagram could not be rendered: " + ex.Message[..Math.Min(ex.Message.Length, 300)]);
         }

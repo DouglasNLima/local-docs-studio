@@ -18,6 +18,11 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--mermaid-fidelity")
+        {
+            try { NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--mermaid-performance")
         {
             try { NativeMermaidPerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }

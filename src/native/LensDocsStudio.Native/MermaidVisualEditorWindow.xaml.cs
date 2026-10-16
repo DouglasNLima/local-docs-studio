@@ -46,7 +46,7 @@ public partial class MermaidVisualEditorWindow : Window
     private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
-    private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
+    private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
 
     public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null, System.Windows.Media.FontFamily? sourceFont = null, double sourceFontSize = 14)
@@ -74,8 +74,8 @@ public partial class MermaidVisualEditorWindow : Window
         try { SourceEditor.Text = draft.Source; } finally { updating = false; }
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; connectionUpdate?.Abort(); lifetime.Cancel(); lifetime.Dispose(); };
-        Loaded += (_, _) => { Refresh(true); Fit(this, new()); };
+        Closed += (_, _) => { closed = true; canvasRender?.Cancel(); lifetime.Cancel(); lifetime.Dispose(); };
+        Loaded += (_, _) => { Refresh(true); };
     }
     public void ApplyTheme(string theme)
     {
@@ -103,7 +103,7 @@ public partial class MermaidVisualEditorWindow : Window
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
-            Status.Text = draft.Model.Diagnostic ?? (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
+            Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax." : (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
         }
         finally { updating = false; }
     }
@@ -120,7 +120,7 @@ public partial class MermaidVisualEditorWindow : Window
         SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid Visual Editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
-        DraftIndicator.Text = busy ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : !draft.Model.CanEdit ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
+        DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : !draft.Model.CanEdit || !canonicalMapped ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
         RenderedPreviewButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && inlineEditor is null;
         SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit ? Visibility.Visible : Visibility.Collapsed;
         SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";

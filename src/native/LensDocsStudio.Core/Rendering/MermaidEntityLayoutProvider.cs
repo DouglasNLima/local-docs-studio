@@ -8,6 +8,8 @@ namespace LensDocsStudio.Core.Rendering;
 /// This avoids turning escaped delimiters into syntax, and keeps preview/export text and measurements consistent.</summary>
 internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider inner) : IGraphLayoutProvider
 {
+    // This provider belongs to one render call. Never install it on MermaidRenderer globally.
+    public PositionedGraph? Flowchart { get; private set; }
     public PositionedGraph LayoutFlowchart(MermaidGraph graph, RenderOptions? options = null, StrictStylingOptions? strict = null)
     {
         var decoded = graph with
@@ -16,8 +18,17 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             Edges = graph.Edges.Select(edge => edge with { Label = edge.Label is null ? null : Decode(edge.Label) }).ToArray(),
             Subgraphs = graph.Subgraphs.Select(DecodeGroup).ToArray()
         };
-        return inner.LayoutFlowchart(decoded, options, strict);
+        var positioned = inner.LayoutFlowchart(decoded, options, strict);
+        Flowchart = positioned with
+        {
+            Nodes = Array.AsReadOnly(positioned.Nodes.ToArray()),
+            Edges = Array.AsReadOnly(positioned.Edges.Select(edge => edge with { Points = Array.AsReadOnly(edge.Points.ToArray()) }).ToArray()),
+            Groups = Array.AsReadOnly(positioned.Groups.Select(FreezeGroup).ToArray()),
+            Notes = Array.AsReadOnly(positioned.Notes.ToArray())
+        };
+        return positioned;
     }
+    private static PositionedGroup FreezeGroup(PositionedGroup group) => group with { Children = Array.AsReadOnly(group.Children.Select(FreezeGroup).ToArray()) };
     public PositionedClassDiagram LayoutClass(ClassDiagram diagram) => inner.LayoutClass(diagram);
     public PositionedErDiagram LayoutEr(ErDiagram diagram) => inner.LayoutEr(diagram);
     private static MermaidSubgraph DecodeGroup(MermaidSubgraph group) => group with { Label = Decode(group.Label), Children = group.Children.Select(DecodeGroup).ToArray() };

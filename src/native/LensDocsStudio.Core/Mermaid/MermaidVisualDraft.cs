@@ -67,7 +67,7 @@ public sealed class MermaidVisualDraft
         {
             cancellationToken.ThrowIfCancellationRequested(); var parsed = parser.Parse(candidate, cancellationToken);
             if (!parsed.CanEdit) return (parsed, error: parsed.Diagnostic ?? "This source is protected.");
-            cancellationToken.ThrowIfCancellationRequested(); var rendered = diagrams.Render(candidate);
+            cancellationToken.ThrowIfCancellationRequested(); var rendered = diagrams.Render(candidate, cancellationToken: cancellationToken);
             cancellationToken.ThrowIfCancellationRequested(); return (parsed, error: rendered.Error);
         }, cancellationToken);
         if (version != revision) return new(false, "A newer draft superseded this validation.");

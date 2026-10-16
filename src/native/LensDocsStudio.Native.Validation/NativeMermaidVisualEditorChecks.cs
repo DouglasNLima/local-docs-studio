@@ -322,12 +322,23 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == "", "New flowchart insertion was not one coherent document Undo.");
             }
             const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\n";
-            LaunchDocument("Protected.mmd", protectedSource); OpenInsertion(false); Capture("protected-source");
+            LaunchDocument("Protected.mmd", protectedSource); Open(0, false); Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
             if (polish)
             {
+                var lab = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/flow-error-log-lab.mmd");
+                LaunchDocument("Flow-error-log-lab.mermaid", lab);
+                Open(0, false);
+                Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
+                    "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
+                Click("MermaidFit"); Capture("flow-error-log-lab-canvas"); Click("MermaidRenderedPreview");
+                var labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow();
+                Wait(() => (labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Protected Rendered preview did not open.");
+                labPreview!.Close(); Click("MermaidActualSize");
+                Check(Draft() == lab, "Protected zoom, Fit and Rendered preview leave the complete original source exact");
+                Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
                 foreach (var count in new[] { 20, 100, 300 })
                 {
                     var graph = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, count).Select(index => $"N{index}[Node {index}]"))
@@ -373,13 +384,14 @@ internal static partial class NativeUiChecks
                 if (polish) CaptureMeaningful("first-meaningful-insertion-" + firstFrames);
             }
 
-            void Open(int blockOffset)
+            void Open(int blockOffset, bool editable = true)
             {
                 FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Edit visually action was not available.");
                 var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
-                Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable.");
+                Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "The visual editor did not finish its canonical render.");
+                if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable: " + Find(visual!, "MermaidStatus").Name);
                 if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
             }
@@ -425,3 +437,4 @@ internal static partial class NativeUiChecks
             Limitations = "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed." }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
+
