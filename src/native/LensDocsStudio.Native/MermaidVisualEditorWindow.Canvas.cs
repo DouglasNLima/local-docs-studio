@@ -45,6 +45,7 @@ public partial class MermaidVisualEditorWindow
     private DiagramResult? canonicalRender;
     private DrawingImage? canonicalDrawing;
     private readonly Dictionary<string, DrawingGroup> nodeDrawings = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, DrawingGroup> groupLabelDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeLabelDrawings = new(StringComparer.Ordinal);
     private readonly HashSet<string> sessionConnections = new(StringComparer.Ordinal);
@@ -162,7 +163,7 @@ public partial class MermaidVisualEditorWindow
         CancelPointerInteraction();
         DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
         nodeTransforms.Clear(); connectionRuntime.Clear(); incidentConnections.Clear();
-        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear(); sessionConnections.Clear();
+        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); groupLabelDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear(); sessionConnections.Clear();
         var labelled = view.Connections.Where(connection => view.Graph.Edges[connection.Ordinal].Label is not null).ToArray();
         foreach (var group in DrawingGroups(mutableDrawing.Drawing))
         {
@@ -171,6 +172,8 @@ public partial class MermaidVisualEditorWindow
                 nodeDrawings["node:" + view.Graph.Nodes[ordinal].Id] = group;
             if (id?.StartsWith("lens-group-", StringComparison.Ordinal) == true && view.Elements.ContainsKey("group:" + id[11..]))
                 nodeDrawings["group:" + id[11..]] = group;
+            if (id?.StartsWith("lens-group-label-", StringComparison.Ordinal) == true && view.Elements.ContainsKey("group:" + id[17..]))
+                groupLabelDrawings["group:" + id[17..]] = group;
             if (id?.StartsWith("lens-edge-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(10), out var edgeOrdinal) && edgeOrdinal < view.Connections.Count)
                 edgeDrawings[canonicalMapped ? draft.Model.Edges[view.Connections[edgeOrdinal].Ordinal].Id : id] = group;
             if (id?.StartsWith("lens-label-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(11), out var labelOrdinal) && labelOrdinal < labelled.Length && canonicalMapped)
@@ -181,8 +184,10 @@ public partial class MermaidVisualEditorWindow
             var translation = new TranslateTransform();
             drawing.Transform = new TransformGroup { Children = { drawing.Transform ?? Transform.Identity, translation } };
             nodeTransforms[key] = translation;
+            if (groupLabelDrawings.TryGetValue(key, out var title))
+                title.Transform = new TransformGroup { Children = { title.Transform ?? Transform.Identity, translation } };
         }
-        FreezeStaticDrawing(mutableDrawing.Drawing, nodeDrawings.Values.Concat(edgeDrawings.Values).Concat(edgeLabelDrawings.Values).ToHashSet());
+        FreezeStaticDrawing(mutableDrawing.Drawing, nodeDrawings.Values.Concat(groupLabelDrawings.Values).Concat(edgeDrawings.Values).Concat(edgeLabelDrawings.Values).ToHashSet());
         var image = new CanonicalDrawingHost(mutableDrawing.Drawing, view.Drawing.Drawing.Bounds.Location)
         { Width = view.Drawing.Width, Height = view.Drawing.Height, IsHitTestVisible = false };
         canonicalImage = image;

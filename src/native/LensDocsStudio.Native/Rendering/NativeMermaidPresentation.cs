@@ -38,6 +38,18 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         foreach (var element in root.Descendants().Where(e => HasClass(e, "node"))) element.SetAttributeValue("id", "lens-node-" + nodeIndex++);
         foreach (var element in root.Descendants().Where(e => HasClass(e, "subgraph")))
             element.SetAttributeValue("id", "lens-group-" + (string?)element.Attribute("data-id"));
+        // The pinned canonical SVG paints group titles separately, above edges.
+        // Keep that paint order while giving verified titles the group's session transform.
+        foreach (var group in Groups(graph.Groups))
+        {
+            var titles = root.Elements().Where(element => element.Name.LocalName == "text"
+                && Math.Abs(Number(element, "x") - group.X - 12) < .01
+                && Math.Abs(Number(element, "y") - group.Y - 14) < .01
+                && MetadataLabel(element.Value) == MetadataLabel(group.Label)).ToArray();
+            if (titles.Length != 1) throw new InvalidDataException("The canonical subgraph title cannot be mapped safely: " + group.Id);
+            var title = titles[0]; var wrapper = new XElement(root.Name.Namespace + "g", new XAttribute("id", "lens-group-label-" + group.Id));
+            title.ReplaceWith(wrapper); wrapper.Add(title);
+        }
         var edgeIndex = 0;
         foreach (var element in root.Descendants().Where(e => HasClass(e, "edge")).ToArray())
         { var wrapper = new XElement(root.Name.Namespace + "g", new XAttribute("id", "lens-edge-" + edgeIndex++)); element.ReplaceWith(wrapper); wrapper.Add(element); }
