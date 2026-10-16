@@ -95,8 +95,11 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
             && model.Subgraphs.All(group => Elements.ContainsKey("group:" + group.Id) && Membership.Any(identity => identity.Id == group.Id && identity.ParentId == group.ParentId))
             && model.Nodes.Where(node => node.SubgraphId is not null).All(node => Membership.Any(group => group.Id == node.SubgraphId && group.NodeIds.Contains(node.Id)))
             && model.Edges.Select((edge, ordinal) => Graph.Edges[ordinal].Source == edge.Source.Id && Graph.Edges[ordinal].Target == edge.Target.Id
-                && (Graph.Edges[ordinal].Label ?? "") == edge.Label).All(matches => matches);
+                && (Graph.Edges[ordinal].Label ?? "") == edge.Label && MatchesType(edge.Type, Graph.Edges[ordinal])).All(matches => matches);
     }
+    private static bool MatchesType(FlowConnectionType type, PositionedEdge edge)
+        => edge.Style == (type == FlowConnectionType.Dotted ? EdgeStyle.Dotted : type == FlowConnectionType.Thick ? EdgeStyle.Thick : EdgeStyle.Solid)
+            && edge.HasArrowStart == (type == FlowConnectionType.Bidirectional) && edge.HasArrowEnd == (type != FlowConnectionType.Undirected);
     private static IEnumerable<PositionedGroup> Groups(IEnumerable<PositionedGroup> groups)
     { foreach (var group in groups) { yield return group; foreach (var child in Groups(group.Children)) yield return child; } }
     private static bool HasClass(XElement element, string value) => ((string?)element.Attribute("class") ?? "").Split(' ').Contains(value);
@@ -107,6 +110,10 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         if ((string?)element.Attribute("data-from") != edge.Source || (string?)element.Attribute("data-to") != edge.Target
             || MetadataLabel((string?)element.Attribute("data-label") ?? "") != MetadataLabel(edge.Label ?? ""))
             throw new InvalidDataException("Canonical connection order or identity is ambiguous. Use Edit source.");
+        if (HasClass(element, "edge") && ((string?)element.Attribute("data-style") != edge.Style.ToString().ToLowerInvariant()
+            || (string?)element.Attribute("data-arrow-start") != (edge.HasArrowStart ? "true" : "false")
+            || (string?)element.Attribute("data-arrow-end") != (edge.HasArrowEnd ? "true" : "false")))
+            throw new InvalidDataException("Canonical connection style or arrow identity is ambiguous. Use Edit source.");
     }
     private static double Number(XElement element, string name, double fallback = 0)
     {
