@@ -6,6 +6,10 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.UIA3;
 using LensDocsStudio.Core.State;
+using LensDocsStudio.Core.Exports;
+using LensDocsStudio.Core.Imports;
+using LensDocsStudio.Core.Parsing;
+using DocumentFormat.OpenXml.Packaging;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -49,6 +53,7 @@ internal static partial class NativeUiChecks
         using var automation = new UIA3Automation();
         try
         {
+            var reusableBefore = InspectReusableState();
             var start = new ProcessStartInfo(executable) { UseShellExecute = false };
             start.ArgumentList.Add("--state-directory"); start.ArgumentList.Add(state);
             started = Process.Start(start) ?? throw new IOException("The upgraded native application could not start.");
@@ -81,10 +86,14 @@ internal static partial class NativeUiChecks
             var remainingAfter = Snapshot(state).Where(entry => !mutable.Contains(entry.Key)).OrderBy(entry => entry.Key, StringComparer.Ordinal).ToArray();
             if (!remainingBefore.SequenceEqual(remainingAfter) || sources.Any(entry => Hash(entry.Key) != entry.Value))
                 throw new IOException("Restoring the installed session changed a workspace source, library, snapshot or retained asset.");
+            var reusableAfter = InspectReusableState();
+            if (reusableBefore != reusableAfter) throw new IOException("Restoration changed usable templates, snippets, profiles or recovery snapshots.");
             Write(new { passed = true, restoredDocuments = tabs.Length, retainedStateFiles = remainingBefore.Length,
                 workspaceFiles = sources.Count, sameSession = true, priorFixture = fixture, historicalSchemaCertification = false,
+                reusableState = JsonSerializer.Deserialize<JsonElement>(reusableAfter),
                 checks = new[] { "Prior active document and every preserved tab display exact text", "Saved appearance settings restore in native controls",
-                    "Document identities, workspace, content, settings and update consent survive shutdown", "Library/snapshot/asset bytes and saved workspace sources remain unchanged" } });
+                    "Document identities, workspace, content, settings and update consent survive shutdown", "Library/snapshot/asset bytes and saved workspace sources remain unchanged",
+                    "Retained library content parses, Word templates produce usable DOCX and recovery snapshots remain readable" } });
             Console.WriteLine("Installed session restoration: " + tabs.Length + " preserved tabs passed."); return 0;
         }
         catch (Exception error)
@@ -109,5 +118,42 @@ internal static partial class NativeUiChecks
         static string Hash(string path) { using var file = File.OpenRead(path); return Convert.ToHexString(SHA256.HashData(file)); }
         static Dictionary<string, string> Snapshot(string root) => Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
             .ToDictionary(path => Path.GetRelativePath(root, path), Hash, StringComparer.OrdinalIgnoreCase);
+
+        string InspectReusableState()
+        {
+            var library = new LocalLibraryStore(state).ReadAsync().GetAwaiter().GetResult().State;
+            var items = library.Active.Templates.Concat(library.Archived.Templates)
+                .Concat(library.Active.Snippets).Concat(library.Archived.Snippets).ToArray();
+            foreach (var item in items)
+            {
+                var imported = new MarkdownImageImporter().Import(item.Content);
+                if (new MarkdownService().Parse(imported.Markdown).Source != imported.Markdown)
+                    throw new IOException("A retained reusable entry lost editable source: " + item.Label);
+            }
+            var wordLibrary = new WordTemplateLibrary(Path.Combine(state, "word-templates"));
+            var active = wordLibrary.ListAsync().GetAwaiter().GetResult();
+            var archived = wordLibrary.ListAsync(archived: true).GetAwaiter().GetResult();
+            if (active.Warnings.Count != 0 || archived.Warnings.Count != 0)
+                throw new IOException("A retained Word template is unavailable after upgrade.");
+            var templates = active.Entries.Concat(archived.Entries).ToArray();
+            foreach (var template in templates)
+            {
+                var prepared = wordLibrary.ReadAsync(template).GetAwaiter().GetResult();
+                const string body = "Historical template remains usable — Café.";
+                var content = new ExportContent(new MarkdownService().Parse(body), new Dictionary<int, ExportImage>(), new Dictionary<string, ExportImage>());
+                using var stream = new MemoryStream(new DocxExporter().Export(content, prepared.Bytes));
+                using var package = WordprocessingDocument.Open(stream, false);
+                if (package.MainDocumentPart?.Document?.InnerText.Contains(body, StringComparison.Ordinal) != true)
+                    throw new IOException("A retained Word template could not export current document content.");
+            }
+            var snapshots = new DocumentSnapshotStore(state);
+            var listing = snapshots.ListAsync().GetAwaiter().GetResult();
+            if (listing.Warnings.Count != 0) throw new IOException("A retained recovery snapshot is unavailable after upgrade.");
+            var recovered = listing.Entries.Select(entry => snapshots.ReadAsync(entry).GetAwaiter().GetResult()).ToArray();
+            return JsonSerializer.Serialize(new { library, wordTemplates = templates.Select(entry => entry.Record).ToArray(),
+                snapshots = recovered, templateCount = library.Active.Templates.Length + library.Archived.Templates.Length,
+                snippetCount = library.Active.Snippets.Length + library.Archived.Snippets.Length, wordTemplateCount = templates.Length,
+                snapshotCount = recovered.Length });
+        }
     }
 }
