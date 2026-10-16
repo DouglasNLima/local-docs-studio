@@ -57,8 +57,19 @@ internal static class NativeMermaidFidelityChecks
                 RenderMilliseconds = renderMs, InteractionGeometryMilliseconds = interactionMs, PixelTolerance = 0, CoordinateTolerance = .001,
                 Bounds = new { reference.Width, reference.Height }, SourceUnchanged = result.Source == source });
         }
+        var safeResult = new DiagramService().Render("flowchart LR\nA[Keep] --> B[Source]");
+        Reject(safeResult with { Svg = safeResult.Svg!.Replace("data-id=\"A\"", "data-id=\"B\"", StringComparison.Ordinal) }, "Conflicting node IDs cannot supply interaction identities");
+        Reject(safeResult with { Svg = "<!DOCTYPE svg [<!ENTITY unsafe SYSTEM 'file:///synthetic'>]>" + safeResult.Svg }, "DTD and external entities are rejected before metadata processing");
+        Reject(safeResult with { Svg = safeResult.Svg!.Replace("</svg>", "<image href='https://example.invalid/external'/></svg>", StringComparison.Ordinal) }, "External SVG content cannot enter the native canvas");
         File.WriteAllText(Path.Combine(output, "fidelity.json"), JsonSerializer.Serialize(new { Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
+        void Reject(DiagramResult candidate, string message)
+        {
+            try { NativeMermaidPresentation.Create(candidate, new NativeSvgService()); }
+            catch (Exception error) when (error is InvalidDataException or System.Xml.XmlException or ArgumentException)
+            { checks.Add(message); return; }
+            throw new IOException(message);
+        }
     }
     private static byte[] Pixels(byte[] png)
     {

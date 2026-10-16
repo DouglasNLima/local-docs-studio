@@ -16,6 +16,7 @@ public sealed record NativeMermaidConnection(int Ordinal, string Source, string 
 public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDictionary<string, NativeMermaidElement> Elements,
     IReadOnlyList<NativeMermaidConnection> Connections, PositionedGraph Graph)
 {
+    public IReadOnlyList<FlowchartGroupIdentity> Membership { get; init; } = [];
     public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg)
     {
         var graph = result.FlowchartLayout ?? throw new InvalidDataException("No canonical Flowchart layout is available. Use Edit source.");
@@ -66,7 +67,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
             connections.Add(new(ordinal, edge.Source, edge.Target, edge.Label ?? "", geometry, labelBounds));
         }
         if (labelIndex != labels.Length) throw new InvalidDataException("Conflicting canonical connection labels.");
-        return new(drawing, elements, connections.AsReadOnly(), graph);
+        return new(drawing, elements, connections.AsReadOnly(), graph) { Membership = result.FlowchartGroups };
 
         void Add(string prefix, string id, string label, Rect bounds, string kind)
         {
@@ -90,7 +91,8 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         if (!model.CanEdit || Graph.Nodes.Count != model.Nodes.Count || Graph.Edges.Count != model.Edges.Count
             || Groups(Graph.Groups).Count() != model.Subgraphs.Count) return false;
         return model.Nodes.All(node => Elements.ContainsKey("node:" + node.Id))
-            && model.Subgraphs.All(group => Elements.ContainsKey("group:" + group.Id))
+            && model.Subgraphs.All(group => Elements.ContainsKey("group:" + group.Id) && Membership.Any(identity => identity.Id == group.Id && identity.ParentId == group.ParentId))
+            && model.Nodes.Where(node => node.SubgraphId is not null).All(node => Membership.Any(group => group.Id == node.SubgraphId && group.NodeIds.Contains(node.Id)))
             && model.Edges.Select((edge, ordinal) => Graph.Edges[ordinal].Source == edge.Source.Id && Graph.Edges[ordinal].Target == edge.Target.Id
                 && (Graph.Edges[ordinal].Label ?? "") == edge.Label).All(matches => matches);
     }

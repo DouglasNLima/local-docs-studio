@@ -65,10 +65,10 @@
     <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
     <Grid><Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="*"/></Grid.RowDefinitions>
      <Border Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1"><DockPanel Margin="10,0"><TextBlock Text="CANVAS" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/><TextBlock Text="Mermaider layout" HorizontalAlignment="Right" VerticalAlignment="Center" Foreground="{DynamicResource MutedTextBrush}" ToolTip="The original preview layout is preserved. Space+drag pans. Mermaid does not store manual node coordinates."/></DockPanel></Border>
-     <ScrollViewer x:Name="Viewport" Grid.Row="1" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+     <ScrollViewer x:Name="Viewport" AllowDrop="True" Drop="CanvasDrop" Grid.Row="1" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
       PreviewMouseWheel="CanvasWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost"
       AutomationProperties.Name="Interactive Mermaid canvas. Use the element list for keyboard selection; middle-drag pans." AutomationProperties.AutomationId="MermaidViewport">
-      <Canvas x:Name="DiagramCanvas" Width="800" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" AllowDrop="True" Drop="CanvasDrop" MouseLeftButtonDown="DeselectCanvas">
+      <Canvas x:Name="DiagramCanvas" Width="800" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" AllowDrop="True" MouseLeftButtonDown="DeselectCanvas">
        <Canvas.LayoutTransform><ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
        <Canvas.ContextMenu><ContextMenu><MenuItem Header="Add process" Tag="Process" Click="InsertNode"/><MenuItem Header="Add decision" Tag="Decision" Click="InsertNode"/><MenuItem Header="Add subgraph" Click="InsertSubgraph"/><MenuItem Header="Connect selected node" Click="StartConnection"/><MenuItem Header="Delete selection" Click="Delete"/><Separator/><MenuItem Header="Fit to window" Click="Fit"/></ContextMenu></Canvas.ContextMenu>
       </Canvas>

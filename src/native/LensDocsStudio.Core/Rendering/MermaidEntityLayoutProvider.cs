@@ -10,6 +10,7 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
 {
     // This provider belongs to one render call. Never install it on MermaidRenderer globally.
     public PositionedGraph? Flowchart { get; private set; }
+    public IReadOnlyList<FlowchartGroupIdentity> Groups { get; private set; } = [];
     public PositionedGraph LayoutFlowchart(MermaidGraph graph, RenderOptions? options = null, StrictStylingOptions? strict = null)
     {
         var decoded = graph with
@@ -18,6 +19,7 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             Edges = graph.Edges.Select(edge => edge with { Label = edge.Label is null ? null : Decode(edge.Label) }).ToArray(),
             Subgraphs = graph.Subgraphs.Select(DecodeGroup).ToArray()
         };
+        Groups = Array.AsReadOnly(Identities(decoded.Subgraphs, null).ToArray());
         var positioned = inner.LayoutFlowchart(decoded, options, strict);
         Flowchart = positioned with
         {
@@ -29,6 +31,14 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
         return positioned;
     }
     private static PositionedGroup FreezeGroup(PositionedGroup group) => group with { Children = Array.AsReadOnly(group.Children.Select(FreezeGroup).ToArray()) };
+    private static IEnumerable<FlowchartGroupIdentity> Identities(IEnumerable<MermaidSubgraph> groups, string? parent)
+    {
+        foreach (var group in groups)
+        {
+            yield return new(group.Id, parent, Array.AsReadOnly(group.NodeIds.ToArray()));
+            foreach (var child in Identities(group.Children, group.Id)) yield return child;
+        }
+    }
     public PositionedClassDiagram LayoutClass(ClassDiagram diagram) => inner.LayoutClass(diagram);
     public PositionedErDiagram LayoutEr(ErDiagram diagram) => inner.LayoutEr(diagram);
     private static MermaidSubgraph DecodeGroup(MermaidSubgraph group) => group with { Label = Decode(group.Label), Children = group.Children.Select(DecodeGroup).ToArray() };

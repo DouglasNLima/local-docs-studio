@@ -93,7 +93,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--ux-controls")
             return NativeUiChecks.Run(args[1], args[2], desktopUxOnly: true);
         if (args.FirstOrDefault() == "--mermaid-ui")
-            return NativeUiChecks.RunMermaidVisualEditor(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--polish"));
+            return NativeUiChecks.RunMermaidVisualEditor(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--polish"), args.Contains("--baseline"));
         if (args.FirstOrDefault() == "--preview-input-safety")
         {
             try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }

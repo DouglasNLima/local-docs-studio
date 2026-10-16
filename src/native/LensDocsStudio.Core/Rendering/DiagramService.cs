@@ -3,11 +3,14 @@ using Mermaider.Models;
 
 namespace LensDocsStudio.Core.Rendering;
 
+public sealed record FlowchartGroupIdentity(string Id, string? ParentId, IReadOnlyList<string> NodeIds);
+
 public sealed record DiagramResult(string Source, string? Svg, string? Error)
 {
     public bool Success => Svg is not null;
     public string? Theme { get; init; }
     public PositionedGraph? FlowchartLayout { get; init; }
+    public IReadOnlyList<FlowchartGroupIdentity> FlowchartGroups { get; init; } = [];
 }
 
 public sealed class DiagramService
@@ -66,7 +69,7 @@ public sealed class DiagramService
                 svg = System.Text.Encoding.UTF8.GetString(output.ToArray());
             }
             else svg = MermaidRenderer.RenderSvg(prepared, options);
-            return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart };
+            return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart, FlowchartGroups = layout.Groups };
         }
         catch (Exception ex) when (ex is not OutOfMemoryException && (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested))
         {

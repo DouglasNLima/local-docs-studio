@@ -55,6 +55,7 @@ public sealed class MermaidCanonicalLayoutTests
         var result = new DiagramService().Render(source); Assert.True(result.Success, result.Error);
         var outer = Assert.Single(result.FlowchartLayout!.Groups); Assert.Equal("Outer", outer.Id);
         Assert.Equal("Inner", Assert.Single(outer.Children).Id);
+        Assert.Contains(result.FlowchartGroups, group => group.Id == "Inner" && group.ParentId == "Outer" && group.NodeIds.Contains("A") && group.NodeIds.Contains("B"));
     }
 
     [Fact]

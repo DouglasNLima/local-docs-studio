@@ -31,7 +31,7 @@ public partial class MermaidVisualEditorWindow
     {
         Palette.PreviewMouseLeftButtonDown += (_, e) => paletteStart = e.GetPosition(Palette);
         Palette.PreviewMouseLeftButtonUp += (_, _) => paletteStart = null;
-        DiagramCanvas.PreviewDragOver += (_, e) =>
+        Viewport.PreviewDragOver += (_, e) =>
         {
             e.Effects = CanTransform && !PropertiesPending && e.Data.GetDataPresent("Lens.MermaidElement") ? DragDropEffects.Copy : DragDropEffects.None;
             e.Handled = true;

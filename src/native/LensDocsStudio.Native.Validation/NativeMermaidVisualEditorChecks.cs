@@ -17,17 +17,17 @@ internal static partial class NativeUiChecks
     private static extern uint GetDpiForSystem();
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
     private static extern int DwmFlush();
-    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false) => Task.Run(() =>
+    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false, bool baseline = false) => Task.Run(() =>
     {
         Directory.CreateDirectory(Path.GetFullPath(output));
         using var clipboard = NativeUiClipboard.Start();
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var display = new NativeTestDisplay(output);
-        var result = MermaidVisualEditorCore(executable, output, highContrast, polish);
+        var result = MermaidVisualEditorCore(executable, output, highContrast, polish, baseline);
         if (result == 0) display.Complete(); return result;
     }).GetAwaiter().GetResult();
 
-    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast, bool polish)
+    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast, bool polish, bool baseline)
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         var root = Path.Combine(output, "fixture-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -322,7 +322,9 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == "", "New flowchart insertion was not one coherent document Undo.");
             }
             const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\n";
-            LaunchDocument("Protected.mmd", protectedSource); Open(0, false); Capture("protected-source");
+            LaunchDocument("Protected.mmd", protectedSource);
+            if (baseline) OpenInsertion(false); else Open(0, false);
+            Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
