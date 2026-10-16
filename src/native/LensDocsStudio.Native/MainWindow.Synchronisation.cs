@@ -249,7 +249,7 @@ public partial class MainWindow
         {
             if (!Dispatcher.HasShutdownStarted)
             {
-                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }, DispatcherPriority.Background); }
+                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; TraceViewport("sync-complete " + origin); } }, DispatcherPriority.Background); }
                 catch (TaskCanceledException) when (Dispatcher.HasShutdownStarted) { }
             }
         }

@@ -49,13 +49,17 @@ internal static partial class NativeUiChecks
                 Find(window, "SyncScrollControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
                 editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 75);
+                preview.Focus(); var aSyncStart = SyncCompletions();
                 PreviewRange("Region 065").ScrollIntoView(true);
                 Wait(() => Visible(preview, "Region 065"), "Document A did not reach its reading position.");
+                if (synchronised) Wait(() => SyncCompletions() > aSyncStart, "Document A's focused preview scroll did not finish synchronising.");
                 var aOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("B"); AtTop("B");
                 editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 40);
+                preview.Focus(); var bSyncStart = SyncCompletions();
                 PreviewRange("Region 035").ScrollIntoView(true);
                 Wait(() => Visible(preview, "Region 035"), "Document B did not reach its reading position.");
+                if (synchronised) Wait(() => SyncCompletions() > bSyncStart, "Document B's focused preview scroll did not finish synchronising.");
                 var bOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("A");
                 Wait(() => Math.Abs(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value - aOffset) < 3 && Visible(preview, "Region 065"), "Returning document A inherited another document's viewport.");
@@ -73,7 +77,7 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == texts["C"] && HasPreview("C") && Visible(preview, "Region 040"), "Link navigation did not honour the requested section.");
                 if (mode == "Pages")
                 {
-                    var traces = File.ReadAllLines(Path.Combine(root, mode + synchronised, "viewport-navigation.jsonl"))
+                    var traces = ViewportTraceLines()
                         .Select(line => JsonSerializer.Deserialize<JsonElement>(line)).ToArray();
                     var duringOperation = traces.Last(item => item.GetProperty("Operation").GetString()!.StartsWith("anchor-target", StringComparison.Ordinal));
                     var settled = traces.Last(item => item.GetProperty("Operation").GetString()!.StartsWith("anchor-final-layout", StringComparison.Ordinal));
@@ -99,6 +103,19 @@ internal static partial class NativeUiChecks
                 bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
                     && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
+                int SyncCompletions()
+                {
+                    return ViewportTraceLines().Count(line => line.Contains("sync-complete preview-scroll", StringComparison.Ordinal));
+                }
+                string[] ViewportTraceLines()
+                {
+                    var tracePath = Path.Combine(root, mode + synchronised, "viewport-navigation.jsonl");
+                    if (!File.Exists(tracePath)) return [];
+                    using var stream = new FileStream(tracePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var reader = new StreamReader(stream);
+                    return reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                        .Where(line => line.TrimEnd().EndsWith('}')).ToArray();
+                }
                 bool Visible(AutomationElement pane, string text) => PreviewRange(text).GetBoundingRectangles().Any(box => box.Width > 0 && box.Height > 0 && pane.BoundingRectangle.Contains(box));
                 void AtTop(string name)
                 {
