@@ -46,6 +46,14 @@ public sealed class PreviewSourceMap
         start = first ?? 0; length = last is not null && first is not null ? last.Value - first.Value : 0;
         return first is not null && last is not null && length >= 0;
     }
+    public bool TrySourceOffset(TextPointer position, out int offset)
+    {
+        // A reading position has forward affinity. At a formatting boundary the
+        // range's backwards-affinity end may precede its start in Markdown.
+        var source = PreviewBoundary(position, true);
+        offset = source ?? 0;
+        return source is not null;
+    }
     private int? PreviewBoundary(TextPointer position, bool startBoundary)
     {
         var low = 0; var high = literals.Length - 1;

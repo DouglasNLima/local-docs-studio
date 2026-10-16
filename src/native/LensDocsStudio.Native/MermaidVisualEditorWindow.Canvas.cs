@@ -54,6 +54,7 @@ public partial class MermaidVisualEditorWindow
     private readonly SemaphoreSlim canvasRenderGate = new(1, 1);
     private CancellationTokenSource? canvasRender;
     private int canvasGeneration;
+    private long canvasHistoryIdentity = -1;
     private bool renderingCanvas, canonicalMapped, initialFit = true;
     private string? canvasError;
 
@@ -64,7 +65,7 @@ public partial class MermaidVisualEditorWindow
         var source = draft.Source; var themeDark = dark; var generation = ++canvasGeneration;
         canvasRender?.Cancel();
         if (canonicalRender?.Source == source && canonicalRender.Theme == DiagramThemes.ResolveName(diagramTheme, themeDark)
-            && presentation is not null && (!draft.Model.CanEdit || presentation.Maps(draft.Model)))
+            && canvasHistoryIdentity == draft.HistoryIdentity && presentation is not null && (!draft.Model.CanEdit || presentation.Maps(draft.Model)))
         {
             renderingCanvas = false; canonicalMapped = presentation.Maps(draft.Model);
             UpdateCanvasSelection(); UpdateActions(); return;
@@ -157,6 +158,7 @@ public partial class MermaidVisualEditorWindow
     private void BuildCanonicalCanvas()
     {
         if (presentation is not { } view) return;
+        canvasHistoryIdentity = draft.HistoryIdentity;
         CancelPointerInteraction();
         DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
         nodeTransforms.Clear(); connectionRuntime.Clear(); incidentConnections.Clear();

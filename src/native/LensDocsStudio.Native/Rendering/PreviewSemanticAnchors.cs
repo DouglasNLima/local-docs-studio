@@ -9,7 +9,9 @@ namespace LensDocsStudio.Native.Rendering;
 public sealed class PreviewSemanticAnchors
 {
     private readonly KeyValuePair<int, TextElement>[] anchors;
-    public PreviewSemanticAnchors(PreviewResult result) => anchors = result.SourceElements.OrderBy(item => item.Key).ToArray();
+    private readonly PreviewSourceMap textMap;
+    public PreviewSemanticAnchors(PreviewResult result)
+    { anchors = result.SourceElements.OrderBy(item => item.Key).ToArray(); textMap = result.TextMap; }
     public TextElement? AtSource(int offset)
     {
         var low = 0; var high = anchors.Length;
@@ -38,7 +40,14 @@ public sealed class PreviewSemanticAnchors
             var page = Descendant<FlowDocumentPageViewer>(viewer)?.PageViews.FirstOrDefault()?.DocumentPage;
             if (page is null || viewer.Document is null) return null;
             var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)viewer.Document).DocumentPaginator;
-            if (paginator.GetPagePosition(page) is TextPointer position) return AtPointer(position)?.Start;
+            if (paginator.GetPagePosition(page) is TextPointer position)
+            {
+                // A page can begin halfway through a paragraph. Its block start may
+                // be on the previous page; retain the exact literal boundary instead.
+                var insertion = position.GetInsertionPosition(LogicalDirection.Forward) ?? position;
+                if (textMap.TrySourceOffset(insertion, out var exactSource)) return exactSource;
+                return AtPointer(position)?.Start;
+            }
             return null;
         }
         // Dirty/non-visible positions are skipped, so this cannot paginate the whole document.

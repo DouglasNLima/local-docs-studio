@@ -278,8 +278,8 @@ public partial class MermaidVisualEditorWindow : Window
         var selected = new MermaidSourceParser().Parse(CopiedSource(ids));
         await InsertCopiedGraph(selected, true);
     }
-    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { SaveSessionLayout(); draft.Undo(); RestoreHistoryLayout(); Refresh(true); } }
-    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { SaveSessionLayout(); draft.Redo(); RestoreHistoryLayout(); Refresh(true); } }
+    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { CancelPointerInteraction(); SaveSessionLayout(); draft.Undo(); RestoreHistoryLayout(); Refresh(true); } }
+    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { CancelPointerInteraction(); SaveSessionLayout(); draft.Redo(); RestoreHistoryLayout(); Refresh(true); } }
     private void StartConnection(object sender, RoutedEventArgs e)
     {
         if (!CanTransform || PropertiesPending) return;

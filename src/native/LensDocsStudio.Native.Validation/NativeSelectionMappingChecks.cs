@@ -49,6 +49,11 @@ internal static class NativeSelectionMappingChecks
                 throw new IOException("Adjacent-run native selection boundaries included Markdown link syntax.");
             if (preview.TextMap.TryPreviewRange(source.IndexOf("**", StringComparison.Ordinal), 2, out _, out _))
                 throw new IOException("Formatting delimiters claimed an exact literal selection.");
+            var bold = preview.Document.Blocks.OfType<Paragraph>().SelectMany(paragraph => paragraph.Inlines.OfType<Bold>()).Single();
+            var boldSource = source.IndexOf("**action**", StringComparison.Ordinal) + 2;
+            if (!preview.TextMap.TrySourceOffset(bold.ElementStart, out var readingSource) || readingSource != boldSource)
+                throw new IOException("A reading position at a formatting boundary lost its forward source affinity.");
+            observations.Add(new { Dark = dark, ReadingSource = readingSource, ForwardAffinity = true });
             var other = new FlowDocument(new Paragraph(new Run("action")));
             if (preview.TextMap.TrySourceRange(other.ContentStart, other.ContentEnd, out _, out _))
                 throw new IOException("A stale document pointer mapped into the current preview.");

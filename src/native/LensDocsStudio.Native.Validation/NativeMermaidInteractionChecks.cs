@@ -211,6 +211,22 @@ internal static partial class NativeUiChecks
             finally { Mouse.Up(MouseButton.Left); }
             FocusWindow(visual!);
             Check(Centre("MermaidCanvas_node_Node1") == beforeDeactivation, "Window deactivation cancels movement and releases capture");
+            var beforeInterruptedUndo = Draft(); var positionBeforeUndo = Centre("MermaidCanvas_node_Node1");
+            Mouse.MoveTo(positionBeforeUndo); Mouse.Down(MouseButton.Left);
+            try { MovePointer(new(positionBeforeUndo.X + 28, positionBeforeUndo.Y + 16)); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); }
+            finally { Mouse.Up(MouseButton.Left); }
+            Ready(text => text != beforeInterruptedUndo);
+            Find(visual!, "MermaidElements").Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+            Ready(text => text == beforeInterruptedUndo);
+            Check(Centre("MermaidCanvas_node_Node1") == positionBeforeUndo, "Undo during an active drag cancels capture before changing history; Redo restores the saved position");
+            var beforeRepeatedSource = Draft(); var repeatedCentre = Centre("MermaidCanvas_node_Node1");
+            Find(visual!, "MermaidCanvas_node_Node1").Click();
+            Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Transient label"; Click("MermaidUpdateNode");
+            Ready(text => text.Contains("Transient label", StringComparison.Ordinal));
+            Find(visual!, "MermaidDraftSource").Patterns.Value.Pattern.SetValue(beforeRepeatedSource); Click("MermaidValidateSource");
+            Ready(text => text == beforeRepeatedSource);
+            Click("MermaidUndo"); Click("MermaidUndo"); Ready(text => text == beforeRepeatedSource);
+            Check(Centre("MermaidCanvas_node_Node1") == repeatedCentre, "Rapid Undo through identical source restores its own session layout and private element identities");
             var beforeReconnect = Draft();
             if (!Find(visual!, "MermaidSelectionSummary").Name.Contains("Next 0", StringComparison.Ordinal)) Find(visual!, "MermaidCanvas_edge-0").Patterns.Toggle.Pattern.Toggle();
             Wait(() => visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidDestinationEndpoint")) is not null, "Selected connection has no endpoint handles.");
@@ -233,6 +249,21 @@ internal static partial class NativeUiChecks
             var beforeCancel = Centre("MermaidCanvas_node_Node1");
             Drag(beforeCancel, new(beforeCancel.X + 40, beforeCancel.Y + 20), true);
             Check(Centre("MermaidCanvas_node_Node1") == beforeCancel && Draft() == beforeReconnect, "Escape restores node position and source after reconnection");
+            var beforeGroup = Draft(); var groupPoint = new System.Drawing.Point(view.Left + view.Width / 4, view.Top + view.Height * 4 / 5);
+            Drag(Centre("MermaidInsertSubgraph"), groupPoint); Ready(text => new MermaidSourceParser().Parse(text).Subgraphs.Count == 1);
+            var groupCentre = Centre("MermaidCanvas_group_Group1");
+            Check(Math.Abs(groupCentre.X - groupPoint.X) <= 6 && Math.Abs(groupCentre.Y - groupPoint.Y) <= 6, "Palette subgraph appears at its actual drop centre");
+            Drag(Centre("MermaidInsertProcess"), groupCentre);
+            Ready(text => new MermaidSourceParser().Parse(text).Nodes.Any(node => node.Id == "Node4" && node.SubgraphId == "Group1"));
+            Check(true, "Dropping into the explicitly selected subgraph uses verified membership");
+            Find(visual!, "MermaidCanvas_node_N0").Click(); Find(visual!, "MermaidNodeGroup").Focus();
+            Find(visual!, "MermaidNodeGroup").AsComboBox().Select("Group1"); Click("MermaidMoveNode");
+            Ready(text => new MermaidSourceParser().Parse(text).Node("N0").SubgraphId == "Group1");
+            Check(Find(visual!, "MermaidCanvas_group_Group1").BoundingRectangle.Contains(Find(visual!, "MermaidCanvas_node_N0").BoundingRectangle), "Unpositioned members inherit the manually placed subgraph's translation");
+            Capture("positioned-subgraph-membership");
+            Click("MermaidUndo"); Ready(text => new MermaidSourceParser().Parse(text).Node("N0").SubgraphId is null);
+            Click("MermaidUndo"); Ready(text => !new MermaidSourceParser().Parse(text).Nodes.Any(node => node.Id == "Node4"));
+            Click("MermaidUndo"); Ready(text => text == beforeGroup);
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
             {
                 visual!.Patterns.Transform.Pattern.Resize(width, height); Capture("candidate-" + width + "x" + height);

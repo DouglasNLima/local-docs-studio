@@ -61,6 +61,8 @@ jobs:
         uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+      - name: Initialise the test-only HTTP runtime before its readiness deadline
+        run: python -c "import argparse, functools, http.server, socketserver, pathlib"
       - name: Validate exported Docs Site on disk and static hosting
         env:
           LENS_TEST_PORT: '4183'

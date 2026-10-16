@@ -25,6 +25,7 @@ public partial class MermaidVisualEditorWindow
     private ToggleButton? dragOwner;
     private DispatcherOperation? dragFrame;
     private Vector pendingDrag;
+    private Dictionary<string, Point?>? initialManualPositions;
     private bool dragging;
     private string[] affectedConnections = [];
     private long dragAllocated, dragTicks, frameAllocated;
@@ -33,6 +34,7 @@ public partial class MermaidVisualEditorWindow
     private readonly bool interactionDiagnostics = Environment.GetEnvironmentVariable("LENS_NATIVE_MERMAID_DIAGNOSTICS") == "1";
     private (string Key, Point Centre)? pendingNodePlacement;
     private Button? sourceHandle, targetHandle;
+    private string? endpointEdgeKey;
     private string? reconnectEdge;
     private bool reconnectSource;
     private Button? reconnectOwner;
@@ -77,6 +79,7 @@ public partial class MermaidVisualEditorWindow
         CancelPointerInteraction(); dragOwner = owner; dragStart = start; dragging = false;
         dragged = draft.Selection.Where(key => key.StartsWith("node:", StringComparison.Ordinal) && nodeTransforms.ContainsKey(key))
             .ToDictionary(key => key, key => positions[key]);
+        initialManualPositions = dragged.Keys.ToDictionary(key => key, key => sessionPositions.TryGetValue(key, out var centre) ? (Point?)centre : null);
         affectedConnections = dragged.Keys.Where(incidentConnections.ContainsKey).SelectMany(key => incidentConnections[key]).Distinct().ToArray();
         dragFrames = 0; frameAllocated = 0; maximumDragFrame = firstDragFrame = 0; dragAllocated = GC.GetAllocatedBytesForCurrentThread(); dragTicks = pressedAt;
         if (!owner.CaptureMouse()) FinishNodeDrag(true);
@@ -112,12 +115,14 @@ public partial class MermaidVisualEditorWindow
         if (!cancel && dragging) ApplyDragFrame();
         if (cancel)
         {
-            foreach (var (key, original) in dragged) PositionNode(key, new(original.CentreX, original.CentreY));
+            foreach (var (key, original) in dragged) PositionNode(key, new(original.CentreX, original.CentreY), false);
+            foreach (var (key, centre) in initialManualPositions ?? [])
+                if (centre is { } saved) sessionPositions[key] = saved; else sessionPositions.Remove(key);
             foreach (var key in affectedConnections) UpdateSessionConnection(key);
         }
         else if (dragging) SaveSessionLayout();
         var incidentCount = affectedConnections.Length;
-        var owner = dragOwner; dragged = null; dragOwner = null; dragStart = null; dragging = false; affectedConnections = [];
+        var owner = dragOwner; dragged = null; initialManualPositions = null; dragOwner = null; dragStart = null; dragging = false; affectedConnections = [];
         if (owner is not null) { owner.Cursor = null; if (owner.IsMouseCaptured) owner.ReleaseMouseCapture(); }
         UpdateExtent(); UpdateCanvasSelection();
         if (dragFrames > 0)
@@ -126,7 +131,7 @@ public partial class MermaidVisualEditorWindow
             if (interactionDiagnostics) AutomationProperties.SetHelpText(Status, $"First update after native press: {firstDragFrame:F3} ms; incident connections: {incidentCount}; Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; update allocated bytes: {frameAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
         }
     }
-    private void PositionNode(string key, Point centre)
+    private void PositionNode(string key, Point centre, bool remember = true)
     {
         if (presentation is null || !positions.TryGetValue(key, out var box) || !nodeTransforms.TryGetValue(key, out var transform)) return;
         var canonical = presentation.Elements[key].Bounds;
@@ -134,7 +139,7 @@ public partial class MermaidVisualEditorWindow
         positions[key] = box; Canvas.SetLeft(canvasElements[key], box.X); Canvas.SetTop(canvasElements[key], box.Y);
         transform.X = box.X - canonical.X; transform.Y = box.Y - canonical.Y;
         if (ports.TryGetValue(key, out var port)) { Canvas.SetLeft(port, box.X + box.Width - 16); Canvas.SetTop(port, box.CentreY - 16); }
-        sessionPositions[key] = centre;
+        if (remember) sessionPositions[key] = centre;
     }
     private void UpdateSessionConnection(string key)
     {
@@ -170,7 +175,32 @@ public partial class MermaidVisualEditorWindow
     {
         foreach (var key in sessionPositions.Keys.Where(key => !nodeTransforms.ContainsKey(key)).ToArray()) sessionPositions.Remove(key);
         foreach (var (key, centre) in sessionPositions.ToArray()) PositionNode(key, centre);
-        foreach (var key in sessionPositions.Keys.Where(incidentConnections.ContainsKey).SelectMany(key => incidentConnections[key]).Distinct()) UpdateSessionConnection(key);
+        // Group drawings are flat in the canonical SVG. Unpositioned descendants
+        // inherit their container's session translation; explicit node centres win.
+        if (canonicalMapped && presentation is { } view)
+        {
+            var offsets = new Dictionary<string, Vector>(StringComparer.Ordinal);
+            Vector GroupOffset(string id)
+            {
+                if (offsets.TryGetValue(id, out var cached)) return cached;
+                var bounds = view.Elements["group:" + id].Bounds;
+                var offset = sessionPositions.TryGetValue("group:" + id, out var point) ? point - new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2)
+                    : draft.Model.Subgraph(id).ParentId is { } parent ? GroupOffset(parent) : new Vector();
+                return offsets[id] = offset;
+            }
+            foreach (var group in draft.Model.Subgraphs.Where(group => !sessionPositions.ContainsKey("group:" + group.Id)))
+            {
+                var offset = GroupOffset(group.Id); var box = positions["group:" + group.Id];
+                if (offset.LengthSquared > .0001) PositionNode("group:" + group.Id, new Point(box.CentreX, box.CentreY) + offset, false);
+            }
+            foreach (var node in draft.Model.Nodes.Where(node => node.SubgraphId is not null && !sessionPositions.ContainsKey("node:" + node.Id)))
+            {
+                var offset = GroupOffset(node.SubgraphId!); var box = positions["node:" + node.Id];
+                if (offset.LengthSquared > .0001) PositionNode("node:" + node.Id, new Point(box.CentreX, box.CentreY) + offset, false);
+            }
+        }
+        foreach (var key in nodeTransforms.Where(pair => incidentConnections.ContainsKey(pair.Key) && (Math.Abs(pair.Value.X) > .01 || Math.Abs(pair.Value.Y) > .01))
+            .SelectMany(pair => incidentConnections[pair.Key]).Distinct()) UpdateSessionConnection(key);
     }
     private void RestoreHistoryLayout()
     {
@@ -247,14 +277,21 @@ public partial class MermaidVisualEditorWindow
     { foreach (var group in groups) { yield return group; foreach (var child in InspectionGroups(group.Children)) yield return child; } }
     private void UpdateEndpointHandles()
     {
+        var key = Selected;
+        var available = CanTransform && !PropertiesPending && Elements.SelectedItems.Count == 1 && key is not null && connectionRuntime.ContainsKey(key);
+        if (available && endpointEdgeKey == key && sourceHandle is not null && targetHandle is not null
+            && DiagramCanvas.Children.Contains(sourceHandle) && DiagramCanvas.Children.Contains(targetHandle))
+        { UpdateEndpointHandlePositions(); return; }
+        if (reconnectEdge is not null) CancelReconnection();
         if (sourceHandle is not null) DiagramCanvas.Children.Remove(sourceHandle);
         if (targetHandle is not null) DiagramCanvas.Children.Remove(targetHandle);
-        sourceHandle = targetHandle = null;
-        if (!CanTransform || PropertiesPending || Selected is not { } key || !connectionRuntime.ContainsKey(key)) return;
+        sourceHandle = targetHandle = null; endpointEdgeKey = null;
+        if (!available) return;
+        endpointEdgeKey = key;
         sourceHandle = Handle(true); targetHandle = Handle(false); UpdateEndpointHandlePositions();
         Button Handle(bool source)
         {
-            var edge = draft.Model.Edge(key);
+            var edge = draft.Model.Edge(key!);
             var button = new Button { Content = source ? "S" : "D", Width = 24, Height = 24, MinHeight = 24, Padding = new(0), Margin = new(0), Style = (Style)FindResource("Mermaid.Port"), Tag = true, Opacity = 1,
                 Cursor = Cursors.Cross, ToolTip = "Drag the " + (source ? "source" : "destination") + " endpoint to a node. Properties provides the keyboard alternative." };
             AutomationProperties.SetAutomationId(button, source ? "MermaidSourceEndpoint" : "MermaidDestinationEndpoint");
@@ -263,7 +300,8 @@ public partial class MermaidVisualEditorWindow
             {
                 if (!CanTransform || PropertiesPending) return;
                 connectionSource = null; CancelPointerInteraction(); reconnectEdge = key; reconnectSource = source; reconnectOwner = button;
-                button.CaptureMouse(); e.Handled = true;
+                if (!button.CaptureMouse()) { CancelReconnection(); Status.Text = "Reconnection cancelled because the pointer could not be captured."; return; }
+                e.Handled = true;
                 if (connectionGuidePath is not null) connectionGuidePath.Visibility = Visibility.Visible;
                 MoveReconnection(e.GetPosition(DiagramCanvas));
                 Status.Text = "Reconnect " + (source ? "source" : "destination") + ": drop on a node; Escape cancels.";
@@ -278,7 +316,7 @@ public partial class MermaidVisualEditorWindow
                 var original = draft.Model.Edge(edgeId);
                 await Execute(new UpdateMermaidConnection(edgeId, sourceEndpoint ? target : original.Source.Id, sourceEndpoint ? original.Target.Id : target, original.Label, original.Type), edgeId);
             };
-            button.LostMouseCapture += (_, _) => CancelReconnection();
+            button.LostMouseCapture += (_, _) => { if (reconnectEdge is null) return; CancelReconnection(); Status.Text = "Reconnection cancelled after losing pointer capture. Source is unchanged."; };
             Panel.SetZIndex(button, 40); DiagramCanvas.Children.Add(button); return button;
         }
     }
