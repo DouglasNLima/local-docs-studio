@@ -1,7 +1,15 @@
 # Native workspace and Mermaid interaction stability
 
-Status: implementation and certification in progress. Draft PR targets `develop`;
-no merge, public release or installation on the ordinary desktop is authorised.
+Status: implementation and scoped unsigned internal-preview certification complete.
+Draft PR 30 targets `develop`. Exact final-head CI and any newer package pins are
+recorded at delivery; no merge, public release or ordinary-desktop installation occurs.
+
+The continuation addresses seven reported problems: the main toolbar ICO, shared
+document scroll state, difficult element selection, missing endpoint manipulation,
+canonical repositioning after palette drops, lost session positions and termination
+while dragging an existing node. The separate native .NET 10/WPF application keeps
+AvalonEdit, Markdig, Mermaider 0.15.1, SharpVectors and FlowDocument. The static web
+application and the excluded PR #22 viewer remain unchanged.
 
 ## Baseline and reproduced crash
 
@@ -104,6 +112,25 @@ page. Tab restoration and Back/Forward therefore use the exact mapped text point
 before falling back to a semantic block. The bounded opt-in viewport diagnostic
 records identities and offsets, never document text.
 
+The hosted Pages test also isolated a separate layout cause: the operation's
+visible Cancel button reduced the reader height from 559.45 to 546.45 DIPs. A
+section selected during that operation reflowed when the button collapsed,
+retaining the page's first position rather than the requested section. Back had
+the same problem. The cancellation control now retains its measured layout space
+while hidden, keeping the reader height stable, and section navigation commits
+after the operation's layout settles. Acceptance compares the actual native
+height during and after the operation as well as checking the visible section.
+Earlier native text-range experiments were rejected after regression failures;
+they are absent from the final implementation and retained in Git/CI history.
+
+The opt-in diagnostic also exposed its own side effect during investigation:
+querying `FlowDocument.DocumentPaginator` in Continuous mode switches the document
+away from its bottomless formatter. That produced blank synthetic previews in the
+instrumented tests. The query is now Pages-only, and the original failures remain
+retained. The actual Continuous/Pages workspace scenarios run with diagnostics
+enabled so this side effect remains covered. The relevant behaviour is explicit in
+the [WPF FlowDocument implementation](https://raw.githubusercontent.com/dotnet/wpf/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/FlowDocument.cs).
+
 Only the 24-pixel toolbar ICO image is removed. The window, executable, installer,
 taskbar and shortcut resources retain their existing branding.
 
@@ -111,48 +138,49 @@ taskbar and shortcut resources retain their existing branding.
 
 The immutable baseline exits with CLR exception code `-532462766` (`0xE0434352`).
 This is retained diagnostic evidence, rather than an inferred performance failure.
+The original private diagram was unavailable; the concrete synthetic null-transform
+crash was reproduced and eliminated in the tested replacement path.
 
-[Candidate pointer run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38949043030),
-source `6319a37848833a74dd05244d5eb2d16f68549a70`, completed 30 drags each on
-20-, 100-, 300- and 24-node nested/long-label diagrams in normal and actual Windows
-High Contrast: 240 drags, exact private/disk source and process liveness. The whole
-run remained red because of a later harness preview-reopening observation; it is
-not presented as completed end-to-end acceptance.
+[Completed interaction run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676231),
+application source `1700b203a612e05158697bf95410f1f48772a3bc`, passed 30 actual drags
+on each 20-, 100-, 300- and 24-node nested/long-label fixture in normal and actual
+Windows High Contrast: 240 drags and 4,080 delivered pointer moves. Both N0 and N1
+were exercised. Reversals, repeated Escape, subsequent selection, process response,
+exact private/disk source and ordinary Cancel passed. Separate scenario checks cover
+multi-node movement, pending labels, deactivation, active-drag Undo and reconnection.
 
-| Fixture | Normal worst update | High Contrast worst update | Normal / HC update allocation per frame |
+| Fixture | Worst native press to first update, normal / HC | Worst update method, normal / HC | Update allocation per frame, normal / HC |
 |---|---:|---:|---:|
-| 20 nodes | 5.086 ms | 4.209 ms | 1,711 / 1,708 bytes |
-| 100 nodes | 4.582 ms | 4.876 ms | 1,843 / 1,825 bytes |
-| 300 nodes | 3.867 ms | 3.938 ms | 2,042 / 2,042 bytes |
-| Nested / long labels | 4.782 ms | 12.037 ms | 2,417 / 2,411 bytes |
+| 20 nodes | 33.909 / 38.417 ms | 3.217 / 3.024 ms | 1,275 / 1,274 bytes |
+| 100 nodes | 34.642 / 41.882 ms | 2.885 / 3.417 ms | 1,329 / 1,367 bytes |
+| 300 nodes | 31.959 / 41.558 ms | 2.246 / 3.037 ms | 1,718 / 1,813 bytes |
+| Nested / long labels | 41.004 / 39.099 ms | 2.882 / 3.067 ms | 1,852 / 1,830 bytes |
 
-These timings cover the native update method, not input-to-display latency. Allocations
-inside that method are distinguished from all dispatcher allocations between frames.
-End-of-case working set spans approximately 229–399 MiB across these cold/warm cases;
-this is not a long-duration heap-leak certification. The baseline crashes before a
-comparable sustained measurement, so a before/after speed-up percentage is unsupported.
-Subsequent instrumentation records native press-to-first-update and incident-edge
-counts separately and is enabled only for the synthetic interaction harness.
+[Derived observations](evidence/workspace-mermaid-stability/drag-metrics.json) retain
+sample/frame counts and incident connections (at most three in the main fixtures,
+six in the nested fixture). First-update timing starts at the native press handler;
+it does not measure device delivery or physical display latency. Update-method timing
+excludes WPF painting and UIA transport. The allocations in the table are weighted
+by observed update frames, including cancellation samples.
 
-Measured placement at 96 DPI uses a six-physical-pixel tolerance (six DIPs at this
-DPI). In that candidate the 50%, 100%, 150% and 200% cases measured errors of 0,
-0, approximately 1.414 and 1 pixel in High Contrast. Normal placement also passed
-all four zooms. Tests exercise native PAN and asynchronous canonical rendering;
-source existence alone does not count as placement acceptance.
+Total UI-thread allocations between updates were much larger and grew with diagram
+size: approximately 0.53 MB/frame at 20 nodes, 3.17–3.37 MB/frame at 100 and
+13.82–15.23 MB/frame at 300. These include other dispatcher/WPF/UIA work and have
+not been stack-attributed. They are not represented by the small method-allocation
+figure. End-of-case working sets were 228.8–394.2 MiB in separate fixture processes;
+this is bounded stress evidence, not a long-duration heap-leak or graphics-paint
+certification. There was no crash or unresponsive process in these repeated cases.
+The baseline crashes before comparable sustained measurement, so a before/after
+speed-up percentage is unsupported. The earlier complete 240-drag measurement at
+`6319a37` remains in [its original run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38949043030),
+whose later preview-reopening harness failure is retained rather than counted green.
 
-Multi-node pointer movement, three separate insertions, label rerenders, safe rename,
-private Undo/Redo, themes, editable endpoint reconnection, invalid drops, deactivation,
-Escape, all five requested window sizes, Apply and one document Undo have scoped
-Windows evidence. Source-order changes made by the existing reconnection service
-are checked by exact semantic/private edge identity, never by assuming the edited
-edge remains the first statement. Separate native authoring coverage exercises an
-identical parallel edge and protected read-only inspection.
-
-The native regression run for source `6bf4ceb` passed 122 normal and 118 actual
-High Contrast authoring assertions, plus 281 canonical-fidelity assertions. Its
-package job was cancelled when a newer source superseded it, so no package readiness
-is inferred. Original CI runs and downloaded evidence remain under ignored
-`artifacts/interactions/`; baseline crash evidence is also committed beside this report.
+Placement acceptance uses six physical pixels at measured 96 DPI, equivalent to
+six DIPs on that runner. The completed application run measured 1.414, 0, 1.414
+and 0 pixels at 50%, 100%, 150% and 200% zoom in each appearance. Those measurements
+alone did not certify non-zero scrolling. The stronger repeat below explicitly
+measures those offsets. Source existence alone never
+counts as placement acceptance. Zoom percentages are not OS DPI certification.
 
 ## Source-preserving reconnection
 
@@ -164,30 +192,199 @@ Comments, Unicode, line endings, classes and unrelated statements are retained.
 The operation validates before one private Undo entry; Apply still performs one
 owning-document transaction. Invalid drops have no source operation or history entry.
 
-## Certification ledger
+For an existing dotted parallel connection, the Core tests reconnect only the second
+private identity while leaving the first `A -.->|Next| B` unchanged. The changed edge
+retains `Next` and `Dotted`; the original `A[Start]`, `B[Review]`, `C[Alternative]`,
+Unicode comment, `classDef`, class assignment and LF/CRLF convention survive. Private
+Undo restores the exact input bytes and Redo restores the same selected edge identity.
+The native harness separately performs an actual drag on the second identical edge.
+Protected chained source stays exact and receives no private Undo entry on rejection.
 
-Implemented, pending verification: bounded dragging; drop positions; session layout;
-editable/protected selection; endpoint reconnection; document viewport ownership;
-toolbar correction. No overall readiness claim is made until candidate Windows
-pointer tests, screenshots, regression jobs and independent package verification pass.
+## Inspected native evidence
 
-The current local Release build and all 1,234 Core tests pass, including distinct
-identical-source history steps, source-preserving parallel reconnection and separate
-preview-history anchors. The original regex timeout remains retained as a baseline
-failure. The help guide retains its original 14-topic contract.
+All images below come from synthetic documents on disposable hosted Windows at 96
+DPI. The baseline is immutable `14b3d4f`; initial application images are from source
+`1700b203a612e05158697bf95410f1f48772a3bc`. Scrolled drop/marker and five-size
+images are from harness revision `df71d00f9dd83532106fd43a1004722d84b27238`;
+its Native/Core product sources are unchanged from that implementation revision. Image inspection found and corrected
+detached subgraph titles, capture destroyed by recreated endpoint buttons, invisible
+High Contrast handles and a viewport shift after zoomed insertion. Rejected captures
+and original failures remain in the downloaded CI evidence.
 
-Hosted discoveries were kept as failing evidence while their causes were corrected:
-stale preview actions after document Undo; test assumptions about connection source
-order; capture lost when unchanged endpoint buttons were recreated; Follow Caret
-overriding history restoration; and page starts mapped to the preceding paragraph.
-The export browser harness also encountered Python's first-use initialisation
-inside its unchanged 15-second server readiness window. CI now imports that
-test-only runtime before the deadline; no timeout or application architecture changed.
+| View | Actual Windows evidence |
+|---|---|
+| Toolbar before / after; title-bar icon retained | [Before](evidence/workspace-mermaid-stability/toolbar-before.png), [after](evidence/workspace-mermaid-stability/toolbar-after.png) |
+| First-open Pages / returning reading position | [New document](evidence/workspace-mermaid-stability/pages-new-document.png), [restored document](evidence/workspace-mermaid-stability/pages-restored.png) |
+| Existing node in active drag / multiple session positions | [Active drag](evidence/workspace-mermaid-stability/drag-active-20.png), [manual positions](evidence/workspace-mermaid-stability/multiple-session-positions.png) |
+| Selected connection / endpoint drag / canonical result | [Handles](evidence/workspace-mermaid-stability/connection-endpoints.png), [in progress](evidence/workspace-mermaid-stability/reconnecting-destination.png), [result](evidence/workspace-mermaid-stability/reconnection-result.png) |
+| Protected inspector / actual Windows High Contrast | [Read-only inspection](evidence/workspace-mermaid-stability/protected-inspection.png), [High Contrast handles](evidence/workspace-mermaid-stability/high-contrast-endpoints.png) |
+| Translated subgraph / Auto layout / Dark | [Group and title](evidence/workspace-mermaid-stability/positioned-subgraph-membership.png), [canonical reset](evidence/workspace-mermaid-stability/auto-layout-reset.png), [Dark session](evidence/workspace-mermaid-stability/dark-session-layout.png) |
 
-Pending: final revision and CI links, performance comparison, placement tolerance
-results, actual High Contrast and window-size evidence, Core/render/browser/UIA
-totals, installer/ZIP versions and SHA-256, lifecycle and rejection controls.
+The first 1920×1080 stress-harness capture was rejected during visual inspection:
+resizing a centred window left its right/bottom outside the desktop. The harness now
+moves it to the desktop origin and requires complete desktop, Apply and taskbar
+containment before capture. Earlier percentage measurements also exposed PAN inputs
+clamped at zero; final coordinate checks explicitly require non-zero vertical offsets,
+an effective native PAN and a non-zero horizontal offset in the narrow 200% case.
 
-Higher-DPI certification requires a suitable disposable authorised environment.
-Renderer cancellation limitations and the separate historical Continuous 250 ms
-first-layout issue remain documented in `performance-and-responsiveness.md`.
+The [stronger repeat](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38975164864)
+at `df71d00f9dd83532106fd43a1004722d84b27238` passes another 240 actual drags,
+4,080 moves, 57 normal and 52 actual HC scenario assertions and all four workspace
+contexts per appearance. The [recorded placement results](evidence/workspace-mermaid-stability/scrolled-placement-results.json)
+show effective PAN and approximately 35.4–37.0% vertical scroll at every zoom; the
+narrow 200% case also starts at 44.72% horizontal scroll. Both appearances measure
+1.414 / 0 / 1.414 / 0 physical pixels of error at 50 / 100 / 150 / 200% zoom.
+The changing horizontal percentage after insertion reflects a changed content extent;
+the physical target centre and observed camera offset remain correct. This repeat's
+worst update method observation is 5.046 ms, separately from the earlier table.
+
+The complete 880×600, 1024×768, 1280×800, 1440×900 and 1920×1080 captures were
+inspected. Inspector scrolling and native toolbar overflow retain access to controls
+at the smallest size; Apply remains visible. The complete 1920×1080 light and actual
+HC captures include their right edge and footer. Native drop markers are visible.
+
+| Stronger visual acceptance | Evidence |
+|---|---|
+| Insertion marker / scrolled drop at 200% | [Marker](evidence/workspace-mermaid-stability/palette-marker.png), [placed node](evidence/workspace-mermaid-stability/scrolled-drop.png) |
+| Actual HC marker / complete desktop | [HC marker](evidence/workspace-mermaid-stability/high-contrast-palette-marker.png), [HC 1920×1080](evidence/workspace-mermaid-stability/high-contrast-full-desktop.png) |
+| Complete requested window sizes | [880×600](evidence/workspace-mermaid-stability/editor-880x600.png), [1024×768](evidence/workspace-mermaid-stability/editor-1024x768.png), [1280×800](evidence/workspace-mermaid-stability/editor-1280x800.png), [1440×900](evidence/workspace-mermaid-stability/editor-1440x900.png), [1920×1080](evidence/workspace-mermaid-stability/editor-1920x1080.png) |
+
+## Regression and source provenance
+
+Implementation source is `1700b203a612e05158697bf95410f1f48772a3bc`.
+The PR merge checkout is `ab0f2dc43d0db49a3868d9cb30d1301901b58bbc`;
+both resolve to tree `8e31ddd5eee6454f79259eab15970be491592289`. Subsequent changes
+extend only the synthetic validation harness and this documentation/evidence. They
+require their own final-HEAD workflow results; this report does not transfer an older
+run's success to newer application changes. The branch remains
+`feature/native-workspace-mermaid-interaction-stability` and
+[Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30) targets `develop`.
+
+| Mandatory validation | Application-revision evidence |
+|---|---|
+| Release build / full Core / transformation cases | [Native pipeline](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676302): 1,234 Core passes, including exact parallel reconnection, LF/CRLF, Unicode, protected rejection, private history and independent preview anchors |
+| Native rendering/export corpus | Same pipeline: 70 native diagram/export cases, zero failures, and 12 Chromium/Edge static Docs Site export checks |
+| Canonical fidelity | [Native UX](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676214): 291 assertions; exact normalised preview/canvas pixels, including translated-title identities |
+| Normal / actual High Contrast authoring | Same UX run: 122 / 118 assertions, including protected inspection and actual second-identical-edge endpoint dragging |
+| Repeated dragging / selection / reconnection | [Interactions](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676231): 240 drags, 4,080 moves and 52 normal / 47 HC scenario assertions |
+| Scroll / navigation | Same interaction run: four Continuous/Pages × sync contexts in each normal/HC process; independent Pages-first job also passes all four |
+| Desktop UIA / persisted workspace and export | Native pipeline: 75 UIA groups in each of four contexts (build output, initial install, upgrade, reinstall); 13 persisted workspace/export checks, plus separate UX controls |
+| Chromium / Edge | [Web regression](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676251): 134 + 134 passes |
+| Static integrity | Same web run: 50 modules, 57 shell assets, 150 vendor assets and 56 runtime external-dependency scans |
+| Installer lifecycle / package rejection controls | Native pipeline: five wizard checks, seven rejection controls and 20 lifecycle checks; downloaded packages independently verified below |
+
+The original unchanged Core timeout is retained as a baseline failure; subsequent
+full suites pass without increasing its timeout. Existing UIA and source-preservation
+tests remain in place. New native assertions also cover the fresh Pages anchor,
+forward affinity at a formatted text boundary and zero-height-change anchor navigation.
+The help guide retains its original 14-topic contract.
+
+Hosted discoveries were retained while their causes were corrected: stale preview
+actions after document Undo; assumptions about source-order position after reconnection;
+endpoint capture destroyed by recreated buttons; Follow caret overriding history;
+page starts mapped to the preceding paragraph; operation-footer reflow; and an active
+paginator query in the Continuous diagnostic. The export browser harness encountered
+Python first-use initialisation inside its unchanged 15-second readiness window.
+CI now imports that test-only runtime before the deadline. No timeout or application
+architecture was changed to conceal a failure.
+
+## Packages and lifecycle
+
+Unsigned self-contained x64 preview `0.1.1-preview.581` is built and independently
+verified. The lifecycle upgrades `0.1.0-preview.581` to that version, then uninstalls,
+reinstalls and restores actual saved/unsaved session state. The verified source is
+PR merge `ab0f2dc43d0db49a3868d9cb30d1301901b58bbc`, whose complete tree matches
+application commit `1700b203a612e05158697bf95410f1f48772a3bc`. Metadata declares
+`sourceDirty: false`, `pull-request-merge-checkout`, .NET 10 WPF and `NotSigned`.
+
+| Package | SHA-256 |
+|---|---|
+| `LensDocsStudio.Native-0.1.1-preview.581-win-x64-Setup.exe` | `ccfe7365cab6efff8747e92d6dc3e5a427b784a6e375b2000890635659393f76` |
+| `LensDocsStudio.Native-0.1.1-preview.581-win-x64.zip` | `09ea10a591b7322aa5a6e046a90cdce75c010bef2097a25d0cff9796db980808` |
+| Lifecycle initial `0.1.0-preview.581` installer | `1a26f032fce908e956d5cd6314e1d8dda90eed8c2797e9e3670e2aa0af4f8dad` |
+| Lifecycle initial `0.1.0-preview.581` ZIP | `ccc272e997d644050a86f6017d3b1e1054b99cd957b0e85d39155785b66a2e22` |
+
+[Hosted package artefact](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38971676302/artifacts/12078955537)
+contains installers, ZIPs, version metadata, SHA256SUMS and the original verification
+and lifecycle evidence (14-day CI retention). Independent local read-only verification
+was repeated on both downloaded versions with explicit source and both hash pins.
+The [retained verification report](evidence/workspace-mermaid-stability/package-verification-581.json)
+records matching app/Core identities, included runtime, original executable/installer
+icon frames and native Mermaid resources, no browser runtime, excluded experiment or
+private/development payload, and `executionPerformed: false`. No native UI or installer
+was launched on the ordinary desktop.
+
+The [20-check lifecycle report](evidence/workspace-mermaid-stability/installer-lifecycle-581.json)
+confirms all 528 installed payload files match portable bytes. Twenty-two existing
+native state files and workspace source survive upgrade, uninstall, reinstall and
+final uninstall; actual tabs, settings, dirty saved and untitled drafts are restored.
+Interrupted-save recovery, shortcuts, file branding, existing shell registration and
+Markdown defaults pass. This is a same-source, distinct-version upgrade.
+The [seven negative controls](evidence/workspace-mermaid-stability/package-rejection-controls.json)
+reject wrong source, version, independent hash, dirty metadata, ZIP tampering,
+excluded-viewer payload even with recomputed checksum, and a missing editor assembly
+even with recomputed checksum. The original package remains unchanged.
+The [persisted workspace/export result](evidence/workspace-mermaid-stability/persisted-workspace-export-results.json)
+retains the 13-check service/artefact workflow separately from interactive UIA.
+
+Later harness/documentation revisions generate their own CI package identities.
+Their final source/hash pins belong to the delivery verification report; this immutable
+implementation certificate continues to identify exactly the package bytes above.
+The [PR checks](https://github.com/DouglasNLima/local-docs-studio/pull/30/checks)
+expose the final revision's independent workflows. No older run is counted as a pass
+for a later application change.
+
+## Readiness and limits
+
+**Verdict: ready for a scoped unsigned internal preview, with the explicit limits below.**
+The concrete synthetic P0 crash is reproduced, diagnosed and corrected; repeated
+pointer input, the stronger non-zero coordinate checks, source integrity, workspace
+navigation, visual inspection, full regression and independent package/lifecycle
+verification pass at the pinned revisions. Final documentation-only HEAD workflows
+are inspected separately before hand-off and their exact URLs accompany delivery.
+
+| Classification | Finding |
+|---|---|
+| Implemented and verified | Toolbar correction; editable/protected selection; exact endpoint reconnection and rejection; document-owned positions, anchors and Back/Forward; canonical fidelity; source/Undo/Cancel protections; package/lifecycle checks |
+| Implemented with bounded limitations | Efficient drag/drop and session layout at measured 96 DPI, all requested sizes and diagram zooms; temporary connection guides; source-authoritative routing and supported editing budgets |
+| Not reproduced but stress-tested | The precise unavailable private diagram/failure. A concrete equivalent synthetic null-transform crash is reproduced and its replacement path survives repeated input |
+| Blocked | Unsigned in-app updater execution remains blocked by the existing trust policy; production signing is outside scope |
+| Not completed | The separate pre-existing Continuous 250 ms first-layout work and unrestricted dense rendering remain unresolved; neither is represented as a new pointer-stability pass |
+| Not certified | Higher OS DPI, physical-device/display latency, long-duration heap/paint profiling, assistive-technology user study and a separate SDK-free clean machine |
+
+All achievable scope of this interaction continuation is implemented and evidenced.
+The limits below remain part of the internal-preview verdict.
+
+Measured 96 DPI is the only OS scaling certified by the hosted environment. No suitable
+authorised disposable 125%, 150% or 200% OS-DPI environment was available. Actual
+Windows High Contrast was used; choosing a dark appearance is not counted as HC.
+Native accessible names, selection patterns, keyboard alternatives and focus checks
+are exercised, but an assistive-technology user study is not certified.
+
+The 300-node editable fixture uses 181 connections to remain within the 500-element
+budget; it is not an unrestricted dense-graph editing claim. Protected dense cases
+retain their existing source-only/protected rejection and source-integrity coverage.
+In the separate performance harness, the 20-node/190-edge dense case rejected editing
+and its render was cancelled after approximately 7.13 seconds, with about 2.39 GB of
+process allocation recorded during the attempt. That case is not a successful dense
+render or editable pointer test. Ordinary protected chained/multiline diagrams have
+separate successful native inspection coverage. Synchronous renderer cancellation
+limits remain. Session centres and dashed connection
+guides are intentionally private to the editing session; saved Mermaid has canonical
+layout on reopening and no proprietary coordinates.
+
+The small drag-update timings do not certify end-to-end paint latency, total dispatcher
+allocation or long-duration heap behaviour. The separate historical Continuous 250 ms
+first-layout failures remain unresolved in
+[performance and responsiveness](performance-and-responsiveness.md), including the
+mixed/large-document and details-construction limitations. Green compatibility checks
+do not convert those observations into performance passes. This completed run's
+[retained observations](evidence/workspace-mermaid-stability/continuous-observations.json)
+record list 1,297.07 ms, table 257.98 ms and mixed 666.16 ms against 250 ms: all
+three remain **FAIL**. Source, complete text and target visibility pass separately.
+
+Production signing, trusted in-app update execution and a separate SDK-free clean-machine
+image remain outside this internal-preview certification. Existing historical migration
+fixtures/workflows are retained; the integration-only twelve cross-revision cases are
+historical reference evidence, not rerun by this feature branch's conditional job.
+No merge, public release or ordinary-desktop installation has been performed.

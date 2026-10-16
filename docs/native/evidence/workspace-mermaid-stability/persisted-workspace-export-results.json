@@ -1,0 +1,24 @@
+{
+  "Status": "PASS",
+  "Root": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\validation\\acceptance-workflow-82326b584edd4a52a12e792d8aed53c0",
+  "Documents": 2,
+  "Assets": 1,
+  "SourcePreserved": true,
+  "SourceSha256": "904EF691CB961F2401241615ACD977150B6F4EFF94F514B106C5BC67594A1840",
+  "Checks": [
+    "Nested Portuguese workspace save/reopen",
+    "Bundle byte-preserving round-trip to a different root",
+    "Repeated portable image bytes and export reuse",
+    "Native Mermaid preview and SVG/PNG export",
+    "Native pasted table line break",
+    "Quoted TSV and CSV round-trips",
+    "Schema-valid DOCX with images/line breaks",
+    "DOCX import",
+    "PDF selectable Unicode",
+    "HTML images and line breaks",
+    "Standalone Docs Site",
+    "Synthetic Word template header/footer",
+    "Original workspace preserved"
+  ],
+  "Limitation": "Public-service/actual-artefact validation; it does not certify interactive destination pagination, live Azure DevOps or a clean Windows installation."
+}

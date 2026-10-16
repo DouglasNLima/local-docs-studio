@@ -1,0 +1,34 @@
+{
+  "applicationSource": "1700b203a612e05158697bf95410f1f48772a3bc",
+  "baselineSource": "14b3d4fc605c965a35107cceb0cf20a60226f1ca",
+  "pullRequestMergeSource": "ab0f2dc43d0db49a3868d9cb30d1301901b58bbc",
+  "branchAndMergeTree": "8e31ddd5eee6454f79259eab15970be491592289",
+  "runs": {
+    "interactions": "38971676231",
+    "workspace": "38971676231",
+    "authoringAndFidelity": "38971676214",
+    "web": "38971676251",
+    "nativeAndPackages": "38971676302",
+    "strongerNonZeroCoordinates": "38975164864"
+  },
+  "counts": {
+    "core": 1234,
+    "authoringNormal": 122,
+    "authoringActualHighContrast": 118,
+    "canonicalFidelity": 291,
+    "browserChromium": 134,
+    "browserEdge": 134,
+    "stressDrags": 240,
+    "stressPointerMoves": 4080,
+    "strongerScenarioAssertionsNormal": 57,
+    "strongerScenarioAssertionsActualHighContrast": 52
+  },
+  "images": "Baseline captures use immutable 14b3d4f. Initial application evidence uses 1700b203; editor-size, scrolled-drop and palette-marker images use df71d00. Native/Core product sources are identical across those two revisions. No ordinary-desktop native execution was performed.",
+  "limitations": [
+    "96 DPI only; diagram zoom is not OS DPI scaling",
+    "Original private diagram unavailable; synthetic crash mechanism reproduced",
+    "Drag update method timings exclude painting and UIA transport",
+    "Total dispatcher allocations remain substantially larger and are not stack-attributed"
+  ],
+  "strongerHarnessSource": "df71d00f9dd83532106fd43a1004722d84b27238"
+}

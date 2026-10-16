@@ -1,0 +1,63 @@
+{
+  "Result": "FAIL retained: section link corrected; Back still changed page after operation layout",
+  "Observations": [
+    {
+      "Operation": "anchor-target 3719 page 1",
+      "Busy": true,
+      "PreviewPage": 1,
+      "PreviewHeight": 546.45,
+      "PageSize": "816,1056"
+    },
+    {
+      "Operation": "anchor-final-layout 3719",
+      "Busy": false,
+      "PreviewPage": 1,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "anchor computed page 9, count 21, size 389.5,530.49, text offset 3759",
+      "Busy": false,
+      "PreviewPage": 1,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "anchor before page selection: reader 1/16, native 1/21, allowed True, size 389.5,530.49",
+      "Busy": false,
+      "PreviewPage": 1,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "anchor after page selection: reader 1/16, native 9/21, size 389.5,530.49",
+      "Busy": false,
+      "PreviewPage": 1,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "anchor-result True page 1",
+      "Busy": false,
+      "PreviewPage": 1,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "history-target 37095ad3-b3cb-4323-8d12-78e00b59b7c7 preview 5968",
+      "Busy": true,
+      "PreviewPage": 9,
+      "PreviewHeight": 559.45,
+      "PageSize": "389.5,530.49"
+    },
+    {
+      "Operation": "history-restore 5968",
+      "Busy": true,
+      "PreviewPage": 1,
+      "PreviewHeight": 546.45,
+      "PageSize": "389.5,517.49"
+    }
+  ],
+  "RunId": "38967108524",
+  "SourceRevision": "f8271c6f8126cb2899ebfe5090234f6965f7401a"
+}

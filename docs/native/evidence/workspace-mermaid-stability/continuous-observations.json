@@ -1,0 +1,56 @@
+[
+  {
+    "Name": "details",
+    "FirstLayoutInputMilliseconds": 101.91139999999999,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "PASS",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  },
+  {
+    "Name": "list",
+    "FirstLayoutInputMilliseconds": 1297.0704,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "FAIL",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  },
+  {
+    "Name": "paragraphs",
+    "FirstLayoutInputMilliseconds": 231.27349999999998,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "PASS",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  },
+  {
+    "Name": "quote",
+    "FirstLayoutInputMilliseconds": 114.6145,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "PASS",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  },
+  {
+    "Name": "table",
+    "FirstLayoutInputMilliseconds": 257.98209999999995,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "FAIL",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  },
+  {
+    "Name": "mixed",
+    "FirstLayoutInputMilliseconds": 666.1555,
+    "InputBudgetMilliseconds": 250,
+    "InputAcceptance": "FAIL",
+    "SourcePreserved": true,
+    "CompleteText": true,
+    "TargetVisible": true
+  }
+]
