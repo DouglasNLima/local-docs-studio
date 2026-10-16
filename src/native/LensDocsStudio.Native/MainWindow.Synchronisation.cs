@@ -74,6 +74,28 @@ public partial class MainWindow
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
+        if (pendingViewportDocument is { } documentId && renderedDocumentId == documentId)
+        {
+            var resultToRestore = rendered; var tab = model.ActiveDocument!; var generation = viewportGeneration;
+            var offsetToRestore = Math.Clamp(tab.PreviewSourceOffset, 0, tab.EditorDocument.TextLength);
+            applyingSync = true; applyingSyncOrigin = "restore-preview";
+            Dispatcher.BeginInvoke(async () =>
+            {
+                try
+                {
+                    if (generation != viewportGeneration || model.ActiveDocument != tab || rendered != resultToRestore || !SyncCurrent) return;
+                    var pointer = offsetToRestore == 0 ? resultToRestore!.Document.ContentStart
+                        : resultToRestore!.TextMap.TryPreviewRange(offsetToRestore, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offsetToRestore)?.ContentStart;
+                    if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer);
+                }
+                finally
+                {
+                    if (generation == viewportGeneration && model.ActiveDocument == tab)
+                    { pendingViewportDocument = null; applyingSync = false; applyingSyncOrigin = null; }
+                }
+            }, DispatcherPriority.Loaded);
+            return;
+        }
         // An edit can retain the same selected span while replacing its contents.
         // Reconcile that current input once the new immutable map is installed;
         // it need not raise another SelectionChanged event.
@@ -132,7 +154,7 @@ public partial class MainWindow
     }
     private void QueueSynchronisation(string origin)
     {
-        if (!SyncCurrent) return;
+        if (bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
         if (!syncTimer.IsEnabled) syncTimer.Start();

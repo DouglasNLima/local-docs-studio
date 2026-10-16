@@ -1,0 +1,47 @@
+flowchart TD
+    %% Synthetic stability fixture
+N0["Node 0<br/>Second line"]
+N1{Decision 1}
+N2["Node 2<br/>Second line"]
+N3["Node 3<br/>Second line"]
+N4["Node 4<br/>Second line"]
+N5["Node 5<br/>Second line"]
+N6{Decision 6}
+N7["Node 7<br/>Second line"]
+N8["Node 8<br/>Second line"]
+N9["Node 9<br/>Second line"]
+N10["Node 10<br/>Second line"]
+N11{Decision 11}
+N12["Node 12<br/>Second line"]
+N13["Node 13<br/>Second line"]
+N14["Node 14<br/>Second line"]
+N15["Node 15<br/>Second line"]
+N16{Decision 16}
+N17["Node 17<br/>Second line"]
+N18["Node 18<br/>Second line"]
+N19["Node 19<br/>Second line"]
+N0 -->|Next 0| N1
+N1 -->|Next 1| N2
+N2 -->|Next 2| N3
+N3 -->|Next 3| N4
+N4 -->|Next 4| N5
+N5 -->|Next 5| N6
+N6 -->|Next 6| N7
+N7 -->|Next 7| N8
+N8 -->|Next 8| N9
+N9 -->|Next 9| N10
+N10 -->|Next 10| N11
+N11 -->|Next 11| N12
+N12 -->|Next 12| N13
+N13 -->|Next 13| N14
+N14 -->|Next 14| N15
+N15 -->|Next 15| N16
+N16 -->|Next 16| N17
+N17 -->|Next 17| N18
+N18 -->|Next 18| N19
+N0 --> N4
+N0 --> N7
+N4 --> N9
+N9 --> N2
+N7 --> N12
+N12 --> N4

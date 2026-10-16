@@ -203,7 +203,6 @@
   </Menu>
   <Border x:Name="PrimaryToolbar" DockPanel.Dock="Top" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
    <DockPanel Background="{DynamicResource PanelBrush}">
-    <Image DockPanel.Dock="Left" Source="Resources/Brand/application.ico" Width="24" Height="24" Margin="10,0,6,0" ToolTip="Lens Docs Studio · Local Markdown, Mermaid, and documentation studio"/>
     <ToolBar x:Name="ApplicationToolbar" Style="{StaticResource Desktop.Toolbar}" AutomationProperties.Name="Application commands">
      <Button Click="ToggleSidebar" ToolTip="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.Name="Toggle workspace (Ctrl+Alt+B)" AutomationProperties.AutomationId="ToggleSidebar"><ui:CommandIcon Kind="Sidebar"/></Button>
      <Button Command="{Binding NewDocumentCommand}" ToolTip="New document (Ctrl+N)" AutomationProperties.Name="New document (Ctrl+N)"><ui:CommandIcon Kind="New"/></Button>

@@ -34,8 +34,10 @@ public partial class MermaidVisualEditorWindow
         Viewport.PreviewDragOver += (_, e) =>
         {
             e.Effects = CanTransform && !PropertiesPending && e.Data.GetDataPresent("Lens.MermaidElement") ? DragDropEffects.Copy : DragDropEffects.None;
+            ShowInsertionMarker(e.GetPosition(DiagramCanvas), e.Effects != DragDropEffects.None);
             e.Handled = true;
         };
+        Viewport.DragLeave += (_, _) => { if (insertionMarker is not null) insertionMarker.Visibility = Visibility.Collapsed; };
     }
 
     private NativeMermaidPresentation? presentation;
@@ -45,7 +47,7 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, DrawingGroup> edgeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeLabelDrawings = new(StringComparer.Ordinal);
     private readonly HashSet<string> sessionConnections = new(StringComparer.Ordinal);
-    private Image? canonicalImage;
+    private FrameworkElement? canonicalImage;
 
     private readonly NativeSvgService canvasSvg = new();
     private readonly SemaphoreSlim canvasRenderGate = new(1, 1);
@@ -56,6 +58,7 @@ public partial class MermaidVisualEditorWindow
 
     private async void RebuildCanvas(bool layout)
     {
+        CancelPointerInteraction();
         var source = draft.Source; var themeDark = dark; var generation = ++canvasGeneration;
         canvasRender?.Cancel();
         if (canonicalRender?.Source == source && canonicalRender.Theme == DiagramThemes.ResolveName(diagramTheme, themeDark)
@@ -89,7 +92,7 @@ public partial class MermaidVisualEditorWindow
             if (closed || generation != canvasGeneration || draft.Source != source || dark != themeDark) return;
             presentation = next; canvasError = null; canonicalMapped = next?.Maps(draft.Model) == true;
             canonicalRender = rendered; canonicalDrawing = next?.Drawing ?? inspection;
-            if (next is not null) BuildCanonicalCanvas();
+            if (next is not null) { if (!canonicalMapped) InstallInspectionChoices(next); BuildCanonicalCanvas(); }
             else
             {
                 DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear();
@@ -140,7 +143,9 @@ public partial class MermaidVisualEditorWindow
     private void BuildCanonicalCanvas()
     {
         if (presentation is not { } view) return;
+        CancelPointerInteraction();
         DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
+        nodeTransforms.Clear(); connectionRuntime.Clear(); incidentConnections.Clear();
         var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear(); sessionConnections.Clear();
         var labelled = view.Connections.Where(connection => view.Graph.Edges[connection.Ordinal].Label is not null).ToArray();
         foreach (var group in DrawingGroups(mutableDrawing.Drawing))
@@ -153,7 +158,14 @@ public partial class MermaidVisualEditorWindow
             if (id?.StartsWith("lens-label-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(11), out var labelOrdinal) && labelOrdinal < labelled.Length && canonicalMapped)
                 edgeLabelDrawings[draft.Model.Edges[labelled[labelOrdinal].Ordinal].Id] = group;
         }
-        var image = new Image { Source = mutableDrawing, Width = view.Drawing.Width, Height = view.Drawing.Height, Stretch = Stretch.None, IsHitTestVisible = false };
+        foreach (var (key, drawing) in nodeDrawings)
+        {
+            var translation = new TranslateTransform();
+            drawing.Transform = new TransformGroup { Children = { drawing.Transform ?? Transform.Identity, translation } };
+            nodeTransforms[key] = translation;
+        }
+        var image = new CanonicalDrawingHost(mutableDrawing.Drawing, view.Drawing.Drawing.Bounds.Location)
+        { Width = view.Drawing.Width, Height = view.Drawing.Height, IsHitTestVisible = false };
         canonicalImage = image;
         AutomationProperties.SetAutomationId(image, "MermaidCanonicalDrawing");
         Panel.SetZIndex(image, -10); DiagramCanvas.Children.Add(image);
@@ -165,89 +177,72 @@ public partial class MermaidVisualEditorWindow
             var box = element.Bounds; positions[key] = new(box.X, box.Y, box.Width, box.Height);
             var geometry = element.Geometry.Clone();
             geometry.Transform = new TransformGroup { Children = { element.Geometry.Transform, new TranslateTransform(-box.X, -box.Y) } }; geometry.Freeze();
-            var outline = new System.Windows.Shapes.Path { Data = geometry, Fill = Brushes.Transparent, StrokeThickness = 2, Stretch = Stretch.None };
+            var outline = new System.Windows.Shapes.Path { Data = geometry, Fill = key.StartsWith("group:", StringComparison.Ordinal) ? null : Brushes.Transparent, StrokeThickness = 2, Stretch = Stretch.None };
             var button = ElementButton(key, choice.Description, outline, positions[key]);
             Panel.SetZIndex(button, key.StartsWith("node:", StringComparison.Ordinal) ? 20 : 0);
             if (key.StartsWith("node:", StringComparison.Ordinal))
             {
                 var id = key[5..];
-                button.Click += async (_, _) => await PickNode(id);
+                button.Click += async (_, _) => { if (connectionSource is not null) await PickNode(id); };
                 button.PreviewMouseLeftButtonDown += async (_, e) =>
                 {
+                    if (Keyboard.IsKeyDown(Key.Space)) return;
                     e.Handled = true;
                     if (PropertiesPending) { SelectElement(key); return; }
                     if (e.ClickCount == 2) { SelectElement(key); BeginInlineEdit(id); return; }
                     if (connectionSource is not null) { await PickNode(id); return; }
-                    SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
-                    if (!CanTransform || !nodeDrawings.ContainsKey(key)) return;
-                    dragStart = e.GetPosition(DiagramCanvas);
-                    dragged = draft.Selection.Where(item => item.StartsWith("node:", StringComparison.Ordinal) && positions.ContainsKey(item)).ToDictionary(item => item, item => positions[item]);
-                    button.CaptureMouse();
+                    if (!draft.Selection.Contains(key) || Keyboard.Modifiers == ModifierKeys.Control)
+                        SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
+                    if (!CanTransform || !nodeTransforms.ContainsKey(key) || !draft.Selection.Contains(key)) return;
+                    StartNodeDrag(button, e.GetPosition(DiagramCanvas));
                 };
-                button.PreviewMouseMove += (_, e) =>
-                {
-                    if (dragStart is not { } start || dragged is null || e.LeftButton != MouseButtonState.Pressed) return;
-                    var delta = e.GetPosition(DiagramCanvas) - start; if (delta.Length < 4) return;
-                    foreach (var (nodeKey, original) in dragged)
-                    {
-                        var canonical = view.Elements[nodeKey].Bounds;
-                        var box = original with { X = Math.Max(0, original.X + delta.X), Y = Math.Max(0, original.Y + delta.Y) };
-                        positions[nodeKey] = box; Canvas.SetLeft(canvasElements[nodeKey], box.X); Canvas.SetTop(canvasElements[nodeKey], box.Y);
-                        nodeDrawings[nodeKey].Transform = new TranslateTransform(box.X - canonical.X, box.Y - canonical.Y);
-                        if (ports.TryGetValue(nodeKey, out var nodePort)) { Canvas.SetLeft(nodePort, box.X + box.Width - 16); Canvas.SetTop(nodePort, box.CentreY - 16); }
-                    }
-                    UpdateSessionConnections(); UpdateExtent(); e.Handled = true;
-                };
-                button.PreviewMouseLeftButtonUp += (_, e) => { dragStart = null; dragged = null; button.ReleaseMouseCapture(); e.Handled = true; };
-                button.LostMouseCapture += (_, _) => { dragStart = null; dragged = null; };
-                AutomationProperties.SetHelpText(button, "Select to edit properties. F2 edits the label. Dragging changes this session only; connection guides return to canonical routing after Auto layout or an edit. Space+drag pans.");
+                button.PreviewMouseMove += (_, e) => MoveNodeDrag(e);
+                button.PreviewMouseLeftButtonUp += (_, e) => { if (dragStart is not null) { FinishNodeDrag(false); e.Handled = true; } };
+                button.LostMouseCapture += (_, _) => { if (dragStart is not null) FinishNodeDrag(true); };
+                AutomationProperties.SetHelpText(button, "Select to edit properties. F2 edits the label. Dragging changes this session only; positions survive visual edits until Auto layout or closing this window. Space+drag pans.");
                 var port = ConnectionPort(id, button);
                 AutomationProperties.SetName(port, "Connect from node " + id); AutomationProperties.SetAutomationId(port, "MermaidPort_" + id);
                 port.Click += (_, e) => { if (PropertiesPending || !CanTransform) return; SelectElement(key); connectionSource = id; UpdateCanvasSelection(); Status.Text = "Connection from " + id + ": choose a destination node. Escape cancels."; e.Handled = true; };
                 Canvas.SetLeft(port, box.Right - 16); Canvas.SetTop(port, box.Top + box.Height / 2 - 16); Panel.SetZIndex(port, 30);
                 DiagramCanvas.Children.Add(port); ports[key] = port;
             }
-            else button.Click += (_, _) => SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
+            else button.PreviewMouseLeftButtonDown += (_, e) =>
+            { if (Keyboard.IsKeyDown(Key.Space)) return; SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control); e.Handled = true; };
         }
-        if (canonicalMapped)
         foreach (var edge in view.Connections)
         {
-            var key = draft.Model.Edges[edge.Ordinal].Id;
+            var key = ConnectionKey(edge);
             var hit = new System.Windows.Shapes.Path { Data = edge.Path, Stroke = Brushes.Transparent, StrokeThickness = 12 };
             hit.MouseLeftButtonDown += (_, e) =>
             {
                 var point = e.GetPosition(DiagramCanvas);
-                var overlaps = connectionHitPaths.Count(pair => pair.Value.Data.StrokeContains(new Pen(Brushes.Black, 12), point));
+                var overlaps = connectionHitPaths.Count(pair => pair.Value.Data.StrokeContains(connectionHitPen, point));
                 if (overlaps > 1) Status.Text = "Connections overlap here. Choose the intended connection in the element list.";
                 else SelectElement(key);
                 e.Handled = true;
             };
+            AutomationProperties.SetAutomationId(hit, "MermaidPath_" + key);
             Panel.SetZIndex(hit, 4); DiagramCanvas.Children.Add(hit); connectionHitPaths[key] = hit;
             var selection = new System.Windows.Shapes.Path { Data = edge.Path, StrokeThickness = 3, IsHitTestVisible = false, Opacity = .65 };
             Panel.SetZIndex(selection, 5); DiagramCanvas.Children.Add(selection); connectionPaths[key] = selection;
             if (edge.LabelBounds is { } box)
             {
                 var button = ElementButton(key, choices.Single(choice => choice.Key == key).Description, new Rectangle { Fill = Brushes.Transparent }, new(box.X, box.Y, box.Width, box.Height));
-                button.Click += (_, _) => SelectElement(key); Panel.SetZIndex(button, 10);
+                button.PreviewMouseLeftButtonDown += (_, e) => { SelectElement(key); e.Handled = true; }; Panel.SetZIndex(button, 10);
             }
             else
             {
                 var targetBounds = edge.Path.Bounds; targetBounds.Inflate(6, 6);
                 var local = edge.Path.Clone();
-                local.Transform = new TransformGroup { Children = { edge.Path.Transform, new TranslateTransform(-targetBounds.X, -targetBounds.Y) } };
+                local.Transform = new TransformGroup { Children = { edge.Path.Transform ?? Transform.Identity, new TranslateTransform(-targetBounds.X, -targetBounds.Y) } };
                 var target = new System.Windows.Shapes.Path { Data = local, Stroke = Brushes.Transparent, StrokeThickness = 12 };
                 var button = ElementButton(key, choices.Single(choice => choice.Key == key).Description, target, new(targetBounds.X, targetBounds.Y, targetBounds.Width, targetBounds.Height));
-                button.PreviewMouseLeftButtonDown += (_, e) =>
-                {
-                    var point = e.GetPosition(DiagramCanvas);
-                    if (connectionHitPaths.Count(pair => pair.Value.Data.StrokeContains(new Pen(Brushes.Black, 12), point)) > 1)
-                        Status.Text = "Connections overlap here. Choose the intended connection in the element list.";
-                    else SelectElement(key);
-                    e.Handled = true;
-                };
-                Panel.SetZIndex(button, 4);
+                // Keep the native Toggle pattern for automation/keyboard; pointer hits use the routed path above.
+                button.IsHitTestVisible = false; Panel.SetZIndex(button, 3);
             }
+            CacheConnection(key, edge);
         }
+        RestoreSessionPositions();
         AddConnectionGuide(); UpdateCanvasSelection(); UpdateExtent(); UpdateActions();
     }
     private ToggleButton ElementButton(string key, string name, object? content, MermaidLayoutBox box)
@@ -289,58 +284,19 @@ public partial class MermaidVisualEditorWindow
                 : sessionConnections.Contains(key) ? BrushResource("MutedTextBrush") : Brushes.Transparent;
         }
         finally { synchronisingCanvasSelection = false; }
+        UpdateEndpointHandles();
     }
     private void UpdateExtent()
     {
         DiagramCanvas.Width = Math.Max(1, Math.Max(presentation?.Drawing.Width ?? 1, positions.Values.Select(box => box.X + box.Width).DefaultIfEmpty(1).Max()));
         DiagramCanvas.Height = Math.Max(1, Math.Max(presentation?.Drawing.Height ?? 1, positions.Values.Select(box => box.Y + box.Height).DefaultIfEmpty(1).Max()));
-        if (canonicalImage?.Source is DrawingImage image) { canonicalImage.Width = image.Width; canonicalImage.Height = image.Height; }
+
     }
     private static IEnumerable<DrawingGroup> DrawingGroups(Drawing drawing)
     {
         if (drawing is not DrawingGroup group) yield break;
         yield return group;
         foreach (var child in group.Children) foreach (var nested in DrawingGroups(child)) yield return nested;
-    }
-    private void UpdateSessionConnections()
-    {
-        if (presentation is not { } view) return;
-        foreach (var connection in view.Connections)
-        {
-            var key = draft.Model.Edges[connection.Ordinal].Id;
-            if (!positions.TryGetValue("node:" + connection.Source, out var source) || !positions.TryGetValue("node:" + connection.Target, out var target)) continue;
-            var originalSource = view.Elements["node:" + connection.Source].Bounds; var originalTarget = view.Elements["node:" + connection.Target].Bounds;
-            var from = new Vector(source.X - originalSource.X, source.Y - originalSource.Y); var to = new Vector(target.X - originalTarget.X, target.Y - originalTarget.Y);
-            var moved = from.Length > .01 || to.Length > .01;
-            if (!moved && !sessionConnections.Contains(key)) continue;
-            if (moved) sessionConnections.Add(key); else sessionConnections.Remove(key);
-            if (edgeDrawings.TryGetValue(key, out var drawing)) drawing.Opacity = moved ? 0 : 1;
-            var geometry = connection.Path.GetFlattenedPathGeometry().Clone();
-            foreach (var figure in geometry.Figures)
-            {
-                var points = new List<Point> { figure.StartPoint };
-                foreach (var segment in figure.Segments)
-                { if (segment is PolyLineSegment line) points.AddRange(line.Points); else if (segment is LineSegment single) points.Add(single.Point); }
-                if (points.Count < 2) continue;
-                var transformed = points.Select((point, index) => point + from * (1 - index / (double)(points.Count - 1)) + to * (index / (double)(points.Count - 1))).ToArray();
-                figure.StartPoint = transformed[0]; figure.Segments.Clear(); figure.Segments.Add(new PolyLineSegment(transformed.Skip(1), true));
-            }
-            connectionHitPaths[key].Data = geometry;
-            var path = connectionPaths[key]; path.Data = geometry; path.StrokeDashArray = moved ? new DoubleCollection([4, 3]) : null;
-            path.Stroke = moved ? BrushResource("MutedTextBrush") : Brushes.Transparent;
-            var labelOffset = (from + to) / 2;
-            if (edgeLabelDrawings.TryGetValue(key, out var labelDrawing)) labelDrawing.Transform = new TranslateTransform(labelOffset.X, labelOffset.Y);
-            if (connection.LabelBounds is { } labelBounds && canvasElements.TryGetValue(key, out var labelButton))
-            { Canvas.SetLeft(labelButton, labelBounds.X + labelOffset.X); Canvas.SetTop(labelButton, labelBounds.Y + labelOffset.Y); }
-            else if (canvasElements.TryGetValue(key, out var pathButton) && pathButton.Content is System.Windows.Shapes.Path targetPath)
-            {
-                var bounds = geometry.Bounds; bounds.Inflate(6, 6); var local = geometry.Clone();
-                local.Transform = new TransformGroup { Children = { geometry.Transform, new TranslateTransform(-bounds.X, -bounds.Y) } };
-                targetPath.Data = local; pathButton.Width = bounds.Width; pathButton.Height = bounds.Height;
-                Canvas.SetLeft(pathButton, bounds.X); Canvas.SetTop(pathButton, bounds.Y);
-            }
-        }
-        Status.Text = "Session positions only. Dashed connection guides are temporary; Auto layout or a source edit restores the original Mermaider layout.";
     }
     private Brush BrushResource(string key) => (Brush)FindResource(key);
     private void UpdateCanvasColours() => RebuildCanvas(false);
@@ -383,6 +339,7 @@ public partial class MermaidVisualEditorWindow
         if (inlineEditor is not null) { inlineEditor.Focus(); Status.Text = "Confirm or cancel the inline label before changing layout."; return; }
         if (presentation is null)
         { Status.Text = canvasError ?? "The original drawing remains in protected visual inspection. Use Edit source to change it."; return; }
+        CancelPointerInteraction(); sessionPositions.Clear(); layoutHistory.Clear();
         BuildCanonicalCanvas(); Status.Text = "Canonical Mermaider layout restored. No coordinates were written to source.";
     }
     private void Fit(object sender, RoutedEventArgs e)
@@ -427,9 +384,9 @@ public partial class MermaidVisualEditorWindow
     private async void CanvasDrop(object sender, DragEventArgs e)
     {
         if (!CanTransform || PropertiesPending || e.Data.GetData("Lens.MermaidElement") is not string text) return;
+        if (insertionMarker is not null) insertionMarker.Visibility = Visibility.Collapsed;
         var point = e.GetPosition(DiagramCanvas); e.Effects = DragDropEffects.Copy; e.Handled = true;
-        var group = positions.Where(pair => pair.Key.StartsWith("group:", StringComparison.Ordinal) && Contains(pair.Value, point))
-            .OrderBy(pair => pair.Value.Width * pair.Value.Height).Select(pair => pair.Key[6..]).FirstOrDefault();
+        var group = IntendedGroup(point);
         if (text == "Connection")
         {
             var target = positions.FirstOrDefault(pair => pair.Key.StartsWith("node:", StringComparison.Ordinal) && Contains(pair.Value, point)).Key;
@@ -447,7 +404,7 @@ public partial class MermaidVisualEditorWindow
         }
         if (!Enum.TryParse<FlowNodeShape>(text, out var shape)) return;
         var id = MermaidTransformationService.UniqueId(draft.Model);
-        await Execute(new AddMermaidNode(id, shape.ToString(), shape, group), "node:" + id);
-        static bool Contains(MermaidLayoutBox box, Point position) => position.X >= box.X && position.X <= box.X + box.Width && position.Y >= box.Y && position.Y <= box.Y + box.Height;
+        await InsertPositionedNode(id, shape, point, group);
+
     }
 }

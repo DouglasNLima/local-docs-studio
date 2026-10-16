@@ -42,6 +42,9 @@ public partial class MainWindow : Window
     private ParsedDocument? parsed;
     private Guid? renderedDocumentId;
     private DocumentViewModel? displayedTab;
+    private bool bindingViewport;
+    private Guid? pendingViewportDocument;
+    private long viewportGeneration;
     private bool previewFocused;
     private bool searchPreview;
     private bool closing;
@@ -98,7 +101,7 @@ public partial class MainWindow : Window
     }
     private void SaveViewport()
     {
-        if (displayedTab is null) return;
+        if (displayedTab is null || bindingViewport) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
         if (renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
@@ -109,14 +112,20 @@ public partial class MainWindow : Window
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
-        CancelSynchronisation();
-        Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
-        Editor.IsEnabled = displayedTab is not null;
-        if (displayedTab is not null)
+        CancelSynchronisation(); previewCancellation?.Cancel(); viewportGeneration++;
+        pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
+        // The shared reader may still display the outgoing document while rendering.
+        // Its visible position must never be captured for the incoming tab.
+        renderedDocumentId = null; renderedVersion = null; syncAnchors = null;
+        try
         {
-            Editor.CaretOffset = Math.Clamp(displayedTab.CaretOffset, 0, Editor.Document.TextLength);
-            Editor.ScrollToVerticalOffset(displayedTab.VerticalOffset);
+            Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
+            Editor.IsEnabled = displayedTab is not null;
+            Editor.CaretOffset = Math.Clamp(displayedTab?.CaretOffset ?? 0, 0, Editor.Document.TextLength);
+            Editor.ScrollToHorizontalOffset(0);
+            Editor.ScrollToVerticalOffset(displayedTab?.VerticalOffset ?? 0);
         }
+        finally { bindingViewport = false; }
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();

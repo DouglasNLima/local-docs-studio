@@ -26,7 +26,7 @@ internal static partial class NativeUiChecks
                 var fixture = Path.Combine(output, "drag-" + count + ".mmd"); File.WriteAllText(fixture, source);
                 var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false, RedirectStandardError = true };
                 launch.ArgumentList.Add("--state-directory"); launch.ArgumentList.Add(Path.Combine(output, "state-" + count)); launch.ArgumentList.Add(fixture);
-                observedProcess = Process.Start(launch) ?? throw new IOException("Process launch failed."); app = Application.Attach(observedProcess);
+                observedProcess = Process.Start(launch) ?? throw new IOException("Process launch failed."); app = Application.Attach(observedProcess.Id);
                 main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Native window did not open.");
                 main.Patterns.Transform.Pattern.Resize(1280, 800);
                 Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Preview Visual Edit action missing.");
@@ -50,7 +50,8 @@ internal static partial class NativeUiChecks
                         try
                         {
                             for (var move = 0; move < 16; move++)
-                                Mouse.MoveTo(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + move * 2));
+                                Mouse.MoveTo(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + (move % 4) * 2));
+                            Mouse.MoveTo(new System.Drawing.Point(start.X + 12, start.Y));
                             if (iteration % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE);
                         }
                         finally { Mouse.Up(MouseButton.Left); }
@@ -58,6 +59,7 @@ internal static partial class NativeUiChecks
                         if (draft != source) throw new IOException("Session dragging mutated the private source.");
                         if (!observedProcess!.Responding) throw new IOException("The native process stopped responding after pointer release.");
                         samples.Add(watch.Elapsed.TotalMilliseconds);
+                        if (iteration % 3 == 2) Find(visual, "MermaidAutoLayout").AsButton().Invoke();
                     }
                     visual.CaptureToFile(Path.Combine(output, "after-" + count + ".png"));
                     observations.Add(new { Nodes = count, Editable = true, Drags = samples.Count, PointerMoves = samples.Count * 16,
@@ -73,7 +75,7 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             try { (visual ?? main)?.CaptureToFile(Path.Combine(output, "failure.png")); } catch (Exception capture) { File.WriteAllText(Path.Combine(output, "capture-error.txt"), capture.ToString()); }
-            if (app?.HasExited == true) File.WriteAllText(Path.Combine(output, "process-exit.txt"), observedProcess!.ExitCode + "\n" + observedProcess!.StandardError.ReadToEnd());
+            if (observedProcess?.HasExited == true) File.WriteAllText(Path.Combine(output, "process-exit.txt"), observedProcess!.ExitCode + "\n" + observedProcess!.StandardError.ReadToEnd());
             Record(false, error.ToString()); Console.Error.WriteLine(error); return 1;
         }
         finally
