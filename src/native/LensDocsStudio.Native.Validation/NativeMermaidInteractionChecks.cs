@@ -236,13 +236,13 @@ internal static partial class NativeUiChecks
             Check(ReadEditorText(editor) == original, "All private interactions preserve the original document before Apply");
             var applied = Draft(); Click("MermaidApply");
             Wait(() => ReadEditorText(editor) == applied, "Apply did not write the validated source to the owning editor.");
-            var obsoletePreviewAction = Find(main!, "DiagramEditVisually0").FrameworkAutomationElement.RuntimeId;
+            var obsoletePreviewAction = Find(main!, "DiagramEditVisually0").FrameworkAutomationElement.RuntimeId.Value;
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == original, "One document Undo did not restore the entire original diagram.");
             Check(true, "Apply and one document Undo preserve the original portable source exactly");
             // Reopen so the caller also verifies ordinary Cancel after the completed transaction.
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is { } currentAction
-                && !obsoletePreviewAction.SequenceEqual(currentAction.FrameworkAutomationElement.RuntimeId), "The current preview action was not replaced after document Undo.");
+                && !obsoletePreviewAction.SequenceEqual(currentAction.FrameworkAutomationElement.RuntimeId.Value), "The current preview action was not replaced after document Undo.");
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Editor did not reopen after Undo.");
             Wait(() => Find(visual!, "MermaidApply").IsEnabled, "Reopened diagram did not finish rendering.");
