@@ -330,6 +330,18 @@ internal static partial class NativeUiChecks
             Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
+            if (!baseline)
+            {
+                Find(visual!, "MermaidCanvas_node_B").Click();
+                Wait(() => Find(visual!, "MermaidInspectionProperties").Name.Contains("Node ID: B", StringComparison.Ordinal), "Protected node identity did not reach its read-only inspector.");
+                Check(Find(visual!, "MermaidSelectionSummary").Name.Contains("Read-only inspection", StringComparison.Ordinal), "Protected selection explicitly identifies its read-only state");
+                var inspectionRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                inspectionRows.Single(row => row.Name.StartsWith("Connection 2", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+                Wait(() => Find(visual!, "MermaidInspectionProperties").Name.Contains("Source: B", StringComparison.Ordinal), "Protected ordered connection did not reach its read-only inspector.");
+                Check(visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidDestinationEndpoint")) is null && Draft() == protectedSource,
+                    "Protected inspection cannot expose endpoint transformation handles or mutate source");
+                Capture("protected-connection-inspection");
+            }
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
             if (polish)
             {
@@ -509,7 +521,16 @@ internal static partial class NativeUiChecks
         {
             try { visual?.CaptureToFile(Path.Combine(output, "mermaid-failure.png")); main?.CaptureToFile(Path.Combine(output, "mermaid-main-failure.png"));
                 File.WriteAllLines(Path.Combine(output, "mermaid-failure-controls.txt"), (visual ?? main)?.FindAllDescendants().Select(element => element.ControlType + ": " + element.AutomationId + " · " + element.Name) ?? []); } catch { }
-            Record(false, error.ToString()); Console.Error.WriteLine(error); return 1;
+            Record(false, error.ToString());
+            try
+            {
+                using var eventLog = new EventLog("Application");
+                File.WriteAllLines(Path.Combine(output, "windows-events.txt"), eventLog.Entries.Cast<EventLogEntry>()
+                    .Where(entry => entry.TimeGenerated.ToUniversalTime() >= Process.GetCurrentProcess().StartTime.ToUniversalTime() && entry.Source is ".NET Runtime" or "Application Error" or "Windows Error Reporting")
+                    .Select(entry => entry.Source + "\n" + entry.Message));
+            }
+            catch (Exception diagnostic) { File.WriteAllText(Path.Combine(output, "event-log-unavailable.txt"), diagnostic.Message); }
+            Console.Error.WriteLine(error); return 1;
         }
         finally { RestoreClipboard(clipboardBefore, clipboardOwned); if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "mermaid-ui.json"), JsonSerializer.Serialize(new

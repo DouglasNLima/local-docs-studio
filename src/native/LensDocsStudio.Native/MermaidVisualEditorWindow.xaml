@@ -68,7 +68,7 @@
      <ScrollViewer x:Name="Viewport" AllowDrop="True" Drop="CanvasDrop" Grid.Row="1" Background="{DynamicResource WindowBrush}" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
       PreviewMouseWheel="CanvasWheel" PreviewMouseDown="PanStarted" PreviewMouseMove="PanMoved" PreviewMouseUp="PanFinished" LostMouseCapture="PanCaptureLost"
       AutomationProperties.Name="Interactive Mermaid canvas. Use the element list for keyboard selection; middle-drag pans." AutomationProperties.AutomationId="MermaidViewport">
-      <Canvas x:Name="DiagramCanvas" Width="800" Height="600" HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent" AllowDrop="True" MouseLeftButtonDown="DeselectCanvas">
+      <Canvas x:Name="DiagramCanvas" Width="800" Height="600" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" AllowDrop="True" MouseLeftButtonDown="DeselectCanvas">
        <Canvas.LayoutTransform><ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
        <Canvas.ContextMenu><ContextMenu><MenuItem Header="Add process" Tag="Process" Click="InsertNode"/><MenuItem Header="Add decision" Tag="Decision" Click="InsertNode"/><MenuItem Header="Add subgraph" Click="InsertSubgraph"/><MenuItem Header="Connect selected node" Click="StartConnection"/><MenuItem Header="Delete selection" Click="Delete"/><Separator/><MenuItem Header="Fit to window" Click="Fit"/></ContextMenu></Canvas.ContextMenu>
       </Canvas>

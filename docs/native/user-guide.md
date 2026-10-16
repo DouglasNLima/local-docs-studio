@@ -12,9 +12,23 @@ unchanged; Save remains responsible for writing the file and checking disk chang
 Use F2 to edit a node label (Enter confirms; Escape cancels), named + ports to start
 a connection, and the element list for keyboard selection. Middle-drag or
 Space+drag pans, Ctrl+wheel zooms, F fits and Home resets. Manual positions last for
-the editing session, with dashed temporary connection guides. Auto layout or any
-source edit restores the canonical Mermaider drawing. No coordinates are saved.
+the editing session, with dashed temporary connection guides. Supported visual edits,
+label changes, insertion, zoom, PAN and themes retain manual positions. **Auto layout**
+explicitly resets them to the canonical Mermaider drawing. Apply saves portable source;
+closing and reopening restores canonical layout. No coordinates are saved.
+
+Drag a shape from the palette to place its centre where you release it. Clicking a
+shape inserts it near the viewport centre. Select a containing subgraph explicitly
+before dropping inside it to add membership safely. A connection dropped on a node
+retains the existing connection-creation workflow.
+
+Select a connection path or label to show its source and destination endpoint handles.
+Drag either handle onto a single editable node to reconnect it. Escape or a drop on
+empty space cancels without a source change. The Properties source/destination fields
+provide the same operation from the keyboard. Overlapping connections have distinct
+ordered entries in the element list; choose the intended entry there.
 Unsupported syntax opens the complete original diagram for protected visual inspection.
+Safely mapped nodes, connections and subgraphs have a read-only inspector.
 Zoom, PAN, Rendered preview and Edit source remain available; unsafe transformations
 and Apply stay disabled. Resource limits still apply to very large or dense diagrams. Editing covers
 `flowchart` and `graph`, five directions, common node shapes, separate connections

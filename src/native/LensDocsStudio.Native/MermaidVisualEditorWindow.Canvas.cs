@@ -188,6 +188,7 @@ public partial class MermaidVisualEditorWindow
                 {
                     if (Keyboard.IsKeyDown(Key.Space)) return;
                     e.Handled = true;
+                    button.Focus();
                     if (PropertiesPending) { SelectElement(key); return; }
                     if (e.ClickCount == 2) { SelectElement(key); BeginInlineEdit(id); return; }
                     if (connectionSource is not null) { await PickNode(id); return; }

@@ -311,7 +311,7 @@ public partial class MermaidVisualEditorWindow : Window
         InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
         SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph to edit its properties." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
         if (Elements.SelectedItems.Count != 1 || Selected is not { } key) return;
-        if ((!draft.Model.CanEdit || !canonicalMapped) && presentation is { } inspected)
+        if (!draft.Model.CanEdit && canonicalRender?.Source == draft.Source && presentation is { } inspected)
         {
             InspectionProperties.Visibility = Visibility.Visible;
             SelectionSummary.Text += " · Read-only inspection";
@@ -438,6 +438,8 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; Apply(sender, e); return; }
         if (e.Key == Key.F11) { ToggleFullScreen(); e.Handled = true; return; }
+        if (e.Key == Key.Escape && (dragStart is not null || reconnectEdge is not null || panStart is not null))
+        { CancelPointerInteraction(); UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
