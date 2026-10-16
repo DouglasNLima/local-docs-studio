@@ -71,6 +71,15 @@ internal static partial class NativeUiChecks
                 Wait(() => (link = preview.Patterns.Text.Pattern.DocumentRange.GetChildren().FirstOrDefault(element => element.Name == "Visit section")) is not null, "The native anchor link was unavailable.");
                 link!.Patterns.Invoke.Pattern.Invoke();
                 Wait(() => ReadEditorText(editor) == texts["C"] && HasPreview("C") && Visible(preview, "Region 040"), "Link navigation did not honour the requested section.");
+                if (mode == "Pages")
+                {
+                    var traces = File.ReadAllLines(Path.Combine(root, mode + synchronised, "viewport-navigation.jsonl"))
+                        .Select(line => JsonSerializer.Deserialize<JsonElement>(line)).ToArray();
+                    var duringOperation = traces.Last(item => item.GetProperty("Operation").GetString()!.StartsWith("anchor-target", StringComparison.Ordinal));
+                    var settled = traces.Last(item => item.GetProperty("Operation").GetString()!.StartsWith("anchor-final-layout", StringComparison.Ordinal));
+                    if (Math.Abs(duringOperation.GetProperty("PreviewHeight").GetDouble() - settled.GetProperty("PreviewHeight").GetDouble()) > .5)
+                        throw new IOException("The operation status control changed the native reader's available height.");
+                }
                 Find(window, "NavigateBack").AsButton().Invoke();
                 Wait(() => ReadEditorText(editor) == texts["A"] && HasPreview("A") && Visible(preview, "Region 065"), "Back did not restore the previous document's reading position.");
                 Find(window, "NavigateForward").AsButton().Invoke();

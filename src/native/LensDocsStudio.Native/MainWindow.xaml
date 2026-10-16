@@ -242,8 +242,9 @@
      </StackPanel>
      <TextBlock Grid.Column="2" Text="{Binding PreviewStatus}" ToolTip="{Binding PreviewStatus}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,10,0" MaxWidth="180" AutomationProperties.AutomationId="PreviewStatus"/>
      <TextBlock Grid.Column="3" x:Name="CaretStatus" Text="UTF-8" VerticalAlignment="Center" Margin="0,0,8,0" AutomationProperties.AutomationId="CaretStatus"/>
+     <!-- Reserve the cancellation control's measured size so operations cannot repaginate the reader. -->
      <Button Grid.Column="4" Content="Cancel operation" Command="{Binding CancelOperationCommand}" IsEnabled="{Binding IsBusy}" AutomationProperties.AutomationId="CancelOperation">
-      <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Collapsed"/><Style.Triggers>
+      <Button.Style><Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}"><Setter Property="Visibility" Value="Hidden"/><Style.Triggers>
        <DataTrigger Binding="{Binding IsBusy}" Value="True"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
       </Style.Triggers></Style></Button.Style>
      </Button>
