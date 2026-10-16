@@ -141,10 +141,23 @@ internal static partial class NativeUiChecks
             var scroll = Find(visual!, "MermaidViewport").Patterns.Scroll.Pattern;
             foreach (var zoom in new[] { 50, 100, 150, 200 })
             {
+                visual!.Patterns.Transform.Pattern.Resize(zoom == 200 ? 880 : 1280, zoom == 200 ? 600 : 800);
                 Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.SetValue(zoom);
+                Wait(() => scroll.VerticallyScrollable.Value, "The tall coordinate fixture has no vertical scrolling at " + zoom);
+                // Exercise non-zero native scroll offsets, rather than counting a PAN
+                // gesture clamped at the origin as scroll-coordinate acceptance.
+                scroll.SetScrollPercent(scroll.HorizontallyScrollable.Value ? 35 : -1, 35);
+                Wait(() => scroll.VerticalScrollPercent.Value > 20, "Vertical scroll did not settle before palette insertion.");
+                if (zoom == 200) Check(scroll.HorizontallyScrollable.Value && scroll.HorizontalScrollPercent.Value > 20,
+                    "The narrow 200% viewport has a measured non-zero horizontal offset");
                 var viewport = Find(visual!, "MermaidViewport").BoundingRectangle;
-                // Exercise real middle-button PAN before measuring the drop target.
-                Mouse.DragHorizontally(new(viewport.Left + viewport.Width / 2, viewport.Top + viewport.Height / 2), -35, MouseButton.Middle);
+                var panStart = new System.Drawing.Point(viewport.Left + viewport.Width / 2, viewport.Top + viewport.Height / 2);
+                var verticalBeforePan = scroll.VerticalScrollPercent.Value;
+                Mouse.MoveTo(panStart); Mouse.Down(MouseButton.Middle);
+                try { MovePointer(new(panStart.X - 35, panStart.Y - 24)); }
+                finally { Mouse.Up(MouseButton.Middle); }
+                Check(scroll.VerticalScrollPercent.Value > verticalBeforePan,
+                    "Native middle-button PAN changes the measured vertical offset at zoom " + zoom);
                 var point = new System.Drawing.Point(viewport.Left + viewport.Width / 2, viewport.Top + viewport.Height / 2);
                 var horizontal = scroll.HorizontalScrollPercent.Value; var vertical = scroll.VerticalScrollPercent.Value;
                 Drag(Centre("MermaidInsertProcess"), point, capture: "palette-preview-" + zoom);
@@ -155,11 +168,14 @@ internal static partial class NativeUiChecks
                 Check(ReadEditorText(editor) == original, "Palette insertion leaves owning source unchanged before Apply at " + zoom);
                 placements.Add(new { Zoom = zoom, Target = point, Actual = centre, DistancePixels = distance, HorizontalBefore = horizontal, HorizontalAfter = scroll.HorizontalScrollPercent.Value, VerticalBefore = vertical, VerticalAfter = scroll.VerticalScrollPercent.Value });
                 Capture("drop-" + zoom); Click("MermaidUndo"); Ready(text => text == original);
+                scroll.SetScrollPercent(scroll.HorizontallyScrollable.Value ? 0 : -1, 0);
+                Wait(() => scroll.VerticalScrollPercent.Value == 0, "The existing-node check did not return to the top.");
                 var nodeBefore = Centre("MermaidCanvas_node_N0"); Drag(nodeBefore, new(nodeBefore.X + 24, nodeBefore.Y));
                 Check(Math.Abs(Centre("MermaidCanvas_node_N0").X - nodeBefore.X - 24) <= 3 && Draft() == original,
                     "Existing-node dragging follows the actual pointer without changing source at zoom " + zoom);
                 Click("MermaidAutoLayout");
             }
+            visual!.Patterns.Transform.Pattern.Resize(1280, 800);
             Click("MermaidActualSize"); Click("MermaidReset");
             var view = Find(visual!, "MermaidViewport").BoundingRectangle;
             var expectedCentres = new Dictionary<string, System.Drawing.Point>();
@@ -266,7 +282,14 @@ internal static partial class NativeUiChecks
             Click("MermaidUndo"); Ready(text => text == beforeGroup);
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
             {
-                visual!.Patterns.Transform.Pattern.Resize(width, height); Capture("candidate-" + width + "x" + height);
+                visual!.Patterns.Transform.Pattern.Resize(width, height);
+                visual.Patterns.Transform.Pattern.Move(0, 0);
+                Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3
+                    && automation.GetDesktop().BoundingRectangle.Contains(visual.BoundingRectangle)
+                    && visual.BoundingRectangle.Contains(Find(visual, "MermaidApply").BoundingRectangle)
+                    && !display.TaskbarOverlaps(Find(visual, "MermaidApply").BoundingRectangle),
+                    "The complete resized editor must fit the disposable desktop before capture.");
+                Capture("candidate-" + width + "x" + height);
                 var apply = Find(visual, "MermaidApply").BoundingRectangle;
                 Check(visual.BoundingRectangle.Contains(apply), "Apply remains visible at " + width + "x" + height);
             }
