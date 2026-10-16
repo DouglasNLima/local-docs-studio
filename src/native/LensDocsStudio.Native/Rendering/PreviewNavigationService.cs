@@ -144,10 +144,12 @@ public static class PreviewNavigationService
 
     private static void BringIntoScrollView(FlowDocumentScrollViewer viewer, TextPointer position, Action<string>? diagnostic = null)
     {
+        diagnostic?.Invoke($"scroll entry: {viewer.GetType().Name}, visible {viewer.IsVisible}, loaded {viewer.IsLoaded}, size {viewer.ActualWidth} x {viewer.ActualHeight}, document matches {viewer.Document is { } shown && position.IsInSameDocument(shown.ContentStart)}");
         viewer.UpdateLayout();
         ((FrameworkContentElement?)position.Paragraph ?? position.Parent as FrameworkContentElement)?.BringIntoView();
         viewer.UpdateLayout();
         var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
+        diagnostic?.Invoke($"scroll character: {rectangle}, valid layout {position.HasValidLayout}, content host {viewer.Template.FindName("PART_ContentHost", viewer)?.GetType().Name ?? "missing"}");
         if (rectangle.IsEmpty || viewer.Template.FindName("PART_ContentHost", viewer) is not ScrollViewer scrolling) return;
         var target = Math.Max(0, scrolling.VerticalOffset + rectangle.Top - scrolling.ViewportHeight / 3);
         diagnostic?.Invoke($"scroll offset {scrolling.VerticalOffset}, extent {scrolling.ExtentHeight}, viewport {scrolling.ViewportHeight}, character {rectangle}, requested {target}");
