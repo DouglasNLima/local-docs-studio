@@ -71,10 +71,11 @@ public partial class MainWindow
             CancelSynchronisation();
             if (rendered is not null)
             {
-                var nearest = rendered.SourceElements.Where(e => e.Key <= previewOffset).OrderByDescending(e => e.Key).FirstOrDefault();
                 TraceViewport("history-restore " + previewOffset);
                 rendered.RevealSource(previewOffset);
-                if (nearest.Value is { } element) await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
+                var pointer = previewOffset == 0 ? rendered.Document.ContentStart
+                    : rendered.TextMap.TryPreviewRange(previewOffset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(previewOffset)?.ContentStart;
+                if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer);
             }
             Editor.Focus();
         }
