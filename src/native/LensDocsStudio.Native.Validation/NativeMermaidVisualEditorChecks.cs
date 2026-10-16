@@ -490,4 +490,3 @@ internal static partial class NativeUiChecks
             Limitations = "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed." }, new JsonSerializerOptions { WriteIndented = true }));
     }
 }
-

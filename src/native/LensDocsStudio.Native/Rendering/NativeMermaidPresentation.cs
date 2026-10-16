@@ -76,7 +76,8 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
             if (candidates.Length != 1 || MetadataLabel((string?)candidates[0].Attribute("data-label") ?? "") != MetadataLabel(label))
                 throw new InvalidDataException("Conflicting canonical element identity: " + id);
             var shapes = candidates[0].Elements().Where(e => e.Name.LocalName is "rect" or "circle" or "ellipse" or "polygon" or "path" or "line").ToArray();
-            var geometry = new GeometryGroup();
+            // Compound filled shapes (notably double circles) must remain clickable at their centre.
+            var geometry = new GeometryGroup { FillRule = FillRule.Nonzero };
             foreach (var shape in shapes) geometry.Children.Add(Shape(shape));
             if (geometry.Children.Count == 0) throw new InvalidDataException("The canonical element has no safe hit geometry: " + id);
             geometry.Transform = shift; geometry.Freeze();

@@ -41,6 +41,8 @@ internal static class NativeMermaidFidelityChecks
                 var box = presentation.Elements["node:" + node.Id].Bounds; var origin = presentation.Drawing.Drawing.Bounds;
                 Check(Math.Abs(box.X - node.X + origin.X) < .001 && Math.Abs(box.Y - node.Y + origin.Y) < .001
                     && Math.Abs(box.Width - node.Width) < .001 && Math.Abs(box.Height - node.Height) < .001, file + ": node bounds are canonical for " + node.Id);
+                Check(presentation.Elements["node:" + node.Id].Geometry.FillContains(new Point(box.X + box.Width / 2, box.Y + box.Height / 2)),
+                    file + ": the actual shape centre is a valid native hit target for " + node.Id);
             }
             var markdown = "Before\r\n\r\n```mermaid\r\n" + source + "\r\n```\r\n\r\nAfter";
             var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single(); var selected = -1;
