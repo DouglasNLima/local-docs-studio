@@ -1,0 +1,47 @@
+name: Validate native workspace and Mermaid interactions
+on:
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  interactions:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Build immutable pre-change baseline
+        run: |
+          git fetch origin 14b3d4fc605c965a35107cceb0cf20a60226f1ca
+          git worktree add --detach artifacts/baseline 14b3d4fc605c965a35107cceb0cf20a60226f1ca
+          dotnet build artifacts/baseline/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Exercise original dragging and retain failure diagnostics
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-interactions artifacts/baseline/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/interactions/baseline --baseline $appearance
+          $LASTEXITCODE | Set-Content artifacts/interactions/baseline/harness-exit.txt
+          # Baseline failures are evidence. Candidate failures below remain blocking.
+          exit 0
+      - name: Certify candidate pointer interactions
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --mermaid-interactions src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/interactions/candidate $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-interactions-${{ matrix.appearance }}
+          path: artifacts/interactions/
+          retention-days: 14
