@@ -271,7 +271,7 @@ public partial class MainWindow : Window
     }
     private async void Navigate(string reference)
     {
-        (DocumentViewModel Document, PreviewResult Preview, TextElement Element, int Offset, long Generation)? pendingPageAnchor = null;
+        (DocumentViewModel Document, PreviewResult Preview, TextElement Element, int Offset, long Generation)? pendingPreviewAnchor = null;
         await model.RunAsync(async () =>
         {
             var fragment = reference.Contains('#') ? Uri.UnescapeDataString(reference.Split('#', 2)[1]) : null;
@@ -304,9 +304,7 @@ public partial class MainWindow : Window
                         {
                             rendered.RevealSource(target.SourceStart);
                             TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
-                            if (Preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll)
-                                pendingPageAnchor = (model.ActiveDocument!, rendered, element, target.SourceStart, viewportGeneration);
-                            else await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
+                            pendingPreviewAnchor = (model.ActiveDocument!, rendered, element, target.SourceStart, viewportGeneration);
                         }
                     }
                     else model.Status = "The linked section was not found; the document remains open.";
@@ -314,7 +312,7 @@ public partial class MainWindow : Window
             }
             finally { restoringNavigation = previousRestoring; if (!previousRestoring) VisitCurrentNavigation(); }
         });
-        if (pendingPageAnchor is not { } request) return;
+        if (pendingPreviewAnchor is not { } request) return;
         var wasRestoring = restoringNavigation; restoringNavigation = true;
         bool CurrentAnchor() => model.ActiveDocument == request.Document && rendered == request.Preview
             && viewportGeneration == request.Generation && SyncCurrent;

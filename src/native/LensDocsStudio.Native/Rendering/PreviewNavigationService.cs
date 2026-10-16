@@ -57,7 +57,7 @@ public static class PreviewNavigationService
                             if (viewer.Selection is not { } selection) return;
                             selection.Select(position, selectionEnd);
                         }
-                        BringIntoScrollView(scrolling, position);
+                        BringIntoScrollView(scrolling, position, diagnostic);
                         shown = true;
                     }, DispatcherPriority.Loaded);
                     return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
@@ -142,13 +142,15 @@ public static class PreviewNavigationService
         }, DispatcherPriority.Loaded);
     }
 
-    private static void BringIntoScrollView(FlowDocumentScrollViewer viewer, TextPointer position)
+    private static void BringIntoScrollView(FlowDocumentScrollViewer viewer, TextPointer position, Action<string>? diagnostic = null)
     {
         viewer.UpdateLayout();
         ((FrameworkContentElement?)position.Paragraph ?? position.Parent as FrameworkContentElement)?.BringIntoView();
         viewer.UpdateLayout();
         var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
         if (rectangle.IsEmpty || viewer.Template.FindName("PART_ContentHost", viewer) is not ScrollViewer scrolling) return;
-        scrolling.ScrollToVerticalOffset(Math.Max(0, scrolling.VerticalOffset + rectangle.Top - scrolling.ViewportHeight / 3));
+        var target = Math.Max(0, scrolling.VerticalOffset + rectangle.Top - scrolling.ViewportHeight / 3);
+        diagnostic?.Invoke($"scroll offset {scrolling.VerticalOffset}, extent {scrolling.ExtentHeight}, viewport {scrolling.ViewportHeight}, character {rectangle}, requested {target}");
+        scrolling.ScrollToVerticalOffset(target);
     }
 }
