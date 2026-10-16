@@ -293,7 +293,7 @@ public partial class MermaidVisualEditorWindow
             foreach (var (key, button) in canvasElements)
             {
                 button.IsChecked = draft.Selection.Contains(key);
-                if (!key.StartsWith("edge-", StringComparison.Ordinal) && button.Content is System.Windows.Shapes.Path shape)
+                if ((key.StartsWith("node:", StringComparison.Ordinal) || key.StartsWith("group:", StringComparison.Ordinal)) && button.Content is System.Windows.Shapes.Path shape)
                     shape.Stroke = button.IsChecked == true ? BrushResource("AccentBrush") : Brushes.Transparent;
             }
             foreach (var (key, port) in ports) port.Tag = draft.Selection.Contains(key) || connectionSource == key[5..] || canvasElements[key].IsMouseOver;

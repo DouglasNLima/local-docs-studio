@@ -25,8 +25,12 @@ public partial class MainWindow
         JumpToSource(offset);
         if (revealEditor) await SavePreferences();
     }
-    private NavigationLocation? CurrentNavigation() => displayedTab is null ? null :
-        new(displayedTab.Id, displayedTab.FilePath, Editor.CaretOffset, Editor.VerticalOffset);
+    private NavigationLocation? CurrentNavigation()
+    {
+        if (displayedTab is null) return null;
+        SaveViewport();
+        return new(displayedTab.Id, displayedTab.FilePath, Editor.CaretOffset, Editor.VerticalOffset, displayedTab.PreviewSourceOffset);
+    }
     private void CaptureCurrentNavigation()
     { if (!restoringNavigation && CurrentNavigation() is { } location) navigation.UpdateCurrent(location); }
     private void VisitCurrentNavigation()
@@ -57,13 +61,17 @@ public partial class MainWindow
             BindActiveDocument();
             Editor.CaretOffset = Math.Clamp(target.CaretOffset, 0, Editor.Document.TextLength);
             Editor.ScrollToVerticalOffset(Math.Max(0, target.VerticalOffset));
+            var destination = model.ActiveDocument!; var generation = viewportGeneration;
+            destination.PreviewSourceOffset = Math.Clamp(target.PreviewSourceOffset ?? target.CaretOffset, 0, Editor.Document.TextLength);
             navigation.CompleteMove(forward, CurrentNavigation()!);
             await UpdatePreviewAsync();
+            if (model.ActiveDocument != destination || generation != viewportGeneration) return;
             CancelSynchronisation();
             if (rendered is not null)
             {
-                var nearest = rendered.SourceElements.Where(e => e.Key <= Editor.CaretOffset).OrderByDescending(e => e.Key).FirstOrDefault();
-                rendered.RevealSource(Editor.CaretOffset);
+                var previewOffset = destination.PreviewSourceOffset;
+                var nearest = rendered.SourceElements.Where(e => e.Key <= previewOffset).OrderByDescending(e => e.Key).FirstOrDefault();
+                rendered.RevealSource(previewOffset);
                 if (nearest.Value is { } element) await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
             }
             Editor.Focus();

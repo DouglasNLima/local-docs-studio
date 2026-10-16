@@ -1,6 +1,6 @@
 namespace LensDocsStudio.Core.State;
 
-public sealed record NavigationLocation(Guid DocumentId, string? Path, int CaretOffset, double VerticalOffset);
+public sealed record NavigationLocation(Guid DocumentId, string? Path, int CaretOffset, double VerticalOffset, int? PreviewSourceOffset = null);
 
 /// <summary>Bounded session navigation. A failed destination never advances the history.</summary>
 public sealed class NavigationHistory(int capacity = 100)

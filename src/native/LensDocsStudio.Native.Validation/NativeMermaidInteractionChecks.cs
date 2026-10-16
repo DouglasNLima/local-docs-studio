@@ -57,6 +57,7 @@ internal static partial class NativeUiChecks
                             for (var move = 0; move < 16; move++)
                                 MovePointer(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + (move % 4) * 2));
                             MovePointer(new System.Drawing.Point(start.X + 12, start.Y));
+                            if (iteration == 1) visual!.CaptureToFile(Path.Combine(output, "drag-active-" + count + ".png"));
                             if (iteration % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE);
                         }
                         finally { Mouse.Up(MouseButton.Left); }

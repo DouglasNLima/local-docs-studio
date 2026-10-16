@@ -16,7 +16,7 @@ internal static partial class NativeUiChecks
         var texts = new Dictionary<string, string>(); var observations = new List<object>();
         foreach (var name in new[] { "A", "B", "C" })
         {
-            texts[name] = "# Document " + name + "\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
+            texts[name] = "# Document " + name + "\n\n[Visit section](C.md#region-040)\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
                 $"## Region {index:000}\n\nDocument {name} has a distinct portable source region {index:000}, with **formatted text**.\n\n"));
             File.WriteAllText(Path.Combine(root, name + ".md"), texts[name]);
         }
@@ -56,8 +56,17 @@ internal static partial class NativeUiChecks
                 Wait(() => Math.Abs(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value - bOffset) < 3 && Visible(preview, "Region 035"), "Sidebar activation did not restore document B's own viewport.");
                 foreach (var name in new[] { "A", "C", "B", "C" }) Open(name, false);
                 Wait(() => HasPreview("C") && Visible(preview, "Document C"), "A delayed preview replaced or repositioned the latest selected document.");
+                Open("A");
+                AutomationElement? link = null;
+                Wait(() => (link = preview.Patterns.Text.Pattern.DocumentRange.GetChildren().FirstOrDefault(element => element.Name == "Visit section")) is not null, "The native anchor link was unavailable.");
+                link!.Patterns.Invoke.Pattern.Invoke();
+                Wait(() => ReadEditorText(editor) == texts["C"] && HasPreview("C") && Visible(preview, "Region 040"), "Link navigation did not honour the requested section.");
+                Find(window, "NavigateBack").AsButton().Invoke();
+                Wait(() => ReadEditorText(editor) == texts["A"] && HasPreview("A") && Visible(preview, "Region 065"), "Back did not restore the previous document's reading position.");
+                Find(window, "NavigateForward").AsButton().Invoke();
+                Wait(() => ReadEditorText(editor) == texts["C"] && HasPreview("C") && Visible(preview, "Region 040"), "Forward did not restore the requested anchor.");
                 foreach (var pair in texts) if (File.ReadAllText(Path.Combine(root, pair.Key + ".md")) != pair.Value) throw new IOException("Viewport navigation mutated disk source.");
-                observations.Add(new { ReadingMode = mode, Synchronised = synchronised, FirstOpenTop = true, ReturnOwnPosition = true, SidebarExistingTab = true, RapidLatestWins = true, AEditorPercent = aOffset, BEditorPercent = bOffset });
+                observations.Add(new { ReadingMode = mode, Synchronised = synchronised, FirstOpenTop = true, ReturnOwnPosition = true, SidebarExistingTab = true, RapidLatestWins = true, AnchorBackForward = true, AEditorPercent = aOffset, BEditorPercent = bOffset });
 
                 void Open(string name, bool wait = true)
                 {
@@ -68,8 +77,8 @@ internal static partial class NativeUiChecks
                     Wait(() => ReadEditorText(editor) == texts[name], "Sidebar did not activate " + name);
                     if (wait) Wait(() => HasPreview(name), "Current document preview missing: " + name);
                 }
-                bool HasPreview(string name) => preview.Patterns.Text.Pattern.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal)
-                    && Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal);
+                bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
+                    && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
                 bool Visible(AutomationElement pane, string text) => PreviewRange(text).GetBoundingRectangles().Any(box => box.Width > 0 && box.Height > 0 && pane.BoundingRectangle.Contains(box));
                 void AtTop(string name)

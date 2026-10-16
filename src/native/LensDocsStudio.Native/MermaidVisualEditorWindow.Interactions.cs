@@ -234,11 +234,13 @@ public partial class MermaidVisualEditorWindow
         if (key.StartsWith("inspect-edge-", StringComparison.Ordinal) && int.TryParse(key.AsSpan(13), out var ordinal))
         {
             var edge = view.Graph.Edges[ordinal];
-            return "Connection " + (ordinal + 1) + "\nSource: " + edge.Source + "\nDestination: " + edge.Target + "\nLabel: " + edge.Label + "\nType: " + edge.Style;
+            return "Connection " + (ordinal + 1) + "\nSource: " + edge.Source + "\nDestination: " + edge.Target + "\nLabel: " + edge.Label + "\nType: " + (edge.HasArrowStart && edge.HasArrowEnd ? "Bidirectional" : edge.HasArrowEnd ? "Directed" : edge.HasArrowStart ? "Arrow at source" : "Undirected") + " · " + edge.Style;
         }
         var group = view.Membership.SingleOrDefault(group => "group:" + group.Id == key);
-        return "Subgraph ID: " + key[6..] + "\nParent: " + (group?.ParentId ?? "Root") + "\nMembers: " + string.Join(", ", group?.NodeIds ?? []);
+        return "Subgraph ID: " + key[6..] + "\nLabel: " + InspectionGroups(view.Graph.Groups).Single(item => "group:" + item.Id == key).Label + "\nParent: " + (group?.ParentId ?? "Root") + "\nMembers: " + string.Join(", ", group?.NodeIds ?? []);
     }
+    private static IEnumerable<Mermaider.Models.PositionedGroup> InspectionGroups(IEnumerable<Mermaider.Models.PositionedGroup> groups)
+    { foreach (var group in groups) { yield return group; foreach (var child in InspectionGroups(group.Children)) yield return child; } }
     private void UpdateEndpointHandles()
     {
         if (sourceHandle is not null) DiagramCanvas.Children.Remove(sourceHandle);

@@ -390,6 +390,22 @@ internal static partial class NativeUiChecks
                     "Parallel connection deletion retains both neighbouring source connections and their labels");
                 Click("MermaidUndo"); AwaitSource(text => text == parallelChanged); Click("MermaidUndo"); AwaitSource(text => text == parallel);
                 Check(Draft() == parallel && ReadEditorText(editor) == parallel, "Private history restores exact parallel source without changing its owner");
+                if (!baseline)
+                {
+                    var endpoint = Find(visual!, "MermaidDestinationEndpoint").BoundingRectangle;
+                    var node = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                    var from = new System.Drawing.Point(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2);
+                    var to = new System.Drawing.Point(node.Left + node.Width / 2, node.Top + node.Height / 2);
+                    Mouse.MoveTo(from); Mouse.Down(MouseButton.Left);
+                    try { for (var step = 1; step <= 8; step++) MovePointer(new(from.X + (to.X - from.X) * step / 8, from.Y + (to.Y - from.Y) * step / 8)); }
+                    finally { Mouse.Up(MouseButton.Left); }
+                    AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Count(edge => edge.Target.Id == "A" && edge.Label == "Same") == 1);
+                    var reconnected = new MermaidSourceParser().Parse(Draft());
+                    Check(reconnected.Edges.Count(edge => edge.Source.Id == "A" && edge.Target.Id == "B" && edge.Label == "Same") == 1
+                        && reconnected.Edges.Count(edge => edge.Label == "Diagnostic" && edge.Type == FlowConnectionType.Dotted) == 1,
+                        "Actual endpoint dragging reconnects only the selected identical parallel edge");
+                    Capture("parallel-endpoint-reconnection"); Click("MermaidUndo"); AwaitSource(text => text == parallel);
+                }
                 Capture("parallel-edges"); Click("MermaidCancel"); WaitClosed();
                 var shapes = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/shapes.mmd");
                 LaunchDocument("Shapes.mmd", shapes); Open(0); Click("MermaidFit");

@@ -137,7 +137,7 @@ public partial class MermaidVisualEditorWindow : Window
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
         ValidateSourceButton.IsEnabled = !busy && !renderingCanvas && !PropertiesPending && inlineEditor is null;
-        foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
+        foreach (var port in ports.Values) { port.IsEnabled = canEdit && !PropertiesPending; port.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed; }
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
         UpdateEndpointHandles();
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;

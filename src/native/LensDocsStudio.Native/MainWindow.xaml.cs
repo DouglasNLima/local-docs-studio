@@ -104,7 +104,7 @@ public partial class MainWindow : Window
         if (displayedTab is null || bindingViewport) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
-        if (renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+        if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
     }
@@ -194,7 +194,11 @@ public partial class MainWindow : Window
                 return (drawings, images, formulae);
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
-            var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
+            var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
+                {
+                    if (model.ActiveDocument == tab && renderedDocumentId == tab.Id && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0) Navigate(reference);
+                    else model.Status = "The document changed. Wait for its current preview before following a link.";
+                }, ExportDiagram,
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
@@ -269,30 +273,38 @@ public partial class MainWindow : Window
         await model.RunAsync(async () =>
         {
             var fragment = reference.Contains('#') ? Uri.UnescapeDataString(reference.Split('#', 2)[1]) : null;
-            if (!reference.StartsWith('#'))
+            if (!reference.StartsWith('#') && Uri.TryCreate(reference, UriKind.Absolute, out var uri))
             {
-                if (Uri.TryCreate(reference, UriKind.Absolute, out var uri))
-                {
-                    if (uri.Scheme is "https" or "http" or "mailto")
-                        if (dialogs.Confirm("Open this external link in its default application?\n\n" + reference, "External link")) Process.Start(new ProcessStartInfo(reference) { UseShellExecute = true });
-                    return;
-                }
-                if (model.ActiveDocument is not { FilePath: not null, WorkspaceRoot: not null } tab) throw new IOException("Open a workspace to follow relative links.");
-                var path = new WorkspacePath(tab.WorkspaceRoot).ResolveLink(tab.FilePath, reference);
-                if (!WorkspaceService.IsDocument(path)) throw new IOException("This link is not a supported document.");
-                await model.OpenPathAsync(path, tab.WorkspaceRoot); BindActiveDocument(); await UpdatePreviewAsync();
+                if (uri.Scheme is "https" or "http" or "mailto")
+                    if (dialogs.Confirm("Open this external link in its default application?\n\n" + reference, "External link")) Process.Start(new ProcessStartInfo(reference) { UseShellExecute = true });
+                return;
             }
-            if (fragment is not null)
+            CaptureCurrentNavigation(); var previousRestoring = restoringNavigation; restoringNavigation = true;
+            try
             {
-                var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
-                if (target is not null)
+                if (!reference.StartsWith('#'))
                 {
-                    JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
-                    if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                    { rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
+                    if (model.ActiveDocument is not { FilePath: not null, WorkspaceRoot: not null } tab) throw new IOException("Open a workspace to follow relative links.");
+                    var path = new WorkspacePath(tab.WorkspaceRoot).ResolveLink(tab.FilePath, reference);
+                    if (!WorkspaceService.IsDocument(path)) throw new IOException("This link is not a supported document.");
+                    await model.OpenPathAsync(path, tab.WorkspaceRoot); BindActiveDocument();
+                    var destination = model.ActiveDocument; var generation = viewportGeneration;
+                    await UpdatePreviewAsync();
+                    if (model.ActiveDocument != destination || generation != viewportGeneration) return;
                 }
-                else model.Status = "The linked section was not found; the document remains open.";
+                if (fragment is not null)
+                {
+                    var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
+                    if (target is not null)
+                    {
+                        JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
+                        if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
+                        { rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
+                    }
+                    else model.Status = "The linked section was not found; the document remains open.";
+                }
             }
+            finally { restoringNavigation = previousRestoring; if (!previousRestoring) VisitCurrentNavigation(); }
         });
     }
     private void OpenFind(object sender, RoutedEventArgs e) => ShowFind(false);
