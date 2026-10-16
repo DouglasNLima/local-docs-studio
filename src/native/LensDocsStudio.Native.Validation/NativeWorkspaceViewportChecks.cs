@@ -12,6 +12,7 @@ internal static partial class NativeUiChecks
 {
     public static int RunWorkspaceViewports(string executable, string output) => Task.Run(() =>
     {
+        output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         using var display = new NativeTestDisplay(output);
         try { CheckWorkspaceViewportOwnership(executable, output, true); display.Complete(); return 0; }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
