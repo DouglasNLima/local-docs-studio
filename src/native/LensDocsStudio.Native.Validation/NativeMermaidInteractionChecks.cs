@@ -46,11 +46,16 @@ internal static partial class NativeUiChecks
                 else
                 {
                     Find(visual, "MermaidActualSize").AsButton().Invoke();
-                    var samples = new List<double>(); var updateMetrics = new List<string>();
+                    var samples = new List<double>(); var updateMetrics = new List<string>(); var draggedIds = new HashSet<string>();
                     for (var iteration = 0; iteration < 30; iteration++)
                     {
                         if (app.HasExited) throw new IOException("Application exited during node dragging: " + observedProcess!.ExitCode);
-                        var node = Find(visual, "MermaidCanvas_node_N0"); var bounds = node.BoundingRectangle;
+                        var draggedId = iteration % 2 == 0 ? "N0" : "N1";
+                        var node = Find(visual, "MermaidCanvas_node_" + draggedId); var bounds = node.BoundingRectangle;
+                        var viewportBounds = Find(visual, "MermaidViewport").BoundingRectangle;
+                        if (!viewportBounds.Contains(new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2)))
+                        { draggedId = "N0"; node = Find(visual, "MermaidCanvas_node_N0"); bounds = node.BoundingRectangle; }
+                        draggedIds.Add(draggedId);
                         var start = new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
                         var watch = Stopwatch.StartNew(); Mouse.MoveTo(start); Mouse.Down(MouseButton.Left);
                         try
@@ -72,7 +77,7 @@ internal static partial class NativeUiChecks
                     }
                     visual.CaptureToFile(Path.Combine(output, "after-" + count + ".png"));
                     observations.Add(new { Nodes = count, Editable = true, Drags = samples.Count, PointerMoves = samples.Count * 17,
-                        RoundTripMilliseconds = samples, UpdateMetrics = updateMetrics, PrivateSourceExact = true, DiskSourceExact = File.ReadAllText(fixture) == source,
+                        DraggedNodeIds = draggedIds, RoundTripMilliseconds = samples, UpdateMetrics = updateMetrics, PrivateSourceExact = true, DiskSourceExact = File.ReadAllText(fixture) == source,
                         WorkingSet = observedProcess!.WorkingSet64, ProcessAlive = !app.HasExited });
                 }
                 Record(false, "Validation in progress; completion is recorded only after all checks pass.");
@@ -150,6 +155,10 @@ internal static partial class NativeUiChecks
                 Check(ReadEditorText(editor) == original, "Palette insertion leaves owning source unchanged before Apply at " + zoom);
                 placements.Add(new { Zoom = zoom, Target = point, Actual = centre, DistancePixels = distance, HorizontalBefore = horizontal, HorizontalAfter = scroll.HorizontalScrollPercent.Value, VerticalBefore = vertical, VerticalAfter = scroll.VerticalScrollPercent.Value });
                 Capture("drop-" + zoom); Click("MermaidUndo"); Ready(text => text == original);
+                var nodeBefore = Centre("MermaidCanvas_node_N0"); Drag(nodeBefore, new(nodeBefore.X + 24, nodeBefore.Y));
+                Check(Math.Abs(Centre("MermaidCanvas_node_N0").X - nodeBefore.X - 24) <= 3 && Draft() == original,
+                    "Existing-node dragging follows the actual pointer without changing source at zoom " + zoom);
+                Click("MermaidAutoLayout");
             }
             Click("MermaidActualSize"); Click("MermaidReset");
             var view = Find(visual!, "MermaidViewport").BoundingRectangle;

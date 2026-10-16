@@ -100,11 +100,11 @@ public partial class MainWindow
         // Reconcile that current input once the new immutable map is installed;
         // it need not raise another SelectionChanged event.
         if (QueueCurrentEditorInput()) return;
-        var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0;
+        var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0; var restorationGeneration = syncGeneration;
         if (offset > 0)
             Dispatcher.BeginInvoke(async () =>
             {
-                if (!SyncCurrent || rendered != result || !Preview.IsVisible) return;
+                if (restorationGeneration != syncGeneration || !SyncCurrent || rendered != result || !Preview.IsVisible) return;
                 var pointer = result!.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
                 if (pointer is null) return;
                 var generation = ++syncGeneration; applyingSync = true; applyingSyncOrigin = "restore-preview";
@@ -154,7 +154,7 @@ public partial class MainWindow
     }
     private void QueueSynchronisation(string origin)
     {
-        if (bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
+        if (restoringNavigation || bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
         if (!syncTimer.IsEnabled) syncTimer.Start();
@@ -178,7 +178,7 @@ public partial class MainWindow
     private async void SyncTick(object? sender, EventArgs e)
     {
         syncTimer.Stop(); var origin = pendingSync; pendingSync = null;
-        if (origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
+        if (restoringNavigation || origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
         applyingSync = true; applyingSyncOrigin = origin;
         try
