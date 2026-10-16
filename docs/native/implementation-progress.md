@@ -1,5 +1,7 @@
 # Native implementation progress
 
+Current consolidation status is recorded in [integration readiness](integration-readiness.md) and [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29). The implementation milestones and package identities below retain their original source labels.
+
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),
 branch `feature/native-mermaid-preview-fidelity`, based on verified `47e78d6`.
 The [fidelity report](mermaid-preview-fidelity.md) owns the shared native drawing,

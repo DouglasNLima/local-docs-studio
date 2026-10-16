@@ -1,5 +1,7 @@
 # Functional parity matrix
 
+The current integrated feature matrix and restrictions are recorded in [integration readiness](integration-readiness.md). The source-specific results below remain historical evidence and are not relabelled as current integrated acceptance.
+
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),
 branch `feature/native-mermaid-preview-fidelity`, based on verified `47e78d6`.
 The [fidelity report](mermaid-preview-fidelity.md) owns the shared native drawing,

@@ -2,13 +2,17 @@
 
 Local Markdown, Mermaid, and documentation studio.
 
-## Native Windows reconstruction
+<a id="native-windows-reconstruction"></a>
+
+## Native Windows edition
+
+The consolidated native candidate, original historical upgrade results and exact package identities are tracked in the [integration readiness report](docs/native/integration-readiness.md) and [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29). Integration review does not authorise a merge or production release.
 
 The browser-free Windows edition is implemented separately under `src/native/` using .NET 10, WPF, AvalonEdit, Markdig and Mermaider. It coexists with the existing WinUI/WebView2 shell described below. Its installer-based unsigned internal preview is validated in the documented scope; production certification remains incomplete. See the [engineering delivery report](docs/native/engineering-completion-report.md) for the 28-condition audit and exact evidence.
 
 Native **Visual Edit** opens recognised Flowcharts directly from preview for WPF authoring or protected visual inspection. **Edit source** remains separate; **Insert → Flowchart visually…** creates a new diagram. The canvas shares the native Mermaider drawing, with node, connection, subgraph and basic style commands. Edits use a private Mermaid source draft; Apply updates the intended Markdown block or standalone file in one Undo transaction, with stale-source protection. Temporary canvas positions are session-only. The [preview fidelity report](docs/native/mermaid-preview-fidelity.md) records the shared rendering architecture, protected inspection and current evidence; the [original editor report](docs/native/mermaid-visual-editor.md) defines its bounded transformation grammar.
 
-The latest native UX improvements, Word template compatibility, private-sample acceptance and verified preview identities are recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md).
+Source-specific UX refinement, Word template compatibility and earlier private-sample acceptance remain recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md). Current integration acceptance uses synthetic fixtures and the separate integration report.
 
 ```powershell
 dotnet build src/native/LensDocsStudio.Native.slnx -c Release
@@ -40,7 +44,7 @@ Native **Edit → Copy Markdown with images** preserves literal source around lo
 
 Native paste converts formatted HTML and spreadsheet TSV into editable Markdown, retaining embedded images as local assets. **Edit → Paste Special** offers table, text, code, quote, HTML, list, checklist, numbered list and Mermaid modes; `Ctrl+Shift+V` pastes literal text. Images are validated and written before the editor selection is replaced. HTML file imports use the same converter, with warnings for flattened merged cells and unfetched linked images.
 
-Native preview and Word export retain labelled callouts, ordered starting numbers, table alignment, strikethrough, scripts, insertion underline and highlighting. PDF preserves callout labels, list starts and alignment, but currently represents deletion with visible `~~` markers and omits highlight shading; these remain recorded parity gaps.
+Native preview and Word export retain labelled callouts, ordered starting numbers, table alignment, strikethrough, scripts, insertion underline and highlighting. PDF also retains callout labels, list starts, alignment, selectable Unicode, strike-through lines, highlight geometry and hyperlinks within the tested synthetic corpus. Inspect important exports; this does not establish complete Microsoft Word visual fidelity.
 
 Native Word export maps H1–H6 to their matching heading styles and supplies outline levels when a template lacks them. Template body, code, quote, caption and table styles are matched by compatible style type and recognised names; existing formatting and prototype table widths are retained. Word template selection applies to the current session.
 
@@ -56,7 +60,7 @@ Native **Export → Export profiles** offers generic documentation, Azure DevOps
 
 **Export → Select Word template…** validates the chosen `.docx` before applying it. Native exports copy supported styles, numbering, theme, settings, page layout and referenced header/footer logos into a fresh package. Original document text, comments, custom XML, unrelated media and personal package metadata are excluded. The final section's inherited default/first/even headers and footers are retained. Templates containing active fields, external resources or unsupported retained objects are rejected with an explanation; page, section and date/time fields are supported. The original file is never changed. **Use default Word styles** clears the session selection.
 
-Native preview also recognises the existing status-badge and keyboard-shortcut snippets as selectable text. Labels and HTML entities survive HTML, Word and PDF export; imported HTML attributes are discarded. Source copy retains the original markup. Other HTML-based document helpers remain under implementation.
+Native preview also recognises the existing status-badge and keyboard-shortcut snippets as selectable text. Labels and HTML entities survive HTML, Word and PDF export; imported HTML attributes are discarded. Source copy retains the original markup. Unsupported HTML structures remain inert source.
 
 Native **Insert → Details section…** inserts or edits a summary, Markdown body and initial expansion state as one undoable change. Complete `<details>` sections with a plain-text `<summary>` render as accessible native expanders; nested headings, links, images, tables and diagrams retain their source positions. Preview Find reveals hidden matches, and heading/link navigation opens the containing sections. Expanding a preview does not change Markdown. Word, PDF and rich clipboard output retain the complete body; HTML and Docs Site retain interactive sections, including section-search navigation. Unsupported attributes, summary markup or incomplete tags remain visible source.
 
@@ -86,7 +90,7 @@ Native editor syntax colours follow the selected light/dark theme and preserve W
 
 Native Mermaid suggestions appear while typing a prefix inside a diagram, or through **Edit → Mermaid suggestions** (`Ctrl+Space`). Enter or Tab accepts a suggestion; Escape dismisses it. Standalone Mermaid, standard Markdown fences and Azure DevOps containers are supported. Insertions preserve line endings and indentation. Automatic completion scans up to 256 Ki characters; explicit completion scans up to 4 Mi characters.
 
-Native **Export → Docs Site** creates a static ZIP from the open workspace, including current edits to saved documents. The site has document/heading navigation, local search and light/dark/system themes, with embedded native-rendered images and Mermaid diagrams. Front matter supplies page title, description, order, tags, draft status and navigation group. Private native state is excluded. Open the exported `index.html` directly or publish the complete ZIP contents to GitHub Pages; export does not deploy anything. Missing/invalid images or diagrams stop export before the destination is written. Artefact metadata fallback and wider Docs Site parity remain incomplete.
+Native **Export → Docs Site** creates a static ZIP from the open workspace, including current edits to saved documents. The site has document/heading navigation, local search and light/dark/system themes, with embedded native-rendered images and Mermaid diagrams. Front matter supplies page title, description, order, tags, draft status and navigation group. Private native state is excluded. Open the exported `index.html` directly or publish the complete ZIP contents to GitHub Pages; export does not deploy anything. Missing/invalid images or diagrams stop export before the destination is written. Optional artefact metadata supplies safe display fallbacks after front matter; supplied evidence labels are display-only. The integration feature matrix records the tested export scope.
 
 Native **Insert → Progress indicator** creates a portable labelled progress figure. Place the caret inside an existing recognised figure to edit its label, percentage and colour. The native preview exposes an accessible progress value with selectable text; Word, PDF, HTML and Docs Site exports retain the label and bar. Malformed or unsupported embedded HTML remains visible as source.
 
@@ -104,7 +108,7 @@ Right-click a native preview table and choose **Copy table for Excel** to copy o
 
 Native **View → Document review…** checks current editor text for heading structure, duplicate headings, missing Markdown image descriptions, pipe-table separator/row consistency, prose spelling suggestions, TODO/FIXME markers and missing targets within the same document. It shows word/reading estimates and content counts; choose a note and **Go to source** to select the exact original text. Review is advisory and never rewrites or saves the document. Code examples, URL destinations and embedded HTML are excluded from prose checks. Table checks retain escaped pipes, optional outer delimiters and quoted/list source positions. For saved documents, review also checks relative workspace document links and fragments against current open drafts or safely read files. Missing targets and unchecked targets are distinguished; private application state, external URLs and other asset types are excluded. Unavailable workspaces still allow current-buffer review. HTML semantics and diagram validity remain separate parity work.
 
-Native fenced-code preview uses bundled offline syntax definitions for C#, JavaScript, JSON, Python, XML/XAML, HTML, CSS, PowerShell, SQL, Java, C/C++, PHP, Visual Basic and diff. Light and dark palettes retain selectable source; high contrast uses system text colours. Unknown languages and code beyond the highlighting limits remain fully visible as plain text. Syntax colouring in exported documents remains separate work.
+Native fenced-code preview uses bundled offline syntax definitions for C#, JavaScript, JSON, Python, XML/XAML, HTML, CSS, PowerShell, SQL, Java, C/C++, PHP, Visual Basic and diff. Light and dark palettes retain selectable source; high contrast uses system text colours. Native Word, PDF and HTML exports retain supported token colours through export preparation. Unknown languages and code beyond the highlighting limits remain complete plain text.
 
 To verify native-generated sites, run `dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release -- --docs-site artifacts/native/validation`, then `npx playwright test --config playwright.native-export.config.mjs`. Browser tools are development validation dependencies only; the installed native app does not require them.
 
@@ -128,11 +132,13 @@ Lens Docs Studio is a local-first documentation workspace with a static browser/
 Files stay in the browser unless you save, copy, or export them.
 Use **Help > Open feature guide** to open the local Markdown feature guide inside the app in read-only mode.
 
-## Windows Shell
+<a id="windows-shell"></a>
 
-The first Windows desktop shell lives under `src/windows/LensDocsStudio.Windows/`. It uses WinUI 3 and WebView2 to host the same static app from packaged local files, keeping the browser and GitHub Pages runtime unchanged.
+## Legacy Windows shell
 
-The desktop direction is offline-first: package the static assets with the app, load them through WebView2 virtual host mapping, and avoid requiring a production local HTTP server. GitHub Pages remains a secondary web demo, fallback, and validation target for the shared runtime.
+The retained legacy desktop shell lives under `src/windows/LensDocsStudio.Windows/`. It uses WinUI 3 and WebView2 to host the static app from packaged local files. It is separate from the native WPF edition and its installer payload; the browser and GitHub Pages runtime remain unchanged.
+
+That legacy shell packages static assets for offline use through WebView2 virtual host mapping, without requiring a production local HTTP server. The following shell commands and release history refer to that shared web runtime.
 
 Supported runtime modes:
 
@@ -142,7 +148,7 @@ Supported runtime modes:
 - Windows shell / packaged local assets: WebView2 loads the copied app through `https://lens-docs-studio.local/`, backed by packaged files rather than a server.
 - Windows shell / offline mode: the packaged shell can load the app, CSS, JavaScript modules, local vendor libraries, the help guide, templates, snippets, and existing export workflows without internet access.
 
-For Windows production usage, a local HTTP server is not required. Runtime dependencies are pinned under `assets/vendor/`, and the Windows project copies `index.html`, `md-mmd-renderer-v5.html`, `manifest.webmanifest`, `icon.svg`, `service-worker.js`, `assets/`, and `docs/` into the desktop output. Offline hardening does not add an installer, auto-update, account sync, Git integration, native PDF export, or any network fallback.
+The legacy shell requires no local HTTP server. Its runtime dependencies are pinned under `assets/vendor/`, and its project copies `index.html`, `md-mmd-renderer-v5.html`, `manifest.webmanifest`, `icon.svg`, `service-worker.js`, `assets/`, and `docs/` into the desktop output. That shell's offline-hardening phase did not add an installer, auto-update, account sync, Git integration, native PDF export, or any network fallback.
 
 Run it locally from the repository root:
 

@@ -1,5 +1,7 @@
 # Native validation report
 
+Current integrated regression, historical migration and package evidence is recorded in [integration readiness](integration-readiness.md). The validation records below remain source-specific historical evidence, with their original environments, failures and limitations.
+
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),
 branch `feature/native-mermaid-preview-fidelity`, based on verified `47e78d6`.
 The [fidelity report](mermaid-preview-fidelity.md) owns the shared native drawing,
