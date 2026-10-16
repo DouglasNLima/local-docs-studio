@@ -363,7 +363,9 @@ public partial class MermaidVisualEditorWindow
     private void AutoLayout(object sender, RoutedEventArgs e)
     {
         if (inlineEditor is not null) { inlineEditor.Focus(); Status.Text = "Confirm or cancel the inline label before changing layout."; return; }
-        if (presentation is not null) BuildCanonicalCanvas(); Status.Text = "Canonical Mermaider layout restored. No coordinates were written to source.";
+        if (presentation is null)
+        { Status.Text = canvasError ?? "The original drawing remains in protected visual inspection. Use Edit source to change it."; return; }
+        BuildCanonicalCanvas(); Status.Text = "Canonical Mermaider layout restored. No coordinates were written to source.";
     }
     private void Fit(object sender, RoutedEventArgs e)
     {

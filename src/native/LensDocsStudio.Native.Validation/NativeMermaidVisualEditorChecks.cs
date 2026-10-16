@@ -373,7 +373,21 @@ internal static partial class NativeUiChecks
                 LaunchDocument("Invalid-initial.mmd", invalidInitial); Open(0, false);
                 Check(Draft() == invalidInitial && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
                     "An invalid recognised Flowchart opens from preview with diagnostics, retained source and separate source editing");
+                Click("MermaidAutoLayout");
+                Check(Find(visual!, "MermaidStatus").Name.Contains("missing its destination", StringComparison.Ordinal), "Auto layout retains invalid-source diagnostics instead of claiming a successful rendering");
                 Capture("invalid-initial"); Click("MermaidCancel"); WaitClosed();
+                var closedSource = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/simple.mmd");
+                LaunchDocument("Closed-owner.mmd", closedSource); Open(0); Select("node_A");
+                Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Retained private draft"; Click("MermaidUpdateNode");
+                AwaitSource(text => text.Contains("Retained private draft", StringComparison.Ordinal));
+                var closedDraft = Draft(); var tabsBeforeClose = main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length;
+                FocusWindow(main); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                Wait(() => main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length < tabsBeforeClose, "The owning tab did not close for stale-source validation.");
+                FocusWindow(visual!); Click("MermaidApply");
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("owning document has been closed", StringComparison.Ordinal), "The closed owning document did not reject Apply.");
+                Check(Draft() == closedDraft && File.ReadAllText(Path.Combine(root, "Closed-owner.mmd")) == closedSource,
+                    "Actual tab closure rejects stale Apply and retains both private draft and exact disk source");
+                Capture("closed-owner"); Click("MermaidCancel"); WaitClosed();
                 foreach (var count in new[] { 20, 100, 300 })
                 {
                     var graph = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, count).Select(index => $"N{index}[Node {index}]"))
@@ -421,7 +435,7 @@ internal static partial class NativeUiChecks
 
             void Open(int blockOffset, bool editable = true)
             {
-                FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Edit visually action was not available.");
+                FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Visual Edit action was not available.");
                 var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
@@ -431,7 +445,11 @@ internal static partial class NativeUiChecks
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
-            void Select(string id) { Find(visual!, "MermaidCanvas_" + id).Patterns.Toggle.Pattern.Toggle(); }
+            void Select(string id)
+            {
+                var selectionWatch = Stopwatch.StartNew(); Find(visual!, "MermaidCanvas_" + id).Patterns.Toggle.Pattern.Toggle();
+                timings.Add(new { Operation = "Native selection including UIA transport", Element = id, Milliseconds = selectionWatch.Elapsed.TotalMilliseconds });
+            }
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()) && Find(visual!, "MermaidDraftState").Name != "Validating...", "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }

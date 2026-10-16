@@ -31,9 +31,22 @@ internal static class NativeMermaidPerformanceChecks
                 EditAndRenderMilliseconds = edit, AllocatedProcessBytes = GC.GetTotalAllocatedBytes(true) - allocated,
                 Rendered = render.Success, RenderError = render.Error, EditAccepted = result.Success, EditError = result.Error,
                 RenderingSkippedForProtection = false,
+                WorkingSetBytes = Process.GetCurrentProcess().WorkingSet64,
                 SourcePreservedAfterRejection = result.Success || draft.Source == source });
         }
-        File.WriteAllText(output, JsonSerializer.Serialize(new { Scenarios = observations, Environment.ProcessorCount,
+        using var cancellation = new CancellationTokenSource();
+        using var started = new ManualResetEventSlim();
+        var cancellationSource = Fixtures().Single(fixture => fixture.Name == "Dense connections").Source;
+        var cancellationWatch = Stopwatch.StartNew();
+        var cancelledRender = Task.Run(() => { started.Set(); return new DiagramService().Render(cancellationSource, cancellationToken: cancellation.Token); });
+        started.Wait(); Thread.Sleep(25); var cancelledAt = Stopwatch.GetTimestamp(); cancellation.Cancel();
+        var cancellationObserved = false;
+        try { _ = cancelledRender.GetAwaiter().GetResult(); }
+        catch (OperationCanceledException) { cancellationObserved = true; }
+        if (!cancellationObserved) throw new IOException("Obsolete canonical rendering did not honour external cancellation.");
+        var cancellationMilliseconds = Stopwatch.GetElapsedTime(cancelledAt).TotalMilliseconds;
+        File.WriteAllText(output, JsonSerializer.Serialize(new { Scenarios = observations, ExternalCancellationObserved = cancellationObserved,
+            CancellationCompletionMilliseconds = cancellationMilliseconds, CancellationTotalMilliseconds = cancellationWatch.Elapsed.TotalMilliseconds, Environment.ProcessorCount,
             Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
             Limits = "100,000 characters; 300 nodes; 500 total elements; eight nested subgraphs; unchanged three-second renderer deadline.",
             Limitations = "Single-process observations include cold/warm runtime effects; these are source/model/layout/render measurements, not physical input or monitor certification. Renderer rejection within editing bounds remains a protected source/preview case." }, new JsonSerializerOptions { WriteIndented = true }));

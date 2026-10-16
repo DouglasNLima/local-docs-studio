@@ -53,6 +53,13 @@ internal static class NativeMermaidFidelityChecks
             visual.RaiseEvent(new RoutedEventArgs(Button.ClickEvent)); Check(selected == code.Span.Start, file + ": preview targets its precise source container");
             Check(AutomationProperties.GetAutomationId(visual) == "DiagramEditVisually" + code.Span.Start, file + ": existing automation identity is preserved");
             Check(Pixels(NativeSvgService.ToPng(preview.Media.Single().Image.Source, .75)).SequenceEqual(Pixels(canvas)), file + ": actual FlowDocument diagram equals the canvas");
+            var viewer = new DiagramWindow(reference, _ => { });
+            try
+            {
+                var viewerImage = (Image)viewer.FindName("DiagramImage");
+                Check(Pixels(NativeSvgService.ToPng(viewerImage.Source, .75)).SequenceEqual(Pixels(canvas)), file + ": actual Rendered preview image equals the canvas");
+            }
+            finally { viewer.Close(); }
             observations.Add(new { Fixture = name, Model = model.Compatibility.ToString(), Nodes = presentation.Graph.Nodes.Count, Connections = presentation.Connections.Count,
                 RenderMilliseconds = renderMs, InteractionGeometryMilliseconds = interactionMs, PixelTolerance = 0, CoordinateTolerance = .001,
                 Bounds = new { reference.Width, reference.Height }, SourceUnchanged = result.Source == source });
@@ -61,6 +68,8 @@ internal static class NativeMermaidFidelityChecks
         Reject(safeResult with { Svg = safeResult.Svg!.Replace("data-id=\"A\"", "data-id=\"B\"", StringComparison.Ordinal) }, "Conflicting node IDs cannot supply interaction identities");
         Reject(safeResult with { Svg = "<!DOCTYPE svg [<!ENTITY unsafe SYSTEM 'file:///synthetic'>]>" + safeResult.Svg }, "DTD and external entities are rejected before metadata processing");
         Reject(safeResult with { Svg = safeResult.Svg!.Replace("</svg>", "<image href='https://example.invalid/external'/></svg>", StringComparison.Ordinal) }, "External SVG content cannot enter the native canvas");
+        Reject(safeResult with { FlowchartLayout = safeResult.FlowchartLayout! with
+        { Nodes = safeResult.FlowchartLayout.Nodes.Select((node, index) => index == 0 ? node with { X = double.NaN } : node).ToArray() } }, "Non-finite canonical coordinates cannot supply interaction geometry");
         File.WriteAllText(Path.Combine(output, "fidelity.json"), JsonSerializer.Serialize(new { Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
         void Reject(DiagramResult candidate, string message)
