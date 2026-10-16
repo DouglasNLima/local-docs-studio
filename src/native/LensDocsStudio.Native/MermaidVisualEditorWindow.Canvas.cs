@@ -58,6 +58,12 @@ public partial class MermaidVisualEditorWindow
     {
         var source = draft.Source; var themeDark = dark; var generation = ++canvasGeneration;
         canvasRender?.Cancel();
+        if (canonicalRender?.Source == source && canonicalRender.Theme == DiagramThemes.ResolveName(diagramTheme, themeDark)
+            && presentation is not null && (!draft.Model.CanEdit || presentation.Maps(draft.Model)))
+        {
+            renderingCanvas = false; canonicalMapped = presentation.Maps(draft.Model);
+            UpdateCanvasSelection(); UpdateActions(); return;
+        }
         var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token); canvasRender = cancellation;
         renderingCanvas = true; canonicalMapped = false; UpdateActions();
         var leased = false;

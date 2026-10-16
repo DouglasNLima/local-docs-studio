@@ -134,7 +134,7 @@ public partial class MermaidVisualEditorWindow : Window
         SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
-        ValidateSourceButton.IsEnabled = !busy && !PropertiesPending && inlineEditor is null;
+        ValidateSourceButton.IsEnabled = !busy && !renderingCanvas && !PropertiesPending && inlineEditor is null;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
@@ -343,7 +343,15 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
-        if (busy || PropertiesPending || inlineEditor is not null) return;
+        if (busy || renderingCanvas || PropertiesPending || inlineEditor is not null) return;
+        if (!SourcePending)
+        {
+            sourceValidationFailed = false;
+            Status.Text = canvasError ?? (!draft.Model.CanEdit || !canonicalMapped
+                ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
+                : "The source matches the validated visual draft.");
+            UpdateActions(); return;
+        }
         busy = true; UpdateActions(); var text = SourceEditor.Text;
         try
         {

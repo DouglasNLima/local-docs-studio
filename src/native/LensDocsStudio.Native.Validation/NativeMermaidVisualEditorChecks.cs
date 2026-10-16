@@ -337,6 +337,9 @@ internal static partial class NativeUiChecks
                 Open(0, false);
                 Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
                     "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
+                Click("MermaidValidateSource");
+                Check(Find(visual!, "MermaidDraftState").Name == "Protected source" && Draft() == lab,
+                    "Validating unchanged protected source preserves its inspection capability instead of reporting invalid Mermaid");
                 Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide protected diagrams initially open at actual size for readable labels");
                 Capture("flow-error-log-lab-initial");
                 var labViewport = Find(visual!, "MermaidViewport"); var labScroll = labViewport.Patterns.Scroll.Pattern;

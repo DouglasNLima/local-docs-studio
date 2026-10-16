@@ -30,7 +30,7 @@ Uninstall through Windows **Installed apps**. Application binaries, shortcuts an
 
 ## Start a synthetic workspace
 
-For visual diagram evaluation, open the offline **Native guide → Mermaid visual authoring** topic. Use **Edit visually** on a supported Flowchart, or **Insert → Flowchart visually…**. The editor's private draft has its own Undo/Redo; Apply changes the owning document in memory and ordinary Save writes it. Canvas drag positions last only for the session. Protected syntax remains available through Edit source. Evaluate with copies or synthetic files.
+For visual diagram evaluation, open the offline **Native guide → Mermaid visual authoring** topic. Use **Visual Edit** on an existing recognised Flowchart, including protected source. **Edit source** remains separate; **Insert → Flowchart visually…**. The editor's private draft has its own Undo/Redo; Apply changes the owning document in memory and ordinary Save writes it. The canvas and Rendered preview share the original native Mermaider drawing. Canvas drag positions and dashed connection guides are temporary; Auto layout or a source edit restores canonical routing. Protected source remains visible for zoom and PAN while unsafe transformations and Apply are disabled. Wide diagrams open at Actual Size; Fit provides an overview. Evaluate with copies or synthetic files.
 
 1. Open the app. The empty-draft strip offers **Open workspace**, **Open document** and the offline **Native guide**. You can simply type; the strip disappears without changing your text.
 2. Choose **File → Open folder** for a copied/synthetic workspace; double-click a nested Markdown document. **Ctrl+O** opens an individual file, **Ctrl+N** creates a draft.

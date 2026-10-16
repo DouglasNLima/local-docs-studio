@@ -2,7 +2,7 @@
 
 ## Mermaid visual authoring
 
-Choose **Edit visually** beside a supported Flowchart preview, or **Insert →
+Choose **Visual Edit** beside an existing recognised Flowchart preview, including protected source. **Edit source** remains separate. Choose **Insert →
 Flowchart visually** for a new diagram. The native editor offers nodes, connections,
 subgraphs, properties, source inspection and private Undo/Redo. Update edited
 properties before Apply; Reset property changes discards only those pending fields.
