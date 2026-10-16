@@ -9,7 +9,12 @@ using Mermaider.Models;
 
 namespace LensDocsStudio.Native.Rendering;
 
-public sealed record NativeMermaidElement(string Key, Rect Bounds, Geometry Geometry);
+public sealed record NativeMermaidElement(string Key, Rect Bounds, Geometry Geometry)
+{
+    public string? Fill { get; init; }
+    public string? Stroke { get; init; }
+    public string? TextColour { get; init; }
+}
 public sealed record NativeMermaidConnection(int Ordinal, string Source, string Target, string Label, Geometry Path, Rect? LabelBounds);
 
 /// <summary>The preview drawing and interaction geometry from the very same render. Never accepts imported SVG.</summary>
@@ -82,9 +87,13 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
             if (geometry.Children.Count == 0) throw new InvalidDataException("The canonical element has no safe hit geometry: " + id);
             geometry.Transform = shift; geometry.Freeze();
             bounds.Offset(-origin.X, -origin.Y);
-            if (!elements.TryAdd(prefix + id, new(prefix + id, bounds, geometry))) throw new InvalidDataException("Duplicate canonical element identity: " + id);
+            var text = candidates[0].Descendants().FirstOrDefault(element => element.Name.LocalName == "text");
+            var element = new NativeMermaidElement(prefix + id, bounds, geometry)
+            { Fill = Colour((string?)shapes[0].Attribute("fill")), Stroke = Colour((string?)shapes[0].Attribute("stroke")), TextColour = Colour((string?)text?.Attribute("fill")) };
+            if (!elements.TryAdd(prefix + id, element)) throw new InvalidDataException("Duplicate canonical element identity: " + id);
         }
     }
+    private static string? Colour(string? value) => NativeSvgService.TrySolidColour(value, out var colour) ? $"#{colour.R:X2}{colour.G:X2}{colour.B:X2}" : null;
 
     // Source order is verified by the lexical adapter against Mermaider. Ordinals distinguish identical parallel edges.
     public bool Maps(MermaidDiagramModel model)

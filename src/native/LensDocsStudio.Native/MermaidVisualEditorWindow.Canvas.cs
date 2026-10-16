@@ -97,6 +97,8 @@ public partial class MermaidVisualEditorWindow
                 AutomationProperties.SetAutomationId(drawing, "MermaidCanonicalDrawing"); DiagramCanvas.Children.Add(drawing);
                 DiagramCanvas.Width = inspection.Width; DiagramCanvas.Height = inspection.Height;
             }
+            if (!PropertiesPending && inlineEditor is null)
+            { var wasUpdating = updating; updating = true; try { ShowProperties(); } finally { updating = wasUpdating; } }
             Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
                 : !canonicalMapped ? "The rendered elements cannot all be mapped safely. Inspect the original diagram or use Edit source."
                 : draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.";
@@ -344,7 +346,8 @@ public partial class MermaidVisualEditorWindow
     private void UpdateCanvasColours() => RebuildCanvas(false);
     private (Brush Fill, Brush Stroke, Brush Text) Colours(MermaidNode node, string fill, string stroke, string text)
     {
-        if (SystemParameters.HighContrast) return (SystemColors.WindowBrush, SystemColors.WindowTextBrush, SystemColors.WindowTextBrush);
+        if (presentation?.Elements.TryGetValue("node:" + node.Id, out var rendered) == true)
+        { fill = rendered.Fill ?? fill; stroke = rendered.Stroke ?? stroke; text = rendered.TextColour ?? text; }
         var className = draft.Model.ClassForNode(node.Id);
         var values = draft.Model.Styles.Where(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == className))
             .Concat(draft.Model.Styles.Where(style => style.Kind == "style" && style.Targets.Any(target => target.Id == node.Id)));

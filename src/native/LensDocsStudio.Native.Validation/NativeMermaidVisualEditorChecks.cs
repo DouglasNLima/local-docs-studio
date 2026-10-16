@@ -189,6 +189,7 @@ internal static partial class NativeUiChecks
             }
             Find(visual!, "MermaidFillColour").AsTextBox().Text = "#E8F3FA"; Click("MermaidApplyStyle");
             AwaitSource(text => text.Contains("style Node1 fill:#E8F3FA", StringComparison.Ordinal));
+            Check(Find(visual!, "MermaidFillColour").AsTextBox().Text == "#E8F3FA", "Authored colour values remain visible in the inspector in normal and High Contrast modes");
             var valid = Draft(); var sourceEditor = Find(visual!, "MermaidDraftSource");
             sourceEditor.Patterns.Value.Pattern.SetValue("flowchart TD\nA -->"); Click("MermaidValidateSource");
             Wait(() => Find(visual!, "MermaidStatus").Name.Contains("retained", StringComparison.Ordinal), "Invalid source did not retain its diagnostic and draft.");
@@ -379,6 +380,17 @@ internal static partial class NativeUiChecks
                 Find(visual!, "MermaidCanvas_node_F").Click();
                 Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("F", StringComparison.Ordinal), "Clicking the double-circle centre did not select its actual native node.");
                 Check(Draft() == shapes, "Actual pointer selection at a compound shape centre retains exact Mermaid source");
+                var shapeResult = new DiagramService().Render(shapes, LensDocsStudio.Native.Platform.ThemeService.IsDark("Light"));
+                var shapeSvg = new LensDocsStudio.Native.Rendering.NativeSvgService().Prepare(shapeResult.Svg!);
+                using (var shapeReader = System.Xml.XmlReader.Create(new StringReader(shapeSvg), new System.Xml.XmlReaderSettings
+                    { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 }))
+                {
+                    var shapeXml = System.Xml.Linq.XDocument.Load(shapeReader);
+                    var shapeNode = shapeXml.Descendants().Single(element => (string?)element.Attribute("data-id") == "F");
+                    var expectedStroke = (string?)shapeNode.Elements().First(element => element.Name.LocalName == "circle").Attribute("stroke");
+                    Check(string.Equals(Find(visual!, "MermaidStrokeColour").AsTextBox().Text, expectedStroke, StringComparison.OrdinalIgnoreCase),
+                        "Unstyled node colour properties match the canonical native drawing instead of the former canvas defaults");
+                }
                 Capture("compound-shape-selection"); Click("MermaidCancel"); WaitClosed();
                 const string invalidInitial = "flowchart LR\nA -->";
                 LaunchDocument("Invalid-initial.mmd", invalidInitial); Open(0, false);

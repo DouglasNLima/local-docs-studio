@@ -84,7 +84,7 @@ public sealed partial class NativeSvgService
             replacement = Contrast(background, Colors.Black) >= Contrast(background, Colors.White) ? "#000000" : "#FFFFFF";
         label.SetAttributeValue("fill", replacement);
     }
-    private static bool TrySolidColour(string? value, out Color colour)
+    internal static bool TrySolidColour(string? value, out Color colour)
     {
         colour = default;
         if (string.IsNullOrWhiteSpace(value) || value.Contains('(') || value is "none" or "currentColor") return false;
