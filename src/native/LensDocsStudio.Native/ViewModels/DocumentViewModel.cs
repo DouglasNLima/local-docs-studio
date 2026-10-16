@@ -1,0 +1,54 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using ICSharpCode.AvalonEdit.Document;
+using LensDocsStudio.Core.Documents;
+using LensDocsStudio.Core.State;
+
+namespace LensDocsStudio.Native.ViewModels;
+
+public partial class DocumentViewModel : ObservableObject
+{
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public TextDocument EditorDocument { get; }
+    public DocumentSnapshot? SavedSnapshot { get; private set; }
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] [NotifyPropertyChangedFor(nameof(IsEmptyDraft))] [NotifyPropertyChangedFor(nameof(Location))] private string? filePath;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool isDirty;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private bool externalChange;
+    [ObservableProperty] private bool isSaving;
+    [ObservableProperty] private bool isPinned;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Title))] private string? displayName;
+    public string? RecoveryKey { get; set; }
+    public bool IsEmptyDraft => FilePath is null && EditorDocument.TextLength == 0;
+    public string? AssetWorkspace { get; set; }
+    public string? EffectivePath => FilePath ?? (AssetWorkspace is null ? null : Path.Combine(AssetWorkspace,
+        Path.GetExtension(DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid" ? "Untitled.mmd" : "Untitled.md"));
+    public string? EffectiveWorkspace => FilePath is null ? AssetWorkspace : WorkspaceRoot;
+    public int CaretOffset { get; set; }
+    public double VerticalOffset { get; set; }
+    public int PreviewSourceOffset { get; set; }
+    public string Title => (Path.GetFileName(FilePath) ?? DisplayName ?? "Untitled.md") + (IsDirty ? " •" : "") + (ExternalChange ? " ⚠" : "");
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(Location))] private string? workspaceRoot;
+    public string Location => FilePath is null ? "Unsaved document" : WorkspaceRoot is { } root && Core.Workspace.WorkspacePath.Contains(root, FilePath)
+        ? Path.GetFileName(Path.TrimEndingDirectorySeparator(root)) + " / " + Path.GetRelativePath(root, FilePath).Replace('\\', '/')
+        : Path.GetFileName(Path.GetDirectoryName(FilePath)) + " / " + Path.GetFileName(FilePath);
+    public event EventHandler? Edited;
+
+    public DocumentViewModel(string text, DocumentSnapshot? snapshot = null)
+    {
+        SavedSnapshot = snapshot;
+        FilePath = snapshot?.Path;
+        EditorDocument = new TextDocument(text);
+        IsDirty = snapshot is null ? text.Length != 0 : text != snapshot.Text;
+        EditorDocument.TextChanged += (_, _) => { IsDirty = SavedSnapshot is null || EditorDocument.Text != SavedSnapshot.Text; OnPropertyChanged(nameof(IsEmptyDraft)); Edited?.Invoke(this, EventArgs.Empty); };
+    }
+
+    public void MarkSaved(DocumentSnapshot snapshot)
+    {
+        SavedSnapshot = snapshot;
+        FilePath = snapshot.Path;
+        IsDirty = EditorDocument.Text != snapshot.Text;
+        ExternalChange = false;
+    }
+
+    public RecoveredDocument Recovery() => new(Id, FilePath, EditorDocument.Text, SavedSnapshot?.Fingerprint,
+        SavedSnapshot?.Utf8Bom ?? false, CaretOffset, VerticalOffset, SavedSnapshot?.Text, AssetWorkspace, RecoveryKey, DisplayName, WorkspaceRoot, IsPinned, PreviewSourceOffset);
+}

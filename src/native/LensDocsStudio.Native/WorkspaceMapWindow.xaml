@@ -1,0 +1,71 @@
+<Window x:Class="LensDocsStudio.Native.WorkspaceMapWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Workspace map" Width="1060" Height="820" MinWidth="780" MinHeight="600" WindowStartupLocation="CenterOwner"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" PreviewKeyDown="MapKeyDown">
+ <Window.Resources>
+  <DataTemplate x:Key="MapLinkTemplate"><StackPanel Margin="5,4">
+   <TextBlock Text="{Binding Label}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+   <TextBlock Text="{Binding AccessibleName}" TextWrapping="Wrap" Margin="0,3,0,0" FontSize="12"/>
+  </StackPanel></DataTemplate>
+  <Style x:Key="MapLinkItem" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+   <Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/>
+  </Style>
+ </Window.Resources>
+ <Grid Margin="24">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <StackPanel>
+   <TextBlock Text="Workspace map" FontSize="23" FontWeight="SemiBold"/>
+   <TextBlock Text="{Binding Summary}" TextWrapping="Wrap" Margin="0,8,0,0" AutomationProperties.AutomationId="MapSummary"/>
+  </StackPanel>
+  <ScrollViewer Grid.Row="1" MaxHeight="70" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,8,0,8">
+   <TextBlock Text="{Binding ScanNotes}" TextWrapping="Wrap" FontSize="12" AutomationProperties.AutomationId="MapScanNotes"/>
+  </ScrollViewer>
+  <Grid Grid.Row="2" Margin="0,0,0,12">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="210"/></Grid.ColumnDefinitions>
+   <StackPanel Margin="0,0,12,0">
+    <Label Content="_Find a document" Target="{Binding ElementName=Query}"/>
+    <TextBox x:Name="Query" Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" MaxLength="256" Padding="8,5" AutomationProperties.Name="Find a map document" AutomationProperties.AutomationId="MapQuery"/>
+   </StackPanel>
+   <StackPanel Grid.Column="1">
+    <Label Content="_Show" Target="{Binding ElementName=Filter}"/>
+    <ComboBox x:Name="Filter" ItemsSource="{Binding Filters}" SelectedItem="{Binding Filter}" Padding="6,5" AutomationProperties.Name="Map document filter" AutomationProperties.AutomationId="MapFilter"/>
+   </StackPanel>
+  </Grid>
+  <Grid Grid.Row="3">
+   <Grid.ColumnDefinitions><ColumnDefinition Width="*" MinWidth="220"/><ColumnDefinition Width="10"/><ColumnDefinition Width="1.2*" MinWidth="280"/></Grid.ColumnDefinitions>
+   <ListBox x:Name="Documents" ItemsSource="{Binding Documents}" SelectedItem="{Binding SelectedDocument}" HorizontalContentAlignment="Stretch"
+    ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource PanelBrush}" BorderThickness="0"
+    AutomationProperties.Name="Workspace map documents" AutomationProperties.AutomationId="MapDocuments">
+    <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="6,5">
+     <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap"/>
+     <TextBlock Text="{Binding Path}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+     <WrapPanel Margin="0,4,0,0"><TextBlock Text="{Binding Incoming, StringFormat={}{0} incoming}" Margin="0,0,12,0" FontSize="12"/><TextBlock Text="{Binding Outgoing, StringFormat={}{0} outgoing}" Margin="0,0,12,0" FontSize="12"/><TextBlock Text="{Binding Issues, StringFormat={}Notes: {0}}" FontSize="12"/></WrapPanel>
+    </StackPanel></DataTemplate></ListBox.ItemTemplate>
+    <ListBox.ItemContainerStyle><Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}"><Setter Property="AutomationProperties.Name" Value="{Binding AccessibleName}"/></Style></ListBox.ItemContainerStyle>
+   </ListBox>
+   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center" Background="{DynamicResource BorderBrush}" AutomationProperties.Name="Resize map document list"/>
+   <Grid Grid.Column="2">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <TextBlock Text="Incoming links" FontWeight="SemiBold" Margin="0,0,0,6"/>
+    <ListBox x:Name="Incoming" Grid.Row="1" ItemsSource="{Binding Incoming}" SelectionChanged="LinkSelected" ItemTemplate="{StaticResource MapLinkTemplate}" ItemContainerStyle="{StaticResource MapLinkItem}"
+     HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource PanelBrush}" BorderThickness="0" AutomationProperties.Name="Incoming document links" AutomationProperties.AutomationId="MapIncoming"/>
+    <TextBlock Grid.Row="2" Text="Outgoing links" FontWeight="SemiBold" Margin="0,12,0,6"/>
+    <ListBox x:Name="Outgoing" Grid.Row="3" ItemsSource="{Binding Outgoing}" SelectionChanged="LinkSelected" ItemTemplate="{StaticResource MapLinkTemplate}" ItemContainerStyle="{StaticResource MapLinkItem}"
+     HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled" Background="{DynamicResource PanelBrush}" BorderThickness="0" AutomationProperties.Name="Outgoing document links" AutomationProperties.AutomationId="MapOutgoing"/>
+    <Button Grid.Row="4" Content="Go to link source" Command="{Binding GoToSourceCommand}" Padding="12,6" HorizontalAlignment="Right" Margin="0,8,0,0" AutomationProperties.AutomationId="MapGoToSource"/>
+   </Grid>
+  </Grid>
+  <StackPanel Grid.Row="4" Margin="0,12,0,0">
+   <TextBlock Text="{Binding Status}" TextWrapping="Wrap" Margin="0,0,0,8" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="MapStatus"/>
+   <WrapPanel HorizontalAlignment="Right">
+    <Button Content="Clear filters" Command="{Binding ClearCommand}" Padding="12,6" Margin="0,0,8,6" AutomationProperties.AutomationId="MapClear"/>
+    <Button Content="Copy Markdown report" Click="CopyReport" Padding="12,6" Margin="0,0,8,6" AutomationProperties.AutomationId="MapCopyReport"/>
+    <Button Content="Workspace diagram" Command="{Binding WorkspaceDiagramCommand}" Padding="12,6" Margin="0,0,8,6" AutomationProperties.AutomationId="MapWorkspaceDiagram"/>
+    <Button Content="Selected diagram" Command="{Binding SelectedDiagramCommand}" Padding="12,6" Margin="0,0,8,6" AutomationProperties.AutomationId="MapSelectedDiagram"/>
+    <Button Content="Open document" Command="{Binding OpenCommand}" Padding="12,6" Margin="0,0,8,6" AutomationProperties.AutomationId="MapOpenDocument"/>
+    <Button Content="Close" IsCancel="True" Padding="16,6" Margin="0,0,0,6"/>
+   </WrapPanel>
+  </StackPanel>
+ </Grid>
+</Window>

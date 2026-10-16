@@ -55,6 +55,7 @@ async function waitForAppReady(page) {
 async function gotoApp(page) {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await waitForAppReady(page);
+  await expect(page.locator('.topbar')).toHaveCSS('display', 'flex');
 }
 
 async function openFixture(page, name) {
@@ -1564,6 +1565,135 @@ test('File System Access save writes back to the opened file without Save as', a
   expect(result.savePickerCalls).toBe(0);
 });
 
+test('a delayed draft lookup preserves edits made after the file becomes available', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.addInitScript(() => {
+    const originalGet = IDBObjectStore.prototype.get;
+    let held = false;
+    IDBObjectStore.prototype.get = function get(key) {
+      const request = originalGet.call(this, key);
+      if (this.name === 'drafts' && String(key).endsWith('::opened.md') && !held) {
+        held = true;
+        request.addEventListener('success', (event) => {
+          event.stopImmediatePropagation();
+          window.__draftLookupHeld = true;
+          window.__releaseDraftLookup = () => request.onsuccess.call(request, event);
+        }, { once: true });
+      }
+      return request;
+    };
+  });
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect.poll(() => page.evaluate(() => window.__draftLookupHeld)).toBe(true);
+  await page.locator('#editor').fill('# Edited while recovery is loading\n');
+  await page.evaluate(() => window.__releaseDraftLookup());
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue('# Edited while recovery is loading\n');
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Edited while recovery is loading\n');
+});
+
+test('a queued preview retains the completed save confirmation and saved bytes', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-10-13T10:00:00Z') });
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#preview h1')).toHaveText('Opened');
+  await page.clock.pauseAt(new Date('2026-10-13T10:01:00Z'));
+  const saved = '# Saved before the queued preview\n';
+  await page.locator('#editor').fill(saved);
+  await page.locator('#saveButton').click();
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  // Advance past the old debounce to verify it cannot replay after saving; no wall-clock sleep.
+  await page.clock.runFor(250);
+  await expect(page.locator('#preview h1')).toHaveText('Saved before the queued preview');
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue(saved);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await page.clock.resume();
+  await page.locator('#editor').fill('# Next edit remains unsaved\n');
+  await expect(page.locator('#preview h1')).toHaveText('Next edit remains unsaved');
+  await expect(page.locator('#status')).toHaveText(/Rendered.*edited in the app/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+});
+
+test('an in-flight preview cannot replace a newer save confirmation or saved bytes', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#preview h1')).toHaveText('Opened');
+  await page.evaluate(async () => {
+    const { default: mermaid } = await import('/assets/vendor/mermaid-11.15.0.esm.min.js');
+    const original = mermaid.render;
+    mermaid.render = async function render(...args) {
+      mermaid.render = original;
+      window.__previewRenderHeld = true;
+      await new Promise((resolve) => { window.__releasePreviewRender = resolve; });
+      return original.apply(this, args);
+    };
+  });
+  const saved = '# Saved during an active preview\n\n```mermaid\nflowchart LR\n A --> B\n```\n';
+  await page.locator('#editor').fill(saved);
+  await expect.poll(() => page.evaluate(() => window.__previewRenderHeld)).toBe(true);
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+  await page.evaluate(() => window.__releasePreviewRender());
+  await expect(page.locator('#preview .mermaid svg')).toHaveCount(1);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue(saved);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe(saved);
+});
+
+test('a late draft lookup does not replace a newer save confirmation or its saved bytes', async ({ page }) => {
+  await installMockFileSystemAccess(page);
+  await page.addInitScript(() => {
+    const originalGet = IDBObjectStore.prototype.get;
+    let held = false;
+    IDBObjectStore.prototype.get = function get(key) {
+      const request = originalGet.call(this, key);
+      if (this.name === 'drafts' && String(key).endsWith('::opened.md') && !held) {
+        held = true;
+        request.addEventListener('success', (event) => {
+          event.stopImmediatePropagation();
+          window.__draftLookupHeld = true;
+          window.__releaseDraftLookup = () => request.onsuccess.call(request, event);
+        }, { once: true });
+      }
+      return request;
+    };
+  });
+  await gotoApp(page);
+  await page.locator('summary').filter({ hasText: /^File$/ }).click();
+  await page.locator('details.menu[open]').getByRole('button', { name: 'Open file' }).click();
+  await expect(page.locator('#editor')).toHaveValue('# Opened\n');
+  await expect.poll(() => page.evaluate(() => window.__draftLookupHeld)).toBe(true);
+  await page.locator('#editor').fill('# Saved during a delayed lookup\n');
+  await page.locator('#saveButton').click();
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved during a delayed lookup\n');
+  const statusChanges = await page.evaluate(async () => {
+    const status = document.querySelector('#status');
+    const changes = [];
+    const observer = new MutationObserver(() => changes.push(status.textContent));
+    observer.observe(status, { childList: true, subtree: true });
+    window.__releaseDraftLookup();
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    observer.disconnect();
+    return changes;
+  });
+  expect(statusChanges).toEqual([]);
+  await expect(page.locator('#status')).toHaveText(/opened\.md saved/);
+  await expect(page.locator('#editor')).toHaveValue('# Saved during a delayed lookup\n');
+  await expect.poll(() => page.evaluate(() => window.__mockFs.fileHandle._text)).toBe('# Saved during a delayed lookup\n');
+});
+
 test('workspace folders can create, add, refresh, and detect changed files', async ({ page }) => {
   await installMockFileSystemAccess(page);
   await gotoApp(page);
@@ -1864,8 +1994,7 @@ test('welcome Open folder uses the packaged native bridge route without browser 
 
   await page.locator('.welcome-state').getByRole('button', { name: 'Open folder' }).click();
 
-  const messages = await page.evaluate(() => window.__nativeBridgeMessages);
-  expect(messages.some((message) => message.type === 'lensDocs.native.openFolder')).toBe(true);
+  await expect.poll(() => page.evaluate(() => window.__nativeBridgeMessages.some((message) => message.type === 'lensDocs.native.openFolder'))).toBe(true);
   await expect.poll(() => page.evaluate(() => window.__browserDirectoryPickerCalls)).toBe(0);
   await expect(page.locator('#activeFileLabel')).not.toHaveText('No file selected');
   await expect(page.locator('#fileList [data-path="README.md"]')).toBeVisible();
@@ -2267,9 +2396,9 @@ test('fake WebView2 bridge creates Markdown files in native workspaces', async (
   await page.locator('details.menu[open]').getByRole('button', { name: 'Open folder' }).click();
   await expect(page.locator('#folderBadge')).toHaveText('Project Docs');
 
-  if (!await page.locator('details.menu[open]').isVisible()) {
-    await page.locator('summary').filter({ hasText: /^File$/ }).click();
-  }
+  // The folder badge updates before the asynchronous menu action closes its menu.
+  await expect(page.locator('details.menu[open]')).toHaveCount(0);
+  await openFileMenu(page);
   await page.getByRole('button', { name: 'New Markdown file' }).click();
   await page.locator('#appDialogPromptInput').fill('notes/new-note.md');
   await submitAppDialog(page, { button: 'Create file' });
@@ -3316,7 +3445,8 @@ test('emoji picker search includes expanded documentation emojis', async ({ page
   await page.getByRole('button', { name: 'Insert emoji' }).click();
 
   await expect(page.locator('#editor')).toHaveValue('🛡️');
-  await expect(page.locator('#status')).toHaveText(/Emoji inserted/);
+  await expect(page.locator('#insertHelperDialog')).toBeHidden();
+  await expect(page.locator('#preview')).toContainText('🛡️');
 });
 
 test('table toolbar opens a visual editor for new and existing Markdown tables', async ({ page }) => {
@@ -4397,6 +4527,35 @@ test('Word export is a valid native DOCX package without interactive UI text', a
   await expect(page.locator('#exportTrust')).toHaveText(/Word ready: 1\/1 diagram rendered/);
 });
 
+test('appearance settings export transfers supported choices without documents or unrelated preferences', async ({ page }, testInfo) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('md-mmd-renderer.theme', 'dark');
+    localStorage.setItem('md-mmd-renderer.editorLayout', 'split');
+    localStorage.setItem('md-mmd-renderer.outline', 'true');
+    localStorage.setItem('private-test-path', 'C:\\Private\\confidential.md');
+    localStorage.setItem('private-test-token', 'test-secret-do-not-export');
+    localStorage.setItem('md-mmd-renderer.devopsMarkdownExport', 'true');
+  });
+  await gotoApp(page);
+  const source = '# Private unsaved draft\n\nKeep this content local.';
+  await page.locator('#editor').fill(source);
+  await expect(page.locator('#preview')).toContainText('Keep this content local.');
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export appearance settings' }).click()]);
+  expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe('lens-docs-studio-settings.json');
+  const payload = JSON.parse(await readFile(await download.path(), 'utf8'));
+  expect(payload).toEqual({ formatVersion: 'lens-docs-studio-settings-1.0', theme: 'Dark', layout: 'Split', showOutline: true });
+  await download.saveAs(testInfo.outputPath('browser-appearance-settings.json'));
+  await expect(page.locator('#editor')).toHaveValue(source);
+  expect(await page.evaluate(() => localStorage.getItem('md-mmd-renderer.devopsMarkdownExport'))).toBe('true');
+  expect(await page.evaluate(() => localStorage.getItem('private-test-token'))).toBe('test-secret-do-not-export');
+  await page.evaluate(() => localStorage.removeItem('md-mmd-renderer.theme'));
+  await page.locator('summary').filter({ hasText: /^View$/ }).click();
+  const [following] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Export appearance settings' }).click()]);
+  expect(JSON.parse(await readFile(await following.path(), 'utf8')).theme).toBe('System');
+});
+
 test('Word template import stores manifests and tolerates missing optional parts', async ({ page }, testInfo) => {
   await gotoApp(page);
   const minimalPath = await writeWordTemplateFixture(testInfo, 'minimal-template.docx', {
@@ -4442,6 +4601,80 @@ test('Word template import stores manifests and tolerates missing optional parts
     media: false,
   });
   expect(manifests.find((manifest) => manifest.displayName === 'Corporate Word Template')?.semanticStyleMapping.heading1).toBe('CorporateHeading1');
+});
+
+test('Word template copy preserves original bytes and selection across restart for native migration', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await expect(page.locator('#wordTemplateCopyButton')).toBeDisabled();
+  const parts = ['[Content_Types].xml', '_rels/.rels', 'word/document.xml', 'word/styles.xml', 'word/_rels/document.xml.rels', 'word/header1.xml'];
+  const templatePath = await writeZipFixture(testInfo, 'Portable handbook.docx', await Promise.all(parts.map(async (name) => ({
+    name, data: await readFile(fixturePath(`native-word-template/${name}`)),
+  }))));
+  await importWordTemplate(page, templatePath, 'Portable handbook');
+  const selected = await page.locator('#wordTemplateSelect').inputValue();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitForAppReady(page);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  await expect(page.locator('#wordTemplateCopyButton')).toBeEnabled();
+  const source = '# Migration working draft\n\nKeep this unsaved text.';
+  await page.locator('#editor').fill(source);
+  await expect(page.locator('#preview')).toContainText('Keep this unsaved text.');
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await attachViewportScreenshot(page, testInfo, 'word-template-copy-menu');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.locator('#wordTemplateCopyButton').click()]);
+  expect(await download.failure()).toBeNull();
+  expect(download.suggestedFilename()).toBe('Portable handbook.docx');
+  const copiedPath = testInfo.outputPath('browser-template-copy.docx');
+  await download.saveAs(copiedPath);
+  expect(await readFile(copiedPath)).toEqual(await readFile(templatePath));
+  await expect(page.locator('#status')).toHaveText('Word template copy prepared for download.');
+  await expect(page.locator('#editor')).toHaveValue(source);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#wordTemplateSelect').selectOption('');
+  await expect(page.locator('#wordTemplateCopyButton')).toBeDisabled();
+  await page.locator('#wordTemplateSelect').selectOption(selected);
+  const secondCopy = await clickExportDownload(page, 'Save template copy');
+  expect(await readFile(secondCopy)).toEqual(await readFile(templatePath));
+});
+
+test('Word template copy reports missing original bytes without changing the stored template', async ({ page }, testInfo) => {
+  await gotoApp(page);
+  await importWordTemplate(page, await writeWordTemplateFixture(testInfo, 'damaged-template.docx'), 'Retained template');
+  const source = await page.locator('#editor').inputValue();
+  const selected = await page.locator('#wordTemplateSelect').inputValue();
+  const manifest = await page.evaluate(async (id) => {
+    const { idbRequest, idbTransactionDone } = await import('/assets/scripts/utils/idb.js');
+    const db = await idbRequest(indexedDB.open('local-docs-studio-word-templates', 1));
+    try {
+      const transaction = db.transaction('templates', 'readwrite');
+      const completed = idbTransactionDone(transaction);
+      const store = transaction.objectStore('templates');
+      const record = await idbRequest(store.get(id));
+      delete record.templateDocx;
+      store.put(record);
+      await completed;
+      return record.manifest;
+    } finally { db.close(); }
+  }, selected);
+  const downloads = [];
+  page.on('download', (download) => downloads.push(download));
+  await page.locator('summary').filter({ hasText: /^Export$/ }).click();
+  await page.locator('#wordTemplateCopyButton').click();
+  await expect(page.locator('#status')).toHaveText('The original Word template is unavailable. Import the original .docx again to save a copy.');
+  await expect(page.locator('#wordTemplateCopyButton')).toBeEnabled();
+  await expect(page.locator('#editor')).toHaveValue(source);
+  await expect(page.locator('#wordTemplateSelect')).toHaveValue(selected);
+  expect(downloads).toHaveLength(0);
+  const retained = await page.evaluate(async (id) => {
+    const { idbRequest } = await import('/assets/scripts/utils/idb.js');
+    const db = await idbRequest(indexedDB.open('local-docs-studio-word-templates', 1));
+    try { return await idbRequest(db.transaction('templates', 'readonly').objectStore('templates').get(id)); }
+    finally { db.close(); }
+  }, selected);
+  expect(retained.manifest).toEqual(manifest);
+  expect(retained.parts['word/styles.xml']).toBeTruthy();
+  expect(retained.templateDocx).toBeUndefined();
 });
 
 test('Word export applies selected template parts and preserves default export fallback', async ({ page }, testInfo) => {
@@ -5096,23 +5329,29 @@ test('document import converts HTML and DOCX into editable Markdown', async ({ p
 
   const docxPath = testInfo.outputPath('import-word.docx');
   await writeFile(docxPath, createDocxImportFixture());
-  let releaseWorker;
-  let resolveWorkerRequested;
-  const workerGate = new Promise((resolve) => { releaseWorker = resolve; });
-  const workerRequested = new Promise((resolve) => { resolveWorkerRequested = resolve; });
-  await page.route('**/assets/scripts/files/document-import-worker.js', async (route) => {
-    resolveWorkerRequested();
-    await workerGate;
-    await route.continue();
+  // Gate the real worker's input, which also works when its script is already in the service-worker cache.
+  await page.evaluate(() => {
+    const postMessage = Worker.prototype.postMessage;
+    Worker.prototype.postMessage = function (message, ...options) {
+      if (message?.fileName?.endsWith('.docx')) {
+        window.__documentImportQueued = true;
+        window.__releaseDocumentImport = () => {
+          Worker.prototype.postMessage = postMessage;
+          postMessage.call(this, message, ...options);
+        };
+        return;
+      }
+      return postMessage.call(this, message, ...options);
+    };
   });
 
   await page.locator('#documentInput').setInputFiles(docxPath);
   await submitAppDialog(page, { button: 'Discard changes' });
-  await workerRequested;
+  await expect.poll(() => page.evaluate(() => window.__documentImportQueued)).toBe(true);
   await expect(page.locator('#status')).toHaveText(/Converting 1 document to Markdown/);
   await expect(page.locator('#status')).toHaveClass(/busy/);
   await expect(page.locator('#status')).toHaveAttribute('aria-busy', 'true');
-  releaseWorker();
+  await page.evaluate(() => window.__releaseDocumentImport());
   await expect(page.locator('#status')).toHaveText(/Imported 1 converted document and 1 image asset/, { timeout: 20_000 });
   await expect(page.locator('#status')).not.toHaveAttribute('aria-busy', 'true');
 

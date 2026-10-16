@@ -2,6 +2,8 @@
 
 Guidance for coding agents working in this repository.
 
+The browser-only constraints below continue to protect the static web application. The separately authorised native WPF reconstruction under `src/native/` follows `src/native/AGENTS.md` and `docs/native/reconstruction-brief.txt`; it must preserve the web application and existing Windows shell.
+
 ## Project Overview
 
 This is Lens Docs Studio, a buildless, browser-only Markdown, Mermaid, and documentation studio. It must remain compatible with publication on GitHub Pages and should run directly from GitHub Pages or from a local static server, without a backend or production build step.
@@ -84,7 +86,7 @@ python -m http.server 4173
 
 Then open `http://127.0.0.1:4173/`.
 
-The Playwright config starts the same server automatically and uses `http://127.0.0.1:4173` as `baseURL`.
+The Playwright config starts `tests/browser/serve-static.py` automatically, serving the same static files with HTTP/1.1 and a larger connection queue for cold PWA loads. Its default `baseURL` is `http://127.0.0.1:4173`; set `LENS_TEST_PORT` to use a different local test port. CI always starts its own server.
 
 ## Architecture And Coding Conventions
 

@@ -1,0 +1,144 @@
+using System.Globalization;
+using W = DocumentFormat.OpenXml.Wordprocessing;
+
+namespace LensDocsStudio.Core.Imports;
+
+// Word stores list items as sibling paragraphs. Keep their numbering and physical
+// continuation indents separate from the indentation required by Markdown markers.
+internal sealed class WordListMarkdownWriter(W.Numbering? numbering, W.Styles? styles, List<string> warnings, int maximumCharacters)
+{
+    private sealed record Frame(int NumberId, int Level, long WordIndent, int MarkerIndent, int ContentIndent, string Suffix);
+    private readonly List<Frame> frames = [];
+    private readonly Dictionary<(int Id, int Level), long> counters = [];
+    private readonly WordNumberingReader numberingReader = new(numbering, styles, warnings);
+    private readonly HashSet<string> reported = [];
+    private WordMarkdownBuilder output = new(maximumCharacters);
+    private int? previousQuoteIndent;
+
+    public void Paragraph(W.Paragraph paragraph, string text, bool quote = false)
+    {
+        var properties = numberingReader.Read(paragraph);
+        // numId=0 explicitly removes numbering, including inherited numbering.
+        if (properties.NumberId is not > 0)
+        {
+            Block(text, properties.WordIndent, quote);
+            return;
+        }
+        var id = properties.NumberId.Value;
+        var level = properties.Level;
+        if (level is < 0 or > 8) throw new InvalidDataException("The Word document contains an invalid list level.");
+        var (definition, start) = numberingReader.Definition(id, level);
+        var bullet = definition?.NumberingFormat?.Val?.Value == W.NumberFormatValues.Bullet;
+        if (definition is null) Warn("A missing Word list definition was converted to decimal numbering.");
+        else if (!bullet && definition.NumberingFormat?.Val?.Value != W.NumberFormatValues.Decimal)
+            Warn("A Word list number format was converted to decimal numbering.");
+        var levelText = definition?.LevelText?.Val?.Value;
+        var placeholder = "%" + (level + 1).ToString(CultureInfo.InvariantCulture);
+        if (!bullet && levelText is not null && levelText != placeholder && levelText != placeholder + "." && levelText != placeholder + ")")
+            Warn("A composite or decorated Word list marker was simplified for Markdown.");
+        var key = (id, level);
+        var value = counters.GetValueOrDefault(key, start);
+        if (!bullet && value is < 0 or > 999999999)
+            throw new InvalidDataException("Word list numbers must be between 0 and 999999999 for Markdown import.");
+        counters[key] = value + 1;
+        for (var childLevel = level + 1; childLevel < 9; childLevel++)
+        {
+            var child = (id, childLevel);
+            if (!counters.ContainsKey(child)) continue;
+            var restart = numberingReader.Definition(id, childLevel).Level?.LevelRestart?.Val?.Value ?? childLevel;
+            if (restart < 0 || restart > childLevel) restart = childLevel;
+            if (restart > 0 && restart - 1 == level) counters.Remove(child);
+        }
+
+        var wordIndent = properties.WordIndent ?? Indent(definition?.PreviousParagraphProperties?.Indentation);
+        while (frames.Count > 0 && frames[^1].Level > level) frames.RemoveAt(frames.Count - 1);
+        var previous = frames.Count > 0 && frames[^1].Level == level ? frames[^1] : null;
+        var markerIndent = previous?.MarkerIndent ?? (frames.Count > 0 ? frames[^1].ContentIndent : 0);
+        var suffix = bullet ? "-" : ".";
+        if (previous is not null)
+        {
+            // Distinct Word numbering instances must not merge into one Markdown list.
+            if (previous.NumberId == id) suffix = previous.Suffix;
+            else if (bullet == (previous.Suffix is "-" or "+")) suffix = bullet ? previous.Suffix == "-" ? "+" : "-" : previous.Suffix == "." ? ")" : ".";
+            frames.RemoveAt(frames.Count - 1);
+        }
+        var marker = bullet ? suffix : value.ToString(CultureInfo.InvariantCulture) + suffix;
+        var contentIndent = markerIndent + marker.Length + 1;
+        frames.Add(new(id, level, wordIndent ?? 0, markerIndent, contentIndent, suffix));
+        Append(text, new string(' ', markerIndent) + marker + " ", contentIndent, separate: text.Length != 0, quote: quote);
+    }
+
+    public void Block(string text, long? wordIndent, bool quote = false)
+    {
+        var index = wordIndent is > 0 ? frames.FindLastIndex(f => f.WordIndent == wordIndent) : -1;
+        if (index < 0) frames.Clear();
+        else if (index < frames.Count - 1) frames.RemoveRange(index + 1, frames.Count - index - 1);
+        var indent = index < 0 ? 0 : frames[index].ContentIndent;
+        Append(text, new string(' ', indent), indent, separate: true, quote: quote, joinQuote: true);
+    }
+
+    // Pipe tables cannot contain Markdown block lists. Keep visible markers, but
+    // isolate cell hierarchy so that it cannot become a continuation of a body item.
+    public string Cell(IEnumerable<W.Paragraph> paragraphs, Func<W.Paragraph, string> render, Func<W.Paragraph, bool>? isQuote = null)
+    {
+        var savedFrames = frames.ToArray();
+        var savedOutput = output;
+        var savedQuote = previousQuoteIndent;
+        frames.Clear(); output = new(maximumCharacters); previousQuoteIndent = null;
+        try
+        {
+            foreach (var paragraph in paragraphs)
+            {
+                if (numberingReader.Read(paragraph).NumberId is > 0)
+                    Warn("Word lists inside table cells were flattened to text with visible markers.");
+                var quote = isQuote?.Invoke(paragraph) == true;
+                if (quote) Warn("Word quotes inside table cells were flattened to text with visible markers.");
+                Paragraph(paragraph, render(paragraph), quote);
+            }
+            var cell = new WordMarkdownBuilder(maximumCharacters);
+            var text = output.ToString().AsSpan().Trim();
+            for (var index = 0; index < text.Length; index++)
+            {
+                if (text[index] != '\n') cell.Append(text[index]);
+                else
+                {
+                    cell.Append("<br>");
+                    if (index + 1 < text.Length && text[index + 1] == '\n') index++;
+                }
+            }
+            return cell.ToString();
+        }
+        finally { frames.Clear(); frames.AddRange(savedFrames); output = savedOutput; previousQuoteIndent = savedQuote; }
+    }
+
+    public override string ToString() => output.ToString();
+
+    private void Append(string text, string firstPrefix, int continuationIndent, bool separate, bool quote = false, bool joinQuote = false)
+    {
+        if (quote && joinQuote && previousQuoteIndent == continuationIndent && output.Length >= 2)
+        {
+            // Replace the last blank separator with a quoted blank line, keeping
+            // consecutive Word quote paragraphs inside one Markdown quote block.
+            output.RemoveLastNewLine();
+            output.Append(' ', continuationIndent).AppendLine(">");
+        }
+        var first = true;
+        foreach (var line in text.AsSpan().EnumerateLines())
+        {
+            if (first) { output.Append(firstPrefix); first = false; }
+            else output.Append(' ', continuationIndent);
+            output.Append(quote ? "> " : "").AppendLine(line);
+        }
+        if (separate) output.AppendLine();
+        previousQuoteIndent = quote && separate ? continuationIndent : null;
+    }
+
+    private void Warn(string message) { if (reported.Add(message)) warnings.Add(message); }
+
+    internal static long? Indent(W.Indentation? indent)
+    {
+        if (indent is null) return null;
+        var start = indent.GetAttributes().FirstOrDefault(a => a.LocalName == "start" && a.NamespaceUri == "http://schemas.openxmlformats.org/wordprocessingml/2006/main").Value;
+        return long.TryParse(string.IsNullOrEmpty(start) ? indent.Left?.Value : start, NumberStyles.Integer, CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+}

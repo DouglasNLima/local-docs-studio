@@ -2,6 +2,7 @@ node_modules/
 test-results/
 playwright-report/
 artifacts/
+acceptance/
 artifacts/windows/local-dev-smoke/
 artifacts/windows/local-dev-smoke-validation/
 artifacts/windows/local-dev-package-smoke/

@@ -1,0 +1,25 @@
+<Window x:Class="LensDocsStudio.Native.ProgressWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="Progress indicator" Width="520" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+ Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+ <StackPanel Margin="24">
+  <TextBlock x:Name="Heading" Text="Insert progress indicator" FontSize="21" FontWeight="SemiBold" Margin="0,0,0,14"/>
+  <Label Content="_Label" Target="{Binding ElementName=ProgressLabel}"/>
+  <TextBox x:Name="ProgressLabel" Padding="8" MaxLength="512" AutomationProperties.Name="Progress label" AutomationProperties.AutomationId="ProgressLabel"/>
+  <Label Content="_Percentage" Target="{Binding ElementName=Percentage}" Margin="0,12,0,0"/>
+  <DockPanel>
+   <TextBox x:Name="Percentage" DockPanel.Dock="Right" Width="70" Padding="8" Text="{Binding Value, ElementName=PercentageSlider, Mode=OneWay, StringFormat=F0}" LostFocus="UpdateSlider" AutomationProperties.Name="Progress percentage" AutomationProperties.AutomationId="ProgressPercentage"/>
+   <Slider x:Name="PercentageSlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" SmallChange="1" LargeChange="10" VerticalAlignment="Center" Margin="0,0,12,0" AutomationProperties.Name="Progress percentage slider"/>
+  </DockPanel>
+  <Label Content="_Colour" Target="{Binding ElementName=ProgressColour}" Margin="0,12,0,0"/>
+  <ComboBox x:Name="ProgressColour" SelectedValuePath="Tag" AutomationProperties.Name="Progress colour">
+   <ComboBoxItem Content="Accent" Tag="accent"/><ComboBoxItem Content="Green" Tag="green"/><ComboBoxItem Content="Blue" Tag="blue"/>
+   <ComboBoxItem Content="Amber" Tag="amber"/><ComboBoxItem Content="Red" Tag="red"/><ComboBoxItem Content="Neutral" Tag="neutral"/>
+  </ComboBox>
+  <TextBlock x:Name="ValidationMessage" TextWrapping="Wrap" Margin="0,16,0,8" AutomationProperties.LiveSetting="Polite" AutomationProperties.AutomationId="ProgressValidation"/>
+  <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+   <Button Content="Cancel" IsCancel="True" Padding="14,6" Margin="0,0,8,0"/>
+   <Button Content="Apply" IsDefault="True" Click="Accept" Padding="14,6" AutomationProperties.AutomationId="ApplyProgress"/>
+  </StackPanel>
+ </StackPanel>
+</Window>

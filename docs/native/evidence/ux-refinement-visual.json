@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "sourceRevision": "ef392b0df46243805e5596d160d2c077a1c9f8dd",
+  "baselineRevision": "5a373a412e86b93ea8af1b9e5b867250e3d23ee1",
+  "workflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38739187808",
+  "passed": true,
+  "focusedUiAGroups": 10,
+  "normalCaptures": 8,
+  "highContrastCaptures": 4,
+  "widths": [
+    860,
+    1280,
+    1440,
+    1920
+  ],
+  "lastTwoRowWindowWidth": 1161,
+  "firstSingleRowWindowWidth": 1162,
+  "visibleRecentExportActionsAndCopiedPath": true,
+  "actualExplorerSelection": true,
+  "physicalDpiCertified": false,
+  "screenReaderSpeechCertified": false,
+  "images": [
+    {
+      "file": "baseline-light-1280.png",
+      "sha256": "0ac0c201ff31a78c61f13c750be3ca123d7b28b0f67d3ef58d939f253a86cd7c"
+    },
+    {
+      "file": "export-completed.png",
+      "sha256": "c881c3cd0493d0dc9263f25093ea935ad8e45b435221ae93fbc3509cfec5f92c"
+    },
+    {
+      "file": "export-revealed.png",
+      "sha256": "3dee3ab770dd10fe817cc2c560021e47253ac815f9519b1827d5953e8f9ecb8c"
+    },
+    {
+      "file": "file-icons-dark.png",
+      "sha256": "f75fd6f96d0bcfc531b0b4215345704881b79bc338366dc7c84121b8c90ac126"
+    },
+    {
+      "file": "file-icons-light.png",
+      "sha256": "7fadca97add88e760e187974806c6fc8f5cee6feebb573321d3b2582ce31c106"
+    },
+    {
+      "file": "main-dark-1440.png",
+      "sha256": "5ef3c66a99178841e9cb2ff65fad7fe704db35e28ef98dd1f1850ef531a2996e"
+    },
+    {
+      "file": "main-dark-860.png",
+      "sha256": "2b7beb5ff4a85cc01b8b5aa563b02331a22e82749729cd2beef300ba2af2ccb5"
+    },
+    {
+      "file": "main-high-contrast-1440.png",
+      "sha256": "8c0057c9f48f548e917b163e606921bdb830d446671b653b0bdd3d3b2ec70e32"
+    },
+    {
+      "file": "main-high-contrast-860.png",
+      "sha256": "c8198a7870c0af6ba17ecc593206652c0c5e29db9ab41c3e55e7a28424621927"
+    },
+    {
+      "file": "main-light-1280.png",
+      "sha256": "b1ccb7934f6d928fa5addee555e2e2b82d9ecc20a5a73b55e0bd2f82f06c2c43"
+    },
+    {
+      "file": "main-light-860.png",
+      "sha256": "bd893622ef8f2502770d4ba37d036d970b36d16d9c93df24bfe749b66ba4020f"
+    },
+    {
+      "file": "recent-exports.png",
+      "sha256": "71fa9afacf420e41732b841728adc5e72f54d3a7fd960c7e0bb84155a686c8a8"
+    },
+    {
+      "file": "settings-minimum-dark.png",
+      "sha256": "05fc2747a34980e692ef69227716136867eef816be07095e24e53b36adb49586"
+    },
+    {
+      "file": "settings-minimum-light.png",
+      "sha256": "ebb7d1ae96f21caba022f22b570cb25a913de9fc30115d5cb6d706e17289555f"
+    },
+    {
+      "file": "settings-search.png",
+      "sha256": "d92f01d8db149ee9d10b6e9d7d9ff13b213cfb84c0d4eed48a9a0253a0acb391"
+    },
+    {
+      "file": "settings.png",
+      "sha256": "bbfeaa33b92ff555e4e959ed3603964f5e25d0ee7c395c4b0bcef43eb296a1ac"
+    },
+    {
+      "file": "template-empty.png",
+      "sha256": "2656ed3d0418304c66cd5ea90ffad020c604c85cd762c3e1b318c9ac46bbe46c"
+    },
+    {
+      "file": "template-import-warning.png",
+      "sha256": "f1f7dc774de7f1defa7fe3f327b8d42ea2be28f487aa70a753b8cca600a3a838"
+    },
+    {
+      "file": "template-library.png",
+      "sha256": "1e6ee059efccc60c7d382385b37636d69f1e95f50260d608ae917b64bfc7ea94"
+    },
+    {
+      "file": "workspace-closed.png",
+      "sha256": "f2c5656969144c7183a5cd9c51dfa29d9948c37e1ddd847bc24ceae7e77ba5ac"
+    }
+  ],
+  "nativeWorkflow": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38739187969",
+  "hiddenRasterImages": [
+    "file-icons-light.png",
+    "file-icons-dark.png",
+    "settings-minimum-light.png",
+    "settings-minimum-dark.png"
+  ]
+}

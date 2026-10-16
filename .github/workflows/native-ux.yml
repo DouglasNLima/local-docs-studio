@@ -1,0 +1,91 @@
+name: Validate native desktop UX
+on:
+  push:
+    branches: ['feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+  pull_request:
+    branches: ['release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-ux-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mermaid-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build source-mapped native editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Compare canonical geometry and normalised native drawing pixels
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-fidelity artifacts/native/mermaid-fidelity
+      - name: Exercise visual authoring, source preservation and conflicts on disposable Windows
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-ui --polish
+      - name: Measure bounded Mermaid editing scenarios
+        if: always()
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-performance artifacts/native/mermaid-performance.json
+      - name: Exercise actual Windows high contrast
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-high-contrast --high-contrast --polish
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-mermaid-visual-evidence
+          path: |
+            artifacts/native/mermaid-fidelity/
+            artifacts/native/mermaid-performance.json
+            artifacts/native/mermaid-ui/*.png
+            artifacts/native/mermaid-ui/*.json
+            artifacts/native/mermaid-ui/*.txt
+            artifacts/native/mermaid-ui/*.md
+            artifacts/native/mermaid-high-contrast/*.png
+            artifacts/native/mermaid-high-contrast/*.json
+            artifacts/native/mermaid-high-contrast/*.txt
+          retention-days: 14
+  baseline:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build current validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Build verified baseline in isolation
+        run: |
+          git worktree add --detach artifacts/native/ux-base 47e78d6bff490a9b0c0b5cb2022dab262fe14e5e
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/ux-base/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Capture reproducible baseline on disposable Windows
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots artifacts/native/ux-base/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-baseline 47e78d6bff490a9b0c0b5cb2022dab262fe14e5e
+      - name: Capture verified Mermaid editor before presentation changes
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --mermaid-ui artifacts/native/ux-base/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/mermaid-baseline --baseline
+      - name: Capture current native shell
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-current ${{ github.sha }}
+      - name: Capture actual high contrast on the disposable desktop
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-screenshots src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-high-contrast ${{ github.sha }} --high-contrast
+      - name: Exercise desktop UX controls and synchronisation
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ux-controls src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/ux-controls
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-ux-visual-evidence
+          path: |
+            artifacts/native/mermaid-baseline/*.png
+            artifacts/native/mermaid-baseline/*.json
+            artifacts/native/ux-baseline/*.png
+            artifacts/native/ux-baseline/*.json
+            artifacts/native/ux-current/*.png
+            artifacts/native/ux-current/*.json
+            artifacts/native/ux-controls/*.png
+            artifacts/native/ux-controls/*.json
+            artifacts/native/ux-controls/refinement-display/*.json
+            artifacts/native/ux-high-contrast/*.png
+            artifacts/native/ux-high-contrast/*.json
+          retention-days: 14

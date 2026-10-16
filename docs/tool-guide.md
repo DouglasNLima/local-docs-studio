@@ -70,6 +70,8 @@ flowchart LR
 
 - **HTML** creates a standalone rendered document.
 - **Word** creates a `.docx` with rendered diagrams and compatible content. Use **Import Word template** and the **Word template** selector to apply a browser-local `.docx` template pack during export.
+- **Save template copy** downloads the selected Word template's original DOCX, including its original body and metadata. Use it for backup or import through **Export → Word template library** in the native edition. The stored template and current document remain unchanged.
+- **View → Export appearance settings** saves theme, editor layout and outline choices. Import the JSON through the native edition's **Edit → Settings**, review the choices and choose **Apply**. Documents, local handles and unrelated preferences are excluded.
 - **PDF** opens the browser print flow so you can choose Save as PDF.
 - **Docs Site** builds a static ZIP with theme, navigation, and search that can open directly from `index.html` or be hosted on GitHub Pages.
 - Docs Site exports can read optional Markdown front matter for page title, description, order, tags, draft status, and navigation group. With a loaded artefact bundle, safe metadata can fill missing title, order, evidence, and navigation hints; front matter remains highest priority.
