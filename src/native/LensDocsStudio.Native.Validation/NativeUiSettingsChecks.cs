@@ -11,9 +11,11 @@ internal static partial class NativeUiChecks
 {
     private static bool ExportCompleted(Window window, string path)
     {
+        window = ObserveWindow(window);
         var open = window.FindFirstDescendant(cf => cf.ByAutomationId("OpenExportedFile"));
         var reveal = window.FindFirstDescendant(cf => cf.ByAutomationId("RevealExportedFile"));
-        return Find(window, "Status").Name.StartsWith("Export completed — " + Path.GetFileName(path), StringComparison.Ordinal)
+        var status = window.FindFirstDescendant(cf => cf.ByAutomationId("Status"));
+        return status?.Name.StartsWith("Export completed — " + Path.GetFileName(path), StringComparison.Ordinal) == true
             && open is { IsEnabled: true, IsOffscreen: false } && reveal is { IsEnabled: true, IsOffscreen: false }
             && open.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path) && reveal.Properties.HelpText.ValueOrDefault == Path.GetFullPath(path);
     }

@@ -1737,8 +1737,18 @@ internal static partial class NativeUiChecks
     private static AutomationElement Find(Window window, string id)
     {
         AutomationElement? element = null;
-        Wait(() => (element = window.FindFirstDescendant(cf => cf.ByAutomationId(id))) is not null, "Missing native control: " + id);
+        Wait(() => (element = ObserveWindow(window).FindFirstDescendant(cf => cf.ByAutomationId(id))) is not null, "Missing native control: " + id);
         return element!;
+    }
+    private static Window ObserveWindow(Window window)
+    {
+        // A completed shell Save dialogue can leave the previously acquired owner exposing
+        // only its non-client title bar. Refresh the same HWND provider for each observation.
+        // This repeats no input and retains the caller's original deadline and assertions.
+        var observed = window.Automation.FromHandle(window.Properties.NativeWindowHandle.Value).AsWindow();
+        if (observed.Properties.ProcessId.Value != window.Properties.ProcessId.Value)
+            throw new InvalidOperationException("The native observation resolved a different process.");
+        return observed;
     }
     private static string ReadObservedText(string path)
     {

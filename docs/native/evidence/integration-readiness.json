@@ -1,5 +1,5 @@
 {
-  "status": "READY WITH RESTRICTIONS: tested application candidate; final documentation HEAD gate is recorded in PR 29",
+  "status": "READY WITH RESTRICTIONS: tested application candidate; final handoff HEAD gate is recorded in PR 29",
   "observedAtUtc": "2026-10-16T15:14:23.762578+00:00",
   "baseline": "2cc3b5680958c9c553dad23856e6010c158fccd7",
   "applicationValidationCandidate": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
@@ -1923,11 +1923,32 @@
       }
     ]
   },
-  "finalDocumentationHeadGate": "All mandatory workflows must complete successfully on the documentation-only handoff HEAD; exact SHA and conclusions are recorded in PR 29 and the final handoff.",
   "historical317VisualInspection": {
     "runId": 38914784848,
     "phase": "restored-after-upgrade",
     "inspection": "Actual restored untitled draft remains dirty and shows exact Cafe/Greek text in the native editor and preview. All14 tab text/baseline identities are separately asserted by the receipt.",
     "screenshotSha256": "c1afd7774b3e74c74dd7eba10f5f66e79417c47eed18d869fed66214f36b14f0"
+  },
+  "finalHandoffHeadGate": "All mandatory workflows must complete successfully on the final integration handoff HEAD; exact SHA and conclusions are recorded in PR 29 and the final handoff.",
+  "finalGateObservationCorrection": {
+    "failedSourceRevision": "fdebe1f82ce5a5a58943ea2ffdb4c34785c803e3",
+    "failedRunId": "38922782024",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38922782024",
+    "phase": "after-reinstall table CSV export completion observation",
+    "displayedStatus": "Export completed — fixture-table-2.csv. Table exported as UTF-8 CSV",
+    "uiaTree": "TitleBar/SystemMenuBar only; full provider root cause not established",
+    "preservedEvidence": {
+      "native-ui-failure-desktop.png": "c0c6b2c61c02c019c045e2eed5ce287da97d7a02720f3e8db8bd9a2b3e903d69",
+      "native-ui-failure-controls.txt": "3bb7099b76e3300fca2704de415712667cef0def5530cc42f82bd62c4362a876",
+      "native-ui-failure-threads.dmp": "b3d044124847fbb065bd7432f332947cff976bcbf12f9a9850d126ed0049b7e9",
+      "native-save-dialogues.json": "15db0609f0c1eb67a3e4cd43641bf94f958ae103f1fdefddc7e4b5e919e65f8a",
+      "native-ui.json": "9fe7020798baf4bd27824e7a872f0f11e733b1c3e436e3f4649aba1785143122"
+    },
+    "change": "Reacquire the same HWND provider and verify process identity for each window/control observation; query completion status directly in the existing outer deadline instead of a nested wait.",
+    "repeatedInput": false,
+    "assertionsRelaxed": false,
+    "timeoutIncreased": false,
+    "applicationChanged": false,
+    "acceptance": "Requires all mandatory final handoff checks; this failure and its skipped historical jobs are not PASS."
   }
 }
