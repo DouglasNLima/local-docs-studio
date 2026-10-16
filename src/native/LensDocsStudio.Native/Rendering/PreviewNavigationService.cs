@@ -17,6 +17,12 @@ public static class PreviewNavigationService
         public CancellationTokenSource? Pending;
     }
     private static readonly ConditionalWeakTable<FlowDocumentReader, NavigationState> States = new();
+    private sealed class NativeInsertionIndex(FlowDocument document)
+    {
+        public int Symbols { get; } = document.ContentStart.GetOffsetToPosition(document.ContentEnd);
+        public List<(TextPointer Position, int Units)> Checkpoints { get; } = [(document.ContentStart.GetInsertionPosition(LogicalDirection.Forward), 0)];
+    }
+    private static readonly ConditionalWeakTable<FlowDocument, NativeInsertionIndex> InsertionIndices = new();
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
@@ -71,7 +77,7 @@ public static class PreviewNavigationService
                 if (!Current() || page < 0 || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll) return false;
                 if (FindViewer<FlowDocumentPageViewer>(viewer) is not { } paged) return false;
                 var selected = false;
-                await viewer.Dispatcher.InvokeAsync(() =>
+                await viewer.Dispatcher.InvokeAsync(async () =>
                 {
                     if (!Current() || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll || paged.Document != document) return;
                     // Publish the paginator's new page count through WPF binding before
@@ -84,7 +90,7 @@ public static class PreviewNavigationService
                         // A page number resets WPF's internal content anchor. Its next
                         // layout can re-anchor at the preceding page boundary. The native
                         // text provider scrolls the exact character without selecting it.
-                        var anchored = ScrollExactNativeRange(document, position);
+                        var anchored = await ScrollExactNativeRangeAsync(document, position, Current, cancellation.Token);
                         diagnostic?.Invoke("exact native range anchor " + anchored);
                         if (!anchored) return;
                     }
@@ -97,7 +103,7 @@ public static class PreviewNavigationService
                     // paragraph into view would jump back to that paragraph's first page.
                     paged.UpdateLayout();
                     selected = true;
-                }, DispatcherPriority.Loaded);
+                }, DispatcherPriority.Loaded).Task.Unwrap();
                 return selected && !cancellation.IsCancellationRequested && viewer.Document == document;
             }
             catch (OperationCanceledException) { return false; }
@@ -109,22 +115,52 @@ public static class PreviewNavigationService
         }
     }
 
-    private static bool ScrollExactNativeRange(FlowDocument document, TextPointer position)
+    private static async Task<bool> ScrollExactNativeRangeAsync(FlowDocument document, TextPointer position, Func<bool> current, CancellationToken cancellation)
     {
         var peer = ContentElementAutomationPeer.CreatePeerForElement(document);
         if (peer?.GetPattern(PatternInterface.Text) is not ITextProvider provider) return false;
-        var range = provider.DocumentRange.Clone();
-        // Match the complete native prefix from the document start. Searching only
-        // the target word could select a different repeated occurrence; character
-        // counts alone also differ at Unicode insertion and paragraph boundaries.
-        var prefix = new TextRange(document.ContentStart, position).Text;
-        if (prefix.Length > 0)
+        var index = InsertionIndices.GetValue(document, key => new(key));
+        if (index.Symbols != document.ContentStart.GetOffsetToPosition(document.ContentEnd))
         {
-            range = range.FindText(prefix, false, false);
-            if (range is null) return false;
-            range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End);
+            InsertionIndices.Remove(document); index = InsertionIndices.GetValue(document, key => new(key));
         }
-        else range.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
+        var target = position.GetInsertionPosition(LogicalDirection.Forward);
+        var low = 0; var high = index.Checkpoints.Count;
+        while (low < high)
+        {
+            var middle = (low + high) / 2;
+            if (index.Checkpoints[middle].Position.CompareTo(target) <= 0) low = middle + 1; else high = middle;
+        }
+        var (cursor, units) = index.Checkpoints[Math.Max(0, low - 1)];
+        var work = 0;
+        // UIA Character movement uses these same native insertion boundaries,
+        // including Unicode clusters and structural paragraph/object positions.
+        // Sparse checkpoints belong only to this immutable native document.
+        while (cursor.CompareTo(target) < 0)
+        {
+            if (cursor.GetNextInsertionPosition(LogicalDirection.Forward) is not { } next) return false;
+            cursor = next; units++;
+            if (units % 1024 == 0 && cursor.CompareTo(index.Checkpoints[^1].Position) > 0) index.Checkpoints.Add((cursor, units));
+            if (++work % 4096 == 0)
+            {
+                await document.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background, cancellation);
+                if (!current()) return false;
+            }
+        }
+        var range = provider.DocumentRange.Clone();
+        while (units > 0)
+        {
+            var chunk = Math.Min(4096, units);
+            if (range.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Character, chunk) != chunk) return false;
+            units -= chunk;
+            if (units > 0)
+            {
+                await document.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background, cancellation);
+                if (!current()) return false;
+            }
+        }
+        if (!current()) return false;
+        range.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
         range.ScrollIntoView(true);
         return true;
     }
