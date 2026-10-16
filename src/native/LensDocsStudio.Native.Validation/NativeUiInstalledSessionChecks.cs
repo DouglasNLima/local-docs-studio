@@ -10,6 +10,9 @@ using LensDocsStudio.Core.Exports;
 using LensDocsStudio.Core.Imports;
 using LensDocsStudio.Core.Parsing;
 using DocumentFormat.OpenXml.Packaging;
+using LensDocsStudio.Core.Workspace;
+using LensDocsStudio.Native.Platform;
+using LensDocsStudio.Native.Rendering;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -121,9 +124,34 @@ internal static partial class NativeUiChecks
 
         string InspectReusableState()
         {
-            var library = new LocalLibraryStore(state).ReadAsync().GetAwaiter().GetResult().State;
+            var retainedImages = StaWorker.RunAsync(() =>
+            {
+                var images = new List<object>();
+                foreach (var document in before.Documents)
+                {
+                    var root = document.Path is null ? document.AssetWorkspace : document.WorkspaceRoot ?? before.Workspace;
+                    var path = document.Path ?? (root is null ? null : Path.Combine(root, "draft.md"));
+                    var parsed = new MarkdownService().Parse(document.Text, Path.GetExtension(path) is ".mmd" or ".mermaid");
+                    foreach (var image in new PreviewImageService().Prepare(parsed, path, root))
+                    {
+                        if (image.Value.Pixels is not { } pixels || path is null || root is null)
+                            throw new IOException("A retained workspace image cannot be displayed: " + image.Key + ". " + image.Value.Error);
+                        var file = new WorkspacePath(root).ResolveLink(path, image.Key);
+                        images.Add(new { document.Id, reference = image.Key, pixels.PixelWidth, pixels.PixelHeight, sha256 = Hash(file) });
+                    }
+                }
+                if (images.Count == 0) throw new IOException("The original UI fixture must retain relative workspace images before migration acceptance.");
+                return images;
+            }).GetAwaiter().GetResult();
+            var libraryDirectory = Path.Combine(state, "content-library");
+            if (!File.Exists(Path.Combine(libraryDirectory, "library.json")))
+                throw new IOException("The original UI fixture did not retain its actual content library.");
+            var library = new LocalLibraryStore(libraryDirectory).ReadAsync().GetAwaiter().GetResult().State;
             var items = library.Active.Templates.Concat(library.Archived.Templates)
                 .Concat(library.Active.Snippets).Concat(library.Archived.Snippets).ToArray();
+            if (library.Active.Templates.Length + library.Archived.Templates.Length == 0
+                || library.Active.Snippets.Length + library.Archived.Snippets.Length == 0)
+                throw new IOException("The original UI fixture must retain usable templates and snippets before migration acceptance.");
             foreach (var item in items)
             {
                 var imported = new MarkdownImageImporter().Import(item.Content);
@@ -153,7 +181,7 @@ internal static partial class NativeUiChecks
             return JsonSerializer.Serialize(new { library, wordTemplates = templates.Select(entry => entry.Record).ToArray(),
                 snapshots = recovered, templateCount = library.Active.Templates.Length + library.Archived.Templates.Length,
                 snippetCount = library.Active.Snippets.Length + library.Archived.Snippets.Length, wordTemplateCount = templates.Length,
-                snapshotCount = recovered.Length });
+                snapshotCount = recovered.Length, retainedImages });
         }
     }
 }
