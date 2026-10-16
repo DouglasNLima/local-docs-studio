@@ -1,0 +1,30 @@
+{
+  "formatVersion": "lens-docs-studio-library-1.0",
+  "exportedAt": "2026-10-11T22:00:00.000Z",
+  "templates": [
+    {
+      "id": "template-1728000000000-fixture",
+      "label": "Café handbook",
+      "name": "cafe-handbook.md",
+      "content": "# Café handbook\r\n\r\nRetain **formatting** and [a relative link](docs/guide.md).\r\n\r\n![Logo](assets/logo.png)\r\n",
+      "createdAt": 1728000000000
+    }
+  ],
+  "snippets": [
+    {
+      "id": "snippet-1728000000001-fixture",
+      "label": "Review checklist",
+      "content": "- [ ] Review organisation guidance\n- [x] Preserve source\n",
+      "createdAt": 1728000000001
+    }
+  ],
+  "profiles": [
+    {
+      "id": "profile-1728000000002-fixture",
+      "label": "Team documentation",
+      "devopsMarkdownExport": true,
+      "docsSite": { "title": "Café documentation", "description": "A portable team handbook.", "theme": "dark" },
+      "createdAt": 1728000000002
+    }
+  ]
+}

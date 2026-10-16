@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "previews": [
+    { "version": "0.1.1-preview.317", "sourceRevision": "dd6c4c33f1a6fa86206e76b2153afcc7b151a523", "runId": "38523259733", "artifactId": "11874889099", "installerSha256": "77b36337e2df38256375eba4caae76f8a2a656d8b371a203cfc00615201d52e0", "zipSha256": "36d1954a8e4fcac47565971a93e902ea550da60f2485e0df0acc06bd507e3a2f" },
+    { "version": "0.1.1-preview.393", "sourceRevision": "5a373a412e86b93ea8af1b9e5b867250e3d23ee1", "runId": "38614758427", "artifactId": "11921090952", "installerSha256": "1823aa5b758330e90553de4d5c6d64f14eb0edff440dc5db88de09e59ed05a27", "zipSha256": "bb0ff3ac6dd57e084394a16bd881bc0d8c1c2fcc5bbb49ddacdde14a4b1a7ec7" },
+    { "version": "0.1.1-preview.433", "sourceRevision": "ef392b0df46243805e5596d160d2c077a1c9f8dd", "runId": "38739187969", "artifactId": "11976154440", "installerSha256": "8eaa53d04bdc260eb457f44106d9526a84cbdaeffc762630b5122251b36a4361", "zipSha256": "59aed3b6d6184d279aff697d0676495019115fcf56765accc83b478bf4153596" },
+    { "version": "0.1.1-preview.473", "sourceRevision": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac", "runId": "38778919600", "artifactId": "11996638307", "installerSha256": "2404b36aa4b1d37c962ca42ad99f1ad59697367727cb60eca7713fda10c862c6", "zipSha256": "31517034d22c00cff7133b799e511204d286dec9d4e29ae35ab807ba96ef6077" },
+    { "version": "0.1.1-preview.497", "sourceRevision": "302096110631c6ad5ad12cdc4b44587cc293ccf6", "runId": "38813557924", "artifactId": "12010778495", "installerSha256": "30d017d72ce54ff9d30e21024f91581d361b5a0bf182b0ee63fdee3a1b10aa82", "zipSha256": "acef70855f9bc6c16dfcd903d48b3e43a095601c6eaf0343b6ef3d1d450c7860" },
+    { "version": "0.1.1-preview.531", "sourceRevision": "4940c58a542b635e7e008eeaf31b03ca4ec5878a", "runId": "38890518579", "artifactId": "12042946581", "installerSha256": "e39fc3f50efc8f0445f425181d2f6af41b0baee07f0919d85413290c8aea2a4a", "zipSha256": "7d9e4a05479c9da08f2d333c0f25bb872f02282ec96c616ea19a72f302f0808b" }
+  ]
+}

@@ -1,0 +1,12 @@
+flowchart LR
+    Source["Synthetic event source<br/>Document and operation identifiers"] --> Ingress["Receive event<br/>Validate the request"] --> Process["Process event<br/>Capture diagnostic context"]
+    Process --> Decision{Succeeded?}
+    Decision -->|Yes| Store[(Event store)]
+    Decision -->|No| ErrorLog["Flow error log<br/>Operation, stage and diagnostic message"]
+    Process -.->|Diagnostic context| ErrorLog
+    ErrorLog --> Queue["Notification queue<br/>Synthetic recipients only"] --> Notify["Notify operator<br/>Review and investigate"]
+    ErrorLog --> Review["Review console<br/>Search the synthetic incident record"]
+    Store -.->|Reference| Review
+    Retry --> Ingress
+    Review --> Retry
+    Notify --> Review

@@ -13,6 +13,7 @@ import { isImportableDocumentFile } from './files/document-import-service.js';
 import { createFileService } from './files/file-service.js';
 import { createExportService } from './exports/export-service.js';
 import { createExportProfileService } from './exports/export-profile-service.js';
+import { exportAppearanceSettings } from './exports/settings-export-service.js';
 import { createWordTemplateService } from './exports/word-template-service.js';
 import { createNativeBridgeClient } from './native/native-bridge-client.js';
 import { createRenderingService } from './rendering/render-service.js';
@@ -76,6 +77,7 @@ export function createAppController() {
       exportWordButton,
       wordTemplateSelect,
       wordTemplateImportButton,
+      wordTemplateCopyButton,
       wordTemplateSummary,
       exportPdfButton,
       exportMarkdownBundleButton,
@@ -602,11 +604,13 @@ export function createAppController() {
       dom: {
         wordTemplateInput,
         wordTemplateImportButton,
+        wordTemplateCopyButton,
         wordTemplateSelect,
         wordTemplateSummary,
       },
       callbacks: {
         closeOpenMenus,
+        downloadBlob,
         promptForText: promptDialog,
         setStatus,
       },
@@ -990,6 +994,7 @@ export function createAppController() {
           if (button.dataset.menuAction === 'checkNativeBridge') await checkNativeBridge();
           if (button.dataset.menuAction === 'openWindowsShellDiagnostics') await openWindowsShellDiagnostics();
           if (button.dataset.menuAction === 'openWindowsSetup') await windowsSetupTools.openWindowsSetupWizard();
+          if (button.dataset.menuAction === 'exportSettings') exportAppearanceSettings(state, setStatus);
           closeOpenMenus();
         });
       });

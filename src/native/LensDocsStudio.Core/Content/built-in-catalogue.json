@@ -1,0 +1,743 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "example/sample",
+      "group": "Examples",
+      "label": "Markdown and Mermaid sample",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "sample.md",
+      "contentPattern": "# Markdown + Mermaid sample\n\nThis preview renders **Markdown** and Mermaid diagrams inside ```mermaid``` fenced blocks.\n\n## Flow\n\n```mermaid\nflowchart LR\n  A[Markdown / MMD] --> B[Parser]\n  B --> C{Source type}\n  C -->|.md| D[Markdown parser]\n  C -->|.mmd| E[Mermaid]\n  D --> F[Native preview]\n  E --> F\n```\n\n## Table\n\n| File | Rendering |\n|---|---|\n| .md / .markdown | Markdown with Mermaid blocks |\n| .mmd / .mermaid | Standalone Mermaid diagram |\n\n## Code\n\n```ts\nconst render = async (source: string) => await renderPreview(source);\n```\n",
+      "fields": []
+    },
+    {
+      "id": "example/readme",
+      "group": "Examples",
+      "label": "Product README",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "readme-example.md",
+      "contentPattern": "# Product README\n\nShort, practical docs help new users understand what this project does and how to start.\n\n## Quick start\n\n1. Open the app.\n2. Choose a Markdown or Mermaid file.\n3. Review the preview and export when ready.\n\n## Workflow\n\n```mermaid\nflowchart LR\n  A[Open file] --> B[Edit Markdown]\n  B --> C[Preview]\n  C --> D{Ready?}\n  D -->|No| B\n  D -->|Yes| E[Export HTML or Word]\n```\n\n## Notes\n\n| Area | Detail |\n|---|---|\n| Privacy | Files stay on your computer |\n| Runtime | Native Windows application |\n| Output | HTML and Word documents |\n",
+      "fields": []
+    },
+    {
+      "id": "example/architecture",
+      "group": "Examples",
+      "label": "Application architecture",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "architecture-example.md",
+      "contentPattern": "# Native Application Architecture\n\nThe app keeps editing, rendering and exporting local, with native Windows controls and portable documents.\n\n```mermaid\nflowchart TB\n  subgraph Windows\n    A[File picker] --> B[Markdown editor]\n    B --> C[Markdown parser]\n    B --> D[Mermaid renderer]\n    C --> E[Native preview]\n    D --> E\n    E --> F[HTML export]\n    E --> G[Word export]\n  end\n  H[(Local files)] --> A\n  F --> I[Save file]\n  G --> I\n```\n\n## Responsibilities\n\n- Native controls support editing, preview and document navigation.\n- Local services manage files, exports and theme preferences.\n- Guarded saves preserve original files when a conflict is detected.\n",
+      "fields": []
+    },
+    {
+      "id": "example/brief",
+      "group": "Examples",
+      "label": "Project brief",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "project-brief-example.md",
+      "contentPattern": "# Project Brief\n\n## Goal\n\nCreate a reliable local documentation studio that exports clean Markdown and Mermaid documents without a backend.\n\n## Audience\n\nTeams that need to review specs, diagrams, and notes from local files.\n\n## Success criteria\n\n- Open individual files or folders.\n- Preview Markdown and Mermaid accurately.\n- Save local edits with conflict checks.\n- Export HTML and Word documents with visible confidence checks.\n\n## Timeline\n\n```mermaid\ngantt\n  title Adoption plan\n  dateFormat  YYYY-MM-DD\n  section UX\n  First-run flow      :done,    a1, 2026-05-20, 1d\n  Examples and help   :active,  a2, 2026-05-21, 1d\n  section Trust\n  Export checks       :         b1, 2026-05-22, 1d\n  GitHub Pages docs   :         b2, 2026-05-23, 1d\n```\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/flowchart",
+      "group": "Mermaid",
+      "label": "Flowchart",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "flowchart.mmd",
+      "contentPattern": "flowchart LR\n  A[Idea] --> B{Ready?}\n  B -->|Yes| C[Build]\n  B -->|No| D[Refine]\n  D --> B\n  C --> E[Ship]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/sequence",
+      "group": "Mermaid",
+      "label": "Sequence",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "sequence.mmd",
+      "contentPattern": "sequenceDiagram\n  participant User\n  participant App\n  participant Renderer\n  User->>App: Open diagram\n  App->>Renderer: Render Mermaid\n  Renderer-->>User: Preview and export\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/gantt",
+      "group": "Mermaid",
+      "label": "Gantt",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "gantt-plan.mmd",
+      "contentPattern": "gantt\n  title Delivery plan\n  dateFormat  YYYY-MM-DD\n  section Discovery\n  Requirements      :done,    a1, 2026-05-20, 2d\n  Prototype         :active,  a2, 2026-05-22, 3d\n  section Build\n  Implementation    :         b1, 2026-05-25, 5d\n  Review            :         b2, 2026-05-30, 2d\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/class",
+      "group": "Mermaid",
+      "label": "Class",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "class-diagram.mmd",
+      "contentPattern": "classDiagram\n  class Renderer {\n    +renderMarkdown()\n    +renderMermaid()\n    +exportHtml()\n  }\n  class Document {\n    +title\n    +source\n  }\n  Renderer --> Document\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/state",
+      "group": "Mermaid",
+      "label": "State",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "state-diagram.mmd",
+      "contentPattern": "stateDiagram-v2\n  [*] --> Editing\n  Editing --> Rendering: Ctrl+Enter\n  Rendering --> Ready\n  Ready --> Exporting\n  Exporting --> Ready\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/er",
+      "group": "Mermaid",
+      "label": "ERD",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "entity-relationship.mmd",
+      "contentPattern": "erDiagram\n  USER ||--o{ DOCUMENT : owns\n  DOCUMENT ||--o{ DIAGRAM : contains\n  DOCUMENT {\n    string title\n    string path\n  }\n  DIAGRAM {\n    string type\n    string source\n  }\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/journey",
+      "group": "Mermaid",
+      "label": "Journey",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "journey-map.mmd",
+      "contentPattern": "journey\n  title Diagram export journey\n  section Create\n    Pick template: 5: User\n    Edit source: 4: User\n  section Share\n    Render preview: 5: App\n    Export image: 5: User\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/mindmap",
+      "group": "Mermaid",
+      "label": "Mindmap",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "mindmap.mmd",
+      "contentPattern": "mindmap\n  root((Mermaid Studio))\n    Templates\n      Flowchart\n      Sequence\n      Gantt\n    Exports\n      SVG\n      PNG\n      Source\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/pie",
+      "group": "Mermaid",
+      "label": "Pie",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "pie-chart.mmd",
+      "contentPattern": "pie showData\n  title Export formats\n  \"HTML\" : 35\n  \"Word\" : 25\n  \"SVG\" : 20\n  \"PNG\" : 20\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid/timeline",
+      "group": "Mermaid",
+      "label": "Timeline",
+      "kind": "template",
+      "format": "mermaid",
+      "namePattern": "timeline.mmd",
+      "contentPattern": "timeline\n  title Product milestones\n  2026-05-20 : Markdown renderer\n             : Mermaid support\n  2026-05-21 : Docs site builder\n  2026-05-22 : Diagram Studio\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/subgraph",
+      "group": "Mermaid",
+      "label": "Subgraph",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "subgraph Application\n  A[Editor] --> B[Preview]\nend\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/decision",
+      "group": "Mermaid",
+      "label": "Decision",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "B{Decision?}\nB -->|Yes| C[Continue]\nB -->|No| D[Revise]\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/sequenceNote",
+      "group": "Mermaid",
+      "label": "Sequence Note",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "Note over User,App: Add context here\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/style",
+      "group": "Mermaid",
+      "label": "Style",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "style A fill:#FFF1E8,stroke:#FF883E,stroke-width:2px\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/classDef",
+      "group": "Mermaid",
+      "label": "Class Def",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "classDef important fill:#FFF1E8,stroke:#FF883E,color:#111827\nclass A important\n",
+      "fields": []
+    },
+    {
+      "id": "mermaid-snippet/linkStyle",
+      "group": "Mermaid",
+      "label": "Link Style",
+      "kind": "snippet",
+      "format": "mermaid",
+      "namePattern": null,
+      "contentPattern": "linkStyle 0 stroke:#FF883E,stroke-width:2px\n",
+      "fields": []
+    },
+    {
+      "id": "project/readme",
+      "group": "Project Docs",
+      "label": "README",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-readme.md",
+      "contentPattern": "# {{title}}\n\nShort description of what this project does and why it exists.\n\n## Who this is for\n\n{{audience}}\n\n## Quick start\n\n```sh\n# Install dependencies\nnpm install\n\n# Run locally\nnpm run dev\n```\n\n## Usage\n\n1. Configure the environment.\n2. Run the application.\n3. Review output and logs.\n\n## Architecture\n\n```mermaid\nflowchart LR\n  User[User] --> App[Application]\n  App --> Data[(Data)]\n  App --> Export[Outputs]\n```\n\n## Configuration\n\n| Setting | Purpose | Default |\n|---|---|---|\n| ENVIRONMENT | Runtime environment | local |\n| LOG_LEVEL | Logging verbosity | info |\n\n## Development\n\n- Keep changes small and reviewed.\n- Update tests when behaviour changes.\n- Document operational assumptions.\n\n## Support\n\nAdd ownership, escalation, and troubleshooting notes here.\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Project name",
+          "defaultValue": "Project Name"
+        },
+        {
+          "key": "audience",
+          "label": "Primary audience",
+          "defaultValue": "Developers and operators"
+        }
+      ]
+    },
+    {
+      "id": "project/architecture",
+      "group": "Project Docs",
+      "label": "Architecture Overview",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-architecture.md",
+      "contentPattern": "# {{title}} Architecture\n\n## Audience\n\n{{audience}}\n\n## Context\n\nDescribe the system boundary, users, and core business capability.\n\n## System View\n\n```mermaid\nflowchart TB\n  subgraph Client\n    UI[User Interface]\n  end\n  subgraph Application\n    API[API Layer]\n    Services[Domain Services]\n  end\n  subgraph Data\n    Store[(Primary Store)]\n  end\n  UI --> API\n  API --> Services\n  Services --> Store\n```\n\n## Key Components\n\n| Component | Responsibility | Owner |\n|---|---|---|\n| User Interface | User workflows | TBD |\n| API Layer | Request handling | TBD |\n| Domain Services | Business logic | TBD |\n| Primary Store | Durable data | TBD |\n\n## Important Decisions\n\n- Decision 1: TBD\n- Decision 2: TBD\n\n## Risks\n\n- Risk: TBD\n- Mitigation: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "System name",
+          "defaultValue": "System Architecture"
+        },
+        {
+          "key": "audience",
+          "label": "Audience",
+          "defaultValue": "Engineering and product stakeholders"
+        }
+      ]
+    },
+    {
+      "id": "project/adr",
+      "group": "Project Docs",
+      "label": "ADR",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "adr-{{slug:title}}.md",
+      "contentPattern": "# ADR: {{title}}\n\nDate: {{date}}\n\nStatus: Proposed\n\n## Context\n\nDescribe the problem, constraints, and forces affecting this decision.\n\n## Decision\n\nState the decision in one or two clear paragraphs.\n\n## Consequences\n\n### Positive\n\n- Outcome: TBD\n\n### Negative\n\n- Tradeoff: TBD\n\n### Neutral\n\n- Follow-up: TBD\n\n## Alternatives Considered\n\n| Option | Pros | Cons | Decision |\n|---|---|---|---|\n| Option A | TBD | TBD | TBD |\n| Option B | TBD | TBD | TBD |\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Decision title",
+          "defaultValue": "Use a modular architecture"
+        },
+        {
+          "key": "date",
+          "label": "Decision date",
+          "defaultValue": "{{today}}"
+        }
+      ]
+    },
+    {
+      "id": "project/runbook",
+      "group": "Project Docs",
+      "label": "Runbook",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-runbook.md",
+      "contentPattern": "# {{title}} Runbook\n\nOwner: {{owner}}\n\n## Purpose\n\nDescribe what this runbook helps operators diagnose or complete.\n\n## Normal Operation\n\n- Expected status: TBD\n- Expected logs: TBD\n- Expected dashboards: TBD\n\n## Common Tasks\n\n### Start\n\n```sh\ncommand-to-start\n```\n\n### Stop\n\n```sh\ncommand-to-stop\n```\n\n### Health Check\n\n```sh\ncommand-to-check-health\n```\n\n## Troubleshooting\n\n| Symptom | Likely Cause | Action |\n|---|---|---|\n| TBD | TBD | TBD |\n\n## Escalation\n\nAdd contacts, support windows, and escalation path.\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Service or workflow name",
+          "defaultValue": "Service Runbook"
+        },
+        {
+          "key": "owner",
+          "label": "Owner/team",
+          "defaultValue": "Team Name"
+        }
+      ]
+    },
+    {
+      "id": "project/api",
+      "group": "Project Docs",
+      "label": "API Notes",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-api-notes.md",
+      "contentPattern": "# {{title}} Notes\n\n## Overview\n\nDescribe the API purpose, consumers, and authentication model.\n\n## Endpoints\n\n| Method | Path | Purpose |\n|---|---|---|\n| GET | /health | Health check |\n| GET | /items | List items |\n| POST | /items | Create item |\n\n## Request Example\n\n```json\n{\n  \"name\": \"Example\"\n}\n```\n\n## Response Example\n\n```json\n{\n  \"id\": \"item_123\",\n  \"name\": \"Example\"\n}\n```\n\n## Error Handling\n\n| Status | Meaning | Recovery |\n|---|---|---|\n| 400 | Invalid request | Fix input |\n| 401 | Unauthorized | Check credentials |\n| 500 | Server error | Retry or escalate |\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "API name",
+          "defaultValue": "Project API"
+        }
+      ]
+    },
+    {
+      "id": "project/onboarding",
+      "group": "Project Docs",
+      "label": "Onboarding Guide",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-onboarding.md",
+      "contentPattern": "# {{title}} Onboarding\n\nAudience: {{audience}}\n\n## First Day\n\n- Get repository access.\n- Set up local environment.\n- Read the README and architecture overview.\n\n## First Week\n\n- Run the app locally.\n- Pick a starter issue.\n- Pair with a maintainer.\n\n## Core Concepts\n\n| Concept | Why it matters |\n|---|---|\n| Domain model | TBD |\n| Deployment flow | TBD |\n| Support process | TBD |\n\n## Useful Links\n\n- Repository: TBD\n- Docs: TBD\n- Dashboard: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Team/project name",
+          "defaultValue": "Project"
+        },
+        {
+          "key": "audience",
+          "label": "New joiner audience",
+          "defaultValue": "New team members"
+        }
+      ]
+    },
+    {
+      "id": "project/docsIndex",
+      "group": "Project Docs",
+      "label": "Docs Pack Index",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-index.md",
+      "contentPattern": "# {{title}}\n\nUse this page as the entry point for a docs site bundle.\n\n## Start Here\n\n- [README](README.md)\n- [Architecture](architecture.md)\n- [Runbook](runbook.md)\n- [Release Notes](release-notes.md)\n- [Requirements](requirements.md)\n\n## Docs Map\n\n```mermaid\nflowchart LR\n  Index[Docs Index] --> Readme[README]\n  Index --> Architecture[Architecture]\n  Index --> Runbook[Runbook]\n  Index --> Releases[Release Notes]\n  Index --> Requirements[Requirements]\n```\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Docs pack name",
+          "defaultValue": "Project Docs"
+        }
+      ]
+    },
+    {
+      "id": "project-snippet/install",
+      "group": "Project Docs",
+      "label": "Install",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Installation\n\n1. Download the application from its trusted distribution channel.\n2. Run the installation wizard.\n3. Open the application and check its version.\n",
+      "fields": []
+    },
+    {
+      "id": "project-snippet/usage",
+      "group": "Project Docs",
+      "label": "Usage",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Usage\n\n1. Start the application.\n2. Complete the primary workflow.\n3. Review the output.\n",
+      "fields": []
+    },
+    {
+      "id": "project-snippet/supportMatrix",
+      "group": "Project Docs",
+      "label": "Support Matrix",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Support Matrix\n\n| Environment | Supported | Notes |\n|---|---|---|\n| Supported platform | TBD | Record the tested version |\n| Optional integration | TBD | Record validation evidence |\n| Other environment | TBD | Record any limitations |\n",
+      "fields": []
+    },
+    {
+      "id": "project-snippet/roadmap",
+      "group": "Project Docs",
+      "label": "Roadmap",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Roadmap\n\n- Now: Stabilise the core workflow.\n- Next: Improve documentation and onboarding.\n- Later: Add optional automation around repeated tasks.\n",
+      "fields": []
+    },
+    {
+      "id": "project-snippet/architectureBlock",
+      "group": "Project Docs",
+      "label": "Architecture Block",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Architecture\n\n```mermaid\nflowchart TB\n  User[User] --> UI[Native UI]\n  UI --> Logic[Local app logic]\n  Logic --> Preview[Rendered preview]\n  Logic --> Export[Export files]\n```\n",
+      "fields": []
+    },
+    {
+      "id": "release/customer",
+      "group": "Release Notes",
+      "label": "Customer Release Notes",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "release-notes-{{slug:version}}.md",
+      "contentPattern": "# Release Notes {{version}}\n\nRelease date: {{date}}\n\n## Highlights\n\n- Highlight 1: TBD\n- Highlight 2: TBD\n\n## New\n\n- New capability: TBD\n\n## Improved\n\n- Improvement: TBD\n\n## Fixed\n\n- Fix: TBD\n\n## Known Issues\n\n- Known issue: TBD\n\n## Release Timeline\n\n```mermaid\ntimeline\n  title {{version}} rollout\n  {{date}} : Release prepared\n              : Customer notes published\n```\n",
+      "fields": [
+        {
+          "key": "version",
+          "label": "Release version",
+          "defaultValue": "v1.0.0"
+        },
+        {
+          "key": "date",
+          "label": "Release date",
+          "defaultValue": "{{today}}"
+        }
+      ]
+    },
+    {
+      "id": "release/changelog",
+      "group": "Release Notes",
+      "label": "Technical Changelog",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "changelog-{{slug:version}}.md",
+      "contentPattern": "# Changelog {{version}}\n\nDate: {{date}}\n\n## Added\n\n- TBD\n\n## Changed\n\n- TBD\n\n## Fixed\n\n- TBD\n\n## Deprecated\n\n- TBD\n\n## Security\n\n- TBD\n\n## Breaking Changes\n\n- TBD\n",
+      "fields": [
+        {
+          "key": "version",
+          "label": "Version",
+          "defaultValue": "v1.0.0"
+        },
+        {
+          "key": "date",
+          "label": "Date",
+          "defaultValue": "{{today}}"
+        }
+      ]
+    },
+    {
+      "id": "release/sprint",
+      "group": "Release Notes",
+      "label": "Sprint Summary",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}.md",
+      "contentPattern": "# {{title}}\n\nDate: {{date}}\n\n## Goals\n\n- Goal: TBD\n\n## Completed\n\n- Completed work: TBD\n\n## Carried Forward\n\n- Item: TBD\n\n## Risks And Blockers\n\n- Risk: TBD\n\n## Metrics\n\n| Metric | Value | Notes |\n|---|---:|---|\n| Stories completed | TBD | TBD |\n| Defects fixed | TBD | TBD |\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Sprint name",
+          "defaultValue": "Sprint Summary"
+        },
+        {
+          "key": "date",
+          "label": "Summary date",
+          "defaultValue": "{{today}}"
+        }
+      ]
+    },
+    {
+      "id": "release/migration",
+      "group": "Release Notes",
+      "label": "Migration Notes",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "migration-{{slug:version}}.md",
+      "contentPattern": "# Migration Notes {{version}}\n\n## Who Needs This\n\nDescribe affected users, systems, and environments.\n\n## What Changed\n\n- Change: TBD\n\n## Before You Upgrade\n\n- Backup data.\n- Review breaking changes.\n- Confirm rollback plan.\n\n## Migration Steps\n\n1. Step one.\n2. Step two.\n3. Validate the result.\n\n## Rollback\n\nDescribe rollback commands and decision criteria.\n\n## Validation\n\n| Check | Expected Result |\n|---|---|\n| Health check | Passing |\n| Key workflow | Successful |\n",
+      "fields": [
+        {
+          "key": "version",
+          "label": "Target version",
+          "defaultValue": "v1.0.0"
+        }
+      ]
+    },
+    {
+      "id": "release-snippet/added",
+      "group": "Release Notes",
+      "label": "Added",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Added\n\n- New capability: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/changed",
+      "group": "Release Notes",
+      "label": "Changed",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Changed\n\n- Changed behaviour: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/fixed",
+      "group": "Release Notes",
+      "label": "Fixed",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Fixed\n\n- Fix: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/deprecated",
+      "group": "Release Notes",
+      "label": "Deprecated",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Deprecated\n\n- Deprecated item: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/security",
+      "group": "Release Notes",
+      "label": "Security",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Security\n\n- Security update: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/breaking",
+      "group": "Release Notes",
+      "label": "Breaking",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Breaking Changes\n\n- Breaking change: TBD\n\n### Migration\n\n1. Review affected workflows.\n2. Update configuration or code.\n3. Validate the result.\n",
+      "fields": []
+    },
+    {
+      "id": "release-snippet/knownIssues",
+      "group": "Release Notes",
+      "label": "Known Issues",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Known Issues\n\n| Issue | Impact | Workaround |\n|---|---|---|\n| TBD | TBD | TBD |\n",
+      "fields": []
+    },
+    {
+      "id": "requirements/prd",
+      "group": "Requirements",
+      "label": "PRD",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-prd.md",
+      "contentPattern": "# PRD: {{title}}\n\n## Target Users\n\n{{audience}}\n\n## Problem\n\nDescribe the problem and why it matters now.\n\n## Goals\n\n- Goal: TBD\n\n## Non-goals\n\n- Non-goal: TBD\n\n## User Journey\n\n```mermaid\nflowchart LR\n  A[Need] --> B[Discover feature]\n  B --> C[Complete workflow]\n  C --> D[Measure success]\n```\n\n## Requirements\n\n| ID | Requirement | Priority |\n|---|---|---|\n| R1 | TBD | Must |\n\n## Success Metrics\n\n- Metric: TBD\n\n## Open Questions\n\n- Question: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Product/feature name",
+          "defaultValue": "Feature Name"
+        },
+        {
+          "key": "audience",
+          "label": "Target users",
+          "defaultValue": "Target users"
+        }
+      ]
+    },
+    {
+      "id": "requirements/featureBrief",
+      "group": "Requirements",
+      "label": "Feature Brief",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-brief.md",
+      "contentPattern": "# {{title}}\n\n## Summary\n\nOne paragraph explaining the feature.\n\n## Customer Need\n\nDescribe the need in plain language.\n\n## Proposed Experience\n\n- Step 1: TBD\n- Step 2: TBD\n\n## Scope\n\n### In Scope\n\n- TBD\n\n### Out Of Scope\n\n- TBD\n\n## Risks\n\n- Risk: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Feature name",
+          "defaultValue": "Feature Brief"
+        }
+      ]
+    },
+    {
+      "id": "requirements/storySet",
+      "group": "Requirements",
+      "label": "User Story Set",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-stories.md",
+      "contentPattern": "# User Stories: {{title}}\n\n## Epic\n\nAs a user, I want a clear workflow so that I can complete my goal with confidence.\n\n## Stories\n\n### Story 1\n\nAs a [persona], I want [capability], so that [outcome].\n\nAcceptance criteria:\n\n- Given [context], when [action], then [result].\n\n### Story 2\n\nAs a [persona], I want [capability], so that [outcome].\n\nAcceptance criteria:\n\n- Given [context], when [action], then [result].\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Epic name",
+          "defaultValue": "Epic Name"
+        }
+      ]
+    },
+    {
+      "id": "requirements/devopsConclusion",
+      "group": "Requirements",
+      "label": "DevOps User Story / Task Conclusion",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:workItemId}}-conclusion.md",
+      "contentPattern": "# DevOps User Story / Task Conclusion: {{title}}\n\nWork item: {{workItemId}}\nDeveloper: {{developer}}\nDate: {{date}}\n\n## Outcome\n\nSummarise what was completed and why the story or task is ready for review.\n\n## Implementation Details\n\n- Approach: TBD\n- Important decisions: TBD\n- Constraints or assumptions: TBD\n\n## Components Created Or Changed\n\n| Component | Type | Change | Notes |\n|---|---|---|---|\n| TBD | Created/Changed | TBD | TBD |\n\n## How To Test\n\n1. Test step one.\n2. Test step two.\n3. Confirm the expected result.\n\n## Test Evidence\n\n| Check | Result | Evidence |\n|---|---|---|\n| Unit/static checks | TBD | TBD |\n| Browser/manual validation | TBD | TBD |\n| Regression area | TBD | TBD |\n\n## Deployment Requirements\n\n- Configuration changes: TBD\n- Feature flags: TBD\n- Data/schema changes: TBD\n- Environment variables or secrets: TBD\n- Release order or dependency: TBD\n\n## Rollback Plan\n\nDescribe how to revert safely if deployment validation fails.\n\n## Reviewer Notes\n\n- Known limitations: TBD\n- Follow-up work: TBD\n- Screenshots or links: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Story or task title",
+          "defaultValue": "Completed User Story"
+        },
+        {
+          "key": "workItemId",
+          "label": "Azure DevOps work item ID",
+          "defaultValue": "AB#0000"
+        },
+        {
+          "key": "developer",
+          "label": "Developer",
+          "defaultValue": "Developer Name"
+        },
+        {
+          "key": "date",
+          "label": "Completion date",
+          "defaultValue": "{{today}}"
+        }
+      ]
+    },
+    {
+      "id": "requirements/acceptance",
+      "group": "Requirements",
+      "label": "Acceptance Criteria",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-acceptance.md",
+      "contentPattern": "# Acceptance Criteria: {{title}}\n\n## Functional Criteria\n\n- [ ] Criterion 1\n- [ ] Criterion 2\n- [ ] Criterion 3\n\n## Non-functional Criteria\n\n- [ ] Performance: TBD\n- [ ] Accessibility: TBD\n- [ ] Security: TBD\n\n## Definition Of Done\n\n- [ ] Tests are updated.\n- [ ] Documentation is updated.\n- [ ] Stakeholders have reviewed the result.\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Feature name",
+          "defaultValue": "Feature"
+        }
+      ]
+    },
+    {
+      "id": "requirements/gherkin",
+      "group": "Requirements",
+      "label": "Gherkin Scenarios",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-gherkin.md",
+      "contentPattern": "# Gherkin: {{title}}\n\n```gherkin\nFeature: {{title}}\n\n  Scenario: Successful workflow\n    Given the user has the required context\n    When the user completes the main action\n    Then the expected result is shown\n\n  Scenario: Validation error\n    Given the user provides incomplete input\n    When the user submits the form\n    Then a clear validation message is shown\n```\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Feature name",
+          "defaultValue": "Feature"
+        }
+      ]
+    },
+    {
+      "id": "requirements/journey",
+      "group": "Requirements",
+      "label": "Journey Map",
+      "kind": "template",
+      "format": "markdown",
+      "namePattern": "{{slug:title}}-journey.md",
+      "contentPattern": "# {{title}}\n\n## Persona\n\nDescribe the user, their context, and their goal.\n\n## Journey\n\n```mermaid\njourney\n  title {{title}}\n  section Discover\n    Understand need: 3: User\n    Find option: 4: User\n  section Complete\n    Start workflow: 4: User\n    Finish goal: 5: User\n  section Follow up\n    Confirm result: 5: User\n```\n\n## Pain Points\n\n- Pain point: TBD\n\n## Opportunities\n\n- Opportunity: TBD\n",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Journey name",
+          "defaultValue": "User Journey"
+        }
+      ]
+    },
+    {
+      "id": "requirements-snippet/persona",
+      "group": "Requirements",
+      "label": "Persona",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Persona\n\n- Name: TBD\n- Role: TBD\n- Goal: TBD\n- Pain point: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/problem",
+      "group": "Requirements",
+      "label": "Problem",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Problem Statement\n\nUsers need TBD because TBD. Solving this should improve TBD.\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/nonGoals",
+      "group": "Requirements",
+      "label": "Non Goals",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Non-goals\n\n- This will not cover TBD.\n- This will not replace TBD.\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/metrics",
+      "group": "Requirements",
+      "label": "Metrics",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Success Metrics\n\n| Metric | Target | Measurement |\n|---|---:|---|\n| Adoption | TBD | TBD |\n| Completion rate | TBD | TBD |\n| Support contacts | TBD | TBD |\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/risks",
+      "group": "Requirements",
+      "label": "Risks",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Risks\n\n| Risk | Likelihood | Impact | Mitigation |\n|---|---|---|---|\n| TBD | Medium | Medium | TBD |\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/openQuestions",
+      "group": "Requirements",
+      "label": "Open Questions",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## Open Questions\n\n- Question: TBD\n- Decision owner: TBD\n- Needed by: TBD\n",
+      "fields": []
+    },
+    {
+      "id": "requirements-snippet/flow",
+      "group": "Requirements",
+      "label": "Flow",
+      "kind": "snippet",
+      "format": "markdown",
+      "namePattern": null,
+      "contentPattern": "## User Flow\n\n```mermaid\nflowchart LR\n  A[Start] --> B[Choose option]\n  B --> C[Complete task]\n  C --> D[Confirm outcome]\n```\n",
+      "fields": []
+    }
+  ]
+}

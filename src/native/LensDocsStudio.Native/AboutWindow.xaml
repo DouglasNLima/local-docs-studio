@@ -1,0 +1,16 @@
+<Window x:Class="LensDocsStudio.Native.AboutWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ Title="About Lens Docs Studio" Width="540" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterOwner"
+ Icon="Resources/Brand/application.ico" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}">
+ <StackPanel Margin="24">
+  <DockPanel Margin="0,0,0,16">
+   <Image Source="Resources/Brand/application.ico" Width="64" Height="64" DockPanel.Dock="Left" Margin="0,0,16,0" AutomationProperties.Name="Lens Docs Studio application icon"/>
+   <StackPanel VerticalAlignment="Center">
+    <TextBlock Text="Lens Docs Studio" FontSize="23" FontWeight="SemiBold"/>
+    <TextBlock Text="Local Markdown, Mermaid, and documentation studio." TextWrapping="Wrap" Margin="0,4,0,0"/>
+   </StackPanel>
+  </DockPanel>
+  <TextBlock x:Name="Identity" TextWrapping="Wrap" Margin="0,0,0,16" Text="{Binding}"/>
+  <TextBlock Text="Internal preview for controlled evaluation. See PREVIEW-GUIDE.md for restrictions and Help → Updates for update availability and trust." TextWrapping="Wrap" Foreground="{DynamicResource MutedTextBrush}" Margin="0,0,0,16"/>
+  <Button Content="OK" HorizontalAlignment="Right" MinWidth="80" IsDefault="True" IsCancel="True"/>
+ </StackPanel>
+</Window>

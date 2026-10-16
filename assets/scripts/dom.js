@@ -24,6 +24,7 @@ export const domIds = {
   exportWordButton: 'exportWordButton',
   wordTemplateSelect: 'wordTemplateSelect',
   wordTemplateImportButton: 'wordTemplateImportButton',
+  wordTemplateCopyButton: 'wordTemplateCopyButton',
   wordTemplateSummary: 'wordTemplateSummary',
   exportPdfButton: 'exportPdfButton',
   exportMarkdownBundleButton: 'exportMarkdownBundleButton',

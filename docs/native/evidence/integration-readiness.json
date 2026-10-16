@@ -1,0 +1,1954 @@
+{
+  "status": "READY WITH RESTRICTIONS: tested application candidate; final handoff HEAD gate is recorded in PR 29",
+  "observedAtUtc": "2026-10-16T15:14:23.762578+00:00",
+  "baseline": "2cc3b5680958c9c553dad23856e6010c158fccd7",
+  "applicationValidationCandidate": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+  "branch": "integration/native-wpf-candidate",
+  "draftPr": "https://github.com/DouglasNLima/local-docs-studio/pull/29",
+  "includedPrs": [
+    21,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28
+  ],
+  "excludedPr22": {
+    "head": "83eeb9e489bd3c9513f9ffb17fe0b833c1a088ff",
+    "isAncestor": false,
+    "uniquePathsAbsent": 27
+  },
+  "conflicts": 0,
+  "selectedPackage": {
+    "sourceRevision": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+    "version": "0.1.1-preview.546",
+    "sourceKind": "branch-source",
+    "ciRunId": "38914784848",
+    "package": {
+      "installerSha256": "ba026e35c884ad012d53c6b62be098bf4227c7b9889def1e1a1e42c2d307d0dd",
+      "portableSha256": "ad375d02c98b6613929eceeeb8907b9ab57a5b1cb43714e15a44a0c63a8396a9",
+      "signature": "NotSigned"
+    },
+    "payloadFiles": 528,
+    "core": {
+      "total": "1229",
+      "executed": "1229",
+      "passed": "1229",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "corpusCases": 70,
+    "corpusFailures": 0,
+    "desktopUi": [
+      {
+        "context": "ui",
+        "groups": 75,
+        "receiptSha256": "57d7e1980a14f2fdaa7861661480380b4a1dafe2288fbb7dca08aef010f0e6f8"
+      },
+      {
+        "context": "first-launch",
+        "groups": 75,
+        "receiptSha256": "90e105791758b9e822d54967e5f6bee04a192ced72c133ff5e3e0f9153296eca"
+      },
+      {
+        "context": "after-upgrade",
+        "groups": 75,
+        "receiptSha256": "b560bf3d9cf263f122072f2164370f31f4aac4ce2224a7925b38f1f62cab7067"
+      },
+      {
+        "context": "after-reinstall",
+        "groups": 75,
+        "receiptSha256": "66215771cc0d3ec824919054fafa5a41850048b882df379c87004ccff4a30b21"
+      }
+    ],
+    "lifecycle": {
+      "passed": true,
+      "preservedStateFiles": 22,
+      "sameRevisionUpgrade": true,
+      "historicalSourceRevision": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "candidateSourceRevision": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee"
+    },
+    "restoration": [
+      {
+        "phase": "restored-after-reinstall",
+        "documents": 14,
+        "retainedStateFiles": 18,
+        "workspaceFiles": 13,
+        "unsavedSavedDocuments": 1,
+        "untitledDrafts": 1,
+        "templateCount": 2,
+        "snippetCount": 2,
+        "wordTemplateCount": 1,
+        "snapshotCount": 6,
+        "imageReferences": 6,
+        "receiptSha256": "b843998300b6672140a04b9817e1e284f9e0573d476fc8147d6743eee3b1d925"
+      },
+      {
+        "phase": "restored-after-upgrade",
+        "documents": 14,
+        "retainedStateFiles": 18,
+        "workspaceFiles": 13,
+        "unsavedSavedDocuments": 1,
+        "untitledDrafts": 1,
+        "templateCount": 2,
+        "snippetCount": 2,
+        "wordTemplateCount": 1,
+        "snapshotCount": 6,
+        "imageReferences": 6,
+        "receiptSha256": "b843998300b6672140a04b9817e1e284f9e0573d476fc8147d6743eee3b1d925"
+      }
+    ],
+    "mermaidAuthoring": [
+      {
+        "context": "mermaid-ui",
+        "checks": 119,
+        "actualHighContrastRequested": false,
+        "receiptSha256": "595aebdb9652b22807378ad1612ebced6ddb0366e482f49c92ee959dea0c90e0"
+      },
+      {
+        "context": "mermaid-high-contrast",
+        "checks": 115,
+        "actualHighContrastRequested": true,
+        "receiptSha256": "d6cca10b2562e0640640cefc8de4622a5e4b54132cf3604bafd1515e49364d3d"
+      }
+    ],
+    "fidelityAssertions": 281,
+    "packageNegativeControls": 7,
+    "packageReceiptSha256": "5e9b5f67bafdce91da4662f84fc709e995c5450c6a57a5a4e4eb7883898faad9"
+  },
+  "prMergePackage": {
+    "sourceRevision": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+    "version": "0.1.1-preview.547",
+    "sourceKind": "pull-request-merge-checkout",
+    "ciRunId": "38914793068",
+    "package": {
+      "installerSha256": "5493e9540965ab0e0b1a7d6e9a173f7b9198c6a1b39c67fbd235dcd8b848ea3a",
+      "portableSha256": "9787b9960fe771c73e36813b23bd6622029a458f65d95da2921de8be8f3bed23",
+      "signature": "NotSigned"
+    },
+    "payloadFiles": 528,
+    "core": {
+      "total": "1229",
+      "executed": "1229",
+      "passed": "1229",
+      "failed": "0",
+      "error": "0",
+      "timeout": "0",
+      "aborted": "0",
+      "inconclusive": "0",
+      "passedButRunAborted": "0",
+      "notRunnable": "0",
+      "notExecuted": "0",
+      "disconnected": "0",
+      "warning": "0",
+      "completed": "0",
+      "inProgress": "0",
+      "pending": "0"
+    },
+    "corpusCases": 70,
+    "corpusFailures": 0,
+    "desktopUi": [
+      {
+        "context": "ui",
+        "groups": 75,
+        "receiptSha256": "d2903f4c0a52ccde213153a953fd9e6afbe1291fe1576302ab0016c1be4758b9"
+      },
+      {
+        "context": "first-launch",
+        "groups": 75,
+        "receiptSha256": "d1ab8e6b8ef517dde9b8f4e5cd2b800a96cc99725f581eecb72886520c542782"
+      },
+      {
+        "context": "after-upgrade",
+        "groups": 75,
+        "receiptSha256": "de040c1d242eccc2f8f877e6ba976ccf8f0251500b5522d2be53596975005b09"
+      },
+      {
+        "context": "after-reinstall",
+        "groups": 75,
+        "receiptSha256": "ca3482a3c472203493c9692aea4bac2a0e1ba114f9f32d564c902105b2dab8c2"
+      }
+    ],
+    "lifecycle": {
+      "passed": true,
+      "preservedStateFiles": 22,
+      "sameRevisionUpgrade": true,
+      "historicalSourceRevision": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "candidateSourceRevision": "223cd7e767540beaf5af3f38a680ca608cc60aee"
+    },
+    "restoration": [
+      {
+        "phase": "restored-after-reinstall",
+        "documents": 14,
+        "retainedStateFiles": 18,
+        "workspaceFiles": 13,
+        "unsavedSavedDocuments": 1,
+        "untitledDrafts": 1,
+        "templateCount": 2,
+        "snippetCount": 2,
+        "wordTemplateCount": 1,
+        "snapshotCount": 6,
+        "imageReferences": 6,
+        "receiptSha256": "24e52c861ee0895ad21f1f05f1c45ef684914d26c28d67a15fa6ed9ff6b741a7"
+      },
+      {
+        "phase": "restored-after-upgrade",
+        "documents": 14,
+        "retainedStateFiles": 18,
+        "workspaceFiles": 13,
+        "unsavedSavedDocuments": 1,
+        "untitledDrafts": 1,
+        "templateCount": 2,
+        "snippetCount": 2,
+        "wordTemplateCount": 1,
+        "snapshotCount": 6,
+        "imageReferences": 6,
+        "receiptSha256": "24e52c861ee0895ad21f1f05f1c45ef684914d26c28d67a15fa6ed9ff6b741a7"
+      }
+    ],
+    "mermaidAuthoring": [
+      {
+        "context": "mermaid-ui",
+        "checks": 119,
+        "actualHighContrastRequested": false,
+        "receiptSha256": "c326fb575fc023e5a85850fdd96e1de7d992fdbd9f45dbb6f0f0e019f89b4940"
+      },
+      {
+        "context": "mermaid-high-contrast",
+        "checks": 115,
+        "actualHighContrastRequested": true,
+        "receiptSha256": "909e6316ef4e741277e0d9edaaa667075d715575584f2f599cc455aa44660b0b"
+      }
+    ],
+    "fidelityAssertions": 281,
+    "packageNegativeControls": 7,
+    "packageReceiptSha256": "6641451e4e06a4c528e35732f076d4f0512b8e21f26f16c631d9425921ffd0ca"
+  },
+  "artifactMetadata": [
+    {
+      "created_at": "2026-10-16T14:47:59Z",
+      "digest": "sha256:b71ffe8adf1bf65a2cc673f208cfd3410a9bced67ae84608490aff0b7c76bde5",
+      "expires_at": "2026-10-30T14:47:37Z",
+      "id": 12053906934,
+      "name": "native-validation",
+      "size_in_bytes": 312698604,
+      "workflow_run": {
+        "head_branch": "integration/native-wpf-candidate",
+        "head_repository_id": 1248627951,
+        "head_sha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "id": 38914784848,
+        "repository_id": 1248627951
+      }
+    },
+    {
+      "created_at": "2026-10-16T14:44:51Z",
+      "digest": "sha256:c5610119c70a18a9f61e587ca64195555139529664a939fe2cc670605bc28611",
+      "expires_at": "2026-10-30T14:44:39Z",
+      "id": 12053316965,
+      "name": "native-validation",
+      "size_in_bytes": 312635268,
+      "workflow_run": {
+        "head_branch": "integration/native-wpf-candidate",
+        "head_repository_id": 1248627951,
+        "head_sha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "id": 38914793068,
+        "repository_id": 1248627951
+      }
+    }
+  ],
+  "security": {
+    "observedAtUtc": "2026-10-16T12:51:46.8043795+00:00",
+    "scanId": "e020dea9-3e87-47d8-9c8a-162d1eb0c196",
+    "base": "2cc3b5680958c9c553dad23856e6010c158fccd7",
+    "head": "599a44eaa2e11ffbdb020b76a3059b4b37743154",
+    "outcome": "completed",
+    "coverage": "complete",
+    "sourceEntries": 472,
+    "supportingFiles": 69,
+    "nonExecutableChanges": 138,
+    "confirmedFindings": 0,
+    "deferred": 0,
+    "mode": "source_review",
+    "workbenchRolloutTokens": 67465862,
+    "inputTokens": 67334120,
+    "cachedInputTokens": 65905280,
+    "note": "Counters include cached context and nested worker rollouts; not a billing estimate.",
+    "canonicalReportSha256": "336c8b3b2bcded59f758890d60c85a6a98b9f7f2b0644491dc928c4994e01104",
+    "supplementalIntegrationReviews": [
+      {
+        "through": "eb6ac95b2f45411bfd6bceb53044ddc97ad7017c",
+        "mode": "delegated source review",
+        "actionableFindings": 0
+      },
+      {
+        "through": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "mode": "root source review of narrower CI scope and active-document readiness wait",
+        "actionableFindings": 0
+      }
+    ],
+    "usageScope": "Recorded canonical scan rollout counters at sealing; cached context and nested rollouts are included; not a billing estimate."
+  },
+  "visualInspection": {
+    "sourceRevision": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+    "runId": 38914784977,
+    "inspection": "Fresh hosted light shell and Mermaid Apply focus under actual Windows High Contrast are readable. Earlier normal/minimum/dark captures have the identical Native/Core application trees. No physical-display or screen-reader certification.",
+    "images": [
+      {
+        "path": "native-ux-visual-evidence/ux-current/native-light-1280x800.png",
+        "sha256": "16d269b36129e45f84c072fd8b85f209636e7e98ba41cd5d6895befd53b0bfc0"
+      },
+      {
+        "path": "native-mermaid-visual-evidence/mermaid-high-contrast/mermaid-apply-focus-light.png",
+        "sha256": "1771c2c6ad34b68d4a1d1816ceb2b8dfc488d7cc4752d81149e2f23450e6678b"
+      }
+    ]
+  },
+  "nativeAssemblyAudit": {
+    "assemblies": [
+      {
+        "assembly": "LensDocsStudio.Native.dll",
+        "references": [
+          "CommunityToolkit.Mvvm",
+          "ICSharpCode.AvalonEdit",
+          "LensDocsStudio.Core",
+          "Markdig",
+          "Mermaider",
+          "Microsoft.VisualBasic.Core",
+          "Microsoft.Win32.Primitives",
+          "Microsoft.Win32.Registry",
+          "Microsoft.Win32.SystemEvents",
+          "MigraDoc.DocumentObjectModel",
+          "MigraDoc.Rendering-wpf",
+          "PdfSharp-wpf",
+          "PresentationCore",
+          "PresentationFramework",
+          "SharpVectors.Converters.Wpf",
+          "SharpVectors.Rendering.Wpf",
+          "SharpVectors.Runtime.Wpf",
+          "System.Collections",
+          "System.Collections.Concurrent",
+          "System.ComponentModel",
+          "System.ComponentModel.EventBasedAsync",
+          "System.ComponentModel.Primitives",
+          "System.ComponentModel.TypeConverter",
+          "System.Data.Common",
+          "System.Diagnostics.Process",
+          "System.Diagnostics.Tracing",
+          "System.IO.FileSystem.Watcher",
+          "System.IO.Pipes",
+          "System.Linq",
+          "System.Memory",
+          "System.Net.Http",
+          "System.ObjectModel",
+          "System.Runtime",
+          "System.Runtime.InteropServices",
+          "System.Security.Cryptography",
+          "System.Text.Json",
+          "System.Text.RegularExpressions",
+          "System.Threading",
+          "System.Threading.Thread",
+          "System.Xaml",
+          "System.Xml.ReaderWriter",
+          "System.Xml.XDocument",
+          "WindowsBase",
+          "WpfMath",
+          "XamlMath.Shared"
+        ],
+        "typeCount": 705,
+        "forbiddenTypesOrReferences": 0
+      },
+      {
+        "assembly": "LensDocsStudio.Core.dll",
+        "references": [
+          "AngleSharp",
+          "DocumentFormat.OpenXml",
+          "DocumentFormat.OpenXml.Framework",
+          "Markdig",
+          "Mermaider",
+          "System.Collections",
+          "System.IO.Compression",
+          "System.IO.Compression.ZipFile",
+          "System.IO.Hashing",
+          "System.Linq",
+          "System.Memory",
+          "System.Net.Http",
+          "System.Net.Primitives",
+          "System.ObjectModel",
+          "System.Runtime",
+          "System.Runtime.Numerics",
+          "System.Security.Cryptography",
+          "System.Text.Encoding.Extensions",
+          "System.Text.Json",
+          "System.Text.RegularExpressions",
+          "System.Threading",
+          "System.Xml.ReaderWriter",
+          "System.Xml.XDocument",
+          "UglyToad.PdfPig",
+          "UglyToad.PdfPig.DocumentLayoutAnalysis"
+        ],
+        "typeCount": 779,
+        "forbiddenTypesOrReferences": 0
+      }
+    ],
+    "executionPerformed": false,
+    "status": "PASS"
+  },
+  "prAssemblyAudit": {
+    "assemblies": [
+      {
+        "assembly": "LensDocsStudio.Native.dll",
+        "references": [
+          "CommunityToolkit.Mvvm",
+          "ICSharpCode.AvalonEdit",
+          "LensDocsStudio.Core",
+          "Markdig",
+          "Mermaider",
+          "Microsoft.VisualBasic.Core",
+          "Microsoft.Win32.Primitives",
+          "Microsoft.Win32.Registry",
+          "Microsoft.Win32.SystemEvents",
+          "MigraDoc.DocumentObjectModel",
+          "MigraDoc.Rendering-wpf",
+          "PdfSharp-wpf",
+          "PresentationCore",
+          "PresentationFramework",
+          "SharpVectors.Converters.Wpf",
+          "SharpVectors.Rendering.Wpf",
+          "SharpVectors.Runtime.Wpf",
+          "System.Collections",
+          "System.Collections.Concurrent",
+          "System.ComponentModel",
+          "System.ComponentModel.EventBasedAsync",
+          "System.ComponentModel.Primitives",
+          "System.ComponentModel.TypeConverter",
+          "System.Data.Common",
+          "System.Diagnostics.Process",
+          "System.Diagnostics.Tracing",
+          "System.IO.FileSystem.Watcher",
+          "System.IO.Pipes",
+          "System.Linq",
+          "System.Memory",
+          "System.Net.Http",
+          "System.ObjectModel",
+          "System.Runtime",
+          "System.Runtime.InteropServices",
+          "System.Security.Cryptography",
+          "System.Text.Json",
+          "System.Text.RegularExpressions",
+          "System.Threading",
+          "System.Threading.Thread",
+          "System.Xaml",
+          "System.Xml.ReaderWriter",
+          "System.Xml.XDocument",
+          "WindowsBase",
+          "WpfMath",
+          "XamlMath.Shared"
+        ],
+        "typeCount": 705,
+        "forbiddenTypesOrReferences": 0
+      },
+      {
+        "assembly": "LensDocsStudio.Core.dll",
+        "references": [
+          "AngleSharp",
+          "DocumentFormat.OpenXml",
+          "DocumentFormat.OpenXml.Framework",
+          "Markdig",
+          "Mermaider",
+          "System.Collections",
+          "System.IO.Compression",
+          "System.IO.Compression.ZipFile",
+          "System.IO.Hashing",
+          "System.Linq",
+          "System.Memory",
+          "System.Net.Http",
+          "System.Net.Primitives",
+          "System.ObjectModel",
+          "System.Runtime",
+          "System.Runtime.Numerics",
+          "System.Security.Cryptography",
+          "System.Text.Encoding.Extensions",
+          "System.Text.Json",
+          "System.Text.RegularExpressions",
+          "System.Threading",
+          "System.Xml.ReaderWriter",
+          "System.Xml.XDocument",
+          "UglyToad.PdfPig",
+          "UglyToad.PdfPig.DocumentLayoutAnalysis"
+        ],
+        "typeCount": 779,
+        "forbiddenTypesOrReferences": 0
+      }
+    ],
+    "executionPerformed": false,
+    "status": "PASS"
+  },
+  "historicalUpgrades": [
+    {
+      "preview": "0.1.1-preview.317",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "dd6c4c33f1a6fa86206e76b2153afcc7b151a523",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 20,
+      "installerReceiptSha256": "41bdf544dc608cb845491ecf8c2f2d7e9b91f7fa92de25a08958d18dbedccb3d",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 68,
+          "receiptSha256": "d730883091fed0257fda24480bead2035bbc54fcd00f13a888b8243f4772a011"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "b1b89756421fe68a5630ea07b4306a8220a359b1978280e948df03c91fd2a46c"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "21c56f7c44cc327a98cc71ee245632c39d5eae19a53f9c043f6549164cdf4ad6"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 16,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 4,
+          "imageReferences": 6,
+          "receiptSha256": "fe37f2404758be1cd4257454f849dd8304c78f5c03ea8a6763760340016eedde"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 16,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 4,
+          "imageReferences": 6,
+          "receiptSha256": "fe37f2404758be1cd4257454f849dd8304c78f5c03ea8a6763760340016eedde"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.393",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "5a373a412e86b93ea8af1b9e5b867250e3d23ee1",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "1e8b66b4a13f722cb62421f828eed4de9cb4a1bf7a6e71ae206d44f7528c0411",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 74,
+          "receiptSha256": "4f4e3fa2ee4d9ce6feb27f33a4e4f5c3aabfddc2565969f718adc439711b118b"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "91be53152bd3774950f14da53d4a3599878db0a43e767fe34ee87bbe132ec2b1"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "38aa93b8b509c4a7d3f99c529e6f4788e0b7533c39441a4973ec247b2267bb21"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "42de65bcbba93f8dcca12fa85b7096f555c60ac88fff994b6146be0bcdd86a26"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "42de65bcbba93f8dcca12fa85b7096f555c60ac88fff994b6146be0bcdd86a26"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.433",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "ef392b0df46243805e5596d160d2c077a1c9f8dd",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "9cf2d986ebbd01033e0efc6436fef1d65b6381faf9ebe6417f84ac0d114d6889",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "af4eb197bf5bfa7a1c2ae67334bd608049900b34544463ff4f4cbaa37036532b"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "97adfeaab1a3f576c340b0723d20097c585fdcf8db03fde1bb3a1eafdde19be1"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "2f6e85bafc54deaf5bf0bb473fda78f2fca10c72a1347c97381025360f83dc4f"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "f72fb75082a89ae21d3670691bc775a250314a136e64778729863a422a25eb90"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "f72fb75082a89ae21d3670691bc775a250314a136e64778729863a422a25eb90"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.473",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "298b4da17f015ddd97a3a597bc0568e38a0c901a73991723fa39d4ccafb43b89",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "0a4748a0a0a0d8b849f636b77be904a769434b46fe5d9feb060b658da2967d3f"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "49ba430dbafd548701305e9af4a72af80f8dc44ba426ac4b389273a4aa4fa182"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "d34220e1aff60e8a24d7753b31c8166164715dcc1a874e9e2d1160f1911a7c8e"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "c53c779009b9df67a77170902ec7e1196968a649c19a7ee63cd3ef882fec849f"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "c53c779009b9df67a77170902ec7e1196968a649c19a7ee63cd3ef882fec849f"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.497",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "302096110631c6ad5ad12cdc4b44587cc293ccf6",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "2146ccb05cab36f8636f6def7780b9a14ede304179f457d007ab4b864d10c531",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "52d9696009ff31e19ab380651911ac49016e1bd182c969ed76134f631fad04f4"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "d86960d2f17d07a4f0df0174817e1b7bb45498bf9c140fa4edc6cafcd18523e1"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "ba5331c6bac582e259f55e762a355a81985fdd0d426f7f53948948dfc34053d7"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "9ffd454915c810941e23e2541abad3724f8026562fbf950b961914c7888700e0"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "9ffd454915c810941e23e2541abad3724f8026562fbf950b961914c7888700e0"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.531",
+      "runId": 38914784848,
+      "status": "PASS",
+      "originalSource": "4940c58a542b635e7e008eeaf31b03ca4ec5878a",
+      "candidateSource": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "bfd53a153b8b54abe9b190e088962e845f4cca2b8c6430de2816af901060b299",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "8b84e737989b3c3552631136c25d45f07366179c6b58d70d3f2eff700381a094"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "d1064aba0feb1433adfa67c9bdc0b03c163edfb490b7cc545d58825a82d82d15"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "b263ccc4740a0919ce2f9eee4d76c8235f1a7a735989737aef266666b94ea9c2"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "cfe5e9d1cad892e58a1b0792dcef33aa8c118dbfb2efe264b2675165b0988243"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "cfe5e9d1cad892e58a1b0792dcef33aa8c118dbfb2efe264b2675165b0988243"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.317",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "dd6c4c33f1a6fa86206e76b2153afcc7b151a523",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 20,
+      "installerReceiptSha256": "78dfa8635137ae86a2d54814dd4fe8f739b883f6d57ad6a71ccda4da97965aac",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 68,
+          "receiptSha256": "e23d64a2d4498fb5e0bc53b225708ef3a3153b9f6d84338a0ad34b70a2322835"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "0e47d7999571807b97e22ffc7f7503742b9d0b93c1c8a8e1b042aa7e86e57b05"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "81ff9b53f33f313995d133d65ce55b98fd3803762e5db377b7c97a2ca49fbb92"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 16,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 4,
+          "imageReferences": 6,
+          "receiptSha256": "99ddbeb3b14422f7f8b03c9987cd1331a4b76c5a51a0db26a5c7c433c6680854"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 16,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 4,
+          "imageReferences": 6,
+          "receiptSha256": "99ddbeb3b14422f7f8b03c9987cd1331a4b76c5a51a0db26a5c7c433c6680854"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.393",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "5a373a412e86b93ea8af1b9e5b867250e3d23ee1",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "1c60ddc25972abe11e0759f129f8dfdbae783d4b38296a24e23dbc435bf793d8",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 74,
+          "receiptSha256": "d2e4da518ae08014c4569cdeae25f94ae6ea2654202793a345d618bea903ceac"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "d05694cbfdd7e351ad4c6dcdcd09cc3b6d76eeef5e1debad54877650c0a03166"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "19d2382cfc1e3a22783ae0027e89ebc5850633dfa236c1b7b80138df0c83aa90"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "e580f5e1ade60ae35b9749faa9af0140e5d2c5531efe134c852a5e15fc6f9cfa"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "e580f5e1ade60ae35b9749faa9af0140e5d2c5531efe134c852a5e15fc6f9cfa"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.433",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "ef392b0df46243805e5596d160d2c077a1c9f8dd",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "257418cec47222f451310846eb26f717666a22f46628218ea864d531260fd22f",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "bd9fc586ad827158c6f826f56aa5eb7c70fba02f00e034440a1f62e5860c62c0"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "a26c640e5b9e2f3330b1e56f1015f23692bc232fb349ed7eab8e451a45d131d9"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "b3aa900d2ec9eb8330c6f7c9fdd074dfd735e93edcb9d55382602603f086dad6"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "ccb740e3112c11f5579c9d7c667a3e75f199817c3d70d9c18e0007997eff10eb"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "ccb740e3112c11f5579c9d7c667a3e75f199817c3d70d9c18e0007997eff10eb"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.473",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "36b331ac6c2b29ebcf53e1a16735a5696ae8b2ac",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "6214f4c4cc6095b2c09ba2b5df0f56b8561fc966ecb9031c2ace8a57b870ddf5",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "4a1b0d9db97b097e21b1091bb488fa5230aaeff42b2a76a27335c2c2e29592c4"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "85cbe8dfe268d0b55996dfa78d879ac96b8288c6e9eb7e4418ef32acd80cb1ae"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "948262ffae87617f5bbe665743b32b2b2155e1a8e8a74f0ad2d46df8709dc433"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "b45576811cb63e4c06b54f26a754e836b1444748743df4aaf803f83ba9e6699d"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "b45576811cb63e4c06b54f26a754e836b1444748743df4aaf803f83ba9e6699d"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.497",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "302096110631c6ad5ad12cdc4b44587cc293ccf6",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "c44d3586fbeeff6989d635daea4c3fb5d052d54980143bb8d9d23316bfb4bb59",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "7fabf014b0cbf389e7e98eb234578285a34db45c1a32145cbdb6a9f19e6d4ea0"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "daa8e49c40c9e6a172046346570f56ba36a8c17bc2425c26732d4befd0364af6"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "d1e15fe00cc343d2d90b497837fb8dfbc53a596c1a199f7aec90d243750a6e31"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "ebd69570d51c52fbfb009c01258ca09bdef7c9ba9407199bffbee65a964e8175"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "ebd69570d51c52fbfb009c01258ca09bdef7c9ba9407199bffbee65a964e8175"
+        }
+      ]
+    },
+    {
+      "preview": "0.1.1-preview.531",
+      "runId": 38914793068,
+      "status": "PASS",
+      "originalSource": "4940c58a542b635e7e008eeaf31b03ca4ec5878a",
+      "candidateSource": "223cd7e767540beaf5af3f38a680ca608cc60aee",
+      "originalHarnessUsed": true,
+      "sameRevisionUpgrade": false,
+      "preservedStateFiles": 22,
+      "installerReceiptSha256": "e6f55ca2c6449a57cee67c1a9bc0066d15ff9f8fc45f3965a9440e8defbc88bb",
+      "originalDraftReceiptSha256": "3a239d5e044ee0c1934d5ddd8a6977a493d548d876d4e9a666adb7aff2cc27bd",
+      "uiGroups": [
+        {
+          "phase": "first-launch",
+          "groups": 75,
+          "receiptSha256": "d358e4a45211c21121e54a729d84f94c63e7d0357edffd06f1eebd85fb1ddca5"
+        },
+        {
+          "phase": "after-upgrade",
+          "groups": 75,
+          "receiptSha256": "7b05390f9263bc6b89a3f49bc386e17b8d2ef5eedbfe5bf7596cac9127cf3954"
+        },
+        {
+          "phase": "after-reinstall",
+          "groups": 75,
+          "receiptSha256": "6f4e4522fd288d80169f33e0f88d4a9e67a55579e9b419ec96eed76d72a64f12"
+        }
+      ],
+      "restoration": [
+        {
+          "phase": "restored-after-upgrade",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "5784cdec1009ac1c6b645ae52e0ca120ff457ba1246ac6ca577029d61623aefa"
+        },
+        {
+          "phase": "restored-after-reinstall",
+          "documents": 14,
+          "retainedStateFiles": 18,
+          "unsavedSavedDocuments": 1,
+          "untitledDrafts": 1,
+          "workspaceFiles": 13,
+          "templateCount": 2,
+          "snippetCount": 2,
+          "wordTemplateCount": 1,
+          "snapshotCount": 6,
+          "imageReferences": 6,
+          "receiptSha256": "5784cdec1009ac1c6b645ae52e0ca120ff457ba1246ac6ca577029d61623aefa"
+        }
+      ]
+    }
+  ],
+  "browser": {
+    "branchRun": 38914784874,
+    "prRun": 38914792732,
+    "casesPerBrowser": 134,
+    "browsers": [
+      "chromium",
+      "edge"
+    ],
+    "staticIntegrity": "PASS",
+    "deployment": "expected SKIPPED"
+  },
+  "performance": {
+    "native": {
+      "continuous": [
+        {
+          "Name": "list",
+          "FirstLayoutInputMilliseconds": 875.4746,
+          "InputAcceptance": "FAIL",
+          "ConstructionMilliseconds": 203.1933,
+          "AllocatedBytes": 106230680
+        },
+        {
+          "Name": "mixed",
+          "FirstLayoutInputMilliseconds": 352.72579999999994,
+          "InputAcceptance": "FAIL",
+          "ConstructionMilliseconds": 213.8271,
+          "AllocatedBytes": 51142256
+        }
+      ],
+      "editorInitialLayoutMs": 115.4529,
+      "workspace": [
+        {
+          "Iteration": 1,
+          "EnumerationMilliseconds": 12.5782,
+          "ReadMilliseconds": 17.36,
+          "ParseMilliseconds": 318.656,
+          "Memory": {
+            "WorkingSetBytes": 480759808,
+            "PrivateBytes": 322736128,
+            "ManagedHeapBytes": 175142288,
+            "TotalManagedAllocatedBytes": 1761162608
+          }
+        },
+        {
+          "Iteration": 2,
+          "EnumerationMilliseconds": 11.1777,
+          "ReadMilliseconds": 8.58,
+          "ParseMilliseconds": 379.0029,
+          "Memory": {
+            "WorkingSetBytes": 539291648,
+            "PrivateBytes": 382398464,
+            "ManagedHeapBytes": 216364000,
+            "TotalManagedAllocatedBytes": 1832468016
+          }
+        },
+        {
+          "Iteration": 3,
+          "EnumerationMilliseconds": 11.9817,
+          "ReadMilliseconds": 8.6439,
+          "ParseMilliseconds": 313.4998,
+          "Memory": {
+            "WorkingSetBytes": 610295808,
+            "PrivateBytes": 454574080,
+            "ManagedHeapBytes": 287814784,
+            "TotalManagedAllocatedBytes": 1903784352
+          }
+        }
+      ],
+      "programmaticEdits": [
+        {
+          "Offset": 0,
+          "Iteration": 1,
+          "TargetViewportY": 8.196666666666667,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.988,
+          "UndoAndLayoutMilliseconds": 0.8521
+        },
+        {
+          "Offset": 0,
+          "Iteration": 2,
+          "TargetViewportY": 8.196666666666667,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.5965,
+          "UndoAndLayoutMilliseconds": 0.6033
+        },
+        {
+          "Offset": 0,
+          "Iteration": 3,
+          "TargetViewportY": 8.196666666666667,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.902,
+          "UndoAndLayoutMilliseconds": 0.776
+        },
+        {
+          "Offset": 0,
+          "Iteration": 4,
+          "TargetViewportY": 8.196666666666667,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.5833,
+          "UndoAndLayoutMilliseconds": 0.5046
+        },
+        {
+          "Offset": 0,
+          "Iteration": 5,
+          "TargetViewportY": 8.196666666666667,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.4677,
+          "UndoAndLayoutMilliseconds": 0.4515
+        },
+        {
+          "Offset": 2060012,
+          "Iteration": 1,
+          "TargetViewportY": 160.0000000000582,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 1.511,
+          "UndoAndLayoutMilliseconds": 1.2056
+        },
+        {
+          "Offset": 2060012,
+          "Iteration": 2,
+          "TargetViewportY": 160.0000000000582,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 1.1284,
+          "UndoAndLayoutMilliseconds": 1.041
+        },
+        {
+          "Offset": 2060012,
+          "Iteration": 3,
+          "TargetViewportY": 160.0000000000582,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 1.1359,
+          "UndoAndLayoutMilliseconds": 1.2483
+        },
+        {
+          "Offset": 2060012,
+          "Iteration": 4,
+          "TargetViewportY": 160.0000000000582,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 91.042,
+          "UndoAndLayoutMilliseconds": 1.4565
+        },
+        {
+          "Offset": 2060012,
+          "Iteration": 5,
+          "TargetViewportY": 160.0000000000582,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 1.2959,
+          "UndoAndLayoutMilliseconds": 1.1706
+        },
+        {
+          "Offset": 4120025,
+          "Iteration": 1,
+          "TargetViewportY": 471.8033333332278,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.8903,
+          "UndoAndLayoutMilliseconds": 4.1189
+        },
+        {
+          "Offset": 4120025,
+          "Iteration": 2,
+          "TargetViewportY": 471.8033333332278,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.9456,
+          "UndoAndLayoutMilliseconds": 1.0863
+        },
+        {
+          "Offset": 4120025,
+          "Iteration": 3,
+          "TargetViewportY": 471.8033333332278,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.8649,
+          "UndoAndLayoutMilliseconds": 0.8356
+        },
+        {
+          "Offset": 4120025,
+          "Iteration": 4,
+          "TargetViewportY": 471.8033333332278,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.8505,
+          "UndoAndLayoutMilliseconds": 0.8663
+        },
+        {
+          "Offset": 4120025,
+          "Iteration": 5,
+          "TargetViewportY": 471.8033333332278,
+          "ActualHeight": 480,
+          "InsertAndLayoutMilliseconds": 0.8979,
+          "UndoAndLayoutMilliseconds": 0.7991
+        }
+      ],
+      "exports": {
+        "Fixture": "tests/fixtures/mixed.md",
+        "SourceBytes": 557,
+        "ReadAndPrepareMilliseconds": 30.058,
+        "DocxMilliseconds": 3.3727,
+        "PdfMilliseconds": 45.2719,
+        "HtmlMilliseconds": 2.6317,
+        "DocxBytes": 45392,
+        "PdfBytes": 103859,
+        "HtmlCharacters": 59744,
+        "Limitation": "Warm validation-process observations; export durations exclude file writes and separate schema/content validation."
+      },
+      "actualUi": {
+        "Samples": [
+          {
+            "Operation": "Initial process launch through fixture text and Mermaid preview readiness",
+            "ElapsedMilliseconds": 2059.9866,
+            "ProcessId": 9800,
+            "WorkingSetBytes": 171184128,
+            "PrivateBytes": 76632064,
+            "PeakWorkingSetBytes": 171184128,
+            "ProcessCpuMilliseconds": 2265.625
+          },
+          {
+            "Operation": "Windows keyboard text delivery through exact editor observation",
+            "ElapsedMilliseconds": 626.2235,
+            "ProcessId": 9800,
+            "WorkingSetBytes": 373219328,
+            "PrivateBytes": 219451392,
+            "PeakWorkingSetBytes": 379764736,
+            "ProcessCpuMilliseconds": 56375
+          },
+          {
+            "Operation": "Save shortcut through observed UTF-8 file update",
+            "ElapsedMilliseconds": 107.3233,
+            "ProcessId": 9800,
+            "WorkingSetBytes": 374497280,
+            "PrivateBytes": 221425664,
+            "PeakWorkingSetBytes": 379764736,
+            "ProcessCpuMilliseconds": 56484.375
+          },
+          {
+            "Operation": "Paste shortcut through persisted 2 by 2 image and source insertion",
+            "ElapsedMilliseconds": 25.0756,
+            "ProcessId": 9800,
+            "WorkingSetBytes": 416313344,
+            "PrivateBytes": 252628992,
+            "PeakWorkingSetBytes": 421400576,
+            "ProcessCpuMilliseconds": 86078.125
+          }
+        ],
+        "ProcessorCount": 4,
+        "Limitations": "Observed Windows workflow latency includes input delivery, UIA and 100 ms polling. First launch is of this fixture process, not a cold operating-system cache. Memory belongs to the actual tested application; no forced garbage collection or universal timing threshold is used."
+      }
+    },
+    "mermaid": {
+      "source": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+      "mermaid": {
+        "Scenarios": [
+          {
+            "Fixture": "20 nodes",
+            "Nodes": 20,
+            "Connections": 19,
+            "Subgraphs": 0,
+            "SourceCharacters": 635,
+            "ParseMilliseconds": 107.3429,
+            "NativeLayoutMilliseconds": 379.9662,
+            "RenderMilliseconds": 250.7952,
+            "EditAndRenderMilliseconds": 27.3008,
+            "AllocatedProcessBytes": 14650792,
+            "Rendered": true,
+            "RenderError": null,
+            "EditAccepted": true,
+            "EditError": null,
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 85385216,
+            "SourcePreservedAfterRejection": true
+          },
+          {
+            "Fixture": "100 nodes",
+            "Nodes": 100,
+            "Connections": 99,
+            "Subgraphs": 0,
+            "SourceCharacters": 3355,
+            "ParseMilliseconds": 2.7842,
+            "NativeLayoutMilliseconds": 312.2921,
+            "RenderMilliseconds": 20.4229,
+            "EditAndRenderMilliseconds": 24.496,
+            "AllocatedProcessBytes": 66291560,
+            "Rendered": true,
+            "RenderError": null,
+            "EditAccepted": true,
+            "EditError": null,
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 99758080,
+            "SourcePreservedAfterRejection": true
+          },
+          {
+            "Fixture": "300 nodes",
+            "Nodes": 300,
+            "Connections": 199,
+            "Subgraphs": 0,
+            "SourceCharacters": 8954,
+            "ParseMilliseconds": 8.3755,
+            "NativeLayoutMilliseconds": 1165.9333,
+            "RenderMilliseconds": 77.9999,
+            "EditAndRenderMilliseconds": 58.3711,
+            "AllocatedProcessBytes": 194716328,
+            "Rendered": true,
+            "RenderError": null,
+            "EditAccepted": true,
+            "EditError": null,
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 131366912,
+            "SourcePreservedAfterRejection": true
+          },
+          {
+            "Fixture": "Dense connections",
+            "Nodes": 20,
+            "Connections": 190,
+            "Subgraphs": 0,
+            "SourceCharacters": 3542,
+            "ParseMilliseconds": 0.9765,
+            "NativeLayoutMilliseconds": 0.0002,
+            "RenderMilliseconds": 7574.7844,
+            "EditAndRenderMilliseconds": 0.6763,
+            "AllocatedProcessBytes": 2394172632,
+            "Rendered": false,
+            "RenderError": "Diagram could not be rendered: The operation was canceled.",
+            "EditAccepted": false,
+            "EditError": "This dense graph exceeds the visual editing budget (more than 100 connections and four connections per node). Keep it in protected source/preview mode.",
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 135741440,
+            "SourcePreservedAfterRejection": true
+          },
+          {
+            "Fixture": "Nested groups",
+            "Nodes": 100,
+            "Connections": 99,
+            "Subgraphs": 20,
+            "SourceCharacters": 3935,
+            "ParseMilliseconds": 8.935,
+            "NativeLayoutMilliseconds": 432.3689,
+            "RenderMilliseconds": 45.0698,
+            "EditAndRenderMilliseconds": 29.1821,
+            "AllocatedProcessBytes": 81312880,
+            "Rendered": true,
+            "RenderError": null,
+            "EditAccepted": true,
+            "EditError": null,
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 145068032,
+            "SourcePreservedAfterRejection": true
+          },
+          {
+            "Fixture": "Long labels",
+            "Nodes": 20,
+            "Connections": 0,
+            "Subgraphs": 0,
+            "SourceCharacters": 14602,
+            "ParseMilliseconds": 1.7772,
+            "NativeLayoutMilliseconds": 1698.7293,
+            "RenderMilliseconds": 21.5368,
+            "EditAndRenderMilliseconds": 6.4183,
+            "AllocatedProcessBytes": 361340584,
+            "Rendered": true,
+            "RenderError": null,
+            "EditAccepted": true,
+            "EditError": null,
+            "RenderingSkippedForProtection": false,
+            "WorkingSetBytes": 179216384,
+            "SourcePreservedAfterRejection": true
+          }
+        ],
+        "ExternalCancellationObserved": true,
+        "CancellationCompletionMilliseconds": 5653.4511,
+        "CancellationTotalMilliseconds": 5679.6947,
+        "ProcessorCount": 4,
+        "Runtime": ".NET 10.0.13",
+        "Limits": "100,000 characters; 300 nodes; 500 total elements; eight nested subgraphs; unchanged three-second renderer deadline.",
+        "Limitations": "Single-process observations include cold/warm runtime effects; these are source/model/layout/render measurements, not physical input or monitor certification. Renderer rejection within editing bounds remains a protected source/preview case."
+      },
+      "actualUiTimings": [
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 960.0497
+        },
+        {
+          "Operation": "Zoom in and out including UIA transport and compositor flush",
+          "Milliseconds": 98.8809
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_B",
+          "Milliseconds": 66.8521
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_A",
+          "Milliseconds": 92.3482
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_Node1",
+          "Milliseconds": 70.717
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 666.3568
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 658.0238
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_Reviewed",
+          "Milliseconds": 109.1099
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 645.5394
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 637.6929
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_Reviewed",
+          "Milliseconds": 96.1373
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 706.7225
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_Reviewed",
+          "Milliseconds": 96.7649
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 752.9129
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_A",
+          "Milliseconds": 107.4244
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 770.9034
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 994.6861
+        },
+        {
+          "Operation": "Protected middle-button PAN including synthetic drag, UIA transport and compositor flush",
+          "Milliseconds": 446.6067
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 844.2703
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 980.7821
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 670.4918
+        },
+        {
+          "Operation": "Open visual editor",
+          "Milliseconds": 820.5657
+        },
+        {
+          "Operation": "Native selection including UIA transport",
+          "Element": "node_A",
+          "Milliseconds": 97.1008
+        },
+        {
+          "Operation": "Native canvas 20 nodes",
+          "Milliseconds": 1550.9594
+        },
+        {
+          "Operation": "Native canvas 100 nodes",
+          "Milliseconds": 2829.7995
+        },
+        {
+          "Operation": "Native canvas 300 nodes",
+          "Milliseconds": 5804.83
+        }
+      ]
+    }
+  },
+  "restrictions": [
+    "Continuous first-layout input still exceeds 250 ms",
+    "Intermittent construction delays unresolved",
+    "Coarse dependency cancellation is not a hard three-second bound",
+    "SDK-free clean Windows certification BLOCKED",
+    "Production signing BLOCKED; unsigned in-app update execution disabled",
+    "Physical DPI/multiple monitors/assistive technology unexecuted",
+    "Complete Microsoft Word visual fidelity not certified",
+    "Mid-write installer interruption, power loss and downgrade compatibility not certified"
+  ],
+  "sourceTrees": {
+    "native": "fb1a3c4f2b06f5529906c3a442c3b8409a444e2f",
+    "core": "acab5f44d41b9b6c2ef76b435d503cf0cbac7125",
+    "assets": "a5eda9906664f2f46b8608ff702c820fcc038bcb",
+    "embeddedNativeHelpBlob": "b4cf44e9b59ca5cf89e90e3d4884d5ced09447f0"
+  },
+  "candidateCiAudit": {
+    "status": "PASS",
+    "head": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+    "runs": [
+      {
+        "databaseId": 38914784848,
+        "name": "Validate native Windows edition",
+        "event": "push",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848",
+        "createdAt": "2026-10-16T14:19:08Z",
+        "updatedAt": "2026-10-16T15:07:57Z",
+        "jobs": [
+          {
+            "name": "native",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117019925534"
+          },
+          {
+            "name": "Historical upgrade (317)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739300"
+          },
+          {
+            "name": "Historical upgrade (473)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739333"
+          },
+          {
+            "name": "Historical upgrade (433)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739348"
+          },
+          {
+            "name": "Historical upgrade (393)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739447"
+          },
+          {
+            "name": "Historical upgrade (531)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739453"
+          },
+          {
+            "name": "Historical upgrade (497)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784848/job/117032739578"
+          }
+        ]
+      },
+      {
+        "databaseId": 38914793068,
+        "name": "Validate native Windows edition",
+        "event": "pull_request",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068",
+        "createdAt": "2026-10-16T14:19:11Z",
+        "updatedAt": "2026-10-16T15:05:25Z",
+        "jobs": [
+          {
+            "name": "native",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117019910555"
+          },
+          {
+            "name": "Historical upgrade (393)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031264961"
+          },
+          {
+            "name": "Historical upgrade (497)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031264968"
+          },
+          {
+            "name": "Historical upgrade (317)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031265015"
+          },
+          {
+            "name": "Historical upgrade (433)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031265075"
+          },
+          {
+            "name": "Historical upgrade (531)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031265092"
+          },
+          {
+            "name": "Historical upgrade (473)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793068/job/117031265093"
+          }
+        ]
+      },
+      {
+        "databaseId": 38914784977,
+        "name": "Validate native desktop UX",
+        "event": "push",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784977",
+        "createdAt": "2026-10-16T14:19:08Z",
+        "updatedAt": "2026-10-16T14:25:13Z",
+        "jobs": [
+          {
+            "name": "baseline",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784977/job/117019352936"
+          },
+          {
+            "name": "mermaid-visual-editor",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784977/job/117019353267"
+          }
+        ]
+      },
+      {
+        "databaseId": 38914793282,
+        "name": "Validate native desktop UX",
+        "event": "pull_request",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793282",
+        "createdAt": "2026-10-16T14:19:11Z",
+        "updatedAt": "2026-10-16T14:24:09Z",
+        "jobs": [
+          {
+            "name": "baseline",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793282/job/117019383888"
+          },
+          {
+            "name": "mermaid-visual-editor",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914793282/job/117019384307"
+          }
+        ]
+      },
+      {
+        "databaseId": 38914784874,
+        "name": "Publish Lens Docs Studio",
+        "event": "push",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784874",
+        "createdAt": "2026-10-16T14:19:08Z",
+        "updatedAt": "2026-10-16T14:24:05Z",
+        "jobs": [
+          {
+            "name": "Test static app (edge)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784874/job/117019351696"
+          },
+          {
+            "name": "Test static app (chromium)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784874/job/117019351912"
+          },
+          {
+            "name": "Test static app",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784874/job/117021588294"
+          },
+          {
+            "name": "Deploy to GitHub Pages",
+            "conclusion": "skipped",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914784874/job/117021635239"
+          }
+        ]
+      },
+      {
+        "databaseId": 38914792732,
+        "name": "Publish Lens Docs Studio",
+        "event": "pull_request",
+        "headSha": "8e27f5ee0e407fa2fe5cb9b95dcb16db8ce3ccee",
+        "status": "completed",
+        "conclusion": "success",
+        "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914792732",
+        "createdAt": "2026-10-16T14:19:11Z",
+        "updatedAt": "2026-10-16T14:25:34Z",
+        "jobs": [
+          {
+            "name": "Test static app (edge)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914792732/job/117019378484"
+          },
+          {
+            "name": "Test static app (chromium)",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914792732/job/117019378518"
+          },
+          {
+            "name": "Test static app",
+            "conclusion": "success",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914792732/job/117022230689"
+          },
+          {
+            "name": "Deploy to GitHub Pages",
+            "conclusion": "skipped",
+            "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38914792732/job/117022311568"
+          }
+        ]
+      }
+    ]
+  },
+  "historical317VisualInspection": {
+    "runId": 38914784848,
+    "phase": "restored-after-upgrade",
+    "inspection": "Actual restored untitled draft remains dirty and shows exact Cafe/Greek text in the native editor and preview. All14 tab text/baseline identities are separately asserted by the receipt.",
+    "screenshotSha256": "c1afd7774b3e74c74dd7eba10f5f66e79417c47eed18d869fed66214f36b14f0"
+  },
+  "finalHandoffHeadGate": "All mandatory workflows must complete successfully on the final integration handoff HEAD; exact SHA and conclusions are recorded in PR 29 and the final handoff.",
+  "finalGateObservationCorrection": {
+    "failedSourceRevision": "fdebe1f82ce5a5a58943ea2ffdb4c34785c803e3",
+    "failedRunId": "38922782024",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/38922782024",
+    "phase": "after-reinstall table CSV export completion observation",
+    "displayedStatus": "Export completed — fixture-table-2.csv. Table exported as UTF-8 CSV",
+    "uiaTree": "TitleBar/SystemMenuBar only; full provider root cause not established",
+    "preservedEvidence": {
+      "native-ui-failure-desktop.png": "c0c6b2c61c02c019c045e2eed5ce287da97d7a02720f3e8db8bd9a2b3e903d69",
+      "native-ui-failure-controls.txt": "3bb7099b76e3300fca2704de415712667cef0def5530cc42f82bd62c4362a876",
+      "native-ui-failure-threads.dmp": "b3d044124847fbb065bd7432f332947cff976bcbf12f9a9850d126ed0049b7e9",
+      "native-save-dialogues.json": "15db0609f0c1eb67a3e4cd43641bf94f958ae103f1fdefddc7e4b5e919e65f8a",
+      "native-ui.json": "9fe7020798baf4bd27824e7a872f0f11e733b1c3e436e3f4649aba1785143122"
+    },
+    "change": "Reacquire the same HWND provider and verify process identity for each window/control observation; query completion status directly in the existing outer deadline instead of a nested wait.",
+    "repeatedInput": false,
+    "assertionsRelaxed": false,
+    "timeoutIncreased": false,
+    "applicationChanged": false,
+    "acceptance": "Requires all mandatory final handoff checks; this failure and its skipped historical jobs are not PASS."
+  }
+}

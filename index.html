@@ -217,6 +217,7 @@
               </select>
             </label>
             <button id="wordTemplateImportButton" type="button">Import Word template</button>
+            <button id="wordTemplateCopyButton" type="button" disabled title="Save the original imported DOCX for backup or import into another edition">Save template copy</button>
             <div id="wordTemplateSummary" class="menu-note">Default export uses the built-in document styling.</div>
             <button id="exportPdfButton" type="button">Export PDF</button>
             <div class="menu-note">HTML and Word download files. PDF opens the browser print dialogue with a clean print view.</div>
@@ -263,6 +264,10 @@
             <button type="button" data-view-action="openDocsMap">Open docs map</button>
             <button type="button" data-view-action="manageAssets">Manage assets</button>
             <div class="menu-note">Render also runs with Ctrl/Cmd+Enter. Use the preview header for Find, Review, Outline, and diagram zoom. Escape restores a maximised preview.</div>
+            <hr>
+            <div class="menu-heading">Appearance settings</div>
+            <button type="button" data-menu-action="exportSettings">Export appearance settings</button>
+            <div class="menu-note">Save theme, layout and outline choices for import into native Settings.</div>
           </div>
         </details>
         <details class="menu align-right">

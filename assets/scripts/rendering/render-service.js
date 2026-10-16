@@ -284,9 +284,11 @@ export function createRenderingService({
       const renderId = ++state.renderId;
       const source = editor.value.replace(/^[\u200B\u200C\u200D\u200E\u200F\uFEFF]/, '');
       const selectedMode = resolveModeFor(source, state.fileName);
+      let renderStatusRevision = null;
 
       try {
         setStatus('Rendering...');
+        renderStatusRevision = state.statusRevision;
         setExportTrust('', '');
 
         const dirtyHtml = selectedMode === 'mermaid'
@@ -328,7 +330,8 @@ export function createRenderingService({
         };
         updatePreviewOutline();
         afterPreviewRender?.();
-        setRenderStatus(diagramResult.errors);
+        // A save or other action may complete while preview rendering is awaiting work.
+        if (state.statusRevision === renderStatusRevision) setRenderStatus(diagramResult.errors);
         return { ok: true, cancelled: false, diagramErrors: diagramResult.errors, diagramTotal: diagrams.length };
       } catch (error) {
         if (renderId !== state.renderId) return { ok: false, cancelled: true, diagramErrors: 0 };
@@ -338,7 +341,7 @@ export function createRenderingService({
         state.lastRenderResult = { ok: false, diagramErrors: 0, diagramTotal: 0 };
         updatePreviewOutline();
         afterPreviewRender?.();
-        setStatus('Error while rendering.', 'danger');
+        if (state.statusRevision === renderStatusRevision) setStatus('Error while rendering.', 'danger');
         return { ok: false, cancelled: false, diagramErrors: 0 };
       }
     }

@@ -1,0 +1,26 @@
+flowchart LR
+    %% Synthetic error-log lab; no private documents or imported metadata.
+    subgraph Capture[Capture error context]
+        Input([Trigger])
+        Details["Capture error<br/>Operation, timestamp and correlation identifier"]
+        Route{Retry allowed?}
+    end
+    subgraph Diagnostics[Diagnostics]
+        subgraph Collect[Collect local context]
+            Payload["Collect diagnostic details
+without discarding the original error source"]
+            Store[(Local log)]
+        end
+        Review[[Review context]]
+    end
+    Complete(((Complete)))
+    Input --> Details
+    Details --> Route
+    Route -->|Yes| Payload
+    Route -.->|No| Review
+    Payload ==> Store
+    Store <--> Review
+    Review --> Complete
+    class Details,Payload context
+    classDef context fill:#E8F3FA,stroke:#007F79;
+    style Route fill:#FAFAFA,stroke:#56606C,color:#202124

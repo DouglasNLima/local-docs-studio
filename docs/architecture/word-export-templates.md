@@ -23,6 +23,8 @@ The manifest records:
 
 Imported packs are stored in the `local-docs-studio-word-templates` IndexedDB database for the current browser profile. They are not uploaded, shared, or added to Markdown Bundle exports.
 
+**Save template copy** explicitly downloads the selected record's original `templateDocx` bytes as a DOCX with a sanitised filename. It does not reconstruct the package from extracted parts or alter the record, selection or current Markdown. Missing original bytes produce a visible reimport message. The default built-in styling has no original file, so copying is disabled. The native edition imports this ordinary DOCX through its validated template library; no browser-profile scan or separate pack contract is required. The original browser copy includes source body and metadata, while native library copies contain only prepared reusable formatting.
+
 The ignored `artifacts/word-templates/` path is reserved for optional local/debug copies when developers need to inspect packs. User-imported templates, logos, and generated packs must not be committed.
 
 ## Export Application
@@ -55,7 +57,7 @@ The selected template's first detected header and first detected footer are appl
 
 ## Future Enhancements
 
-- Template management actions such as rename, delete, and export pack.
+- Template management actions such as rename and delete.
 - Full first/even/default header and footer mapping.
 - Richer content type extraction from the source package.
 - Deeper list/numbering mapping for generated ordered and unordered lists.
