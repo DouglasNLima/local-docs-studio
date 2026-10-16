@@ -125,7 +125,7 @@ internal static partial class NativePaginationChecks
             checks.Add("Continuous guidance uses source characters or mapped-element counts, preserves selection and explicit mode, and clears in Pages or a small replacement");
 
             var sections = "# Replacement sections\n\n" + string.Concat(Enumerable.Range(1, 90)
-                .Select(index => $"## Region {index:000}\n\nA distinct portable source region with **formatted text**.\n\n"));
+                .Select(index => $"## Region {index:000}\n\nCafé 😀 é: a repeated portable source region with **formatted text**.\n\n"));
             var sectionResult = renderer.Render(new MarkdownService().Parse(sections), false,
                 new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
             viewer.SetPreview(sectionResult, sections.Length, "Pages");

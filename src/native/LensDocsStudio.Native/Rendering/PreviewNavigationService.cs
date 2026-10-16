@@ -4,6 +4,9 @@ using System.Windows.Documents;
 using System.Windows.Threading;
 using System.Windows.Media;
 using System.Runtime.CompilerServices;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
+using System.Windows.Automation.Text;
 
 namespace LensDocsStudio.Native.Rendering;
 
@@ -76,6 +79,15 @@ public static class PreviewNavigationService
                     diagnostic?.Invoke($"before page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, allowed {paged.CanGoToPage(page + 1)}, size {paginator.PageSize}");
                     paged.GoToPage(page + 1); paged.UpdateLayout();
                     diagnostic?.Invoke($"after page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, size {paginator.PageSize}");
+                    if (selectionEnd is null)
+                    {
+                        // A page number resets WPF's internal content anchor. Its next
+                        // layout can re-anchor at the preceding page boundary. The native
+                        // text provider scrolls the exact character without selecting it.
+                        var anchored = ScrollExactNativeRange(document, position);
+                        diagnostic?.Invoke("exact native range anchor " + anchored);
+                        if (!anchored) return;
+                    }
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;
@@ -95,6 +107,26 @@ public static class PreviewNavigationService
                 cancellation.Dispose();
             }
         }
+    }
+
+    private static bool ScrollExactNativeRange(FlowDocument document, TextPointer position)
+    {
+        var peer = ContentElementAutomationPeer.CreatePeerForElement(document);
+        if (peer?.GetPattern(PatternInterface.Text) is not ITextProvider provider) return false;
+        var range = provider.DocumentRange.Clone();
+        // Match the complete native prefix from the document start. Searching only
+        // the target word could select a different repeated occurrence; character
+        // counts alone also differ at Unicode insertion and paragraph boundaries.
+        var prefix = new TextRange(document.ContentStart, position).Text;
+        if (prefix.Length > 0)
+        {
+            range = range.FindText(prefix, false, false);
+            if (range is null) return false;
+            range.MoveEndpointByRange(TextPatternRangeEndpoint.Start, range, TextPatternRangeEndpoint.End);
+        }
+        else range.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
+        range.ScrollIntoView(true);
+        return true;
     }
 
     private static async Task<int> GetPageNumber(DynamicDocumentPaginator paginator, TextPointer position, CancellationToken cancellationToken)
