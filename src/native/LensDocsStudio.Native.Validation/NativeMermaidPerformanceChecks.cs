@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Rendering;
+using LensDocsStudio.Native.Rendering;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -15,10 +16,12 @@ internal static class NativeMermaidPerformanceChecks
             var allocated = GC.GetTotalAllocatedBytes(true); var watch = Stopwatch.StartNew();
             var model = new MermaidSourceParser().Parse(source); var parse = watch.Elapsed.TotalMilliseconds;
             if (!model.CanEdit && name != "Dense connections") throw new IOException(name + ": " + model.Diagnostic);
-            watch.Restart(); var boxes = MermaidGraphLayout.Arrange(model); var layout = watch.Elapsed.TotalMilliseconds;
-            if (boxes.Count != model.Nodes.Count + model.Subgraphs.Count) throw new IOException("Layout omitted an element in " + name);
             var service = new DiagramService(); watch.Restart();
-            var render = model.CanEdit ? service.Render(source) : new DiagramResult(source, null, model.Diagnostic); var rendering = watch.Elapsed.TotalMilliseconds;
+            var render = service.Render(source); var rendering = watch.Elapsed.TotalMilliseconds;
+            watch.Restart();
+            var presentation = render.Success ? NativeMermaidPresentation.Create(render, new NativeSvgService()) : null;
+            var layout = watch.Elapsed.TotalMilliseconds;
+            if (presentation is not null && model.CanEdit && !presentation.Maps(model)) throw new IOException("Canonical layout omitted an editable identity in " + name);
             var draft = new MermaidVisualDraft(source, service); var node = model.Nodes[0]; watch.Restart();
             var result = draft.ExecuteAsync(new UpdateMermaidNode(node.Id, "Updated label", node.Shape, node.Id)).GetAwaiter().GetResult();
             var edit = watch.Elapsed.TotalMilliseconds;
@@ -27,7 +30,7 @@ internal static class NativeMermaidPerformanceChecks
                 SourceCharacters = source.Length, ParseMilliseconds = parse, NativeLayoutMilliseconds = layout, RenderMilliseconds = rendering,
                 EditAndRenderMilliseconds = edit, AllocatedProcessBytes = GC.GetTotalAllocatedBytes(true) - allocated,
                 Rendered = render.Success, RenderError = render.Error, EditAccepted = result.Success, EditError = result.Error,
-                RenderingSkippedForProtection = !model.CanEdit,
+                RenderingSkippedForProtection = false,
                 SourcePreservedAfterRejection = result.Success || draft.Source == source });
         }
         File.WriteAllText(output, JsonSerializer.Serialize(new { Scenarios = observations, Environment.ProcessorCount,

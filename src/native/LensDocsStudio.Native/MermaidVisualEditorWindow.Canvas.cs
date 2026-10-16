@@ -60,15 +60,32 @@ public partial class MermaidVisualEditorWindow
             var rendered = await Task.Run(() => diagrams.Render(source, themeDark, diagramTheme, cancellation.Token), cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
             if (!rendered.Success) throw new InvalidDataException(rendered.Error);
-            var next = await LensDocsStudio.Native.Platform.StaWorker.RunAsync(() => NativeMermaidPresentation.Create(rendered, canvasSvg), cancellation.Token);
+            DrawingImage? inspection = null;
+            string? mappingDiagnostic = null;
+            var next = await LensDocsStudio.Native.Platform.StaWorker.RunAsync(() =>
+            {
+                try { return NativeMermaidPresentation.Create(rendered, canvasSvg); }
+                catch (Exception error) when (error is InvalidDataException or ArgumentException or FormatException)
+                {
+                    // A valid drawing remains inspectable even if its interaction metadata cannot be mapped.
+                    inspection = canvasSvg.Render(rendered.Svg!); mappingDiagnostic = error.Message; return null;
+                }
+            }, cancellation.Token);
             if (closed || generation != canvasGeneration || draft.Source != source || dark != themeDark) return;
-            presentation = next; canvasError = null; canonicalMapped = next.Maps(draft.Model);
-            BuildCanonicalCanvas();
+            presentation = next; canvasError = null; canonicalMapped = next?.Maps(draft.Model) == true;
+            if (next is not null) BuildCanonicalCanvas();
+            else
+            {
+                DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear();
+                var drawing = new Image { Source = inspection, Width = inspection!.Width, Height = inspection.Height, Stretch = Stretch.None, IsHitTestVisible = false };
+                AutomationProperties.SetAutomationId(drawing, "MermaidCanonicalDrawing"); DiagramCanvas.Children.Add(drawing);
+                DiagramCanvas.Width = inspection.Width; DiagramCanvas.Height = inspection.Height;
+            }
             Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
                 : !canonicalMapped ? "The rendered elements cannot all be mapped safely. Inspect the original diagram or use Edit source."
                 : draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.";
-            Status.ToolTip = draft.Model.Diagnostic ?? Status.Text;
-            if (initialFit) { initialFit = false; Viewport.UpdateLayout(); Fit(this, new()); }
+            Status.ToolTip = mappingDiagnostic ?? draft.Model.Diagnostic ?? Status.Text;
+            if (initialFit) { initialFit = false; Viewport.UpdateLayout(); Fit(this, new()); if (Zoom.Value > 100) Zoom.Value = 100; }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException)
@@ -240,7 +257,7 @@ public partial class MermaidVisualEditorWindow
             var from = new Vector(source.X - originalSource.X, source.Y - originalSource.Y); var to = new Vector(target.X - originalTarget.X, target.Y - originalTarget.Y);
             var moved = from.Length > .01 || to.Length > .01;
             if (edgeDrawings.TryGetValue(key, out var drawing)) drawing.Opacity = moved ? 0 : 1;
-            var geometry = connection.Path.GetFlattenedPathGeometry();
+            var geometry = connection.Path.GetFlattenedPathGeometry().Clone();
             foreach (var figure in geometry.Figures)
             {
                 var points = new List<Point> { figure.StartPoint };

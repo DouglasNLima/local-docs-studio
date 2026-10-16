@@ -330,13 +330,16 @@ internal static partial class NativeUiChecks
             {
                 var lab = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/flow-error-log-lab.mmd");
                 LaunchDocument("Flow-error-log-lab.mermaid", lab);
+                Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Protected preview action did not appear.");
+                main!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-preview.png"));
                 Open(0, false);
                 Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
                     "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
                 Click("MermaidFit"); Capture("flow-error-log-lab-canvas"); Click("MermaidRenderedPreview");
                 var labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow();
                 Wait(() => (labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Protected Rendered preview did not open.");
-                labPreview!.Close(); Click("MermaidActualSize");
+                _ = DwmFlush(); labPreview!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered.png"));
+                labPreview.Close(); Click("MermaidActualSize");
                 Check(Draft() == lab, "Protected zoom, Fit and Rendered preview leave the complete original source exact");
                 Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
                 foreach (var count in new[] { 20, 100, 300 })
@@ -398,7 +401,7 @@ internal static partial class NativeUiChecks
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
             void Select(string id) { Find(visual!, "MermaidCanvas_" + id).Patterns.Toggle.Pattern.Toggle(); }
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
-            void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
+            void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()) && Find(visual!, "MermaidDraftState").Name != "Validating...", "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
             void CapturePrimaryFocus(string name)
             {

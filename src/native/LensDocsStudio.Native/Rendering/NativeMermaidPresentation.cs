@@ -51,7 +51,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         {
             var (edge, ordinal) = visible[index]; var path = paths[index];
             ValidateEdge(path, edge);
-            var geometry = Shape(path); geometry.Transform = shift; geometry.Freeze();
+            var geometry = Shape(path).Clone(); geometry.Transform = shift; geometry.Freeze();
             CheckBounds(geometry.Bounds);
             Rect? labelBounds = null;
             if (edge.Label is not null)
