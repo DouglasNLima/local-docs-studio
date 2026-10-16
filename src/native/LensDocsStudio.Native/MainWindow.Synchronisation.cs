@@ -76,14 +76,14 @@ public partial class MainWindow
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
         if (pendingViewportDocument is { } documentId && renderedDocumentId == documentId)
         {
-            var resultToRestore = rendered; var tab = model.ActiveDocument!; var generation = viewportGeneration;
+            var resultToRestore = rendered; var tab = model.ActiveDocument!; var generation = viewportGeneration; var restoreSyncGeneration = syncGeneration;
             var offsetToRestore = Math.Clamp(tab.PreviewSourceOffset, 0, tab.EditorDocument.TextLength);
             applyingSync = true; applyingSyncOrigin = "restore-preview";
             Dispatcher.BeginInvoke(async () =>
             {
                 try
                 {
-                    if (generation != viewportGeneration || model.ActiveDocument != tab || rendered != resultToRestore || !SyncCurrent) return;
+                    if (generation != viewportGeneration || restoreSyncGeneration != syncGeneration || model.ActiveDocument != tab || rendered != resultToRestore || !SyncCurrent) return;
                     var pointer = offsetToRestore == 0 ? resultToRestore!.Document.ContentStart
                         : resultToRestore!.TextMap.TryPreviewRange(offsetToRestore, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offsetToRestore)?.ContentStart;
                     if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer);

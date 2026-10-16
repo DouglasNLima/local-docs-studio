@@ -27,7 +27,7 @@ public partial class MermaidVisualEditorWindow
     private Vector pendingDrag;
     private bool dragging;
     private string[] affectedConnections = [];
-    private long dragAllocated, dragTicks;
+    private long dragAllocated, dragTicks, frameAllocated;
     private int dragFrames;
     private double maximumDragFrame;
     private (string Key, Point Centre)? pendingNodePlacement;
@@ -46,6 +46,14 @@ public partial class MermaidVisualEditorWindow
             context.PushTransform(new TranslateTransform(-origin.X, -origin.Y));
             context.DrawDrawing(drawing); context.Pop();
         }
+    }
+    private static bool FreezeStaticDrawing(Drawing drawing, HashSet<DrawingGroup> mutable)
+    {
+        if (drawing is not DrawingGroup group) { if (drawing.CanFreeze) drawing.Freeze(); return false; }
+        var keepMutable = mutable.Contains(group);
+        foreach (var child in group.Children) keepMutable |= FreezeStaticDrawing(child, mutable);
+        if (!keepMutable && group.CanFreeze) group.Freeze();
+        return keepMutable;
     }
     private static Pen FrozenHitPen() { var pen = new Pen(Brushes.Black, 12); pen.Freeze(); return pen; }
     private string ConnectionKey(NativeMermaidConnection edge) => canonicalMapped ? draft.Model.Edges[edge.Ordinal].Id : "inspect-edge-" + edge.Ordinal;
@@ -69,7 +77,7 @@ public partial class MermaidVisualEditorWindow
         dragged = draft.Selection.Where(key => key.StartsWith("node:", StringComparison.Ordinal) && nodeTransforms.ContainsKey(key))
             .ToDictionary(key => key, key => positions[key]);
         affectedConnections = dragged.Keys.Where(incidentConnections.ContainsKey).SelectMany(key => incidentConnections[key]).Distinct().ToArray();
-        dragFrames = 0; maximumDragFrame = 0; dragAllocated = GC.GetAllocatedBytesForCurrentThread(); dragTicks = Stopwatch.GetTimestamp();
+        dragFrames = 0; frameAllocated = 0; maximumDragFrame = 0; dragAllocated = GC.GetAllocatedBytesForCurrentThread(); dragTicks = Stopwatch.GetTimestamp();
         if (!owner.CaptureMouse()) FinishNodeDrag(true);
     }
     private void MoveNodeDrag(MouseEventArgs e)
@@ -87,11 +95,12 @@ public partial class MermaidVisualEditorWindow
     {
         dragFrame = null;
         if (!dragging || dragged is null) return;
-        var watch = Stopwatch.GetTimestamp();
+        var watch = Stopwatch.GetTimestamp(); var allocated = GC.GetAllocatedBytesForCurrentThread();
         foreach (var (key, original) in dragged)
             PositionNode(key, new(Math.Max(original.Width / 2, original.CentreX + pendingDrag.X), Math.Max(original.Height / 2, original.CentreY + pendingDrag.Y)));
         foreach (var key in affectedConnections) UpdateSessionConnection(key);
         UpdateEndpointHandlePositions();
+        frameAllocated += GC.GetAllocatedBytesForCurrentThread() - allocated;
         dragFrames++; maximumDragFrame = Math.Max(maximumDragFrame, Stopwatch.GetElapsedTime(watch).TotalMilliseconds);
     }
     private void FinishNodeDrag(bool cancel)
@@ -111,7 +120,7 @@ public partial class MermaidVisualEditorWindow
         if (dragFrames > 0)
         {
             Status.Text = cancel ? "Movement cancelled. Source is unchanged." : "Session position retained. Auto layout resets positions; Apply saves Mermaid source only.";
-            AutomationProperties.SetHelpText(Status, $"Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
+            AutomationProperties.SetHelpText(Status, $"Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; update allocated bytes: {frameAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
         }
     }
     private void PositionNode(string key, Point centre)

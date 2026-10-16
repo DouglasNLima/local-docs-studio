@@ -59,6 +59,7 @@ public partial class MainWindow
             Editor.ScrollToVerticalOffset(Math.Max(0, target.VerticalOffset));
             navigation.CompleteMove(forward, CurrentNavigation()!);
             await UpdatePreviewAsync();
+            CancelSynchronisation();
             if (rendered is not null)
             {
                 var nearest = rendered.SourceElements.Where(e => e.Key <= Editor.CaretOffset).OrderByDescending(e => e.Key).FirstOrDefault();

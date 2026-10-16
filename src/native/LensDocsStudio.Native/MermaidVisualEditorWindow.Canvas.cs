@@ -59,6 +59,7 @@ public partial class MermaidVisualEditorWindow
     private async void RebuildCanvas(bool layout)
     {
         CancelPointerInteraction();
+        var viewportOffsets = new Point(Viewport.HorizontalOffset, Viewport.VerticalOffset); var restoreViewport = !initialFit;
         var source = draft.Source; var themeDark = dark; var generation = ++canvasGeneration;
         canvasRender?.Cancel();
         if (canonicalRender?.Source == source && canonicalRender.Theme == DiagramThemes.ResolveName(diagramTheme, themeDark)
@@ -99,6 +100,18 @@ public partial class MermaidVisualEditorWindow
                 var drawing = new Image { Source = inspection, Width = inspection!.Width, Height = inspection.Height, Stretch = Stretch.None, IsHitTestVisible = false };
                 AutomationProperties.SetAutomationId(drawing, "MermaidCanonicalDrawing"); DiagramCanvas.Children.Add(drawing);
                 DiagramCanvas.Width = inspection.Width; DiagramCanvas.Height = inspection.Height;
+            }
+            if (restoreViewport)
+            {
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    if (closed || generation != canvasGeneration || draft.Source != source) return;
+                    // A previously clamped PAN request can otherwise become active when the
+                    // new canonical drawing gains scrollable width. Restore observed offsets.
+                    Viewport.ScrollToHorizontalOffset(viewportOffsets.X); Viewport.ScrollToVerticalOffset(viewportOffsets.Y);
+                    Viewport.UpdateLayout();
+                }, DispatcherPriority.Loaded);
+                if (closed || generation != canvasGeneration || draft.Source != source) return;
             }
             if (!PropertiesPending && inlineEditor is null)
             { var wasUpdating = updating; updating = true; try { ShowProperties(); } finally { updating = wasUpdating; } }
@@ -166,6 +179,7 @@ public partial class MermaidVisualEditorWindow
             drawing.Transform = new TransformGroup { Children = { drawing.Transform ?? Transform.Identity, translation } };
             nodeTransforms[key] = translation;
         }
+        FreezeStaticDrawing(mutableDrawing.Drawing, nodeDrawings.Values.Concat(edgeDrawings.Values).Concat(edgeLabelDrawings.Values).ToHashSet());
         var image = new CanonicalDrawingHost(mutableDrawing.Drawing, view.Drawing.Drawing.Bounds.Location)
         { Width = view.Drawing.Width, Height = view.Drawing.Height, IsHitTestVisible = false };
         canonicalImage = image;
