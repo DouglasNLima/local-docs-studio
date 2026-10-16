@@ -173,11 +173,11 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         actions.Children.Add(button);
                     }
                     if (editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)
-                        && new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).CanEdit)
+                        && new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).DiagramType == "Flowchart")
                     {
-                        var visual = new Button { Content = "Edit visually", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                        var visual = new Button { Content = "Visual Edit", ToolTip = "Open this Flowchart in the visual editor.", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
                         System.Windows.Automation.AutomationProperties.SetAutomationId(visual, "DiagramEditVisually" + code.Span.Start);
-                        visual.Click += (_, _) => editDiagramVisually(code.Span.Start); actions.Children.Add(visual);
+                        visual.Click += (_, _) => editDiagramVisually(code.Span.Start); actions.Children.Insert(0, visual);
                     }
                     if (editDiagramSource is not null)
                     {
