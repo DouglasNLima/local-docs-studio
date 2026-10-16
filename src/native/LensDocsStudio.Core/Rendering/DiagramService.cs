@@ -68,7 +68,7 @@ public sealed class DiagramService
             else svg = MermaidRenderer.RenderSvg(prepared, options);
             return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart };
         }
-        catch (Exception ex) when (ex is not (OutOfMemoryException or OperationCanceledException))
+        catch (Exception ex) when (ex is not OutOfMemoryException && (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested))
         {
             return new(source, null, "Diagram could not be rendered: " + ex.Message[..Math.Min(ex.Message.Length, 300)]);
         }

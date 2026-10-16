@@ -41,6 +41,7 @@ public partial class MermaidVisualEditorWindow
     private NativeMermaidPresentation? presentation;
     private readonly Dictionary<string, DrawingGroup> nodeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeDrawings = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, DrawingGroup> edgeLabelDrawings = new(StringComparer.Ordinal);
     private Image? canonicalImage;
 
     private readonly NativeSvgService canvasSvg = new();
@@ -107,14 +108,17 @@ public partial class MermaidVisualEditorWindow
     {
         if (presentation is not { } view) return;
         DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
-        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear();
+        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear();
+        var labelled = view.Connections.Where(connection => view.Graph.Edges[connection.Ordinal].Label is not null).ToArray();
         foreach (var group in DrawingGroups(mutableDrawing.Drawing))
         {
             var id = SvgObject.GetId(group);
             if (id?.StartsWith("lens-node-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(10), out var ordinal) && ordinal < view.Graph.Nodes.Count)
                 nodeDrawings["node:" + view.Graph.Nodes[ordinal].Id] = group;
             if (id?.StartsWith("lens-edge-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(10), out var edgeOrdinal) && edgeOrdinal < view.Connections.Count)
-                edgeDrawings[draft.Model.CanEdit ? draft.Model.Edges[view.Connections[edgeOrdinal].Ordinal].Id : id] = group;
+                edgeDrawings[canonicalMapped ? draft.Model.Edges[view.Connections[edgeOrdinal].Ordinal].Id : id] = group;
+            if (id?.StartsWith("lens-label-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(11), out var labelOrdinal) && labelOrdinal < labelled.Length && canonicalMapped)
+                edgeLabelDrawings[draft.Model.Edges[labelled[labelOrdinal].Ordinal].Id] = group;
         }
         var image = new Image { Source = mutableDrawing, Width = view.Drawing.Width, Height = view.Drawing.Height, Stretch = Stretch.None, IsHitTestVisible = false };
         canonicalImage = image;
@@ -270,7 +274,10 @@ public partial class MermaidVisualEditorWindow
             connectionHitPaths[key].Data = geometry;
             var path = connectionPaths[key]; path.Data = geometry; path.StrokeDashArray = moved ? new DoubleCollection([4, 3]) : null;
             path.Stroke = moved ? BrushResource("MutedTextBrush") : Brushes.Transparent;
-            // The original label remains in its canonical position; a session guide is explicitly temporary.
+            var labelOffset = (from + to) / 2;
+            if (edgeLabelDrawings.TryGetValue(key, out var labelDrawing)) labelDrawing.Transform = new TranslateTransform(labelOffset.X, labelOffset.Y);
+            if (connection.LabelBounds is { } labelBounds && canvasElements.TryGetValue(key, out var labelButton))
+            { Canvas.SetLeft(labelButton, labelBounds.X + labelOffset.X); Canvas.SetTop(labelButton, labelBounds.Y + labelOffset.Y); }
         }
         Status.Text = "Session positions only. Dashed connection guides are temporary; Auto layout or a source edit restores the original Mermaider layout.";
     }
@@ -290,21 +297,6 @@ public partial class MermaidVisualEditorWindow
         }
         return ((Brush)new BrushConverter().ConvertFromString(fill)!, (Brush)new BrushConverter().ConvertFromString(stroke)!, (Brush)new BrushConverter().ConvertFromString(text)!);
     }
-    private static Geometry NodeGeometry(FlowNodeShape shape, double width, double height)
-    {
-        if (shape == FlowNodeShape.Decision) return Polygon(new(width / 2, 0), new(width, height / 2), new(width / 2, height), new(0, height / 2));
-        if (shape == FlowNodeShape.Hexagon) return Polygon(new(20, 0), new(width - 20, 0), new(width, height / 2), new(width - 20, height), new(20, height), new(0, height / 2));
-        if (shape is FlowNodeShape.Circle or FlowNodeShape.DoubleCircle)
-        { var ellipse = new EllipseGeometry(new Rect(0, 0, width, height)); if (shape == FlowNodeShape.Circle) return ellipse; return new GeometryGroup { Children = { ellipse, new EllipseGeometry(new Rect(6, 6, width - 12, height - 12)) } }; }
-        var radius = shape == FlowNodeShape.Terminal ? height / 2 : shape == FlowNodeShape.Rounded ? 14 : 2;
-        var rectangle = new RectangleGeometry(new Rect(0, 0, width, height), radius, radius);
-        if (shape == FlowNodeShape.Subroutine) return new GeometryGroup { Children = { rectangle, new LineGeometry(new(10, 0), new(10, height)), new LineGeometry(new(width - 10, 0), new(width - 10, height)) } };
-        if (shape == FlowNodeShape.Cylinder) return new GeometryGroup { Children = { new RectangleGeometry(new Rect(0, 10, width, height - 20)), new EllipseGeometry(new Rect(0, 0, width, 20)), new EllipseGeometry(new Rect(0, height - 20, width, 20)) } };
-        return rectangle;
-    }
-    private static Geometry Polygon(params Point[] points)
-    { var geometry = new StreamGeometry(); using (var context = geometry.Open()) { context.BeginFigure(points[0], true, true); context.PolyLineTo(points.Skip(1).ToArray(), true, true); } geometry.Freeze(); return geometry; }
-
     private void BeginInlineEdit(string id)
     {
         if (PropertiesPending) { Status.Text = "Update or reset pending property changes before inline label editing."; return; }

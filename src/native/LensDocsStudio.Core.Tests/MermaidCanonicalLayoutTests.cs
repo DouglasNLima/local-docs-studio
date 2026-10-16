@@ -64,4 +64,14 @@ public sealed class MermaidCanonicalLayoutTests
         var results = await Task.WhenAll(Enumerable.Range(0, 12).Select(index => Task.Run(() => service.Render($"flowchart LR\nN{index}[Node {index}]", index % 2 == 0))));
         for (var index = 0; index < results.Length; index++) Assert.Equal("N" + index, Assert.Single(results[index].FlowchartLayout!.Nodes).Id);
     }
+
+    [Fact]
+    public void Cancellation_rejects_cached_results_without_poisoning_the_render_cache()
+    {
+        const string source = "flowchart LR\nA[Keep] --> B[Source]";
+        var service = new DiagramService(); var original = service.Render(source);
+        using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
+        Assert.Throws<OperationCanceledException>(() => service.Render(source, cancellationToken: cancelled.Token));
+        Assert.Same(original, service.Render(source));
+    }
 }

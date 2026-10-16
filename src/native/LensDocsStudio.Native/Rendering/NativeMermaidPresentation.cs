@@ -33,6 +33,8 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         var edgeIndex = 0;
         foreach (var element in root.Descendants().Where(e => HasClass(e, "edge")).ToArray())
         { var wrapper = new XElement(root.Name.Namespace + "g", new XAttribute("id", "lens-edge-" + edgeIndex++)); element.ReplaceWith(wrapper); wrapper.Add(element); }
+        var labelIdentity = 0;
+        foreach (var element in root.Descendants().Where(e => HasClass(e, "edge-label"))) element.SetAttributeValue("id", "lens-label-" + labelIdentity++);
         var drawing = NativeSvgService.RenderPrepared(root.ToString(SaveOptions.DisableFormatting), identities: true);
         var origin = drawing.Drawing.Bounds.Location;
         var shift = new TranslateTransform(-origin.X, -origin.Y);
@@ -70,7 +72,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         {
             CheckBounds(bounds);
             var candidates = root.Descendants().Where(e => HasClass(e, kind) && (string?)e.Attribute("data-id") == id).ToArray();
-            if (candidates.Length != 1 || (string?)candidates[0].Attribute("data-label") != label)
+            if (candidates.Length != 1 || MetadataLabel((string?)candidates[0].Attribute("data-label") ?? "") != MetadataLabel(label))
                 throw new InvalidDataException("Conflicting canonical element identity: " + id);
             var shapes = candidates[0].Elements().Where(e => e.Name.LocalName is "rect" or "circle" or "ellipse" or "polygon" or "path" or "line").ToArray();
             var geometry = new GeometryGroup();
@@ -95,10 +97,12 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
     private static IEnumerable<PositionedGroup> Groups(IEnumerable<PositionedGroup> groups)
     { foreach (var group in groups) { yield return group; foreach (var child in Groups(group.Children)) yield return child; } }
     private static bool HasClass(XElement element, string value) => ((string?)element.Attribute("class") ?? "").Split(' ').Contains(value);
+    // XML normalises literal attribute line breaks and tabs. IDs, source labels and rendered text stay untouched.
+    private static string MetadataLabel(string label) => label.ReplaceLineEndings(" ").Replace('\t', ' ');
     private static void ValidateEdge(XElement element, PositionedEdge edge)
     {
         if ((string?)element.Attribute("data-from") != edge.Source || (string?)element.Attribute("data-to") != edge.Target
-            || ((string?)element.Attribute("data-label") ?? "") != (edge.Label ?? ""))
+            || MetadataLabel((string?)element.Attribute("data-label") ?? "") != MetadataLabel(edge.Label ?? ""))
             throw new InvalidDataException("Canonical connection order or identity is ambiguous. Use Edit source.");
     }
     private static double Number(XElement element, string name, double fallback = 0)
