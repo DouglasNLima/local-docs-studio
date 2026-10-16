@@ -145,7 +145,8 @@ icon copies the draft. A star marks source needing validation or protected sourc
 its tooltip explains the state. Collapse the header to reclaim canvas space. The
 **Mermaider layout** tooltip explains canonical positioning. Preview, Rendered preview
 and the visual canvas share the same native drawing; selection outlines and ports are
-editing adorners. At overlapping connection paths, choose the intended connection in
+editing adorners. Wide diagrams initially open at Actual Size for readable labels;
+Fit shows the whole graph and PAN explores it at the chosen zoom. At overlapping connection paths, choose the intended connection in
 the element list rather than guessing from a pointer click. Apply and
 Cancel remain in the fixed footer; hover a shortened status to read its full message.
 

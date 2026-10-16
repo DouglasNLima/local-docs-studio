@@ -87,7 +87,22 @@ public partial class MermaidVisualEditorWindow
                 : !canonicalMapped ? "The rendered elements cannot all be mapped safely. Inspect the original diagram or use Edit source."
                 : draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.";
             Status.ToolTip = mappingDiagnostic ?? draft.Model.Diagnostic ?? Status.Text;
-            if (initialFit) { initialFit = false; Viewport.UpdateLayout(); Fit(this, new()); if (Zoom.Value > 100) Zoom.Value = 100; }
+            if (initialFit)
+            {
+                initialFit = false; Viewport.UpdateLayout(); Fit(this, new());
+                if (Zoom.Value < 60)
+                {
+                    Zoom.Value = 100; Viewport.UpdateLayout();
+                    var first = draft.Model.Nodes.FirstOrDefault();
+                    if (first is not null && positions.TryGetValue("node:" + first.Id, out var anchor))
+                    {
+                        Viewport.ScrollToHorizontalOffset(Math.Max(0, anchor.CentreX - Viewport.ViewportWidth / 2));
+                        Viewport.ScrollToVerticalOffset(Math.Max(0, anchor.CentreY - Viewport.ViewportHeight / 2));
+                    }
+                    Status.Text += " Opened at actual size for readable labels; Fit shows the whole graph.";
+                }
+                else if (Zoom.Value > 100) Zoom.Value = 100;
+            }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException)

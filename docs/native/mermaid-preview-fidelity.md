@@ -82,7 +82,8 @@ mapping fails, the original sanitised drawing remains available for inspection.
 Every accepted semantic edit still validates portable Mermaid, commits only the
 private draft, rerenders through the shared pipeline and restores logical selection.
 The editor keeps the user's zoom and scroll position; only the initial view fits
-automatically. Auto layout restores the canonical drawing without another parser
+automatically; very wide diagrams open at 100% around the first safely mapped node
+for readable labels, with Fit available for an overview. Auto layout restores the canonical drawing without another parser
 or layout engine. Cancellation reaches Mermaider's supported asynchronous render
 pipeline; generation, source and theme checks reject obsolete results. Frozen native
 geometry crosses worker boundaries; UI mutations belong to the WPF dispatcher.
@@ -104,7 +105,9 @@ their lexical representation can be transformed safely.
 Canvas extent follows actual drawing bounds rather than a 600 by 400 minimum with
 extra margins. Smaller content is centred. Initial fit avoids enlarging a small
 diagram beyond 100%; explicit Fit and Actual Size remain available. The standalone
-Rendered preview adds Fit width and centres smaller drawings. Both surfaces use
+Rendered preview adds Fit width and centres smaller drawings. When a whole-diagram
+fit would be below 60%, both surfaces initially use readable Actual Size; explicit
+Fit still reaches any required scale down to 1%, and PAN explores the wide drawing. Both surfaces use
 WPF coordinate transforms to preserve the pointer's diagram anchor while zooming.
 Space+drag, middle-button PAN and keyboard alternatives remain. Very wide diagrams
 necessarily shrink when fitted into narrow viewports; Actual Size and PAN allow

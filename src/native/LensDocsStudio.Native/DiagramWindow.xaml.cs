@@ -32,6 +32,16 @@ public partial class DiagramWindow : Window
         Zoom.Value = Math.Clamp(Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100, Zoom.Minimum, Zoom.Maximum);
         DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
     }
+    private void InitialView(object sender, RoutedEventArgs e)
+    {
+        FitDiagram(sender, e);
+        if (Zoom.Value < 60)
+        {
+            Zoom.Value = 100;
+            DiagramStatus.Text = "Opened at actual size for readable labels. Fit diagram shows the whole drawing. Space+drag or middle-drag pans; Ctrl+wheel zooms.";
+        }
+        else if (Zoom.Value > 100) Zoom.Value = 100;
+    }
     private void FitWidth(object sender, RoutedEventArgs e)
     {
         if (DiagramImage.Source is null || DiagramScroll.ViewportWidth <= 48) return;

@@ -337,10 +337,21 @@ internal static partial class NativeUiChecks
                 Open(0, false);
                 Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
                     "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
+                Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide protected diagrams initially open at actual size for readable labels");
+                Capture("flow-error-log-lab-initial");
+                var labViewport = Find(visual!, "MermaidViewport"); var labScroll = labViewport.Patterns.Scroll.Pattern;
+                var labBefore = labScroll.HorizontalScrollPercent.Value; var labBounds = labViewport.BoundingRectangle;
+                Mouse.DragHorizontally(new(labBounds.Left + labBounds.Width / 2, labBounds.Top + labBounds.Height / 2), labBefore > 0 ? 100 : -100, MouseButton.Middle);
+                Wait(() => Math.Abs(labScroll.HorizontalScrollPercent.Value - labBefore) > .1, "Protected PAN did not move its actual native viewport.");
+                Check(Draft() == lab, "Protected actual-size PAN changes the viewport without changing original source");
                 Click("MermaidFit"); Capture("flow-error-log-lab-canvas"); Click("MermaidRenderedPreview");
                 var labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow();
                 Wait(() => (labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Protected Rendered preview did not open.");
-                _ = DwmFlush(); labPreview!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered.png"));
+                Check(Find(labPreview!, "DiagramZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide Rendered preview initially preserves readable actual-size labels");
+                _ = DwmFlush(); labPreview!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered-initial.png"));
+                Find(labPreview, "DiagramFit").AsButton().Invoke();
+                Wait(() => Find(labPreview, "DiagramZoom").Patterns.RangeValue.Pattern.Value.Value < 100, "Explicit Fit did not reveal the complete wide diagram.");
+                _ = DwmFlush(); labPreview.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered.png"));
                 labPreview.Close(); Click("MermaidActualSize");
                 Check(Draft() == lab, "Protected zoom, Fit and Rendered preview leave the complete original source exact");
                 Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
