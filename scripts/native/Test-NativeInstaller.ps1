@@ -1,5 +1,9 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][string]$Installer, [string]$UpgradeInstaller)
+param(
+    [Parameter(Mandatory)][string]$Installer,
+    [string]$UpgradeInstaller,
+    [string]$HistoricalValidationProject
+)
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
     throw 'Installer validation requires a disposable GitHub-hosted Windows runner.'
@@ -7,6 +11,10 @@ if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUN
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $Installer = (Resolve-Path -LiteralPath $Installer).Path
 if ($UpgradeInstaller) { $UpgradeInstaller = (Resolve-Path -LiteralPath $UpgradeInstaller).Path }
+if ($HistoricalValidationProject) {
+    if (-not $UpgradeInstaller) { throw 'Historical validation requires an upgrade candidate.' }
+    $HistoricalValidationProject = (Resolve-Path -LiteralPath $HistoricalValidationProject).Path
+}
 $uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{3AF043CA-F7C1-4D1F-A8BC-847B4C44E23F}_is1'
 if (Test-Path -LiteralPath $uninstallKey) { throw 'A native installation already exists. This test will not replace it.' }
 $shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Lens Docs Studio Native Preview/Lens Docs Studio Native Preview.lnk'
@@ -54,6 +62,9 @@ $initialIdentity = Get-PackageIdentity $Installer
 if ($UpgradeInstaller) {
     $upgradeIdentity = Get-PackageIdentity $UpgradeInstaller
     if ($upgradeIdentity.version -eq $initialIdentity.version) { throw 'The simulated upgrade requires distinct package versions.' }
+    if ($HistoricalValidationProject -and ($initialIdentity.sourceKind -ne 'branch-source' -or $initialIdentity.sourceRevision -eq $upgradeIdentity.sourceRevision)) {
+        throw 'Historical upgrades require an original branch-source package from a different revision.'
+    }
 }
 function Run-Installer([string]$Path, [string]$Phase) {
     $expectedIdentity = Get-PackageIdentity $Path
@@ -91,7 +102,9 @@ function Run-Installer([string]$Path, [string]$Phase) {
 function Run-NativeUi([string]$Phase) {
     Push-Location $repo
     try {
-        & dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $Phase) --require-bundled-runtime
+        # Historical state must be produced by the original version's own UI and services.
+        $validationProject = if ($Phase -eq 'first-launch' -and $HistoricalValidationProject) { $HistoricalValidationProject } else { Join-Path $repo 'src/native/LensDocsStudio.Native.Validation' }
+        & dotnet run --project $validationProject -c Release --no-build -- --ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $Phase) --require-bundled-runtime
         if ($LASTEXITCODE -ne 0) { throw "Installed application UI validation failed during $Phase." }
     } finally { Pop-Location }
     $checks.Add("${Phase}: installed application saved and restored UTF-8 source")
@@ -138,7 +151,9 @@ try {
     @{ passed=$true; checks=$checks; installedVersions=$installedVersions; shortcutIdentities=$shortcutIdentities; preservedStateFiles=$preservedStateSnapshot.Count; evidence=$root;
         cleanMachineCertification=$false; upgradeTested=[bool]$UpgradeInstaller; productionSignedUpgrade=$false; sessionRestorationTested=$true;
         sameRevisionUpgrade=[bool]($UpgradeInstaller -and $upgradeIdentity.sourceRevision -eq $initialIdentity.sourceRevision);
-        upgradeLimitation='Preview package replacement and preservation only; production signing, historical schema migration and SDK-free clean-machine certification remain separate.' } |
+        historicalSourceRevision=$initialIdentity.sourceRevision; candidateSourceRevision=$(if ($UpgradeInstaller) { $upgradeIdentity.sourceRevision } else { $initialIdentity.sourceRevision });
+        historicalStateProducer=$HistoricalValidationProject;
+        upgradeLimitation='Synthetic state from the specified original application/harness only; production signing, unrepresented historical state and SDK-free clean-machine certification remain separate.' } |
         ConvertTo-Json -Depth 5 | Set-Content (Join-Path $root 'installer-results.json')
     "Native installer lifecycle passed. Evidence: $root"
 } catch {

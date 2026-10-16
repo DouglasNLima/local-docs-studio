@@ -1,7 +1,7 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: [develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
     branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   workflow_dispatch:
@@ -165,4 +165,69 @@ jobs:
             artifacts/native/packages/*/*.zip
             artifacts/native/packages/*/*.json
             artifacts/native/packages/*/SHA256SUMS.txt
+          retention-days: 14
+
+  historical-upgrade:
+    name: Historical upgrade (${{ matrix.preview }})
+    needs: native
+    if: github.ref == 'refs/heads/integration/native-wpf-candidate' || github.base_ref == 'develop'
+    runs-on: windows-latest
+    timeout-minutes: 35
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        preview: ['317', '393', '433', '473', '497', '531']
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Resolve pinned original package
+        id: original
+        shell: pwsh
+        run: |
+          $catalogue = Get-Content tests/fixtures/native-historical-previews.json -Raw | ConvertFrom-Json
+          $pin = $catalogue.previews | Where-Object { $_.version -eq '0.1.1-preview.${{ matrix.preview }}' }
+          "run=$($pin.runId)" >> $env:GITHUB_OUTPUT
+          "source=$($pin.sourceRevision)" >> $env:GITHUB_OUTPUT
+      - name: Retrieve original historical artefact without rebuilding its binaries
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          run-id: ${{ steps.original.outputs.run }}
+          github-token: ${{ github.token }}
+          path: artifacts/integration/original
+      - name: Retrieve this run's integrated candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          path: artifacts/integration/candidate
+      - name: Verify original installer and ZIP provenance before execution
+        run: pwsh -NoProfile -File scripts/native/Test-NativeHistoricalPackage.ps1 -PackageDirectory 'artifacts/integration/original/packages/0.1.1-preview.${{ matrix.preview }}' -Version '0.1.1-preview.${{ matrix.preview }}'
+      - name: Build current and original state-producing validation harnesses
+        shell: pwsh
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/integration/original-source '${{ steps.original.outputs.source }}'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/integration/original-source/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Exercise real cross-revision installation and state restoration
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer 'artifacts/integration/original/packages/0.1.1-preview.${{ matrix.preview }}/LensDocsStudio.Native-0.1.1-preview.${{ matrix.preview }}-win-x64-Setup.exe' -UpgradeInstaller 'artifacts/integration/candidate/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe' -HistoricalValidationProject 'artifacts/integration/original-source/src/native/LensDocsStudio.Native.Validation'
+      - name: Retain synthetic migration evidence without republishing historical binaries
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-historical-upgrade-${{ matrix.preview }}
+          path: |
+            artifacts/native/install-smoke/**/*.json
+            artifacts/native/install-smoke/**/*.png
+            artifacts/native/install-smoke/**/*.txt
+            artifacts/native/install-smoke/**/*.log
           retention-days: 14
