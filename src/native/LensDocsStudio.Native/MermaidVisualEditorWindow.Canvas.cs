@@ -39,6 +39,8 @@ public partial class MermaidVisualEditorWindow
     }
 
     private NativeMermaidPresentation? presentation;
+    private DiagramResult? canonicalRender;
+    private DrawingImage? canonicalDrawing;
     private readonly Dictionary<string, DrawingGroup> nodeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeLabelDrawings = new(StringComparer.Ordinal);
@@ -75,6 +77,7 @@ public partial class MermaidVisualEditorWindow
             }, cancellation.Token);
             if (closed || generation != canvasGeneration || draft.Source != source || dark != themeDark) return;
             presentation = next; canvasError = null; canonicalMapped = next?.Maps(draft.Model) == true;
+            canonicalRender = rendered; canonicalDrawing = next?.Drawing ?? inspection;
             if (next is not null) BuildCanonicalCanvas();
             else
             {
@@ -108,7 +111,7 @@ public partial class MermaidVisualEditorWindow
         catch (Exception error) when (error is not OutOfMemoryException)
         {
             if (closed || generation != canvasGeneration) return;
-            presentation = null; canonicalMapped = false; canvasError = error.Message;
+            presentation = null; canonicalRender = null; canonicalDrawing = null; canonicalMapped = false; canvasError = error.Message;
             DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear();
             var diagnostic = new TextBlock { Text = "The original diagram could not be rendered. " + error.Message + " Edit the source to correct it.", TextWrapping = TextWrapping.Wrap, MaxWidth = 520, Margin = new(20) };
             AutomationProperties.SetAutomationId(diagnostic, "MermaidCanvasDiagnostic");

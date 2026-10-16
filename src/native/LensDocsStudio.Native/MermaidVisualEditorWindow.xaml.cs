@@ -124,7 +124,7 @@ public partial class MermaidVisualEditorWindow : Window
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
         DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : !draft.Model.CanEdit || !canonicalMapped ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
-        RenderedPreviewButton.IsEnabled = !busy && !renderingCanvas && !SourcePending && !PropertiesPending && inlineEditor is null;
+        RenderedPreviewButton.IsEnabled = canonicalDrawing is not null && !busy && !renderingCanvas && !SourcePending && !PropertiesPending && inlineEditor is null;
         SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit || !canonicalMapped ? Visibility.Visible : Visibility.Collapsed;
         SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
@@ -384,19 +384,18 @@ public partial class MermaidVisualEditorWindow : Window
         catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Select the source and try again."; }
     }
     private void EditOwningSource(object sender, RoutedEventArgs e) { editSource?.Invoke(); Status.Text = "The owning document's source is available. This private draft remains open."; }
-    private async void ShowRenderedPreview(object sender, RoutedEventArgs e)
+    private void ShowRenderedPreview(object sender, RoutedEventArgs e)
     {
-        if (busy || SourcePending || PropertiesPending || inlineEditor is not null) return;
-        busy = true; UpdateActions();
+        if (busy || renderingCanvas || SourcePending || PropertiesPending || inlineEditor is not null) return;
+        if (canonicalRender is not { Success: true } result || canonicalDrawing is not { } drawing || result.Source != draft.Source
+            || result.Theme != DiagramThemes.ResolveName(diagramTheme, dark))
+        { Status.Text = canvasError ?? "Wait for the current original diagram to finish rendering."; return; }
         try
         {
-            var result = await Task.Run(() => diagrams.Render(draft.Source, dark, diagramTheme, lifetime.Token), lifetime.Token); if (closed) return;
-            if (!result.Success) { Status.Text = result.Error; return; }
-            new DiagramWindow(new NativeSvgService().Render(result.Svg!), format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
+            // The immutable drawing is shared with the canvas; session drag transforms belong to a private clone.
+            new DiagramWindow(drawing, format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
         }
-        catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "Preview could not be opened: " + ex.Message; }
-        finally { busy = false; if (!closed) UpdateActions(); }
     }
     private void Shortcut(object sender, KeyEventArgs e)
     {
