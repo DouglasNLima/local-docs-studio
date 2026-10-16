@@ -406,7 +406,8 @@ public partial class MermaidVisualEditorWindow
         var group = IntendedGroup(point);
         if (text == "Connection")
         {
-            var target = positions.FirstOrDefault(pair => pair.Key.StartsWith("node:", StringComparison.Ordinal) && Contains(pair.Value, point)).Key;
+            var targetId = ReconnectionTarget(point);
+            var target = targetId is null ? null : "node:" + targetId;
             if (target is null) { Status.Text = "Drop the connection on an existing node; no node has been created."; return; }
             connectionSource ??= Selected?.StartsWith("node:", StringComparison.Ordinal) == true ? Selected[5..] : null;
             if (connectionSource is null) { SelectElement(target); StartConnection(this, e); }

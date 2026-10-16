@@ -21,7 +21,7 @@ internal static partial class NativeUiChecks
         Process? observedProcess = null; Application? app = null; Window? main = null; Window? visual = null;
         try
         {
-            foreach (var count in new[] { 20, 100, 300 })
+            foreach (var count in baseline ? new[] { 20, 100, 300, 24 } : new[] { 100, 300, 24, 20 })
             {
                 var source = InteractionFixture(count);
                 var fixture = Path.Combine(output, "drag-" + count + ".mmd"); File.WriteAllText(fixture, source);
@@ -36,7 +36,7 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "Canonical rendering did not finish.");
                 var editable = Find(visual!, "MermaidApply").IsEnabled;
                 visual!.CaptureToFile(Path.Combine(output, "before-" + count + ".png"));
-                // The 300-node case can exceed the existing editable edge budget. Retain that boundary.
+                // Keep renderer protection fail-closed; it must not become an editing permission.
                 if (!editable) { observations.Add(new { Nodes = count, Editable = false, Status = Find(visual, "MermaidStatus").Name }); }
                 else
                 {
@@ -65,10 +65,11 @@ internal static partial class NativeUiChecks
                         if (iteration % 3 == 2) Find(visual, "MermaidAutoLayout").AsButton().Invoke();
                     }
                     visual.CaptureToFile(Path.Combine(output, "after-" + count + ".png"));
-                    observations.Add(new { Nodes = count, Editable = true, Drags = samples.Count, PointerMoves = samples.Count * 16,
+                    observations.Add(new { Nodes = count, Editable = true, Drags = samples.Count, PointerMoves = samples.Count * 17,
                         RoundTripMilliseconds = samples, UpdateMetrics = updateMetrics, PrivateSourceExact = true, DiskSourceExact = File.ReadAllText(fixture) == source,
                         WorkingSet = observedProcess!.WorkingSet64, ProcessAlive = !app.HasExited });
                 }
+                Record(false, "Validation in progress; completion is recorded only after all checks pass.");
                 if (!baseline && count == 20 && editable) CandidateScenarios(source);
                 Find(visual, "MermaidCancel").AsButton().Invoke();
                 Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "Cancel did not close the editor after stress.");
@@ -100,6 +101,7 @@ internal static partial class NativeUiChecks
         void CandidateScenarios(string original)
         {
             var checks = new List<string>(); var placements = new List<object>();
+            observations.Add(new { CandidateChecks = checks, Placements = placements });
             var editor = Find(main!, "MarkdownEditor");
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
@@ -118,6 +120,12 @@ internal static partial class NativeUiChecks
                     if (cancel) Keyboard.Type(VirtualKeyShort.ESCAPE);
                 }
                 finally { Mouse.Up(MouseButton.Left); }
+            }
+            void ChangeTheme(string name)
+            {
+                FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand();
+                Find(main!, name + "Theme").AsMenuItem().Invoke(); FocusWindow(visual!);
+                Ready(text => text.Contains("Session centre retained", StringComparison.Ordinal));
             }
             var scroll = Find(visual!, "MermaidViewport").Patterns.Scroll.Pattern;
             foreach (var zoom in new[] { 50, 100, 150, 200 })
@@ -153,19 +161,31 @@ internal static partial class NativeUiChecks
             Find(visual!, "MermaidCanvas_node_Node1").Click(); Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Session centre retained"; Click("MermaidUpdateNode");
             Ready(text => text.Contains("Session centre retained", StringComparison.Ordinal));
             foreach (var (node, expected) in expectedCentres) Check(Math.Abs(Centre("MermaidCanvas_node_" + node).X - expected.X) <= 6 && Math.Abs(Centre("MermaidCanvas_node_" + node).Y - expected.Y) <= 6, "Label rerender retains session centre: " + node);
+            if (!highContrast)
+            {
+                ChangeTheme("Dark"); Capture("dark-session-layout");
+                foreach (var (node, expected) in expectedCentres) Check(Math.Abs(Centre("MermaidCanvas_node_" + node).X - expected.X) <= 6 && Math.Abs(Centre("MermaidCanvas_node_" + node).Y - expected.Y) <= 6, "Theme rerender retains session centre: " + node);
+                ChangeTheme("Light");
+            }
+            var beforeDeactivation = Centre("MermaidCanvas_node_Node1");
+            Mouse.MoveTo(beforeDeactivation); Mouse.Down(MouseButton.Left);
+            try { MovePointer(new(beforeDeactivation.X + 45, beforeDeactivation.Y + 25)); FocusWindow(main!); }
+            finally { Mouse.Up(MouseButton.Left); }
+            FocusWindow(visual!);
+            Check(Centre("MermaidCanvas_node_Node1") == beforeDeactivation, "Window deactivation cancels movement and releases capture");
             var beforeReconnect = Draft();
             if (!Find(visual!, "MermaidSelectionSummary").Name.Contains("Next 0", StringComparison.Ordinal)) Find(visual!, "MermaidCanvas_edge-0").Patterns.Toggle.Pattern.Toggle();
             Wait(() => visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidDestinationEndpoint")) is not null, "Selected connection has no endpoint handles.");
             Capture("connection-endpoints");
             Drag(Centre("MermaidDestinationEndpoint"), Centre("MermaidCanvas_node_Node3"), capture: "reconnecting-destination");
-            Ready(text => new MermaidSourceParser().Parse(text).Edges[0].Target.Id == "Node3");
-            Check(new MermaidSourceParser().Parse(Draft()).Edges[0].Label == "Next 0", "Destination reconnection preserves the exact original label");
+            Ready(text => new MermaidSourceParser().Parse(text).Edges.Single(edge => edge.Label == "Next 0").Target.Id == "Node3");
+            Check(new MermaidSourceParser().Parse(Draft()).Edges.Single(edge => edge.Label == "Next 0").Type == FlowConnectionType.Directed, "Destination reconnection preserves the exact original label");
             Capture("reconnection-result"); var connected = Draft();
             Click("MermaidUndo"); Ready(text => text == beforeReconnect); Click("MermaidRedo"); Ready(text => text == connected);
             Click("MermaidUndo"); Ready(text => text == beforeReconnect);
             if (!Find(visual!, "MermaidSelectionSummary").Name.Contains("Next 0", StringComparison.Ordinal)) Find(visual!, "MermaidCanvas_edge-0").Patterns.Toggle.Pattern.Toggle();
             Drag(Centre("MermaidSourceEndpoint"), Centre("MermaidCanvas_node_Node2"));
-            Ready(text => new MermaidSourceParser().Parse(text).Edges[0].Source.Id == "Node2");
+            Ready(text => new MermaidSourceParser().Parse(text).Edges.Single(edge => edge.Label == "Next 0").Source.Id == "Node2");
             Check(true, "Source endpoint uses the exact selected edge and validates Mermaid");
             Click("MermaidUndo"); Ready(text => text == beforeReconnect);
             if (!Find(visual!, "MermaidSelectionSummary").Name.Contains("Next 0", StringComparison.Ordinal)) Find(visual!, "MermaidCanvas_edge-0").Patterns.Toggle.Pattern.Toggle();
@@ -189,7 +209,6 @@ internal static partial class NativeUiChecks
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == original, "One document Undo did not restore the entire original diagram.");
             Check(true, "Apply and one document Undo preserve the original portable source exactly");
-            observations.Add(new { CandidateChecks = checks, Placements = placements });
             // Reopen so the caller also verifies ordinary Cancel after the completed transaction.
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Preview action missing after document Undo.");
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
@@ -203,8 +222,13 @@ internal static partial class NativeUiChecks
 
     private static void MovePointer(System.Drawing.Point point) { Mouse.Position = point; Thread.Sleep(16); }
 
-    private static string InteractionFixture(int count) => "flowchart TD\n    %% Synthetic stability fixture\n"
+    private static string InteractionFixture(int count) => count == 24 ? NestedInteractionFixture() : "flowchart TD\n    %% Synthetic stability fixture\n"
         + string.Join('\n', Enumerable.Range(0, count).Select(index => index % 5 == 1 ? $"N{index}{{Decision {index}}}" : $"N{index}[\"Node {index}<br/>Second line\"]"))
         + "\n" + string.Join('\n', Enumerable.Range(0, Math.Min(count - 1, 175)).Select(index => $"N{index} -->|Next {index}| N{index + 1}"))
         + "\nN0 --> N4\nN0 --> N7\nN4 --> N9\nN9 --> N2\nN7 --> N12\nN12 --> N4\n";
+    private static string NestedInteractionFixture() => "flowchart TD\nsubgraph Outer[Outer workflow]\nsubgraph Inner[Inner review]\n"
+        + "N0[\"Long review label with detailed synthetic context<br/>Second line with further context\"]\nN1{Decision}\nend\nN2[Shared]\nN3[Review]\nend\n"
+        + string.Join('\n', Enumerable.Range(4, 20).Select(index => $"N{index}[Node {index}]"))
+        + "\n" + string.Join('\n', Enumerable.Range(0, 23).Select(index => $"N{index} -->|Next| N{index + 1}"))
+        + "\nN0 --> N4\nN0 --> N6\nN0 --> N8\nN0 --> N10\nN0 --> N12\nN10 --> N2\nN12 --> N3\n";
 }

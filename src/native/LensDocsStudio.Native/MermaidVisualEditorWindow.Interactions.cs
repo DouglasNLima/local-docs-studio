@@ -278,7 +278,9 @@ public partial class MermaidVisualEditorWindow
     }
     private string? ReconnectionTarget(Point point)
     {
-        var matches = positions.Where(pair => pair.Key.StartsWith("node:", StringComparison.Ordinal) && Contains(pair.Value, point)).Take(2).ToArray();
+        var matches = positions.Where(pair => pair.Key.StartsWith("node:", StringComparison.Ordinal) && Contains(pair.Value, point)
+            && presentation?.Elements.TryGetValue(pair.Key, out var element) == true
+            && element.Geometry.FillContains(point - new Vector(pair.Value.X - element.Bounds.X, pair.Value.Y - element.Bounds.Y))).Take(2).ToArray();
         return matches.Length == 1 ? matches[0].Key[5..] : null;
     }
     private void MoveReconnection(Point point)

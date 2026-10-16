@@ -1,5 +1,13 @@
 # Native Windows engineering handover
 
+The workspace and Mermaid interaction stability continuation is tracked in
+[Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30) and the
+[interaction stability report](workspace-mermaid-interaction-stability.md). The
+immutable integration baseline reproduces a native pointer-drag exception; its
+original Windows stack and synthetic fixture are retained. Candidate interaction,
+viewport and preview-package certification are recorded separately from the
+historical results below. No merge or public release is authorised.
+
 Current consolidation status is recorded in [integration readiness](integration-readiness.md) and [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29). The following source-specific handover remains historical evidence; its package identities are unchanged.
 
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),
