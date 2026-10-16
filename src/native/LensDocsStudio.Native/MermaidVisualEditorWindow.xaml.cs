@@ -157,7 +157,7 @@ public partial class MermaidVisualEditorWindow : Window
             {
                 foreach (var rename in operations.OfType<UpdateMermaidNode>().Where(node => node.NewId is not null && node.NewId != node.Id))
                     if (sessionPositions.Remove("node:" + rename.Id, out var centre)) sessionPositions["node:" + rename.NewId] = centre;
-                foreach (var key in sessionPositions.Keys.Where(key => !draft.Model.Nodes.Any(node => "node:" + node.Id == key)).ToArray()) sessionPositions.Remove(key);
+                foreach (var key in sessionPositions.Keys.Where(key => !draft.Model.Nodes.Any(node => "node:" + node.Id == key) && !draft.Model.Subgraphs.Any(group => "group:" + group.Id == key)).ToArray()) sessionPositions.Remove(key);
                 if (pendingNodePlacement is { } placement) sessionPositions[placement.Key] = placement.Centre;
                 SaveSessionLayout();
                 if (select is not null) draft.Select([select]);
@@ -180,7 +180,7 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (!CanTransform || PropertiesPending) return;
         var id = MermaidTransformationService.UniqueId(draft.Model, "Group");
-        await Execute(new AddMermaidSubgraph(id, "New subgraph", Selected?.StartsWith("group:", StringComparison.Ordinal) == true ? Selected[6..] : null), "group:" + id);
+        await InsertPositionedSubgraph(id, VisibleInsertionPoint(), Selected?.StartsWith("group:", StringComparison.Ordinal) == true ? Selected[6..] : null);
     }
     private async void UpdateNode(object sender, RoutedEventArgs e)
         => await CommitNodeProperties();
@@ -311,7 +311,7 @@ public partial class MermaidVisualEditorWindow : Window
         InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
         SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph to edit its properties." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
         if (Elements.SelectedItems.Count != 1 || Selected is not { } key) return;
-        if (!draft.Model.CanEdit && canonicalRender?.Source == draft.Source && presentation is { } inspected)
+        if (!canonicalMapped && canonicalRender?.Source == draft.Source && presentation is { } inspected)
         {
             InspectionProperties.Visibility = Visibility.Visible;
             SelectionSummary.Text += " · Read-only inspection";

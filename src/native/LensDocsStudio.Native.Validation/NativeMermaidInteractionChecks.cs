@@ -51,8 +51,8 @@ internal static partial class NativeUiChecks
                         try
                         {
                             for (var move = 0; move < 16; move++)
-                                Mouse.MoveTo(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + (move % 4) * 2));
-                            Mouse.MoveTo(new System.Drawing.Point(start.X + 12, start.Y));
+                                MovePointer(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + (move % 4) * 2));
+                            MovePointer(new System.Drawing.Point(start.X + 12, start.Y));
                             if (iteration % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE);
                         }
                         finally { Mouse.Up(MouseButton.Left); }
@@ -61,6 +61,7 @@ internal static partial class NativeUiChecks
                         if (!observedProcess!.Responding) throw new IOException("The native process stopped responding after pointer release.");
                         samples.Add(watch.Elapsed.TotalMilliseconds);
                         updateMetrics.Add(Find(visual, "MermaidStatus").Properties.HelpText.ValueOrDefault ?? "");
+                        Console.WriteLine($"Nodes {count}: drag {iteration + 1}/30, {watch.Elapsed.TotalMilliseconds:F1} ms round trip");
                         if (iteration % 3 == 2) Find(visual, "MermaidAutoLayout").AsButton().Invoke();
                     }
                     visual.CaptureToFile(Path.Combine(output, "after-" + count + ".png"));
@@ -73,6 +74,7 @@ internal static partial class NativeUiChecks
                 Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "Cancel did not close the editor after stress.");
                 app.Kill(); app.Dispose(); app = null; visual = null;
             }
+            if (!baseline) CheckWorkspaceViewportOwnership(executable, output);
             Record(true, null); display.Complete(); return 0;
         }
         catch (Exception error)
@@ -111,7 +113,7 @@ internal static partial class NativeUiChecks
                 Mouse.MoveTo(from); Mouse.Down(MouseButton.Left);
                 try
                 {
-                    for (var step = 1; step <= 8; step++) Mouse.MoveTo(new(from.X + (to.X - from.X) * step / 8, from.Y + (to.Y - from.Y) * step / 8));
+                    for (var step = 1; step <= 8; step++) MovePointer(new(from.X + (to.X - from.X) * step / 8, from.Y + (to.Y - from.Y) * step / 8));
                     if (capture is not null) Capture(capture);
                     if (cancel) Keyboard.Type(VirtualKeyShort.ESCAPE);
                 }
@@ -198,6 +200,8 @@ internal static partial class NativeUiChecks
         { Passed = passed, Baseline = baseline, HighContrast = highContrast, Dpi = GetDpiForSystem(), Observations = observations, Error = error,
             Limitation = "Original private fixture unavailable; synthetic repeated pointer test. Round trips include input pacing and UIA transport, not per-frame latency." }, new JsonSerializerOptions { WriteIndented = true }));
     }).GetAwaiter().GetResult();
+
+    private static void MovePointer(System.Drawing.Point point) { Mouse.Position = point; Thread.Sleep(16); }
 
     private static string InteractionFixture(int count) => "flowchart TD\n    %% Synthetic stability fixture\n"
         + string.Join('\n', Enumerable.Range(0, count).Select(index => index % 5 == 1 ? $"N{index}{{Decision {index}}}" : $"N{index}[\"Node {index}<br/>Second line\"]"))

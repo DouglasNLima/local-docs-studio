@@ -153,6 +153,8 @@ public partial class MermaidVisualEditorWindow
             var id = SvgObject.GetId(group);
             if (id?.StartsWith("lens-node-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(10), out var ordinal) && ordinal < view.Graph.Nodes.Count)
                 nodeDrawings["node:" + view.Graph.Nodes[ordinal].Id] = group;
+            if (id?.StartsWith("lens-group-", StringComparison.Ordinal) == true && view.Elements.ContainsKey("group:" + id[11..]))
+                nodeDrawings["group:" + id[11..]] = group;
             if (id?.StartsWith("lens-edge-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(10), out var edgeOrdinal) && edgeOrdinal < view.Connections.Count)
                 edgeDrawings[canonicalMapped ? draft.Model.Edges[view.Connections[edgeOrdinal].Ordinal].Id : id] = group;
             if (id?.StartsWith("lens-label-", StringComparison.Ordinal) == true && int.TryParse(id.AsSpan(11), out var labelOrdinal) && labelOrdinal < labelled.Length && canonicalMapped)
@@ -400,7 +402,7 @@ public partial class MermaidVisualEditorWindow
         if (text == "Subgraph")
         {
             var groupId = MermaidTransformationService.UniqueId(draft.Model, "Group");
-            await Execute(new AddMermaidSubgraph(groupId, "New subgraph", group), "group:" + groupId);
+            await InsertPositionedSubgraph(groupId, point, group);
             return;
         }
         if (!Enum.TryParse<FlowNodeShape>(text, out var shape)) return;

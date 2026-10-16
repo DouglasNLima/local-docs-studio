@@ -36,6 +36,8 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         // without another SVG parse or render on selection, hover or pointer movement.
         var nodeIndex = 0;
         foreach (var element in root.Descendants().Where(e => HasClass(e, "node"))) element.SetAttributeValue("id", "lens-node-" + nodeIndex++);
+        foreach (var element in root.Descendants().Where(e => HasClass(e, "subgraph")))
+            element.SetAttributeValue("id", "lens-group-" + (string?)element.Attribute("data-id"));
         var edgeIndex = 0;
         foreach (var element in root.Descendants().Where(e => HasClass(e, "edge")).ToArray())
         { var wrapper = new XElement(root.Name.Namespace + "g", new XAttribute("id", "lens-edge-" + edgeIndex++)); element.ReplaceWith(wrapper); wrapper.Add(element); }

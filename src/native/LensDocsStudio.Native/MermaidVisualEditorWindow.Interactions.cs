@@ -189,6 +189,12 @@ public partial class MermaidVisualEditorWindow
         try { await Execute(new AddMermaidNode(id, shape == FlowNodeShape.Terminal ? "Start / End" : shape.ToString(), shape, group), key); }
         finally { pendingNodePlacement = null; }
     }
+    private async Task InsertPositionedSubgraph(string id, Point point, string? parent)
+    {
+        pendingNodePlacement = ("group:" + id, point);
+        try { await Execute(new AddMermaidSubgraph(id, "New subgraph", parent), "group:" + id); }
+        finally { pendingNodePlacement = null; }
+    }
     private void CancelPointerInteraction()
     {
         FinishNodeDrag(true); CancelReconnection();
