@@ -48,6 +48,7 @@ public partial class MermaidVisualEditorWindow
     private Image? canonicalImage;
 
     private readonly NativeSvgService canvasSvg = new();
+    private readonly SemaphoreSlim canvasRenderGate = new(1, 1);
     private CancellationTokenSource? canvasRender;
     private int canvasGeneration;
     private bool renderingCanvas, canonicalMapped, initialFit = true;
@@ -59,8 +60,12 @@ public partial class MermaidVisualEditorWindow
         canvasRender?.Cancel();
         var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token); canvasRender = cancellation;
         renderingCanvas = true; canonicalMapped = false; UpdateActions();
+        var leased = false;
         try
         {
+            // SharpVectors has no interruptible conversion API. Serialise work so obsolete
+            // conversions can finish without accumulating threads, drawings or font geometry.
+            await canvasRenderGate.WaitAsync(cancellation.Token); leased = true;
             var rendered = await Task.Run(() => diagrams.Render(source, themeDark, diagramTheme, cancellation.Token), cancellation.Token);
             cancellation.Token.ThrowIfCancellationRequested();
             if (!rendered.Success) throw new InvalidDataException(rendered.Error);
@@ -119,6 +124,7 @@ public partial class MermaidVisualEditorWindow
         }
         finally
         {
+            if (leased) canvasRenderGate.Release();
             cancellation.Dispose(); if (ReferenceEquals(canvasRender, cancellation)) canvasRender = null;
             if (!closed && generation == canvasGeneration) { renderingCanvas = false; UpdateActions(); }
         }

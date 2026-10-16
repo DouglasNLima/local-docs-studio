@@ -74,7 +74,12 @@ public partial class MermaidVisualEditorWindow : Window
         try { SourceEditor.Text = draft.Source; } finally { updating = false; }
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; canvasRender?.Cancel(); lifetime.Cancel(); lifetime.Dispose(); };
+        Closed += async (_, _) =>
+        {
+            closed = true; canvasRender?.Cancel(); lifetime.Cancel();
+            await canvasRenderGate.WaitAsync();
+            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose();
+        };
         Loaded += (_, _) => { Refresh(true); };
     }
     public void ApplyTheme(string theme)
