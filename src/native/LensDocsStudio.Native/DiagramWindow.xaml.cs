@@ -24,12 +24,14 @@ public partial class DiagramWindow : Window
     {
         if (DiagramScale is null) return;
         DiagramScale.ScaleX = DiagramScale.ScaleY = e.NewValue / 100;
-        ZoomLabel.Text = Math.Round(e.NewValue) + "%";
+        ZoomLabel.Text = (e.NewValue < 1 ? e.NewValue.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) : Math.Round(e.NewValue).ToString()) + "%";
     }
     private void FitDiagram(object sender, RoutedEventArgs e)
     {
         if (DiagramImage.Source is null || DiagramScroll.ViewportWidth <= 0 || DiagramScroll.ViewportHeight <= 0) return;
-        Zoom.Value = Math.Clamp(Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100, Zoom.Minimum, Zoom.Maximum);
+        var fit = Math.Min((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width, (DiagramScroll.ViewportHeight - 48) / DiagramImage.Source.Height) * 100;
+        if (fit <= 0 || !double.IsFinite(fit)) return;
+        Zoom.Minimum = Math.Min(1, fit); Zoom.Value = Math.Min(fit, Zoom.Maximum);
         DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
     }
     private void InitialView(object sender, RoutedEventArgs e)
@@ -45,7 +47,8 @@ public partial class DiagramWindow : Window
     private void FitWidth(object sender, RoutedEventArgs e)
     {
         if (DiagramImage.Source is null || DiagramScroll.ViewportWidth <= 48) return;
-        Zoom.Value = Math.Clamp((DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width * 100, Zoom.Minimum, Zoom.Maximum);
+        var fit = (DiagramScroll.ViewportWidth - 48) / DiagramImage.Source.Width * 100;
+        Zoom.Minimum = Math.Min(1, fit); Zoom.Value = Math.Min(fit, Zoom.Maximum);
         DiagramScroll.ScrollToHorizontalOffset(0); DiagramScroll.ScrollToVerticalOffset(0);
     }
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;

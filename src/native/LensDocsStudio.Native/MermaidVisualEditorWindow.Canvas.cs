@@ -379,18 +379,19 @@ public partial class MermaidVisualEditorWindow
     private void Fit(object sender, RoutedEventArgs e)
     {
         if (Viewport is null || DiagramCanvas is null || Viewport.ViewportWidth <= 0 || Viewport.ViewportHeight <= 0) return;
-        Zoom.Value = Math.Clamp(Math.Min(Viewport.ViewportWidth / DiagramCanvas.Width, Viewport.ViewportHeight / DiagramCanvas.Height) * 100, 1, 400);
+        var fit = Math.Min(Viewport.ViewportWidth / DiagramCanvas.Width, Viewport.ViewportHeight / DiagramCanvas.Height) * 100;
+        Zoom.Minimum = Math.Min(1, fit); Zoom.Value = Math.Min(fit, Zoom.Maximum);
         Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0);
     }
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void ResetView(object sender, RoutedEventArgs e) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; ZoomLabel.Text = Math.Round(e.NewValue) + "%"; }
+    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; ZoomLabel.Text = (e.NewValue < 1 ? e.NewValue.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) : Math.Round(e.NewValue).ToString()) + "%"; }
     private void CanvasWheel(object sender, MouseWheelEventArgs e)
     {
         if (Keyboard.Modifiers != ModifierKeys.Control) return; e.Handled = true;
         var pointer = e.GetPosition(Viewport); var anchor = e.GetPosition(DiagramCanvas);
-        Zoom.Value = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.15 : 1 / 1.15), 1, 400); Viewport.UpdateLayout();
+        Zoom.Value = Math.Clamp(Zoom.Value * (e.Delta > 0 ? 1.15 : 1 / 1.15), Zoom.Minimum, Zoom.Maximum); Viewport.UpdateLayout();
         var after = DiagramCanvas.TranslatePoint(anchor, Viewport);
         Viewport.ScrollToHorizontalOffset(Viewport.HorizontalOffset + after.X - pointer.X); Viewport.ScrollToVerticalOffset(Viewport.VerticalOffset + after.Y - pointer.Y);
     }

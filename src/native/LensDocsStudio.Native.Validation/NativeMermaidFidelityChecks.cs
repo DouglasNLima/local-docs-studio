@@ -72,6 +72,20 @@ internal static class NativeMermaidFidelityChecks
         Reject(safeResult with { Svg = safeResult.Svg!.Replace("</svg>", "<image href='https://example.invalid/external'/></svg>", StringComparison.Ordinal) }, "External SVG content cannot enter the native canvas");
         Reject(safeResult with { FlowchartLayout = safeResult.FlowchartLayout! with
         { Nodes = safeResult.FlowchartLayout.Nodes.Select((node, index) => index == 0 ? node with { X = double.NaN } : node).ToArray() } }, "Non-finite canonical coordinates cannot supply interaction geometry");
+        var wide = new DrawingGroup();
+        using (var context = wide.Open()) context.DrawRectangle(Brushes.LightGray, null, new Rect(0, 0, 200_000, 100));
+        wide.Freeze(); var wideImage = new DrawingImage(wide); wideImage.Freeze();
+        var wideViewer = new DiagramWindow(wideImage, _ => { }) { ShowInTaskbar = false };
+        try
+        {
+            wideViewer.Show(); wideViewer.UpdateLayout();
+            ((Button)wideViewer.FindName("DiagramFit")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            wideViewer.UpdateLayout();
+            var zoom = (Slider)wideViewer.FindName("Zoom"); var viewport = (ScrollViewer)wideViewer.FindName("DiagramScroll");
+            Check(zoom.Value is > 0 and < 1 && viewport.ScrollableWidth < 1 && viewport.ScrollableHeight < 1,
+                "Actual native Fit supports very wide drawings below one per cent without hiding content");
+        }
+        finally { wideViewer.Close(); }
         File.WriteAllText(Path.Combine(output, "fidelity.json"), JsonSerializer.Serialize(new { Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool success, string message) { if (!success) throw new IOException(message); checks.Add(message); }
         void Reject(DiagramResult candidate, string message)
