@@ -156,7 +156,9 @@ internal static partial class NativeUiChecks
                 Mouse.MoveTo(panStart); Mouse.Down(MouseButton.Middle);
                 try { MovePointer(new(panStart.X - 35, panStart.Y - 24)); }
                 finally { Mouse.Up(MouseButton.Middle); }
-                Check(scroll.VerticalScrollPercent.Value > verticalBeforePan,
+                Wait(() => scroll.VerticalScrollPercent.Value > verticalBeforePan,
+                    "The native PAN request did not change the measured vertical offset.");
+                Check(true,
                     "Native middle-button PAN changes the measured vertical offset at zoom " + zoom);
                 var point = new System.Drawing.Point(viewport.Left + viewport.Width / 2, viewport.Top + viewport.Height / 2);
                 var horizontal = scroll.HorizontalScrollPercent.Value; var vertical = scroll.VerticalScrollPercent.Value;
