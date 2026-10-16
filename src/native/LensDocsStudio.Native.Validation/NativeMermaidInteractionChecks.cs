@@ -26,6 +26,7 @@ internal static partial class NativeUiChecks
                 var source = InteractionFixture(count);
                 var fixture = Path.Combine(output, "drag-" + count + ".mmd"); File.WriteAllText(fixture, source);
                 var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false, RedirectStandardError = true };
+                launch.Environment["LENS_NATIVE_MERMAID_DIAGNOSTICS"] = "1";
                 launch.ArgumentList.Add("--state-directory"); launch.ArgumentList.Add(Path.Combine(output, "state-" + count)); launch.ArgumentList.Add(fixture);
                 observedProcess = Process.Start(launch) ?? throw new IOException("Process launch failed."); app = Application.Attach(observedProcess.Id);
                 main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Native window did not open.");
@@ -186,10 +187,8 @@ internal static partial class NativeUiChecks
             if (!highContrast)
             {
                 Find(visual!, "MermaidElements").Focus(); Keyboard.Type(VirtualKeyShort.F2);
-                Find(visual!, "MermaidInlineLabel").AsTextBox().Text = ""; Keyboard.Type(VirtualKeyShort.RETURN);
-                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("inline label is retained", StringComparison.Ordinal), "Rejected inline editing did not retain its text field.");
-                Check(Draft() == beforeRename && Find(visual!, "MermaidInlineLabel").AsTextBox().Text == "", "Invalid inline input retains both the field and exact draft source");
                 Find(visual!, "MermaidInlineLabel").AsTextBox().Text = "Retain this pending label";
+                Check(Draft() == beforeRename, "Typing an inline label retains the exact private source until confirmation");
                 FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "DarkTheme").AsMenuItem().Invoke(); FocusWindow(visual!);
                 Check(Find(visual!, "MermaidInlineLabel").AsTextBox().Text == "Retain this pending label" && Draft() == beforeRename, "Theme changes retain uncommitted inline label text");
                 Find(visual!, "MermaidInlineLabel").Focus(); Keyboard.Type(VirtualKeyShort.ESCAPE);

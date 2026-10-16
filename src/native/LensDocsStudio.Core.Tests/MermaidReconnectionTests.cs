@@ -5,6 +5,26 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class MermaidReconnectionTests
 {
+    [Fact]
+    public async Task Identical_source_at_distinct_history_steps_has_independent_session_identity()
+    {
+        const string original = "flowchart LR\nA[Keep] --> B[Review]\n";
+        var draft = new MermaidVisualDraft(original); var first = draft.HistoryIdentity;
+        var edit = await draft.ExecuteAsync(new UpdateMermaidNode("A", "Changed", FlowNodeShape.Process, "A"));
+        Assert.True(edit.Success, edit.Error); var changed = draft.HistoryIdentity;
+        var restore = await draft.ValidateAndCommitAsync(original);
+        Assert.True(restore.Success, restore.Error); var repeated = draft.HistoryIdentity;
+        Assert.Equal(original, draft.Source); Assert.NotEqual(first, repeated); Assert.NotEqual(changed, repeated);
+        draft.Undo(); Assert.Equal(changed, draft.HistoryIdentity);
+        draft.Undo(); Assert.Equal(first, draft.HistoryIdentity); Assert.Equal(original, draft.Source);
+        draft.Redo(); draft.Redo(); Assert.Equal(repeated, draft.HistoryIdentity); Assert.Equal(original, draft.Source);
+        draft.Undo(); draft.Undo();
+        var branch = await draft.ExecuteAsync(new UpdateMermaidNode("B", "Another branch", FlowNodeShape.Process, "B"));
+        Assert.True(branch.Success, branch.Error); Assert.False(draft.CanRedo);
+        Assert.Contains(first, draft.HistoryIdentities); Assert.Contains(draft.HistoryIdentity, draft.HistoryIdentities);
+        Assert.DoesNotContain(changed, draft.HistoryIdentities); Assert.DoesNotContain(repeated, draft.HistoryIdentities);
+    }
+
     [Theory]
     [InlineData(false, "\n")]
     [InlineData(true, "\r\n")]

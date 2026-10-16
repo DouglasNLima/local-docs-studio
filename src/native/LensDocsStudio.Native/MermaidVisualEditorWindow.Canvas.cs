@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -203,6 +204,7 @@ public partial class MermaidVisualEditorWindow
                 button.PreviewMouseLeftButtonDown += async (_, e) =>
                 {
                     if (Keyboard.IsKeyDown(Key.Space)) return;
+                    var pressedAt = Stopwatch.GetTimestamp();
                     e.Handled = true;
                     button.Focus();
                     if (PropertiesPending) { SelectElement(key); return; }
@@ -211,7 +213,7 @@ public partial class MermaidVisualEditorWindow
                     if (!draft.Selection.Contains(key) || Keyboard.Modifiers == ModifierKeys.Control)
                         SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
                     if (!CanTransform || !nodeTransforms.ContainsKey(key) || !draft.Selection.Contains(key)) return;
-                    StartNodeDrag(button, e.GetPosition(DiagramCanvas));
+                    StartNodeDrag(button, e.GetPosition(DiagramCanvas), pressedAt);
                 };
                 button.PreviewMouseMove += (_, e) => MoveNodeDrag(e);
                 button.PreviewMouseLeftButtonUp += (_, e) => { if (dragStart is not null) { FinishNodeDrag(false); e.Handled = true; } };

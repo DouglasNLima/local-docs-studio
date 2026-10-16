@@ -16,8 +16,9 @@ internal static partial class NativeUiChecks
         var texts = new Dictionary<string, string>(); var observations = new List<object>();
         foreach (var name in new[] { "A", "B", "C" })
         {
-            texts[name] = "# Document " + name + "\n\n[Visit section](C.md#region-040)\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
-                $"## Region {index:000}\n\nDocument {name} has a distinct portable source region {index:000}, with **formatted text**.\n\n"));
+            texts[name] = "# Document " + name + "\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
+                $"## Region {index:000}\n\nDocument {name} has a distinct portable source region {index:000}, with **formatted text**.\n\n"
+                + (name == "A" && index == 65 ? "[Visit section](C.md#region-040)\n\n" : "")));
             File.WriteAllText(Path.Combine(root, name + ".md"), texts[name]);
         }
         using var automation = new UIA3Automation();

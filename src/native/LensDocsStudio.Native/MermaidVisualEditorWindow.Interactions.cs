@@ -16,7 +16,7 @@ public partial class MermaidVisualEditorWindow
     // Coordinates are canvas DIPs. WPF GetPosition/TranslatePoint account for layout scale,
     // scrolling, centring and device DPI exactly once. Saved source never contains positions.
     private readonly Dictionary<string, Point> sessionPositions = new(StringComparer.Ordinal);
-    private readonly Dictionary<string, Dictionary<string, Point>> layoutHistory = new(StringComparer.Ordinal);
+    private readonly Dictionary<long, Dictionary<string, Point>> layoutHistory = new();
     private readonly Dictionary<string, TranslateTransform> nodeTransforms = new(StringComparer.Ordinal);
     private readonly Dictionary<string, ConnectionRuntime> connectionRuntime = new(StringComparer.Ordinal);
     private readonly Dictionary<string, HashSet<string>> incidentConnections = new(StringComparer.Ordinal);
@@ -29,7 +29,8 @@ public partial class MermaidVisualEditorWindow
     private string[] affectedConnections = [];
     private long dragAllocated, dragTicks, frameAllocated;
     private int dragFrames;
-    private double maximumDragFrame;
+    private double maximumDragFrame, firstDragFrame;
+    private readonly bool interactionDiagnostics = Environment.GetEnvironmentVariable("LENS_NATIVE_MERMAID_DIAGNOSTICS") == "1";
     private (string Key, Point Centre)? pendingNodePlacement;
     private Button? sourceHandle, targetHandle;
     private string? reconnectEdge;
@@ -71,13 +72,13 @@ public partial class MermaidVisualEditorWindow
             edges.Add(key);
         }
     }
-    private void StartNodeDrag(ToggleButton owner, Point start)
+    private void StartNodeDrag(ToggleButton owner, Point start, long pressedAt)
     {
         CancelPointerInteraction(); dragOwner = owner; dragStart = start; dragging = false;
         dragged = draft.Selection.Where(key => key.StartsWith("node:", StringComparison.Ordinal) && nodeTransforms.ContainsKey(key))
             .ToDictionary(key => key, key => positions[key]);
         affectedConnections = dragged.Keys.Where(incidentConnections.ContainsKey).SelectMany(key => incidentConnections[key]).Distinct().ToArray();
-        dragFrames = 0; frameAllocated = 0; maximumDragFrame = 0; dragAllocated = GC.GetAllocatedBytesForCurrentThread(); dragTicks = Stopwatch.GetTimestamp();
+        dragFrames = 0; frameAllocated = 0; maximumDragFrame = firstDragFrame = 0; dragAllocated = GC.GetAllocatedBytesForCurrentThread(); dragTicks = pressedAt;
         if (!owner.CaptureMouse()) FinishNodeDrag(true);
     }
     private void MoveNodeDrag(MouseEventArgs e)
@@ -95,6 +96,7 @@ public partial class MermaidVisualEditorWindow
     {
         dragFrame = null;
         if (!dragging || dragged is null) return;
+        if (dragFrames == 0) firstDragFrame = Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds;
         var watch = Stopwatch.GetTimestamp(); var allocated = GC.GetAllocatedBytesForCurrentThread();
         foreach (var (key, original) in dragged)
             PositionNode(key, new(Math.Max(original.Width / 2, original.CentreX + pendingDrag.X), Math.Max(original.Height / 2, original.CentreY + pendingDrag.Y)));
@@ -114,13 +116,14 @@ public partial class MermaidVisualEditorWindow
             foreach (var key in affectedConnections) UpdateSessionConnection(key);
         }
         else if (dragging) SaveSessionLayout();
+        var incidentCount = affectedConnections.Length;
         var owner = dragOwner; dragged = null; dragOwner = null; dragStart = null; dragging = false; affectedConnections = [];
         if (owner is not null) { owner.Cursor = null; if (owner.IsMouseCaptured) owner.ReleaseMouseCapture(); }
         UpdateExtent(); UpdateCanvasSelection();
         if (dragFrames > 0)
         {
             Status.Text = cancel ? "Movement cancelled. Source is unchanged." : "Session position retained. Auto layout resets positions; Apply saves Mermaid source only.";
-            AutomationProperties.SetHelpText(Status, $"Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; update allocated bytes: {frameAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
+            if (interactionDiagnostics) AutomationProperties.SetHelpText(Status, $"First update after native press: {firstDragFrame:F3} ms; incident connections: {incidentCount}; Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; update allocated bytes: {frameAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
         }
     }
     private void PositionNode(string key, Point centre)
@@ -159,8 +162,9 @@ public partial class MermaidVisualEditorWindow
     private static DoubleCollection FrozenDashes() { var dashes = new DoubleCollection([4, 3]); dashes.Freeze(); return dashes; }
     private void SaveSessionLayout()
     {
-        layoutHistory[draft.Source] = new(sessionPositions, StringComparer.Ordinal);
-        while (layoutHistory.Count > 100 || layoutHistory.Keys.Sum(source => source.Length) > 8_000_000 && layoutHistory.Count > 1) layoutHistory.Remove(layoutHistory.Keys.First());
+        layoutHistory[draft.HistoryIdentity] = new(sessionPositions, StringComparer.Ordinal);
+        var reachable = draft.HistoryIdentities.ToHashSet();
+        foreach (var key in layoutHistory.Keys.Where(key => !reachable.Contains(key)).ToArray()) layoutHistory.Remove(key);
     }
     private void RestoreSessionPositions()
     {
@@ -171,7 +175,7 @@ public partial class MermaidVisualEditorWindow
     private void RestoreHistoryLayout()
     {
         sessionPositions.Clear();
-        if (layoutHistory.TryGetValue(draft.Source, out var saved)) foreach (var pair in saved) sessionPositions[pair.Key] = pair.Value;
+        if (layoutHistory.TryGetValue(draft.HistoryIdentity, out var saved)) foreach (var pair in saved) sessionPositions[pair.Key] = pair.Value;
     }
     private Point VisibleInsertionPoint() => Viewport.TranslatePoint(new(Viewport.ViewportWidth / 2, Viewport.ViewportHeight / 2), DiagramCanvas);
     private void ShowInsertionMarker(Point point, bool valid)
