@@ -357,6 +357,8 @@ internal static partial class NativeUiChecks
                 Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
                 var parallel = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/parallel.mmd");
                 LaunchDocument("Parallel.mmd", parallel); Open(0);
+                Check(Find(visual!, "MermaidCanvas_edge-0").Name != Find(visual!, "MermaidCanvas_edge-1").Name,
+                    "Identical parallel connections have distinct accessible source-order descriptions");
                 var parallelRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
                 parallelRows[3].Patterns.SelectionItem.Pattern.Select();
                 Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Second only"; Click("MermaidUpdateEdge");

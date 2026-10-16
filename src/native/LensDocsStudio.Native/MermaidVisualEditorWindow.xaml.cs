@@ -96,8 +96,11 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Direction.SelectedItem = draft.Model.Direction;
+            var parallel = draft.Model.Edges.GroupBy(edge => (edge.Source.Id, edge.Target.Id)).Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet();
             choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" "), node.Shape.ToString()))
-                .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
+                .Concat(draft.Model.Edges.Select((edge, ordinal) => new ElementChoice(edge.Id,
+                    (parallel.Contains((edge.Source.Id, edge.Target.Id)) ? "Connection " + (ordinal + 1) + " · " : "")
+                    + edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
             Elements.ItemsSource = choices;
             Elements.UnselectAll();
