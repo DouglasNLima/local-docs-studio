@@ -203,6 +203,7 @@ public partial class MermaidVisualEditorWindow
             geometry.Transform = new TransformGroup { Children = { element.Geometry.Transform, new TranslateTransform(-box.X, -box.Y) } }; geometry.Freeze();
             var outline = new System.Windows.Shapes.Path { Data = geometry, Fill = key.StartsWith("group:", StringComparison.Ordinal) ? null : Brushes.Transparent, StrokeThickness = 2, Stretch = Stretch.None };
             var button = ElementButton(key, choice.Description, outline, positions[key]);
+            if (nodeTransforms.TryGetValue(key, out var overlayTranslation)) button.RenderTransform = overlayTranslation;
             Panel.SetZIndex(button, key.StartsWith("node:", StringComparison.Ordinal) ? 20 : 0);
             if (key.StartsWith("node:", StringComparison.Ordinal))
             {
@@ -227,6 +228,7 @@ public partial class MermaidVisualEditorWindow
                 button.LostMouseCapture += (_, _) => { if (dragStart is not null) FinishNodeDrag(true); };
                 AutomationProperties.SetHelpText(button, "Select to edit properties. F2 edits the label. Dragging changes this session only; positions survive visual edits until Auto layout or closing this window. Space+drag pans.");
                 var port = ConnectionPort(id, button);
+                if (nodeTransforms.TryGetValue(key, out var portTranslation)) port.RenderTransform = portTranslation;
                 AutomationProperties.SetName(port, "Connect from node " + id); AutomationProperties.SetAutomationId(port, "MermaidPort_" + id);
                 port.Click += (_, e) => { if (PropertiesPending || !CanTransform) return; SelectElement(key); connectionSource = id; UpdateCanvasSelection(); Status.Text = "Connection from " + id + ": choose a destination node. Escape cancels."; e.Handled = true; };
                 Canvas.SetLeft(port, box.Right - 16); Canvas.SetTop(port, box.Top + box.Height / 2 - 16); Panel.SetZIndex(port, 30);

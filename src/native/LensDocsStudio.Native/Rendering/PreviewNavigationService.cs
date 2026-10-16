@@ -17,7 +17,7 @@ public static class PreviewNavigationService
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
-    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null)
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
     {
         viewer.VerifyAccess();
         var document = viewer.Document;
@@ -64,6 +64,7 @@ public static class PreviewNavigationService
                 }
                 var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)document).DocumentPaginator;
                 var page = await GetPageNumber(paginator, position, cancellation.Token);
+                diagnostic?.Invoke($"computed page {page + 1}, count {paginator.PageCount}, size {paginator.PageSize}, text offset {document.ContentStart.GetOffsetToPosition(position)}");
                 if (!Current() || page < 0 || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll) return false;
                 if (FindViewer<FlowDocumentPageViewer>(viewer) is not { } paged) return false;
                 var selected = false;
@@ -72,7 +73,9 @@ public static class PreviewNavigationService
                     if (!Current() || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll || paged.Document != document) return;
                     // Publish the paginator's new page count through WPF binding before
                     // GoToPage; otherwise a freshly replaced reader silently rejects it.
+                    diagnostic?.Invoke($"before page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, allowed {paged.CanGoToPage(page + 1)}, size {paginator.PageSize}");
                     paged.GoToPage(page + 1); paged.UpdateLayout();
+                    diagnostic?.Invoke($"after page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, size {paginator.PageSize}");
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;

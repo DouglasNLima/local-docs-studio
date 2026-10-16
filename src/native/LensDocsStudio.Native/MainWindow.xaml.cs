@@ -303,7 +303,8 @@ public partial class MainWindow : Window
                         {
                             rendered.RevealSource(target.SourceStart);
                             TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
-                            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
+                            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart,
+                                diagnostic: viewportDiagnostics ? message => TraceViewport("anchor " + message) : null);
                             TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
                         }
                     }

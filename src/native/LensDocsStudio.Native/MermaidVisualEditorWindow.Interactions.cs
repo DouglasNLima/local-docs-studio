@@ -21,7 +21,7 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, ConnectionRuntime> connectionRuntime = new(StringComparer.Ordinal);
     private readonly Dictionary<string, HashSet<string>> incidentConnections = new(StringComparer.Ordinal);
     private static readonly Pen connectionHitPen = FrozenHitPen();
-    private sealed record ConnectionRuntime(NativeMermaidConnection Canonical, Point Start, Point End, LineGeometry Guide);
+    private sealed record ConnectionRuntime(NativeMermaidConnection Canonical, Point Start, Point End, LineGeometry Guide, TranslateTransform LabelTranslation);
     private ToggleButton? dragOwner;
     private DispatcherOperation? dragFrame;
     private Vector pendingDrag;
@@ -67,7 +67,11 @@ public partial class MermaidVisualEditorWindow
         // Flatten once per canonical render, never during pointer input.
         var geometry = edge.Path.GetFlattenedPathGeometry();
         geometry.GetPointAtFractionLength(0, out var start, out _); geometry.GetPointAtFractionLength(1, out var end, out _);
-        connectionRuntime[key] = new(edge, start, end, new(start, end));
+        var labelTranslation = new TranslateTransform();
+        connectionRuntime[key] = new(edge, start, end, new(start, end), labelTranslation);
+        if (edgeLabelDrawings.TryGetValue(key, out var labelDrawing))
+            labelDrawing.Transform = new TransformGroup { Children = { labelDrawing.Transform ?? Transform.Identity, labelTranslation } };
+        if (canvasElements.TryGetValue(key, out var labelButton)) labelButton.RenderTransform = labelTranslation;
         foreach (var node in new[] { "node:" + edge.Source, "node:" + edge.Target })
         {
             if (!incidentConnections.TryGetValue(node, out var edges)) incidentConnections[node] = edges = new(StringComparer.Ordinal);
@@ -138,9 +142,8 @@ public partial class MermaidVisualEditorWindow
         if (presentation is null || !positions.TryGetValue(key, out var box) || !nodeTransforms.TryGetValue(key, out var transform)) return;
         var canonical = presentation.Elements[key].Bounds;
         box = box with { X = centre.X - box.Width / 2, Y = centre.Y - box.Height / 2 };
-        positions[key] = box; Canvas.SetLeft(canvasElements[key], box.X); Canvas.SetTop(canvasElements[key], box.Y);
+        positions[key] = box;
         transform.X = box.X - canonical.X; transform.Y = box.Y - canonical.Y;
-        if (ports.TryGetValue(key, out var port)) { Canvas.SetLeft(port, box.X + box.Width - 16); Canvas.SetTop(port, box.CentreY - 16); }
         if (remember) sessionPositions[key] = centre;
     }
     private void UpdateSessionConnection(string key)
@@ -161,9 +164,7 @@ public partial class MermaidVisualEditorWindow
         path.StrokeDashArray = moved ? sessionGuideDashes : null;
         path.Stroke = draft.Selection.Contains(key) ? BrushResource("AccentBrush") : moved ? BrushResource("MutedTextBrush") : Brushes.Transparent;
         var labelOffset = (from + to) / 2;
-        if (edgeLabelDrawings.TryGetValue(key, out var labelDrawing)) labelDrawing.Transform = new TranslateTransform(labelOffset.X, labelOffset.Y);
-        if (connection.LabelBounds is { } label && canvasElements.TryGetValue(key, out var button))
-        { Canvas.SetLeft(button, label.X + labelOffset.X); Canvas.SetTop(button, label.Y + labelOffset.Y); }
+        runtime.LabelTranslation.X = labelOffset.X; runtime.LabelTranslation.Y = labelOffset.Y;
     }
     private static readonly DoubleCollection sessionGuideDashes = FrozenDashes();
     private static DoubleCollection FrozenDashes() { var dashes = new DoubleCollection([4, 3]); dashes.Freeze(); return dashes; }

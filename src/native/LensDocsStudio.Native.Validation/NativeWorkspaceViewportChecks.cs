@@ -10,7 +10,14 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    private static void CheckWorkspaceViewportOwnership(string executable, string output)
+    public static int RunWorkspaceViewports(string executable, string output) => Task.Run(() =>
+    {
+        using var display = new NativeTestDisplay(output);
+        try { CheckWorkspaceViewportOwnership(executable, output, true); display.Complete(); return 0; }
+        catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+    }).GetAwaiter().GetResult();
+
+    private static void CheckWorkspaceViewportOwnership(string executable, string output, bool pagesFirst = false)
     {
         var root = Path.Combine(output, "workspace-viewport"); Directory.CreateDirectory(root);
         var texts = new Dictionary<string, string>(); var observations = new List<object>();
@@ -22,7 +29,7 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(root, name + ".md"), texts[name]);
         }
         using var automation = new UIA3Automation();
-        foreach (var mode in new[] { "Continuous", "Pages" })
+        foreach (var mode in pagesFirst ? new[] { "Pages", "Continuous" } : new[] { "Continuous", "Pages" })
         foreach (var synchronised in new[] { false, true })
         {
             var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
