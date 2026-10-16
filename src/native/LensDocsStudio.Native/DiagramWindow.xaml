@@ -7,12 +7,12 @@
  </ResourceDictionary></Window.Resources>
  <DockPanel>
   <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Diagram commands">
-   <Button Content="Fit diagram" Click="FitDiagram" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="DiagramFit"/>
+   <Button ToolBar.OverflowMode="Never" Content="Fit diagram" Click="FitDiagram" ToolTip="Fit to Window (F)" AutomationProperties.AutomationId="DiagramFit"/>
    <Button Content="Fit width" Click="FitWidth" ToolTip="Fit the diagram width" AutomationProperties.AutomationId="DiagramFitWidth"/>
-   <Button Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>
-   <Button Content="Reset" Click="ResetView" ToolTip="Reset View (Home)" AutomationProperties.AutomationId="DiagramReset"/>
-   <Slider x:Name="Zoom" Minimum="1" Maximum="400" Value="100" Width="180" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
-   <TextBlock x:Name="ZoomLabel" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel"/>
+   <Button ToolBar.OverflowMode="Never" Content="100%" Click="ActualSize" ToolTip="Actual Size (Ctrl+0)" AutomationProperties.AutomationId="DiagramActualSize"/>
+   <Button ToolBar.OverflowMode="Never" Content="Reset" Click="ResetView" ToolTip="Reset View (Home)" AutomationProperties.AutomationId="DiagramReset"/>
+   <Slider x:Name="Zoom" ToolBar.OverflowMode="Never" Minimum="1" Maximum="400" Value="100" Width="140" ValueChanged="ZoomChanged" VerticalAlignment="Center" AutomationProperties.Name="Diagram zoom percentage" AutomationProperties.AutomationId="DiagramZoom"/>
+   <TextBlock x:Name="ZoomLabel" ToolBar.OverflowMode="Never" Text="100%" Width="55" Margin="8,0" VerticalAlignment="Center" AutomationProperties.AutomationId="DiagramZoomLabel"/>
    <Button Content="Copy image" Click="CopyImage" Padding="12,6" Margin="0,0,8,0" AutomationProperties.AutomationId="DiagramCopyImage"/>
    <Button Content="SVG…" Tag="SVG" Click="Export" Padding="12,6" Margin="0,0,8,0"/>
    <Button Content="PNG…" Tag="PNG" Click="Export" Padding="12,6"/>
