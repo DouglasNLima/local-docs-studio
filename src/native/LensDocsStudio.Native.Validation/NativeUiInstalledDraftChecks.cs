@@ -53,6 +53,8 @@ internal static partial class NativeUiChecks
             app = Application.Attach(started.Id);
             window = app.GetMainWindow(automation, TimeSpan.FromSeconds(20)) ?? throw new IOException("The historical draft window did not appear.");
             var editor = Find(window, "MarkdownEditor");
+            var active = before.Documents.Single(document => document.Id == before.ActiveDocument);
+            Wait(() => ReadEditorText(editor) == active.Text, "The original application did not finish restoring its active document.");
             var tabs = Find(window, "DocumentTabs").FindAllChildren(cf => cf.ByControlType(ControlType.TabItem));
             if (tabs.Length != before.Documents.Count) throw new IOException("Draft preparation lost existing tabs.");
             tabs[targetIndex].Patterns.SelectionItem.Pattern.Select();
