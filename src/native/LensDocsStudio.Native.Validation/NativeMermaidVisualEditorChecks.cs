@@ -80,8 +80,10 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(visual!, "MermaidViewport").BoundingRectangle.Height < beforeHeight + 5, "Expanding source did not restore the workspace split.");
                 Check(Draft() == source, "Source collapse and expansion preserve the exact draft");
                 var zoomValue = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
+                var zoomWatch = Stopwatch.StartNew();
                 Click("MermaidZoomIn"); Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value > zoomValue, "Zoom in changes the native viewport scale");
                 Click("MermaidZoomOut"); Check(Math.Abs(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value - zoomValue) < .01, "Zoom out reverses the zoom-in scale without source changes");
+                _ = DwmFlush(); timings.Add(new { Operation = "Zoom in and out including UIA transport and compositor flush", Milliseconds = zoomWatch.Elapsed.TotalMilliseconds });
                 Check(Draft() == source, "View commands leave Mermaid source byte-for-byte unchanged");
                 Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Source collapse and view commands retain the original multi-selection");
                 foreach (var selected in Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value)
@@ -345,8 +347,10 @@ internal static partial class NativeUiChecks
                 Capture("flow-error-log-lab-initial");
                 var labViewport = Find(visual!, "MermaidViewport"); var labScroll = labViewport.Patterns.Scroll.Pattern;
                 var labBefore = labScroll.HorizontalScrollPercent.Value; var labBounds = labViewport.BoundingRectangle;
+                var panWatch = Stopwatch.StartNew();
                 Mouse.DragHorizontally(new(labBounds.Left + labBounds.Width / 2, labBounds.Top + labBounds.Height / 2), labBefore > 0 ? 100 : -100, MouseButton.Middle);
                 Wait(() => Math.Abs(labScroll.HorizontalScrollPercent.Value - labBefore) > .1, "Protected PAN did not move its actual native viewport.");
+                _ = DwmFlush(); timings.Add(new { Operation = "Protected middle-button PAN including synthetic drag, UIA transport and compositor flush", Milliseconds = panWatch.Elapsed.TotalMilliseconds });
                 Check(Draft() == lab, "Protected actual-size PAN changes the viewport without changing original source");
                 Click("MermaidFit"); Capture("flow-error-log-lab-canvas"); Click("MermaidRenderedPreview");
                 var labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow();
