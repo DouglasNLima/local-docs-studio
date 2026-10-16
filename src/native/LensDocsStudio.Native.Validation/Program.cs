@@ -80,7 +80,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui")
+        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -111,6 +111,8 @@ internal static class Program
             return NativeUiChecks.RunInstallerWizard(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/installer-wizard");
         if (args.FirstOrDefault() == "--restore-installed-session")
             return NativeUiChecks.RunInstalledSession(args[1], args[2], args[3]);
+        if (args.FirstOrDefault() == "--seed-installed-drafts")
+            return NativeUiChecks.RunInstalledDrafts(args[1], args[2], args[3]);
         if (args.FirstOrDefault() == "--office")
             return OfficeClipboardChecks.Run(args.ElementAtOrDefault(1) ?? "artifacts/native/office");
         if (args.FirstOrDefault() == "--authenticode")

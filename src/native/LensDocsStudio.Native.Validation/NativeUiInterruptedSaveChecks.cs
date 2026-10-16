@@ -2,8 +2,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using FlaUI.Core;
 using FlaUI.Core.AutomationElements;
-using FlaUI.Core.Input;
-using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
 using LensDocsStudio.Core.Documents;
 using LensDocsStudio.Core.State;
@@ -48,8 +46,10 @@ internal static partial class NativeUiChecks
             Launch(true);
             var editor = Find(window!, "MarkdownEditor");
             Wait(() => ReadEditorText(editor) == original, "The interrupted-save fixture did not open exactly.");
-            FocusWindow(window!); editor.Click(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.END);
-            Keyboard.Type(addition);
+            FocusWindow(window!); editor.Click();
+            // Prepare exact multilingual recovery text through the actual native editor.
+            // SendInput character delivery has separate desktop checks; this fixture tests a rejected save.
+            editor.Patterns.Value.Pattern.SetValue(draft);
             Wait(() => ReadEditorText(editor) == draft, "The real editor did not retain the exact unsaved draft.");
 
             Guid documentId;

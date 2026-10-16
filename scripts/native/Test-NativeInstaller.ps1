@@ -161,6 +161,9 @@ try {
     $firstLaunchRoots = @(Get-ChildItem -LiteralPath (Join-Path $root 'first-launch') -Directory -Filter 'ui-*')
     if ($firstLaunchRoots.Count -ne 1) { throw 'The initial UI run did not produce exactly one isolated state directory.' }
     $preservedStateRoot = Join-Path $firstLaunchRoots[0].FullName 'state'
+    & dotnet run --project (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation') -c Release --no-build -- --seed-installed-drafts (Join-Path $installDirectory 'LensDocsStudio.Native.exe') $preservedStateRoot (Join-Path $root 'historical-drafts')
+    if ($LASTEXITCODE -ne 0) { throw 'The original installed application did not retain representative unsaved drafts.' }
+    $checks.Add('Original application UI retained a dirty saved document and untitled draft without changing workspace bytes')
     $preservedStateSnapshot = Get-StateSnapshot $preservedStateRoot
     if ($preservedStateSnapshot.Count -eq 0 -or -not $preservedStateSnapshot.ContainsKey('preferences.json')) { throw 'The initial UI run did not retain native preferences for preservation checks.' }
     if ($UpgradeInstaller) { Run-Installer $UpgradeInstaller 'upgrade'; Restore-PreservedSession 'restored-after-upgrade'; Run-NativeUi 'after-upgrade' }

@@ -46,6 +46,10 @@ internal static partial class NativeUiChecks
         var preferences = ReadPreferences();
         if (before.SchemaVersion != 1 || before.Documents.Count == 0 || preferences.AutomaticUpdateChecks)
             throw new IOException("The preserved fixture must contain documents with automatic network checks disabled.");
+        var unsavedSavedDocuments = before.Documents.Count(document => document.Path is not null && HasUnsavedText(document));
+        var untitledDrafts = before.Documents.Count(document => document.Path is null && HasUnsavedText(document));
+        if (unsavedSavedDocuments == 0 || untitledDrafts == 0)
+            throw new IOException("Migration acceptance requires both a dirty saved document and an untitled draft.");
         var activeIndex = before.Documents.ToList().FindIndex(document => document.Id == before.ActiveDocument);
         if (activeIndex < 0) throw new IOException("The preserved fixture has no active document.");
         var stateFiles = Snapshot(state);
@@ -76,7 +80,7 @@ internal static partial class NativeUiChecks
             Wait(() => ReadEditorText(editor) == before.Documents[activeIndex].Text, "The original active tab was not restored after inspection.");
             CheckRestoredSettings(window, automation, app.ProcessId);
             window.CaptureToFile(Path.Combine(output, "restored-session.png"));
-            window.Close(); Wait(() => started.HasExited, "The restored session did not close safely.");
+            CloseRetainingDrafts(window, automation, started, before.Documents.Count(HasUnsavedText));
             if (started.ExitCode != 0) throw new IOException("The restored session failed during shutdown: " + started.ExitCode);
             var after = ReadSession(); var afterPreferences = ReadPreferences();
             if (Canonical(before) != Canonical(after)
@@ -92,7 +96,7 @@ internal static partial class NativeUiChecks
             var reusableAfter = InspectReusableState();
             if (reusableBefore != reusableAfter) throw new IOException("Restoration changed usable templates, snippets, profiles or recovery snapshots.");
             Write(new { passed = true, restoredDocuments = tabs.Length, retainedStateFiles = remainingBefore.Length,
-                workspaceFiles = sources.Count, sameSession = true, priorFixture = fixture, historicalSchemaCertification = false,
+                workspaceFiles = sources.Count, unsavedSavedDocuments, untitledDrafts, sameSession = true, priorFixture = fixture, historicalSchemaCertification = false,
                 reusableState = JsonSerializer.Deserialize<JsonElement>(reusableAfter),
                 checks = new[] { "Prior active document and every preserved tab display exact text", "Saved appearance settings restore in native controls",
                     "Document identities, workspace, content, settings and update consent survive shutdown", "Library/snapshot/asset bytes and saved workspace sources remain unchanged",

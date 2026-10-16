@@ -145,6 +145,7 @@ jobs:
             artifacts/native/install-smoke/**/native-diagram-error.png
             artifacts/native/install-smoke/**/restored-session.json
             artifacts/native/install-smoke/**/restored-session.png
+            artifacts/native/install-smoke/**/seeded-drafts.*
             artifacts/native/install-smoke/**/interrupted-save.json
             artifacts/native/install-smoke/**/blocked-save.png
             artifacts/native/install-smoke/**/recovered-draft.png
