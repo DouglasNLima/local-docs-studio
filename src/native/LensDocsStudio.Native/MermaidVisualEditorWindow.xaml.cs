@@ -439,7 +439,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; Apply(sender, e); return; }
         if (e.Key == Key.F11) { ToggleFullScreen(); e.Handled = true; return; }
         if (e.Key == Key.Escape && (dragStart is not null || reconnectEdge is not null || panStart is not null))
-        { CancelPointerInteraction(); UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
+        { CancelPointerInteraction(); connectionSource = null; UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)

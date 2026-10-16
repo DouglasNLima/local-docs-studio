@@ -37,7 +37,11 @@ internal static partial class NativeUiChecks
                 var editable = Find(visual!, "MermaidApply").IsEnabled;
                 visual!.CaptureToFile(Path.Combine(output, "before-" + count + ".png"));
                 // Keep renderer protection fail-closed; it must not become an editing permission.
-                if (!editable) { observations.Add(new { Nodes = count, Editable = false, Status = Find(visual, "MermaidStatus").Name }); }
+                if (!editable)
+                {
+                    observations.Add(new { Nodes = count, Editable = false, Status = Find(visual, "MermaidStatus").Name });
+                    if (!baseline) throw new IOException("The supported synthetic stress fixture did not become editable: " + count);
+                }
                 else
                 {
                     Find(visual, "MermaidActualSize").AsButton().Invoke();
@@ -161,6 +165,23 @@ internal static partial class NativeUiChecks
             Find(visual!, "MermaidCanvas_node_Node1").Click(); Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Session centre retained"; Click("MermaidUpdateNode");
             Ready(text => text.Contains("Session centre retained", StringComparison.Ordinal));
             foreach (var (node, expected) in expectedCentres) Check(Math.Abs(Centre("MermaidCanvas_node_" + node).X - expected.X) <= 6 && Math.Abs(Centre("MermaidCanvas_node_" + node).Y - expected.Y) <= 6, "Label rerender retains session centre: " + node);
+            var selectedRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+            selectedRows.Single(row => row.Name.StartsWith("Node1 ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+            selectedRows.Single(row => row.Name.StartsWith("Node2 ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.AddToSelection();
+            var nodeOne = Centre("MermaidCanvas_node_Node1"); var nodeTwo = Centre("MermaidCanvas_node_Node2");
+            Drag(nodeOne, new(nodeOne.X + 36, nodeOne.Y + 12));
+            foreach (var id in new[] { "Node1", "Node2" }) expectedCentres[id] = new(expectedCentres[id].X + 36, expectedCentres[id].Y + 12);
+            Check(Math.Abs(Centre("MermaidCanvas_node_Node1").X - nodeOne.X - 36) <= 2 && Math.Abs(Centre("MermaidCanvas_node_Node2").X - nodeTwo.X - 36) <= 2, "Actual multi-node dragging moves both selected nodes together");
+            Capture("multi-node-drag");
+            selectedRows.Single(row => row.Name.StartsWith("Node1 ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+            var beforeRename = Draft(); var renameCentre = Centre("MermaidCanvas_node_Node1");
+            Find(visual!, "MermaidNodeId").AsTextBox().Text = "Positioned"; Click("MermaidUpdateNode");
+            Ready(text => new MermaidSourceParser().Parse(text).Nodes.Any(node => node.Id == "Positioned"));
+            Check(Centre("MermaidCanvas_node_Positioned") == renameCentre, "Safe node renaming transfers its session centre");
+            var renamed = Draft(); Click("MermaidUndo"); Ready(text => text == beforeRename);
+            Check(Centre("MermaidCanvas_node_Node1") == renameCentre, "Private Undo restores the previous node identity and session centre");
+            Click("MermaidRedo"); Ready(text => text == renamed); Click("MermaidUndo"); Ready(text => text == beforeRename);
+            Check(Centre("MermaidCanvas_node_Node1") == renameCentre, "Private Redo and Undo retain the manual centre");
             if (!highContrast)
             {
                 ChangeTheme("Dark"); Capture("dark-session-layout");
@@ -206,11 +227,13 @@ internal static partial class NativeUiChecks
             Check(ReadEditorText(editor) == original, "All private interactions preserve the original document before Apply");
             var applied = Draft(); Click("MermaidApply");
             Wait(() => ReadEditorText(editor) == applied, "Apply did not write the validated source to the owning editor.");
+            var obsoletePreviewAction = Find(main!, "DiagramEditVisually0");
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == original, "One document Undo did not restore the entire original diagram.");
             Check(true, "Apply and one document Undo preserve the original portable source exactly");
             // Reopen so the caller also verifies ordinary Cancel after the completed transaction.
-            Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Preview action missing after document Undo.");
+            Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is { } currentAction
+                && !automation.Compare(obsoletePreviewAction, currentAction), "The current preview action was not replaced after document Undo.");
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Editor did not reopen after Undo.");
             Wait(() => Find(visual!, "MermaidApply").IsEnabled, "Reopened diagram did not finish rendering.");

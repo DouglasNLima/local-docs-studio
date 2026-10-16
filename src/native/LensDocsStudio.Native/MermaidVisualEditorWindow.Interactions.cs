@@ -256,7 +256,7 @@ public partial class MermaidVisualEditorWindow
             button.PreviewMouseLeftButtonDown += (_, e) =>
             {
                 if (!CanTransform || PropertiesPending) return;
-                CancelPointerInteraction(); reconnectEdge = key; reconnectSource = source; reconnectOwner = button;
+                connectionSource = null; CancelPointerInteraction(); reconnectEdge = key; reconnectSource = source; reconnectOwner = button;
                 button.CaptureMouse(); e.Handled = true;
                 if (connectionGuidePath is not null) connectionGuidePath.Visibility = Visibility.Visible;
                 MoveReconnection(e.GetPosition(DiagramCanvas));
@@ -307,5 +307,9 @@ public partial class MermaidVisualEditorWindow
         var owner = reconnectOwner; reconnectOwner = null; reconnectEdge = null;
         if (owner is not null) { owner.Cursor = Cursors.Cross; if (owner.IsMouseCaptured) owner.ReleaseMouseCapture(); }
         if (connectionGuidePath is not null && connectionSource is null) connectionGuidePath.Visibility = Visibility.Collapsed;
+        if (owner is not null)
+            foreach (var (key, button) in canvasElements)
+                if (key.StartsWith("node:", StringComparison.Ordinal) && button.Content is System.Windows.Shapes.Path shape)
+                    shape.Stroke = draft.Selection.Contains(key) ? BrushResource("AccentBrush") : Brushes.Transparent;
     }
 }

@@ -353,6 +353,7 @@ public partial class MermaidVisualEditorWindow
     }
     private void AutoLayout(object sender, RoutedEventArgs e)
     {
+        if (busy || renderingCanvas) { Status.Text = "Wait for the current canonical rendering before resetting layout."; return; }
         if (inlineEditor is not null) { inlineEditor.Focus(); Status.Text = "Confirm or cancel the inline label before changing layout."; return; }
         if (presentation is null)
         { Status.Text = canvasError ?? "The original drawing remains in protected visual inspection. Use Edit source to change it."; return; }
