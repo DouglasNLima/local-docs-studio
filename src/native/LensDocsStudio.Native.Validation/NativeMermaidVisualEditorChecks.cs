@@ -344,6 +344,25 @@ internal static partial class NativeUiChecks
                 labPreview.Close(); Click("MermaidActualSize");
                 Check(Draft() == lab, "Protected zoom, Fit and Rendered preview leave the complete original source exact");
                 Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
+                var parallel = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/parallel.mmd");
+                LaunchDocument("Parallel.mmd", parallel); Open(0);
+                var parallelRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                parallelRows[3].Patterns.SelectionItem.Pattern.Select();
+                Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Second only"; Click("MermaidUpdateEdge");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Edges[1].Label == "Second only");
+                Check(new MermaidSourceParser().Parse(Draft()).Edges[0].Label == "Same" && new MermaidSourceParser().Parse(Draft()).Edges[2].Label == "Diagnostic",
+                    "Selecting the second parallel connection edits only its stable source identity");
+                var parallelChanged = Draft(); Click("MermaidDelete"); AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Count == 2);
+                Check(new MermaidSourceParser().Parse(Draft()).Edges.Select(edge => edge.Label).SequenceEqual(new[] { "Same", "Diagnostic" }),
+                    "Parallel connection deletion retains both neighbouring source connections and their labels");
+                Click("MermaidUndo"); AwaitSource(text => text == parallelChanged); Click("MermaidUndo"); AwaitSource(text => text == parallel);
+                Check(Draft() == parallel && ReadEditorText(editor) == parallel, "Private history restores exact parallel source without changing its owner");
+                Capture("parallel-edges"); Click("MermaidCancel"); WaitClosed();
+                const string invalidInitial = "flowchart LR\nA -->";
+                LaunchDocument("Invalid-initial.mmd", invalidInitial); Open(0, false);
+                Check(Draft() == invalidInitial && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
+                    "An invalid recognised Flowchart opens from preview with diagnostics, retained source and separate source editing");
+                Capture("invalid-initial"); Click("MermaidCancel"); WaitClosed();
                 foreach (var count in new[] { 20, 100, 300 })
                 {
                     var graph = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, count).Select(index => $"N{index}[Node {index}]"))

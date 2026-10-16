@@ -121,7 +121,7 @@ public partial class MermaidVisualEditorWindow : Window
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
         DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : !draft.Model.CanEdit || !canonicalMapped ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
-        RenderedPreviewButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && inlineEditor is null;
+        RenderedPreviewButton.IsEnabled = !busy && !renderingCanvas && !SourcePending && !PropertiesPending && inlineEditor is null;
         SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit || !canonicalMapped ? Visibility.Visible : Visibility.Collapsed;
         SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
@@ -351,7 +351,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (!CanTransform || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
         try
         {
-            var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme), lifetime.Token);
+            var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme, lifetime.Token), lifetime.Token);
             if (closed) return; if (!result.Success) { Status.Text = result.Error; return; }
             var error = await applyToDocument(source, lifetime.Token); if (closed) return;
             if (error is not null) { Status.Text = error; return; }
@@ -387,7 +387,7 @@ public partial class MermaidVisualEditorWindow : Window
         busy = true; UpdateActions();
         try
         {
-            var result = await Task.Run(() => diagrams.Render(draft.Source, dark, diagramTheme), lifetime.Token); if (closed) return;
+            var result = await Task.Run(() => diagrams.Render(draft.Source, dark, diagramTheme, lifetime.Token), lifetime.Token); if (closed) return;
             if (!result.Success) { Status.Text = result.Error; return; }
             new DiagramWindow(new NativeSvgService().Render(result.Svg!), format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
         }

@@ -42,6 +42,7 @@ public partial class MermaidVisualEditorWindow
     private readonly Dictionary<string, DrawingGroup> nodeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeDrawings = new(StringComparer.Ordinal);
     private readonly Dictionary<string, DrawingGroup> edgeLabelDrawings = new(StringComparer.Ordinal);
+    private readonly HashSet<string> sessionConnections = new(StringComparer.Ordinal);
     private Image? canonicalImage;
 
     private readonly NativeSvgService canvasSvg = new();
@@ -108,7 +109,7 @@ public partial class MermaidVisualEditorWindow
     {
         if (presentation is not { } view) return;
         DiagramCanvas.Children.Clear(); positions.Clear(); canvasElements.Clear(); ports.Clear(); connectionPaths.Clear(); connectionHitPaths.Clear(); inlineEditor = null;
-        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear();
+        var mutableDrawing = view.Drawing.Clone(); nodeDrawings.Clear(); edgeDrawings.Clear(); edgeLabelDrawings.Clear(); sessionConnections.Clear();
         var labelled = view.Connections.Where(connection => view.Graph.Edges[connection.Ordinal].Label is not null).ToArray();
         foreach (var group in DrawingGroups(mutableDrawing.Drawing))
         {
@@ -197,6 +198,23 @@ public partial class MermaidVisualEditorWindow
                 var button = ElementButton(key, choices.Single(choice => choice.Key == key).Description, new Rectangle { Fill = Brushes.Transparent }, new(box.X, box.Y, box.Width, box.Height));
                 button.Click += (_, _) => SelectElement(key); Panel.SetZIndex(button, 10);
             }
+            else
+            {
+                var targetBounds = edge.Path.Bounds; targetBounds.Inflate(6, 6);
+                var local = edge.Path.Clone();
+                local.Transform = new TransformGroup { Children = { edge.Path.Transform, new TranslateTransform(-targetBounds.X, -targetBounds.Y) } };
+                var target = new System.Windows.Shapes.Path { Data = local, Stroke = Brushes.Transparent, StrokeThickness = 12 };
+                var button = ElementButton(key, choices.Single(choice => choice.Key == key).Description, target, new(targetBounds.X, targetBounds.Y, targetBounds.Width, targetBounds.Height));
+                button.PreviewMouseLeftButtonDown += (_, e) =>
+                {
+                    var point = e.GetPosition(DiagramCanvas);
+                    if (connectionHitPaths.Count(pair => pair.Value.Data.StrokeContains(new Pen(Brushes.Black, 12), point)) > 1)
+                        Status.Text = "Connections overlap here. Choose the intended connection in the element list.";
+                    else SelectElement(key);
+                    e.Handled = true;
+                };
+                Panel.SetZIndex(button, 4);
+            }
         }
         AddConnectionGuide(); UpdateCanvasSelection(); UpdateExtent(); UpdateActions();
     }
@@ -231,10 +249,12 @@ public partial class MermaidVisualEditorWindow
             foreach (var (key, button) in canvasElements)
             {
                 button.IsChecked = draft.Selection.Contains(key);
-                if (button.Content is System.Windows.Shapes.Path shape) shape.Stroke = button.IsChecked == true ? BrushResource("AccentBrush") : Brushes.Transparent;
+                if (!key.StartsWith("edge-", StringComparison.Ordinal) && button.Content is System.Windows.Shapes.Path shape)
+                    shape.Stroke = button.IsChecked == true ? BrushResource("AccentBrush") : Brushes.Transparent;
             }
             foreach (var (key, port) in ports) port.Tag = draft.Selection.Contains(key) || connectionSource == key[5..] || canvasElements[key].IsMouseOver;
-            foreach (var (key, path) in connectionPaths) path.Stroke = draft.Selection.Contains(key) ? BrushResource("AccentBrush") : Brushes.Transparent;
+            foreach (var (key, path) in connectionPaths) path.Stroke = draft.Selection.Contains(key) ? BrushResource("AccentBrush")
+                : sessionConnections.Contains(key) ? BrushResource("MutedTextBrush") : Brushes.Transparent;
         }
         finally { synchronisingCanvasSelection = false; }
     }
@@ -260,6 +280,8 @@ public partial class MermaidVisualEditorWindow
             var originalSource = view.Elements["node:" + connection.Source].Bounds; var originalTarget = view.Elements["node:" + connection.Target].Bounds;
             var from = new Vector(source.X - originalSource.X, source.Y - originalSource.Y); var to = new Vector(target.X - originalTarget.X, target.Y - originalTarget.Y);
             var moved = from.Length > .01 || to.Length > .01;
+            if (!moved && !sessionConnections.Contains(key)) continue;
+            if (moved) sessionConnections.Add(key); else sessionConnections.Remove(key);
             if (edgeDrawings.TryGetValue(key, out var drawing)) drawing.Opacity = moved ? 0 : 1;
             var geometry = connection.Path.GetFlattenedPathGeometry().Clone();
             foreach (var figure in geometry.Figures)
@@ -278,6 +300,13 @@ public partial class MermaidVisualEditorWindow
             if (edgeLabelDrawings.TryGetValue(key, out var labelDrawing)) labelDrawing.Transform = new TranslateTransform(labelOffset.X, labelOffset.Y);
             if (connection.LabelBounds is { } labelBounds && canvasElements.TryGetValue(key, out var labelButton))
             { Canvas.SetLeft(labelButton, labelBounds.X + labelOffset.X); Canvas.SetTop(labelButton, labelBounds.Y + labelOffset.Y); }
+            else if (canvasElements.TryGetValue(key, out var pathButton) && pathButton.Content is System.Windows.Shapes.Path targetPath)
+            {
+                var bounds = geometry.Bounds; bounds.Inflate(6, 6); var local = geometry.Clone();
+                local.Transform = new TransformGroup { Children = { geometry.Transform, new TranslateTransform(-bounds.X, -bounds.Y) } };
+                targetPath.Data = local; pathButton.Width = bounds.Width; pathButton.Height = bounds.Height;
+                Canvas.SetLeft(pathButton, bounds.X); Canvas.SetTop(pathButton, bounds.Y);
+            }
         }
         Status.Text = "Session positions only. Dashed connection guides are temporary; Auto layout or a source edit restores the original Mermaider layout.";
     }

@@ -1,5 +1,12 @@
 # Functional parity matrix
 
+The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),
+branch `feature/native-mermaid-preview-fidelity`, based on verified `47e78d6`.
+The [fidelity report](mermaid-preview-fidelity.md) owns the shared native drawing,
+protected preview entry point, source/geometry mapping and current certification
+status. Its Windows/package acceptance remains provisional until final evidence is
+recorded. Historical delivery statements below retain their original revisions.
+
 The native Mermaid editor visual integration is tracked in
 [Draft PR 27](https://github.com/DouglasNLima/local-docs-studio/pull/27) on
 `feature/native-mermaid-editor-visual-polish`, targeting verified PR 26 head

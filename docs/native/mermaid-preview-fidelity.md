@@ -121,12 +121,28 @@ diagram against the interaction drawing in Light and Dark, checks every canonica
 node rectangle with a 0.001 native-unit tolerance, verifies group and edge identities,
 and asserts normalised raster equality with zero pixel tolerance. UIA extends the
 existing authoring suite to open protected diagrams through the actual document
-preview button. Windows screenshots and final hosted results are pending.
+preview button. The first complete comparison passed all eight fixture/theme pairs on hosted Windows,
+including the protected lab. Captures have been inspected; final revision certification
+is still pending.
 
-Local verification so far: solution build with zero warnings; eight new Core cases;
-full Core suite 1,228 passed, zero skipped. First hosted comparison caught a frozen
+Local verification so far: solution build with zero warnings; nine new Core cases;
+full Core suite 1,229 passed, zero skipped. First hosted comparison caught a frozen
 WPF path mutation before certification; its original log is retained and the path
 is now cloned before transformation. No assertion was weakened.
+
+The engineering checkpoint `03a0666` passes normal and actual Windows High Contrast
+visual authoring on [run 38879424059](https://github.com/DouglasNLima/local-docs-studio/actions/runs/38879424059).
+Earlier failures are preserved: frozen path mutation, XML attribute line-break
+normalisation and palette drops outside the small centred drawing. The baseline
+comparison explicitly uses the old Insert entry point for protected diagrams;
+requiring the new button from the unchanged baseline would hide the original defect.
+
+Checkpoint performance observations (four-core hosted .NET 10.0.13) include about
+245/151/605 ms for canonical presentation preparation at 20/100/300 nodes, and
+20/14/46 ms for source edit plus render. These include cold/warm process effects.
+The dense 190-edge fixture reaches the existing render deadline and remains rejected;
+its original source stays exact. Long labels remain materially more expensive to
+materialise through native text geometry. These are observations, not timing guarantees.
 
 Pending: final native rendering, normal and actual High Contrast UIA, browser and
 desktop regression results; screenshot inspection; measured canonical presentation
