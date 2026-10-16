@@ -49,17 +49,11 @@ internal static partial class NativeUiChecks
                 Find(window, "SyncScrollControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
                 editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 75);
-                preview.Focus(); var aSyncStart = SyncCompletions();
-                PreviewRange("Region 065").ScrollIntoView(true);
-                Wait(() => Visible(preview, "Region 065"), "Document A did not reach its reading position.");
-                if (synchronised) Wait(() => SyncCompletions() > aSyncStart, "Document A's focused preview scroll did not finish synchronising.");
+                ReadAt("A", "Region 065");
                 var aOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("B"); AtTop("B");
                 editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 40);
-                preview.Focus(); var bSyncStart = SyncCompletions();
-                PreviewRange("Region 035").ScrollIntoView(true);
-                Wait(() => Visible(preview, "Region 035"), "Document B did not reach its reading position.");
-                if (synchronised) Wait(() => SyncCompletions() > bSyncStart, "Document B's focused preview scroll did not finish synchronising.");
+                ReadAt("B", "Region 035");
                 var bOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("A");
                 Wait(() => Math.Abs(editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value - aOffset) < 3 && Visible(preview, "Region 065"), "Returning document A inherited another document's viewport.");
@@ -103,6 +97,19 @@ internal static partial class NativeUiChecks
                 bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
                     && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
+                void ReadAt(string name, string text)
+                {
+                    var focusRange = preview.Patterns.Text.Pattern.GetVisibleRanges()
+                        .Select(range => range.FindText("Document " + name, false, false)).FirstOrDefault(range => range is not null)
+                        ?? throw new IOException("No visible native text was available to focus the reader.");
+                    var focusBox = focusRange.GetBoundingRectangles().First(box => preview.BoundingRectangle.Contains(box));
+                    Mouse.Click(new System.Drawing.Point(focusBox.Left + focusBox.Width * (name == "A" ? 1 : 2) / 3, focusBox.Top + focusBox.Height / 2));
+                    var alreadyVisible = Visible(preview, text); var syncStart = SyncCompletions();
+                    PreviewRange(text).ScrollIntoView(true);
+                    Wait(() => Visible(preview, text), "Document " + name + " did not reach its reading position.");
+                    if (synchronised && !alreadyVisible)
+                        Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
+                }
                 int SyncCompletions()
                 {
                     return ViewportTraceLines().Count(line => line.Contains("sync-complete preview-scroll", StringComparison.Ordinal));
