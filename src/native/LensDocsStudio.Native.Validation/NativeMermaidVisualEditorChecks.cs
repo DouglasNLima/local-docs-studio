@@ -369,6 +369,12 @@ internal static partial class NativeUiChecks
                 Click("MermaidUndo"); AwaitSource(text => text == parallelChanged); Click("MermaidUndo"); AwaitSource(text => text == parallel);
                 Check(Draft() == parallel && ReadEditorText(editor) == parallel, "Private history restores exact parallel source without changing its owner");
                 Capture("parallel-edges"); Click("MermaidCancel"); WaitClosed();
+                var shapes = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/shapes.mmd");
+                LaunchDocument("Shapes.mmd", shapes); Open(0); Click("MermaidFit");
+                Find(visual!, "MermaidCanvas_node_F").Click();
+                Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("F", StringComparison.Ordinal), "Clicking the double-circle centre did not select its actual native node.");
+                Check(Draft() == shapes, "Actual pointer selection at a compound shape centre retains exact Mermaid source");
+                Capture("compound-shape-selection"); Click("MermaidCancel"); WaitClosed();
                 const string invalidInitial = "flowchart LR\nA -->";
                 LaunchDocument("Invalid-initial.mmd", invalidInitial); Open(0, false);
                 Check(Draft() == invalidInitial && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
