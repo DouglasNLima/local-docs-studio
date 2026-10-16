@@ -107,6 +107,7 @@ public partial class MainWindow : Window
         if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
+        TraceViewport("viewport-saved");
     }
     private void BindActiveDocument()
     {

@@ -25,6 +25,7 @@ internal static partial class NativeUiChecks
         foreach (var synchronised in new[] { false, true })
         {
             var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+            launch.Environment["LENS_NATIVE_VIEWPORT_DIAGNOSTICS"] = "1";
             launch.ArgumentList.Add("--state-directory"); launch.ArgumentList.Add(Path.Combine(root, mode + synchronised));
             launch.ArgumentList.Add(root); launch.ArgumentList.Add(Path.Combine(root, "A.md"));
             using var app = Application.Launch(launch);

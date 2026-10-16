@@ -344,7 +344,17 @@ public partial class MermaidVisualEditorWindow
         {
             if (e.Key is not (Key.Enter or Key.Escape)) return; e.Handled = true;
             var text = editor.Text; DiagramCanvas.Children.Remove(editor); inlineEditor = null;
-            if (e.Key == Key.Enter) await Execute(new UpdateMermaidNode(id, text, node.Shape, id), "node:" + id);
+            if (e.Key == Key.Enter)
+            {
+                if (!await Execute(new UpdateMermaidNode(id, text, node.Shape, id), "node:" + id))
+                {
+                    if (closed) return;
+                    inlineEditor = editor; DiagramCanvas.Children.Add(editor); editor.Focus();
+                    UpdateActions(); Status.Text += " The inline label is retained; correct it or press Escape."; return;
+                }
+                inlineThemeRefresh = false;
+            }
+            else if (inlineThemeRefresh) { inlineThemeRefresh = false; RebuildCanvas(false); }
             UpdateActions();
             Elements.Focus();
         };

@@ -185,7 +185,15 @@ internal static partial class NativeUiChecks
             Check(Centre("MermaidCanvas_node_Node1") == renameCentre, "Private Redo and Undo retain the manual centre");
             if (!highContrast)
             {
-                ChangeTheme("Dark"); Capture("dark-session-layout");
+                Find(visual!, "MermaidElements").Focus(); Keyboard.Type(VirtualKeyShort.F2);
+                Find(visual!, "MermaidInlineLabel").AsTextBox().Text = ""; Keyboard.Type(VirtualKeyShort.RETURN);
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("inline label is retained", StringComparison.Ordinal), "Rejected inline editing did not retain its text field.");
+                Check(Draft() == beforeRename && Find(visual!, "MermaidInlineLabel").AsTextBox().Text == "", "Invalid inline input retains both the field and exact draft source");
+                Find(visual!, "MermaidInlineLabel").AsTextBox().Text = "Retain this pending label";
+                FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "DarkTheme").AsMenuItem().Invoke(); FocusWindow(visual!);
+                Check(Find(visual!, "MermaidInlineLabel").AsTextBox().Text == "Retain this pending label" && Draft() == beforeRename, "Theme changes retain uncommitted inline label text");
+                Find(visual!, "MermaidInlineLabel").Focus(); Keyboard.Type(VirtualKeyShort.ESCAPE);
+                Ready(text => text == beforeRename); Capture("dark-session-layout");
                 foreach (var (node, expected) in expectedCentres) Check(Math.Abs(Centre("MermaidCanvas_node_" + node).X - expected.X) <= 6 && Math.Abs(Centre("MermaidCanvas_node_" + node).Y - expected.Y) <= 6, "Theme rerender retains session centre: " + node);
                 ChangeTheme("Light");
             }
@@ -228,13 +236,13 @@ internal static partial class NativeUiChecks
             Check(ReadEditorText(editor) == original, "All private interactions preserve the original document before Apply");
             var applied = Draft(); Click("MermaidApply");
             Wait(() => ReadEditorText(editor) == applied, "Apply did not write the validated source to the owning editor.");
-            var obsoletePreviewAction = Find(main!, "DiagramEditVisually0");
+            var obsoletePreviewAction = Find(main!, "DiagramEditVisually0").FrameworkAutomationElement.RuntimeId;
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
             Wait(() => ReadEditorText(editor) == original, "One document Undo did not restore the entire original diagram.");
             Check(true, "Apply and one document Undo preserve the original portable source exactly");
             // Reopen so the caller also verifies ordinary Cancel after the completed transaction.
             Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is { } currentAction
-                && !automation.Compare(obsoletePreviewAction, currentAction), "The current preview action was not replaced after document Undo.");
+                && !obsoletePreviewAction.SequenceEqual(currentAction.FrameworkAutomationElement.RuntimeId), "The current preview action was not replaced after document Undo.");
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Editor did not reopen after Undo.");
             Wait(() => Find(visual!, "MermaidApply").IsEnabled, "Reopened diagram did not finish rendering.");

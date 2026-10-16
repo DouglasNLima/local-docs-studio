@@ -25,7 +25,7 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
     private bool updating, busy, closed, discard;
-    private bool sourceValidationFailed;
+    private bool sourceValidationFailed, inlineThemeRefresh;
     private string? connectionSource;
     private IReadOnlyList<ElementChoice> choices = [];
     private object? propertyBaseline;
@@ -92,6 +92,12 @@ public partial class MermaidVisualEditorWindow : Window
         SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
         SourceEditor.TextArea.SelectionForeground = BrushResource("AccentTextBrush");
         SourceEditor.TextArea.TextView.Redraw();
+        if (inlineEditor is not null)
+        {
+            inlineThemeRefresh = true; UpdateActions();
+            Status.Text = "Theme updated. Confirm or cancel the retained inline label to refresh diagram colours.";
+            return;
+        }
         UpdateCanvasColours();
         if (!PropertiesPending && inlineEditor is null) { updating = true; try { ShowProperties(); } finally { updating = false; } }
         UpdateActions();

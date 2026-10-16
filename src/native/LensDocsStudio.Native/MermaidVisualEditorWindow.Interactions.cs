@@ -251,7 +251,7 @@ public partial class MermaidVisualEditorWindow
         Button Handle(bool source)
         {
             var edge = draft.Model.Edge(key);
-            var button = new Button { Content = source ? "S" : "D", Width = 24, Height = 24, MinHeight = 24, Padding = new(0), Margin = new(0), Style = (Style)FindResource("Mermaid.Port"), Tag = true,
+            var button = new Button { Content = source ? "S" : "D", Width = 24, Height = 24, MinHeight = 24, Padding = new(0), Margin = new(0), Style = (Style)FindResource("Mermaid.Port"), Tag = true, Opacity = 1,
                 Cursor = Cursors.Cross, ToolTip = "Drag the " + (source ? "source" : "destination") + " endpoint to a node. Properties provides the keyboard alternative." };
             AutomationProperties.SetAutomationId(button, source ? "MermaidSourceEndpoint" : "MermaidDestinationEndpoint");
             AutomationProperties.SetName(button, $"Connection {edge.Source.Id} to {edge.Target.Id}, {(source ? "source" : "destination")} endpoint");

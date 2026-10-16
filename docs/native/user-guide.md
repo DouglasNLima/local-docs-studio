@@ -288,3 +288,11 @@ Downloading and installing are separate user actions. Installation saves recover
 Production signing identities are not yet configured for this internal preview, so untrusted downloaded installers cannot run through the app. Positive signed-upgrade and clean-machine certification remain outstanding.
 
 Native preferences and recovery are stored under `%LOCALAPPDATA%/LensDocsStudio.Native`. Source documents remain ordinary local files. Automatic release checks are optional; image retrieval and opening external links require explicit actions. The installed editor and preview use no embedded browser, JavaScript runtime or local server.
+
+## Workspace reading positions
+
+A newly opened workspace document starts at the top. Returning to an open tab,
+including through the sidebar, restores that document's own editor and preview
+positions. Back and Forward retain the reading anchor independently of the editor
+caret; links containing a section anchor reveal that section. An obsolete preview
+cannot supply a link action for a different or changed document.

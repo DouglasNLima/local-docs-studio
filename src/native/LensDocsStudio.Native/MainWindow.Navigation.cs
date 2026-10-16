@@ -62,15 +62,17 @@ public partial class MainWindow
             Editor.CaretOffset = Math.Clamp(target.CaretOffset, 0, Editor.Document.TextLength);
             Editor.ScrollToVerticalOffset(Math.Max(0, target.VerticalOffset));
             var destination = model.ActiveDocument!; var generation = viewportGeneration;
-            destination.PreviewSourceOffset = Math.Clamp(target.PreviewSourceOffset ?? target.CaretOffset, 0, Editor.Document.TextLength);
+            var previewOffset = Math.Clamp(target.PreviewSourceOffset ?? target.CaretOffset, 0, Editor.Document.TextLength);
+            destination.PreviewSourceOffset = previewOffset;
+            TraceViewport("history-target " + target.DocumentId + " preview " + previewOffset);
             navigation.CompleteMove(forward, CurrentNavigation()!);
             await UpdatePreviewAsync();
             if (model.ActiveDocument != destination || generation != viewportGeneration) return;
             CancelSynchronisation();
             if (rendered is not null)
             {
-                var previewOffset = destination.PreviewSourceOffset;
                 var nearest = rendered.SourceElements.Where(e => e.Key <= previewOffset).OrderByDescending(e => e.Key).FirstOrDefault();
+                TraceViewport("history-restore " + previewOffset);
                 rendered.RevealSource(previewOffset);
                 if (nearest.Value is { } element) await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
             }
