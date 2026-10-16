@@ -58,6 +58,33 @@ function Assert-PreservedState([string]$Phase) {
     if ((Get-FileHash -LiteralPath $document -Algorithm SHA256).Hash -ne $documentHash) { throw "${Phase}: workspace bytes changed." }
     $checks.Add("${Phase}: preserved $($current.Count) existing native state files and workspace source byte-for-byte")
 }
+function Assert-InstalledPayload([string]$Package, [string]$Phase) {
+    $portable = $Package -replace '-Setup\.exe$', '.zip'
+    $archive = [IO.Compression.ZipFile]::OpenRead($portable)
+    $expected = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    try {
+        foreach ($entry in $archive.Entries) {
+            if ($entry.FullName.EndsWith('/')) { continue }
+            $name = $entry.FullName.Replace('\','/')
+            if ($name.StartsWith('/') -or $name.Contains(':') -or $name.Split('/') -contains '..' -or -not $expected.Add($name)) {
+                throw 'The installer comparison encountered an unsafe or duplicate portable path.'
+            }
+            $installed = Join-Path $installDirectory $name
+            $stream = $entry.Open()
+            try { $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($stream)) } finally { $stream.Dispose() }
+            if (-not (Test-Path -LiteralPath $installed -PathType Leaf) -or (Get-FileHash -LiteralPath $installed -Algorithm SHA256).Hash -ne $hash) {
+                throw "${Phase}: installed payload differs from its portable package: $name"
+            }
+        }
+        foreach ($file in Get-ChildItem -LiteralPath $installDirectory -Recurse -File) {
+            $name = [IO.Path]::GetRelativePath($installDirectory, $file.FullName).Replace('\','/')
+            if (-not $expected.Contains($name) -and $name -notin 'unins000.exe','unins000.dat') {
+                throw "${Phase}: unexpected installed payload: $name"
+            }
+        }
+    } finally { $archive.Dispose() }
+    $checks.Add("${Phase}: all $($expected.Count) installed payload files match the original portable bytes; only Inno uninstall files are additional")
+}
 $initialIdentity = Get-PackageIdentity $Installer
 if ($UpgradeInstaller) {
     $upgradeIdentity = Get-PackageIdentity $UpgradeInstaller
@@ -96,6 +123,7 @@ function Run-Installer([string]$Path, [string]$Phase) {
         throw "${Phase}: installed metadata, registration or binary does not match the requested package version."
     }
     $installedVersions.Add(@{ phase=$Phase; expected=$expectedIdentity.version; metadata=$installedIdentity.version; registration=$registeredVersion; binary=$binaryVersion })
+    Assert-InstalledPayload $Path $Phase
     $checks.Add("${Phase}: installed self-contained application, shortcuts and Open with registration")
     Assert-PreservedState $Phase
 }
