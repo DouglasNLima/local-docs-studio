@@ -90,8 +90,15 @@ public partial class MainWindow
                 }
                 finally
                 {
-                    if (generation == viewportGeneration && model.ActiveDocument == tab)
-                    { pendingViewportDocument = null; applyingSync = false; applyingSyncOrigin = null; }
+                    if (generation == viewportGeneration && model.ActiveDocument == tab && rendered == resultToRestore)
+                    {
+                        pendingViewportDocument = null; applyingSync = false; applyingSyncOrigin = null;
+                        // Actual text selection can arrive while the incoming reading
+                        // position is restoring. Reconcile it against this immutable map;
+                        // an empty caret must not override a returning tab's viewport.
+                        if (DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin && Editor.SelectionLength > 0)
+                            QueueSynchronisation("editor-selection");
+                    }
                 }
             }, DispatcherPriority.Loaded);
             return;

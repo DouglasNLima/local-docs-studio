@@ -28,14 +28,16 @@ public static class PreviewNavigationService
         var cancellation = new CancellationTokenSource(); state.Pending = cancellation;
         var originalSelectionStart = viewer.Selection?.Start;
         var originalSelectionEnd = viewer.Selection?.End;
+        var originalSelectionEmpty = viewer.Selection?.IsEmpty == true;
         return viewer.Dispatcher.InvokeAsync(Navigate, DispatcherPriority.Loaded).Task.Unwrap();
 
-        // Plain navigation may outlive the reader's deferred selection restoration.
-        // Actual user input cancels Pending; selection operations also guard their range.
+        // Plain navigation may outlive deferred restoration of an empty reader caret.
+        // Actual user input cancels Pending; a newer selected range always supersedes us.
         bool Current() => !cancellation.IsCancellationRequested && viewer.Document == document
             && position.IsInSameDocument(document.ContentStart)
-            && (selectionEnd is null || originalSelectionStart is null || viewer.Selection is { } selection
-                && selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
+            && (originalSelectionStart is null || viewer.Selection is { } selection
+                && (selectionEnd is null && originalSelectionEmpty && selection.IsEmpty
+                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0));
 
         async Task<bool> Navigate()
         {
@@ -64,11 +66,13 @@ public static class PreviewNavigationService
                 var page = await GetPageNumber(paginator, position, cancellation.Token);
                 if (!Current() || page < 0 || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll) return false;
                 if (FindViewer<FlowDocumentPageViewer>(viewer) is not { } paged) return false;
-                paged.GoToPage(page + 1); paged.UpdateLayout();
                 var selected = false;
                 await viewer.Dispatcher.InvokeAsync(() =>
                 {
-                    if (!Current()) return;
+                    if (!Current() || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll || paged.Document != document) return;
+                    // Publish the paginator's new page count through WPF binding before
+                    // GoToPage; otherwise a freshly replaced reader silently rejects it.
+                    paged.GoToPage(page + 1); paged.UpdateLayout();
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;

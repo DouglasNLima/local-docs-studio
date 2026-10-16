@@ -124,6 +124,19 @@ internal static partial class NativePaginationChecks
             if (viewer.ShowContinuousGuidance) throw new IOException("Continuous guidance survived a small replacement.");
             checks.Add("Continuous guidance uses source characters or mapped-element counts, preserves selection and explicit mode, and clears in Pages or a small replacement");
 
+            var sections = "# Replacement sections\n\n" + string.Concat(Enumerable.Range(1, 90)
+                .Select(index => $"## Region {index:000}\n\nA distinct portable source region with **formatted text**.\n\n"));
+            var sectionResult = renderer.Render(new MarkdownService().Parse(sections), false,
+                new Dictionary<FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
+            viewer.SetPreview(sectionResult, sections.Length, "Pages");
+            var sectionPointer = Find(sectionResult.Document, "Region 040");
+            var revealSection = PreviewNavigationService.BringIntoViewAsync(viewer, sectionPointer);
+            Complete(revealSection); Layout(viewer); Pump(); Layout(viewer);
+            var sectionRectangle = sectionPointer.GetCharacterRect(LogicalDirection.Forward);
+            if (!revealSection.Result || sectionRectangle.IsEmpty || sectionRectangle.Top < 0 || sectionRectangle.Bottom > viewer.ActualHeight)
+                throw new IOException("Immediate navigation into a replacement paged document did not reveal its exact section: " + sectionRectangle);
+            checks.Add("Immediate section navigation waits for a replacement reader's page count before choosing its exact page");
+
             var drawing = new DrawingVisual();
             using (var dc = drawing.RenderOpen())
             {
