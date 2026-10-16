@@ -20,6 +20,8 @@ public partial class MainWindow
                 Operation = operation, Active = model.ActiveDocument?.Id, Displayed = displayedTab?.Id,
                 Rendered = renderedDocumentId, Pending = pendingViewportDocument, Generation = viewportGeneration,
                 Restoring = restoringNavigation, EditorCaret = Editor.CaretOffset, EditorVertical = Editor.VerticalOffset,
+                Busy = model.IsBusy, PreviewPage = Preview.PageNumber, PreviewPages = Preview.PageCount, PreviewHeight = Preview.ActualHeight,
+                PageSize = Preview.Document is { } document ? ((System.Windows.Documents.IDocumentPaginatorSource)document).DocumentPaginator.PageSize.ToString() : null,
                 Back = navigation.Back, Forward = navigation.Forward,
                 Documents = model.Documents.Select(tab => new { tab.Id, tab.CaretOffset, tab.VerticalOffset, tab.PreviewSourceOffset })
             }) + Environment.NewLine);

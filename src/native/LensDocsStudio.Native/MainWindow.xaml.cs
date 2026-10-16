@@ -271,6 +271,7 @@ public partial class MainWindow : Window
     }
     private async void Navigate(string reference)
     {
+        (DocumentViewModel Document, PreviewResult Preview, TextElement Element, int Offset, long Generation)? pendingPageAnchor = null;
         await model.RunAsync(async () =>
         {
             var fragment = reference.Contains('#') ? Uri.UnescapeDataString(reference.Split('#', 2)[1]) : null;
@@ -303,11 +304,9 @@ public partial class MainWindow : Window
                         {
                             rendered.RevealSource(target.SourceStart);
                             TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
-                            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart,
-                                diagnostic: viewportDiagnostics ? message => TraceViewport("anchor " + message) : null);
                             if (Preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll)
-                                element.BringIntoView();
-                            TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
+                                pendingPageAnchor = (model.ActiveDocument!, rendered, element, target.SourceStart, viewportGeneration);
+                            else await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
                         }
                     }
                     else model.Status = "The linked section was not found; the document remains open.";
@@ -315,6 +314,29 @@ public partial class MainWindow : Window
             }
             finally { restoringNavigation = previousRestoring; if (!previousRestoring) VisitCurrentNavigation(); }
         });
+        if (pendingPageAnchor is not { } request) return;
+        var wasRestoring = restoringNavigation; restoringNavigation = true;
+        bool CurrentAnchor() => model.ActiveDocument == request.Document && rendered == request.Preview
+            && viewportGeneration == request.Generation && SyncCurrent;
+        try
+        {
+            CancelSynchronisation();
+            // The operation's Cancel button changes the status-bar height. A page
+            // selected before it disappears can reflow onto the preceding page.
+            await Dispatcher.InvokeAsync(() => Preview.UpdateLayout(), DispatcherPriority.Loaded);
+            if (!CurrentAnchor()) return;
+            TraceViewport("anchor-final-layout " + request.Offset);
+            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, request.Element.ContentStart,
+                diagnostic: viewportDiagnostics ? message => TraceViewport("anchor " + message) : null);
+            if (!CurrentAnchor()) return;
+            TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
+        }
+        finally
+        {
+            restoringNavigation = wasRestoring;
+            if (!wasRestoring && CurrentAnchor()) CaptureCurrentNavigation();
+            RefreshNavigationControls();
+        }
     }
     private void OpenFind(object sender, RoutedEventArgs e) => ShowFind(false);
     private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);
