@@ -65,6 +65,14 @@ and restores them on Undo/Redo. Arbitrary source validation conservatively retai
 unchanged node identities. Auto layout clears session layout history. Apply writes
 only portable Mermaid; reopening restores canonical layout.
 
+Cancelled movement restores both the visible position and whether that position
+was explicitly manual. It cannot manufacture an offset for an originally canonical
+node. A manually inserted subgraph carries unpositioned descendants with its
+translation; individually positioned nodes retain their own absolute centres.
+Canonical drawings are flat, so this inheritance is applied explicitly without
+introducing a second layout engine. Undo cancels active pointer capture before
+changing private history, and a render cache also checks the private history identity.
+
 Pointer selection uses canonical routed paths with a 12-DIP target and the actual
 label rectangle. Transparent path bounding rectangles do not intercept input.
 Canvas selection no longer combines competing click and toggle mutations. Protected
@@ -88,6 +96,13 @@ The preview restores that document's source anchor, including explicit source ze
 for first open, behind document and generation guards. Synchronisation is suppressed
 during that restoration. Back/Forward and explicit anchors retain their navigation
 operations. Both native Continuous and Pages modes use the existing navigation API.
+
+Paged reading positions use the paginator's actual page position, mapped with
+forward affinity through literal text. A page can start midway through a paragraph
+or at an emphasis boundary; restoring the paragraph's start selects the preceding
+page. Tab restoration and Back/Forward therefore use the exact mapped text pointer
+before falling back to a semantic block. The bounded opt-in viewport diagnostic
+records identities and offsets, never document text.
 
 Only the 24-pixel toolbar ICO image is removed. The window, executable, installer,
 taskbar and shortcut resources retain their existing branding.
@@ -160,6 +175,14 @@ The current local Release build and all 1,234 Core tests pass, including distinc
 identical-source history steps, source-preserving parallel reconnection and separate
 preview-history anchors. The original regex timeout remains retained as a baseline
 failure. The help guide retains its original 14-topic contract.
+
+Hosted discoveries were kept as failing evidence while their causes were corrected:
+stale preview actions after document Undo; test assumptions about connection source
+order; capture lost when unchanged endpoint buttons were recreated; Follow Caret
+overriding history restoration; and page starts mapped to the preceding paragraph.
+The export browser harness also encountered Python's first-use initialisation
+inside its unchanged 15-second server readiness window. CI now imports that
+test-only runtime before the deadline; no timeout or application architecture changed.
 
 Pending: final revision and CI links, performance comparison, placement tolerance
 results, actual High Contrast and window-size evidence, Core/render/browser/UIA

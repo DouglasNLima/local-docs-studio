@@ -218,7 +218,7 @@ public partial class MermaidVisualEditorWindow
                     StartNodeDrag(button, e.GetPosition(DiagramCanvas), pressedAt);
                 };
                 button.PreviewMouseMove += (_, e) => MoveNodeDrag(e);
-                button.PreviewMouseLeftButtonUp += (_, e) => { if (dragStart is not null) { FinishNodeDrag(false); e.Handled = true; } };
+                button.PreviewMouseLeftButtonUp += (_, e) => { if (dragStart is { } start) { pendingDrag = e.GetPosition(DiagramCanvas) - start; FinishNodeDrag(false); e.Handled = true; } };
                 button.LostMouseCapture += (_, _) => { if (dragStart is not null) FinishNodeDrag(true); };
                 AutomationProperties.SetHelpText(button, "Select to edit properties. F2 edits the label. Dragging changes this session only; positions survive visual edits until Auto layout or closing this window. Space+drag pans.");
                 var port = ConnectionPort(id, button);

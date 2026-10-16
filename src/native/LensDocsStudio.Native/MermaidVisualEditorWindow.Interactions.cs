@@ -87,7 +87,9 @@ public partial class MermaidVisualEditorWindow
     private void MoveNodeDrag(MouseEventArgs e)
     {
         if (dragStart is not { } start || dragged is null) return;
-        if (e.LeftButton != MouseButtonState.Pressed) { FinishNodeDrag(true); return; }
+        // WPF can dispatch a queued move after Windows has observed button-up.
+        // Commit the last captured movement; capture loss still cancels explicitly.
+        if (e.LeftButton != MouseButtonState.Pressed) { pendingDrag = e.GetPosition(DiagramCanvas) - start; FinishNodeDrag(false); return; }
         pendingDrag = e.GetPosition(DiagramCanvas) - start;
         if (!dragging && Math.Abs(pendingDrag.X) < SystemParameters.MinimumHorizontalDragDistance && Math.Abs(pendingDrag.Y) < SystemParameters.MinimumVerticalDragDistance) return;
         dragging = true; e.Handled = true;
@@ -306,7 +308,7 @@ public partial class MermaidVisualEditorWindow
                 MoveReconnection(e.GetPosition(DiagramCanvas));
                 Status.Text = "Reconnect " + (source ? "source" : "destination") + ": drop on a node; Escape cancels.";
             };
-            button.PreviewMouseMove += (_, e) => { if (reconnectEdge is null) return; if (e.LeftButton != MouseButtonState.Pressed) { CancelReconnection(); return; } MoveReconnection(e.GetPosition(DiagramCanvas)); e.Handled = true; };
+            button.PreviewMouseMove += (_, e) => { if (reconnectEdge is null || e.LeftButton != MouseButtonState.Pressed) return; MoveReconnection(e.GetPosition(DiagramCanvas)); e.Handled = true; };
             button.PreviewMouseLeftButtonUp += async (_, e) =>
             {
                 if (reconnectEdge is not { } edgeId) return;

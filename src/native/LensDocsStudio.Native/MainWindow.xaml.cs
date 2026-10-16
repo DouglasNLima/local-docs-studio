@@ -300,7 +300,12 @@ public partial class MainWindow : Window
                     {
                         JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
                         if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                        { rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
+                        {
+                            rendered.RevealSource(target.SourceStart);
+                            TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
+                            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart);
+                            TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
+                        }
                     }
                     else model.Status = "The linked section was not found; the document remains open.";
                 }

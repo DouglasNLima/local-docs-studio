@@ -30,9 +30,11 @@ public static class PreviewNavigationService
         var originalSelectionEnd = viewer.Selection?.End;
         return viewer.Dispatcher.InvokeAsync(Navigate, DispatcherPriority.Loaded).Task.Unwrap();
 
+        // Plain navigation may outlive the reader's deferred selection restoration.
+        // Actual user input cancels Pending; selection operations also guard their range.
         bool Current() => !cancellation.IsCancellationRequested && viewer.Document == document
             && position.IsInSameDocument(document.ContentStart)
-            && (originalSelectionStart is null || viewer.Selection is { } selection
+            && (selectionEnd is null || originalSelectionStart is null || viewer.Selection is { } selection
                 && selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
 
         async Task<bool> Navigate()
