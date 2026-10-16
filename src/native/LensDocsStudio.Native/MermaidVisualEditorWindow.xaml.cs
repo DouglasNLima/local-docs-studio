@@ -46,7 +46,7 @@ public partial class MermaidVisualEditorWindow : Window
     private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
-    private bool CanTransform => !busy && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
+    private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
 
     public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null, System.Windows.Media.FontFamily? sourceFont = null, double sourceFontSize = 14)
@@ -74,8 +74,13 @@ public partial class MermaidVisualEditorWindow : Window
         try { SourceEditor.Text = draft.Source; } finally { updating = false; }
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; connectionUpdate?.Abort(); lifetime.Cancel(); lifetime.Dispose(); };
-        Loaded += (_, _) => { Refresh(true); Fit(this, new()); };
+        Closed += async (_, _) =>
+        {
+            closed = true; canvasRender?.Cancel(); lifetime.Cancel();
+            await canvasRenderGate.WaitAsync();
+            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose();
+        };
+        Loaded += (_, _) => { Refresh(true); };
     }
     public void ApplyTheme(string theme)
     {
@@ -96,14 +101,17 @@ public partial class MermaidVisualEditorWindow : Window
         try
         {
             if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Direction.SelectedItem = draft.Model.Direction;
+            var parallel = draft.Model.Edges.GroupBy(edge => (edge.Source.Id, edge.Target.Id)).Where(group => group.Count() > 1).Select(group => group.Key).ToHashSet();
             choices = draft.Model.Nodes.Select(node => new ElementChoice("node:" + node.Id, node.Id + " · " + node.Label.ReplaceLineEndings(" "), node.Shape.ToString()))
-                .Concat(draft.Model.Edges.Select(edge => new ElementChoice(edge.Id, edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
+                .Concat(draft.Model.Edges.Select((edge, ordinal) => new ElementChoice(edge.Id,
+                    (parallel.Contains((edge.Source.Id, edge.Target.Id)) ? "Connection " + (ordinal + 1) + " · " : "")
+                    + edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
             Elements.ItemsSource = choices;
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
-            Status.Text = draft.Model.Diagnostic ?? (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
+            Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax." : (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
         }
         finally { updating = false; }
     }
@@ -120,13 +128,13 @@ public partial class MermaidVisualEditorWindow : Window
         SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid Visual Editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
-        DraftIndicator.Text = busy ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : !draft.Model.CanEdit ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
-        RenderedPreviewButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && inlineEditor is null;
-        SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit ? Visibility.Visible : Visibility.Collapsed;
+        DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : !draft.Model.CanEdit || !canonicalMapped ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
+        RenderedPreviewButton.IsEnabled = canonicalDrawing is not null && !busy && !renderingCanvas && !SourcePending && !PropertiesPending && inlineEditor is null;
+        SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit || !canonicalMapped ? Visibility.Visible : Visibility.Collapsed;
         SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
-        ValidateSourceButton.IsEnabled = !busy && !PropertiesPending && inlineEditor is null;
+        ValidateSourceButton.IsEnabled = !busy && !renderingCanvas && !PropertiesPending && inlineEditor is null;
         foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
@@ -335,7 +343,15 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
-        if (busy || PropertiesPending || inlineEditor is not null) return;
+        if (busy || renderingCanvas || PropertiesPending || inlineEditor is not null) return;
+        if (!SourcePending)
+        {
+            sourceValidationFailed = false;
+            Status.Text = canvasError ?? (!draft.Model.CanEdit || !canonicalMapped
+                ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
+                : "The source matches the validated visual draft.");
+            UpdateActions(); return;
+        }
         busy = true; UpdateActions(); var text = SourceEditor.Text;
         try
         {
@@ -351,7 +367,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (!CanTransform || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
         try
         {
-            var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme), lifetime.Token);
+            var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme, lifetime.Token), lifetime.Token);
             if (closed) return; if (!result.Success) { Status.Text = result.Error; return; }
             var error = await applyToDocument(source, lifetime.Token); if (closed) return;
             if (error is not null) { Status.Text = error; return; }
@@ -381,19 +397,18 @@ public partial class MermaidVisualEditorWindow : Window
         catch (ExternalException) { Status.Text = "The Windows clipboard is busy. Select the source and try again."; }
     }
     private void EditOwningSource(object sender, RoutedEventArgs e) { editSource?.Invoke(); Status.Text = "The owning document's source is available. This private draft remains open."; }
-    private async void ShowRenderedPreview(object sender, RoutedEventArgs e)
+    private void ShowRenderedPreview(object sender, RoutedEventArgs e)
     {
-        if (busy || SourcePending || PropertiesPending || inlineEditor is not null) return;
-        busy = true; UpdateActions();
+        if (busy || renderingCanvas || SourcePending || PropertiesPending || inlineEditor is not null) return;
+        if (canonicalRender is not { Success: true } result || canonicalDrawing is not { } drawing || result.Source != draft.Source
+            || result.Theme != DiagramThemes.ResolveName(diagramTheme, dark))
+        { Status.Text = canvasError ?? "Wait for the current original diagram to finish rendering."; return; }
         try
         {
-            var result = await Task.Run(() => diagrams.Render(draft.Source, dark, diagramTheme), lifetime.Token); if (closed) return;
-            if (!result.Success) { Status.Text = result.Error; return; }
-            new DiagramWindow(new NativeSvgService().Render(result.Svg!), format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
+            // The immutable drawing is shared with the canvas; session drag transforms belong to a private clone.
+            new DiagramWindow(drawing, format => exportDiagram?.Invoke(format, result.Svg!)) { Owner = this }.Show();
         }
-        catch (OperationCanceledException) { }
         catch (Exception ex) when (ex is not OutOfMemoryException) { if (!closed) Status.Text = "Preview could not be opened: " + ex.Message; }
-        finally { busy = false; if (!closed) UpdateActions(); }
     }
     private void Shortcut(object sender, KeyEventArgs e)
     {

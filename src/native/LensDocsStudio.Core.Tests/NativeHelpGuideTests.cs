@@ -21,7 +21,8 @@ public sealed class NativeHelpGuideTests
     {
         var topic = Assert.Single(NativeHelpGuide.Search("Mermaid visual authoring"));
         Assert.Equal("mermaid-visual-authoring", topic.Anchor);
-        Assert.Contains("Edit visually", topic.Source); Assert.Contains("one ordinary Undo action", topic.Source);
+        Assert.Contains("Visual Edit", topic.Source); Assert.Contains("Edit source", topic.Source);
+        Assert.Contains("protected visual inspection", topic.Source); Assert.Contains("one ordinary Undo action", topic.Source);
         Assert.Contains("positions last", topic.Source); Assert.Contains("protected", topic.Source);
     }
     [Fact] public void Topic_search_matches_body_text_without_changing_bundled_source()

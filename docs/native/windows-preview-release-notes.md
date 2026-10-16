@@ -1,8 +1,8 @@
 # Windows internal preview release notes
 
-This candidate adds native Mermaid visual authoring to verified refinement baseline `42c3fc6` in Draft PR 26. The packaged `version.json` records this build's exact version, source revision, source kind and Actions run. Packages are unsigned and remain separate from the browser/PWA and legacy Windows shell.
+This candidate adds native Mermaid preview fidelity and direct protected visual inspection to verified visual-polish baseline `47e78d6` in Draft PR 28. The packaged `version.json` records this build's exact version, source revision, source kind and Actions run. Packages are unsigned and remain separate from the browser/PWA and legacy Windows shell.
 
-- Supported Flowcharts offer **Edit visually** beside their native preview. **Insert → Flowchart visually…** creates a new diagram. Nodes, connections, nested subgraphs and basic styles use native WPF controls and keyboard alternatives.
+- Recognised Flowcharts offer **Visual Edit** beside their native preview, including protected source. **Edit source** remains separate. **Insert → Flowchart visually…** creates a new diagram. The visual canvas uses the same Mermaider drawing as the native preview. Protected diagrams preserve their original layout for inspection; supported nodes, connections, nested subgraphs and styles retain native WPF controls and keyboard alternatives.
 - The editor keeps a private source draft with Undo/Redo, source validation, zoom/PAN and temporary positioning. Apply replaces only the tracked diagram in one document Undo transaction; Cancel retains the original. Conflicting source, unsafe wrappers and unsupported grammar are protected.
 - Standalone `.mmd`/`.mermaid` files retain raw source. Existing Mermaid rendering/export services validate every accepted visual operation. See the offline Native guide's **Mermaid visual authoring** topic for supported bounds and commands.
 

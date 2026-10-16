@@ -2,7 +2,7 @@
 
 ## Mermaid visual authoring
 
-Choose **Edit visually** beside a supported Flowchart preview, or **Insert →
+Choose **Visual Edit** beside an existing recognised Flowchart preview, including protected source. **Edit source** remains separate. Choose **Insert →
 Flowchart visually** for a new diagram. The native editor offers nodes, connections,
 subgraphs, properties, source inspection and private Undo/Redo. Update edited
 properties before Apply; Reset property changes discards only those pending fields.
@@ -12,8 +12,11 @@ unchanged; Save remains responsible for writing the file and checking disk chang
 Use F2 to edit a node label (Enter confirms; Escape cancels), named + ports to start
 a connection, and the element list for keyboard selection. Middle-drag or
 Space+drag pans, Ctrl+wheel zooms, F fits and Home resets. Manual positions last for
-the editing session; Mermaid lays out the saved portable source. Unsupported or
-very dense graphs remain protected and available for source editing. Editing covers
+the editing session, with dashed temporary connection guides. Auto layout or any
+source edit restores the canonical Mermaider drawing. No coordinates are saved.
+Unsupported syntax opens the complete original diagram for protected visual inspection.
+Zoom, PAN, Rendered preview and Edit source remain available; unsafe transformations
+and Apply stay disabled. Resource limits still apply to very large or dense diagrams. Editing covers
 `flowchart` and `graph`, five directions, common node shapes, separate connections
 and named subgraphs. Keep connections outside groups when moving nodes between
 them. Chained connections, edge IDs, interactions, configuration directives and
@@ -47,7 +50,7 @@ Right-click a document tab for closing, copy/reveal and pin actions. **Pinned ta
 
 The preview toolbar exposes **Automatic**, **Pages** and **Continuous** reading modes, zoom, Find and rendered copy. Three separate opt-in controls offer **Follow caret**, **Synchronise scroll** and **Synchronise selection** in Split layout. They preserve the originating pane's keyboard focus. Literal selections use source offsets, including repeated words; generated or transformed content is labelled as a semantic block highlight when exact text correspondence is unavailable. Turning one behaviour off does not disable the others.
 
-In the diagram window, hold **Space** and drag, or drag with the **middle mouse button**, to pan. **Ctrl+mouse wheel** zooms around the pointer. **F** fits the diagram, **Ctrl+0** selects Actual Size, **Home** resets the viewport and arrow keys pan. **Ctrl+C** copies the original drawing, independently of pan or zoom. SVG/PNG exports retain the original drawing.
+In the diagram window, hold **Space** and drag, or drag with the **middle mouse button**, to pan. **Ctrl+mouse wheel** zooms around the pointer. **F** fits the diagram, **Fit width** fills the available width, **Ctrl+0** selects Actual Size, **Home** resets the viewport and arrow keys pan. **Ctrl+C** copies the original drawing, independently of pan or zoom. SVG/PNG exports retain the original drawing.
 
 ## Getting started
 
@@ -140,7 +143,11 @@ six-digit hexadecimal values; the validated source value remains authoritative.
 The tick in the **Mermaid source** header validates source changes; the adjacent copy
 icon copies the draft. A star marks source needing validation or protected source;
 its tooltip explains the state. Collapse the header to reclaim canvas space. The
-**Session layout** tooltip explains that manual positions are temporary. Apply and
+**Mermaider layout** tooltip explains canonical positioning. Preview, Rendered preview
+and the visual canvas share the same native drawing; selection outlines and ports are
+editing adorners. Wide diagrams initially open at Actual Size for readable labels;
+Fit shows the whole graph and PAN explores it at the chosen zoom. At overlapping connection paths, choose the intended connection in
+the element list rather than guessing from a pointer click. Apply and
 Cancel remain in the fixed footer; hover a shortened status to read its full message.
 
 

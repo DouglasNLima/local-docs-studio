@@ -17,17 +17,17 @@ internal static partial class NativeUiChecks
     private static extern uint GetDpiForSystem();
     [System.Runtime.InteropServices.DllImport("dwmapi.dll")]
     private static extern int DwmFlush();
-    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false) => Task.Run(() =>
+    public static int RunMermaidVisualEditor(string executable, string output, bool highContrast, bool polish = false, bool baseline = false) => Task.Run(() =>
     {
         Directory.CreateDirectory(Path.GetFullPath(output));
         using var clipboard = NativeUiClipboard.Start();
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var display = new NativeTestDisplay(output);
-        var result = MermaidVisualEditorCore(executable, output, highContrast, polish);
+        var result = MermaidVisualEditorCore(executable, output, highContrast, polish, baseline);
         if (result == 0) display.Complete(); return result;
     }).GetAwaiter().GetResult();
 
-    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast, bool polish)
+    private static int MermaidVisualEditorCore(string executable, string output, bool highContrast, bool polish, bool baseline)
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         var root = Path.Combine(output, "fixture-" + Guid.NewGuid().ToString("N")); Directory.CreateDirectory(root);
@@ -80,8 +80,10 @@ internal static partial class NativeUiChecks
                 Wait(() => Find(visual!, "MermaidViewport").BoundingRectangle.Height < beforeHeight + 5, "Expanding source did not restore the workspace split.");
                 Check(Draft() == source, "Source collapse and expansion preserve the exact draft");
                 var zoomValue = Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value;
+                var zoomWatch = Stopwatch.StartNew();
                 Click("MermaidZoomIn"); Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value > zoomValue, "Zoom in changes the native viewport scale");
                 Click("MermaidZoomOut"); Check(Math.Abs(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value - zoomValue) < .01, "Zoom out reverses the zoom-in scale without source changes");
+                _ = DwmFlush(); timings.Add(new { Operation = "Zoom in and out including UIA transport and compositor flush", Milliseconds = zoomWatch.Elapsed.TotalMilliseconds });
                 Check(Draft() == source, "View commands leave Mermaid source byte-for-byte unchanged");
                 Check(Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value.Length == 2, "Source collapse and view commands retain the original multi-selection");
                 foreach (var selected in Find(visual!, "MermaidElements").Patterns.Selection.Pattern.Selection.Value)
@@ -189,6 +191,7 @@ internal static partial class NativeUiChecks
             }
             Find(visual!, "MermaidFillColour").AsTextBox().Text = "#E8F3FA"; Click("MermaidApplyStyle");
             AwaitSource(text => text.Contains("style Node1 fill:#E8F3FA", StringComparison.Ordinal));
+            Check(Find(visual!, "MermaidFillColour").AsTextBox().Text == "#E8F3FA", "Authored colour values remain visible in the inspector in normal and High Contrast modes");
             var valid = Draft(); var sourceEditor = Find(visual!, "MermaidDraftSource");
             sourceEditor.Patterns.Value.Pattern.SetValue("flowchart TD\nA -->"); Click("MermaidValidateSource");
             Wait(() => Find(visual!, "MermaidStatus").Name.Contains("retained", StringComparison.Ordinal), "Invalid source did not retain its diagnostic and draft.");
@@ -322,12 +325,96 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == "", "New flowchart insertion was not one coherent document Undo.");
             }
             const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\n";
-            LaunchDocument("Protected.mmd", protectedSource); OpenInsertion(false); Capture("protected-source");
+            LaunchDocument("Protected.mmd", protectedSource);
+            if (baseline) OpenInsertion(false); else Open(0, false);
+            Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
             if (polish)
             {
+                var lab = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/flow-error-log-lab.mmd");
+                LaunchDocument("Flow-error-log-lab.mermaid", lab);
+                Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Protected preview action did not appear.");
+                main!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-preview.png"));
+                Open(0, false);
+                Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
+                    "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
+                Click("MermaidValidateSource");
+                Check(Find(visual!, "MermaidDraftState").Name == "Protected source" && Draft() == lab,
+                    "Validating unchanged protected source preserves its inspection capability instead of reporting invalid Mermaid");
+                Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide protected diagrams initially open at actual size for readable labels");
+                Capture("flow-error-log-lab-initial");
+                var labViewport = Find(visual!, "MermaidViewport"); var labScroll = labViewport.Patterns.Scroll.Pattern;
+                var labBefore = labScroll.HorizontalScrollPercent.Value; var labBounds = labViewport.BoundingRectangle;
+                var panWatch = Stopwatch.StartNew();
+                Mouse.DragHorizontally(new(labBounds.Left + labBounds.Width / 2, labBounds.Top + labBounds.Height / 2), labBefore > 0 ? 100 : -100, MouseButton.Middle);
+                Wait(() => Math.Abs(labScroll.HorizontalScrollPercent.Value - labBefore) > .1, "Protected PAN did not move its actual native viewport.");
+                _ = DwmFlush(); timings.Add(new { Operation = "Protected middle-button PAN including synthetic drag, UIA transport and compositor flush", Milliseconds = panWatch.Elapsed.TotalMilliseconds });
+                Check(Draft() == lab, "Protected actual-size PAN changes the viewport without changing original source");
+                Click("MermaidFit"); Capture("flow-error-log-lab-canvas"); Click("MermaidRenderedPreview");
+                var labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow();
+                Wait(() => (labPreview = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("DiagramWindow")))?.AsWindow()) is not null, "Protected Rendered preview did not open.");
+                Check(Find(labPreview!, "DiagramZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide Rendered preview initially preserves readable actual-size labels");
+                _ = DwmFlush(); labPreview!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered-initial.png"));
+                Find(labPreview, "DiagramFit").AsButton().Invoke();
+                Wait(() => Find(labPreview, "DiagramZoom").Patterns.RangeValue.Pattern.Value.Value < 100, "Explicit Fit did not reveal the complete wide diagram.");
+                _ = DwmFlush(); labPreview.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-rendered.png"));
+                labPreview.Close(); Click("MermaidActualSize");
+                Check(Draft() == lab, "Protected zoom, Fit and Rendered preview leave the complete original source exact");
+                Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == lab, "Protected visual inspection never changes the owning raw Mermaid document");
+                var parallel = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/parallel.mmd");
+                LaunchDocument("Parallel.mmd", parallel); Open(0);
+                Check(Find(visual!, "MermaidCanvas_edge-0").Name != Find(visual!, "MermaidCanvas_edge-1").Name,
+                    "Identical parallel connections have distinct accessible source-order descriptions");
+                var parallelRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                parallelRows[3].Patterns.SelectionItem.Pattern.Select();
+                Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Second only"; Click("MermaidUpdateEdge");
+                AwaitSource(text => new MermaidSourceParser().Parse(text).Edges[1].Label == "Second only");
+                Check(new MermaidSourceParser().Parse(Draft()).Edges[0].Label == "Same" && new MermaidSourceParser().Parse(Draft()).Edges[2].Label == "Diagnostic",
+                    "Selecting the second parallel connection edits only its stable source identity");
+                var parallelChanged = Draft(); Click("MermaidDelete"); AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Count == 2);
+                Check(new MermaidSourceParser().Parse(Draft()).Edges.Select(edge => edge.Label).SequenceEqual(new[] { "Same", "Diagnostic" }),
+                    "Parallel connection deletion retains both neighbouring source connections and their labels");
+                Click("MermaidUndo"); AwaitSource(text => text == parallelChanged); Click("MermaidUndo"); AwaitSource(text => text == parallel);
+                Check(Draft() == parallel && ReadEditorText(editor) == parallel, "Private history restores exact parallel source without changing its owner");
+                Capture("parallel-edges"); Click("MermaidCancel"); WaitClosed();
+                var shapes = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/shapes.mmd");
+                LaunchDocument("Shapes.mmd", shapes); Open(0); Click("MermaidFit");
+                Find(visual!, "MermaidCanvas_node_F").Click();
+                Wait(() => Find(visual!, "MermaidSelectionSummary").Name.StartsWith("F", StringComparison.Ordinal), "Clicking the double-circle centre did not select its actual native node.");
+                Check(Draft() == shapes, "Actual pointer selection at a compound shape centre retains exact Mermaid source");
+                var shapeResult = new DiagramService().Render(shapes, LensDocsStudio.Native.Platform.ThemeService.IsDark("Light"));
+                var shapeSvg = new LensDocsStudio.Native.Rendering.NativeSvgService().Prepare(shapeResult.Svg!);
+                using (var shapeReader = System.Xml.XmlReader.Create(new StringReader(shapeSvg), new System.Xml.XmlReaderSettings
+                    { DtdProcessing = System.Xml.DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 }))
+                {
+                    var shapeXml = System.Xml.Linq.XDocument.Load(shapeReader);
+                    var shapeNode = shapeXml.Descendants().Single(element => (string?)element.Attribute("data-id") == "F");
+                    var expectedStroke = (string?)shapeNode.Elements().First(element => element.Name.LocalName == "circle").Attribute("stroke");
+                    Check(string.Equals(Find(visual!, "MermaidStrokeColour").AsTextBox().Text, expectedStroke, StringComparison.OrdinalIgnoreCase),
+                        "Unstyled node colour properties match the canonical native drawing instead of the former canvas defaults");
+                }
+                Capture("compound-shape-selection"); Click("MermaidCancel"); WaitClosed();
+                const string invalidInitial = "flowchart LR\nA -->";
+                LaunchDocument("Invalid-initial.mmd", invalidInitial); Open(0, false);
+                Check(Draft() == invalidInitial && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
+                    "An invalid recognised Flowchart opens from preview with diagnostics, retained source and separate source editing");
+                Click("MermaidAutoLayout");
+                Check(Find(visual!, "MermaidStatus").Name.Contains("missing its destination", StringComparison.Ordinal), "Auto layout retains invalid-source diagnostics instead of claiming a successful rendering");
+                Capture("invalid-initial"); Click("MermaidCancel"); WaitClosed();
+                var closedSource = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/simple.mmd");
+                LaunchDocument("Closed-owner.mmd", closedSource); Open(0); Select("node_A");
+                Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Retained private draft"; Click("MermaidUpdateNode");
+                AwaitSource(text => text.Contains("Retained private draft", StringComparison.Ordinal));
+                var closedDraft = Draft(); var tabsBeforeClose = main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length;
+                FocusWindow(main); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                Wait(() => main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length < tabsBeforeClose, "The owning tab did not close for stale-source validation.");
+                FocusWindow(visual!); Click("MermaidApply");
+                Wait(() => Find(visual!, "MermaidStatus").Name.Contains("owning document has been closed", StringComparison.Ordinal), "The closed owning document did not reject Apply.");
+                Check(Draft() == closedDraft && File.ReadAllText(Path.Combine(root, "Closed-owner.mmd")) == closedSource,
+                    "Actual tab closure rejects stale Apply and retains both private draft and exact disk source");
+                Capture("closed-owner"); Click("MermaidCancel"); WaitClosed();
                 foreach (var count in new[] { 20, 100, 300 })
                 {
                     var graph = "flowchart TD\n" + string.Join('\n', Enumerable.Range(0, count).Select(index => $"N{index}[Node {index}]"))
@@ -373,20 +460,25 @@ internal static partial class NativeUiChecks
                 if (polish) CaptureMeaningful("first-meaningful-insertion-" + firstFrames);
             }
 
-            void Open(int blockOffset)
+            void Open(int blockOffset, bool editable = true)
             {
-                FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Edit visually action was not available.");
+                FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Visual Edit action was not available.");
                 var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
-                Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable.");
+                Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "The visual editor did not finish its canonical render.");
+                if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable: " + Find(visual!, "MermaidStatus").Name);
                 if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
-            void Select(string id) { Find(visual!, "MermaidCanvas_" + id).Patterns.Toggle.Pattern.Toggle(); }
+            void Select(string id)
+            {
+                var selectionWatch = Stopwatch.StartNew(); Find(visual!, "MermaidCanvas_" + id).Patterns.Toggle.Pattern.Toggle();
+                timings.Add(new { Operation = "Native selection including UIA transport", Element = id, Milliseconds = selectionWatch.Elapsed.TotalMilliseconds });
+            }
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
-            void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()), "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
+            void AwaitSource(Func<string, bool> predicate) => Wait(() => predicate(Draft()) && Find(visual!, "MermaidDraftState").Name != "Validating...", "The Mermaid draft did not reach its expected semantic/source state: " + (visual is null ? "closed" : Find(visual, "MermaidStatus").Name));
             void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor"))) is null, "The visual editor did not close."); visual = null; }
             void CapturePrimaryFocus(string name)
             {

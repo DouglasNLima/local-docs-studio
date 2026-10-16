@@ -18,6 +18,14 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--mermaid-fidelity")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Native viewport certification requires a disposable GitHub-hosted Windows runner."); return 1; }
+            try { NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--mermaid-performance")
         {
             try { NativeMermaidPerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
@@ -88,7 +96,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--ux-controls")
             return NativeUiChecks.Run(args[1], args[2], desktopUxOnly: true);
         if (args.FirstOrDefault() == "--mermaid-ui")
-            return NativeUiChecks.RunMermaidVisualEditor(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--polish"));
+            return NativeUiChecks.RunMermaidVisualEditor(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--polish"), args.Contains("--baseline"));
         if (args.FirstOrDefault() == "--preview-input-safety")
         {
             try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }
