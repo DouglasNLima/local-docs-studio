@@ -305,6 +305,8 @@ public partial class MainWindow : Window
                             TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
                             var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart,
                                 diagnostic: viewportDiagnostics ? message => TraceViewport("anchor " + message) : null);
+                            if (Preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll)
+                                element.BringIntoView();
                             TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
                         }
                     }

@@ -4,9 +4,6 @@ using System.Windows.Documents;
 using System.Windows.Threading;
 using System.Windows.Media;
 using System.Runtime.CompilerServices;
-using System.Windows.Automation.Peers;
-using System.Windows.Automation.Provider;
-using System.Windows.Automation.Text;
 
 namespace LensDocsStudio.Native.Rendering;
 
@@ -17,12 +14,6 @@ public static class PreviewNavigationService
         public CancellationTokenSource? Pending;
     }
     private static readonly ConditionalWeakTable<FlowDocumentReader, NavigationState> States = new();
-    private sealed class NativeInsertionIndex(FlowDocument document)
-    {
-        public int Symbols { get; } = document.ContentStart.GetOffsetToPosition(document.ContentEnd);
-        public List<(TextPointer Position, int Units)> Checkpoints { get; } = [(document.ContentStart.GetInsertionPosition(LogicalDirection.Forward), 0)];
-    }
-    private static readonly ConditionalWeakTable<FlowDocument, NativeInsertionIndex> InsertionIndices = new();
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
@@ -77,7 +68,7 @@ public static class PreviewNavigationService
                 if (!Current() || page < 0 || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll) return false;
                 if (FindViewer<FlowDocumentPageViewer>(viewer) is not { } paged) return false;
                 var selected = false;
-                await viewer.Dispatcher.InvokeAsync(async () =>
+                await viewer.Dispatcher.InvokeAsync(() =>
                 {
                     if (!Current() || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll || paged.Document != document) return;
                     // Publish the paginator's new page count through WPF binding before
@@ -85,15 +76,6 @@ public static class PreviewNavigationService
                     diagnostic?.Invoke($"before page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, allowed {paged.CanGoToPage(page + 1)}, size {paginator.PageSize}");
                     paged.GoToPage(page + 1); paged.UpdateLayout();
                     diagnostic?.Invoke($"after page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, size {paginator.PageSize}");
-                    if (selectionEnd is null)
-                    {
-                        // A page number resets WPF's internal content anchor. Its next
-                        // layout can re-anchor at the preceding page boundary. The native
-                        // text provider scrolls the exact character without selecting it.
-                        var anchored = await ScrollExactNativeRangeAsync(document, position, Current, cancellation.Token);
-                        diagnostic?.Invoke("exact native range anchor " + anchored);
-                        if (!anchored) return;
-                    }
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;
@@ -103,7 +85,7 @@ public static class PreviewNavigationService
                     // paragraph into view would jump back to that paragraph's first page.
                     paged.UpdateLayout();
                     selected = true;
-                }, DispatcherPriority.Loaded).Task.Unwrap();
+                }, DispatcherPriority.Loaded);
                 return selected && !cancellation.IsCancellationRequested && viewer.Document == document;
             }
             catch (OperationCanceledException) { return false; }
@@ -113,56 +95,6 @@ public static class PreviewNavigationService
                 cancellation.Dispose();
             }
         }
-    }
-
-    private static async Task<bool> ScrollExactNativeRangeAsync(FlowDocument document, TextPointer position, Func<bool> current, CancellationToken cancellation)
-    {
-        var peer = ContentElementAutomationPeer.CreatePeerForElement(document);
-        if (peer?.GetPattern(PatternInterface.Text) is not ITextProvider provider) return false;
-        var index = InsertionIndices.GetValue(document, key => new(key));
-        if (index.Symbols != document.ContentStart.GetOffsetToPosition(document.ContentEnd))
-        {
-            InsertionIndices.Remove(document); index = InsertionIndices.GetValue(document, key => new(key));
-        }
-        var target = position.GetInsertionPosition(LogicalDirection.Forward);
-        var low = 0; var high = index.Checkpoints.Count;
-        while (low < high)
-        {
-            var middle = (low + high) / 2;
-            if (index.Checkpoints[middle].Position.CompareTo(target) <= 0) low = middle + 1; else high = middle;
-        }
-        var (cursor, units) = index.Checkpoints[Math.Max(0, low - 1)];
-        var work = 0;
-        // UIA Character movement uses these same native insertion boundaries,
-        // including Unicode clusters and structural paragraph/object positions.
-        // Sparse checkpoints belong only to this immutable native document.
-        while (cursor.CompareTo(target) < 0)
-        {
-            if (cursor.GetNextInsertionPosition(LogicalDirection.Forward) is not { } next) return false;
-            cursor = next; units++;
-            if (units % 1024 == 0 && cursor.CompareTo(index.Checkpoints[^1].Position) > 0) index.Checkpoints.Add((cursor, units));
-            if (++work % 4096 == 0)
-            {
-                await document.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background, cancellation);
-                if (!current()) return false;
-            }
-        }
-        var range = provider.DocumentRange.Clone();
-        while (units > 0)
-        {
-            var chunk = Math.Min(4096, units);
-            if (range.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Character, chunk) != chunk) return false;
-            units -= chunk;
-            if (units > 0)
-            {
-                await document.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background, cancellation);
-                if (!current()) return false;
-            }
-        }
-        if (!current()) return false;
-        range.MoveEndpointByRange(TextPatternRangeEndpoint.End, range, TextPatternRangeEndpoint.Start);
-        range.ScrollIntoView(true);
-        return true;
     }
 
     private static async Task<int> GetPageNumber(DynamicDocumentPaginator paginator, TextPointer position, CancellationToken cancellationToken)
