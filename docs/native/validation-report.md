@@ -1,7 +1,7 @@
 # Native validation report
 
 Sequence editor work is tracked in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
-The local Release build has zero warnings/errors; 1,286 Core cases (52 new Sequence
+The local Release build has zero warnings/errors; 1,287 Core cases (53 new Sequence
 cases) pass without skips and static integrity passes. The [Sequence report](mermaid-sequence-visual-editor.md)
 records hosted canonical fidelity, normal/actual High Contrast UIA and package results
 as they become available. Historical counts below are retained for their original revisions.

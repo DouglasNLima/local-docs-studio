@@ -36,6 +36,10 @@ internal static partial class NativeUiChecks
             Check(true, "Real pointer selection uses the canonical message path/label hit target");
             SelectParticipant("Studio"); Check(Find(visual!, "SequenceParticipantId").AsTextBox().Text == "Studio", "Participant ID inspection");
             Check(Find(visual!, "SequenceLabel").AsTextBox().Text == "Lens Docs Studio", "Participant alias inspection"); Capture("selected-participant");
+            var selectionSource = Draft(); var selectionTimer = Stopwatch.StartNew();
+            for (var index = 0; index < 10; index++) { SelectParticipant("Author"); SelectParticipant("Studio"); }
+            observations.Add(new { Operation = "Twenty real canonical participant selections including UIA transport", Milliseconds = selectionTimer.Elapsed.TotalMilliseconds });
+            Check(Draft() == selectionSource, "Repeated native selection preserves exact private source without rendering or source edits");
             var participantSource = Draft();
             Find(visual!, "SequenceParticipantId").AsTextBox().Text = "LocalStudio"; Find(visual!, "SequenceLabel").AsTextBox().Text = "Local documentation studio";
             Click("SequenceUpdate"); Await(text => text.Contains("activate LocalStudio", StringComparison.Ordinal) && text.Contains("Note over Author,LocalStudio", StringComparison.Ordinal));

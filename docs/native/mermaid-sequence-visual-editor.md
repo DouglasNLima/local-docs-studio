@@ -4,27 +4,28 @@ This work extends the native editor independently from Draft PR #31. The baselin
 
 ## Verified renderer grammar
 
-Mermaider **0.15.1**, NuGet repository commit `71b64845570d633a94d29e85579c0a02786fece8`, is the authority. Inspection covered `SequenceParser`, `SequenceDiagram`, `PositionedSequenceDiagram`, `SequenceLayout`, `SequenceSvgRenderer` and `MermaidRenderPipeline`. Sequence layout bypasses `IGraphLayoutProvider`; no change to that renderer path is proposed.
+Mermaider **0.15.1**, NuGet repository commit `71b64845570d633a94d29e85579c0a02786fece8`, is the authority. Inspection covered [SequenceParser](https://github.com/nullean/mermaider/blob/71b64845570d633a94d29e85579c0a02786fece8/src/Mermaider/Parsing/SequenceParser.cs), `SequenceDiagram`, `PositionedSequenceDiagram`, [SequenceLayout](https://github.com/nullean/mermaider/blob/71b64845570d633a94d29e85579c0a02786fece8/src/Mermaider/Layout/SequenceLayout.cs), [SequenceSvgRenderer](https://github.com/nullean/mermaider/blob/71b64845570d633a94d29e85579c0a02786fece8/src/Mermaider/Rendering/SequenceSvgRenderer.cs) and `MermaidRenderPipeline`. Sequence layout bypasses `IGraphLayoutProvider`; the renderer path is unchanged.
 
-| Construct | Pinned renderer | Source model / operation policy |
-|---|---|---|
-| `sequenceDiagram` | Supported | Required exact header |
-| `participant`, `actor`, `as` aliases | Supported | Explicit declarations editable; safe known-reference rename |
-| Implicit participants | Supported | Inspect; bounded message label/arrow edits; endpoint/order changes protected |
-| `->>`, `-->>`, `->`, `-->` | Supported | Editable solid/dashed, filled/open arrows |
-| `-)`, `--)` | Supported | Open head; renderer does not distinguish an asynchronous head |
-| `-x`, `--x` | Parsed as filled head | Preserved/editable as pinned semantics; no distinct cross head |
-| `<<->>`, `<<-->>` | Supported | Editable bidirectional messages; reverse head omitted on self messages |
-| Self messages | Supported | Editable; canonical polyline geometry |
-| Message `+` / `-` | Supported | Simple non-nested activation lifecycles editable |
-| Standalone `activate` / `deactivate` | Lens adapter only | Exact adjacent-message subset; original representation retained |
-| Notes left/right/over | Supported | One participant; over may span two; source position retained |
-| `autonumber [start [step]]` | Supported | Preserved; rendered labels verified including prefix |
-| `loop`, `alt`, `opt`, `par`, `critical`, `break`, `rect` | Supported | Boundaries retained; inspect; message labels editable; structural changes protected |
-| `else`, `and`, `end` | Supported | Retained; source-only structural changes |
-| `box` | Supported | Preserved, protected dependency analysis |
-| `create participant/actor`, `destroy` | Supported | Preserved, protected dependency analysis |
-| Unknown statements | May be silently ignored | Preserved; all visual transformations fail closed |
+| Construct | Pinned renderer | Source recognised | Selectable inspection | Safe transformation | Protected scope |
+|---|---|---|---|---|---|
+| `sequenceDiagram` | Yes | Exact header | Source | New diagram creation | Header rewriting |
+| `participant`, `actor`, `as` | Yes | Explicit ID/type/label spans | Headers/lifelines/list | Add, alias/type, known-reference rename, bounded order/delete | Duplicate/late declarations; unknown references |
+| Implicit participants | Yes | First-use identity/order | Headers/lifelines/list | Existing message text/arrow | Declaration, endpoint/order changes |
+| `->>`, `-->>`, `->`, `-->` | Yes | Exact arrow/endpoints/text | Path/label/list | Add/update/delete/duplicate/bounded order | Dependency/block constraints |
+| `-)`, `--)` | Open head | Yes | Path/label/list | Same as other messages | No distinct asynchronous glyph in pinned renderer |
+| `-x`, `--x` | Filled head | Yes | Path/label/list | Same as other messages | No distinct cross head in pinned renderer |
+| `<<->>`, `<<-->>` | Yes | Bidirectional token | Path/label/list | Bounded message edits | Activation shorthand; reverse head omitted on self messages |
+| Self messages | Yes | Sender equals recipient | Canonical polyline/label/list | Bounded message edits | Same dependency constraints |
+| Message `+` / `-` | Yes | Marker and trigger identity | Message inspector; unique simple bar | Simple lifecycle marker changes | Nested/unmatched lifecycles; blocks |
+| Standalone `activate` / `deactivate` | Adjacent subset through Lens adapter | Command spans and exact trigger | Command/message inspector; unique simple bar | Change/remove original command | Non-adjacent/conflicting/ambiguous lifecycles |
+| Notes left/right | Yes | Placement, text, participant | Note/list | Add/update/delete | One participant; block-bound deletion/insertion |
+| Notes over | Yes | Placement, text, participant pair | Note/list | Add/update/delete | One or two participants; block-bound deletion/insertion |
+| `autonumber [start [step]]` | Yes | Numbering state | Source; numbered messages | Preserve through message changes | Numbering-control authoring; overflow/mismatched semantics |
+| `loop`, `alt`, `opt`, `par`, `critical`, `break`, `rect` | Yes | Boundaries/type/label/depth | Block/list headings | Bounded message labels inside blocks | Structural rewrites; insertion/deletion/reorder inside blocks |
+| `else`, `and`, `end` | Yes | Boundary statements | Source | Preserve | Structural changes |
+| `box` | Yes | Protected raw span | Canonical drawing/source | Preserve only | Entire dependency-sensitive draft |
+| `create participant/actor`, `destroy` | Yes | Protected raw span | Canonical drawing/source | Preserve only | Entire dependency-sensitive draft |
+| Unknown statements/directives | May be ignored by renderer | Protected raw span | Original drawing/source | Preserve only | All visual transformations fail closed |
 
 The editable identifier subset is letters, digits and underscores, beginning with a letter or underscore. Plain Unicode labels and verified `<br/>`/escaped-newline representation are supported. Rich markup is retained for source editing.
 
@@ -36,7 +37,7 @@ For example, editing the final repeated `A->>B: Request` patches only that occur
 
 ## Verification status
 
-The expanded local suite contains **1,286 Core cases, including 52 Sequence cases**. The previous 1,285-case run passed with no skips; the added activation-selection regression is checked with the next candidate. Release builds have zero warnings/errors; static integrity passes. No native application has been executed or installed on the ordinary desktop.
+The expanded local suite passes **1,287 Core cases, including 53 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity and all **268 Chromium/Edge browser cases** pass locally. No native application has been executed or installed on the ordinary desktop.
 
 At source `ca331b92c66b8b4868eca1af0145db18684a922c`, [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004555) passed the Sequence normal and actual High Contrast jobs, with 18 UIA assertions each and 73 Sequence fidelity/geometry assertions per appearance job. The complete existing Flowchart UIA/fidelity and baseline jobs also passed. [Workspace and interaction CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004553) passed. [Both browser projects](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004612) passed. These results belong to that source revision; subsequent enhancements require fresh certification.
 
@@ -45,6 +46,22 @@ Initial native captures were inspected at all five requested window sizes, plus 
 The expanded run at `e1cad9205c6c04cf0474265d055fcc40b3f2c8e9` passed **101 fidelity/ownership assertions, 27 normal UIA assertions and 28 actual High Contrast assertions** in [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033667815). The additional cases cover participant rename/actor creation/reorder/deletion, real pointer message selection, message ordering/duplication, empty diagrams, protected blocks, repeated occurrences and standalone `.mermaid` Apply/Undo/Save. Source-specific receipts are retained under [evidence/sequence-visual-editor](evidence/sequence-visual-editor/).
 
 Screenshot review of that run found that an inherited Flowchart hover fill obscured a canonical message label in dark mode. The [retained before image](evidence/sequence-visual-editor/before-hover-dark.png) records the defect. The subsequent Sequence-only hit-target style uses transparent interiors with focus/selection outlines; it has no apparent drag handles. A focused regression also retains shorthand activation selection through message edits and private history.
+
+At `269b288ae89714add99e3f74937ce6382b3b6665`, both Sequence appearances and existing Flowchart authoring passed in [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39034075723). The corrected dark capture was inspected: message labels remain visible through hovered hit targets. Receipts prefixed `269b288` retain that source-specific result.
+
+## Screenshot gallery
+
+These native captures come from disposable Windows at `269b288`; they are not mock-ups. The hover correction is visible in the dark capture.
+
+![Native Sequence message inspector](images/sequence-visual-editor/selected-message.png)
+
+| Area | Captures |
+|---|---|
+| Starting states | [Empty](images/sequence-visual-editor/empty.png), [starter/multiple participants](images/sequence-visual-editor/starter.png), [new diagram](images/sequence-visual-editor/new-sequence.png) |
+| Selection and authoring | [Participant](images/sequence-visual-editor/selected-participant.png), [message](images/sequence-visual-editor/selected-message.png), [note](images/sequence-visual-editor/selected-note.png), [activation](images/sequence-visual-editor/activation-inspector.png), [message creation](images/sequence-visual-editor/message-creation.png), [reordering](images/sequence-visual-editor/message-reorder.png) |
+| Protected and repeated source | [Block inspection](images/sequence-visual-editor/protected-block.png), [repeated messages](images/sequence-visual-editor/repeated.png), [reopened document](images/sequence-visual-editor/reopened.png) |
+| Source and appearances | [Collapsed](images/sequence-visual-editor/source-collapsed.png), [expanded](images/sequence-visual-editor/source-expanded.png), [dark](images/sequence-visual-editor/dark.png), [actual High Contrast](images/sequence-visual-editor/high-contrast-note.png) |
+| Window sizes | [880 × 600](images/sequence-visual-editor/viewport-880x600.png), [1024 × 768](images/sequence-visual-editor/viewport-1024x768.png), [1280 × 800](images/sequence-visual-editor/viewport-1280x800.png), [1440 × 900](images/sequence-visual-editor/viewport-1440x900.png), [1920 × 1080](images/sequence-visual-editor/viewport-1920x1080.png), [High Contrast minimum](images/sequence-visual-editor/high-contrast-880x600.png) |
 
 ## Safe operations and protected boundaries
 

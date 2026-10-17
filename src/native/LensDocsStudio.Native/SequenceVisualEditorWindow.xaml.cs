@@ -91,6 +91,7 @@ public partial class SequenceVisualEditorWindow : Window
     private async Task RenderAsync(bool fit)
     {
         var version = ++renderGeneration; mapped = false; UpdateActions(); var model = draft.Model; var themeDark = dark;
+        Status.Text = "Rendering canonical Sequence diagram…";
         pendingRender?.Cancel(); var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token); pendingRender = cancellation;
         var leased = false;
         try
@@ -104,12 +105,17 @@ public partial class SequenceVisualEditorWindow : Window
             { CanonicalImage.Source = null; Surface.Width = 420; Surface.Height = 260; mapped = true; Status.Text = "Add participants, then add a message to begin."; return; }
             var converted = await StaWorker.RunAsync(() =>
             {
-                var presentation = model.CanEdit ? NativeSequencePresentation.Create(model, render, svg) : null;
+                NativeSequencePresentation? presentation = null; string? diagnostic = null;
+                if (model.CanEdit)
+                {
+                    try { presentation = NativeSequencePresentation.Create(model, render, svg); }
+                    catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
+                }
                 var drawing = presentation?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null);
-                return (presentation, drawing);
+                return (presentation, drawing, diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return;
-            var (presentation, drawing) = converted;
+            var (presentation, drawing, diagnostic) = converted;
             CanonicalImage.Source = drawing; CanonicalImage.Width = drawing?.Width ?? 420; CanonicalImage.Height = drawing?.Height ?? 260;
             Surface.Width = CanonicalImage.Width; Surface.Height = CanonicalImage.Height;
             if (presentation is not null)
@@ -129,11 +135,15 @@ public partial class SequenceVisualEditorWindow : Window
             UpdateSelectionOverlay();
             Status.Text = !model.CanEdit ? string.Join(" ", model.Diagnostics) : "Ready. Select an element or add an interaction. Middle mouse pans; source order controls layout.";
             if (render.Error is not null) Status.Text = render.Error;
+            else if (diagnostic is not null) Status.Text = diagnostic;
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is ArgumentException or InvalidDataException or System.Xml.XmlException)
-        { if (!closed && version == renderGeneration) Status.Text = error.Message; }
+        {
+            if (!closed && version == renderGeneration)
+            { CanonicalImage.Source = null; targets.Clear(); Overlay.Children.Clear(); Status.Text = error.Message; }
+        }
         finally
         {
             if (leased) renderGate.Release();

@@ -63,7 +63,7 @@ public static class SequenceRenderCorrespondence
             if (statement.Kind == SequenceStatementKind.Autonumber)
             {
                 number = statement.Tokens.ContainsKey("start") ? long.Parse(statement.Read(model.Source, "start"), CultureInfo.InvariantCulture) : 1;
-                step = statement.Tokens.ContainsKey("step") ? long.Parse(statement.Read(model.Source, "step"), CultureInfo.InvariantCulture) : 1;
+                if (statement.Tokens.ContainsKey("step")) step = long.Parse(statement.Read(model.Source, "step"), CultureInfo.InvariantCulture);
             }
             if (statement.Kind != SequenceStatementKind.Message) continue;
             var label = SequenceSourceParser.NormaliseLabel(statement.Read(model.Source, "label"));

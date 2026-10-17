@@ -60,6 +60,35 @@ internal static class NativeSequenceChecks
                 NativePresentationMilliseconds = nativeMs, ThousandPrivateSelectionsMilliseconds = selectionMs, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated,
                 Scope = "Hosted thread measurements; includes cold work and allocations, excludes UIA transport. No universal responsiveness claim." });
         }
+        foreach (var (name, source) in new[]
+        {
+            ("Long labels", "sequenceDiagram\nparticipant A as " + new string('A', 180) + "\nparticipant B as Studio\nA->>B: " + new string('x', 600) + "\nB-->>A: Response\n"),
+            ("Notes and standalone activations", File.ReadAllText("tests/fixtures/native-sequence/local-document.mmd")),
+            ("Nested structural blocks", File.ReadAllText("tests/fixtures/native-sequence/blocks.mmd")),
+            ("Protected grouping", "sequenceDiagram\nbox rgb(240,240,240) Services\nparticipant A\nparticipant B\nend\nA->>B: Protected grouping\n")
+        })
+        {
+            var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew(); var model = new SequenceSourceParser().Parse(source); var parseMs = timer.Elapsed.TotalMilliseconds;
+            timer.Restart(); var render = new DiagramService().Render(source); var renderMs = timer.Elapsed.TotalMilliseconds;
+            Check(render.Success, name + ": performance fixture uses the canonical renderer");
+            timer.Restart(); if (model.CanEdit) SequenceRenderCorrespondence.Validate(model, render); var semanticMs = timer.Elapsed.TotalMilliseconds;
+            timer.Restart(); if (model.CanEdit) _ = NativeSequencePresentation.Create(model, render, new()); else _ = new NativeSvgService().Render(render.Svg!); var nativeMs = timer.Elapsed.TotalMilliseconds;
+            performance.Add(new { Scenario = name, ParseMilliseconds = parseMs, SemanticValidationMilliseconds = model.CanEdit ? (double?)semanticMs : null,
+                RenderMilliseconds = renderMs, NativePresentationMilliseconds = nativeMs, ReadOnly = !model.CanEdit, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated });
+        }
+        var edited = new SequenceVisualDraft("sequenceDiagram\nparticipant A\nparticipant B\nA->>B: Original\n"); var editTimer = Stopwatch.StartNew();
+        var trigger = edited.Model.Messages[0].Identity;
+        for (var index = 0; index < 10; index++)
+        {
+            var result = edited.ExecuteAsync(new UpdateSequenceMessage(trigger, "A", "B", "Edit " + index, "->>")).GetAwaiter().GetResult();
+            Check(result.Success, "Repeated validated message edit " + index + ": " + result.Error);
+        }
+        var editMs = editTimer.Elapsed.TotalMilliseconds; var retained = edited.Source; var retainedIdentity = edited.HistoryIdentity;
+        using var cancelled = new CancellationTokenSource(); cancelled.Cancel(); editTimer.Restart();
+        var rejection = edited.ExecuteAsync(new AddSequenceMessage("A", "B", "Cancelled"), cancelled.Token).GetAwaiter().GetResult();
+        Check(!rejection.Success && edited.Source == retained && edited.HistoryIdentity == retainedIdentity, "Pre-cancelled work leaves source and private history unchanged");
+        performance.Add(new { Scenario = "Repeated edits and cancellation", TenValidatedEditsMilliseconds = editMs, PreCancelledEditMilliseconds = editTimer.Elapsed.TotalMilliseconds,
+            CancellationScope = "Pre-cancelled source operation. SharpVectors conversion itself is non-interruptible; production serialises it and rejects stale results." });
         File.WriteAllText(Path.Combine(output, "sequence-fidelity.json"), JsonSerializer.Serialize(new { Checks = checks, Observations = observations, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
     }

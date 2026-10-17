@@ -232,4 +232,15 @@ public sealed class SequenceVisualTests
         Assert.Equal(activation.Identity, draft.Selection); draft.Undo(); Assert.Equal(activation.Identity, draft.Selection);
         draft.Redo(); Assert.Equal(activation.Identity, draft.Selection);
     }
+
+    [Fact]
+    public async Task Autonumber_reset_retains_the_pinned_renderers_previous_step()
+    {
+        var source = Simple.Replace("    A->>B", "    autonumber 5 2\r\n    A->>B", StringComparison.Ordinal)
+            .Replace("    B-->>A", "    autonumber 10\r\n    B-->>A", StringComparison.Ordinal) + "    A->>B: Third\r\n";
+        var draft = new SequenceVisualDraft(source);
+        await Execute(draft, new UpdateSequenceMessage(draft.Model.Messages[2].Identity, "A", "B", "Changed", "->>"));
+        Assert.Contains("12. Changed", new DiagramService().Render(draft.Source).Svg);
+        Assert.Equal(source.Replace("Third", "Changed", StringComparison.Ordinal), draft.Source);
+    }
 }
