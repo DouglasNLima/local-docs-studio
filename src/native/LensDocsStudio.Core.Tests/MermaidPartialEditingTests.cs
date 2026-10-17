@@ -192,4 +192,16 @@ public sealed class MermaidPartialEditingTests
         Assert.Equal("Next café", draft.Model.Edge("edge-2").Label); Assert.Equal("Changed Ω", draft.Model.Edge("edge-3").Label);
         draft.Undo(); Assert.Equal(source, draft.Source);
     }
+
+    [Fact]
+    public async Task A_node_named_like_a_private_edge_cannot_transfer_its_capabilities_to_that_edge()
+    {
+        const string source = "flowchart LR\nA --> B --> C\nedge-0[Independent]\nD[Other]\n";
+        var draft = new MermaidVisualDraft(source);
+        Assert.True(draft.Model.Capabilities.Query(MermaidOperationKind.NodeId, "edge-0").Permitted);
+        Assert.False(draft.Model.Capabilities.Query(MermaidOperationKind.Reconnect, "edge-0").Permitted);
+        await Denied(draft, new UpdateMermaidConnection("edge-0", "D", "B", "", FlowConnectionType.Directed));
+        await Success(draft, new UpdateMermaidNode("edge-0", "Updated independent", FlowNodeShape.Process, "edge-0"));
+        Assert.Equal(source.Replace("edge-0[Independent]", "edge-0[\"Updated independent\"]", StringComparison.Ordinal), draft.Source);
+    }
 }

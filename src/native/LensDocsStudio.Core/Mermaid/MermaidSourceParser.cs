@@ -167,6 +167,9 @@ public sealed class MermaidSourceParser
                 error ?? (partialReasons.Count == 0 ? null : string.Join(" ", partialReasons.Distinct())))
                 { DiagramType = diagramType, HasCompleteSourceMap = error is null };
         }
+        catch (RegexMatchTimeoutException)
+        { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Protected,
+            "The bounded source dependency scan could not complete. Inspect the original diagram or edit its source.") { DiagramType = diagramType }; }
         catch (Exception ex) when (ex is ArgumentException or MermaidParseException)
         { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Invalid, ex.Message) { DiagramType = diagramType }; }
     }

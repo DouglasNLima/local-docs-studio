@@ -33,9 +33,13 @@ public sealed class MermaidCapabilityAnalysis
     }
     public MermaidOperationCapability Query(MermaidOperationKind kind, string? target = null)
     {
-        var node = model.Nodes.FirstOrDefault(item => item.Id == target);
-        var edge = model.Edges.FirstOrDefault(item => item.Id == target);
-        var group = model.Subgraphs.FirstOrDefault(item => item.Id == target);
+        var nodeKind = kind is MermaidOperationKind.Inspect or MermaidOperationKind.NodeLabel or MermaidOperationKind.NodeShape or MermaidOperationKind.NodeId
+            or MermaidOperationKind.DeleteNode or MermaidOperationKind.DuplicateNode or MermaidOperationKind.NodeClass or MermaidOperationKind.NodeStyle or MermaidOperationKind.MoveNode;
+        var edgeKind = kind is MermaidOperationKind.Inspect or MermaidOperationKind.ConnectionLabel or MermaidOperationKind.ConnectionType or MermaidOperationKind.Reconnect or MermaidOperationKind.DeleteConnection;
+        var groupKind = kind is MermaidOperationKind.Inspect or MermaidOperationKind.SubgraphLabel or MermaidOperationKind.DeleteSubgraph or MermaidOperationKind.Direction;
+        var node = nodeKind ? model.Nodes.FirstOrDefault(item => item.Id == target) : null;
+        var edge = edgeKind ? model.Edges.FirstOrDefault(item => item.Id == target) : null;
+        var group = groupKind ? model.Subgraphs.FirstOrDefault(item => item.Id == target) : null;
         var spans = node is not null ? node.Occurrences.Select(item => item.Span).ToArray()
             : edge is not null ? new[] { edge.Statement } : group is not null ? new[] { group.Opening, group.Closing } : [];
         var dependencies = node is not null ? node.Occurrences.Where(item => chains.Contains(item.Statement)).Select(item => item.Statement).Distinct().ToArray()
@@ -57,6 +61,8 @@ public sealed class MermaidCapabilityAnalysis
                     if (node is null) reason = "Select an existing node.";
                     else if (dependencies.Length > 0) reason = "This node is referenced by a protected chain. Its identity, deletion and membership require source editing.";
                     else if (node.Occurrences.Count(item => item.LabelSpan is not null) > 1) reason = "Repeated declarations protect this node's identity and membership.";
+                    else if (kind == MermaidOperationKind.MoveNode && node.Occurrences.Any(item => item.SubgraphId is not null && model.Edges.Any(connection => connection.Statement == item.Statement)))
+                        reason = "Move this node's connections outside subgraphs in source mode first. Its existing membership is preserved.";
                     else if (kind == MermaidOperationKind.DeleteNode && HasOrdinalStyles) reason = "Deleting incident connections could shift ordinal linkStyle assignments.";
                     break;
                 case MermaidOperationKind.NodeClass or MermaidOperationKind.NodeStyle or MermaidOperationKind.DuplicateNode:

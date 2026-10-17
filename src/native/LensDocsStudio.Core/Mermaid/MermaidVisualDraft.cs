@@ -39,6 +39,7 @@ public sealed class MermaidVisualDraft
         {
             if (operations.Count > MermaidSourceParser.MaximumElements) return new(false, "The edit exceeds the bounded operation limit.");
             if (operations.Count == 0) return new(true, null);
+            operations = operations.ToArray();
             var original = Model; var generation = ++revision; var candidateNextEdge = nextEdgeId;
             var candidate = await Task.Run(() =>
             {
