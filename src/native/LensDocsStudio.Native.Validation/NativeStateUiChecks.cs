@@ -76,18 +76,27 @@ internal static partial class NativeUiChecks
             if (!highContrast)
             {
                 foreach (var theme in new[] { "Dark", "Light" })
-                { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); Capture(theme.ToLowerInvariant()); Click("StateCancel"); WaitClosed(); }
+                { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectState("Draft"); Capture(theme.ToLowerInvariant()); Click("StateCancel"); WaitClosed(); }
             }
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").AsMenuItem().Click(); Find(main!, "InsertState").AsMenuItem().Click(); WaitVisual(); Check(new StateDiagramSourceParser().Parse(Draft()).IsValid, "Insert State opens a valid supported starter"); Click("StateApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual State insertion applies a portable Markdown fence");
             Stop();
-            foreach (var fixture in new[] { "document-review", "advanced-protected" })
+            foreach (var fixture in new[] { "document-review", "advanced-protected", "unknown-protected" })
             {
-                var raw = File.ReadAllText("tests/fixtures/native-state/" + fixture + ".mmd"); var rawPath = Path.Combine(root, fixture + ".mmd"); File.WriteAllText(rawPath, raw); Launch(rawPath); Open(0);
+                var raw = File.ReadAllText("tests/fixtures/native-state/" + fixture + ".mmd"); var rawPath = Path.Combine(root, fixture + (fixture == "unknown-protected" ? ".mermaid" : ".mmd")); File.WriteAllText(rawPath, raw); Launch(rawPath); Open(0);
                 if (fixture == "advanced-protected")
                 {
                     SelectState("Reviewer"); Check(!Find(visual!, "StateNodeId").IsEnabled && !Find(visual!, "StateDelete").IsEnabled, "Composite/notes/styles protect State ID and structural operations with accessible explanations");
                     Find(visual!, "StateLabel").AsTextBox().Text = "Independent local reviewer"; Click("StateUpdate"); Await(text => text.Contains("Independent local reviewer", StringComparison.Ordinal));
-                    Check(Draft().Contains("note right of Reviewer : Synthetic local review", StringComparison.Ordinal), "Independent supported label edit retains protected note bytes"); Capture("advanced-protected"); Click("StateUndo"); Await(text => text == raw);
+                    Check(Draft().Contains("note right of Reviewer : Synthetic local review", StringComparison.Ordinal), "Independent supported label edit retains protected note bytes"); Capture("advanced-protected");
+                    var independentDraft = Draft(); SelectTransition(7); Find(visual!, "StateLabel").AsTextBox().Text = "Second identical occurrence"; Click("StateUpdate"); Await(text => new StateDiagramSourceParser().Parse(text).Transitions[7].Label == "Second identical occurrence");
+                    Check(new StateDiagramSourceParser().Parse(Draft()).Transitions[6].Label == "Choose", "Repeated State transitions retain exact independent identities in the real native editor"); Click("StateUndo"); Await(text => text == independentDraft); Click("StateUndo"); Await(text => text == raw);
+                }
+                else if (fixture == "unknown-protected")
+                {
+                    SelectState("A"); Check(!Find(visual!, "StateAddState").IsEnabled, "Unknown State dependencies protect palette operations");
+                    Find(visual!, "StateLabel").AsTextBox().Text = "Rejected unknown dependency";
+                    Check(!Find(visual!, "StateUpdate").IsEnabled && !string.IsNullOrWhiteSpace(Find(visual!, "StateUpdate").Properties.HelpText.ValueOrDefault), "Unknown State edits are disabled with accessible dependency diagnostics");
+                    Check(Draft() == raw && !Find(visual!, "StateUndo").IsEnabled && ReadEditorText(Find(main!, "MarkdownEditor")) == raw, "Rejected unknown State edits leave source, history and owning .mermaid document unchanged"); Capture("unknown-protected"); Click("StateResetProperties");
                 }
                 else
                 {

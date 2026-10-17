@@ -175,6 +175,22 @@ public sealed class StateVisualTests
         var draft = new StateVisualDraft("stateDiagram-v2\nstate \"Outer<br/>literal\" as Outer {\nA --> A\n}\n");
         Assert.True((await draft.ValidateAsync()).Success); await Success(draft, new UpdateStateGroupLabel("Outer", "Local composite")); Assert.Contains("state \"Local composite\" as Outer {", draft.Source);
     }
+    [Fact]
+    public async Task Bounded_private_history_retains_the_immutable_original_and_valid_redo_branch()
+    {
+        var original = "stateDiagram-v2\n%% " + new string('x', 89_000) + "\nstate \"Original\" as A\n"; var draft = new StateVisualDraft(original);
+        for (var i = 0; i < 101; i++) await Success(draft, new UpdateStateNode("A", "A", "Revision " + i));
+        Assert.InRange(draft.HistoryCount, 2, 89); Assert.Equal(original, draft.OriginalSource); var final = draft.Source;
+        while (draft.CanUndo) draft.Undo(); while (draft.CanRedo) draft.Redo(); Assert.Equal(final, draft.Source);
+    }
+    [Fact]
+    public async Task Implicit_unindented_state_can_rename_and_materialise_its_label_in_one_exact_edit()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nDraft --> Review\nReview --> Draft\n");
+        await Success(draft, new UpdateStateNode("Draft", "LocalDraft", "Local draft"));
+        Assert.Equal("stateDiagram-v2\n    state \"Local draft\" as LocalDraft\nLocalDraft --> Review\nReview --> LocalDraft\n", draft.Source);
+        draft.Undo(); Assert.Equal(draft.OriginalSource, draft.Source);
+    }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]
     [InlineData("stateDiagram\nstate \"Alias\" as A\nA --> A : Again\n", 1, 1, 0)]

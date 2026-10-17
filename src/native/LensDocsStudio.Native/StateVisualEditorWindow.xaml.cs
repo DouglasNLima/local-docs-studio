@@ -118,7 +118,7 @@ public partial class StateVisualEditorWindow : Window
     private void RestoreSelection() => Elements.SelectedItem = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     { if (!updating && Elements.SelectedItem is Choice item) Select(item.Identity); }
-    private void Select(string identity)
+    private void Select(string? identity)
     {
         if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } return; }
         draft.Select(identity); updating = true; try { RestoreSelection(); ShowProperties(); UpdateSelection(); } finally { updating = false; } UpdateActions();

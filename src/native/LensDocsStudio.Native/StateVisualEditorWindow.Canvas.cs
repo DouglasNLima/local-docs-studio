@@ -133,6 +133,7 @@ public partial class StateVisualEditorWindow
         var button = new ElementButton { Content = content, Width = Math.Max(10, bounds.Width), Height = Math.Max(10, bounds.Height), Style = (Style)FindResource("Mermaid.CanonicalElement"), ToolTip = description };
         AutomationProperties.SetName(button, description); AutomationProperties.SetAutomationId(button, "StateCanvas_" + identity);
         button.Checked += (_, _) => { if (!updating) Select(identity); };
+        button.Unchecked += (_, _) => { if (!updating && draft.Selection == identity) Select(null); };
         button.Click += (_, _) => { if (!updating) Select(identity); };
         button.MouseEnter += (_, _) => { if (button.Content is Path shape && button.IsChecked != true) shape.Stroke = BrushResource("BorderBrush"); };
         button.MouseLeave += (_, _) => UpdateSelection();

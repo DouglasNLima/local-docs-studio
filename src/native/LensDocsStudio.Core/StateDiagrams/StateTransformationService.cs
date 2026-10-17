@@ -132,6 +132,16 @@ public sealed class StateTransformationService
             }
             default: throw new ArgumentException("This State operation is protected in this version.");
         }
+        // An unindented first reference may begin at the insertion boundary for
+        // its new explicit declaration. Combine that insertion with the exact ID
+        // replacement rather than relaxing the shared overlap/staleness guard.
+        foreach (var insertion in patches.Where(item => item.Span.Length == 0).ToArray())
+        {
+            var replacement = patches.SingleOrDefault(item => item.Span.Start == insertion.Span.Start && item.Span.Length > 0);
+            if (replacement is null) continue;
+            patches[patches.IndexOf(replacement)] = replacement with { Replacement = insertion.Replacement + replacement.Replacement };
+            patches.Remove(insertion);
+        }
         return new(patches.AsReadOnly(), identities.AsReadOnly());
     }
     internal static string Label(string value, bool quoted, bool allowEmpty = false)

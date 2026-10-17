@@ -37,6 +37,12 @@ jobs:
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --state-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/state-ui $appearance
           exit $LASTEXITCODE
+      - name: Measure real State editor opening, selection, memory and pointer updates at bounded sizes
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --state-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/state-performance-ui $appearance
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -44,6 +50,7 @@ jobs:
           path: |
             artifacts/native/state-fidelity/
             artifacts/native/state-ui/
+            artifacts/native/state-performance-ui/
           retention-days: 14
   sequence-visual-editor:
     runs-on: windows-latest

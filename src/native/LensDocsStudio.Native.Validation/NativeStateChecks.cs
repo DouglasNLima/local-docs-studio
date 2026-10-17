@@ -77,6 +77,23 @@ internal static class NativeStateChecks
                 OperationMilliseconds = editMs, RenderSuccess = render.Success, render.Error, EditSuccess = edited.Success, EditError = edited.Error, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated,
                 LimitsUnchanged = true, Scope = "Hosted thread measurements including cold work; UIA drag/open timing recorded separately. Over-budget fixtures are observations, never a larger rendering limit." });
         }
+        foreach (var (name, source) in new[]
+        {
+            ("Long labels", "stateDiagram-v2\nstate \"" + new string('A', 180) + "\" as A\nstate \"Review\" as B\nA --> B : " + new string('x', 600) + "\nB --> A\n"),
+            ("Nested/protected source", File.ReadAllText("tests/fixtures/native-state/advanced-protected.mmd"))
+        })
+        {
+            var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew(); var model = new StateDiagramSourceParser().Parse(source); var parseMs = timer.Elapsed.TotalMilliseconds;
+            timer.Restart(); var render = new DiagramService().Render(source); var renderMs = timer.Elapsed.TotalMilliseconds; double? nativeMs = null;
+            if (render.Success) { timer.Restart(); _ = NativeStatePresentation.Create(model, render, new()); nativeMs = timer.Elapsed.TotalMilliseconds; }
+            performance.Add(new { Scenario = name, ParseMilliseconds = parseMs, RenderMilliseconds = renderMs, NativeMilliseconds = nativeMs, RenderSuccess = render.Success, render.Error, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated, LimitsUnchanged = true });
+        }
+        var repeated = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\nA --> A\n"); var repeatTimer = Stopwatch.StartNew();
+        for (var i = 0; i < 10; i++) { var result = repeated.ExecuteAsync(new UpdateStateNode("A", "A", "Local " + i)).GetAwaiter().GetResult(); Check(result.Success, "Repeated State operation " + i + ": " + result.Error); }
+        var tenEditMs = repeatTimer.Elapsed.TotalMilliseconds; var retained = repeated.Source; var retainedIdentity = repeated.HistoryIdentity; using var cancelled = new CancellationTokenSource(); cancelled.Cancel(); repeatTimer.Restart();
+        var rejection = repeated.ExecuteAsync(new AddStateNode("Cancelled", "Cancelled"), cancelled.Token).GetAwaiter().GetResult();
+        Check(!rejection.Success && repeated.Source == retained && repeated.HistoryIdentity == retainedIdentity, "Cancelled State validation retains source/history exactly");
+        performance.Add(new { Scenario = "Repeated operations and cancellation", TenEditsMilliseconds = tenEditMs, PreCancelledMilliseconds = repeatTimer.Elapsed.TotalMilliseconds, CancellationScope = "Pre-cancelled edit; stale UI render rejection is separately exercised during live High Contrast. Native SVG conversion is non-interruptible." });
         DocumentChecks(checks);
         File.WriteAllText(Path.Combine(output, "state-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Fidelity = fidelity, Syntax = syntax, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
