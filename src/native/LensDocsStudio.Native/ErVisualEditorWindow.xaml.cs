@@ -67,7 +67,7 @@ public partial class ErVisualEditorWindow : Window
         foreach (var entity in draft.Model.Entities)
         {
             yield return new(entity.Identity, entity.Id + " · " + entity.Label + (entity.Implicit ? " (implicit)" : ""));
-            foreach (var (attribute, index) in entity.Attributes.Select((item, index) => (item, index))) yield return new(attribute.Identity, "  Attribute " + (index + 1) + " · " + attribute.Type + " " + attribute.Name);
+            foreach (var (attribute, index) in entity.Attributes.Select((item, index) => (item, index))) yield return new(attribute.Identity, "  " + entity.Id + " · attribute " + (index + 1) + " · " + attribute.Type + " " + attribute.Name);
         }
         foreach (var (relationship, index) in draft.Model.Relationships.Select((item, index) => (item, index))) yield return new(relationship.Identity, "Relationship " + (index + 1) + " · " + relationship.Entity1 + " → " + relationship.Entity2 + " · " + relationship.Label);
         foreach (var statement in draft.Model.Statements.Where(item => item.Protected)) yield return new(statement.Identity, "Protected · " + statement.Span.Read(draft.Source));

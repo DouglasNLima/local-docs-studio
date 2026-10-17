@@ -14,8 +14,21 @@ public sealed class ErDiagramSourceParser
     private static readonly Regex Relationship = Pattern("^(?<from>\\S+)\\s+(?<left>[|o}{]+)(?<style>--|\\.\\.)(?<right>[|o}{]+)\\s+(?<to>[^\\s:]+)(?:\\s*:\\s*(?<label>.+))?$");
     private static readonly Regex Comment = Pattern("\"([^\"]*)\"");
     private static readonly Regex Break = new("<br\\s*/?>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+    private static readonly Regex EscapedNewline = Pattern(@"\\n");
+    private static readonly Regex UnsupportedFormatting = new(@"</?(?:sub|sup|small|mark)\s*>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
+    private static readonly Regex Bold = Pattern(@"\*\*(.+?)\*\*");
+    private static readonly Regex Italic = Pattern(@"(?<!\*)\*([^\s*](?:[^*]*[^\s*])?)\*(?!\*)");
+    private static readonly Regex Strike = Pattern(@"~~(.+?)~~");
     private static readonly Regex DirectionLine = new("^direction\\s+(TD|TB|LR|BT|RL)\\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
-    internal static string Normalise(string value) => Break.Replace(value, "\n");
+    internal static string Normalise(string value)
+    {
+        // Match MultilineUtils.NormalizeBrTags at the pinned parser boundary, including
+        // escaped line breaks and formatting. Original source tokens are kept separately.
+        var result = value is ['"', .., '"'] ? value[1..^1] : value;
+        result = Break.Replace(result, "\n"); result = EscapedNewline.Replace(result, "\n");
+        result = UnsupportedFormatting.Replace(result, ""); result = Bold.Replace(result, "<b>$1</b>");
+        result = Italic.Replace(result, "<i>$1</i>"); return Strike.Replace(result, "<s>$1</s>");
+    }
     public static bool IsEr(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) == "erDiagram";
     public ErDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
@@ -30,7 +43,7 @@ public sealed class ErDiagramSourceParser
             cancellationToken.ThrowIfCancellationRequested(); var end = source.IndexOf('\n', start); var next = end < 0 ? source.Length : end + 1;
             var raw = source[start..(end < 0 ? source.Length : end)]; var text = raw.Trim(); var offset = start + raw.Length - raw.TrimStart().Length;
             var span = new MermaidSourceSpan(offset, text.Length); var line = new MermaidSourceSpan(start, next - start); start = next;
-            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal)) continue;
+            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal) && !text.StartsWith("%%{", StringComparison.Ordinal)) continue;
             var identity = Guid.NewGuid().ToString("N");
             var tokens = new Dictionary<string, MermaidSourceSpan>();
             ErStatement Statement(ErStatementKind kind, Match? match = null, bool protect = false)
@@ -38,6 +51,7 @@ public sealed class ErDiagramSourceParser
                 if (match is not null) foreach (var name in match.Groups.Keys.Where(key => !int.TryParse(key, out _))) if (match.Groups[name].Success) tokens[name] = new(offset + match.Groups[name].Index, match.Groups[name].Length);
                 var statement = new ErStatement(identity, kind, span, line, owner, tokens, protect); statements.Add(statement); return statement;
             }
+            if (text.StartsWith("%%{", StringComparison.Ordinal)) { Statement(ErStatementKind.Unknown, protect: true); continue; }
             if (!header) { header = true; Statement(ErStatementKind.Header); if (text != "erDiagram") diagnostics.Add("Expected an exact erDiagram header."); continue; }
             if (owner is not null)
             {

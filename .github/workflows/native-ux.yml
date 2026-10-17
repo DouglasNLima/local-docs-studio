@@ -36,6 +36,11 @@ jobs:
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --er-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/er-ui $appearance
           exit $LASTEXITCODE
+      - name: Measure actual ER opening, ordered selection, endpoint movement and memory at bounded sizes
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --er-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/er-performance-ui $appearance
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -43,6 +48,7 @@ jobs:
           path: |
             artifacts/native/er-fidelity/
             artifacts/native/er-ui/
+            artifacts/native/er-performance-ui/
           retention-days: 14
   state-visual-editor:
     runs-on: windows-latest

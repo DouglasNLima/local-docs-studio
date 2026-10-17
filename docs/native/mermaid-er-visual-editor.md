@@ -9,8 +9,8 @@ passed Chromium and Edge; Pages deployment was skipped. The native
 was still executing installer lifecycle checks when this implementation milestone
 was recorded. Baseline acceptance remains pending its final result.
 
-The local Release solution builds with zero warnings/errors. All 1,489 Core cases
-pass, including 65 initial ER cases. Actual Windows UIA, High Contrast, canonical
+The local Release solution builds with zero warnings/errors. All 1,510 Core cases
+pass, including 86 ER cases. Actual Windows UIA, High Contrast, canonical
 fidelity, performance observations, installer lifecycle and independent package
 verification are mandatory hosted gates and are **not yet certified** at this
 milestone. Earlier State/Sequence/Flowchart results are retained in their own reports.
@@ -181,3 +181,15 @@ normal/High Contrast logs are retained; this does not count as a passing accepta
 The extended source-integrity suite now passes 82 ER cases locally, including alias
 forms, entity duplicate/delete, self-to-normal reconnection, native-conversion
 rejection, invalid property atomicity and quoted/unlabelled relationship labels.
+
+At `d0d4604`, High Contrast fidelity, grammar/resource observations and document
+ownership checks pass. Actual UIA reaches entity/attribute editing, keys, relationship
+cardinalities/type, creation, private Undo/Redo and inspector reconnection, then
+fails its invalid-drop check. Inspection of the retained native screenshot shows
+an unintended discard prompt: the parent canvas intercepted endpoint-handle clicks,
+rebuilt the selected relationship controls and prevented capture before Escape.
+The correction excludes endpoint-control descendants from parent path selection.
+The cancellation check now also requires measured native pointer updates, preventing
+a source-only assertion from falsely establishing that a drag actually occurred.
+Original [run 39063313555](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39063313555)
+logs and captures are retained. Complete UIA remains pending correction validation.

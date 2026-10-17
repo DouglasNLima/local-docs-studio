@@ -45,11 +45,17 @@ internal static partial class NativeUiChecks
             Click("ErFit"); var endpoint = Find(visual!, "ErSecondEndpoint").BoundingRectangle; var beforeDrag = Draft(); var allocated = Process.GetProcessById(app!.ProcessId).PrivateMemorySize64; var timer = Stopwatch.StartNew();
             Mouse.MoveTo(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2); Mouse.Down(MouseButton.Left);
             try { for (var step = 1; step <= 20; step++) Mouse.MoveTo(endpoint.Left + step, endpoint.Top + step); Keyboard.Type(VirtualKeyShort.ESCAPE); } finally { Mouse.Up(MouseButton.Left); }
+            Check((Find(visual!, "ErStatus").Properties.HelpText.ValueOrDefault ?? "").StartsWith("ER endpoint drag updates:", StringComparison.Ordinal), "Endpoint dragging produces measured pointer updates before cancellation");
             Check(Draft() == beforeDrag && !app!.HasExited, "Real endpoint drag cancellation retains exact source/history and releases capture"); observations.Add(new { Operation = "Actual endpoint drag with twenty pointer updates and cancellation", Milliseconds = timer.Elapsed.TotalMilliseconds, PrivateBytesBefore = allocated, PrivateBytesAfter = Process.GetProcessById(app!.ProcessId).PrivateMemorySize64 });
             // Empty-space drop must retain source and history; a valid target is exercised through the inspector above.
             var empty = Find(visual!, "ErViewport").BoundingRectangle; endpoint = Find(visual!, "ErSecondEndpoint").BoundingRectangle;
             Mouse.MoveTo(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2); Mouse.Down(MouseButton.Left); Mouse.MoveTo(empty.Right - 15, empty.Bottom - 15); Mouse.Up(MouseButton.Left);
             Wait(() => Find(visual!, "ErStatus").Name.Contains("unchanged", StringComparison.OrdinalIgnoreCase), "Invalid endpoint drop feedback missing."); Check(Draft() == changed, "Invalid endpoint drop leaves validated source unchanged");
+            endpoint = Find(visual!, "ErSecondEndpoint").BoundingRectangle; var validTarget = Find(visual!, "ErCanvas_entity:ORDER_LINE").BoundingRectangle;
+            Mouse.MoveTo(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2); Mouse.Down(MouseButton.Left);
+            try { Mouse.MoveTo(validTarget.Left + validTarget.Width / 2, validTarget.Top + Math.Min(8, validTarget.Height / 2)); } finally { Mouse.Up(MouseButton.Left); }
+            Await(text => new ErDiagramSourceParser().Parse(text).Relationships[^1].Entity2 == "ORDER_LINE");
+            Check(new ErDiagramSourceParser().Parse(Draft()).Relationships[^1].Cardinality2 == ErCardinality.ZeroMany, "Actual endpoint drop keeps the second endpoint cardinality"); Click("ErUndo"); Await(text => text == changed);
             Click("ErValidate"); Wait(() => Find(visual!, "ErApply").IsEnabled, "ER validation did not finish.");
             Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original, "Private ER operations retain owner and disk bytes before Apply");
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })

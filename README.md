@@ -14,6 +14,8 @@ Native **Visual Edit** opens recognised Flowcharts directly from preview for WPF
 
 Recognised Sequence diagrams open a dedicated native editor through **Visual Edit**. **Insert → Sequence diagram visually…** creates a portable starter. Participants, messages, basic notes and simple activations use exact source patches and private Undo/Redo; canonical layout follows participant and interaction order. Unknown dependencies and structural rewrites remain protected. The [Sequence editor report](docs/native/mermaid-sequence-visual-editor.md) records the pinned syntax matrix, supported operations, native screenshots, test evidence, performance and package provenance.
 
+Native State and ER diagrams also have dedicated **Visual Edit** and **Insert** commands. The ER inspector edits entities, ordered attribute occurrences, key markers/comments and relationships with endpoint cardinalities and identifying semantics. All four editors retain portable source through bounded patches, private Undo/Redo and owning-document revision checks. The [State report](docs/native/mermaid-state-visual-editor.md) and [ER report](docs/native/mermaid-er-visual-editor.md) distinguish supported operations, protected grammar and revision-specific certification.
+
 Source-specific UX refinement, Word template compatibility and earlier private-sample acceptance remain recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md). Current integration acceptance uses synthetic fixtures and the separate integration report.
 
 ```powershell

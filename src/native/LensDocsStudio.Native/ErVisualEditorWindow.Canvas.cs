@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Diagnostics;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
@@ -20,6 +21,8 @@ public partial class ErVisualEditorWindow
     private (FrameworkElement Owner, string Identity, bool First)? endpointDrag;
     private LineGeometry? dragGuide;
     private Path? dragOverlay;
+    private int endpointFrames;
+    private long endpointAllocated, endpointStarted;
     private static readonly Pen HitPen = HitTestPen();
     private static Pen HitTestPen() { var pen = new Pen(Brushes.Black, 12); pen.Freeze(); return pen; }
     private sealed class ElementButton : ToggleButton { protected override AutomationPeer OnCreateAutomationPeer() => new ElementPeer(this); }
@@ -80,10 +83,11 @@ public partial class ErVisualEditorWindow
         handle.PreviewMouseLeftButtonDown += (_, e) =>
         {
             if (!CanEdit || PropertiesPending) return; CancelPointer(); endpointDrag = (handle, relationship.Identity, first);
+            endpointFrames = 0; endpointAllocated = GC.GetAllocatedBytesForCurrentThread(); endpointStarted = Stopwatch.GetTimestamp();
             dragGuide = new(relationship.First, relationship.Second); dragOverlay = new() { Data = dragGuide, Stroke = (Brush)FindResource("AccentBrush"), StrokeThickness = 2, IsHitTestVisible = false };
             Surface.Children.Add(dragOverlay); Panel.SetZIndex(dragOverlay, 40); if (!handle.CaptureMouse()) CancelPointer(); e.Handled = true;
         };
-        handle.PreviewMouseMove += (_, e) => { if (endpointDrag is not { } drag || dragGuide is null) return; if (e.LeftButton != MouseButtonState.Pressed) { CancelPointer(); return; } if (drag.First) dragGuide.StartPoint = e.GetPosition(Surface); else dragGuide.EndPoint = e.GetPosition(Surface); e.Handled = true; };
+        handle.PreviewMouseMove += (_, e) => { if (endpointDrag is not { } drag || dragGuide is null) return; if (e.LeftButton != MouseButtonState.Pressed) { CancelPointer(); return; } if (drag.First) dragGuide.StartPoint = e.GetPosition(Surface); else dragGuide.EndPoint = e.GetPosition(Surface); endpointFrames++; e.Handled = true; };
         handle.PreviewMouseLeftButtonUp += async (_, e) =>
         {
             if (endpointDrag is not { } drag || presentation is null) return; var pointAtDrop = e.GetPosition(Surface); var hit = presentation.Entities.Where(item => item.Bounds.Contains(pointAtDrop)).ToArray();
@@ -98,10 +102,14 @@ public partial class ErVisualEditorWindow
     private void CancelPointer()
     {
         var owner = endpointDrag?.Owner; endpointDrag = null; if (owner?.IsMouseCaptured == true) owner.ReleaseMouseCapture(); if (dragOverlay is not null) Surface.Children.Remove(dragOverlay); dragOverlay = null; dragGuide = null;
+        if (owner is not null && endpointFrames > 0) AutomationProperties.SetHelpText(Status, $"ER endpoint drag updates: {endpointFrames}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - endpointAllocated}; duration: {Stopwatch.GetElapsedTime(endpointStarted).TotalMilliseconds:F1} ms. No parsing, layout or SVG conversion during movement.");
     }
     private void CanvasPointer(object sender, MouseButtonEventArgs e)
     {
         if (presentation is null || busy || endpointDrag is not null || e.ChangedButton != MouseButton.Left) return; var point = e.GetPosition(Surface);
+        // Endpoint controls own capture. Selecting the underlying path here would rebuild
+        // and detach that control before its tunnelling pointer handler can execute.
+        if (e.OriginalSource is DependencyObject target && endpointHandles.OfType<Button>().Any(handle => ReferenceEquals(handle, target) || handle.IsAncestorOf(target))) return;
         if (presentation.Entities.Any(item => item.Bounds.Contains(point))) return;
         var hits = presentation.Relationships.Where(item => item.Path.StrokeContains(HitPen, point) || item.LabelBounds?.Contains(point) == true).ToArray(); if (hits.Length == 0) return;
         e.Handled = true; if (hits.Length == 1) { Select(hits[0].Identity); return; }

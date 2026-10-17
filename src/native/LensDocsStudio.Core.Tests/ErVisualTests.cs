@@ -159,4 +159,11 @@ public class ErVisualTests
         Assert.Contains("A ||--o{ B : " + (relationship.Contains('\'') ? "'Updated label'" : "\"Updated label\""), draft.Source);
         Assert.True((await draft.ExecuteAsync(new UpdateErRelationship(current.Identity, "A", "B", current.Cardinality1, current.Cardinality2, current.Identifying, ""))).Success); Assert.EndsWith(" A ||--o{ B\n", draft.Source);
     }
+    [Theory, InlineData("Line\\nSecond"), InlineData("Line<br/>Second"), InlineData("**Bold** and *italic*"), InlineData("~~Removed~~ <sub>suffix</sub>")]
+    public async Task Pinned_comment_and_relationship_formatting_is_verified_without_rewriting_original_tokens(string text)
+    {
+        var source = "erDiagram\n A {\n string id PK \"" + text + "\"\n }\n B {\n }\n A ||--o{ B : \"" + text + "\"\n"; var draft = new ErVisualDraft(source);
+        ErSemanticValidation.ValidateRendering(draft.Model, new DiagramService().Render(source));
+        var result = await draft.ExecuteAsync(new UpdateErEntity("B", "B", "Independent")); Assert.True(result.Success, result.Error); Assert.Equal(source.Replace(" B {", " B[\"Independent\"] {"), draft.Source);
+    }
 }

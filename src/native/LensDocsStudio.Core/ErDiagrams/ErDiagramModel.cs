@@ -32,7 +32,7 @@ public sealed record ErDiagramModel(string Source, IReadOnlyList<ErStatement> St
     public string Revision => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(Source)));
     public bool IsValid => Diagnostics.Count == 0;
     public bool HasUnknownDependencies => Statements.Any(item => item.Protected);
-    public ErCompatibility Compatibility => !IsValid ? ErCompatibility.Invalid : !HasUnknownDependencies ? ErCompatibility.Editable
+    public ErCompatibility Compatibility => !IsValid ? ErCompatibility.Invalid : !HasUnknownDependencies && Entities.All(item => item.Declarations.Count <= 1) ? ErCompatibility.Editable
         : Statements.Any(item => !item.Protected && item.Kind is ErStatementKind.Entity or ErStatementKind.Relationship) ? ErCompatibility.PartiallyEditable : ErCompatibility.Protected;
     public string NewLine => Source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
     public ErEntityModel Entity(string id) => Entities.SingleOrDefault(item => item.Id == id) ?? throw new ArgumentException("Select an existing entity.");
