@@ -56,7 +56,7 @@ semantics. SVG success alone never grants permission.
 | Implicit entity | Created by recognised relationship | Semantic ID and first occurrence order checked | Label/attribute edit adds explicit block; last-reference removal requires explicit block first |
 | Explicit block | Separate opening/closing lines; attributes accumulated | Full block and ordered row spans | Ordinary single block supported; repeated declarations protect structure |
 | `ENTITY["Label"]` alias | Recognised on block opening; latest explicit alias wins | Alias value/span retained | Existing alias token edited in place; repeated authority protected |
-| Unquoted block alias | Recognised | Exact token retained | Plain bare aliases preserve their syntax; quote-containing fallback forms are protected |
+| Unquoted block alias | Recognised by pinned Mermaider; spaced bare aliases fail browser Mermaid | Exact token retained | Bare alias forms remain protected; source editing preserves the user's control of their syntax |
 | Attribute type/name | Pinned parser accepts broad non-space tokens | Every row counted; safe single-token grammar independently checked | Safe type/name spans edited; unsupported tokens protected |
 | PK, FK, UK | Case-insensitive marker tokens retained in order | Complete ordered marker list checked | Single markers supported; multiple markers use isolated commas: `PK , FK , UK`, retained by pinned Mermaider and portable Mermaid |
 | `PK, FK` | Comma token silently ignored, FK retained | Entire original statement protected | Never repair or rewrite the recognised prefix |
@@ -64,7 +64,7 @@ semantics. SVG success alone never grants permission.
 | Quoted attribute comment | First double-quoted comment parsed; HTML breaks normalised | Complete comment and exact original source retained | Ordinary single-line quoted comment supported; quote/braces/newline injection rejected |
 | Relationship endpoints | Both semantic IDs recognised | Exact endpoint token spans | Reconnect existing entities; unknown global references protect reconnection |
 | Cardinalities | One, zero/one, many, zero/many; token characters normalised | Both endpoint values checked independently | All 16 endpoint pairs, solid/dotted: 32 cases |
-| Optional relationship label | Unlabelled, plain, single/double-quoted supported | Complete semantic label checked | Existing quote style retained on label change; unsupported quoting protected |
+| Optional relationship label | Pinned parser recognises unlabelled, plain and quoted forms | Complete semantic label checked | Unlabelled/plain/double-quoted editing supported; single quotes and quotes embedded in plain labels remain protected |
 | Identifying `--` | Solid relationship | Identifying semantic flag checked | Explicit identifying choice |
 | Non-identifying `..` | Dotted relationship | Non-identifying semantic flag checked | Explicit non-identifying choice |
 | Self-relationship | Supported; laid out after ordinary relationships | Reconciled to original occurrence, not global source ordinal | Independent editing, reversing and duplication supported |
@@ -90,20 +90,22 @@ cardinalities together, retaining each entity's original cardinality.
 
 Portability is a separate check from pinned authorisation. The shared
 `portable-keys.mmd` fixture is checked against pinned Mermaider semantics and the
-repository's browser Mermaid 11.15.0 parser. Isolated comma tokens retain all keys
+repository's browser Mermaid 11.15.0 parser. Quoted aliases, Unicode entity IDs and
+double-quoted relationship labels are checked too. Isolated comma tokens retain all keys
 in both parsers; attached commas can lose keys in Mermaider and space-only lists
 fail browser Mermaid. Dotted attribute type/name tokens are also protected because
 the browser grammar rejects them. New operations emit the verified intersection.
-The newer browser parser never grants permission to rewrite source; pinned complete
+Bare alias forms and single-quoted relationship labels are also protected; the
+native writer emits quoted aliases and double-quoted labels. The newer browser parser never grants permission to rewrite source; pinned complete
 semantics, exact patches and native correspondence remain mandatory.
 
 ## Operation capabilities
 
 | Target | Supported | Protected limitations |
 |---|---|---|
-| Entity | Add; display label; ID and all recognised references; implicit-to-explicit; duplicate with unique ID; independent delete; inspect incident relationships | Duplicate declarations, unsupported IDs/alias quoting, unknown references/contents; implicit materialisation requires known dependencies; connected delete requires explicitly removing/reconnecting each relationship |
+| Entity | Add; display label; ID and all recognised references; implicit-to-explicit; duplicate with unique ID; independent delete; inspect incident relationships | Duplicate declarations, bare aliases, unsupported IDs/quoting, unknown references/contents; implicit materialisation requires known dependencies; connected delete requires explicitly removing/reconnecting each relationship |
 | Attribute | Add; type/name; PK/FK/UK; comment; duplicate; delete; move up/down | Unknown suffix/statement in owning entity; unsupported quoting/type/name; invalid move; no inferred FK relationship |
-| Relationship | Add; label; endpoints; both cardinalities; identifying/non-identifying; delete; duplicate; explicit semantic reverse | Unknown dependencies for structural changes; last-reference removal of implicit entities requires explicit materialisation |
+| Relationship | Add; label; endpoints; both cardinalities; identifying/non-identifying; delete; duplicate; explicit semantic reverse | Single-quoted or quote-bearing plain labels; unknown dependencies for structural changes; last-reference removal of implicit entities requires explicit materialisation |
 | Source | View immutable original; edit and validate candidate; locate exact occurrence | Invalid or semantically unreconciled candidate cannot commit |
 
 The inspector table shows type, name, keys and comment. Separate native fields edit

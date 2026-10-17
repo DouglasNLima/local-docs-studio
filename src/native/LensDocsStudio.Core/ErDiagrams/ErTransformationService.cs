@@ -64,7 +64,7 @@ public sealed class ErTransformationService
             if (current.Label != label)
             {
                 if (current.Statement.Tokens.TryGetValue("label", out var span) && label.Length > 0)
-                { var raw = span.Read(model.Source); var quote = raw.StartsWith('\'') ? '\'' : '"'; if (label.Contains(quote)) throw new ArgumentException("The label contains its quote delimiter. Use Edit source."); Patch(span, quote + label + quote); }
+                { Patch(span, "\"" + label + "\""); }
                 else { var at = current.Statement.Tokens["to"].End; Patch(new(at, current.Statement.Span.End - at), label.Length == 0 ? "" : " : \"" + label + "\""); }
             }
             relationships[model.Relationships.ToList().FindIndex(item => item.Identity == identity)] = new(from, to, first, second, label, identifying);
@@ -99,7 +99,6 @@ public sealed class ErTransformationService
                     if (entity.Label != update.Label)
                     {
                         if (declaration.Tokens.ContainsKey("label")) Token(declaration, "label", update.Label);
-                        else if (declaration.Tokens.ContainsKey("bare")) Token(declaration, "bare", update.Label);
                         else Patch(new(declaration.Tokens["id"].End, 0), "[\"" + update.Label + "\"]");
                     }
                     if (update.Id != update.NewId) foreach (var relationship in model.Relationships)

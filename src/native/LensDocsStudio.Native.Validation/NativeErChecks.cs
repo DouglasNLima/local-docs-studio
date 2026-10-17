@@ -43,6 +43,7 @@ internal static partial class NativeErChecks
         }
         foreach (var (name, body) in new[] {
             ("implicit", "A ||--o{ B : places"), ("block and alias", "A[\"Display label\"] {\n string id PK\n}"),
+            ("bare alias protected for portability", "A[Display label] {\n string id PK\n}"), ("single-quoted label protected for portability", "A ||--o{ B : 'places orders'"),
             ("portable isolated comma keys", "A {\n string id PK , FK , UK \"Comment\"\n}"), ("non-portable space-only keys protected", "A {\n string id PK FK UK\n}"), ("comma-attached keys ignored", "A {\n string id PK, FK\n}"),
             ("unknown suffix", "A {\n string id PK unknown\n}"), ("unknown entity statement", "A {\n mystery\n}"), ("unknown outside", "A {\n}\nmystery"),
             ("repeated and self", "A ||--o{ B\nA |o..o{ A : self\nA ||--o{ B"), ("quoted relationship label", "A ||--o{ B : \"places orders\""),

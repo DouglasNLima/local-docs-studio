@@ -109,10 +109,12 @@ public class ErVisualTests
         Assert.True((await draft.ExecuteAsync(new UpdateErEntity("A", "A", "Branch"))).Success); Assert.False(draft.CanRedo);
     }
     [Theory, InlineData("A[\"Original label\"]", "A[\"New label\"]"), InlineData("A[Original label]", "A[New label]"), InlineData("A", "A[\"New label\"]")]
-    public async Task Alias_changes_preserve_declaration_form_and_never_move_authority(string before, string after)
+    public async Task Portable_alias_changes_preserve_form_while_bare_aliases_remain_protected(string before, string after)
     {
         var source = "erDiagram\r\n    " + before + "  {\r\n        string id PK\n    }\r\n    %% After\n"; var draft = new ErVisualDraft(source);
-        var result = await draft.ExecuteAsync(new UpdateErEntity("A", "A", "New label")); Assert.True(result.Success, result.Error); Assert.Equal(source.Replace(before + "  {", after + "  {"), draft.Source);
+        var result = await draft.ExecuteAsync(new UpdateErEntity("A", "A", "New label"));
+        if (before == "A[Original label]") { Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount); return; }
+        Assert.True(result.Success, result.Error); Assert.Equal(source.Replace(before + "  {", after + "  {"), draft.Source);
     }
     [Fact] public async Task Duplicate_delete_and_add_entity_preserve_unrelated_source_and_collision_safety()
     {
@@ -152,11 +154,12 @@ public class ErVisualTests
         draft = new ErVisualDraft(Source); var row = draft.Model.Entity("CUSTOMER").Attributes[0]; var result = await draft.ExecuteAsync(new UpdateErAttribute(row.Identity, row.Type, row.Name, row.Keys, row.Comment)); Assert.True(result.Success, result.Error); Assert.Equal(Source, draft.Source); Assert.Equal(1, draft.HistoryCount);
     }
     [Theory, InlineData("A ||--o{ B"), InlineData("A ||--o{ B : 'single quoted'"), InlineData("A ||--o{ B : \"double quoted\""), InlineData("A ||--o{ B : plain label")]
-    public async Task Optional_and_quoted_labels_retain_unrelated_notation(string relationship)
+    public async Task Portable_labels_preserve_notation_while_single_quotes_remain_protected(string relationship)
     {
         var source = "erDiagram\n A {\n }\n B {\n }\n " + relationship + "\n"; var draft = new ErVisualDraft(source); var current = draft.Model.Relationships.Single();
-        var result = await draft.ExecuteAsync(new UpdateErRelationship(current.Identity, "A", "B", current.Cardinality1, current.Cardinality2, current.Identifying, "Updated label")); Assert.True(result.Success, result.Error);
-        Assert.Contains("A ||--o{ B : " + (relationship.Contains('\'') ? "'Updated label'" : "\"Updated label\""), draft.Source);
+        var result = await draft.ExecuteAsync(new UpdateErRelationship(current.Identity, "A", "B", current.Cardinality1, current.Cardinality2, current.Identifying, "Updated label"));
+        if (relationship.Contains('\'')) { Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount); return; }
+        Assert.True(result.Success, result.Error); Assert.Contains("A ||--o{ B : \"Updated label\"", draft.Source);
         Assert.True((await draft.ExecuteAsync(new UpdateErRelationship(current.Identity, "A", "B", current.Cardinality1, current.Cardinality2, current.Identifying, ""))).Success); Assert.EndsWith(" A ||--o{ B\n", draft.Source);
     }
     [Theory, InlineData("Line\\nSecond"), InlineData("Line<br/>Second"), InlineData("**Bold** and *italic*"), InlineData("~~Removed~~ <sub>suffix</sub>")]
@@ -175,7 +178,7 @@ public class ErVisualTests
     [Theory, InlineData("Line\\nSecond"), InlineData("Line<br/>Second"), InlineData("**Bold** and *italic*"), InlineData("~~Removed~~ <sub>suffix</sub>")]
     public async Task Key_and_cardinality_changes_retain_raw_comment_and_label_escaping(string text)
     {
-        var source = "erDiagram\r\n A {\n string id UK   \"" + text + "\"\r\n }\n B {\n }\n A ||--o{ B : '" + text + "'\n";
+        var source = "erDiagram\r\n A {\n string id UK   \"" + text + "\"\r\n }\n B {\n }\n A ||--o{ B : \"" + text + "\"\n";
         var draft = new ErVisualDraft(source); var attribute = draft.Model.Entity("A").Attributes.Single();
         var result = await draft.ExecuteAsync(new UpdateErAttribute(attribute.Identity, attribute.Type, attribute.Name, new[] { ErKeyType.UK, ErKeyType.PK }, attribute.Comment)); Assert.True(result.Success, result.Error);
         Assert.Equal(source.Replace("id UK   ", "id UK , PK   "), draft.Source);

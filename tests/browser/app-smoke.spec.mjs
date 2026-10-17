@@ -3197,13 +3197,19 @@ test('editor context menu copies Markdown with Mermaid diagrams as clipboard ima
 test('native ER key notation retains portable Mermaid attributes and ordered keys', async ({ page }) => {
   await gotoApp(page);
   const source = await readFile(fixturePath('native-er/portable-keys.mmd'), 'utf8');
-  const attributes = await page.evaluate(async (fixture) => {
+  const result = await page.evaluate(async (fixture) => {
     const { default: mermaid } = await import('/assets/vendor/mermaid-11.15.0.esm.min.js');
     mermaid.initialize({ startOnLoad: false, securityLevel: 'strict' });
     await mermaid.parse(fixture);
     const diagram = await mermaid.mermaidAPI.getDiagramFromText(fixture);
-    return [...diagram.db.getEntities().values()].flatMap((entity) => entity.attributes);
+    const entities = [...diagram.db.getEntities().values()];
+    return {
+      attributes: entities.flatMap((entity) => entity.attributes),
+      entities: entities.map(({ label, alias }) => ({ label, alias })),
+      labels: diagram.db.getRelationships().map((relationship) => relationship.roleA),
+    };
   }, source);
+  const { attributes } = result;
   expect(attributes).toHaveLength(6);
   expect(attributes[0]).toMatchObject({ type: 'string', name: 'id', keys: ['PK', 'FK', 'UK'], comment: 'All three markers' });
   expect(attributes[1]).toMatchObject({ name: 'reference', keys: ['FK', 'PK'] });
@@ -3211,6 +3217,11 @@ test('native ER key notation retains portable Mermaid attributes and ordered key
   expect(attributes[3]).toMatchObject({ type: 'string[]', name: 'names' });
   expect(attributes[4]).toMatchObject({ type: 'decimal(10)', name: 'amount' });
   expect(attributes[5]).toMatchObject({ name: 'café', comment: 'Combining character' });
+  expect(result.entities).toEqual([
+    { label: 'RECORD', alias: 'Synthetic record' },
+    { label: 'Café', alias: 'Unicode entity' },
+  ]);
+  expect(result.labels).toEqual(["Customer's records"]);
 });
 
 test('Azure DevOps Markdown clipboard carrier keeps source Markdown and ordered image payloads', async ({ page }) => {

@@ -71,7 +71,7 @@ public sealed class ErDiagramSourceParser
             if (block.Success)
             {
                 var statement = Statement(ErStatementKind.Entity, block, !ValidId(block.Groups["id"].Value)
-                    || block.Groups["bare"].Success && block.Groups["bare"].Value.Contains('"')); owner = block.Groups["id"].Value;
+                    || block.Groups["bare"].Success); owner = block.Groups["id"].Value;
                 var entity = Ensure(owner); var label = block.Groups["label"].Success ? block.Groups["label"].Value : block.Groups["bare"].Success ? block.Groups["bare"].Value : entity.Label;
                 Set(entity with { Label = label, Declarations = entity.Declarations.Append(statement).ToArray() }); continue;
             }
@@ -79,7 +79,9 @@ public sealed class ErDiagramSourceParser
             if (relationship.Success && Cardinality(relationship.Groups["left"].Value) is { } first && Cardinality(relationship.Groups["right"].Value) is { } second)
             {
                 var from = relationship.Groups["from"].Value; var to = relationship.Groups["to"].Value; var label = relationship.Groups["label"].Value.Trim().Trim('"', '\'');
-                var quoted = relationship.Groups["label"].Value; var safeLabel = quoted.Length == 0 || quoted[0] is not ('"' or '\'') || quoted.Length >= 2 && quoted[^1] == quoted[0] && !quoted[1..^1].Contains(quoted[0]);
+                var quoted = relationship.Groups["label"].Value; var safeLabel = quoted.Length == 0
+                    || quoted[0] == '"' && quoted.Length >= 2 && quoted[^1] == '"' && !quoted[1..^1].Contains('"')
+                    || quoted[0] is not ('"' or '\'') && !quoted.Contains('"') && !quoted.Contains('\'');
                 var statement = Statement(ErStatementKind.Relationship, relationship, !ValidId(from) || !ValidId(to) || !safeLabel);
                 Ensure(from); Ensure(to); relationships.Add(new(identity, from, to, first, second, Normalise(label), relationship.Groups["style"].Value == "--", statement)); continue;
             }
