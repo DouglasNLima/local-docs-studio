@@ -22,19 +22,35 @@ shape inserts it near the viewport centre. Select a containing subgraph explicit
 before dropping inside it to add membership safely. A connection dropped on a node
 retains the existing connection-creation workflow.
 
-Select a connection path or label to show its source and destination endpoint handles.
+When reconnection is permitted, select a connection path or label to show its source
+and destination endpoint handles.
 Drag either handle onto a single editable node to reconnect it. Escape or a drop on
 empty space cancels without a source change. The Properties source/destination fields
 provide the same operation from the keyboard. Overlapping connections have distinct
 ordered entries in the element list; choose the intended entry there.
-Unsupported syntax opens the complete original diagram for protected visual inspection.
-Safely mapped nodes, connections and subgraphs have a read-only inspector.
-Zoom, PAN, Rendered preview and Edit source remain available; unsafe transformations
-and Apply stay disabled. Resource limits still apply to very large or dense diagrams. Editing covers
+The inspector distinguishes **Editable**, **Partially editable** and **Protected**.
+In a partially editable Flowchart, each property has its own permission. For example,
+an independent node's label, shape and local colours can be edited beside a chain;
+a chain node's identity or deletion remains protected. Read-only values stay available
+for inspection and copying. Disabled actions explain their dependencies in tooltips
+and accessible HelpText. Every accepted edit validates the complete source and render.
+Apply becomes available only after a real validated private change.
+Use Edit source to change protected grammar in the owning document. Manual changes
+in the visual source panel require the fully supported subset; partial visual edits
+must use the permitted property and palette controls.
+
+Unknown dependencies open the complete original diagram for protected visual inspection.
+Zoom, PAN, Rendered preview and Edit source remain available. Resource limits still
+apply to very large or dense diagrams. Editing covers
 `flowchart` and `graph`, five directions, common node shapes, separate connections
 and named subgraphs. Keep connections outside groups when moving nodes between
-them. Chained connections, edge IDs, interactions, configuration directives and
-HTML label markup beyond line breaks stay protected.
+them. Exact chain node/connection property spans can be edited when safe, without
+splitting or rewriting the chain. Chain deletion/reconnection, repeated declarations,
+edge IDs, interactions, configuration directives and HTML markup beyond line breaks
+retain explicit protections. Ordinal/default `linkStyle` permits safe property edits
+but blocks connection-order changes. Inline text and quoted connection labels retain
+their original syntax for label changes. See the [advanced compatibility report](mermaid-advanced-flowchart-partial-editing.md)
+for operation boundaries and verification status.
 
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.

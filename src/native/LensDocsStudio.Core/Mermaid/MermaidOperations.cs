@@ -22,7 +22,7 @@ public sealed class MermaidTransformationService
 {
     public IReadOnlyList<MermaidDocumentPatch> Plan(MermaidDiagramModel model, MermaidEditOperation operation)
     {
-        if (!model.CanEdit) throw new ArgumentException(model.Diagnostic ?? "This source is protected. Use Edit source.");
+        model.Capabilities.Require(operation);
         var patches = new List<MermaidDocumentPatch>();
         switch (operation)
         {
@@ -80,10 +80,21 @@ public sealed class MermaidTransformationService
                 }
                 else
                 {
-                    if (edge.Type != update.Type) Replace(edge.ConnectionSpan, ConnectionToken(update.Type));
-                    if (edge.Label != update.Label)
+                    if (edge.InlineLabel && update.Label.Length == 0 && edge.Label != update.Label)
+                        Replace(edge.ConnectionSpan, ConnectionToken(update.Type));
+                    else if (edge.InlineLabel && edge.Type != update.Type)
+                        Replace(edge.ConnectionSpan, ConnectionToken(update.Type) + "|" + (edge.Label == update.Label ? edge.LabelSpan!.Value.Read(model.Source) : EscapeLabel(update.Label)) + "|");
+                    else if (edge.Type != update.Type) Replace(edge.ConnectionSpan, ConnectionToken(update.Type));
+                    if (edge.Label != update.Label && !(edge.InlineLabel && (edge.Type != update.Type || update.Label.Length == 0)))
                     {
-                        if (edge.LabelSpan is { } span) Replace(span, EscapeLabel(update.Label));
+                        if (edge.LabelSpan is { } span)
+                        {
+                            var label = EscapeLabel(update.Label);
+                            var quoted = span.Start > 0 && span.End < model.Source.Length && model.Source[span.Start - 1] == '"' && model.Source[span.End] == '"';
+                            // Numeric escapes contain semicolons. A quoted inline token keeps
+                            // them inside the label rather than creating source statements.
+                            Replace(span, edge.InlineLabel && !quoted && label.Contains(';') ? "\"" + label + "\"" : label);
+                        }
                         else Insert(edge.ConnectionSpan.End, "|" + EscapeLabel(update.Label) + "|");
                     }
                 }
@@ -145,7 +156,7 @@ public sealed class MermaidTransformationService
                 break;
             case SetMermaidClass assign:
                 model.Node(assign.Id);
-                if (!MermaidSourceParser.IsId(assign.ClassName) || !model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == assign.ClassName)))
+                if (!MermaidSourceParser.IsClassId(assign.ClassName) || !model.Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == assign.ClassName)))
                     throw new ArgumentException("Choose a class defined in this diagram's source.");
                 var existing = model.Styles.LastOrDefault(style => style.Kind == "class" && style.Targets.Any(target => target.Id == assign.Id));
                 if (existing?.Targets.Count == 1) Replace(new(existing.Statement.End - existing.Value.Length, existing.Value.Length), assign.ClassName);

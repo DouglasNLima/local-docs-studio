@@ -23,6 +23,7 @@ public sealed class MermaidVisualDraft
     public IReadOnlyList<string> Selection { get; private set; } = [];
     public bool CanUndo => index > 0;
     public bool CanRedo => index + 1 < history.Count;
+    public bool CanApply => IsDirty && HistoryIdentity != 0 && Model.HasSafeTransformations && Model.HasCompleteSourceMap;
 
     public MermaidVisualDraft(string source, DiagramService? diagramService = null)
     {
@@ -37,41 +38,48 @@ public sealed class MermaidVisualDraft
         try
         {
             if (operations.Count > MermaidSourceParser.MaximumElements) return new(false, "The edit exceeds the bounded operation limit.");
+            if (operations.Count == 0) return new(true, null);
+            operations = operations.ToArray();
             var original = Model; var generation = ++revision; var candidateNextEdge = nextEdgeId;
             var candidate = await Task.Run(() =>
             {
                 var current = original;
+                original.Capabilities.Require(operations[0]);
+                var baseline = diagrams.Render(original.Source, cancellationToken: cancellationToken);
+                if (!baseline.Success) throw new ArgumentException(baseline.Error ?? "The complete original diagram could not be rendered.");
+                if (!MermaidSemanticValidation.RenderingAgrees(original, baseline)) throw new ArgumentException("The complete original renderer semantics cannot be mapped to source safely.");
                 foreach (var operation in operations)
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     var changes = transformations.Plan(current, operation);
-                    foreach (var patch in changes)
-                        if (current.ProtectedRegions.Any(region => patch.Span.Start < region.Span.End && patch.Span.End > region.Span.Start))
-                            throw new ArgumentException("A protected source region would be changed. Use Edit source.");
                     var parsed = parser.Parse(MermaidPatches.Apply(current.Source, changes), cancellationToken);
-                    current = PreserveEdgeIdentities(current, parsed, changes, operation, ref candidateNextEdge);
-                    if (!current.CanEdit) break;
+                    var identified = PreserveEdgeIdentities(current, parsed, changes, operation, ref candidateNextEdge);
+                    MermaidSemanticValidation.Validate(current, identified, operation, changes, cancellationToken);
+                    current = identified;
                 }
                 return current;
             }, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             if (generation != revision) return new(false, "A newer draft superseded this operation.");
-            if (!candidate.CanEdit) return new(false, candidate.Diagnostic);
-            return await ValidateAndCommitCoreAsync(candidate.Source, candidate.Edges.Select(edge => edge.Id).ToArray(), cancellationToken);
+            return await ValidateAndCommitCoreAsync(candidate.Source, candidate.Edges.Select(edge => edge.Id).ToArray(), cancellationToken, capabilityProof: true);
         }
         catch (ArgumentException ex) { return new(false, ex.Message); }
     }
     public async Task<MermaidDraftResult> ValidateAndCommitAsync(string candidate, CancellationToken cancellationToken = default)
         => await ValidateAndCommitCoreAsync(candidate, null, cancellationToken);
-    private async Task<MermaidDraftResult> ValidateAndCommitCoreAsync(string candidate, IReadOnlyList<string>? edgeIds, CancellationToken cancellationToken)
+    private async Task<MermaidDraftResult> ValidateAndCommitCoreAsync(string candidate, IReadOnlyList<string>? edgeIds, CancellationToken cancellationToken, bool capabilityProof = false)
     {
         var version = ++revision;
         var result = await Task.Run(() =>
         {
             cancellationToken.ThrowIfCancellationRequested(); var parsed = parser.Parse(candidate, cancellationToken);
-            if (!parsed.CanEdit) return (parsed, error: parsed.Diagnostic ?? "This source is protected.");
+            if (!(capabilityProof ? parsed.HasSafeTransformations && parsed.HasCompleteSourceMap : parsed.CanEdit))
+                return (parsed, error: parsed.Diagnostic ?? "Manual source validation requires the fully supported subset; partial transformations require operation capability proofs.");
             cancellationToken.ThrowIfCancellationRequested(); var rendered = diagrams.Render(candidate, cancellationToken: cancellationToken);
-            cancellationToken.ThrowIfCancellationRequested(); return (parsed, error: rendered.Error);
+            cancellationToken.ThrowIfCancellationRequested(); return (parsed, error: rendered.Error
+                ?? (MermaidSemanticValidation.RenderingAgrees(parsed, rendered) ? null : "The candidate renderer and source semantics disagree. Source and history were preserved."));
         }, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (version != revision) return new(false, "A newer draft superseded this validation.");
         if (result.error is not null) return new(false, result.error);
         if (candidate == Source) return new(true, null);
@@ -83,6 +91,16 @@ public sealed class MermaidVisualDraft
         while (history.Count > 100 || history.Sum(item => item.Source.Length) > MaximumHistoryCharacters && history.Count > 2)
         { history.RemoveAt(0); index--; }
         return new(true, null);
+    }
+    public async Task<MermaidDraftResult> ValidateForApplyAsync(CancellationToken cancellationToken = default)
+    {
+        if (!CanApply) return new(false, "Apply requires a real, validated private source change.");
+        var generation = revision; var source = Source;
+        var result = await Task.Run(() => diagrams.Render(source, cancellationToken: cancellationToken), cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (generation != revision || source != Source) return new(false, "A newer draft superseded Apply validation.");
+        var agrees = MermaidSemanticValidation.RenderingAgrees(Model, result);
+        return new(result.Success && agrees, result.Error ?? (agrees ? null : "The final renderer and source semantics disagree."));
     }
     public void Undo() { if (CanUndo) Restore(--index); }
     public void Redo() { if (CanRedo) Restore(++index); }

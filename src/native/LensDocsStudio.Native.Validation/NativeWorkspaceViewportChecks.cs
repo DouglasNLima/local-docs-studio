@@ -5,6 +5,7 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
+using LensDocsStudio.Core.State;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -21,7 +22,7 @@ internal static partial class NativeUiChecks
     private static void CheckWorkspaceViewportOwnership(string executable, string output, bool pagesFirst = false)
     {
         var root = Path.Combine(output, "workspace-viewport"); Directory.CreateDirectory(root);
-        var texts = new Dictionary<string, string>(); var observations = new List<object>();
+        var texts = new Dictionary<string, string>(); var observations = new List<object>(); var readingDiagnostics = new List<object>();
         foreach (var name in new[] { "A", "B", "C" })
         {
             texts[name] = "# Document " + name + "\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
@@ -48,11 +49,19 @@ internal static partial class NativeUiChecks
                 Find(window, "FollowCaretControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncScrollControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
-                editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 75);
+                Wait(() =>
+                {
+                    var preferencePath = Path.Combine(root, mode + synchronised, "preferences.json");
+                    if (!File.Exists(preferencePath)) return false;
+                    using var input = new FileStream(preferencePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    var desktop = JsonSerializer.Deserialize<UserPreferences>(input)?.Desktop ?? new DesktopPreferences();
+                    return desktop.FollowCaret == synchronised && desktop.SyncScroll == synchronised && !desktop.SyncSelection;
+                }, "The requested synchronisation preferences did not finish applying.");
+                ScrollEditorTo(75, "Region 065");
                 ReadAt("A", "Region 065");
                 var aOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("B"); AtTop("B");
-                editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 40);
+                ScrollEditorTo(40, "Region 035");
                 ReadAt("B", "Region 035");
                 var bOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("A");
@@ -97,6 +106,16 @@ internal static partial class NativeUiChecks
                 bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
                     && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
+                void ScrollEditorTo(double percent, string target)
+                {
+                    var beforeSync = SyncCompletions("editor-scroll");
+                    editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, percent);
+                    // This ownership test performs two distinct reading actions. Complete
+                    // the requested editor alignment before beginning the preview action;
+                    // UIA ScrollIntoView does not deliver a mouse-wheel cancellation event.
+                    if (synchronised) Wait(() => SyncCompletions("editor-scroll") > beforeSync, "The initial editor scroll did not finish synchronising before preview reading.");
+                    RecordReading("editor-aligned", target);
+                }
                 void ReadAt(string name, string text)
                 {
                     var focusRange = preview.Patterns.Text.Pattern.GetVisibleRanges()
@@ -105,14 +124,19 @@ internal static partial class NativeUiChecks
                     var focusBox = focusRange.GetBoundingRectangles().First(box => preview.BoundingRectangle.Contains(box));
                     Mouse.Click(new System.Drawing.Point(focusBox.Left + focusBox.Width * (name == "A" ? 1 : 2) / 3, focusBox.Top + focusBox.Height / 2));
                     var alreadyVisible = Visible(preview, text); var syncStart = SyncCompletions();
-                    PreviewRange(text).ScrollIntoView(true);
+                    RecordReading("preview-focused", text);
+                    // WPF UIA can treat an already-visible range's viewport coordinate
+                    // as an absolute document offset. Do not request redundant scrolling;
+                    // the same visibility/ownership assertions remain mandatory below.
+                    if (!alreadyVisible) PreviewRange(text).ScrollIntoView(true);
+                    RecordReading(alreadyVisible ? "reading-target-already-visible" : "scroll-requested", text);
                     Wait(() => Visible(preview, text), "Document " + name + " did not reach its reading position.");
                     if (synchronised && !alreadyVisible)
                         Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
                 }
-                int SyncCompletions()
+                int SyncCompletions(string origin = "preview-scroll")
                 {
-                    return ViewportTraceLines().Count(line => line.Contains("sync-complete preview-scroll", StringComparison.Ordinal));
+                    return ViewportTraceLines().Count(line => line.Contains("sync-complete " + origin, StringComparison.Ordinal));
                 }
                 string[] ViewportTraceLines()
                 {
@@ -122,6 +146,15 @@ internal static partial class NativeUiChecks
                     using var reader = new StreamReader(stream);
                     return reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries)
                         .Where(line => line.TrimEnd().EndsWith('}')).ToArray();
+                }
+                void RecordReading(string phase, string target)
+                {
+                    var focus = automation.FocusedElement();
+                    readingDiagnostics.Add(new { Mode = mode, Synchronised = synchronised, Phase = phase, Target = target,
+                        FocusedId = focus?.AutomationId, FocusedType = focus?.ControlType.ToString(), EditorPercent = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value,
+                        PreviewBounds = preview.BoundingRectangle.ToString(), TargetBounds = PreviewRange(target).GetBoundingRectangles().Select(box => box.ToString()).ToArray(),
+                        VisibleText = preview.Patterns.Text.Pattern.GetVisibleRanges().Select(range => range.GetText(160)).ToArray() });
+                    File.WriteAllText(Path.Combine(root, "reading-actions.json"), JsonSerializer.Serialize(readingDiagnostics, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 bool Visible(AutomationElement pane, string text) => PreviewRange(text).GetBoundingRectangles().Any(box => box.Width > 0 && box.Height > 0 && pane.BoundingRectangle.Contains(box));
                 void AtTop(string name)

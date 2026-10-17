@@ -188,6 +188,7 @@ public partial class MainWindow
         if (restoringNavigation || origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
         applyingSync = true; applyingSyncOrigin = origin;
+        TraceViewport("sync-start " + origin);
         try
         {
             if (origin == "preview-selection" && DesktopState.SyncSelection && Preview.Selection is { IsEmpty: false } selection)
@@ -240,7 +241,8 @@ public partial class MainWindow
                 }
                 result.RevealSource(offset);
                 var pointer = result.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
-                if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer);
+                if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer,
+                    diagnostic: viewportDiagnostics ? message => TraceViewport("sync-navigation " + origin + " source " + offset + " " + message) : null);
             }
         }
         catch (Exception error) when (error is InvalidOperationException or ArgumentException)

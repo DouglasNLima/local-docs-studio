@@ -19,7 +19,8 @@ internal static class NativeMermaidFidelityChecks
     public static void Run(string output)
     {
         Directory.CreateDirectory(output); var checks = new List<string>(); var observations = new List<object>();
-        foreach (var file in Directory.GetFiles("tests/fixtures/native-mermaid-fidelity", "*.mmd"))
+        foreach (var file in Directory.GetFiles("tests/fixtures/native-mermaid-fidelity", "*.mmd")
+            .Append("tests/fixtures/native-mermaid-visual/advanced-flow-error-log-lab.mmd"))
         foreach (var dark in new[] { false, true })
         {
             var source = File.ReadAllText(file); var service = new DiagramService(); var svg = new NativeSvgService();
@@ -27,7 +28,7 @@ internal static class NativeMermaidFidelityChecks
             Check(result.Success, file + ": original source renders: " + result.Error);
             watch.Restart(); var presentation = NativeMermaidPresentation.Create(result, svg); var interactionMs = watch.Elapsed.TotalMilliseconds;
             var reference = svg.Render(result.Svg!); var model = new MermaidSourceParser().Parse(source);
-            Check(!model.CanEdit || presentation.Maps(model), file + ": all editable identities map to the canonical drawing");
+            Check(!model.HasSafeTransformations || presentation.Maps(model), file + ": all fully or partially editable identities map to the canonical drawing");
             var baseline = NativeSvgService.ToPng(reference, .75); var canvas = NativeSvgService.ToPng(presentation.Drawing, .75);
             Check(Pixels(baseline).SequenceEqual(Pixels(canvas)), file + ": normalised canvas pixels equal native preview pixels exactly");
             var name = Path.GetFileNameWithoutExtension(file) + (dark ? "-dark" : "-light");

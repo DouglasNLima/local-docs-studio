@@ -1,0 +1,39 @@
+{
+  "runId": "39025931169",
+  "source": "f8772647df65da41079b3c6dd148d9444ea50bfc",
+  "mergeCheckout": "f1adf3747c06a5355d75654f2d8d990b33f8b646",
+  "status": "success",
+  "releaseBuild": "PASS",
+  "core": {
+    "total": 1323,
+    "passed": 1323,
+    "failed": 0,
+    "skipped": 0
+  },
+  "nativeDiagramExport": {
+    "failed": 0,
+    "cases": 72
+  },
+  "staticDocsSiteBrowsers": 12,
+  "desktopUiAutomation": {
+    "contexts": [
+      "build output",
+      "initial installation",
+      "after upgrade",
+      "reinstall"
+    ],
+    "groupsPerContext": 75
+  },
+  "installerWizard": 5,
+  "packageRejectionControls": 7,
+  "authenticode": 7,
+  "signedUpdatePolicy": 7,
+  "historicalUpgradeMatrix": "skipped: existing integration-only branch condition",
+  "continuous250ms": {
+    "mixed": "FAIL: 265.72 ms",
+    "list": "FAIL: 578.95 ms",
+    "scope": "Separate pre-existing performance target; not reported as fixed",
+    "table": "PASS: 187.96 ms"
+  },
+  "nativeExecution": "Disposable hosted Windows only"
+}

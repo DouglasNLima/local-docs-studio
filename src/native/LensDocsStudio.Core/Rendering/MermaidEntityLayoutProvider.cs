@@ -10,15 +10,14 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
 {
     // This provider belongs to one render call. Never install it on MermaidRenderer globally.
     public PositionedGraph? Flowchart { get; private set; }
+    public MermaidGraph? FlowchartSemantics { get; private set; }
     public IReadOnlyList<FlowchartGroupIdentity> Groups { get; private set; } = [];
     public PositionedGraph LayoutFlowchart(MermaidGraph graph, RenderOptions? options = null, StrictStylingOptions? strict = null)
     {
-        var decoded = graph with
-        {
-            Nodes = graph.Nodes.ToDictionary(pair => pair.Key, pair => pair.Value with { Label = Decode(pair.Value.Label) }),
-            Edges = graph.Edges.Select(edge => edge with { Label = edge.Label is null ? null : Decode(edge.Label) }).ToArray(),
-            Subgraphs = graph.Subgraphs.Select(DecodeGroup).ToArray()
-        };
+        var decoded = DecodeSemantics(graph);
+        // Layout adds visual wrapping to labels. Retain the complete decoded semantics
+        // at the renderer boundary so wrapping cannot be mistaken for a source change.
+        FlowchartSemantics = decoded;
         Groups = Array.AsReadOnly(Identities(decoded.Subgraphs, null).ToArray());
         var positioned = inner.LayoutFlowchart(decoded, options, strict);
         Flowchart = positioned with
@@ -30,6 +29,12 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
         };
         return positioned;
     }
+    internal static MermaidGraph DecodeSemantics(MermaidGraph graph) => graph with
+    {
+        Nodes = graph.Nodes.ToDictionary(pair => pair.Key, pair => pair.Value with { Label = Decode(pair.Value.Label) }),
+        Edges = graph.Edges.Select(edge => edge with { Label = edge.Label is null ? null : Decode(edge.Label) }).ToArray(),
+        Subgraphs = graph.Subgraphs.Select(DecodeGroup).ToArray()
+    };
     private static PositionedGroup FreezeGroup(PositionedGroup group) => group with { Children = Array.AsReadOnly(group.Children.Select(FreezeGroup).ToArray()) };
     private static IEnumerable<FlowchartGroupIdentity> Identities(IEnumerable<MermaidSubgraph> groups, string? parent)
     {

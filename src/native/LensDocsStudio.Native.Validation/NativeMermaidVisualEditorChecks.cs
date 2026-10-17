@@ -54,7 +54,12 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); Capture("existing-light");
             if (polish)
             {
-                var source = Draft(); CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
+                var source = Draft();
+                Check(!Find(visual!, "MermaidApply").IsEnabled, "An unchanged diagram cannot Apply or enter document Undo history");
+                Select("node_B"); Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review focus fixture"; Click("MermaidUpdateNode");
+                AwaitSource(text => text.Contains("Review focus fixture", StringComparison.Ordinal));
+                CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
+                Click("MermaidUndo"); AwaitSource(text => text == source);
                 var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
                 var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
                 Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
@@ -324,12 +329,12 @@ internal static partial class NativeUiChecks
                 FocusWindow(main); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
                 Wait(() => ReadEditorText(editor) == "", "New flowchart insertion was not one coherent document Undo.");
             }
-            const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\n";
+            const string protectedSource = "flowchart TD\nA[Keep] --> B[Protect] --> C[Source]\nclick A \"https://example.invalid/protected\"\n";
             LaunchDocument("Protected.mmd", protectedSource);
             if (baseline) OpenInsertion(false); else Open(0, false);
             Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
-                "Unsupported chained source opens for protected inspection without destructive visual commands");
+                "Chained source with an unknown interaction opens for protected inspection without destructive visual commands");
             if (!baseline)
             {
                 Find(visual!, "MermaidCanvas_node_B").Click();
@@ -343,6 +348,60 @@ internal static partial class NativeUiChecks
                 Capture("protected-connection-inspection");
             }
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
+            if (!baseline)
+            {
+                var partial = File.ReadAllText("tests/fixtures/native-mermaid-visual/advanced-flow-error-log-lab.mmd");
+                LaunchDocument("Advanced-partial.mmd", partial); Open(0);
+                Check(Find(visual!, "MermaidDraftState").Name == "Partially editable" && !Find(visual!, "MermaidApply").IsEnabled,
+                    "A complete synthetic chained Flowchart has mixed capabilities and requires a real change for Apply");
+                Select("node_Capture");
+                Check(Find(visual!, "MermaidNodeLabel").Patterns.Value.Pattern.IsReadOnly.Value == false
+                    && Find(visual!, "MermaidNodeId").Patterns.Value.Pattern.IsReadOnly.Value
+                    && !Find(visual!, "MermaidDelete").IsEnabled,
+                    "A chain node exposes an editable label and read-only identity/deletion with accessible explanations");
+                Check(Find(visual!, "MermaidNodeId").Properties.HelpText.Value.Contains("protected chain", StringComparison.Ordinal),
+                    "A denied identity edit explains its chain dependency to assistive technology");
+                Capture("partial-chain-capabilities");
+                Find(visual!, "MermaidNodeShape").AsComboBox().Select("Rounded"); Click("MermaidUpdateNode");
+                var captureShape = partial.Replace("Capture[\"Capture context<br/>Synthetic operation identifiers\"]", "Capture(\"Capture context<br/>Synthetic operation identifiers\")", StringComparison.Ordinal);
+                AwaitSource(text => text == captureShape);
+                Check(Draft() == captureShape, "A chain node shape edit preserves its unchanged multiline label representation exactly");
+                Click("MermaidUndo"); AwaitSource(text => text == partial);
+                Select("node_IndependentStep");
+                Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Reviewed synthetic step";
+                Select("node_Archive");
+                Check(Find(visual!, "MermaidNodeLabel").AsTextBox().Text == "Reviewed synthetic step"
+                    && !Find(visual!, "MermaidApply").IsEnabled, "Selection cannot discard a partial diagram's pending inspector values");
+                Click("MermaidUpdateNode"); AwaitSource(text => text.Contains("IndependentStep[\"Reviewed synthetic step\"]", StringComparison.Ordinal));
+                var expectedNode = partial.Replace("Independent diagnostic step", "Reviewed synthetic step", StringComparison.Ordinal);
+                Check(Draft() == expectedNode && ReadEditorText(editor) == partial, "Only the independent label changes privately; owning source remains exact");
+                Click("MermaidFit");
+                Check(Find(visual!, "MermaidSelectionSummary").Name.StartsWith("IndependentStep", StringComparison.Ordinal), "The independent node inspector remains selected for visual acceptance");
+                Capture("partial-independent-inspector");
+                var parsedPartial = new MermaidSourceParser().Parse(Draft());
+                var independentEdge = parsedPartial.Edges.Single(edge => edge.Source.Id == "Notify" && edge.Target.Id == "Archive");
+                Select(independentEdge.Id);
+                Check(!Find(visual!, "MermaidEdgeSource").IsEnabled && Find(visual!, "MermaidEdgeLabel").Patterns.Value.Pattern.IsReadOnly.Value == false,
+                    "Nested independent connections permit labels while protecting membership-sensitive reconnection");
+                Find(visual!, "MermaidEdgeLabel").AsTextBox().Text = "Archive verified"; Click("MermaidUpdateEdge");
+                var expectedPartial = expectedNode.Replace("|Archive next|", "|Archive verified|", StringComparison.Ordinal);
+                AwaitSource(text => text == expectedPartial); Capture("partial-connection-inspector");
+                Click("MermaidUndo"); AwaitSource(text => text == expectedNode); Click("MermaidRedo"); AwaitSource(text => text == expectedPartial);
+                Click("MermaidApply"); WaitClosed();
+                Check(ReadEditorText(editor) == expectedPartial, "Validated partial source applies through the owning document transaction");
+                FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z);
+                Wait(() => ReadEditorText(editor) == partial, "One document Undo did not restore the entire original partial diagram.");
+                Check(ReadEditorText(editor) == partial, "One document Undo restores all original protected statements byte for byte");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y);
+                Wait(() => ReadEditorText(editor) == expectedPartial, "Document Redo did not restore the applied partial source.");
+                Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S);
+                Wait(() => File.ReadAllText(Path.Combine(root, "Advanced-partial.mmd")) == expectedPartial, "Saving partial source did not retain exact bytes.");
+                LaunchDocument("Advanced-partial.mmd", expectedPartial, write: false); Open(0);
+                Check(Draft() == expectedPartial && Find(visual!, "MermaidDraftState").Name == "Partially editable",
+                    "Saved partial source reopens and renders with its complete graph and capability state");
+                Select("node_IndependentStep"); Capture("partial-saved-reopened");
+                Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == expectedPartial, "Cancel after reopening preserves the saved source");
+            }
             if (polish)
             {
                 var lab = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/flow-error-log-lab.mmd");
@@ -351,9 +410,9 @@ internal static partial class NativeUiChecks
                 main!.CaptureToFile(Path.Combine(output, "mermaid-flow-error-log-lab-preview.png"));
                 Open(0, false);
                 Check(Draft() == lab && !Find(visual!, "MermaidApply").IsEnabled && Find(visual!, "MermaidEditSource").IsEnabled,
-                    "The synthetic chained, dotted and multiline Flowchart opens directly from preview for protected inspection");
+                    "The synthetic chained, dotted and multiline Flowchart opens directly from preview with capability-aware inspection");
                 Click("MermaidValidateSource");
-                Check(Find(visual!, "MermaidDraftState").Name == "Protected source" && Draft() == lab,
+                Check(Find(visual!, "MermaidDraftState").Name == "Partially editable" && Draft() == lab,
                     "Validating unchanged protected source preserves its inspection capability instead of reporting invalid Mermaid");
                 Check(Find(visual!, "MermaidZoom").Patterns.RangeValue.Pattern.Value.Value == 100, "Wide protected diagrams initially open at actual size for readable labels");
                 Capture("flow-error-log-lab-initial");
@@ -460,10 +519,11 @@ internal static partial class NativeUiChecks
             }
             Record(true, null); return 0;
 
-            void LaunchDocument(string name, string text)
+            void LaunchDocument(string name, string text, bool write = true)
             {
                 if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); }
-                var fixturePath = Path.Combine(root, name); File.WriteAllText(fixturePath, text);
+                var fixturePath = Path.Combine(root, name); if (write) File.WriteAllText(fixturePath, text);
+                else Check(File.ReadAllText(fixturePath) == text, "Reopening reads the existing saved file without rewriting its fixture");
                 var launch = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
                 launch.ArgumentList.Add("--state-directory"); launch.ArgumentList.Add(Path.Combine(root, "state-" + name.Replace('.', '-')));
                 launch.ArgumentList.Add(root); launch.ArgumentList.Add(fixturePath);
@@ -484,20 +544,36 @@ internal static partial class NativeUiChecks
                 FocusWindow(main!); Find(main!, "InsertMenu").Click(); Find(main!, "InsertFlowchart").AsMenuItem().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Insert Flowchart did not open the native editor.");
                 if (polish) Capture("first-frame-insertion-" + ++firstFrames);
-                if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The new diagram did not become editable.");
+                if (editable) Wait(() => Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable", "The new diagram did not become editable.");
                 if (polish) CaptureMeaningful("first-meaningful-insertion-" + firstFrames);
             }
 
             void Open(int blockOffset, bool editable = true)
             {
                 FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Visual Edit action was not available.");
-                var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
-                Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
+                var watch = Stopwatch.StartNew(); var ownerSource = ReadEditorText(editor);
+                var action = Find(main!, "DiagramEditVisually" + blockOffset); var identity = action.FrameworkAutomationElement.RuntimeId.Value;
+                action.AsButton().Invoke();
+                Wait(() => EditorAppeared() || Find(main!, "Status").Name == "The document changed. Wait for its current preview before editing visually.", "The native visual editor did not open or explain its revision guard.");
+                if (visual is null)
+                {
+                    // Source edits can leave an old preview visible until replacement. Its
+                    // rejection is correct; require a different actual UIA action before proceeding.
+                    Wait(() => EditorAppeared() || main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is { } fresh
+                        && !identity.SequenceEqual(fresh.FrameworkAutomationElement.RuntimeId.Value), "The stale preview action was not replaced by a fresh source revision.");
+                    if (visual is null)
+                    {
+                        Check(ReadEditorText(editor) == ownerSource, "A stale preview action rejects opening without changing the owning document");
+                        Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
+                        Wait(EditorAppeared, "The fresh revision-bound visual editor did not open.");
+                    }
+                }
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
                 Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "The visual editor did not finish its canonical render.");
-                if (editable) Wait(() => Find(visual!, "MermaidApply").IsEnabled, "The visual editor did not become editable: " + Find(visual!, "MermaidStatus").Name);
+                if (editable) Wait(() => Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable", "The visual editor did not become editable: " + Find(visual!, "MermaidStatus").Name);
                 if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
+                bool EditorAppeared() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null;
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
             void Select(string id)

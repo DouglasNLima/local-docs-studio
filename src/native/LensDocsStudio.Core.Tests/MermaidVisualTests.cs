@@ -147,7 +147,19 @@ public sealed class MermaidVisualTests
         var source = "flowchart TD\n" + body; var draft = new MermaidVisualDraft(source);
         Assert.False(draft.Model.CanEdit); Assert.Contains(reason, draft.Model.Diagnostic, StringComparison.OrdinalIgnoreCase);
         var result = await draft.ExecuteAsync(new AddMermaidNode("New", "New", FlowNodeShape.Process));
-        Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+        if (draft.Model.Compatibility == MermaidCompatibility.PartiallyEditable)
+        {
+            Assert.True(result.Success, result.Error); Assert.StartsWith(source, draft.Source);
+            Assert.False(draft.Model.CanEdit); Assert.True(draft.CanApply);
+            draft.Undo(); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+            var denied = body.Contains("linkStyle", StringComparison.Ordinal)
+                ? await draft.ExecuteAsync(new AddMermaidConnection("A", "B"))
+                : body.Contains("Second", StringComparison.Ordinal)
+                    ? await draft.ExecuteAsync(new UpdateMermaidNode("A", "Changed", FlowNodeShape.Process, "A"))
+                    : await draft.ExecuteAsync(new DeleteMermaidConnection("edge-0"));
+            Assert.False(denied.Success); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+        }
+        else { Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo); }
     }
 
     [Fact]
