@@ -26,7 +26,11 @@ internal static partial class NativeUiChecks
                 var source = "erDiagram\n" + string.Concat(Enumerable.Range(0, entities).Select(i => " E" + i + " {\n string id PK\n string reference FK\n }\n"))
                     + string.Concat(Enumerable.Range(0, relationships).Select(i => " E" + (i % entities) + " ||--o{ E" + ((i * 7 + 1) % entities) + " : relation" + i + "\n"));
                 var render = new DiagramService().Render(source);
-                if (!render.Success) { measurements.Add(new { Entities = entities, Relationships = relationships, ResourceLimit = render.Error, NativeEditorOpened = false, LimitsUnchanged = true }); continue; }
+                if (!render.Success)
+                {
+                    if (entities != 100 || !IsRenderDeadline(render.Error)) throw new IOException("The required ER performance scenario failed: " + render.Error);
+                    measurements.Add(new { Entities = entities, Relationships = relationships, ResourceLimit = render.Error, FailureStage = "Preflight", NativeEditorOpened = false, LimitsUnchanged = true }); continue;
+                }
                 var path = Path.Combine(root, "ER.mmd"); File.WriteAllText(path, source);
                 var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; foreach (var argument in new[] { "--state-directory", stateRoot, root, path }) info.ArgumentList.Add(argument);
                 app = Application.Launch(info); var main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The ER performance fixture did not open.");
@@ -34,7 +38,19 @@ internal static partial class NativeUiChecks
                 using var process = Process.GetProcessById(app.ProcessId); process.Refresh(); var beforeMemory = process.WorkingSet64;
                 var timer = Stopwatch.StartNew(); Find(main, "DiagramEditVisually0").AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("ErVisualEditor")))?.AsWindow()) is not null, "The ER performance editor did not open.");
-                Wait(() => Find(visual!, "ErApply").IsEnabled, "The ER performance editor did not finish canonical mapping."); var openMs = timer.Elapsed.TotalMilliseconds;
+                Wait(() => Find(visual!, "ErApply").IsEnabled || entities == 100 && IsRenderDeadline(Find(visual!, "ErStatus").Name), "The ER performance editor did not finish canonical mapping.");
+                if (!Find(visual!, "ErApply").IsEnabled)
+                {
+                    var resourceError = Find(visual!, "ErStatus").Name; var resourceMs = timer.Elapsed.TotalMilliseconds;
+                    Find(visual!, "ErSourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); process.Refresh();
+                    if (entities != 100 || !IsRenderDeadline(resourceError) || Find(visual!, "ErUndo").IsEnabled || Find(visual!, "ErAddEntity").IsEnabled
+                        || ReadEditorText(Find(visual!, "ErSource")) != source || ReadEditorText(Find(main, "MarkdownEditor")) != source
+                        || File.ReadAllText(path) != source || app.HasExited || !process.Responding) throw new IOException("The ER renderer deadline did not retain protected exact source and history.");
+                    measurements.Add(new { Entities = entities, Relationships = relationships, ResourceLimit = resourceError, FailureStage = "Editor canonical mapping", NativeEditorOpened = true,
+                        ResourceFailureIncludingUiaMilliseconds = resourceMs, SourceExact = true, HistoryUnchanged = true, ApplyDisabled = true, ProcessResponding = true, LimitsUnchanged = true });
+                    _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, "er-100-resource-limit.png")); app.Kill(); app.Dispose(); app = null; visual = null; continue;
+                }
+                var openMs = timer.Elapsed.TotalMilliseconds;
                 Find(visual!, "ErSourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); timer.Restart();
                 for (var i = 0; i < 20; i++) Find(visual!, "ErCanvas_entity:E" + (i % entities)).Patterns.SelectionItem.Pattern.Select(); var entityMs = timer.Elapsed.TotalMilliseconds;
                 var targets = visual!.FindAllDescendants().Where(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ErCanvas_", StringComparison.Ordinal)).ToArray();
@@ -59,7 +75,8 @@ internal static partial class NativeUiChecks
             }
             File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Measurements = measurements, Scope = "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. No rendering limits changed." }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
-        catch (Exception error) { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "er-performance-failure.txt"), error.ToString()); Console.Error.WriteLine(error); return 1; }
+        catch (Exception error) { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Measurements = measurements, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); File.WriteAllText(Path.Combine(output, "er-performance-failure.txt"), error.ToString()); Console.Error.WriteLine(error); return 1; }
         finally { Mouse.Up(MouseButton.Left); if (app is not null) { try { app.Kill(); } catch { } app.Dispose(); } }
     }).GetAwaiter().GetResult();
+    private static bool IsRenderDeadline(string? diagnostic) => diagnostic == "Diagram could not be rendered: The operation was canceled.";
 }

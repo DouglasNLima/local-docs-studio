@@ -330,6 +330,18 @@ source/history. Hosted observations do not promise hardware-independent timing.
 
 ## Final protection and qualification boundaries
 
+The later documentation candidate `2d06a5d` exposed a benchmark assumption in
+[run 39069037180](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39069037180):
+10/15 and 30/60 interactions completed, then the 100/150 preflight happened to render
+inside the deadline while the actual editor's independent render exceeded it.
+The retained screenshot shows the precise cancellation diagnostic and disabled
+editing. The harness now records that exact deadline failure at either stage for
+100/150, verifies private/owner/disk source, empty history, disabled Apply/palette
+and process responsiveness, and makes no successful large-editor timing claim.
+Small scenarios must complete; unrelated diagnostics and mapping timeouts still
+fail the job. Partial measurements are also retained on any future failure. No
+deadline, renderer budget or existing interaction assertion is increased or removed.
+
 - Implemented: entities, supported attribute types/names and unique key combinations,
   exact quoted comments, row order/duplication/removal, relationship labels, both
   endpoint cardinalities, identifying semantics, safe reconnection, exact occurrences,
