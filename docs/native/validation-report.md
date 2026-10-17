@@ -1,5 +1,15 @@
 # Native validation report
 
+Sequence editor work is tracked in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
+The local Release build has zero warnings/errors; 1,294 Core cases (60 new Sequence
+cases) pass without skips and static integrity passes. The [Sequence report](mermaid-sequence-visual-editor.md)
+records 183 Sequence fidelity/ownership checks, 29 normal and 30 actual High Contrast
+authoring checks, 293 Flowchart fidelity assertions, 82 native rendering/export cases
+and 75 desktop UIA groups in each of four contexts at accepted application `37c6220`.
+Exact-source preview `0.1.1-preview.614` passes independent verification and disposable
+installer lifecycle checks. The retained frozen-baseline first-attempt failure passed
+an unchanged job rerun; no assertion was removed. Historical counts below retain their revisions.
+
 The advanced Flowchart partial-editing continuation is implemented in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
 verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.

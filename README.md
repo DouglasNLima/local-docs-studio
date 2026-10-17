@@ -12,6 +12,8 @@ The browser-free Windows edition is implemented separately under `src/native/` u
 
 Native **Visual Edit** opens recognised Flowcharts directly from preview for WPF authoring or protected visual inspection. **Edit source** remains separate; **Insert → Flowchart visually…** creates a new diagram. The canvas shares the native Mermaider drawing, with node, connection, subgraph and basic style commands. Edits use a private Mermaid source draft; Apply updates the intended Markdown block or standalone file in one Undo transaction, with stale-source protection. Temporary canvas positions are session-only. The [preview fidelity report](docs/native/mermaid-preview-fidelity.md) records the shared rendering architecture, protected inspection and current evidence; the [original editor report](docs/native/mermaid-visual-editor.md) defines its bounded transformation grammar.
 
+Recognised Sequence diagrams open a dedicated native editor through **Visual Edit**. **Insert → Sequence diagram visually…** creates a portable starter. Participants, messages, basic notes and simple activations use exact source patches and private Undo/Redo; canonical layout follows participant and interaction order. Unknown dependencies and structural rewrites remain protected. The [Sequence editor report](docs/native/mermaid-sequence-visual-editor.md) records the pinned syntax matrix, supported operations, native screenshots, test evidence, performance and package provenance.
+
 Source-specific UX refinement, Word template compatibility and earlier private-sample acceptance remain recorded in the [native refinement report](docs/native/ux-refinement-and-word-templates.md). Current integration acceptance uses synthetic fixtures and the separate integration report.
 
 ```powershell

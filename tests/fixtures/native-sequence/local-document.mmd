@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Author as Documentation Author
+    participant Studio as Lens Docs Studio
+    participant Workspace as Local Workspace
+
+    Author->>Studio: Open documentation
+    activate Studio
+    Studio->>Workspace: Read Markdown file
+    Workspace-->>Studio: Return document contents
+    Studio-->>Author: Display preview
+    deactivate Studio
+
+    Note over Author,Studio: Documents remain local

@@ -2,6 +2,34 @@
 
 ## Mermaid visual authoring
 
+**Sequence diagrams:** Visual Edit automatically opens the Sequence editor for
+`sequenceDiagram`. Choose **Insert → Sequence diagram visually…** to start one.
+Select a participant header/lifeline, message path/label or note on the canonical
+drawing, or use the native participant and ordered interaction lists. The inspector
+edits participant IDs, aliases and actor type; message endpoints, text and arrows;
+and note placement/text. **Add message** and **Add note** offer insertion before or
+after the selected interaction, or at the end. Use **Earlier/Later** for eligible
+participant/message ordering. Layout follows source order; zoom and middle-mouse
+PAN change only the view. The viewport also supports keyboard scrolling.
+
+Update properties before changing selection or applying. **Discard pending
+properties** retains the validated draft. Activation behaviour is attached to its
+triggering message; the editor preserves existing standalone commands and validates
+simple lifecycles. Structural blocks remain visible and their headings inspectable;
+unsafe moves, unknown dependencies, grouping/lifecycle constructs and nested
+activation rewrites require **Edit source**. Disabled actions explain the restriction.
+
+Sequence private Undo/Redo uses Ctrl+Z/Ctrl+Y outside text fields. Ctrl+Shift+P adds
+a participant, Ctrl+Shift+M adds a message, Alt+Up/Down moves eligible selections,
+F2 focuses the selected text, F fits, Ctrl+0 restores actual size, Ctrl+Enter applies
+and Escape cancels. Text fields retain their normal editing shortcuts. Expand
+**Portable Mermaid source** to inspect/edit and validate the private source, locate
+the selection, or inspect the immutable original. Apply is one owning-document Undo
+step; Cancel preserves that document. Save writes ordinary portable Mermaid.
+
+The [Sequence engineering report](mermaid-sequence-visual-editor.md) records the
+pinned renderer grammar, safe operation subset and current certification evidence.
+
 Choose **Visual Edit** beside an existing recognised Flowchart preview, including protected source. **Edit source** remains separate. Choose **Insert →
 Flowchart visually** for a new diagram. The native editor offers nodes, connections,
 subgraphs, properties, source inspection and private Undo/Redo. Update edited
@@ -55,7 +83,7 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Other Mermaid families keep their existing
+than four connections per node. Families other than Flowchart and Sequence keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## Desktop workspace and synchronisation

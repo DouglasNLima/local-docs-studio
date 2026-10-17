@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant A
+    participant B
+    A->>B: Same
+    A->>B: Same
+    A->>B: Same
+    A->>A: Self<br/>message
+    A<<-->>B: Bidirectional
+    Note left of A: Before
+    Note over A,B: Across

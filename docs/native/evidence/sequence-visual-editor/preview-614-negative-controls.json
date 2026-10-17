@@ -1,0 +1,42 @@
+{
+  "checks": [
+    {
+      "name": "wrong-source",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-version",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-independent-hash",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "dirty-source",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "tampered-zip",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "excluded-experiment-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "missing-editor-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    }
+  ],
+  "sourceRevision": "37c622022c235ca97dcf4be7e96eaa651ac5c338",
+  "status": "PASS",
+  "originalPackageUnchanged": true
+}

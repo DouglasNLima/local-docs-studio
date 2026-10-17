@@ -1,0 +1,15 @@
+{
+  "baseline": "7bd2207b9c18e451b17678f4dd417134070a5722",
+  "sourceRevision": "e1cad9205c6c04cf0474265d055fcc40b3f2c8e9",
+  "renderer": "Mermaider 0.15.1",
+  "rendererRepositoryRevision": "71b64845570d633a94d29e85579c0a02786fece8",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033667815",
+  "environment": "Disposable GitHub-hosted Windows; native application not run on the ordinary desktop",
+  "normalArtefact": "native-sequence-normal",
+  "highContrastArtefact": "native-sequence-high-contrast",
+  "fidelityAndOwnershipAssertions": 101,
+  "normalUiAssertions": 27,
+  "actualHighContrastUiAssertions": 28,
+  "reviewObservation": "before-hover-dark.png retains an opaque inherited hover surface over a canonical message. The next candidate replaces it with a transparent outline-only Sequence target.",
+  "scope": "These receipts identify the recorded source only. Final package and HEAD certification are reported separately. Physical higher-DPI and production trust certification remain outstanding."
+}

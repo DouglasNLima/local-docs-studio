@@ -1,5 +1,19 @@
 # Native diagram compatibility
 
+The [native Sequence visual editor report](mermaid-sequence-visual-editor.md) records
+the exact Mermaider 0.15.1 grammar and bounded source-preserving authoring subset.
+Sequence and Flowchart preview actions route to separate native semantic editors.
+Sequence layout and rendering remain authoritative in Mermaider; its verified SVG
+metadata supplies interaction geometry only after correspondence with source tokens.
+The existing standalone activation adapter continues to affect rendering only.
+
+Sequence certification exposed a native interpolation failure for functional RGB
+colours in protected participant boxes. The adapter now resolves bounded numeric,
+percentage and alpha RGB/RGBA channels before native conversion. It retains the
+original Mermaid and existing SVG sanitisation; this does not certify every CSS
+colour space accepted lexically by the pinned renderer. Conversion failures retain
+source and a visible diagnostic.
+
 The advanced native Flowchart editing continuation is tracked in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), stacked on
 the exact unmerged PR #30 implementation. Its [partial-editing report](mermaid-advanced-flowchart-partial-editing.md)

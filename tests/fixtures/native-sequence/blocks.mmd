@@ -1,0 +1,12 @@
+sequenceDiagram
+    autonumber 5 2
+    participant A as Author
+    actor B as Studio
+    loop Local files
+        alt Exists
+            A->>B: Open
+        else Missing
+            B-->>A: Choose file
+        end
+    end
+    Note right of B: Remains local

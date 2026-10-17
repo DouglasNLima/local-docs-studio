@@ -1,5 +1,12 @@
 # Native Windows engineering handover
 
+Continue Sequence authoring work from [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
+branch `feature/native-mermaid-sequence-visual-editor`, based on verified `7bd2207`.
+Its [Sequence report](mermaid-sequence-visual-editor.md) owns current evidence and
+scoped certification of application `37c6220` and exact-source unsigned preview
+`0.1.1-preview.614`. It is independent of Draft PR #31; shared integration
+surfaces are documented there. Do not merge or publish automatically.
+
 The advanced Flowchart partial-editing continuation is implemented in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
 verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.

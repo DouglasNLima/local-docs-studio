@@ -69,6 +69,11 @@ internal static class NativeMermaidFidelityChecks
                 RenderMilliseconds = renderMs, InteractionGeometryMilliseconds = interactionMs, PixelTolerance = 0, CoordinateTolerance = .001,
                 Bounds = new { reference.Width, reference.Height }, SourceUnchanged = result.Source == source });
         }
+        const string literalSource = "flowchart LR\nA[\"Read var(--missing) and 2rem\"] --> B[\"Keep color-mix(in srgb, red, blue) literal\"]";
+        var literalRender = new DiagramService().Render(literalSource);
+        var literalPresentation = NativeMermaidPresentation.Create(literalRender, new NativeSvgService());
+        Check(literalPresentation.Maps(new MermaidSourceParser().Parse(literalSource)), "Literal CSS words in Flowchart source metadata retain exact canonical identities");
+        Check(NativeSvgService.ToPng(literalPresentation.Drawing, .5).Length > 100, "Literal CSS labels retain actual Flowchart PNG output");
         var safeResult = new DiagramService().Render("flowchart LR\nA[Keep] --> B[Source]");
         Reject(safeResult with { Svg = safeResult.Svg!.Replace("data-id=\"A\"", "data-id=\"B\"", StringComparison.Ordinal) }, "Conflicting node IDs cannot supply interaction identities");
         Reject(safeResult with { Svg = "<!DOCTYPE svg [<!ENTITY unsafe SYSTEM 'file:///synthetic'>]>" + safeResult.Svg }, "DTD and external entities are rejected before metadata processing");

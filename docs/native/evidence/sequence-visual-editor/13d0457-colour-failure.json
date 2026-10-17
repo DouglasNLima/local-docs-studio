@@ -1,0 +1,12 @@
+{
+  "sourceRevision": "13d045708a5eb2e817102e23eab4ff251d95c00d",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39034670483",
+  "job": 117402231151,
+  "status": "FAIL",
+  "stage": "Expanded Sequence fidelity/performance; before UIA",
+  "scenario": "Protected grouping using box rgb(240,240,240) Services",
+  "exception": "System.FormatException: Token is not valid. NativeSvgService.Colour passed rgb(240,240,240) to WPF ColorConverter during canonical colour interpolation.",
+  "artifact": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39034670483/artifacts/12102105960",
+  "artifactSha256": "71e56bdc94a08a5ed4eeed97c0854b123c90ab2c7d026eb48910ec52051f1357",
+  "response": "Retain the original scenario and failure evidence. Add bounded functional RGB/RGBA channel conversion, native PNG regressions and a non-fatal Sequence drawing diagnostic. No renderer, source or test requirement is removed."
+}

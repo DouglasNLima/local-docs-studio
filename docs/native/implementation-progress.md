@@ -1,5 +1,14 @@
 # Native implementation progress
 
+Sequence visual authoring is tracked independently in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
+based on `develop` at `7bd2207`. Dedicated Core semantics, exact patches, private
+history, canonical native selection/inspector, authoring and owning-document routing
+are implemented. The [Sequence report](mermaid-sequence-visual-editor.md) owns the
+current verification status. Accepted application `37c6220` passes the scoped native,
+normal/actual High Contrast, browser and package checks, including independently
+verified unsigned exact-source preview `0.1.1-preview.614`. Evidence commits retain
+that application/package identity separately from their final documentation HEAD.
+
 The advanced Flowchart partial-editing continuation is implemented in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
 verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.

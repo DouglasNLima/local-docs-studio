@@ -1,5 +1,12 @@
 # Functional parity matrix
 
+The native [Sequence editor](mermaid-sequence-visual-editor.md) adds participant,
+message, basic note and simple activation authoring with exact source patches and
+private history. Structural rewrites, participant boxes/create/destroy and unknown
+dependencies remain source-only. Accepted application `37c6220` passes the scoped
+normal/actual High Contrast, source/ownership, regression and exact-source preview
+`0.1.1-preview.614` checks. This does not claim universal Mermaid authoring parity.
+
 The advanced Flowchart partial-editing continuation is implemented in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
 verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.

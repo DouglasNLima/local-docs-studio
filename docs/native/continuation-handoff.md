@@ -1,5 +1,12 @@
 # Native Windows development continuation handoff
 
+The active Sequence editor implementation is [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
+See [its report](mermaid-sequence-visual-editor.md) for source modelling, canonical
+mapping, safe/protected operations and accepted application `37c6220` / independently
+verified unsigned preview `0.1.1-preview.614` evidence. Execute native UI and
+installer checks only in disposable Windows environments. No automatic merge,
+stable release or unsigned automatic updates are authorised.
+
 The advanced Flowchart partial-editing continuation is implemented in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
 verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.
