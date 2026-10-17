@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -168,6 +170,32 @@ jobs:
             artifacts/native/packages/*/*.zip
             artifacts/native/packages/*/*.json
             artifacts/native/packages/*/SHA256SUMS.txt
+          retention-days: 14
+
+  state-installed-authoring:
+    needs: native
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          path: artifacts/state-installer-packages
+      - name: Build exact-head native State validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify installed, upgraded and reinstalled State authoring independently
+        run: pwsh -NoProfile -File scripts/native/Test-NativeStateInstaller.ps1 -Installer "artifacts/state-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/state-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-state-installed-authoring
+          path: artifacts/native/state-install-smoke/
           retention-days: 14
 
   historical-upgrade:

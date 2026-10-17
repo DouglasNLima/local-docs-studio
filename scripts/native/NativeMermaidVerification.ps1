@@ -40,13 +40,14 @@ function Test-NativeMermaidResources {
     }
     $native = Read-MermaidMetadata $NativeAssemblyPath $true
     $core = Read-MermaidMetadata $CoreAssemblyPath $false
-    $requiredNative = @('LensDocsStudio.Native.MermaidVisualEditorWindow', 'LensDocsStudio.Native.SequenceVisualEditorWindow', 'LensDocsStudio.Native.Rendering.NativeSequencePresentation', 'LensDocsStudio.Native.Editor.MermaidDocumentEditSession', 'LensDocsStudio.Native.Editor.MermaidSourceHighlighting')
+    $requiredNative = @('LensDocsStudio.Native.MermaidVisualEditorWindow', 'LensDocsStudio.Native.SequenceVisualEditorWindow', 'LensDocsStudio.Native.Rendering.NativeSequencePresentation', 'LensDocsStudio.Native.StateVisualEditorWindow', 'LensDocsStudio.Native.Rendering.NativeStatePresentation', 'LensDocsStudio.Native.Editor.MermaidDocumentEditSession', 'LensDocsStudio.Native.Editor.MermaidSourceHighlighting')
     $requiredCore = @('LensDocsStudio.Core.Mermaid.MermaidDiagramModel', 'LensDocsStudio.Core.Mermaid.MermaidSourceParser', 'LensDocsStudio.Core.Mermaid.MermaidTransformationService', 'LensDocsStudio.Core.Mermaid.MermaidVisualDraft', 'LensDocsStudio.Core.Mermaid.MermaidGraphLayout',
         'LensDocsStudio.Core.Mermaid.MermaidCapabilityAnalysis', 'LensDocsStudio.Core.Mermaid.MermaidOperationCapability', 'LensDocsStudio.Core.Mermaid.MermaidOperationKind', 'LensDocsStudio.Core.Mermaid.MermaidSemanticValidation',
-        'LensDocsStudio.Core.Sequence.SequenceDiagramModel', 'LensDocsStudio.Core.Sequence.SequenceSourceParser', 'LensDocsStudio.Core.Sequence.SequenceTransformationService', 'LensDocsStudio.Core.Sequence.SequenceVisualDraft')
+        'LensDocsStudio.Core.Sequence.SequenceDiagramModel', 'LensDocsStudio.Core.Sequence.SequenceSourceParser', 'LensDocsStudio.Core.Sequence.SequenceTransformationService', 'LensDocsStudio.Core.Sequence.SequenceVisualDraft',
+        'LensDocsStudio.Core.StateDiagrams.StateDiagramModel', 'LensDocsStudio.Core.StateDiagrams.StateDiagramSourceParser', 'LensDocsStudio.Core.StateDiagrams.StateTransformationService', 'LensDocsStudio.Core.StateDiagrams.StateVisualDraft', 'LensDocsStudio.Core.StateDiagrams.StateCapabilityAnalysis', 'LensDocsStudio.Core.StateDiagrams.StateSemanticValidation')
     foreach ($name in $requiredNative) { if (-not $native.Types.Contains($name)) { throw "The native Mermaid editor type is missing: $name" } }
     foreach ($name in $requiredCore) { if (-not $core.Types.Contains($name)) { throw "The Core Mermaid editor type is missing: $name" } }
-    foreach ($name in @('mermaidvisualeditorwindow.baml', 'sequencevisualeditorwindow.baml', 'resources/desktopstyles.baml', 'resources/formstyles.baml', 'resources/commandicons.baml', 'resources/mermaideditorstyles.baml', 'resources/brand/application.ico')) {
+    foreach ($name in @('mermaidvisualeditorwindow.baml', 'sequencevisualeditorwindow.baml', 'statevisualeditorwindow.baml', 'resources/desktopstyles.baml', 'resources/formstyles.baml', 'resources/commandicons.baml', 'resources/mermaideditorstyles.baml', 'resources/brand/application.ico')) {
         if (-not $native.Resources.Contains($name)) { throw "The compiled native Mermaid editor resource is missing: $name" }
     }
     return [ordered]@{ status='PASS'; executionPerformed=$false; nativeTypes=$requiredNative; coreTypes=$requiredCore; editorXaml='mermaidvisualeditorwindow.baml'; originalIcon='resources/brand/application.ico' }

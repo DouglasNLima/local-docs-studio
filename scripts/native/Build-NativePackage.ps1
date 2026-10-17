@@ -40,10 +40,11 @@ try {
     Invoke-NativeAuthenticodeSigning -FilePath $exe -Configuration $signing
     $metadata = [ordered]@{ schemaVersion=1; product='LensDocsStudio.Native'; version=$Version; channel='Preview'; architecture='x64'; minimumWindowsVersion='10.0.17763'; selfContained=$true; internalPreview=$true; signingRequested=($signing.Mode -ne 'Unsigned'); signingProvider=$signing.Mode; sourceRevision=(& git rev-parse HEAD).Trim(); sourceDirty=[bool](& git status --porcelain); builtAtUtc=[DateTimeOffset]::UtcNow.ToString('O') }
     if ($metadata.sourceRevision -ne $revision -or $metadata.sourceDirty) { throw 'Source changed while publishing; discard this incomplete output and use a new version.' }
-    $metadata.sourceKind = if ($env:GITHUB_EVENT_NAME -eq 'pull_request') { 'pull-request-merge-checkout' } elseif ($env:GITHUB_ACTIONS -eq 'true') { 'branch-source' } else { 'local-source' }
+    $mergeCheckout = $env:GITHUB_EVENT_NAME -eq 'pull_request' -and $metadata.sourceRevision -eq $env:GITHUB_SHA
+    $metadata.sourceKind = if ($mergeCheckout) { 'pull-request-merge-checkout' } elseif ($env:GITHUB_ACTIONS -eq 'true') { 'branch-source' } else { 'local-source' }
     $metadata.ciRunId = $env:GITHUB_RUN_ID
     $metadata.ciRunAttempt = $env:GITHUB_RUN_ATTEMPT
-    $metadata.checkoutRef = $env:GITHUB_REF
+    $metadata.checkoutRef = if ($env:GITHUB_EVENT_NAME -eq 'pull_request' -and -not $mergeCheckout) { 'refs/heads/' + $env:GITHUB_HEAD_REF } else { $env:GITHUB_REF }
     $metadata | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $payload 'version.json') -Encoding utf8NoBOM
     if (Test-Path -LiteralPath (Join-Path $repo 'LICENSE')) { Copy-Item -LiteralPath (Join-Path $repo 'LICENSE') -Destination $payload }
     & (Join-Path $PSScriptRoot 'Write-NativeNotices.ps1') -PayloadDirectory $payload

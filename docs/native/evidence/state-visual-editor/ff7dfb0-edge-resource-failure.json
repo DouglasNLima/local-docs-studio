@@ -1,0 +1,14 @@
+{
+  "sameRevisionPushResult": "PASS",
+  "disposition": "Retain failure; require final-head browser certification. No web product change justified by this trace.",
+  "assertion": "topbar computed display must equal flex",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39048347552",
+  "browser": "Edge",
+  "resource": "http://127.0.0.1:4173/assets/styles/app.css",
+  "revision": "ff7dfb06784b5eaaf61aeec16355ba77f6c51cbd",
+  "observed": "block",
+  "sameRevisionPushRun": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39048343864",
+  "failingTest": "Windows shell diagnostics report browser fallback safely",
+  "consoleError": "Failed to load resource: net::ERR_NO_BUFFER_SPACE",
+  "focusedLocalReproduction": "PASS: one unchanged Edge test; no timeout or assertion change"
+}

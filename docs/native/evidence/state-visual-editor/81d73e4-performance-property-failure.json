@@ -1,0 +1,10 @@
+{
+  "correction": "Read the optional AutomationId property before filtering State canvas targets; State targets still require the exact non-empty prefix.",
+  "authoringResult": "PASS: 46 High Contrast checks",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39050931461",
+  "phase": "Native State performance harness",
+  "error": "AutomationId is not supported by an unrelated Windows title-bar automation element",
+  "status": "FAIL",
+  "retryOrTimeoutChange": false,
+  "revision": "81d73e47a6fd64816f817342095a51c3b9fead56"
+}

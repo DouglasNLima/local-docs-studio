@@ -596,6 +596,7 @@ public partial class MainWindow : Window
         helpWindow?.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<MermaidVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         foreach (var editor in OwnedWindows.OfType<SequenceVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
+        foreach (var editor in OwnedWindows.OfType<StateVisualEditorWindow>()) editor.ApplyTheme(model.Theme);
         editorHighlighting.Dark = ThemeService.IsDark(model.Theme); editorHighlighting.HighContrast = SystemParameters.HighContrast;
         Editor.TextArea.SelectionBrush = (Brush)Application.Current.Resources["AccentBrush"];
         Editor.TextArea.SelectionForeground = (Brush)Application.Current.Resources["AccentTextBrush"];
@@ -685,6 +686,8 @@ public partial class MainWindow : Window
                       if (!visualEditor.CloseForOwner()) return;
                   foreach (var sequenceEditor in OwnedWindows.OfType<SequenceVisualEditorWindow>().ToArray())
                       if (!sequenceEditor.CloseForOwner()) return;
+                  foreach (var stateEditor in OwnedWindows.OfType<StateVisualEditorWindow>().ToArray())
+                      if (!stateEditor.CloseForOwner()) return;
                 SaveViewport();
                 if (!await model.PrepareCloseAsync()) return;
                 await model.UpdatePreferencesAsync(p => p with { Window = fullScreen ? previousWindow : WindowStateService.Capture(this) });

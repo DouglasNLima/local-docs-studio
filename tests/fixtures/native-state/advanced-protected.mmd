@@ -1,0 +1,20 @@
+stateDiagram-v2
+    %% Bounded synthetic review process; preserve this comment.
+    state "Independent reviewer" as Reviewer
+    state "Review process" as Process {
+        [*] --> Draft
+        state "Nested review" as Nested {
+            [*] --> Checking
+            Checking --> Checking : Check again
+            Checking --> [*]
+        }
+        Draft --> Draft : Request changes
+        Draft --> [*]
+    }
+    state Decision <<choice>>
+    Reviewer --> Decision : Choose
+    Reviewer --> Decision : Choose
+    Decision --> Reviewer : Reconsider
+    note right of Reviewer : Synthetic local review
+    classDef quiet fill:#F3F4F6
+    class Reviewer quiet
