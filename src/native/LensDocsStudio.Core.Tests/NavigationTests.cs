@@ -5,6 +5,19 @@ namespace LensDocsStudio.Core.Tests;
 
 public sealed class NavigationTests
 {
+    [Fact] public void Preview_reading_locations_remain_distinct_when_the_editor_has_not_moved()
+    {
+        var history = new NavigationHistory();
+        var first = new NavigationLocation(Guid.NewGuid(), "reading.md", 0, 0, 120);
+        var second = first with { PreviewSourceOffset = 940 };
+        history.Visit(first); history.Visit(second);
+        Assert.True(history.CanGoBack); Assert.Equal(120, history.Back!.PreviewSourceOffset);
+        history.CompleteMove(false, history.Back);
+        Assert.Equal(940, history.Forward!.PreviewSourceOffset);
+        history.RelocateDocument(first.DocumentId, "renamed.md");
+        Assert.Equal("renamed.md", history.Forward.Path); Assert.Equal(940, history.Forward.PreviewSourceOffset);
+    }
+
     [Fact] public void Navigation_retains_viewports_and_discards_the_forward_branch_after_a_new_visit()
     {
         var history = new NavigationHistory();

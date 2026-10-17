@@ -36,6 +36,8 @@ internal static class NativeMermaidFidelityChecks
             Check(presentation.Elements.Count == presentation.Graph.Nodes.Count + CountGroups(presentation.Graph.Groups), file + ": every canonical node and nested subgraph has geometry");
             Check(Groups(presentation.Drawing.Drawing).Count(group => SvgObject.GetId(group)?.StartsWith("lens-node-", StringComparison.Ordinal) == true) == presentation.Graph.Nodes.Count,
                 file + ": native drawing groups retain safe session-only node identities");
+            Check(Groups(presentation.Drawing.Drawing).Count(group => SvgObject.GetId(group)?.StartsWith("lens-group-label-", StringComparison.Ordinal) == true) == CountGroups(presentation.Graph.Groups),
+                file + ": verified subgraph titles retain their own session translation identities");
             foreach (var node in presentation.Graph.Nodes)
             {
                 var box = presentation.Elements["node:" + node.Id].Bounds; var origin = presentation.Drawing.Drawing.Bounds;

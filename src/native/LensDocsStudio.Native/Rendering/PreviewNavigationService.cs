@@ -17,7 +17,7 @@ public static class PreviewNavigationService
     public static void CancelPending(FlowDocumentReader viewer)
     { if (States.TryGetValue(viewer, out var state)) state.Pending?.Cancel(); }
 
-    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null)
+    public static Task<bool> BringIntoViewAsync(FlowDocumentReader viewer, TextPointer position, TextPointer? selectionEnd = null, Action<string>? diagnostic = null)
     {
         viewer.VerifyAccess();
         var document = viewer.Document;
@@ -28,12 +28,16 @@ public static class PreviewNavigationService
         var cancellation = new CancellationTokenSource(); state.Pending = cancellation;
         var originalSelectionStart = viewer.Selection?.Start;
         var originalSelectionEnd = viewer.Selection?.End;
+        var originalSelectionEmpty = viewer.Selection?.IsEmpty == true;
         return viewer.Dispatcher.InvokeAsync(Navigate, DispatcherPriority.Loaded).Task.Unwrap();
 
+        // Plain navigation may outlive deferred restoration of an empty reader caret.
+        // Actual user input cancels Pending; a newer selected range always supersedes us.
         bool Current() => !cancellation.IsCancellationRequested && viewer.Document == document
             && position.IsInSameDocument(document.ContentStart)
             && (originalSelectionStart is null || viewer.Selection is { } selection
-                && selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0);
+                && (selectionEnd is null && originalSelectionEmpty && selection.IsEmpty
+                    || selection.Start.CompareTo(originalSelectionStart) == 0 && selection.End.CompareTo(originalSelectionEnd!) == 0));
 
         async Task<bool> Navigate()
         {
@@ -53,20 +57,25 @@ public static class PreviewNavigationService
                             if (viewer.Selection is not { } selection) return;
                             selection.Select(position, selectionEnd);
                         }
-                        BringIntoScrollView(scrolling, position);
+                        BringIntoScrollView(scrolling, position, diagnostic);
                         shown = true;
                     }, DispatcherPriority.Loaded);
                     return shown && !cancellation.IsCancellationRequested && viewer.Document == document;
                 }
                 var paginator = (DynamicDocumentPaginator)((IDocumentPaginatorSource)document).DocumentPaginator;
                 var page = await GetPageNumber(paginator, position, cancellation.Token);
+                diagnostic?.Invoke($"computed page {page + 1}, count {paginator.PageCount}, size {paginator.PageSize}, text offset {document.ContentStart.GetOffsetToPosition(position)}");
                 if (!Current() || page < 0 || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll) return false;
                 if (FindViewer<FlowDocumentPageViewer>(viewer) is not { } paged) return false;
-                paged.GoToPage(page + 1); paged.UpdateLayout();
                 var selected = false;
                 await viewer.Dispatcher.InvokeAsync(() =>
                 {
-                    if (!Current()) return;
+                    if (!Current() || viewer.ViewingMode == FlowDocumentReaderViewingMode.Scroll || paged.Document != document) return;
+                    // Publish the paginator's new page count through WPF binding before
+                    // GoToPage; otherwise a freshly replaced reader silently rejects it.
+                    diagnostic?.Invoke($"before page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, allowed {paged.CanGoToPage(page + 1)}, size {paginator.PageSize}");
+                    paged.GoToPage(page + 1); paged.UpdateLayout();
+                    diagnostic?.Invoke($"after page selection: reader {viewer.PageNumber}/{viewer.PageCount}, native {paged.MasterPageNumber}/{paged.PageCount}, size {paginator.PageSize}");
                     if (selectionEnd is not null)
                     {
                         if (viewer.Selection is not { } selection) return;
@@ -133,13 +142,17 @@ public static class PreviewNavigationService
         }, DispatcherPriority.Loaded);
     }
 
-    private static void BringIntoScrollView(FlowDocumentScrollViewer viewer, TextPointer position)
+    private static void BringIntoScrollView(FlowDocumentScrollViewer viewer, TextPointer position, Action<string>? diagnostic = null)
     {
+        diagnostic?.Invoke($"scroll entry: {viewer.GetType().Name}, visible {viewer.IsVisible}, loaded {viewer.IsLoaded}, size {viewer.ActualWidth} x {viewer.ActualHeight}, document matches {viewer.Document is { } shown && position.IsInSameDocument(shown.ContentStart)}");
         viewer.UpdateLayout();
         ((FrameworkContentElement?)position.Paragraph ?? position.Parent as FrameworkContentElement)?.BringIntoView();
         viewer.UpdateLayout();
         var rectangle = position.GetCharacterRect(LogicalDirection.Forward);
+        diagnostic?.Invoke($"scroll character: {rectangle}, valid layout {position.HasValidLayout}, content host {viewer.Template.FindName("PART_ContentHost", viewer)?.GetType().Name ?? "missing"}");
         if (rectangle.IsEmpty || viewer.Template.FindName("PART_ContentHost", viewer) is not ScrollViewer scrolling) return;
-        scrolling.ScrollToVerticalOffset(Math.Max(0, scrolling.VerticalOffset + rectangle.Top - scrolling.ViewportHeight / 3));
+        var target = Math.Max(0, scrolling.VerticalOffset + rectangle.Top - scrolling.ViewportHeight / 3);
+        diagnostic?.Invoke($"scroll offset {scrolling.VerticalOffset}, extent {scrolling.ExtentHeight}, viewport {scrolling.ViewportHeight}, character {rectangle}, requested {target}");
+        scrolling.ScrollToVerticalOffset(target);
     }
 }

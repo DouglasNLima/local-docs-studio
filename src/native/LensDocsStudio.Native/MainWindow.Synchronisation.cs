@@ -74,15 +74,44 @@ public partial class MainWindow
         semanticHighlight?.Show(null);
         if (semanticHighlight is null && AdornerLayer.GetAdornerLayer(Preview) is { } layer)
         { semanticHighlight = new(Preview); layer.Add(semanticHighlight); }
+        if (pendingViewportDocument is { } documentId && renderedDocumentId == documentId)
+        {
+            var resultToRestore = rendered; var tab = model.ActiveDocument!; var generation = viewportGeneration; var restoreSyncGeneration = syncGeneration;
+            var offsetToRestore = Math.Clamp(tab.PreviewSourceOffset, 0, tab.EditorDocument.TextLength);
+            applyingSync = true; applyingSyncOrigin = "restore-preview";
+            Dispatcher.BeginInvoke(async () =>
+            {
+                try
+                {
+                    if (generation != viewportGeneration || restoreSyncGeneration != syncGeneration || model.ActiveDocument != tab || rendered != resultToRestore || !SyncCurrent) return;
+                    var pointer = offsetToRestore == 0 ? resultToRestore!.Document.ContentStart
+                        : resultToRestore!.TextMap.TryPreviewRange(offsetToRestore, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offsetToRestore)?.ContentStart;
+                    if (pointer is not null) await PreviewNavigationService.BringIntoViewAsync(Preview, pointer);
+                }
+                finally
+                {
+                    if (generation == viewportGeneration && model.ActiveDocument == tab && rendered == resultToRestore)
+                    {
+                        pendingViewportDocument = null; applyingSync = false; applyingSyncOrigin = null;
+                        // Actual text selection can arrive while the incoming reading
+                        // position is restoring. Reconcile it against this immutable map;
+                        // an empty caret must not override a returning tab's viewport.
+                        if (DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin && Editor.SelectionLength > 0)
+                            QueueSynchronisation("editor-selection");
+                    }
+                }
+            }, DispatcherPriority.Loaded);
+            return;
+        }
         // An edit can retain the same selected span while replacing its contents.
         // Reconcile that current input once the new immutable map is installed;
         // it need not raise another SelectionChanged event.
         if (QueueCurrentEditorInput()) return;
-        var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0;
+        var result = rendered; var offset = model.ActiveDocument?.PreviewSourceOffset ?? 0; var restorationGeneration = syncGeneration;
         if (offset > 0)
             Dispatcher.BeginInvoke(async () =>
             {
-                if (!SyncCurrent || rendered != result || !Preview.IsVisible) return;
+                if (restorationGeneration != syncGeneration || !SyncCurrent || rendered != result || !Preview.IsVisible) return;
                 var pointer = result!.TextMap.TryPreviewRange(offset, 0, out var literal, out _) ? literal : syncAnchors?.AtSource(offset)?.ContentStart;
                 if (pointer is null) return;
                 var generation = ++syncGeneration; applyingSync = true; applyingSyncOrigin = "restore-preview";
@@ -132,7 +161,7 @@ public partial class MainWindow
     }
     private void QueueSynchronisation(string origin)
     {
-        if (!SyncCurrent) return;
+        if (restoringNavigation || bindingViewport || pendingViewportDocument is not null || !SyncCurrent) return;
         if (pendingSync?.EndsWith("selection", StringComparison.Ordinal) == true && origin.EndsWith("scroll", StringComparison.Ordinal)) return;
         pendingSync = origin;
         if (!syncTimer.IsEnabled) syncTimer.Start();
@@ -156,7 +185,7 @@ public partial class MainWindow
     private async void SyncTick(object? sender, EventArgs e)
     {
         syncTimer.Stop(); var origin = pendingSync; pendingSync = null;
-        if (origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
+        if (restoringNavigation || origin is null || !SyncCurrent || !BothPanesVisible || applyingSync) return;
         var generation = ++syncGeneration; var result = rendered!;
         applyingSync = true; applyingSyncOrigin = origin;
         try
@@ -220,7 +249,7 @@ public partial class MainWindow
         {
             if (!Dispatcher.HasShutdownStarted)
             {
-                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; } }, DispatcherPriority.Background); }
+                try { await Dispatcher.InvokeAsync(() => { if (syncGeneration == generation) { applyingSync = false; applyingSyncOrigin = null; TraceViewport("sync-complete " + origin); } }, DispatcherPriority.Background); }
                 catch (TaskCanceledException) when (Dispatcher.HasShutdownStarted) { }
             }
         }

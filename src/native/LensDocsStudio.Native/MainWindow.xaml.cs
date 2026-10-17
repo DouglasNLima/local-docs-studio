@@ -42,6 +42,9 @@ public partial class MainWindow : Window
     private ParsedDocument? parsed;
     private Guid? renderedDocumentId;
     private DocumentViewModel? displayedTab;
+    private bool bindingViewport;
+    private Guid? pendingViewportDocument;
+    private long viewportGeneration;
     private bool previewFocused;
     private bool searchPreview;
     private bool closing;
@@ -98,25 +101,32 @@ public partial class MainWindow : Window
     }
     private void SaveViewport()
     {
-        if (displayedTab is null) return;
+        if (displayedTab is null || bindingViewport) return;
         displayedTab.CaretOffset = Editor.CaretOffset;
         displayedTab.VerticalOffset = Editor.VerticalOffset;
-        if (renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
+        if (pendingViewportDocument != displayedTab.Id && renderedDocumentId == displayedTab.Id && Preview.IsVisible && renderedVersion is not null
             && VisiblePreviewSource() is { } source)
             displayedTab.PreviewSourceOffset = Math.Clamp(renderedVersion.MoveOffsetTo(Editor.Document.Version, source, AnchorMovementType.AfterInsertion), 0, Editor.Document.TextLength);
+        TraceViewport("viewport-saved");
     }
     private void BindActiveDocument()
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
-        CancelSynchronisation();
-        Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
-        Editor.IsEnabled = displayedTab is not null;
-        if (displayedTab is not null)
+        CancelSynchronisation(); previewCancellation?.Cancel(); viewportGeneration++;
+        pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
+        // The shared reader may still display the outgoing document while rendering.
+        // Its visible position must never be captured for the incoming tab.
+        renderedDocumentId = null; renderedVersion = null; syncAnchors = null;
+        try
         {
-            Editor.CaretOffset = Math.Clamp(displayedTab.CaretOffset, 0, Editor.Document.TextLength);
-            Editor.ScrollToVerticalOffset(displayedTab.VerticalOffset);
+            Editor.Document = displayedTab?.EditorDocument ?? new TextDocument();
+            Editor.IsEnabled = displayedTab is not null;
+            Editor.CaretOffset = Math.Clamp(displayedTab?.CaretOffset ?? 0, 0, Editor.Document.TextLength);
+            Editor.ScrollToHorizontalOffset(0);
+            Editor.ScrollToVerticalOffset(displayedTab?.VerticalOffset ?? 0);
         }
+        finally { bindingViewport = false; }
         UpdateCaretStatus();
         if (!restoringNavigation && CurrentNavigation() is { } location) navigation.Visit(location);
         RefreshNavigationControls();
@@ -185,7 +195,11 @@ public partial class MainWindow : Window
                 return (drawings, images, formulae);
             }, cancellation);
             if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
-            var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, Navigate, ExportDiagram,
+            var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
+                {
+                    if (model.ActiveDocument == tab && renderedDocumentId == tab.Id && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0) Navigate(reference);
+                    else model.Status = "The document changed. Wait for its current preview before following a link.";
+                }, ExportDiagram,
                 nativeDrawings.drawings, CopyDocumentImage, nativeDrawings.images, cancellation, CopyCodeBlock, prepared.syntax,
                 selection => _ = CopyDocumentAsync(false, selection, prepared.source.Source, tab.Id),
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
@@ -237,6 +251,7 @@ public partial class MainWindow : Window
     }
     private async void JumpToSource(int offset, bool focusEditor = true)
     {
+        CancelSynchronisation();
         CaptureCurrentNavigation();
         Editor.Select(Math.Clamp(offset, 0, Editor.Document.TextLength), 0);
         var document = Editor.Document; var target = Editor.CaretOffset;
@@ -256,34 +271,70 @@ public partial class MainWindow : Window
     }
     private async void Navigate(string reference)
     {
+        (DocumentViewModel Document, PreviewResult Preview, TextElement Element, int Offset, long Generation)? pendingPreviewAnchor = null;
         await model.RunAsync(async () =>
         {
             var fragment = reference.Contains('#') ? Uri.UnescapeDataString(reference.Split('#', 2)[1]) : null;
-            if (!reference.StartsWith('#'))
+            if (!reference.StartsWith('#') && Uri.TryCreate(reference, UriKind.Absolute, out var uri))
             {
-                if (Uri.TryCreate(reference, UriKind.Absolute, out var uri))
-                {
-                    if (uri.Scheme is "https" or "http" or "mailto")
-                        if (dialogs.Confirm("Open this external link in its default application?\n\n" + reference, "External link")) Process.Start(new ProcessStartInfo(reference) { UseShellExecute = true });
-                    return;
-                }
-                if (model.ActiveDocument is not { FilePath: not null, WorkspaceRoot: not null } tab) throw new IOException("Open a workspace to follow relative links.");
-                var path = new WorkspacePath(tab.WorkspaceRoot).ResolveLink(tab.FilePath, reference);
-                if (!WorkspaceService.IsDocument(path)) throw new IOException("This link is not a supported document.");
-                await model.OpenPathAsync(path, tab.WorkspaceRoot); BindActiveDocument(); await UpdatePreviewAsync();
+                if (uri.Scheme is "https" or "http" or "mailto")
+                    if (dialogs.Confirm("Open this external link in its default application?\n\n" + reference, "External link")) Process.Start(new ProcessStartInfo(reference) { UseShellExecute = true });
+                return;
             }
-            if (fragment is not null)
+            CaptureCurrentNavigation(); var previousRestoring = restoringNavigation; restoringNavigation = true;
+            try
             {
-                var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
-                if (target is not null)
+                if (!reference.StartsWith('#'))
                 {
-                    JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
-                    if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
-                    { rendered.RevealSource(target.SourceStart); await PreviewNavigationService.BringIntoViewAsync(Preview, element.ContentStart); }
+                    if (model.ActiveDocument is not { FilePath: not null, WorkspaceRoot: not null } tab) throw new IOException("Open a workspace to follow relative links.");
+                    var path = new WorkspacePath(tab.WorkspaceRoot).ResolveLink(tab.FilePath, reference);
+                    if (!WorkspaceService.IsDocument(path)) throw new IOException("This link is not a supported document.");
+                    await model.OpenPathAsync(path, tab.WorkspaceRoot); BindActiveDocument();
+                    var destination = model.ActiveDocument; var generation = viewportGeneration;
+                    await UpdatePreviewAsync();
+                    if (model.ActiveDocument != destination || generation != viewportGeneration) return;
                 }
-                else model.Status = "The linked section was not found; the document remains open.";
+                if (fragment is not null)
+                {
+                    var target = parsed is null ? null : DocumentAnchors.Find(parsed, fragment);
+                    if (target is not null)
+                    {
+                        JumpToSource(target.SourceStart, focusEditor: model.Layout == "Editor");
+                        if (Preview.Visibility == Visibility.Visible && rendered?.SourceElements.TryGetValue(target.SourceStart, out var element) == true)
+                        {
+                            rendered.RevealSource(target.SourceStart);
+                            TraceViewport("anchor-target " + target.SourceStart + " page " + Preview.PageNumber);
+                            pendingPreviewAnchor = (model.ActiveDocument!, rendered, element, target.SourceStart, viewportGeneration);
+                        }
+                    }
+                    else model.Status = "The linked section was not found; the document remains open.";
+                }
             }
+            finally { restoringNavigation = previousRestoring; if (!previousRestoring) VisitCurrentNavigation(); }
         });
+        if (pendingPreviewAnchor is not { } request) return;
+        var wasRestoring = restoringNavigation; restoringNavigation = true;
+        bool CurrentAnchor() => model.ActiveDocument == request.Document && rendered == request.Preview
+            && viewportGeneration == request.Generation && SyncCurrent;
+        try
+        {
+            CancelSynchronisation();
+            // The operation's Cancel button changes the status-bar height. A page
+            // selected before it disappears can reflow onto the preceding page.
+            await Dispatcher.InvokeAsync(() => Preview.UpdateLayout(), DispatcherPriority.Loaded);
+            if (!CurrentAnchor()) return;
+            TraceViewport("anchor-final-layout " + request.Offset);
+            var revealed = await PreviewNavigationService.BringIntoViewAsync(Preview, request.Element.ContentStart,
+                diagnostic: viewportDiagnostics ? message => TraceViewport("anchor " + message) : null);
+            if (!CurrentAnchor()) return;
+            TraceViewport("anchor-result " + revealed + " page " + Preview.PageNumber);
+        }
+        finally
+        {
+            restoringNavigation = wasRestoring;
+            if (!wasRestoring && CurrentAnchor()) CaptureCurrentNavigation();
+            RefreshNavigationControls();
+        }
     }
     private void OpenFind(object sender, RoutedEventArgs e) => ShowFind(false);
     private void OpenReplace(object sender, RoutedEventArgs e) => ShowFind(true);

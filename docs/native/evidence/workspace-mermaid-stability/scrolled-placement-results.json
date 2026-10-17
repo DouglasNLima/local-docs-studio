@@ -1,0 +1,166 @@
+[
+  {
+    "Appearance": "normal",
+    "Passed": true,
+    "Dpi": 96,
+    "SourceRevision": "df71d00f9dd83532106fd43a1004722d84b27238",
+    "RunId": "38975164864",
+    "ScenarioAssertions": 57,
+    "Placements": [
+      {
+        "Zoom": 50,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 829,
+          "Y": 410
+        },
+        "DistancePixels": 1.4142135623730951,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 36.98019801980198,
+        "VerticalAfter": 36.98019801980198
+      },
+      {
+        "Zoom": 100,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "DistancePixels": 0,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 35.852575488454704,
+        "VerticalAfter": 35.852575488454704
+      },
+      {
+        "Zoom": 150,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 829,
+          "Y": 410
+        },
+        "DistancePixels": 1.4142135623730951,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 35.543232231779086,
+        "VerticalAfter": 35.543232231779086
+      },
+      {
+        "Zoom": 200,
+        "Target": {
+          "IsEmpty": false,
+          "X": 630,
+          "Y": 311
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 630,
+          "Y": 311
+        },
+        "DistancePixels": 0,
+        "HorizontalBefore": 44.72222222222222,
+        "HorizontalAfter": 24.69325153374233,
+        "VerticalBefore": 35.3857900659058,
+        "VerticalAfter": 35.3857900659058
+      }
+    ]
+  },
+  {
+    "Appearance": "hc",
+    "Passed": true,
+    "Dpi": 96,
+    "SourceRevision": "df71d00f9dd83532106fd43a1004722d84b27238",
+    "RunId": "38975164864",
+    "ScenarioAssertions": 52,
+    "Placements": [
+      {
+        "Zoom": 50,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 829,
+          "Y": 410
+        },
+        "DistancePixels": 1.4142135623730951,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 36.98019801980198,
+        "VerticalAfter": 36.98019801980198
+      },
+      {
+        "Zoom": 100,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "DistancePixels": 0,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 35.852575488454704,
+        "VerticalAfter": 35.852575488454704
+      },
+      {
+        "Zoom": 150,
+        "Target": {
+          "IsEmpty": false,
+          "X": 830,
+          "Y": 411
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 829,
+          "Y": 410
+        },
+        "DistancePixels": 1.4142135623730951,
+        "HorizontalBefore": -1,
+        "HorizontalAfter": -1,
+        "VerticalBefore": 35.543232231779086,
+        "VerticalAfter": 35.543232231779086
+      },
+      {
+        "Zoom": 200,
+        "Target": {
+          "IsEmpty": false,
+          "X": 630,
+          "Y": 311
+        },
+        "Actual": {
+          "IsEmpty": false,
+          "X": 630,
+          "Y": 311
+        },
+        "DistancePixels": 0,
+        "HorizontalBefore": 44.72222222222222,
+        "HorizontalAfter": 24.69325153374233,
+        "VerticalBefore": 35.3857900659058,
+        "VerticalAfter": 35.3857900659058
+      }
+    ]
+  }
+]

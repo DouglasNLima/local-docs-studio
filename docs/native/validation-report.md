@@ -1,5 +1,14 @@
 # Native validation report
 
+The workspace and Mermaid interaction continuation is implemented in
+[Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
+[interaction stability report](workspace-mermaid-interaction-stability.md) records
+its reproduced pointer-drag exception, source/viewport corrections, repeated native
+mouse checks, inspected 96-DPI images and independently verified unsigned preview
+`0.1.1-preview.581`. Final-head CI/package identities accompany delivery. Its scoped
+internal-preview verdict retains the explicit performance, DPI and trust limits;
+the historical source/package records below remain intact. No merge or release occurs.
+
 Current integrated regression, historical migration and package evidence is recorded in [integration readiness](integration-readiness.md). The validation records below remain source-specific historical evidence, with their original environments, failures and limitations.
 
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),

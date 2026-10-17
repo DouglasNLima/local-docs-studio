@@ -80,7 +80,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui")
+        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -95,6 +95,10 @@ internal static class Program
             return NativeUiChecks.CaptureUxScreenshots(args[1], args[2], args[3], args.ElementAtOrDefault(4) == "--high-contrast");
         if (args.FirstOrDefault() == "--ux-controls")
             return NativeUiChecks.Run(args[1], args[2], desktopUxOnly: true);
+        if (args.FirstOrDefault() == "--mermaid-interactions")
+            return NativeUiChecks.RunMermaidInteractions(args[1], args[2], args.Contains("--baseline"), args.Contains("--high-contrast"));
+        if (args.FirstOrDefault() == "--workspace-viewports")
+            return NativeUiChecks.RunWorkspaceViewports(args[1], args[2]);
         if (args.FirstOrDefault() == "--mermaid-ui")
             return NativeUiChecks.RunMermaidVisualEditor(args[1], args[2], args.Contains("--high-contrast"), args.Contains("--polish"), args.Contains("--baseline"));
         if (args.FirstOrDefault() == "--preview-input-safety")

@@ -25,7 +25,7 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
     private bool updating, busy, closed, discard;
-    private bool sourceValidationFailed;
+    private bool sourceValidationFailed, inlineThemeRefresh;
     private string? connectionSource;
     private IReadOnlyList<ElementChoice> choices = [];
     private object? propertyBaseline;
@@ -74,9 +74,10 @@ public partial class MermaidVisualEditorWindow : Window
         try { SourceEditor.Text = draft.Source; } finally { updating = false; }
         EditSourceButton.IsEnabled = editSource is not null;
         Closing += ConfirmClose;
+        Deactivated += (_, _) => CancelPointerInteraction();
         Closed += async (_, _) =>
         {
-            closed = true; canvasRender?.Cancel(); lifetime.Cancel();
+            CancelPointerInteraction(); closed = true; canvasRender?.Cancel(); lifetime.Cancel();
             await canvasRenderGate.WaitAsync();
             canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose();
         };
@@ -86,10 +87,17 @@ public partial class MermaidVisualEditorWindow : Window
     {
         var nextDark = ThemeService.IsDark(theme);
         if (closed || nextDark == dark && highContrast == SystemParameters.HighContrast) return;
+        CancelPointerInteraction();
         dark = nextDark; highContrast = SystemParameters.HighContrast; sourceHighlighting.Dark = dark;
         SourceEditor.TextArea.SelectionBrush = BrushResource("AccentBrush");
         SourceEditor.TextArea.SelectionForeground = BrushResource("AccentTextBrush");
         SourceEditor.TextArea.TextView.Redraw();
+        if (inlineEditor is not null)
+        {
+            inlineThemeRefresh = true; UpdateActions();
+            Status.Text = "Theme updated. Confirm or cancel the retained inline label to refresh diagram colours.";
+            return;
+        }
         UpdateCanvasColours();
         if (!PropertiesPending && inlineEditor is null) { updating = true; try { ShowProperties(); } finally { updating = false; } }
         UpdateActions();
@@ -135,8 +143,9 @@ public partial class MermaidVisualEditorWindow : Window
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
         ValidateSourceButton.IsEnabled = !busy && !renderingCanvas && !PropertiesPending && inlineEditor is null;
-        foreach (var port in ports.Values) port.IsEnabled = canEdit && !PropertiesPending;
+        foreach (var port in ports.Values) { port.IsEnabled = canEdit && !PropertiesPending; port.Visibility = canEdit ? Visibility.Visible : Visibility.Collapsed; }
         ClassButton.IsEnabled = canEdit && NodeClass.Items.Count > 0;
+        UpdateEndpointHandles();
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
         UpdateNodeButton.Visibility = NodeProperties.Visibility == Visibility.Visible && PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
         NodeClassField.Visibility = ClassButton.Visibility = NodeClass.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
@@ -145,13 +154,18 @@ public partial class MermaidVisualEditorWindow : Window
         => await ExecuteBatch([operation], select);
     private async Task<bool> ExecuteBatch(IReadOnlyList<MermaidEditOperation> operations, string? select = null)
     {
-        if (!CanTransform) return false; busy = true; UpdateActions(); Status.Text = "Validating diagram draft…";
+        if (!CanTransform) return false; CancelPointerInteraction(); SaveSessionLayout(); busy = true; UpdateActions(); Status.Text = "Validating diagram draft…";
         try
         {
             var result = await draft.ExecuteBatchAsync(operations, lifetime.Token);
             if (closed) return false;
             if (result.Success)
             {
+                foreach (var rename in operations.OfType<UpdateMermaidNode>().Where(node => node.NewId is not null && node.NewId != node.Id))
+                    if (sessionPositions.Remove("node:" + rename.Id, out var centre)) sessionPositions["node:" + rename.NewId] = centre;
+                foreach (var key in sessionPositions.Keys.Where(key => !draft.Model.Nodes.Any(node => "node:" + node.Id == key) && !draft.Model.Subgraphs.Any(group => "group:" + group.Id == key)).ToArray()) sessionPositions.Remove(key);
+                if (pendingNodePlacement is { } placement) sessionPositions[placement.Key] = placement.Centre;
+                SaveSessionLayout();
                 if (select is not null) draft.Select([select]);
                 Refresh(operations.Any(operation => operation is AddMermaidNode or DeleteMermaidNodes or AddMermaidSubgraph or DeleteMermaidSubgraph or MoveMermaidNode or ChangeMermaidDirection));
             }
@@ -166,13 +180,13 @@ public partial class MermaidVisualEditorWindow : Window
         var tag = sender is FrameworkElement element ? element.Tag as string : null;
         if (!CanTransform || PropertiesPending || !Enum.TryParse<FlowNodeShape>(tag, out var shape)) return;
         var id = MermaidTransformationService.UniqueId(draft.Model);
-        await Execute(new AddMermaidNode(id, shape == FlowNodeShape.Terminal ? "Start / End" : shape.ToString(), shape), "node:" + id);
+        await InsertPositionedNode(id, shape, VisibleInsertionPoint());
     }
     private async void InsertSubgraph(object sender, RoutedEventArgs e)
     {
         if (!CanTransform || PropertiesPending) return;
         var id = MermaidTransformationService.UniqueId(draft.Model, "Group");
-        await Execute(new AddMermaidSubgraph(id, "New subgraph", Selected?.StartsWith("group:", StringComparison.Ordinal) == true ? Selected[6..] : null), "group:" + id);
+        await InsertPositionedSubgraph(id, VisibleInsertionPoint(), Selected?.StartsWith("group:", StringComparison.Ordinal) == true ? Selected[6..] : null);
     }
     private async void UpdateNode(object sender, RoutedEventArgs e)
         => await CommitNodeProperties();
@@ -264,8 +278,8 @@ public partial class MermaidVisualEditorWindow : Window
         var selected = new MermaidSourceParser().Parse(CopiedSource(ids));
         await InsertCopiedGraph(selected, true);
     }
-    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Undo(); Refresh(true); } }
-    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { draft.Redo(); Refresh(true); } }
+    private void Undo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { CancelPointerInteraction(); SaveSessionLayout(); draft.Undo(); RestoreHistoryLayout(); Refresh(true); } }
+    private void Redo(object sender, RoutedEventArgs e) { if (!busy && !SourcePending && !PropertiesPending) { CancelPointerInteraction(); SaveSessionLayout(); draft.Redo(); RestoreHistoryLayout(); Refresh(true); } }
     private void StartConnection(object sender, RoutedEventArgs e)
     {
         if (!CanTransform || PropertiesPending) return;
@@ -284,7 +298,8 @@ public partial class MermaidVisualEditorWindow : Window
             UpdateCanvasSelection(); Status.Text = inlineEditor is null ? "Update the current properties or reset their changes before selecting another element." : "Press Enter to confirm the inline label, or Escape to cancel it."; return;
         }
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
-        ShowProperties(); UpdateCanvasSelection(); UpdateActions();
+        updating = true; try { ShowProperties(); } finally { updating = false; }
+        UpdateCanvasSelection(); UpdateActions();
     }
     private void SelectElement(string key, bool extend = false)
     {
@@ -298,10 +313,17 @@ public partial class MermaidVisualEditorWindow : Window
     private void ShowProperties()
     {
         propertyBaseline = null;
-        NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = Visibility.Collapsed;
+        NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = InspectionProperties.Visibility = Visibility.Collapsed;
         InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
         SelectionSummary.Text = Selected is null ? "Select a node, connection or subgraph to edit its properties." : Elements.SelectedItems.Count > 1 ? Elements.SelectedItems.Count + " elements selected" : choices.FirstOrDefault(choice => choice.Key == Selected)?.Description;
         if (Elements.SelectedItems.Count != 1 || Selected is not { } key) return;
+        if (!canonicalMapped && canonicalRender?.Source == draft.Source && presentation is { } inspected)
+        {
+            InspectionProperties.Visibility = Visibility.Visible;
+            SelectionSummary.Text += " · Read-only inspection";
+            InspectionProperties.Text = InspectionText(key, inspected) + "\n\nProtected source. Edit source to change this diagram.";
+            return;
+        }
         if (key.StartsWith("node:", StringComparison.Ordinal))
         {
             var node = draft.Model.Node(key[5..]); NodeProperties.Visibility = Visibility.Visible;
@@ -352,12 +374,20 @@ public partial class MermaidVisualEditorWindow : Window
                 : "The source matches the validated visual draft.");
             UpdateActions(); return;
         }
+        CancelPointerInteraction(); SaveSessionLayout(); var previousModel = draft.Model;
         busy = true; UpdateActions(); var text = SourceEditor.Text;
         try
         {
             var result = await draft.ValidateAndCommitAsync(text, lifetime.Token); if (closed) return;
             sourceValidationFailed = !result.Success;
-            if (result.Success) Refresh(true); else Status.Text = result.Error + " Your source draft has been retained; correct it or use Undo within the source panel.";
+            if (result.Success)
+            {
+                // Arbitrary source validation has no rename proof. Keep only unchanged identities.
+                foreach (var key in sessionPositions.Keys.Where(key => !previousModel.Nodes.Any(before => "node:" + before.Id == key
+                    && draft.Model.Nodes.Any(after => after.Id == before.Id && after.Label == before.Label && after.Shape == before.Shape))).ToArray()) sessionPositions.Remove(key);
+                SaveSessionLayout(); Refresh(true);
+            }
+            else Status.Text = result.Error + " Your source draft has been retained; correct it or use Undo within the source panel.";
         }
         catch (OperationCanceledException) { }
         finally { busy = false; if (!closed) UpdateActions(); }
@@ -414,6 +444,8 @@ public partial class MermaidVisualEditorWindow : Window
     {
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { e.Handled = true; Apply(sender, e); return; }
         if (e.Key == Key.F11) { ToggleFullScreen(); e.Handled = true; return; }
+        if (e.Key == Key.Escape && (dragStart is not null || reconnectEdge is not null || panStart is not null))
+        { CancelPointerInteraction(); connectionSource = null; UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
@@ -439,7 +471,7 @@ public partial class MermaidVisualEditorWindow : Window
         else if (e.Key == Key.F4) { if (NodeProperties.IsVisible) NodeLabel.Focus(); else if (EdgeProperties.IsVisible) EdgeLabel.Focus(); else if (GroupProperties.IsVisible) GroupLabel.Focus(); }
         else if (e.Key == Key.Escape)
         {
-            connectionSource = null;
+            CancelPointerInteraction(); connectionSource = null;
             if (PropertiesPending) { UpdateCanvasSelection(); Status.Text = "Update or reset pending property changes before clearing selection."; }
             else { Elements.UnselectAll(); Status.Text = "Selection cleared. The draft remains open."; }
         }

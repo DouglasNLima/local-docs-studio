@@ -1,5 +1,14 @@
 # Native Windows development continuation handoff
 
+The workspace and Mermaid interaction continuation is implemented in
+[Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
+[interaction stability report](workspace-mermaid-interaction-stability.md) records
+its reproduced pointer-drag exception, source/viewport corrections, repeated native
+mouse checks, inspected 96-DPI images and independently verified unsigned preview
+`0.1.1-preview.581`. Final-head CI/package identities accompany delivery. Its scoped
+internal-preview verdict retains the explicit performance, DPI and trust limits;
+the historical source/package records below remain intact. No merge or release occurs.
+
 Current consolidation status is recorded in [integration readiness](integration-readiness.md) and [Draft PR 29](https://github.com/DouglasNLima/local-docs-studio/pull/29). The following source-specific handoff remains historical evidence; its package identities are unchanged.
 
 The Mermaid preview fidelity work is tracked in [Draft PR 28](https://github.com/DouglasNLima/local-docs-studio/pull/28),

@@ -330,6 +330,18 @@ internal static partial class NativeUiChecks
             Capture("protected-source");
             Check(!Find(visual!, "MermaidApply").IsEnabled && !Find(visual!, "MermaidInsertProcess").IsEnabled && Draft() == protectedSource,
                 "Unsupported chained source opens for protected inspection without destructive visual commands");
+            if (!baseline)
+            {
+                Find(visual!, "MermaidCanvas_node_B").Click();
+                Wait(() => Find(visual!, "MermaidInspectionProperties").Name.Contains("Node ID: B", StringComparison.Ordinal), "Protected node identity did not reach its read-only inspector.");
+                Check(Find(visual!, "MermaidSelectionSummary").Name.Contains("Read-only inspection", StringComparison.Ordinal), "Protected selection explicitly identifies its read-only state");
+                var inspectionRows = Find(visual!, "MermaidElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem));
+                inspectionRows.Single(row => row.Name.StartsWith("Connection 2", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+                Wait(() => Find(visual!, "MermaidInspectionProperties").Name.Contains("Source: B", StringComparison.Ordinal), "Protected ordered connection did not reach its read-only inspector.");
+                Check(visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidDestinationEndpoint")) is null && Draft() == protectedSource,
+                    "Protected inspection cannot expose endpoint transformation handles or mutate source");
+                Capture("protected-connection-inspection");
+            }
             Click("MermaidCancel"); WaitClosed(); Check(ReadEditorText(editor) == protectedSource, "Protected inspection leaves the owning source exact");
             if (polish)
             {
@@ -378,6 +390,22 @@ internal static partial class NativeUiChecks
                     "Parallel connection deletion retains both neighbouring source connections and their labels");
                 Click("MermaidUndo"); AwaitSource(text => text == parallelChanged); Click("MermaidUndo"); AwaitSource(text => text == parallel);
                 Check(Draft() == parallel && ReadEditorText(editor) == parallel, "Private history restores exact parallel source without changing its owner");
+                if (!baseline)
+                {
+                    var endpoint = Find(visual!, "MermaidDestinationEndpoint").BoundingRectangle;
+                    var node = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
+                    var from = new System.Drawing.Point(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2);
+                    var to = new System.Drawing.Point(node.Left + node.Width / 2, node.Top + node.Height / 2);
+                    Mouse.MoveTo(from); Mouse.Down(MouseButton.Left);
+                    try { for (var step = 1; step <= 8; step++) MovePointer(new(from.X + (to.X - from.X) * step / 8, from.Y + (to.Y - from.Y) * step / 8)); }
+                    finally { Mouse.Up(MouseButton.Left); }
+                    AwaitSource(text => new MermaidSourceParser().Parse(text).Edges.Count(edge => edge.Target.Id == "A" && edge.Label == "Same") == 1);
+                    var reconnected = new MermaidSourceParser().Parse(Draft());
+                    Check(reconnected.Edges.Count(edge => edge.Source.Id == "A" && edge.Target.Id == "B" && edge.Label == "Same") == 1
+                        && reconnected.Edges.Count(edge => edge.Label == "Diagnostic" && edge.Type == FlowConnectionType.Dotted) == 1,
+                        "Actual endpoint dragging reconnects only the selected identical parallel edge");
+                    Capture("parallel-endpoint-reconnection"); Click("MermaidUndo"); AwaitSource(text => text == parallel);
+                }
                 Capture("parallel-edges"); Click("MermaidCancel"); WaitClosed();
                 var shapes = File.ReadAllText("tests/fixtures/native-mermaid-fidelity/shapes.mmd");
                 LaunchDocument("Shapes.mmd", shapes); Open(0); Click("MermaidFit");
@@ -509,7 +537,16 @@ internal static partial class NativeUiChecks
         {
             try { visual?.CaptureToFile(Path.Combine(output, "mermaid-failure.png")); main?.CaptureToFile(Path.Combine(output, "mermaid-main-failure.png"));
                 File.WriteAllLines(Path.Combine(output, "mermaid-failure-controls.txt"), (visual ?? main)?.FindAllDescendants().Select(element => element.ControlType + ": " + element.AutomationId + " · " + element.Name) ?? []); } catch { }
-            Record(false, error.ToString()); Console.Error.WriteLine(error); return 1;
+            Record(false, error.ToString());
+            try
+            {
+                using var eventLog = new EventLog("Application");
+                File.WriteAllLines(Path.Combine(output, "windows-events.txt"), eventLog.Entries.Cast<EventLogEntry>()
+                    .Where(entry => entry.TimeGenerated.ToUniversalTime() >= Process.GetCurrentProcess().StartTime.ToUniversalTime() && entry.Source is ".NET Runtime" or "Application Error" or "Windows Error Reporting")
+                    .Select(entry => entry.Source + "\n" + entry.Message));
+            }
+            catch (Exception diagnostic) { File.WriteAllText(Path.Combine(output, "event-log-unavailable.txt"), diagnostic.Message); }
+            Console.Error.WriteLine(error); return 1;
         }
         finally { RestoreClipboard(clipboardBefore, clipboardOwned); if (app is not null) { if (!app.HasExited) app.Kill(); app.Dispose(); } }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "mermaid-ui.json"), JsonSerializer.Serialize(new

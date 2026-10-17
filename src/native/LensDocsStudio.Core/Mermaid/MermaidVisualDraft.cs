@@ -3,7 +3,7 @@ using LensDocsStudio.Core.Rendering;
 namespace LensDocsStudio.Core.Mermaid;
 
 public sealed record MermaidDraftResult(bool Success, string? Error);
-public sealed record MermaidDraftSnapshot(string Source, IReadOnlyList<string> Selection, IReadOnlyList<string> EdgeIds);
+public sealed record MermaidDraftSnapshot(string Source, IReadOnlyList<string> Selection, IReadOnlyList<string> EdgeIds, long HistoryIdentity = 0);
 
 /// <summary>Private source-based history. Failed and obsolete validation never changes the draft or its history.</summary>
 public sealed class MermaidVisualDraft
@@ -16,6 +16,8 @@ public sealed class MermaidVisualDraft
     private const int MaximumHistoryCharacters = 8_000_000;
     public MermaidDiagramModel Model { get; private set; }
     public string Source => Model.Source;
+    public long HistoryIdentity { get; private set; }
+    public IReadOnlyList<long> HistoryIdentities => history.Select(snapshot => snapshot.HistoryIdentity).ToArray();
     public string OriginalSource { get; }
     public bool IsDirty => Source != OriginalSource;
     public IReadOnlyList<string> Selection { get; private set; } = [];
@@ -74,7 +76,7 @@ public sealed class MermaidVisualDraft
         if (result.error is not null) return new(false, result.error);
         if (candidate == Source) return new(true, null);
         var parsedEdges = result.parsed.Edges.Select((edge, position) => edge with { Id = edgeIds is null ? "edge-" + nextEdgeId++ : edgeIds[position] }).ToArray();
-        Model = result.parsed with { Edges = parsedEdges };
+        Model = result.parsed with { Edges = parsedEdges }; HistoryIdentity = version;
         foreach (var edge in parsedEdges) if (int.TryParse(edge.Id.AsSpan(5), out var number)) nextEdgeId = Math.Max(nextEdgeId, number + 1);
         if (index + 1 < history.Count) history.RemoveRange(index + 1, history.Count - index - 1);
         Selection = Selection.Where(Exists).ToArray(); history.Add(Snapshot()); index++;
@@ -88,9 +90,9 @@ public sealed class MermaidVisualDraft
     {
         revision++; var snapshot = history[value]; var parsed = parser.Parse(snapshot.Source);
         Model = parsed with { Edges = parsed.Edges.Select((edge, position) => edge with { Id = snapshot.EdgeIds[position] }).ToArray() };
-        Selection = snapshot.Selection.ToArray();
+        Selection = snapshot.Selection.ToArray(); HistoryIdentity = snapshot.HistoryIdentity;
     }
-    private MermaidDraftSnapshot Snapshot() => new(Source, Selection.ToArray(), Model.Edges.Select(edge => edge.Id).ToArray());
+    private MermaidDraftSnapshot Snapshot() => new(Source, Selection.ToArray(), Model.Edges.Select(edge => edge.Id).ToArray(), HistoryIdentity);
     private static MermaidDiagramModel PreserveEdgeIdentities(MermaidDiagramModel before, MermaidDiagramModel after,
         IReadOnlyList<MermaidDocumentPatch> patches, MermaidEditOperation operation, ref int nextId)
     {
