@@ -48,11 +48,22 @@ internal static partial class NativeUiChecks
                 Find(window, "FollowCaretControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncScrollControl").AsCheckBox().IsChecked = synchronised;
                 Find(window, "SyncSelectionControl").AsCheckBox().IsChecked = false;
-                editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 75);
+                Wait(() =>
+                {
+                    var preferencePath = Path.Combine(root, mode + synchronised, "preferences.json");
+                    if (!File.Exists(preferencePath)) return false;
+                    using var input = new FileStream(preferencePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                    using var preferences = JsonDocument.Parse(input);
+                    var desktop = preferences.RootElement.GetProperty("Desktop");
+                    return desktop.GetProperty("FollowCaret").GetBoolean() == synchronised
+                        && desktop.GetProperty("SyncScroll").GetBoolean() == synchronised
+                        && !desktop.GetProperty("SyncSelection").GetBoolean();
+                }, "The requested synchronisation preferences did not finish applying.");
+                ScrollEditorTo(75);
                 ReadAt("A", "Region 065");
                 var aOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("B"); AtTop("B");
-                editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, 40);
+                ScrollEditorTo(40);
                 ReadAt("B", "Region 035");
                 var bOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("A");
@@ -97,6 +108,15 @@ internal static partial class NativeUiChecks
                 bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
                     && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
+                void ScrollEditorTo(double percent)
+                {
+                    var beforeSync = SyncCompletions("editor-scroll");
+                    editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, percent);
+                    // This ownership test performs two distinct reading actions. Complete
+                    // the requested editor alignment before beginning the preview action;
+                    // UIA ScrollIntoView does not deliver a mouse-wheel cancellation event.
+                    if (synchronised) Wait(() => SyncCompletions("editor-scroll") > beforeSync, "The initial editor scroll did not finish synchronising before preview reading.");
+                }
                 void ReadAt(string name, string text)
                 {
                     var focusRange = preview.Patterns.Text.Pattern.GetVisibleRanges()
@@ -110,9 +130,9 @@ internal static partial class NativeUiChecks
                     if (synchronised && !alreadyVisible)
                         Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
                 }
-                int SyncCompletions()
+                int SyncCompletions(string origin = "preview-scroll")
                 {
-                    return ViewportTraceLines().Count(line => line.Contains("sync-complete preview-scroll", StringComparison.Ordinal));
+                    return ViewportTraceLines().Count(line => line.Contains("sync-complete " + origin, StringComparison.Ordinal));
                 }
                 string[] ViewportTraceLines()
                 {
