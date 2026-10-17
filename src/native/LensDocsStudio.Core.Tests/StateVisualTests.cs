@@ -169,6 +169,12 @@ public sealed class StateVisualTests
     [Fact]
     public async Task Empty_supported_source_can_start_with_an_independent_state()
     { var draft = new StateVisualDraft("stateDiagram-v2\n"); await Success(draft, new AddStateNode("Draft", "Draft")); Assert.Single(draft.Model.Nodes); }
+    [Fact]
+    public async Task Composite_headings_preserve_the_pinned_literal_break_tag_semantics()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"Outer<br/>literal\" as Outer {\nA --> A\n}\n");
+        Assert.True((await draft.ValidateAsync()).Success); await Success(draft, new UpdateStateGroupLabel("Outer", "Local composite")); Assert.Contains("state \"Local composite\" as Outer {", draft.Source);
+    }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]
     [InlineData("stateDiagram\nstate \"Alias\" as A\nA --> A : Again\n", 1, 1, 0)]

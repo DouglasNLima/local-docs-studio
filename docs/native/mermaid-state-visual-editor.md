@@ -154,9 +154,24 @@ semantic validation, bounded private history, canonical WPF canvas/inspector,
 source validation, family routing, insertion and document Apply integration.
 
 Local Release build: zero warnings/errors. Initial complete Core suite: 1,408
-passed without skips; expanded State suite: 30 passed. Hosted State grammar,
+passed without skips; expanded complete suite: 1,413 passed; State suite: 31 passed.
+At `ff7dfb0`, both normal and actual High Contrast State native UIA acceptance,
+Sequence regressions, Flowchart interaction regressions and the complete native
+desktop UX workflow passed. The first `0afabbc` State UIA attempt reached the
+authoring operations but then requested a source control after collapsing its
+panel; the corrected harness retains the source panel during pointer checks.
+Both failure JSON reports are retained alongside the first passing fidelity
+report under `evidence/state-visual-editor/`. No assertion or timeout was relaxed.
+
+The `ff7dfb0` PR Edge run failed one existing browser-fallback test because the
+top bar had browser-default `display: block` instead of the required stylesheet
+value; Chromium and the same-revision push browser run passed. The failed trace
+is retained for investigation; the earlier successful run is not a substitute
+for final-head browser certification.
+
+Hosted State grammar,
 fidelity/performance, full native UIA, High Contrast and existing editor/browser
-regressions are running. The new State jobs are mandatory on PRs to `develop`.
+regressions are being extended. The new State jobs are mandatory on PRs to `develop`.
 Pages deployment remains restricted to default-branch non-PR events. Native
 package builds check out the exact PR head for source provenance.
 

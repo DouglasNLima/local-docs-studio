@@ -23,7 +23,7 @@ internal static class Program
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
                 || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
             { Console.Error.WriteLine("Native viewport certification requires a disposable GitHub-hosted Windows runner."); return 1; }
-            try { if (args[0] == "--state-fidelity") NativeStateChecks.Run(Path.GetFullPath(args[1])); else if (args[0] == "--sequence-fidelity") NativeSequenceChecks.Run(Path.GetFullPath(args[1])); else NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            try { if (args[0] == "--state-fidelity") NativeStateChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--sequence-fidelity") NativeSequenceChecks.Run(Path.GetFullPath(args[1])); else NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--mermaid-performance")

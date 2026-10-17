@@ -28,7 +28,9 @@ jobs:
       - name: Build native State editor and validation harness
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
       - name: Verify pinned State grammar, canonical pixels, source ownership and bounded performance
-        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --state-fidelity artifacts/native/state-fidelity
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --state-fidelity artifacts/native/state-fidelity $appearance
       - name: Exercise real State authoring, pointers, document Undo, Save and restart
         shell: pwsh
         run: |

@@ -60,12 +60,18 @@ public partial class StateVisualEditorWindow : Window
     { dark = ThemeService.IsDark(theme); highlighting.Dark = dark; SourceEditor.TextArea.TextView.Redraw(); if (!closed && draft is not null) await RenderAsync(false); }
     private IEnumerable<Choice> Choices()
     {
-        foreach (var node in draft.Model.Nodes)
-        { var scope = node.Scopes.Count == 1 ? node.Scopes[0] : "shared"; yield return new(node.Identity, new string(' ', Depth(scope) * 2) + node.Id + " · " + node.Label); }
-        foreach (var group in draft.Model.Groups) yield return new(group.Identity, new string(' ', Depth(group.Parent) * 2) + "Composite · " + group.Id + " · " + group.Label);
-        foreach (var pseudo in draft.Model.PseudoNodes) yield return new(pseudo.Identity, (pseudo.Initial ? "Initial" : "Final") + " · " + (pseudo.Scope ?? "diagram"));
+        if (!draft.Model.IsValid) { yield return new("invalid", "Invalid source · inspect diagnostics and Edit source"); yield break; }
+        foreach (var choice in ScopeChoices(null, 0)) yield return choice;
         foreach (var (edge, index) in draft.Model.Transitions.Select((item, index) => (item, index))) yield return new(edge.Identity, "Transition " + (index + 1) + " · " + EndpointName(edge.Source) + " → " + EndpointName(edge.Destination) + (edge.Label.Length > 0 ? " · " + edge.Label : ""));
-        int Depth(string? scope) { int depth = 0; while (!string.IsNullOrEmpty(scope) && depth < 50) { depth++; scope = draft.Model.Groups.FirstOrDefault(item => item.Id == scope)?.Parent; } return depth; }
+        foreach (var statement in draft.Model.Statements.Where(item => item.Kind is StateStatementKind.Note or StateStatementKind.Style or StateStatementKind.Unknown))
+            yield return new(statement.Identity, "Protected " + statement.Kind + " · " + statement.Span.Read(draft.Source).ReplaceLineEndings(" "));
+        IEnumerable<Choice> ScopeChoices(string? scope, int depth)
+        {
+            var children = draft.Model.Nodes.Where(item => item.First.Scope == scope).Select(item => (At: item.First.Span.Start, Choice: new Choice(item.Identity, item.Id + " · " + item.Label + (item.Scopes.Count > 1 ? " (shared scopes)" : "")), Group: (string?)null))
+                .Concat(draft.Model.Groups.Where(item => item.Parent == scope).Select(item => (At: item.Opening.Span.Start, Choice: new Choice(item.Identity, "Composite · " + item.Id + " · " + item.Label), Group: (string?)item.Id)))
+                .Concat(draft.Model.PseudoNodes.Where(item => item.Scope == scope).Select(item => (At: draft.Model.Transitions.First(edge => edge.Source == item.Identity || edge.Destination == item.Identity).Statement.Span.Start, Choice: new Choice(item.Identity, EndpointName(item.Identity)), Group: (string?)null))).OrderBy(item => item.At);
+            foreach (var child in children) { yield return child.Choice with { Description = new string(' ', depth * 2) + child.Choice.Description }; if (child.Group is not null) foreach (var nested in ScopeChoices(child.Group, depth + 1)) yield return nested; }
+        }
     }
     private string EndpointName(string id) => draft.Model.PseudoNodes.FirstOrDefault(item => item.Identity == id) is { } pseudo ? (pseudo.Initial ? "Initial" : "Final") + " (" + (pseudo.Scope ?? "diagram") + ")" : id;
     private async Task RefreshAsync(bool fit = false)
@@ -102,6 +108,7 @@ public partial class StateVisualEditorWindow : Window
                 Surface.Children.Add(image); Surface.Width = converted.Drawing?.Width ?? 420; Surface.Height = converted.Drawing?.Height ?? 260;
             }
             Status.Text = converted.diagnostic ?? (model.HasUnknownDependencies ? "Protected source retained. Unrecognised dependencies require Edit source." : "Ready. Select a state or transition. Drag states for temporary positioning; Auto layout restores canonical positions.");
+            AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
         }
         catch (OperationCanceledException) { }
@@ -140,6 +147,8 @@ public partial class StateVisualEditorWindow : Window
         { LabelFields.Visibility = Visibility.Visible; LabelText.Text = group.Label; Summary.Text = "Composite " + group.Id; Dependencies.Text = "Parent: " + (group.Parent ?? "diagram") + ". Membership, movement and structural operations are protected."; }
         else if (draft.Model.PseudoNodes.FirstOrDefault(item => item.Identity == draft.Selection) is { } pseudo)
         { Summary.Text = EndpointName(pseudo.Identity); Dependencies.Text = "Scoped " + (pseudo.Initial ? "initial source" : "final destination") + ". Remove or reconnect its transition; this marker is never a globally renamable state."; }
+        else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement)
+        { Summary.Text = "Protected " + statement.Kind; Dependencies.Text = statement.Span.Read(draft.Source); }
         baseline = Values;
     }
     private StateEditOperation? UpdateOperation() => mode == "state" ? new AddStateNode(NodeId.Text, LabelText.Text)
@@ -241,7 +250,7 @@ public partial class StateVisualEditorWindow : Window
     }
     private void LocateSource(object sender, RoutedEventArgs e)
     {
-        var statement = draft.Model.Nodes.FirstOrDefault(item => item.Identity == draft.Selection)?.First ?? draft.Model.Groups.FirstOrDefault(item => item.Identity == draft.Selection)?.Opening ?? draft.Model.Transitions.FirstOrDefault(item => item.Identity == draft.Selection)?.Statement;
+        var statement = draft.Model.Nodes.FirstOrDefault(item => item.Identity == draft.Selection)?.First ?? draft.Model.Groups.FirstOrDefault(item => item.Identity == draft.Selection)?.Opening ?? draft.Model.Transitions.FirstOrDefault(item => item.Identity == draft.Selection)?.Statement ?? draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection);
         if (statement is null || SourcePending) return; SourcePanel.IsExpanded = true; SourceEditor.Select(statement.Span.Start, statement.Span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(statement.Span.Start).LineNumber); SourceEditor.Focus();
     }
     private void ShowOriginal(object sender, RoutedEventArgs e)

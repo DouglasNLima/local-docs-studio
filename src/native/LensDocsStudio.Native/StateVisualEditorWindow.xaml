@@ -44,7 +44,7 @@
      <Button x:Name="AddTransitionButton" Content="Add transition" Click="AddTransition" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddTransition"/>
      <Button x:Name="InitialButton" Content="Connect initial state" Click="AddInitial" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddInitial"/>
      <Button x:Name="FinalButton" Content="Connect final state" Click="AddFinal" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddFinal"/>
-     <TextBlock Text="ELEMENTS IN SOURCE ORDER" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
+     <TextBlock Text="STATES AND TRANSITIONS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
     </StackPanel>
     <ListBox x:Name="Elements" SelectionChanged="SelectionChanged" DisplayMemberPath="Description" AutomationProperties.Name="States, scoped markers, composite groups and exact transition occurrences" AutomationProperties.AutomationId="StateElements"/>
    </DockPanel>

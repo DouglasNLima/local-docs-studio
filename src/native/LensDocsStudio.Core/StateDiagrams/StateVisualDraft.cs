@@ -71,7 +71,7 @@ public sealed class StateVisualDraft
     {
         Model = candidate;
         if (!Model.Nodes.Any(item => item.Identity == Selection) && !Model.Transitions.Any(item => item.Identity == Selection)
-            && !Model.Groups.Any(item => item.Identity == Selection) && !Model.PseudoNodes.Any(item => item.Identity == Selection)) Selection = null;
+            && !Model.Groups.Any(item => item.Identity == Selection) && !Model.PseudoNodes.Any(item => item.Identity == Selection) && !Model.Statements.Any(item => item.Identity == Selection)) Selection = null;
         if (index + 1 < history.Count) history.RemoveRange(index + 1, history.Count - index - 1);
         history.Add(new(Model, Selection, ++nextIdentity)); index++;
         while (history.Count > 100 || history.Count > 2 && history.Sum(item => item.Model.Source.Length) > 8_000_000) { history.RemoveAt(0); index--; }

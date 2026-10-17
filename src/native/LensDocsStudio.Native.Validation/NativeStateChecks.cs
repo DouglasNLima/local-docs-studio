@@ -17,9 +17,11 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeStateChecks
 {
-    public static void Run(string output)
+    public static void Run(string output, bool highContrast = false)
     {
+        using var contrast = highContrast ? new NativeTestHighContrast() : null;
         Directory.CreateDirectory(output); var checks = new List<string>(); var fidelity = new List<object>(); var performance = new List<object>(); var syntax = new List<object>();
+        if (highContrast) Check(SystemParameters.HighContrast, "Actual Windows High Contrast is active for canonical State fidelity");
         foreach (var file in Directory.GetFiles("tests/fixtures/native-state", "*.mmd"))
         foreach (var dark in new[] { false, true })
         {
@@ -76,7 +78,7 @@ internal static class NativeStateChecks
                 LimitsUnchanged = true, Scope = "Hosted thread measurements including cold work; UIA drag/open timing recorded separately. Over-budget fixtures are observations, never a larger rendering limit." });
         }
         DocumentChecks(checks);
-        File.WriteAllText(Path.Combine(output, "state-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", Checks = checks, Fidelity = fidelity, Syntax = syntax, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
+        File.WriteAllText(Path.Combine(output, "state-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Fidelity = fidelity, Syntax = syntax, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
     }
     private static byte[] Pixels(byte[] png)

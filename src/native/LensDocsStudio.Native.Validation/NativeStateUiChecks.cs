@@ -46,7 +46,17 @@ internal static partial class NativeUiChecks
             {
                 var bounds = Find(visual!, "StateCanvas_state:Draft").BoundingRectangle; var centre = new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
                 Mouse.MoveTo(centre); Mouse.Down(MouseButton.Left);
-                try { for (var step = 1; step <= 12; step++) { Mouse.MoveTo(centre.X + step * 2, centre.Y + step); Thread.Sleep(8); } if (i % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE); }
+                try
+                {
+                    for (var step = 1; step <= 12; step++) { Mouse.MoveTo(centre.X + step * 2, centre.Y + step); Thread.Sleep(8); }
+                    if (i == 1 && !highContrast)
+                    {
+                        using (var liveContrast = new NativeTestHighContrast())
+                        { Wait(() => visual!.Properties.ItemStatus.ValueOrDefault == "High Contrast" && Find(visual!, "StateApply").IsEnabled, "Live High Contrast did not complete a safe State re-render during pointer capture."); Capture("live-high-contrast"); Check(Draft() == beforeDrag, "High Contrast and canonical re-render during dragging preserve private State source"); }
+                        Wait(() => visual!.Properties.ItemStatus.ValueOrDefault != "High Contrast" && Find(visual!, "StateApply").IsEnabled, "State presentation did not restore after live High Contrast.");
+                    }
+                    if (i % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE);
+                }
                 finally { Mouse.Up(MouseButton.Left); }
                 Check(Draft() == beforeDrag && !app!.HasExited, "Session drag " + (i + 1) + " preserves source and process stability"); dragMetrics.Add(Find(visual!, "StateStatus").Properties.HelpText.ValueOrDefault ?? "");
                 if (i % 3 == 2) Click("StateAutoLayout");
@@ -55,7 +65,7 @@ internal static partial class NativeUiChecks
             Capture("session-drag"); Click("StateAutoLayout");
             Find(visual!, "StateSourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("StateValidate"); Wait(() => Find(visual!, "StateApply").IsEnabled, "State validation did not finish.");
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
-            { visual!.Patterns.Transform.Pattern.Resize(width, height); Click("StateFit"); Capture("viewport-" + width + "x" + height); Check(visual.BoundingRectangle.Contains(Find(visual, "StateApply").BoundingRectangle), "State Apply remains visible at " + width + "x" + height); }
+            { visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3, "Requested State window dimensions did not settle."); Click("StateFit"); Capture("viewport-" + width + "x" + height); Check(visual.BoundingRectangle.Contains(Find(visual, "StateApply").BoundingRectangle), "State Apply remains visible at " + width + "x" + height); }
             visual!.Patterns.Transform.Pattern.Resize(1280, 800); Capture("validated");
             var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1]; var expected = original[..target.Body.Start] + changed + original[target.Body.End..];
             Click("StateApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "State Apply did not change only the second identical diagram.");
@@ -86,6 +96,42 @@ internal static partial class NativeUiChecks
                     automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(rawPath) == raw, "Source-preserving State Cancel retains exact owner and disk source");
                 }
                 if (visual is not null) { Click("StateCancel"); WaitClosed(); } Stop();
+            }
+            foreach (var scenario in new[] { "outside-change", "changed-owner", "closed-owner", "other-tab" })
+            {
+                var body = "stateDiagram-v2\r\nstate \"Draft\" as Draft\r\nDraft --> Draft : Check\r\n";
+                var raw = scenario == "outside-change" ? "# Outside changes\r\n\r\n```mermaid\r\n" + body + "```\r\n" : body;
+                var scenarioPath = Path.Combine(root, scenario + (scenario == "outside-change" ? ".md" : ".mmd")); File.WriteAllText(scenarioPath, raw); Launch(scenarioPath); Open(scenario == "outside-change" ? raw.IndexOf("```mermaid", StringComparison.Ordinal) : 0); SelectState("Draft");
+                Find(visual!, "StateLabel").AsTextBox().Text = "Private change"; Click("StateUpdate"); Await(text => text.Contains("Private change", StringComparison.Ordinal)); var privateSource = Draft();
+                FocusWindow(main!); var ownerEditor = Find(main!, "MarkdownEditor"); ownerEditor.Focus();
+                if (scenario == "outside-change")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type("%% Outside comment"); Keyboard.Type(VirtualKeyShort.RETURN);
+                    Wait(() => ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw, "The State owner outside edit did not arrive."); FocusWindow(visual!); Click("StateApply"); WaitClosed();
+                    var targetBody = MermaidBlockSource.Find(new MarkdownService().Parse(raw)).Single().Body;
+                    Check(ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw[..targetBody.Start] + privateSource + raw[targetBody.End..], "State Apply relocates the owning Markdown container while preserving surrounding edits");
+                }
+                else if (scenario == "changed-owner")
+                {
+                    ownerEditor.Patterns.Value.Pattern.SetValue(raw.Replace("Draft\"", "External\"", StringComparison.Ordinal)); var outside = ReadEditorText(ownerEditor); FocusWindow(visual!); Click("StateApply");
+                    Wait(() => Find(visual!, "StateStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Concurrent owner edits were not rejected."); Check(Draft() == privateSource && ReadEditorText(ownerEditor) == outside, "State owner conflicts retain private and external source exactly"); Capture(scenario);
+                }
+                else if (scenario == "closed-owner")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("closed-owner.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select(); ownerEditor.Focus();
+                    var count = main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                    Wait(() => main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length < count, "The State owner tab did not close."); FocusWindow(visual!); Click("StateApply");
+                    Wait(() => Find(visual!, "StateStatus").Name.Contains("owning document has been closed", StringComparison.Ordinal), "Closed State owner did not reject Apply."); Check(Draft() == privateSource && File.ReadAllText(scenarioPath) == raw, "Closed-owner rejection preserves private State source and disk bytes"); Capture(scenario);
+                }
+                else
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); var otherEditor = Find(main!, "MarkdownEditor"); otherEditor.Patterns.Value.Pattern.SetValue("Another local document");
+                    FocusWindow(visual!); Click("StateApply"); WaitClosed(); Check(ReadEditorText(otherEditor) == "Another local document", "State Apply cannot redirect to the currently active other tab");
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("other-tab.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+                    Wait(() => ReadEditorText(Find(main, "MarkdownEditor")) == privateSource, "State Apply did not retain its owning tab identity."); Check(true, "State Apply updates the original owner while another tab is active");
+                }
+                if (visual is not null) { Click("StateCancel"); Discard(); WaitClosed(); } Stop();
             }
             File.WriteAllText(Path.Combine(output, "state-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
@@ -120,6 +166,8 @@ internal static partial class NativeUiChecks
         void Click(string id) => Find(visual!, id).AsButton().Invoke();
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("StateVisualEditor"))) is null, "The State editor did not close."); visual = null; }
         void Capture(string name) { _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
+        void Discard()
+        { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Private State discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
     }).GetAwaiter().GetResult();
 }

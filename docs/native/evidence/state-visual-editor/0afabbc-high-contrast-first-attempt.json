@@ -1,0 +1,10 @@
+{
+  "Status": "FAIL",
+  "Checks": [
+    "Actual Windows High Contrast is active during State authoring",
+    "State canvas exposes native SelectionItem and exact state identity",
+    "Pending State properties protect Apply",
+    "State editing and private Undo/Redo leave owner/disk source exact before Apply"
+  ],
+  "Error": "System.InvalidOperationException: Missing native control: StateSource\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Find(Window window, String id) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1740\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass9_1.\u003CRunStateEditor\u003Eg__Draft|7() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeStateUiChecks.cs:line 118\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass9_0.\u003CRunStateEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeStateUiChecks.cs:line 44"
+}

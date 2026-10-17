@@ -25,7 +25,8 @@ public sealed class StateDiagramSourceParser
     public static bool IsState(string source) => source.ReplaceLineEndings("\n").Split('\n').Select(item => item.Trim())
         .FirstOrDefault(item => item.Length > 0 && !item.StartsWith("%%", StringComparison.Ordinal)) is { } header && HeaderPattern.IsMatch(header);
     public static bool IsIdentifier(string value) => value.Length is > 0 and <= 100 && Identifier.IsMatch(value) && !value.StartsWith('_') && !value.All(char.IsDigit);
-    public static string NormaliseLabel(string value) => Entities.Replace(Breaks.Replace(value, "\n"), match => int.TryParse(match.Groups[1].Value, out var scalar)
+    public static string NormaliseLabel(string value) => DecodeEntities(Breaks.Replace(value, "\n"));
+    private static string DecodeEntities(string value) => Entities.Replace(value, match => int.TryParse(match.Groups[1].Value, out var scalar)
         && System.Text.Rune.IsValid(scalar) && (scalar >= 32 || scalar is 9 or 10 or 13) ? char.ConvertFromUtf32(scalar) : match.Value);
 
     public StateDiagramModel Parse(string source, CancellationToken cancellationToken = default)
@@ -39,6 +40,7 @@ public sealed class StateDiagramSourceParser
         foreach (var raw in source.Split('\n'))
         {
             cancellationToken.ThrowIfCancellationRequested();
+            if (statements.Count >= 1000) { diagnostics.Add("The State source model exceeds the 1,000-statement inspection budget."); break; }
             var lineLength = Math.Min(raw.Length + 1, source.Length - offset); var text = raw.Trim();
             var start = offset + raw.Length - raw.TrimStart().Length; var span = new MermaidSourceSpan(start, text.Length);
             var line = new MermaidSourceSpan(offset, lineLength); offset += lineLength;
@@ -78,7 +80,7 @@ public sealed class StateDiagramSourceParser
             {
                 if (!match.Success) match = composite; var opening = Add(StateStatementKind.Composite, match); var id = match.Groups["id"].Value;
                 if (groups.Any(item => item.Id == id)) diagnostics.Add("Composite IDs must be unique: " + id);
-                groups.Add(new(id, match.Groups["label"].Success ? NormaliseLabel(match.Groups["label"].Value) : id, scope, opening, null));
+                groups.Add(new(id, match.Groups["label"].Success ? DecodeEntities(match.Groups["label"].Value) : id, scope, opening, null));
                 stack.Push(id); continue;
             }
             if (match.Success)
