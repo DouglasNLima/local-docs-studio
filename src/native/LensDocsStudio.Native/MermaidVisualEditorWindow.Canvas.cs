@@ -216,12 +216,13 @@ public partial class MermaidVisualEditorWindow
                     e.Handled = true;
                     button.Focus();
                     if (PropertiesPending) { SelectElement(key); return; }
-                    if (e.ClickCount == 2) { SelectElement(key); BeginInlineEdit(id); return; }
+                    if (e.ClickCount == 2) SelectElement(key);
                     if (connectionSource is not null) { await PickNode(id); return; }
                     if (!draft.Selection.Contains(key) || Keyboard.Modifiers == ModifierKeys.Control)
                         SelectElement(key, Keyboard.Modifiers == ModifierKeys.Control);
                     if (!CanTransform || !nodeTransforms.ContainsKey(key) || !draft.Selection.Contains(key)) return;
                     StartNodeDrag(button, e.GetPosition(DiagramCanvas), pressedAt);
+                    if (e.ClickCount == 2 && dragStart is not null) pendingInlineNode = id;
                 };
                 button.PreviewMouseMove += (_, e) => MoveNodeDrag(e);
                 button.PreviewMouseLeftButtonUp += (_, e) => { if (dragStart is { } start) { pendingDrag = e.GetPosition(DiagramCanvas) - start; FinishNodeDrag(false); e.Handled = true; } };

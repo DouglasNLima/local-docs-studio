@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability', 'feature/native-mermaid-advanced-partial-editing']
+    branches: ['integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
-    branches: [develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability', 'feature/native-mermaid-advanced-partial-editing']
+    branches: [develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
 permissions:
   contents: read

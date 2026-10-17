@@ -177,4 +177,19 @@ public sealed class MermaidPartialEditingTests
         Assert.Equal("Reviewed synthetic step", reopened.Model.Node("IndependentStep").Label);
         draft.Undo(); draft.Undo(); Assert.Equal(source, draft.Source);
     }
+
+    [Theory]
+    [InlineData("-->", FlowConnectionType.Directed)] [InlineData("---", FlowConnectionType.Undirected)]
+    [InlineData("-.->", FlowConnectionType.Dotted)] [InlineData("==>", FlowConnectionType.Thick)] [InlineData("<-->", FlowConnectionType.Bidirectional)]
+    public async Task Every_supported_pipe_form_preserves_quoted_labels_parallel_identities_and_the_other_statement(string token, FlowConnectionType type)
+    {
+        var source = "flowchart LR\r\nA[Start] --> B[Review] --> C[Done]\nD[Notify]\r\nE[Archive]\n"
+            + "D " + token + "|\"Next café\"| E\r\nD " + token + "|\"Next café\"| E\n";
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.PartiallyEditable, draft.Model.Compatibility);
+        var target = draft.Model.Edges[3]; Assert.Equal("Next café", target.Label); var span = target.LabelSpan!.Value;
+        await Success(draft, new UpdateMermaidConnection(target.Id, "D", "E", "Changed Ω", type));
+        Assert.Equal(source[..span.Start] + "Changed Ω" + source[span.End..], draft.Source);
+        Assert.Equal("Next café", draft.Model.Edge("edge-2").Label); Assert.Equal("Changed Ω", draft.Model.Edge("edge-3").Label);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
 }

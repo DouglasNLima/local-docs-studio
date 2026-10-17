@@ -1,5 +1,16 @@
 # Native validation report
 
+The advanced Flowchart partial-editing continuation is in progress in
+[Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
+verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.
+The [advanced editing report](mermaid-advanced-flowchart-partial-editing.md) owns its
+capability, complete semantic/source preservation and native Apply evidence.
+Local Release/Core validation passes; hosted native/High Contrast, final regression
+and new package/lifecycle certification remain pending. Prior source-specific
+reports and package identities below retain their original scope. No merge or
+public release is authorised.
+
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

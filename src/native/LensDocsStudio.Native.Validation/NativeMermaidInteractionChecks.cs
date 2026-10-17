@@ -224,6 +224,11 @@ internal static partial class NativeUiChecks
                 ChangeTheme("Light");
             }
             var beforeDeactivation = Centre("MermaidCanvas_node_Node1");
+            Find(visual!, "MermaidCanvas_node_Node1").DoubleClick();
+            Wait(() => visual!.FindFirstDescendant(cf => cf.ByAutomationId("MermaidInlineLabel")) is not null, "A stationary native double click did not open its label.");
+            Find(visual!, "MermaidInlineLabel").Focus(); Keyboard.Type(VirtualKeyShort.ESCAPE);
+            Ready(text => text == beforeRename);
+            Check(Draft() == beforeRename, "A stationary double click opens inline editing and Escape preserves source before repeated drag cancellation");
             Mouse.MoveTo(beforeDeactivation); Mouse.Down(MouseButton.Left);
             try { MovePointer(new(beforeDeactivation.X + 45, beforeDeactivation.Y + 25)); FocusWindow(main!); }
             finally { Mouse.Up(MouseButton.Left); }
