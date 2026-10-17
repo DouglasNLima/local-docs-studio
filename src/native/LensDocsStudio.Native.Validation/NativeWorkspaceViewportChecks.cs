@@ -22,7 +22,7 @@ internal static partial class NativeUiChecks
     private static void CheckWorkspaceViewportOwnership(string executable, string output, bool pagesFirst = false)
     {
         var root = Path.Combine(output, "workspace-viewport"); Directory.CreateDirectory(root);
-        var texts = new Dictionary<string, string>(); var observations = new List<object>();
+        var texts = new Dictionary<string, string>(); var observations = new List<object>(); var readingDiagnostics = new List<object>();
         foreach (var name in new[] { "A", "B", "C" })
         {
             texts[name] = "# Document " + name + "\n\n" + string.Concat(Enumerable.Range(1, 90).Select(index =>
@@ -114,6 +114,7 @@ internal static partial class NativeUiChecks
                     // the requested editor alignment before beginning the preview action;
                     // UIA ScrollIntoView does not deliver a mouse-wheel cancellation event.
                     if (synchronised) Wait(() => SyncCompletions("editor-scroll") > beforeSync, "The initial editor scroll did not finish synchronising before preview reading.");
+                    RecordReading("editor-aligned", "Region 065");
                 }
                 void ReadAt(string name, string text)
                 {
@@ -123,13 +124,9 @@ internal static partial class NativeUiChecks
                     var focusBox = focusRange.GetBoundingRectangles().First(box => preview.BoundingRectangle.Contains(box));
                     Mouse.Click(new System.Drawing.Point(focusBox.Left + focusBox.Width * (name == "A" ? 1 : 2) / 3, focusBox.Top + focusBox.Height / 2));
                     var alreadyVisible = Visible(preview, text); var syncStart = SyncCompletions();
-                    var target = PreviewRange(text);
-                    // Give WPF's focused reader an explicit reading anchor before UIA
-                    // scrolling. Otherwise deferred restoration of its empty caret can
-                    // supersede ScrollIntoView, which delivers no native wheel gesture.
-                    target.Select();
-                    Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == text), "The preview reading anchor was not selected.");
-                    target.ScrollIntoView(true);
+                    RecordReading("preview-focused", text);
+                    PreviewRange(text).ScrollIntoView(true);
+                    RecordReading("scroll-requested", text);
                     Wait(() => Visible(preview, text), "Document " + name + " did not reach its reading position.");
                     if (synchronised && !alreadyVisible)
                         Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
@@ -146,6 +143,15 @@ internal static partial class NativeUiChecks
                     using var reader = new StreamReader(stream);
                     return reader.ReadToEnd().Split('\n', StringSplitOptions.RemoveEmptyEntries)
                         .Where(line => line.TrimEnd().EndsWith('}')).ToArray();
+                }
+                void RecordReading(string phase, string target)
+                {
+                    var focus = automation.FocusedElement();
+                    readingDiagnostics.Add(new { Mode = mode, Synchronised = synchronised, Phase = phase, Target = target,
+                        FocusedId = focus?.AutomationId, FocusedType = focus?.ControlType.ToString(), EditorPercent = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value,
+                        PreviewBounds = preview.BoundingRectangle.ToString(), TargetBounds = PreviewRange(target).GetBoundingRectangles().Select(box => box.ToString()).ToArray(),
+                        VisibleText = preview.Patterns.Text.Pattern.GetVisibleRanges().Select(range => range.GetText(160)).ToArray() });
+                    File.WriteAllText(Path.Combine(root, "reading-actions.json"), JsonSerializer.Serialize(readingDiagnostics, new JsonSerializerOptions { WriteIndented = true }));
                 }
                 bool Visible(AutomationElement pane, string text) => PreviewRange(text).GetBoundingRectangles().Any(box => box.Width > 0 && box.Height > 0 && pane.BoundingRectangle.Contains(box));
                 void AtTop(string name)

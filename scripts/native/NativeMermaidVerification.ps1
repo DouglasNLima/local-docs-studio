@@ -41,7 +41,8 @@ function Test-NativeMermaidResources {
     $native = Read-MermaidMetadata $NativeAssemblyPath $true
     $core = Read-MermaidMetadata $CoreAssemblyPath $false
     $requiredNative = @('LensDocsStudio.Native.MermaidVisualEditorWindow', 'LensDocsStudio.Native.Editor.MermaidDocumentEditSession', 'LensDocsStudio.Native.Editor.MermaidSourceHighlighting')
-    $requiredCore = @('LensDocsStudio.Core.Mermaid.MermaidDiagramModel', 'LensDocsStudio.Core.Mermaid.MermaidSourceParser', 'LensDocsStudio.Core.Mermaid.MermaidTransformationService', 'LensDocsStudio.Core.Mermaid.MermaidVisualDraft', 'LensDocsStudio.Core.Mermaid.MermaidGraphLayout')
+    $requiredCore = @('LensDocsStudio.Core.Mermaid.MermaidDiagramModel', 'LensDocsStudio.Core.Mermaid.MermaidSourceParser', 'LensDocsStudio.Core.Mermaid.MermaidTransformationService', 'LensDocsStudio.Core.Mermaid.MermaidVisualDraft', 'LensDocsStudio.Core.Mermaid.MermaidGraphLayout',
+        'LensDocsStudio.Core.Mermaid.MermaidCapabilityAnalysis', 'LensDocsStudio.Core.Mermaid.MermaidOperationCapability', 'LensDocsStudio.Core.Mermaid.MermaidOperationKind', 'LensDocsStudio.Core.Mermaid.MermaidSemanticValidation')
     foreach ($name in $requiredNative) { if (-not $native.Types.Contains($name)) { throw "The native Mermaid editor type is missing: $name" } }
     foreach ($name in $requiredCore) { if (-not $core.Types.Contains($name)) { throw "The Core Mermaid editor type is missing: $name" } }
     foreach ($name in @('mermaidvisualeditorwindow.baml', 'resources/desktopstyles.baml', 'resources/formstyles.baml', 'resources/commandicons.baml', 'resources/mermaideditorstyles.baml', 'resources/brand/application.ico')) {
