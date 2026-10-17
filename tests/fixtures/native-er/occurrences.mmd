@@ -1,0 +1,14 @@
+erDiagram
+    %% Source order deliberately differs from positioned relationship order.
+    A["Café catalogue"] {
+        string id PK , FK , UK "First occurrence"
+        string id UK "Second occurrence"
+    }
+    B {
+    }
+    A ||--o{ B : repeated
+    A |o..o{ A : self
+    B }|--|| A
+    A ||--o{ B : repeated
+    A |o..o{ A : self
+    A }o..o| B : parallel

@@ -1,5 +1,13 @@
 # Native diagram compatibility
 
+The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native
+authoring family: exact source entities, ordered attribute occurrences, PK/FK/UK,
+comments, endpoint cardinalities and identifying/non-identifying relationships.
+The pinned parser's ignored suffixes remain protected. Self-loop layout reordering
+is reconciled against actual per-render semantics and metadata. Implementation and
+hosted certification are reported separately; rendering success never grants editing
+permission or universal ER grammar support.
+
 The [State visual editor report](mermaid-state-visual-editor.md) records the pinned
 0.15.1 syntax matrix, exact source identity/patch architecture, scoped markers,
 safe operations and protected constructs. State is the third dedicated native

@@ -1,5 +1,16 @@
 # Native architecture decisions
 
+The fourth native Mermaid authoring family is implemented on
+`feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
+`3229246af356829771a200134a5df38d3cc8a04c`. The
+[ER engineering report](mermaid-er-visual-editor.md) owns its pinned grammar,
+capabilities, exact-source architecture and revision-scoped certification status.
+Local Release compilation and 1,527 Core cases pass. The
+[ER delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34) identifies
+completed Windows/High Contrast checks, exact-source CI, package hashes and independent
+verification. Acceptance requires that record's completed results for the identified
+revision. Earlier reports retain their original evidence scope.
+
 The [Mermaid visual editor](mermaid-visual-editor.md) adds a Core source lexer
 checked against Mermaider's semantic parser, exact patches, stable session edge
 identities and private history. Native WPF controls provide the interactive canvas;

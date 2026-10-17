@@ -45,7 +45,18 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
         }
     }
     public PositionedClassDiagram LayoutClass(ClassDiagram diagram) => inner.LayoutClass(diagram);
-    public PositionedErDiagram LayoutEr(ErDiagram diagram) => inner.LayoutEr(diagram);
+    public ErDiagram? ErSemantics { get; private set; }
+    public PositionedErDiagram? ErLayout { get; private set; }
+    public PositionedErDiagram LayoutEr(ErDiagram diagram)
+    {
+        // Capture this render's inputs and output; never run a second layout to infer identities.
+        static IReadOnlyList<ErAttributeInfo> Attributes(IReadOnlyList<ErAttributeInfo> values) => Array.AsReadOnly(values.Select(value => value with { Keys = Array.AsReadOnly(value.Keys.ToArray()) }).ToArray());
+        ErSemantics = diagram with { Entities = Array.AsReadOnly(diagram.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()), Relationships = Array.AsReadOnly(diagram.Relationships.ToArray()) };
+        var positioned = inner.LayoutEr(diagram);
+        ErLayout = positioned with { Entities = Array.AsReadOnly(positioned.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()),
+            Relationships = Array.AsReadOnly(positioned.Relationships.Select(relationship => relationship with { Points = Array.AsReadOnly(relationship.Points.ToArray()) }).ToArray()) };
+        return positioned;
+    }
     private static MermaidSubgraph DecodeGroup(MermaidSubgraph group) => group with { Label = Decode(group.Label), Children = group.Children.Select(DecodeGroup).ToArray() };
     private static string Decode(string value) => NumericEntity().Replace(value, match => int.TryParse(match.Groups[1].Value, out var scalar)
         && System.Text.Rune.IsValid(scalar) && (scalar >= 32 || scalar is 9 or 10 or 13) ? char.ConvertFromUtf32(scalar) : match.Value);

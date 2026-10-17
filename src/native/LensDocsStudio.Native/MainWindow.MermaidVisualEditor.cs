@@ -5,6 +5,7 @@ using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Sequence;
 using LensDocsStudio.Core.StateDiagrams;
+using LensDocsStudio.Core.ErDiagrams;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -37,7 +38,9 @@ public partial class MainWindow
         => InsertMermaidVisually(true);
     private void InsertState(object sender, RoutedEventArgs e)
         => InsertMermaidVisually(false, true);
-    private void InsertMermaidVisually(bool sequence, bool state = false)
+    private void InsertEr(object sender, RoutedEventArgs e)
+        => InsertMermaidVisually(false, er: true);
+    private void InsertMermaidVisually(bool sequence, bool state = false, bool er = false)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
         if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
@@ -56,7 +59,7 @@ public partial class MainWindow
             var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
             return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
         });
-        OpenVisualDraft(tab, session, state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
+        OpenVisualDraft(tab, session, er ? string.Join(newline, "erDiagram", "    CUSTOMER {", "        string customer_id PK", "        string email UK", "    }", "    ORDER {", "        string order_id PK", "        string customer_id FK", "    }", "    CUSTOMER ||--o{ ORDER : places", "") : state ? string.Join(newline, "stateDiagram-v2", "    state \"Draft\" as Draft", "    state \"Review\" as Review", "    [*] --> Draft", "    Draft --> Review : Submit", "    Review --> Draft : Request changes", "    Review --> [*]", "") : sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
     }
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
@@ -68,13 +71,15 @@ public partial class MainWindow
                 if (model.ActiveDocument == tab && Editor.IsReadOnly) return "The owning document is read-only.";
                 var edit = await session.PrepareAsync(draft, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested(); session.Commit(edit, model.Documents.Contains(tab));
-                model.Status = "Mermaid source applied as one undoable change. Save the document to persist it.";
+                model.Status = edit.Expected == edit.Replacement ? "The Mermaid source is unchanged; no document Undo step was needed." : "Mermaid source applied as one undoable change. Save the document to persist it.";
                 if (model.ActiveDocument == tab) QueuePreview();
                 return null;
             }
             catch (ArgumentException error) { return error.Message; }
         }
-        Window window = StateDiagramSourceParser.IsState(source)
+        Window window = ErDiagramSourceParser.IsEr(source)
+            ? new ErVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : StateDiagramSourceParser.IsState(source)
             ? new StateVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
             : SequenceSourceParser.IsSequence(source)
             ? new SequenceVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)

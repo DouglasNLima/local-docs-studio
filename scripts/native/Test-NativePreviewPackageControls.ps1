@@ -58,6 +58,26 @@ $sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Ob
 }
 $sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
 Reject 'missing-editor-with-recomputed-checksum' @{PackageDirectory=$copy} 'native Mermaid editor type is missing'
+# Target the ER BAML key while retaining the original assembly identity and all editor types.
+$originalArchive = [IO.Compression.ZipFile]::OpenRead((Join-Path $PackageDirectory $zip.Name))
+try {
+    $input = $originalArchive.GetEntry('LensDocsStudio.Native.dll').Open(); $buffer = [IO.MemoryStream]::new()
+    try { $input.CopyTo($buffer); $nativeBytes = $buffer.ToArray() } finally { $input.Dispose(); $buffer.Dispose() }
+} finally { $originalArchive.Dispose() }
+$resourceKey = [Text.Encoding]::Unicode.GetBytes('ervisualeditorwindow.baml')
+$offset = [Convert]::ToHexString($nativeBytes).IndexOf([Convert]::ToHexString($resourceKey), [StringComparison]::Ordinal)
+if ($offset -lt 0 -or $offset % 2 -ne 0) { throw 'The exact compiled ER resource key was not found for the negative control.' }
+$nativeBytes[$offset / 2] = [byte][char]'z'
+$archive = [IO.Compression.ZipFile]::Open($zip.FullName, [IO.Compression.ZipArchiveMode]::Update)
+try {
+    $archive.GetEntry('LensDocsStudio.Native.dll').Delete(); $replacement = $archive.CreateEntry('LensDocsStudio.Native.dll').Open()
+    try { $replacement.Write($nativeBytes, 0, $nativeBytes.Length) } finally { $replacement.Dispose() }
+} finally { $archive.Dispose() }
+$sums = Get-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') | ForEach-Object {
+    if ($_.EndsWith($zip.Name)) { "{0}  {1}" -f (Get-FileHash -LiteralPath $zip.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $zip.Name } else { $_ }
+}
+$sums | Set-Content -LiteralPath (Join-Path $copy 'SHA256SUMS.txt') -Encoding utf8NoBOM
+Reject 'missing-er-resource-with-recomputed-checksum' @{PackageDirectory=$copy} 'compiled native ER editor resource is missing'
 @{ status='PASS'; checks=$checks; sourceRevision=$metadata.sourceRevision; originalPackageUnchanged=$true } |
     ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $OutputDirectory 'negative-controls.json') -Encoding utf8NoBOM
 "Native preview package negative controls PASS: $($checks.Count)"

@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-mermaid-er-visual-editor', develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
+    branches: ['feature/native-mermaid-er-visual-editor', develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
 permissions:
   contents: read
@@ -196,6 +196,32 @@ jobs:
         with:
           name: native-state-installed-authoring
           path: artifacts/native/state-install-smoke/
+          retention-days: 14
+
+  er-installed-authoring:
+    needs: native
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: native-validation
+          path: artifacts/er-installer-packages
+      - name: Build exact-head native ER validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify installed, upgraded and reinstalled ER authoring independently
+        run: pwsh -NoProfile -File scripts/native/Test-NativeErInstaller.ps1 -Installer "artifacts/er-installer-packages/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/er-installer-packages/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -ExpectedSourceRevision (git rev-parse HEAD)
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-er-installed-authoring
+          path: artifacts/native/er-install-smoke/
           retention-days: 14
 
   historical-upgrade:

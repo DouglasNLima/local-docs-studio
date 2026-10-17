@@ -2,6 +2,28 @@
 
 ## Mermaid visual authoring
 
+**ER diagrams:** Visual Edit opens the native ER editor for `erDiagram`.
+Choose **Insert → ER diagram visually…** for a starter. Select an entity header,
+attribute row or relationship on the canonical drawing, or use the element list.
+The attribute table shows type, name, PK/FK/UK markers and comment; edit the selected
+row in the inspector, then **Update properties**. Add, duplicate, remove and reorder
+supported rows. Multiple markers use portable `PK , FK , UK` notation, retaining all
+keys in the pinned native renderer. Key markers document meaning; they do not enforce database constraints.
+
+The relationship inspector exposes both entity endpoints, cardinality at each
+entity, identifying/non-identifying semantics and label. Reverse retains each
+entity's cardinality. Pick endpoints on canvas or drag a selected endpoint to another
+entity. Invalid drops retain source and history. Connected entities must have their
+relationships explicitly removed or reconnected before deletion. Unknown source
+protects affected operations and remains exact; disabled controls explain why.
+
+ER private Undo/Redo uses Ctrl+Z/Ctrl+Y outside text fields; F fits the canonical
+drawing. Zoom, PAN, actual size, source inspection and validation remain available.
+Update or discard pending properties before changing selection or applying. Apply
+creates one document Undo step; Save persists ordinary Mermaid. Entity placement is
+determined by Mermaider. See the [ER report](mermaid-er-visual-editor.md) for verified
+grammar, protection boundaries and current certification status.
+
 **State diagrams:** Visual Edit opens the dedicated State editor for
 `stateDiagram-v2` and `stateDiagram`. Choose **Insert → State diagram visually…**
 for a starter. Select states, scoped initial/final markers, composites and exact
@@ -103,7 +125,7 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families other than Flowchart, Sequence and State keep their existing
+than four connections per node. Families other than Flowchart, Sequence, State and ER keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## Desktop workspace and synchronisation

@@ -1,0 +1,18 @@
+erDiagram
+    CUSTOMER {
+        string customer_id PK
+        string display_name
+        string email UK "Contact email"
+    }
+    ORDER {
+        string order_id PK
+        string customer_id FK
+        datetime created_on
+    }
+    ORDER_LINE {
+        string order_line_id PK
+        string order_id FK
+        int quantity
+    }
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_LINE : contains

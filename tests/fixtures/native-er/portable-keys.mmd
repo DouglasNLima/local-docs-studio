@@ -1,0 +1,12 @@
+erDiagram
+    RECORD["Synthetic record"] {
+        string id PK , FK , UK "All three markers"
+        string reference FK , PK "Ordered markers"
+        string email UK
+        string[] names
+        decimal(10) amount
+        string café "Combining character"
+    }
+    Café["Unicode entity"] {
+    }
+    RECORD ||--o{ Café : "Customer's records"

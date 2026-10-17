@@ -4,7 +4,7 @@ Local Markdown, Mermaid, and documentation studio. This is an **unsigned interna
 
 ## Obtain and verify the package
 
-Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [State editor Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/33). The [State engineering report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-state-visual-editor/docs/native/mermaid-state-visual-editor.md) documents syntax, capabilities, measurements and certification requirements. These source records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
+Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [ER editor Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34). The [ER engineering report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-er-visual-editor/docs/native/mermaid-er-visual-editor.md) documents syntax, capabilities, measurements and certification requirements. Acceptance requires completed checks for the identified source; a queued or failed run does not establish acceptance. These source records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
 
 ```powershell
 gh run download <verified-run-id> --repo DouglasNLima/local-docs-studio --name native-validation --dir <new-empty-directory>
@@ -30,7 +30,15 @@ Uninstall through Windows **Installed apps**. Application binaries, shortcuts an
 
 ## Start a synthetic workspace
 
-For visual diagram evaluation, open the offline **Native guide → Mermaid visual authoring** topic. **Visual Edit** opens the dedicated Flowchart, Sequence or State editor for a recognised diagram. The corresponding **Insert** command creates a supported starter; **Edit source** remains separate. Each editor's private draft has its own Undo/Redo. Apply changes the owning document in memory and ordinary Save writes it. The canvas and Rendered preview share the canonical native Mermaider drawing. Canvas drag positions and connection guides are temporary; Auto layout restores canonical positions. Protected content remains visible while unsafe operations explain their restrictions. Fit provides an overview. Evaluate with copies or synthetic files.
+For visual diagram evaluation, open the offline **Native guide → Mermaid visual authoring** topic. **Visual Edit** opens the dedicated Flowchart, Sequence, State or ER editor for a recognised diagram. The corresponding **Insert** command creates a supported starter; **Edit source** remains separate. Each editor's private draft has its own Undo/Redo. Apply changes the owning document in memory and ordinary Save writes it. The canvas and Rendered preview share the canonical native Mermaider drawing. Supported canvas drag positions and connection guides are temporary; Auto layout restores canonical positions. Protected content remains visible while unsafe operations explain their restrictions. Fit provides an overview. Evaluate with copies or synthetic files.
+
+For ER evaluation, use `erDiagram`. Select an entity and an exact attribute row;
+edit its type/name, supported PK/FK/UK markers or quoted comment in the inspector.
+Add an attribute and relationship, change endpoint cardinalities and choose
+identifying/non-identifying semantics. Validate, Apply, test document Undo/Redo,
+Save and reopen. Unknown suffix tokens and unknown references protect affected
+operations. Key markers describe documentation; this editor does not connect to
+or modify a database. ER entity layout remains canonical.
 
 For State evaluation, use `stateDiagram-v2`. Select a state on the canvas or in the element list, update its label, add a state and connect it through the endpoint selectors or canvas picking. Simple diagrams support scoped initial/final connections, self-transitions and cycles. Validate the draft, Apply, test document Undo/Redo, Save, close and reopen. Composite membership, special-state insertion, notes/styles and unknown dependencies remain protected; independently safe labels may still be editable. Saved source remains standard Mermaid without private coordinates.
 

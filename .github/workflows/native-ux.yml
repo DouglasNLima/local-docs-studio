@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
-    branches: [develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
+    branches: ['feature/native-mermaid-er-visual-editor', develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,6 +11,45 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  er-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source ER editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify pinned ER grammar, occurrence mapping, canonical pixels, document ownership and resource observations
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --er-fidelity artifacts/native/er-fidelity $appearance
+      - name: Exercise actual ER attributes, cardinalities, endpoint pointers, Apply, Undo, Save and reopen
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --er-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/er-ui $appearance
+          exit $LASTEXITCODE
+      - name: Measure actual ER opening, ordered selection, endpoint movement and memory at bounded sizes
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --er-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/er-performance-ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-er-${{ matrix.appearance }}
+          path: |
+            artifacts/native/er-fidelity/
+            artifacts/native/er-ui/
+            artifacts/native/er-performance-ui/
+          retention-days: 14
   state-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 20

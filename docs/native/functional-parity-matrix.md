@@ -1,5 +1,16 @@
 # Functional parity matrix
 
+The fourth native Mermaid authoring family is implemented on
+`feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
+`3229246af356829771a200134a5df38d3cc8a04c`. The
+[ER engineering report](mermaid-er-visual-editor.md) owns its pinned grammar,
+capabilities, exact-source architecture and revision-scoped certification status.
+Local Release compilation and 1,527 Core cases pass. The
+[ER delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34) identifies
+completed Windows/High Contrast checks, exact-source CI, package hashes and independent
+verification. Acceptance requires that record's completed results for the identified
+revision. Earlier reports retain their original evidence scope.
+
 The [State visual editor](mermaid-state-visual-editor.md) adds a third dedicated
 Mermaid authoring model: source-backed states, scoped pseudo-markers, hierarchical
 inspection, exact ordered transition occurrences and bounded private history.
