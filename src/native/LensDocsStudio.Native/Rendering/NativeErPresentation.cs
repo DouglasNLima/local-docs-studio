@@ -47,7 +47,7 @@ public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<Na
             if (Value(path, "data-entity1") != source.Entity1 || Value(path, "data-entity2") != source.Entity2
                 || Value(path, "data-cardinality1") != source.Cardinality1.ToString().ToLowerInvariant() || Value(path, "data-cardinality2") != source.Cardinality2.ToString().ToLowerInvariant()
                 || Value(path, "data-identifying") != (source.Identifying ? "true" : "false") || Value(path, "data-label") != source.Label || positioned.Points.Count < 2) Reject();
-            var geometry = Geometry.Parse(Value(path, "d")); geometry.Transform = new TranslateTransform(-origin.X, -origin.Y); geometry.Freeze(); Check(geometry.Bounds);
+            var geometry = Geometry.Parse(Value(path, "d")).Clone(); geometry.Transform = new TranslateTransform(-origin.X, -origin.Y); geometry.Freeze(); Check(geometry.Bounds);
             var first = new Point(positioned.Points[0].X - origin.X, positioned.Points[0].Y - origin.Y); var second = new Point(positioned.Points[^1].X - origin.X, positioned.Points[^1].Y - origin.Y);
             var flat = geometry.GetFlattenedPathGeometry(); flat.GetPointAtFractionLength(0, out var start, out _); flat.GetPointAtFractionLength(1, out var end, out _);
             if ((start - first).Length > .1 || (end - second).Length > .1) Reject();

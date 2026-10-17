@@ -28,4 +28,3 @@ internal static partial class NativeErChecks
         void Reject(Action action, string message) { try { action(); } catch (ArgumentException) { checks.Add(message); return; } throw new IOException(message); }
     }
 }
-

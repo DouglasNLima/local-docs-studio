@@ -169,3 +169,15 @@ reverifies downloaded packages and runs install/upgrade/reinstall authoring.
 Historical cross-revision migration remains distinct from same-source two-version
 testing. No ordinary-desktop native execution/installation, merge, release or tag
 movement is authorised. Readiness is **implementation in progress; not certified**.
+
+## Retained first-run failure
+
+At `684291f`, both ER fidelity jobs in
+[run 39063103201](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39063103201)
+failed before UIA: WPF `Geometry.Parse` returned a read-only geometry and assigning
+the coordinate transform raised `InvalidOperationException`. The correction clones
+that geometry before assigning its transform and freezes it afterwards. Original
+normal/High Contrast logs are retained; this does not count as a passing acceptance.
+The extended source-integrity suite now passes 82 ER cases locally, including alias
+forms, entity duplicate/delete, self-to-normal reconnection, native-conversion
+rejection, invalid property atomicity and quoted/unlabelled relationship labels.
