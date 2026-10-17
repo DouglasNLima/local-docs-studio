@@ -36,11 +36,15 @@ For example, editing the final repeated `A->>B: Request` patches only that occur
 
 ## Verification status
 
-The current local suite passes **1,285 Core cases, including 51 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity passes. No native application has been executed or installed on the ordinary desktop.
+The expanded local suite contains **1,286 Core cases, including 52 Sequence cases**. The previous 1,285-case run passed with no skips; the added activation-selection regression is checked with the next candidate. Release builds have zero warnings/errors; static integrity passes. No native application has been executed or installed on the ordinary desktop.
 
 At source `ca331b92c66b8b4868eca1af0145db18684a922c`, [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004555) passed the Sequence normal and actual High Contrast jobs, with 18 UIA assertions each and 73 Sequence fidelity/geometry assertions per appearance job. The complete existing Flowchart UIA/fidelity and baseline jobs also passed. [Workspace and interaction CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004553) passed. [Both browser projects](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004612) passed. These results belong to that source revision; subsequent enhancements require fresh certification.
 
 Initial native captures were inspected at all five requested window sizes, plus light, dark, selected message/note/participant, activation inspector, message creation and source collapse/expansion. Apply remained visible at the minimum size. The initial source-specific captures and performance observations are retained in the CI artefact `native-sequence-normal` / `native-sequence-high-contrast`. Package and final-HEAD results are delivered with their exact source identity in the PR and verification receipts; no skipped mandatory check counts as a pass.
+
+The expanded run at `e1cad9205c6c04cf0474265d055fcc40b3f2c8e9` passed **101 fidelity/ownership assertions, 27 normal UIA assertions and 28 actual High Contrast assertions** in [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033667815). The additional cases cover participant rename/actor creation/reorder/deletion, real pointer message selection, message ordering/duplication, empty diagrams, protected blocks, repeated occurrences and standalone `.mermaid` Apply/Undo/Save. Source-specific receipts are retained under [evidence/sequence-visual-editor](evidence/sequence-visual-editor/).
+
+Screenshot review of that run found that an inherited Flowchart hover fill obscured a canonical message label in dark mode. The [retained before image](evidence/sequence-visual-editor/before-hover-dark.png) records the defect. The subsequent Sequence-only hit-target style uses transparent interiors with focus/selection outlines; it has no apparent drag handles. A focused regression also retains shorthand activation selection through message edits and private history.
 
 ## Safe operations and protected boundaries
 

@@ -85,7 +85,8 @@ public sealed class SequenceVisualDraft
     private void Commit(SequenceDiagramModel candidate)
     {
         Model = candidate;
-        if (!Model.Statements.Any(item => item.Identity == Selection) && !Model.Participants.Any(item => "participant:" + item.Id == Selection)) Selection = null;
+        if (!Model.Statements.Any(item => item.Identity == Selection) && !Model.Participants.Any(item => "participant:" + item.Id == Selection)
+            && !Model.Activations.Any(item => item.Identity == Selection)) Selection = null;
         if (index + 1 < history.Count) history.RemoveRange(index + 1, history.Count - index - 1);
         history.Add(new(Model, Selection, ++nextIdentity)); index++;
         while (history.Count > 100 || history.Count > 2 && history.Sum(item => item.Model.Source.Length) > 8_000_000) { history.RemoveAt(0); index--; }

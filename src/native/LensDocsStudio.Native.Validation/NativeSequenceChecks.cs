@@ -54,7 +54,7 @@ internal static class NativeSequenceChecks
             timer.Restart(); var render = new DiagramService().Render(source); var renderMs = timer.Elapsed.TotalMilliseconds;
             timer.Restart(); SequenceRenderCorrespondence.Validate(model, render); var validationMs = timer.Elapsed.TotalMilliseconds;
             timer.Restart(); var presentation = NativeSequencePresentation.Create(model, render, new()); var nativeMs = timer.Elapsed.TotalMilliseconds;
-            var draft = new SequenceVisualDraft(source); timer.Restart(); for (var i = 0; i < 1000; i++) draft.Select(model.Messages[i % messages].Identity); var selectionMs = timer.Elapsed.TotalMilliseconds;
+            var draft = new SequenceVisualDraft(source); timer.Restart(); for (var i = 0; i < 1000; i++) draft.Select(draft.Model.Messages[i % messages].Identity); var selectionMs = timer.Elapsed.TotalMilliseconds;
             Check(render.Success, "Performance fixture renders within existing resource limits: " + messages + " messages");
             performance.Add(new { Participants = participants, Messages = messages, ParseMilliseconds = parseMs, RenderMilliseconds = renderMs, SemanticValidationMilliseconds = validationMs,
                 NativePresentationMilliseconds = nativeMs, ThousandPrivateSelectionsMilliseconds = selectionMs, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated,

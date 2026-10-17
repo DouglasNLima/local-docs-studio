@@ -222,4 +222,14 @@ public sealed class SequenceVisualTests
         }
         Assert.Equal(Simple, draft.Source); Assert.Equal(100, draft.HistoryCount);
     }
+
+    [Fact]
+    public async Task Shorthand_activation_selection_survives_message_edits_and_private_history()
+    {
+        var source = Simple.Replace("A->>B", "A->>+B", StringComparison.Ordinal); var draft = new SequenceVisualDraft(source);
+        var activation = Assert.Single(draft.Model.Activations); draft.Select(activation.Identity);
+        await Execute(draft, new UpdateSequenceMessage(activation.MessageIdentity, "A", "B", "Changed", "->>"));
+        Assert.Equal(activation.Identity, draft.Selection); draft.Undo(); Assert.Equal(activation.Identity, draft.Selection);
+        draft.Redo(); Assert.Equal(activation.Identity, draft.Selection);
+    }
 }

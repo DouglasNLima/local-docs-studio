@@ -19,8 +19,17 @@ public sealed class SequenceSourceParser
         (SequenceStatementKind.Divider, Pattern(@"^(?<type>else|and)(?:\s+(?<label>.*))?$")),
         (SequenceStatementKind.Autonumber, Pattern(@"^autonumber(?:\s+(?<start>\d+))?(?:\s+(?<step>\d+))?$"))
     ];
-    public static bool IsSequence(string source) => source.ReplaceLineEndings("\n").Split('\n')
-        .FirstOrDefault(line => !string.IsNullOrWhiteSpace(line) && !line.TrimStart().StartsWith("%%", StringComparison.Ordinal))?.Trim() == "sequenceDiagram";
+    public static bool IsSequence(string source)
+    {
+        var remaining = source.AsSpan(0, Math.Min(source.Length, 100_000));
+        for (var index = 0; index < 1000 && !remaining.IsEmpty; index++)
+        {
+            var end = remaining.IndexOf('\n'); var line = (end < 0 ? remaining : remaining[..end]).Trim();
+            if (!line.IsEmpty && !line.StartsWith("%%", StringComparison.Ordinal)) return line.SequenceEqual("sequenceDiagram");
+            if (end < 0) break; remaining = remaining[(end + 1)..];
+        }
+        return false;
+    }
     public static bool ValidId(string value) => Pattern("^" + Id + "$").IsMatch(value);
     public static string NormaliseLabel(string value)
     {

@@ -117,7 +117,7 @@ public partial class SequenceVisualEditorWindow : Window
                 foreach (var target in presentation.Targets)
                 {
                     var button = new ToggleButton { Width = Math.Max(10, target.Bounds.Width), Height = Math.Max(10, target.Bounds.Height),
-                        Style = (Style)FindResource("CanvasElement"), ToolTip = target.Description, Tag = target.Identity };
+                        Style = (Style)FindResource("Sequence.HitTarget"), ToolTip = target.Description, Tag = target.Identity };
                     AutomationProperties.SetName(button, target.Description); AutomationProperties.SetAutomationId(button, "SequenceCanvas_" + target.Identity);
                     if (targets.Values.Contains(target.Identity)) AutomationProperties.SetAutomationId(button, "SequenceCanvas_" + target.Identity + "_" + targets.Count);
                     button.Click += (_, _) => Select(target.Identity);

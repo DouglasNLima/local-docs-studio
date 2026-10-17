@@ -66,7 +66,8 @@ public sealed record NativeSequencePresentation(DrawingImage Drawing, IReadOnlyL
             }
             if (bounds.IsEmpty) return;
             bounds.Offset(-origin.X, -origin.Y);
-            if (!double.IsFinite(bounds.Width) || !double.IsFinite(bounds.Height) || bounds.Width > 1_000_000 || bounds.Height > 1_000_000)
+            if (!double.IsFinite(bounds.X) || !double.IsFinite(bounds.Y) || Math.Abs(bounds.X) > 1_000_000 || Math.Abs(bounds.Y) > 1_000_000
+                || !double.IsFinite(bounds.Width) || !double.IsFinite(bounds.Height) || bounds.Width > 1_000_000 || bounds.Height > 1_000_000)
                 throw new InvalidDataException("The canonical Sequence hit target is outside the geometry budget.");
             targets.Add(new(identity, description, bounds));
         }

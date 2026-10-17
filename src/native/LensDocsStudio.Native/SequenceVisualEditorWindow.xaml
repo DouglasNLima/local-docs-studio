@@ -5,7 +5,22 @@
  WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
  FontFamily="Segoe UI" FontSize="12" Icon="Resources/Brand/application.ico" UseLayoutRounding="True"
  AutomationProperties.AutomationId="SequenceVisualEditor" PreviewKeyDown="Shortcut">
- <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/></ResourceDictionary.MergedDictionaries>
+  <Style x:Key="Sequence.HitTarget" TargetType="ToggleButton" BasedOn="{StaticResource Mermaid.CanonicalElement}">
+   <Setter Property="BorderBrush" Value="Transparent"/>
+   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ToggleButton">
+    <Grid Background="Transparent">
+     <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="1" CornerRadius="3" IsHitTestVisible="False"/>
+     <Rectangle x:Name="FocusRing" Stroke="{DynamicResource TextBrush}" StrokeThickness="1" StrokeDashArray="2,2" Margin="-2" Visibility="Collapsed" IsHitTestVisible="False"/>
+    </Grid>
+    <ControlTemplate.Triggers>
+     <Trigger Property="IsMouseOver" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/></Trigger>
+     <Trigger Property="IsChecked" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/></Trigger>
+     <Trigger Property="IsKeyboardFocused" Value="True"><Setter TargetName="FocusRing" Property="Visibility" Value="Visible"/></Trigger>
+    </ControlTemplate.Triggers>
+   </ControlTemplate></Setter.Value></Setter>
+  </Style>
+ </ResourceDictionary></Window.Resources>
  <DockPanel>
   <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,10">
    <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid" Foreground="{DynamicResource AccentBrush}"/><TextBlock Text="Mermaid Visual Editor" FontSize="14" FontWeight="SemiBold" Margin="8,0"/><TextBlock Text="/ Sequence" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/></StackPanel>
