@@ -551,13 +551,29 @@ internal static partial class NativeUiChecks
             void Open(int blockOffset, bool editable = true)
             {
                 FocusWindow(main!); Wait(() => main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is not null, "The mapped Visual Edit action was not available.");
-                var watch = Stopwatch.StartNew(); Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
-                Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "The native visual editor did not open.");
+                var watch = Stopwatch.StartNew(); var ownerSource = ReadEditorText(editor);
+                var action = Find(main!, "DiagramEditVisually" + blockOffset); var identity = action.FrameworkAutomationElement.RuntimeId.Value;
+                action.AsButton().Invoke();
+                Wait(() => EditorAppeared() || Find(main!, "Status").Name == "The document changed. Wait for its current preview before editing visually.", "The native visual editor did not open or explain its revision guard.");
+                if (visual is null)
+                {
+                    // Source edits can leave an old preview visible until replacement. Its
+                    // rejection is correct; require a different actual UIA action before proceeding.
+                    Wait(() => EditorAppeared() || main!.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually" + blockOffset)) is { } fresh
+                        && !identity.SequenceEqual(fresh.FrameworkAutomationElement.RuntimeId.Value), "The stale preview action was not replaced by a fresh source revision.");
+                    if (visual is null)
+                    {
+                        Check(ReadEditorText(editor) == ownerSource, "A stale preview action rejects opening without changing the owning document");
+                        Find(main!, "DiagramEditVisually" + blockOffset).AsButton().Invoke();
+                        Wait(EditorAppeared, "The fresh revision-bound visual editor did not open.");
+                    }
+                }
                 if (polish) Capture("first-frame-existing-" + ++firstFrames);
                 Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "The visual editor did not finish its canonical render.");
                 if (editable) Wait(() => Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable", "The visual editor did not become editable: " + Find(visual!, "MermaidStatus").Name);
                 if (polish) CaptureMeaningful("first-meaningful-existing-" + firstFrames);
                 timings.Add(new { Operation = "Open visual editor", Milliseconds = watch.Elapsed.TotalMilliseconds });
+                bool EditorAppeared() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null;
             }
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
             void Select(string id)
