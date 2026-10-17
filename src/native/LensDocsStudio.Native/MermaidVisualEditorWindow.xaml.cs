@@ -196,7 +196,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (Selected?.StartsWith("node:", StringComparison.Ordinal) != true || propertyBaseline is not NodeValues before) return;
         var next = ReadNodeValues(); var operations = new List<MermaidEditOperation>();
         if (next.Id != before.Id || next.Label != before.Label || next.Shape != before.Shape)
-            operations.Add(new UpdateMermaidNode(before.Id, next.Label, next.Shape, next.Id));
+            operations.Add(new UpdateMermaidNode(before.Id, next.Label == before.Label ? draft.Model.Node(before.Id).Label : next.Label, next.Shape, next.Id));
         if (next.Group != before.Group || force == "group") operations.Add(new MoveMermaidNode(next.Id, next.Group == "(Root)" ? null : next.Group));
         if (next.Class is { } className && (next.Class != before.Class || force == "class")) operations.Add(new SetMermaidClass(next.Id, className));
         if (next.Fill != before.Fill || next.Stroke != before.Stroke || next.Colour != before.Colour || force == "style")
@@ -218,19 +218,21 @@ public partial class MermaidVisualEditorWindow : Window
     private async void UpdateEdge(object sender, RoutedEventArgs e)
     {
         if (Selected is not { } id || EdgeSource.SelectedItem is not string source || EdgeTarget.SelectedItem is not string target || EdgeType.SelectedItem is not FlowConnectionType type) return;
-        await Execute(new UpdateMermaidConnection(id, source, target, EdgeLabel.Text, type));
+        await Execute(new UpdateMermaidConnection(id, source, target, PendingEdgeLabel(id), type));
     }
     private async void ReverseEdge(object sender, RoutedEventArgs e)
     {
         if (Selected is not { } id || !id.StartsWith("edge-", StringComparison.Ordinal)) return;
         if (EdgeSource.SelectedItem is string source && EdgeTarget.SelectedItem is string target && EdgeType.SelectedItem is FlowConnectionType type)
-            await Execute(new UpdateMermaidConnection(id, target, source, EdgeLabel.Text, type));
+            await Execute(new UpdateMermaidConnection(id, target, source, PendingEdgeLabel(id), type));
     }
+    private string PendingEdgeLabel(string id) => propertyBaseline is EdgeValues before && EdgeLabel.Text == before.Label ? draft.Model.Edge(id).Label : EdgeLabel.Text;
     private async void UpdateGroup(object sender, RoutedEventArgs e)
     {
         if (Selected?.StartsWith("group:", StringComparison.Ordinal) != true) return;
         var id = Selected[6..];
-        var operations = new List<MermaidEditOperation> { new RenameMermaidSubgraph(id, GroupLabel.Text) };
+        var label = propertyBaseline is GroupValues original && GroupLabel.Text == original.Label ? draft.Model.Subgraph(id).Label : GroupLabel.Text;
+        var operations = new List<MermaidEditOperation> { new RenameMermaidSubgraph(id, label) };
         if (propertyBaseline is GroupValues before && GroupDirection.SelectedItem is string direction && direction != before.Direction)
             operations.Add(new ChangeMermaidDirection(direction, id));
         await ExecuteBatch(operations);

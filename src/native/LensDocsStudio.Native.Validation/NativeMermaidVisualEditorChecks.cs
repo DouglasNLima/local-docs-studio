@@ -362,6 +362,11 @@ internal static partial class NativeUiChecks
                 Check(Find(visual!, "MermaidNodeId").Properties.HelpText.Value.Contains("protected chain", StringComparison.Ordinal),
                     "A denied identity edit explains its chain dependency to assistive technology");
                 Capture("partial-chain-capabilities");
+                Find(visual!, "MermaidNodeShape").AsComboBox().Select("Rounded"); Click("MermaidUpdateNode");
+                var captureShape = partial.Replace("Capture[\"Capture context<br/>Synthetic operation identifiers\"]", "Capture(\"Capture context<br/>Synthetic operation identifiers\")", StringComparison.Ordinal);
+                AwaitSource(text => text == captureShape);
+                Check(Draft() == captureShape, "A chain node shape edit preserves its unchanged multiline label representation exactly");
+                Click("MermaidUndo"); AwaitSource(text => text == partial);
                 Select("node_IndependentStep");
                 Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Reviewed synthetic step";
                 Select("node_Archive");
@@ -370,7 +375,9 @@ internal static partial class NativeUiChecks
                 Click("MermaidUpdateNode"); AwaitSource(text => text.Contains("IndependentStep[\"Reviewed synthetic step\"]", StringComparison.Ordinal));
                 var expectedNode = partial.Replace("Independent diagnostic step", "Reviewed synthetic step", StringComparison.Ordinal);
                 Check(Draft() == expectedNode && ReadEditorText(editor) == partial, "Only the independent label changes privately; owning source remains exact");
-                Click("MermaidFit"); Select("node_IndependentStep"); Capture("partial-independent-inspector");
+                Click("MermaidFit");
+                Check(Find(visual!, "MermaidSelectionSummary").Name.StartsWith("IndependentStep", StringComparison.Ordinal), "The independent node inspector remains selected for visual acceptance");
+                Capture("partial-independent-inspector");
                 var parsedPartial = new MermaidSourceParser().Parse(Draft());
                 var independentEdge = parsedPartial.Edges.Single(edge => edge.Source.Id == "Notify" && edge.Target.Id == "Archive");
                 Select(independentEdge.Id);
