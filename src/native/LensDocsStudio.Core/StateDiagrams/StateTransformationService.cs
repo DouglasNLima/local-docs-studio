@@ -33,6 +33,8 @@ public sealed class StateTransformationService
         }
         void SafeNode(StateNode node)
         {
+            if (node.Declarations.Count > 0 && node.Declaration is null)
+                throw new ArgumentException("An earlier implicit reference shadows this state's later declaration. Resolve its declaration in Edit source before changing this state.");
             if (node.Kind != "state" || node.Declarations.Count > 1 || node.Scopes.Count > 1)
                 throw new ArgumentException("Repeated declarations, special states or shared hierarchy protect this state. Use Edit source.");
         }
@@ -76,7 +78,7 @@ public sealed class StateTransformationService
                     Simple(); NewId(update.NewId);
                     foreach (var reference in node.References) Patch(reference.Span, update.NewId);
                 }
-                if (node.Label != update.Label)
+                if (node.Label != update.Label || update.Id != update.NewId && node.Declaration is null)
                 {
                     if (node.Declaration is { } declaration) Token(declaration, "label", label);
                     else
@@ -127,7 +129,7 @@ public sealed class StateTransformationService
                 var group = model.Groups.SingleOrDefault(item => item.Id == update.Id) ?? throw new ArgumentException("Select a composite state.");
                 if (update.Label.Contains('\n') || update.Label.Contains('\r')) throw new ArgumentException("Composite headings must stay on one line.");
                 if (group.Opening.Tokens.ContainsKey("label")) Token(group.Opening, "label", Label(update.Label, true));
-                else Patch(group.Opening.Span, "state \"" + Label(update.Label, true) + "\" as " + group.Id + " {");
+                else Patch(new(group.Opening.Tokens["id"].Start, 0), "\"" + Label(update.Label, true) + "\" as ");
                 break;
             }
             default: throw new ArgumentException("This State operation is protected in this version.");

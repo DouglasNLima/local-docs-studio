@@ -3,10 +3,12 @@
 Continue State work from [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33)
 on consolidated `develop` `77dff109`, which includes PR #31 and PR #32. The
 [State report](mermaid-state-visual-editor.md) records dedicated Core semantics,
-exact patches, canonical native mapping, protected operations and current pending
-certification. Complete hosted UIA, actual High Contrast, existing editor/browser
-regressions and exact-head independently verified unsigned previews before calling
-the goal complete. No merge, tag, release or ordinary-desktop installation is authorised.
+exact patches, canonical native mapping, protected operations and revision-scoped
+certification. State normal/actual High Contrast authoring, fidelity, performance,
+Flowchart/Sequence UX and browser checks pass at `357e11f`. Completion requires
+successful mandatory checks and independently verified unsigned packages for the
+exact delivered head; inspect its immutable CI metadata and delivery hashes.
+No merge, tag, release or ordinary-desktop installation is authorised.
 
 The active Sequence editor implementation is [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
 See [its report](mermaid-sequence-visual-editor.md) for source modelling, canonical

@@ -20,7 +20,8 @@ public static class StateSemanticValidation
             throw new ArgumentException(render.Error ?? string.Join(" ", model.Diagnostics) + " The canonical State rendering is unavailable.");
         var graph = Graph(model);
         if (!JsonNode.DeepEquals(Json(graph), Json(render.FlowchartSemantics))) Reject();
-        if (graph.Nodes.Count != model.Nodes.Count + model.PseudoNodes.Count || graph.Edges.Count != model.Transitions.Count) Reject();
+        if (graph.Nodes.Count != model.Nodes.Count + model.PseudoNodes.Count || graph.Edges.Count != model.Transitions.Count
+            || render.FlowchartLayout.Edges.Count != graph.Edges.Count) Reject();
         foreach (var node in model.Nodes)
         {
             var shape = node.Kind == "state" ? NodeShape.Rounded : node.Kind == "choice" ? NodeShape.Diamond : NodeShape.ForkJoin;
@@ -30,7 +31,9 @@ public static class StateSemanticValidation
             if (!graph.Nodes.TryGetValue(pseudo.RendererId, out var parsed) || parsed.Shape != (pseudo.Initial ? NodeShape.StateStart : NodeShape.StateEnd)) Reject();
         for (var i = 0; i < model.Transitions.Count; i++)
         {
-            var item = model.Transitions[i]; var edge = graph.Edges[i];
+            var item = model.Transitions[i]; var edge = graph.Edges[i]; var positioned = render.FlowchartLayout.Edges[i];
+            if (positioned.Source != edge.Source || positioned.Target != edge.Target || positioned.Label != edge.Label || positioned.Style != edge.Style
+                || positioned.HasArrowStart != edge.HasArrowStart || positioned.HasArrowEnd != edge.HasArrowEnd) Reject();
             var source = model.RendererId(item.Source); var target = model.RendererId(item.Destination);
             if (graph.SubgraphEdgeRedirections.TryGetValue(i, out var redirect))
             { source = redirect.SourceSubgraph is null ? source : edge.Source; target = redirect.TargetSubgraph is null ? target : edge.Target; }
@@ -73,7 +76,7 @@ public static class StateSemanticValidation
                 if (update.Id != update.NewId) Rename(update.Id, update.NewId);
                 nodes[update.NewId]!["Label"] = update.Label;
                 // A previously implicit state's declaration moves only that state's first occurrence.
-                if (before.Node(update.Id).Declaration is null && before.Node(update.Id).Label != update.Label)
+                if (before.Node(update.Id).Declaration is null && (before.Node(update.Id).Label != update.Label || update.Id != update.NewId))
                 {
                     var newOrder = actual["NodeOrder"]!.AsArray();
                     if (!order.Where(item => item!.GetValue<string>() != update.NewId).Select(item => item!.GetValue<string>())

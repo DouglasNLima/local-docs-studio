@@ -4,8 +4,11 @@ Current work is [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio
 `feature/native-mermaid-state-visual-editor`, based on consolidated `77dff109`
 including the merged advanced Flowchart and Sequence implementations. The
 [State report](mermaid-state-visual-editor.md) owns current source/operation and
-certification status. Real Windows UIA and installer runs stay on disposable
-GitHub-hosted Windows. Final-head evidence, packages and hashes remain pending.
+certification status. State UIA/fidelity/performance and all three editor UX
+regressions pass at `357e11f`; Core covers 1,424 cases including 41 State cases.
+Real Windows UIA and installer runs stay on disposable GitHub-hosted Windows.
+Final-head packages, literal hashes and lifecycle status are identified by the
+delivery report and mandatory PR check artifacts.
 Retain the earlier reports; do not merge, tag, release or replace an installed preview.
 
 Continue Sequence authoring work from [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),

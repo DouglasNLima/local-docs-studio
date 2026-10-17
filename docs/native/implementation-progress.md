@@ -3,9 +3,11 @@
 State visual authoring is implemented on consolidated `develop` `77dff109`,
 including both PR #31 and PR #32, in [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33).
 The [State report](mermaid-state-visual-editor.md) owns its syntax/operation matrices,
-source-preservation architecture and evolving certification evidence. Hosted State
-UIA, High Contrast, regression and exact-head package certification are pending;
-the earlier editor reports below retain their original revision scope.
+source-preservation architecture and certification evidence. At `357e11f`, 47 State
+UIA checks per appearance, normal/actual High Contrast fidelity, bounded native
+performance, Flowchart/Sequence UX and browser regressions pass. Exact-head
+package/lifecycle provenance is emitted by mandatory native CI and the delivery
+report; earlier editor reports below retain their original revision scope.
 
 Sequence visual authoring is tracked independently in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
 based on `develop` at `7bd2207`. Dedicated Core semantics, exact patches, private

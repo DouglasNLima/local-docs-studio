@@ -1,12 +1,14 @@
 # Native validation report
 
 The State continuation is [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33),
-based on consolidated `77dff109`. Initial full Core regression passes 1,408 cases;
-expanded State-only coverage passes 30 cases. Release compilation has zero
-warnings/errors. Hosted State authoring/fidelity/High Contrast, final-head existing
-editor regressions and unsigned preview certification remain pending. The
+based on consolidated `77dff109`. Complete Core regression passes 1,424 cases;
+State coverage comprises 41 cases. Release compilation has zero warnings/errors.
+At `357e11f`, State UIA passes 47 checks per appearance, fidelity/ownership passes
+110 normal and 111 actual High Contrast checks, all three bounded native process
+sizes pass, and Flowchart/Sequence UX, interaction and browser workflows pass. The
 [State report](mermaid-state-visual-editor.md) distinguishes implementation from
-certification and owns the current evidence.
+revision-scoped certification; exact-head package/lifecycle evidence is emitted
+by the mandatory native workflow and identified in the delivery report.
 
 Sequence editor work is tracked in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
 The local Release build has zero warnings/errors; 1,294 Core cases (60 new Sequence

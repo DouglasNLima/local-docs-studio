@@ -28,9 +28,10 @@ public sealed record StateDiagramModel(string Source, string Header, IReadOnlyLi
 {
     public bool IsValid => Diagnostics.Count == 0;
     public bool HasUnknownDependencies => Statements.Any(item => item.Kind == StateStatementKind.Unknown);
-    public bool IsSimple => Groups.Count == 0 && !Statements.Any(item => item.Kind is StateStatementKind.Unknown or StateStatementKind.Style or StateStatementKind.Note or StateStatementKind.Stereotype);
+    public bool IsSimple => Groups.Count == 0 && !Statements.Any(item => item.Kind is StateStatementKind.Unknown or StateStatementKind.Style or StateStatementKind.Note or StateStatementKind.Stereotype
+        || item.Tokens.ContainsKey("fromClass") || item.Tokens.ContainsKey("toClass"));
     public StateSourceCompatibility Compatibility => !IsValid ? StateSourceCompatibility.Invalid : HasUnknownDependencies ? StateSourceCompatibility.Protected
-        : !IsSimple || Nodes.Any(item => item.Declarations.Count > 1 || item.Scopes.Count > 1 || item.Kind != "state") ? StateSourceCompatibility.PartiallyEditable : StateSourceCompatibility.Editable;
+        : !IsSimple || Nodes.Any(item => item.Declarations.Count > 1 || item.Declarations.Count > 0 && item.Declaration is null || item.Scopes.Count > 1 || item.Kind != "state") ? StateSourceCompatibility.PartiallyEditable : StateSourceCompatibility.Editable;
     public string NewLine => Source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
     public StateNode Node(string id) => Nodes.SingleOrDefault(item => item.Id == id) ?? throw new ArgumentException("Select an existing state.");
     public StateTransition Transition(string identity) => Transitions.SingleOrDefault(item => item.Identity == identity) ?? throw new ArgumentException("Select an exact transition occurrence.");

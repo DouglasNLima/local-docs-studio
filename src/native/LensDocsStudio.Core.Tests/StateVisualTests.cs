@@ -1,5 +1,6 @@
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Rendering;
+using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.StateDiagrams;
 using Mermaider;
 using Xunit;
@@ -205,6 +206,51 @@ public sealed class StateVisualTests
     {
         var source = "stateDiagram-v2\n" + string.Join('\n', Enumerable.Repeat("unrecognised directive", 3000)); var model = new StateDiagramSourceParser().Parse(source);
         Assert.False(model.IsValid); Assert.Equal(StateSourceCompatibility.Invalid, model.Compatibility); Assert.Equal(source, model.Source); Assert.InRange(model.Statements.Count, 1, 1000); Assert.False(StateCapabilityAnalysis.For(model, new AddStateNode("A", "A")).Allowed);
+    }
+    [Fact]
+    public void Nested_example_fences_do_not_become_editable_State_targets()
+    {
+        const string body = "stateDiagram-v2\nA --> A\n";
+        var source = "````markdown\n```mermaid\n" + body + "```\n````\n\n```mermaid\n" + body + "```\n";
+        var target = Assert.Single(MermaidBlockSource.Find(new MarkdownService().Parse(source)));
+        Assert.Equal(source.LastIndexOf("```mermaid", StringComparison.Ordinal), target.Container.Start); Assert.Equal(body, target.Source);
+    }
+    [Fact]
+    public async Task Adding_a_composite_heading_label_preserves_its_original_spacing_and_crlf()
+    {
+        const string source = "stateDiagram-v2\r\n\tstate  Outer\t{\r\n    A --> A : Repeat\r\n\t}\r\n"; var draft = new StateVisualDraft(source);
+        await Success(draft, new UpdateStateGroupLabel("Outer", "Local group"));
+        Assert.Equal(source.Replace("state  Outer", "state  \"Local group\" as Outer", StringComparison.Ordinal), draft.Source);
+    }
+    [Fact]
+    public async Task Inline_transition_classes_protect_structural_dependencies_without_a_class_definition()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\nstate \"B\" as B\nA:::quiet --> B : Submit\n");
+        Assert.Equal(StateSourceCompatibility.PartiallyEditable, draft.Model.Compatibility);
+        Assert.False(StateCapabilityAnalysis.For(draft.Model, new UpdateStateNode("A", "Renamed", "A")).Allowed);
+        await Rejected(draft, new DeleteStateTransition(draft.Model.Transitions[0].Identity));
+        await Success(draft, new UpdateStateNode("A", "A", "Local draft")); Assert.Contains("A:::quiet --> B : Submit", draft.Source);
+    }
+    [Fact]
+    public async Task Renaming_an_implicit_state_retains_its_display_label_and_all_known_references()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nA --> B\nB --> A\n");
+        await Success(draft, new UpdateStateNode("B", "LocalB", "B")); Assert.Equal("B", draft.Model.Node("LocalB").Label);
+        Assert.Equal("stateDiagram-v2\n    state \"B\" as LocalB\nA --> LocalB\nLocalB --> A\n", draft.Source); draft.Undo(); Assert.Equal(draft.OriginalSource, draft.Source);
+    }
+    [Fact]
+    public async Task A_later_shadowed_declaration_is_protected_without_inventing_a_duplicate_alias()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nA --> B\nstate \"Later label\" as A\n");
+        Assert.Equal(StateSourceCompatibility.PartiallyEditable, draft.Model.Compatibility);
+        await Rejected(draft, new UpdateStateNode("A", "A", "Changed")); Assert.Single(draft.Model.Node("A").Declarations);
+    }
+    [Fact]
+    public void Source_to_positioned_transition_ordinals_reject_dropped_or_reordered_geometry()
+    {
+        var model = new StateDiagramSourceParser().Parse(Simple); var render = new DiagramService().Render(Simple); var layout = render.FlowchartLayout!;
+        Assert.Throws<ArgumentException>(() => StateSemanticValidation.ValidateRendering(model, render with { FlowchartLayout = layout with { Edges = layout.Edges.Skip(1).ToArray() } }));
+        Assert.Throws<ArgumentException>(() => StateSemanticValidation.ValidateRendering(model, render with { FlowchartLayout = layout with { Edges = layout.Edges.Reverse().ToArray() } }));
     }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]

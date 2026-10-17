@@ -1,6 +1,8 @@
 # Native Mermaid State Visual Editor
 
-Status: implementation in progress; not certified.
+Status: implemented; native authoring and performance accepted at `357e11f`.
+Exact-head unsigned-preview certification is recorded by mandatory PR checks and
+immutable package artifacts, as described below.
 
 The feature branch starts at consolidated `develop` commit
 `77dff109d84c0730c5b6b3574c71b02b112b082f`, including advanced Flowchart
@@ -28,26 +30,26 @@ positioned graph records and emitted SVG. Executable fixtures use the applicatio
 rendering limits. Rendering success alone does not establish intended semantics:
 this parser silently ignores several unsupported statements.
 
-| Construct | Recognised by pinned parser | Renders | Source model / inspection | Visual editing v1 |
-| --- | --- | --- | --- | --- |
-| `stateDiagram-v2`, `stateDiagram` | Yes | Yes | Header retained | Supported |
-| Named states through transitions | Yes, first reference creates state | Yes | Exact ID/reference spans | Label materialised before first reference when simple |
-| `state "Label" as ID` | Yes, word IDs | Yes | First declaration and all references | Label; safe simple ID rename |
-| `ID : description` | Yes, first occurrence wins | Yes | Exact description span | Label; description is display text, not a state action |
-| Bare `state ID` | Ignored | Empty/partial output possible | Unknown, retained | Protected |
-| `[*] --> ID`, `ID --> [*]` | Yes | Yes | Distinct initial/final identities per source scope | Create/reconnect/remove through simple transitions |
-| Directed, labelled, self and cyclic transitions | Yes | Yes | Private occurrence identity and exact endpoint/label spans | Supported subject to dependencies |
-| Repeated identical transitions | Yes, distinct ordered edges | Yes | Distinct private identities | Exact occurrence; overlapping pointer paths offer a choice |
-| Composite and nested state blocks | Yes | Yes | Opening/closing spans, parent and references | Selection, inspection and unambiguous heading labels |
-| Internal actions/transitions | No separate internal-action grammar | May be mistaken for a description | Original description/unknown statement retained | No action authoring |
-| `<<choice>>`, `<<fork>>`, `<<join>>` | Yes | Yes | Special-state identity and inspection | Protected; no special-state palette insertion |
-| Inline and block left/right notes | Yes | Yes | Protected full statement and target | Preserved; independent declared labels may be edited |
-| Direction commands | Yes, scoped | Yes | Exact command retained | Source editing only |
-| Full-line comments | Skipped by renderer | Yes | Original source bytes retained | Never rewritten |
-| Concurrent regions `--` | Separator ignored | Partial drawing possible | Unknown dependency | Protected |
-| `classDef`, `class`, `style`, class shorthand | Yes | Yes for bounded fixtures | Protected styling/dependency statements | Labels may remain independently editable; structural edits protected |
-| Configuration directives | Preprocessed by renderer | May render | Protected dependency; never treated as an inert comment | Source only |
-| Unknown directives, malformed boundaries | Ignored or rejected | Partial output possible | Retained with protection/diagnostics | No guessed editable identities |
+| Construct | Recognised by pinned parser | Renders | Source model | Safe inspection | Safe edits | Protected / unsupported |
+| --- | --- | --- | --- | --- | --- | --- |
+| `stateDiagram-v2`, `stateDiagram` | Yes | Yes | Exact header | Source | Retained | Other header casing source-only |
+| Named states through transitions | Yes, first reference creates state | Yes | Exact ID/reference spans | Canvas/list | Simple implicit label materialisation; known dependencies | Complex implicit declarations |
+| `state "Label" as ID` | Yes, word IDs | Yes | First declaration and all references | Canvas/list | Label; safe simple ID rename | Duplicate/shared declarations |
+| `ID : description` | Yes, first occurrence wins | Yes | Exact description span | State and source | Display label | No internal-action semantics inferred |
+| Bare `state ID` | Ignored | Empty/partial possible | Unknown statement retained | Source span only | None | Unsupported |
+| `[*] --> ID`, `ID --> [*]` | Yes | Yes | Initial/final identities per scope | Canvas/list | Simple scoped connections | No global ID rename |
+| Directed, labelled, self and cyclic transitions | Yes | Yes | Ordered identity and endpoint/label spans | Verified path/label/list | Safe labels, endpoints, reverse, delete/add | Dependency checks per operation |
+| Repeated identical transitions | Yes, ordered edges | Yes | Distinct private occurrences | Exact list/path; overlap choice | Exact selected occurrence | Never selected by label alone |
+| Composite and nested blocks | Yes | Yes | Boundaries, parent and references | Canvas/hierarchical list | Unambiguous heading labels | Membership, creation and movement |
+| Internal actions/transitions | No separate grammar | May become a description | Original description/unknown retained | Display/source only | No action authoring | Intended action semantics unsupported |
+| `<<choice>>`, `<<fork>>`, `<<join>>` | Yes | Yes | Special-state identity | Canvas/list | Independent ordinary labels only | Special-state authoring |
+| Inline and block left/right notes | Yes | Yes | Full statement and target | Protected list/source | Independent declared labels | Notes and structural dependencies |
+| Direction commands | Yes, scoped | Yes | Exact command retained | Source | Explicit source editing | Visual direction changes |
+| Full-line comments | Skipped | Yes | Original source bytes | Source | Never rewritten by visual edits | No invented semantic identities |
+| Concurrent regions `--` | Separator ignored | Partial possible | Unknown dependency | Source only | None | Unsupported; operations protected |
+| `classDef`, `class`, `style`, shorthand / inline classes | Yes | Yes for fixtures | Protected statements/tokens | Source/list where available | Independently proven labels | Structural edits, including unresolved inline classes |
+| Configuration directives | Preprocessed | May render | Protected dependency | Source span only | Explicit source editing | Never treated as inert comments |
+| Unknown directives / malformed boundaries | Ignored or rejected | Partial possible | Original statement / diagnostics | Retained source only | None visually | Unknown dependencies / invalid source |
 
 The hosted `state-fidelity.json` report contains the exact probe sources,
 recognition/mapping results and render outcomes. No online newer Mermaid grammar
@@ -156,8 +158,9 @@ Implemented: dedicated source model, expected-text transformations, complete
 semantic validation, bounded private history, canonical WPF canvas/inspector,
 source validation, family routing, insertion and document Apply integration.
 
-Local Release build: zero warnings/errors. Initial complete Core suite: 1,408
-passed without skips; expanded complete suite: 1,413 passed; State suite: 31 passed.
+Local Release build: zero warnings/errors. Complete Core suite: **1,424 passed**,
+without skips, including **41 State cases**. Complete static/browser regression:
+**268 passed** across Chromium and Microsoft Edge. Static integrity passes.
 At `ff7dfb0`, both normal and actual High Contrast State native UIA acceptance,
 Sequence regressions, Flowchart interaction regressions and the complete native
 desktop UX workflow passed. The first `0afabbc` State UIA attempt reached the
@@ -174,7 +177,112 @@ in the harness; its failure reports are retained. Selection now uses native
 keyboard navigation to realise and verify the exact occurrence. A local stale
 validation test also exposed an invalid timing assumption; explicit validation
 barriers now make the interruption deterministic, without delays or retries.
-The current State unit suite passes 35 tests, including native conversion rejection.
+The current State unit suite passes 41 tests, including native conversion rejection,
+nested example fences, exact composite-heading whitespace, inline-class dependencies,
+implicit ID rename/display-label preservation, shadowed declarations and explicit
+source-to-positioned ordinal rejection for dropped/reordered geometry.
+
+At accepted application `357e11fdf0fda630fdde2f4d74b87702edf29ada`,
+[native UX run 39051251622](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39051251622)
+passes all seven jobs: State normal/actual High Contrast, Sequence normal/actual
+High Contrast, Flowchart authoring/fidelity, the frozen baseline and advanced
+partial-editing baseline. Both State appearances pass **47 native acceptance
+checks**. State fidelity/source ownership passes **110 normal checks** and **111
+actual High Contrast checks**, with zero pixel tolerance. Three source fixtures
+are compared in light and dark rendering in each appearance.
+
+[Interaction run 39051251621](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39051251621)
+passes normal/actual High Contrast Flowchart pointer/reconnection stress and
+workspace viewports. [PR browser run 39051251617](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39051251617)
+and [push browser run 39051247434](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39051247434)
+both pass Chromium, Edge and static integrity. Pages deployment is skipped.
+
+These revision-scoped reports are retained in `evidence/state-visual-editor/`.
+The final documentation head must independently pass its mandatory workflows;
+the [PR checks record](https://github.com/DouglasNLima/local-docs-studio/pull/33/checks)
+is authoritative for that head. Earlier green runs do not certify a later revision.
+
+## Source preservation and real native acceptance
+
+The native workflow opens the **second of two identical Markdown diagrams**,
+selects Draft by its canvas SelectionItem identity, edits its label, selects the
+Review → Draft transition, edits its text, adds Archived and a transition, reconnects
+both endpoints through native pointer targets, reverses/undoes, creates a self-loop,
+and exercises private Undo/Redo. Initial/final palette connections also validate
+and undo. The owning document and disk remain byte-exact throughout private work.
+
+Complete validation precedes Apply. One document Undo restores the whole original;
+Redo restores the exact edited block. Save writes the expected Markdown; process
+restart and reopen recover the exact source and canonical image. Visual insertion
+creates an ordinary Markdown fence. Cancel after private edits preserves owner
+and disk. Real tab closure, another active tab, overlapping source edits and safe
+outside-container relocation are exercised with ownership/version guards.
+
+The protected fixture keeps nested composites, scoped markers, repeated identical
+transitions, choice, notes and styles. An independent label and the second repeated
+transition edit without changing their siblings. Unknown source disables visual
+operations with accessible reasons; source, history and the `.mermaid` owner remain
+unchanged. Core/native ownership checks additionally cover CRLF/LF, Unicode and
+combining characters, duplicate IDs/labels, invalid IDs, missing destinations,
+incident-edge deletion, overlapping patches, Markdown wrapper closure, Azure DevOps
+containers, cancelled/stale validation, independent history branches and bounded
+history. Unsupported content is retained as original source.
+
+## Performance observations
+
+Normal hosted Windows measurements at `357e11f`; milliseconds rounded. The native
+column includes complete correspondence checking and native SVG preparation/conversion.
+Source operation timing is the Core transaction; UI opening/selection includes UIA.
+
+| States / transitions | Lexical parse | Mermaid render | Semantic/native presentation | Core label operation | Real editor opening | 20 real canvas selections |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 10 / 15 | 0.26 | 22.59 | 76.76 | 26.50 | 578 | 2,311 |
+| 30 / 60 | 0.50 | 37.54 | 359.50 | 61.41 | 878 | 3,369 |
+| 100 / 150 | 2.07 | 69.81 | 1,249.96 | 150.16 | 2,156 | 5,293 |
+
+Actual High Contrast editor opening: 578 / 811 / 1,933 ms at those sizes. All six
+real native performance processes remain responsive with byte-exact private/disk
+source. Each performs 20 selections and a real 20-move drag with 35 dispatcher
+updates. Maximum measured update work is 1.18 / 1.50 / 1.72 ms normally and
+1.29 / 1.54 / 2.00 ms in High Contrast. This excludes other dispatcher/raster work;
+the UI-thread allocation and total gesture duration are retained separately.
+
+Normal working set grows from approximately 166 / 175 / 197 MiB before opening
+to 208 / 226 / 266 MiB after interaction. Parse/render/native benchmark allocated
+bytes are approximately 14 / 52 / 146 MiB, excluding worker-thread allocations.
+These are observations from hosted machines, not universal latency/memory promises.
+
+Long labels render/convert successfully (2 / 180 ms); nested/protected source
+renders/converts in 4 / 64 ms. Ten repeated Core edits take 16 ms; pre-cancelled
+validation returns in 0.6 ms with unchanged history/source. No rendering, element,
+geometry or deadline limit was increased. Existing Continuous preview 250 ms and
+dense-render cancellation limitations are outside this State result.
+
+## Hosted screenshot gallery
+
+Actual Windows captures at `357e11f`, not mock-ups. Source inspection, capabilities,
+native focus and Apply remain available. At 880 × 600 the inspector/source scroll;
+Fit intentionally prioritises the complete canonical drawing over label size.
+
+| Light | Dark |
+| --- | --- |
+| ![Light State editor](images/state-visual-editor/light.png) | ![Dark State editor](images/state-visual-editor/dark.png) |
+
+| Actual Windows High Contrast | Protected nested diagram |
+| --- | --- |
+| ![High Contrast State editor](images/state-visual-editor/high-contrast.png) | ![Protected State diagram](images/state-visual-editor/advanced-protected.png) |
+
+| Saved, restarted and reopened | Unknown dependencies protected |
+| --- | --- |
+| ![Saved State source reopened](images/state-visual-editor/saved-reopened.png) | ![Unknown State source retained](images/state-visual-editor/unknown-protected.png) |
+
+Inspected window captures: [880 × 600](images/state-visual-editor/viewport-880x600.png),
+[1024 × 768](images/state-visual-editor/viewport-1024x768.png),
+[1280 × 800](images/state-visual-editor/viewport-1280x800.png),
+[1440 × 900](images/state-visual-editor/viewport-1440x900.png),
+[1920 × 1080](images/state-visual-editor/viewport-1920x1080.png).
+
+## Retained failures and corrections
 
 The `ff7dfb0` PR Edge run failed one existing browser-fallback test because the
 top bar had browser-default `display: block` instead of the required stylesheet
@@ -186,14 +294,60 @@ Chromium PR run failed during context teardown in the legacy-redirect test while
 133 other tests and the same-revision push browser run passed. These failures
 remain visible and do not waive the final-head browser checks.
 
-Hosted State grammar,
-fidelity/performance, full native UIA, High Contrast and existing editor/browser
-regressions are being extended. The new State jobs are mandatory on PRs to `develop`.
-Pages deployment remains restricted to default-branch non-PR events. Native
-package builds check out the exact PR head for source provenance.
+The first native performance harness failed while reading an optional AutomationId
+from an unrelated Windows title-bar element. The corrected scan still requires
+exact State IDs and then validates actual pointer updates. The passing normal and
+High Contrast performance reports retain every measurement. No assertion, rendering
+budget or timeout was relaxed to obtain these passes.
 
-Not yet certified: final-head UIA, screenshots, performance observations,
-Flowchart/Sequence hosted regression conclusions, installer lifecycle and
-independent unsigned package verification/hashes. Evidence and screenshot gallery
-will be added after actual hosted acceptance. No production readiness, signing,
-merge, tag, release or installation on the ordinary desktop is authorised.
+## CI, packaging and provenance
+
+State source/semantic tests are part of the mandatory Core suite. Normal/actual
+High Contrast State fidelity, UIA and real process performance are mandatory
+`native-ux.yml` jobs on PRs to `develop`. Existing Flowchart, Sequence, native corpus,
+export, workspace and browser gates remain intact. Native package builds and State
+jobs check out the exact PR head. Pages deployment remains restricted to default-
+branch non-PR events and cannot publish this Draft PR.
+
+`native.yml` builds self-contained Windows x64 unsigned installer/portable versions,
+independently verifies metadata, SHA-256, runtime, icons and compiled resources for
+all three editors, and runs rejection controls plus the existing installer lifecycle.
+A separate mandatory `state-installed-authoring` job verifies the downloaded
+installer/ZIP again, compares every installed file with the portable payload, and
+runs the complete State acceptance against install, upgrade and reinstall.
+This keeps existing lifecycle assertions/time budgets intact.
+
+Package outputs contain `version.json`, `SHA256SUMS.txt` and
+`package-verification.json`; State lifecycle emits `state-installer-results.json`
+and phase-specific UIA JSON/screenshots. Exact final-head source revision, version,
+installer/portable SHA-256 and independent verification results belong to those
+immutable CI artifacts and the delivery report. The containing documentation
+commit cannot embed its own hash. Do not substitute an earlier package's provenance
+for the final delivered head. Artifacts have the workflow's 14-day retention;
+keep the downloaded internal preview and checksums for longer use.
+
+An exact-head deliverable is **ready for unsigned internal preview** only when its
+general native, State installed-authoring, UX, interaction and browser workflows
+all complete successfully. The delivery report identifies that commit, completed
+run URLs, package versions and literal installer/ZIP hashes. A queued, cancelled,
+failed or earlier run does not certify a later head. Production signing, trusted
+updates and release/clean-machine certification remain outside this preview scope.
+
+## Genuine limits and readiness scope
+
+- Implemented: ordinary states/transitions, exact identities/patches, private history,
+  scoped markers, self-loops/cycles, canonical native interaction, document Apply,
+  Undo/Redo, Save/restart/reopen, protected inspection and capability explanations.
+- Protected: composite membership changes/creation, special-state insertion, note
+  authoring, directions/styles, unknown dependencies, shared/duplicate declarations
+  and any structural edit whose complete dependencies cannot be proven. Complex
+  explicit labels may remain independently editable.
+- Session only: manual positions and connection guides; Auto layout restores the
+  renderer. Position changes are not independent source Undo entries and are never
+  persisted. The pinned layout can overlap some complex labels/notes; this editor
+  deliberately retains the canonical image.
+- Not certified for production: signing, trusted automatic updates and a separate
+  clean-machine release certification. These are excluded from the unsigned
+  internal-preview goal. SharpVectors conversion is non-interruptible; stale
+  results are rejected and conversion failure cannot commit private history.
+- No automatic merge, tag, public release or ordinary-desktop installation is authorised.

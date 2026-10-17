@@ -1,0 +1,24 @@
+{
+  "sequenceModelPathPresent": true,
+  "baselineBranch": "develop",
+  "rendererRepositoryRevision": "71b64845570d633a94d29e85579c0a02786fece8",
+  "nativePostMerge": {
+    "conclusion": "success",
+    "headSha": "77dff109d84c0730c5b6b3574c71b02b112b082f",
+    "status": "completed",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39045995957"
+  },
+  "webPostMerge": {
+    "conclusion": "success",
+    "headSha": "77dff109d84c0730c5b6b3574c71b02b112b082f",
+    "status": "completed",
+    "url": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39045995936"
+  },
+  "ordinaryDesktopPreviewInstalled": false,
+  "rendererPackage": "Mermaider 0.15.1",
+  "pr31Merge": "91f541ce5a8172b9985b18dae842b98e3c2b05f9",
+  "flowchartAdvancedPathPresent": true,
+  "baselineRevision": "77dff109d84c0730c5b6b3574c71b02b112b082f",
+  "pr32Merge": "77dff109d84c0730c5b6b3574c71b02b112b082f",
+  "mainModified": false
+}

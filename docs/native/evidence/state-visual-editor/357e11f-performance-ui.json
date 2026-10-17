@@ -1,0 +1,43 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": false,
+  "Measurements": [
+    {
+      "States": 10,
+      "Transitions": 15,
+      "EditorOpenIncludingUiaMilliseconds": 577.9997,
+      "TwentyCanvasSelectionsIncludingUiaMilliseconds": 2311.0747,
+      "WorkingSetBeforeEditor": 174014464,
+      "WorkingSetAfterInteractions": 218222592,
+      "ActualPointerDrag": "State drag frames: 35; maximum update: 1.184 ms; update allocated bytes: 142768; UI-thread allocated bytes: 9134936; duration: 2536.4 ms.",
+      "DragLimit": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "States": 30,
+      "Transitions": 60,
+      "EditorOpenIncludingUiaMilliseconds": 878.0854,
+      "TwentyCanvasSelectionsIncludingUiaMilliseconds": 3368.5883,
+      "WorkingSetBeforeEditor": 183463936,
+      "WorkingSetAfterInteractions": 236904448,
+      "ActualPointerDrag": "State drag frames: 35; maximum update: 1.500 ms; update allocated bytes: 489904; UI-thread allocated bytes: 38205608; duration: 2466.1 ms.",
+      "DragLimit": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "States": 100,
+      "Transitions": 150,
+      "EditorOpenIncludingUiaMilliseconds": 2156.4736,
+      "TwentyCanvasSelectionsIncludingUiaMilliseconds": 5292.955,
+      "WorkingSetBeforeEditor": 206757888,
+      "WorkingSetAfterInteractions": 279134208,
+      "ActualPointerDrag": "State drag frames: 35; maximum update: 1.724 ms; update allocated bytes: 1163304; UI-thread allocated bytes: 110827088; duration: 2572.5 ms.",
+      "DragLimit": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    }
+  ],
+  "Scope": "Real hosted native process; timings include UIA transport and cold conversion. No rendering limit was increased."
+}
