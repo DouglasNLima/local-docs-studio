@@ -123,7 +123,13 @@ internal static partial class NativeUiChecks
                     var focusBox = focusRange.GetBoundingRectangles().First(box => preview.BoundingRectangle.Contains(box));
                     Mouse.Click(new System.Drawing.Point(focusBox.Left + focusBox.Width * (name == "A" ? 1 : 2) / 3, focusBox.Top + focusBox.Height / 2));
                     var alreadyVisible = Visible(preview, text); var syncStart = SyncCompletions();
-                    PreviewRange(text).ScrollIntoView(true);
+                    var target = PreviewRange(text);
+                    // Give WPF's focused reader an explicit reading anchor before UIA
+                    // scrolling. Otherwise deferred restoration of its empty caret can
+                    // supersede ScrollIntoView, which delivers no native wheel gesture.
+                    target.Select();
+                    Wait(() => preview.Patterns.Text.Pattern.GetSelection().Any(range => range.GetText(-1) == text), "The preview reading anchor was not selected.");
+                    target.ScrollIntoView(true);
                     Wait(() => Visible(preview, text), "Document " + name + " did not reach its reading position.");
                     if (synchronised && !alreadyVisible)
                         Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
