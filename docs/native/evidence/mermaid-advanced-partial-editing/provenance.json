@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 1,
+  "applicationRevision": "f8772647df65da41079b3c6dd148d9444ea50bfc",
+  "baselineRevision": "833e9db1f8643f7023143dd94349a2709f9ae9ce",
+  "mergeCheckout": "f1adf3747c06a5355d75654f2d8d990b33f8b646",
+  "applicationAndMergeTree": "c099eed52cd8275bc8e2732b6a08b388f4348e05",
+  "featureBranch": "feature/native-mermaid-advanced-partial-editing",
+  "targetBranch": "feature/native-workspace-mermaid-interaction-stability",
+  "pullRequest": "https://github.com/DouglasNLima/local-docs-studio/pull/31",
+  "unsignedInternalPreview": true,
+  "localNativeExecution": false,
+  "runs": [
+    {
+      "status": "success",
+      "number": 599,
+      "name": "native",
+      "id": "39025931169",
+      "artifact": "12099285435"
+    },
+    {
+      "status": "success",
+      "artifacts": [
+        "12098827006",
+        "12098637145",
+        "12098343786"
+      ],
+      "name": "native UX",
+      "id": "39025931155"
+    },
+    {
+      "status": "success",
+      "artifacts": [
+        "12098368974",
+        "12098273794",
+        "12097858940"
+      ],
+      "name": "interactions",
+      "id": "39025931158"
+    },
+    {
+      "status": "success",
+      "pagesDeployment": "skipped by default-branch condition",
+      "name": "Chromium and Edge",
+      "id": "39025931200"
+    }
+  ],
+  "counts": {
+    "browserEdge": 134,
+    "normalInteractionAssertions": 58,
+    "normalAuthoring": 143,
+    "highContrastInteractionAssertions": 53,
+    "pointerMoves": 4080,
+    "drags": 240,
+    "partialCases": 86,
+    "deterministicSeeds": 48,
+    "browserChromium": 134,
+    "fidelity": 369,
+    "rendererCorrespondenceCases": 3,
+    "actualHighContrastAuthoring": 139,
+    "core": 1323
+  },
+  "limitations": [
+    "96 OS DPI measured; higher OS DPI and physical screen-reader use not certified",
+    "Separate pre-existing Continuous 250 ms performance target unresolved",
+    "Dense renderer cancellation and allocation observations remain explicit",
+    "No production signing or trusted unsigned update execution",
+    "Separate SDK-free clean-machine certification not performed"
+  ],
+  "files": [
+    {
+      "file": ".gitattributes",
+      "bytes": 27,
+      "sha256": "c089985639038cc07dc37c07a8d0d543df7ddf9b1873a948000494a6e230530d"
+    },
+    {
+      "file": "baseline-reproduction.json",
+      "bytes": 265,
+      "sha256": "6f0602c7efb03254109f3d0ca694835e83dc145e1565bf99fb35a9a14cebb76d"
+    },
+    {
+      "file": "canonical-fidelity.json",
+      "bytes": 47029,
+      "sha256": "d9f2969850df5fc85632508cfabe4d6175631ed3f1a56eb3823268c06d4ae5a0"
+    },
+    {
+      "file": "continuous-observations.json",
+      "bytes": 2738,
+      "sha256": "2859a9870134ceb979907825eb1f47689c8e66ea0f99f8b2088865027b59bd08"
+    },
+    {
+      "file": "desktop-after-reinstall.json",
+      "bytes": 10381,
+      "sha256": "3e37083bfddbec6115d16d461e3f30107e256285b665dc7341e449c93d49ed1f"
+    },
+    {
+      "file": "desktop-after-upgrade.json",
+      "bytes": 10379,
+      "sha256": "46c5b2f9a115a19a3a64cf8bf9ccf500eb6c0e49b88b9224aeb10483406680f0"
+    },
+    {
+      "file": "desktop-build-output.json",
+      "bytes": 10310,
+      "sha256": "81e353cf3dad5bb62d8dd2c4e6be85df6353e5227c7768285fca53ec5e6f1695"
+    },
+    {
+      "file": "desktop-first-launch.json",
+      "bytes": 10378,
+      "sha256": "1bd1f1386811cabf08f58d1462ddefd4334a84fc0b1f1641aa242430347462bb"
+    },
+    {
+      "file": "high-contrast-authoring.json",
+      "bytes": 14373,
+      "sha256": "9ce0ab4507f92b91e9989948c08ffd39d2dbad9774ba94fd94ef8a37a4beb043"
+    },
+    {
+      "file": "installer-finished-599.png",
+      "bytes": 32958,
+      "sha256": "f4999a65acb9fc1ca6090be2b158de640e939d469f9ecf5954560eed702bf517"
+    },
+    {
+      "file": "installer-lifecycle-599.json",
+      "bytes": 5739,
+      "sha256": "96d704c38b7ff769c98ad36d206b45b94a8f34fa2a7f35fbf045b577a8084a0f"
+    },
+    {
+      "file": "installer-wizard-599.json",
+      "bytes": 813,
+      "sha256": "29e4716aff8b5266f4eac30123a449e85f78de055b6875433981eb17bad63e25"
+    },
+    {
+      "file": "interactions-high-contrast.json",
+      "bytes": 40846,
+      "sha256": "b05393051039441852b2c7a50b6d56829856e7baa17c22bc99ef81f1785198cb"
+    },
+    {
+      "file": "interactions-normal.json",
+      "bytes": 41155,
+      "sha256": "003139db04b778cba8280014b8d57c7dd821c3c211824e90a99303dd1e1c734c"
+    },
+    {
+      "file": "mermaid-dark.png",
+      "bytes": 116959,
+      "sha256": "9c4b79cf320a22e23d910be7d69a8fa82a0a823d09e9477c5580f8c2aa80662a"
+    },
+    {
+      "file": "mermaid-partial-chain-capabilities.png",
+      "bytes": 136215,
+      "sha256": "18850b583d4503c92122c003d304d266a9ff62982b21bcd5ea39cfeac7e8159b"
+    },
+    {
+      "file": "mermaid-partial-connection-inspector.png",
+      "bytes": 133701,
+      "sha256": "d7e38447410465ca58204f5c559b13872caae7e33a6fd46e960c91eb54fc7f8f"
+    },
+    {
+      "file": "mermaid-partial-high-contrast.png",
+      "bytes": 131045,
+      "sha256": "f18144502f6a45b8d41c8b4cf88beeaa3f697cd552642ba8796844c7abd6e7bd"
+    },
+    {
+      "file": "mermaid-partial-independent-inspector.png",
+      "bytes": 135993,
+      "sha256": "a16caed5a888ee388fa9b64f6e3fc8402c240f008fe9b57884df03ab7563c9a8"
+    },
+    {
+      "file": "mermaid-partial-saved-reopened.png",
+      "bytes": 140378,
+      "sha256": "beacd260feee132bc667a19e9854e1b2d01caea9a6d9eb450098e9d0fdb5991f"
+    },
+    {
+      "file": "native-corpus.json",
+      "bytes": 42,
+      "sha256": "c63189c72f59b9af51f0e520d6458b0897039acb1eaa11b796f5e86b1f111f43"
+    },
+    {
+      "file": "native-run-summary.json",
+      "bytes": 1007,
+      "sha256": "feff07d33fa596104d030d0b52d1b2b63ba79b4c5a04c3f772e26f5e7c304e96"
+    },
+    {
+      "file": "normal-authoring.json",
+      "bytes": 14879,
+      "sha256": "708a8039703518b258b43cbae53e14af515a63499faed5f5765957151df63b2d"
+    },
+    {
+      "file": "package-rejection-controls.json",
+      "bytes": 841,
+      "sha256": "694eac664b43a7989aa67328636cea65111ab3e24b5874cd9187f6e2dfd5c2e5"
+    },
+    {
+      "file": "package-verification-599.json",
+      "bytes": 94342,
+      "sha256": "6b1fec1bdde267ac1a22973946e470c1f6e637dafd7744821976766b85362b55"
+    },
+    {
+      "file": "package-verification-initial-599.json",
+      "bytes": 94342,
+      "sha256": "1c42caeb55fbbefd4dd8da8d4fe5e0fabe0ae42c8cd5aaf96ae5122c3e1590be"
+    },
+    {
+      "file": "performance.json",
+      "bytes": 7501,
+      "sha256": "300c030016eb4251882b59993fe21bca2c14af122d806253ac9cca54de19c8ef"
+    },
+    {
+      "file": "persisted-workspace-export.json",
+      "bytes": 1026,
+      "sha256": "14c7c66aabc57cf2fc4226e78e7f1b04a92762eae6402b2fb83c06a9ddd8f4a2"
+    },
+    {
+      "file": "SHA256SUMS-599.txt",
+      "bytes": 242,
+      "sha256": "ab5ca0909341e083f7e012fe7d4da63e8751c61498d520e73a91ca0c3e76fac2"
+    },
+    {
+      "file": "version-599.json",
+      "bytes": 579,
+      "sha256": "16cb409dd193053cc8e9bf1590a37a48d7914d683b8f7d440f5dbe49da385f1f"
+    },
+    {
+      "file": "workspace-viewports.json",
+      "bytes": 1315,
+      "sha256": "b4b3083d7258827a57328cd44d49b3c67df361642d9c63c1662a70afedb944fb"
+    }
+  ],
+  "packageVersion": "0.1.1-preview.599",
+  "installerSha256": "4f18835d003523661f4d68b37d65621e4d171abc3b09cb7a710a0698c57a18bc",
+  "portableSha256": "6c2aa002889546ab660ffba10a7881397554c3ef0864bf27073b0d99222fcd9a",
+  "textReceiptFormat": "Retained text receipts use LF; Continuous observations are a field projection, with complete raw originals in the pinned CI artefact. Package and screenshot bytes are unchanged."
+}

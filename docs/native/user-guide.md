@@ -22,7 +22,8 @@ shape inserts it near the viewport centre. Select a containing subgraph explicit
 before dropping inside it to add membership safely. A connection dropped on a node
 retains the existing connection-creation workflow.
 
-Select a connection path or label to show its source and destination endpoint handles.
+When reconnection is permitted, select a connection path or label to show its source
+and destination endpoint handles.
 Drag either handle onto a single editable node to reconnect it. Escape or a drop on
 empty space cancels without a source change. The Properties source/destination fields
 provide the same operation from the keyboard. Overlapping connections have distinct
@@ -34,6 +35,9 @@ a chain node's identity or deletion remains protected. Read-only values stay ava
 for inspection and copying. Disabled actions explain their dependencies in tooltips
 and accessible HelpText. Every accepted edit validates the complete source and render.
 Apply becomes available only after a real validated private change.
+Use Edit source to change protected grammar in the owning document. Manual changes
+in the visual source panel require the fully supported subset; partial visual edits
+must use the permitted property and palette controls.
 
 Unknown dependencies open the complete original diagram for protected visual inspection.
 Zoom, PAN, Rendered preview and Edit source remain available. Resource limits still

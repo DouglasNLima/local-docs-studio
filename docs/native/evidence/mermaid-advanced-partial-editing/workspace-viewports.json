@@ -1,0 +1,49 @@
+{
+  "Passed": true,
+  "Observations": [
+    {
+      "ReadingMode": "Pages",
+      "Synchronised": false,
+      "FirstOpenTop": true,
+      "ReturnOwnPosition": true,
+      "SidebarExistingTab": true,
+      "RapidLatestWins": true,
+      "AnchorBackForward": true,
+      "AEditorPercent": 72.87616395439909,
+      "BEditorPercent": 38.64074493081542
+    },
+    {
+      "ReadingMode": "Pages",
+      "Synchronised": true,
+      "FirstOpenTop": true,
+      "ReturnOwnPosition": true,
+      "SidebarExistingTab": true,
+      "RapidLatestWins": true,
+      "AnchorBackForward": true,
+      "AEditorPercent": 72.0510472986226,
+      "BEditorPercent": 38.64074493081542
+    },
+    {
+      "ReadingMode": "Continuous",
+      "Synchronised": false,
+      "FirstOpenTop": true,
+      "ReturnOwnPosition": true,
+      "SidebarExistingTab": true,
+      "RapidLatestWins": true,
+      "AnchorBackForward": true,
+      "AEditorPercent": 72.87616395439909,
+      "BEditorPercent": 38.64074493081542
+    },
+    {
+      "ReadingMode": "Continuous",
+      "Synchronised": true,
+      "FirstOpenTop": true,
+      "ReturnOwnPosition": true,
+      "SidebarExistingTab": true,
+      "RapidLatestWins": true,
+      "AnchorBackForward": true,
+      "AEditorPercent": 72.87616395439909,
+      "BEditorPercent": 38.64074493081542
+    }
+  ]
+}

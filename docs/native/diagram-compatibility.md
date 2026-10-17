@@ -4,7 +4,9 @@ The advanced native Flowchart editing continuation is tracked in
 [Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), stacked on
 the exact unmerged PR #30 implementation. Its [partial-editing report](mermaid-advanced-flowchart-partial-editing.md)
 owns current source-transformation evidence; the rendering reports below retain
-their original revision scope. Hosted native and package certification is in progress.
+their original revision scope. Full native regression, actual High Contrast,
+source-preserving Apply and independently verified unsigned preview `0.1.1-preview.599`
+pass within the report's explicit compatibility and certification limits.
 
 | Flowchart source | Transformation behaviour |
 |---|---|
