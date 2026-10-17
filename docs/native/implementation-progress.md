@@ -5,9 +5,11 @@ The fourth native Mermaid authoring family is implemented on
 `3229246af356829771a200134a5df38d3cc8a04c`. The
 [ER engineering report](mermaid-er-visual-editor.md) owns its pinned grammar,
 capabilities, exact-source architecture and revision-scoped certification status.
-Local Release compilation and 1,521 Core cases pass; final-head Windows/High Contrast,
-package and final-head CI certification remain pending. Earlier reports retain their
-original evidence scope.
+Local Release compilation and 1,521 Core cases pass. The
+[ER delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34) identifies
+completed Windows/High Contrast checks, exact-source CI, package hashes and independent
+verification. Acceptance requires that record's completed results for the identified
+revision. Earlier reports retain their original evidence scope.
 
 State visual authoring is implemented on consolidated `develop` `77dff109`,
 including both PR #31 and PR #32, in [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33).
