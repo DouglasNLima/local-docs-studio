@@ -35,7 +35,7 @@ internal static partial class NativeUiChecks
                 for (var i = 0; i < 20; i++) Find(visual!, "StateCanvas_state:S" + (i % states)).Patterns.SelectionItem.Pattern.Select(); var selectionMs = timer.Elapsed.TotalMilliseconds;
                 if (ReadEditorText(Find(visual!, "StateSource")) != source) throw new IOException("Performance selection changed State source.");
                 Find(visual!, "StateActualSize").AsButton().Invoke(); var viewport = Find(visual!, "StateViewport").BoundingRectangle;
-                var target = visual!.FindAllDescendants().FirstOrDefault(item => item.AutomationId.StartsWith("StateCanvas_state:", StringComparison.Ordinal)
+                var target = visual!.FindAllDescendants().FirstOrDefault(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("StateCanvas_state:", StringComparison.Ordinal)
                     && !item.IsOffscreen && viewport.Contains(item.BoundingRectangle));
                 string? drag = null;
                 if (target is not null)

@@ -199,7 +199,7 @@ public partial class StateVisualEditorWindow : Window
         var edge = draft.Model.Transitions.FirstOrDefault(item => item.Identity == draft.Selection);
         var reconnect = can && (mode == "transition" || edge is not null && draft.Model.IsSimple && !draft.Model.HasUnknownDependencies);
         From.IsEnabled = To.IsEnabled = ReconnectFromButton.IsEnabled = ReconnectToButton.IsEnabled = reconnect;
-        var capabilities = new List<string>();
+        var capabilities = new List<string> { "Source: " + (draft.Model.Compatibility == StateSourceCompatibility.PartiallyEditable ? "partially editable" : draft.Model.Compatibility.ToString().ToLowerInvariant()) + "." };
         if (node is not null)
         {
             void Describe(string name, StateEditOperation operation) { var result = StateCapabilityAnalysis.For(draft.Model, operation); capabilities.Add(name + ": " + (result.Allowed ? "editable" : "protected — " + result.Reason)); }
@@ -246,7 +246,7 @@ public partial class StateVisualEditorWindow : Window
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
         if (busy || PropertiesPending) return; SavePositions(); var sourceChanged = SourcePending; busy = true; UpdateActions();
-        try { var result = await draft.ValidateSourceAsync(SourceEditor.Text, lifetime.Token); if (closed) return; if (result.Success) { if (sourceChanged) { sessionPositions.Clear(); SavePositions(); } await RefreshAsync(); Status.Text = "Complete source semantics and canonical rendering validated."; } else Status.Text = result.Error; }
+        try { var result = await draft.ValidateSourceAsync(SourceEditor.Text, lifetime.Token); if (closed) return; if (result.Success) { if (sourceChanged) { sessionPositions.Clear(); SavePositions(); } await RefreshAsync(); Status.Text = draft.Model.HasUnknownDependencies ? "Canonical rendering validated. Unrecognised statements remain protected; inspect the retained source." : "Complete source semantics and canonical rendering validated."; } else Status.Text = result.Error; }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
     private async void Apply(object sender, RoutedEventArgs e)

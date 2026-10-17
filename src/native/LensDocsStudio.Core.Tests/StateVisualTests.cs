@@ -23,6 +23,7 @@ public sealed class StateVisualTests
     public async Task Complete_private_workflow_preserves_unrelated_bytes_and_distinct_history(string header)
     {
         var original = Simple.Replace("stateDiagram-v2", header); var draft = new StateVisualDraft(original);
+        Assert.Equal(StateSourceCompatibility.Editable, draft.Model.Compatibility);
         var returnEdge = draft.Model.Transitions[2].Identity; draft.Select(returnEdge);
         await Success(draft, new UpdateStateNode("Draft", "Draft", "Local draft"));
         Assert.Contains("    state \"Local draft\" as Draft\n    [*] --> Draft", draft.Source);
@@ -61,6 +62,7 @@ public sealed class StateVisualTests
     {
         var source = "stateDiagram-v2\nstate \"Independent\" as Independent\n[*] --> Independent\nstate Outer {\n[*] --> A\nstate Inner {\n[*] --> B\nB --> [*]\n}\nA --> [*]\n}\n";
         var draft = new StateVisualDraft(source); Assert.Equal(5, draft.Model.PseudoNodes.Count);
+        Assert.Equal(StateSourceCompatibility.PartiallyEditable, draft.Model.Compatibility);
         Assert.True((await draft.ValidateAsync()).Success);
         await Success(draft, new UpdateStateNode("Independent", "Independent", "Independent label"));
         await Success(draft, new UpdateStateGroupLabel("Outer", "Outer review"));
@@ -143,7 +145,7 @@ public sealed class StateVisualTests
     public async Task Configuration_directives_are_not_inert_comments()
     {
         var draft = new StateVisualDraft("%%{init: {'theme':'dark'}}%%\nstateDiagram-v2\nstate \"A\" as A\nA --> A\n");
-        Assert.True(draft.Model.HasUnknownDependencies); await Rejected(draft, new UpdateStateNode("A", "A", "Changed"));
+        Assert.True(draft.Model.HasUnknownDependencies); Assert.Equal(StateSourceCompatibility.Protected, draft.Model.Compatibility); await Rejected(draft, new UpdateStateNode("A", "A", "Changed"));
     }
     [Fact]
     public async Task Hyphenated_existing_state_labels_use_the_verified_description_grammar()
@@ -202,7 +204,7 @@ public sealed class StateVisualTests
     public void Pathological_statement_counts_are_bounded_without_discarding_source()
     {
         var source = "stateDiagram-v2\n" + string.Join('\n', Enumerable.Repeat("unrecognised directive", 3000)); var model = new StateDiagramSourceParser().Parse(source);
-        Assert.False(model.IsValid); Assert.Equal(source, model.Source); Assert.InRange(model.Statements.Count, 1, 1000); Assert.False(StateCapabilityAnalysis.For(model, new AddStateNode("A", "A")).Allowed);
+        Assert.False(model.IsValid); Assert.Equal(StateSourceCompatibility.Invalid, model.Compatibility); Assert.Equal(source, model.Source); Assert.InRange(model.Statements.Count, 1, 1000); Assert.False(StateCapabilityAnalysis.For(model, new AddStateNode("A", "A")).Allowed);
     }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]

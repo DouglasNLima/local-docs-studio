@@ -14,9 +14,9 @@
    <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="StateUndo"><ui:CommandIcon Kind="Undo"/></Button>
    <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="StateRedo"><ui:CommandIcon Kind="Redo"/></Button>
    <Separator/>
-   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDelete"/>
-   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDuplicate"/>
-   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateReverse"/>
+   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDelete" AutomationProperties.Name="Delete selected State element"/>
+   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDuplicate" AutomationProperties.Name="Duplicate selected state"/>
+   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateReverse" AutomationProperties.Name="Reverse selected transition"/>
    <Separator/>
    <Button Content="−" Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom out" AutomationProperties.AutomationId="StateZoomOut"/>
    <Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="StateZoom"/>
