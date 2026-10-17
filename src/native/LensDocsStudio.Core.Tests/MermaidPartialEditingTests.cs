@@ -204,4 +204,16 @@ public sealed class MermaidPartialEditingTests
         await Success(draft, new UpdateMermaidNode("edge-0", "Updated independent", FlowNodeShape.Process, "edge-0"));
         Assert.Equal(source.Replace("edge-0[Independent]", "edge-0[\"Updated independent\"]", StringComparison.Ordinal), draft.Source);
     }
+
+    [Fact]
+    public async Task Fully_editable_group_flattening_preserves_child_and_direct_member_order()
+    {
+        const string source = "flowchart LR\nsubgraph Parent[Parent]\nBefore[Before]\nsubgraph Removed[Removed]\nMember[Member]\nsubgraph Child[Child]\nNested[Nested]\nend\nend\nAfter[After]\nsubgraph Sibling[Sibling]\nOther[Other]\nend\nend\nBefore --> Member\nMember --> After\n";
+        var draft = new MermaidVisualDraft(source); Assert.True(draft.Model.CanEdit, draft.Model.Diagnostic);
+        await Success(draft, new DeleteMermaidSubgraph("Removed"));
+        var graph = Mermaider.MermaidRenderer.Parse(draft.Source); var parent = Assert.Single(graph.Subgraphs);
+        Assert.Equal(["Before", "Member", "After"], parent.NodeIds); Assert.Equal(["Child", "Sibling"], parent.Children.Select(group => group.Id));
+        Assert.Equal("Parent", draft.Model.Subgraph("Child").ParentId);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
 }

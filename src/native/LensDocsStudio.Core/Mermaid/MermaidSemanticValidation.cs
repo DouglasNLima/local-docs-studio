@@ -115,9 +115,16 @@ internal static class MermaidSemanticValidation
                 else
                 {
                     if (old.ParentId is not null)
-                        foreach (var id in group["NodeIds"]!.AsArray().Select(value => value!.GetValue<string>()))
-                            if (!FindGroup(expected, old.ParentId)!["NodeIds"]!.AsArray().Any(value => value!.GetValue<string>() == id)) FindGroup(expected, old.ParentId)!["NodeIds"]!.AsArray().Add(id);
-                    foreach (var child in group["Children"]!.AsArray()) parent.Add(child!.DeepClone());
+                    {
+                        var containing = FindGroup(expected, old.ParentId)!;
+                        var members = containing["NodeIds"]!.AsArray().Concat(group["NodeIds"]!.AsArray()).Select(value => value!.GetValue<string>()).ToHashSet(StringComparer.Ordinal);
+                        var ordered = after.Nodes.Where(node => node.Occurrences.Any(item => item.SubgraphId == old.ParentId))
+                            .OrderBy(node => node.Occurrences.First(item => item.SubgraphId == old.ParentId).Span.Start).Select(node => node.Id).ToArray();
+                        if (!members.SetEquals(ordered)) Reject();
+                        containing["NodeIds"] = new JsonArray(ordered.Select(id => (JsonNode?)JsonValue.Create(id)).ToArray());
+                    }
+                    var position = parent.IndexOf(group);
+                    foreach (var child in group["Children"]!.AsArray()) parent.Insert(position++, child!.DeepClone());
                 }
                 parent.Remove(group); AdoptNodeOrder(before.Nodes.Select(node => node.Id).ToArray()); break;
             }
