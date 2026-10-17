@@ -60,7 +60,7 @@ public sealed class MermaidCapabilityAnalysis
                 case MermaidOperationKind.NodeId or MermaidOperationKind.DeleteNode or MermaidOperationKind.MoveNode:
                     if (node is null) reason = "Select an existing node.";
                     else if (dependencies.Length > 0) reason = "This node is referenced by a protected chain. Its identity, deletion and membership require source editing.";
-                    else if (node.Occurrences.Count(item => item.LabelSpan is not null) > 1) reason = "Repeated declarations protect this node's identity and membership.";
+                    else if (node.Occurrences.Any(item => item.LabelSpan is not null && item != node.Declaration)) reason = "Repeated declarations protect this node's identity and membership.";
                     else if (kind == MermaidOperationKind.MoveNode && node.Occurrences.Any(item => item.SubgraphId is not null && model.Edges.Any(connection => connection.Statement == item.Statement)))
                         reason = "Move this node's connections outside subgraphs in source mode first. Its existing membership is preserved.";
                     else if (kind == MermaidOperationKind.DeleteNode && HasOrdinalStyles) reason = "Deleting incident connections could shift ordinal linkStyle assignments.";

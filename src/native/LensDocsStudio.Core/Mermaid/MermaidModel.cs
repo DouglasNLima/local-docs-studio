@@ -62,7 +62,8 @@ public sealed record MermaidDiagramModel(string Source, string Direction, Mermai
     public string? ClassForNode(string id) => Styles.Where(style => style.Kind == "class" && style.Targets.Any(target => target.Id == id))
         .Select(style => (Start: style.Statement.Start, Name: style.Value))
         .Concat(Node(id).Occurrences.Where(item => item.ClassName is not null).Select(item => (Start: item.Span.Start, Name: item.ClassName!)))
-        .OrderBy(item => item.Start).LastOrDefault().Name;
+        .OrderBy(item => item.Start).LastOrDefault().Name
+        ?? (Styles.Any(style => style.Kind == "classDef" && style.Targets.Any(target => target.Id == "default")) ? "default" : null);
     public string EffectiveDirection(string? groupId)
     {
         while (groupId is not null)

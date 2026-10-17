@@ -50,7 +50,9 @@ internal static class MermaidSemanticValidation
                 if (next.Label != update.Label || next.Shape != update.Shape) Reject();
                 if (update.NewId != update.Id) RenameNode(update.Id, update.NewId);
                 var node = expected["Nodes"]![update.NewId]!;
-                if (old.Label != update.Label) { node["Label"] = actual["Nodes"]![update.NewId]!["Label"]!.DeepClone(); node["IsMarkdown"] = false; }
+                // A new shape can require equivalent escaping inside this one node span.
+                // The adapter and complete renderer must still agree on the requested label.
+                if (old.Label != update.Label || old.Shape != update.Shape) { node["Label"] = actual["Nodes"]![update.NewId]!["Label"]!.DeepClone(); node["IsMarkdown"] = false; }
                 if (old.Shape != update.Shape) node["Shape"] = actual["Nodes"]![update.NewId]!["Shape"]!.DeepClone();
                 break;
             }

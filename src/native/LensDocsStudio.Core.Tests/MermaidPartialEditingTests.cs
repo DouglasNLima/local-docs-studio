@@ -216,4 +216,65 @@ public sealed class MermaidPartialEditingTests
         Assert.Equal("Parent", draft.Model.Subgraph("Child").ParentId);
         draft.Undo(); Assert.Equal(source, draft.Source);
     }
+
+    [Fact]
+    public async Task Moving_an_implicit_node_cannot_discard_a_later_non_authoritative_declaration()
+    {
+        const string source = "flowchart LR\nA\nA[Preserve this declaration]\nD[Independent]\nsubgraph G[Group]\nend\n";
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.PartiallyEditable, draft.Model.Compatibility);
+        Assert.Equal("A", draft.Model.Node("A").Label);
+        await Denied(draft, new MoveMermaidNode("A", "G"));
+        await Success(draft, new UpdateMermaidNode("D", "Updated", FlowNodeShape.Process, "D"));
+        Assert.Contains("A\nA[Preserve this declaration]\n", draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+
+    [Theory] [InlineData("")] [InlineData("class D default\n")] [InlineData("D:::default\n")]
+    public async Task Default_class_dependencies_remain_global_and_local_overrides_do_not_change_other_nodes(string assignment)
+    {
+        var source = Source + "classDef default fill:#FAFAFA,stroke:#123456,stroke-width:2px\n" + assignment;
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.PartiallyEditable, draft.Model.Compatibility);
+        Assert.Equal("default", draft.Model.ClassForNode("D"));
+        await Success(draft, new SetMermaidStyle("D", "#F8F9FB", "#334455", "#111111"));
+        await Success(draft, new AddMermaidNode("New", "New", FlowNodeShape.Process));
+        var graph = Mermaider.MermaidRenderer.Parse(draft.Source);
+        Assert.Equal("default", graph.ClassAssignments["New"]); Assert.Equal("default", graph.ClassAssignments["A"]);
+        Assert.Equal("#FAFAFA", graph.ClassDefs["default"]["fill"]); Assert.False(graph.NodeStyles.ContainsKey("A"));
+        Assert.StartsWith(source, draft.Source); draft.Undo(); draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+
+    [Fact]
+    public async Task Unknown_style_grammar_is_protected_inspection_rather_than_an_editing_permission_or_invalid_source_claim()
+    {
+        var source = Source + "class D one,two\n";
+        Assert.True(new DiagramService().Render(source).Success);
+        var draft = new MermaidVisualDraft(source); Assert.Equal(MermaidCompatibility.Protected, draft.Model.Compatibility);
+        Assert.Contains("Protected style syntax", draft.Model.Diagnostic);
+        await Denied(draft, new UpdateMermaidNode("D", "Blocked", FlowNodeShape.Process, "D"));
+    }
+
+    [Theory] [InlineData("")] [InlineData("Café \"quoted\" | brackets[] #34; &amp;")] [InlineData("First line\nSecond line Ω 😀")]
+    public async Task Inline_labels_can_be_removed_or_escaped_without_splitting_the_chain(string label)
+    {
+        const string source = "flowchart LR\n%% Preserve exactly\nA[Start] -- Initial --> B[Review] --> C[Done]\nD[Keep]\n";
+        var draft = new MermaidVisualDraft(source);
+        await Success(draft, new UpdateMermaidConnection("edge-0", "A", "B", label, FlowConnectionType.Directed));
+        var escaped = MermaidTransformationService.EscapeLabel(label);
+        var expected = label.Length == 0 ? source.Replace("-- Initial -->", "-->", StringComparison.Ordinal)
+            : source.Replace("Initial", escaped.Contains(';') ? "\"" + escaped + "\"" : escaped, StringComparison.Ordinal);
+        Assert.Equal(expected, draft.Source); Assert.Equal(label, draft.Model.Edge("edge-0").Label);
+        Assert.Equal(["edge-0", "edge-1"], draft.Model.Edges.Select(edge => edge.Id));
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+
+    [Theory] [InlineData("Call (x) & retain")] [InlineData("First & retain\r\n    Second line")]
+    public async Task Shape_changes_allow_equivalent_target_label_escaping_and_preserve_every_other_span(string rawLabel)
+    {
+        var source = "flowchart LR\nA --> B --> C\nD[\"" + rawLabel + "\"]\nE[Unchanged & exact]\n";
+        var draft = new MermaidVisualDraft(source); var originalLabel = draft.Model.Node("D").Label;
+        await Success(draft, new UpdateMermaidNode("D", originalLabel, FlowNodeShape.Rounded, "D"));
+        Assert.Equal(originalLabel, draft.Model.Node("D").Label);
+        Assert.Contains("A --> B --> C\n", draft.Source); Assert.EndsWith("\nE[Unchanged & exact]\n", draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
 }

@@ -1,6 +1,6 @@
 # Advanced Flowchart compatibility and safe partial editing
 
-Status: implementation in progress; hosted native certification and package verification pending.
+Status: candidate implementation complete; final hosted native certification and package verification pending.
 
 ## Verified baseline
 
@@ -70,15 +70,19 @@ the fully supported subset; it cannot masquerade as an authorised partial operat
 | Reconnect / delete connection | Separate root statement | Chains, internal membership and `linkStyle` order remain protected |
 | Add node | Unique ID, known scope, within budgets | No insertion into unknown source |
 | Add connection | Existing known nodes | All insertion blocked when ordinal/default `linkStyle` is present |
-| Local style / class | Targeted override or defined class assignment | Shared class definitions and unrelated custom properties retained |
+| Local style / class | Targeted override or defined class assignment, including existing `default` classes | Shared class definitions and unrelated custom properties retained |
 | Group label | Known heading span | Group hierarchy retained |
 | Group structure / direction | Existing fully editable workflow | Protected in partial diagrams |
 
 Supported links retain `-->`, `---`, `-.->`, `==>`, `<-->`, pipe labels and pinned
 inline text forms (`-- text -->`, `-. text .->`, `== text ==>`, `<-- text -->`).
 Quoted label content uses the pinned parser's quote semantics. Label-only edits
-retain original delimiters and quotes. An inline type change can replace only its
-arrow span with the equivalent pipe form. Other arrow combinations, edge IDs,
+retain original delimiters and quotes where representable. An unquoted inline
+label gains quotes only when escaping requires them; removing an inline label or
+changing its type can replace only its arrow span with an equivalent supported
+form. Shape changes preserve raw labels where representable, otherwise checking
+equivalent target-label escaping against both complete semantics and rendering.
+Other arrow combinations, edge IDs,
 interactions, unknown directives and unknown dependencies remain protected.
 
 ## Source preservation example
@@ -113,10 +117,32 @@ Apply, one document Undo, Redo, Save, process restart without rewriting the file
 reopen/render and Cancel. These checks run in normal and actual Windows High
 Contrast alongside all existing authoring and interaction tests.
 
-Local Release builds and the full Core suite passed 1,301 tests before the final
-renderer-correspondence tightening; the subsequent run and hosted evidence are
-pending. The initial retained run had four old global-read-only expectations fail;
+Local Release builds and the full Core suite pass **1,321 tests**, with no skips.
+The new partial-editing class has 84 cases, plus three renderer-correspondence
+cases. Static integrity passes 50 modules, 57 shell assets, 150 vendor assets and
+56 runtime external-dependency scans. Final hosted evidence is pending.
+The initial retained run had four old global-read-only expectations fail;
 those cases now also verify safe insertion and explicit unsafe-operation rejection.
 No existing scenario has been removed. Forty-eight deterministic seeds exercise
 whitespace, LF/CRLF/mixed endings, Unicode, declaration order, class sharing and
 parallel edge labels, checking exact source and history restoration.
+
+Hosted normal authoring at `e92174b` passes 140 checks, including the complete
+synthetic sequence and both identical fenced-block mappings. Its screenshots were
+inspected: the chain inspector and connection permissions are clear; the independent
+node capture accidentally toggled the selected node off and is corrected in the
+later harness. Final-source images and actual High Contrast remain required.
+
+Additional corrections retain stationary double-click label editing while allowing
+rapid successive drags and active-drag Undo; preserve unchanged inspector label
+semantics when only another property changes; preserve sibling/member order when
+flattening fully editable groups; and protect later non-authoritative declarations
+from destructive movement. Unsupported style grammar is protected inspection,
+not an editing permission. Bounded regex analysis failures also use protection.
+
+The historical baseline UIA run exposed the intended stale-preview revision guard
+after document Undo/Redo. The harness now records that rejection and waits for an
+actually replaced UIA preview action before opening, with no timeout increase or
+guard bypass. The earlier synchronised Continuous workspace failure is retained;
+a later unchanged-workspace revision passes all four viewport contexts. This does
+not certify the separate Continuous preview performance target.

@@ -72,7 +72,9 @@ public sealed class MermaidSourceParser
                     if (stack.Count == 0 || !IsDirection(value)) throw new ArgumentException("Use a supported direction inside a subgraph.");
                     var group = stack.Peek(); group.Direction = value; group.DirectionSpan = statement; continue;
                 }
-                if (TryStyle(text, statement, styles)) continue;
+                try { if (TryStyle(text, statement, styles)) continue; }
+                catch (ArgumentException ex)
+                { error ??= "Protected style syntax: " + ex.Message; protectedRegions.Add(new(statement, ex.Message)); continue; }
                 if (TryLinkStyle(text))
                 {
                     protectedRegions.Add(new(statement, "Ordinal-sensitive connection styling is preserved."));
@@ -133,7 +135,8 @@ public sealed class MermaidSourceParser
             var nodes = occurrences.GroupBy(item => item.Id).Select(items =>
             {
                 var declarations = items.Where(item => item.LabelSpan is not null).ToArray();
-                if (declarations.Length > 1) partialReasons.Add("Repeated node declarations have protected identity and declaration properties.");
+                if (declarations.Length > 1 || declarations.Length > 0 && items.First().LabelSpan is null)
+                    partialReasons.Add("Repeated node declarations have protected identity and declaration properties.");
                 var first = items.First();
                 return new MermaidNode(items.Key, first.LabelSpan is { } span ? DecodeLabel(span.Read(source)) : items.Key, first.Shape, items.ToArray());
             }).ToArray();
@@ -205,6 +208,7 @@ public sealed class MermaidSourceParser
     internal static string RendererShape(FlowNodeShape shape) => shape switch
     { FlowNodeShape.Process => "Rectangle", FlowNodeShape.Decision => "Diamond", FlowNodeShape.Terminal => "Stadium", _ => shape.ToString() };
     public static bool IsDirection(string text) => text is "TD" or "TB" or "BT" or "LR" or "RL";
+    public static bool IsClassId(string text) => text == "default" || IsId(text);
     public static bool IsId(string text) => text.Length is > 0 and <= 128 && (char.IsLetter(text[0]) || text[0] == '_')
         && text[^1] != '-' && !text.Contains("--", StringComparison.Ordinal)
         && text.All(character => char.IsLetterOrDigit(character) || character is '_' or '-')
@@ -263,7 +267,7 @@ public sealed class MermaidSourceParser
         }
         string? className = null;
         if (text.AsSpan(position).StartsWith(":::", StringComparison.Ordinal))
-        { position += 3; className = ReadId(text, ref position); if (!IsId(className)) throw new ArgumentException("Use a supported class identifier."); }
+        { position += 3; className = ReadId(text, ref position); if (!IsClassId(className)) throw new ArgumentException("Use a supported class identifier."); }
         return new(id, idSpan, new(statement.Start + start, position - start), label, shape, statement, scope, className);
     }
     private static string ReadId(string text, ref int position)
@@ -289,12 +293,12 @@ public sealed class MermaidSourceParser
         while (true)
         {
             var start = index; var id = ReadId(text, ref index);
-            if (!IsId(id)) throw new ArgumentException("A style uses an unsupported identifier.");
+            if (!(kind == "classDef" ? IsClassId(id) : IsId(id))) throw new ArgumentException("A style uses an unsupported identifier.");
             targets.Add((id, new(statement.Start + start, index - start)));
             if (index >= text.Length || text[index] != ',') break; index++;
         }
         SkipSpace(text, ref index); var value = text[index..];
-        if (value.Length == 0 || kind == "class" && !IsId(value)) throw new ArgumentException("Complete the class or style in source mode.");
+        if (value.Length == 0 || kind == "class" && !IsClassId(value)) throw new ArgumentException("Complete the class or style in source mode.");
         styles.Add(new(kind, value, targets, statement)); return true;
     }
     private static IEnumerable<MermaidSourceSpan> Statements(string source)
