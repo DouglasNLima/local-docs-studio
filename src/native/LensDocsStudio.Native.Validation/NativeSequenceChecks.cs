@@ -5,9 +5,12 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Rendering;
 using LensDocsStudio.Core.Sequence;
 using LensDocsStudio.Native.Rendering;
+using LensDocsStudio.Native.Editor;
+using LensDocsStudio.Native.ViewModels;
 using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Validation;
@@ -17,6 +20,7 @@ internal static class NativeSequenceChecks
     public static void Run(string output)
     {
         Directory.CreateDirectory(output); var checks = new List<string>(); var observations = new List<object>();
+        CheckDocumentOwnership(checks);
         foreach (var file in Directory.GetFiles("tests/fixtures/native-sequence", "*.mmd"))
         foreach (var dark in new[] { false, true })
         {
@@ -63,5 +67,35 @@ internal static class NativeSequenceChecks
     {
         using var stream = new MemoryStream(png); var frame = BitmapFrame.Create(stream, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
         var bytes = new byte[frame.PixelHeight * ((frame.PixelWidth * frame.Format.BitsPerPixel + 7) / 8)]; frame.CopyPixels(bytes, (frame.PixelWidth * frame.Format.BitsPerPixel + 7) / 8, 0); return bytes;
+    }
+    private static void CheckDocumentOwnership(List<string> checks)
+    {
+        const string body = "sequenceDiagram\r\n    participant A\r\n    participant B\r\n    A->>B: Keep\r\n";
+        foreach (var (opening, closing) in new[] { ("```mermaid", "```"), ("~~~~mermaid", "~~~~"), ("::: mermaid", ":::") })
+        {
+            var block = opening + "\r\n" + body + closing + "\r\n"; var source = "Before\r\n\r\n" + block + "\r\nMiddle\r\n\r\n" + block;
+            var owner = new DocumentViewModel(source) { DisplayName = "Unsaved sequence.md" }; var other = new DocumentViewModel("Other tab");
+            var target = MermaidBlockSource.Find(new MarkdownService().Parse(source))[1]; var first = new MermaidDocumentEditSession(owner, target); var competing = new MermaidDocumentEditSession(owner, target);
+            var draft = body.Replace("Keep", "Changed", StringComparison.Ordinal); owner.EditorDocument.Insert(0, "Outside\r\n\r\n"); first.Apply(draft, true);
+            var expected = "Outside\r\n\r\n" + source[..target.Body.Start] + draft + source[target.Body.End..];
+            Check(owner.EditorDocument.Text == expected && other.EditorDocument.Text == "Other tab", opening + ": identical Sequence container relocates safely without redirecting to another tab");
+            owner.EditorDocument.UndoStack.Undo(); Check(owner.EditorDocument.Text == "Outside\r\n\r\n" + source, opening + ": one document Undo retains outside changes");
+            owner.EditorDocument.UndoStack.Redo(); Check(owner.EditorDocument.Text == expected, opening + ": document Redo restores exact Sequence source");
+            Reject(() => competing.Apply(draft, true), opening + ": a competing editor cannot overwrite a committed Sequence session");
+            var conflict = new DocumentViewModel(source); var session = new MermaidDocumentEditSession(conflict, target); conflict.EditorDocument.Insert(target.Body.Start + 1, "changed"); var changed = conflict.EditorDocument.Text;
+            Reject(() => session.Apply(draft, true), opening + ": overlapping source revisions reject Apply"); Check(conflict.EditorDocument.Text == changed, opening + ": rejected Apply retains independent source");
+            var closed = new DocumentViewModel(source); Reject(() => new MermaidDocumentEditSession(closed, target).Apply(draft, false), opening + ": closed owner rejects Apply");
+            var raced = new DocumentViewModel(source); var racedSession = new MermaidDocumentEditSession(raced, target); var prepared = racedSession.PrepareAsync(draft).GetAwaiter().GetResult(); raced.EditorDocument.Insert(0, "Race\r\n");
+            Reject(() => racedSession.Commit(prepared, true), opening + ": changed version rejects prepared Apply");
+        }
+        foreach (var extension in new[] { ".mmd", ".mermaid" })
+        {
+            var owner = new DocumentViewModel(body) { DisplayName = "Sequence" + extension }; var target = MermaidBlockSource.Find(new MarkdownService().Parse(body, true), true).Single();
+            new MermaidDocumentEditSession(owner, target).Apply(body.Replace("Keep", "Changed", StringComparison.Ordinal), true);
+            Check(!owner.EditorDocument.Text.Contains("```", StringComparison.Ordinal) && owner.EditorDocument.Text.Contains("Changed", StringComparison.Ordinal), extension + ": standalone Apply retains ordinary raw Mermaid");
+            owner.EditorDocument.UndoStack.Undo(); Check(owner.EditorDocument.Text == body, extension + ": standalone Undo restores exact source");
+        }
+        void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
+        void Reject(Action action, string message) { try { action(); } catch (ArgumentException) { checks.Add(message); return; } throw new IOException(message); }
     }
 }

@@ -15,33 +15,35 @@ namespace LensDocsStudio.Native;
 
 public partial class SequenceVisualEditorWindow : Window
 {
-    private readonly SequenceVisualDraft draft;
+    private SequenceVisualDraft draft = null!;
     private readonly DiagramService diagrams;
     private readonly NativeSvgService svg = new();
     private readonly Func<string, CancellationToken, Task<string?>> applyToDocument;
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly SemaphoreSlim renderGate = new(1, 1);
+    private CancellationTokenSource? pendingRender;
     private readonly MermaidSourceHighlighting highlighting;
     private readonly Dictionary<ToggleButton, string> targets = [];
-    private bool dark, updating, busy, closed, discard, mapped;
+    private bool dark, updating, busy = true, closed, discard, mapped;
     private int renderGeneration;
     private string mode = "inspect", baseline = "", markerBaseline = "";
     private string? anchor;
     private Point? pan;
     private double panHorizontal, panVertical;
     private record Choice(string Identity, string Description) { public override string ToString() => Description; }
-    private bool SourcePending => SourceEditor.Text != draft.Source;
+    private bool SourcePending => draft is not null && SourceEditor.Text != draft.Source;
     private string Values => string.Join('\u001f', ParticipantId.Text, Actor.IsChecked, LabelText.Text, Sender.SelectedItem,
         Recipient.SelectedItem, Arrow.SelectedItem, Marker.SelectedItem, Placement.SelectedItem, First.SelectedItem, Second.SelectedItem, Insertion.SelectedIndex);
-    private bool PropertiesPending => mode != "inspect" || baseline != Values;
-    private bool CanEdit => !busy && !SourcePending && mapped && draft.Model.CanEdit;
+    private bool PropertiesPending => draft is not null && (mode != "inspect" || baseline != Values);
+    private bool CanEdit => draft is not null && !busy && !SourcePending && mapped && draft.Model.CanEdit;
 
     public SequenceVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, FontFamily? sourceFont = null, double sourceFontSize = 14)
     {
         this.diagrams = diagrams; this.applyToDocument = applyToDocument; this.dark = dark; this.diagramTheme = diagramTheme; this.editSource = editSource;
-        draft = new(source, diagrams); highlighting = new(dark);
+        highlighting = new(dark);
         InitializeComponent(); WindowStateService.FitInitialWindow(this);
         SourceEditor.FontFamily = sourceFont ?? new FontFamily("Cascadia Code, Consolas"); SourceEditor.FontSize = sourceFontSize;
         SourceEditor.Options.EnableHyperlinks = false; SourceEditor.Options.EnableEmailHyperlinks = false;
@@ -52,7 +54,16 @@ public partial class SequenceVisualEditorWindow : Window
         foreach (var field in new[] { Sender, Recipient, Arrow, Marker, Placement, First, Second, Insertion }) field.SelectionChanged += (_, _) => { if (!updating) UpdateActions(); };
         Actor.Checked += (_, _) => { if (!updating) UpdateActions(); }; Actor.Unchecked += (_, _) => { if (!updating) UpdateActions(); };
         EditSourceButton.IsEnabled = editSource is not null;
-        Loaded += async (_, _) => await RefreshAsync(true);
+        IsEnabled = false;
+        Loaded += async (_, _) =>
+        {
+            try
+            {
+                draft = await Task.Run(() => new SequenceVisualDraft(source, diagrams), lifetime.Token);
+                if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true);
+            }
+            catch (OperationCanceledException) { }
+        };
         Closing += ConfirmClose;
         Closed += (_, _) => { closed = true; renderGeneration++; lifetime.Cancel(); };
         Deactivated += (_, _) => EndPan();
@@ -60,7 +71,7 @@ public partial class SequenceVisualEditorWindow : Window
     public async void ApplyTheme(string theme)
     {
         dark = ThemeService.IsDark(theme); highlighting.Dark = dark; SourceEditor.TextArea.TextView.Redraw();
-        if (!closed) await RenderAsync(false);
+        if (!closed && draft is not null) await RenderAsync(false);
     }
     private async Task RefreshAsync(bool fit = false)
     {
@@ -79,16 +90,26 @@ public partial class SequenceVisualEditorWindow : Window
     }
     private async Task RenderAsync(bool fit)
     {
-        var version = ++renderGeneration; mapped = false; UpdateActions(); var model = draft.Model;
+        var version = ++renderGeneration; mapped = false; UpdateActions(); var model = draft.Model; var themeDark = dark;
+        pendingRender?.Cancel(); var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token); pendingRender = cancellation;
+        var leased = false;
         try
         {
-            var render = await Task.Run(() => diagrams.Render(model.Source, dark, diagramTheme, lifetime.Token), lifetime.Token);
+            // The converter cannot be interrupted mid-drawing. Serialise STA conversion, then reject stale generations.
+            await renderGate.WaitAsync(cancellation.Token); leased = true;
+            var render = await Task.Run(() => diagrams.Render(model.Source, themeDark, diagramTheme, cancellation.Token), cancellation.Token);
             if (closed || version != renderGeneration) return;
             targets.Clear(); Overlay.Children.Clear();
             if (model.Participants.Count == 0 && model.CanEdit)
             { CanonicalImage.Source = null; Surface.Width = 420; Surface.Height = 260; mapped = true; Status.Text = "Add participants, then add a message to begin."; return; }
-            var presentation = model.CanEdit ? NativeSequencePresentation.Create(model, render, svg) : null;
-            var drawing = presentation?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null);
+            var converted = await StaWorker.RunAsync(() =>
+            {
+                var presentation = model.CanEdit ? NativeSequencePresentation.Create(model, render, svg) : null;
+                var drawing = presentation?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null);
+                return (presentation, drawing);
+            }, cancellation.Token);
+            if (closed || version != renderGeneration) return;
+            var (presentation, drawing) = converted;
             CanonicalImage.Source = drawing; CanonicalImage.Width = drawing?.Width ?? 420; CanonicalImage.Height = drawing?.Height ?? 260;
             Surface.Width = CanonicalImage.Width; Surface.Height = CanonicalImage.Height;
             if (presentation is not null)
@@ -113,7 +134,13 @@ public partial class SequenceVisualEditorWindow : Window
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is ArgumentException or InvalidDataException or System.Xml.XmlException)
         { if (!closed && version == renderGeneration) Status.Text = error.Message; }
-        finally { if (!closed && version == renderGeneration) UpdateActions(); }
+        finally
+        {
+            if (leased) renderGate.Release();
+            if (ReferenceEquals(pendingRender, cancellation)) pendingRender = null;
+            cancellation.Dispose();
+            if (!closed && version == renderGeneration) UpdateActions();
+        }
     }
     private void RestoreSelection()
     {
@@ -183,7 +210,7 @@ public partial class SequenceVisualEditorWindow : Window
     private string? MessageIdentity => draft.Model.Activations.FirstOrDefault(item => item.Identity == draft.Selection)?.MessageIdentity ?? draft.Selection;
     private void UpdateActions()
     {
-        if (SourceEditor is null || UpdateButton is null) return;
+        if (draft is null || SourceEditor is null || UpdateButton is null) return;
         var ready = CanEdit; var pending = PropertiesPending;
         SourceEditor.IsReadOnly = busy || pending; ApplyButton.IsEnabled = ready && !pending;
         UndoButton.IsEnabled = !busy && !pending && !SourcePending && draft.CanUndo; RedoButton.IsEnabled = !busy && !pending && !SourcePending && draft.CanRedo;
@@ -281,7 +308,7 @@ public partial class SequenceVisualEditorWindow : Window
     private void ResetProperties(object sender, RoutedEventArgs e) { if (busy) return; updating = true; try { ShowProperties(); } finally { updating = false; } UpdateActions(); Status.Text = "Pending properties discarded; the validated source is unchanged."; }
     private async void Undo(object sender, RoutedEventArgs e) { if (busy || PropertiesPending || SourcePending) return; draft.Undo(); await RefreshAsync(); }
     private async void Redo(object sender, RoutedEventArgs e) { if (busy || PropertiesPending || SourcePending) return; draft.Redo(); await RefreshAsync(); }
-    private void SourceChanged(object? sender, EventArgs e) { if (!updating && SourceEditor is not null) { UpdateActions(); Status.Text = "Source changes require validation before visual editing or Apply."; } }
+    private void SourceChanged(object? sender, EventArgs e) { if (draft is not null && !updating && SourceEditor is not null) { UpdateActions(); Status.Text = "Source changes require validation before visual editing or Apply."; } }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
         if (busy || PropertiesPending) return; busy = true; UpdateActions();
@@ -305,7 +332,7 @@ public partial class SequenceVisualEditorWindow : Window
     public bool CloseForOwner() { Close(); return closed; }
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
-        if (discard) return;
+        if (discard || draft is null) return;
         if (busy) { e.Cancel = true; Status.Text = "Wait for validation or Apply to finish before closing."; return; }
         if ((draft.Source != draft.OriginalSource || SourcePending || PropertiesPending)
             && MessageBox.Show(this, "Discard the private Sequence draft and pending properties? The owning document has not changed.", "Discard Sequence draft", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) e.Cancel = true;

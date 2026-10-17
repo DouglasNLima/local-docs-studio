@@ -1,5 +1,11 @@
 # Native Windows engineering handover
 
+Continue Sequence authoring work from [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
+branch `feature/native-mermaid-sequence-visual-editor`, based on verified `7bd2207`.
+Its [Sequence report](mermaid-sequence-visual-editor.md) owns current evidence and
+remaining certification. It is independent of Draft PR #31; shared integration
+surfaces are documented there. Do not merge or publish automatically.
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

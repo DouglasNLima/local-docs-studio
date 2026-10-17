@@ -163,4 +163,63 @@ public sealed class SequenceVisualTests
         Assert.Equal(source.Replace("Response", "Réponse", StringComparison.Ordinal), draft.Source);
         var render = new DiagramService().Render(draft.Source); Assert.Contains("7. Réponse", render.Svg);
     }
+
+    [Fact]
+    public async Task Failed_batch_keeps_source_selection_and_history_atomic()
+    {
+        var draft = new SequenceVisualDraft(Simple); var identity = draft.Model.Messages[0].Identity; draft.Select(identity);
+        var result = await draft.ExecuteBatchAsync([new UpdateSequenceMessage(identity, "A", "B", "Valid first operation", "->>"), new AddSequenceMessage("Missing", "B", "Rejected")]);
+        Assert.False(result.Success); Assert.Equal(Simple, draft.Source); Assert.Equal(identity, draft.Selection); Assert.Equal(1, draft.HistoryCount);
+    }
+
+    [Theory]
+    [InlineData("", "B", "->>")] [InlineData("A", "", "->>")] [InlineData("A", "B", "==>")] [InlineData("Missing", "B", "->>")]
+    public async Task Missing_unknown_or_unverified_message_properties_reject(string sender, string recipient, string arrow)
+    {
+        var draft = new SequenceVisualDraft(Simple);
+        Assert.False((await draft.ExecuteAsync(new UpdateSequenceMessage(draft.Model.Messages[0].Identity, sender, recipient, "Text", arrow))).Success);
+        Assert.Equal(Simple, draft.Source); Assert.False(draft.CanUndo);
+    }
+
+    [Fact]
+    public async Task Overlong_labels_and_missing_occurrences_reject_without_losing_redo()
+    {
+        var draft = new SequenceVisualDraft(Simple); var identity = draft.Model.Messages[0].Identity;
+        await Execute(draft, new UpdateSequenceMessage(identity, "A", "B", "Changed", "->>")); draft.Undo();
+        Assert.False((await draft.ExecuteAsync(new UpdateSequenceMessage(identity, "A", "B", new string('x', 4097), "->>"))).Success);
+        Assert.False((await draft.ExecuteAsync(new UpdateSequenceMessage("missing", "A", "B", "Changed", "->>"))).Success);
+        Assert.Equal(Simple, draft.Source); Assert.True(draft.CanRedo);
+    }
+
+    [Fact]
+    public async Task Configuration_directives_are_protected_instead_of_being_treated_as_comments()
+    {
+        var source = "%%{init: {'theme':'dark'}}%%\n" + Simple; var draft = new SequenceVisualDraft(source);
+        Assert.False(draft.Model.CanEdit); Assert.False((await draft.ExecuteAsync(new AddSequenceParticipant("C", "Other"))).Success);
+        Assert.Equal(source, draft.Source);
+    }
+
+    [Fact]
+    public async Task Nested_blocks_and_note_boundaries_reject_moves_but_preserve_local_label_edits()
+    {
+        var source = Simple.Replace("    A->>B: Request", "    loop retry\r\n    opt local\r\n    A->>B: Request\r\n    end\r\n    end", StringComparison.Ordinal);
+        var draft = new SequenceVisualDraft(source); var identity = draft.Model.Messages[0].Identity;
+        await Execute(draft, new UpdateSequenceMessage(identity, "A", "B", "Changed", "->>"));
+        Assert.False((await draft.ExecuteAsync(new MoveSequenceMessage(identity, 1))).Success);
+        Assert.Equal(source.Replace("Request", "Changed", StringComparison.Ordinal), draft.Source);
+        var withNote = new SequenceVisualDraft(Simple.Replace("    B-->>", "    Note over A,B: Preserve attachment\r\n    B-->>", StringComparison.Ordinal));
+        Assert.False((await withNote.ExecuteAsync(new MoveSequenceMessage(withNote.Model.Messages[0].Identity, 1))).Success);
+    }
+
+    [Fact]
+    public async Task Private_history_is_bounded_and_same_source_steps_have_distinct_identities()
+    {
+        var draft = new SequenceVisualDraft(Simple); var identity = draft.Model.Messages[0].Identity; var previous = draft.HistoryIdentity;
+        for (var index = 0; index < 105; index++)
+        {
+            await Execute(draft, new UpdateSequenceMessage(identity, "A", "B", "Request", "->>"));
+            Assert.True(draft.HistoryIdentity > previous); previous = draft.HistoryIdentity;
+        }
+        Assert.Equal(Simple, draft.Source); Assert.Equal(100, draft.HistoryCount);
+    }
 }

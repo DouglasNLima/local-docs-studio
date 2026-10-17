@@ -1,5 +1,11 @@
 # Functional parity matrix
 
+The native [Sequence editor](mermaid-sequence-visual-editor.md) adds participant,
+message, basic note and simple activation authoring with exact source patches and
+private history. Structural rewrites, participant boxes/create/destroy and unknown
+dependencies remain source-only. Hosted UI/package certification is pending; this
+does not claim universal Mermaid authoring parity.
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

@@ -17,7 +17,7 @@ public sealed class SequenceTransformationService
         string Label(string value) => SequenceSourceParser.EncodeLabel(value);
         void Arrow(string arrow) { if (!SequenceSourceParser.Arrows.Contains(arrow)) throw new ArgumentException("Choose a renderer-supported message arrow."); }
         void Identifier(string id) { if (!SequenceSourceParser.ValidId(id)) throw new ArgumentException("Use a participant ID containing letters, digits and underscores, beginning with a letter or underscore."); }
-        void Insert(string text, string? anchor, bool before, SequenceStatementKind kind)
+        void Insert(string text, string? anchor, bool before)
         {
             SequenceStatement? target = anchor is null ? null : model.Statement(anchor);
             if (target is not null && target.Kind is not (SequenceStatementKind.Message or SequenceStatementKind.Note)) throw new ArgumentException("Choose a message or note as the insertion position.");
@@ -79,14 +79,14 @@ public sealed class SequenceTransformationService
                 Token(message.Statement, "arrow", update.Arrow); Token(message.Statement, "label", Label(update.Text)); break;
             case AddSequenceMessage add:
                 ExplicitParticipants(); Participant(add.Sender); Participant(add.Recipient); Arrow(add.Arrow);
-                Insert(add.Sender + add.Arrow + add.Recipient + ": " + Label(add.Text), add.Anchor, add.Before, SequenceStatementKind.Message); break;
+                Insert(add.Sender + add.Arrow + add.Recipient + ": " + Label(add.Text), add.Anchor, add.Before); break;
             case DuplicateSequenceMessage duplicate:
                 var original = model.Messages.SingleOrDefault(item => item.Identity == duplicate.Identity) ?? throw new ArgumentException("Select a message.");
                 if (model.Activations.Any(item => item.MessageIdentity == original.Identity)) throw new ArgumentException("Activation-triggering messages cannot be duplicated safely.");
                 return Plan(model, new AddSequenceMessage(original.Sender, original.Recipient, original.Text, original.Arrow, original.Identity));
             case AddSequenceNote add:
                 ExplicitParticipants(); Participant(add.First); if (!string.IsNullOrEmpty(add.Second)) Participant(add.Second);
-                Insert(Note(add.Placement, add.First, add.Second, Label(add.Text)), add.Anchor, add.Before, SequenceStatementKind.Note); break;
+                Insert(Note(add.Placement, add.First, add.Second, Label(add.Text)), add.Anchor, add.Before); break;
             case UpdateSequenceNote update:
                 Participant(update.First); if (!string.IsNullOrEmpty(update.Second)) Participant(update.Second);
                 var note = model.Notes.SingleOrDefault(item => item.Identity == update.Identity) ?? throw new ArgumentException("Select a note.");

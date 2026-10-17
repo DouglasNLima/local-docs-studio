@@ -26,12 +26,27 @@ internal static partial class NativeUiChecks
         Application? app = null; Window? main = null; Window? visual = null;
         try
         {
+            if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active during Sequence certification");
             Launch(); var editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "The Sequence fixture did not load exactly.");
             var offset = original.LastIndexOf("```mermaid", StringComparison.Ordinal); Open(offset);
             Check(Find(visual!, "SequenceApply").IsEnabled, "Correct Sequence family editor opens from the second identical diagram");
             Capture("starter");
+            var canvasMessage = visual!.FindFirstDescendant(cf => cf.ByName("Message 2: Read Markdown file")) ?? throw new IOException("The canonical message hit target is unavailable.");
+            canvasMessage.Click(); Wait(() => Find(visual!, "SequenceLabel").AsTextBox().Text == "Read Markdown file", "Pointer selection of the canonical message did not reach its properties.");
+            Check(true, "Real pointer selection uses the canonical message path/label hit target");
             SelectParticipant("Studio"); Check(Find(visual!, "SequenceParticipantId").AsTextBox().Text == "Studio", "Participant ID inspection");
             Check(Find(visual!, "SequenceLabel").AsTextBox().Text == "Lens Docs Studio", "Participant alias inspection"); Capture("selected-participant");
+            var participantSource = Draft();
+            Find(visual!, "SequenceParticipantId").AsTextBox().Text = "LocalStudio"; Find(visual!, "SequenceLabel").AsTextBox().Text = "Local documentation studio";
+            Click("SequenceUpdate"); Await(text => text.Contains("activate LocalStudio", StringComparison.Ordinal) && text.Contains("Note over Author,LocalStudio", StringComparison.Ordinal));
+            Check(!Draft().Contains("activate Studio", StringComparison.Ordinal), "Participant ID/alias edits update all known activation, endpoint and note references");
+            Click("SequenceUndo"); Await(text => text == participantSource);
+            Click("SequenceAddParticipant"); Find(visual!, "SequenceParticipantId").AsTextBox().Text = "Reviewer";
+            Find(visual!, "SequenceLabel").AsTextBox().Text = "Documentation reviewer"; Find(visual!, "SequenceActor").Patterns.Toggle.Pattern.Toggle();
+            Click("SequenceUpdate"); Await(text => text.Contains("actor Reviewer as Documentation reviewer", StringComparison.Ordinal));
+            Click("SequenceEarlier"); Await(text => new SequenceSourceParser().Parse(text).Participants[2].Id == "Reviewer");
+            Click("SequenceDelete"); Await(text => text == participantSource);
+            Check(true, "Actor creation, source-authoritative participant reordering and dependency-free deletion work");
             SelectMessage(0); Capture("selected-message"); var before = Draft();
             Find(visual!, "SequenceLabel").AsTextBox().Text = "Open local documentation";
             Check(!Find(visual!, "SequenceApply").IsEnabled, "Pending properties block Apply"); Click("SequenceUpdate");
@@ -63,7 +78,7 @@ internal static partial class NativeUiChecks
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); Wait(() => ReadEditorText(editor) == expected, "Document Redo did not restore the Sequence source.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); Wait(() => ReadObservedText(path) == expected, "Save did not persist the Sequence source.");
             Check(true, "Apply is one document Undo/Redo step and ordinary Save persists it");
-            app!.Close(); app.Dispose(); app = null; Launch(); editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == expected, "Save/close/reopen lost Sequence or unrelated document content.");
+            app!.Close(); Wait(() => app.HasExited, "The saved native application did not close before reopening."); app.Dispose(); app = null; Launch(); editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == expected, "Save/close/reopen lost Sequence or unrelated document content.");
             Open(offset); Check(Draft() == changed, "Save/close/reopen retains exact portable source and canonical editor ownership"); Capture("reopened");
             // Create pending properties, then explicitly discard them before Cancel.
             SelectMessage(0); Find(visual!, "SequenceLabel").AsTextBox().Text = "Discard this"; Click("SequenceResetProperties"); Click("SequenceCancel"); WaitClosed();
@@ -76,8 +91,41 @@ internal static partial class NativeUiChecks
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
             Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertSequence").AsMenuItem().Invoke(); WaitVisual();
             Check(Draft().StartsWith("sequenceDiagram", StringComparison.Ordinal), "Insert Sequence visually creates the portable starter"); Capture("new-sequence");
+            SelectMessage(1); var ordered = Draft(); Click("SequenceEarlier"); Await(text => new SequenceSourceParser().Parse(text).Messages[0].Sender == "Studio"); Capture("message-reorder");
+            Click("SequenceUndo"); Await(text => text == ordered);
+            Click("SequenceDuplicate"); Await(text => new SequenceSourceParser().Parse(text).Messages.Count == 3);
+            Click("SequenceUndo"); Await(text => text == ordered);
+            Check(true, "Eligible messages reorder/duplicate through native commands with exact private Undo");
             Click("SequenceApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "New Sequence Apply inserts a Markdown fence");
             app!.Kill(); app.Dispose(); app = null;
+            foreach (var fixture in new[] { "empty", "blocks", "repeated" })
+            {
+                var raw = fixture == "empty" ? "sequenceDiagram\n" : File.ReadAllText("tests/fixtures/native-sequence/" + fixture + ".mmd");
+                var rawPath = Path.Combine(root, fixture + (fixture == "repeated" ? ".mermaid" : ".mmd")); File.WriteAllText(rawPath, raw);
+                Launch(rawPath); var rawEditor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(rawEditor) == raw, "The standalone Sequence fixture did not load exactly."); Open(0); Capture(fixture);
+                if (fixture == "empty")
+                {
+                    Check(Find(visual!, "SequenceAddParticipant").IsEnabled, "Empty Sequence authoring is available");
+                }
+                else if (fixture == "blocks")
+                {
+                    Find(visual!, "SequenceInteractions").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).First(item => item.Name.StartsWith("Block ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+                    Check(Find(visual!, "SequenceSelectionSummary").Name == "Protected Block", "Structural block heading inspection is read-only"); Capture("protected-block");
+                    SelectMessage(0); Check(!Find(visual!, "SequenceEarlier").IsEnabled && !Find(visual!, "SequenceDelete").IsEnabled, "Block boundaries disable unsafe message moves and deletion");
+                }
+                else
+                {
+                    SelectMessage(2); Find(visual!, "SequenceLabel").AsTextBox().Text = "Third occurrence"; Click("SequenceUpdate");
+                    Await(text => new SequenceSourceParser().Parse(text).Messages[2].Text == "Third occurrence");
+                    var model = new SequenceSourceParser().Parse(Draft()); Check(model.Messages[0].Text == "Same" && model.Messages[1].Text == "Same", "The third identical message edits without changing earlier occurrences");
+                    var applied = Draft(); Click("SequenceApply"); WaitClosed(); Wait(() => ReadEditorText(rawEditor) == applied, "Standalone .mermaid Apply changed its raw-source contract.");
+                    Check(!ReadEditorText(rawEditor).Contains("```", StringComparison.Ordinal), "Standalone .mermaid Apply writes no synthetic fence");
+                    FocusWindow(main!); rawEditor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(rawEditor) == raw, "Standalone document Undo lost original source.");
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); Wait(() => ReadObservedText(rawPath) == applied, "Standalone Save did not persist the exact Sequence draft.");
+                }
+                if (visual is not null) { Click("SequenceCancel"); WaitClosed(); }
+                app!.Kill(); app.Dispose(); app = null;
+            }
             File.WriteAllText(Path.Combine(output, "sequence-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
         catch (Exception error)
@@ -87,9 +135,11 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "sequence-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Checks = checks, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); Console.Error.WriteLine(error); return 1;
         }
         finally { if (app is not null) { try { app.Kill(); } catch { } app.Dispose(); } }
-        void Launch()
+        void Launch(string? fixturePath = null)
         {
-            var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(root); info.ArgumentList.Add(path);
+            var fixtureState = fixturePath is null ? state : Path.Combine(root, "state-" + Path.GetFileNameWithoutExtension(fixturePath));
+            Directory.CreateDirectory(fixtureState); if (fixturePath is not null) File.WriteAllText(Path.Combine(fixtureState, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
+            var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(fixtureState); info.ArgumentList.Add(root); info.ArgumentList.Add(fixturePath ?? path);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native Sequence fixture did not open."); main.Patterns.Transform.Pattern.Resize(1280, 840);
         }
         void WaitVisual()

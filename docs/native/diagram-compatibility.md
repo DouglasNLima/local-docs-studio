@@ -1,5 +1,12 @@
 # Native diagram compatibility
 
+The [native Sequence visual editor report](mermaid-sequence-visual-editor.md) records
+the exact Mermaider 0.15.1 grammar and bounded source-preserving authoring subset.
+Sequence and Flowchart preview actions route to separate native semantic editors.
+Sequence layout and rendering remain authoritative in Mermaider; its verified SVG
+metadata supplies interaction geometry only after correspondence with source tokens.
+The existing standalone activation adapter continues to affect rendering only.
+
 Hyperlinked images now retain both their supported external destination and original image bytes through Word import. The focused core test uses an actual embedded PNG package; the full local native corpus still passes in `artifacts/native/word-links-final-validation`. This does not claim that Word images recover their original Mermaid/LaTeX source.
 
 The Word reimport probe now confirms exact native Mermaid/formula image bytes after DOCX export and import, retaining two list items and their continuations. The full local harness passes in `artifacts/native/word-import-heading-validation`, alongside 868 core tests. This does not recover Mermaid/LaTeX source from the rendered images or certify complete Word formatting.

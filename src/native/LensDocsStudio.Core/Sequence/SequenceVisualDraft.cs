@@ -37,6 +37,7 @@ public sealed class SequenceVisualDraft
             {
                 cancellationToken.ThrowIfCancellationRequested();
                 if (operations.Count is 0 or > 100) throw new ArgumentException("Choose between one and 100 bounded Sequence operations.");
+                Validate(original, cancellationToken);
                 var parsed = original;
                 foreach (var operation in operations)
                 {

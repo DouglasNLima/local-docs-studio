@@ -1,5 +1,11 @@
 # Native implementation progress
 
+Sequence visual authoring is tracked independently in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
+based on `develop` at `7bd2207`. Dedicated Core semantics, exact patches, private
+history, canonical native selection/inspector, authoring and owning-document routing
+are implemented. The [Sequence report](mermaid-sequence-visual-editor.md) owns the
+current verification status; hosted UI/package certification is in progress.
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

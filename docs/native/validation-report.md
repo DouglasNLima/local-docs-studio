@@ -1,5 +1,11 @@
 # Native validation report
 
+Sequence editor work is tracked in [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
+The local Release build has zero warnings/errors; 1,285 Core cases (51 new Sequence
+cases) pass without skips and static integrity passes. The [Sequence report](mermaid-sequence-visual-editor.md)
+records hosted canonical fidelity, normal/actual High Contrast UIA and package results
+as they become available. Historical counts below are retained for their original revisions.
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

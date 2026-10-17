@@ -1,5 +1,11 @@
 # Native Windows development continuation handoff
 
+The active Sequence editor implementation is [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
+See [its report](mermaid-sequence-visual-editor.md) for source modelling, canonical
+mapping, safe/protected operations and current evidence. Execute native UI and
+installer checks only in disposable Windows environments. No automatic merge,
+stable release or unsigned automatic updates are authorised.
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records
