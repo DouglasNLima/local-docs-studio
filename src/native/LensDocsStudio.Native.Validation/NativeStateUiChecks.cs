@@ -40,7 +40,7 @@ internal static partial class NativeUiChecks
             Click("StateAddTransition"); Find(visual!, "StateFrom").AsComboBox().Select("Archived · Archived locally"); Find(visual!, "StateTo").AsComboBox().Select("Archived · Archived locally"); Find(visual!, "StateLabel").AsTextBox().Text = "Check again"; Click("StateUpdate"); Await(text => text.Contains("Archived --> Archived : Check again", StringComparison.Ordinal));
             var changed = Draft(); Click("StateUndo"); Await(text => !text.Contains("Archived --> Archived", StringComparison.Ordinal)); Click("StateRedo"); Await(text => text == changed);
             Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original, "State editing and private Undo/Redo leave owner/disk source exact before Apply");
-            SelectState("Draft"); Find(visual!, "StateSourcePanel").Patterns.ExpandCollapse.Pattern.Collapse(); Click("StateFit");
+            SelectState("Draft"); Click("StateFit");
             var dragMetrics = new List<string>(); var beforeDrag = Draft();
             for (var i = 0; i < 20; i++)
             {

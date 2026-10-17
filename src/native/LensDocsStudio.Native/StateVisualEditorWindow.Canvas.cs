@@ -32,6 +32,7 @@ public partial class StateVisualEditorWindow
     private int frameCount;
     private double maximumFrame;
     private static readonly Pen HitPen = CreateHitPen();
+    private static readonly DoubleCollection GuideDashes = CreateDashes();
     private sealed record EdgeRuntime(NativeMermaidConnection Canonical, string From, string To, DrawingGroup? Drawing, DrawingGroup? Label,
         LineGeometry Guide, Path Overlay, TranslateTransform LabelTranslation, Point Start, Point End);
     private sealed class DrawingHost(Drawing drawing, Point origin) : FrameworkElement
@@ -54,6 +55,7 @@ public partial class StateVisualEditorWindow
         private void Select() => owner.Dispatcher.Invoke(() => { if (!owner.IsEnabled) throw new ElementNotEnabledException(); owner.IsChecked = true; });
     }
     private static Pen CreateHitPen() { var pen = new Pen(Brushes.Black, 12); pen.Freeze(); return pen; }
+    private static DoubleCollection CreateDashes() { var dashes = new DoubleCollection { 3, 2 }; dashes.Freeze(); return dashes; }
     private Brush BrushResource(string key) => (Brush)FindResource(key);
     private static IEnumerable<DrawingGroup> DrawingGroups(Drawing drawing)
     { if (drawing is not DrawingGroup group) yield break; yield return group; foreach (var child in group.Children) foreach (var nested in DrawingGroups(child)) yield return nested; }
@@ -87,13 +89,14 @@ public partial class StateVisualEditorWindow
         FreezeStatic(mutable.Drawing, nodeDrawings.Values.Concat(edges.Values).Concat(labels.Values).ToHashSet());
         var host = new DrawingHost(mutable.Drawing, view.Drawing.Drawing.Bounds.Location) { Width = view.Drawing.Width, Height = view.Drawing.Height, IsHitTestVisible = false };
         AutomationProperties.SetAutomationId(host, "StateCanonicalDrawing"); Panel.SetZIndex(host, -10); Surface.Children.Add(host);
+        var descriptions = Choices().ToDictionary(item => item.Identity, item => item.Description);
         foreach (var element in view.Elements.Values)
         {
             if (!state.Elements.TryGetValue(element.Key, out var identity)) continue;
             var bounds = element.Bounds; var geometry = element.Geometry.Clone();
             geometry.Transform = new TransformGroup { Children = { element.Geometry.Transform ?? Transform.Identity, new TranslateTransform(-bounds.X, -bounds.Y) } }; geometry.Freeze();
             var shape = new Path { Data = geometry, Fill = identity.StartsWith("group:", StringComparison.Ordinal) ? null : Brushes.Transparent, Stroke = Brushes.Transparent, StrokeThickness = 2, Stretch = Stretch.None };
-            var description = Choices().FirstOrDefault(item => item.Identity == identity)?.Description ?? identity;
+            var description = descriptions.GetValueOrDefault(identity) ?? identity;
             var button = Button(identity, description, shape, bounds); Panel.SetZIndex(button, identity.StartsWith("group:", StringComparison.Ordinal) ? 0 : 10);
             if (translations.TryGetValue(identity, out var translation)) button.RenderTransform = translation;
             button.PreviewMouseLeftButtonDown += (_, e) =>
@@ -197,6 +200,7 @@ public partial class StateVisualEditorWindow
             var from = Offset("state:" + edge.From); var to = Offset("state:" + edge.To); var moved = from.LengthSquared > .001 || to.LengthSquared > .001;
             if (edge.Drawing is not null) edge.Drawing.Opacity = moved ? 0 : 1;
             edge.Guide.StartPoint = edge.Start + from; edge.Guide.EndPoint = edge.End + to; edge.Overlay.Data = moved ? edge.Guide : edge.Canonical.Path;
+            edge.Overlay.StrokeDashArray = moved ? GuideDashes : null;
             edge.LabelTranslation.X = (from.X + to.X) / 2; edge.LabelTranslation.Y = (from.Y + to.Y) / 2;
         }
     }

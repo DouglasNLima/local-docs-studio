@@ -64,8 +64,8 @@ public sealed class StateVisualDraft
     }
     private void Validate(StateDiagramModel model, CancellationToken cancellationToken)
     { cancellationToken.ThrowIfCancellationRequested(); StateSemanticValidation.ValidateRendering(model, diagrams.Render(model.Source, cancellationToken: cancellationToken)); cancellationToken.ThrowIfCancellationRequested(); }
-    private static bool Recoverable(Exception error, CancellationToken token) => error is ArgumentException or System.Xml.XmlException or InvalidDataException
-        || error is OperationCanceledException && token.IsCancellationRequested;
+    private static bool Recoverable(Exception error, CancellationToken token) => error is not OutOfMemoryException
+        && (error is not OperationCanceledException || token.IsCancellationRequested);
     private static string Message(Exception error) => error is OperationCanceledException ? "State validation was cancelled; the draft is unchanged." : error.Message;
     private void Commit(StateDiagramModel candidate)
     {

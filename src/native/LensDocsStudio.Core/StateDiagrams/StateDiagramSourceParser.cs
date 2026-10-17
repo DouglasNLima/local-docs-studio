@@ -42,7 +42,7 @@ public sealed class StateDiagramSourceParser
             var lineLength = Math.Min(raw.Length + 1, source.Length - offset); var text = raw.Trim();
             var start = offset + raw.Length - raw.TrimStart().Length; var span = new MermaidSourceSpan(start, text.Length);
             var line = new MermaidSourceSpan(offset, lineLength); offset += lineLength;
-            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal)) continue;
+            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal) && !text.StartsWith("%%{", StringComparison.Ordinal)) continue;
             var scope = stack.TryPeek(out var current) ? current : null;
             StateSourceStatement Add(StateStatementKind kind, Match? match = null)
             {
@@ -63,6 +63,7 @@ public sealed class StateDiagramSourceParser
                 var expanded = pendingNote with { Span = new(pendingNote.Span.Start, span.End - pendingNote.Span.Start), Line = new(pendingNote.Line.Start, line.End - pendingNote.Line.Start) };
                 statements[statements.IndexOf(pendingNote)] = expanded; pendingNote = text.Equals("end note", StringComparison.OrdinalIgnoreCase) ? null : expanded; continue;
             }
+            if (text.StartsWith("%%{", StringComparison.Ordinal)) { Add(StateStatementKind.Unknown); continue; }
             if (header.Length == 0)
             { if (!HeaderPattern.IsMatch(text)) diagnostics.Add("The first statement must be stateDiagram-v2 or stateDiagram."); header = text; Add(StateStatementKind.Header); continue; }
             if (text == "}")

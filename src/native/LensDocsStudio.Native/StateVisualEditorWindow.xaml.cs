@@ -219,8 +219,8 @@ public partial class StateVisualEditorWindow : Window
     private void SourceChanged(object? sender, EventArgs e) { if (draft is not null && !updating && SourceEditor is not null) { UpdateActions(); Status.Text = "Validate source changes before visual editing or Apply."; } }
     private async void ValidateSource(object sender, RoutedEventArgs e)
     {
-        if (busy || PropertiesPending) return; busy = true; UpdateActions();
-        try { var result = await draft.ValidateSourceAsync(SourceEditor.Text, lifetime.Token); if (closed) return; if (result.Success) { await RefreshAsync(); Status.Text = "Complete source semantics and canonical rendering validated."; } else Status.Text = result.Error; }
+        if (busy || PropertiesPending) return; SavePositions(); var sourceChanged = SourcePending; busy = true; UpdateActions();
+        try { var result = await draft.ValidateSourceAsync(SourceEditor.Text, lifetime.Token); if (closed) return; if (result.Success) { if (sourceChanged) { sessionPositions.Clear(); SavePositions(); } await RefreshAsync(); Status.Text = "Complete source semantics and canonical rendering validated."; } else Status.Text = result.Error; }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
     private async void Apply(object sender, RoutedEventArgs e)

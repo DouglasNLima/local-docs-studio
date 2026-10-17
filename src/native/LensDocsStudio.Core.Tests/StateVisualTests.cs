@@ -139,6 +139,36 @@ public sealed class StateVisualTests
         Assert.Throws<ArgumentException>(() => MermaidPatches.Apply("abc", [new(new(0, 1), "x", "z")]));
         Assert.Throws<ArgumentException>(() => MermaidPatches.Apply("abc", [new(new(0, 2), "ab", "z"), new(new(1, 1), "b", "z")]));
     }
+    [Fact]
+    public async Task Configuration_directives_are_not_inert_comments()
+    {
+        var draft = new StateVisualDraft("%%{init: {'theme':'dark'}}%%\nstateDiagram-v2\nstate \"A\" as A\nA --> A\n");
+        Assert.True(draft.Model.HasUnknownDependencies); await Rejected(draft, new UpdateStateNode("A", "A", "Changed"));
+    }
+    [Fact]
+    public async Task Hyphenated_existing_state_labels_use_the_verified_description_grammar()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nA --> review-state : Submit\nreview-state --> A\n");
+        await Success(draft, new UpdateStateNode("review-state", "review-state", "Local review")); Assert.Contains("review-state : Local review", draft.Source);
+    }
+    [Fact]
+    public async Task No_op_does_not_add_history_and_same_text_after_undo_has_a_new_branch_identity()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\n");
+        await Success(draft, new UpdateStateNode("A", "A", "A")); Assert.Equal(1, draft.HistoryCount);
+        await Success(draft, new UpdateStateNode("A", "A", "First")); var identity = draft.HistoryIdentity;
+        draft.Undo(); await Success(draft, new UpdateStateNode("A", "A", "First")); Assert.NotEqual(identity, draft.HistoryIdentity); Assert.False(draft.CanRedo);
+    }
+    [Fact]
+    public async Task Stale_in_flight_validation_cannot_replace_a_newer_source_revision()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\n");
+        var original = draft.Source; var validation = draft.ValidateSourceAsync("stateDiagram-v2\nstate \"B\" as B\n");
+        draft.Undo(); var result = await validation; Assert.False(result.Success); Assert.Equal(original, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact]
+    public async Task Empty_supported_source_can_start_with_an_independent_state()
+    { var draft = new StateVisualDraft("stateDiagram-v2\n"); await Success(draft, new AddStateNode("Draft", "Draft")); Assert.Single(draft.Model.Nodes); }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]
     [InlineData("stateDiagram\nstate \"Alias\" as A\nA --> A : Again\n", 1, 1, 0)]

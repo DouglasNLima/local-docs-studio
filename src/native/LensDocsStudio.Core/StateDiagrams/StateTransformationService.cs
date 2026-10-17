@@ -83,7 +83,8 @@ public sealed class StateTransformationService
                     {
                         if (!model.IsSimple) throw new ArgumentException("An implicit state in a complex diagram needs an explicit declaration in source before its label can be edited.");
                         // The pinned parser keeps the first occurrence, including bare references.
-                        Insert("state \"" + label + "\" as " + update.NewId, node.First.Line.Start, model.Statements.ToList().IndexOf(node.First));
+                        var declarationText = update.NewId.Contains('-') ? update.NewId + " : " + Label(update.Label, false) : "state \"" + label + "\" as " + update.NewId;
+                        Insert(declarationText, node.First.Line.Start, model.Statements.ToList().IndexOf(node.First));
                     }
                 }
                 break;

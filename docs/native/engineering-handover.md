@@ -1,5 +1,13 @@
 # Native Windows engineering handover
 
+Current work is [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33),
+`feature/native-mermaid-state-visual-editor`, based on consolidated `77dff109`
+including the merged advanced Flowchart and Sequence implementations. The
+[State report](mermaid-state-visual-editor.md) owns current source/operation and
+certification status. Real Windows UIA and installer runs stay on disposable
+GitHub-hosted Windows. Final-head evidence, packages and hashes remain pending.
+Retain the earlier reports; do not merge, tag, release or replace an installed preview.
+
 Continue Sequence authoring work from [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
 branch `feature/native-mermaid-sequence-visual-editor`, based on verified `7bd2207`.
 Its [Sequence report](mermaid-sequence-visual-editor.md) owns current evidence and

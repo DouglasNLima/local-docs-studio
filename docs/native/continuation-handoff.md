@@ -1,5 +1,13 @@
 # Native Windows development continuation handoff
 
+Continue State work from [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33)
+on consolidated `develop` `77dff109`, which includes PR #31 and PR #32. The
+[State report](mermaid-state-visual-editor.md) records dedicated Core semantics,
+exact patches, canonical native mapping, protected operations and current pending
+certification. Complete hosted UIA, actual High Contrast, existing editor/browser
+regressions and exact-head independently verified unsigned previews before calling
+the goal complete. No merge, tag, release or ordinary-desktop installation is authorised.
+
 The active Sequence editor implementation is [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
 See [its report](mermaid-sequence-visual-editor.md) for source modelling, canonical
 mapping, safe/protected operations and accepted application `37c6220` / independently
