@@ -51,6 +51,8 @@ At `269b288ae89714add99e3f74937ce6382b3b6665`, both Sequence appearances and exi
 
 The expanded protected-grouping performance case exposed a native colour-adapter failure at `13d0457`: WPF's `ColorConverter` rejected functional `rgb(...)` inside Mermaider colour interpolation. [The failure receipt](evidence/sequence-visual-editor/13d0457-colour-failure.json) retains its source/job/artefact identity. The correction parses bounded RGB/RGBA channels, retains the original scenario and adds real native PNG regressions for numeric, percentage and alpha forms. Sequence conversion failures also retain source and a visible diagnostic instead of escaping the asynchronous window handler. The pinned layout, sanitisation and protected grouping policy are unchanged.
 
+Style materialisation now leaves inert `data-*` source metadata literal. Labels mentioning `var(...)`, `color-mix(...)` or `rem` units cannot be mistaken for style declarations or corrupt correspondence checks. Sequence and Flowchart native regressions exercise those labels through canonical mapping and PNG output. Active/external SVG checks still run before attribute materialisation.
+
 ## Screenshot gallery
 
 These native captures come from disposable Windows at `269b288`; they are not mock-ups. The hover correction is visible in the dark capture.

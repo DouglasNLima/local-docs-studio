@@ -40,7 +40,8 @@ public sealed partial class NativeSvgService
                     throw new InvalidDataException("The diagram contains an active reference.");
                 if (attribute.Name.LocalName is "style" or "fill" or "stroke" or "filter" or "clip-path" or "mask" or "marker" or "marker-start" or "marker-mid" or "marker-end" or "cursor" or "font" or "font-family" or "color-profile")
                     RejectExternalCss(attribute.Value);
-                attribute.Value = Resolve(attribute.Value, variables, 0);
+                // Inert source metadata is literal text, even when a label mentions CSS functions or rem units.
+                if (!attribute.Name.LocalName.StartsWith("data-", StringComparison.Ordinal)) attribute.Value = Resolve(attribute.Value, variables, 0);
             }
             if (element.Name.LocalName == "style")
             {

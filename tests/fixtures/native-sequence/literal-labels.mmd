@@ -1,0 +1,6 @@
+sequenceDiagram
+    participant Author as var(--missing)
+    participant Studio as color-mix(in srgb, red, blue)
+    Author->>Studio: Read 2rem tokens
+    Studio-->>Author: Keep var(--private-token) literal
+    Note over Author,Studio: CSS words remain text
