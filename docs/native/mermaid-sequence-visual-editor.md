@@ -37,7 +37,7 @@ For example, editing the final repeated `A->>B: Request` patches only that occur
 
 ## Verification status
 
-The expanded local suite passes **1,287 Core cases, including 53 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity and all **268 Chromium/Edge browser cases** pass locally. No native application has been executed or installed on the ordinary desktop.
+The expanded local suite passes **1,292 Core cases, including 58 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity and all **268 Chromium/Edge browser cases** pass locally. No native application has been executed or installed on the ordinary desktop.
 
 At source `ca331b92c66b8b4868eca1af0145db18684a922c`, [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004555) passed the Sequence normal and actual High Contrast jobs, with 18 UIA assertions each and 73 Sequence fidelity/geometry assertions per appearance job. The complete existing Flowchart UIA/fidelity and baseline jobs also passed. [Workspace and interaction CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004553) passed. [Both browser projects](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004612) passed. These results belong to that source revision; subsequent enhancements require fresh certification.
 
@@ -48,6 +48,8 @@ The expanded run at `e1cad9205c6c04cf0474265d055fcc40b3f2c8e9` passed **101 fide
 Screenshot review of that run found that an inherited Flowchart hover fill obscured a canonical message label in dark mode. The [retained before image](evidence/sequence-visual-editor/before-hover-dark.png) records the defect. The subsequent Sequence-only hit-target style uses transparent interiors with focus/selection outlines; it has no apparent drag handles. A focused regression also retains shorthand activation selection through message edits and private history.
 
 At `269b288ae89714add99e3f74937ce6382b3b6665`, both Sequence appearances and existing Flowchart authoring passed in [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39034075723). The corrected dark capture was inspected: message labels remain visible through hovered hit targets. Receipts prefixed `269b288` retain that source-specific result.
+
+The expanded protected-grouping performance case exposed a native colour-adapter failure at `13d0457`: WPF's `ColorConverter` rejected functional `rgb(...)` inside Mermaider colour interpolation. [The failure receipt](evidence/sequence-visual-editor/13d0457-colour-failure.json) retains its source/job/artefact identity. The correction parses bounded RGB/RGBA channels, retains the original scenario and adds real native PNG regressions for numeric, percentage and alpha forms. Sequence conversion failures also retain source and a visible diagnostic instead of escaping the asynchronous window handler. The pinned layout, sanitisation and protected grouping policy are unchanged.
 
 ## Screenshot gallery
 

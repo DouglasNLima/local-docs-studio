@@ -52,6 +52,15 @@ internal static class NativeSequenceChecks
             observations.Add(new { Fixture = name, ParseMilliseconds = parseMs, RenderMilliseconds = renderMs, NativePresentationMilliseconds = presentationMs, PixelTolerance = 0, Targets = presentation.Targets.Count });
         }
         var performance = new List<object>();
+        foreach (var colour in new[] { "rgb(240,240,240)", "rgba(240,240,240,0.5)", "rgb(100%,50%,0%)" })
+        {
+            var source = "sequenceDiagram\nbox " + colour + " Services\nparticipant A\nparticipant B\nend\nA->>B: Protected grouping\n";
+            var render = new DiagramService().Render(source); var native = new NativeSvgService();
+            Check(render.Success, "Pinned renderer accepts protected grouping colour " + colour);
+            var prepared = native.Prepare(render.Svg!);
+            Check(!prepared.Contains("color-mix(", StringComparison.Ordinal), "Functional RGB interpolation resolves before native conversion: " + colour);
+            Check(NativeSvgService.ToPng(native.Render(render.Svg!), .5).Length > 100, "Protected grouping retains actual native PNG output: " + colour);
+        }
         foreach (var (participants, messages) in new[] { (2, 5), (10, 50), (20, 150) })
         {
             var source = "sequenceDiagram\n" + string.Join('\n', Enumerable.Range(0, participants).Select(index => "participant P" + index)) + "\n"

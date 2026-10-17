@@ -204,6 +204,21 @@ public sealed partial class NativeSvgService
         var match = Weight().Match(value.Trim());
         double? weight = match.Success ? double.Parse(match.Groups[2].Value, CultureInfo.InvariantCulture) / 100 : null;
         var colour = match.Success ? match.Groups[1].Value.Trim() : value.Trim();
+        var functional = RgbColour().Match(colour);
+        if (functional.Success)
+        {
+            if (functional.Groups["rgba"].Success != functional.Groups["alpha"].Success)
+                throw new InvalidDataException("The generated RGB colour has an inconsistent alpha channel.");
+            byte Component(string text, bool alpha = false)
+            {
+                var percentage = text.EndsWith('%'); var scalar = double.Parse(percentage ? text[..^1] : text, CultureInfo.InvariantCulture);
+                var maximum = percentage ? 100 : alpha ? 1 : 255;
+                if (!double.IsFinite(scalar) || scalar < 0 || scalar > maximum) throw new InvalidDataException("The generated RGB colour exceeds its channel limits.");
+                return (byte)Math.Round(scalar / maximum * 255);
+            }
+            return (Color.FromArgb(functional.Groups["alpha"].Success ? Component(functional.Groups["alpha"].Value, true) : (byte)255,
+                Component(functional.Groups["red"].Value), Component(functional.Groups["green"].Value), Component(functional.Groups["blue"].Value)), weight);
+        }
         return ((Color)ColorConverter.ConvertFromString(colour), weight);
     }
     private static List<string> Split(string text)
@@ -219,6 +234,8 @@ public sealed partial class NativeSvgService
     }
     [GeneratedRegex(@"(--[\w-]+)\s*:\s*([^;{}]+);?")] private static partial Regex Variable();
     [GeneratedRegex(@"var\(|color-mix\(")] private static partial Regex Function();
+    [GeneratedRegex(@"^rgb(?<rgba>a)?\(\s*(?<red>(?:\d+(?:\.\d+)?|\.\d+)%?)\s*,\s*(?<green>(?:\d+(?:\.\d+)?|\.\d+)%?)\s*,\s*(?<blue>(?:\d+(?:\.\d+)?|\.\d+)%?)(?:\s*,\s*(?<alpha>(?:\d+(?:\.\d+)?|\.\d+)%?))?\s*\)$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, 100)]
+    private static partial Regex RgbColour();
     [GeneratedRegex(@"([\d.]+)rem")] private static partial Regex Rem();
     [GeneratedRegex(@"^(.*?)\s+([\d.]+)%$")] private static partial Regex Weight();
 }

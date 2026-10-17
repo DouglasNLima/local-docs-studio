@@ -54,6 +54,7 @@ public sealed class SequenceVisualDraft
             Commit(candidate); return new(true, null);
         }
         catch (ArgumentException error) { return new(false, error.Message); }
+        catch (System.Xml.XmlException) { return new(false, "The rendered Sequence source contains invalid XML characters. Use valid Unicode text; the draft is unchanged."); }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return new(false, "Sequence validation was cancelled; the draft is unchanged."); }
     }
     public async Task<SequenceEditResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
@@ -67,6 +68,7 @@ public sealed class SequenceVisualDraft
             if (source != Source) Commit(candidate); return new(true, null);
         }
         catch (ArgumentException error) { return new(false, error.Message); }
+        catch (System.Xml.XmlException) { return new(false, "The rendered Sequence source contains invalid XML characters. The retained draft is unchanged."); }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { return new(false, "Sequence validation was cancelled; the draft is unchanged."); }
     }
     public async Task<SequenceEditResult> ValidateAsync(CancellationToken cancellationToken = default)
@@ -74,6 +76,7 @@ public sealed class SequenceVisualDraft
         var current = Model; var version = generation;
         try { await Task.Run(() => Validate(current, cancellationToken), cancellationToken); return version == generation ? new(true, null) : new(false, "The draft changed during validation."); }
         catch (ArgumentException error) { return new(false, error.Message); }
+        catch (System.Xml.XmlException) { return new(false, "The rendered Sequence source contains invalid XML characters. Apply was rejected."); }
     }
     private void Validate(SequenceDiagramModel model, CancellationToken cancellationToken)
     {

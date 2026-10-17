@@ -243,4 +243,21 @@ public sealed class SequenceVisualTests
         Assert.Contains("12. Changed", new DiagramService().Render(draft.Source).Svg);
         Assert.Equal(source.Replace("Third", "Changed", StringComparison.Ordinal), draft.Source);
     }
+
+    [Theory]
+    [InlineData(0xD800)] [InlineData(0xDC00)] [InlineData(0xFFFE)] [InlineData(0xFFFF)]
+    public async Task Invalid_Unicode_and_XML_noncharacters_reject_without_private_history(int codeUnit)
+    {
+        var draft = new SequenceVisualDraft(Simple); var label = new string((char)codeUnit, 1);
+        Assert.False((await draft.ExecuteAsync(new UpdateSequenceMessage(draft.Model.Messages[0].Identity, "A", "B", label, "->>"))).Success);
+        Assert.Equal(Simple, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+
+    [Fact]
+    public async Task Valid_supplementary_Unicode_remains_portable_and_editable()
+    {
+        var draft = new SequenceVisualDraft(Simple);
+        await Execute(draft, new UpdateSequenceMessage(draft.Model.Messages[0].Identity, "A", "B", "Review 😀", "->>"));
+        Assert.Contains("A->>B: Review 😀", draft.Source); draft.Undo(); Assert.Equal(Simple, draft.Source);
+    }
 }

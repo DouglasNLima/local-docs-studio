@@ -44,6 +44,8 @@ public sealed class SequenceSourceParser
         if (encoded.Length is 0 or > 4096 || encoded.Trim() != encoded || plain.Any(char.IsControl)
             || plain.IndexOfAny(['<', '>', '"', '*', '~']) >= 0 || plain.Contains("%%", StringComparison.Ordinal))
             throw new ArgumentException("Use a non-empty label of up to 4,096 characters. Plain Unicode text and line breaks are supported; markup and control characters require Edit source.");
+        try { System.Xml.XmlConvert.VerifyXmlChars(encoded); }
+        catch (System.Xml.XmlException) { throw new ArgumentException("Use valid Unicode label text without invalid surrogates or XML control characters."); }
         return encoded;
     }
     public SequenceDiagramModel Parse(string source, CancellationToken cancellationToken = default)
@@ -103,7 +105,7 @@ public sealed class SequenceSourceParser
             if (tokens.ContainsKey("label"))
             {
                 try { EncodeLabel(NormaliseLabel(Get("label"))); }
-                catch (ArgumentException) { diagnostics.Add("Rich label syntax is preserved for source editing."); }
+                catch (ArgumentException) { diagnostics.Add("Unsupported label encoding or markup is preserved for source editing."); }
             }
             void Ensure(string id) { if (participants.All(item => item.Id != id)) participants.Add(new(id, id, false, null)); }
         }

@@ -140,7 +140,7 @@ public partial class SequenceVisualEditorWindow : Window
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
         }
         catch (OperationCanceledException) { }
-        catch (Exception error) when (error is ArgumentException or InvalidDataException or System.Xml.XmlException)
+        catch (Exception error) when (error is not OutOfMemoryException)
         {
             if (!closed && version == renderGeneration)
             { CanonicalImage.Source = null; targets.Clear(); Overlay.Children.Clear(); Status.Text = error.Message; }

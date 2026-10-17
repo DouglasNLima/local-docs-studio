@@ -7,6 +7,13 @@ Sequence layout and rendering remain authoritative in Mermaider; its verified SV
 metadata supplies interaction geometry only after correspondence with source tokens.
 The existing standalone activation adapter continues to affect rendering only.
 
+Sequence certification exposed a native interpolation failure for functional RGB
+colours in protected participant boxes. The adapter now resolves bounded numeric,
+percentage and alpha RGB/RGBA channels before native conversion. It retains the
+original Mermaid and existing SVG sanitisation; this does not certify every CSS
+colour space accepted lexically by the pinned renderer. Conversion failures retain
+source and a visible diagnostic.
+
 Hyperlinked images now retain both their supported external destination and original image bytes through Word import. The focused core test uses an actual embedded PNG package; the full local native corpus still passes in `artifacts/native/word-links-final-validation`. This does not claim that Word images recover their original Mermaid/LaTeX source.
 
 The Word reimport probe now confirms exact native Mermaid/formula image bytes after DOCX export and import, retaining two list items and their continuations. The full local harness passes in `artifacts/native/word-import-heading-validation`, alongside 868 core tests. This does not recover Mermaid/LaTeX source from the rendered images or certify complete Word formatting.
