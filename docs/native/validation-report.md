@@ -10,6 +10,19 @@ Exact-source preview `0.1.1-preview.614` passes independent verification and dis
 installer lifecycle checks. The retained frozen-baseline first-attempt failure passed
 an unchanged job rerun; no assertion was removed. Historical counts below retain their revisions.
 
+The advanced Flowchart partial-editing continuation is implemented in
+[Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), based on
+verified unmerged PR #30 head `833e9db1f8643f7023143dd94349a2709f9ae9ce`.
+The [advanced editing report](mermaid-advanced-flowchart-partial-editing.md) owns
+operation capabilities, complete dependency/semantic/source validation, exact partial
+Apply/Save/Reopen, inspected normal/actual High Contrast captures, full regression
+and independently verified unsigned preview `0.1.1-preview.599` with its lifecycle.
+Application source `f8772647df65da41079b3c6dd148d9444ea50bfc` passes the scoped
+internal-preview verdict and its explicit grammar, performance, DPI and trust limits.
+Final documentation-head checks are reported separately; previous source/package
+records below retain their original scope. No merge or public release occurs.
+
+
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The
 [interaction stability report](workspace-mermaid-interaction-stability.md) records

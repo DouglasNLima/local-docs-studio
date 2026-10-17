@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "product": "LensDocsStudio.Native",
+  "version": "0.1.1-preview.599",
+  "channel": "Preview",
+  "architecture": "x64",
+  "minimumWindowsVersion": "10.0.17763",
+  "selfContained": true,
+  "internalPreview": true,
+  "signingRequested": false,
+  "signingProvider": "Unsigned",
+  "sourceRevision": "f1adf3747c06a5355d75654f2d8d990b33f8b646",
+  "sourceDirty": false,
+  "builtAtUtc": "2026-10-17T10:52:16.3884787+00:00",
+  "sourceKind": "pull-request-merge-checkout",
+  "ciRunId": "39025931169",
+  "ciRunAttempt": "1",
+  "checkoutRef": "refs/pull/31/merge"
+}

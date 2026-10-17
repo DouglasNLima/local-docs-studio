@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "version": "0.1.0-preview.599",
+  "checks": [
+    "Keyboard navigation, reviewed path/tasks, Back and confirmed Cancel preserve the uninstalled state",
+    "Visible Install and Finish produce matching native files/version, selected shortcuts and Open with registration",
+    "An installed application with an unsaved draft blocks Setup; cancelling preserves the live draft, source and installed payload",
+    "Workspace bytes and the legacy product registration remain unchanged",
+    "Cleanup removes only the test installation and retains prior default associations and source"
+  ],
+  "sourcePreserved": true,
+  "cleanMachineCertification": false,
+  "limitation": "GitHub-hosted Windows GUI and keyboard validation; physical screen-reader/DPI and SDK-free certification remain separate."
+}

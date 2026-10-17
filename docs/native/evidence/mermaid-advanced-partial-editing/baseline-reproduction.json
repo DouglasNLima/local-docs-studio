@@ -1,0 +1,8 @@
+{
+  "baseline": "833e9db1f8643f7023143dd94349a2709f9ae9ce",
+  "runId": "39025931155",
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "outcome": "Reproduced original denial of independent node and connection label updates beside a chain; source/history unchanged."
+}

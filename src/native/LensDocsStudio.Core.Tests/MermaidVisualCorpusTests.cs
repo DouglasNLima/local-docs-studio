@@ -29,14 +29,17 @@ public sealed class MermaidVisualCorpusTests
 
     [Theory]
     [InlineData("protected", MermaidCompatibility.Protected)]
-    [InlineData("duplicate-declarations", MermaidCompatibility.Protected)]
+    [InlineData("duplicate-declarations", MermaidCompatibility.PartiallyEditable)]
     [InlineData("malformed", MermaidCompatibility.Invalid)]
     public async Task Protected_and_invalid_corpus_stays_byte_for_byte_available(string fixture, MermaidCompatibility compatibility)
     {
         var source = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", "native-mermaid-visual", fixture + ".mmd"));
         var draft = new MermaidVisualDraft(source); Assert.Equal(compatibility, draft.Model.Compatibility);
         var result = await draft.ExecuteAsync(new AddMermaidNode("New", "New", FlowNodeShape.Process));
-        Assert.False(result.Success); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+        if (compatibility == MermaidCompatibility.PartiallyEditable)
+        { Assert.True(result.Success, result.Error); Assert.StartsWith(source, draft.Source); draft.Undo(); }
+        else Assert.False(result.Success);
+        Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
     }
 
     [Theory] [InlineData("TD")] [InlineData("TB")] [InlineData("BT")] [InlineData("LR")] [InlineData("RL")]

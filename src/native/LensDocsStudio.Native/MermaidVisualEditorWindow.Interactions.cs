@@ -27,6 +27,7 @@ public partial class MermaidVisualEditorWindow
     private Vector pendingDrag;
     private Dictionary<string, Point?>? initialManualPositions;
     private bool dragging;
+    private string? pendingInlineNode;
     private string[] affectedConnections = [];
     private long dragAllocated, dragTicks, frameAllocated;
     private int dragFrames;
@@ -117,6 +118,10 @@ public partial class MermaidVisualEditorWindow
     private void FinishNodeDrag(bool cancel)
     {
         dragFrame?.Abort(); dragFrame = null;
+        var inlineNode = !cancel && !dragging
+            && Math.Abs(pendingDrag.X) < SystemParameters.MinimumHorizontalDragDistance
+            && Math.Abs(pendingDrag.Y) < SystemParameters.MinimumVerticalDragDistance ? pendingInlineNode : null;
+        pendingInlineNode = null;
         if (dragged is null) return;
         if (!cancel && dragging) ApplyDragFrame();
         if (cancel)
@@ -136,6 +141,9 @@ public partial class MermaidVisualEditorWindow
             Status.Text = cancel ? "Movement cancelled. Source is unchanged." : "Session position retained. Auto layout resets positions; Apply saves Mermaid source only.";
             if (interactionDiagnostics) AutomationProperties.SetHelpText(Status, $"First update after native press: {firstDragFrame:F3} ms; incident connections: {incidentCount}; Drag frames: {dragFrames}; maximum update: {maximumDragFrame:F3} ms; update allocated bytes: {frameAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - dragAllocated}; duration: {Stopwatch.GetElapsedTime(dragTicks).TotalMilliseconds:F1} ms. Includes other dispatcher work between frames.");
         }
+        // A double press can begin a second drag. Open the label only after a
+        // completed stationary release, so cancellation/Undo cannot become inline editing.
+        if (inlineNode is not null) BeginInlineEdit(inlineNode);
     }
     private void PositionNode(string key, Point centre, bool remember = true)
     {
@@ -281,7 +289,8 @@ public partial class MermaidVisualEditorWindow
     private void UpdateEndpointHandles()
     {
         var key = Selected;
-        var available = CanTransform && !PropertiesPending && Elements.SelectedItems.Count == 1 && key is not null && connectionRuntime.ContainsKey(key);
+        var available = CanTransform && !PropertiesPending && Elements.SelectedItems.Count == 1 && key is not null && connectionRuntime.ContainsKey(key)
+            && draft.Model.Capabilities.Query(MermaidOperationKind.Reconnect, key).Permitted;
         if (available && endpointEdgeKey == key && sourceHandle is not null && targetHandle is not null
             && DiagramCanvas.Children.Contains(sourceHandle) && DiagramCanvas.Children.Contains(targetHandle))
         { UpdateEndpointHandlePositions(); return; }
