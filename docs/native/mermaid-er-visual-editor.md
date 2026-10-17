@@ -342,6 +342,23 @@ source/history. Hosted observations do not promise hardware-independent timing.
 
 ## Final protection and qualification boundaries
 
+The `46d40d1` branch [installed State job](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39074516736/job/117524777020)
+crashed during its live High Contrast switch with a WPF cyclic menu-style exception;
+the same-source PR lifecycle passed. The original log, screenshots and failed receipt
+remain retained, rather than being replaced by that successful duplicate. Inspection
+of WPF's [theme manager](https://github.com/dotnet/wpf/blob/v10.0.9/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/ThemeManager.cs)
+confirmed that directly merged Fluent dictionaries also enable automatic WPF theme
+ownership and replacement. That conflicted with the existing native preference
+handler's dictionary tracking. Native appearance now owns one unlabelled wrapper
+with an explicitly resolved Light, Dark or actual High Contrast Fluent dictionary;
+WPF's automatic `ThemeMode` remains `None`. Dictionary and brush changes suspend
+dispatcher processing, and the existing deferred preference handler updates the
+native editors. A native regression checks single ownership, unchanged-preference
+identity and System appearance, while the full real-app live High Contrast drag
+checks remain mandatory. No exception is swallowed, deadline increased or interaction
+assertion removed. The final delivery record identifies the replacement source and
+its fresh complete CI/package qualification; `.649` is earlier-candidate evidence.
+
 A focused ID-only rename regression exposed safe rejection when an entity without
 an alias changed ID while retaining its displayed label. The patch planner now
 adds a quoted alias at that same declaration when required, updates every known

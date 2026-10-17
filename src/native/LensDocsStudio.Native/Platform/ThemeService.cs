@@ -21,14 +21,19 @@ public static class ThemeService
     }
     public static void Apply(ResourceDictionary resources, string theme)
     {
+        using var processing = System.Windows.Threading.Dispatcher.CurrentDispatcher.DisableProcessing();
         var dark = IsDark(theme);
-        var variant = theme == "System" ? "Fluent" : dark ? "Fluent.Dark" : "Fluent.Light";
+        var variant = SystemParameters.HighContrast ? "Fluent.HC" : dark ? "Fluent.Dark" : "Fluent.Light";
         Themes.TryGetValue(resources, out var applied);
         if (applied?.Variant != variant || !resources.MergedDictionaries.Contains(applied.Dictionary))
         {
             if (applied is not null) resources.MergedDictionaries.Remove(applied.Dictionary);
-            var fluent = new ResourceDictionary { Source = new Uri($"pack://application:,,,/PresentationFramework.Fluent;component/Themes/{variant}.xaml", UriKind.Absolute) };
-            resources.MergedDictionaries.Add(fluent); Themes.Remove(resources); Themes.Add(resources, new(variant, fluent));
+            // WPF infers ThemeMode from a directly merged Fluent source and replaces that
+            // dictionary during WM_THEMECHANGED. Keep one owner of these resources: our
+            // deferred preference handler selects Light/Dark/HC inside an unlabelled wrapper.
+            var wrapper = new ResourceDictionary();
+            wrapper.MergedDictionaries.Add(new ResourceDictionary { Source = new Uri($"pack://application:,,,/PresentationFramework.Fluent;component/Themes/{variant}.xaml", UriKind.Absolute) });
+            resources.MergedDictionaries.Add(wrapper); Themes.Remove(resources); Themes.Add(resources, new(variant, wrapper));
         }
         foreach (var (key, light, night) in new[] {
             ("WindowBrush", "#FAFAFA", "#202124"), ("PanelBrush", "#F3F4F6", "#292B2F"),

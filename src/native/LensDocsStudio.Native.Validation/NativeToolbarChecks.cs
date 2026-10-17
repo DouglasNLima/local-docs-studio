@@ -30,6 +30,20 @@ internal static class NativeToolbarChecks
             {
                 application.Resources = new ResourceDictionary();
                 ThemeService.Apply(application.Resources, theme);
+                var ownedTheme = application.Resources.MergedDictionaries.Single();
+                ThemeService.Apply(application.Resources, theme);
+                // Read the .NET 10 evaluation property only to detect accidental WPF ownership.
+                // Product code does not depend on or set this experimental API.
+#pragma warning disable WPF0001
+                if (application.ThemeMode != ThemeMode.None || ownedTheme.Source is not null
+                    || ownedTheme.MergedDictionaries.Count != 1
+                    || !ReferenceEquals(ownedTheme, application.Resources.MergedDictionaries.Single()))
+                    throw new IOException("Native appearance resources acquired a second WPF theme owner or changed on an unchanged preference.");
+                ThemeService.Apply(application.Resources, "System");
+                if (application.ThemeMode != ThemeMode.None || application.Resources.MergedDictionaries.Count != 1)
+                    throw new IOException("System appearance enabled automatic Fluent dictionary replacement alongside the native preference handler.");
+#pragma warning restore WPF0001
+                ThemeService.Apply(application.Resources, theme);
                 var pressedForeground = (System.Windows.Media.SolidColorBrush)application.Resources["PressedTextBrush"];
                 var pressedBackground = (System.Windows.Media.SolidColorBrush)application.Resources["PressedBrush"];
                 if (NativeSyntaxChecks.Contrast(pressedForeground.Color, pressedBackground.Color) < 4.5)
