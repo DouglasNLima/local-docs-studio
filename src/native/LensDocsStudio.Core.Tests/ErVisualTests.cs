@@ -231,4 +231,15 @@ public class ErVisualTests
         var portable = draft.Source; result = await draft.ExecuteAsync(new UpdateErAttribute(row.Identity, "int", row.Name, draft.Model.Attribute(row.Identity).Keys, "All markers"));
         Assert.True(result.Success, result.Error); Assert.Equal(portable.Replace("string id", "int id"), draft.Source);
     }
+    [Fact] public async Task Entity_id_only_rename_retains_the_existing_display_label_and_updates_every_reference()
+    {
+        var source = "erDiagram\n A {\n string id PK \"A identifier\"\n }\n B {\n }\n A ||--o{ B : owns\n A |o..o{ A : parent\n B ||--|| A : returns\n";
+        var draft = new ErVisualDraft(source); var identities = draft.Model.Relationships.Select(item => item.Identity).ToArray();
+        var result = await draft.ExecuteAsync(new UpdateErEntity("A", "CLIENT", "A"));
+        Assert.True(result.Success, result.Error); Assert.Equal("A", draft.Model.Entity("CLIENT").Label);
+        Assert.Contains("CLIENT[\"A\"] {", draft.Source); Assert.Contains("\"A identifier\"", draft.Source);
+        Assert.Equal(identities, draft.Model.Relationships.Select(item => item.Identity));
+        Assert.Equal(new[] { ("CLIENT", "B"), ("CLIENT", "CLIENT"), ("B", "CLIENT") }, draft.Model.Relationships.Select(item => (item.Entity1, item.Entity2)));
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
 }

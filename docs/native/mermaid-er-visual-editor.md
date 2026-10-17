@@ -10,8 +10,8 @@ has now passed both the complete native build/Core/export/package/installer job
 and the separate installed/upgraded/reinstalled State authoring job. The
 consolidated baseline is accepted from these actual post-merge results.
 
-The local Release solution builds with zero warnings/errors. All 1,526 Core cases
-pass, including 102 ER cases. Actual Windows authoring, High Contrast, canonical
+The local Release solution builds with zero warnings/errors. All 1,527 Core cases
+pass, including 103 ER cases. Actual Windows authoring, High Contrast, canonical
 fidelity and all existing editor UX regressions pass at `03869b8`; later identity
 hardening requires its own exact-source checks. The
 [Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34)
@@ -341,6 +341,13 @@ scenario, not a peak/live-memory measurement. Cancellation checks retain exact
 source/history. Hosted observations do not promise hardware-independent timing.
 
 ## Final protection and qualification boundaries
+
+A focused ID-only rename regression exposed safe rejection when an entity without
+an alias changed ID while retaining its displayed label. The patch planner now
+adds a quoted alias at that same declaration when required, updates every known
+normal/self reference, and verifies complete semantics, private relationship
+identities and Undo. The original failing TRX is retained; no original source was
+partially committed.
 
 A late portability check found that the initial space-only key writer produced
 source accepted by Mermaider but rejected by standard Mermaid. The correction uses

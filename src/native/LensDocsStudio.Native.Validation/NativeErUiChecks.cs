@@ -29,6 +29,10 @@ internal static partial class NativeUiChecks
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active during ER authoring");
             Launch(); var editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "The ER fixture did not load exactly."); Open(original.LastIndexOf("```mermaid", StringComparison.Ordinal)); Capture("starter");
             SelectEntity("CUSTOMER"); var entityButton = Find(visual!, "ErCanvas_entity:CUSTOMER"); Check(entityButton.Patterns.SelectionItem.Pattern.IsSelected.Value, "Native entity SelectionItem exposes exact source identity");
+            var beforeIdRename = Draft(); Find(visual!, "ErNodeId").AsTextBox().Text = "CLIENT"; Click("ErUpdate");
+            Await(text => new ErDiagramSourceParser().Parse(text).Entities.Any(entity => entity.Id == "CLIENT" && entity.Label == "CUSTOMER"));
+            Check(new ErDiagramSourceParser().Parse(Draft()).Relationships.All(relationship => relationship.Entity1 != "CUSTOMER" && relationship.Entity2 != "CUSTOMER"), "ID-only rename retains the displayed label and updates all native relationship references");
+            Click("ErUndo"); Await(text => text == beforeIdRename); SelectEntity("CUSTOMER");
             Find(visual!, "ErLabel").AsTextBox().Text = "Customers locally"; Check(!Find(visual!, "ErApply").IsEnabled, "Pending entity properties protect Apply"); Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entity("CUSTOMER").Label == "Customers locally"); Capture("entity-inspector");
             SelectAttribute("CUSTOMER", 2); Check(Find(visual!, "ErAttributeName").AsTextBox().Text == "email", "Verified canvas row selects the correct source attribute occurrence");
             Find(visual!, "ErAttributeComment").AsTextBox().Text = "Contact email edited locally"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entity("CUSTOMER").Attributes[2].Comment == "Contact email edited locally");

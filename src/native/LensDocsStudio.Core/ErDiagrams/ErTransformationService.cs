@@ -96,7 +96,7 @@ public sealed class ErTransformationService
                 {
                     var declaration = entity.Declarations.Single();
                     Token(declaration, "id", update.NewId);
-                    if (entity.Label != update.Label)
+                    if (entity.Label != update.Label || update.Id != update.NewId && !declaration.Tokens.ContainsKey("label"))
                     {
                         if (declaration.Tokens.ContainsKey("label")) Token(declaration, "label", update.Label);
                         else Patch(new(declaration.Tokens["id"].End, 0), "[\"" + update.Label + "\"]");
