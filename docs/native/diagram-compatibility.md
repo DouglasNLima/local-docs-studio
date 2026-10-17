@@ -1,5 +1,25 @@
 # Native diagram compatibility
 
+The advanced native Flowchart editing continuation is tracked in
+[Draft PR 31](https://github.com/DouglasNLima/local-docs-studio/pull/31), stacked on
+the exact unmerged PR #30 implementation. Its [partial-editing report](mermaid-advanced-flowchart-partial-editing.md)
+owns current source-transformation evidence; the rendering reports below retain
+their original revision scope. Hosted native and package certification is in progress.
+
+| Flowchart source | Transformation behaviour |
+|---|---|
+| Fully supported separate statements | Existing operations, complete semantic comparison and rendering |
+| Known chains | Partial; independent edits and exact chain property spans; no automatic splitting |
+| Repeated declarations | Partial; first occurrence remains authoritative; repeated declaration/identity edits protected |
+| Pipe, inline text and quoted connection labels | Exact label spans; type changes use a bounded arrow replacement when necessary |
+| `classDef`, multi-target `class`, local `style` | Preserve shared definitions/custom properties; targeted local overrides |
+| Numeric/default `linkStyle` | Safe properties; connection insertion, deletion and reconnection protected |
+| Nested named subgraphs | Preserve hierarchy, direction and membership; safe labels/properties |
+| Unknown directives, interactions, edge IDs or configuration | Protected inspection; unknown dependencies fail closed |
+
+Rendering support does not itself grant editing permission. No universal Mermaid
+compatibility or production certification is claimed by these boundaries.
+
 Hyperlinked images now retain both their supported external destination and original image bytes through Word import. The focused core test uses an actual embedded PNG package; the full local native corpus still passes in `artifacts/native/word-links-final-validation`. This does not claim that Word images recover their original Mermaid/LaTeX source.
 
 The Word reimport probe now confirms exact native Mermaid/formula image bytes after DOCX export and import, retaining two list items and their continuations. The full local harness passes in `artifacts/native/word-import-heading-validation`, alongside 868 core tests. This does not recover Mermaid/LaTeX source from the rendered images or certify complete Word formatting.

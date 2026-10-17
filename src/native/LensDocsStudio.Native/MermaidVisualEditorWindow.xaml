@@ -90,7 +90,7 @@
    <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" Margin="3,0,0,8">
     <StackPanel DockPanel.Dock="Top" Margin="12,12,12,8"><TextBlock Text="PROPERTIES" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}"/>
      <TextBlock x:Name="CapabilitySummary" FontWeight="SemiBold" Margin="0,6,0,0" AutomationProperties.AutomationId="MermaidCapabilities"/><TextBlock x:Name="SelectionSummary" Text="Select a node, connection or subgraph to edit its properties." TextWrapping="Wrap" Margin="0,8,0,0" FontWeight="SemiBold" AutomationProperties.AutomationId="MermaidSelectionSummary"/>
-     <WrapPanel><Button x:Name="UpdateNodeButton" Content="Update node" Style="{StaticResource Mermaid.Action}" Click="UpdateNode" Visibility="Collapsed" ToolTip="Update all pending properties for this node" AutomationProperties.AutomationId="MermaidUpdateNode"/>
+     <TextBlock x:Name="CapabilityDetails" TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" Margin="0,6,0,0" AutomationProperties.AutomationId="MermaidOperationPermissions"/><WrapPanel><Button x:Name="UpdateNodeButton" Content="Update node" Style="{StaticResource Mermaid.Action}" Click="UpdateNode" Visibility="Collapsed" ToolTip="Update all pending properties for this node" AutomationProperties.AutomationId="MermaidUpdateNode"/>
      <Button x:Name="ResetPropertiesButton" Content="Reset changes" ToolTip="Reset unapplied property changes" Style="{StaticResource Mermaid.Action}" Click="ResetProperties" AutomationProperties.AutomationId="MermaidResetProperties"/></WrapPanel>
     </StackPanel>
     <ScrollViewer x:Name="InspectorScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="12,0,12,12">

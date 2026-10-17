@@ -106,6 +106,7 @@ public sealed class MermaidPartialEditingTests
         Assert.False(result.Success); Assert.Equal(Source, draft.Source); Assert.False(draft.CanUndo); Assert.Equal(["node:D"], draft.Selection);
         Assert.Throws<ArgumentException>(() => MermaidPatches.Apply(Source, [new(new(0, 10), "stale text", "x")]));
         Assert.Throws<ArgumentException>(() => MermaidPatches.Apply(Source, [new(new(0, 10), Source[..10], "x"), new(new(2, 10), Source[2..12], "y")]));
+        Assert.Throws<ArgumentException>(() => MermaidPatches.Apply(Source, [new(new(2, 0), "", "x"), new(new(2, 0), "", "y")]));
     }
 
     public static IEnumerable<object[]> Seeds => Enumerable.Range(0, 48).Select(seed => new object[] { seed });

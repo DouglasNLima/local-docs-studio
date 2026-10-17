@@ -79,12 +79,15 @@ public static class MermaidPatches
     {
         var patches = changes.OrderByDescending(patch => patch.Span.Start).ThenByDescending(patch => patch.Span.Length).ToArray();
         var boundary = source.Length;
+        int? previousStart = null;
         foreach (var patch in patches)
         {
             if (patch.Span.Start < 0 || patch.Span.Length < 0 || patch.Span.End > boundary
+                || previousStart == patch.Span.Start
                 || patch.Span.Read(source) != patch.Expected)
                 throw new ArgumentException("The diagram changed or its source edits overlap. Reopen the current source.");
             boundary = patch.Span.Start;
+            previousStart = patch.Span.Start;
         }
         var result = new System.Text.StringBuilder(source);
         foreach (var patch in patches) result.Remove(patch.Span.Start, patch.Span.Length).Insert(patch.Span.Start, patch.Replacement);

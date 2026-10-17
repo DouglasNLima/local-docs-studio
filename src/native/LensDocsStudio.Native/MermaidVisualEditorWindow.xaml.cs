@@ -370,9 +370,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (!SourcePending)
         {
             sourceValidationFailed = false;
-            Status.Text = canvasError ?? (!draft.Model.CanEdit || !canonicalMapped
-                ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
-                : "The source matches the validated visual draft.");
+            Status.Text = canvasError ?? (!canonicalMapped ? draft.Model.Diagnostic ?? "The canonical identities remain protected." : CompatibilityStatus);
             UpdateActions(); return;
         }
         CancelPointerInteraction(); SaveSessionLayout(); var previousModel = draft.Model;

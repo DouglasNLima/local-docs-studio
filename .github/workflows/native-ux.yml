@@ -11,6 +11,29 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  partial-source-baseline:
+    runs-on: windows-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Reproduce independent-edit protection at the exact PR 30 baseline
+        shell: pwsh
+        run: |
+          git worktree add --detach artifacts/native/partial-base 833e9db1f8643f7023143dd94349a2709f9ae9ce
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item -LiteralPath tests/fixtures/native-mermaid-visual/MermaidPartialBaselineTests.cs -Destination artifacts/native/partial-base/src/native/LensDocsStudio.Core.Tests/MermaidPartialBaselineTests.cs
+          dotnet test artifacts/native/partial-base/src/native/LensDocsStudio.Core.Tests -c Release -p:RestoreLockedMode=true --filter FullyQualifiedName~MermaidPartialBaselineTests --logger "trx;LogFileName=baseline-partial.trx" --results-directory artifacts/native/partial-baseline
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-partial-baseline
+          path: artifacts/native/partial-baseline/
+          retention-days: 14
   mermaid-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 15

@@ -15,7 +15,9 @@ internal static class MermaidSemanticValidation
         if (!rendered.Success || graph is null || graph.Nodes.Count != model.Nodes.Count || graph.Edges.Count != model.Edges.Count
             || rendered.FlowchartGroups.Count != model.Subgraphs.Count) return false;
         var nodes = graph.Nodes;
-        return model.Nodes.All(node => nodes.TryGetValue(node.Id, out var shown) && shown.Label == node.Label && shown.Shape.ToString() == MermaidSourceParser.RendererShape(node.Shape))
+        var completeParserGraph = Rendering.MermaidEntityLayoutProvider.DecodeSemantics(MermaidRenderer.Parse(model.Source));
+        return JsonNode.DeepEquals(JsonSerializer.SerializeToNode(completeParserGraph, Options), JsonSerializer.SerializeToNode(graph, Options))
+            && model.Nodes.All(node => nodes.TryGetValue(node.Id, out var shown) && shown.Label == node.Label && shown.Shape.ToString() == MermaidSourceParser.RendererShape(node.Shape))
             && model.Edges.Select((edge, index) => graph.Edges[index].Source == edge.Source.Id && graph.Edges[index].Target == edge.Target.Id
                 && (graph.Edges[index].Label ?? "") == edge.Label
                 && graph.Edges[index].Style == (edge.Type == FlowConnectionType.Dotted ? Mermaider.Models.EdgeStyle.Dotted : edge.Type == FlowConnectionType.Thick ? Mermaider.Models.EdgeStyle.Thick : Mermaider.Models.EdgeStyle.Solid)

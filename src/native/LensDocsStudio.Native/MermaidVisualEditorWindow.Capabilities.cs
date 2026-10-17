@@ -48,8 +48,17 @@ public partial class MermaidVisualEditorWindow
         CapabilitySummary.Text = draft.Model.Compatibility switch
         { MermaidCompatibility.PartiallyEditable => "Partially editable", MermaidCompatibility.Editable => "Editable", MermaidCompatibility.Invalid => "Invalid source", _ => "Protected" };
         CapabilitySummary.ToolTip = string.Join("\n", diagnostics.Distinct());
+        CapabilityDetails.Text = nodeId is not null ? string.Join(" · ", new[]
+            { Permission("Label", MermaidOperationKind.NodeLabel, nodeId), Permission("Shape", MermaidOperationKind.NodeShape, nodeId),
+              Permission("ID", MermaidOperationKind.NodeId, nodeId), Permission("Delete", MermaidOperationKind.DeleteNode, nodeId), Permission("Colour", MermaidOperationKind.NodeStyle, nodeId) })
+            : selected?.StartsWith("edge-", StringComparison.Ordinal) == true ? string.Join(" · ", new[]
+            { Permission("Label", MermaidOperationKind.ConnectionLabel, selected), Permission("Type", MermaidOperationKind.ConnectionType, selected), Permission("Endpoints", MermaidOperationKind.Reconnect, selected), Permission("Delete", MermaidOperationKind.DeleteConnection, selected) })
+            : groupId is not null ? Permission("Label", MermaidOperationKind.SubgraphLabel, groupId) + " · " + Permission("Structure", MermaidOperationKind.DeleteSubgraph, groupId) : "";
+        CapabilityDetails.Visibility = CapabilityDetails.Text.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
         AutomationProperties.SetHelpText(CapabilitySummary, string.Join("\n", visible.Where(text => text is not null)));
         Explain(FillColour, FillColour.ToolTip + " Colours show effective appearance; edits append a local override and preserve class definitions and custom properties.");
+
+        string Permission(string title, MermaidOperationKind kind, string? target) => title + ": " + (analysis.Query(kind, target).Permitted ? "editable" : "protected");
 
         void Field(TextBox field, MermaidOperationKind kind, string? target, string title)
         {

@@ -54,7 +54,12 @@ internal static partial class NativeUiChecks
             _ = DwmFlush(); Capture("existing-light");
             if (polish)
             {
-                var source = Draft(); CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
+                var source = Draft();
+                Check(!Find(visual!, "MermaidApply").IsEnabled, "An unchanged diagram cannot Apply or enter document Undo history");
+                Select("node_B"); Find(visual!, "MermaidNodeLabel").AsTextBox().Text = "Review focus fixture"; Click("MermaidUpdateNode");
+                AwaitSource(text => text.Contains("Review focus fixture", StringComparison.Ordinal));
+                CaptureApplyHover("apply-hover-light"); CapturePrimaryFocus("apply-focus-light");
+                Click("MermaidUndo"); AwaitSource(text => text == source);
                 var fromBounds = Find(visual!, "MermaidCanvas_node_A").BoundingRectangle;
                 var toBounds = Find(visual!, "MermaidCanvas_node_B").BoundingRectangle;
                 Mouse.Click(new System.Drawing.Point(toBounds.Left - 13, fromBounds.Top + fromBounds.Height / 2 + 4));
