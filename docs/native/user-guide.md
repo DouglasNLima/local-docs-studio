@@ -2,6 +2,26 @@
 
 ## Mermaid visual authoring
 
+**State diagrams:** Visual Edit opens the dedicated State editor for
+`stateDiagram-v2` and `stateDiagram`. Choose **Insert → State diagram visually…**
+for a starter. Select states, scoped initial/final markers, composites and exact
+transition occurrences on the canonical drawing or in the element list. Update
+labels in the inspector; add ordinary states and transitions through the palette.
+Endpoint selectors and canvas picking support safe connections/reconnection,
+including self-transitions and cycles. Disabled commands explain dependencies.
+
+Simple states may be dragged temporarily; **Auto layout** restores Mermaider's
+canonical drawing. Positions are never saved. Composite membership, special states,
+notes, styles and unknown dependencies protect structural operations; independently
+safe labels may remain editable. Use **Edit source** for protected changes.
+
+State private Undo/Redo uses Ctrl+Z/Ctrl+Y outside text fields. Ctrl+Shift+S adds a
+state, Ctrl+Shift+T a transition, F fits, Ctrl+0 shows actual size, F2 focuses its
+label and Ctrl+Enter applies. Expand the source panel to validate the draft or view
+the immutable original. Apply is one document Undo step; Cancel retains the owner
+exactly. Save persists ordinary portable Mermaid. The [State report](mermaid-state-visual-editor.md)
+records the verified pinned grammar, operation limits and current certification.
+
 **Sequence diagrams:** Visual Edit automatically opens the Sequence editor for
 `sequenceDiagram`. Choose **Insert → Sequence diagram visually…** to start one.
 Select a participant header/lifeline, message path/label or note on the canonical
@@ -83,7 +103,7 @@ for operation boundaries and verification status.
 The visual editor supports up to 300 nodes, 500 total elements, eight nested
 subgraphs, 100,000 diagram characters and documents up to 4 million characters.
 Source-only mode also protects graphs with more than 100 connections and more
-than four connections per node. Families other than Flowchart and Sequence keep their existing
+than four connections per node. Families other than Flowchart, Sequence and State keep their existing
 [rendering and export commands](#mermaid-diagrams-and-maths).
 
 ## Desktop workspace and synchronisation

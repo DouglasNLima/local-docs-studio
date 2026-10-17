@@ -1,5 +1,12 @@
 # Native diagram compatibility
 
+The [State visual editor report](mermaid-state-visual-editor.md) records the pinned
+0.15.1 syntax matrix, exact source identity/patch architecture, scoped markers,
+safe operations and protected constructs. State is the third dedicated native
+visual authoring family. Its canonical geometry uses the pinned renderer's graph
+pipeline, with State-specific semantic verification before shared native hit
+geometry. Current certification status is reported separately from implementation.
+
 The [native Sequence visual editor report](mermaid-sequence-visual-editor.md) records
 the exact Mermaider 0.15.1 grammar and bounded source-preserving authoring subset.
 Sequence and Flowchart preview actions route to separate native semantic editors.

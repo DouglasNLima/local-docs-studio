@@ -11,6 +11,47 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  state-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build native State editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify pinned State grammar, canonical pixels, source ownership and bounded performance
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --state-fidelity artifacts/native/state-fidelity $appearance
+      - name: Exercise real State authoring, pointers, document Undo, Save and restart
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --state-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/state-ui $appearance
+          exit $LASTEXITCODE
+      - name: Measure real State editor opening, selection, memory and pointer updates at bounded sizes
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --state-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/state-performance-ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-state-${{ matrix.appearance }}
+          path: |
+            artifacts/native/state-fidelity/
+            artifacts/native/state-ui/
+            artifacts/native/state-performance-ui/
+          retention-days: 14
   sequence-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 20

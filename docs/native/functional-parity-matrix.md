@@ -1,5 +1,14 @@
 # Functional parity matrix
 
+The [State visual editor](mermaid-state-visual-editor.md) adds a third dedicated
+Mermaid authoring model: source-backed states, scoped pseudo-markers, hierarchical
+inspection, exact ordered transition occurrences and bounded private history.
+Ordinary state/transition authoring and proven label edits are implemented;
+advanced membership/special-state/note authoring remains protected. Native State
+acceptance, actual High Contrast, fidelity and bounded native performance pass
+at `357e11f`. Final-head package/lifecycle status follows mandatory Draft PR #33
+checks and its immutable metadata/verification artifacts.
+
 The native [Sequence editor](mermaid-sequence-visual-editor.md) adds participant,
 message, basic note and simple activation authoring with exact source patches and
 private history. Structural rewrites, participant boxes/create/destroy and unknown

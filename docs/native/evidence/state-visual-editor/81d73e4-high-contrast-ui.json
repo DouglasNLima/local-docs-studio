@@ -1,0 +1,115 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": true,
+  "Checks": [
+    "Actual Windows High Contrast is active during State authoring",
+    "State canvas exposes native SelectionItem and exact state identity",
+    "Pending State properties protect Apply",
+    "Source and destination canvas reconnection, reverse and scoped initial/final palette connections validate and undo safely",
+    "State editing and private Undo/Redo leave owner/disk source exact before Apply",
+    "Session drag 1 preserves source and process stability",
+    "Session drag 2 preserves source and process stability",
+    "Session drag 3 preserves source and process stability",
+    "Session drag 4 preserves source and process stability",
+    "Session drag 5 preserves source and process stability",
+    "Session drag 6 preserves source and process stability",
+    "Session drag 7 preserves source and process stability",
+    "Session drag 8 preserves source and process stability",
+    "Session drag 9 preserves source and process stability",
+    "Session drag 10 preserves source and process stability",
+    "Session drag 11 preserves source and process stability",
+    "Session drag 12 preserves source and process stability",
+    "Session drag 13 preserves source and process stability",
+    "Session drag 14 preserves source and process stability",
+    "Session drag 15 preserves source and process stability",
+    "Session drag 16 preserves source and process stability",
+    "Session drag 17 preserves source and process stability",
+    "Session drag 18 preserves source and process stability",
+    "Session drag 19 preserves source and process stability",
+    "Session drag 20 preserves source and process stability",
+    "State Apply remains visible at 880x600",
+    "State Apply remains visible at 1024x768",
+    "State Apply remains visible at 1280x800",
+    "State Apply remains visible at 1440x900",
+    "State Apply remains visible at 1920x1080",
+    "Real native Open, Select, Edit state/transition, Add, Connect, self-transition, Validate, Apply, document Undo/Redo and Save pass",
+    "Save/restart/reopen preserves complete State source and canonical rendering",
+    "Insert State opens a valid supported starter",
+    "Visual State insertion applies a portable Markdown fence",
+    "Source-preserving State Cancel retains exact owner and disk source",
+    "Composite/notes/styles protect State ID and structural operations with accessible explanations",
+    "Independent supported label edit retains protected note bytes",
+    "Repeated State transitions retain exact independent identities in the real native editor",
+    "Unknown State dependencies protect palette operations",
+    "Unknown State edits are disabled with accessible dependency diagnostics",
+    "Rejected unknown State edits leave source, history and owning .mermaid document unchanged",
+    "State Apply relocates the owning Markdown container while preserving surrounding edits",
+    "State owner conflicts retain private and external source exactly",
+    "Closed-owner rejection preserves private State source and disk bytes",
+    "State Apply cannot redirect to the currently active other tab",
+    "State Apply updates the original owner while another tab is active"
+  ],
+  "Observations": [
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 427.0285
+    },
+    {
+      "Operation": "Twenty native State drags with 240 pointer moves, cancellation and Auto layout",
+      "Metrics": [
+        "State drag frames: 22; maximum update: 1.078 ms; update allocated bytes: 60736; UI-thread allocated bytes: 3415488; duration: 1528.4 ms.",
+        "State drag frames: 23; maximum update: 0.187 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3202880; duration: 1560.2 ms.",
+        "State drag frames: 23; maximum update: 0.171 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3198680; duration: 1610.8 ms.",
+        "State drag frames: 23; maximum update: 0.144 ms; update allocated bytes: 62656; UI-thread allocated bytes: 3159168; duration: 1518.9 ms.",
+        "State drag frames: 23; maximum update: 0.123 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3150832; duration: 1493.0 ms.",
+        "State drag frames: 22; maximum update: 0.103 ms; update allocated bytes: 60456; UI-thread allocated bytes: 3353120; duration: 1466.3 ms.",
+        "State drag frames: 23; maximum update: 0.093 ms; update allocated bytes: 62592; UI-thread allocated bytes: 3159064; duration: 1513.9 ms.",
+        "State drag frames: 23; maximum update: 0.091 ms; update allocated bytes: 62600; UI-thread allocated bytes: 3150936; duration: 1439.0 ms.",
+        "State drag frames: 23; maximum update: 0.087 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3150864; duration: 1497.2 ms.",
+        "State drag frames: 23; maximum update: 0.091 ms; update allocated bytes: 62592; UI-thread allocated bytes: 3159128; duration: 1546.2 ms.",
+        "State drag frames: 22; maximum update: 0.105 ms; update allocated bytes: 60520; UI-thread allocated bytes: 3353160; duration: 1474.3 ms.",
+        "State drag frames: 23; maximum update: 0.087 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3151496; duration: 1534.2 ms.",
+        "State drag frames: 23; maximum update: 0.091 ms; update allocated bytes: 62656; UI-thread allocated bytes: 3159064; duration: 1544.3 ms.",
+        "State drag frames: 23; maximum update: 0.087 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3150856; duration: 1539.7 ms.",
+        "State drag frames: 23; maximum update: 0.100 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3150904; duration: 1512.7 ms.",
+        "State drag frames: 22; maximum update: 0.089 ms; update allocated bytes: 60512; UI-thread allocated bytes: 3361720; duration: 1578.3 ms.",
+        "State drag frames: 23; maximum update: 0.081 ms; update allocated bytes: 62600; UI-thread allocated bytes: 3155392; duration: 1468.2 ms.",
+        "State drag frames: 23; maximum update: 0.165 ms; update allocated bytes: 62536; UI-thread allocated bytes: 3150904; duration: 1484.3 ms.",
+        "State drag frames: 23; maximum update: 0.173 ms; update allocated bytes: 62592; UI-thread allocated bytes: 3159176; duration: 1528.5 ms.",
+        "State drag frames: 23; maximum update: 0.088 ms; update allocated bytes: 62600; UI-thread allocated bytes: 3150968; duration: 1496.1 ms."
+      ]
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 434.8884
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 463.1604
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 446.5566
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 352.202
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 422.314
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 346.9913
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 373.6355
+    },
+    {
+      "Operation": "Open State editor including UIA transport",
+      "Milliseconds": 363.147
+    }
+  ]
+}
