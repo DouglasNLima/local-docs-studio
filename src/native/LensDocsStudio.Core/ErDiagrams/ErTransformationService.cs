@@ -185,7 +185,7 @@ public sealed class ErTransformationService
     { if ((!empty && string.IsNullOrWhiteSpace(value)) || value.Length > 2000 || value.Any(character => char.IsControl(character) || character is '"' or '{' or '}' or '[' or ']') || value.Contains("<br", StringComparison.OrdinalIgnoreCase)) throw new ArgumentException("Use a single-line " + name + " without quotes, brackets, braces or HTML breaks (maximum 2,000 characters)."); }
     private static string Declaration(string id, string label) => id + (id == label ? "" : "[\"" + label + "\"]") + " {";
     private static string KeyText(IReadOnlyList<ErKeyType> keys)
-    { if (keys.Any(key => !Enum.IsDefined(key)) || keys.Count != keys.Distinct().Count()) throw new ArgumentException("Choose each PK, FK or UK marker at most once."); return keys.Count == 0 ? "" : " " + string.Join(' ', keys); }
+    { if (keys.Any(key => !Enum.IsDefined(key)) || keys.Count != keys.Distinct().Count()) throw new ArgumentException("Choose each PK, FK or UK marker at most once."); return keys.Count == 0 ? "" : " " + string.Join(" , ", keys); }
     private static string AttributeText(string type, string name, IReadOnlyList<ErKeyType> keys, string? comment)
     {
         var candidate = type + " " + name + KeyText(keys) + (comment is null ? "" : " \"" + comment + "\"");

@@ -10,8 +10,8 @@ has now passed both the complete native build/Core/export/package/installer job
 and the separate installed/upgraded/reinstalled State authoring job. The
 consolidated baseline is accepted from these actual post-merge results.
 
-The local Release solution builds with zero warnings/errors. All 1,521 Core cases
-pass, including 97 ER cases. Actual Windows authoring, High Contrast, canonical
+The local Release solution builds with zero warnings/errors. All 1,526 Core cases
+pass, including 102 ER cases. Actual Windows authoring, High Contrast, canonical
 fidelity and all existing editor UX regressions pass at `03869b8`; later identity
 hardening requires its own exact-source checks. The
 [Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34)
@@ -58,8 +58,9 @@ semantics. SVG success alone never grants permission.
 | `ENTITY["Label"]` alias | Recognised on block opening; latest explicit alias wins | Alias value/span retained | Existing alias token edited in place; repeated authority protected |
 | Unquoted block alias | Recognised | Exact token retained | Plain bare aliases preserve their syntax; quote-containing fallback forms are protected |
 | Attribute type/name | Pinned parser accepts broad non-space tokens | Every row counted; safe single-token grammar independently checked | Safe type/name spans edited; unsupported tokens protected |
-| PK, FK, UK | Case-insensitive, space-separated markers retained in order | Complete ordered marker list checked | Toggle supported unique markers; unchanged ordering retained |
+| PK, FK, UK | Case-insensitive marker tokens retained in order | Complete ordered marker list checked | Single markers supported; multiple markers use isolated commas: `PK , FK , UK`, retained by pinned Mermaider and portable Mermaid |
 | `PK, FK` | Comma token silently ignored, FK retained | Entire original statement protected | Never repair or rewrite the recognised prefix |
+| `PK FK UK` | Pinned parser retains all markers; standard Mermaid rejects this syntax | Inspected with original bytes | Protected rather than emitted or silently normalised |
 | Quoted attribute comment | First double-quoted comment parsed; HTML breaks normalised | Complete comment and exact original source retained | Ordinary single-line quoted comment supported; quote/braces/newline injection rejected |
 | Relationship endpoints | Both semantic IDs recognised | Exact endpoint token spans | Reconnect existing entities; unknown global references protect reconnection |
 | Cardinalities | One, zero/one, many, zero/many; token characters normalised | Both endpoint values checked independently | All 16 endpoint pairs, solid/dotted: 32 cases |
@@ -86,6 +87,15 @@ Canonical cardinality notation is endpoint oriented:
 The parser also recognises character permutations of these pairs; an unchanged
 cardinality keeps its original bytes. Reverse explicitly swaps endpoint IDs and
 cardinalities together, retaining each entity's original cardinality.
+
+Portability is a separate check from pinned authorisation. The shared
+`portable-keys.mmd` fixture is checked against pinned Mermaider semantics and the
+repository's browser Mermaid 11.15.0 parser. Isolated comma tokens retain all keys
+in both parsers; attached commas can lose keys in Mermaider and space-only lists
+fail browser Mermaid. Dotted attribute type/name tokens are also protected because
+the browser grammar rejects them. New operations emit the verified intersection.
+The newer browser parser never grants permission to rewrite source; pinned complete
+semantics, exact patches and native correspondence remain mandatory.
 
 ## Operation capabilities
 
@@ -329,6 +339,14 @@ scenario, not a peak/live-memory measurement. Cancellation checks retain exact
 source/history. Hosted observations do not promise hardware-independent timing.
 
 ## Final protection and qualification boundaries
+
+A late portability check found that the initial space-only key writer produced
+source accepted by Mermaider but rejected by standard Mermaid. The correction uses
+`PK , FK , UK`, verifies all pinned ordered keys after edits, and adds an independent
+browser semantic regression over the shared fixture. Space-only multiple keys,
+attached-comma tokens and dotted attribute type/name forms remain byte-exact and
+protected. Earlier screenshots/packages showing space-only combinations are earlier
+candidate evidence, not the delivered portable-source certification.
 
 The later documentation candidate `2d06a5d` exposed a benchmark assumption in
 [run 39069037180](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39069037180):

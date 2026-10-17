@@ -7,7 +7,8 @@ Choose **Insert → ER diagram visually…** for a starter. Select an entity hea
 attribute row or relationship on the canonical drawing, or use the element list.
 The attribute table shows type, name, PK/FK/UK markers and comment; edit the selected
 row in the inspector, then **Update properties**. Add, duplicate, remove and reorder
-supported rows. Key markers document meaning; they do not enforce database constraints.
+supported rows. Multiple markers use portable `PK , FK , UK` notation, retaining all
+keys in the pinned native renderer. Key markers document meaning; they do not enforce database constraints.
 
 The relationship inspector exposes both entity endpoints, cardinality at each
 entity, identifying/non-identifying semantics and label. Reverse retains each

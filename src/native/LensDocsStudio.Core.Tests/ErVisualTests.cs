@@ -31,10 +31,10 @@ public class ErVisualTests
     [Theory, InlineData("TD"), InlineData("TB"), InlineData("LR"), InlineData("BT"), InlineData("RL")]
     public void Direction_matches_the_pinned_semantics(string direction)
     { var source = "erDiagram\n direction " + direction + "\n A {\n }\n"; var model = parser.Parse(source); ErSemanticValidation.ValidateRendering(model, new DiagramService().Render(source)); Assert.Equal(direction, model.Direction.ToString()); }
-    [Theory, InlineData("PK"), InlineData("FK"), InlineData("UK"), InlineData("PK FK"), InlineData("UK PK FK"), InlineData("pk fk uk"), InlineData("")]
-    public void Space_separated_markers_and_quoted_comments_are_completely_recognised(string keys)
+    [Theory, InlineData("PK"), InlineData("FK"), InlineData("UK"), InlineData("PK , FK"), InlineData("UK , PK , FK"), InlineData("pk , fk , uk"), InlineData("")]
+    public void Portable_isolated_comma_markers_and_quoted_comments_match_the_pinned_parser(string keys)
     { var source = "erDiagram\n A[\"A label\"] {\n string id " + keys + " \"Comment\"\n }\n"; var model = parser.Parse(source); Assert.False(model.HasUnknownDependencies); ErSemanticValidation.ValidateRendering(model, new DiagramService().Render(source)); }
-    [Theory, InlineData("string email PK, FK"), InlineData("string email UK unknown"), InlineData("string email \"ok\" extra"), InlineData("unknown"), InlineData("string email PK\tFK")]
+    [Theory, InlineData("string email PK, FK"), InlineData("string email UK unknown"), InlineData("string email \"ok\" extra"), InlineData("unknown"), InlineData("string email PK\tFK"), InlineData("string email PK FK"), InlineData("string email UK PK FK"), InlineData("System.String email"), InlineData("string email.address")]
     public async Task Unknown_entity_content_is_preserved_and_cannot_create_history(string content)
     {
         var source = "erDiagram\n A {\n " + content + "\n }\n B {\n string id PK\n }\n"; var draft = new ErVisualDraft(source);
@@ -95,7 +95,7 @@ public class ErVisualTests
     }
     [Fact] public async Task Mixed_line_endings_comments_and_combining_characters_remain_byte_exact()
     {
-        var source = "erDiagram\n    %% Leading comment\r\n    A[\"Café\"] {\r\n        string id UK PK \"café\"\n        %% row comment\r\n        string id\n    }\r\n"; var draft = new ErVisualDraft(source);
+        var source = "erDiagram\n    %% Leading comment\r\n    A[\"Café\"] {\r\n        string id UK , PK \"café\"\n        %% row comment\r\n        string id\n    }\r\n"; var draft = new ErVisualDraft(source);
         var row = draft.Model.Entity("A").Attributes[0]; var result = await draft.ExecuteAsync(new UpdateErAttribute(row.Identity, "int", row.Name, row.Keys, row.Comment)); Assert.True(result.Success, result.Error);
         Assert.Equal(source.Replace("string id UK", "int id UK"), draft.Source); draft.Undo(); Assert.Equal(source, draft.Source);
     }
@@ -178,9 +178,9 @@ public class ErVisualTests
         var source = "erDiagram\r\n A {\n string id UK   \"" + text + "\"\r\n }\n B {\n }\n A ||--o{ B : '" + text + "'\n";
         var draft = new ErVisualDraft(source); var attribute = draft.Model.Entity("A").Attributes.Single();
         var result = await draft.ExecuteAsync(new UpdateErAttribute(attribute.Identity, attribute.Type, attribute.Name, new[] { ErKeyType.UK, ErKeyType.PK }, attribute.Comment)); Assert.True(result.Success, result.Error);
-        Assert.Equal(source.Replace("id UK   ", "id UK PK   "), draft.Source);
+        Assert.Equal(source.Replace("id UK   ", "id UK , PK   "), draft.Source);
         var relationship = draft.Model.Relationships.Single(); result = await draft.ExecuteAsync(new UpdateErRelationship(relationship.Identity, "A", "B", ErCardinality.ZeroOne, relationship.Cardinality2, relationship.Identifying, relationship.Label)); Assert.True(result.Success, result.Error);
-        Assert.Equal(source.Replace("id UK   ", "id UK PK   ").Replace("A ||--o{ B", "A |o--o{ B"), draft.Source);
+        Assert.Equal(source.Replace("id UK   ", "id UK , PK   ").Replace("A ||--o{ B", "A |o--o{ B"), draft.Source);
     }
     [Fact] public async Task Unsupported_implicit_identity_cannot_be_materialised_by_an_attribute_edit()
     {
@@ -217,5 +217,15 @@ public class ErVisualTests
         var source = "erDiagram\n " + alias + " {\n string id\n }\n"; var draft = new ErVisualDraft(source);
         Assert.True(draft.Model.HasUnknownDependencies);
         Assert.False((await draft.ExecuteAsync(new UpdateErEntity("A", "A", "Replacement"))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact] public async Task Combined_keys_use_portable_separators_and_retain_every_pinned_key_in_order()
+    {
+        var draft = new ErVisualDraft("erDiagram\n A {\n string id\n }\n"); var row = draft.Model.Entity("A").Attributes.Single();
+        var result = await draft.ExecuteAsync(new UpdateErAttribute(row.Identity, row.Type, row.Name, new[] { ErKeyType.UK, ErKeyType.PK, ErKeyType.FK }, "All markers"));
+        Assert.True(result.Success, result.Error); Assert.Contains("string id UK , PK , FK \"All markers\"", draft.Source);
+        var render = new DiagramService().Render(draft.Source); ErSemanticValidation.ValidateRendering(draft.Model, render);
+        Assert.Equal(new[] { ErKeyType.UK, ErKeyType.PK, ErKeyType.FK }, render.ErSemantics!.Entities.Single().Attributes.Single().Keys);
+        var portable = draft.Source; result = await draft.ExecuteAsync(new UpdateErAttribute(row.Identity, "int", row.Name, draft.Model.Attribute(row.Identity).Keys, "All markers"));
+        Assert.True(result.Success, result.Error); Assert.Equal(portable.Replace("string id", "int id"), draft.Source);
     }
 }

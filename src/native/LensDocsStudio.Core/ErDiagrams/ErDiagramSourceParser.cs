@@ -10,7 +10,8 @@ public sealed class ErDiagramSourceParser
     private static Regex Pattern(string pattern) => new(pattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
     private static readonly Regex Entity = Pattern("^(?<id>[^\\s\\[{}]+)(?:\\[(?:\"(?<label>[^\"]+)\"|(?<bare>[^\\]]+))\\])?\\s*\\{$");
     private static readonly Regex Attribute = Pattern("^(?<type>\\S+)\\s+(?<name>\\S+)(?:\\s+(?<rest>.+))?$");
-    private static readonly Regex SafeAttribute = Pattern("^(?<type>[A-Za-z_][A-Za-z0-9_\\[\\]().-]*)[ \\t]+(?<name>[\\p{L}_][\\p{L}\\p{M}\\p{N}_.-]*)(?<keys>(?: +(?:[Pp][Kk]|[Ff][Kk]|[Uu][Kk]))*)(?: +\"(?<comment>[^\"\\r\\n]*)\")?$");
+    // Isolated comma separators retain every key in Mermaider and portable Mermaid.
+    private static readonly Regex SafeAttribute = Pattern("^(?<type>[A-Za-z_][A-Za-z0-9_\\[\\]()-]*)[ \\t]+(?<name>[\\p{L}_][\\p{L}\\p{M}\\p{N}_-]*)(?<keys>(?: +(?:[Pp][Kk]|[Ff][Kk]|[Uu][Kk])(?: +, +(?:[Pp][Kk]|[Ff][Kk]|[Uu][Kk]))*)?)(?: +\"(?<comment>[^\"\\r\\n]*)\")?$");
     private static readonly Regex Relationship = Pattern("^(?<from>\\S+)\\s+(?<left>[|o}{]+)(?<style>--|\\.\\.)(?<right>[|o}{]+)\\s+(?<to>[^\\s:]+)(?:\\s*:\\s*(?<label>.+))?$");
     private static readonly Regex Comment = Pattern("\"([^\"]*)\"");
     private static readonly Regex Break = new("<br\\s*/?>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100));
