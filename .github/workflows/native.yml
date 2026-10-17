@@ -92,7 +92,7 @@ jobs:
           pwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}" -OutputDirectory artifacts/native/package-controls
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate installation upgrade and uninstall lifecycle
-        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe"
+        run: pwsh -NoProfile -File scripts/native/Test-NativeInstaller.ps1 -Installer "artifacts/native/packages/0.1.0-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.0-preview.${{ github.run_number }}-win-x64-Setup.exe" -UpgradeInstaller "artifacts/native/packages/0.1.1-preview.${{ github.run_number }}/LensDocsStudio.Native-0.1.1-preview.${{ github.run_number }}-win-x64-Setup.exe" -StateVisualEditor
       - name: Upload validation evidence
         if: always()
         uses: actions/upload-artifact@v4

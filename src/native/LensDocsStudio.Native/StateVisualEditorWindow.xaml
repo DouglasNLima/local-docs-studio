@@ -1,0 +1,99 @@
+<Window x:Class="LensDocsStudio.Native.StateVisualEditorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:edit="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Title="Mermaid Visual Editor / State" Width="1280" Height="800" MinWidth="880" MinHeight="600"
+ WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
+ FontFamily="Segoe UI" FontSize="12" Icon="Resources/Brand/application.ico" UseLayoutRounding="True"
+ AutomationProperties.AutomationId="StateVisualEditor" PreviewKeyDown="Shortcut">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <DockPanel>
+  <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,10">
+   <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid" Foreground="{DynamicResource AccentBrush}"/><TextBlock Text="Mermaid Visual Editor" FontSize="14" FontWeight="SemiBold" Margin="8,0"/><TextBlock Text="/ State" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/></StackPanel>
+  </Border>
+  <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="State commands">
+   <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="StateUndo"><ui:CommandIcon Kind="Undo"/></Button>
+   <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="StateRedo"><ui:CommandIcon Kind="Redo"/></Button>
+   <Separator/>
+   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDelete"/>
+   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateDuplicate"/>
+   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateReverse"/>
+   <Separator/>
+   <Button Content="−" Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom out" AutomationProperties.AutomationId="StateZoomOut"/>
+   <Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="StateZoom"/>
+   <Button Content="+" Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom in" AutomationProperties.AutomationId="StateZoomIn"/>
+   <Button Content="Fit" Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateFit"/>
+   <Button Content="100%" Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateActualSize"/>
+   <Button Content="Auto layout" Click="AutoLayout" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Restore canonical positions; temporary positions are never saved" AutomationProperties.AutomationId="StateAutoLayout"/>
+   <Button Content="Rendered preview" Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StatePreview"/>
+  </ToolBar>
+  <Border DockPanel.Dock="Bottom" Padding="12,8" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock x:Name="Status" Text="Preparing State diagram…" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.AutomationId="StateStatus" AutomationProperties.LiveSetting="Polite"/>
+    <StackPanel Grid.Column="1" Orientation="Horizontal">
+     <Button x:Name="EditSourceButton" Content="Edit source" Click="EditSource" Style="{StaticResource Form.Action}" Margin="0,0,8,0" AutomationProperties.AutomationId="StateEditSource"/>
+     <Button Content="Cancel" Click="Cancel" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="StateCancel"/>
+     <Button x:Name="ApplyButton" Content="Apply" Click="Apply" Style="{StaticResource Mermaid.PrimaryAction}" ToolTip="Apply as one document Undo action (Ctrl+Enter)" AutomationProperties.AutomationId="StateApply"/>
+    </StackPanel>
+   </Grid>
+  </Border>
+  <Grid Margin="8"><Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="150"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="220"/><ColumnDefinition Width="6"/><ColumnDefinition Width="260" MinWidth="220"/></Grid.ColumnDefinitions>
+   <DockPanel Background="{DynamicResource PanelBrush}">
+    <StackPanel DockPanel.Dock="Top" Margin="8">
+     <TextBlock Text="STATE PALETTE" Style="{StaticResource Desktop.PanelHeading}"/>
+     <Button x:Name="AddStateButton" Content="Add state" Click="AddState" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddState"/>
+     <Button x:Name="AddTransitionButton" Content="Add transition" Click="AddTransition" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddTransition"/>
+     <Button x:Name="InitialButton" Content="Connect initial state" Click="AddInitial" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddInitial"/>
+     <Button x:Name="FinalButton" Content="Connect final state" Click="AddFinal" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddFinal"/>
+     <TextBlock Text="ELEMENTS IN SOURCE ORDER" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
+    </StackPanel>
+    <ListBox x:Name="Elements" SelectionChanged="SelectionChanged" DisplayMemberPath="Description" AutomationProperties.Name="States, scoped markers, composite groups and exact transition occurrences" AutomationProperties.AutomationId="StateElements"/>
+   </DockPanel>
+   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <ScrollViewer x:Name="Viewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" PreviewMouseWheel="Wheel" PreviewMouseDown="PanStart" PreviewMouseMove="PanMove" PreviewMouseUp="PanEnd" Focusable="True" AutomationProperties.Name="State diagram; middle mouse pans, arrow keys scroll" AutomationProperties.AutomationId="StateViewport">
+     <Canvas x:Name="Surface" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" PreviewMouseLeftButtonDown="CanvasPointer">
+      <Canvas.LayoutTransform><ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
+     </Canvas>
+    </ScrollViewer>
+    <Expander x:Name="SourcePanel" Grid.Row="1" Header="Portable Mermaid source and validation" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}" AutomationProperties.AutomationId="StateSourcePanel">
+     <DockPanel Height="170">
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+       <Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="StateValidate"/>
+       <Button Content="Original source" Click="ShowOriginal" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="StateOriginal"/>
+      </StackPanel>
+      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="State draft source" AutomationProperties.AutomationId="StateSource"/>
+     </DockPanel>
+    </Expander>
+   </Grid>
+   <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
+   <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
+    <StackPanel Margin="12">
+     <TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
+     <TextBlock x:Name="Summary" Text="Select a state or transition." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="StateSelectionSummary"/>
+     <TextBlock x:Name="Dependencies" TextWrapping="Wrap" Style="{StaticResource Form.Help}" AutomationProperties.AutomationId="StateDependencies"/>
+     <StackPanel x:Name="NodeFields" Visibility="Collapsed">
+      <Label Content="_ID" Target="{Binding ElementName=NodeId}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="NodeId" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="State ID" AutomationProperties.AutomationId="StateNodeId"/>
+     </StackPanel>
+     <StackPanel x:Name="TransitionFields" Visibility="Collapsed">
+      <Label Content="_Source state" Target="{Binding ElementName=From}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="From" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="Transition source state" AutomationProperties.AutomationId="StateFrom"/>
+      <Label Content="_Destination state" Target="{Binding ElementName=To}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="To" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="Transition destination state" AutomationProperties.AutomationId="StateTo"/>
+      <TextBlock Text="Connect on canvas: choose source, then destination. Self-transitions are supported." TextWrapping="Wrap" Style="{StaticResource Form.Help}"/>
+      <Button x:Name="ReconnectFromButton" Content="Pick source on canvas" Click="ReconnectFrom" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateReconnectFrom"/>
+      <Button x:Name="ReconnectToButton" Content="Pick destination on canvas" Click="ReconnectTo" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateReconnectTo"/>
+     </StackPanel>
+     <StackPanel x:Name="LabelFields" Visibility="Collapsed">
+      <Label Content="_Label" Target="{Binding ElementName=LabelText}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="LabelText" Style="{StaticResource Mermaid.PropertyInput}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="60" MaxHeight="150" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Selected State element label" AutomationProperties.AutomationId="StateLabel"/>
+     </StackPanel>
+     <TextBlock x:Name="Capabilities" TextWrapping="Wrap" Style="{StaticResource Form.Help}" Margin="0,10" AutomationProperties.AutomationId="StateCapabilities"/>
+     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" AutomationProperties.AutomationId="StateUpdate"/>
+     <Button x:Name="ResetButton" Content="Discard pending properties" Click="ResetProperties" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateResetProperties"/>
+     <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateLocateSource"/>
+    </StackPanel>
+   </ScrollViewer>
+  </Grid>
+ </DockPanel>
+</Window>

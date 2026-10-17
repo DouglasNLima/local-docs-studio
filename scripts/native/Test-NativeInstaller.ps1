@@ -2,7 +2,8 @@
 param(
     [Parameter(Mandatory)][string]$Installer,
     [string]$UpgradeInstaller,
-    [string]$HistoricalValidationProject
+    [string]$HistoricalValidationProject,
+    [switch]$StateVisualEditor
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
@@ -134,6 +135,11 @@ function Run-NativeUi([string]$Phase) {
         $validationProject = if ($Phase -eq 'first-launch' -and $HistoricalValidationProject) { $HistoricalValidationProject } else { Join-Path $repo 'src/native/LensDocsStudio.Native.Validation' }
         & dotnet run --project $validationProject -c Release --no-build -- --ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $Phase) --require-bundled-runtime
         if ($LASTEXITCODE -ne 0) { throw "Installed application UI validation failed during $Phase." }
+        if ($StateVisualEditor -and -not ($Phase -eq 'first-launch' -and $HistoricalValidationProject)) {
+            & dotnet run --project (Join-Path $repo 'src/native/LensDocsStudio.Native.Validation') -c Release --no-build -- --state-ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root "state-$Phase") --normal
+            if ($LASTEXITCODE -ne 0) { throw "Installed State authoring failed during $Phase." }
+            $checks.Add("${Phase}: installed State authoring, document Undo/Redo, Save/restart/reopen and source-preserving Cancel")
+        }
     } finally { Pop-Location }
     $checks.Add("${Phase}: installed application saved and restored UTF-8 source")
 }
