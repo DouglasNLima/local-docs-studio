@@ -7,7 +7,7 @@ public static class ErCapabilityAnalysis
 {
     public static ErOperationCapability For(ErDiagramModel model, ErEditOperation operation)
     {
-        try { _ = new ErTransformationService().Plan(model, operation); return new(true, "Validated expected-text patches and complete canonical semantics are required."); }
+        try { _ = new ErTransformationService().Plan(model, operation); return new(true, "Available for this source."); }
         catch (ArgumentException error) { return new(false, error.Message); }
     }
 }
@@ -27,6 +27,7 @@ public sealed class ErTransformationService
         { if (model.Statements.Any(item => item.Protected)) throw new ArgumentException("Unknown source may contain references. Use Edit source for structural entity changes."); }
         void EntitySafe(ErEntityModel entity)
         {
+            if (!ErDiagramSourceParser.ValidId(entity.Id)) throw new ArgumentException("This entity ID is outside the safe authoring grammar. Use Edit source to correct all of its references.");
             if (entity.Declarations.Count > 1 || model.Statements.Any(item => item.Owner == entity.Id && item.Protected) || entity.Declarations.Any(item => item.Protected))
                 throw new ArgumentException("Repeated declarations or unknown entity contents protect this entity's structure. Use Edit source.");
         }
@@ -40,7 +41,7 @@ public sealed class ErTransformationService
         void EnsureExplicit(ErEntityModel entity, string content, int count)
         {
             EntitySafe(entity);
-            if (entity.Implicit) Append("    " + entity.Id + " {" + model.NewLine + content + "    }" + model.NewLine, count + 2);
+            if (entity.Implicit) { GlobalReferences(); Append("    " + entity.Id + " {" + model.NewLine + content + "    }" + model.NewLine, count + 2); }
             else { var close = End(entity); Insert(close.Line.Start, identities.IndexOf(close.Identity), content, count); }
         }
         void ValidNew(string id)
@@ -86,6 +87,7 @@ public sealed class ErTransformationService
                 if (update.Id != update.NewId) { GlobalReferences(); ValidNew(update.NewId); }
                 if (entity.Implicit)
                 {
+                    GlobalReferences();
                     if (update.Id != update.NewId) foreach (var relationship in model.Relationships)
                     { if (relationship.Entity1 == update.Id) Token(relationship.Statement, "from", update.NewId); if (relationship.Entity2 == update.Id) Token(relationship.Statement, "to", update.NewId); }
                     Append("    " + Declaration(update.NewId, update.Label) + model.NewLine + "    }" + model.NewLine, 2);

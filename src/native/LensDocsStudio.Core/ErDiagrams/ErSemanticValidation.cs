@@ -13,7 +13,8 @@ public static class ErSemanticValidation
         if (!model.IsValid || !render.Success || render.Source != model.Source || render.ErSemantics is null || render.ErLayout is null || !Equal(model.Semantic, render.ErSemantics))
             throw new ArgumentException(render.Error ?? "The complete pinned ER semantics cannot be reconciled with every source occurrence. Use Edit source.");
         var layout = render.ErLayout;
-        if (layout.Entities.Count != model.Entities.Count || layout.Relationships.Count != model.Relationships.Count) Reject();
+        if (layout.Entities.Count != model.Entities.Count || layout.Entities.Select(item => item.Id).Distinct(StringComparer.Ordinal).Count() != model.Entities.Count
+            || layout.Relationships.Count != model.Relationships.Count) Reject();
         foreach (var entity in layout.Entities)
         {
             var source = model.Entity(entity.Id);

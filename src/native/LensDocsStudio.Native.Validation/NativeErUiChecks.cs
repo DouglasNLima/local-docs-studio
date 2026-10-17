@@ -38,6 +38,8 @@ internal static partial class NativeUiChecks
             SelectRelationship(0); Find(visual!, "ErLabel").AsTextBox().Text = "places locally"; Find(visual!, "ErSecondCardinality").AsComboBox().Select("One or more   |{"); Find(visual!, "ErRelationshipType").AsComboBox().Select("Non-identifying   .."); Click("ErUpdate");
             Await(text => { var relationship = new ErDiagramSourceParser().Parse(text).Relationships[0]; return relationship.Label == "places locally" && relationship.Cardinality2 == ErCardinality.Many && !relationship.Identifying; }); Capture("relationship-inspector");
             Click("ErAddEntity"); Find(visual!, "ErNodeId").AsTextBox().Text = "SHIPMENT"; Find(visual!, "ErLabel").AsTextBox().Text = "Shipment"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Any(item => item.Id == "SHIPMENT"));
+            Wait(() => !Find(visual!, "ErCanvas_entity:SHIPMENT").IsOffscreen && Find(visual!, "ErViewport").BoundingRectangle.IntersectsWith(Find(visual!, "ErCanvas_entity:SHIPMENT").BoundingRectangle), "The new palette entity was not brought into the zoomed viewport.");
+            Check(true, "New palette entities remain visible through the native zoom and scroll transform");
             Click("ErAddRelationship"); Find(visual!, "ErFrom").AsComboBox().Select("ORDER · ORDER"); Find(visual!, "ErTo").AsComboBox().Select("SHIPMENT · Shipment"); Find(visual!, "ErLabel").AsTextBox().Text = "ships"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Relationships.Count == 3);
             var changed = Draft(); Click("ErUndo"); Await(text => new ErDiagramSourceParser().Parse(text).Relationships.Count == 2); Click("ErRedo"); Await(text => text == changed);
             Click("ErReverse"); Await(text => new ErDiagramSourceParser().Parse(text).Relationships[^1].Entity1 == "SHIPMENT"); Click("ErUndo"); Await(text => text == changed);
@@ -62,11 +64,12 @@ internal static partial class NativeUiChecks
             {
                 ResizeForCapture(width, height); Click("ErFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "ErApply").BoundingRectangle), "ER Apply remains visible at " + width + "x" + height);
                 SelectAttribute("CUSTOMER", 2);
-                foreach (var fieldId in new[] { "ErAttributeType", "ErAttributeName", "ErPK", "ErFK", "ErUK", "ErAttributeComment" })
+                foreach (var fieldId in new[] { "ErAttributeType", "ErAttributeName", "ErPK", "ErFK", "ErUK", "ErAttributeComment", "ErUpdate" })
                 {
                     var field = Find(visual!, fieldId); field.Focus();
                     Wait(() => !field.IsOffscreen && Find(visual!, "ErInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle), "ER attribute field is clipped at " + width + "x" + height + ": " + fieldId);
                 }
+                Find(visual!, "ErAttributeComment").Focus();
                 Capture("attribute-viewport-" + width + "x" + height); Check(true, "All attribute fields and key markers remain keyboard accessible at " + width + "x" + height); SelectRelationship(2);
             }
             ResizeForCapture(1280, 800); Capture("validated");
@@ -77,8 +80,8 @@ internal static partial class NativeUiChecks
             Check(true, "Real Open, Select entity/attribute/relationship, edit, cardinality, non-identifying, add, private Undo/Redo, Validate, Apply, document Undo/Redo and Save pass");
             Stop(); Launch(); Wait(() => ReadEditorText(Find(main!, "MarkdownEditor")) == expected, "Restart/reopen lost ER source."); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); Check(Draft() == changed, "Save/restart/reopen retains complete ER source and rendering"); SelectEntity("CUSTOMER"); SelectAttribute("CUSTOMER", 2); Capture("saved-reopened"); Click("ErCancel"); WaitClosed();
             if (!highContrast) foreach (var theme in new[] { "Dark", "Light" }) { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectEntity("CUSTOMER"); Capture(theme.ToLowerInvariant()); Click("ErCancel"); WaitClosed(); }
-            FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").AsMenuItem().Click(); Find(main!, "InsertEr").AsMenuItem().Click(); WaitVisual(); Check(new ErDiagramSourceParser().Parse(Draft()).IsValid, "Insert ER opens a valid portable starter"); Click("ErApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual ER insertion applies a portable Markdown fence"); Stop();
-            foreach (var fixture in new[] { "occurrences", "unknown-protected", "empty-final" })
+            FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertEr").AsMenuItem().Invoke(); WaitVisual(); Check(new ErDiagramSourceParser().Parse(Draft()).IsValid, "Insert ER opens a valid portable starter"); Click("ErApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual ER insertion applies a portable Markdown fence"); Stop();
+            foreach (var fixture in new[] { "occurrences", "unknown-protected", "empty-final", "identical-attributes" })
             {
                 var raw = File.ReadAllText("tests/fixtures/native-er/" + fixture + ".mmd"); var rawPath = Path.Combine(root, fixture + (fixture == "unknown-protected" ? ".mermaid" : ".mmd")); File.WriteAllText(rawPath, raw); Launch(rawPath); Open(0);
                 if (fixture == "empty-final")
@@ -88,6 +91,18 @@ internal static partial class NativeUiChecks
                     Click("ErUndo"); Await(text => text == raw); Click("ErRedo"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Count == 0);
                     Click("ErAddEntity"); Find(visual!, "ErNodeId").AsTextBox().Text = "B"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Single().Id == "B");
                     Check(true, "Empty native ER draft supports new entity creation and exact private Undo/Redo"); Click("ErCancel"); Discard(); WaitClosed();
+                }
+                else if (fixture == "identical-attributes")
+                {
+                    SelectAttribute("A", 1); Click("ErMoveUp"); Await(text => text == raw);
+                    Wait(() => Find(visual!, "ErSelectionSummary").Name == "A · attribute 1", "Moving identical rows did not retain the selected occurrence.");
+                    Check(Find(visual!, "ErUndo").IsEnabled, "Byte-identical row movement has one private history step without changing portable source");
+                    Find(visual!, "ErAttributeComment").AsTextBox().Text = "Moved second occurrence"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entity("A").Attributes[0].Comment == "Moved second occurrence");
+                    Check(new ErDiagramSourceParser().Parse(Draft()).Entity("A").Attributes[1].Comment is null, "The next native edit follows the moved identical occurrence"); var edited = Draft();
+                    Click("ErUndo"); Await(text => text == raw); Click("ErUndo"); Await(text => text == raw);
+                    Wait(() => Find(visual!, "ErSelectionSummary").Name == "A · attribute 2", "Private Undo did not restore identical row identities.");
+                    Click("ErRedo"); Await(text => text == raw); Click("ErRedo"); Await(text => text == edited); Capture("identical-attribute-identities");
+                    Click("ErCancel"); Discard(); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw, "Private identical-row movement and editing leave the owner unchanged on Cancel");
                 }
                 else if (fixture == "unknown-protected")
                 {

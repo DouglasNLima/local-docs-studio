@@ -69,7 +69,8 @@ public sealed class ErDiagramSourceParser
             var block = Entity.Match(text);
             if (block.Success)
             {
-                var statement = Statement(ErStatementKind.Entity, block, !ValidId(block.Groups["id"].Value)); owner = block.Groups["id"].Value;
+                var statement = Statement(ErStatementKind.Entity, block, !ValidId(block.Groups["id"].Value)
+                    || block.Groups["bare"].Success && block.Groups["bare"].Value.Contains('"')); owner = block.Groups["id"].Value;
                 var entity = Ensure(owner); var label = block.Groups["label"].Success ? block.Groups["label"].Value : block.Groups["bare"].Success ? block.Groups["bare"].Value : entity.Label;
                 Set(entity with { Label = label, Declarations = entity.Declarations.Append(statement).ToArray() }); continue;
             }

@@ -40,7 +40,10 @@ public partial class ErVisualEditorWindow
     private void BuildCanvas()
     {
         if (presentation is not { } view) return; CancelPointer(); Surface.Children.Clear(); buttons.Clear(); endpointHandles.Clear();
-        var image = new Image { Source = view.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }; AutomationProperties.SetAutomationId(image, "ErCanonicalDrawing"); Surface.Children.Add(image);
+        if (view.Entities.Count > 0)
+        {
+            var image = new Image { Source = view.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }; AutomationProperties.SetAutomationId(image, "ErCanonicalDrawing"); Surface.Children.Add(image);
+        }
         Surface.Width = view.Entities.Count == 0 ? 320 : view.Drawing.Width; Surface.Height = view.Entities.Count == 0 ? 180 : view.Drawing.Height;
         if (view.Entities.Count == 0) Surface.Children.Add(new TextBlock { Text = "Add an entity to start this ER diagram.", Foreground = (Brush)FindResource("MutedTextBrush"), Margin = new(16), IsHitTestVisible = false });
         var descriptions = Choices().GroupBy(item => item.Identity).ToDictionary(group => group.Key, group => group.First().Description);
@@ -49,7 +52,8 @@ public partial class ErVisualEditorWindow
         foreach (var relationship in view.Relationships)
         {
             var bounds = relationship.LabelBounds ?? relationship.Path.Bounds; bounds.Inflate(3, 3);
-            var button = AddHit(new(relationship.Identity, bounds), descriptions[relationship.Identity], 5);
+            // The canonical renderer paints labels after entity boxes.
+            var button = AddHit(new(relationship.Identity, bounds), descriptions[relationship.Identity], relationship.LabelBounds is null ? 5 : 25);
             button.IsHitTestVisible = relationship.LabelBounds is not null;
         }
         UpdateSelection();
@@ -120,8 +124,13 @@ public partial class ErVisualEditorWindow
         // Endpoint controls own capture. Selecting the underlying path here would rebuild
         // and detach that control before its tunnelling pointer handler can execute.
         if (e.OriginalSource is DependencyObject target && endpointHandles.OfType<Button>().Any(handle => ReferenceEquals(handle, target) || handle.IsAncestorOf(target))) return;
-        if (presentation.Entities.Any(item => item.Bounds.Contains(point))) return;
-        var hits = presentation.Relationships.Where(item => item.Path.StrokeContains(HitPen, point) || item.LabelBounds?.Contains(point) == true).ToArray(); if (hits.Length == 0) return;
+        var hits = presentation.Relationships.Where(item => item.LabelBounds?.Contains(point) == true).ToArray();
+        if (hits.Length == 0)
+        {
+            if (presentation.Entities.Any(item => item.Bounds.Contains(point))) return;
+            hits = presentation.Relationships.Where(item => item.Path.StrokeContains(HitPen, point)).ToArray();
+        }
+        if (hits.Length == 0) return;
         e.Handled = true; if (hits.Length == 1) { Select(hits[0].Identity); return; }
         var menu = new ContextMenu(); foreach (var hit in hits) { var item = new MenuItem { Header = Choices().First(choice => choice.Identity == hit.Identity).Description }; item.Click += (_, _) => Select(hit.Identity); menu.Items.Add(item); } menu.IsOpen = true;
     }

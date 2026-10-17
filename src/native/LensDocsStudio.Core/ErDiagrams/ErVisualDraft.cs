@@ -42,7 +42,9 @@ public sealed class ErVisualDraft
             if (validatePresentation is not null) await validatePresentation(candidate, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (version != generation || !ReferenceEquals(Model, original)) return new(false, "A newer draft superseded this operation.");
-            if (candidate.Source != Source) Commit(candidate); return new(true, null);
+            // Reordering byte-identical rows is still a real occurrence-identity edit.
+            // Its private selection/history must move even though portable source is equal.
+            if (candidate.Source != Source || operation is MoveErAttribute) Commit(candidate); return new(true, null);
         }
         catch (Exception error) when (Recoverable(error, cancellationToken)) { return new(false, Message(error)); }
     }

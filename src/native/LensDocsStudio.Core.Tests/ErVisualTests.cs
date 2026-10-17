@@ -182,4 +182,40 @@ public class ErVisualTests
         var relationship = draft.Model.Relationships.Single(); result = await draft.ExecuteAsync(new UpdateErRelationship(relationship.Identity, "A", "B", ErCardinality.ZeroOne, relationship.Cardinality2, relationship.Identifying, relationship.Label)); Assert.True(result.Success, result.Error);
         Assert.Equal(source.Replace("id UK   ", "id UK PK   ").Replace("A ||--o{ B", "A |o--o{ B"), draft.Source);
     }
+    [Fact] public async Task Unsupported_implicit_identity_cannot_be_materialised_by_an_attribute_edit()
+    {
+        var source = "erDiagram\n BAD-ID ||--o{ OK\n"; var draft = new ErVisualDraft(source);
+        var operation = new AddErAttribute("BAD-ID", "string", "id", []);
+        Assert.False(ErCapabilityAnalysis.For(draft.Model, operation).Allowed); Assert.False((await draft.ExecuteAsync(operation)).Success);
+        Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact] public async Task Moving_byte_identical_attributes_moves_private_identity_and_the_next_edit_targets_that_row()
+    {
+        var source = "erDiagram\n A {\n string id UK\n string id UK\n }\n"; var draft = new ErVisualDraft(source); var selected = draft.Model.Entity("A").Attributes[1].Identity; draft.Select(selected);
+        var moved = await draft.ExecuteAsync(new MoveErAttribute(selected, -1)); Assert.True(moved.Success, moved.Error);
+        Assert.Equal(source, draft.Source); Assert.Equal(2, draft.HistoryCount); Assert.Equal(selected, draft.Model.Entity("A").Attributes[0].Identity); Assert.Equal(selected, draft.Selection);
+        var edited = await draft.ExecuteAsync(new UpdateErAttribute(selected, "int", "id", new[] { ErKeyType.UK }, "Moved")); Assert.True(edited.Success, edited.Error);
+        Assert.Equal("erDiagram\n A {\n int id UK \"Moved\"\n string id UK\n }\n", draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.Equal(selected, draft.Model.Entity("A").Attributes[0].Identity);
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.Equal(selected, draft.Model.Entity("A").Attributes[1].Identity);
+        draft.Redo(); Assert.Equal(selected, draft.Model.Entity("A").Attributes[0].Identity); draft.Redo(); Assert.Equal("Moved", draft.Model.Attribute(selected).Comment);
+    }
+    [Fact] public async Task Unknown_dependencies_cannot_be_bypassed_by_materialising_an_implicit_entity()
+    {
+        var source = "erDiagram\n A ||--o{ B\n unknown_global_statement\n"; var draft = new ErVisualDraft(source);
+        foreach (var operation in new ErEditOperation[] { new AddErAttribute("B", "string", "id", []), new UpdateErEntity("B", "B", "New alias") })
+        { Assert.False(ErCapabilityAnalysis.For(draft.Model, operation).Allowed); Assert.False((await draft.ExecuteAsync(operation)).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount); }
+    }
+    [Fact] public void Canonical_layout_cannot_duplicate_one_entity_while_omitting_another()
+    {
+        var model = parser.Parse(Source); var render = new DiagramService().Render(Source); var layout = render.ErLayout!;
+        Assert.Throws<ArgumentException>(() => ErSemanticValidation.ValidateRendering(model, render with { ErLayout = layout with { Entities = new[] { layout.Entities[0], layout.Entities[0] } } }));
+    }
+    [Theory, InlineData("A[\"Label \\\"quoted\\\"\"]"), InlineData("A[\"Label\" suffix]")]
+    public async Task Quoted_alias_fallbacks_remain_protected_instead_of_being_rewritten_as_bare_aliases(string alias)
+    {
+        var source = "erDiagram\n " + alias + " {\n string id\n }\n"; var draft = new ErVisualDraft(source);
+        Assert.True(draft.Model.HasUnknownDependencies);
+        Assert.False((await draft.ExecuteAsync(new UpdateErEntity("A", "A", "Replacement"))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
 }

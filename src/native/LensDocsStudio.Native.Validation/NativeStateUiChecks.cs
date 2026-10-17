@@ -84,7 +84,7 @@ internal static partial class NativeUiChecks
                 foreach (var theme in new[] { "Dark", "Light" })
                 { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectState("Draft"); Capture(theme.ToLowerInvariant()); Click("StateCancel"); WaitClosed(); }
             }
-            FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").AsMenuItem().Click(); Find(main!, "InsertState").AsMenuItem().Click(); WaitVisual(); Check(new StateDiagramSourceParser().Parse(Draft()).IsValid, "Insert State opens a valid supported starter"); Click("StateApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual State insertion applies a portable Markdown fence");
+            FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertState").AsMenuItem().Invoke(); WaitVisual(); Check(new StateDiagramSourceParser().Parse(Draft()).IsValid, "Insert State opens a valid supported starter"); Click("StateApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual State insertion applies a portable Markdown fence");
             Stop();
             foreach (var fixture in new[] { "document-review", "advanced-protected", "unknown-protected" })
             {

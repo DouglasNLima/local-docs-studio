@@ -71,7 +71,7 @@ public partial class MainWindow
                 if (model.ActiveDocument == tab && Editor.IsReadOnly) return "The owning document is read-only.";
                 var edit = await session.PrepareAsync(draft, cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested(); session.Commit(edit, model.Documents.Contains(tab));
-                model.Status = "Mermaid source applied as one undoable change. Save the document to persist it.";
+                model.Status = edit.Expected == edit.Replacement ? "The Mermaid source is unchanged; no document Undo step was needed." : "Mermaid source applied as one undoable change. Save the document to persist it.";
                 if (model.ActiveDocument == tab) QueuePreview();
                 return null;
             }

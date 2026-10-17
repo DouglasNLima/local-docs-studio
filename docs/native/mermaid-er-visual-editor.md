@@ -10,11 +10,14 @@ has now passed both the complete native build/Core/export/package/installer job
 and the separate installed/upgraded/reinstalled State authoring job. The
 consolidated baseline is accepted from these actual post-merge results.
 
-The local Release solution builds with zero warnings/errors. All 1,515 Core cases
-pass, including 91 ER cases. Actual Windows UIA, High Contrast, canonical
-fidelity, performance observations, installer lifecycle and independent package
-verification are mandatory hosted gates and are **not yet certified** at this
-milestone. Earlier State/Sequence/Flowchart results are retained in their own reports.
+The local Release solution builds with zero warnings/errors. All 1,521 Core cases
+pass, including 97 ER cases. Actual Windows authoring, High Contrast, canonical
+fidelity and all existing editor UX regressions pass at `03869b8`; later identity
+hardening requires its own exact-source checks. The
+[Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34)
+identifies the delivered commit, completed mandatory runs, package versions,
+literal hashes and independent receipts. Earlier State/Sequence/Flowchart reports
+retain their original evidence scope. No production qualification is claimed.
 
 ## Architecture and source authority
 
@@ -53,7 +56,7 @@ semantics. SVG success alone never grants permission.
 | Implicit entity | Created by recognised relationship | Semantic ID and first occurrence order checked | Label/attribute edit adds explicit block; last-reference removal requires explicit block first |
 | Explicit block | Separate opening/closing lines; attributes accumulated | Full block and ordered row spans | Ordinary single block supported; repeated declarations protect structure |
 | `ENTITY["Label"]` alias | Recognised on block opening; latest explicit alias wins | Alias value/span retained | Existing alias token edited in place; repeated authority protected |
-| Unquoted block alias | Recognised | Exact token retained | Bounded alias edit preserves its syntax |
+| Unquoted block alias | Recognised | Exact token retained | Plain bare aliases preserve their syntax; quote-containing fallback forms are protected |
 | Attribute type/name | Pinned parser accepts broad non-space tokens | Every row counted; safe single-token grammar independently checked | Safe type/name spans edited; unsupported tokens protected |
 | PK, FK, UK | Case-insensitive, space-separated markers retained in order | Complete ordered marker list checked | Toggle supported unique markers; unchanged ordering retained |
 | `PK, FK` | Comma token silently ignored, FK retained | Entire original statement protected | Never repair or rewrite the recognised prefix |
@@ -88,7 +91,7 @@ cardinalities together, retaining each entity's original cardinality.
 
 | Target | Supported | Protected limitations |
 |---|---|---|
-| Entity | Add; display label; ID and all recognised references; implicit-to-explicit; duplicate with unique ID; independent delete; inspect incident relationships | Duplicate declarations, unknown references/contents; connected delete requires explicitly removing/reconnecting each relationship |
+| Entity | Add; display label; ID and all recognised references; implicit-to-explicit; duplicate with unique ID; independent delete; inspect incident relationships | Duplicate declarations, unsupported IDs/alias quoting, unknown references/contents; implicit materialisation requires known dependencies; connected delete requires explicitly removing/reconnecting each relationship |
 | Attribute | Add; type/name; PK/FK/UK; comment; duplicate; delete; move up/down | Unknown suffix/statement in owning entity; unsupported quoting/type/name; invalid move; no inferred FK relationship |
 | Relationship | Add; label; endpoints; both cardinalities; identifying/non-identifying; delete; duplicate; explicit semantic reverse | Unknown dependencies for structural changes; last-reference removal of implicit entities requires explicit materialisation |
 | Source | View immutable original; edit and validate candidate; locate exact occurrence | Invalid or semantically unreconciled candidate cannot commit |
@@ -110,8 +113,11 @@ committing history. Cancellation, stale presentation and conversion failures can
 commit. No whole-diagram serialisation is used.
 
 Private history retains up to 100 entries and an 8-million-character aggregate
-budget; selection and exact source are restored. Rejected/no-op edits create no
-entry. A new successful edit invalidates redo. Source editing requires explicit
+budget; selection and exact source are restored. Reordering byte-identical rows
+records their changed private occurrence order, so the following property edit
+targets the moved row. Its Undo/Redo restores identities and selection even while
+source bytes remain identical. Rejected operations and ordinary no-op property
+updates create no entry. A new successful edit invalidates redo. Source editing requires explicit
 validation; pending inspector properties require Update or Discard before selection,
 other operations or Apply.
 
@@ -160,16 +166,19 @@ No rendering resource limit is raised. Native SVG conversion remains non-interru
 stale results are discarded. Hosted timings are observations, not hardware-independent
 guarantees. Existing Continuous 250 ms and dense-render limitations remain separate.
 
-Final evidence must add the inspected screenshot gallery (Light/Dark/High Contrast
-and five viewport sizes), actual assertion counts/performance results, CI URLs,
-exact commit, package versions/hashes and independent receipts. The mandatory native
+The inspected screenshot gallery and revision-scoped measurements appear below.
+Final-head CI URLs, exact commit, package versions/hashes and independent receipts
+belong to the linked delivery record and immutable CI artefacts. This containing
+documentation commit cannot embed the hashes of its own packages. The mandatory native
 workflow produces self-contained Windows x64 unsigned installer/portable previews,
 verifies ER compiled resources beside all three previous editors, checks runtime,
 branding, payload identity and rejection controls. A separate installed ER job
 reverifies downloaded packages and runs install/upgrade/reinstall authoring.
 Historical cross-revision migration remains distinct from same-source two-version
 testing. No ordinary-desktop native execution/installation, merge, release or tag
-movement is authorised. Readiness is **implementation in progress; not certified**.
+movement is authorised. A source revision is **ready for unsigned internal preview**
+only after all mandatory exact-head jobs and independent package/lifecycle receipts
+pass. A queued, failed, cancelled or earlier run does not qualify a later head.
 
 ## Retained first-run failure
 
@@ -179,7 +188,7 @@ failed before UIA: WPF `Geometry.Parse` returned a read-only geometry and assign
 the coordinate transform raised `InvalidOperationException`. The correction clones
 that geometry before assigning its transform and freezes it afterwards. Original
 normal/High Contrast logs are retained; this does not count as a passing acceptance.
-The extended source-integrity suite now passes 82 ER cases locally, including alias
+The following source-integrity milestone passed 82 ER cases locally, including alias
 forms, entity duplicate/delete, self-to-normal reconnection, native-conversion
 rejection, invalid property atomicity and quoted/unlabelled relationship labels.
 
@@ -193,7 +202,7 @@ The correction excludes endpoint-control descendants from parent path selection.
 The cancellation check now also requires measured native pointer updates, preventing
 a source-only assertion from falsely establishing that a drag actually occurred.
 Original [run 39063313555](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39063313555)
-logs and captures are retained. Complete UIA remains pending correction validation.
+logs and captures are retained. Later successful acceptance is recorded separately.
 
 At that same revision the High Contrast fidelity report passes 104 assertions,
 covering six fixture/theme pixel comparisons and document ownership checks. Hosted
@@ -226,3 +235,127 @@ A source-integrity review additionally found that key changes could rewrite a
 normalised formatted comment. Unchanged comments now retain their original quoted
 bytes and spacing; unchanged relationship labels retain original quoting/escaping
 through cardinality edits. Four pinned formatting/escaping regressions verify this.
+
+## Windows acceptance and screenshot gallery
+
+The `03869b8` native run [39064786435](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39064786435)
+passed the complete native/package job and all three installed ER authoring phases.
+Its separate State install and upgrade phases passed, but reinstall stopped at
+Insert State after successful editing, Apply, Undo/Redo and Save/reopen. The retained
+failure screenshot shows the Insert menu still open. The harness now expands the
+menu and invokes the native UIA command, as the existing Sequence harness does;
+canvas pointer coverage and all assertions remain. This explains the observed test
+failure without claiming an application defect or a passed run. Final-source State
+and ER lifecycle qualification is recorded separately in the delivery record.
+
+At `03869b8`, [PR desktop UX run 39064786469](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39064786469)
+passes 35 normal and 36 actual High Contrast ER UIA assertions, plus 114 normal and
+115 High Contrast fidelity/ownership assertions. The
+[branch UX run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39064783108)
+passes all nine jobs, including Flowchart, Sequence, State, historical presentation
+and independent partial-source regressions. The corresponding
+[browser/static run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39064786439)
+and [workspace/interaction run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39064786534)
+pass; feature Pages deployment is skipped. These are genuine earlier-revision
+results; final-head qualification is identified in the delivery record.
+
+The actual native workflow edits entity labels, attributes/comments/keys, row order,
+relationship labels/cardinalities/type, adds entities and relationships, reverses
+and reconnects endpoints, tests measured pointer cancellation and invalid/valid
+drops, validates, applies only the second identical fence, performs document
+Undo/Redo, saves, restarts and reopens the complete source. Separate real-app cases
+cover standalone source, repeated attribute canvas hits, reordered self-loop canvas
+identities, protected unknown suffixes, independent safe edits, empty-draft recovery,
+outside/inside owner edits, closed owners and Apply while another tab is active.
+
+These are unmodified Windows captures from `03869b8`, inspected at their actual
+pixel dimensions. All six attribute inputs were focused and verified inside the
+inspector at every required size. Later captures, additional identical-row history
+checks and final package acceptance are retained in the final-head CI artefacts.
+
+| Light | Dark |
+|---|---|
+| ![Light ER editor](images/er-visual-editor/light.png) | ![Dark ER editor](images/er-visual-editor/dark.png) |
+
+| Attribute inspector | Actual Windows High Contrast |
+|---|---|
+| ![ER attribute inspector](images/er-visual-editor/attribute-viewport-1280x800.png) | ![High Contrast ER attribute inspector](images/er-visual-editor/high-contrast.png) |
+
+| Small-window attribute controls | Save, restart and reopen |
+|---|---|
+| ![ER attribute controls at 880 by 600](images/er-visual-editor/attribute-viewport-880x600.png) | ![ER saved source reopened](images/er-visual-editor/saved-reopened.png) |
+
+Inspected windows: [880 × 600](images/er-visual-editor/viewport-880x600.png),
+[1024 × 768](images/er-visual-editor/viewport-1024x768.png),
+[1280 × 800](images/er-visual-editor/viewport-1280x800.png),
+[1440 × 900](images/er-visual-editor/viewport-1440x900.png),
+[1920 × 1080](images/er-visual-editor/viewport-1920x1080.png).
+
+Attribute controls at [1024 × 768](images/er-visual-editor/attribute-viewport-1024x768.png),
+[1440 × 900](images/er-visual-editor/attribute-viewport-1440x900.png) and
+[1920 × 1080](images/er-visual-editor/attribute-viewport-1920x1080.png) retain the key
+markers and comment input; the inspector scrolls while footer Apply/Cancel stays
+visible. [Repeated/self relationships](images/er-visual-editor/occurrences.png) and
+[protected unknown source](images/er-visual-editor/unknown-protected.png) remain
+available for exact occurrence and protection inspection.
+
+## Measured resource and interaction observations
+
+Normal hosted measurements at `03869b8`; milliseconds include cold work where stated.
+
+| Scenario | Scan | Render | Native conversion | Core label operation |
+|---|---:|---:|---:|---:|
+| 10 entities / 15 relationships | 0.59 | 60.80 | 271.10 | 115.61 |
+| 30 entities / 60 relationships | 2.65 | 1,021.10 | 697.91 | 2,011.57 |
+| 100 entities / 150 relationships | 3.42 | **Failed**, reported after 6,396.64 | Not run | **Rejected**, 4,629.01 |
+| 250 attributes in one entity | 0.68 | 2.76 | 767.34 | 8.65 |
+| Convergence and disconnected clusters | 0.15 | 10.15 | 94.63 | 33.94 |
+| Long labels | 0.07 | 0.37 | 68.53 | 6.95 |
+
+Actual process editor opening is 668 / 1,308 ms at 10/15 and 30/60, including UIA
+transport. Twenty entity selections take 2,652 / 3,281 ms; twenty attribute selections
+451 / 518 ms; twenty relationship selections 424 / 495 ms. Working set grows from
+approximately 166 / 187 MiB before opening to 218 / 256 MiB after interaction.
+Actual endpoint dragging records 21 / 20 updates, a maximum measured handler update
+of 0.120 ms in both cases, and 10,912 / 10,368 handler-allocated bytes across those
+updates. The complete synthetic drags take about 2.5 seconds including the driver's
+pointer transport; that duration is not per-frame latency. Source remains exact
+and processes respond throughout.
+
+The 100/150 source fails the unchanged renderer deadline; its native editor is not
+opened and no large-diagram UI timing claim is made. Approximately 1.43 GB of
+current-thread cumulative allocations occur across that failed scan/render/edit
+scenario, not a peak/live-memory measurement. Cancellation checks retain exact
+source/history. Hosted observations do not promise hardware-independent timing.
+
+## Final protection and qualification boundaries
+
+- Implemented: entities, supported attribute types/names and unique key combinations,
+  exact quoted comments, row order/duplication/removal, relationship labels, both
+  endpoint cardinalities, identifying semantics, safe reconnection, exact occurrences,
+  canonical presentation, private history and document Apply/Cancel/Save integration.
+- Known-source conditions: implicit materialisation requires fully recognised
+  dependencies. Removing the last implicit reference is protected until an explicit
+  declaration exists. Structural edits that alter unrelated first-occurrence entity
+  ordering are rejected by complete semantic comparison; use earlier explicit blocks
+  or Edit source. Duplicate declarations and unsupported alias quote fallbacks remain
+  protected. New field inputs use the documented bounded single-line grammar.
+- Occurrence identity: moving byte-identical attributes is a private identity change.
+  It creates one private step and supports the next targeted property edit; an Apply
+  with unchanged portable bytes creates no document Undo step. IDs remain private.
+- Session layout: entity positions follow Mermaider. Manual entity dragging and palette
+  drop positioning are absent. Newly created palette entities are brought into view
+  through WPF's existing zoom/scroll transform. No coordinates are persisted.
+- Resource limits: 100,000 source characters, existing 500-element renderer budget,
+  unchanged three-second requested render deadline, native geometry/bitmap budgets
+  and non-interruptible SharpVectors conversion remain in force. The dense ER failure
+  above is retained explicitly; Continuous preview's separate 250 ms issue is unchanged.
+- Packaging: self-contained unsigned Windows x64 previews, all four compiled editors,
+  exact .NET/WPF payload and Lens resources are independently inspected. Negative
+  controls include an ER-only BAML resource removal with a recomputed ZIP checksum;
+  required types and original assembly versions remain intact, and the verifier must
+  still reject that copy. Installer/portable payload equality is checked after install,
+  upgrade and reinstall. Historical cross-revision migration is a separate result.
+- Not production certified: production signing, trusted automatic updates and separate
+  release/clean-machine qualification. No merge, tag, public release or ordinary-
+  desktop native execution/installation is performed by this work.

@@ -194,8 +194,15 @@ public partial class ErVisualEditorWindow : Window
         TransitionFields.IsEnabled = authorised || can && mode == "relationship";
         var reconnect = can && !draft.Model.Statements.Any(item => item.Protected && item.Owner is null);
         From.IsEnabled = To.IsEnabled = ReconnectFromButton.IsEnabled = ReconnectToButton.IsEnabled = reconnect;
+        foreach (var handle in endpointHandles.OfType<Button>())
+        {
+            handle.IsEnabled = reconnect && clean && relationship?.Statement.Protected == false;
+            var explanation = !clean ? "Update or discard pending properties before dragging an endpoint." : !reconnect ? "Validate the current source; unknown dependencies require Edit source for reconnection." : "Drag this endpoint to another entity, or use the keyboard-accessible inspector.";
+            handle.ToolTip = explanation; ToolTipService.SetShowOnDisabled(handle, true); AutomationProperties.SetHelpText(handle, explanation);
+        }
         foreach (var panel in new[] { NodeFields, LabelFields, AttributeFields, TransitionFields }) { panel.ToolTip = UpdateButton.ToolTip; ToolTipService.SetShowOnDisabled(panel, true); }
-        Capabilities.Text = "Source: " + draft.Model.Compatibility + ".\nUpdate: " + (UpdateButton.IsEnabled ? "editable; validated before commit" : UpdateButton.ToolTip) + "\nDelete: " + DeleteButton.ToolTip + "\nDuplicate: " + DuplicateButton.ToolTip;
+        var sourceState = draft.Model.Compatibility == ErCompatibility.PartiallyEditable ? "Partially editable" : draft.Model.Compatibility.ToString();
+        Capabilities.Text = "Source: " + sourceState + ".\nUpdate: " + (UpdateButton.IsEnabled ? "Available." : UpdateButton.ToolTip) + "\nDelete: " + DeleteButton.ToolTip + "\nDuplicate: " + DuplicateButton.ToolTip;
     }
     private void BeginCreation(string kind)
     {
@@ -225,6 +232,7 @@ public partial class ErVisualEditorWindow : Window
             else if (operation is AddErRelationship or DuplicateErRelationship) draft.Select(draft.Model.Relationships[^1].Identity);
             else if (operation is AddErAttribute attribute) draft.Select(draft.Model.Entity(attribute.EntityId).Attributes[^1].Identity);
             await RefreshAsync();
+            if ((operation is AddErEntity or DuplicateErEntity or AddErAttribute) && draft.Selection is { } selection && buttons.TryGetValue(selection, out var added)) { Surface.UpdateLayout(); added.BringIntoView(); }
         }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
@@ -255,7 +263,7 @@ public partial class ErVisualEditorWindow : Window
     private void ConfirmClose(object? sender, CancelEventArgs e)
     {
         if (discard || draft is null) return; if (busy) { e.Cancel = true; Status.Text = "Wait for validation or Apply to finish before closing."; return; }
-        if ((draft.Source != draft.OriginalSource || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard the private ER draft and pending properties? The owning document has not changed.", "Discard ER draft", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) e.Cancel = true;
+        if ((draft.Source != draft.OriginalSource || SourcePending || PropertiesPending) && MessageBox.Show(this, "Discard the private ER draft and pending properties? Current changes in the owning document will be kept.", "Discard ER draft", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) e.Cancel = true;
     }
     private void LocateSource(object sender, RoutedEventArgs e)
     {
@@ -263,7 +271,12 @@ public partial class ErVisualEditorWindow : Window
         if (statement is null || SourcePending) return; SourcePanel.IsExpanded = true; SourceEditor.Select(statement.Span.Start, statement.Span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(statement.Span.Start).LineNumber); SourceEditor.Focus();
     }
     private void ShowOriginal(object sender, RoutedEventArgs e) { new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true, FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") }, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show(); }
-    private void Preview(object sender, RoutedEventArgs e) { if (presentation is { } view) new Window { Owner = this, Title = "Rendered ER preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
+    private void Preview(object sender, RoutedEventArgs e)
+    {
+        if (presentation is not { } view) return;
+        if (view.Entities.Count == 0) { Status.Text = "This ER draft has no entities to preview. Add an entity or undo the deletion."; return; }
+        new Window { Owner = this, Title = "Rendered ER preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show();
+    }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
     private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
     private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
