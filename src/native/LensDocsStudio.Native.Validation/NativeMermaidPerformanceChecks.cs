@@ -48,6 +48,7 @@ internal static class NativeMermaidPerformanceChecks
         File.WriteAllText(output, JsonSerializer.Serialize(new { Scenarios = observations, ExternalCancellationObserved = cancellationObserved,
             CancellationCompletionMilliseconds = cancellationMilliseconds, CancellationTotalMilliseconds = cancellationWatch.Elapsed.TotalMilliseconds, Environment.ProcessorCount,
             Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription,
+            PartialEditing = NativeMermaidPartialPerformanceChecks.Run(),
             Limits = "100,000 characters; 300 nodes; 500 total elements; eight nested subgraphs; unchanged three-second renderer deadline.",
             Limitations = "Single-process observations include cold/warm runtime effects; these are source/model/layout/render measurements, not physical input or monitor certification. Renderer rejection within editing bounds remains a protected source/preview case." }, new JsonSerializerOptions { WriteIndented = true }));
     }

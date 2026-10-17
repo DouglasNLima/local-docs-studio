@@ -46,7 +46,7 @@ public partial class MermaidVisualEditorWindow : Window
     private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
-    private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.CanEdit;
+    private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.HasSafeTransformations;
 
     public MermaidVisualEditorWindow(string source, DiagramService diagrams, Func<string, CancellationToken, Task<string?>> applyToDocument,
         bool dark = false, string diagramTheme = "Auto", Action? editSource = null, Action<string, string>? exportDiagram = null, System.Windows.Media.FontFamily? sourceFont = null, double sourceFontSize = 14)
@@ -119,7 +119,7 @@ public partial class MermaidVisualEditorWindow : Window
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
-            Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax." : (draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.");
+            Status.Text = CompatibilityStatus;
         }
         finally { updating = false; }
     }
@@ -129,17 +129,17 @@ public partial class MermaidVisualEditorWindow : Window
         var canEdit = CanTransform;
         NodeProperties.IsEnabled = EdgeProperties.IsEnabled = GroupProperties.IsEnabled = canEdit;
         Palette.IsEnabled = Direction.IsEnabled = canEdit && !PropertiesPending;
-        ApplyButton.IsEnabled = canEdit && !PropertiesPending; UndoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanUndo;
+        ApplyButton.IsEnabled = canEdit && !PropertiesPending && draft.CanApply; UndoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanUndo;
         RedoButton.IsEnabled = !busy && !SourcePending && !PropertiesPending && draft.CanRedo;
         DeleteButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.Count > 0;
         DuplicateButton.IsEnabled = canEdit && !PropertiesPending && Elements.SelectedItems.OfType<ElementChoice>().Any(choice => choice.Key.StartsWith("node:", StringComparison.Ordinal));
         SourceEditor.IsReadOnly = busy || PropertiesPending || inlineEditor is not null; Title = "Mermaid Visual Editor" + (draft.IsDirty || SourcePending || PropertiesPending || inlineEditor is not null ? " •" : "");
         ResetPropertiesButton.IsEnabled = !busy && PropertiesPending;
         ResetPropertiesButton.Visibility = PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
-        DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : !draft.Model.CanEdit || !canonicalMapped ? "Protected source" : draft.IsDirty ? "Draft modified" : "Ready";
+        DraftIndicator.Text = busy || renderingCanvas ? "Validating..." : PropertiesPending ? "Pending properties" : sourceValidationFailed ? "Validation failed" : SourcePending ? "Source unvalidated" : canvasError is not null ? "Render failed" : draft.Model.Compatibility == MermaidCompatibility.Invalid ? "Invalid source" : !draft.Model.HasSafeTransformations || !canonicalMapped ? "Protected source" : draft.Model.Compatibility == MermaidCompatibility.PartiallyEditable ? "Partially editable" : draft.IsDirty ? "Draft modified" : "Ready";
         RenderedPreviewButton.IsEnabled = canonicalDrawing is not null && !busy && !renderingCanvas && !SourcePending && !PropertiesPending && inlineEditor is null;
         SourceStateIndicator.Visibility = SourcePending || !draft.Model.CanEdit || !canonicalMapped ? Visibility.Visible : Visibility.Collapsed;
-        SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : "Protected source";
+        SourceStateIndicator.ToolTip = sourceValidationFailed ? "Validation failed; correct the retained source" : SourcePending ? "Source changes need validation" : draft.Model.Compatibility == MermaidCompatibility.PartiallyEditable ? "Partially editable; inspect individual operation permissions" : "Protected source";
         AutomationProperties.SetName(SourceStateIndicator, SourceStateIndicator.ToolTip.ToString());
         UpdateColourSwatches();
         ValidateSourceButton.IsEnabled = !busy && !renderingCanvas && !PropertiesPending && inlineEditor is null;
@@ -149,6 +149,7 @@ public partial class MermaidVisualEditorWindow : Window
         UpdateNodeButton.IsEnabled = canEdit && PropertiesPending;
         UpdateNodeButton.Visibility = NodeProperties.Visibility == Visibility.Visible && PropertiesPending ? Visibility.Visible : Visibility.Collapsed;
         NodeClassField.Visibility = ClassButton.Visibility = NodeClass.Items.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        UpdateCapabilityActions();
     }
     private async Task<bool> Execute(MermaidEditOperation operation, string? select = null)
         => await ExecuteBatch([operation], select);
@@ -394,9 +395,11 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private async void Apply(object sender, RoutedEventArgs e)
     {
-        if (!CanTransform || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
+        if (!CanTransform || !draft.CanApply || PropertiesPending) return; busy = true; UpdateActions(); Status.Text = "Validating source and document identity…";
         try
         {
+            var validated = await draft.ValidateForApplyAsync(lifetime.Token);
+            if (!validated.Success) { Status.Text = validated.Error; return; }
             var source = draft.Source; var result = await Task.Run(() => diagrams.Render(source, dark, diagramTheme, lifetime.Token), lifetime.Token);
             if (closed) return; if (!result.Success) { Status.Text = result.Error; return; }
             var error = await applyToDocument(source, lifetime.Token); if (closed) return;

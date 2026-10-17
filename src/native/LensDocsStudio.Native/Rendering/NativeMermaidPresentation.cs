@@ -22,6 +22,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
     IReadOnlyList<NativeMermaidConnection> Connections, PositionedGraph Graph)
 {
     public IReadOnlyList<FlowchartGroupIdentity> Membership { get; init; } = [];
+    public IReadOnlyDictionary<string, string> SourceLabels { get; init; } = new Dictionary<string, string>();
     public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg)
     {
         var graph = result.FlowchartLayout ?? throw new InvalidDataException("No canonical Flowchart layout is available. Use Edit source.");
@@ -86,7 +87,8 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
             connections.Add(new(ordinal, edge.Source, edge.Target, edge.Label ?? "", geometry, labelBounds));
         }
         if (labelIndex != labels.Length) throw new InvalidDataException("Conflicting canonical connection labels.");
-        return new(drawing, elements, connections.AsReadOnly(), graph) { Membership = result.FlowchartGroups };
+        return new(drawing, elements, connections.AsReadOnly(), graph) { Membership = result.FlowchartGroups,
+            SourceLabels = result.FlowchartSemantics?.Nodes.ToDictionary(pair => pair.Key, pair => pair.Value.Label) ?? new Dictionary<string, string>() };
 
         void Add(string prefix, string id, string label, Rect bounds, string kind)
         {
@@ -112,9 +114,9 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
     // Source order is verified by the lexical adapter against Mermaider. Ordinals distinguish identical parallel edges.
     public bool Maps(MermaidDiagramModel model)
     {
-        if (!model.CanEdit || Graph.Nodes.Count != model.Nodes.Count || Graph.Edges.Count != model.Edges.Count
+        if (!model.HasCompleteSourceMap || Graph.Nodes.Count != model.Nodes.Count || Graph.Edges.Count != model.Edges.Count
             || Groups(Graph.Groups).Count() != model.Subgraphs.Count) return false;
-        return model.Nodes.All(node => Elements.ContainsKey("node:" + node.Id))
+        return model.Nodes.All(node => Elements.ContainsKey("node:" + node.Id) && SourceLabels.TryGetValue(node.Id, out var label) && label == node.Label)
             && model.Subgraphs.All(group => Elements.ContainsKey("group:" + group.Id) && Membership.Any(identity => identity.Id == group.Id && identity.ParentId == group.ParentId))
             && model.Nodes.Where(node => node.SubgraphId is not null).All(node => Membership.Any(group => group.Id == node.SubgraphId && group.NodeIds.Contains(node.Id)))
             && model.Edges.Select((edge, ordinal) => Graph.Edges[ordinal].Source == edge.Source.Id && Graph.Edges[ordinal].Target == edge.Target.Id

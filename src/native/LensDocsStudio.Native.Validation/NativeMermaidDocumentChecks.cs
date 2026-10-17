@@ -10,6 +10,22 @@ internal static class NativeMermaidDocumentChecks
     public static IReadOnlyList<string> Run()
     {
         var checks = new List<string>();
+        const string partialBody = "flowchart LR\r\nA[Start] --> B[Review] --> C[Done]\r\nD[Independent]\r\n";
+        foreach (var fence in new[] { "```", "~~~" })
+        {
+            var partialBlock = fence + "mermaid\r\n" + partialBody + fence + "\r\n";
+            var partialDocument = "Before café\r\n" + partialBlock + "Between\r\n" + partialBlock + "After\r\n";
+            var partialOwner = new DocumentViewModel(partialDocument) { DisplayName = "Identical partial.md" };
+            var partialTarget = MermaidBlockSource.Find(new MarkdownService().Parse(partialDocument))[1];
+            var partialDraft = new MermaidVisualDraft(partialTarget.Source);
+            var editResult = Task.Run(() => partialDraft.ExecuteAsync(new UpdateMermaidNode("D", "Reviewed", FlowNodeShape.Process, "D"))).GetAwaiter().GetResult();
+            Check(editResult.Success && partialDraft.CanApply, "Partial Core proof authorises an independent label in identical " + fence + " blocks");
+            new MermaidDocumentEditSession(partialOwner, partialTarget).Apply(partialDraft.Source, true);
+            Check(partialOwner.EditorDocument.Text == partialDocument[..partialTarget.Body.Start] + partialDraft.Source + partialDocument[partialTarget.Body.End..],
+                "Partial Apply changes only the tracked second identical " + fence + " block, preserving its first block and surrounding Unicode");
+            partialOwner.EditorDocument.UndoStack.Undo();
+            Check(partialOwner.EditorDocument.Text == partialDocument, "One native Undo restores exact identical partial diagrams with " + fence + " fences");
+        }
         const string block = "```mermaid\r\nflowchart TD\r\nA[Original] --> B[Keep]\r\n```\r\n";
         const string source = "Before\r\n\r\n" + block + "\r\nMiddle\r\n\r\n" + block;
         var owner = new DocumentViewModel(source) { DisplayName = "Synthetic.md" };

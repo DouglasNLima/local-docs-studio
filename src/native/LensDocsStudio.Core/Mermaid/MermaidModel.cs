@@ -8,18 +8,22 @@ public readonly record struct MermaidSourceSpan(int Start, int Length)
 
 public enum FlowNodeShape { Process, Decision, Rounded, Terminal, Circle, DoubleCircle, Subroutine, Cylinder, Hexagon }
 public enum FlowConnectionType { Directed, Undirected, Dotted, Thick, Bidirectional }
-public enum MermaidCompatibility { Editable, Protected, Invalid }
+public enum MermaidCompatibility { Editable, PartiallyEditable, Protected, Invalid }
 
 public sealed record MermaidOccurrence(string Id, MermaidSourceSpan IdSpan, MermaidSourceSpan Span,
     MermaidSourceSpan? LabelSpan, FlowNodeShape Shape, MermaidSourceSpan Statement, string? SubgraphId, string? ClassName);
 public sealed record MermaidNode(string Id, string Label, FlowNodeShape Shape, IReadOnlyList<MermaidOccurrence> Occurrences)
 {
-    public MermaidOccurrence? Declaration => Occurrences.FirstOrDefault(item => item.LabelSpan is not null);
+    // The pinned parser honours the first occurrence, including an implicit bare node.
+    public MermaidOccurrence? Declaration => Occurrences.FirstOrDefault() is { LabelSpan: not null } first ? first : null;
     public string? SubgraphId => Occurrences.Select(item => item.SubgraphId).FirstOrDefault(id => id is not null);
 }
 public sealed record MermaidEdge(string Id, MermaidOccurrence Source, MermaidOccurrence Target,
     string Label, FlowConnectionType Type, MermaidSourceSpan ConnectionSpan, MermaidSourceSpan? LabelSpan,
-    MermaidSourceSpan Statement);
+    MermaidSourceSpan Statement)
+{
+    public bool InlineLabel { get; init; }
+}
 public sealed record MermaidSubgraph(string Id, string Label, string? ParentId, MermaidSourceSpan Opening,
     MermaidSourceSpan Heading, MermaidSourceSpan Closing, MermaidSourceSpan? DirectionSpan, string? Direction);
 public sealed record MermaidStyle(string Kind, string Value, IReadOnlyList<(string Id, MermaidSourceSpan Span)> Targets,
@@ -34,6 +38,9 @@ public sealed record MermaidDiagramModel(string Source, string Direction, Mermai
 {
     public string DiagramType { get; init; } = "Flowchart";
     public bool CanEdit => Compatibility == MermaidCompatibility.Editable;
+    public bool HasSafeTransformations => Compatibility is MermaidCompatibility.Editable or MermaidCompatibility.PartiallyEditable;
+    public bool HasCompleteSourceMap { get; init; }
+    public MermaidCapabilityAnalysis Capabilities => MermaidCapabilityAnalysis.For(this);
     public string NewLine => Source.Contains("\r\n", StringComparison.Ordinal) ? "\r\n" : "\n";
     public string Indentation
     {

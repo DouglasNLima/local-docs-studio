@@ -118,7 +118,7 @@ public partial class MermaidVisualEditorWindow
             }
             if (!PropertiesPending && inlineEditor is null)
             { var wasUpdating = updating; updating = true; try { ShowProperties(); } finally { updating = wasUpdating; } }
-            Status.Text = !draft.Model.CanEdit ? "Visual editing is limited for this diagram. Its original layout is preserved. Edit the source to change unsupported syntax."
+            Status.Text = draft.Model.Compatibility == MermaidCompatibility.PartiallyEditable ? CompatibilityStatus : !draft.Model.CanEdit ? CompatibilityStatus
                 : !canonicalMapped ? "The rendered elements cannot all be mapped safely. Inspect the original diagram or use Edit source."
                 : draft.IsDirty ? "Draft modified. Apply when ready." : "Ready. Select an element or add one from the palette.";
             Status.ToolTip = mappingDiagnostic ?? draft.Model.Diagnostic ?? Status.Text;
@@ -346,7 +346,7 @@ public partial class MermaidVisualEditorWindow
     private void BeginInlineEdit(string id)
     {
         if (PropertiesPending) { Status.Text = "Update or reset pending property changes before inline label editing."; return; }
-        if (!CanTransform || !positions.TryGetValue("node:" + id, out var box)) return;
+        if (!CanTransform || !draft.Model.Capabilities.Query(MermaidOperationKind.NodeLabel, id).Permitted || !positions.TryGetValue("node:" + id, out var box)) return;
         if (inlineEditor is not null) DiagramCanvas.Children.Remove(inlineEditor);
         var node = draft.Model.Node(id); var editor = new TextBox { Text = node.Label, MaxLength = 4096, Width = box.Width - 16, MinHeight = 36, TextWrapping = TextWrapping.Wrap, Padding = new(5) };
         inlineEditor = editor; AutomationProperties.SetName(editor, "Edit label for node " + id); AutomationProperties.SetAutomationId(editor, "MermaidInlineLabel");

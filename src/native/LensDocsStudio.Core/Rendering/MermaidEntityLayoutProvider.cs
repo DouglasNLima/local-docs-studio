@@ -10,6 +10,7 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
 {
     // This provider belongs to one render call. Never install it on MermaidRenderer globally.
     public PositionedGraph? Flowchart { get; private set; }
+    public MermaidGraph? FlowchartSemantics { get; private set; }
     public IReadOnlyList<FlowchartGroupIdentity> Groups { get; private set; } = [];
     public PositionedGraph LayoutFlowchart(MermaidGraph graph, RenderOptions? options = null, StrictStylingOptions? strict = null)
     {
@@ -19,6 +20,9 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             Edges = graph.Edges.Select(edge => edge with { Label = edge.Label is null ? null : Decode(edge.Label) }).ToArray(),
             Subgraphs = graph.Subgraphs.Select(DecodeGroup).ToArray()
         };
+        // Layout adds visual wrapping to labels. Retain the complete decoded semantics
+        // at the renderer boundary so wrapping cannot be mistaken for a source change.
+        FlowchartSemantics = decoded;
         Groups = Array.AsReadOnly(Identities(decoded.Subgraphs, null).ToArray());
         var positioned = inner.LayoutFlowchart(decoded, options, strict);
         Flowchart = positioned with

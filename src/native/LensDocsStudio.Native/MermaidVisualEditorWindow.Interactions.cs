@@ -281,7 +281,8 @@ public partial class MermaidVisualEditorWindow
     private void UpdateEndpointHandles()
     {
         var key = Selected;
-        var available = CanTransform && !PropertiesPending && Elements.SelectedItems.Count == 1 && key is not null && connectionRuntime.ContainsKey(key);
+        var available = CanTransform && !PropertiesPending && Elements.SelectedItems.Count == 1 && key is not null && connectionRuntime.ContainsKey(key)
+            && draft.Model.Capabilities.Query(MermaidOperationKind.Reconnect, key).Permitted;
         if (available && endpointEdgeKey == key && sourceHandle is not null && targetHandle is not null
             && DiagramCanvas.Children.Contains(sourceHandle) && DiagramCanvas.Children.Contains(targetHandle))
         { UpdateEndpointHandlePositions(); return; }

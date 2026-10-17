@@ -22,7 +22,7 @@ public sealed class MermaidTransformationService
 {
     public IReadOnlyList<MermaidDocumentPatch> Plan(MermaidDiagramModel model, MermaidEditOperation operation)
     {
-        if (!model.CanEdit) throw new ArgumentException(model.Diagnostic ?? "This source is protected. Use Edit source.");
+        model.Capabilities.Require(operation);
         var patches = new List<MermaidDocumentPatch>();
         switch (operation)
         {
@@ -80,8 +80,10 @@ public sealed class MermaidTransformationService
                 }
                 else
                 {
-                    if (edge.Type != update.Type) Replace(edge.ConnectionSpan, ConnectionToken(update.Type));
-                    if (edge.Label != update.Label)
+                    if (edge.InlineLabel && edge.Type != update.Type)
+                        Replace(edge.ConnectionSpan, ConnectionToken(update.Type) + "|" + (edge.Label == update.Label ? edge.LabelSpan!.Value.Read(model.Source) : EscapeLabel(update.Label)) + "|");
+                    else if (edge.Type != update.Type) Replace(edge.ConnectionSpan, ConnectionToken(update.Type));
+                    if (edge.Label != update.Label && !(edge.InlineLabel && edge.Type != update.Type))
                     {
                         if (edge.LabelSpan is { } span) Replace(span, EscapeLabel(update.Label));
                         else Insert(edge.ConnectionSpan.End, "|" + EscapeLabel(update.Label) + "|");

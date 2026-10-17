@@ -1,9 +1,9 @@
 name: Validate native Windows edition
 on:
   push:
-    branches: [develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: [develop, 'integration/native-wpf-candidate', 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability', 'feature/native-mermaid-advanced-partial-editing']
   pull_request:
-    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: [develop, 'feature/native-wpf-rebuild', 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability', 'feature/native-mermaid-advanced-partial-editing']
   workflow_dispatch:
 permissions:
   contents: read

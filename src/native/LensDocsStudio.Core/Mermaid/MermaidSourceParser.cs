@@ -19,6 +19,7 @@ public sealed class MermaidSourceParser
         var occurrences = new List<MermaidOccurrence>(); var edges = new List<MermaidEdge>();
         var groups = new List<MermaidSubgraph>(); var styles = new List<MermaidStyle>();
         var protectedRegions = new List<MermaidProtectedRegion>(); var stack = new Stack<GroupDraft>();
+        var partialReasons = new List<string>();
         string direction = "TD"; MermaidSourceSpan directionSpan = default; string? error = null; var diagramType = "Unknown";
         var header = false;
         try
@@ -72,6 +73,11 @@ public sealed class MermaidSourceParser
                     var group = stack.Peek(); group.Direction = value; group.DirectionSpan = statement; continue;
                 }
                 if (TryStyle(text, statement, styles)) continue;
+                if (TryLinkStyle(text))
+                {
+                    protectedRegions.Add(new(statement, "Ordinal-sensitive connection styling is preserved."));
+                    partialReasons.Add("Connection order is protected by linkStyle."); continue;
+                }
                 var position = 0;
                 var scope = stack.TryPeek(out var current) ? current.Id : null;
                 try
@@ -82,22 +88,40 @@ public sealed class MermaidSourceParser
                     {
                         SkipSpace(text, ref position); if (position == text.Length) break;
                         var connectionStart = position;
-                        var type = ReadConnection(text, ref position); var connectionEnd = position;
-                        SkipSpace(text, ref position); MermaidSourceSpan? labelSpan = null; var label = "";
-                        if (position < text.Length && text[position] == '|')
+                        MermaidSourceSpan? labelSpan = null; var label = "";
+                        var inline = Regex.Match(text[position..], @"^(<)?(--|==|-\.)\s+(.+?)\s+(-->|==>|\.->)", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(50));
+                        FlowConnectionType type;
+                        if (inline.Success)
+                        {
+                            type = inline.Groups[4].Value switch { "==>" => FlowConnectionType.Thick, ".->" => FlowConnectionType.Dotted, _ => inline.Groups[1].Success ? FlowConnectionType.Bidirectional : FlowConnectionType.Directed };
+                            if (inline.Groups[1].Success && type is FlowConnectionType.Thick or FlowConnectionType.Dotted)
+                                throw new ArgumentException("This combination of arrow ends and line style remains protected.");
+                            var raw = inline.Groups[3]; var leading = raw.Value.Length - raw.Value.TrimStart().Length;
+                            labelSpan = new(statement.Start + position + raw.Index + leading, raw.Value.Trim().Length);
+                            label = DecodeEdgeLabel(labelSpan.Value.Read(source));
+                            labelSpan = UnquoteSpan(labelSpan.Value, source); position += inline.Length;
+                        }
+                        else type = ReadConnection(text, ref position);
+                        var connectionEnd = position;
+                        SkipSpace(text, ref position);
+                        if (!inline.Success && position < text.Length && text[position] == '|')
                         {
                             var start = ++position;
                             while (position < text.Length && text[position] != '|') position++;
                             if (position == text.Length) throw new ArgumentException("Close the connection label with a pipe.");
-                            labelSpan = new(statement.Start + start, position - start); label = DecodeLabel(text[start..position]); position++;
+                            labelSpan = new(statement.Start + start, position - start); label = DecodeEdgeLabel(text[start..position]);
+                            labelSpan = UnquoteSpan(labelSpan.Value, source); position++;
                         }
                         var target = ReadNode(text, ref position, statement, scope);
                         localEdges.Add(new("edge-" + (edges.Count + localEdges.Count), local[^1], target, label, type,
-                            new(statement.Start + connectionStart, connectionEnd - connectionStart), labelSpan, statement));
+                            new(statement.Start + connectionStart, connectionEnd - connectionStart), labelSpan, statement) { InlineLabel = inline.Success });
                         local.Add(target);
                     }
-                    // Chained edges are mapped for inspection, but transforming a shared middle declaration is unsafe.
-                    if (localEdges.Count > 1) { error ??= "Chained connections are protected. Split them into separate source statements to edit visually."; protectedRegions.Add(new(statement, error)); }
+                    if (localEdges.Count > 1)
+                    {
+                        const string reason = "Chained connection structure is protected; exact property spans can be checked independently.";
+                        partialReasons.Add(reason); protectedRegions.Add(new(statement, reason));
+                    }
                     occurrences.AddRange(local); edges.AddRange(localEdges);
                 }
                 catch (ArgumentException ex)
@@ -109,8 +133,8 @@ public sealed class MermaidSourceParser
             var nodes = occurrences.GroupBy(item => item.Id).Select(items =>
             {
                 var declarations = items.Where(item => item.LabelSpan is not null).ToArray();
-                if (declarations.Length > 1) error ??= "Repeated node declarations are protected; keep one declaration and use IDs for references.";
-                var first = declarations.FirstOrDefault() ?? items.First();
+                if (declarations.Length > 1) partialReasons.Add("Repeated node declarations have protected identity and declaration properties.");
+                var first = items.First();
                 return new MermaidNode(items.Key, first.LabelSpan is { } span ? DecodeLabel(span.Read(source)) : items.Key, first.Shape, items.ToArray());
             }).ToArray();
             if (nodes.Length > MaximumNodes || nodes.Length + edges.Count + groups.Count > MaximumElements)
@@ -127,20 +151,47 @@ public sealed class MermaidSourceParser
                 error ??= "A node belongs to more than one subgraph. Its membership is protected; resolve it in source mode.";
             if (styles.Where(style => style.Kind is "class" or "style").SelectMany(style => style.Targets).Any(target => nodes.All(node => node.Id != target.Id)))
                 error ??= "A class or style references an unknown node. Correct it in source mode.";
-            var compatibility = error is null ? MermaidCompatibility.Editable : MermaidCompatibility.Protected;
+            var compatibility = error is null ? (partialReasons.Count == 0 ? MermaidCompatibility.Editable : MermaidCompatibility.PartiallyEditable) : MermaidCompatibility.Protected;
             if (error is null)
             {
                 var graph = MermaidRenderer.Parse(source);
                 if (graph.Nodes.Count != nodes.Length || graph.Edges.Count != edges.Count
                     || nodes.Any(node => !graph.Nodes.TryGetValue(node.Id, out var parsed) || parsed.Label != RendererLabel(node, source) || parsed.Shape.ToString() != RendererShape(node.Shape))
-                    || edges.Where((edge, index) => graph.Edges[index].Source != edge.Source.Id || graph.Edges[index].Target != edge.Target.Id).Any())
+                    || edges.Where((edge, index) => graph.Edges[index].Source != edge.Source.Id || graph.Edges[index].Target != edge.Target.Id
+                        || DecodeEdgeLabel(graph.Edges[index].Label ?? "") != edge.Label
+                        || !MatchesConnection(edge.Type, graph.Edges[index])).Any()
+                    || !GroupsAgree(graph.Subgraphs, groups, nodes))
                 { error = "The source adapter and Mermaid parser disagree. This diagram is protected; use Edit source."; compatibility = MermaidCompatibility.Protected; }
             }
-            return new(source, direction, directionSpan, nodes, edges, groups.OrderBy(group => group.Opening.Start).ToArray(), styles, protectedRegions, compatibility, error) { DiagramType = diagramType };
+            return new(source, direction, directionSpan, nodes, edges, groups.OrderBy(group => group.Opening.Start).ToArray(), styles, protectedRegions, compatibility,
+                error ?? (partialReasons.Count == 0 ? null : string.Join(" ", partialReasons.Distinct())))
+                { DiagramType = diagramType, HasCompleteSourceMap = error is null };
         }
         catch (Exception ex) when (ex is ArgumentException or MermaidParseException)
         { return new(source, direction, directionSpan, [], [], [], [], protectedRegions, MermaidCompatibility.Invalid, ex.Message) { DiagramType = diagramType }; }
     }
+
+    internal static bool MatchesConnection(FlowConnectionType type, Mermaider.Models.MermaidEdge edge)
+        => edge.Style == (type == FlowConnectionType.Dotted ? Mermaider.Models.EdgeStyle.Dotted : type == FlowConnectionType.Thick ? Mermaider.Models.EdgeStyle.Thick : Mermaider.Models.EdgeStyle.Solid)
+            && edge.HasArrowStart == (type == FlowConnectionType.Bidirectional) && edge.HasArrowEnd == (type != FlowConnectionType.Undirected) && edge.MinLength == 1;
+    private static bool GroupsAgree(IReadOnlyList<Mermaider.Models.MermaidSubgraph> rendererGroups, IReadOnlyList<MermaidSubgraph> groups, IReadOnlyList<MermaidNode> nodes, string? parent = null)
+    {
+        var local = groups.Where(group => group.ParentId == parent).OrderBy(group => group.Opening.Start).ToArray();
+        return rendererGroups.Count == local.Length && rendererGroups.Select((group, index) =>
+            group.Id == local[index].Id && DecodeLabel(group.Label) == local[index].Label
+            && group.Direction?.ToString() == local[index].Direction
+            && group.NodeIds.SequenceEqual(nodes.Where(node => node.Occurrences.Any(item => item.SubgraphId == group.Id)).OrderBy(node => node.Occurrences.First(item => item.SubgraphId == group.Id).Span.Start).Select(node => node.Id))
+            && GroupsAgree(group.Children, groups, nodes, group.Id)).All(value => value);
+    }
+    internal static string DecodeEdgeLabel(string text) => DecodeLabel(text.Trim());
+    private static MermaidSourceSpan UnquoteSpan(MermaidSourceSpan span, string source)
+    {
+        var text = span.Read(source); var leading = text.Length - text.TrimStart().Length; var trimmed = text.Trim();
+        return trimmed.Length >= 2 && trimmed[0] == '"' && trimmed[^1] == '"'
+            ? new(span.Start + leading + 1, trimmed.Length - 2) : span;
+    }
+    private static bool TryLinkStyle(string text) => Regex.IsMatch(text,
+        @"^linkStyle\s+(?:default|\d+(?:\s*,\s*\d+)*)\s+[A-Za-z-]+\s*:[^\r\n]+$", RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(50));
 
     private static string RendererLabel(MermaidNode node, string source)
     {
@@ -148,7 +199,7 @@ public sealed class MermaidSourceParser
         if (raw.Length >= 2 && raw[0] == '"' && raw[^1] == '"') raw = raw[1..^1];
         return Regex.Replace(raw, "<br\\s*/?>", "\n", RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(50)).Replace("\\n", "\n");
     }
-    private static string RendererShape(FlowNodeShape shape) => shape switch
+    internal static string RendererShape(FlowNodeShape shape) => shape switch
     { FlowNodeShape.Process => "Rectangle", FlowNodeShape.Decision => "Diamond", FlowNodeShape.Terminal => "Stadium", _ => shape.ToString() };
     public static bool IsDirection(string text) => text is "TD" or "TB" or "BT" or "LR" or "RL";
     public static bool IsId(string text) => text.Length is > 0 and <= 128 && (char.IsLetter(text[0]) || text[0] == '_')

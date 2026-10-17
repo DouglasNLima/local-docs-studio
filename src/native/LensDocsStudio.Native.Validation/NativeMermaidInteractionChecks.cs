@@ -35,7 +35,7 @@ internal static partial class NativeUiChecks
                 Find(main, "DiagramEditVisually0").AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Visual Edit did not open.");
                 Wait(() => Find(visual!, "MermaidDraftState").Name != "Validating...", "Canonical rendering did not finish.");
-                var editable = Find(visual!, "MermaidApply").IsEnabled;
+                var editable = Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable";
                 visual!.CaptureToFile(Path.Combine(output, "before-" + count + ".png"));
                 // Keep renderer protection fail-closed; it must not become an editing permission.
                 if (!editable)
@@ -116,7 +116,7 @@ internal static partial class NativeUiChecks
             var editor = Find(main!, "MarkdownEditor");
             string Draft() => ReadEditorText(Find(visual!, "MermaidDraftSource"));
             void Click(string id) => Find(visual!, id).AsButton().Invoke();
-            void Ready(Func<string, bool> expected) => Wait(() => expected(Draft()) && Find(visual!, "MermaidApply").IsEnabled, "Candidate draft/render did not settle: " + Find(visual!, "MermaidStatus").Name);
+            void Ready(Func<string, bool> expected) => Wait(() => expected(Draft()) && (Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable"), "Candidate draft/render did not settle: " + Find(visual!, "MermaidStatus").Name);
             System.Drawing.Point Centre(string id)
             { var box = Find(visual!, id).BoundingRectangle; return new(box.Left + box.Width / 2, box.Top + box.Height / 2); }
             void Check(bool valid, string text) { if (!valid) throw new IOException(text); checks.Add(text); }
@@ -309,7 +309,7 @@ internal static partial class NativeUiChecks
                 && !obsoletePreviewAction.SequenceEqual(currentAction.FrameworkAutomationElement.RuntimeId.Value), "The current preview action was not replaced after document Undo.");
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Editor did not reopen after Undo.");
-            Wait(() => Find(visual!, "MermaidApply").IsEnabled, "Reopened diagram did not finish rendering.");
+            Wait(() => Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable", "Reopened diagram did not finish rendering.");
         }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "interactions.json"), JsonSerializer.Serialize(new
         { Passed = passed, Baseline = baseline, HighContrast = highContrast, Dpi = GetDpiForSystem(), Observations = observations, Error = error,

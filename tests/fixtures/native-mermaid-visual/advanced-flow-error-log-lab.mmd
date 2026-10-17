@@ -1,0 +1,22 @@
+flowchart LR
+    %% Synthetic fixture. Preserve comments, chains, styles and source representation.
+    Api["Synthetic API entry"] --> Capture["Capture context<br/>Synthetic operation identifiers"] --> Validate{Valid context?}
+    Batch["Synthetic batch entry"] --> Capture
+    Manual["Manual diagnostic entry"] --> Capture
+    Validate -->|Yes| Store[(Synthetic error log)]
+    Validate -.->|Missing context| Reject["Reject incomplete record"]
+    Store --> Schedule["Background scheduler"] --> Queue["Retry queue"]
+    Queue -.->|Retry due| Retry
+    Retry --> Capture
+    Store --> Review["Review synthetic records<br/>No private documentation"]
+    Review -->|Retry| Queue
+    subgraph Diagnostics[Diagnostics]
+        subgraph Independent[Independent branch]
+            direction TB
+            IndependentStep["Independent diagnostic step"]
+            Notify["Notify synthetic operator"] -->|Archive next| Archive["Archive synthetic record"]
+        end
+    end
+    classDef quiet fill:#FAFAFA,stroke:#334155,color:#111111
+    class IndependentStep,Notify quiet
+    style Archive stroke-width:2px,stroke-dasharray:4 2
