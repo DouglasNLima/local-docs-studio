@@ -6,11 +6,12 @@ of PRs #30, #31, #32 and #33. Main remains untouched. Post-merge browser/static
 [run 39061522521](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39061522521)
 passed Chromium and Edge; Pages deployment was skipped. The native
 [post-merge run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39061522483)
-was still executing installer lifecycle checks when this implementation milestone
-was recorded. Baseline acceptance remains pending its final result.
+has now passed both the complete native build/Core/export/package/installer job
+and the separate installed/upgraded/reinstalled State authoring job. The
+consolidated baseline is accepted from these actual post-merge results.
 
-The local Release solution builds with zero warnings/errors. All 1,510 Core cases
-pass, including 86 ER cases. Actual Windows UIA, High Contrast, canonical
+The local Release solution builds with zero warnings/errors. All 1,515 Core cases
+pass, including 91 ER cases. Actual Windows UIA, High Contrast, canonical
 fidelity, performance observations, installer lifecycle and independent package
 verification are mandatory hosted gates and are **not yet certified** at this
 milestone. Earlier State/Sequence/Flowchart results are retained in their own reports.
@@ -193,3 +194,35 @@ The cancellation check now also requires measured native pointer updates, preven
 a source-only assertion from falsely establishing that a drag actually occurred.
 Original [run 39063313555](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39063313555)
 logs and captures are retained. Complete UIA remains pending correction validation.
+
+At that same revision the High Contrast fidelity report passes 104 assertions,
+covering six fixture/theme pixel comparisons and document ownership checks. Hosted
+parse/render/native-conversion observations are respectively 0.36/59/244 ms for
+10 entities and 15 relationships, and 10.90/894/858 ms for 30/60. The 100/150 case
+fails the existing renderer deadline (reported after 5.66 seconds); its attempted
+edit also fails safely. No limits were increased. Approximately 1.43 GB of
+current-thread cumulative allocations were recorded across that failed scenario,
+including repeated validation; this is neither live nor peak process memory and
+excludes worker-thread allocations. The 250-attribute case renders/converts in
+4/1,005 ms; convergence/clusters in 12/168 ms; long labels in 0.4/83 ms. These
+revision-scoped hosted observations do not establish complete UI acceptance or
+hardware-independent performance guarantees. Actual editor process measurements
+are captured separately by `--er-performance-ui`.
+
+At `3814db8`, both ER jobs pass in run 39063821569: 22 normal and 23 actual High
+Contrast UIA assertions; 103 normal and 104 High Contrast fidelity/ownership
+assertions; and actual process performance at 10/15 and 30/60. The 100/150 editor
+case is explicitly recorded as a renderer resource failure. This proves the
+complete authoring, cardinality, endpoint-pointer, Apply/document Undo/Redo,
+Save/restart/reopen workflow at that revision. Later source changes still require
+their own exact-head certification.
+
+Screenshot inspection found a partially clipped UK control caused by native minimum
+width. The next candidate constrains the key row and adds focus/visibility assertions
+for all six attribute inputs at every required window size. It also covers deleting
+and recreating the last independent entity, real owner conflicts/close/other-tab
+Apply, repeated canvas attribute hits and self-loop canvas SelectionItem identities.
+A source-integrity review additionally found that key changes could rewrite a
+normalised formatted comment. Unchanged comments now retain their original quoted
+bytes and spacing; unchanged relationship labels retain original quoting/escaping
+through cardinality edits. Four pinned formatting/escaping regressions verify this.

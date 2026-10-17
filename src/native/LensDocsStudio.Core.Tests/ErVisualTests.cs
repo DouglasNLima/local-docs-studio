@@ -166,4 +166,20 @@ public class ErVisualTests
         ErSemanticValidation.ValidateRendering(draft.Model, new DiagramService().Render(source));
         var result = await draft.ExecuteAsync(new UpdateErEntity("B", "B", "Independent")); Assert.True(result.Success, result.Error); Assert.Equal(source.Replace(" B {", " B[\"Independent\"] {"), draft.Source);
     }
+    [Fact] public async Task Last_independent_entity_deletion_and_empty_draft_creation_are_reversible()
+    {
+        var source = "erDiagram\n A {\n }\n"; var draft = new ErVisualDraft(source); var result = await draft.ExecuteAsync(new DeleteErEntity("A")); Assert.True(result.Success, result.Error);
+        Assert.Equal("erDiagram\n", draft.Source); Assert.Empty(draft.Model.Entities); draft.Undo(); Assert.Equal(source, draft.Source); draft.Redo();
+        result = await draft.ExecuteAsync(new AddErEntity("B", "New entity")); Assert.True(result.Success, result.Error); Assert.Equal("B", draft.Model.Entities.Single().Id);
+    }
+    [Theory, InlineData("Line\\nSecond"), InlineData("Line<br/>Second"), InlineData("**Bold** and *italic*"), InlineData("~~Removed~~ <sub>suffix</sub>")]
+    public async Task Key_and_cardinality_changes_retain_raw_comment_and_label_escaping(string text)
+    {
+        var source = "erDiagram\r\n A {\n string id UK   \"" + text + "\"\r\n }\n B {\n }\n A ||--o{ B : '" + text + "'\n";
+        var draft = new ErVisualDraft(source); var attribute = draft.Model.Entity("A").Attributes.Single();
+        var result = await draft.ExecuteAsync(new UpdateErAttribute(attribute.Identity, attribute.Type, attribute.Name, new[] { ErKeyType.UK, ErKeyType.PK }, attribute.Comment)); Assert.True(result.Success, result.Error);
+        Assert.Equal(source.Replace("id UK   ", "id UK PK   "), draft.Source);
+        var relationship = draft.Model.Relationships.Single(); result = await draft.ExecuteAsync(new UpdateErRelationship(relationship.Identity, "A", "B", ErCardinality.ZeroOne, relationship.Cardinality2, relationship.Identifying, relationship.Label)); Assert.True(result.Success, result.Error);
+        Assert.Equal(source.Replace("id UK   ", "id UK PK   ").Replace("A ||--o{ B", "A |o--o{ B"), draft.Source);
+    }
 }

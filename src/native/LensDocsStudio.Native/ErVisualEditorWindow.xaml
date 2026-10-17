@@ -64,7 +64,7 @@
     </Expander>
    </Grid>
    <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
-   <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
+   <ScrollViewer x:Name="InspectorViewport" Grid.Column="4" AutomationProperties.AutomationId="ErInspectorViewport" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
     <StackPanel Margin="12">
      <TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
      <TextBlock x:Name="Summary" Text="Select an entity, attribute or relationship." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="ErSelectionSummary"/>
@@ -104,7 +104,7 @@
       <TextBox x:Name="AttributeType" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Attribute type" AutomationProperties.AutomationId="ErAttributeType"/>
       <Label Content="Attribute name" Target="{Binding ElementName=AttributeName}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="AttributeName" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Attribute name" AutomationProperties.AutomationId="ErAttributeName"/>
-      <StackPanel Orientation="Horizontal" Margin="0,6"><CheckBox x:Name="PrimaryKey" Content="PK" Margin="0,0,12,0" AutomationProperties.Name="Primary key documentation marker" AutomationProperties.AutomationId="ErPK"/><CheckBox x:Name="ForeignKey" Content="FK" Margin="0,0,12,0" AutomationProperties.Name="Foreign key documentation marker" AutomationProperties.AutomationId="ErFK"/><CheckBox x:Name="UniqueKey" Content="UK" AutomationProperties.Name="Unique key documentation marker" AutomationProperties.AutomationId="ErUK"/></StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,6"><CheckBox x:Name="PrimaryKey" Style="{StaticResource Form.CheckBox}" Width="60" MinWidth="0" Padding="0" HorizontalAlignment="Left" Content="PK" Margin="0,0,12,0" AutomationProperties.Name="Primary key documentation marker" AutomationProperties.AutomationId="ErPK"/><CheckBox x:Name="ForeignKey" Style="{StaticResource Form.CheckBox}" Width="60" MinWidth="0" Padding="0" HorizontalAlignment="Left" Content="FK" Margin="0,0,12,0" AutomationProperties.Name="Foreign key documentation marker" AutomationProperties.AutomationId="ErFK"/><CheckBox x:Name="UniqueKey" Margin="0" Style="{StaticResource Form.CheckBox}" Width="60" MinWidth="0" Padding="0" HorizontalAlignment="Left" Content="UK" AutomationProperties.Name="Unique key documentation marker" AutomationProperties.AutomationId="ErUK"/></StackPanel>
       <Label Content="Attribute comment" Target="{Binding ElementName=AttributeComment}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="AttributeComment" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Attribute comment" AutomationProperties.AutomationId="ErAttributeComment"/>
       <TextBlock Text="PK, FK and UK are Mermaid documentation markers. They do not enforce database constraints or create relationships." Style="{StaticResource Form.Help}" TextWrapping="Wrap"/>

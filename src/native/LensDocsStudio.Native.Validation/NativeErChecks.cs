@@ -21,6 +21,8 @@ internal static partial class NativeErChecks
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         Directory.CreateDirectory(output); var checks = new List<string>(); var fidelity = new List<object>(); var performance = new List<object>(); var grammar = new List<object>();
         if (highContrast) Check(SystemParameters.HighContrast, "Actual Windows High Contrast is active for canonical ER fidelity");
+        var emptySource = "erDiagram\n"; var empty = NativeErPresentation.Create(new ErDiagramSourceParser().Parse(emptySource), new DiagramService().Render(emptySource), new());
+        Check(empty.Entities.Count == 0 && empty.Attributes.Count == 0 && empty.Relationships.Count == 0, "Empty canonical ER draft has no fabricated geometry or editing identities");
         foreach (var file in Directory.GetFiles("tests/fixtures/native-er", "*.mmd"))
         foreach (var dark in new[] { false, true })
         {

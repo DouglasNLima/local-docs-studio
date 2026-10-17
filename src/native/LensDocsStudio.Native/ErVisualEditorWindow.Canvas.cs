@@ -23,6 +23,8 @@ public partial class ErVisualEditorWindow
     private Path? dragOverlay;
     private int endpointFrames;
     private long endpointAllocated, endpointStarted;
+    private long endpointUpdateAllocated;
+    private double endpointMaximumUpdate;
     private static readonly Pen HitPen = HitTestPen();
     private static Pen HitTestPen() { var pen = new Pen(Brushes.Black, 12); pen.Freeze(); return pen; }
     private sealed class ElementButton : ToggleButton { protected override AutomationPeer OnCreateAutomationPeer() => new ElementPeer(this); }
@@ -39,7 +41,8 @@ public partial class ErVisualEditorWindow
     {
         if (presentation is not { } view) return; CancelPointer(); Surface.Children.Clear(); buttons.Clear(); endpointHandles.Clear();
         var image = new Image { Source = view.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }; AutomationProperties.SetAutomationId(image, "ErCanonicalDrawing"); Surface.Children.Add(image);
-        Surface.Width = view.Drawing.Width; Surface.Height = view.Drawing.Height;
+        Surface.Width = view.Entities.Count == 0 ? 320 : view.Drawing.Width; Surface.Height = view.Entities.Count == 0 ? 180 : view.Drawing.Height;
+        if (view.Entities.Count == 0) Surface.Children.Add(new TextBlock { Text = "Add an entity to start this ER diagram.", Foreground = (Brush)FindResource("MutedTextBrush"), Margin = new(16), IsHitTestVisible = false });
         var descriptions = Choices().GroupBy(item => item.Identity).ToDictionary(group => group.Key, group => group.First().Description);
         foreach (var item in view.Entities) AddHit(item, descriptions.GetValueOrDefault(item.Identity) ?? item.Identity, 10);
         foreach (var item in view.Attributes) AddHit(item, descriptions.GetValueOrDefault(item.Identity) ?? item.Identity, 20);
@@ -84,10 +87,17 @@ public partial class ErVisualEditorWindow
         {
             if (!CanEdit || PropertiesPending) return; CancelPointer(); endpointDrag = (handle, relationship.Identity, first);
             endpointFrames = 0; endpointAllocated = GC.GetAllocatedBytesForCurrentThread(); endpointStarted = Stopwatch.GetTimestamp();
+            endpointUpdateAllocated = 0; endpointMaximumUpdate = 0;
             dragGuide = new(relationship.First, relationship.Second); dragOverlay = new() { Data = dragGuide, Stroke = (Brush)FindResource("AccentBrush"), StrokeThickness = 2, IsHitTestVisible = false };
             Surface.Children.Add(dragOverlay); Panel.SetZIndex(dragOverlay, 40); if (!handle.CaptureMouse()) CancelPointer(); e.Handled = true;
         };
-        handle.PreviewMouseMove += (_, e) => { if (endpointDrag is not { } drag || dragGuide is null) return; if (e.LeftButton != MouseButtonState.Pressed) { CancelPointer(); return; } if (drag.First) dragGuide.StartPoint = e.GetPosition(Surface); else dragGuide.EndPoint = e.GetPosition(Surface); endpointFrames++; e.Handled = true; };
+        handle.PreviewMouseMove += (_, e) =>
+        {
+            if (endpointDrag is not { } drag || dragGuide is null) return; if (e.LeftButton != MouseButtonState.Pressed) { CancelPointer(); return; }
+            var allocated = GC.GetAllocatedBytesForCurrentThread(); var started = Stopwatch.GetTimestamp();
+            if (drag.First) dragGuide.StartPoint = e.GetPosition(Surface); else dragGuide.EndPoint = e.GetPosition(Surface); endpointFrames++; e.Handled = true;
+            endpointUpdateAllocated += GC.GetAllocatedBytesForCurrentThread() - allocated; endpointMaximumUpdate = Math.Max(endpointMaximumUpdate, Stopwatch.GetElapsedTime(started).TotalMilliseconds);
+        };
         handle.PreviewMouseLeftButtonUp += async (_, e) =>
         {
             if (endpointDrag is not { } drag || presentation is null) return; var pointAtDrop = e.GetPosition(Surface); var hit = presentation.Entities.Where(item => item.Bounds.Contains(pointAtDrop)).ToArray();
@@ -102,7 +112,7 @@ public partial class ErVisualEditorWindow
     private void CancelPointer()
     {
         var owner = endpointDrag?.Owner; endpointDrag = null; if (owner?.IsMouseCaptured == true) owner.ReleaseMouseCapture(); if (dragOverlay is not null) Surface.Children.Remove(dragOverlay); dragOverlay = null; dragGuide = null;
-        if (owner is not null && endpointFrames > 0) AutomationProperties.SetHelpText(Status, $"ER endpoint drag updates: {endpointFrames}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - endpointAllocated}; duration: {Stopwatch.GetElapsedTime(endpointStarted).TotalMilliseconds:F1} ms. No parsing, layout or SVG conversion during movement.");
+        if (owner is not null && endpointFrames > 0) AutomationProperties.SetHelpText(Status, $"ER endpoint drag updates: {endpointFrames}; maximum update: {endpointMaximumUpdate:F3} ms; update allocated bytes: {endpointUpdateAllocated}; UI-thread allocated bytes: {GC.GetAllocatedBytesForCurrentThread() - endpointAllocated}; duration: {Stopwatch.GetElapsedTime(endpointStarted).TotalMilliseconds:F1} ms. No parsing, layout or SVG conversion during movement.");
     }
     private void CanvasPointer(object sender, MouseButtonEventArgs e)
     {

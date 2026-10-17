@@ -51,7 +51,8 @@ public sealed class ErTransformationService
         { var attribute = model.Attribute(identity); var entity = model.Entity(attribute.EntityId); EntitySafe(entity); Safe(attribute.Statement); edit(attribute, entity, entity.Attributes.ToList().FindIndex(item => item.Identity == identity)); }
         void RelationshipUpdate(string identity, string from, string to, ErCardinality first, ErCardinality second, bool identifying, string label)
         {
-            var current = model.Relationship(identity); Safe(current.Statement); Id(from); Id(to); model.Entity(from); model.Entity(to); Text(label, "relationship label", true);
+            var current = model.Relationship(identity); Safe(current.Statement); Id(from); Id(to); model.Entity(from); model.Entity(to);
+            if (current.Label != label) Text(label, "relationship label", true);
             _ = ErDiagramSourceParser.Notation(first, true); _ = ErDiagramSourceParser.Notation(second, false);
             if ((current.Entity1 != from || current.Entity2 != to) && model.Statements.Any(item => item.Protected && item.Owner is null)) throw new ArgumentException("Unknown statements protect endpoint reconnection. Use Edit source.");
             CheckOrphan(current, from, to);
@@ -81,7 +82,7 @@ public sealed class ErTransformationService
                 entities.Add(new() { Id = add.Id, Label = add.Label, Attributes = [] }); break;
             case UpdateErEntity update:
             {
-                var entity = model.Entity(update.Id); EntitySafe(entity); Id(update.NewId); Text(update.Label, "entity label");
+                var entity = model.Entity(update.Id); EntitySafe(entity); Id(update.NewId); if (entity.Label != update.Label) Text(update.Label, "entity label");
                 if (update.Id != update.NewId) { GlobalReferences(); ValidNew(update.NewId); }
                 if (entity.Implicit)
                 {
@@ -126,12 +127,16 @@ public sealed class ErTransformationService
             case UpdateErAttribute update:
                 AttributeEdit(update.Identity, (attribute, entity, index) =>
                 {
-                    _ = AttributeText(update.Type, update.Name, update.Keys, update.Comment);
+                    _ = AttributeText(update.Type, update.Name, update.Keys, attribute.Comment == update.Comment ? null : update.Comment);
                     Token(attribute.Statement, "type", update.Type); Token(attribute.Statement, "name", update.Name);
                     if (!attribute.Keys.SequenceEqual(update.Keys) || attribute.Comment != update.Comment)
                     {
                         var at = attribute.Statement.Tokens["name"].End; var keys = attribute.Keys.SequenceEqual(update.Keys) ? attribute.Statement.Read(model.Source, "keys") : KeyText(update.Keys);
-                        Patch(new(at, attribute.Statement.Span.End - at), keys + (update.Comment is null ? "" : " \"" + update.Comment + "\""));
+                        var hasComment = attribute.Statement.Tokens.TryGetValue("comment", out var originalComment);
+                        var separator = hasComment ? model.Source[attribute.Statement.Tokens["keys"].End..(originalComment.Start - 1)] : " ";
+                        var comment = attribute.Comment == update.Comment && hasComment
+                            ? model.Source.Substring(originalComment.Start - 1, originalComment.Length + 2) : "\"" + update.Comment + "\"";
+                        Patch(new(at, attribute.Statement.Span.End - at), keys + (update.Comment is null ? "" : separator + comment));
                     }
                     ChangeAttributes(entity.Id, values => { values[index] = new(update.Type, update.Name, update.Keys.ToArray(), update.Comment); return values; });
                 }); break;

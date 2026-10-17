@@ -21,6 +21,13 @@ public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<Na
         using var reader = XmlReader.Create(new StringReader(safe), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
         var root = XDocument.Load(reader).Root!;
         if (root.Descendants().Count() > 30_000) throw new InvalidDataException("The canonical ER drawing exceeds the interaction geometry budget.");
+        if (model.Entities.Count == 0)
+        {
+            if (root.Descendants().Any(item => Class(item, "entity") || Class(item, "er-relationship") || Class(item, "edge-label"))) Reject();
+            // An empty canonical diagram has no pixels or hit targets. Retain its valid
+            // source draft so deleting the last independent entity remains reversible.
+            var blank = new DrawingImage(new DrawingGroup()); blank.Freeze(); return new(blank, [], [], []);
+        }
         var drawing = svg.Render(render.Svg!); var origin = drawing.Drawing.Bounds.Location;
         var entities = new List<NativeErHit>(); var attributes = new List<NativeErHit>(); var connections = new List<NativeErConnection>();
         var boxes = root.Descendants().Where(item => Class(item, "entity")).ToArray();

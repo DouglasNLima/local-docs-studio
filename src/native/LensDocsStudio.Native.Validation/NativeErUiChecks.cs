@@ -59,7 +59,16 @@ internal static partial class NativeUiChecks
             Click("ErValidate"); Wait(() => Find(visual!, "ErApply").IsEnabled, "ER validation did not finish.");
             Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original, "Private ER operations retain owner and disk bytes before Apply");
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
-            { ResizeForCapture(width, height); Click("ErFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "ErApply").BoundingRectangle), "ER Apply remains visible at " + width + "x" + height); }
+            {
+                ResizeForCapture(width, height); Click("ErFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "ErApply").BoundingRectangle), "ER Apply remains visible at " + width + "x" + height);
+                SelectAttribute("CUSTOMER", 2);
+                foreach (var fieldId in new[] { "ErAttributeType", "ErAttributeName", "ErPK", "ErFK", "ErUK", "ErAttributeComment" })
+                {
+                    var field = Find(visual!, fieldId); field.Focus();
+                    Wait(() => !field.IsOffscreen && Find(visual!, "ErInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle), "ER attribute field is clipped at " + width + "x" + height + ": " + fieldId);
+                }
+                Capture("attribute-viewport-" + width + "x" + height); Check(true, "All attribute fields and key markers remain keyboard accessible at " + width + "x" + height); SelectRelationship(2);
+            }
             ResizeForCapture(1280, 800); Capture("validated");
             var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1]; var expected = original[..target.Body.Start] + changed + original[target.Body.End..];
             Click("ErApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "ER Apply did not change only the second identical diagram.");
@@ -69,10 +78,18 @@ internal static partial class NativeUiChecks
             Stop(); Launch(); Wait(() => ReadEditorText(Find(main!, "MarkdownEditor")) == expected, "Restart/reopen lost ER source."); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); Check(Draft() == changed, "Save/restart/reopen retains complete ER source and rendering"); SelectEntity("CUSTOMER"); SelectAttribute("CUSTOMER", 2); Capture("saved-reopened"); Click("ErCancel"); WaitClosed();
             if (!highContrast) foreach (var theme in new[] { "Dark", "Light" }) { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectEntity("CUSTOMER"); Capture(theme.ToLowerInvariant()); Click("ErCancel"); WaitClosed(); }
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").AsMenuItem().Click(); Find(main!, "InsertEr").AsMenuItem().Click(); WaitVisual(); Check(new ErDiagramSourceParser().Parse(Draft()).IsValid, "Insert ER opens a valid portable starter"); Click("ErApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "Visual ER insertion applies a portable Markdown fence"); Stop();
-            foreach (var fixture in new[] { "occurrences", "unknown-protected" })
+            foreach (var fixture in new[] { "occurrences", "unknown-protected", "empty-final" })
             {
                 var raw = File.ReadAllText("tests/fixtures/native-er/" + fixture + ".mmd"); var rawPath = Path.Combine(root, fixture + (fixture == "unknown-protected" ? ".mermaid" : ".mmd")); File.WriteAllText(rawPath, raw); Launch(rawPath); Open(0);
-                if (fixture == "unknown-protected")
+                if (fixture == "empty-final")
+                {
+                    SelectEntity("A"); Click("ErDelete"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Count == 0);
+                    Check(Find(visual!, "ErAddEntity").IsEnabled, "Deleting the last independent entity leaves an editable empty native draft");
+                    Click("ErUndo"); Await(text => text == raw); Click("ErRedo"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Count == 0);
+                    Click("ErAddEntity"); Find(visual!, "ErNodeId").AsTextBox().Text = "B"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entities.Single().Id == "B");
+                    Check(true, "Empty native ER draft supports new entity creation and exact private Undo/Redo"); Click("ErCancel"); Discard(); WaitClosed();
+                }
+                else if (fixture == "unknown-protected")
                 {
                     SelectEntity("A"); Check(!Find(visual!, "ErNodeId").IsEnabled && !Find(visual!, "ErDelete").IsEnabled, "Unknown source disables ID and structural controls with explanations"); SelectAttribute("A", 0);
                     Check(!Find(visual!, "ErAttributeName").IsEnabled && !Find(visual!, "ErUpdate").IsEnabled && !Find(visual!, "ErUndo").IsEnabled, "Unknown attribute suffix cannot be overwritten or create history"); Capture("unknown-protected");
@@ -80,10 +97,51 @@ internal static partial class NativeUiChecks
                 }
                 else
                 {
-                    SelectRelationship(4); Find(visual!, "ErLabel").AsTextBox().Text = "Second self occurrence"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Relationships[4].Label == "Second self occurrence");
+                    var repeatedRow = visual!.FindAllDescendants().Single(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ErCanvas_", StringComparison.Ordinal) && item.Name == "  A · attribute 2 · string id"); repeatedRow.Click();
+                    Wait(() => Find(visual!, "ErSelectionSummary").Name == "A · attribute 2", "The repeated attribute canvas hit selected the wrong occurrence.");
+                    Find(visual!, "ErAttributeComment").AsTextBox().Text = "Second exact row edited"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Entity("A").Attributes[1].Comment == "Second exact row edited");
+                    Check(new ErDiagramSourceParser().Parse(Draft()).Entity("A").Attributes[0].Comment == "First occurrence", "Repeated attribute canvas hits retain exact private row identities"); Click("ErUndo"); Await(text => text == raw);
+                    visual!.FindAllDescendants().Single(item => (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ErCanvas_", StringComparison.Ordinal) && item.Name == "Relationship 5 · A → A · self").Patterns.SelectionItem.Pattern.Select();
+                    Find(visual!, "ErLabel").AsTextBox().Text = "Second self occurrence"; Click("ErUpdate"); Await(text => new ErDiagramSourceParser().Parse(text).Relationships[4].Label == "Second self occurrence");
                     Check(new ErDiagramSourceParser().Parse(Draft()).Relationships[1].Label == "self", "Rendered self-loop reordering cannot redirect edits to another occurrence"); Capture("occurrences"); Click("ErCancel"); Discard(); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(rawPath) == raw, "Cancel preserves exact standalone owner and disk bytes");
                 }
                 if (visual is not null) { Click("ErCancel"); WaitClosed(); } Stop();
+            }
+            foreach (var scenario in new[] { "outside-change", "changed-owner", "closed-owner", "other-tab" })
+            {
+                var body = "erDiagram\r\n A[\"Draft\"] {\r\n string id PK\r\n }\r\n A ||--o{ A : Check\r\n";
+                var raw = scenario == "outside-change" ? "# Outside changes\r\n\r\n```mermaid\r\n" + body + "```\r\n" : body;
+                var scenarioPath = Path.Combine(root, scenario + (scenario == "outside-change" ? ".md" : ".mmd")); File.WriteAllText(scenarioPath, raw); Launch(scenarioPath); Open(scenario == "outside-change" ? raw.IndexOf("```mermaid", StringComparison.Ordinal) : 0); SelectEntity("A");
+                Find(visual!, "ErLabel").AsTextBox().Text = "Private change"; Click("ErUpdate"); Await(text => text.Contains("Private change", StringComparison.Ordinal)); var privateSource = Draft();
+                FocusWindow(main!); var ownerEditor = Find(main!, "MarkdownEditor"); ownerEditor.Focus();
+                if (scenario == "outside-change")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type("%% Outside comment"); Keyboard.Type(VirtualKeyShort.RETURN);
+                    Wait(() => ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw, "The Er owner outside edit did not arrive."); FocusWindow(visual!); Click("ErApply"); WaitClosed();
+                    var targetBody = MermaidBlockSource.Find(new MarkdownService().Parse(raw)).Single().Body;
+                    Check(ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw[..targetBody.Start] + privateSource + raw[targetBody.End..], "Er Apply relocates the owning Markdown container while preserving surrounding edits");
+                }
+                else if (scenario == "changed-owner")
+                {
+                    ownerEditor.Patterns.Value.Pattern.SetValue(raw.Replace("Draft\"", "External\"", StringComparison.Ordinal)); var outside = ReadEditorText(ownerEditor); FocusWindow(visual!); Click("ErApply");
+                    Wait(() => Find(visual!, "ErStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Concurrent owner edits were not rejected."); Check(Draft() == privateSource && ReadEditorText(ownerEditor) == outside, "Er owner conflicts retain private and external source exactly"); Capture(scenario);
+                }
+                else if (scenario == "closed-owner")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("closed-owner.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select(); ownerEditor.Focus();
+                    var count = main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                    Wait(() => main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length < count, "The Er owner tab did not close."); FocusWindow(visual!); Click("ErApply");
+                    Wait(() => Find(visual!, "ErStatus").Name.Contains("owning document has been closed", StringComparison.Ordinal), "Closed Er owner did not reject Apply."); Check(Draft() == privateSource && File.ReadAllText(scenarioPath) == raw, "Closed-owner rejection preserves private Er source and disk bytes"); Capture(scenario);
+                }
+                else
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); var otherEditor = Find(main!, "MarkdownEditor"); otherEditor.Patterns.Value.Pattern.SetValue("Another local document");
+                    FocusWindow(visual!); Click("ErApply"); WaitClosed(); Check(ReadEditorText(otherEditor) == "Another local document", "Er Apply cannot redirect to the currently active other tab");
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("other-tab.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+                    Wait(() => ReadEditorText(Find(main, "MarkdownEditor")) == privateSource, "Er Apply did not retain its owning tab identity."); Check(true, "Er Apply updates the original owner while another tab is active");
+                }
+                if (visual is not null) { Click("ErCancel"); Discard(); WaitClosed(); } Stop();
             }
             File.WriteAllText(Path.Combine(output, "er-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
