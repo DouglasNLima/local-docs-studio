@@ -55,7 +55,7 @@ Style materialisation now leaves inert `data-*` source metadata literal. Labels 
 
 ## Screenshot gallery
 
-These native captures come from disposable Windows at `269b288`; they are not mock-ups. The hover correction is visible in the dark capture.
+These native captures come from disposable Windows at accepted application revision `37c622022c235ca97dcf4be7e96eaa651ac5c338`. The hover correction is visible in the dark capture; the implicit-participant capture retains ordinary declaration-free Mermaid.
 
 ![Native Sequence message inspector](images/sequence-visual-editor/selected-message.png)
 
@@ -63,7 +63,7 @@ These native captures come from disposable Windows at `269b288`; they are not mo
 |---|---|
 | Starting states | [Empty](images/sequence-visual-editor/empty.png), [starter/multiple participants](images/sequence-visual-editor/starter.png), [new diagram](images/sequence-visual-editor/new-sequence.png) |
 | Selection and authoring | [Participant](images/sequence-visual-editor/selected-participant.png), [message](images/sequence-visual-editor/selected-message.png), [note](images/sequence-visual-editor/selected-note.png), [activation](images/sequence-visual-editor/activation-inspector.png), [message creation](images/sequence-visual-editor/message-creation.png), [reordering](images/sequence-visual-editor/message-reorder.png) |
-| Protected and repeated source | [Block inspection](images/sequence-visual-editor/protected-block.png), [repeated messages](images/sequence-visual-editor/repeated.png), [reopened document](images/sequence-visual-editor/reopened.png) |
+| Protected and repeated source | [Block inspection](images/sequence-visual-editor/protected-block.png), [repeated messages](images/sequence-visual-editor/repeated.png), [implicit message creation](images/sequence-visual-editor/implicit-message-created.png), [reopened document](images/sequence-visual-editor/reopened.png) |
 | Source and appearances | [Collapsed](images/sequence-visual-editor/source-collapsed.png), [expanded](images/sequence-visual-editor/source-expanded.png), [dark](images/sequence-visual-editor/dark.png), [actual High Contrast](images/sequence-visual-editor/high-contrast-note.png) |
 | Window sizes | [880 × 600](images/sequence-visual-editor/viewport-880x600.png), [1024 × 768](images/sequence-visual-editor/viewport-1024x768.png), [1280 × 800](images/sequence-visual-editor/viewport-1280x800.png), [1440 × 900](images/sequence-visual-editor/viewport-1440x900.png), [1920 × 1080](images/sequence-visual-editor/viewport-1920x1080.png), [High Contrast minimum](images/sequence-visual-editor/high-contrast-880x600.png) |
 
@@ -101,6 +101,93 @@ Hosted measurements at `ca331b9`, in milliseconds; these are observations rather
 | 20 / 150 | 1.22 | 4.34 | 7.80 | 876.96 | 116.2 MB |
 
 Allocation figures combine the measured stages. The 150-message conversion motivated moving conversion onto the existing STA worker in the subsequent candidate. A thousand private selection changes took under 0.7 ms in these hosted measurements; this excludes real UIA transport/native focus and is not a UI latency guarantee. The historical Continuous preview 250 ms limitation is unchanged.
+
+## Accepted application evidence
+
+Application revision **`37c622022c235ca97dcf4be7e96eaa651ac5c338`** passes 183 Sequence fidelity/ownership assertions, 29 normal Sequence UIA assertions and 30 actual High Contrast Sequence assertions. The [desktop UX run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39035922529) also passes 293 Flowchart fidelity assertions, 122 normal authoring checks and 118 actual High Contrast checks. The [interaction run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39035922572) passes 240 native drags and 4,080 pointer movements across normal/High Contrast, plus workspace viewport checks. [Chromium and Edge](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39035922576) pass; Pages deployment is intentionally skipped for the PR.
+
+The frozen historical application `47e78d6` failed one first-attempt screenshot assertion: its active tab close button remained beyond the tab strip after a 1440-pixel resize. [Original failure](evidence/sequence-visual-editor/37c6220-historical-baseline-first-attempt.json), [tab bounds](evidence/sequence-visual-editor/37c6220-historical-baseline-tabs.json) and [screenshot](evidence/sequence-visual-editor/37c6220-historical-baseline-failure.png) remain intact. An unchanged rerun of that job passed all baseline/current captures and desktop controls. No assertion, deadline or failure evidence was removed. This historical retry is separate from the first-attempt successful candidate Sequence/Flowchart jobs.
+
+Current performance observations, milliseconds, at the accepted application revision:
+
+| Scenario | Parse | Semantic validation | Render | Native conversion |
+|---|---:|---:|---:|---:|
+| 2 participants / 5 messages | 0.12 | 0.26 | 0.73 | 30.92 |
+| 10 participants / 50 messages | 0.41 | 1.54 | 2.72 | 195.24 |
+| 20 participants / 150 messages | 1.21 | 3.69 | 7.27 | 839.15 |
+| Long labels | 0.12 | 0.33 | 1.38 | 195.86 |
+| Notes / standalone activations | 0.26 | 0.48 | 1.41 | 49.29 |
+| Nested blocks | 0.27 | 0.45 | 1.38 | 37.54 |
+| Protected grouping | 0.09 | Source-only | 1.08 | 17.09 |
+
+Ten complete validated message edits took 29.01 ms; a pre-cancelled edit returned without source/history changes in 0.40 ms. Twenty actual native participant selections, including UIA calls, took 4.15 seconds in total. Initial editor opening, including UIA transport and source-panel expansion, ranged from 0.40 to 0.80 seconds across seven recorded cases. Current-thread allocations for the three size cases were approximately 5.2, 40.7 and 116.2 MB. These measurements are hosted observations; native font conversion is the dominant large-case cost and is serialised off the UI thread. [The complete receipt](evidence/sequence-visual-editor/37c6220-fidelity.json) retains the scenarios, allocations and cancellation scope.
+
+## Source preservation examples
+
+Editing the third repeated occurrence changes one label token:
+
+```mermaid
+sequenceDiagram
+    participant A
+    participant B
+    %% Retain this comment and the original line endings
+    A->>B: Same
+    A->>B: Same
+    A->>B: Third occurrence
+```
+
+The first two `Same` messages retain their private identities and exact bytes. Undo restores the original third `Same` token. No IDs or coordinates are written into Mermaid.
+
+Updating a message label beside a standalone activation retains its representation:
+
+```mermaid
+sequenceDiagram
+    participant Author
+    participant Studio
+    Author->>Studio: Open local documentation
+    activate Studio
+    Studio-->>Author: Display preview
+    deactivate Studio
+```
+
+The visual operation changes the selected message token; it does not rewrite the standalone commands into shorthand. Renaming `Studio` uses separate expected-text patches for its declaration and every known endpoint/note/activation reference. Unknown dependencies reject the rename without a history entry.
+
+## Windows preview package certification
+
+The accepted application package is **`0.1.1-preview.614`**, built from exact branch revision **`37c622022c235ca97dcf4be7e96eaa651ac5c338`** in [native run 614](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39036561155). Its source kind is `branch-source` and `sourceDirty` is false. Subsequent evidence/documentation commits are separate from that application/package identity.
+
+| File | SHA-256 |
+|---|---|
+| `LensDocsStudio.Native-0.1.1-preview.614-win-x64-Setup.exe` | `3d083cbbfea7a7c477551d2db0b93c276e58f0bd4bc551a78f8c47e9715b4a0f` |
+| `LensDocsStudio.Native-0.1.1-preview.614-win-x64.zip` | `ade40f4e06d6aa55f2d87a374ede9206b03b8bfe7aec9a7aea8721758d816bae` |
+
+[Download the native validation artefact](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39036561155/artifacts/12103267365); the package files are under `packages/0.1.1-preview.614/`. GitHub artefact retention applies. [Version metadata](evidence/sequence-visual-editor/preview-614-version.json), [independent static verification](evidence/sequence-visual-editor/preview-614-independent-verification.json), [negative controls](evidence/sequence-visual-editor/preview-614-negative-controls.json) and [installer lifecycle](evidence/sequence-visual-editor/preview-614-installer-lifecycle.json) retain the identities and actual outcomes.
+
+The package contains the new Sequence Core/native types and compiled editor XAML, existing Flowchart resources, original application icons and the self-contained Windows x64 .NET 10/WPF runtime. Static checks verify binary/source versions, hashes, update metadata, excluded browser/experimental runtimes and payload hygiene. Seven negative controls reject wrong source/version/hash, dirty source, tampered ZIP, excluded experimental payload and a missing editor. Local independent verification reads package metadata/bytes only (`executionPerformed=false`); all application execution and installation occurred on disposable GitHub-hosted Windows.
+
+Installer lifecycle testing passed 20 assertions, including all 528 payload files matching portable bytes, actual installed version/source identity, upgrade from `0.1.0-preview.614` to `0.1.1-preview.614`, uninstall/reinstall, interrupted-save recovery and restored dirty saved/untitled documents. It preserved 22 native state files and workspace source byte-for-byte. Existing shell registration and Markdown defaults remained intact. This is a same-revision version upgrade; the integration-only six-version historical migration matrix is intentionally ineligible for this feature branch and is not counted as a pass.
+
+The complete native run passes 82 rendering/export cases with zero failures, including the Sequence source fixtures through native SVG/PNG and document/export preparation. Desktop UIA passes all 75 groups in each of four contexts: development, first installed launch, upgraded and reinstalled. DOCX/PDF and Docs Site checks retain their existing assertions. The PR merge-checkout run also passed independently as [native run 613](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39035922527); its synthetic merge revision/package is distinct from the exact-branch package delivered above.
+
+## Readiness and remaining limitations
+
+**Readiness: scoped unsigned Windows internal preview for Sequence Editor v1.** All saved source remains portable Mermaid. No merge, stable release, tag movement or unsigned automatic update has been performed.
+
+| Area | Classification | Practical scope |
+|---|---|---|
+| Dedicated source model, exact patches, private history | Implemented and verified | Complete original source; bounded expected-text patches; stable private occurrences; rejected/cancelled edits retain history/source |
+| Native Sequence authoring | Implemented with bounded limitations | Explicit participant/actor editing; safe message/note operations; proven implicit message insertion; simple activation lifecycles |
+| Apply/Cancel/Undo/Save/reopen | Implemented and verified | Exact owner/container/version protection; one document Undo; duplicate diagrams and standalone files |
+| Canonical fidelity and normal/High Contrast UIA | Implemented and verified | Pinned native drawing; 183 Sequence assertions; 29/30 normal/actual High Contrast authoring assertions; five requested window sizes at hosted 96 DPI |
+| Flowchart and browser regression | Implemented and verified | Existing authoring, stress, exports and static hosting checks retained; source-specific counts above |
+| Advanced structural rewrites, boxes, create/destroy, unknown dependencies | Protected/unsupported | Complete source and canonical inspection retained; no silent syntax rewriting |
+| Duplicate block/activation canvas regions | Implemented with bounded limitations | Ambiguous hit regions omitted with an actionable diagnostic; exact interaction-list inspection remains available |
+| Installer/ZIP integrity and disposable lifecycle | Implemented and verified | Exact-source preview 614; independent receipt; payload parity; runtime identities; state preservation |
+| Six-version historical migration matrix | Not completed for this feature branch | Conditional integration gate is not a successful feature-branch check; no cross-revision migration claim |
+| Physical higher-DPI / physical accessibility | Not certified | Hosted display/UIA evidence does not replace physical device testing |
+| Genuinely clean Windows / production signing / trusted automatic updates | Not certified | Unsigned preview only; signing/update trust remains blocked by its existing production requirements |
+
+Rich/unknown grammar, unsupported label encodings, renderer/source correspondence mismatches, nested activation rewrites and unproven implicit ordering remain source-only. Other functional CSS colour spaces beyond the tested RGB/RGBA subset can still produce a native diagnostic; they are not certified by this work. SharpVectors conversion cannot be interrupted mid-call, and the 150-message hosted conversion still takes approximately 0.84 seconds off the UI thread. No universal responsiveness, Mermaid compatibility or Word visual-fidelity claim is made.
 
 ## Integration considerations
 

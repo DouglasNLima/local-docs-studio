@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "version": "0.1.1-preview.614",
+  "sourceRevision": "37c622022c235ca97dcf4be7e96eaa651ac5c338",
+  "sourceKind": "branch-source",
+  "ciRunId": "39036561155",
+  "installerSha256": "3d083cbbfea7a7c477551d2db0b93c276e58f0bd4bc551a78f8c47e9715b4a0f",
+  "portableSha256": "ade40f4e06d6aa55f2d87a374ede9206b03b8bfe7aec9a7aea8721758d816bae",
+  "signature": "NotSigned",
+  "executionPerformed": false,
+  "binaryVersions": {
+    "LensDocsStudio.Native.dll": "0.1.1-preview.614+37c622022c235ca97dcf4be7e96eaa651ac5c338",
+    "LensDocsStudio.Core.dll": "0.1.1-preview.614+37c622022c235ca97dcf4be7e96eaa651ac5c338",
+    "LensDocsStudio.Native.exe": "0.1.1-preview.614+37c622022c235ca97dcf4be7e96eaa651ac5c338"
+  },
+  "mermaidEditor": {
+    "status": "PASS",
+    "executionPerformed": false,
+    "nativeTypes": [
+      "LensDocsStudio.Native.MermaidVisualEditorWindow",
+      "LensDocsStudio.Native.SequenceVisualEditorWindow",
+      "LensDocsStudio.Native.Rendering.NativeSequencePresentation",
+      "LensDocsStudio.Native.Editor.MermaidDocumentEditSession",
+      "LensDocsStudio.Native.Editor.MermaidSourceHighlighting"
+    ],
+    "coreTypes": [
+      "LensDocsStudio.Core.Mermaid.MermaidDiagramModel",
+      "LensDocsStudio.Core.Mermaid.MermaidSourceParser",
+      "LensDocsStudio.Core.Mermaid.MermaidTransformationService",
+      "LensDocsStudio.Core.Mermaid.MermaidVisualDraft",
+      "LensDocsStudio.Core.Mermaid.MermaidGraphLayout",
+      "LensDocsStudio.Core.Sequence.SequenceDiagramModel",
+      "LensDocsStudio.Core.Sequence.SequenceSourceParser",
+      "LensDocsStudio.Core.Sequence.SequenceTransformationService",
+      "LensDocsStudio.Core.Sequence.SequenceVisualDraft"
+    ],
+    "editorXaml": "mermaidvisualeditorwindow.baml",
+    "originalIcon": "resources/brand/application.ico"
+  },
+  "payloadFileCount": 528,
+  "verification": "Independent local static package verification with CI SHA-256 pins; candidate application and installer not executed locally",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39036561155"
+}

@@ -3,8 +3,9 @@
 The native [Sequence editor](mermaid-sequence-visual-editor.md) adds participant,
 message, basic note and simple activation authoring with exact source patches and
 private history. Structural rewrites, participant boxes/create/destroy and unknown
-dependencies remain source-only. Hosted UI/package certification is pending; this
-does not claim universal Mermaid authoring parity.
+dependencies remain source-only. Accepted application `37c6220` passes the scoped
+normal/actual High Contrast, source/ownership, regression and exact-source preview
+`0.1.1-preview.614` checks. This does not claim universal Mermaid authoring parity.
 
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The

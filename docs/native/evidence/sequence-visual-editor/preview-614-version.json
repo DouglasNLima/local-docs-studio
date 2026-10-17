@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "product": "LensDocsStudio.Native",
+  "version": "0.1.1-preview.614",
+  "channel": "Preview",
+  "architecture": "x64",
+  "minimumWindowsVersion": "10.0.17763",
+  "selfContained": true,
+  "internalPreview": true,
+  "signingRequested": false,
+  "signingProvider": "Unsigned",
+  "sourceRevision": "37c622022c235ca97dcf4be7e96eaa651ac5c338",
+  "sourceDirty": false,
+  "builtAtUtc": "2026-10-17T13:38:18.4020067+00:00",
+  "sourceKind": "branch-source",
+  "ciRunId": "39036561155",
+  "ciRunAttempt": "1",
+  "checkoutRef": "refs/heads/feature/native-mermaid-sequence-visual-editor"
+}

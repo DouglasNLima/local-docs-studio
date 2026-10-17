@@ -4,7 +4,10 @@ Sequence visual authoring is tracked independently in [Draft PR #32](https://git
 based on `develop` at `7bd2207`. Dedicated Core semantics, exact patches, private
 history, canonical native selection/inspector, authoring and owning-document routing
 are implemented. The [Sequence report](mermaid-sequence-visual-editor.md) owns the
-current verification status; hosted UI/package certification is in progress.
+current verification status. Accepted application `37c6220` passes the scoped native,
+normal/actual High Contrast, browser and package checks, including independently
+verified unsigned exact-source preview `0.1.1-preview.614`. Evidence commits retain
+that application/package identity separately from their final documentation HEAD.
 
 The workspace and Mermaid interaction continuation is implemented in
 [Draft PR 30](https://github.com/DouglasNLima/local-docs-studio/pull/30). The

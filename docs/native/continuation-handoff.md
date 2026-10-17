@@ -2,7 +2,8 @@
 
 The active Sequence editor implementation is [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32).
 See [its report](mermaid-sequence-visual-editor.md) for source modelling, canonical
-mapping, safe/protected operations and current evidence. Execute native UI and
+mapping, safe/protected operations and accepted application `37c6220` / independently
+verified unsigned preview `0.1.1-preview.614` evidence. Execute native UI and
 installer checks only in disposable Windows environments. No automatic merge,
 stable release or unsigned automatic updates are authorised.
 

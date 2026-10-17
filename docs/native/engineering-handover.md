@@ -3,7 +3,8 @@
 Continue Sequence authoring work from [Draft PR #32](https://github.com/DouglasNLima/local-docs-studio/pull/32),
 branch `feature/native-mermaid-sequence-visual-editor`, based on verified `7bd2207`.
 Its [Sequence report](mermaid-sequence-visual-editor.md) owns current evidence and
-remaining certification. It is independent of Draft PR #31; shared integration
+scoped certification of application `37c6220` and exact-source unsigned preview
+`0.1.1-preview.614`. It is independent of Draft PR #31; shared integration
 surfaces are documented there. Do not merge or publish automatically.
 
 The workspace and Mermaid interaction continuation is implemented in
