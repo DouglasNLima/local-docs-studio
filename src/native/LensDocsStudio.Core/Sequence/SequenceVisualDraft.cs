@@ -45,6 +45,9 @@ public sealed class SequenceVisualDraft
                     var plan = transformations.Plan(parsed, operation);
                     var next = parser.Parse(MermaidPatches.Apply(parsed.Source, plan.Patches), cancellationToken);
                     if (next.Statements.Count != plan.Identities.Count) throw new ArgumentException("The edit changed unplanned source statements. Use Edit source.");
+                    if (operation is AddSequenceMessage && parsed.Participants.Any(item => item.Declaration is null)
+                        && !parsed.Participants.Select(item => (item.Id, item.Label, item.Actor)).SequenceEqual(next.Participants.Select(item => (item.Id, item.Label, item.Actor))))
+                        throw new ArgumentException("That insertion would change implicit participant identities or ordering. Choose a later interaction position, or declare participants explicitly in source.");
                     parsed = Identify(next, plan.Identities);
                 }
                 Validate(parsed, cancellationToken); return parsed;

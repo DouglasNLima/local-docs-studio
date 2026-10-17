@@ -102,7 +102,7 @@ internal static partial class NativeUiChecks
             Check(true, "Eligible messages reorder/duplicate through native commands with exact private Undo");
             Click("SequenceApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("```mermaid", StringComparison.Ordinal), "New Sequence Apply inserts a Markdown fence");
             app!.Kill(); app.Dispose(); app = null;
-            foreach (var fixture in new[] { "empty", "blocks", "repeated" })
+            foreach (var fixture in new[] { "empty", "blocks", "implicit", "repeated" })
             {
                 var raw = fixture == "empty" ? "sequenceDiagram\n" : File.ReadAllText("tests/fixtures/native-sequence/" + fixture + ".mmd");
                 var rawPath = Path.Combine(root, fixture + (fixture == "repeated" ? ".mermaid" : ".mmd")); File.WriteAllText(rawPath, raw);
@@ -116,6 +116,14 @@ internal static partial class NativeUiChecks
                     Find(visual!, "SequenceInteractions").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).First(item => item.Name.StartsWith("Block ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
                     Check(Find(visual!, "SequenceSelectionSummary").Name == "Protected Block", "Structural block heading inspection is read-only"); Capture("protected-block");
                     SelectMessage(0); Check(!Find(visual!, "SequenceEarlier").IsEnabled && !Find(visual!, "SequenceDelete").IsEnabled, "Block boundaries disable unsafe message moves and deletion");
+                }
+                else if (fixture == "implicit")
+                {
+                    SelectMessage(0); Click("SequenceAddMessage"); Find(visual!, "SequenceSender").AsComboBox().Select("B"); Find(visual!, "SequenceRecipient").AsComboBox().Select("A");
+                    Find(visual!, "SequenceLabel").AsTextBox().Text = "Added safely"; Find(visual!, "SequenceInsertion").AsComboBox().Select("At end"); Click("SequenceUpdate");
+                    Await(text => new SequenceSourceParser().Parse(text).Messages.Count == 3);
+                    Check(new SequenceSourceParser().Parse(Draft()).Participants.All(item => item.Declaration is null) && ReadEditorText(rawEditor) == raw, "Proven implicit-participant message insertion retains source representation and the owning document");
+                    Capture("implicit-message-created"); Click("SequenceUndo"); Await(text => text == raw);
                 }
                 else
                 {

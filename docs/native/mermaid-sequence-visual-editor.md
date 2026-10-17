@@ -10,7 +10,7 @@ Mermaider **0.15.1**, NuGet repository commit `71b64845570d633a94d29e85579c0a027
 |---|---|---|---|---|---|
 | `sequenceDiagram` | Yes | Exact header | Source | New diagram creation | Header rewriting |
 | `participant`, `actor`, `as` | Yes | Explicit ID/type/label spans | Headers/lifelines/list | Add, alias/type, known-reference rename, bounded order/delete | Duplicate/late declarations; unknown references |
-| Implicit participants | Yes | First-use identity/order | Headers/lifelines/list | Existing message text/arrow | Declaration, endpoint/order changes |
+| Implicit participants | Yes | First-use identity/order | Headers/lifelines/list | Message text/arrow; insertion with proven actor identity/order | Declaration, endpoint/reorder changes; unproven insertion |
 | `->>`, `-->>`, `->`, `-->` | Yes | Exact arrow/endpoints/text | Path/label/list | Add/update/delete/duplicate/bounded order | Dependency/block constraints |
 | `-)`, `--)` | Open head | Yes | Path/label/list | Same as other messages | No distinct asynchronous glyph in pinned renderer |
 | `-x`, `--x` | Filled head | Yes | Path/label/list | Same as other messages | No distinct cross head in pinned renderer |
@@ -37,7 +37,7 @@ For example, editing the final repeated `A->>B: Request` patches only that occur
 
 ## Verification status
 
-The expanded local suite passes **1,292 Core cases, including 58 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity and all **268 Chromium/Edge browser cases** pass locally. No native application has been executed or installed on the ordinary desktop.
+The expanded local suite passes **1,294 Core cases, including 60 Sequence cases**, with no skips. Release builds have zero warnings/errors; static integrity and all **268 Chromium/Edge browser cases** pass locally. No native application has been executed or installed on the ordinary desktop.
 
 At source `ca331b92c66b8b4868eca1af0145db18684a922c`, [desktop UX CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004555) passed the Sequence normal and actual High Contrast jobs, with 18 UIA assertions each and 73 Sequence fidelity/geometry assertions per appearance job. The complete existing Flowchart UIA/fidelity and baseline jobs also passed. [Workspace and interaction CI](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004553) passed. [Both browser projects](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39033004612) passed. These results belong to that source revision; subsequent enhancements require fresh certification.
 
@@ -72,8 +72,8 @@ These native captures come from disposable Windows at `269b288`; they are not mo
 | Area | Implemented operations | Restrictions |
 |---|---|---|
 | Participants | Add participant/actor; edit alias/type; rename all known ID references; explicit declaration reorder; dependency-free delete | Implicit declarations inspect only; duplicate/late declarations and unknown dependencies protect the source; remove known dependencies before deletion |
-| Messages | Add, update text/endpoints/arrows, duplicate, insert before/after, delete, earlier/later | New endpoints and order changes require explicit participants; activation-triggering endpoints stay fixed; only adjacent top-level messages without activation dependencies may move |
-| Notes | Add, update text/placement/participants, remove; defined insertion position | Left/right notes use one participant; over uses one or two; block-bound removal/insertion protected |
+| Messages | Add, update text/endpoints/arrows, duplicate, insert before/after, delete, earlier/later | Endpoint changes, deletion and reordering require explicit participants. Insertion into implicit diagrams must preserve the complete actor identity/label/type/order sequence. Activation-triggering endpoints stay fixed; only adjacent top-level messages without activation dependencies may move |
+| Notes | Add, update text/placement/participants, remove; defined insertion position | Left/right notes use one participant; over uses one or two; note insertion and changed participant references require explicit declarations; block-bound removal/insertion protected |
 | Activations | Inspect triggering participant/message; change/remove marker or adjacent standalone command | Simple non-nested lifecycles only; block/bidirectional changes protected; unmatched deactivation rejected; existing standalone representation retained |
 | Structural blocks | Canonical display; heading inspection; bounded message-label edits | Source-only block creation/rewrite, boundary-crossing moves, deletion inside blocks, boxes and create/destroy |
 | History | Atomic batches; one private step per successful visual operation; exact Undo/Redo and selection; 100-step/8-million-character bound | Rejected/cancelled/superseded candidates retain source/history; new edits discard obsolete Redo branches |

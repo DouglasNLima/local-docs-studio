@@ -260,4 +260,22 @@ public sealed class SequenceVisualTests
         await Execute(draft, new UpdateSequenceMessage(draft.Model.Messages[0].Identity, "A", "B", "Review 😀", "->>"));
         Assert.Contains("A->>B: Review 😀", draft.Source); draft.Undo(); Assert.Equal(Simple, draft.Source);
     }
+
+    [Fact]
+    public async Task Message_insertion_with_implicit_participants_requires_proven_identity_and_order_preservation()
+    {
+        const string source = "sequenceDiagram\n    A->>B: Request\n    B-->>A: Response\n"; var draft = new SequenceVisualDraft(source);
+        await Execute(draft, new AddSequenceMessage("B", "A", "Added safely"));
+        Assert.Equal(new[] { "A", "B" }, draft.Model.Participants.Select(item => item.Id));
+        Assert.All(draft.Model.Participants, item => Assert.Null(item.Declaration)); Assert.StartsWith(source, draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+
+    [Fact]
+    public async Task Insertion_before_first_use_rejects_unproven_implicit_participant_order_changes()
+    {
+        const string source = "sequenceDiagram\n    A->>B: Request\n"; var draft = new SequenceVisualDraft(source);
+        var result = await draft.ExecuteAsync(new AddSequenceMessage("B", "A", "Would reverse actors", Anchor: draft.Model.Messages[0].Identity, Before: true));
+        Assert.False(result.Success); Assert.Contains("implicit participant", result.Error); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
 }

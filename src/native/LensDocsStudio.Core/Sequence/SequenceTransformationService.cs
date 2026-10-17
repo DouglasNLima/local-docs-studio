@@ -78,7 +78,7 @@ public sealed class SequenceTransformationService
                 Token(message.Statement, "from", update.Sender); Token(message.Statement, "to", update.Recipient);
                 Token(message.Statement, "arrow", update.Arrow); Token(message.Statement, "label", Label(update.Text)); break;
             case AddSequenceMessage add:
-                ExplicitParticipants(); Participant(add.Sender); Participant(add.Recipient); Arrow(add.Arrow);
+                Participant(add.Sender); Participant(add.Recipient); Arrow(add.Arrow);
                 Insert(add.Sender + add.Arrow + add.Recipient + ": " + Label(add.Text), add.Anchor, add.Before); break;
             case DuplicateSequenceMessage duplicate:
                 var original = model.Messages.SingleOrDefault(item => item.Identity == duplicate.Identity) ?? throw new ArgumentException("Select a message.");
