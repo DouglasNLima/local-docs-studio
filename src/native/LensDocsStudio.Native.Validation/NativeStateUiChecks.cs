@@ -71,8 +71,8 @@ internal static partial class NativeUiChecks
             Capture("session-drag"); Click("StateAutoLayout");
             Find(visual!, "StateSourcePanel").Patterns.ExpandCollapse.Pattern.Expand(); Click("StateValidate"); Wait(() => Find(visual!, "StateApply").IsEnabled, "State validation did not finish.");
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
-            { visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3, "Requested State window dimensions did not settle."); Click("StateFit"); Capture("viewport-" + width + "x" + height); Check(visual.BoundingRectangle.Contains(Find(visual, "StateApply").BoundingRectangle), "State Apply remains visible at " + width + "x" + height); }
-            visual!.Patterns.Transform.Pattern.Resize(1280, 800); Capture("validated");
+            { ResizeForCapture(width, height); Click("StateFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "StateApply").BoundingRectangle), "State Apply remains visible at " + width + "x" + height); }
+            ResizeForCapture(1280, 800); Capture("validated");
             var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1]; var expected = original[..target.Body.Start] + changed + original[target.Body.End..];
             Click("StateApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "State Apply did not change only the second identical diagram.");
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(editor) == original, "State Apply did not produce one document Undo step.");
@@ -188,7 +188,26 @@ internal static partial class NativeUiChecks
         void Await(Func<string, bool> predicate) => Wait(() => predicate(Draft()) && Find(visual!, "StateApply").IsEnabled, "The private State draft did not reach the expected state: " + Find(visual!, "StateStatus").Name);
         void Click(string id) => Find(visual!, id).AsButton().Invoke();
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("StateVisualEditor"))) is null, "The State editor did not close."); visual = null; }
-        void Capture(string name) { _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
+        void ResizeForCapture(int width, int height)
+        {
+            visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height);
+            Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3 && FooterSettled(), "Requested State window and client layout did not settle.");
+            var window = visual.BoundingRectangle; var footer = Find(visual, "StateApply").BoundingRectangle;
+            observations.Add(new { Operation = "Settled State client layout", Width = width, Height = height, FooterRightInset = window.Right - footer.Right, FooterBottomInset = window.Bottom - footer.Bottom });
+        }
+        bool FooterSettled()
+        {
+            var window = visual!.BoundingRectangle; var footer = Find(visual, "StateApply").BoundingRectangle;
+            return window.Right - footer.Right is >= 4 and <= 32 && window.Bottom - footer.Bottom is >= 4 and <= 24;
+        }
+        void Capture(string name)
+        {
+            // Window chrome can resize before WPF arranges its client. Observe actual
+            // layout and the input queue before flushing the compositor, without sleeps.
+            Wait(FooterSettled, "State client layout is incomplete before capture.");
+            if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("The native State application did not become idle before capture.");
+            _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png"));
+        }
         void Discard()
         { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Private State discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }

@@ -302,6 +302,13 @@ budget or timeout was relaxed to obtain these passes.
 
 ## CI, packaging and provenance
 
+Final-candidate screenshot inspection also exposed a capture race: a 1024 × 768
+window frame had resized while its WPF client still showed the earlier 880 × 600
+layout. State capture now waits for the actual footer/client bounds, observes the
+application input queue becoming idle and then flushes the compositor. It records
+the settled footer insets. This changes the evidence harness, without sleeps,
+larger timeouts or weaker assertions; fresh exact-head captures are required.
+
 State source/semantic tests are part of the mandatory Core suite. Normal/actual
 High Contrast State fidelity, UIA and real process performance are mandatory
 `native-ux.yml` jobs on PRs to `develop`. Existing Flowchart, Sequence, native corpus,
