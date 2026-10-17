@@ -57,11 +57,11 @@ internal static partial class NativeUiChecks
                     var desktop = JsonSerializer.Deserialize<UserPreferences>(input)?.Desktop ?? new DesktopPreferences();
                     return desktop.FollowCaret == synchronised && desktop.SyncScroll == synchronised && !desktop.SyncSelection;
                 }, "The requested synchronisation preferences did not finish applying.");
-                ScrollEditorTo(75);
+                ScrollEditorTo(75, "Region 065");
                 ReadAt("A", "Region 065");
                 var aOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("B"); AtTop("B");
-                ScrollEditorTo(40);
+                ScrollEditorTo(40, "Region 035");
                 ReadAt("B", "Region 035");
                 var bOffset = editor.Patterns.Scroll.Pattern.VerticalScrollPercent.Value;
                 Open("A");
@@ -106,7 +106,7 @@ internal static partial class NativeUiChecks
                 bool HasPreview(string name) => Find(window, "PreviewStatus").Name.StartsWith("Preview updated", StringComparison.Ordinal)
                     && preview.Patterns.Text.PatternOrDefault is { } text && text.DocumentRange.GetText(-1).Contains("Document " + name, StringComparison.Ordinal);
                 FlaUI.Core.ITextRange PreviewRange(string text) => preview.Patterns.Text.Pattern.DocumentRange.FindText(text, false, false) ?? throw new IOException("Missing preview text: " + text);
-                void ScrollEditorTo(double percent)
+                void ScrollEditorTo(double percent, string target)
                 {
                     var beforeSync = SyncCompletions("editor-scroll");
                     editor.Focus(); editor.Patterns.Scroll.Pattern.SetScrollPercent(-1, percent);
@@ -114,7 +114,7 @@ internal static partial class NativeUiChecks
                     // the requested editor alignment before beginning the preview action;
                     // UIA ScrollIntoView does not deliver a mouse-wheel cancellation event.
                     if (synchronised) Wait(() => SyncCompletions("editor-scroll") > beforeSync, "The initial editor scroll did not finish synchronising before preview reading.");
-                    RecordReading("editor-aligned", "Region 065");
+                    RecordReading("editor-aligned", target);
                 }
                 void ReadAt(string name, string text)
                 {
@@ -125,8 +125,11 @@ internal static partial class NativeUiChecks
                     Mouse.Click(new System.Drawing.Point(focusBox.Left + focusBox.Width * (name == "A" ? 1 : 2) / 3, focusBox.Top + focusBox.Height / 2));
                     var alreadyVisible = Visible(preview, text); var syncStart = SyncCompletions();
                     RecordReading("preview-focused", text);
-                    PreviewRange(text).ScrollIntoView(true);
-                    RecordReading("scroll-requested", text);
+                    // WPF UIA can treat an already-visible range's viewport coordinate
+                    // as an absolute document offset. Do not request redundant scrolling;
+                    // the same visibility/ownership assertions remain mandatory below.
+                    if (!alreadyVisible) PreviewRange(text).ScrollIntoView(true);
+                    RecordReading(alreadyVisible ? "reading-target-already-visible" : "scroll-requested", text);
                     Wait(() => Visible(preview, text), "Document " + name + " did not reach its reading position.");
                     if (synchronised && !alreadyVisible)
                         Wait(() => SyncCompletions() > syncStart, "Document " + name + "'s focused preview scroll did not finish synchronising.");
