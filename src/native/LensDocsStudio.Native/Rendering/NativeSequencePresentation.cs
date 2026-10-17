@@ -9,17 +9,21 @@ namespace LensDocsStudio.Native.Rendering;
 
 public sealed record NativeSequenceTarget(string Identity, string Description, Rect Bounds);
 /// <summary>Hit bounds from verified canonical SVG primitives. Drawing pixels are the unchanged preview conversion.</summary>
-public sealed record NativeSequencePresentation(DrawingImage Drawing, IReadOnlyList<NativeSequenceTarget> Targets)
+public sealed record NativeSequencePresentation(DrawingImage Drawing, IReadOnlyList<NativeSequenceTarget> Targets, IReadOnlyList<string> Diagnostics)
 {
     public static NativeSequencePresentation Create(SequenceDiagramModel model, DiagramResult render, NativeSvgService svg)
     {
         var xml = SequenceRenderCorrespondence.Validate(model, render);
         // Use exactly the same sanitisation/conversion as the FlowDocument preview.
         var drawing = svg.Render(render.Svg!); var origin = drawing.Drawing.Bounds.Location;
-        var root = xml.Root!; var targets = new List<NativeSequenceTarget>();
+        var root = xml.Root!; var targets = new List<NativeSequenceTarget>(); var diagnostics = new List<string>();
         var blocks = SequenceRenderCorrespondence.Elements(root, "block").ToList();
-        foreach (var block in model.Statements.Where(item => item.Kind == SequenceStatementKind.Block).Reverse())
+        var sourceBlocks = model.Statements.Where(item => item.Kind == SequenceStatementKind.Block).ToArray();
+        foreach (var block in sourceBlocks.Reverse())
         {
+            if (sourceBlocks.Count(item => item.Read(model.Source, "type") == block.Read(model.Source, "type")
+                && SequenceSourceParser.NormaliseLabel(item.Read(model.Source, "label")).ReplaceLineEndings(" ") == SequenceSourceParser.NormaliseLabel(block.Read(model.Source, "label")).ReplaceLineEndings(" ")) > 1)
+            { diagnostics.Add("Repeated block headings have no unique canvas identity. Inspect their exact occurrences in the interaction list."); continue; }
             var element = blocks.FirstOrDefault(item => (string?)item.Attribute("data-type") == block.Read(model.Source, "type")
                 && ((string?)item.Attribute("data-label") ?? "") == SequenceSourceParser.NormaliseLabel(block.Read(model.Source, "label")).ReplaceLineEndings(" "));
             if (element is null) continue; blocks.Remove(element);
@@ -39,12 +43,13 @@ public sealed record NativeSequencePresentation(DrawingImage Drawing, IReadOnlyL
         {
             var candidates = model.Activations.Where(item => item.Activate && item.Participant == (string?)bar.Attribute("data-actor")).ToArray();
             if (candidates.Length == 1) Add(bar, candidates[0].Identity, "Activation " + candidates[0].Participant);
+            else diagnostics.Add("Several activation lifecycles share a participant. Inspect each triggering message or command in the interaction list.");
         }
         var messages = SequenceRenderCorrespondence.Elements(root, "message").ToArray();
         for (var index = 0; index < messages.Length; index++) Add(messages[index], model.Messages[index].Identity, "Message " + (index + 1) + ": " + model.Messages[index].Text);
         var notes = SequenceRenderCorrespondence.Elements(root, "sequence-note").ToArray();
         for (var index = 0; index < notes.Length; index++) Add(notes[index], model.Notes[index].Identity, "Note: " + model.Notes[index].Text);
-        return new(drawing, targets.AsReadOnly());
+        return new(drawing, targets.AsReadOnly(), diagnostics.Distinct().ToArray());
 
         void Add(XElement element, string identity, string description)
         {

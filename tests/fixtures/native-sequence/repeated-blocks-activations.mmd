@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant A
+    participant B
+    loop Phase
+        A->>+B: First
+        B-->>-A: Finished
+    end
+    loop Phase
+        A->>+B: Second
+        B-->>-A: Finished
+    end

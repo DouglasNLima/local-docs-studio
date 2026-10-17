@@ -136,6 +136,7 @@ public partial class SequenceVisualEditorWindow : Window
             Status.Text = !model.CanEdit ? string.Join(" ", model.Diagnostics) : "Ready. Select an element or add an interaction. Middle mouse pans; source order controls layout.";
             if (render.Error is not null) Status.Text = render.Error;
             else if (diagnostic is not null) Status.Text = diagnostic;
+            else if (presentation?.Diagnostics.Count > 0) Status.Text = string.Join(" ", presentation.Diagnostics);
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
         }
         catch (OperationCanceledException) { }

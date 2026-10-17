@@ -34,7 +34,13 @@ internal static class NativeSequenceChecks
             foreach (var participant in model.Participants) Check(presentation.Targets.Any(item => item.Identity == "participant:" + participant.Id), file + ": participant geometry " + participant.Id);
             foreach (var message in model.Messages) Check(presentation.Targets.Any(item => item.Identity == message.Identity), file + ": message occurrence geometry " + message.Identity);
             foreach (var note in model.Notes) Check(presentation.Targets.Any(item => item.Identity == note.Identity), file + ": note geometry " + note.Identity);
-            foreach (var activation in model.Activations.Where(item => item.Activate)) Check(presentation.Targets.Any(item => item.Identity == activation.Identity), file + ": simple activation geometry");
+            foreach (var activation in model.Activations.Where(item => item.Activate && model.Activations.Count(other => other.Activate && other.Participant == item.Participant) == 1))
+                Check(presentation.Targets.Any(item => item.Identity == activation.Identity), file + ": unique simple activation geometry");
+            if (Path.GetFileName(file) == "repeated-blocks-activations.mmd")
+            {
+                Check(model.Statements.Where(item => item.Kind == SequenceStatementKind.Block).All(item => presentation.Targets.All(target => target.Identity != item.Identity)), file + ": repeated block headings never map to the wrong source occurrence");
+                Check(presentation.Diagnostics.Any(item => item.Contains("block", StringComparison.Ordinal)) && presentation.Diagnostics.Any(item => item.Contains("activation", StringComparison.Ordinal)), file + ": ambiguous canvas regions explain the exact-list inspection alternative");
+            }
             var markdown = "Before\n\n```mermaid\n" + source + "\n```\n\nAfter"; var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single(); var selected = -1;
             var preview = new NativeMarkdownRenderer(svg).Render(parsed, dark, new Dictionary<FencedCodeBlock, DiagramResult> { [code] = render }, _ => { }, (_, _) => { },
                 new Dictionary<FencedCodeBlock, DrawingImage> { [code] = reference }, editDiagramSource: _ => { }, editDiagramVisually: offset => selected = offset);
