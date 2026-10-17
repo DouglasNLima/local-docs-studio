@@ -11,6 +11,8 @@ public sealed record DiagramResult(string Source, string? Svg, string? Error)
     public string? Theme { get; init; }
     public PositionedGraph? FlowchartLayout { get; init; }
     public MermaidGraph? FlowchartSemantics { get; init; }
+    public ErDiagram? ErSemantics { get; init; }
+    public PositionedErDiagram? ErLayout { get; init; }
     public IReadOnlyList<FlowchartGroupIdentity> FlowchartGroups { get; init; } = [];
 }
 
@@ -70,7 +72,7 @@ public sealed class DiagramService
                 svg = System.Text.Encoding.UTF8.GetString(output.ToArray());
             }
             else svg = MermaidRenderer.RenderSvg(prepared, options);
-            return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart, FlowchartSemantics = layout.FlowchartSemantics, FlowchartGroups = layout.Groups };
+            return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart, FlowchartSemantics = layout.FlowchartSemantics, FlowchartGroups = layout.Groups, ErSemantics = layout.ErSemantics, ErLayout = layout.ErLayout };
         }
         catch (Exception ex) when (ex is not OutOfMemoryException && (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested))
         {

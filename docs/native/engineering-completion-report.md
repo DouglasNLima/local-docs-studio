@@ -1,5 +1,14 @@
 # Native Windows preview acceptance and engineering delivery
 
+The fourth native Mermaid authoring family is in progress on
+`feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
+`3229246af356829771a200134a5df38d3cc8a04c`. The
+[ER engineering report](mermaid-er-visual-editor.md) owns its pinned grammar,
+capabilities, exact-source architecture and revision-scoped certification status.
+Local Release compilation and 1,489 Core cases pass; actual Windows/High Contrast,
+package and final-head CI certification remain pending. Earlier reports retain their
+original evidence scope.
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 ## Performance continuation after the accepted baseline

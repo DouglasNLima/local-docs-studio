@@ -175,7 +175,8 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     if (editDiagramVisually is not null && visualTargets.Any(target => code.Span.Start >= target.Container.Start && code.Span.Start < target.Container.End)
                         && (new Core.Mermaid.MermaidSourceParser().Parse(diagram.Source, cancellationToken).DiagramType == "Flowchart"
                             || Core.Sequence.SequenceSourceParser.IsSequence(diagram.Source)
-                            || Core.StateDiagrams.StateDiagramSourceParser.IsState(diagram.Source)))
+                            || Core.StateDiagrams.StateDiagramSourceParser.IsState(diagram.Source)
+                            || Core.ErDiagrams.ErDiagramSourceParser.IsEr(diagram.Source)))
                     {
                         var visual = new Button { Content = "Visual Edit", ToolTip = "Open this diagram in its native visual editor.", Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
                         System.Windows.Automation.AutomationProperties.SetAutomationId(visual, "DiagramEditVisually" + code.Span.Start);

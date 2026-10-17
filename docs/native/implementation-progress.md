@@ -1,5 +1,14 @@
 # Native implementation progress
 
+The fourth native Mermaid authoring family is in progress on
+`feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
+`3229246af356829771a200134a5df38d3cc8a04c`. The
+[ER engineering report](mermaid-er-visual-editor.md) owns its pinned grammar,
+capabilities, exact-source architecture and revision-scoped certification status.
+Local Release compilation and 1,489 Core cases pass; actual Windows/High Contrast,
+package and final-head CI certification remain pending. Earlier reports retain their
+original evidence scope.
+
 State visual authoring is implemented on consolidated `develop` `77dff109`,
 including both PR #31 and PR #32, in [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33).
 The [State report](mermaid-state-visual-editor.md) owns its syntax/operation matrices,
