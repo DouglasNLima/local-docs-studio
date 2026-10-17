@@ -32,6 +32,7 @@ public partial class StateVisualEditorWindow : Window
     private Point? pan;
     private double panHorizontal, panVertical;
     private NativeStatePresentation? presentation;
+    private (StateDiagramModel Model, bool Dark, NativeStatePresentation View)? preparedPresentation;
     private record Choice(string Identity, string Description) { public override string ToString() => Description; }
     private bool SourcePending => draft is not null && SourceEditor.Text != draft.Source;
     private string Values => string.Join('\u001f', NodeId.Text, LabelText.Text, From.SelectedValue, To.SelectedValue);
@@ -49,7 +50,7 @@ public partial class StateVisualEditorWindow : Window
         EditSourceButton.IsEnabled = editSource is not null; IsEnabled = false;
         Loaded += async (_, _) =>
         {
-            try { draft = await Task.Run(() => new StateVisualDraft(source, diagrams), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); }
+            try { draft = await Task.Run(() => new StateVisualDraft(source, diagrams, ValidateNativeCandidateAsync), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); }
             catch (OperationCanceledException) { }
         };
         Closing += ConfirmClose;
@@ -81,6 +82,20 @@ public partial class StateVisualEditorWindow : Window
         finally { updating = false; }
         await RenderAsync(fit); UpdateActions();
     }
+    private async Task ValidateNativeCandidateAsync(StateDiagramModel candidate, CancellationToken cancellationToken)
+    {
+        var version = renderGeneration; var themeDark = dark;
+        await renderGate.WaitAsync(cancellationToken);
+        try
+        {
+            var render = await Task.Run(() => diagrams.Render(candidate.Source, themeDark, diagramTheme, cancellationToken), cancellationToken);
+            var view = await StaWorker.RunAsync(() => NativeStatePresentation.Create(candidate, render, svg), cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (closed || version != renderGeneration) throw new ArgumentException("The State presentation changed during validation. Retry against the current presentation; the draft is unchanged.");
+            preparedPresentation = (candidate, themeDark, view);
+        }
+        finally { renderGate.Release(); }
+    }
     private async Task RenderAsync(bool fit)
     {
         CancelPointer(); canvasPick = null; var version = ++renderGeneration; mapped = false; UpdateActions(); var model = draft.Model; var themeDark = dark;
@@ -91,10 +106,12 @@ public partial class StateVisualEditorWindow : Window
             await renderGate.WaitAsync(cancellation.Token); leased = true;
             var render = await Task.Run(() => diagrams.Render(model.Source, themeDark, diagramTheme, cancellation.Token), cancellation.Token);
             if (closed || version != renderGeneration) return;
+            var ready = preparedPresentation is { } prepared && ReferenceEquals(prepared.Model, model) && prepared.Dark == themeDark ? prepared.View : null;
+            preparedPresentation = null;
             var converted = await StaWorker.RunAsync(() =>
             {
-                NativeStatePresentation? view = null; string? diagnostic = null;
-                try { view = NativeStatePresentation.Create(model, render, svg); }
+                NativeStatePresentation? view = ready; string? diagnostic = null;
+                try { view ??= NativeStatePresentation.Create(model, render, svg); }
                 catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
                 return (view, Drawing: view?.Canonical.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
             }, cancellation.Token);

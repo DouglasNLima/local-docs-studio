@@ -36,9 +36,14 @@ internal static partial class NativeUiChecks
             Click("StateAddState"); Find(visual!, "StateNodeId").AsTextBox().Text = "Archived"; Find(visual!, "StateLabel").AsTextBox().Text = "Archived locally"; Click("StateUpdate"); Await(text => text.Contains("as Archived", StringComparison.Ordinal));
             Click("StateAddTransition"); Find(visual!, "StateFrom").AsComboBox().Select("Review · Review"); Find(visual!, "StateTo").AsComboBox().Select("Archived · Archived locally"); Find(visual!, "StateLabel").AsTextBox().Text = "Archive"; Click("StateUpdate"); Await(text => text.Contains("Review --> Archived : Archive", StringComparison.Ordinal));
             Click("StateReconnectFrom"); Find(visual!, "StateCanvas_state:Approved").Click(); Click("StateUpdate"); Await(text => text.Contains("Approved --> Archived : Archive", StringComparison.Ordinal));
+            Click("StateReconnectTo"); Find(visual!, "StateCanvas_state:Published").Click(); Click("StateUpdate"); Await(text => text.Contains("Approved --> Published : Archive", StringComparison.Ordinal));
+            Click("StateUndo"); Await(text => text.Contains("Approved --> Archived : Archive", StringComparison.Ordinal));
             Click("StateReverse"); Await(text => text.Contains("Archived --> Approved : Archive", StringComparison.Ordinal)); Click("StateUndo"); Await(text => text.Contains("Approved --> Archived : Archive", StringComparison.Ordinal));
             Click("StateAddTransition"); Find(visual!, "StateFrom").AsComboBox().Select("Archived · Archived locally"); Find(visual!, "StateTo").AsComboBox().Select("Archived · Archived locally"); Find(visual!, "StateLabel").AsTextBox().Text = "Check again"; Click("StateUpdate"); Await(text => text.Contains("Archived --> Archived : Check again", StringComparison.Ordinal));
             var changed = Draft(); Click("StateUndo"); Await(text => !text.Contains("Archived --> Archived", StringComparison.Ordinal)); Click("StateRedo"); Await(text => text == changed);
+            Click("StateAddInitial"); Find(visual!, "StateTo").AsComboBox().Select("Archived · Archived locally"); Click("StateUpdate"); Await(text => text.Contains("[*] --> Archived", StringComparison.Ordinal)); Click("StateUndo"); Await(text => text == changed);
+            Click("StateAddFinal"); Find(visual!, "StateFrom").AsComboBox().Select("Archived · Archived locally"); Click("StateUpdate"); Await(text => text.Contains("Archived --> [*]", StringComparison.Ordinal)); Click("StateUndo"); Await(text => text == changed);
+            Check(true, "Source and destination canvas reconnection, reverse and scoped initial/final palette connections validate and undo safely");
             Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original, "State editing and private Undo/Redo leave owner/disk source exact before Apply");
             SelectState("Draft"); Click("StateFit");
             var dragMetrics = new List<string>(); var beforeDrag = Draft();
@@ -169,7 +174,15 @@ internal static partial class NativeUiChecks
         void SelectState(string id)
         { Find(visual!, "StateCanvas_state:" + id).Patterns.SelectionItem.Pattern.Select(); Wait(() => Find(visual!, "StateNodeId").AsTextBox().Text == id, "State selection did not reach the inspector."); }
         void SelectTransition(int index)
-        { Find(visual!, "StateElements").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).Single(item => item.Name.StartsWith("Transition " + (index + 1) + " ·", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select(); Wait(() => Find(visual!, "StateSelectionSummary").Name.StartsWith("Transition", StringComparison.Ordinal), "Transition occurrence selection failed."); }
+        {
+            var list = Find(visual!, "StateElements"); var model = new StateDiagramSourceParser().Parse(Draft());
+            // WPF virtualises off-screen tree rows. Native keyboard navigation
+            // realises the exact source-order occurrence without guessing a label.
+            list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
+            for (var step = 0; step < model.Nodes.Count + model.Groups.Count + model.PseudoNodes.Count + index; step++) Keyboard.Type(VirtualKeyShort.DOWN);
+            Wait(() => list.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).Any(item => item.Name.StartsWith("Transition " + (index + 1) + " ·", StringComparison.Ordinal) && item.Patterns.SelectionItem.Pattern.IsSelected.Value), "Keyboard selection did not realise the exact transition occurrence.");
+            Wait(() => Find(visual!, "StateSelectionSummary").Name.StartsWith("Transition", StringComparison.Ordinal), "Transition occurrence selection failed.");
+        }
         string Draft() => ReadEditorText(Find(visual!, "StateSource"));
         void Await(Func<string, bool> predicate) => Wait(() => predicate(Draft()) && Find(visual!, "StateApply").IsEnabled, "The private State draft did not reach the expected state: " + Find(visual!, "StateStatus").Name);
         void Click(string id) => Find(visual!, id).AsButton().Invoke();

@@ -9,6 +9,7 @@ public sealed class StateVisualDraft
     private readonly StateDiagramSourceParser parser = new();
     private readonly StateTransformationService transformations = new();
     private readonly DiagramService diagrams;
+    private readonly Func<StateDiagramModel, CancellationToken, Task>? validatePresentation;
     private sealed record Snapshot(StateDiagramModel Model, string? Selection, long Identity);
     private readonly List<Snapshot> history = [];
     private int index, generation;
@@ -21,8 +22,8 @@ public sealed class StateVisualDraft
     public bool CanRedo => index + 1 < history.Count;
     public long HistoryIdentity => history[index].Identity;
     public int HistoryCount => history.Count;
-    public StateVisualDraft(string source, DiagramService? diagrams = null)
-    { this.diagrams = diagrams ?? new(); OriginalSource = source; Model = parser.Parse(source); history.Add(new(Model, null, 0)); }
+    public StateVisualDraft(string source, DiagramService? diagrams = null, Func<StateDiagramModel, CancellationToken, Task>? validatePresentation = null)
+    { this.diagrams = diagrams ?? new(); this.validatePresentation = validatePresentation; OriginalSource = source; Model = parser.Parse(source); history.Add(new(Model, null, 0)); }
     public void Select(string? identity) { Selection = identity; history[index] = history[index] with { Selection = identity }; }
     public async Task<StateEditResult> ExecuteAsync(StateEditOperation operation, CancellationToken cancellationToken = default)
     {
@@ -38,6 +39,7 @@ public sealed class StateVisualDraft
                 parsed = Identify(parsed, plan.Identities);
                 StateSemanticValidation.ValidateEdit(original, parsed, operation, plan); Validate(parsed, cancellationToken); return parsed;
             }, cancellationToken);
+            if (validatePresentation is not null) await validatePresentation(candidate, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (version != generation || !ReferenceEquals(Model, original)) return new(false, "A newer draft superseded this operation.");
             if (candidate.Source != Source) Commit(candidate); return new(true, null);
@@ -50,6 +52,7 @@ public sealed class StateVisualDraft
         try
         {
             var candidate = await Task.Run(() => { var parsed = parser.Parse(source, cancellationToken); Validate(parsed, cancellationToken); return parsed; }, cancellationToken);
+            if (validatePresentation is not null) await validatePresentation(candidate, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (version != generation) return new(false, "A newer draft superseded source validation.");
             if (candidate.Source != Source) { Selection = null; Commit(candidate); } return new(true, null);
@@ -59,7 +62,7 @@ public sealed class StateVisualDraft
     public async Task<StateEditResult> ValidateAsync(CancellationToken cancellationToken = default)
     {
         var version = generation; var current = Model;
-        try { await Task.Run(() => Validate(current, cancellationToken), cancellationToken); return version == generation ? new(true, null) : new(false, "The draft changed during validation."); }
+        try { await Task.Run(() => Validate(current, cancellationToken), cancellationToken); if (validatePresentation is not null) await validatePresentation(current, cancellationToken); cancellationToken.ThrowIfCancellationRequested(); return version == generation ? new(true, null) : new(false, "The draft changed during validation."); }
         catch (Exception error) when (Recoverable(error, cancellationToken)) { return new(false, Message(error)); }
     }
     private void Validate(StateDiagramModel model, CancellationToken cancellationToken)

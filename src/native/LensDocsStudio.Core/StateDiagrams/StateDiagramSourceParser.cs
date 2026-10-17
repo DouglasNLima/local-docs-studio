@@ -31,6 +31,11 @@ public sealed class StateDiagramSourceParser
 
     public StateDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        try { return ParseCore(source, cancellationToken); }
+        catch (RegexMatchTimeoutException) { return new(source, "", [], [], [], [], [], ["State source inspection exceeded its lexical budget. The complete source is retained; use Edit source."]); }
+    }
+    private static StateDiagramModel ParseCore(string source, CancellationToken cancellationToken)
+    {
         var statements = new List<StateSourceStatement>(); var transitions = new List<StateTransition>(); var groups = new List<StateGroup>();
         var pseudo = new List<StatePseudoNode>(); var diagnostics = new List<string>(); var stack = new Stack<string>();
         var first = new Dictionary<string, (string Label, string Kind, StateSourceStatement Statement)>();

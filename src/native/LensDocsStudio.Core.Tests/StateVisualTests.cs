@@ -162,9 +162,16 @@ public sealed class StateVisualTests
     [Fact]
     public async Task Stale_in_flight_validation_cannot_replace_a_newer_source_revision()
     {
-        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\n");
+        var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\n", validatePresentation: async (_, token) => { entered.SetResult(); await release.Task.WaitAsync(token); });
         var original = draft.Source; var validation = draft.ValidateSourceAsync("stateDiagram-v2\nstate \"B\" as B\n");
-        draft.Undo(); var result = await validation; Assert.False(result.Success); Assert.Equal(original, draft.Source); Assert.Equal(1, draft.HistoryCount);
+        await entered.Task; draft.Undo(); release.SetResult(); var result = await validation; Assert.False(result.Success); Assert.Equal(original, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact]
+    public async Task Failed_native_presentation_validation_cannot_commit_private_source_or_history()
+    {
+        var draft = new StateVisualDraft("stateDiagram-v2\nstate \"A\" as A\n", validatePresentation: (_, _) => throw new InvalidDataException("Synthetic native conversion rejection"));
+        draft.Select("state:A"); await Rejected(draft, new UpdateStateNode("A", "A", "Changed")); Assert.Equal(1, draft.HistoryCount);
     }
     [Fact]
     public async Task Empty_supported_source_can_start_with_an_independent_state()
@@ -190,6 +197,12 @@ public sealed class StateVisualTests
         await Success(draft, new UpdateStateNode("Draft", "LocalDraft", "Local draft"));
         Assert.Equal("stateDiagram-v2\n    state \"Local draft\" as LocalDraft\nLocalDraft --> Review\nReview --> LocalDraft\n", draft.Source);
         draft.Undo(); Assert.Equal(draft.OriginalSource, draft.Source);
+    }
+    [Fact]
+    public void Pathological_statement_counts_are_bounded_without_discarding_source()
+    {
+        var source = "stateDiagram-v2\n" + string.Join('\n', Enumerable.Repeat("unrecognised directive", 3000)); var model = new StateDiagramSourceParser().Parse(source);
+        Assert.False(model.IsValid); Assert.Equal(source, model.Source); Assert.InRange(model.Statements.Count, 1, 1000); Assert.False(StateCapabilityAnalysis.For(model, new AddStateNode("A", "A")).Allowed);
     }
     [Theory]
     [InlineData("stateDiagram-v2\nA --> B\n", 2, 1, 0)]

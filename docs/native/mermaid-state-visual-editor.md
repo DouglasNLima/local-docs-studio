@@ -74,6 +74,9 @@ Each transformation checks capabilities, builds expected-text patches, rejects
 stale/overlapping spans, applies privately, reparses the full source, compares the
 complete pinned parser graph against only the authorised semantic delta, renders
 the candidate and verifies renderer/source correspondence before committing.
+The native host also validates SVG conversion and hit geometry before the private
+history commit. Its verified presentation is reused by model identity for the
+canvas refresh. Native conversion rejection is an atomic failed edit.
 The comparison includes notes, styles, directions, node order, hierarchy and
 composite endpoint redirections. Implicit label materialisation may move only
 that selected state's first occurrence; unrelated state order is checked.
@@ -163,11 +166,25 @@ panel; the corrected harness retains the source panel during pointer checks.
 Both failure JSON reports are retained alongside the first passing fidelity
 report under `evidence/state-visual-editor/`. No assertion or timeout was relaxed.
 
+At `6db27df`, 41 normal and 41 High Contrast native State checks pass, including
+owner closure, external edits, safe relocation, another active tab and live High
+Contrast during dragging. Actual High Contrast fidelity also passes. The larger
+repeated-transition acceptance at `0f1f09a` exposed off-screen WPF row virtualisation
+in the harness; its failure reports are retained. Selection now uses native
+keyboard navigation to realise and verify the exact occurrence. A local stale
+validation test also exposed an invalid timing assumption; explicit validation
+barriers now make the interruption deterministic, without delays or retries.
+The current State unit suite passes 35 tests, including native conversion rejection.
+
 The `ff7dfb0` PR Edge run failed one existing browser-fallback test because the
 top bar had browser-default `display: block` instead of the required stylesheet
 value; Chromium and the same-revision push browser run passed. The failed trace
 is retained for investigation; the earlier successful run is not a substitute
-for final-head browser certification.
+for final-head browser certification. The trace identifies `ERR_NO_BUFFER_SPACE`
+for `app.css`; the unchanged focused local Edge test passes. A later `6db27df`
+Chromium PR run failed during context teardown in the legacy-redirect test while
+133 other tests and the same-revision push browser run passed. These failures
+remain visible and do not waive the final-head browser checks.
 
 Hosted State grammar,
 fidelity/performance, full native UIA, High Contrast and existing editor/browser
