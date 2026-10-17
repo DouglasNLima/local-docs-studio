@@ -117,8 +117,8 @@ Apply, one document Undo, Redo, Save, process restart without rewriting the file
 reopen/render and Cancel. These checks run in normal and actual Windows High
 Contrast alongside all existing authoring and interaction tests.
 
-Local Release builds and the full Core suite pass **1,321 tests**, with no skips.
-The new partial-editing class has 84 cases, plus three renderer-correspondence
+Local Release builds and the full Core suite pass **1,323 tests**, with no skips.
+The new partial-editing class has 86 cases, plus three renderer-correspondence
 cases. Static integrity passes 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime external-dependency scans. Final hosted evidence is pending.
 The initial retained run had four old global-read-only expectations fail;
@@ -146,3 +146,17 @@ actually replaced UIA preview action before opening, with no timeout increase or
 guard bypass. The earlier synchronised Continuous workspace failure is retained;
 a later unchanged-workspace revision passes all four viewport contexts. This does
 not certify the separate Continuous preview performance target.
+
+At application source `f71ac3b`, hosted authoring passes 143 normal and 139 actual
+Windows High Contrast checks, and canonical fidelity passes 369 assertions.
+Both stress appearances complete 120 drags and 2,040 moves each; the normal job
+then fails its separate Continuous synchronised workspace check. These outcomes
+remain distinct. The workspace fixture now waits for actual preference application
+and editor alignment before requesting a separate UIA preview scroll; it retains
+all ownership assertions and original deadlines. The initial harness correction
+also handles the application's valid null/default desktop-preference representation.
+
+Queued-context tests additionally prove that cancellation between rendering and
+commit leaves source/history unchanged, and that an older completed validation
+cannot overwrite a newer accepted operation. Cancellation is rechecked after
+asynchronous work and before committing or applying a draft.

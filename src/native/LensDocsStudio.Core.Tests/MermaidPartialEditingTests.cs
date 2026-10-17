@@ -277,4 +277,53 @@ public sealed class MermaidPartialEditingTests
         Assert.Contains("A --> B --> C\n", draft.Source); Assert.EndsWith("\nE[Unchanged & exact]\n", draft.Source);
         draft.Undo(); Assert.Equal(source, draft.Source);
     }
+
+    [Fact]
+    public async Task Cancellation_after_renderer_completion_but_before_the_queued_commit_preserves_source_and_history()
+    {
+        const string source = "flowchart LR\nA[Original] --> B[Keep]\n";
+        var draft = new MermaidVisualDraft(source); draft.Select(["node:A"]);
+        using var cancellation = new CancellationTokenSource();
+        using var posted = new System.Collections.Concurrent.BlockingCollection<(SendOrPostCallback Callback, object? State)>();
+        var previous = SynchronizationContext.Current; Task<MermaidDraftResult> validating;
+        SynchronizationContext.SetSynchronizationContext(new QueuedValidationContext(posted));
+        try { validating = draft.ValidateAndCommitAsync(source.Replace("Original", "Changed", StringComparison.Ordinal), cancellation.Token); }
+        finally { SynchronizationContext.SetSynchronizationContext(previous); }
+        Assert.True(posted.TryTake(out var first, TimeSpan.FromSeconds(10)), "Renderer completion did not post its commit continuation.");
+        cancellation.Cancel(); first.Callback(first.State);
+        for (var step = 0; step < 4 && !validating.IsCompleted; step++)
+        {
+            Assert.True(posted.TryTake(out var next, TimeSpan.FromSeconds(5)), "The cancelled validation did not complete its queued continuation.");
+            next.Callback(next.State);
+        }
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => validating);
+        Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo); Assert.False(draft.CanApply);
+        Assert.Equal(["node:A"], draft.Selection); Assert.Equal([0L], draft.HistoryIdentities);
+    }
+    private sealed class QueuedValidationContext(System.Collections.Concurrent.BlockingCollection<(SendOrPostCallback Callback, object? State)> posted) : SynchronizationContext
+    { public override void Post(SendOrPostCallback callback, object? state) => posted.Add((callback, state)); }
+
+    [Fact]
+    public async Task A_queued_older_validation_cannot_overwrite_a_newer_committed_operation()
+    {
+        const string source = "flowchart LR\nA[Original] --> B[Keep]\n";
+        var draft = new MermaidVisualDraft(source);
+        using var posted = new System.Collections.Concurrent.BlockingCollection<(SendOrPostCallback Callback, object? State)>();
+        var previous = SynchronizationContext.Current; Task<MermaidDraftResult> older;
+        SynchronizationContext.SetSynchronizationContext(new QueuedValidationContext(posted));
+        try { older = draft.ValidateAndCommitAsync(source.Replace("Original", "Obsolete", StringComparison.Ordinal)); }
+        finally { SynchronizationContext.SetSynchronizationContext(previous); }
+        Assert.True(posted.TryTake(out var first, TimeSpan.FromSeconds(10)));
+        await Success(draft, new UpdateMermaidNode("B", "Current", FlowNodeShape.Process, "B"));
+        var latest = draft.Source; var history = draft.HistoryIdentities.ToArray();
+        first.Callback(first.State);
+        for (var step = 0; step < 4 && !older.IsCompleted; step++)
+        {
+            Assert.True(posted.TryTake(out var next, TimeSpan.FromSeconds(5)));
+            next.Callback(next.State);
+        }
+        var result = await older; Assert.False(result.Success); Assert.Contains("newer", result.Error, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(latest, draft.Source); Assert.Equal(history, draft.HistoryIdentities); Assert.DoesNotContain("Obsolete", draft.Source);
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.False(draft.CanUndo);
+    }
 }

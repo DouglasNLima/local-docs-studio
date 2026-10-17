@@ -5,6 +5,7 @@ using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Input;
 using FlaUI.Core.WindowsAPI;
 using FlaUI.UIA3;
+using LensDocsStudio.Core.State;
 
 namespace LensDocsStudio.Native.Validation;
 
@@ -53,11 +54,8 @@ internal static partial class NativeUiChecks
                     var preferencePath = Path.Combine(root, mode + synchronised, "preferences.json");
                     if (!File.Exists(preferencePath)) return false;
                     using var input = new FileStream(preferencePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using var preferences = JsonDocument.Parse(input);
-                    var desktop = preferences.RootElement.GetProperty("Desktop");
-                    return desktop.GetProperty("FollowCaret").GetBoolean() == synchronised
-                        && desktop.GetProperty("SyncScroll").GetBoolean() == synchronised
-                        && !desktop.GetProperty("SyncSelection").GetBoolean();
+                    var desktop = JsonSerializer.Deserialize<UserPreferences>(input)?.Desktop ?? new DesktopPreferences();
+                    return desktop.FollowCaret == synchronised && desktop.SyncScroll == synchronised && !desktop.SyncSelection;
                 }, "The requested synchronisation preferences did not finish applying.");
                 ScrollEditorTo(75);
                 ReadAt("A", "Region 065");

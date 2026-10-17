@@ -59,6 +59,7 @@ public sealed class MermaidVisualDraft
                 }
                 return current;
             }, cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
             if (generation != revision) return new(false, "A newer draft superseded this operation.");
             return await ValidateAndCommitCoreAsync(candidate.Source, candidate.Edges.Select(edge => edge.Id).ToArray(), cancellationToken, capabilityProof: true);
         }
@@ -78,6 +79,7 @@ public sealed class MermaidVisualDraft
             cancellationToken.ThrowIfCancellationRequested(); return (parsed, error: rendered.Error
                 ?? (MermaidSemanticValidation.RenderingAgrees(parsed, rendered) ? null : "The candidate renderer and source semantics disagree. Source and history were preserved."));
         }, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (version != revision) return new(false, "A newer draft superseded this validation.");
         if (result.error is not null) return new(false, result.error);
         if (candidate == Source) return new(true, null);
@@ -95,6 +97,7 @@ public sealed class MermaidVisualDraft
         if (!CanApply) return new(false, "Apply requires a real, validated private source change.");
         var generation = revision; var source = Source;
         var result = await Task.Run(() => diagrams.Render(source, cancellationToken: cancellationToken), cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
         if (generation != revision || source != Source) return new(false, "A newer draft superseded Apply validation.");
         var agrees = MermaidSemanticValidation.RenderingAgrees(Model, result);
         return new(result.Success && agrees, result.Error ?? (agrees ? null : "The final renderer and source semantics disagree."));
