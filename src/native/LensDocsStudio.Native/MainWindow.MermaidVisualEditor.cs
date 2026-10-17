@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit.Document;
 using LensDocsStudio.Core.Mermaid;
 using LensDocsStudio.Core.Parsing;
 using LensDocsStudio.Core.State;
+using LensDocsStudio.Core.Sequence;
 using LensDocsStudio.Native.Editor;
 using LensDocsStudio.Native.Platform;
 using LensDocsStudio.Native.ViewModels;
@@ -30,6 +31,10 @@ public partial class MainWindow
         });
     }
     private void InsertFlowchart(object sender, RoutedEventArgs e)
+        => InsertMermaidVisually(false);
+    private void InsertSequence(object sender, RoutedEventArgs e)
+        => InsertMermaidVisually(true);
+    private void InsertMermaidVisually(bool sequence)
     {
         if (model.ActiveDocument is not { IsSaving: false } tab || Editor.IsReadOnly) return;
         if (tab.EditorDocument.TextLength > MermaidDocumentEditSession.MaximumDocumentCharacters)
@@ -48,12 +53,12 @@ public partial class MainWindow
             var suffix = span.End == current.Length || current[span.End..].StartsWith(newline + newline, StringComparison.Ordinal) ? "" : current[span.End..].StartsWith(newline, StringComparison.Ordinal) ? newline : newline + newline;
             return prefix + "```mermaid" + newline + draft.TrimEnd('\r', '\n') + newline + "```" + suffix;
         });
-        OpenVisualDraft(tab, session, "flowchart TD" + newline, null);
+        OpenVisualDraft(tab, session, sequence ? string.Join(newline, "sequenceDiagram", "    participant Author", "    participant Studio", "    Author->>Studio: Open documentation", "    Studio-->>Author: Display preview", "") : "flowchart TD" + newline, null);
     }
     private static bool IsStandaloneMermaid(DocumentViewModel tab) => Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
     private void OpenVisualDraft(DocumentViewModel tab, MermaidDocumentEditSession session, string source, Action? editSource)
     {
-        var window = new MermaidVisualEditorWindow(source, diagrams, async (draft, cancellationToken) =>
+        async Task<string?> ApplyDraft(string draft, CancellationToken cancellationToken)
         {
             try
             {
@@ -65,7 +70,11 @@ public partial class MainWindow
                 return null;
             }
             catch (ArgumentException error) { return error.Message; }
-        }, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize) { Owner = this };
+        }
+        Window window = SequenceSourceParser.IsSequence(source)
+            ? new SequenceVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, Editor.FontFamily, Editor.FontSize)
+            : new MermaidVisualEditorWindow(source, diagrams, ApplyDraft, ThemeService.IsDark(model.Theme), WorkspaceSettings.From(model.Preferences).Preview.DiagramTheme, editSource, ExportDiagram, sourceFont: Editor.FontFamily, sourceFontSize: Editor.FontSize);
+        window.Owner = this;
         window.Show();
     }
 }

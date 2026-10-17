@@ -11,6 +11,36 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  sequence-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build native Sequence editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify canonical Sequence pixels and geometry; record performance
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --sequence-fidelity artifacts/native/sequence-fidelity
+      - name: Exercise native Sequence authoring, document ownership, Save and reopen
+        shell: pwsh
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --sequence-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/sequence-ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-sequence-${{ matrix.appearance }}
+          path: |
+            artifacts/native/sequence-fidelity/
+            artifacts/native/sequence-ui/
+          retention-days: 14
   mermaid-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 15

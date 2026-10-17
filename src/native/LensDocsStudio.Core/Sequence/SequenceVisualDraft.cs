@@ -27,6 +27,8 @@ public sealed class SequenceVisualDraft
     }
     public void Select(string? identity) { Selection = identity; history[index] = history[index] with { Selection = identity }; }
     public async Task<SequenceEditResult> ExecuteAsync(SequenceEditOperation operation, CancellationToken cancellationToken = default)
+        => await ExecuteBatchAsync([operation], cancellationToken);
+    public async Task<SequenceEditResult> ExecuteBatchAsync(IReadOnlyList<SequenceEditOperation> operations, CancellationToken cancellationToken = default)
     {
         var version = ++generation; var original = Model;
         try
@@ -34,10 +36,16 @@ public sealed class SequenceVisualDraft
             var candidate = await Task.Run(() =>
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                var plan = transformations.Plan(original, operation);
-                var parsed = parser.Parse(MermaidPatches.Apply(original.Source, plan.Patches), cancellationToken);
-                if (parsed.Statements.Count != plan.Identities.Count) throw new ArgumentException("The edit changed unplanned source statements. Use Edit source.");
-                parsed = Identify(parsed, plan.Identities);
+                if (operations.Count is 0 or > 100) throw new ArgumentException("Choose between one and 100 bounded Sequence operations.");
+                var parsed = original;
+                foreach (var operation in operations)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    var plan = transformations.Plan(parsed, operation);
+                    var next = parser.Parse(MermaidPatches.Apply(parsed.Source, plan.Patches), cancellationToken);
+                    if (next.Statements.Count != plan.Identities.Count) throw new ArgumentException("The edit changed unplanned source statements. Use Edit source.");
+                    parsed = Identify(next, plan.Identities);
+                }
                 Validate(parsed, cancellationToken); return parsed;
             }, cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();

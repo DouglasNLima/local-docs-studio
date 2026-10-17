@@ -28,11 +28,6 @@ public sealed class SequenceSourceParser
         return Regex.Replace(value, @"<br\s*/?>", "\n", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100))
             .Replace("\\n", "\n", StringComparison.Ordinal);
     }
-    public static bool SupportedLabel(string text) => text.Length is > 0 and <= 4096 && text.Trim() == text
-        && !text.Any(char.IsControl) && !text.Contains("%%", StringComparison.Ordinal)
-        && !Regex.Replace(text, @"<br\s*/?>", "", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(100)).Contains('<')
-        && !text.Contains('>') // <br> is checked separately below by callers through EncodeLabel.
-        && !text.Contains('"') && !text.Contains('*') && !text.Contains('~');
     public static string EncodeLabel(string text)
     {
         var encoded = text.ReplaceLineEndings("<br/>");
@@ -54,7 +49,7 @@ public sealed class SequenceSourceParser
             cancellationToken.ThrowIfCancellationRequested();
             var raw = line.TrimEnd('\r'); var text = raw.Trim(); var start = offset + raw.Length - raw.TrimStart().Length;
             var lineSpan = new MermaidSourceSpan(offset, line.Length + (offset + line.Length < source.Length ? 1 : 0)); offset += lineSpan.Length;
-            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal)) continue;
+            if (text.Length == 0 || text.StartsWith("%%", StringComparison.Ordinal) && !text.StartsWith("%%{", StringComparison.Ordinal)) continue;
             if (statements.Count >= 1000) { diagnostics.Add("The Sequence statement limit is 1,000."); break; }
             var kind = SequenceStatementKind.Protected; Match? match = null;
             if (!header && text == "sequenceDiagram") { header = true; kind = SequenceStatementKind.Header; }

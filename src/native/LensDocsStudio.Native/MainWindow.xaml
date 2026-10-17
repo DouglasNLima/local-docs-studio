@@ -112,6 +112,7 @@
    </MenuItem>
    <MenuItem Header="_Insert" AutomationProperties.AutomationId="InsertMenu">
     <MenuItem Header="Flowchart visually…" Click="InsertFlowchart" AutomationProperties.AutomationId="InsertFlowchart"/>
+    <MenuItem Header="Sequence diagram visually…" Click="InsertSequence" AutomationProperties.AutomationId="InsertSequence"/>
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
