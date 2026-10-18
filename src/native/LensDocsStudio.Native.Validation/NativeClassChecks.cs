@@ -11,7 +11,7 @@ using Markdig.Syntax;
 
 namespace LensDocsStudio.Native.Validation;
 
-internal static class NativeClassChecks
+internal static partial class NativeClassChecks
 {
     public static void Run(string output, bool highContrast)
     {
@@ -44,6 +44,7 @@ internal static class NativeClassChecks
         Observe("Many methods", "classDiagram\nclass A {\n" + string.Concat(Enumerable.Range(0, 250).Select(i => "+Method" + i + "(path, options) bool\n")) + "}\n");
         Observe("Long method signatures", "classDiagram\nclass A {\n+Run(" + string.Join(", ", Enumerable.Repeat("parameter", 60)) + ") bool\n}\n");
         Observe("Protected global grammar", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n");
+        DocumentChecks(checks);
         File.WriteAllText(Path.Combine(output, "class-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Fidelity = fidelity, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
         void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
         void Observe(string scenario, string source)

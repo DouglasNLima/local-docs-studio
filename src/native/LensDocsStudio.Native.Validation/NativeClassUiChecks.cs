@@ -29,17 +29,17 @@ internal static partial class NativeUiChecks
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active during Class authoring");
             Launch(); var editor = Find(main!, "MarkdownEditor"); Wait(() => ReadEditorText(editor) == original, "Class fixture did not load exactly."); Open(original.LastIndexOf("```mermaid", StringComparison.Ordinal)); Capture("starter");
             SelectClass("Document"); Check(CanvasClass("Document").Patterns.SelectionItem.Pattern.IsSelected.Value, "Native class SelectionItem reports the selected source identity");
-            Click("ClassAddAttribute"); Set("ClassAttributeName", "Revision"); Set("ClassAttributeType", "int"); Find(visual!, "ClassVisibility").AsComboBox().Select("Private"); Click("ClassUpdate");
+            Click("ClassAddAttribute"); Set("ClassAttributeName", "Revision"); Set("ClassAttributeType", "int"); Choose("ClassVisibility", "Private"); Click("ClassUpdate");
             Await(model => model.Class("Document").Attributes.Any(item => item.Semantic.Name == "Revision" && item.Semantic.Type == "int" && item.Semantic.Visibility == ClassVisibility.Private)); Capture("attribute-inspector");
-            Set("ClassAttributeName", "CurrentRevision"); Set("ClassAttributeType", "long"); Find(visual!, "ClassVisibility").AsComboBox().Select("Protected"); Click("ClassUpdate"); Await(model => model.Class("Document").Attributes[^1].Semantic.Name == "CurrentRevision");
+            Set("ClassAttributeName", "CurrentRevision"); Set("ClassAttributeType", "long"); Choose("ClassVisibility", "Protected"); Click("ClassUpdate"); Await(model => model.Class("Document").Attributes[^1].Semantic.Name == "CurrentRevision");
             Click("ClassAddMethod"); Set("ClassAttributeName", "Save"); Set("ClassParameters", "document, options"); Set("ClassAttributeType", "bool"); Click("ClassUpdate"); Await(model => model.Class("Document").Methods.Any(item => item.Semantic.Name == "Save"));
             SelectMember("Document", 1); Check(Find(visual!, "ClassAttributeName").AsTextBox().Text == "Open", "Canvas/list member navigation selects the original exact method occurrence");
             Set("ClassParameters", "path, options"); Set("ClassAttributeType", "MarkdownDocument"); Click("ClassUpdate"); Await(model => model.Class("Document").Methods[0].Semantic.Params == "path, options" && model.Class("Document").Methods[0].Semantic.Type == "MarkdownDocument"); Capture("method-inspector");
             Click("ClassAddClass"); Set("ClassNodeId", "DocumentService"); Click("ClassUpdate"); Await(model => model.Classes.Any(item => item.Id == "DocumentService"));
             Wait(() => !CanvasClass("DocumentService").IsOffscreen && Find(visual!, "ClassViewport").BoundingRectangle.IntersectsWith(CanvasClass("DocumentService").BoundingRectangle), "New canonical class was not brought into view."); Check(true, "Class insertion selects and brings the canonical header into view");
-            Click("ClassAddRelationship"); Find(visual!, "ClassFrom").AsComboBox().Select("Document"); Find(visual!, "ClassTo").AsComboBox().Select("DocumentService"); Find(visual!, "ClassRelationshipType").AsComboBox().Select("Inheritance"); Find(visual!, "ClassMarkerAt").AsComboBox().Select("From"); Click("ClassUpdate");
+            Click("ClassAddRelationship"); Choose("ClassFrom", "Document"); Choose("ClassTo", "DocumentService"); Choose("ClassRelationshipType", "Inheritance"); Choose("ClassMarkerAt", "From"); Click("ClassUpdate");
             Await(model => model.Relationships.Count == 2 && model.Relationships[^1].Semantic.Type == ClassRelationType.Inheritance && model.Relationships[^1].Semantic.MarkerAt == ClassMarkerAt.From);
-            SelectRelationship(0); Find(visual!, "ClassRelationshipType").AsComboBox().Select("Composition"); Find(visual!, "ClassMarkerAt").AsComboBox().Select("From"); Set("ClassLabel", "owns documentation"); Set("ClassFirstCardinality", "1"); Set("ClassSecondCardinality", "0..*"); Click("ClassUpdate");
+            SelectRelationship(0); Choose("ClassRelationshipType", "Composition"); Choose("ClassMarkerAt", "From"); Set("ClassLabel", "owns documentation"); Set("ClassFirstCardinality", "1"); Set("ClassSecondCardinality", "0..*"); Click("ClassUpdate");
             Await(model => model.Relationships[0].Semantic.Type == ClassRelationType.Composition && model.Relationships[0].Semantic.Label == "owns documentation"); Capture("relationship-inspector");
             Click("ClassReconnectTo"); CanvasClass("DocumentService").Click(); Click("ClassUpdate"); Await(model => model.Relationships[0].Semantic.To == "DocumentService");
             Check(Model().Relationships[0].Semantic.ToCardinality == "0..*" && Model().Relationships[0].Semantic.MarkerAt == ClassMarkerAt.From, "Safe canvas endpoint reconnection preserves marker and endpoint cardinality ownership");
@@ -75,7 +75,7 @@ internal static partial class NativeUiChecks
         catch (Exception error)
         {
             File.WriteAllText(Path.Combine(output, "class-failure.txt"), error.ToString());
-            try { (visual ?? main)?.CaptureToFile(Path.Combine(output, "failure.png")); File.WriteAllLines(Path.Combine(output, "failure-controls.txt"), (visual ?? main)?.FindAllDescendants().Select(item => item.ControlType + ": " + item.AutomationId + " · " + item.Name) ?? []); } catch { }
+            try { (visual ?? main)?.CaptureToFile(Path.Combine(output, "failure.png")); File.WriteAllLines(Path.Combine(output, "failure-controls.txt"), (visual ?? main)?.FindAllDescendants().Select(item => item.ControlType + ": " + item.AutomationId + " · " + item.Name + " · enabled=" + item.IsEnabled + " · " + item.Properties.HelpText.ValueOrDefault) ?? []); } catch { }
             File.WriteAllText(Path.Combine(output, "class-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Checks = checks, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); Console.Error.WriteLine(error); return 1;
         }
         finally { Mouse.Up(MouseButton.Left); Stop(); }
@@ -100,7 +100,8 @@ internal static partial class NativeUiChecks
         ClassDiagramModel Model() => new ClassDiagramSourceParser().Parse(Draft());
         void Await(Func<ClassDiagramModel, bool> predicate) => Wait(() => predicate(Model()) && Find(visual!, "ClassApply").IsEnabled, "Private Class draft did not reach expected state: " + Find(visual!, "ClassStatus").Name);
         void Set(string id, string value) => Find(visual!, id).AsTextBox().Text = value;
-        void Click(string id) => Find(visual!, id).AsButton().Invoke();
+        void Click(string id) { Wait(() => Find(visual!, id).IsEnabled, "Class command is disabled: " + id + "; " + Find(visual!, id).Properties.HelpText.ValueOrDefault + "; " + Find(visual!, "ClassStatus").Name); Find(visual!, id).AsButton().Invoke(); }
+        void Choose(string id, string item) { var combo = Find(visual!, id).AsComboBox(); combo.Select(item); if (combo.Patterns.ExpandCollapse.IsSupported) combo.Patterns.ExpandCollapse.Pattern.Collapse(); }
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("ClassVisualEditor"))) is null, "Class editor did not close."); visual = null; }
         void Resize(int width, int height) { visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3 && FooterSettled(), "Class viewport did not settle."); }
         bool FooterSettled() { var window = visual!.BoundingRectangle; var footer = Find(visual, "ClassApply").BoundingRectangle; return window.Right - footer.Right is >= 4 and <= 32 && window.Bottom - footer.Bottom is >= 4 and <= 24; }

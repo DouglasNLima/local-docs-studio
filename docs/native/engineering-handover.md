@@ -1,5 +1,16 @@
 # Native Windows engineering handover
 
+
+Class authoring is being implemented in [Draft PR #35](https://github.com/DouglasNLima/local-docs-studio/pull/35)
+from consolidated `develop` `5b732cd`. The [Class engineering report](mermaid-class-visual-editor.md)
+owns the fifth-family grammar/capability boundaries and evidence. The exact
+post-merge native run `39080262652` and browser/static run `39080262674` passed.
+Class source/semantic tests and initial hosted canonical fidelity pass; the first
+normal/High Contrast UIA attempt failed at relationship inspector completion.
+The failure is retained and under investigation. Class packages, final UIA and
+final-HEAD regressions are not yet certified. Earlier evidence below retains its
+original revision and scope.
+
 Current work is [Draft PR #33](https://github.com/DouglasNLima/local-docs-studio/pull/33),
 `feature/native-mermaid-state-visual-editor`, based on consolidated `77dff109`
 including the merged advanced Flowchart and Sequence implementations. The

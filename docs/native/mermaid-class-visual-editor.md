@@ -11,8 +11,9 @@ are present. The browser/static post-merge run
 [39080262674](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39080262674)
 passed both browsers. Native post-merge run
 [39080262652](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39080262652)
-was still running installer lifecycle checks when work began; completion remains
-to be recorded before baseline certification.
+completed successfully, including native validation and installed State/ER
+authoring. The historical-upgrade job was intentionally outside this baseline
+branch condition; it was not counted as a passing mandatory check.
 
 Class authoring will use a dedicated Core semantic/source adapter, exact source
 patches, private occurrence identities and bounded history. The existing native
@@ -177,3 +178,28 @@ inspection; broader adversarial document tests; Class UI performance observation
 final regression totals; final CI URLs; unsigned package versions/checksums and
 independent receipts. The feature remains **not certified** and **not ready for
 internal-preview delivery** until those results are complete and reviewed.
+
+
+### First hosted Class revision: `5f1e790`
+
+[Push UX run 39082076781](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39082076781)
+passed all 28 light/dark Class fidelity contexts in both normal and actual High
+Contrast jobs before their real UIA step failed. The exact failure reports and
+screenshots are retained under the `native-class-normal` and
+`native-class-high-contrast` workflow artefacts. Failure occurs during relationship
+creation after class/member edits and new class insertion; the final marker
+selector popup remains open. Selector completion and command state are being
+investigated. No completed native authoring acceptance is claimed.
+
+The same revision's full Core run exposed an outdated exact help-topic count
+(14 expected, 15 actual) after the new Class topic was added. The correction
+retains exact topic-count/unique-anchor checks and adds a Class-specific topic
+assertion. Original failing TRX remains under `artifacts/class-core/core-5f1e790.trx`.
+
+Windowless performance observations at that hosted revision include successful
+100-class/150-relationship canonical rendering in 45.9 ms and native conversion
+in 1,773.4 ms, with approximately 340 MB total allocations across the observed
+scenario. This does not certify real editor opening/selection responsiveness or
+all dense workloads. The existing 500-element/three-second renderer budgets were
+unchanged. SharpVectors conversion remains non-interruptible while its STA call
+runs; cancellation rejects stale results after conversion.

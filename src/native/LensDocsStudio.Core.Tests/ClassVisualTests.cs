@@ -138,4 +138,46 @@ public class ClassVisualTests
         Assert.Equal(pinnedType, member.Semantic.Type); Assert.True(member.Statement.Protected); ClassDiagramSemanticValidation.ValidateRendering(draft.Model, new DiagramService().Render(source));
         Assert.False((await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "Changed" }))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
     }
+    [Fact] public async Task Moving_byte_identical_members_preserves_the_selected_occurrence_and_private_history()
+    {
+        var source = "classDiagram\nclass A {\n+string Name\n+string Name\n}\n"; var draft = new ClassDiagramVisualDraft(source); var selected = draft.Model.Class("A").Attributes[1].Identity; draft.Select(selected);
+        Success(await draft.ExecuteAsync(new MoveClassMember(selected, -1))); Assert.Equal(source, draft.Source); Assert.Equal(2, draft.HistoryCount); Assert.Equal(selected, draft.Model.Class("A").Attributes[0].Identity);
+        Success(await draft.ExecuteAsync(new UpdateClassMember(selected, draft.Model.Member(selected).Semantic with { Name = "Moved" })));
+        Assert.Equal("Moved", draft.Model.Class("A").Attributes[0].Semantic.Name); Assert.Equal("Name", draft.Model.Class("A").Attributes[1].Semantic.Name);
+        draft.Undo(); draft.Undo(); Assert.Equal(selected, draft.Model.Class("A").Attributes[1].Identity); Assert.Equal(selected, draft.Selection); Assert.Equal(source, draft.Source);
+        draft.Redo(); draft.Redo(); Assert.Equal("Moved", draft.Model.Class("A").Attributes[0].Semantic.Name);
+    }
+    [Fact] public async Task Unicode_mixed_line_endings_and_unrelated_tokens_remain_exact()
+    {
+        var source = "classDiagram\n    %% Café comment\r\n    class Café {\r\n        +string Titre\n        +Lire(chemin) bool\r\n    }\n    class Document\r\n    Café \"1\" *-- Document : possède\n";
+        var draft = new ClassDiagramVisualDraft(source); var row = draft.Model.Class("Café").Attributes[0];
+        Success(await draft.ExecuteAsync(new UpdateClassMember(row.Identity, row.Semantic with { Type = "int" })));
+        Assert.Equal(source.Replace("+string Titre", "+int Titre", StringComparison.Ordinal), draft.Source); draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+    [Theory, InlineData("A~T,U~"), InlineData("A[\"Display label\"]"), InlineData("A~T[]~")]
+    public async Task Broad_pinned_class_ids_do_not_grant_safe_structural_authoring(string id)
+    {
+        var source = "classDiagram\nclass " + id + "\n"; var draft = new ClassDiagramVisualDraft(source);
+        Assert.True(draft.Model.HasUnknownDependencies); Assert.False((await draft.ExecuteAsync(new AddClass("NewClass"))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact] public async Task Unknown_local_member_source_allows_an_independent_class_member_edit_without_touching_protected_bytes()
+    {
+        var source = "classDiagram\nclass A {\nunknown { directive\n}\nclass B {\n+string Name\n}\n"; var draft = new ClassDiagramVisualDraft(source); var member = draft.Model.Class("B").Attributes[0];
+        Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "Title" }))); Assert.Equal(source.Replace("+string Name", "+string Title", StringComparison.Ordinal), draft.Source);
+        Assert.Equal(ClassCompatibility.PartiallyEditable, draft.Model.Compatibility);
+    }
+    [Fact] public async Task Identical_relationship_duplicate_and_delete_retain_every_other_occurrence()
+    {
+        var draft = new ClassDiagramVisualDraft(Source); var original = draft.Model.Relationships.ToArray(); var selected = original[2];
+        Success(await draft.ExecuteAsync(new DuplicateClassRelationship(selected.Identity))); Assert.Equal(5, draft.Model.Relationships.Count); Assert.NotEqual(selected.Identity, draft.Model.Relationships[^1].Identity);
+        Success(await draft.ExecuteAsync(new DeleteClassRelationship(selected.Identity))); Assert.Equal(original[0].Identity, draft.Model.Relationships[0].Identity); Assert.DoesNotContain(draft.Model.Relationships, item => item.Identity == selected.Identity);
+        draft.Undo(); Assert.Equal(selected.Identity, draft.Model.Relationships[2].Identity);
+    }
+    [Fact] public async Task History_is_bounded_and_branching_invalidates_redo()
+    {
+        var draft = new ClassDiagramVisualDraft("classDiagram\nclass A {\n+int Value\n}\n"); var member = draft.Model.Class("A").Attributes[0]; draft.Select(member.Identity);
+        for (var i = 0; i < 105; i++) Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "Value" + i })));
+        Assert.Equal(100, draft.HistoryCount); draft.Undo(); Assert.Equal(member.Identity, draft.Selection); Assert.True(draft.CanRedo);
+        Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "Branch" }))); Assert.False(draft.CanRedo);
+    }
 }

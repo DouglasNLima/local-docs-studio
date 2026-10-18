@@ -284,6 +284,7 @@ public partial class ClassVisualEditorWindow : Window
     private void EndPan() { pan = null; if (Viewport.IsMouseCaptured) Viewport.ReleaseMouseCapture(); Viewport.Cursor = Cursors.Arrow; }
     private void Shortcut(object sender, KeyEventArgs e)
     {
+        if (e.Key == Key.Escape && new[] { From, To, RelationshipType, MarkerAt, MemberVisibility }.Any(combo => combo.IsDropDownOpen)) return;
         if (e.Key == Key.Escape) { if (endpointDrag is not null) CancelPointer(); else if (canvasPick is not null) { canvasPick = null; Status.Text = "Canvas picking cancelled."; } else if (pan is not null) EndPan(); else Close(); e.Handled = true; return; }
         if (e.Key == Key.Enter && Keyboard.Modifiers == ModifierKeys.Control) { Apply(sender, new()); e.Handled = true; return; }
         if (e.OriginalSource is TextBoxBase || SourceEditor.IsKeyboardFocusWithin) return;
