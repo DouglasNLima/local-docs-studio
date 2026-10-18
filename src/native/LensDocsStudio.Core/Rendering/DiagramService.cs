@@ -85,7 +85,15 @@ public sealed class DiagramService
             else svg = MermaidRenderer.RenderSvg(prepared, options);
             return new(source, svg, null) { Theme = theme, FlowchartLayout = layout.Flowchart, FlowchartSemantics = layout.FlowchartSemantics, FlowchartGroups = layout.Groups, ErSemantics = layout.ErSemantics, ErLayout = layout.ErLayout, ClassSemantics = layout.ClassSemantics, ClassLayout = layout.ClassLayout };
         }
-        catch (Exception ex) when (ex is not OutOfMemoryException && (ex is not OperationCanceledException || !cancellationToken.IsCancellationRequested))
+        catch (MermaidResourceLimitException ex)
+        {
+            return new(source, null, "Rendering resource limit reached: " + ex.Message[..Math.Min(ex.Message.Length, 300)]);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            return new(source, null, "Rendering resource deadline reached (3 seconds). Reduce the diagram size and validate again.");
+        }
+        catch (Exception ex) when (ex is not OutOfMemoryException && ex is not OperationCanceledException)
         {
             return new(source, null, "Diagram could not be rendered: " + ex.Message[..Math.Min(ex.Message.Length, 300)]);
         }

@@ -1,0 +1,1575 @@
+{
+  "CoreAssemblySha256": "749E4AD504B752C9DE391A867FDAFF78702B83147C4F4CCDF62589F26C35D59E",
+  "RendererIdentity": "Mermaider 0.15.1 / SharpVectors.Wpf 1.8.6, pinned by locked dependencies and process lifetime",
+  "NativeAssemblySha256": "A4F80EC1DB4D0590E44801553E3691B6B8B101F4B3E5D0FA0DF09D0B1626E095",
+  "HarnessSha256": "05019775624EE890816B0237A0D46E54A6124A6BEC6DD6C73013DF038DAD2A30",
+  "Host": {
+    "Framework": ".NET 10.0.13",
+    "OS": "Microsoft Windows 10.0.26100",
+    "ProcessorCount": 4,
+    "Architecture": "X64",
+    "RunnerImage": "win25-vs2026",
+    "RunnerImageVersion": "20261007.264.1",
+    "Frequency": 10000000
+  },
+  "Method": "STA windowless diagnostic; seven samples per fixture; first execution and six repeats. Adapter scanning includes its existing semantic work. Renderer parsing/layout/SVG and native conversion/drawing are combined only where no independent public boundary exists. Presentation includes correspondence and conversion; standalone phases overlap it and must not be summed. No UIA, first-window or interaction latency claim. Pixel checks excluded from timing. No production GC changes.",
+  "Observations": [
+    {
+      "Family": "Flowchart",
+      "Size": "Smaller",
+      "SourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+      "Source": "flowchart TD\nN0[\u0022Node 0 with context\u0022]\nN1[\u0022Node 1 with context\u0022]\nN2[\u0022Node 2 with context\u0022]\nN3[\u0022Node 3 with context\u0022]\nN4[\u0022Node 4 with context\u0022]\nN5[\u0022Node 5 with context\u0022]\nN6[\u0022Node 6 with context\u0022]\nN7[\u0022Node 7 with context\u0022]\nN8[\u0022Node 8 with context\u0022]\nN9[\u0022Node 9 with context\u0022]\nN10[\u0022Node 10 with context\u0022]\nN11[\u0022Node 11 with context\u0022]\nN12[\u0022Node 12 with context\u0022]\nN13[\u0022Node 13 with context\u0022]\nN14[\u0022Node 14 with context\u0022]\nN15[\u0022Node 15 with context\u0022]\nN16[\u0022Node 16 with context\u0022]\nN17[\u0022Node 17 with context\u0022]\nN18[\u0022Node 18 with context\u0022]\nN19[\u0022Node 19 with context\u0022]\nN0 --\u003E N1\nN0 --\u003E N2\nN1 --\u003E N3\nN1 --\u003E N4\nN2 --\u003E N5\nN2 --\u003E N6\nN3 --\u003E N7\nN3 --\u003E N8\nN4 --\u003E N9\nN4 --\u003E N10\nN5 --\u003E N11\nN5 --\u003E N12\nN6 --\u003E N13\nN6 --\u003E N14\nN7 --\u003E N15\nN7 --\u003E N16\nN8 --\u003E N17\nN8 --\u003E N18\nN9 --\u003E N19\nN19 --\u003E N0\nN18 --\u003E N1\nN17 --\u003E N2\nN16 --\u003E N0\nN15 --\u003E N1\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 134.0231,
+          "RendererIncludingParsingLayoutSvgMs": 309.6631,
+          "StandaloneSanitisationMs": 20.3528,
+          "StandaloneSharpVectorsAndDrawingMs": 412.8634,
+          "CompletePresentationMs": 97.2741,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 35146384,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 35153280,
+          "PresentationCurrentThreadAllocatedBytes": 16364136,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 40001536,
+          "WorkingSetAfter": 100044800,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.8305,
+          "RendererIncludingParsingLayoutSvgMs": 0.0329,
+          "StandaloneSanitisationMs": 2.0381,
+          "StandaloneSharpVectorsAndDrawingMs": 71.6441,
+          "CompletePresentationMs": 95.2648,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31725880,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31721752,
+          "PresentationCurrentThreadAllocatedBytes": 16353264,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 100081664,
+          "WorkingSetAfter": 107032576,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0252,
+          "RendererIncludingParsingLayoutSvgMs": 0.0147,
+          "StandaloneSanitisationMs": 5.7083,
+          "StandaloneSharpVectorsAndDrawingMs": 106.1522,
+          "CompletePresentationMs": 119.3576,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31717616,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31718512,
+          "PresentationCurrentThreadAllocatedBytes": 16349432,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 107036672,
+          "WorkingSetAfter": 111419392,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7915,
+          "RendererIncludingParsingLayoutSvgMs": 0.0102,
+          "StandaloneSanitisationMs": 2.0985,
+          "StandaloneSharpVectorsAndDrawingMs": 122.1704,
+          "CompletePresentationMs": 127.7747,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31745784,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31749416,
+          "PresentationCurrentThreadAllocatedBytes": 16367520,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            1
+          ],
+          "WorkingSetBefore": 111419392,
+          "WorkingSetAfter": 109449216,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7324,
+          "RendererIncludingParsingLayoutSvgMs": 0.0096,
+          "StandaloneSanitisationMs": 2.1117,
+          "StandaloneSharpVectorsAndDrawingMs": 113.6395,
+          "CompletePresentationMs": 119.9771,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31729264,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31726000,
+          "PresentationCurrentThreadAllocatedBytes": 16358792,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 109449216,
+          "WorkingSetAfter": 113684480,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 1.2483,
+          "RendererIncludingParsingLayoutSvgMs": 0.012,
+          "StandaloneSanitisationMs": 3.604,
+          "StandaloneSharpVectorsAndDrawingMs": 77.8765,
+          "CompletePresentationMs": 84.7832,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31718152,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31719464,
+          "PresentationCurrentThreadAllocatedBytes": 16349968,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 113684480,
+          "WorkingSetAfter": 114556928,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.8976,
+          "RendererIncludingParsingLayoutSvgMs": 0.0097,
+          "StandaloneSanitisationMs": 2.3147,
+          "StandaloneSharpVectorsAndDrawingMs": 69.5716,
+          "CompletePresentationMs": 118.2776,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 31737952,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 31735096,
+          "PresentationCurrentThreadAllocatedBytes": 16360200,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 114556928,
+          "WorkingSetAfter": 115646464,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Flowchart",
+      "Size": "Larger",
+      "SourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+      "Source": "flowchart TD\nN0[\u0022Node 0 with context\u0022]\nN1[\u0022Node 1 with context\u0022]\nN2[\u0022Node 2 with context\u0022]\nN3[\u0022Node 3 with context\u0022]\nN4[\u0022Node 4 with context\u0022]\nN5[\u0022Node 5 with context\u0022]\nN6[\u0022Node 6 with context\u0022]\nN7[\u0022Node 7 with context\u0022]\nN8[\u0022Node 8 with context\u0022]\nN9[\u0022Node 9 with context\u0022]\nN10[\u0022Node 10 with context\u0022]\nN11[\u0022Node 11 with context\u0022]\nN12[\u0022Node 12 with context\u0022]\nN13[\u0022Node 13 with context\u0022]\nN14[\u0022Node 14 with context\u0022]\nN15[\u0022Node 15 with context\u0022]\nN16[\u0022Node 16 with context\u0022]\nN17[\u0022Node 17 with context\u0022]\nN18[\u0022Node 18 with context\u0022]\nN19[\u0022Node 19 with context\u0022]\nN20[\u0022Node 20 with context\u0022]\nN21[\u0022Node 21 with context\u0022]\nN22[\u0022Node 22 with context\u0022]\nN23[\u0022Node 23 with context\u0022]\nN24[\u0022Node 24 with context\u0022]\nN25[\u0022Node 25 with context\u0022]\nN26[\u0022Node 26 with context\u0022]\nN27[\u0022Node 27 with context\u0022]\nN28[\u0022Node 28 with context\u0022]\nN29[\u0022Node 29 with context\u0022]\nN30[\u0022Node 30 with context\u0022]\nN31[\u0022Node 31 with context\u0022]\nN32[\u0022Node 32 with context\u0022]\nN33[\u0022Node 33 with context\u0022]\nN34[\u0022Node 34 with context\u0022]\nN35[\u0022Node 35 with context\u0022]\nN36[\u0022Node 36 with context\u0022]\nN37[\u0022Node 37 with context\u0022]\nN38[\u0022Node 38 with context\u0022]\nN39[\u0022Node 39 with context\u0022]\nN40[\u0022Node 40 with context\u0022]\nN41[\u0022Node 41 with context\u0022]\nN42[\u0022Node 42 with context\u0022]\nN43[\u0022Node 43 with context\u0022]\nN44[\u0022Node 44 with context\u0022]\nN45[\u0022Node 45 with context\u0022]\nN46[\u0022Node 46 with context\u0022]\nN47[\u0022Node 47 with context\u0022]\nN48[\u0022Node 48 with context\u0022]\nN49[\u0022Node 49 with context\u0022]\nN50[\u0022Node 50 with context\u0022]\nN51[\u0022Node 51 with context\u0022]\nN52[\u0022Node 52 with context\u0022]\nN53[\u0022Node 53 with context\u0022]\nN54[\u0022Node 54 with context\u0022]\nN55[\u0022Node 55 with context\u0022]\nN56[\u0022Node 56 with context\u0022]\nN57[\u0022Node 57 with context\u0022]\nN58[\u0022Node 58 with context\u0022]\nN59[\u0022Node 59 with context\u0022]\nN60[\u0022Node 60 with context\u0022]\nN61[\u0022Node 61 with context\u0022]\nN62[\u0022Node 62 with context\u0022]\nN63[\u0022Node 63 with context\u0022]\nN64[\u0022Node 64 with context\u0022]\nN65[\u0022Node 65 with context\u0022]\nN66[\u0022Node 66 with context\u0022]\nN67[\u0022Node 67 with context\u0022]\nN68[\u0022Node 68 with context\u0022]\nN69[\u0022Node 69 with context\u0022]\nN70[\u0022Node 70 with context\u0022]\nN71[\u0022Node 71 with context\u0022]\nN72[\u0022Node 72 with context\u0022]\nN73[\u0022Node 73 with context\u0022]\nN74[\u0022Node 74 with context\u0022]\nN75[\u0022Node 75 with context\u0022]\nN76[\u0022Node 76 with context\u0022]\nN77[\u0022Node 77 with context\u0022]\nN78[\u0022Node 78 with context\u0022]\nN79[\u0022Node 79 with context\u0022]\nN80[\u0022Node 80 with context\u0022]\nN81[\u0022Node 81 with context\u0022]\nN82[\u0022Node 82 with context\u0022]\nN83[\u0022Node 83 with context\u0022]\nN84[\u0022Node 84 with context\u0022]\nN85[\u0022Node 85 with context\u0022]\nN86[\u0022Node 86 with context\u0022]\nN87[\u0022Node 87 with context\u0022]\nN88[\u0022Node 88 with context\u0022]\nN89[\u0022Node 89 with context\u0022]\nN90[\u0022Node 90 with context\u0022]\nN91[\u0022Node 91 with context\u0022]\nN92[\u0022Node 92 with context\u0022]\nN93[\u0022Node 93 with context\u0022]\nN94[\u0022Node 94 with context\u0022]\nN95[\u0022Node 95 with context\u0022]\nN96[\u0022Node 96 with context\u0022]\nN97[\u0022Node 97 with context\u0022]\nN98[\u0022Node 98 with context\u0022]\nN99[\u0022Node 99 with context\u0022]\nN0 --\u003E N1\nN0 --\u003E N2\nN1 --\u003E N3\nN1 --\u003E N4\nN2 --\u003E N5\nN2 --\u003E N6\nN3 --\u003E N7\nN3 --\u003E N8\nN4 --\u003E N9\nN4 --\u003E N10\nN5 --\u003E N11\nN5 --\u003E N12\nN6 --\u003E N13\nN6 --\u003E N14\nN7 --\u003E N15\nN7 --\u003E N16\nN8 --\u003E N17\nN8 --\u003E N18\nN9 --\u003E N19\nN9 --\u003E N20\nN10 --\u003E N21\nN10 --\u003E N22\nN11 --\u003E N23\nN11 --\u003E N24\nN12 --\u003E N25\nN12 --\u003E N26\nN13 --\u003E N27\nN13 --\u003E N28\nN14 --\u003E N29\nN14 --\u003E N30\nN15 --\u003E N31\nN15 --\u003E N32\nN16 --\u003E N33\nN16 --\u003E N34\nN17 --\u003E N35\nN17 --\u003E N36\nN18 --\u003E N37\nN18 --\u003E N38\nN19 --\u003E N39\nN19 --\u003E N40\nN20 --\u003E N41\nN20 --\u003E N42\nN21 --\u003E N43\nN21 --\u003E N44\nN22 --\u003E N45\nN22 --\u003E N46\nN23 --\u003E N47\nN23 --\u003E N48\nN24 --\u003E N49\nN24 --\u003E N50\nN25 --\u003E N51\nN25 --\u003E N52\nN26 --\u003E N53\nN26 --\u003E N54\nN27 --\u003E N55\nN27 --\u003E N56\nN28 --\u003E N57\nN28 --\u003E N58\nN29 --\u003E N59\nN29 --\u003E N60\nN30 --\u003E N61\nN30 --\u003E N62\nN31 --\u003E N63\nN31 --\u003E N64\nN32 --\u003E N65\nN32 --\u003E N66\nN33 --\u003E N67\nN33 --\u003E N68\nN34 --\u003E N69\nN34 --\u003E N70\nN35 --\u003E N71\nN35 --\u003E N72\nN36 --\u003E N73\nN36 --\u003E N74\nN37 --\u003E N75\nN37 --\u003E N76\nN38 --\u003E N77\nN38 --\u003E N78\nN39 --\u003E N79\nN39 --\u003E N80\nN40 --\u003E N81\nN40 --\u003E N82\nN41 --\u003E N83\nN41 --\u003E N84\nN42 --\u003E N85\nN42 --\u003E N86\nN43 --\u003E N87\nN43 --\u003E N88\nN44 --\u003E N89\nN44 --\u003E N90\nN45 --\u003E N91\nN45 --\u003E N92\nN46 --\u003E N93\nN46 --\u003E N94\nN47 --\u003E N95\nN47 --\u003E N96\nN48 --\u003E N97\nN48 --\u003E N98\nN49 --\u003E N99\nN99 --\u003E N0\nN98 --\u003E N1\nN97 --\u003E N2\nN96 --\u003E N0\nN95 --\u003E N1\nN94 --\u003E N2\nN93 --\u003E N0\nN92 --\u003E N1\nN91 --\u003E N2\nN90 --\u003E N0\nN89 --\u003E N1\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 3.7569,
+          "RendererIncludingParsingLayoutSvgMs": 310.767,
+          "StandaloneSanitisationMs": 10.2371,
+          "StandaloneSharpVectorsAndDrawingMs": 448.5304,
+          "CompletePresentationMs": 539.989,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194241736,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194264280,
+          "PresentationCurrentThreadAllocatedBytes": 82676536,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 115662848,
+          "WorkingSetAfter": 135745536,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 5.9177,
+          "RendererIncludingParsingLayoutSvgMs": 0.0223,
+          "StandaloneSanitisationMs": 47.8401,
+          "StandaloneSharpVectorsAndDrawingMs": 461.8415,
+          "CompletePresentationMs": 617.7055,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159534400,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159545144,
+          "PresentationCurrentThreadAllocatedBytes": 82633160,
+          "PresentationCollectionCounts": [
+            6,
+            3,
+            1
+          ],
+          "WorkingSetBefore": 135745536,
+          "WorkingSetAfter": 153399296,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 6.8309,
+          "RendererIncludingParsingLayoutSvgMs": 0.0215,
+          "StandaloneSanitisationMs": 13.739,
+          "StandaloneSharpVectorsAndDrawingMs": 443.244,
+          "CompletePresentationMs": 484.7585,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159431936,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159427992,
+          "PresentationCurrentThreadAllocatedBytes": 82626328,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 153407488,
+          "WorkingSetAfter": 169832448,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 6.0824,
+          "RendererIncludingParsingLayoutSvgMs": 0.0227,
+          "StandaloneSanitisationMs": 16.8274,
+          "StandaloneSharpVectorsAndDrawingMs": 450.8181,
+          "CompletePresentationMs": 470.1956,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159434088,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159435640,
+          "PresentationCurrentThreadAllocatedBytes": 82628480,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 169836544,
+          "WorkingSetAfter": 178487296,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 2.106,
+          "RendererIncludingParsingLayoutSvgMs": 0.0247,
+          "StandaloneSanitisationMs": 13.6874,
+          "StandaloneSharpVectorsAndDrawingMs": 357.4674,
+          "CompletePresentationMs": 395.2455,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159406552,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159406008,
+          "PresentationCurrentThreadAllocatedBytes": 82611184,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 178495488,
+          "WorkingSetAfter": 176660480,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 1.3053,
+          "RendererIncludingParsingLayoutSvgMs": 0.0129,
+          "StandaloneSanitisationMs": 2.8875,
+          "StandaloneSharpVectorsAndDrawingMs": 300.7638,
+          "CompletePresentationMs": 423.9089,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159333224,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159335040,
+          "PresentationCurrentThreadAllocatedBytes": 82574640,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 176660480,
+          "WorkingSetAfter": 159703040,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+          "SourceScanIncludingAdapterSemanticsMs": 1.9976,
+          "RendererIncludingParsingLayoutSvgMs": 0.013,
+          "StandaloneSanitisationMs": 4.3431,
+          "StandaloneSharpVectorsAndDrawingMs": 230.3518,
+          "CompletePresentationMs": 310.634,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 159312408,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 159308272,
+          "PresentationCurrentThreadAllocatedBytes": 82553376,
+          "PresentationCollectionCounts": [
+            4,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 159707136,
+          "WorkingSetAfter": 168923136,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Sequence",
+      "Size": "Smaller",
+      "SourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+      "Source": "sequenceDiagram\nparticipant P0 as Participant 0\nparticipant P1 as Participant 1\nparticipant P2 as Participant 2\nparticipant P3 as Participant 3\nparticipant P4 as Participant 4\nP0-\u003E\u003EP1: Message 0 with context\nP1-\u003E\u003EP2: Message 1 with context\nP2-\u003E\u003EP3: Message 2 with context\nP3-\u003E\u003EP4: Message 3 with context\nP4-\u003E\u003EP0: Message 4 with context\nP0-\u003E\u003EP1: Message 5 with context\nP1-\u003E\u003EP2: Message 6 with context\nP2-\u003E\u003EP3: Message 7 with context\nP3-\u003E\u003EP4: Message 8 with context\nP4-\u003E\u003EP0: Message 9 with context\nP0-\u003E\u003EP1: Message 10 with context\nP1-\u003E\u003EP2: Message 11 with context\nP2-\u003E\u003EP3: Message 12 with context\nP3-\u003E\u003EP4: Message 13 with context\nP4-\u003E\u003EP0: Message 14 with context\nP0-\u003E\u003EP1: Message 15 with context\nP1-\u003E\u003EP2: Message 16 with context\nP2-\u003E\u003EP3: Message 17 with context\nP3-\u003E\u003EP4: Message 18 with context\nP4-\u003E\u003EP0: Message 19 with context\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 7.9388,
+          "RendererIncludingParsingLayoutSvgMs": 48.954,
+          "StandaloneSanitisationMs": 1.6313,
+          "StandaloneSharpVectorsAndDrawingMs": 73.9847,
+          "CompletePresentationMs": 73.0223,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47998672,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 48000096,
+          "PresentationCurrentThreadAllocatedBytes": 23809688,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 168988672,
+          "WorkingSetAfter": 170754048,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2068,
+          "RendererIncludingParsingLayoutSvgMs": 0.0114,
+          "StandaloneSanitisationMs": 1.0071,
+          "StandaloneSharpVectorsAndDrawingMs": 58.5155,
+          "CompletePresentationMs": 107.5699,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47477616,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47479320,
+          "PresentationCurrentThreadAllocatedBytes": 23810464,
+          "PresentationCollectionCounts": [
+            3,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 170754048,
+          "WorkingSetAfter": 177709056,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3207,
+          "RendererIncludingParsingLayoutSvgMs": 0.0115,
+          "StandaloneSanitisationMs": 1.5426,
+          "StandaloneSharpVectorsAndDrawingMs": 98.5648,
+          "CompletePresentationMs": 84.6449,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47477072,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47478096,
+          "PresentationCurrentThreadAllocatedBytes": 23809280,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 177709056,
+          "WorkingSetAfter": 181997568,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.238,
+          "RendererIncludingParsingLayoutSvgMs": 0.0119,
+          "StandaloneSanitisationMs": 1.277,
+          "StandaloneSharpVectorsAndDrawingMs": 84.7904,
+          "CompletePresentationMs": 115.8604,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47474880,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47480424,
+          "PresentationCurrentThreadAllocatedBytes": 23806816,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 181997568,
+          "WorkingSetAfter": 186740736,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1992,
+          "RendererIncludingParsingLayoutSvgMs": 0.0115,
+          "StandaloneSanitisationMs": 1.5201,
+          "StandaloneSharpVectorsAndDrawingMs": 64.3849,
+          "CompletePresentationMs": 92.6184,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47476720,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47482664,
+          "PresentationCurrentThreadAllocatedBytes": 23807504,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 186740736,
+          "WorkingSetAfter": 186961920,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1944,
+          "RendererIncludingParsingLayoutSvgMs": 0.0109,
+          "StandaloneSanitisationMs": 0.9367,
+          "StandaloneSharpVectorsAndDrawingMs": 61.6164,
+          "CompletePresentationMs": 62.9885,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47478112,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47472648,
+          "PresentationCurrentThreadAllocatedBytes": 23808392,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 186961920,
+          "WorkingSetAfter": 191225856,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1947,
+          "RendererIncludingParsingLayoutSvgMs": 0.012,
+          "StandaloneSanitisationMs": 0.9335,
+          "StandaloneSharpVectorsAndDrawingMs": 75.3474,
+          "CompletePresentationMs": 81.021,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47476080,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47481872,
+          "PresentationCurrentThreadAllocatedBytes": 23809176,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 191225856,
+          "WorkingSetAfter": 195534848,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Sequence",
+      "Size": "Larger",
+      "SourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+      "Source": "sequenceDiagram\nparticipant P0 as Participant 0\nparticipant P1 as Participant 1\nparticipant P2 as Participant 2\nparticipant P3 as Participant 3\nparticipant P4 as Participant 4\nparticipant P5 as Participant 5\nparticipant P6 as Participant 6\nparticipant P7 as Participant 7\nparticipant P8 as Participant 8\nparticipant P9 as Participant 9\nparticipant P10 as Participant 10\nparticipant P11 as Participant 11\nparticipant P12 as Participant 12\nparticipant P13 as Participant 13\nparticipant P14 as Participant 14\nparticipant P15 as Participant 15\nparticipant P16 as Participant 16\nparticipant P17 as Participant 17\nparticipant P18 as Participant 18\nparticipant P19 as Participant 19\nP0-\u003E\u003EP1: Message 0 with context\nP1-\u003E\u003EP2: Message 1 with context\nP2-\u003E\u003EP3: Message 2 with context\nP3-\u003E\u003EP4: Message 3 with context\nP4-\u003E\u003EP5: Message 4 with context\nP5-\u003E\u003EP6: Message 5 with context\nP6-\u003E\u003EP7: Message 6 with context\nP7-\u003E\u003EP8: Message 7 with context\nP8-\u003E\u003EP9: Message 8 with context\nP9-\u003E\u003EP10: Message 9 with context\nP10-\u003E\u003EP11: Message 10 with context\nP11-\u003E\u003EP12: Message 11 with context\nP12-\u003E\u003EP13: Message 12 with context\nP13-\u003E\u003EP14: Message 13 with context\nP14-\u003E\u003EP15: Message 14 with context\nP15-\u003E\u003EP16: Message 15 with context\nP16-\u003E\u003EP17: Message 16 with context\nP17-\u003E\u003EP18: Message 17 with context\nP18-\u003E\u003EP19: Message 18 with context\nP19-\u003E\u003EP0: Message 19 with context\nP0-\u003E\u003EP1: Message 20 with context\nP1-\u003E\u003EP2: Message 21 with context\nP2-\u003E\u003EP3: Message 22 with context\nP3-\u003E\u003EP4: Message 23 with context\nP4-\u003E\u003EP5: Message 24 with context\nP5-\u003E\u003EP6: Message 25 with context\nP6-\u003E\u003EP7: Message 26 with context\nP7-\u003E\u003EP8: Message 27 with context\nP8-\u003E\u003EP9: Message 28 with context\nP9-\u003E\u003EP10: Message 29 with context\nP10-\u003E\u003EP11: Message 30 with context\nP11-\u003E\u003EP12: Message 31 with context\nP12-\u003E\u003EP13: Message 32 with context\nP13-\u003E\u003EP14: Message 33 with context\nP14-\u003E\u003EP15: Message 34 with context\nP15-\u003E\u003EP16: Message 35 with context\nP16-\u003E\u003EP17: Message 36 with context\nP17-\u003E\u003EP18: Message 37 with context\nP18-\u003E\u003EP19: Message 38 with context\nP19-\u003E\u003EP0: Message 39 with context\nP0-\u003E\u003EP1: Message 40 with context\nP1-\u003E\u003EP2: Message 41 with context\nP2-\u003E\u003EP3: Message 42 with context\nP3-\u003E\u003EP4: Message 43 with context\nP4-\u003E\u003EP5: Message 44 with context\nP5-\u003E\u003EP6: Message 45 with context\nP6-\u003E\u003EP7: Message 46 with context\nP7-\u003E\u003EP8: Message 47 with context\nP8-\u003E\u003EP9: Message 48 with context\nP9-\u003E\u003EP10: Message 49 with context\nP10-\u003E\u003EP11: Message 50 with context\nP11-\u003E\u003EP12: Message 51 with context\nP12-\u003E\u003EP13: Message 52 with context\nP13-\u003E\u003EP14: Message 53 with context\nP14-\u003E\u003EP15: Message 54 with context\nP15-\u003E\u003EP16: Message 55 with context\nP16-\u003E\u003EP17: Message 56 with context\nP17-\u003E\u003EP18: Message 57 with context\nP18-\u003E\u003EP19: Message 58 with context\nP19-\u003E\u003EP0: Message 59 with context\nP0-\u003E\u003EP1: Message 60 with context\nP1-\u003E\u003EP2: Message 61 with context\nP2-\u003E\u003EP3: Message 62 with context\nP3-\u003E\u003EP4: Message 63 with context\nP4-\u003E\u003EP5: Message 64 with context\nP5-\u003E\u003EP6: Message 65 with context\nP6-\u003E\u003EP7: Message 66 with context\nP7-\u003E\u003EP8: Message 67 with context\nP8-\u003E\u003EP9: Message 68 with context\nP9-\u003E\u003EP10: Message 69 with context\nP10-\u003E\u003EP11: Message 70 with context\nP11-\u003E\u003EP12: Message 71 with context\nP12-\u003E\u003EP13: Message 72 with context\nP13-\u003E\u003EP14: Message 73 with context\nP14-\u003E\u003EP15: Message 74 with context\nP15-\u003E\u003EP16: Message 75 with context\nP16-\u003E\u003EP17: Message 76 with context\nP17-\u003E\u003EP18: Message 77 with context\nP18-\u003E\u003EP19: Message 78 with context\nP19-\u003E\u003EP0: Message 79 with context\nP0-\u003E\u003EP1: Message 80 with context\nP1-\u003E\u003EP2: Message 81 with context\nP2-\u003E\u003EP3: Message 82 with context\nP3-\u003E\u003EP4: Message 83 with context\nP4-\u003E\u003EP5: Message 84 with context\nP5-\u003E\u003EP6: Message 85 with context\nP6-\u003E\u003EP7: Message 86 with context\nP7-\u003E\u003EP8: Message 87 with context\nP8-\u003E\u003EP9: Message 88 with context\nP9-\u003E\u003EP10: Message 89 with context\nP10-\u003E\u003EP11: Message 90 with context\nP11-\u003E\u003EP12: Message 91 with context\nP12-\u003E\u003EP13: Message 92 with context\nP13-\u003E\u003EP14: Message 93 with context\nP14-\u003E\u003EP15: Message 94 with context\nP15-\u003E\u003EP16: Message 95 with context\nP16-\u003E\u003EP17: Message 96 with context\nP17-\u003E\u003EP18: Message 97 with context\nP18-\u003E\u003EP19: Message 98 with context\nP19-\u003E\u003EP0: Message 99 with context\nP0-\u003E\u003EP1: Message 100 with context\nP1-\u003E\u003EP2: Message 101 with context\nP2-\u003E\u003EP3: Message 102 with context\nP3-\u003E\u003EP4: Message 103 with context\nP4-\u003E\u003EP5: Message 104 with context\nP5-\u003E\u003EP6: Message 105 with context\nP6-\u003E\u003EP7: Message 106 with context\nP7-\u003E\u003EP8: Message 107 with context\nP8-\u003E\u003EP9: Message 108 with context\nP9-\u003E\u003EP10: Message 109 with context\nP10-\u003E\u003EP11: Message 110 with context\nP11-\u003E\u003EP12: Message 111 with context\nP12-\u003E\u003EP13: Message 112 with context\nP13-\u003E\u003EP14: Message 113 with context\nP14-\u003E\u003EP15: Message 114 with context\nP15-\u003E\u003EP16: Message 115 with context\nP16-\u003E\u003EP17: Message 116 with context\nP17-\u003E\u003EP18: Message 117 with context\nP18-\u003E\u003EP19: Message 118 with context\nP19-\u003E\u003EP0: Message 119 with context\nP0-\u003E\u003EP1: Message 120 with context\nP1-\u003E\u003EP2: Message 121 with context\nP2-\u003E\u003EP3: Message 122 with context\nP3-\u003E\u003EP4: Message 123 with context\nP4-\u003E\u003EP5: Message 124 with context\nP5-\u003E\u003EP6: Message 125 with context\nP6-\u003E\u003EP7: Message 126 with context\nP7-\u003E\u003EP8: Message 127 with context\nP8-\u003E\u003EP9: Message 128 with context\nP9-\u003E\u003EP10: Message 129 with context\nP10-\u003E\u003EP11: Message 130 with context\nP11-\u003E\u003EP12: Message 131 with context\nP12-\u003E\u003EP13: Message 132 with context\nP13-\u003E\u003EP14: Message 133 with context\nP14-\u003E\u003EP15: Message 134 with context\nP15-\u003E\u003EP16: Message 135 with context\nP16-\u003E\u003EP17: Message 136 with context\nP17-\u003E\u003EP18: Message 137 with context\nP18-\u003E\u003EP19: Message 138 with context\nP19-\u003E\u003EP0: Message 139 with context\nP0-\u003E\u003EP1: Message 140 with context\nP1-\u003E\u003EP2: Message 141 with context\nP2-\u003E\u003EP3: Message 142 with context\nP3-\u003E\u003EP4: Message 143 with context\nP4-\u003E\u003EP5: Message 144 with context\nP5-\u003E\u003EP6: Message 145 with context\nP6-\u003E\u003EP7: Message 146 with context\nP7-\u003E\u003EP8: Message 147 with context\nP8-\u003E\u003EP9: Message 148 with context\nP9-\u003E\u003EP10: Message 149 with context\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 0.9674,
+          "RendererIncludingParsingLayoutSvgMs": 6.1085,
+          "StandaloneSanitisationMs": 4.5165,
+          "StandaloneSharpVectorsAndDrawingMs": 597.3812,
+          "CompletePresentationMs": 758.0709,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322057624,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322068176,
+          "PresentationCurrentThreadAllocatedBytes": 160289800,
+          "PresentationCollectionCounts": [
+            12,
+            6,
+            2
+          ],
+          "WorkingSetBefore": 195534848,
+          "WorkingSetAfter": 201293824,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0086,
+          "RendererIncludingParsingLayoutSvgMs": 0.0182,
+          "StandaloneSanitisationMs": 4.3252,
+          "StandaloneSharpVectorsAndDrawingMs": 538.7649,
+          "CompletePresentationMs": 552.0332,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319866736,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319870072,
+          "PresentationCurrentThreadAllocatedBytes": 160282864,
+          "PresentationCollectionCounts": [
+            10,
+            4,
+            1
+          ],
+          "WorkingSetBefore": 201293824,
+          "WorkingSetAfter": 213651456,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 1.2014,
+          "RendererIncludingParsingLayoutSvgMs": 0.0162,
+          "StandaloneSanitisationMs": 27.3754,
+          "StandaloneSharpVectorsAndDrawingMs": 493.7806,
+          "CompletePresentationMs": 489.5266,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319863336,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319865160,
+          "PresentationCurrentThreadAllocatedBytes": 160279384,
+          "PresentationCollectionCounts": [
+            9,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 213651456,
+          "WorkingSetAfter": 235859968,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 0.9846,
+          "RendererIncludingParsingLayoutSvgMs": 0.0188,
+          "StandaloneSanitisationMs": 7.8218,
+          "StandaloneSharpVectorsAndDrawingMs": 477.5503,
+          "CompletePresentationMs": 574.6705,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319827296,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319832832,
+          "PresentationCurrentThreadAllocatedBytes": 160280224,
+          "PresentationCollectionCounts": [
+            10,
+            4,
+            1
+          ],
+          "WorkingSetBefore": 235859968,
+          "WorkingSetAfter": 264790016,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0294,
+          "RendererIncludingParsingLayoutSvgMs": 0.0175,
+          "StandaloneSanitisationMs": 4.6681,
+          "StandaloneSharpVectorsAndDrawingMs": 485.9926,
+          "CompletePresentationMs": 493.7934,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319825464,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319826032,
+          "PresentationCurrentThreadAllocatedBytes": 160278888,
+          "PresentationCollectionCounts": [
+            9,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 264790016,
+          "WorkingSetAfter": 274767872,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5621,
+          "RendererIncludingParsingLayoutSvgMs": 0.0166,
+          "StandaloneSanitisationMs": 5.9785,
+          "StandaloneSharpVectorsAndDrawingMs": 459.0639,
+          "CompletePresentationMs": 601.4523,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319825656,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319831784,
+          "PresentationCurrentThreadAllocatedBytes": 160279328,
+          "PresentationCollectionCounts": [
+            11,
+            5,
+            1
+          ],
+          "WorkingSetBefore": 274767872,
+          "WorkingSetAfter": 298381312,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5946,
+          "RendererIncludingParsingLayoutSvgMs": 0.0174,
+          "StandaloneSanitisationMs": 5.8724,
+          "StandaloneSharpVectorsAndDrawingMs": 477.5628,
+          "CompletePresentationMs": 499.626,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 319825352,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 319824144,
+          "PresentationCurrentThreadAllocatedBytes": 160279024,
+          "PresentationCollectionCounts": [
+            10,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 298381312,
+          "WorkingSetAfter": 284487680,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "State",
+      "Size": "Smaller",
+      "SourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+      "Source": "stateDiagram-v2\nstate \u0022State 0 with context\u0022 as S0\nstate \u0022State 1 with context\u0022 as S1\nstate \u0022State 2 with context\u0022 as S2\nstate \u0022State 3 with context\u0022 as S3\nstate \u0022State 4 with context\u0022 as S4\nstate \u0022State 5 with context\u0022 as S5\nstate \u0022State 6 with context\u0022 as S6\nstate \u0022State 7 with context\u0022 as S7\nstate \u0022State 8 with context\u0022 as S8\nstate \u0022State 9 with context\u0022 as S9\nS0 --\u003E S1 : transition0\nS1 --\u003E S8 : transition1\nS2 --\u003E S5 : transition2\nS3 --\u003E S2 : transition3\nS4 --\u003E S9 : transition4\nS5 --\u003E S6 : transition5\nS6 --\u003E S3 : transition6\nS7 --\u003E S0 : transition7\nS8 --\u003E S7 : transition8\nS9 --\u003E S4 : transition9\nS0 --\u003E S1 : transition10\nS1 --\u003E S8 : transition11\nS2 --\u003E S5 : transition12\nS3 --\u003E S2 : transition13\nS4 --\u003E S9 : transition14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 9.7484,
+          "RendererIncludingParsingLayoutSvgMs": 38.0128,
+          "StandaloneSanitisationMs": 1.1526,
+          "StandaloneSharpVectorsAndDrawingMs": 44.9229,
+          "CompletePresentationMs": 133.6848,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 34694712,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 34696680,
+          "PresentationCurrentThreadAllocatedBytes": 17679032,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 284631040,
+          "WorkingSetAfter": 285220864,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1904,
+          "RendererIncludingParsingLayoutSvgMs": 0.0107,
+          "StandaloneSanitisationMs": 0.7954,
+          "StandaloneSharpVectorsAndDrawingMs": 39.3283,
+          "CompletePresentationMs": 65.4,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33355520,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33364784,
+          "PresentationCurrentThreadAllocatedBytes": 17114024,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 285220864,
+          "WorkingSetAfter": 288309248,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1507,
+          "RendererIncludingParsingLayoutSvgMs": 0.0112,
+          "StandaloneSanitisationMs": 0.9423,
+          "StandaloneSharpVectorsAndDrawingMs": 38.7075,
+          "CompletePresentationMs": 73.1512,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33348056,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33342672,
+          "PresentationCurrentThreadAllocatedBytes": 17110512,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 288309248,
+          "WorkingSetAfter": 281968640,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3008,
+          "RendererIncludingParsingLayoutSvgMs": 0.0137,
+          "StandaloneSanitisationMs": 1.354,
+          "StandaloneSharpVectorsAndDrawingMs": 61.3557,
+          "CompletePresentationMs": 79.8616,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33354416,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33357976,
+          "PresentationCurrentThreadAllocatedBytes": 17113512,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 281968640,
+          "WorkingSetAfter": 290635776,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1534,
+          "RendererIncludingParsingLayoutSvgMs": 0.009,
+          "StandaloneSanitisationMs": 0.7985,
+          "StandaloneSharpVectorsAndDrawingMs": 35.8191,
+          "CompletePresentationMs": 52.1414,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33346784,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33347288,
+          "PresentationCurrentThreadAllocatedBytes": 17109512,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 290635776,
+          "WorkingSetAfter": 291307520,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1869,
+          "RendererIncludingParsingLayoutSvgMs": 0.0091,
+          "StandaloneSanitisationMs": 0.8081,
+          "StandaloneSharpVectorsAndDrawingMs": 53.4743,
+          "CompletePresentationMs": 49.9587,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33353168,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33360360,
+          "PresentationCurrentThreadAllocatedBytes": 17112952,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 291307520,
+          "WorkingSetAfter": 292495360,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1337,
+          "RendererIncludingParsingLayoutSvgMs": 0.0085,
+          "StandaloneSanitisationMs": 0.8438,
+          "StandaloneSharpVectorsAndDrawingMs": 43.7529,
+          "CompletePresentationMs": 54.6928,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33355752,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33362112,
+          "PresentationCurrentThreadAllocatedBytes": 17114240,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 292495360,
+          "WorkingSetAfter": 301178880,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "State",
+      "Size": "Larger",
+      "SourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+      "Source": "stateDiagram-v2\nstate \u0022State 0 with context\u0022 as S0\nstate \u0022State 1 with context\u0022 as S1\nstate \u0022State 2 with context\u0022 as S2\nstate \u0022State 3 with context\u0022 as S3\nstate \u0022State 4 with context\u0022 as S4\nstate \u0022State 5 with context\u0022 as S5\nstate \u0022State 6 with context\u0022 as S6\nstate \u0022State 7 with context\u0022 as S7\nstate \u0022State 8 with context\u0022 as S8\nstate \u0022State 9 with context\u0022 as S9\nstate \u0022State 10 with context\u0022 as S10\nstate \u0022State 11 with context\u0022 as S11\nstate \u0022State 12 with context\u0022 as S12\nstate \u0022State 13 with context\u0022 as S13\nstate \u0022State 14 with context\u0022 as S14\nstate \u0022State 15 with context\u0022 as S15\nstate \u0022State 16 with context\u0022 as S16\nstate \u0022State 17 with context\u0022 as S17\nstate \u0022State 18 with context\u0022 as S18\nstate \u0022State 19 with context\u0022 as S19\nstate \u0022State 20 with context\u0022 as S20\nstate \u0022State 21 with context\u0022 as S21\nstate \u0022State 22 with context\u0022 as S22\nstate \u0022State 23 with context\u0022 as S23\nstate \u0022State 24 with context\u0022 as S24\nstate \u0022State 25 with context\u0022 as S25\nstate \u0022State 26 with context\u0022 as S26\nstate \u0022State 27 with context\u0022 as S27\nstate \u0022State 28 with context\u0022 as S28\nstate \u0022State 29 with context\u0022 as S29\nstate \u0022State 30 with context\u0022 as S30\nstate \u0022State 31 with context\u0022 as S31\nstate \u0022State 32 with context\u0022 as S32\nstate \u0022State 33 with context\u0022 as S33\nstate \u0022State 34 with context\u0022 as S34\nstate \u0022State 35 with context\u0022 as S35\nstate \u0022State 36 with context\u0022 as S36\nstate \u0022State 37 with context\u0022 as S37\nstate \u0022State 38 with context\u0022 as S38\nstate \u0022State 39 with context\u0022 as S39\nstate \u0022State 40 with context\u0022 as S40\nstate \u0022State 41 with context\u0022 as S41\nstate \u0022State 42 with context\u0022 as S42\nstate \u0022State 43 with context\u0022 as S43\nstate \u0022State 44 with context\u0022 as S44\nstate \u0022State 45 with context\u0022 as S45\nstate \u0022State 46 with context\u0022 as S46\nstate \u0022State 47 with context\u0022 as S47\nstate \u0022State 48 with context\u0022 as S48\nstate \u0022State 49 with context\u0022 as S49\nstate \u0022State 50 with context\u0022 as S50\nstate \u0022State 51 with context\u0022 as S51\nstate \u0022State 52 with context\u0022 as S52\nstate \u0022State 53 with context\u0022 as S53\nstate \u0022State 54 with context\u0022 as S54\nstate \u0022State 55 with context\u0022 as S55\nstate \u0022State 56 with context\u0022 as S56\nstate \u0022State 57 with context\u0022 as S57\nstate \u0022State 58 with context\u0022 as S58\nstate \u0022State 59 with context\u0022 as S59\nS0 --\u003E S1 : transition0\nS1 --\u003E S8 : transition1\nS2 --\u003E S15 : transition2\nS3 --\u003E S22 : transition3\nS4 --\u003E S29 : transition4\nS5 --\u003E S36 : transition5\nS6 --\u003E S43 : transition6\nS7 --\u003E S50 : transition7\nS8 --\u003E S57 : transition8\nS9 --\u003E S4 : transition9\nS10 --\u003E S11 : transition10\nS11 --\u003E S18 : transition11\nS12 --\u003E S25 : transition12\nS13 --\u003E S32 : transition13\nS14 --\u003E S39 : transition14\nS15 --\u003E S46 : transition15\nS16 --\u003E S53 : transition16\nS17 --\u003E S0 : transition17\nS18 --\u003E S7 : transition18\nS19 --\u003E S14 : transition19\nS20 --\u003E S21 : transition20\nS21 --\u003E S28 : transition21\nS22 --\u003E S35 : transition22\nS23 --\u003E S42 : transition23\nS24 --\u003E S49 : transition24\nS25 --\u003E S56 : transition25\nS26 --\u003E S3 : transition26\nS27 --\u003E S10 : transition27\nS28 --\u003E S17 : transition28\nS29 --\u003E S24 : transition29\nS30 --\u003E S31 : transition30\nS31 --\u003E S38 : transition31\nS32 --\u003E S45 : transition32\nS33 --\u003E S52 : transition33\nS34 --\u003E S59 : transition34\nS35 --\u003E S6 : transition35\nS36 --\u003E S13 : transition36\nS37 --\u003E S20 : transition37\nS38 --\u003E S27 : transition38\nS39 --\u003E S34 : transition39\nS40 --\u003E S41 : transition40\nS41 --\u003E S48 : transition41\nS42 --\u003E S55 : transition42\nS43 --\u003E S2 : transition43\nS44 --\u003E S9 : transition44\nS45 --\u003E S16 : transition45\nS46 --\u003E S23 : transition46\nS47 --\u003E S30 : transition47\nS48 --\u003E S37 : transition48\nS49 --\u003E S44 : transition49\nS50 --\u003E S51 : transition50\nS51 --\u003E S58 : transition51\nS52 --\u003E S5 : transition52\nS53 --\u003E S12 : transition53\nS54 --\u003E S19 : transition54\nS55 --\u003E S26 : transition55\nS56 --\u003E S33 : transition56\nS57 --\u003E S40 : transition57\nS58 --\u003E S47 : transition58\nS59 --\u003E S54 : transition59\nS0 --\u003E S1 : transition60\nS1 --\u003E S8 : transition61\nS2 --\u003E S15 : transition62\nS3 --\u003E S22 : transition63\nS4 --\u003E S29 : transition64\nS5 --\u003E S36 : transition65\nS6 --\u003E S43 : transition66\nS7 --\u003E S50 : transition67\nS8 --\u003E S57 : transition68\nS9 --\u003E S4 : transition69\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4546,
+          "RendererIncludingParsingLayoutSvgMs": 40.7548,
+          "StandaloneSanitisationMs": 3.7495,
+          "StandaloneSharpVectorsAndDrawingMs": 279.7217,
+          "CompletePresentationMs": 265.582,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177628376,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177634768,
+          "PresentationCurrentThreadAllocatedBytes": 89765336,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 301178880,
+          "WorkingSetAfter": 242667520,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.8816,
+          "RendererIncludingParsingLayoutSvgMs": 0.0201,
+          "StandaloneSanitisationMs": 4.8318,
+          "StandaloneSharpVectorsAndDrawingMs": 269.5226,
+          "CompletePresentationMs": 255.7064,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174602912,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174603600,
+          "PresentationCurrentThreadAllocatedBytes": 89706032,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 242667520,
+          "WorkingSetAfter": 247304192,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7441,
+          "RendererIncludingParsingLayoutSvgMs": 0.0099,
+          "StandaloneSanitisationMs": 4.6648,
+          "StandaloneSharpVectorsAndDrawingMs": 267.2036,
+          "CompletePresentationMs": 265.7202,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174588144,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174592152,
+          "PresentationCurrentThreadAllocatedBytes": 89706224,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 247304192,
+          "WorkingSetAfter": 245886976,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.357,
+          "RendererIncludingParsingLayoutSvgMs": 0.0092,
+          "StandaloneSanitisationMs": 2.5918,
+          "StandaloneSharpVectorsAndDrawingMs": 244.1826,
+          "CompletePresentationMs": 243.1381,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174581120,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174582968,
+          "PresentationCurrentThreadAllocatedBytes": 89705528,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 245886976,
+          "WorkingSetAfter": 247345152,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3595,
+          "RendererIncludingParsingLayoutSvgMs": 0.0091,
+          "StandaloneSanitisationMs": 3.8027,
+          "StandaloneSharpVectorsAndDrawingMs": 217.6385,
+          "CompletePresentationMs": 269.4358,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174593216,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174593528,
+          "PresentationCurrentThreadAllocatedBytes": 89713576,
+          "PresentationCollectionCounts": [
+            6,
+            3,
+            1
+          ],
+          "WorkingSetBefore": 247349248,
+          "WorkingSetAfter": 247484416,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3728,
+          "RendererIncludingParsingLayoutSvgMs": 0.0092,
+          "StandaloneSanitisationMs": 2.6447,
+          "StandaloneSharpVectorsAndDrawingMs": 214.2284,
+          "CompletePresentationMs": 266.1488,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174577280,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174578592,
+          "PresentationCurrentThreadAllocatedBytes": 89703200,
+          "PresentationCollectionCounts": [
+            6,
+            3,
+            1
+          ],
+          "WorkingSetBefore": 247484416,
+          "WorkingSetAfter": 250118144,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3613,
+          "RendererIncludingParsingLayoutSvgMs": 0.0084,
+          "StandaloneSanitisationMs": 3.6497,
+          "StandaloneSharpVectorsAndDrawingMs": 270.9853,
+          "CompletePresentationMs": 243.7532,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 174579552,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 174586104,
+          "PresentationCurrentThreadAllocatedBytes": 89705528,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 250118144,
+          "WorkingSetAfter": 247033856,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "ER",
+      "Size": "Smaller",
+      "SourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+      "Source": "erDiagram\nE0 {\n int id PK\n string description\n}\nE1 {\n int id PK\n string description\n}\nE2 {\n int id PK\n string description\n}\nE3 {\n int id PK\n string description\n}\nE4 {\n int id PK\n string description\n}\nE5 {\n int id PK\n string description\n}\nE6 {\n int id PK\n string description\n}\nE7 {\n int id PK\n string description\n}\nE8 {\n int id PK\n string description\n}\nE9 {\n int id PK\n string description\n}\nE0 ||--o{ E1 : relation0\nE1 ||--o{ E8 : relation1\nE2 ||--o{ E5 : relation2\nE3 ||--o{ E2 : relation3\nE4 ||--o{ E9 : relation4\nE5 ||--o{ E6 : relation5\nE6 ||--o{ E3 : relation6\nE7 ||--o{ E0 : relation7\nE8 ||--o{ E7 : relation8\nE9 ||--o{ E4 : relation9\nE0 ||--o{ E1 : relation10\nE1 ||--o{ E8 : relation11\nE2 ||--o{ E5 : relation12\nE3 ||--o{ E2 : relation13\nE4 ||--o{ E9 : relation14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 11.0684,
+          "RendererIncludingParsingLayoutSvgMs": 50.7437,
+          "StandaloneSanitisationMs": 2.4359,
+          "StandaloneSharpVectorsAndDrawingMs": 71.3316,
+          "CompletePresentationMs": 101.563,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70926520,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70925000,
+          "PresentationCurrentThreadAllocatedBytes": 32732112,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 247042048,
+          "WorkingSetAfter": 248754176,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2717,
+          "RendererIncludingParsingLayoutSvgMs": 0.0069,
+          "StandaloneSanitisationMs": 1.5975,
+          "StandaloneSharpVectorsAndDrawingMs": 86.887,
+          "CompletePresentationMs": 83.9275,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63614992,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63617104,
+          "PresentationCurrentThreadAllocatedBytes": 32531152,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 248754176,
+          "WorkingSetAfter": 239247360,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2906,
+          "RendererIncludingParsingLayoutSvgMs": 0.0066,
+          "StandaloneSanitisationMs": 1.6289,
+          "StandaloneSharpVectorsAndDrawingMs": 99.2024,
+          "CompletePresentationMs": 113.9665,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63596912,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63614104,
+          "PresentationCurrentThreadAllocatedBytes": 32524688,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            1
+          ],
+          "WorkingSetBefore": 239255552,
+          "WorkingSetAfter": 224989184,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2669,
+          "RendererIncludingParsingLayoutSvgMs": 0.0066,
+          "StandaloneSanitisationMs": 1.7038,
+          "StandaloneSharpVectorsAndDrawingMs": 81.3001,
+          "CompletePresentationMs": 90.9796,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63590672,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63594016,
+          "PresentationCurrentThreadAllocatedBytes": 32523296,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 224989184,
+          "WorkingSetAfter": 186150912,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3198,
+          "RendererIncludingParsingLayoutSvgMs": 0.0065,
+          "StandaloneSanitisationMs": 1.6101,
+          "StandaloneSharpVectorsAndDrawingMs": 82.4133,
+          "CompletePresentationMs": 100.166,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63597072,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63605088,
+          "PresentationCurrentThreadAllocatedBytes": 32525488,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 186155008,
+          "WorkingSetAfter": 176132096,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3123,
+          "RendererIncludingParsingLayoutSvgMs": 0.0069,
+          "StandaloneSanitisationMs": 1.5658,
+          "StandaloneSharpVectorsAndDrawingMs": 78.2471,
+          "CompletePresentationMs": 92.5851,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63585824,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63590256,
+          "PresentationCurrentThreadAllocatedBytes": 32526136,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 176132096,
+          "WorkingSetAfter": 175452160,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1937,
+          "RendererIncludingParsingLayoutSvgMs": 0.0069,
+          "StandaloneSanitisationMs": 1.5746,
+          "StandaloneSharpVectorsAndDrawingMs": 66.5028,
+          "CompletePresentationMs": 72.0159,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 63597168,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 63601400,
+          "PresentationCurrentThreadAllocatedBytes": 32529744,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 175452160,
+          "WorkingSetAfter": 179073024,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "ER",
+      "Size": "Larger",
+      "SourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+      "Source": "erDiagram\nE0 {\n int id PK\n string description\n}\nE1 {\n int id PK\n string description\n}\nE2 {\n int id PK\n string description\n}\nE3 {\n int id PK\n string description\n}\nE4 {\n int id PK\n string description\n}\nE5 {\n int id PK\n string description\n}\nE6 {\n int id PK\n string description\n}\nE7 {\n int id PK\n string description\n}\nE8 {\n int id PK\n string description\n}\nE9 {\n int id PK\n string description\n}\nE10 {\n int id PK\n string description\n}\nE11 {\n int id PK\n string description\n}\nE12 {\n int id PK\n string description\n}\nE13 {\n int id PK\n string description\n}\nE14 {\n int id PK\n string description\n}\nE15 {\n int id PK\n string description\n}\nE16 {\n int id PK\n string description\n}\nE17 {\n int id PK\n string description\n}\nE18 {\n int id PK\n string description\n}\nE19 {\n int id PK\n string description\n}\nE20 {\n int id PK\n string description\n}\nE21 {\n int id PK\n string description\n}\nE22 {\n int id PK\n string description\n}\nE23 {\n int id PK\n string description\n}\nE24 {\n int id PK\n string description\n}\nE25 {\n int id PK\n string description\n}\nE26 {\n int id PK\n string description\n}\nE27 {\n int id PK\n string description\n}\nE28 {\n int id PK\n string description\n}\nE29 {\n int id PK\n string description\n}\nE0 ||--o{ E1 : relation0\nE1 ||--o{ E8 : relation1\nE2 ||--o{ E15 : relation2\nE3 ||--o{ E22 : relation3\nE4 ||--o{ E29 : relation4\nE5 ||--o{ E6 : relation5\nE6 ||--o{ E13 : relation6\nE7 ||--o{ E20 : relation7\nE8 ||--o{ E27 : relation8\nE9 ||--o{ E4 : relation9\nE10 ||--o{ E11 : relation10\nE11 ||--o{ E18 : relation11\nE12 ||--o{ E25 : relation12\nE13 ||--o{ E2 : relation13\nE14 ||--o{ E9 : relation14\nE15 ||--o{ E16 : relation15\nE16 ||--o{ E23 : relation16\nE17 ||--o{ E0 : relation17\nE18 ||--o{ E7 : relation18\nE19 ||--o{ E14 : relation19\nE20 ||--o{ E21 : relation20\nE21 ||--o{ E28 : relation21\nE22 ||--o{ E5 : relation22\nE23 ||--o{ E12 : relation23\nE24 ||--o{ E19 : relation24\nE25 ||--o{ E26 : relation25\nE26 ||--o{ E3 : relation26\nE27 ||--o{ E10 : relation27\nE28 ||--o{ E17 : relation28\nE29 ||--o{ E24 : relation29\nE0 ||--o{ E1 : relation30\nE1 ||--o{ E8 : relation31\nE2 ||--o{ E15 : relation32\nE3 ||--o{ E22 : relation33\nE4 ||--o{ E29 : relation34\nE5 ||--o{ E6 : relation35\nE6 ||--o{ E13 : relation36\nE7 ||--o{ E20 : relation37\nE8 ||--o{ E27 : relation38\nE9 ||--o{ E4 : relation39\nE10 ||--o{ E11 : relation40\nE11 ||--o{ E18 : relation41\nE12 ||--o{ E25 : relation42\nE13 ||--o{ E2 : relation43\nE14 ||--o{ E9 : relation44\nE15 ||--o{ E16 : relation45\nE16 ||--o{ E23 : relation46\nE17 ||--o{ E0 : relation47\nE18 ||--o{ E7 : relation48\nE19 ||--o{ E14 : relation49\nE20 ||--o{ E21 : relation50\nE21 ||--o{ E28 : relation51\nE22 ||--o{ E5 : relation52\nE23 ||--o{ E12 : relation53\nE24 ||--o{ E19 : relation54\nE25 ||--o{ E26 : relation55\nE26 ||--o{ E3 : relation56\nE27 ||--o{ E10 : relation57\nE28 ||--o{ E17 : relation58\nE29 ||--o{ E24 : relation59\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5663,
+          "RendererIncludingParsingLayoutSvgMs": 179.1201,
+          "StandaloneSanitisationMs": 4.8116,
+          "StandaloneSharpVectorsAndDrawingMs": 302.5075,
+          "CompletePresentationMs": 265.7276,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299645184,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299652368,
+          "PresentationCurrentThreadAllocatedBytes": 110429216,
+          "PresentationCollectionCounts": [
+            7,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 179073024,
+          "WorkingSetAfter": 199262208,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.502,
+          "RendererIncludingParsingLayoutSvgMs": 0.0089,
+          "StandaloneSanitisationMs": 4.933,
+          "StandaloneSharpVectorsAndDrawingMs": 236.6491,
+          "CompletePresentationMs": 277.1113,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216221192,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216218136,
+          "PresentationCurrentThreadAllocatedBytes": 110422800,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 199262208,
+          "WorkingSetAfter": 225210368,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4994,
+          "RendererIncludingParsingLayoutSvgMs": 0.0089,
+          "StandaloneSanitisationMs": 5.4759,
+          "StandaloneSharpVectorsAndDrawingMs": 281.7356,
+          "CompletePresentationMs": 249.5068,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216226776,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216226688,
+          "PresentationCurrentThreadAllocatedBytes": 110427728,
+          "PresentationCollectionCounts": [
+            6,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 225210368,
+          "WorkingSetAfter": 236208128,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4963,
+          "RendererIncludingParsingLayoutSvgMs": 0.0085,
+          "StandaloneSanitisationMs": 4.8712,
+          "StandaloneSharpVectorsAndDrawingMs": 238.5307,
+          "CompletePresentationMs": 271.5152,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216221056,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216222112,
+          "PresentationCurrentThreadAllocatedBytes": 110423160,
+          "PresentationCollectionCounts": [
+            7,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 236208128,
+          "WorkingSetAfter": 254377984,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4996,
+          "RendererIncludingParsingLayoutSvgMs": 0.0093,
+          "StandaloneSanitisationMs": 5.3192,
+          "StandaloneSharpVectorsAndDrawingMs": 247.2556,
+          "CompletePresentationMs": 336.1024,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216220192,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216223384,
+          "PresentationCurrentThreadAllocatedBytes": 110422232,
+          "PresentationCollectionCounts": [
+            8,
+            4,
+            1
+          ],
+          "WorkingSetBefore": 254377984,
+          "WorkingSetAfter": 268570624,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5231,
+          "RendererIncludingParsingLayoutSvgMs": 0.0091,
+          "StandaloneSanitisationMs": 4.8668,
+          "StandaloneSharpVectorsAndDrawingMs": 226.6309,
+          "CompletePresentationMs": 273.7712,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216220456,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216222264,
+          "PresentationCurrentThreadAllocatedBytes": 110422624,
+          "PresentationCollectionCounts": [
+            7,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 268570624,
+          "WorkingSetAfter": 273379328,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5368,
+          "RendererIncludingParsingLayoutSvgMs": 0.0095,
+          "StandaloneSanitisationMs": 5.0011,
+          "StandaloneSharpVectorsAndDrawingMs": 231.0805,
+          "CompletePresentationMs": 271.6238,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 216220504,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 216214584,
+          "PresentationCurrentThreadAllocatedBytes": 110422048,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 273379328,
+          "WorkingSetAfter": 298094592,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Class",
+      "Size": "Smaller",
+      "SourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+      "Source": "classDiagram\nclass C0 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C1 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C2 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C3 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C4 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C5 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C6 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C7 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C8 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C9 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nC0 --\u003E C1 : relation0\nC1 --\u003E C8 : relation1\nC2 --\u003E C5 : relation2\nC3 --\u003E C2 : relation3\nC4 --\u003E C9 : relation4\nC5 --\u003E C6 : relation5\nC6 --\u003E C3 : relation6\nC7 --\u003E C0 : relation7\nC8 --\u003E C7 : relation8\nC9 --\u003E C4 : relation9\nC0 --\u003E C1 : relation10\nC1 --\u003E C8 : relation11\nC2 --\u003E C5 : relation12\nC3 --\u003E C2 : relation13\nC4 --\u003E C9 : relation14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 8.3096,
+          "RendererIncludingParsingLayoutSvgMs": 40.8855,
+          "StandaloneSanitisationMs": 1.1931,
+          "StandaloneSharpVectorsAndDrawingMs": 92.7067,
+          "CompletePresentationMs": 132.5891,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 71282512,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 71288088,
+          "PresentationCurrentThreadAllocatedBytes": 35643504,
+          "PresentationCollectionCounts": [
+            3,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 298098688,
+          "WorkingSetAfter": 307798016,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6339,
+          "RendererIncludingParsingLayoutSvgMs": 0.0073,
+          "StandaloneSanitisationMs": 1.2944,
+          "StandaloneSharpVectorsAndDrawingMs": 76.2952,
+          "CompletePresentationMs": 91.2269,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69801392,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69797832,
+          "PresentationCurrentThreadAllocatedBytes": 35310952,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 307798016,
+          "WorkingSetAfter": 318144512,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7029,
+          "RendererIncludingParsingLayoutSvgMs": 0.0054,
+          "StandaloneSanitisationMs": 1.2875,
+          "StandaloneSharpVectorsAndDrawingMs": 72.6776,
+          "CompletePresentationMs": 91.7929,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69796176,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69791648,
+          "PresentationCurrentThreadAllocatedBytes": 35308256,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 318148608,
+          "WorkingSetAfter": 326836224,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0421,
+          "RendererIncludingParsingLayoutSvgMs": 0.0068,
+          "StandaloneSanitisationMs": 2.2402,
+          "StandaloneSharpVectorsAndDrawingMs": 157.3434,
+          "CompletePresentationMs": 101.158,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69808768,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69806512,
+          "PresentationCurrentThreadAllocatedBytes": 35317104,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 326836224,
+          "WorkingSetAfter": 312053760,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6767,
+          "RendererIncludingParsingLayoutSvgMs": 0.0055,
+          "StandaloneSanitisationMs": 1.2653,
+          "StandaloneSharpVectorsAndDrawingMs": 82.087,
+          "CompletePresentationMs": 87.5065,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69799472,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69794320,
+          "PresentationCurrentThreadAllocatedBytes": 35309928,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 312053760,
+          "WorkingSetAfter": 316293120,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6065,
+          "RendererIncludingParsingLayoutSvgMs": 0.0056,
+          "StandaloneSanitisationMs": 2.5684,
+          "StandaloneSharpVectorsAndDrawingMs": 74.2886,
+          "CompletePresentationMs": 92.9245,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69788152,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69781376,
+          "PresentationCurrentThreadAllocatedBytes": 35308064,
+          "PresentationCollectionCounts": [
+            3,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 316293120,
+          "WorkingSetAfter": 316346368,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4912,
+          "RendererIncludingParsingLayoutSvgMs": 0.0058,
+          "StandaloneSanitisationMs": 1.3049,
+          "StandaloneSharpVectorsAndDrawingMs": 76.8618,
+          "CompletePresentationMs": 80.5607,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 69795584,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 69793488,
+          "PresentationCurrentThreadAllocatedBytes": 35311208,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 316346368,
+          "WorkingSetAfter": 316395520,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Class",
+      "Size": "Larger",
+      "SourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+      "Source": "classDiagram\nclass C0 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C1 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C2 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C3 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C4 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C5 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C6 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C7 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C8 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C9 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C10 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C11 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C12 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C13 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C14 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C15 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C16 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C17 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C18 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C19 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C20 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C21 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C22 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C23 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C24 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C25 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C26 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C27 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C28 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C29 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C30 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C31 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C32 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C33 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C34 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C35 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C36 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C37 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C38 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C39 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C40 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C41 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C42 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C43 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C44 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C45 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C46 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C47 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C48 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C49 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C50 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C51 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C52 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C53 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C54 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C55 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C56 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C57 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C58 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C59 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C60 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C61 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C62 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C63 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C64 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C65 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C66 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C67 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C68 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C69 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C70 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C71 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C72 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C73 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C74 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C75 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C76 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C77 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C78 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C79 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C80 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C81 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C82 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C83 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C84 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C85 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C86 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C87 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C88 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C89 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C90 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C91 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C92 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C93 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C94 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C95 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C96 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C97 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C98 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C99 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nC0 --\u003E C1 : relation0\nC1 --\u003E C8 : relation1\nC2 --\u003E C15 : relation2\nC3 --\u003E C22 : relation3\nC4 --\u003E C29 : relation4\nC5 --\u003E C36 : relation5\nC6 --\u003E C43 : relation6\nC7 --\u003E C50 : relation7\nC8 --\u003E C57 : relation8\nC9 --\u003E C64 : relation9\nC10 --\u003E C71 : relation10\nC11 --\u003E C78 : relation11\nC12 --\u003E C85 : relation12\nC13 --\u003E C92 : relation13\nC14 --\u003E C99 : relation14\nC15 --\u003E C6 : relation15\nC16 --\u003E C13 : relation16\nC17 --\u003E C20 : relation17\nC18 --\u003E C27 : relation18\nC19 --\u003E C34 : relation19\nC20 --\u003E C41 : relation20\nC21 --\u003E C48 : relation21\nC22 --\u003E C55 : relation22\nC23 --\u003E C62 : relation23\nC24 --\u003E C69 : relation24\nC25 --\u003E C76 : relation25\nC26 --\u003E C83 : relation26\nC27 --\u003E C90 : relation27\nC28 --\u003E C97 : relation28\nC29 --\u003E C4 : relation29\nC30 --\u003E C11 : relation30\nC31 --\u003E C18 : relation31\nC32 --\u003E C25 : relation32\nC33 --\u003E C32 : relation33\nC34 --\u003E C39 : relation34\nC35 --\u003E C46 : relation35\nC36 --\u003E C53 : relation36\nC37 --\u003E C60 : relation37\nC38 --\u003E C67 : relation38\nC39 --\u003E C74 : relation39\nC40 --\u003E C81 : relation40\nC41 --\u003E C88 : relation41\nC42 --\u003E C95 : relation42\nC43 --\u003E C2 : relation43\nC44 --\u003E C9 : relation44\nC45 --\u003E C16 : relation45\nC46 --\u003E C23 : relation46\nC47 --\u003E C30 : relation47\nC48 --\u003E C37 : relation48\nC49 --\u003E C44 : relation49\nC50 --\u003E C51 : relation50\nC51 --\u003E C58 : relation51\nC52 --\u003E C65 : relation52\nC53 --\u003E C72 : relation53\nC54 --\u003E C79 : relation54\nC55 --\u003E C86 : relation55\nC56 --\u003E C93 : relation56\nC57 --\u003E C0 : relation57\nC58 --\u003E C7 : relation58\nC59 --\u003E C14 : relation59\nC60 --\u003E C21 : relation60\nC61 --\u003E C28 : relation61\nC62 --\u003E C35 : relation62\nC63 --\u003E C42 : relation63\nC64 --\u003E C49 : relation64\nC65 --\u003E C56 : relation65\nC66 --\u003E C63 : relation66\nC67 --\u003E C70 : relation67\nC68 --\u003E C77 : relation68\nC69 --\u003E C84 : relation69\nC70 --\u003E C91 : relation70\nC71 --\u003E C98 : relation71\nC72 --\u003E C5 : relation72\nC73 --\u003E C12 : relation73\nC74 --\u003E C19 : relation74\nC75 --\u003E C26 : relation75\nC76 --\u003E C33 : relation76\nC77 --\u003E C40 : relation77\nC78 --\u003E C47 : relation78\nC79 --\u003E C54 : relation79\nC80 --\u003E C61 : relation80\nC81 --\u003E C68 : relation81\nC82 --\u003E C75 : relation82\nC83 --\u003E C82 : relation83\nC84 --\u003E C89 : relation84\nC85 --\u003E C96 : relation85\nC86 --\u003E C3 : relation86\nC87 --\u003E C10 : relation87\nC88 --\u003E C17 : relation88\nC89 --\u003E C24 : relation89\nC90 --\u003E C31 : relation90\nC91 --\u003E C38 : relation91\nC92 --\u003E C45 : relation92\nC93 --\u003E C52 : relation93\nC94 --\u003E C59 : relation94\nC95 --\u003E C66 : relation95\nC96 --\u003E C73 : relation96\nC97 --\u003E C80 : relation97\nC98 --\u003E C87 : relation98\nC99 --\u003E C94 : relation99\nC0 --\u003E C1 : relation100\nC1 --\u003E C8 : relation101\nC2 --\u003E C15 : relation102\nC3 --\u003E C22 : relation103\nC4 --\u003E C29 : relation104\nC5 --\u003E C36 : relation105\nC6 --\u003E C43 : relation106\nC7 --\u003E C50 : relation107\nC8 --\u003E C57 : relation108\nC9 --\u003E C64 : relation109\nC10 --\u003E C71 : relation110\nC11 --\u003E C78 : relation111\nC12 --\u003E C85 : relation112\nC13 --\u003E C92 : relation113\nC14 --\u003E C99 : relation114\nC15 --\u003E C6 : relation115\nC16 --\u003E C13 : relation116\nC17 --\u003E C20 : relation117\nC18 --\u003E C27 : relation118\nC19 --\u003E C34 : relation119\nC20 --\u003E C41 : relation120\nC21 --\u003E C48 : relation121\nC22 --\u003E C55 : relation122\nC23 --\u003E C62 : relation123\nC24 --\u003E C69 : relation124\nC25 --\u003E C76 : relation125\nC26 --\u003E C83 : relation126\nC27 --\u003E C90 : relation127\nC28 --\u003E C97 : relation128\nC29 --\u003E C4 : relation129\nC30 --\u003E C11 : relation130\nC31 --\u003E C18 : relation131\nC32 --\u003E C25 : relation132\nC33 --\u003E C32 : relation133\nC34 --\u003E C39 : relation134\nC35 --\u003E C46 : relation135\nC36 --\u003E C53 : relation136\nC37 --\u003E C60 : relation137\nC38 --\u003E C67 : relation138\nC39 --\u003E C74 : relation139\nC40 --\u003E C81 : relation140\nC41 --\u003E C88 : relation141\nC42 --\u003E C95 : relation142\nC43 --\u003E C2 : relation143\nC44 --\u003E C9 : relation144\nC45 --\u003E C16 : relation145\nC46 --\u003E C23 : relation146\nC47 --\u003E C30 : relation147\nC48 --\u003E C37 : relation148\nC49 --\u003E C44 : relation149\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "First fixture execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.1991,
+          "RendererIncludingParsingLayoutSvgMs": 31.8253,
+          "StandaloneSanitisationMs": 10.2915,
+          "StandaloneSharpVectorsAndDrawingMs": 829.9972,
+          "CompletePresentationMs": 1010.7726,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712146784,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712154136,
+          "PresentationCurrentThreadAllocatedBytes": 354451200,
+          "PresentationCollectionCounts": [
+            24,
+            7,
+            2
+          ],
+          "WorkingSetBefore": 316395520,
+          "WorkingSetAfter": 297496576,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.9421,
+          "RendererIncludingParsingLayoutSvgMs": 0.0126,
+          "StandaloneSanitisationMs": 10.2757,
+          "StandaloneSharpVectorsAndDrawingMs": 865.8581,
+          "CompletePresentationMs": 867.5895,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702937944,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702944320,
+          "PresentationCurrentThreadAllocatedBytes": 354390376,
+          "PresentationCollectionCounts": [
+            21,
+            6,
+            0
+          ],
+          "WorkingSetBefore": 297496576,
+          "WorkingSetAfter": 297078784,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.4261,
+          "RendererIncludingParsingLayoutSvgMs": 0.0353,
+          "StandaloneSanitisationMs": 19.932,
+          "StandaloneSharpVectorsAndDrawingMs": 901.3832,
+          "CompletePresentationMs": 878.0543,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702938840,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702948648,
+          "PresentationCurrentThreadAllocatedBytes": 354390376,
+          "PresentationCollectionCounts": [
+            21,
+            5,
+            0
+          ],
+          "WorkingSetBefore": 297021440,
+          "WorkingSetAfter": 341168128,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.1907,
+          "RendererIncludingParsingLayoutSvgMs": 0.0089,
+          "StandaloneSanitisationMs": 10.622,
+          "StandaloneSharpVectorsAndDrawingMs": 828.8236,
+          "CompletePresentationMs": 998.4506,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702932928,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702941296,
+          "PresentationCurrentThreadAllocatedBytes": 354385376,
+          "PresentationCollectionCounts": [
+            22,
+            7,
+            1
+          ],
+          "WorkingSetBefore": 341168128,
+          "WorkingSetAfter": 393383936,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.5459,
+          "RendererIncludingParsingLayoutSvgMs": 0.0088,
+          "StandaloneSanitisationMs": 10.1921,
+          "StandaloneSharpVectorsAndDrawingMs": 817.3494,
+          "CompletePresentationMs": 878.7909,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702932096,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702933520,
+          "PresentationCurrentThreadAllocatedBytes": 354385040,
+          "PresentationCollectionCounts": [
+            21,
+            6,
+            0
+          ],
+          "WorkingSetBefore": 393383936,
+          "WorkingSetAfter": 411168768,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.1777,
+          "RendererIncludingParsingLayoutSvgMs": 0.0088,
+          "StandaloneSanitisationMs": 11.9031,
+          "StandaloneSharpVectorsAndDrawingMs": 907.8207,
+          "CompletePresentationMs": 875.723,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702941672,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702951224,
+          "PresentationCurrentThreadAllocatedBytes": 354390376,
+          "PresentationCollectionCounts": [
+            21,
+            6,
+            0
+          ],
+          "WorkingSetBefore": 411168768,
+          "WorkingSetAfter": 391712768,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Repeated same-source/new-editor-service execution",
+          "SampleSourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+          "SourceScanIncludingAdapterSemanticsMs": 4.2088,
+          "RendererIncludingParsingLayoutSvgMs": 0.0088,
+          "StandaloneSanitisationMs": 14.1901,
+          "StandaloneSharpVectorsAndDrawingMs": 806.1968,
+          "CompletePresentationMs": 886.1083,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 702932872,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 702939544,
+          "PresentationCurrentThreadAllocatedBytes": 354384936,
+          "PresentationCollectionCounts": [
+            21,
+            5,
+            0
+          ],
+          "WorkingSetBefore": 391712768,
+          "WorkingSetAfter": 430645248,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    }
+  ],
+  "Er100Entities150Relationships": {
+    "RenderSuccess": false,
+    "Error": "Diagram could not be rendered: The operation was canceled.",
+    "InteractionCompleted": false,
+    "Classification": "Renderer-only resource diagnostic; not a successful editor benchmark",
+    "LimitsUnchanged": true
+  }
+}

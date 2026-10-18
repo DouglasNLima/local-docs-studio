@@ -1,0 +1,75 @@
+{
+  "Status": "PASS",
+  "ActualHighContrast": true,
+  "Checks": [
+    "System Flowchart: keyboard SelectionItem retains the full semantic description",
+    "System Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Flowchart: property keyboard tab order remains native and predictable",
+    "System Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System Flowchart: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "System Sequence: keyboard SelectionItem retains the full semantic description",
+    "System Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Sequence: property keyboard tab order remains native and predictable",
+    "System Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System Sequence: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "System State: keyboard SelectionItem retains the full semantic description",
+    "System State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System State: property keyboard tab order remains native and predictable",
+    "System State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System State: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "System ER: keyboard SelectionItem retains the full semantic description",
+    "System ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System ER: full long member name, exact selected occurrence and persistent parent context",
+    "System ER: property keyboard tab order remains native and predictable",
+    "System ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System ER: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "System Class: keyboard SelectionItem retains the full semantic description",
+    "System Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Class: full long member name, exact selected occurrence and persistent parent context",
+    "System Class: property keyboard tab order remains native and predictable",
+    "System Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System Class: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo"
+  ],
+  "Measurements": [
+    {
+      "Family": "Flowchart",
+      "Theme": "System",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 4881.3249,
+      "EditorOpenIncludingUiaMs": 1693.3183,
+      "WorkingSetAtFirstUsefulEditor": 211582976,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Sequence",
+      "Theme": "System",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3448.855,
+      "EditorOpenIncludingUiaMs": 826.3049,
+      "WorkingSetAtFirstUsefulEditor": 202399744,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "State",
+      "Theme": "System",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3619.9254,
+      "EditorOpenIncludingUiaMs": 897.6003,
+      "WorkingSetAtFirstUsefulEditor": 203554816,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "ER",
+      "Theme": "System",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3065.486,
+      "EditorOpenIncludingUiaMs": 784.2838,
+      "WorkingSetAtFirstUsefulEditor": 204288000,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Class",
+      "Theme": "System",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3581.8099,
+      "EditorOpenIncludingUiaMs": 1072.5489,
+      "WorkingSetAtFirstUsefulEditor": 214704128,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    }
+  ]
+}

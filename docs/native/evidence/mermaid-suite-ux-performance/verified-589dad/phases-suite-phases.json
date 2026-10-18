@@ -1,0 +1,1043 @@
+{
+  "UiThreadId": 2,
+  "Method": "Opt-in ActivitySource scopes; timings are inclusive and nested stages must not be added twice. Thread start/end tags distinguish dispatcher and workers. Per-thread allocations are deliberately unavailable across a thread change. No source text, document identity, paths or UIA transport is recorded.",
+  "Boundaries": [
+    "Source scanners; semantic/correspondence validation; pinned parsing before the existing graph layout callback; existing graph layout; SVG generation after layout; SVG sanitisation; SharpVectors Read; native drawing freeze/wrapper; geometry correspondence; overlay creation; native first presentation; first interaction; selection/inspector update; private source validation; cleanup.",
+    "Mermaider 0.15.1 exposes graph layout callbacks for Flowchart/State/Class/ER, not the Sequence pipeline. Sequence parsing/layout/SVG remains a labelled renderer.pipeline span; no parser-only time is invented.",
+    "SharpVectors Read creates native DrawingGroup geometry internally. That read is timed together; final WPF freeze/image wrapping is separate. No converter fork, extra graph engine or production budgets changed."
+  ],
+  "Phases": [
+    {
+      "Phase": "renderer.parse-before-layout",
+      "StartedUtc": "2026-10-18T10:47:02.8713704Z",
+      "Milliseconds": 99.1655,
+      "SpanId": "3364c3b0e8c9c125",
+      "ParentSpanId": "14606000029f3238",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 163520
+      }
+    },
+    {
+      "Phase": "renderer.layout.graph",
+      "StartedUtc": "2026-10-18T10:47:02.971713Z",
+      "Milliseconds": 181.8449,
+      "SpanId": "f0954334786b6101",
+      "ParentSpanId": "14606000029f3238",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 1102808
+      }
+    },
+    {
+      "Phase": "renderer.svg-after-layout",
+      "StartedUtc": "2026-10-18T10:47:03.1537122Z",
+      "Milliseconds": 61.2032,
+      "SpanId": "516308c1d8b91e64",
+      "ParentSpanId": "14606000029f3238",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 440464
+      }
+    },
+    {
+      "Phase": "renderer.pipeline",
+      "StartedUtc": "2026-10-18T10:47:02.8607982Z",
+      "Milliseconds": 354.1283,
+      "SpanId": "14606000029f3238",
+      "ParentSpanId": "59150e219ce6199d",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 1723448
+      }
+    },
+    {
+      "Phase": "svg.sanitisation",
+      "StartedUtc": "2026-10-18T10:47:03.2202214Z",
+      "Milliseconds": 17.2635,
+      "SpanId": "5eea7cb103ca95da",
+      "ParentSpanId": "b125dc550cd1b7cc",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 552776
+      }
+    },
+    {
+      "Phase": "native.conversion-queue-wait",
+      "StartedUtc": "2026-10-18T10:47:03.241966Z",
+      "Milliseconds": 0.076,
+      "SpanId": "0362d834b9687914",
+      "ParentSpanId": "b125dc550cd1b7cc",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 256
+      }
+    },
+    {
+      "Phase": "native.sharpvectors.read",
+      "StartedUtc": "2026-10-18T10:47:03.2919634Z",
+      "Milliseconds": 312.1808,
+      "SpanId": "880a3122182a79ce",
+      "ParentSpanId": "b125dc550cd1b7cc",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 14611544
+      }
+    },
+    {
+      "Phase": "native.wpf.drawing-freeze",
+      "StartedUtc": "2026-10-18T10:47:03.6129818Z",
+      "Milliseconds": 2.8209,
+      "SpanId": "a752abacc145c79b",
+      "ParentSpanId": "b125dc550cd1b7cc",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 4712
+      }
+    },
+    {
+      "Phase": "geometry.correspondence.Mermaid",
+      "StartedUtc": "2026-10-18T10:47:03.6193085Z",
+      "Milliseconds": 11.0388,
+      "SpanId": "6ee3f2003a24dd83",
+      "ParentSpanId": "b125dc550cd1b7cc",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 163816
+      }
+    },
+    {
+      "Phase": "presentation.total.Mermaid",
+      "StartedUtc": "2026-10-18T10:47:03.2186703Z",
+      "Milliseconds": 411.6886,
+      "SpanId": "b125dc550cd1b7cc",
+      "ParentSpanId": "59150e219ce6199d",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 17816712
+      }
+    },
+    {
+      "Phase": "renderer.parse.flowchart-source",
+      "StartedUtc": "2026-10-18T10:47:03.6451125Z",
+      "Milliseconds": 0.9162,
+      "SpanId": "a0da8dec7ce91457",
+      "ParentSpanId": "06c51f1fc32717b7",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 76560
+      }
+    },
+    {
+      "Phase": "source.scan.Flowchart",
+      "StartedUtc": "2026-10-18T10:47:03.6348106Z",
+      "Milliseconds": 14.6922,
+      "SpanId": "06c51f1fc32717b7",
+      "ParentSpanId": "59150e219ce6199d",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 162768
+      }
+    },
+    {
+      "Phase": "renderer.parse.flowchart-source",
+      "StartedUtc": "2026-10-18T10:47:03.6577213Z",
+      "Milliseconds": 0.5641,
+      "SpanId": "e363464a88c6a09b",
+      "ParentSpanId": "1d47c1c0b1dd7dee",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 73776
+      }
+    },
+    {
+      "Phase": "source.scan.Flowchart",
+      "StartedUtc": "2026-10-18T10:47:03.6572286Z",
+      "Milliseconds": 1.2098,
+      "SpanId": "1d47c1c0b1dd7dee",
+      "ParentSpanId": "d0917640a5843cc2",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 133984
+      }
+    },
+    {
+      "Phase": "renderer.parse.flowchart-validation",
+      "StartedUtc": "2026-10-18T10:47:03.6598899Z",
+      "Milliseconds": 0.5396,
+      "SpanId": "61fe14ac6c064b46",
+      "ParentSpanId": "1cc89778ef9f0581",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 73776
+      }
+    },
+    {
+      "Phase": "semantic.validation.Flowchart",
+      "StartedUtc": "2026-10-18T10:47:03.6595704Z",
+      "Milliseconds": 92.5291,
+      "SpanId": "1cc89778ef9f0581",
+      "ParentSpanId": "d0917640a5843cc2",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 720200
+      }
+    },
+    {
+      "Phase": "draft.source-validation.Flowchart",
+      "StartedUtc": "2026-10-18T10:47:03.6531815Z",
+      "Milliseconds": 99.81,
+      "SpanId": "d0917640a5843cc2",
+      "ParentSpanId": "59150e219ce6199d",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 5,
+        "allocated.current-thread.unavailable": true
+      }
+    },
+    {
+      "Phase": "scenario.Flowchart",
+      "StartedUtc": "2026-10-18T10:47:02.8529937Z",
+      "Milliseconds": 900.9267,
+      "SpanId": "59150e219ce6199d",
+      "ParentSpanId": "0000000000000000",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 19736456
+      }
+    },
+    {
+      "Phase": "renderer.pipeline",
+      "StartedUtc": "2026-10-18T10:47:03.7542281Z",
+      "Milliseconds": 39.0266,
+      "SpanId": "f41688f331e463e5",
+      "ParentSpanId": "ebad0ace41809ae4",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 330272
+      }
+    },
+    {
+      "Phase": "source.scan.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.7962014Z",
+      "Milliseconds": 4.7725,
+      "SpanId": "266d9fcc63d8b4c7",
+      "ParentSpanId": "ebad0ace41809ae4",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 124896
+      }
+    },
+    {
+      "Phase": "semantic.validation.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.8040288Z",
+      "Milliseconds": 4.2356,
+      "SpanId": "f2b77169384c73c2",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 156936
+      }
+    },
+    {
+      "Phase": "svg.sanitisation",
+      "StartedUtc": "2026-10-18T10:47:03.8083463Z",
+      "Milliseconds": 3.0972,
+      "SpanId": "3cd26ca942950639",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 577648
+      }
+    },
+    {
+      "Phase": "native.conversion-queue-wait",
+      "StartedUtc": "2026-10-18T10:47:03.8119202Z",
+      "Milliseconds": 0.0053,
+      "SpanId": "ed8bc368d61c79dc",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 192
+      }
+    },
+    {
+      "Phase": "native.sharpvectors.read",
+      "StartedUtc": "2026-10-18T10:47:03.8120123Z",
+      "Milliseconds": 123.772,
+      "SpanId": "761aa1cd492a6bfa",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 18065320
+      }
+    },
+    {
+      "Phase": "native.wpf.drawing-freeze",
+      "StartedUtc": "2026-10-18T10:47:03.9490684Z",
+      "Milliseconds": 3.5075,
+      "SpanId": "bccbc4d493f27e76",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 2232
+      }
+    },
+    {
+      "Phase": "geometry.correspondence.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.9569976Z",
+      "Milliseconds": 2.2503,
+      "SpanId": "aae61aba52275503",
+      "ParentSpanId": "d99ef72171f81f87",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 52488
+      }
+    },
+    {
+      "Phase": "presentation.total.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.8024202Z",
+      "Milliseconds": 156.8347,
+      "SpanId": "d99ef72171f81f87",
+      "ParentSpanId": "ebad0ace41809ae4",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 23897288
+      }
+    },
+    {
+      "Phase": "source.scan.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.9596139Z",
+      "Milliseconds": 0.2344,
+      "SpanId": "4ef81af3378b40ff",
+      "ParentSpanId": "ebad0ace41809ae4",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 68088
+      }
+    },
+    {
+      "Phase": "source.scan.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.9611539Z",
+      "Milliseconds": 0.3723,
+      "SpanId": "4039731864780970",
+      "ParentSpanId": "b6e41ac24694fe92",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 68088
+      }
+    },
+    {
+      "Phase": "semantic.validation.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.961934Z",
+      "Milliseconds": 0.8052,
+      "SpanId": "ea25da39d72a4822",
+      "ParentSpanId": "b6e41ac24694fe92",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 157008
+      }
+    },
+    {
+      "Phase": "draft.source-validation.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.9608952Z",
+      "Milliseconds": 2.3808,
+      "SpanId": "b6e41ac24694fe92",
+      "ParentSpanId": "ebad0ace41809ae4",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 5,
+        "allocated.current-thread.unavailable": true
+      }
+    },
+    {
+      "Phase": "scenario.Sequence",
+      "StartedUtc": "2026-10-18T10:47:03.753936Z",
+      "Milliseconds": 209.5517,
+      "SpanId": "ebad0ace41809ae4",
+      "ParentSpanId": "0000000000000000",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 24431928
+      }
+    },
+    {
+      "Phase": "renderer.parse-before-layout",
+      "StartedUtc": "2026-10-18T10:47:03.9638101Z",
+      "Milliseconds": 12.2937,
+      "SpanId": "d00ea0bae474c8d4",
+      "ParentSpanId": "4f39115b9a965453",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 41664
+      }
+    },
+    {
+      "Phase": "renderer.layout.graph",
+      "StartedUtc": "2026-10-18T10:47:03.9761265Z",
+      "Milliseconds": 24.8848,
+      "SpanId": "652910dea255a8bd",
+      "ParentSpanId": "4f39115b9a965453",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 303200
+      }
+    },
+    {
+      "Phase": "renderer.svg-after-layout",
+      "StartedUtc": "2026-10-18T10:47:04.0010192Z",
+      "Milliseconds": 1.5704,
+      "SpanId": "5af1946b29d7b108",
+      "ParentSpanId": "4f39115b9a965453",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 253520
+      }
+    },
+    {
+      "Phase": "renderer.pipeline",
+      "StartedUtc": "2026-10-18T10:47:03.9637858Z",
+      "Milliseconds": 38.8086,
+      "SpanId": "4f39115b9a965453",
+      "ParentSpanId": "0523b2a7afbed4cb",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 605152
+      }
+    },
+    {
+      "Phase": "source.scan.State",
+      "StartedUtc": "2026-10-18T10:47:04.0030388Z",
+      "Milliseconds": 8.6625,
+      "SpanId": "ed2662fda027332b",
+      "ParentSpanId": "0523b2a7afbed4cb",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 127280
+      }
+    },
+    {
+      "Phase": "renderer.parse.state-validation",
+      "StartedUtc": "2026-10-18T10:47:04.0138886Z",
+      "Milliseconds": 0.1394,
+      "SpanId": "1b2b6b1d5cc4ef48",
+      "ParentSpanId": "1472aa3323053f13",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 31768
+      }
+    },
+    {
+      "Phase": "semantic.validation.State",
+      "StartedUtc": "2026-10-18T10:47:04.0136395Z",
+      "Milliseconds": 3.9624,
+      "SpanId": "1472aa3323053f13",
+      "ParentSpanId": "c4fdb5f327472ea3",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 145584
+      }
+    },
+    {
+      "Phase": "svg.sanitisation",
+      "StartedUtc": "2026-10-18T10:47:04.0176135Z",
+      "Milliseconds": 1.8363,
+      "SpanId": "1a082770818e774e",
+      "ParentSpanId": "3a4ad7ef0850ae77",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 516648
+      }
+    },
+    {
+      "Phase": "native.conversion-queue-wait",
+      "StartedUtc": "2026-10-18T10:47:04.0198855Z",
+      "Milliseconds": 0.0034,
+      "SpanId": "945d34715e9acec4",
+      "ParentSpanId": "3a4ad7ef0850ae77",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 192
+      }
+    },
+    {
+      "Phase": "native.sharpvectors.read",
+      "StartedUtc": "2026-10-18T10:47:04.019963Z",
+      "Milliseconds": 61.6293,
+      "SpanId": "cc1a893437eb5942",
+      "ParentSpanId": "3a4ad7ef0850ae77",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 13263080
+      }
+    },
+    {
+      "Phase": "native.wpf.drawing-freeze",
+      "StartedUtc": "2026-10-18T10:47:04.0899986Z",
+      "Milliseconds": 2.6567,
+      "SpanId": "f086e6aa9c12984c",
+      "ParentSpanId": "3a4ad7ef0850ae77",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 1144
+      }
+    },
+    {
+      "Phase": "geometry.correspondence.Mermaid",
+      "StartedUtc": "2026-10-18T10:47:04.0956891Z",
+      "Milliseconds": 1.2536,
+      "SpanId": "fecf5e5f801bdb09",
+      "ParentSpanId": "3a4ad7ef0850ae77",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 100832
+      }
+    },
+    {
+      "Phase": "presentation.total.Mermaid",
+      "StartedUtc": "2026-10-18T10:47:04.0176106Z",
+      "Milliseconds": 79.337,
+      "SpanId": "3a4ad7ef0850ae77",
+      "ParentSpanId": "c4fdb5f327472ea3",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 16841496
+      }
+    },
+    {
+      "Phase": "presentation.total.State",
+      "StartedUtc": "2026-10-18T10:47:04.0122513Z",
+      "Milliseconds": 84.882,
+      "SpanId": "c4fdb5f327472ea3",
+      "ParentSpanId": "0523b2a7afbed4cb",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 16990776
+      }
+    },
+    {
+      "Phase": "source.scan.State",
+      "StartedUtc": "2026-10-18T10:47:04.0975128Z",
+      "Milliseconds": 0.2469,
+      "SpanId": "135af34971ab1ea0",
+      "ParentSpanId": "0523b2a7afbed4cb",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 50736
+      }
+    },
+    {
+      "Phase": "source.scan.State",
+      "StartedUtc": "2026-10-18T10:47:04.0991376Z",
+      "Milliseconds": 0.207,
+      "SpanId": "27d5f059d72b6d5a",
+      "ParentSpanId": "87eba89f9ece397a",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 51128
+      }
+    },
+    {
+      "Phase": "renderer.parse.state-validation",
+      "StartedUtc": "2026-10-18T10:47:04.0994746Z",
+      "Milliseconds": 0.2138,
+      "SpanId": "79cdfa4868070e05",
+      "ParentSpanId": "90510c8532618b8f",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 34072
+      }
+    },
+    {
+      "Phase": "semantic.validation.State",
+      "StartedUtc": "2026-10-18T10:47:04.0994696Z",
+      "Milliseconds": 0.8375,
+      "SpanId": "90510c8532618b8f",
+      "ParentSpanId": "87eba89f9ece397a",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 121712
+      }
+    },
+    {
+      "Phase": "draft.source-validation.State",
+      "StartedUtc": "2026-10-18T10:47:04.0989115Z",
+      "Milliseconds": 1.9681,
+      "SpanId": "87eba89f9ece397a",
+      "ParentSpanId": "0523b2a7afbed4cb",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 5,
+        "allocated.current-thread.unavailable": true
+      }
+    },
+    {
+      "Phase": "scenario.State",
+      "StartedUtc": "2026-10-18T10:47:03.9634973Z",
+      "Milliseconds": 137.5476,
+      "SpanId": "0523b2a7afbed4cb",
+      "ParentSpanId": "0000000000000000",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 17784680
+      }
+    },
+    {
+      "Phase": "renderer.parse-before-layout",
+      "StartedUtc": "2026-10-18T10:47:04.1012991Z",
+      "Milliseconds": 16.1642,
+      "SpanId": "c5fe60185af56c85",
+      "ParentSpanId": "3a8940e8471a61d6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 82584
+      }
+    },
+    {
+      "Phase": "renderer.layout.ER",
+      "StartedUtc": "2026-10-18T10:47:04.1174748Z",
+      "Milliseconds": 45.9297,
+      "SpanId": "f1c62dccdfadf969",
+      "ParentSpanId": "3a8940e8471a61d6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 6010848
+      }
+    },
+    {
+      "Phase": "renderer.svg-after-layout",
+      "StartedUtc": "2026-10-18T10:47:04.1634214Z",
+      "Milliseconds": 11.8046,
+      "SpanId": "5fe9af2b8b8bfda3",
+      "ParentSpanId": "3a8940e8471a61d6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 653184
+      }
+    },
+    {
+      "Phase": "renderer.pipeline",
+      "StartedUtc": "2026-10-18T10:47:04.1012715Z",
+      "Milliseconds": 73.9605,
+      "SpanId": "3a8940e8471a61d6",
+      "ParentSpanId": "d1f4a3e02bcb076f",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 6753048
+      }
+    },
+    {
+      "Phase": "source.scan.ER",
+      "StartedUtc": "2026-10-18T10:47:04.177116Z",
+      "Milliseconds": 8.2661,
+      "SpanId": "ee801bdb5e8fe85e",
+      "ParentSpanId": "d1f4a3e02bcb076f",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 189232
+      }
+    },
+    {
+      "Phase": "semantic.validation.ER",
+      "StartedUtc": "2026-10-18T10:47:04.1880723Z",
+      "Milliseconds": 22.7075,
+      "SpanId": "2e68ee2b2833013f",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 253056
+      }
+    },
+    {
+      "Phase": "svg.sanitisation",
+      "StartedUtc": "2026-10-18T10:47:04.2107898Z",
+      "Milliseconds": 4.2581,
+      "SpanId": "83b0fdb7f03d64f5",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 1061248
+      }
+    },
+    {
+      "Phase": "native.conversion-queue-wait",
+      "StartedUtc": "2026-10-18T10:47:04.2156253Z",
+      "Milliseconds": 0.0035,
+      "SpanId": "254f77b8dd4091d9",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 192
+      }
+    },
+    {
+      "Phase": "native.sharpvectors.read",
+      "StartedUtc": "2026-10-18T10:47:04.2157152Z",
+      "Milliseconds": 105.2183,
+      "SpanId": "984539e557c77ac5",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 25891496
+      }
+    },
+    {
+      "Phase": "native.wpf.drawing-freeze",
+      "StartedUtc": "2026-10-18T10:47:04.357216Z",
+      "Milliseconds": 5.7435,
+      "SpanId": "77264de37c9f7751",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 14392
+      }
+    },
+    {
+      "Phase": "geometry.correspondence.Er",
+      "StartedUtc": "2026-10-18T10:47:04.36829Z",
+      "Milliseconds": 3.6458,
+      "SpanId": "6b2fb1c17ac36632",
+      "ParentSpanId": "0a6e5b192a56edc6",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 112176
+      }
+    },
+    {
+      "Phase": "presentation.total.Er",
+      "StartedUtc": "2026-10-18T10:47:04.1873896Z",
+      "Milliseconds": 184.5544,
+      "SpanId": "0a6e5b192a56edc6",
+      "ParentSpanId": "d1f4a3e02bcb076f",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 31658592
+      }
+    },
+    {
+      "Phase": "source.scan.ER",
+      "StartedUtc": "2026-10-18T10:47:04.3722812Z",
+      "Milliseconds": 0.3595,
+      "SpanId": "ad072ffe56455ba4",
+      "ParentSpanId": "d1f4a3e02bcb076f",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 111600
+      }
+    },
+    {
+      "Phase": "source.scan.ER",
+      "StartedUtc": "2026-10-18T10:47:04.3739911Z",
+      "Milliseconds": 0.5269,
+      "SpanId": "6c9766b479a20798",
+      "ParentSpanId": "09476c21d5869b68",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 108800
+      }
+    },
+    {
+      "Phase": "semantic.validation.ER",
+      "StartedUtc": "2026-10-18T10:47:04.3747029Z",
+      "Milliseconds": 0.3336,
+      "SpanId": "093f526b35243fd2",
+      "ParentSpanId": "09476c21d5869b68",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 38216
+      }
+    },
+    {
+      "Phase": "draft.source-validation.ER",
+      "StartedUtc": "2026-10-18T10:47:04.3737886Z",
+      "Milliseconds": 1.8757,
+      "SpanId": "09476c21d5869b68",
+      "ParentSpanId": "d1f4a3e02bcb076f",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 5,
+        "allocated.current-thread.unavailable": true
+      }
+    },
+    {
+      "Phase": "scenario.ER",
+      "StartedUtc": "2026-10-18T10:47:04.1010542Z",
+      "Milliseconds": 274.7948,
+      "SpanId": "d1f4a3e02bcb076f",
+      "ParentSpanId": "0000000000000000",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 38723496
+      }
+    },
+    {
+      "Phase": "renderer.parse-before-layout",
+      "StartedUtc": "2026-10-18T10:47:04.3761281Z",
+      "Milliseconds": 23.5487,
+      "SpanId": "bd2803e517deefce",
+      "ParentSpanId": "11fa42ac6f29578b",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 68352
+      }
+    },
+    {
+      "Phase": "renderer.layout.Class",
+      "StartedUtc": "2026-10-18T10:47:04.3996862Z",
+      "Milliseconds": 12.907,
+      "SpanId": "002b0e5ea66d547f",
+      "ParentSpanId": "11fa42ac6f29578b",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 277992
+      }
+    },
+    {
+      "Phase": "renderer.svg-after-layout",
+      "StartedUtc": "2026-10-18T10:47:04.4126023Z",
+      "Milliseconds": 7.7323,
+      "SpanId": "1a465287a83c9ead",
+      "ParentSpanId": "11fa42ac6f29578b",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 472640
+      }
+    },
+    {
+      "Phase": "renderer.pipeline",
+      "StartedUtc": "2026-10-18T10:47:04.3761039Z",
+      "Milliseconds": 44.2359,
+      "SpanId": "11fa42ac6f29578b",
+      "ParentSpanId": "fff2ddc08e9c7c35",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 825824
+      }
+    },
+    {
+      "Phase": "source.scan.Class",
+      "StartedUtc": "2026-10-18T10:47:04.4205238Z",
+      "Milliseconds": 7.468,
+      "SpanId": "a9800ed01b683bb1",
+      "ParentSpanId": "fff2ddc08e9c7c35",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 620528
+      }
+    },
+    {
+      "Phase": "semantic.validation.Class",
+      "StartedUtc": "2026-10-18T10:47:04.4315691Z",
+      "Milliseconds": 29.3778,
+      "SpanId": "465e8c8759a18d64",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 472664
+      }
+    },
+    {
+      "Phase": "svg.sanitisation",
+      "StartedUtc": "2026-10-18T10:47:04.46096Z",
+      "Milliseconds": 3.1641,
+      "SpanId": "f2b7028deedac653",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 833776
+      }
+    },
+    {
+      "Phase": "native.conversion-queue-wait",
+      "StartedUtc": "2026-10-18T10:47:04.4646017Z",
+      "Milliseconds": 0.0033,
+      "SpanId": "5b343d6c7aa26acf",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 192
+      }
+    },
+    {
+      "Phase": "native.sharpvectors.read",
+      "StartedUtc": "2026-10-18T10:47:04.4647263Z",
+      "Milliseconds": 111.7148,
+      "SpanId": "8d169475385484b1",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 27089792
+      }
+    },
+    {
+      "Phase": "native.wpf.drawing-freeze",
+      "StartedUtc": "2026-10-18T10:47:04.6037277Z",
+      "Milliseconds": 3.8378,
+      "SpanId": "f27398c4d7b57fdb",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 12792
+      }
+    },
+    {
+      "Phase": "geometry.correspondence.Class",
+      "StartedUtc": "2026-10-18T10:47:04.6132552Z",
+      "Milliseconds": 6.2345,
+      "SpanId": "344401174c14ce66",
+      "ParentSpanId": "2e6e8d9f1e7afdda",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 109624
+      }
+    },
+    {
+      "Phase": "presentation.total.Class",
+      "StartedUtc": "2026-10-18T10:47:04.4308468Z",
+      "Milliseconds": 188.6521,
+      "SpanId": "2e6e8d9f1e7afdda",
+      "ParentSpanId": "fff2ddc08e9c7c35",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 34719192
+      }
+    },
+    {
+      "Phase": "source.scan.Class",
+      "StartedUtc": "2026-10-18T10:47:04.6198012Z",
+      "Milliseconds": 0.9919,
+      "SpanId": "b92fb8fef5ada44e",
+      "ParentSpanId": "fff2ddc08e9c7c35",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 492472
+      }
+    },
+    {
+      "Phase": "source.scan.Class",
+      "StartedUtc": "2026-10-18T10:47:04.6221816Z",
+      "Milliseconds": 1.0031,
+      "SpanId": "e3f05c2af165f0a8",
+      "ParentSpanId": "ce597ca3a5597c2e",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 491192
+      }
+    },
+    {
+      "Phase": "semantic.validation.Class",
+      "StartedUtc": "2026-10-18T10:47:04.6233523Z",
+      "Milliseconds": 0.3352,
+      "SpanId": "dfc4310939e46e41",
+      "ParentSpanId": "ce597ca3a5597c2e",
+      "Tags": {
+        "thread.start": 5,
+        "thread.end": 5,
+        "allocated.current-thread.bytes": 53648
+      }
+    },
+    {
+      "Phase": "draft.source-validation.Class",
+      "StartedUtc": "2026-10-18T10:47:04.6219495Z",
+      "Milliseconds": 2.3221,
+      "SpanId": "ce597ca3a5597c2e",
+      "ParentSpanId": "fff2ddc08e9c7c35",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 5,
+        "allocated.current-thread.unavailable": true
+      }
+    },
+    {
+      "Phase": "scenario.Class",
+      "StartedUtc": "2026-10-18T10:47:04.3758602Z",
+      "Milliseconds": 248.617,
+      "SpanId": "fff2ddc08e9c7c35",
+      "ParentSpanId": "0000000000000000",
+      "Tags": {
+        "thread.start": 2,
+        "thread.end": 2,
+        "allocated.current-thread.bytes": 36670192
+      }
+    }
+  ]
+}

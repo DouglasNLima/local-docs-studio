@@ -1,0 +1,103 @@
+{
+  "preservedStateFiles": 22,
+  "sameRevisionUpgrade": true,
+  "shortcutIdentities": [
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Lens Docs Studio Native Preview\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "install",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    },
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\Desktop\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "install",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    },
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Lens Docs Studio Native Preview\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "upgrade",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    },
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\Desktop\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "upgrade",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    },
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Lens Docs Studio Native Preview\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "reinstall",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    },
+    {
+      "verifiedApplicationIcon": true,
+      "shortcut": "C:\\Users\\runneradmin\\Desktop\\Lens Docs Studio Native Preview.lnk",
+      "icon": ",0",
+      "phase": "reinstall",
+      "target": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed\\installed\\LensDocsStudio.Native.exe"
+    }
+  ],
+  "productionSignedUpgrade": false,
+  "historicalStateProducer": "",
+  "evidence": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\native\\install-smoke\\9936acd7080d4da48711228df77e35ed",
+  "passed": true,
+  "sessionRestorationTested": true,
+  "installedVersions": [
+    {
+      "metadata": "0.1.0-preview.713",
+      "binary": "0.1.0-preview.713",
+      "expected": "0.1.0-preview.713",
+      "phase": "install",
+      "registration": "0.1.0-preview.713"
+    },
+    {
+      "metadata": "0.1.1-preview.713",
+      "binary": "0.1.1-preview.713",
+      "expected": "0.1.1-preview.713",
+      "phase": "upgrade",
+      "registration": "0.1.1-preview.713"
+    },
+    {
+      "metadata": "0.1.1-preview.713",
+      "binary": "0.1.1-preview.713",
+      "expected": "0.1.1-preview.713",
+      "phase": "reinstall",
+      "registration": "0.1.1-preview.713"
+    }
+  ],
+  "candidateSourceRevision": "11063a9c60447a2777bc53906375890b01f6315f",
+  "cleanMachineCertification": false,
+  "upgradeLimitation": "Synthetic state from the specified original application/harness only; production signing, unrepresented historical state and SDK-free clean-machine certification remain separate.",
+  "checks": [
+    "install: all 528 installed payload files match the original portable bytes; only Inno uninstall files are additional",
+    "install: installed self-contained application, shortcuts and Open with registration",
+    "first-launch: installed application saved and restored UTF-8 source",
+    "Original application UI retained a dirty saved document and untitled draft without changing workspace bytes",
+    "upgrade: all 528 installed payload files match the original portable bytes; only Inno uninstall files are additional",
+    "upgrade: installed self-contained application, shortcuts and Open with registration",
+    "upgrade: preserved 22 existing native state files and workspace source byte-for-byte",
+    "restored-after-upgrade: installed application restored the actual previous tabs, text, settings and retained state",
+    "after-upgrade: installed application saved and restored UTF-8 source",
+    "uninstall: removed native installation and preserved workspace source",
+    "uninstall: preserved 22 existing native state files and workspace source byte-for-byte",
+    "reinstall: all 528 installed payload files match the original portable bytes; only Inno uninstall files are additional",
+    "reinstall: installed self-contained application, shortcuts and Open with registration",
+    "reinstall: preserved 22 existing native state files and workspace source byte-for-byte",
+    "restored-after-reinstall: installed application restored the actual previous tabs, text, settings and retained state",
+    "after-reinstall: installed application saved and restored UTF-8 source",
+    "reinstall: interrupted failed save restored exact draft and baseline in a new application process",
+    "final-uninstall: removed native installation and preserved workspace source",
+    "final-uninstall: preserved 22 existing native state files and workspace source byte-for-byte",
+    "Existing shell registration and Markdown default preserved"
+  ],
+  "upgradeTested": true,
+  "historicalSourceRevision": "11063a9c60447a2777bc53906375890b01f6315f"
+}

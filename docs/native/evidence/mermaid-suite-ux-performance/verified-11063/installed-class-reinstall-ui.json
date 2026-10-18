@@ -1,0 +1,113 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": false,
+  "Checks": [
+    "Actual class-header pointer selection and native SelectionItem report the exact source identity",
+    "Actual attribute-row pointer selection retains source identity across compartment ordering",
+    "Actual member-row pointer selection maps the original exact method occurrence",
+    "Class insertion selects and brings the canonical header into view",
+    "Actual relationship-label pointer selection identifies the correct source occurrence",
+    "Safe canvas endpoint reconnection preserves marker and endpoint cardinality ownership",
+    "Actual endpoint movement records pointer-only processing",
+    "Pointer cancellation retains exact source/history and releases capture",
+    "Actual invalid endpoint drop preserves exact private source/history",
+    "Actual valid endpoint drag commits one exact edit and preserves cardinality/marker ownership",
+    "Private Class authoring preserves owning document and saved bytes",
+    "Apply remains visible at 880x600",
+    "Apply remains visible at 1024x768",
+    "Apply remains visible at 1280x800",
+    "Apply remains visible at 1440x900",
+    "Apply remains visible at 1920x1080",
+    "Real Open, Select, Add/Edit attribute, Add/Edit method, Add class, Inheritance, Composition, Reconnect, Validate, private Undo/Redo, Apply, document Undo/Redo and Save pass",
+    "Saved owning document closes gracefully before process restart",
+    "Restart/reopen retains exact portable Class source and canonical semantics",
+    "Cancel of a separate changed draft preserves owning source and saved bytes",
+    "Insert Class opens the exact validated portable starter",
+    "Class insertion applies a portable Mermaid fence",
+    "Unknown global syntax protects native class structure without history",
+    "Unknown dependencies cannot be overwritten through member properties",
+    "Protected commands expose accessible operation reasons",
+    "unknown-protected: Cancel preserves exact standalone document and saved bytes",
+    "Identical attribute movement creates private occurrence history without metadata in source",
+    "Editing a moved identical attribute cannot change another occurrence",
+    "Parallel self-relationship canvas/list identity remains exact",
+    "identical-occurrences: Cancel preserves exact standalone document and saved bytes",
+    "Unrelated native relationship properties preserve both quoted empty cardinalities",
+    "empty-cardinalities: Cancel preserves exact standalone document and saved bytes",
+    "Comments before a swapped pair protect native movement without source or history changes",
+    "Native member property edits preserve comment attachment and every unrelated byte",
+    "commented-members: Cancel preserves exact standalone document and saved bytes",
+    "Unresolved note targets protect native identity changes while preserving source, history and pending properties",
+    "Read-only unresolved notes retain their exact target and text in the native inspector",
+    "Native class insertion skips reserved note IDs without changing source or history",
+    "reserved-note-target: Cancel preserves exact standalone document and saved bytes",
+    "Deleting the last independent class retains an editable empty native draft",
+    "empty-final: Cancel preserves exact standalone document and saved bytes",
+    "Class Apply relocates its original container and preserves surrounding edits",
+    "Class conflict preserves private source and external document exactly",
+    "Closed-owner rejection retains private source and saved bytes",
+    "Class Apply cannot redirect into the active unrelated tab"
+  ],
+  "Observations": [
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 733.8056
+    },
+    {
+      "Operation": "Twenty actual endpoint pointer updates and cancellation",
+      "Milliseconds": 2813.0629
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 848.2387
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 684.2699
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 636.088
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 598.4314
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 634.3681
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 688.3516
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 722.5816
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 709.1502
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 691.7013
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 727.4364
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 758.0273
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 729.7938
+    },
+    {
+      "Operation": "Open Class editor including UIA transport",
+      "Milliseconds": 708.562
+    }
+  ]
+}

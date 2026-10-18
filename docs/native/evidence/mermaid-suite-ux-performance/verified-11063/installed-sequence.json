@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "install: all 528 installed payload files match independently verified portable bytes",
+    "install: real installed Sequence authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "upgrade: all 528 installed payload files match independently verified portable bytes",
+    "upgrade: real installed Sequence authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "before-reinstall: native installation and shortcuts removed",
+    "reinstall: all 528 installed payload files match independently verified portable bytes",
+    "reinstall: real installed Sequence authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "final-uninstall: native installation and shortcuts removed"
+  ],
+  "sourceRevision": "11063a9c60447a2777bc53906375890b01f6315f",
+  "versions": [
+    {
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.0-preview.713",
+      "registered": "0.1.0-preview.713",
+      "phase": "install",
+      "version": "0.1.0-preview.713"
+    },
+    {
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.1-preview.713",
+      "registered": "0.1.1-preview.713",
+      "phase": "upgrade",
+      "version": "0.1.1-preview.713"
+    },
+    {
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.1-preview.713",
+      "registered": "0.1.1-preview.713",
+      "phase": "reinstall",
+      "version": "0.1.1-preview.713"
+    }
+  ],
+  "status": "PASS"
+}

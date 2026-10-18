@@ -1,0 +1,303 @@
+{
+  "Passed": true,
+  "Checks": [
+    "Partial Core proof authorises an independent label in identical \u0060\u0060\u0060 blocks",
+    "Partial Apply changes only the tracked second identical \u0060\u0060\u0060 block, preserving its first block and surrounding Unicode",
+    "One native Undo restores exact identical partial diagrams with \u0060\u0060\u0060 fences",
+    "Partial Core proof authorises an independent label in identical ~~~ blocks",
+    "Partial Apply changes only the tracked second identical ~~~ block, preserving its first block and surrounding Unicode",
+    "One native Undo restores exact identical partial diagrams with ~~~ fences",
+    "AvalonEdit history relocates the intended identical diagram after surrounding changes",
+    "One native document Undo restores the entire diagram and retains the independent surrounding edit",
+    "Native document Redo restores the applied source",
+    "A second Apply through an obsolete session is rejected",
+    "A closed owning tab cannot receive a visual Apply",
+    "An overlapping original-source edit rejects Apply",
+    "Rejected Apply preserves the externally edited in-memory source",
+    "Renamed unsaved-document identities are rejected without source loss",
+    "A switched active tab cannot redirect the owning-document edit",
+    "Visual Apply retains ordinary unsaved state and disk-conflict protection",
+    "Standalone Apply never saves a synthetic Markdown fence",
+    "Standalone source is restored exactly by one native Undo",
+    "Appending to a standalone diagram invalidates the original whole-file identity",
+    "Rejected standalone append preserves the independently added source",
+    "A surrounding outer fence cannot turn the tracked diagram into an editable literal code example",
+    "Rejected surrounding-syntax changes leave all source untouched",
+    "Fence-collision fixture is valid Mermaid independently of its Markdown wrapper",
+    "Valid Mermaid cannot prematurely close its owning Markdown fence",
+    "Fence-collision rejection preserves the complete owning Markdown",
+    "A document change during asynchronous final validation rejects the prepared edit",
+    "A rejected prepared edit never overwrites a newer document revision",
+    "An unchanged diagram cannot Apply or enter document Undo history",
+    "Primary-action hover retains the exact draft in apply-hover-light",
+    "Keyboard primary-action focus retains source in apply-focus-light",
+    "A pointer offset from the thin connection line selects its inspector without changing source",
+    "Real list multi-selection exposes both selected nodes",
+    "Multi-node duplication includes the internal connection and private Undo restores exact source",
+    "Source-header copy emits the exact draft",
+    "Source collapse and expansion preserve the exact draft",
+    "Zoom in changes the native viewport scale",
+    "Zoom out reverses the zoom-in scale without source changes",
+    "View commands leave Mermaid source byte-for-byte unchanged",
+    "Source collapse and view commands retain the original multi-selection",
+    "Shape inspector changes actual Mermaid geometry and Undo restores exact source",
+    "A pending connection/pointer drag retains inspector text, exact source and node positions",
+    "Keyboard connection completion cannot discard pending inspector values",
+    "Inline label entry cannot replace unapplied inspector values",
+    "Escape cancels connection mode while retaining pending properties and selection",
+    "Selection changes retain unapplied property text and selection",
+    "Live theme updates retain pending inspector text, draft, selection and zoom",
+    "Unapplied inspector text cannot be silently lost through Apply",
+    "Source validation cannot discard pending inspector text",
+    "Draft node editing leaves the owning Markdown untouched",
+    "The visible temporary connection guide retains the exact draft before destination selection",
+    "Connection inspector reverses actual endpoints and retains the label",
+    "Real canvas connection, label, deletion, Undo and Redo produce the expected semantic graph",
+    "Invalid pending colours cannot enable document Apply",
+    "Invalid hexadecimal colour keeps exact source and pending inspector protection",
+    "Explicit property reset restores the validated draft",
+    "Keyboard colour input retains an invalid long value instead of truncating it to an accepted prefix",
+    "Invalid long colour is rejected without source mutation",
+    "Authored colour values remain visible in the inspector in normal and High Contrast modes",
+    "Invalid direct source is retained and cannot overwrite the document",
+    "Primary-action hover retains the exact draft in apply-hover-dark",
+    "Keyboard primary-action focus retains source in apply-focus-dark",
+    "Live theme changes retain private and owning source",
+    "Apply retains ordinary unsaved-file behaviour",
+    "Applied portable source renders through the established diagram/export service",
+    "Cancel discards the draft without touching source or disk",
+    "Surrounding edits and visual Apply remain in memory until Save",
+    "Conflicting Apply preserves both the external source and private draft",
+    "MermaidApply remains contained at 880x600",
+    "MermaidCancel remains contained at 880x600",
+    "MermaidViewport remains contained at 880x600",
+    "MermaidElements remains contained at 880x600",
+    "MermaidSelectionSummary remains contained at 880x600",
+    "Native overflow command is completely contained by the disposable desktop",
+    "Narrow toolbar overflow opens the existing native rendered preview without changing source",
+    "MermaidApply remains contained at 1024x768",
+    "MermaidCancel remains contained at 1024x768",
+    "MermaidViewport remains contained at 1024x768",
+    "MermaidElements remains contained at 1024x768",
+    "MermaidSelectionSummary remains contained at 1024x768",
+    "MermaidApply remains contained at 1280x800",
+    "MermaidCancel remains contained at 1280x800",
+    "MermaidViewport remains contained at 1280x800",
+    "MermaidElements remains contained at 1280x800",
+    "MermaidSelectionSummary remains contained at 1280x800",
+    "MermaidApply remains contained at 1440x900",
+    "MermaidCancel remains contained at 1440x900",
+    "MermaidViewport remains contained at 1440x900",
+    "MermaidElements remains contained at 1440x900",
+    "MermaidSelectionSummary remains contained at 1440x900",
+    "MermaidApply remains contained at 1920x1080",
+    "MermaidCancel remains contained at 1920x1080",
+    "MermaidViewport remains contained at 1920x1080",
+    "MermaidElements remains contained at 1920x1080",
+    "MermaidSelectionSummary remains contained at 1920x1080",
+    "Native clipboard paste modifies only the private Mermaid draft",
+    "Real standalone UIA Apply never inserts a synthetic fence",
+    "Escape cancels a real inline label edit in .md",
+    "Native palette drag-and-drop adds the intended semantic shape in .md",
+    "Node dragging keeps portable source byte-for-byte unchanged in .md",
+    "New flowchart uses the correct portable Markdown/raw representation for .md",
+    "Escape cancels a real inline label edit in .mermaid",
+    "Native palette drag-and-drop adds the intended semantic shape in .mermaid",
+    "Node dragging keeps portable source byte-for-byte unchanged in .mermaid",
+    "New flowchart uses the correct portable Markdown/raw representation for .mermaid",
+    "Chained source with an unknown interaction opens for protected inspection without destructive visual commands",
+    "Protected selection explicitly identifies its read-only state",
+    "Protected inspection cannot expose endpoint transformation handles or mutate source",
+    "Protected inspection leaves the owning source exact",
+    "A complete synthetic chained Flowchart has mixed capabilities and requires a real change for Apply",
+    "A chain node exposes an editable label and read-only identity/deletion with accessible explanations",
+    "A denied identity edit explains its chain dependency to assistive technology",
+    "A chain node shape edit preserves its unchanged multiline label representation exactly",
+    "Selection cannot discard a partial diagram\u0027s pending inspector values",
+    "Only the independent label changes privately; owning source remains exact",
+    "The independent node inspector remains selected for visual acceptance",
+    "Nested independent connections permit labels while protecting membership-sensitive reconnection",
+    "Validated partial source applies through the owning document transaction",
+    "One document Undo restores all original protected statements byte for byte",
+    "Reopening reads the existing saved file without rewriting its fixture",
+    "Saved partial source reopens and renders with its complete graph and capability state",
+    "Cancel after reopening preserves the saved source",
+    "The synthetic chained, dotted and multiline Flowchart opens directly from preview with capability-aware inspection",
+    "Validating unchanged protected source preserves its inspection capability instead of reporting invalid Mermaid",
+    "Wide protected diagrams initially open at actual size for readable labels",
+    "Protected actual-size PAN changes the viewport without changing original source",
+    "Wide Rendered preview initially preserves readable actual-size labels",
+    "Protected zoom, Fit and Rendered preview leave the complete original source exact",
+    "Protected visual inspection never changes the owning raw Mermaid document",
+    "Identical parallel connections have distinct accessible source-order descriptions",
+    "Selecting the second parallel connection edits only its stable source identity",
+    "Parallel connection deletion retains both neighbouring source connections and their labels",
+    "Private history restores exact parallel source without changing its owner",
+    "Actual endpoint dragging reconnects only the selected identical parallel edge",
+    "Actual pointer selection at a compound shape centre retains exact Mermaid source",
+    "Unstyled node colour properties match the canonical native drawing instead of the former canvas defaults",
+    "An invalid recognised Flowchart opens from preview with diagnostics, retained source and separate source editing",
+    "Auto layout retains invalid-source diagnostics instead of claiming a successful rendering",
+    "Actual tab closure rejects stale Apply and retains both private draft and exact disk source",
+    "Native 20-node canvas retains exact source and accessible list",
+    "Native 100-node canvas retains exact source and accessible list",
+    "Native 300-node canvas retains exact source and accessible list",
+    "Complex nested and styled diagram is preserved through the native canvas"
+  ],
+  "Timings": [
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 819.2082
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_B",
+      "Milliseconds": 94.5039
+    },
+    {
+      "Operation": "Zoom in and out including UIA transport and compositor flush",
+      "Milliseconds": 119.8095
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_B",
+      "Milliseconds": 64.5139
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_A",
+      "Milliseconds": 66.393
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Node1",
+      "Milliseconds": 83.6523
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 693.7608
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 678.3128
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Reviewed",
+      "Milliseconds": 108.8484
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 653.2886
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 646.3723
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Reviewed",
+      "Milliseconds": 100.2811
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 669.3651
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Reviewed",
+      "Milliseconds": 81.4813
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 964.7526
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_A",
+      "Milliseconds": 102.2533
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 792.1461
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 1267.6166
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Capture",
+      "Milliseconds": 146.9329
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_IndependentStep",
+      "Milliseconds": 176.3713
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_Archive",
+      "Milliseconds": 167.8835
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "edge-12",
+      "Milliseconds": 174.8133
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 1211.278
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_IndependentStep",
+      "Milliseconds": 187.2377
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 1089.6498
+    },
+    {
+      "Operation": "Protected middle-button PAN including synthetic drag, UIA transport and compositor flush",
+      "Milliseconds": 433.014
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 881.8234
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 966.9335
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 763.2874
+    },
+    {
+      "Operation": "Open visual editor",
+      "Milliseconds": 903.6728
+    },
+    {
+      "Operation": "Native selection including UIA transport",
+      "Element": "node_A",
+      "Milliseconds": 97.6621
+    },
+    {
+      "Operation": "Native canvas 20 nodes",
+      "Milliseconds": 1750.5632
+    },
+    {
+      "Operation": "Native canvas 100 nodes",
+      "Milliseconds": 2592.8378
+    },
+    {
+      "Operation": "Native canvas 300 nodes",
+      "Milliseconds": 5817.4104
+    }
+  ],
+  "HighContrastRequested": false,
+  "Dpi": 96,
+  "Error": null,
+  "Limitations": "Disposable hosted Windows desktop UIA; physical monitor/DPI and screen-reader certification are not claimed."
+}

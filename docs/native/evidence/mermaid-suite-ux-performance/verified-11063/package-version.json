@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "product": "LensDocsStudio.Native",
+  "version": "0.1.1-preview.713",
+  "channel": "Preview",
+  "architecture": "x64",
+  "minimumWindowsVersion": "10.0.17763",
+  "selfContained": true,
+  "internalPreview": true,
+  "signingRequested": false,
+  "signingProvider": "Unsigned",
+  "sourceRevision": "11063a9c60447a2777bc53906375890b01f6315f",
+  "sourceDirty": false,
+  "builtAtUtc": "2026-10-18T10:10:10.7445127+00:00",
+  "sourceKind": "branch-source",
+  "ciRunId": "39117433665",
+  "ciRunAttempt": "1",
+  "checkoutRef": "refs/heads/feature/native-mermaid-suite-ux-performance"
+}

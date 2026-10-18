@@ -1,0 +1,2 @@
+ad7a0b6e3554cb795433a668b2d3c084cfa9819150c1be27def7672046e1dfea  LensDocsStudio.Native-0.1.1-preview.713-win-x64-Setup.exe
+27723af8ddb361e9e055e9a4fb417aad9287c7821a5288969067607c2dddce9a  LensDocsStudio.Native-0.1.1-preview.713-win-x64.zip

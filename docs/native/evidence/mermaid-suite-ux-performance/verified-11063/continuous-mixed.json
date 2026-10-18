@@ -1,0 +1,2095 @@
+{
+  "Name": "mixed",
+  "ParsingMilliseconds": 149.5512,
+  "ImageAndDiagramPreparationMilliseconds": 585.6445,
+  "SourceUtf8Bytes": 36425,
+  "ConstructionInputMilliseconds": 23.9095,
+  "FirstLayoutInputMilliseconds": 582.9413,
+  "MaximumInputGapMilliseconds": 582.7987,
+  "InputBudgetMilliseconds": 250,
+  "InputAcceptance": "FAIL",
+  "ConstructionMilliseconds": 261.8626,
+  "AttachmentMilliseconds": 45.414800000000014,
+  "FinalLayoutMilliseconds": 522.0803,
+  "FirstContentLayoutMilliseconds": 829.194,
+  "CompletionMilliseconds": 856.6425,
+  "FirstRasterMilliseconds": 885.7976,
+  "LayoutStages": {
+    "MeasureMilliseconds": 0.001,
+    "ArrangeMilliseconds": 162.4934,
+    "UpdateLayoutMilliseconds": 522.0744,
+    "MeasureCalls": 1,
+    "ArrangeCalls": 1
+  },
+  "AllocatedBytes": 51158632,
+  "PeakWorkingSet64": 186974208,
+  "GarbageCollections": [
+    4,
+    3,
+    1
+  ],
+  "SourcePreserved": true,
+  "CompleteText": true,
+  "TargetVisible": true,
+  "SelectedTarget": true,
+  "Operations": [
+    {
+      "Priority": "Send",
+      "Milliseconds": 0.9328000000000003
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.21729999999999805
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.0032999999999994145
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.5378999999999969
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 9.470499999999998
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.47120000000000317
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.01470000000000482
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 2.9502999999999986
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.7805999999999997
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.012400000000006628
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005299999999998306
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.09450000000000358
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5097000000000023
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999997374
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 2.3825999999999965
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00929999999999609
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5980999999999952
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8138999999999967
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.021199999999993224
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8314000000000021
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.007600000000003604
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.10489999999999355
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7260999999999953
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006500000000002615
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.726700000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006699999999995043
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.060499999999997556
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005400000000001626
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0071000000000012164
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7392000000000039
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006700000000002149
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.08320000000000505
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6659000000000006
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006599999999998829
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9013999999999953
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.008200000000002206
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06820000000000448
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005400000000001626
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.007699999999999818
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5730999999999966
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0058000000000006935
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06989999999999696
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5336999999999961
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0058000000000006935
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5512999999999977
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04999999999999716
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0045000000000001705
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5191000000000017
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06630000000000535
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5434000000000054
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.009199999999999875
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5275000000000034
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.015300000000003422
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.007699999999999818
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.05850000000000222
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.00460000000000349
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0062999999999959755
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5330000000000013
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0683000000000007
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5424000000000007
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0058000000000006935
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5330000000000013
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06929999999999836
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0071000000000012164
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.528100000000002
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06730000000000302
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5467999999999975
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5544000000000011
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04639999999999844
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.01120000000000232
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.012599999999999056
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5018000000000029
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999997374
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06479999999999819
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6362000000000023
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006399999999999295
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.49849999999999994
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005299999999998306
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04490000000000549
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006999999999997897
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4771999999999963
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06330000000000524
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5495999999999981
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006099999999996442
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4889999999999972
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04560000000000031
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004399999999996851
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006099999999996442
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.47740000000000293
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0062999999999959755
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06329999999999814
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.47700000000000387
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005200000000002092
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5632999999999981
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.045000000000001705
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.48270000000000124
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06400000000000006
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4778999999999982
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.01999999999999602
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.618300000000005
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04590000000000316
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004599999999996385
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.47529999999999006
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06300000000000239
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.46630000000000393
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005400000000008731
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6152000000000015
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006099999999989336
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.045100000000005025
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4765000000000015
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005400000000008731
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0636999999999972
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4667999999999921
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005200000000002092
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5212999999999965
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07049999999999557
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005000000000009663
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006699999999995043
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4849000000000103
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06419999999999959
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4765000000000015
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5086999999999904
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04569999999999652
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5548000000000002
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06359999999999388
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4656999999999982
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4864999999999924
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.044899999999998386
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004299999999986426
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5628999999999991
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06409999999999627
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4630999999999972
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005200000000002092
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4975999999999914
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04480000000000928
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005599999999986949
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.781099999999995
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006399999999999295
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06680000000000064
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4718000000000018
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.488900000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.045100000000005025
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.596100000000007
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006399999999999295
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06510000000000105
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.46630000000000393
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005200000000002092
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.49030000000000484
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04540000000000077
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5693000000000126
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06470000000000198
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4650000000000034
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.48680000000000234
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06380000000000052
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005799999999993588
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5531000000000006
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.012200000000007094
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.10660000000000025
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5191999999999979
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.488900000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04569999999999652
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4776000000000096
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.009000000000000341
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.10739999999999839
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4754999999999967
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.48870000000000857
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04540000000000077
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.48930000000000007
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06479999999999109
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.542199999999994
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.028300000000001546
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5067999999999984
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.007000000000005002
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.003900000000001569
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04630000000000223
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.47639999999999816
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0648999999999944
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5369000000000028
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.48520000000000607
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04440000000001021
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.4901999999999873
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005400000000008731
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06419999999999959
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5343999999999909
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5294999999999987
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04979999999999052
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004499999999993065
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5193999999999903
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0630999999999915
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5906999999999982
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006199999999992656
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5324999999999989
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005800000000007799
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04619999999999891
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5172999999999917
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0700999999999965
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5591000000000008
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5354000000000099
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00539999999999452
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04930000000000234
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0043999999999897454
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005900000000011119
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.522199999999998
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07029999999998893
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5847999999999871
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5338999999999885
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04959999999999809
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.005899999999996908
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5457999999999998
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06459999999999866
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5631999999999948
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5390999999999906
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.044699999999991746
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.010499999999993292
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5148000000000081
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00560000000000116
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06929999999999836
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5065999999999917
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5975999999999999
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.05339999999999634
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004499999999993065
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5150999999999897
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06409999999999627
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5099999999999909
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6032999999999902
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006199999999992656
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.045199999999994134
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.009399999999999409
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006399999999999295
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.513300000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06969999999999743
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5084000000000088
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00549999999999784
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6013999999999982
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.046700000000001296
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.5411000000000001
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 10.949399999999997
+    },
+    {
+      "Priority": "DataBind",
+      "Milliseconds": 0.2716999999999956
+    },
+    {
+      "Priority": "Loaded",
+      "Milliseconds": 0.004199999999997317
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.0040000000000048885
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006700000000009254
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.28840000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006999999999990791
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7424999999999926
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.030000000000001137
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7244000000000028
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.008200000000002206
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07520000000000948
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7146000000000043
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07480000000001041
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6463999999999999
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005700000000004479
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.16030000000000655
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.007699999999999818
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.010500000000007503
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.010199999999997544
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.003299999999995862
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6957999999999913
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00570000000001869
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.046799999999990405
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004499999999978854
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006600000000020145
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7190999999999974
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.01079999999998904
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6835999999999842
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.007000000000005002
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0039000000000157797
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6967000000000212
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.804300000000012
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006299999999981765
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06960000000000832
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.6975000000000193
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999990268
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06690000000000396
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7727000000000146
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.046399999999977126
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7489999999999952
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005599999999986949
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.046599999999983766
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006299999999981765
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.865300000000019
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006599999999991724
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.7931999999999846
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005799999999993588
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8054000000000201
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999990268
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8588000000000022
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999990268
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06579999999999586
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8008000000000095
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06640000000001578
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8855000000000075
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04570000000001073
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006399999999985084
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.8487999999999829
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04400000000001114
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006599999999991724
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9236999999999966
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006199999999978445
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9099999999999966
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0056000000000153705
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.0272000000000219
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006299999999981765
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9501000000000204
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005699999999990268
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06700000000000728
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9927999999999884
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06770000000000209
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9095000000000084
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005599999999986949
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.044399999999996
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006199999999978445
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.0276000000000067
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.044899999999984175
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.0069000000000016826
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.9609999999999843
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.0786000000000229
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.096100000000007
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006100000000003547
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.1128999999999962
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07019999999999982
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.0294999999999845
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006199999999978445
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06669999999999732
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.133800000000008
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04560000000000741
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.0883000000000038
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006399999999985084
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04449999999999932
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004300000000000637
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006399999999985084
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.1298999999999921
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006199999999978445
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.198599999999999
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.1557999999999993
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.0053000000000054115
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.237099999999998
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.028999999999996362
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.08230000000000359
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.2051000000000158
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.008399999999994634
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.004199999999997317
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.07500000000001705
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.132300000000015
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.00580000000002201
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.05170000000001096
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006499999999988404
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.292100000000005
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006299999999981765
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04449999999999932
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.2471999999999923
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.2504000000000133
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.3363999999999976
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.37530000000001
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06680000000000064
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.2641999999999882
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005400000000008731
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06799999999998363
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.293200000000013
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006000000000000227
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04600000000002069
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004399999999975535
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.392799999999994
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.009700000000009368
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04609999999999559
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006200000000006867
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.2826000000000022
+    },
+    {
+      "Priority": "Input",
+      "Milliseconds": 0.006799999999998363
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.004099999999993997
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.4331999999999994
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006299999999981765
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.6260999999999797
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006699999999995043
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.4850000000000136
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006499999999988404
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06729999999998881
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.475999999999999
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006400000000013506
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.06839999999999691
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.4324000000000012
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.007000000000005002
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.04570000000001073
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004500000000007276
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006499999999988404
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.5253999999999905
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.048699999999996635
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.004400000000003956
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 0.006499999999988404
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.3936999999999955
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.005500000000012051
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.5479999999999734
+    },
+    {
+      "Priority": "Background",
+      "Milliseconds": 0.006300000000010186
+    },
+    {
+      "Priority": "Normal",
+      "Milliseconds": 1.5652000000000044
+    }
+  ],
+  "Environment": {
+    "OS": "Microsoft Windows NT 10.0.26100.0",
+    "Runtime": "10.0.13",
+    "ProcessorCount": 4,
+    "NativeAssemblySha256": "A9A3D5704B2220E35C039CCB562EEB2C9CE51003113F90F4E306D62FC882E75B",
+    "Width": 640,
+    "Height": 300,
+    "Zoom": 100,
+    "Context": "Hidden HWND, framework-dependent Release validation, isolated process; no foreground interaction"
+  }
+}

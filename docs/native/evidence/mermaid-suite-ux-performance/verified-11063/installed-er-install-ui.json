@@ -1,0 +1,144 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": false,
+  "Checks": [
+    "Native entity SelectionItem exposes exact source identity",
+    "ID-only rename retains the displayed label and updates all native relationship references",
+    "Pending entity properties protect Apply",
+    "Verified canvas row selects the correct source attribute occurrence",
+    "New palette entities remain visible through the native zoom and scroll transform",
+    "Endpoint dragging produces measured pointer updates before cancellation",
+    "Real endpoint drag cancellation retains exact source/history and releases capture",
+    "Invalid endpoint drop leaves validated source unchanged",
+    "Actual endpoint drop keeps the second endpoint cardinality",
+    "Private ER operations retain owner and disk bytes before Apply",
+    "ER Apply remains visible at 880x600",
+    "All attribute fields and key markers remain keyboard accessible at 880x600",
+    "ER Apply remains visible at 1024x768",
+    "All attribute fields and key markers remain keyboard accessible at 1024x768",
+    "ER Apply remains visible at 1280x800",
+    "All attribute fields and key markers remain keyboard accessible at 1280x800",
+    "ER Apply remains visible at 1440x900",
+    "All attribute fields and key markers remain keyboard accessible at 1440x900",
+    "ER Apply remains visible at 1920x1080",
+    "All attribute fields and key markers remain keyboard accessible at 1920x1080",
+    "Real Open, Select entity/attribute/relationship, edit, cardinality, non-identifying, add, private Undo/Redo, Validate, Apply, document Undo/Redo and Save pass",
+    "Save/restart/reopen retains complete ER source and rendering",
+    "Insert ER opens a valid portable starter",
+    "Visual ER insertion applies a portable Markdown fence",
+    "Repeated attribute canvas hits retain exact private row identities",
+    "Rendered self-loop reordering cannot redirect edits to another occurrence",
+    "Cancel preserves exact standalone owner and disk bytes",
+    "Unknown source disables ID and structural controls with explanations",
+    "Unknown attribute suffix cannot be overwritten or create history",
+    "Independent ER label edit preserves unknown comma tokens byte-exact",
+    "Deleting the last independent entity leaves an editable empty native draft",
+    "Empty native ER draft supports new entity creation and exact private Undo/Redo",
+    "Byte-identical row movement has one private history step without changing portable source",
+    "The next native edit follows the moved identical occurrence",
+    "Private identical-row movement and editing leave the owner unchanged on Cancel",
+    "Er Apply relocates the owning Markdown container while preserving surrounding edits",
+    "Er owner conflicts retain private and external source exactly",
+    "Closed-owner rejection preserves private Er source and disk bytes",
+    "Er Apply cannot redirect to the currently active other tab",
+    "Er Apply updates the original owner while another tab is active"
+  ],
+  "Observations": [
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 851.2758
+    },
+    {
+      "Operation": "Actual endpoint drag with twenty pointer updates and cancellation",
+      "Milliseconds": 2755.9322,
+      "PrivateBytesBefore": 130539520,
+      "PrivateBytesAfter": 136798208
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 880,
+      "Height": 600,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 1024,
+      "Height": 768,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 1280,
+      "Height": 800,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 1440,
+      "Height": 900,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 1920,
+      "Height": 1080,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Settled ER client layout",
+      "Width": 1280,
+      "Height": 800,
+      "FooterRightInset": 20,
+      "FooterBottomInset": 16
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 1007.3852
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 818.5402
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 689.7703
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 649.4393
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 648.1255
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 563.4174
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 631.6241
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 659.572
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 621.5755
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 662.1996
+    },
+    {
+      "Operation": "Open ER editor including UIA transport",
+      "Milliseconds": 652.1754
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "checks": [
+    "install: all 528 installed payload files match independently verified portable bytes",
+    "install: real installed ER authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "upgrade: all 528 installed payload files match independently verified portable bytes",
+    "upgrade: real installed ER authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "before-reinstall: native installation and shortcuts removed",
+    "reinstall: all 528 installed payload files match independently verified portable bytes",
+    "reinstall: real installed ER authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "final-uninstall: native installation and shortcuts removed"
+  ],
+  "versions": [
+    {
+      "phase": "install",
+      "registered": "0.1.0-preview.713",
+      "version": "0.1.0-preview.713",
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.0-preview.713"
+    },
+    {
+      "phase": "upgrade",
+      "registered": "0.1.1-preview.713",
+      "version": "0.1.1-preview.713",
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.1-preview.713"
+    },
+    {
+      "phase": "reinstall",
+      "registered": "0.1.1-preview.713",
+      "version": "0.1.1-preview.713",
+      "source": "11063a9c60447a2777bc53906375890b01f6315f",
+      "binary": "0.1.1-preview.713"
+    }
+  ],
+  "sourceRevision": "11063a9c60447a2777bc53906375890b01f6315f",
+  "status": "PASS"
+}
