@@ -1,0 +1,14 @@
+{
+  "ActualHighContrast": true,
+  "WpfHighContrast": true,
+  "ObsoleteAppearance": false,
+  "Installations": [
+    {
+      "ActualHighContrast": true,
+      "WpfHighContrast": true,
+      "CurrentSystemColour": true,
+      "Colour": "#FFFFFFFF",
+      "ExpectedColour": "#FFFFFFFF"
+    }
+  ]
+}

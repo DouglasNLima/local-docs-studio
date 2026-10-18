@@ -263,7 +263,9 @@ internal static class NativePreviewSchedulingChecks
             tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != large) throw new IOException("Rendering changed large-document Undo or Unicode source.");
             var gate = (SemaphoreSlim)Field("previewGate")!;
-            gate.Wait(); Task latestQueued;
+            // A Windows preference notification may already own capacity while
+            // its renderer awaits this dispatcher. Keep pumping that owner.
+            Pump(gate.WaitAsync()); Task latestQueued;
             try
             {
                 previousDocument = preview.Document;

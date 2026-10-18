@@ -1,0 +1,12 @@
+{
+  "Observed": true,
+  "TransitionCreated": true,
+  "ConstructionInFlightAtToggleStart": true,
+  "ControlThread": 11,
+  "UiThread": 2,
+  "ActualHighContrast": true,
+  "WpfHighContrast": false,
+  "PreviousDocumentRetained": true,
+  "ObsoleteAppearance": false,
+  "Installations": []
+}

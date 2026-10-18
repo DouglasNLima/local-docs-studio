@@ -10,7 +10,7 @@ base: `feature/native-mermaid-suite-ux-performance`. Rebase/retarget after the
 dependency is integrated, then repeat integration checks at that revision.
 
 **Implemented with bounded limitations; the 250 ms goal is incomplete.** Lists,
-mixed content and some table samples still fail. This Draft PR is [#37](https://github.com/DouglasNLima/local-docs-studio/pull/37).
+mixed content and some paragraph/table samples still fail. This Draft PR is [#37](https://github.com/DouglasNLima/local-docs-studio/pull/37).
 The final delivery receipt on that PR identifies the exact clean delivered head,
 its required CI results and its own package identities. Results below retain
 their measured application/harness revision and are never relabelled as a later
@@ -227,6 +227,59 @@ were inspected: joining adjacent same-style runs changes WPF glyph positioning
 after the decoded entity; text, emphasis, line positions and wrapping remain
 readable and equivalent in this fixture. No typography setting is disabled.
 
+## Subsequent paired verification at `411ebf5`
+
+This independent later comparison uses the same protocol and original fixture
+bytes, including the appearance-guard refinement. It is not pooled with the
+earlier run. [Replication 1](evidence/continuous-preview-performance/application-411ebf5/replication-1.json)
+and [replication 2](evidence/continuous-preview-performance/application-411ebf5/replication-2.json)
+retain every sample, its original raw hash, allocation/GC/stages and independent
+correctness. Both use harness `4F174FEA2B9153BB30007682E04FAA05086C5FEB42E9254F4F1E5CB9FA5FC0F8`,
+baseline `9a64dfa5adf79dc447db1f671ea39c94ec42de40` and candidate
+`411ebf563c0ffebfd6ab111bc64a4d7830464b26`. The [source run](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39135650685)
+retains full bounded dispatcher arrays and rasters. Both hosts have the same
+recorded Windows image/runtime/DPI/viewport policy as above; replication 1 uses
+EPYC 9V45 and replication 2 EPYC 9V74. Host CPU availability is four logical
+processors. Final-head outcomes remain separately identified in the PR receipt.
+
+**12/66 and 28/66 candidate samples fail acceptance; correctness passes for all
+264 product samples.** A paragraph cold sample reaches 288.46 ms, so the earlier
+paragraph pass is scoped to that earlier measured workload/runner. The target is
+still incomplete. No slow samples are discarded. Values below are first layout
+in milliseconds, baseline → candidate; cold/repeated/edited cells are observed
+median / maximum of three, never p95/p99. The first combined execution is one
+retained sample per fixture. Repeated rows exclude the separately retained
+first construction in that process (repetition zero), which remains in raw JSON.
+
+### Replication 1
+
+| Fixture | First combined execution | Fresh process cold | Repeated construction | Fresh distant-source revision |
+| --- | ---: | ---: | ---: | ---: |
+| details | 78.96 → 56.97 | 102.73/106.82 → 103.95/104.05 | 42.97/64.40 → 33.81/38.02 | 70.97/80.97 → 64.51/77.84 |
+| list | 429.67 → 417.17 | 403.55/406.13 → 399.44/410.62 | 386.41/436.50 → 333.73/444.39 | 377.83/384.70 → 398.72/405.68 |
+| paragraphs | 160.24 → 107.54 | 171.78/175.89 → 139.10/139.92 | 166.24/199.59 → 94.52/134.56 | 157.15/201.34 → 115.06/169.95 |
+| quote | 72.40 → 47.65 | 101.79/105.37 → 99.27/99.88 | 51.26/68.12 → 40.51/49.86 | 55.39/63.27 → 50.18/53.34 |
+| table | 248.31 → 152.99 | 236.67/241.60 → 172.94/220.10 | 150.71/167.50 → 102.76/104.90 | 126.22/209.34 → 136.69/160.07 |
+| mixed | 379.34 → 238.72 | 239.22/243.03 → 233.23/246.94 | 203.15/245.80 → 162.46/172.57 | 261.16/327.20 → 219.98/283.44 |
+
+### Replication 2
+
+| Fixture | First combined execution | Fresh process cold | Repeated construction | Fresh distant-source revision |
+| --- | ---: | ---: | ---: | ---: |
+| details | 97.46 → 130.75 | 166.96/170.50 → 169.66/173.65 | 50.53/67.24 → 60.44/70.69 | 84.84/118.46 → 101.01/140.79 |
+| list | 919.82 → 971.78 | 865.75/985.51 → 834.69/900.27 | 506.43/715.23 → 696.09/726.06 | 686.98/838.07 → 754.17/837.70 |
+| paragraphs | 349.01 → 282.24 | 310.46/344.85 → 240.76/288.46 | 131.59/198.30 → 149.04/206.07 | 212.86/306.37 → 192.85/214.25 |
+| quote | 82.66 → 119.48 | 165.84/174.87 → 162.96/174.33 | 49.13/123.88 → 71.71/117.73 | 76.39/131.92 → 82.42/111.28 |
+| table | 281.97 → 398.52 | 357.65/375.99 → 276.83/289.65 | 134.50/251.81 → 159.45/342.67 | 232.80/250.21 → 163.24/285.86 |
+| mixed | 296.85 → 348.14 | 361.05/365.37 → 368.39/375.37 | 240.67/301.52 → 219.62/324.59 | 217.03/261.89 → 325.27/337.25 |
+
+Regressions include replication 2 mixed cold/repeated/fresh-source maximums,
+list repeated median/maximum and table repeated maximum; details/quote timings
+also vary. These are reported observations, not hidden by the paragraph/table
+construction benefits or an average across hosts. No universal responsiveness
+or memory guarantee is inferred. Full readiness and allocation observations for
+every temperature remain in the linked paired records.
+
 ## Validation and delivery receipt
 
 At application `4e55d15`, local Release compilation has zero warnings/errors,
@@ -299,6 +352,23 @@ settings broadcast from the render dispatcher blocked the harness itself before
 its dispatcher deadline could run; that stalled run remains unpassed. OS-control
 duration is not presented as application dispatcher latency. The trace verifies
 construction was in flight and records distinct control/UI thread identities.
+
+The [`411ebf5` hosted trace](evidence/continuous-preview-performance/contrast-transition-completed-411ebf5.json) subsequently completes the actual OS transition and
+restoration in 11.10 seconds: the original document remains while WPF's flag is
+stale, then exactly one observed installation uses the current system colours.
+The [phase log](evidence/continuous-preview-performance/contrast-transition-phases-411ebf5.txt)
+records restoration. The overall normal interaction job was cancelled after stalling later and is
+not a pass. Inspection found a separate harness ownership defect: the queued-work
+case synchronously waited for the preview semaphore on WPF's dispatcher, while
+a preference-triggered render could own it and await that same dispatcher.
+The subsequent [external stack capture at `b4526ab`](evidence/continuous-preview-performance/queued-gate-blocked-b4526ab.txt)
+confirms the validation UI thread blocked in `SemaphoreSlim.Wait()`; its controlled
+normal interaction job correctly fails, while fixed High Contrast passes.
+The acquisition now pumps `WaitAsync` within the existing 15-second deadline;
+the held-gate cancellation and latest-source assertions are unchanged. An
+independent external process bound retains diagnostics if an uninterruptible
+test stage prevents an in-process deadline from executing. Neither bound changes
+the product's performance acceptance or represents a dispatcher latency promise.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop
