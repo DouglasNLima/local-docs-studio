@@ -24,6 +24,7 @@ public partial class ErVisualEditorWindow : Window
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private CancellationTokenSource? pendingRender;
     private readonly SemaphoreSlim renderGate = new(1, 1);
     private readonly MermaidSourceHighlighting highlighting;
@@ -61,7 +62,7 @@ public partial class ErVisualEditorWindow : Window
         Closing += ConfirmClose; Closed += async (_, _) =>
         {
             closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
-            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }

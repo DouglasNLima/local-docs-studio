@@ -21,6 +21,8 @@ public static class MermaidWorkspace
         "ExpandedHeight", typeof(double), typeof(MermaidWorkspace), new PropertyMetadata(190d));
     private static readonly DependencyProperty InspectorIdentityProperty = DependencyProperty.RegisterAttached(
         "InspectorIdentity", typeof(string), typeof(MermaidWorkspace));
+    private static readonly DependencyProperty InspectorScrollProperty = DependencyProperty.RegisterAttached(
+        "InspectorScroll", typeof(System.Windows.Threading.DispatcherOperation), typeof(MermaidWorkspace));
     public static bool GetAdjustableSource(DependencyObject value) => (bool)value.GetValue(AdjustableSourceProperty);
     public static void SetAdjustableSource(DependencyObject value, bool enabled) => value.SetValue(AdjustableSourceProperty, enabled);
     private static void SourceChanged(DependencyObject value, DependencyPropertyChangedEventArgs args)
@@ -44,11 +46,21 @@ public static class MermaidWorkspace
     public static void Inspect(ScrollViewer inspector, string? identity)
     {
         if (Equals(inspector.GetValue(InspectorIdentityProperty), identity)) return;
+        CancelInspectorScroll(inspector, new RoutedEventArgs());
         inspector.SetValue(InspectorIdentityProperty, identity); inspector.ScrollToTop();
-        inspector.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
+        inspector.Unloaded -= CancelInspectorScroll; inspector.Unloaded += CancelInspectorScroll;
+        var operation = inspector.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
         {
-            if (Equals(inspector.GetValue(InspectorIdentityProperty), identity)) inspector.ScrollToTop();
+            inspector.ClearValue(InspectorScrollProperty);
+            if (inspector.IsLoaded && Equals(inspector.GetValue(InspectorIdentityProperty), identity)) inspector.ScrollToTop();
         });
+        inspector.SetValue(InspectorScrollProperty, operation);
+    }
+    private static void CancelInspectorScroll(object sender, RoutedEventArgs args)
+    {
+        if (sender is not ScrollViewer inspector) return;
+        if (inspector.GetValue(InspectorScrollProperty) is System.Windows.Threading.DispatcherOperation operation) operation.Abort();
+        inspector.ClearValue(InspectorScrollProperty);
     }
     public static void Reveal(FrameworkElement element, ScrollViewer viewport)
     {

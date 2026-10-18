@@ -24,6 +24,7 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly MermaidSourceHighlighting sourceHighlighting;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private bool updating, busy, closed, discard;
     private bool sourceValidationFailed, inlineThemeRefresh;
     private string? connectionSource;
@@ -79,7 +80,7 @@ public partial class MermaidVisualEditorWindow : Window
         {
             CancelPointerInteraction(); closed = true; canvasRender?.Cancel(); lifetime.Cancel();
             await canvasRenderGate.WaitAsync();
-            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose();
+            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
         Loaded += (_, _) => { Refresh(true); };
     }
@@ -431,6 +432,16 @@ public partial class MermaidVisualEditorWindow : Window
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return false;
         discard = true; Close(); return true;
     }
+    private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
+    private void ShowOriginal(object sender, RoutedEventArgs e)
+    {
+        var original = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true,
+            FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = BrushResource("WindowBrush"), Foreground = BrushResource("TextBrush") };
+        original.Options.EnableHyperlinks = false; original.Options.EnableEmailHyperlinks = false;
+        original.TextArea.TextView.LineTransformers.Add(new MermaidSourceHighlighting(dark));
+        AutomationProperties.SetName(original, "Original Mermaid source");
+        new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = original, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show();
+    }
     private void CopySource(object sender, RoutedEventArgs e)
     {
         if (SourceEditor.Text.Length == 0) { Status.Text = "The source draft is empty. Add Mermaid source before copying."; return; }
@@ -459,6 +470,8 @@ public partial class MermaidVisualEditorWindow : Window
         { CancelPointerInteraction(); connectionSource = null; UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
+        if ((Elements.IsKeyboardFocusWithin || Keyboard.FocusedElement is ComboBox or ListBox)
+            && e.Key is Key.Home or Key.End or Key.Up or Key.Down or Key.Left or Key.Right or Key.PageUp or Key.PageDown) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
         {
             if (e.Key == Key.Left) Viewport.ScrollToHorizontalOffset(Viewport.HorizontalOffset - 40);

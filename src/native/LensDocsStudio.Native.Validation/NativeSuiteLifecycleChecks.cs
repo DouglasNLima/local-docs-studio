@@ -36,7 +36,7 @@ internal static class NativeSuiteLifecycleChecks
                 // Diagnostic collection measures retained windows. Never called by production code.
                 GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect(); Drain();
                 var retained = windows.Count(item => item.IsAlive);
-                observations.Add(new { Family = family, Operation = "Controlled diagnostic collection after six open/close cycles", RetainedWindows = retained, ManagedBytes = GC.GetTotalMemory(false), WorkingSet = Environment.WorkingSet });
+                observations.Add(new { Family = family, Operation = "Controlled diagnostic collection after six open/close cycles", RetainedWindows = retained, RetainedIdentities = windows.Select((item, index) => item.IsAlive ? "family index " + (index / 6) + ", cycle " + (index % 6) : null).Where(item => item is not null).ToArray(), ManagedBytes = GC.GetTotalMemory(false), WorkingSet = Environment.WorkingSet });
                 if (retained != 0) throw new IOException(family + ": a closed editor remains retained after dispatcher drain and diagnostic collection.");
             }
             File.WriteAllText(Path.Combine(output, "suite-lifecycle.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrast = highContrast,
@@ -96,11 +96,13 @@ internal static class NativeSuiteLifecycleChecks
             }
             else window.Close();
             if (window.IsVisible) throw new IOException(family + ": unchanged private editor refused closure.");
+            var cleanup = (TaskCompletionSource)window.GetType().GetField("closedCleanup", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!;
+            var cleanupTimer = Stopwatch.StartNew(); PumpUntil(() => cleanup.Task.IsCompleted, "Native editor cleanup did not finish."); cleanup.Task.GetAwaiter().GetResult(); var cleanupMs = cleanupTimer.Elapsed.TotalMilliseconds;
             owner.Activate(); ownerFocus.Focus(); Drain();
             observations.Add(new { Family = family, Cycle = cycle, FirstUsefulPresentationIncludingNativeDispatcherMs = firstUsefulMs,
                 TwentyNativeSelectionUpdatesMs = selectionMs, SelectionUiThreadAllocatedBytes = selectionBytes,
                 MaximumInputHeartbeatGapMs = maximumGap, UiThreadAllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated,
-                WorkingSet = Environment.WorkingSet, SourceExact = true, SelectionConversions = 0, RapidThemeCancellation = cycle == 1, ClosedDuringQueuedConversion = cycle == 2 });
+                WorkingSet = Environment.WorkingSet, CleanupCompletionMs = cleanupMs, SourceExact = true, SelectionConversions = 0, RapidThemeCancellation = cycle == 1, ClosedDuringQueuedConversion = cycle == 2 });
             return weak;
         }
         finally { heartbeat.Stop(); heartbeat.Tick -= Beat; if (window.IsVisible) window.Close(); }

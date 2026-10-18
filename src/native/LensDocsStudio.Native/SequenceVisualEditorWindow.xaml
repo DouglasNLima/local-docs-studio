@@ -35,7 +35,7 @@
    <Button x:Name="LaterButton" Content="Later" Click="Later" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move participant right or message later (Alt+Down)" AutomationProperties.AutomationId="SequenceLater" AutomationProperties.Name="Move later (Alt+Down)"/>
    <Separator/>
    <Button Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceZoomOut" ToolTip="Zoom out (Ctrl+wheel)" AutomationProperties.Name="Zoom out (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomOut"/></Button>
-   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="85" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="SequenceZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.###}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="80" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="SequenceZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.###}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
    <Button Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceZoomIn" ToolTip="Zoom in (Ctrl+wheel)" AutomationProperties.Name="Zoom in (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomIn"/></Button>
    <Button Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceFit" ToolTip="Fit diagram (F)" AutomationProperties.Name="Fit diagram (F)"><ui:CommandIcon Kind="Focus"/></Button>
    <Button Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceActualSize" ToolTip="Actual size (Ctrl+0)" AutomationProperties.Name="Actual size (Ctrl+0)"><ui:CommandIcon Kind="Selection"/></Button>
@@ -88,7 +88,7 @@
     </Expander>
    </Grid>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="SequenceInspectorSplitter"/>
-   <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="SequenceInspectorPanel">
+   <ui:MermaidInspectorPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="SequenceInspectorPanel">
     <StackPanel DockPanel.Dock="Top" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
      <TextBlock x:Name="Summary" Text="Select a participant, message or note." Style="{StaticResource Mermaid.InspectorHeading}" AutomationProperties.AutomationId="SequenceSelectionSummary"/>
      <TextBlock x:Name="ContextDescription" Style="{StaticResource Mermaid.InspectorDescription}" AutomationProperties.AutomationId="SequenceSelectionDescription"/>
@@ -134,7 +134,7 @@
      <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="SequenceLocateSource"/>
     </StackPanel>
    </ScrollViewer>
-   </DockPanel>
+   </ui:MermaidInspectorPanel>
   </Grid>
  </DockPanel>
 </Window>

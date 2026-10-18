@@ -19,7 +19,7 @@
    <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateReverse" AutomationProperties.Name="Reverse selected transition" ToolTip="Reverse selected relationship"/>
    <Separator/>
    <Button Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateZoomOut" ToolTip="Zoom out (Ctrl+wheel)" AutomationProperties.Name="Zoom out (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomOut"/></Button>
-   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="StateZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.###}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="80" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="StateZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.###}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
    <Button Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateZoomIn" ToolTip="Zoom in (Ctrl+wheel)" AutomationProperties.Name="Zoom in (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomIn"/></Button>
    <Button Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateFit" ToolTip="Fit diagram (F)" AutomationProperties.Name="Fit diagram (F)"><ui:CommandIcon Kind="Focus"/></Button>
    <Button Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="StateActualSize" ToolTip="Actual size (Ctrl+0)" AutomationProperties.Name="Actual size (Ctrl+0)"><ui:CommandIcon Kind="Selection"/></Button>
@@ -69,7 +69,7 @@
     </Expander>
    </Grid>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="StateInspectorSplitter"/>
-   <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="StateInspectorPanel">
+   <ui:MermaidInspectorPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="StateInspectorPanel">
     <StackPanel DockPanel.Dock="Top" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
      <TextBlock x:Name="Summary" Text="Select a state or transition." Style="{StaticResource Mermaid.InspectorHeading}" AutomationProperties.AutomationId="StateSelectionSummary"/>
      <TextBlock x:Name="ContextDescription" Style="{StaticResource Mermaid.InspectorDescription}" AutomationProperties.AutomationId="StateSelectionDescription"/>
@@ -103,7 +103,7 @@
      <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateLocateSource"/>
     </StackPanel>
    </ScrollViewer>
-   </DockPanel>
+   </ui:MermaidInspectorPanel>
   </Grid>
  </DockPanel>
 </Window>

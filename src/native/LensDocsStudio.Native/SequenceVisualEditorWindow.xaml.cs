@@ -22,6 +22,7 @@ public partial class SequenceVisualEditorWindow : Window
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly SemaphoreSlim renderGate = new(1, 1);
     private CancellationTokenSource? pendingRender;
     private readonly MermaidSourceHighlighting highlighting;
@@ -68,7 +69,7 @@ public partial class SequenceVisualEditorWindow : Window
         Closed += async (_, _) =>
         {
             closed = true; renderGeneration++; pendingRender?.Cancel(); lifetime.Cancel();
-            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
         Deactivated += (_, _) => EndPan();
     }
@@ -306,6 +307,7 @@ public partial class SequenceVisualEditorWindow : Window
     private async Task Execute(IReadOnlyList<SequenceEditOperation> operations)
     {
         if (!CanEdit) return; busy = true; UpdateActions();
+        var existingStatements = draft.Model.Statements.Select(item => item.Identity).ToHashSet(StringComparer.Ordinal);
         try
         {
             var result = await draft.ExecuteBatchAsync(operations, lifetime.Token); if (closed) return;
@@ -313,6 +315,11 @@ public partial class SequenceVisualEditorWindow : Window
             {
                 if (operations.FirstOrDefault() is UpdateSequenceParticipant rename) draft.Select("participant:" + rename.NewId);
                 else if (operations.FirstOrDefault() is AddSequenceParticipant add) draft.Select("participant:" + add.Id);
+                else if (operations.Any(item => item is AddSequenceMessage or AddSequenceNote or DuplicateSequenceMessage))
+                {
+                    var inserted = draft.Model.Statements.Where(item => !existingStatements.Contains(item.Identity) && item.Kind is SequenceStatementKind.Message or SequenceStatementKind.Note).ToArray();
+                    if (inserted.Length == 1) draft.Select(inserted[0].Identity);
+                }
                 await RefreshAsync();
             }
             else Status.Text = result.Error;

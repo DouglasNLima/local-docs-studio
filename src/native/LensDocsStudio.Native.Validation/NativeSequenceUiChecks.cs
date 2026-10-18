@@ -60,6 +60,10 @@ internal static partial class NativeUiChecks
             Find(visual!, "SequenceSender").AsComboBox().Select("Author"); Find(visual!, "SequenceRecipient").AsComboBox().Select("Workspace");
             Find(visual!, "SequenceLabel").AsTextBox().Text = "Choose another local file";
             Find(visual!, "SequenceInsertion").AsComboBox().Select("At end"); Click("SequenceUpdate"); Await(text => new SequenceSourceParser().Parse(text).Messages.Count == 5);
+            // Parser identities are private to the editor revision; inspect the exact labelled list occurrence instead.
+            var insertedEntry = Find(visual!, "SequenceInteractions").FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).Single(item => item.Name.EndsWith(": Choose another local file", StringComparison.Ordinal));
+            Check(insertedEntry.Patterns.SelectionItem.Pattern.IsSelected.Value, "New Sequence interaction retains its exact private selection after canonical rendering");
+            Capture("new-message-revealed");
             Check(ReadEditorText(editor) == original, "Participant/message authoring retains the immutable owning Markdown until Apply");
             SelectNote(); Find(visual!, "SequenceLabel").AsTextBox().Text = "All documentation remains local"; Click("SequenceUpdate"); Await(text => text.Contains("All documentation remains local", StringComparison.Ordinal)); Capture("selected-note");
             SelectMessage(3); Capture("activation-inspector"); Find(visual!, "SequenceMarker").AsComboBox().Select("None"); Click("SequenceUpdateActivation"); Await(text => !text.Contains("deactivate Studio", StringComparison.Ordinal));

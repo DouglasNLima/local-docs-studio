@@ -182,3 +182,32 @@ Follow-up work adds real WPF retained-window/selection/heartbeat diagnostics,
 explicit cleanup after render completion, cancelled queued conversion tests,
 fixed full-selection descriptions, and Flowchart/Sequence installed authoring
 using the existing package provenance and complete payload-parity assertions.
+
+## Expanded lifecycle and keyboard checks at `f0bb2c5`
+
+[Run 39106077251](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39106077251)
+retains further failures. Normal managed WPF lifecycle checks complete six real
+open/close cycles in each family, with zero retained windows after diagnostic
+collection and zero canonical conversions during 20 selections per cycle. Actual
+High Contrast releases Flowchart, Sequence, State and ER windows but retains one
+Class window at the immediate collection point. This is unresolved evidence, not
+a certified leak fix. The strict zero-retained-window assertion remains.
+
+The new keyboard test identifies Flowchart's window-level Home shortcut consuming
+Home before the focused navigation list can use it. The correction preserves Home
+reset on the canvas and native Home/End/arrow navigation within lists/selectors.
+The fixed-inspector containment check also exposes that a plain DockPanel does
+not create a UIA control peer. A shared native DockPanel subclass now supplies an
+explicit Group peer and the existing inspector automation identifiers.
+
+Follow-up diagnostics wait for actual asynchronous window cleanup completion
+before collection. Deferred inspector scroll callbacks are bounded to the latest
+selection and aborted on unload. No production garbage collection or relaxed
+retention assertion is introduced. These changes still require fresh hosted
+normal and actual High Contrast execution.
+
+Local browser regression completes all 270 Chromium/Edge cases; static validation
+remains unchanged and passing. Sequence insertion now selects the newly inserted
+exact statement occurrence, with a focused native regression. All five toolbars
+include source visibility and original-source inspection is available in Flowchart
+as well as the four newer editors.
