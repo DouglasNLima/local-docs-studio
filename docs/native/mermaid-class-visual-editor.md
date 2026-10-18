@@ -153,7 +153,7 @@ inspectable. Notes remain list-only where SVG lacks an exact note identity.
 ## Current engineering evidence and outstanding certification
 
 The native solution builds with zero warnings/errors. The latest local complete
-Core run passed 1,623 tests (including 95 Class tests), with zero skips.
+Core run passed 1,639 tests (including 111 Class tests), with zero skips.
 Static integrity passed for 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime dependency scans. These are development observations, not final-HEAD
 certification; additional changes require fresh results.
@@ -228,7 +228,7 @@ ID rename updates actual Mermaid identity references and leaves such text intact
 The `53df214` native corpus found a second exact help-topic count in the native
 help integration harness. Its clearing-search assertion is updated from 14 to 15
 alongside the existing Core topic/anchor checks. The original hosted failure log
-is retained in `evidence/class-visual-editor/53df214-native-help-failure.log`.
+is retained in `evidence/class-visual-editor/53df214-native-help-failure.txt`.
 Installer jobs skipped after this failure are not passing certification evidence.
 
 
@@ -286,3 +286,50 @@ bytes and private Undo. Actual pointer updates measured a maximum of
 and complete edit validation dominate larger operations. The 100-class case
 passed here; that does not erase the earlier ER workload's genuine resource failure
 or justify relaxing budgets. Native conversion cancellation limitations remain.
+
+
+### Final validation tightening
+
+The Class adapter now owns its label normalisation independently of the ER parser.
+Plain double-quoted labels match pinned semantics, while exact quote delimiters
+are retained on label edits. Formatted and empty quoted labels remain protected.
+A canonical SVG transform that cannot be reconciled with positioned source
+geometry refuses hit-region creation instead of guessing coordinates.
+
+The final native acceptance harness adds physical class-header, attribute-row,
+method-row and relationship-label pointer selection, invalid/valid endpoint drops
+and graceful application close after Save. This strengthens the earlier passing
+keyboard/SelectionItem, picking, drag-cancellation and restart workflow. Additional
+windowless performance fixtures cover dense inheritance, parallel relationships
+and namespace membership. All final-HEAD results remain to be checked after these
+changes; preceding receipts retain their exact revision scope.
+
+Exact source example (second duplicate attribute only):
+
+```diff
+ classDiagram
+     class Document {
+         +string Title
+-        +string Title
++        -int Revision
+         +Open(path) Document
+     }
+```
+
+The later package run at `0a7293b` passed both positive independent package checks,
+then failed an established whole-editor negative control because the new Class
+resource diagnostic ran before the missing-native-type diagnostic. The verifier
+now checks native types before family resources. All nine negative controls pass
+against those unchanged packages in the local read-only recheck, including both
+ER-only and Class-only resource removal with recomputed checksums. The original
+hosted failure and revision-scoped recheck are retained in
+`evidence/class-visual-editor/0a7293b-*`. No installer ran locally; hosted installed
+lifecycle checks remain required.
+
+Additional Core regressions independently predict first-reference class ordering
+after reversing/reconnecting/deleting relationships involving implicit classes,
+while retaining each class's private GUID through Undo/Redo. Grouped attribute
+insertion retains method ordering and comments; source statements after a block
+remain authoritative. Initial scanning is cancellation-aware and bounded to 500
+semantic elements / 1,500 statements, below the existing 100,000-character source
+limit. Invalid or timed-out scans retain the exact source with a diagnostic.

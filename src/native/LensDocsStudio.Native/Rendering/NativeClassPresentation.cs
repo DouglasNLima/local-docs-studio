@@ -10,12 +10,16 @@ using Point = System.Windows.Point;
 
 namespace LensDocsStudio.Native.Rendering;
 
-public sealed record NativeClassHit(string Identity, Rect Bounds);
+public sealed record NativeClassHit(string Identity, Rect Bounds, Rect? FrameBounds = null)
+{
+    public Rect Frame => FrameBounds ?? Bounds;
+}
 public sealed record NativeClassConnection(string Identity, Geometry Path, Rect? LabelBounds, Point First, Point Second);
 /// <summary>The actual canonical drawing with independently verified occurrence overlays. Never lays out classes.</summary>
 public sealed record NativeClassPresentation(DrawingImage Drawing, IReadOnlyList<NativeClassHit> Classes,
     IReadOnlyList<NativeClassHit> Members, IReadOnlyList<NativeClassConnection> Relationships, IReadOnlyList<NativeClassHit> Containers)
 {
+    public IReadOnlyList<Rect> ReadOnlyBounds { get; init; } = [];
     public static NativeClassPresentation Create(ClassDiagramModel model, DiagramResult render, NativeSvgService svg)
     {
         ClassDiagramSemanticValidation.ValidateRendering(model, render);
@@ -36,9 +40,11 @@ public sealed record NativeClassPresentation(DrawingImage Drawing, IReadOnlyList
         {
             var source = model.Class(positioned.Id); var box = boxes.SingleOrDefault(item => Value(item, "data-id") == positioned.Id);
             if (box is null || Value(box, "data-label") != source.Label || Value(box, "data-annotation") != (source.Annotation ?? "")) Reject();
+            if (box!.AncestorsAndSelf().Any(item => !string.IsNullOrWhiteSpace(Value(item, "transform")))) Reject();
             var frame = box!.Elements().FirstOrDefault(item => item.Name.LocalName == "rect");
             if (frame is null || Math.Abs(Number(frame, "x") - positioned.X) > .1 || Math.Abs(Number(frame, "y") - positioned.Y) > .1 || Math.Abs(Number(frame, "width") - positioned.Width) > .1 || Math.Abs(Number(frame, "height") - positioned.Height) > .1) Reject();
-            var bounds = new Rect(positioned.X - origin.X, positioned.Y - origin.Y, positioned.Width, positioned.HeaderHeight); Check(bounds); classes.Add(new(source.Identity, bounds));
+            var bounds = new Rect(positioned.X - origin.X, positioned.Y - origin.Y, positioned.Width, positioned.HeaderHeight); Check(bounds);
+            var frameBounds = new Rect(bounds.X, bounds.Y, positioned.Width, positioned.Height); Check(frameBounds); classes.Add(new(source.Identity, bounds, frameBounds));
             void Rows(IReadOnlyList<ClassDiagramMember> rows, double top, double height)
             {
                 var rowHeight = rows.Count == 0 ? 0 : Math.Min(28, height / rows.Count);
@@ -64,6 +70,7 @@ public sealed record NativeClassPresentation(DrawingImage Drawing, IReadOnlyList
         for (var i = 0; i < ordered.Count; i++)
         {
             var source = ordered[i]; var semantic = source.Semantic; var positioned = layout.Relationships[i]; var path = paths[i];
+            if (path.AncestorsAndSelf().Any(item => !string.IsNullOrWhiteSpace(Value(item, "transform")))) Reject();
             if (Value(path, "data-from") != semantic.From || Value(path, "data-to") != semantic.To || Value(path, "data-type") != semantic.Type.ToString().ToLowerInvariant()
                 || Value(path, "data-marker-at") != semantic.MarkerAt.ToString().ToLowerInvariant() || Value(path, "data-label") != (semantic.Label ?? "") || positioned.Points.Count < 2) Reject();
             var geometry = Geometry.Parse(Value(path, "d")).Clone(); geometry.Transform = new TranslateTransform(-origin.X, -origin.Y); geometry.Freeze(); Check(geometry.Bounds);
@@ -93,7 +100,9 @@ public sealed record NativeClassPresentation(DrawingImage Drawing, IReadOnlyList
         }
         // Notes are inspectable from their exact source occurrence in the accessible list.
         // No fabricated canvas target is supplied when renderer note identity is absent.
-        return new(drawing, classes.AsReadOnly(), members.AsReadOnly(), relationships.AsReadOnly(), containers.AsReadOnly());
+        var readOnlyBounds = layout.Notes.Select(item => new Rect(item.X - origin.X, item.Y - origin.Y, item.Width, item.Height)).ToArray();
+        foreach (var bounds in readOnlyBounds) Check(bounds);
+        return new(drawing, classes.AsReadOnly(), members.AsReadOnly(), relationships.AsReadOnly(), containers.AsReadOnly()) { ReadOnlyBounds = Array.AsReadOnly(readOnlyBounds) };
     }
     private static void Check(Rect bounds) { if (bounds.IsEmpty || !double.IsFinite(bounds.X + bounds.Y + bounds.Width + bounds.Height) || Math.Abs(bounds.X) > 100_000 || Math.Abs(bounds.Y) > 100_000 || bounds.Width > 100_000 || bounds.Height > 100_000) Reject(); }
     private static string Value(XElement item, string name) => (string?)item.Attribute(name) ?? "";

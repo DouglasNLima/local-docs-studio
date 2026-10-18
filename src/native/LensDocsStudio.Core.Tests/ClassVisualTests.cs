@@ -199,4 +199,77 @@ public class ClassVisualTests
         Assert.False((await draft.ExecuteAsync(new ReverseClassRelationship(relationship.Identity))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
         Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" }))); Assert.Equal(source.Replace("original", "changed", StringComparison.Ordinal), draft.Source);
     }
+    [Fact] public async Task Quoted_relationship_labels_match_pinned_semantics_and_keep_their_original_delimiters()
+    {
+        var source = "classDiagram\nclass A\nclass B\nA --> B : \"original label\"\n"; var draft = new ClassDiagramVisualDraft(source); var relationship = draft.Model.Relationships[0];
+        Assert.Equal("original label", relationship.Semantic.Label); Assert.False(relationship.Statement.Protected); ClassDiagramSemanticValidation.ValidateRendering(draft.Model, new DiagramService().Render(source));
+        Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed label" }))); Assert.Equal(source.Replace("original label", "changed label", StringComparison.Ordinal), draft.Source);
+        Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, draft.Model.Relationship(relationship.Identity).Semantic with { Type = ClassRelationType.Dependency }))); Assert.Contains(": \"changed label\"", draft.Source);
+    }
+    [Theory, InlineData("**styled**"), InlineData("<sub>styled</sub>"), InlineData("\"line<br>break\""), InlineData("'quoted'"), InlineData("\"\"")]
+    public async Task Formatted_or_unfamiliar_label_forms_are_independently_represented_but_protected(string label)
+    {
+        var source = "classDiagram\nclass A\nclass B\nA --> B : " + label + "\n"; var draft = new ClassDiagramVisualDraft(source); var relationship = draft.Model.Relationships[0];
+        ClassDiagramSemanticValidation.ValidateRendering(draft.Model, new DiagramService().Render(source)); Assert.True(relationship.Statement.Protected);
+        Assert.False((await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" }))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+    }
+    [Fact] public async Task Added_attributes_remain_grouped_and_reorder_without_changing_method_source()
+    {
+        var draft = new ClassDiagramVisualDraft(Starter); var method = draft.Model.Class("Document").Methods[0];
+        Success(await draft.ExecuteAsync(new AddClassMember("Document", new(ClassVisibility.Private, "Revision", "int"))));
+        var added = draft.Model.Class("Document").Attributes[^1]; Assert.Contains("+string Title\n        -int Revision\n        +Open(path) Document", draft.Source);
+        Success(await draft.ExecuteAsync(new MoveClassMember(added.Identity, -1))); Assert.Equal(added.Identity, draft.Model.Class("Document").Attributes[0].Identity);
+        Assert.Equal(method.Identity, draft.Model.Class("Document").Methods[0].Identity); Assert.Equal("+Open(path) Document", draft.Model.Member(method.Identity).Statement.Read(draft.Source, "member"));
+    }
+    [Theory, InlineData("class A\nA : +string First\n"), InlineData("class A {\n+string First\n}\nA : +string Second\n"), InlineData("namespace Library {\nclass A\nA : +string First\n}\n")]
+    public async Task Adding_members_after_existing_inline_occurrences_preserves_compartment_order_and_namespace_membership(string body)
+    {
+        var source = "classDiagram\n" + body; var draft = new ClassDiagramVisualDraft(source); var original = draft.Model.Class("A").Members.ToArray(); var namespaces = draft.Model.Semantic.Namespaces;
+        Success(await draft.ExecuteAsync(new AddClassMember("A", new(ClassVisibility.Public, "Last", "int"))));
+        Assert.Equal("Last", draft.Model.Class("A").Attributes[^1].Semantic.Name); Assert.Equal(original.Select(item => item.Identity), draft.Model.Class("A").Members.Take(original.Length).Select(item => item.Identity));
+        Assert.Equal(System.Text.Json.JsonSerializer.Serialize(namespaces), System.Text.Json.JsonSerializer.Serialize(draft.Model.Semantic.Namespaces)); Assert.StartsWith(source, draft.Source);
+    }
+    [Fact] public async Task Implicit_relationship_reversal_preserves_class_identities_and_endpoint_marker_ownership()
+    {
+        var source = "classDiagram\nA \"1\" *-- \"many\" B : owns\n"; var draft = new ClassDiagramVisualDraft(source); var a = draft.Model.Class("A").Identity; var b = draft.Model.Class("B").Identity; var relationship = draft.Model.Relationships[0].Identity; draft.Select(b);
+        Success(await draft.ExecuteAsync(new ReverseClassRelationship(relationship))); Assert.Equal("classDiagram\nB \"many\" --* \"1\" A : owns\n", draft.Source);
+        Assert.Equal(a, draft.Model.Class("A").Identity); Assert.Equal(b, draft.Model.Class("B").Identity); Assert.Equal(b, draft.Selection); Assert.Equal(new[] { "B", "A" }, draft.Model.Classes.Select(item => item.Id));
+        draft.Undo(); Assert.Equal(source, draft.Source); Assert.Equal(b, draft.Selection); draft.Redo(); Assert.Equal(b, draft.Model.Class("B").Identity);
+    }
+    [Fact] public async Task Implicit_reconnection_predicts_first_reference_order_without_creating_or_changing_classes()
+    {
+        var source = "classDiagram\nA --> B\nB --> C\n"; var draft = new ClassDiagramVisualDraft(source); var identities = draft.Model.Classes.ToDictionary(item => item.Id, item => item.Identity); var relationship = draft.Model.Relationships[0];
+        Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { To = "C" })));
+        Assert.Equal(new[] { "A", "C", "B" }, draft.Model.Classes.Select(item => item.Id)); foreach (var item in draft.Model.Classes) Assert.Equal(identities[item.Id], item.Identity);
+        Assert.Equal("classDiagram\nA --> C\nB --> C\n", draft.Source);
+    }
+    [Fact] public async Task Deleting_an_early_relationship_retains_later_explicit_class_identities()
+    {
+        var source = "classDiagram\nA --> B\nclass C\nclass A\nclass B\nB --> C\n"; var draft = new ClassDiagramVisualDraft(source); var identities = draft.Model.Classes.ToDictionary(item => item.Id, item => item.Identity);
+        Success(await draft.ExecuteAsync(new DeleteClassRelationship(draft.Model.Relationships[0].Identity)));
+        Assert.Equal(new[] { "C", "A", "B" }, draft.Model.Classes.Select(item => item.Id)); foreach (var item in draft.Model.Classes) Assert.Equal(identities[item.Id], item.Identity);
+        Assert.Equal(source.Replace("A --> B\n", "", StringComparison.Ordinal), draft.Source);
+    }
+    [Fact] public void Oversized_member_scans_fail_closed_before_unbounded_occurrence_growth()
+    {
+        var source = "classDiagram\nclass A {\n" + string.Concat(Enumerable.Repeat("+x\n", 10_000)) + "}\n";
+        var draft = new ClassDiagramVisualDraft(source); Assert.False(draft.Model.IsValid); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount); Assert.False(draft.CanUndo);
+        Assert.Contains("source budget", Assert.Single(draft.Model.Diagnostics), StringComparison.OrdinalIgnoreCase);
+    }
+    [Fact] public void Pathological_member_text_and_initial_scan_cancellation_cannot_escape_the_source_adapter()
+    {
+        var source = "classDiagram\nclass A {\n+" + new string('(', 90_000) + "\n}\n"; var model = new ClassDiagramSourceParser().Parse(source);
+        Assert.Equal(source, model.Source); Assert.True(!model.IsValid || model.HasUnknownDependencies);
+        using var cancellation = new CancellationTokenSource(); cancellation.Cancel();
+        Assert.Throws<OperationCanceledException>(() => new ClassDiagramVisualDraft(Starter, cancellationToken: cancellation.Token));
+    }
+    [Fact] public async Task Unknown_global_and_endpoint_source_protect_dependent_relationship_properties()
+    {
+        foreach (var source in new[] { Source + "unknown global\n", Source.Replace("+string Title\n", "unknown { directive\n", StringComparison.Ordinal) })
+        {
+            var draft = new ClassDiagramVisualDraft(source); var relationship = draft.Model.Relationships[0]; draft.Select(relationship.Identity);
+            Assert.False((await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" }))).Success);
+            Assert.Equal(source, draft.Source); Assert.Equal(relationship.Identity, draft.Selection); Assert.Equal(1, draft.HistoryCount);
+        }
+    }
 }

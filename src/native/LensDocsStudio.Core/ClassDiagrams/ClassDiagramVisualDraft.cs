@@ -22,8 +22,8 @@ public sealed class ClassDiagramVisualDraft
     public bool CanRedo => index + 1 < history.Count;
     public long HistoryIdentity => history[index].Identity;
     public int HistoryCount => history.Count;
-    public ClassDiagramVisualDraft(string source, DiagramService? diagrams = null, Func<ClassDiagramModel, CancellationToken, Task>? validatePresentation = null)
-    { this.diagrams = diagrams ?? new(); this.validatePresentation = validatePresentation; OriginalSource = source; Model = parser.Parse(source); history.Add(new(Model, null, 0)); }
+    public ClassDiagramVisualDraft(string source, DiagramService? diagrams = null, Func<ClassDiagramModel, CancellationToken, Task>? validatePresentation = null, CancellationToken cancellationToken = default)
+    { this.diagrams = diagrams ?? new(); this.validatePresentation = validatePresentation; OriginalSource = source; Model = parser.Parse(source, cancellationToken); history.Add(new(Model, null, 0)); }
     public void Select(string? identity) { Selection = identity; history[index] = history[index] with { Selection = identity }; }
     public async Task<ClassEditResult> ExecuteAsync(ClassDiagramEditOperation operation, CancellationToken cancellationToken = default)
     {
@@ -65,7 +65,11 @@ public sealed class ClassDiagramVisualDraft
         catch (Exception error) when (Recoverable(error, cancellationToken)) { return new(false, Message(error)); }
     }
     private void Validate(ClassDiagramModel model, CancellationToken cancellationToken)
-    { cancellationToken.ThrowIfCancellationRequested(); ClassDiagramSemanticValidation.ValidateRendering(model, diagrams.Render(model.Source, cancellationToken: cancellationToken)); cancellationToken.ThrowIfCancellationRequested(); }
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!model.IsValid) throw new ArgumentException(model.Diagnostics.FirstOrDefault() ?? "Repair invalid Class source using Edit source.");
+        ClassDiagramSemanticValidation.ValidateRendering(model, diagrams.Render(model.Source, cancellationToken: cancellationToken)); cancellationToken.ThrowIfCancellationRequested();
+    }
     private static bool Recoverable(Exception error, CancellationToken token) => error is not OutOfMemoryException && (error is not OperationCanceledException || token.IsCancellationRequested);
     private static string Message(Exception error) => error is OperationCanceledException ? "Class validation was cancelled; the draft is unchanged." : error.Message;
     private void Commit(ClassDiagramModel candidate)

@@ -105,8 +105,8 @@ public partial class ClassVisualEditorWindow
         };
         handle.PreviewMouseLeftButtonUp += async (_, e) =>
         {
-            if (endpointDrag is not { } drag || presentation is null) return; var pointAtDrop = e.GetPosition(Surface); var hit = presentation.Classes.Where(item => item.Bounds.Contains(pointAtDrop)).ToArray();
-            if (hit.Length == 0 && presentation.Members.FirstOrDefault(item => item.Bounds.Contains(pointAtDrop)) is { } memberHit) { var ownerId = draft.Model.Member(memberHit.Identity).ClassId; hit = presentation.Classes.Where(item => item.Identity == draft.Model.Class(ownerId).Identity).ToArray(); }
+            if (endpointDrag is not { } drag || presentation is null) return; var pointAtDrop = e.GetPosition(Surface);
+            var hit = presentation.ReadOnlyBounds.Any(item => item.Contains(pointAtDrop)) ? [] : presentation.Classes.Where(item => item.Frame.Contains(pointAtDrop)).ToArray();
             CancelPointer(); e.Handled = true;
             if (hit.Length != 1) { Status.Text = "Drop on exactly one class. The relationship, source and history are unchanged."; return; }
             var relationshipModel = draft.Model.Relationship(drag.Identity); var id = draft.Model.Classes.Single(item => item.Identity == hit[0].Identity).Id;
@@ -126,10 +126,17 @@ public partial class ClassVisualEditorWindow
         // Endpoint controls own capture. Selecting the underlying path here would rebuild
         // and detach that control before its tunnelling pointer handler can execute.
         if (e.OriginalSource is DependencyObject target && endpointHandles.OfType<Button>().Any(handle => ReferenceEquals(handle, target) || handle.IsAncestorOf(target))) return;
+        if (presentation.ReadOnlyBounds.Any(item => item.Contains(point))) { Status.Text = "Notes are available in the element list for read-only inspection."; e.Handled = true; return; }
+        if (canvasPick is not null)
+        {
+            var classes = presentation.Classes.Where(item => item.Frame.Contains(point)).ToArray();
+            if (classes.Length == 1) { PickClass(draft.Model.Classes.Single(item => item.Identity == classes[0].Identity).Id); e.Handled = true; return; }
+        }
         var hits = presentation.Relationships.Where(item => item.LabelBounds?.Contains(point) == true).ToArray();
         if (hits.Length == 0)
         {
-            if (presentation.Classes.Concat(presentation.Members).Any(item => item.Bounds.Contains(point))) return;
+            // Canonical class bodies occlude paths even when a member row is list-only.
+            if (presentation.Classes.Any(item => item.Frame.Contains(point))) return;
             hits = presentation.Relationships.Where(item => item.Path.StrokeContains(HitPen, point)).ToArray();
         }
         if (hits.Length == 0) return;

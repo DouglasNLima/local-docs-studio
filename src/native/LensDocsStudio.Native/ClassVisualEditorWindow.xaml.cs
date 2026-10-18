@@ -53,7 +53,7 @@ public partial class ClassVisualEditorWindow : Window
         RelationshipType.ItemsSource = Enum.GetValues<ClassRelationType>().Where(value => value != ClassRelationType.Lollipop).Select(value => new TypeChoice(value, value == ClassRelationType.Realization ? "Realisation" : value.ToString())).ToArray();
         MarkerAt.ItemsSource = Enum.GetValues<ClassMarkerAt>(); MemberVisibility.ItemsSource = Enum.GetValues<ClassVisibility>();
         EditSourceButton.IsEnabled = editSource is not null; IsEnabled = false;
-        Loaded += async (_, _) => { try { draft = await Task.Run(() => new ClassDiagramVisualDraft(source, diagrams, ValidateNativeCandidateAsync), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); } catch (OperationCanceledException) { } };
+        Loaded += async (_, _) => { try { draft = await Task.Run(() => new ClassDiagramVisualDraft(source, diagrams, ValidateNativeCandidateAsync, lifetime.Token), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); } catch (OperationCanceledException) { } };
         Closing += ConfirmClose; Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); lifetime.Cancel(); };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
@@ -105,7 +105,9 @@ public partial class ClassVisualEditorWindow : Window
             if (closed || version != renderGeneration) return; presentation = converted.view;
             if (presentation is not null) { mapped = true; BuildCanvas(); }
             else { Surface.Children.Clear(); buttons.Clear(); Surface.Children.Add(new Image { Source = converted.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }); Surface.Width = converted.Drawing?.Width ?? 420; Surface.Height = converted.Drawing?.Height ?? 260; }
-            Status.Text = converted.diagnostic ?? (current.HasUnknownDependencies ? "Unknown source retained exactly. Inspect individual operation permissions." : "Ready. Select a class, member row or relationship. Canonical layout determines positions.");
+            Status.Text = converted.diagnostic ?? (current.HasUnknownDependencies ? "Unknown source retained exactly. Inspect individual operation permissions."
+                : presentation is { } view && view.Members.Count < current.Classes.Sum(item => item.Members.Count) ? "Some member rows are available through the element list; their canvas positions cannot be mapped confidently."
+                : "Ready. Select a class, member row or relationship. Canonical layout determines positions.");
             AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
             if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
         }
@@ -196,6 +198,9 @@ public partial class ClassVisualEditorWindow : Window
             : member is not null ? new UpdateClassMember(member.Identity, member.Semantic) : relationship is not null ? new UpdateClassRelationship(relationship.Identity, relationship.Semantic) : null;
         var authorised = can && inspection is not null && ClassDiagramCapabilityAnalysis.For(draft.Model, inspection).Allowed;
         NodeFields.IsEnabled = can && (mode == "class" || authorised); LabelFields.IsEnabled = AttributeFields.IsEnabled = TransitionFields.IsEnabled = authorised || can && mode != "inspect";
+        var renameCapability = cls is null ? new ClassOperationCapability(false, "Select a class to inspect its ID references.")
+            : ClassDiagramCapabilityAnalysis.For(draft.Model, new UpdateClass(cls.Id, NextId("Renamed"), ClassDiagramTransformationService.Generic(cls), cls.Annotation));
+        NodeId.IsEnabled = can && (mode == "class" || renameCapability.Allowed); NodeId.ToolTip = renameCapability.Reason; ToolTipService.SetShowOnDisabled(NodeId, true); AutomationProperties.SetHelpText(NodeId, renameCapability.Reason);
         StaticMember.IsEnabled = !memberMethod; AbstractMember.IsEnabled = false;
         var markerReason = "Portable method classifier placement is not faithfully represented by Mermaider 0.15.1. Existing static/abstract method markers and abstract attributes remain protected; use Edit source.";
         StaticMember.ToolTip = memberMethod ? markerReason : "Portable static attribute marker ($)."; AbstractMember.ToolTip = markerReason;
@@ -206,7 +211,7 @@ public partial class ClassVisualEditorWindow : Window
         foreach (var handle in endpointHandles.OfType<Button>()) { handle.IsEnabled = reconnect && clean && relationship?.Statement.Protected == false; AutomationProperties.SetHelpText(handle, reconnect ? "Drag to a class, or choose an endpoint in the keyboard-accessible inspector." : "Unknown dependencies protect endpoint reconnection."); }
         foreach (var panel in new[] { NodeFields, LabelFields, AttributeFields, TransitionFields }) { panel.ToolTip = UpdateButton.ToolTip; ToolTipService.SetShowOnDisabled(panel, true); AutomationProperties.SetHelpText(panel, UpdateButton.ToolTip?.ToString() ?? ""); }
         var state = draft.Model.Compatibility == ClassCompatibility.PartiallyEditable ? "Partially editable" : draft.Model.Compatibility.ToString();
-        Capabilities.Text = "Source: " + state + ".\nUpdate: " + UpdateButton.ToolTip + "\nDelete: " + DeleteButton.ToolTip + "\nDuplicate: " + DuplicateButton.ToolTip;
+        Capabilities.Text = "Source: " + state + ".\nUpdate: " + UpdateButton.ToolTip + "\nDelete: " + DeleteButton.ToolTip + "\nDuplicate: " + DuplicateButton.ToolTip + (cls is null ? "" : "\nClass ID: " + renameCapability.Reason);
     }
     private void BeginCreation(string kind)
     {
@@ -235,7 +240,7 @@ public partial class ClassVisualEditorWindow : Window
             var result = await draft.ExecuteAsync(operation, lifetime.Token); if (closed) return; if (!result.Success) { Status.Text = result.Error; return; }
             if (operation is AddClass add) draft.Select(draft.Model.Class(add.Id).Identity); else if (operation is DuplicateClass duplicate) draft.Select(draft.Model.Class(duplicate.NewId).Identity);
             else if (operation is AddClassRelationship or DuplicateClassRelationship) draft.Select(draft.Model.Relationships[^1].Identity);
-            else if (operation is AddClassMember member) draft.Select(draft.Model.Class(member.ClassId).Members[^1].Identity);
+            else if (operation is AddClassMember member) draft.Select((member.Member.IsMethod ? draft.Model.Class(member.ClassId).Methods : draft.Model.Class(member.ClassId).Attributes)[^1].Identity);
             await RefreshAsync();
             if (draft.Selection is { } selection && buttons.TryGetValue(selection, out var added)) { Surface.UpdateLayout(); added.BringIntoView(); }
         }
@@ -276,6 +281,7 @@ public partial class ClassVisualEditorWindow : Window
         if (statement is null || SourcePending) return; SourcePanel.IsExpanded = true; SourceEditor.Select(statement.Span.Start, statement.Span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(statement.Span.Start).LineNumber); SourceEditor.Focus();
     }
     private void ShowOriginal(object sender, RoutedEventArgs e) { new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true, FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") }, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show(); }
+    private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void Preview(object sender, RoutedEventArgs e)
     { if (presentation is { } view) new Window { Owner = this, Title = "Rendered Class preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }

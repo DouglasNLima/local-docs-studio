@@ -20,6 +20,15 @@ internal static partial class NativeClassChecks
         if (highContrast) Check(SystemParameters.HighContrast, "Actual Windows High Contrast is active for Class fidelity");
         var emptySource = "classDiagram\n"; var empty = NativeClassPresentation.Create(new ClassDiagramSourceParser().Parse(emptySource), new DiagramService().Render(emptySource), new());
         Check(empty.Classes.Count == 0 && empty.Members.Count == 0 && empty.Relationships.Count == 0, "Empty canonical Class source has no fabricated geometry");
+        var starter = new ClassDiagramSourceParser().Parse(ClassDiagramSourceParser.Starter); var starterRender = new DiagramService().Render(starter.Source);
+        var transformedSvg = starterRender.Svg!.Replace("<g class=\"class-node\"", "<g transform=\"translate(200,200)\" class=\"class-node\"", StringComparison.Ordinal);
+        var rejectedTransform = false;
+        try { _ = NativeClassPresentation.Create(starter, starterRender with { Svg = transformedSvg }, new()); } catch (InvalidDataException) { rejectedTransform = true; }
+        Check(rejectedTransform, "Unreconciled SVG ancestor transforms cannot grant source editing hit regions");
+        var ambiguousRow = new ClassDiagramSourceParser().Parse("classDiagram\nclass A {\n+string string\n}\n");
+        var ambiguousView = NativeClassPresentation.Create(ambiguousRow, new DiagramService().Render(ambiguousRow.Source), new());
+        Check(ambiguousView.Members.Count == 0 && ambiguousView.Classes.Single().Frame.Height > ambiguousView.Classes.Single().Bounds.Height,
+            "Indistinguishable type/name text remains list-only and the canonical class body still occludes underlying paths");
         foreach (var file in Directory.GetFiles("tests/fixtures/native-class", "*.mmd"))
         foreach (var dark in new[] { false, true })
         {
@@ -43,6 +52,9 @@ internal static partial class NativeClassChecks
         Observe("Many attributes", "classDiagram\nclass A {\n" + string.Concat(Enumerable.Range(0, 250).Select(i => "+string Attribute" + i + "\n")) + "}\n");
         Observe("Many methods", "classDiagram\nclass A {\n" + string.Concat(Enumerable.Range(0, 250).Select(i => "+Method" + i + "(path, options) bool\n")) + "}\n");
         Observe("Long method signatures", "classDiagram\nclass A {\n+Run(" + string.Join(", ", Enumerable.Repeat("parameter", 60)) + ") bool\n}\n");
+        Observe("Dense inheritance", "classDiagram\nclass Root\n" + string.Concat(Enumerable.Range(0, 30).Select(i => "class C" + i + "\nRoot <|-- C" + i + "\nC" + i + " <|-- C" + ((i + 1) % 30) + "\n")));
+        Observe("Multiple parallel relationships", "classDiagram\nclass A\nclass B\n" + string.Concat(Enumerable.Range(0, 60).Select(i => "A --> B : parallel" + i + "\n")));
+        Observe("Namespace membership", "classDiagram\nnamespace Library {\n" + string.Concat(Enumerable.Range(0, 15).Select(i => "class A" + i + "\n")) + "}\nnamespace Services {\n" + string.Concat(Enumerable.Range(0, 15).Select(i => "class B" + i + "\n")) + "}\n" + string.Concat(Enumerable.Range(0, 15).Select(i => "A" + i + " --> B" + i + "\n")));
         Observe("Protected global grammar", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n");
         DocumentChecks(checks);
         File.WriteAllText(Path.Combine(output, "class-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Fidelity = fidelity, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));

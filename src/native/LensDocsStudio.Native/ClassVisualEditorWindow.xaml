@@ -23,7 +23,8 @@
    <Button Content="+" Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom in" AutomationProperties.AutomationId="ClassZoomIn"/>
    <Button Content="Fit" Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassFit"/>
    <Button Content="100%" Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassActualSize"/>
-   <Button Content="Auto layout" Click="AutoLayout" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Restore canonical positions; temporary positions are never saved" AutomationProperties.AutomationId="ClassAutoLayout"/>
+   <Button Content="Auto layout" Click="AutoLayout" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Fit automatically arranged class positions; source is unchanged" AutomationProperties.AutomationId="ClassAutoLayout"/>
+   <Button Content="Source" Click="ToggleSource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Show or hide the portable Mermaid source" AutomationProperties.AutomationId="ClassToggleSource"/>
    <Button Content="Rendered preview" Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassPreview"/>
   </ToolBar>
   <Border DockPanel.Dock="Bottom" Padding="12,8" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">

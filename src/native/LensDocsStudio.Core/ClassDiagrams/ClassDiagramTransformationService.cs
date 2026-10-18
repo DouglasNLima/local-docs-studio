@@ -38,19 +38,35 @@ public sealed class ClassDiagramTransformationService
         void Append(string text, int count) => Insert(model.Source.Length, identities.Count, (model.Source.Length > 0 && !model.Source.EndsWith('\n') ? model.NewLine : "") + text, count);
         void Remove(ClassDiagramStatement statement) { Safe(statement); Patch(statement.Line, ""); identities.Remove(statement.Identity); }
         ClassDiagramStatement? End(ClassDiagramClass cls) => model.Statements.SingleOrDefault(item => item.Kind == ClassStatementKind.EndClass && item.Owner == cls.Id);
-        void InsertMember(ClassDiagramClass cls, string content)
+        void InsertMember(ClassDiagramClass cls, string content, bool method)
         {
             Local(cls);
-            if (End(cls) is { } end) Insert(end.Line.Start, identities.IndexOf(end.Identity), "        " + content + model.NewLine, 1);
+            if (End(cls) is { } end)
+            {
+                // Appending to this compartment must remain after any source-backed
+                // inline occurrences following the block. Never silently change their order.
+                if (cls.Members.Any(item => item.Semantic.IsMethod == method && item.Statement.Span.Start > end.Span.Start))
+                { Append("    " + cls.Id + " : " + content + model.NewLine, 1); return; }
+                var at = end;
+                if (!method && cls.Methods.FirstOrDefault(item => item.Statement.Owner == cls.Id) is { } firstMethod
+                    && cls.Attributes.All(item => item.Statement.Span.Start < firstMethod.Statement.Span.Start))
+                {
+                    var previous = cls.Attributes.LastOrDefault()?.Statement ?? cls.Declarations.Single();
+                    // Keep ordinary grouped attributes before methods, without moving or
+                    // detaching interleaved comments or annotation statements.
+                    if (string.IsNullOrWhiteSpace(model.Source[previous.Line.End..firstMethod.Statement.Line.Start])) at = firstMethod.Statement;
+                }
+                Insert(at.Line.Start, identities.IndexOf(at.Identity), "        " + content + model.NewLine, 1);
+            }
             else if (cls.Implicit)
             {
                 Global(); Append("    class " + cls.Id + " {" + model.NewLine + "        " + content + model.NewLine + "    }" + model.NewLine, 3);
             }
             else
             {
-                // Inline membership preserves the original declaration and namespace boundaries.
-                var declaration = cls.Declarations.Single(); var suffix = declaration.Line.Read(model.Source).EndsWith('\n') ? "" : model.NewLine;
-                Insert(declaration.Line.End, identities.IndexOf(declaration.Identity) + 1, suffix + "    " + cls.Id + " : " + content + model.NewLine, 1);
+                // An ordinary inline member after existing occurrences preserves the
+                // declaration, source ordering and namespace membership exactly.
+                Append("    " + cls.Id + " : " + content + model.NewLine, 1);
             }
         }
         void ChangeMembers(string id, bool method, Func<List<ClassMember>, List<ClassMember>> edit)
@@ -70,10 +86,32 @@ public sealed class ClassDiagramTransformationService
                     && !model.Relationships.Any(item => item.Identity != current.Identity && (item.Semantic.From == id || item.Semantic.To == id)))
                     throw new ArgumentException("This would remove the last authoritative occurrence of implicit class " + id + ". Materialise it with a member or class properties first.");
         }
+        void ReferenceOrder(ClassDiagramRelationship changed, ClassRelationship? replacement)
+        {
+            // Relationship edits can change the first occurrence order of implicit
+            // classes. Predict that order independently, retaining each class's GUID.
+            var seen = new HashSet<string>(StringComparer.Ordinal); var order = new List<string>();
+            var byStatement = model.Relationships.ToDictionary(item => item.Identity, item => item.Semantic);
+            void Emit(string id) { if (seen.Add(id)) order.Add(id); }
+            foreach (var statement in model.Statements)
+            {
+                if (statement.Identity == changed.Identity)
+                { if (replacement is not null) { Emit(replacement.From); Emit(replacement.To); } continue; }
+                if (statement.Kind is ClassStatementKind.Class or ClassStatementKind.Member && statement.Tokens.TryGetValue("id", out var id)) Emit(id.Read(model.Source));
+                else if (byStatement.TryGetValue(statement.Identity, out var relationship)) { Emit(relationship.From); Emit(relationship.To); }
+            }
+            if (order.Count != classes.Count || order.Any(id => !classes.Any(item => item.Id == id)))
+                throw new ArgumentException("The complete first-occurrence class references cannot be established. Use Edit source.");
+            var nodes = classes.Select((node, index) => (node.Id, Node: node, Identity: classIdentities[index])).ToDictionary(item => item.Id, StringComparer.Ordinal);
+            classes.Clear(); classIdentities.Clear(); foreach (var id in order) { classes.Add(nodes[id].Node); classIdentities.Add(nodes[id].Identity); }
+        }
         void RelationshipUpdate(string identity, ClassRelationship value)
         {
             var current = model.Relationship(identity); Safe(current.Statement); ValidateRelationship(value); model.Class(value.From); model.Class(value.To);
-            if (current.Semantic.From != value.From || current.Semantic.To != value.To) Global(); Orphan(current, value);
+            var endpoints = new[] { current.Semantic.From, current.Semantic.To, value.From, value.To };
+            if (model.Statements.Any(item => item.Protected && (item.Owner is null || endpoints.Contains(item.Owner))))
+                throw new ArgumentException("Unknown global source or protected endpoint contents may affect this relationship. Use Edit source for dependent relationship changes.");
+            if (current.Semantic.From != value.From || current.Semantic.To != value.To) { Global(); ReferenceOrder(current, value); } Orphan(current, value);
             if (current.Semantic.Type != value.Type || current.Semantic.MarkerAt != value.MarkerAt) Token(current.Statement, "arrow", Notation(value.Type, value.MarkerAt));
             void Endpoint(string key, string endpoint, string id, string? before, string? after, bool first)
             {
@@ -88,7 +126,11 @@ public sealed class ClassDiagramTransformationService
             Endpoint("second", "to", value.To, current.Semantic.ToCardinality, value.ToCardinality, false);
             if (current.Semantic.Label != value.Label)
             {
-                if (current.Statement.Tokens.TryGetValue("label", out var label) && value.Label is not null) Patch(label, value.Label);
+                if (current.Statement.Tokens.TryGetValue("label", out var label) && value.Label is not null)
+                {
+                    var raw = label.Read(model.Source);
+                    Patch(raw is ['"', .., '"'] ? new(label.Start + 1, label.Length - 2) : label, value.Label);
+                }
                 else { var at = current.Statement.Tokens["to"].End; Patch(new(at, current.Statement.Span.End - at), value.Label is null ? "" : " : " + value.Label); }
             }
             relationships[model.Relationships.ToList().FindIndex(item => item.Identity == identity)] = value;
@@ -163,7 +205,7 @@ public sealed class ClassDiagramTransformationService
                 Append(text, 2 + cls.Members.Count + (cls.Annotation is null ? 0 : 1)); classes.Add(cls.Semantic with { Id = duplicate.NewId, Label = Label(duplicate.NewId, Generic(cls)) }); classIdentities.Add(Guid.NewGuid().ToString("N")); break;
             }
             case AddClassMember add:
-                var memberText = MemberText(add.Member); InsertMember(model.Class(add.ClassId), memberText);
+                var memberText = MemberText(add.Member); InsertMember(model.Class(add.ClassId), memberText, add.Member.IsMethod);
                 ChangeMembers(add.ClassId, add.Member.IsMethod, items => { items.Add(add.Member); return items; }); break;
             case UpdateClassMember update:
                 MemberEdit(update.Identity, (member, cls, index) =>
@@ -228,7 +270,7 @@ public sealed class ClassDiagramTransformationService
                 var value = reversed.Semantic;
                 RelationshipUpdate(reverse.Identity, value with { From = value.To, To = value.From, MarkerAt = value.MarkerAt == ClassMarkerAt.From ? ClassMarkerAt.To : ClassMarkerAt.From, FromCardinality = value.ToCardinality, ToCardinality = value.FromCardinality }); break;
             case DeleteClassRelationship delete:
-                Global(); var deleted = model.Relationship(delete.Identity); Orphan(deleted); Remove(deleted.Statement); relationships.RemoveAt(model.Relationships.ToList().FindIndex(item => item.Identity == delete.Identity)); break;
+                Global(); var deleted = model.Relationship(delete.Identity); Orphan(deleted); ReferenceOrder(deleted, null); Remove(deleted.Statement); relationships.RemoveAt(model.Relationships.ToList().FindIndex(item => item.Identity == delete.Identity)); break;
             case DuplicateClassRelationship duplicate:
                 Global(); var duplicated = model.Relationship(duplicate.Identity); Safe(duplicated.Statement);
                 Append("    " + duplicated.Statement.Span.Read(model.Source) + model.NewLine, 1); relationships.Add(duplicated.Semantic); break;
