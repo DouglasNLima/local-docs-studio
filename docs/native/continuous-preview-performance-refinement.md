@@ -435,3 +435,30 @@ The traced `2134fe8` process observed automatic enable → current preview → d
 Ten original `.749` launches without pre-input probes also passed on two hosts. Both original and explicit-foreground-restoration routes passed the separately injected foreground-loss schedule on both hosts. Thus that experiment **does not support a focus diagnosis**. No foreground workaround has been added to the ordinary input route. The historical first-launch failure remains unresolved.
 
 The replacement palette passed the owned dynamic-consumer check and three predetermined fresh-process local scheduling runs, all retained under `local-palette-*.json`. Those local runs exercise Automatic/Pages transitions but do not toggle the developer's OS appearance or certify visible desktop interaction. The next hosted candidate must repeat shown normal/High Contrast, both-direction automatic OS transitions, native/browser/export regressions and its own package lifecycle. First-layout acceptance is still unachieved.
+
+### Corrected stock-runtime comparison at 7e80d1a
+
+[Run 39160646840](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39160646840) compares `0237b08` with `7e80d1a` using the corrected identical compiled harness per host. All 264 independent correctness outcomes and all 132 paired initial raster comparisons pass. Acceptance remains **FAIL**, with 13/66 and 19/66 failing candidate samples. The table again reports observed median / maximum over the eleven prescribed samples; each temperature and raw record remains separate in `7e80d1a-replication-*.json`.
+
+| Fixture | Replication 1 baseline | Replication 1 candidate | Replication 2 baseline | Replication 2 candidate |
+|---|---:|---:|---:|---:|
+| details | 64.32 / 105.27 | 60.50 / 106.91 | 76.02 / 120.27 | 75.24 / 118.93 |
+| list | 386.01 / 502.55 | 383.68 / 459.75 | 429.12 / 587.59 | 499.18 / 608.83 |
+| paragraphs | 126.39 / 151.87 | 112.43 / 158.43 | 151.67 / 247.67 | 156.21 / 232.16 |
+| quote | 52.72 / 99.87 | 54.02 / 97.96 | 74.85 / 110.37 | 60.49 / 134.35 |
+| table | 153.25 / 193.75 | 141.67 / 167.57 | 179.68 / 224.90 | 189.06 / 267.67 |
+| mixed | 230.71 / 346.69 | 230.88 / 269.57 | 260.70 / 353.83 | 264.39 / 390.47 |
+
+This includes regressions: list, mixed and table are slower in replication 2, and several maxima rise. It does not establish a six-fixture first-layout improvement. The unchanged acceptance remains independently red.
+
+The same compiled full-resource shown harness passes against both products on each host. Maximum observed Input gaps were baseline/candidate **1,835.33 / 1,075.38 ms** in replication 1 and **2,397.40 / 1,182.04 ms** in replication 2. These are observed maxima for this scenario/order, not frame latency, a percentile or a hardware-independent guarantee. Both directions of actual OS High Contrast transition pass automatically on both products, with every observed installation current. Disable notification/current-preview elapsed time was 2,823.04 / 2,122.35 ms and 3,506.54 / 2,368.54 ms respectively; OS broadcasting, WPF notification, construction and layout are inclusive here. The stock candidate still has substantial non-interruptible formatting.
+
+The 64-item native segmentation experiment also misses: list first/repeated 359.20 / 311.44 ms on replication 1 and 413.00 / 429.23 ms on replication 2. Its logical grouping changes make it ineligible as a product solution even apart from timing. The production list fixture already has the minimal native shape of one List, 4,000 ListItems, 4,000 Paragraphs and 4,000 Runs; single-literal bold formatting does not add a separate formatting container.
+
+### Framework-level diagnostic prototype (pending)
+
+WPF's [list visual validator](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/PtsHost/ListParaClient.cs) iterates all markers. Its [marker formatter](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/PtsHost/ListMarkerLine.cs) creates and disposes a formatted TextLine for each item. Explicit line height and first-line markers also fall outside the framework's [simple-line fast path](https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationCore/MS/internal/TextFormatting/SimpleTextLine.cs). Removing the established line height or native markers would change required appearance/semantics. These internals have no application-level cancellation/yield hook.
+
+A diagnostic-only tool under `scripts/native/experiments/MarkerReuse/` now tests a bounded framework alternative: reuse the native Disc marker TextLine within one existing ValidateVisual scope and release it before the existing marker handle. Numbered markers, actual native List/ListItem objects and complete content remain. This is an isolated modified runtime, **not a product dependency or package**; its framework signature is no longer Microsoft-valid/trusted. The harness labels it EXPERIMENT_ONLY and records the actual loaded framework hash and scalar reuse count.
+
+A local hidden-HWND sanity run loaded the private copy, exercised 3,999 reuses and passed native content/navigation correctness. It is not performance acceptance or GUI evidence. The first tool attempt failed a private-field access check; the flag is now assembly-internal within the framework. Neither attempt changed the installed runtime. The hosted workflow independently compares original/modified private runtime folders with the same application/harness/fixture bytes and the fixed 66-sample policy. ReadyToRun is disabled equally because rewriting the framework emits IL; those samples are a separate experimental temperature and will not be pooled with stock-runtime acceptance. No runtime fork is bundled or certified by this work. Results must inform an explicit architectural decision if the stock control cannot meet 250 ms.

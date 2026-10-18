@@ -1,0 +1,36 @@
+name: Diagnostic WPF marker reuse experiment
+on:
+  push:
+    branches: [feature/native-continuous-preview-performance]
+    paths: ['scripts/native/experiments/MarkerReuse/**', 'scripts/native/Test-WpfMarkerReuseExperiment.ps1', '.github/workflows/native-wpf-marker-experiment.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  framework-experiment:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Compare isolated stock and experimental private runtimes
+        run: pwsh -NoProfile -File scripts/native/Test-WpfMarkerReuseExperiment.ps1 -Replication ${{ matrix.replication }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: wpf-marker-experiment-${{ matrix.replication }}
+          path: |
+            artifacts/wpf-marker-experiment/protocol.json
+            artifacts/wpf-marker-experiment/comparison.json
+            artifacts/wpf-marker-experiment/*.json
+            artifacts/wpf-marker-experiment/samples/
+          retention-days: 30

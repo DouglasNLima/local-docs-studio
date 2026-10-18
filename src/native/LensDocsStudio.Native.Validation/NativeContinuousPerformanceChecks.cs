@@ -27,6 +27,7 @@ internal static class NativeContinuousPerformanceChecks
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(dispatcher));
         try
         {
+            var runtimeLab = Environment.GetEnvironmentVariable("LENS_CONTINUOUS_RUNTIME_LAB") == "1";
             var fixtures = ContinuousPreviewFixtures.Create(output, scenario);
             if (checkAnchors) fixtures = [.. fixtures,
                 ("anchor-spanned-table", "# Spanned table\n\n+-------+-------------+\n| First | " + string.Join(" ", Enumerable.Repeat("Café **wrap**", 120)) + "\n+-------+ carries     +\n| Next  | continued   |\n+-------+-------------+\n\n# Last\n\nLast marker.", "Last marker."),
@@ -195,6 +196,7 @@ internal static class NativeContinuousPerformanceChecks
                 passed &= correct && withinBudget;
                 var observation = new
                 {
+                    RuntimeExperiment = runtimeLab,
                     SegmentedNativePrototype = segmentedPrototype, PrototypeChunkSize = segmentedPrototype ? 64 : 0,
                     WarningCount = result.Warnings.Count,
                     fixture.Name, ParsingMilliseconds = parsing, ImageAndDiagramPreparationMilliseconds = preparation,
@@ -224,6 +226,11 @@ internal static class NativeContinuousPerformanceChecks
                     SelectedTarget = selectedTarget, Operations = operations,
                     AnchorChecks = anchorChecks,
                     ViewportAnchorProbe = new { Enabled = checkAnchors, Milliseconds = visibleAnchorMilliseconds, SourceOffset = visibleAnchor, Boundary = "Outside readiness and first-layout clocks" },
+                    RuntimeLab = runtimeLab ? new {
+                        WpfFrameworkSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(FlowDocument).Assembly.Location))),
+                        ReuseCount = typeof(FlowDocument).Assembly.GetType("MS.Internal.PtsHost.ListMarkerLine")?.GetField("_lensDiagnosticReuseCount", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)?.GetValue(null),
+                        ReadyToRun = Environment.GetEnvironmentVariable("DOTNET_ReadyToRun")
+                    } : null,
                     Environment = new { OS = Environment.OSVersion.ToString(), Runtime = Environment.Version.ToString(), Environment.ProcessorCount,
                         NativeAssemblySha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location))),
                         Dpi = VisualTreeHelper.GetDpi(viewer).PixelsPerInchX, Appearance = SystemParameters.HighContrast ? "High Contrast" : "Light",
@@ -245,8 +252,8 @@ internal static class NativeContinuousPerformanceChecks
             }
             File.WriteAllText(Path.Combine(output, "acceptance.json"), JsonSerializer.Serialize(new
             {
-                Status = segmentedPrototype ? "EXPERIMENT_ONLY" : passed ? "PASS" : "FAIL",
-                AcceptanceEligible = !segmentedPrototype, MeasuredBudgetResult = passed ? "PASS" : "FAIL", Enforced = acceptance, ThresholdMilliseconds = 250,
+                Status = segmentedPrototype || runtimeLab ? "EXPERIMENT_ONLY" : passed ? "PASS" : "FAIL",
+                AcceptanceEligible = !segmentedPrototype && !runtimeLab, MeasuredBudgetResult = passed ? "PASS" : "FAIL", Enforced = acceptance, ThresholdMilliseconds = 250,
                 Boundary = "Input callback queued before attachment, synchronous Measure/Arrange/UpdateLayout and dispatcher delivery; unchanged original first-layout boundary",
                 ReadinessBoundary = "Before parsing through full construction, attachment, initial layout and ApplicationIdle; no required content deferred",
                 Samples = samples
