@@ -51,7 +51,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh run download 39137475867 --repo DouglasNLima/local-docs-studio --name native-validation --dir artifacts/original-749
-      - name: Five predetermined independent first launches, including failures
+      - name: Five independent launches and a controlled focus schedule, retaining every result
         run: pwsh -NoProfile -File scripts/native/Test-NativeFirstLaunch.ps1
       - uses: actions/upload-artifact@v4
         if: always()

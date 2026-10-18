@@ -14,6 +14,12 @@ public partial class MainWindow
     private string diagnosticPhase = "idle";
     private string? diagnosticError;
 
+    private void CancelPreview()
+    {
+        if (previewCancellation is { IsCancellationRequested: false }) PreviewConstructionEvents.Log.Stage("shell/cancel-requested", diagnosticRequest);
+        previewCancellation?.Cancel();
+    }
+
     private void PublishPreviewDiagnostic(string phase)
     {
         diagnosticPhase = phase;

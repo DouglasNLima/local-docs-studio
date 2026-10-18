@@ -59,6 +59,12 @@ jobs:
           dotnet-version: 10.0.x
       - name: Compare identical compiled harness and unchanged fixture bytes on this host
         run: pwsh -NoProfile -File scripts/native/Test-ContinuousPreviewPerformance.ps1 -Replication ${{ matrix.replication }}
+      - name: Independent viewport anchors against the retained exhaustive geometry oracle
+        if: always()
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --viewport-anchors artifacts/continuous-performance/anchor-correctness
+      - name: Experimental native list segmentation, never product acceptance
+        if: always()
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --segmented-native-prototype artifacts/continuous-performance/segmented-prototype
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -67,4 +73,6 @@ jobs:
             artifacts/continuous-performance/protocol.json
             artifacts/continuous-performance/comparison.json
             artifacts/continuous-performance/samples/
+            artifacts/continuous-performance/anchor-correctness/
+            artifacts/continuous-performance/segmented-prototype/
           retention-days: 30

@@ -39,7 +39,7 @@ public partial class MainWindow
     }
     private void CompleteClose()
     {
-        closing = true; previewCancellation?.Cancel(); previewTimer.Stop(); recoveryTimer.Stop();
+        closing = true; CancelPreview(); previewTimer.Stop(); recoveryTimer.Stop();
         updates?.Dispose(); model.Dispose(); Close();
     }
 }

@@ -54,6 +54,16 @@ internal static class Program
             try { NativeMermaidPerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--segmented-native-prototype")
+        {
+            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", repetitions: 2, segmentedPrototype: true); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--viewport-anchors")
+        {
+            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", checkAnchors: true); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() is "--continuous-performance" or "--continuous-acceptance")
         {
             try
@@ -110,7 +120,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--suite-baseline-ui" or "--suite-ui" or "--first-launch-ui" or "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
+        if (args.FirstOrDefault() is "--suite-baseline-ui" or "--suite-ui" or "--outline-focus-holder" or "--first-launch-ui" or "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -145,6 +155,7 @@ internal static class Program
             try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--outline-focus-holder") return NativeOutlineFocusProbe.Hold();
         if (args.FirstOrDefault() == "--first-launch-ui") return NativeUiChecks.Run(args[1], args[2], requireBundledRuntime: true, firstLaunchOnly: true);
         if (args.FirstOrDefault() == "--ui")
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui",

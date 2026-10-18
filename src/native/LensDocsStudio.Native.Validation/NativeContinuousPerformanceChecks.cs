@@ -19,7 +19,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeContinuousPerformanceChecks
 {
-    public static void Run(string output, string? scenario = null, bool acceptance = false, int repetitions = 1, bool edited = false)
+    public static void Run(string output, string? scenario = null, bool acceptance = false, int repetitions = 1, bool edited = false, bool checkAnchors = false, bool segmentedPrototype = false)
     {
         Directory.CreateDirectory(output);
         var dispatcher = Dispatcher.CurrentDispatcher;
@@ -28,6 +28,10 @@ internal static class NativeContinuousPerformanceChecks
         try
         {
             var fixtures = ContinuousPreviewFixtures.Create(output, scenario);
+            if (checkAnchors) fixtures = [.. fixtures,
+                ("anchor-footnotes", "# Reference\n\nReference [^early].\n\n[^early]: Early note.\n\n# Body\n\n" + string.Join("\n\n", Enumerable.Range(0, 150).Select(i => "Body paragraph " + i)) + "\n\n# Last\n\nLast marker.", "Last marker."),
+                ("anchor-wrapped-table", "# Wrapped rows\n\n| Long | Short |\n|---|---|\n| " + string.Join(" ", Enumerable.Repeat("wrapped **Café 😀** content", 160)) + " | small |\n| second | row |\n\n# Last anchor\n\nLast marker.", "Last marker."),
+                ("anchor-nested-list", "# Nested\n\n42. First\n    - Inner **bold**\n    - " + string.Join(" ", Enumerable.Repeat("wrapped inner", 300)) + "\n43. Next\n\n# Details container\n\n<details>\n<summary>Closed</summary>\n\nHidden.\n\n</details>\n\n# Last\n\nLast marker.", "Last marker.")];
             if (repetitions is < 1 or > 8) throw new ArgumentOutOfRangeException(nameof(repetitions));
             var samples = new List<object>(); var passed = true;
             var documents = new List<WeakReference>();
@@ -101,14 +105,18 @@ internal static class NativeContinuousPerformanceChecks
                     }, new JsonSerializerOptions { WriteIndented = true }));
                     throw;
                 }
-                var result = task.GetAwaiter().GetResult(); var construction = watch.Elapsed.TotalMilliseconds;
+                var result = task.GetAwaiter().GetResult();
+                if (segmentedPrototype) SegmentNativeLists(result.Document);
+                var construction = watch.Elapsed.TotalMilliseconds;
                 var constructionAllocation = constructionTrace.AllocatedBytes; var constructionCpu = constructionTrace.ThreadCpuMilliseconds;
                 constructionTrace.Dispose();
                 Input(); var layoutStart = watch.Elapsed.TotalMilliseconds; var layoutInput = -1d;
                 var firstLayoutInput = dispatcher.BeginInvoke(DispatcherPriority.Input, () => { layoutInput = watch.Elapsed.TotalMilliseconds - layoutStart; Input(); });
+                ContinuousHarnessEvents.Log.Stage("harness/first-layout-start");
                 var at = watch.Elapsed.TotalMilliseconds; viewer.Document = result.Document; attach = watch.Elapsed.TotalMilliseconds - at;
                 var beforeLayout = watch.Elapsed.TotalMilliseconds; Layout(); firstLayout = watch.Elapsed.TotalMilliseconds - beforeLayout;
                 Pump(firstLayoutInput.Task);
+                ContinuousHarnessEvents.Log.Stage("harness/first-layout-end");
                 if (fixture.Name == "large-4mb")
                     File.WriteAllText(Path.Combine(output, fixture.Name + "-first-layout.json"), JsonSerializer.Serialize(new
                     {
@@ -141,6 +149,9 @@ internal static class NativeContinuousPerformanceChecks
                 var completedAllocation = GC.GetTotalAllocatedBytes() - allocated;
                 var layoutStages = new { viewer.MeasureMilliseconds, viewer.ArrangeMilliseconds, viewer.UpdateLayoutMilliseconds,
                     viewer.MeasureCalls, viewer.ArrangeCalls };
+                ContinuousHarnessEvents.Log.Stage("harness/correctness-start");
+                var mapProbe = Stopwatch.StartNew(); var visibleAnchor = result.TextMap.VisibleSource(300); mapProbe.Stop();
+                var visibleAnchorMilliseconds = mapProbe.Elapsed.TotalMilliseconds;
                 var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32);
                 var backing = new DrawingVisual();
                 using (var context = backing.RenderOpen()) context.DrawRectangle(Brushes.White, null, new Rect(0, 0, 640, 300));
@@ -148,6 +159,8 @@ internal static class NativeContinuousPerformanceChecks
                 var raster = watch.Elapsed.TotalMilliseconds;
                 var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
                 using (var file = File.Create(Path.Combine(sampleOutput, fixture.Name + "-initial.png"))) encoder.Save(file);
+                if (checkAnchors && result.TextMap.VisibleSource(300) != ViewportAnchorReference.VisibleSource(result.TextMap, 300))
+                    throw new IOException("The initial viewport, including closed details, differs from the exhaustive anchor oracle.");
                 var completeText = result.ReadText().Contains(fixture.Last, StringComparison.Ordinal);
                 var last = result.SourceElements.MaxBy(item => item.Key).Value;
                 viewer.Selection.Select(last.ContentStart, last.ContentEnd);
@@ -157,11 +170,26 @@ internal static class NativeContinuousPerformanceChecks
                 var targetVisible = !rectangle.IsEmpty && rectangle.Top >= 0 && rectangle.Bottom <= scrolling.ViewportHeight;
                 var selectedTarget = viewer.Selection.Text.Contains(edited ? "Changed distant content" : fixture.Last, StringComparison.Ordinal);
                 using var process = Process.GetCurrentProcess();
+                var anchorChecks = new List<object>();
+                if (checkAnchors)
+                {
+                    foreach (var fraction in new[] { 0d, .5, 1d })
+                    {
+                        scrolling.ScrollToVerticalOffset(scrolling.ScrollableHeight * fraction); Layout();
+                        var scan = Stopwatch.StartNew(); var expectedAnchor = ViewportAnchorReference.VisibleSource(result.TextMap, 300); scan.Stop();
+                        var indexed = Stopwatch.StartNew(); var actualAnchor = result.TextMap.VisibleSource(300); indexed.Stop();
+                        anchorChecks.Add(new { Fraction = fraction, ExpectedSourceOffset = expectedAnchor, ActualSourceOffset = actualAnchor,
+                            ExhaustiveMilliseconds = scan.Elapsed.TotalMilliseconds, IndexedMilliseconds = indexed.Elapsed.TotalMilliseconds });
+                        if (actualAnchor != expectedAnchor) throw new IOException("Indexed viewport anchor differs from the retained exhaustive native geometry oracle: " + fixture.Name);
+                    }
+                }
                 var correct = completeText && targetVisible && selectedTarget && parsed.Source == source && result.Warnings.Count == 0;
                 var withinBudget = inputAt >= 0 && inputAt < 250 && layoutInput >= 0 && layoutInput <= 250 && maximumGap < 250;
                 passed &= correct && withinBudget;
                 var observation = new
                 {
+                    SegmentedNativePrototype = segmentedPrototype, PrototypeChunkSize = segmentedPrototype ? 64 : 0,
+                    WarningCount = result.Warnings.Count,
                     fixture.Name, ParsingMilliseconds = parsing, ImageAndDiagramPreparationMilliseconds = preparation,
                     Repetition = repetition, Temperature = repetition == 0 ? "First fixture execution in this process (no prewarm)" : "Repeated fresh construction in the same process",
                     Edited = edited, SourceUtf8Bytes = Encoding.UTF8.GetByteCount(source),
@@ -187,6 +215,8 @@ internal static class NativeContinuousPerformanceChecks
                     SourceElementCount = result.SourceElements.Count,
                     Structure = Structure(result.Document.Blocks),
                     SelectedTarget = selectedTarget, Operations = operations,
+                    AnchorChecks = anchorChecks,
+                    ViewportAnchorProbe = new { Milliseconds = visibleAnchorMilliseconds, SourceOffset = visibleAnchor, Boundary = "Outside readiness and first-layout clocks" },
                     Environment = new { OS = Environment.OSVersion.ToString(), Runtime = Environment.Version.ToString(), Environment.ProcessorCount,
                         NativeAssemblySha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location))),
                         Dpi = VisualTreeHelper.GetDpi(viewer).PixelsPerInchX, Appearance = SystemParameters.HighContrast ? "High Contrast" : "Light",
@@ -208,7 +238,8 @@ internal static class NativeContinuousPerformanceChecks
             }
             File.WriteAllText(Path.Combine(output, "acceptance.json"), JsonSerializer.Serialize(new
             {
-                Status = passed ? "PASS" : "FAIL", Enforced = acceptance, ThresholdMilliseconds = 250,
+                Status = segmentedPrototype ? "EXPERIMENT_ONLY" : passed ? "PASS" : "FAIL",
+                AcceptanceEligible = !segmentedPrototype, MeasuredBudgetResult = passed ? "PASS" : "FAIL", Enforced = acceptance, ThresholdMilliseconds = 250,
                 Boundary = "Input callback queued before attachment, synchronous Measure/Arrange/UpdateLayout and dispatcher delivery; unchanged original first-layout boundary",
                 ReadinessBoundary = "Before parsing through full construction, attachment, initial layout and ApplicationIdle; no required content deferred",
                 Samples = samples
@@ -222,6 +253,27 @@ internal static class NativeContinuousPerformanceChecks
             if (acceptance && !passed) throw new IOException("Continuous 250 ms acceptance FAILED; see acceptance.json and every raw sample.");
         }
         finally { SynchronizationContext.SetSynchronizationContext(previous); }
+    }
+
+    // Experimental native-list segmentation only. Never used by the application.
+    // It changes logical list grouping and is not a production semantics acceptance.
+    private static void SegmentNativeLists(FlowDocument document)
+    {
+        foreach (var list in document.Blocks.OfType<System.Windows.Documents.List>().ToArray())
+        {
+            var items = list.ListItems.ToArray(); if (items.Length <= 64) continue;
+            var count = 0;
+            while (count < items.Length)
+            {
+                var segment = new System.Windows.Documents.List { MarkerStyle = list.MarkerStyle, StartIndex = list.StartIndex + count,
+                    Padding = list.Padding, Margin = new Thickness(list.Margin.Left, count == 0 ? list.Margin.Top : 0,
+                        list.Margin.Right, count + 64 >= items.Length ? list.Margin.Bottom : 0) };
+                document.Blocks.InsertBefore(list, segment);
+                foreach (var item in items.Skip(count).Take(64)) { list.ListItems.Remove(item); segment.ListItems.Add(item); }
+                count += 64;
+            }
+            document.Blocks.Remove(list);
+        }
     }
 
     private static object Structure(BlockCollection blocks)

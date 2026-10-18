@@ -14,8 +14,29 @@ public sealed record PreviewLiteral(Run Run, LiteralSourceSpan Source, int RunOf
 public sealed class PreviewSourceMap
 {
     private readonly PreviewLiteral[] literals;
+    private readonly PreviewLiteral[][] verticalGroups;
     public IReadOnlyList<PreviewLiteral> Literals => literals;
-    public PreviewSourceMap(IEnumerable<PreviewLiteral> literals) => this.literals = literals.OrderBy(item => item.Source.Start).ToArray();
+    public PreviewSourceMap(IEnumerable<PreviewLiteral> literals)
+    {
+        // The renderer supplies visual document order (including relocated footnotes).
+        // Source lookup retains its independent source-order index.
+        var displayLiterals = literals.ToArray();
+        this.literals = displayLiterals.OrderBy(item => item.Source.Start).ToArray();
+        // Paragraphs flow vertically, but the source order of table cells does not:
+        // a wrapped first cell can end below the start of its following cell.
+        // Index the complete outer row as one vertical group in that case.
+        verticalGroups = displayLiterals.GroupBy(VerticalOwner).Select(group => group.ToArray()).ToArray();
+    }
+    private static DependencyObject VerticalOwner(PreviewLiteral literal)
+    {
+        DependencyObject? owner = null;
+        for (DependencyObject? node = literal.Run; node is FrameworkContentElement content; node = content.Parent)
+        {
+            if (owner is null && node is Paragraph) owner = node;
+            if (node is TableRow) owner = node;
+        }
+        return owner ?? literal.Run;
+    }
 
     public bool TryPreviewRange(int start, int length, out TextPointer? from, out TextPointer? to)
     {
@@ -89,10 +110,35 @@ public sealed class PreviewSourceMap
     }
     private static bool EmptyFormattingGap(TextPointer from, TextPointer to)
         => from.IsInSameDocument(to) && from.GetOffsetToPosition(to) is >= 0 and <= 128 && new TextRange(from, to).Text.Length == 0;
+    private IEnumerable<PreviewLiteral> ViewportLiterals(double height)
+    {
+        // Validity is evaluated afresh for details toggles. Unknown geometry falls
+        // back to the exhaustive scan instead of guessing a source anchor.
+        var visibleGroups = verticalGroups.Where(group => group[0].Start.HasValidLayout).ToArray();
+        var low = 0; var high = visibleGroups.Length;
+        while (low < high)
+        {
+            var middle = (low + high) / 2;
+            var rectangle = visibleGroups[middle][0].Start.GetCharacterRect(LogicalDirection.Forward);
+            if (rectangle.IsEmpty) return literals;
+            if (rectangle.Top < 0) low = middle + 1; else high = middle;
+        }
+        var candidates = new List<PreviewLiteral[]>();
+        // The preceding paragraph/row may span the viewport's top edge.
+        for (var index = Math.Max(0, low - 1); index < visibleGroups.Length; index++)
+        {
+            var group = visibleGroups[index];
+            var top = group[0].Start.GetCharacterRect(LogicalDirection.Forward);
+            if (top.IsEmpty) return literals;
+            if (top.Top > height) break;
+            candidates.Add(group);
+        }
+        return candidates.SelectMany(group => group);
+    }
     public int? VisibleSource(double height)
     {
         var wanted = height / 3; var best = double.PositiveInfinity; int? source = null;
-        foreach (var literal in literals)
+        foreach (var literal in ViewportLiterals(height))
         {
             var first = literal.Start; var last = literal.End;
             if (!first.HasValidLayout || !last.HasValidLayout) continue;

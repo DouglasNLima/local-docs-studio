@@ -1,5 +1,5 @@
 param(
-    [string]$BaselineRevision = '9a64dfa5adf79dc447db1f671ea39c94ec42de40',
+    [string]$BaselineRevision = '0237b08390d5d1d946c0b19b81d671ccd54fb951',
     [string]$OutputDirectory = 'artifacts/continuous-performance',
     [ValidateSet(1,2)][int]$Replication = 1
 )

@@ -118,7 +118,7 @@ public partial class MainWindow : Window
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
-        CancelSynchronisation(); previewCancellation?.Cancel(); viewportGeneration++;
+        CancelSynchronisation(); CancelPreview(); viewportGeneration++;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
@@ -144,12 +144,12 @@ public partial class MainWindow : Window
         BindActiveDocument(); QueuePreview();
         QueueActiveTabVisibility();
     }
-    private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); if (!closing) previewTimer.Start(); }
+    private void QueuePreview() { CancelPreview(); previewTimer.Stop(); if (!closing) previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
         if (closing) return;
-        previewCancellation?.Cancel();
+        CancelPreview();
         model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
@@ -165,7 +165,7 @@ public partial class MainWindow : Window
         var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";
         var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
-        previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
+        CancelPreview(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
         var appearance = model.Theme;
         var dark = ThemeService.IsDark(appearance);
@@ -201,7 +201,7 @@ public partial class MainWindow : Window
                 return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
             Phase("prepare-await-end");
-            if (!Current()) return;
+            if (!Current()) { Phase("stale-rejected"); return; }
             if (!preparePreview)
             {
                 parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = null; renderedDocumentId = null;
@@ -225,7 +225,7 @@ public partial class MainWindow : Window
                 var formulae = previewMaths.Prepare(prepared.source, dark, cancellation);
                 return (drawings, images, formulae);
             }, cancellation);
-            if (!Current()) return;
+            if (!Current()) { Phase("stale-rejected"); return; }
             Phase("media-await-end");
             Phase("construction-await-start");
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
@@ -238,7 +238,7 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset),
                 offset => OpenMermaidVisualEditor(tab, prepared.source, sourceVersion, offset));
-            if (!Current()) return;
+            if (!Current()) { Phase("stale-rejected"); return; }
             Phase("construction-await-end");
             Phase("selection-capture-start");
             var previewSelection = CapturePreviewSelection();
@@ -250,6 +250,7 @@ public partial class MainWindow : Window
             Phase("attachment-start");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
             Phase("attachment-end");
+            Phase("installed");
             Phase("sync-install-start");
             InstallSyncPreview(sourceVersion);
             Phase("sync-install-end");

@@ -180,10 +180,15 @@ internal static class NativePreviewSchedulingChecks
                     if (!transitionStarted) return;
                     var actual = NativeTestHighContrast.IsEnabledNow;
                     var currentColour = preview.Document?.Foreground is SolidColorBrush brush && brush.Color == SystemColors.WindowTextColor;
-                    if (actual && !currentColour) obsoleteAppearance = true;
+                    if (!CorrectColour(actual)) obsoleteAppearance = true;
                     if (installed.Count < 64) installed.Add(new { ActualHighContrast = actual, WpfHighContrast = SystemParameters.HighContrast,
                         CurrentSystemColour = currentColour, Colour = preview.Document?.Foreground?.ToString(), ExpectedColour = SystemColors.WindowTextColor.ToString() });
                 };
+                bool CorrectColour(bool expected)
+                {
+                    var colour = expected ? SystemColors.WindowTextColor : Color.FromRgb(32, 33, 36);
+                    return preview.Document?.Foreground is SolidColorBrush value && value.Color == colour;
+                }
                 documentProperty.AddValueChanged(preview, installation);
                 try
                 {
@@ -220,7 +225,7 @@ internal static class NativePreviewSchedulingChecks
                     diagnostic?.Mark("waiting-for-notification");
                     Pump(WaitForAppearanceAsync(true));
                     diagnostic?.Mark("waiting-for-preview");
-                    Invoke("QueuePreview"); Pump(WaitForCurrentAppearanceAsync()); Drain();
+                    Pump(WaitForCurrentAppearanceAsync(true)); Drain();
                     diagnostic?.Mark("preview-ready");
                     File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
                     {
@@ -235,14 +240,30 @@ internal static class NativePreviewSchedulingChecks
                     cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true,
                         AppearanceNotificationAndCurrentPreviewMilliseconds = appearanceWait.Elapsed.TotalMilliseconds });
 
-                    async Task WaitForCurrentAppearanceAsync()
+                    previousDocument = preview.Document;
+                    diagnostic?.Mark("disabling-os");
+                    var disableWatch = Stopwatch.StartNew();
+                    Pump(Task.Run(transition!.Dispose)); transition = null;
+                    Pump(WaitForAppearanceAsync(false));
+                    // Observe the application's notification path before any cleanup can apply a theme.
+                    Pump(WaitForCurrentAppearanceAsync(false)); Drain();
+                    if (editor.TextArea.TextView.LineTransformers.OfType<LensDocsStudio.Native.Editor.MarkdownHighlighting>().Single().HighContrast
+                        || application.Resources["WindowBrush"] is not SolidColorBrush normalBrush || normalBrush.Color != Color.FromRgb(250, 250, 250))
+                        throw new IOException("Disabling actual High Contrast did not restore editor and shell appearance automatically.");
+                    File.WriteAllText(Path.Combine(output, "high-contrast-disable.json"), JsonSerializer.Serialize(new {
+                        Automatic = true, ManualApplyTheme = false, ActualHighContrast = NativeTestHighContrast.IsEnabledNow,
+                        WpfHighContrast = SystemParameters.HighContrast, ElapsedMilliseconds = disableWatch.Elapsed.TotalMilliseconds,
+                        ObsoleteAppearance = obsoleteAppearance, Installations = installed }));
+                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast automatically disabled", NotificationAndCurrentPreviewMilliseconds = disableWatch.Elapsed.TotalMilliseconds });
+                    diagnostic?.Mark("disabled-preview-ready");
+
+                    async Task WaitForCurrentAppearanceAsync(bool expected)
                     {
                         var wait = Stopwatch.StartNew();
                         while (true)
                         {
                             if (obsoleteAppearance) throw new IOException("An obsolete appearance installed while waiting for the current render.");
-                            if (preview.Document != previousDocument && preview.Document.Foreground is SolidColorBrush currentBrush
-                                && currentBrush.Color == SystemColors.WindowTextColor
+                            if (preview.Document != previousDocument && CorrectColour(expected)
                                 && Field("renderedVersion") is ICSharpCode.AvalonEdit.Document.ITextSourceVersion version
                                 && version.CompareAge(model.ActiveDocument!.EditorDocument.Version) == 0
                                 && model.PreviewStatus.StartsWith("Preview updated", StringComparison.Ordinal)) return;
@@ -255,9 +276,11 @@ internal static class NativePreviewSchedulingChecks
                 {
                     documentProperty.RemoveValueChanged(preview, installation);
                     diagnostic?.Mark("restoring-os");
-                    if (transition is not null) Pump(Task.Run(transition.Dispose));
-                    Pump(WaitForAppearanceAsync(false)); Invoke("ApplyTheme"); Invoke("QueuePreview");
-                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    if (transition is not null)
+                    {
+                        // Failure cleanup restores the disposable OS only; it cannot satisfy either acceptance assertion.
+                        Pump(Task.Run(transition.Dispose)); Pump(WaitForAppearanceAsync(false));
+                    }
                     diagnostic?.Mark("os-restored"); transitionWatch = null;
                 }
                 if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");

@@ -16,13 +16,14 @@ internal static partial class NativeUiChecks
         const string fixture = "# Root\n\n## Branch\n\n### Leaf\n\n## Other\n\nPortable outline content.\n";
         var clipboard = NativeUiClipboard.GetDataObject(); uint owned = 0;
         Exception? primary = null;
+        NativeOutlineFocusProbe? focusProbe = null;
         var outline = Find(window, "Outline").AsListBox(); var filter = Find(window, "OutlineFilter").AsTextBox();
         try
         {
-            Observe("before-input");
+            focusProbe = NativeOutlineFocusProbe.StartIfRequested();
+            if (Environment.GetEnvironmentVariable("LENS_NATIVE_OUTLINE_FOCUS_PROBE") == "repaired") FocusWindow(window);
             editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
             NativeUiClipboard.SetText(fixture); owned = GetClipboardSequenceNumber();
-            Observe("before-paste");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => ReadEditorText(editor) == fixture && outline.Items.Length == 4, "The native outline did not expose its current hierarchy.");
             var previewStatus = Find(window, "PreviewStatus").Name;
@@ -55,6 +56,7 @@ internal static partial class NativeUiChecks
         }
         finally
         {
+            try { focusProbe?.Dispose(); } catch when (primary is not null) { }
             try
             {
                 filter.Text = ""; Group("Expand all heading groups"); editor.Focus();

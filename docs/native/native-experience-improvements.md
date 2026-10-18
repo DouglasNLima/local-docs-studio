@@ -1,5 +1,7 @@
 # Native experience improvements
 
+Continuation after `0237b08`: **in progress; the original goal is incomplete**. A shown-shell profile identifies exhaustive viewport source mapping as a major dispatcher cost. The continuation adds a document-owned paragraph/table-row index and checks exact anchors against the retained exhaustive geometry oracle. Actual automatic High Contrast restoration, installed first-launch causality, final-head packages and controlled acceptance are still pending. The original `.749` failure is retained; ten later original-package launches passed without explaining it. See [the continuation report](continuous-preview-performance-refinement.md#continuation-after-0237b08-in-progress).
+
 This Continuous preview continuation is stacked on open PR #36 at 9a64dfa5. Its [focused report](continuous-preview-performance-refinement.md) owns the plain-text/table refinement, current-version and selection guards, controlled six-fixture comparison and new interaction coverage. The controlled 250 ms target remains incomplete: list, mixed and some paragraph/table samples fail. Earlier green compatibility/package records do not certify it; the final Draft PR #37 receipt owns exact-head checks and package readiness.
 
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
