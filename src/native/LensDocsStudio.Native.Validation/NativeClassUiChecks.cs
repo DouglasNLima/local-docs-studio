@@ -108,7 +108,7 @@ internal static partial class NativeUiChecks
         void WaitClosed() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("ClassVisualEditor"))) is null, "Class editor did not close."); visual = null; }
         void Resize(int width, int height) { visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height); Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && Math.Abs(visual.BoundingRectangle.Height - height) < 3 && FooterSettled(), "Class viewport did not settle."); }
         bool FooterSettled() { var window = visual!.BoundingRectangle; var footer = Find(visual, "ClassApply").BoundingRectangle; return window.Right - footer.Right is >= 4 and <= 32 && window.Bottom - footer.Bottom is >= 4 and <= 24; }
-        void Capture(string name) { Wait(FooterSettled, "Class client layout incomplete before capture."); if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Native Class app did not become idle before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
+        void Capture(string name) { Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); Wait(FooterSettled, "Class client layout incomplete before capture."); if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Native Class app did not become idle before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
         void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Class discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
         void RunAdditionalCases()
@@ -117,6 +117,7 @@ internal static partial class NativeUiChecks
             foreach (var (name, raw) in new[] {
                 ("unknown-protected", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n"),
                 ("identical-occurrences", "classDiagram\nclass A {\n+string Name\n+string Name\n+Run(path) bool\n+Run(path) bool\n}\nA --> A : self\nA --> A : self\n"),
+                ("empty-cardinalities", "classDiagram\nclass A\nA \"\" --> \"\" A : original\n"),
                 ("empty-final", "classDiagram\nclass A\n") })
             {
                 var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); Launch(fixture); Open(0);
@@ -125,6 +126,11 @@ internal static partial class NativeUiChecks
                     SelectClass("A"); Check(!Find(visual!, "ClassNodeId").IsEnabled && !Find(visual!, "ClassDelete").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled, "Unknown global syntax protects native class structure without history");
                     SelectMember("A", 0); Check(!Find(visual!, "ClassAttributeName").IsEnabled && !Find(visual!, "ClassUpdate").IsEnabled, "Unknown dependencies cannot be overwritten through member properties");
                     Check(!string.IsNullOrWhiteSpace(Find(visual!, "ClassUpdate").Properties.HelpText.ValueOrDefault), "Protected commands expose accessible operation reasons"); Capture(name); Click("ClassCancel"); WaitClosed();
+                }
+                else if (name == "empty-cardinalities")
+                {
+                    SelectRelationship(0); Set("ClassLabel", "changed"); Click("ClassUpdate"); Await(model => model.Relationships[0].Semantic.Label == "changed");
+                    Check(Draft() == raw.Replace("original", "changed", StringComparison.Ordinal), "Unrelated native relationship properties preserve both quoted empty cardinalities"); Click("ClassCancel"); Discard(); WaitClosed();
                 }
                 else if (name == "empty-final")
                 {

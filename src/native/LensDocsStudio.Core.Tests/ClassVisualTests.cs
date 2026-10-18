@@ -180,4 +180,23 @@ public class ClassVisualTests
         Assert.Equal(100, draft.HistoryCount); draft.Undo(); Assert.Equal(member.Identity, draft.Selection); Assert.True(draft.CanRedo);
         Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "Branch" }))); Assert.False(draft.CanRedo);
     }
+    [Fact] public async Task Unrelated_method_changes_preserve_parameter_spacing_and_statement_terminators()
+    {
+        var source = "classDiagram\r\nclass A {\n    +   Open( path, options )   Document;\r\n}\n"; var draft = new ClassDiagramVisualDraft(source); var member = draft.Model.Class("A").Methods[0];
+        Assert.Equal("path, options", member.Semantic.Params); Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Visibility = ClassVisibility.Private })));
+        Assert.Equal(source.Replace("+   Open", "-   Open", StringComparison.Ordinal), draft.Source); draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+    [Fact] public async Task Empty_quoted_cardinalities_remain_distinct_from_absent_cardinalities()
+    {
+        var source = "classDiagram\nclass A\nclass B\nA \"\" --> \"\" B : original\n"; var draft = new ClassDiagramVisualDraft(source); var relationship = draft.Model.Relationships[0];
+        Assert.Equal("", relationship.Semantic.FromCardinality); Assert.Equal("", relationship.Semantic.ToCardinality);
+        Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" })));
+        Assert.Equal(source.Replace("original", "changed", StringComparison.Ordinal), draft.Source); draft.Undo(); Assert.Equal(source, draft.Source);
+    }
+    [Fact] public async Task Solid_link_labels_preserve_notation_and_direction_reversal_does_not_invent_a_marker()
+    {
+        var source = "classDiagram\nclass A\nclass B\nA -- B : original\n"; var draft = new ClassDiagramVisualDraft(source); var relationship = draft.Model.Relationships[0];
+        Assert.False((await draft.ExecuteAsync(new ReverseClassRelationship(relationship.Identity))).Success); Assert.Equal(source, draft.Source); Assert.Equal(1, draft.HistoryCount);
+        Success(await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" }))); Assert.Equal(source.Replace("original", "changed", StringComparison.Ordinal), draft.Source);
+    }
 }

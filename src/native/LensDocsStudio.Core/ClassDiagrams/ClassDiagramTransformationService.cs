@@ -172,7 +172,7 @@ public sealed class ClassDiagramTransformationService
                     var statement = member.Statement; var edits = new List<(MermaidSourceSpan Span, string Text)>();
                     void Edit(string token, string value) { var span = statement.Tokens[token]; if (span.Read(model.Source) != value) edits.Add((span, value)); }
                     Edit("visibility", Visibility(update.Member.Visibility)); Edit("name", update.Member.Name); Edit("modifier", Modifier(update.Member));
-                    if (update.Member.IsMethod) Edit("parameters", update.Member.Params ?? "");
+                    if (update.Member.IsMethod && member.Semantic.Params != update.Member.Params) Edit("parameters", update.Member.Params ?? "");
                     if (member.Semantic.Type != update.Member.Type)
                     {
                         if (statement.Tokens.TryGetValue("type", out var type))
@@ -223,7 +223,9 @@ public sealed class ClassDiagramTransformationService
                 Append("    " + RelationshipText(add.Relationship) + model.NewLine, 1); relationships.Add(add.Relationship); break;
             case UpdateClassRelationship update: RelationshipUpdate(update.Identity, update.Relationship); break;
             case ReverseClassRelationship reverse:
-                var value = model.Relationship(reverse.Identity).Semantic;
+                var reversed = model.Relationship(reverse.Identity);
+                if (reversed.Statement.Read(model.Source, "arrow") == "--") throw new ArgumentException("A portable solid link has no marker to reverse, although the pinned renderer models it as an association. Choose an explicit relationship type/marker or use Edit source.");
+                var value = reversed.Semantic;
                 RelationshipUpdate(reverse.Identity, value with { From = value.To, To = value.From, MarkerAt = value.MarkerAt == ClassMarkerAt.From ? ClassMarkerAt.To : ClassMarkerAt.From, FromCardinality = value.ToCardinality, ToCardinality = value.FromCardinality }); break;
             case DeleteClassRelationship delete:
                 Global(); var deleted = model.Relationship(delete.Identity); Orphan(deleted); Remove(deleted.Statement); relationships.RemoveAt(model.Relationships.ToList().FindIndex(item => item.Identity == delete.Identity)); break;

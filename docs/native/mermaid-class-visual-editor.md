@@ -153,7 +153,7 @@ inspectable. Notes remain list-only where SVG lacks an exact note identity.
 ## Current engineering evidence and outstanding certification
 
 The native solution builds with zero warnings/errors. The latest local complete
-Core run passed 1,610 tests (including the new Class tests), with zero skips.
+Core run passed 1,623 tests (including 95 Class tests), with zero skips.
 Static integrity passed for 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime dependency scans. These are development observations, not final-HEAD
 certification; additional changes require fresh results.
@@ -215,3 +215,74 @@ empty endpoint IDs and refused the operation. The two bindings are corrected to
 `Identity`. The rejection retained the private source/history and owning document.
 Original `5f1e790` and instrumented `03ae936` failure receipts/screenshots are
 retained in `docs/native/evidence/class-visual-editor/`.
+
+
+### Source-preservation and guide follow-up
+
+Focused regressions now cover visibility-only edits retaining method parameter
+spacing/semicolons, label-only edits retaining quoted empty cardinalities, and
+rejection of direction reversal on a portable bare `--` link. Member types and
+parameters remain source text, rather than inferred references to other classes;
+ID rename updates actual Mermaid identity references and leaves such text intact.
+
+The `53df214` native corpus found a second exact help-topic count in the native
+help integration harness. Its clearing-search assertion is updated from 14 to 15
+alongside the existing Core topic/anchor checks. The original hosted failure log
+is retained in `evidence/class-visual-editor/53df214-native-help-failure.log`.
+Installer jobs skipped after this failure are not passing certification evidence.
+
+
+### Verified native authoring at `53df214`
+
+Both Class jobs in [UX run 39082652476](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39082652476)
+pass canonical fidelity, real authoring and real-process performance. Each covers
+28 light/dark fidelity fixtures, 237/238 correspondence/document checks and
+31/32 native UIA acceptance groups in normal/actual High Contrast respectively.
+These are revision-specific results; later source-preservation corrections still
+require final-HEAD runs. Receipts are stored in
+`evidence/class-visual-editor/53df214-*`.
+
+The actual Windows workflow completed Open → Select class → Add/edit attribute →
+Add/edit method → Add class → Create inheritance → Change composition/label/
+cardinalities → Reconnect → private Undo/Redo → Validate → Apply → one document
+Undo/Redo → Save → restart/reopen → verify exact source → cancel a separate changed
+draft. Additional native checks passed identical attributes, parallel self-links,
+unknown dependencies, deleting the final class, outside edits, conflicting edits,
+closed owners and another active tab.
+
+### Inspected screenshot gallery
+
+The following genuine hosted screenshots at `53df214` were visually inspected.
+All five requested window sizes retain footer actions and keyboard-accessible
+inspector scrolling. Source and element lists retain their own scrollbars.
+Selection outlines remain WPF overlays over the same canonical diagram. Some
+captures retain an ordinary hover tooltip; no image has been cosmetically edited.
+
+| Size | Normal | Actual Windows High Contrast |
+|---|---|---|
+| 880 × 600 | [Method inspector](images/class-visual-editor/normal-method-viewport-880x600.png) | [Method inspector](images/class-visual-editor/high-contrast-method-viewport-880x600.png) |
+| 1024 × 768 | [Method inspector](images/class-visual-editor/normal-method-viewport-1024x768.png) | [Method inspector](images/class-visual-editor/high-contrast-method-viewport-1024x768.png) |
+| 1280 × 800 | [Method inspector](images/class-visual-editor/normal-method-viewport-1280x800.png) | [Method inspector](images/class-visual-editor/high-contrast-method-viewport-1280x800.png) |
+| 1440 × 900 | [Method inspector](images/class-visual-editor/normal-method-viewport-1440x900.png) | [Method inspector](images/class-visual-editor/high-contrast-method-viewport-1440x900.png) |
+| 1920 × 1080 | [Method inspector](images/class-visual-editor/normal-method-viewport-1920x1080.png) | [Method inspector](images/class-visual-editor/high-contrast-method-viewport-1920x1080.png) |
+
+[Dark appearance](images/class-visual-editor/dark.png),
+[relationship properties](images/class-visual-editor/normal-relationship-inspector.png),
+[saved/reopened document](images/class-visual-editor/normal-saved-reopened.png).
+
+### Real-process performance observations at `53df214`
+
+Timings include UIA transport. They describe these synthetic fixtures only.
+
+| Classes / relationships | Editor open | 20 class selections | 20 member selections | 20 relationship selections | Private member edit | Working set after |
+|---|---:|---:|---:|---:|---:|---:|
+| 10 / 15 | 639 ms | 727 ms | 473 ms | 453 ms | 1,366 ms | 219 MiB |
+| 30 / 60 | 1,245 ms | 903 ms | 674 ms | 546 ms | 2,279 ms | 260 MiB |
+| 100 / 150 | 2,817 ms | 1,463 ms | 491 ms | 521 ms | 3,456 ms | 369 MiB |
+
+All three actual processes remained responsive and retained exact source, saved
+bytes and private Undo. Actual pointer updates measured a maximum of
+0.090–0.127 ms with no parsing/layout/conversion during movement. Native conversion
+and complete edit validation dominate larger operations. The 100-class case
+passed here; that does not erase the earlier ER workload's genuine resource failure
+or justify relaxing budgets. Native conversion cancellation limitations remain.

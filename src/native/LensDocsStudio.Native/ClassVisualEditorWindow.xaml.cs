@@ -157,7 +157,14 @@ public partial class ClassVisualEditorWindow : Window
     }
     private static string? Optional(string value) => value.Length == 0 ? null : value;
     private ClassMember MemberValue() => new(MemberVisibility.SelectedItem is ClassVisibility visibility ? visibility : ClassVisibility.None, AttributeName.Text, Optional(AttributeType.Text), StaticMember.IsChecked == true, AbstractMember.IsChecked == true, memberMethod, memberMethod ? Optional(Parameters.Text) : null);
-    private ClassRelationship RelationshipValue() => new(From.SelectedValue as string ?? "", To.SelectedValue as string ?? "", RelationshipType.SelectedValue is ClassRelationType type ? type : ClassRelationType.Association, MarkerAt.SelectedItem is ClassMarkerAt marker ? marker : ClassMarkerAt.To, Optional(LabelText.Text), Optional(FirstCardinality.Text), Optional(SecondCardinality.Text));
+    private ClassRelationship RelationshipValue()
+    {
+        var original = mode == "inspect" ? draft.Model.Relationships.FirstOrDefault(item => item.Identity == draft.Selection)?.Semantic : null;
+        // An existing quoted empty cardinality differs from an absent cardinality.
+        // An unrelated property edit must retain that exact source form.
+        static string? Cardinality(string value, string? before) => value.Length == 0 && before == "" ? "" : Optional(value);
+        return new(From.SelectedValue as string ?? "", To.SelectedValue as string ?? "", RelationshipType.SelectedValue is ClassRelationType type ? type : ClassRelationType.Association, MarkerAt.SelectedItem is ClassMarkerAt marker ? marker : ClassMarkerAt.To, Optional(LabelText.Text), Cardinality(FirstCardinality.Text, original?.FromCardinality), Cardinality(SecondCardinality.Text, original?.ToCardinality));
+    }
     private ClassDiagramEditOperation? UpdateOperation() => mode == "class" ? new AddClass(NodeId.Text, Optional(GenericText.Text), Optional(AnnotationText.Text))
         : mode is "attribute" or "method" ? new AddClassMember(attributeOwner ?? "", MemberValue()) : mode == "relationship" ? new AddClassRelationship(RelationshipValue())
         : draft.Model.Classes.FirstOrDefault(item => item.Identity == draft.Selection) is { } cls ? new UpdateClass(cls.Id, NodeId.Text, Optional(GenericText.Text), Optional(AnnotationText.Text))

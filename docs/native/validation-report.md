@@ -5,10 +5,11 @@ Class authoring is being implemented in [Draft PR #35](https://github.com/Dougla
 from consolidated `develop` `5b732cd`. The [Class engineering report](mermaid-class-visual-editor.md)
 owns the fifth-family grammar/capability boundaries and evidence. The exact
 post-merge native run `39080262652` and browser/static run `39080262674` passed.
-Class source/semantic tests and initial hosted canonical fidelity pass; the first
-normal/High Contrast UIA attempt failed at relationship inspector completion.
-The failure is retained and under investigation. Class packages, final UIA and
-final-HEAD regressions are not yet certified. Earlier evidence below retains its
+Class source/semantic tests and hosted canonical fidelity pass. The initial
+relationship-selector binding failure is retained, diagnosed and corrected. At
+`53df214`, normal/actual High Contrast UIA and real-process performance pass.
+The latest property-preservation and native help-count corrections still require
+final-HEAD CI and package certification. Earlier evidence below retains its
 original revision and scope.
 
 The fourth native Mermaid authoring family is implemented on
