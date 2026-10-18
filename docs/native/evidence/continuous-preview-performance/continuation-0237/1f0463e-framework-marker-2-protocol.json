@@ -1,0 +1,19 @@
+{
+  "FrameworkHashes": {
+    "original": "C6950A0D6ADDFB7A365C11FE0AA82A4677043A263102F1779AA9BE8FD3624019",
+    "modified": "80B183452690D16826C5B243F15FB9594890B084685E56855DBBCA31B3E6E70B"
+  },
+  "Signature": "Modified framework is not Microsoft-signed/trusted; no package or installer is produced",
+  "Policy": "Identical application/harness/fixture bytes. Same 66-sample policy as the controlled path. ReadyToRun disabled equally on both private runtimes; separate experimental temperature, never pooled with stock-runtime acceptance.",
+  "Replication": 2,
+  "SourceRevision": "1f0463e825d91be33b435345044022ae1d9aa418",
+  "RuntimeVersion": "10.0.13",
+  "ProductAcceptanceEligible": false,
+  "HarnessSha256": "0C4EE7CF2EAAD6AC9915E7813B8FE3966AC37B7C2CC659E177F25AADF8DBE3F8",
+  "Processor": {
+    "Name": "AMD EPYC 9V74 80-Core Processor                ",
+    "NumberOfLogicalProcessors": 4
+  },
+  "ImageOS": "win25-vs2026",
+  "ImageVersion": "20261007.264.1"
+}
