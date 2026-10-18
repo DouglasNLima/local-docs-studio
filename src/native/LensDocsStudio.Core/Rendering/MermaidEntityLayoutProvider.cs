@@ -44,7 +44,24 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             foreach (var child in Identities(group.Children, group.Id)) yield return child;
         }
     }
-    public PositionedClassDiagram LayoutClass(ClassDiagram diagram) => inner.LayoutClass(diagram);
+    public ClassDiagram? ClassSemantics { get; private set; }
+    public PositionedClassDiagram? ClassLayout { get; private set; }
+    public PositionedClassDiagram LayoutClass(ClassDiagram diagram)
+    {
+        static IReadOnlyList<ClassMember> Members(IReadOnlyList<ClassMember> items) => Array.AsReadOnly(items.ToArray());
+        ClassSemantics = diagram with {
+            Classes = Array.AsReadOnly(diagram.Classes.Select(item => item with { Attributes = Members(item.Attributes), Methods = Members(item.Methods) }).ToArray()),
+            Relationships = Array.AsReadOnly(diagram.Relationships.ToArray()),
+            Namespaces = Array.AsReadOnly(diagram.Namespaces.Select(item => item with { ClassIds = Array.AsReadOnly(item.ClassIds.ToArray()) }).ToArray()),
+            Notes = Array.AsReadOnly(diagram.Notes.ToArray()) };
+        // Capture the existing renderer-owned call once. No second layout or inferred positions.
+        var positioned = inner.LayoutClass(diagram);
+        ClassLayout = positioned with {
+            Classes = Array.AsReadOnly(positioned.Classes.Select(item => item with { Attributes = Members(item.Attributes), Methods = Members(item.Methods) }).ToArray()),
+            Relationships = Array.AsReadOnly(positioned.Relationships.Select(item => item with { Points = Array.AsReadOnly(item.Points.ToArray()) }).ToArray()),
+            Namespaces = Array.AsReadOnly(positioned.Namespaces.ToArray()), Notes = Array.AsReadOnly(positioned.Notes.ToArray()) };
+        return positioned;
+    }
     public ErDiagram? ErSemantics { get; private set; }
     public PositionedErDiagram? ErLayout { get; private set; }
     public PositionedErDiagram LayoutEr(ErDiagram diagram)

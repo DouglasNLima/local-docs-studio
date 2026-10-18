@@ -1,0 +1,130 @@
+<Window x:Class="LensDocsStudio.Native.ClassVisualEditorWindow"
+ xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:edit="http://icsharpcode.net/sharpdevelop/avalonedit" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls"
+ Title="Mermaid Visual Editor / Class" Width="1280" Height="800" MinWidth="880" MinHeight="600"
+ WindowStartupLocation="CenterOwner" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}"
+ FontFamily="Segoe UI" FontSize="12" Icon="Resources/Brand/application.ico" UseLayoutRounding="True"
+ AutomationProperties.AutomationId="ClassVisualEditor" PreviewKeyDown="Shortcut">
+ <Window.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceDictionary Source="Resources/MermaidEditorStyles.xaml"/></ResourceDictionary.MergedDictionaries></ResourceDictionary></Window.Resources>
+ <DockPanel>
+  <Border DockPanel.Dock="Top" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,10">
+   <StackPanel Orientation="Horizontal"><ui:CommandIcon Kind="Mermaid" Foreground="{DynamicResource AccentBrush}"/><TextBlock Text="Mermaid Visual Editor" FontSize="14" FontWeight="SemiBold" Margin="8,0"/><TextBlock Text="/ Class" Foreground="{DynamicResource MutedTextBrush}" VerticalAlignment="Center"/></StackPanel>
+  </Border>
+  <ToolBar DockPanel.Dock="Top" Style="{StaticResource Desktop.DiagramToolbar}" AutomationProperties.Name="Class commands">
+   <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="ClassUndo"><ui:CommandIcon Kind="Undo"/></Button>
+   <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="ClassRedo"><ui:CommandIcon Kind="Redo"/></Button>
+   <Separator/>
+   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassDelete" AutomationProperties.Name="Delete selected Class element"/>
+   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassDuplicate" AutomationProperties.Name="Duplicate selected Class element"/>
+   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassReverse" AutomationProperties.Name="Reverse relationship and retain endpoint cardinalities"/>
+   <Separator/>
+   <Button Content="−" Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom out" AutomationProperties.AutomationId="ClassZoomOut"/>
+   <Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="ClassZoom"/>
+   <Button Content="+" Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom in" AutomationProperties.AutomationId="ClassZoomIn"/>
+   <Button Content="Fit" Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassFit"/>
+   <Button Content="100%" Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassActualSize"/>
+   <Button Content="Auto layout" Click="AutoLayout" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Fit automatically arranged class positions; source is unchanged" AutomationProperties.AutomationId="ClassAutoLayout"/>
+   <Button Content="Source" Click="ToggleSource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Show or hide the portable Mermaid source" AutomationProperties.AutomationId="ClassToggleSource"/>
+   <Button Content="Rendered preview" Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassPreview"/>
+  </ToolBar>
+  <Border DockPanel.Dock="Bottom" Padding="12,8" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+   <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+    <TextBlock x:Name="Status" Text="Preparing Class diagram…" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" AutomationProperties.AutomationId="ClassStatus" AutomationProperties.LiveSetting="Polite"/>
+    <StackPanel Grid.Column="1" Orientation="Horizontal">
+     <Button x:Name="EditSourceButton" Content="Edit source" Click="EditSource" Style="{StaticResource Form.Action}" Margin="0,0,8,0" AutomationProperties.AutomationId="ClassEditSource"/>
+     <Button Content="Cancel" Click="Cancel" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassCancel"/>
+     <Button x:Name="ApplyButton" Content="Apply" Click="Apply" Style="{StaticResource Mermaid.PrimaryAction}" ToolTip="Apply as one document Undo action (Ctrl+Enter)" AutomationProperties.AutomationId="ClassApply"/>
+    </StackPanel>
+   </Grid>
+  </Border>
+  <Grid Margin="8"><Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="150"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="220"/><ColumnDefinition Width="6"/><ColumnDefinition Width="310" MinWidth="240"/></Grid.ColumnDefinitions>
+   <DockPanel Background="{DynamicResource PanelBrush}">
+    <StackPanel DockPanel.Dock="Top" Margin="8">
+     <TextBlock Text="CLASS PALETTE" Style="{StaticResource Desktop.PanelHeading}"/>
+     <Button x:Name="AddClassButton" Content="Add class" Click="AddClass" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddClass"/>
+     <Button x:Name="AddRelationshipButton" Content="Add relationship" Click="AddRelationship" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddRelationship"/>
+     <TextBlock Text="CLASSES AND MEMBERS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
+    </StackPanel>
+    <ListBox x:Name="Elements" SelectionChanged="SelectionChanged" DisplayMemberPath="Description" AutomationProperties.Name="Classes, members, namespaces, notes and exact relationship occurrences" AutomationProperties.AutomationId="ClassElements"/>
+   </DockPanel>
+   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
+   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <ScrollViewer x:Name="Viewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" PreviewMouseWheel="Wheel" PreviewMouseDown="PanStart" PreviewMouseMove="PanMove" PreviewMouseUp="PanEnd" Focusable="True" AutomationProperties.Name="Class diagram; middle mouse pans, arrow keys scroll" AutomationProperties.AutomationId="ClassViewport">
+     <Canvas x:Name="Surface" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent" PreviewMouseLeftButtonDown="CanvasPointer">
+      <Canvas.LayoutTransform><ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/></Canvas.LayoutTransform>
+     </Canvas>
+    </ScrollViewer>
+    <Expander x:Name="SourcePanel" Grid.Row="1" Header="Portable Mermaid source and validation" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}" AutomationProperties.AutomationId="ClassSourcePanel">
+     <DockPanel Height="170">
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+       <Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassValidate"/>
+       <Button Content="Original source" Click="ShowOriginal" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassOriginal"/>
+      </StackPanel>
+      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="Class draft source" AutomationProperties.AutomationId="ClassSource"/>
+     </DockPanel>
+    </Expander>
+   </Grid>
+   <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
+   <ScrollViewer x:Name="InspectorViewport" Grid.Column="4" AutomationProperties.AutomationId="ClassInspectorViewport" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
+    <StackPanel Margin="12">
+     <TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
+     <TextBlock x:Name="Summary" Text="Select a class, member or relationship." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="ClassSelectionSummary"/>
+     <TextBlock x:Name="Dependencies" TextWrapping="Wrap" Style="{StaticResource Form.Help}" AutomationProperties.AutomationId="ClassDependencies"/>
+     <StackPanel x:Name="NodeFields" Visibility="Collapsed">
+      <Label Content="_ID" Target="{Binding ElementName=NodeId}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="NodeId" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Class ID" AutomationProperties.AutomationId="ClassNodeId"/>
+      <Label Content="Generic parameter" Target="{Binding ElementName=GenericText}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="GenericText" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Generic parameter" AutomationProperties.AutomationId="ClassGeneric"/>
+      <Label Content="Annotation" Target="{Binding ElementName=AnnotationText}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="AnnotationText" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Class annotation" AutomationProperties.AutomationId="ClassAnnotation"/>
+     </StackPanel>
+     <StackPanel x:Name="TransitionFields" Visibility="Collapsed">
+      <Label Content="_First class" Target="{Binding ElementName=From}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="From" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="First relationship class" AutomationProperties.AutomationId="ClassFrom"/>
+      <Label Content="_Second class" Target="{Binding ElementName=To}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="To" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="Second relationship class" AutomationProperties.AutomationId="ClassTo"/>
+      <Label Content="Cardinality at first class" Target="{Binding ElementName=FirstCardinality}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="FirstCardinality" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Cardinality at first class" AutomationProperties.AutomationId="ClassFirstCardinality"/>
+      <Label Content="Cardinality at second class" Target="{Binding ElementName=SecondCardinality}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="SecondCardinality" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Cardinality at second class" AutomationProperties.AutomationId="ClassSecondCardinality"/>
+      <Label Content="Relationship type" Target="{Binding ElementName=RelationshipType}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="RelationshipType" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Value" AutomationProperties.Name="Class relationship type" AutomationProperties.AutomationId="ClassRelationshipType"/>
+      <Label Content="Marker owner" Target="{Binding ElementName=MarkerAt}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="MarkerAt" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Relationship marker owner" AutomationProperties.AutomationId="ClassMarkerAt"/>
+      <TextBlock Text="Cardinality belongs to its class. Reverse keeps cardinalities with their classes. Pick endpoints on canvas or drag a selected endpoint to another class." TextWrapping="Wrap" Style="{StaticResource Form.Help}"/>
+      <Button x:Name="ReconnectFromButton" Content="Pick source on canvas" Click="ReconnectFrom" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassReconnectFrom"/>
+      <Button x:Name="ReconnectToButton" Content="Pick destination on canvas" Click="ReconnectTo" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassReconnectTo"/>
+     </StackPanel>
+     <StackPanel x:Name="LabelFields" Visibility="Collapsed">
+      <Label Content="_Label" Target="{Binding ElementName=LabelText}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="LabelText" Style="{StaticResource Mermaid.PropertyInput}" TextWrapping="Wrap" AutomationProperties.Name="Selected Class element label" AutomationProperties.AutomationId="ClassLabel"/>
+     </StackPanel>
+     <StackPanel x:Name="AttributesPanel" Visibility="Collapsed">
+      <TextBlock Text="MEMBERS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
+      <ListBox x:Name="AttributeRows" SelectionChanged="AttributeSelected" DisplayMemberPath="Description" MaxHeight="160" AutomationProperties.Name="Class members in source order" AutomationProperties.AutomationId="ClassMemberRows"/>
+      <Button x:Name="AddAttributeButton" Content="Add attribute" Click="AddAttribute" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddAttribute"/>
+      <Button x:Name="AddMethodButton" Content="Add method" Click="AddMethod" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddMethod"/>
+     </StackPanel>
+     <StackPanel x:Name="AttributeFields" Visibility="Collapsed">
+      <Label Content="Type / return type" Target="{Binding ElementName=AttributeType}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="AttributeType" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Member type or return type" AutomationProperties.AutomationId="ClassAttributeType"/>
+      <Label Content="Member name" Target="{Binding ElementName=AttributeName}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="AttributeName" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Member name" AutomationProperties.AutomationId="ClassAttributeName"/>
+      <Label Content="Parameters (method only)" Target="{Binding ElementName=Parameters}" Style="{StaticResource Form.Label}"/>
+      <TextBox x:Name="Parameters" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Method parameters" AutomationProperties.AutomationId="ClassParameters"/>
+      <Label Content="Visibility" Target="{Binding ElementName=MemberVisibility}" Style="{StaticResource Form.Label}"/>
+      <ComboBox x:Name="MemberVisibility" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Member visibility" AutomationProperties.AutomationId="ClassVisibility"/>
+      <CheckBox x:Name="StaticMember" Content="Static ($)" Style="{StaticResource Form.CheckBox}" AutomationProperties.Name="Static member" AutomationProperties.AutomationId="ClassStatic"/>
+      <CheckBox x:Name="AbstractMember" Content="Abstract (*)" Style="{StaticResource Form.CheckBox}" AutomationProperties.Name="Abstract member" AutomationProperties.AutomationId="ClassAbstract"/>
+      <TextBlock Text="Parameters remain bounded source text. Static attributes use $. Method classifiers and abstract attributes remain protected because of pinned-parser limitations." Style="{StaticResource Form.Help}" TextWrapping="Wrap"/>
+      <StackPanel Orientation="Horizontal"><Button x:Name="MoveUpButton" Content="Move up" Click="MoveUp" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassMoveUp"/><Button x:Name="MoveDownButton" Content="Move down" Click="MoveDown" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassMoveDown"/></StackPanel>
+     </StackPanel>
+     <TextBlock x:Name="Capabilities" TextWrapping="Wrap" Style="{StaticResource Form.Help}" Margin="0,10" AutomationProperties.AutomationId="ClassCapabilities"/>
+     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" AutomationProperties.AutomationId="ClassUpdate"/>
+     <Button x:Name="ResetButton" Content="Discard pending properties" Click="ResetProperties" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassResetProperties"/>
+     <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassLocateSource"/>
+    </StackPanel>
+   </ScrollViewer>
+  </Grid>
+ </DockPanel>
+</Window>

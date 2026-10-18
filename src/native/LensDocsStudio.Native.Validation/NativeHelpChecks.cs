@@ -47,7 +47,7 @@ internal static class NativeHelpChecks
                 throw new IOException("Empty help search retained an unrelated topic.");
             if (preview.Document.Foreground is not SolidColorBrush foreground || surface.Background is not SolidColorBrush background
                 || NativeSyntaxChecks.Contrast(foreground.Color, background.Color) < 4.5) throw new IOException("Empty help results lost readable contrast.");
-            query.Clear(); if (topics.Items.Count != 14 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore the bundled topics.");
+            query.Clear(); if (topics.Items.Count != 15 || topics.SelectedItem is null) throw new IOException("Clearing help search did not restore the bundled topics.");
             window.ApplyTheme(dark ? "Light" : "Dark");
             if (!SystemParameters.HighContrast && (preview.Document.Foreground is not SolidColorBrush changed || changed.Color == foreground.Color)) throw new IOException("An open guide did not follow native theme changes.");
             host.RootVisual = null; surface.Child = null; window.Close();

@@ -1,0 +1,14 @@
+classDiagram
+    class Document {
+        +string Title
+        #long CurrentRevision
+        +Open(path, options) MarkdownDocument
+        +Save(document, options) bool
+    }
+    class MarkdownDocument {
+        +Render() string
+    }
+    Document "1" *-- "0..*" DocumentService : owns documentation
+    class DocumentService {
+    }
+    Document <|-- DocumentService

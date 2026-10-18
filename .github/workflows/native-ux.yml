@@ -1,9 +1,9 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
-    branches: ['feature/native-mermaid-er-visual-editor', develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
+    branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
 permissions:
   contents: read
@@ -11,6 +11,45 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  class-visual-editor:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source Class editor and validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify Class grammar, canonical pixels and resource observations
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --class-fidelity artifacts/native/class-fidelity $appearance
+      - name: Exercise real Class member and relationship authoring, Apply, Undo, Save and reopen
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --class-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/class-ui $appearance
+          exit $LASTEXITCODE
+      - name: Measure actual Class opening, member and relationship selection, endpoint movement and memory
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --class-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/class-performance-ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-class-${{ matrix.appearance }}
+          path: |
+            artifacts/native/class-fidelity/
+            artifacts/native/class-ui/
+            artifacts/native/class-performance-ui/
+          retention-days: 14
   er-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 20

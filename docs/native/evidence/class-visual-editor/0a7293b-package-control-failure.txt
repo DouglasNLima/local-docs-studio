@@ -1,0 +1,25 @@
+native	Independently verify preview packages and negative controls	﻿2026-10-18T00:41:53.2747571Z ##[group]Run foreach ($base in '0.1.0','0.1.1') {
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2748930Z ^[[36;1mforeach ($base in '0.1.0','0.1.1') {^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2750044Z ^[[36;1m  $version = "$base-preview.660"^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2750975Z ^[[36;1m  pwsh -NoProfile -File scripts/native/Test-NativePreviewPackage.ps1 -PackageDirectory "artifacts/native/packages/$version" -ExpectedVersion $version -ExpectedSourceRevision (git rev-parse HEAD) -OutputPath "artifacts/native/packages/$version/package-verification.json"^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2751655Z ^[[36;1m  if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2751819Z ^[[36;1m}^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2753232Z ^[[36;1mpwsh -NoProfile -File scripts/native/Test-NativePreviewPackageControls.ps1 -PackageDirectory "artifacts/native/packages/0.1.1-preview.660" -OutputDirectory artifacts/native/package-controls^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2753732Z ^[[36;1mif ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2842214Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2842444Z env:
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2842559Z   DOTNET_ROOT: C:\Program Files\dotnet
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2842744Z   pythonLocation: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2843095Z   PKG_CONFIG_PATH: C:\hostedtoolcache\windows\Python\3.12.10\x64/lib/pkgconfig
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2843335Z   Python_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2843548Z   Python2_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2843762Z   Python3_ROOT_DIR: C:\hostedtoolcache\windows\Python\3.12.10\x64
+native	Independently verify preview packages and negative controls	2026-10-18T00:41:53.2843932Z ##[endgroup]
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:06.8559921Z Native preview package verification PASS: 0.1.0-preview.660 (0a7293bc0ec0ddbbccc75abc29a41a5512683242)
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:08.9189777Z Native preview package verification PASS: 0.1.1-preview.660 (0a7293bc0ec0ddbbccc75abc29a41a5512683242)
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.5560462Z ^[[31;1mException: ^[[0mD:\a\local-docs-studio\local-docs-studio\scripts\native\NativeMermaidVerification.ps1:52^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.5560955Z ^[[31;1m^[[0m^[[36;1mLine |^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.5561384Z ^[[31;1m^[[0m^[[36;1m^[[36;1m  52 | ^[[0m … w.baml')) { ^[[36;1mthrow 'The compiled native Class editor resource is missi^[[0m …^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.5561868Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m     | ^[[31;1m               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.5562348Z ^[[31;1m^[[0m^[[36;1m^[[36;1m^[[0m^[[36;1m^[[0m^[[36;1m^[[31;1m^[[31;1m^[[36;1m     | ^[[31;1mThe compiled native Class editor resource is missing.^[[0m
+native	Independently verify preview packages and negative controls	2026-10-18T00:42:12.6540109Z ##[error]Process completed with exit code 1.

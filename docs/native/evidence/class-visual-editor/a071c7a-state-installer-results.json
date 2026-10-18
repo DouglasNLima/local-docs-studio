@@ -1,0 +1,37 @@
+{
+  "sourceRevision": "a071c7a8024920a71977c6f3e1c259e87d5e268b",
+  "status": "PASS",
+  "checks": [
+    "install: all 528 installed payload files match independently verified portable bytes",
+    "install: real installed State authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "upgrade: all 528 installed payload files match independently verified portable bytes",
+    "upgrade: real installed State authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "before-reinstall: native installation and shortcuts removed",
+    "reinstall: all 528 installed payload files match independently verified portable bytes",
+    "reinstall: real installed State authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel and ownership rejection",
+    "final-uninstall: native installation and shortcuts removed"
+  ],
+  "versions": [
+    {
+      "registered": "0.1.0-preview.662",
+      "version": "0.1.0-preview.662",
+      "binary": "0.1.0-preview.662",
+      "phase": "install",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    },
+    {
+      "registered": "0.1.1-preview.662",
+      "version": "0.1.1-preview.662",
+      "binary": "0.1.1-preview.662",
+      "phase": "upgrade",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    },
+    {
+      "registered": "0.1.1-preview.662",
+      "version": "0.1.1-preview.662",
+      "binary": "0.1.1-preview.662",
+      "phase": "reinstall",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    }
+  ]
+}

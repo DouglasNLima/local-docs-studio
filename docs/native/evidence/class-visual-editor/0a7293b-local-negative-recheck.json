@@ -1,0 +1,52 @@
+{
+  "sourceRevision": "0a7293bc0ec0ddbbccc75abc29a41a5512683242",
+  "originalPackageUnchanged": true,
+  "checks": [
+    {
+      "name": "wrong-source",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-version",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "wrong-independent-hash",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "dirty-source",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "tampered-zip",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "excluded-experiment-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "missing-editor-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "missing-er-resource-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    },
+    {
+      "name": "missing-class-resource-with-recomputed-checksum",
+      "rejected": true,
+      "status": "PASS"
+    }
+  ],
+  "status": "PASS"
+}

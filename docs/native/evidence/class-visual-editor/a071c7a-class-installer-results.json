@@ -1,0 +1,37 @@
+{
+  "versions": [
+    {
+      "registered": "0.1.0-preview.662",
+      "binary": "0.1.0-preview.662",
+      "phase": "install",
+      "version": "0.1.0-preview.662",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    },
+    {
+      "registered": "0.1.1-preview.662",
+      "binary": "0.1.1-preview.662",
+      "phase": "upgrade",
+      "version": "0.1.1-preview.662",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    },
+    {
+      "registered": "0.1.1-preview.662",
+      "binary": "0.1.1-preview.662",
+      "phase": "reinstall",
+      "version": "0.1.1-preview.662",
+      "source": "a071c7a8024920a71977c6f3e1c259e87d5e268b"
+    }
+  ],
+  "sourceRevision": "a071c7a8024920a71977c6f3e1c259e87d5e268b",
+  "checks": [
+    "install: all 528 installed payload files match independently verified portable bytes",
+    "install: real installed Class authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "upgrade: all 528 installed payload files match independently verified portable bytes",
+    "upgrade: real installed Class authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "before-reinstall: native installation and shortcuts removed",
+    "reinstall: all 528 installed payload files match independently verified portable bytes",
+    "reinstall: real installed Class authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel",
+    "final-uninstall: native installation and shortcuts removed"
+  ],
+  "status": "PASS"
+}

@@ -7,8 +7,8 @@ public sealed class NativeHelpGuideTests
 {
     [Fact] public void Bundled_guide_has_complete_independent_topics_with_unique_heading_targets()
     {
-        Assert.Equal(14, NativeHelpGuide.Topics.Count);
-        Assert.Equal(14, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
+        Assert.Equal(15, NativeHelpGuide.Topics.Count);
+        Assert.Equal(15, NativeHelpGuide.Topics.Select(topic => topic.Anchor).Distinct().Count());
         foreach (var topic in NativeHelpGuide.Topics)
         {
             var parsed = new MarkdownService().Parse(topic.Source);
@@ -24,6 +24,14 @@ public sealed class NativeHelpGuideTests
         Assert.Contains("Visual Edit", topic.Source); Assert.Contains("Edit source", topic.Source);
         Assert.Contains("protected visual inspection", topic.Source); Assert.Contains("one ordinary Undo action", topic.Source);
         Assert.Contains("positions last", topic.Source); Assert.Contains("protected", topic.Source);
+    }
+    [Fact] public void Class_visual_authoring_has_a_searchable_portable_source_and_classifier_limit_topic()
+    {
+        var topic = Assert.Single(NativeHelpGuide.Search("Class Diagram visual authoring"));
+        Assert.Equal("class-diagram-visual-authoring", topic.Anchor);
+        Assert.Contains("Insert → Class diagram visually", topic.Source); Assert.Contains("one Undo action", topic.Source);
+        Assert.Contains("static/abstract classifiers", topic.Source); Assert.Contains("protected", topic.Source);
+        Assert.Contains("Canonical", topic.Source, StringComparison.OrdinalIgnoreCase);
     }
     [Fact] public void Topic_search_matches_body_text_without_changing_bundled_source()
     {

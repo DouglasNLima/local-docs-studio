@@ -4,7 +4,7 @@ Local Markdown, Mermaid, and documentation studio. This is an **unsigned interna
 
 ## Obtain and verify the package
 
-Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [ER editor Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/34). The [ER engineering report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-er-visual-editor/docs/native/mermaid-er-visual-editor.md) documents syntax, capabilities, measurements and certification requirements. Acceptance requires completed checks for the identified source; a queued or failed run does not establish acceptance. These source records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
+Use the exact successful branch-source Actions run, preview version and SHA-256 values in the [Class editor Draft PR delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/35). The [Class engineering report](https://github.com/DouglasNLima/local-docs-studio/blob/feature/native-mermaid-class-visual-editor/docs/native/mermaid-class-visual-editor.md) documents all five editors' regression evidence, Class syntax, capabilities, measurements and certification requirements. Acceptance requires completed checks for the identified source; a queued, skipped or failed mandatory gate does not establish acceptance. These source records are linked explicitly because the installed guide lives outside the source documentation folder. GitHub Actions artefacts require repository access and expire; they are not permanent download links. With the GitHub CLI:
 
 ```powershell
 gh run download <verified-run-id> --repo DouglasNLima/local-docs-studio --name native-validation --dir <new-empty-directory>
@@ -54,6 +54,15 @@ For State evaluation, use `stateDiagram-v2`. Select a state on the canvas or in 
 Press **F1** for the searchable offline guide. **Help → About the native preview** and **Help → Updates** identify the installed version; `version.json` identifies the source and packaging run. Stable/Preview selection controls discovery, not trust.
 
 ## Restrictions and support
+
+For Class authoring, open a `classDiagram` and choose **Visual Edit**, or use
+**Insert → Class diagram visually…**. Select class headers, verified member rows
+or relationships on the canonical canvas; the element list provides keyboard
+access to every exact occurrence. Add an attribute/method, update its properties,
+add a class and select the relationship type/marker owner. Validate, Apply, test
+document Undo/Redo, Save and reopen. Reverse keeps cardinalities with their actual
+classes. Unknown grammar, method classifiers, namespace membership and notes
+retain protected source inspection. Class placement remains automatic.
 
 - **Updates:** production Authenticode identity and manifest pins are absent. Trusted in-app download/execution of unsigned installers is blocked. This candidate is distributed as a CI artefact, so release discovery does not itself make it available. Obtain later previews through the same reviewed internal procedure.
 - **Performance:** Continuous's 250 ms input objective is not achieved. Large lists, tables, rich paragraphs and mixed documents have recorded delays; the 4.14 MB Continuous case has incomplete full-layout/navigation evidence. The intermittent 587.9933 ms details construction delay remains unresolved. Prefer Pages or Editor for those documents.

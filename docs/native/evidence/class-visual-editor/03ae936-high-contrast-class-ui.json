@@ -1,0 +1,10 @@
+{
+  "Status": "FAIL",
+  "Checks": [
+    "Actual Windows High Contrast is active during Class authoring",
+    "Native class SelectionItem reports the selected source identity",
+    "Canvas/list member navigation selects the original exact method occurrence",
+    "Class insertion selects and brings the canonical header into view"
+  ],
+  "Error": "System.InvalidOperationException: Class command is disabled: ClassUpdate; Use a class ID beginning with a letter or underscore, followed by letters, digits or underscores (maximum 200 characters).; Ready. Select a class, member row or relationship. Canonical layout determines positions.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func\u00601 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1789\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass0_1.\u003CRunClassEditor\u003Eg__Click|14(String id) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeClassUiChecks.cs:line 103\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass0_0.\u003CRunClassEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeClassUiChecks.cs:line 40"
+}

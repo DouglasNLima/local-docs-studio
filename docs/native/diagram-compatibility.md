@@ -1,5 +1,20 @@
 # Native diagram compatibility
 
+The [Class visual editor report](mermaid-class-visual-editor.md) tracks the fifth
+native family: dedicated source occurrences, bounded class/member authoring and
+endpoint-owned relationship markers/cardinalities. Method classifiers, unknown
+source and ambiguous namespace/note operations remain protected. Hosted Class
+certification is identified by the report and exact-revision PR delivery receipt;
+implementation alone does not imply readiness.
+
+| Native authoring family | Source model and authoring boundary | Certification record |
+|---|---|---|
+| Flowchart Advanced | Nodes, connections, supported chains, local styles and subgraphs; dependent unknown grammar protected | [Flowchart report](mermaid-advanced-flowchart-partial-editing.md) |
+| Sequence | Participants and supported ordered interactions; exact occurrence patches | [Sequence report](mermaid-sequence-visual-editor.md) |
+| State | States, transitions and supported scoped markers; exact source patches | [State report](mermaid-state-visual-editor.md) |
+| Entity relationship | Entities, ordered attributes, keys and endpoint cardinalities | [ER report](mermaid-er-visual-editor.md) |
+| Class | Classes, distinct attribute/method occurrences, six relationship types and endpoint-owned markers/cardinalities; classifiers and ambiguous syntax protected | [Class report](mermaid-class-visual-editor.md) |
+
 The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native
 authoring family: exact source entities, ordered attribute occurrences, PK/FK/UK,
 comments, endpoint cardinalities and identifying/non-identifying relationships.

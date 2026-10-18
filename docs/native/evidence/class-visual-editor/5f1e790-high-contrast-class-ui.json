@@ -1,0 +1,10 @@
+{
+  "Status": "FAIL",
+  "Checks": [
+    "Actual Windows High Contrast is active during Class authoring",
+    "Native class SelectionItem reports the selected source identity",
+    "Canvas/list member navigation selects the original exact method occurrence",
+    "Class insertion selects and brings the canonical header into view"
+  ],
+  "Error": "FlaUI.Core.Exceptions.ElementNotEnabledException\r\n ---\u003E System.Runtime.InteropServices.COMException (0x80040200): 0x80040200\r\n   at Interop.UIAutomationClient.IUIAutomationInvokePattern.Invoke()\r\n   at FlaUI.UIA3.Patterns.InvokePattern.\u003CInvoke\u003Eb__3_0()\r\n   at FlaUI.Core.Tools.Com.Call(Action nativeAction)\r\n   --- End of inner exception stack trace ---\r\n   at FlaUI.Core.Tools.Com.Call(Action nativeAction)\r\n   at FlaUI.UIA3.Patterns.InvokePattern.Invoke()\r\n   at FlaUI.Core.AutomationElements.PatternElements.InvokeAutomationElement.Invoke()\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass0_1.\u003CRunClassEditor\u003Eg__Click|14(String id) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeClassUiChecks.cs:line 103\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass0_0.\u003CRunClassEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeClassUiChecks.cs:line 40"
+}

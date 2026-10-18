@@ -1,0 +1,9 @@
+classDiagram
+    class Document {
+        +string Title
+        +Open(path) Document
+    }
+    class MarkdownDocument {
+        +Render() string
+    }
+    Document <|-- MarkdownDocument

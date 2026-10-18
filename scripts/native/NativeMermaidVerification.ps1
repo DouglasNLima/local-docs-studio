@@ -47,11 +47,14 @@ function Test-NativeMermaidResources {
         'LensDocsStudio.Core.StateDiagrams.StateDiagramModel', 'LensDocsStudio.Core.StateDiagrams.StateDiagramSourceParser', 'LensDocsStudio.Core.StateDiagrams.StateTransformationService', 'LensDocsStudio.Core.StateDiagrams.StateVisualDraft', 'LensDocsStudio.Core.StateDiagrams.StateCapabilityAnalysis', 'LensDocsStudio.Core.StateDiagrams.StateSemanticValidation')
     $requiredNative += @('LensDocsStudio.Native.ErVisualEditorWindow', 'LensDocsStudio.Native.Rendering.NativeErPresentation')
     $requiredCore += @('ErDiagramModel', 'ErEntityModel', 'ErAttributeModel', 'ErRelationshipModel', 'ErDiagramSourceParser', 'ErEditOperation', 'ErEditPlan', 'ErTransformationService', 'ErVisualDraft', 'ErCapabilityAnalysis', 'ErSemanticValidation') | ForEach-Object { 'LensDocsStudio.Core.ErDiagrams.' + $_ }
+    $requiredNative += @('LensDocsStudio.Native.ClassVisualEditorWindow', 'LensDocsStudio.Native.Rendering.NativeClassPresentation')
+    $requiredCore += @('ClassDiagramModel', 'ClassDiagramClass', 'ClassDiagramMember', 'ClassDiagramRelationship', 'ClassDiagramNamespace', 'ClassDiagramNote', 'ClassDiagramSourceParser', 'ClassDiagramEditOperation', 'ClassEditPlan', 'ClassDiagramTransformationService', 'ClassDiagramVisualDraft', 'ClassDiagramCapabilityAnalysis', 'ClassDiagramSemanticValidation') | ForEach-Object { 'LensDocsStudio.Core.ClassDiagrams.' + $_ }
     foreach ($name in $requiredNative) { if (-not $native.Types.Contains($name)) { throw "The native Mermaid editor type is missing: $name" } }
+    if (-not $native.Resources.Contains('classvisualeditorwindow.baml')) { throw 'The compiled native Class editor resource is missing.' }
     if (-not $native.Resources.Contains('ervisualeditorwindow.baml')) { throw 'The compiled native ER editor resource is missing.' }
     foreach ($name in $requiredCore) { if (-not $core.Types.Contains($name)) { throw "The Core Mermaid editor type is missing: $name" } }
     foreach ($name in @('mermaidvisualeditorwindow.baml', 'sequencevisualeditorwindow.baml', 'statevisualeditorwindow.baml', 'resources/desktopstyles.baml', 'resources/formstyles.baml', 'resources/commandicons.baml', 'resources/mermaideditorstyles.baml', 'resources/brand/application.ico')) {
         if (-not $native.Resources.Contains($name)) { throw "The compiled native Mermaid editor resource is missing: $name" }
     }
-    return [ordered]@{ status='PASS'; executionPerformed=$false; nativeTypes=$requiredNative; coreTypes=$requiredCore; editorXaml='mermaidvisualeditorwindow.baml'; erEditorXaml='ervisualeditorwindow.baml'; erTypesVerified=$true; originalIcon='resources/brand/application.ico' }
+    return [ordered]@{ status='PASS'; executionPerformed=$false; nativeTypes=$requiredNative; coreTypes=$requiredCore; editorXaml='mermaidvisualeditorwindow.baml'; erEditorXaml='ervisualeditorwindow.baml'; erTypesVerified=$true; classEditorXaml='classvisualeditorwindow.baml'; classTypesVerified=$true; originalIcon='resources/brand/application.ico' }
 }

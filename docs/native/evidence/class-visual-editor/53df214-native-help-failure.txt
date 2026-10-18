@@ -1,0 +1,10 @@
+native	Validate native diagram corpus	﻿2026-10-18T00:27:06.1557036Z ##[group]Run dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .
+native	Validate native diagram corpus	2026-10-18T00:27:06.1558078Z ^[[36;1mdotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .^[[0m
+native	Validate native diagram corpus	2026-10-18T00:27:06.1629571Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+native	Validate native diagram corpus	2026-10-18T00:27:06.1630030Z env:
+native	Validate native diagram corpus	2026-10-18T00:27:06.1630222Z   DOTNET_ROOT: C:\Program Files\dotnet
+native	Validate native diagram corpus	2026-10-18T00:27:06.1630471Z ##[endgroup]
+native	Validate native diagram corpus	2026-10-18T00:28:11.4790555Z Exports generated and DOCX schema validated: 45391 DOCX bytes, 103859 PDF bytes.
+native	Validate native diagram corpus	2026-10-18T00:28:11.4798415Z Native validation: 130 diagram cases and export checks; 1 failures. Evidence: D:\a\local-docs-studio\local-docs-studio\artifacts\native\validation
+native	Validate native diagram corpus	2026-10-18T00:28:11.4799865Z Native help: Clearing help search did not restore the bundled topics.
+native	Validate native diagram corpus	2026-10-18T00:28:11.9538710Z ##[error]Process completed with exit code 1.
