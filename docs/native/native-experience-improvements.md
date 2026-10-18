@@ -1,5 +1,7 @@
 # Native experience improvements
 
+This Continuous preview continuation is stacked on open PR #36 at 9a64dfa5. Its [focused report](continuous-preview-performance-refinement.md) owns the scrollbar/table refinement, current-version and selection guards, controlled six-fixture comparison and new interaction coverage. The unchanged 250 ms target remains incomplete pending exact-head acceptance; earlier green compatibility/package records do not certify it.
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 The targeted [performance continuation](performance-and-responsiveness.md) reduces redundant native formatting elements and initial list allocations, adds exact source/RTF/formatting/stale-render regressions, and fixes a reproduced active-tab close selection race. Continuous list median input improves 923.42 → 727.88 ms on the named machine, but still fails 250 ms; mixed/4.14 MB and the original intermittent details failure remain unresolved. Existing delivery evidence below keeps its historical scope. New-build desktop proof is hosted; the optional local manual retest remains BLOCKED/NOT RUN.

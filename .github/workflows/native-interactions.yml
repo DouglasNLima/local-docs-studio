@@ -1,9 +1,9 @@
 name: Validate native workspace and Mermaid interactions
 on:
   push:
-    branches: ['feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor']
+    branches: ['feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor']
   pull_request:
-    branches: [develop, 'feature/native-workspace-mermaid-interaction-stability']
+    branches: ['feature/native-continuous-preview-performance', 'feature/native-mermaid-suite-ux-performance', develop, 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
 permissions:
   contents: read

@@ -241,27 +241,40 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var wt = new WpfTable { CellSpacing = 0, Margin = new Thickness(0, 8, 0, 12) };
                     wt.ContextMenu = TableContextMenu.Create(table, parsed.Source, copyTable, exportTableCsv);
                     Attach(wt);
-                    var group = new TableRowGroup(); wt.RowGroups.Add(group);
-                    foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
+                    // WPF otherwise revalidates all preceding rows for every cell/row
+                    // insertion. This complete private table has one structural commit.
+                    wt.BeginInit();
+                    try
                     {
-                        await Cooperate();
-                        var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
-                        group.Rows.Add(wr);
-                        var column = 0;
-                        foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                        var group = new TableRowGroup(); wt.RowGroups.Add(group);
+                        foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                         {
                             await Cooperate();
-                            var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
-                            wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
-                            var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
-                            column += Math.Max(1, cell.ColumnSpan);
-                            wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
-                            { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
-                            if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
-                            wr.Cells.Add(wc);
-                            foreach (var child in cell) await Convert(child, wc.Blocks);
+                            var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
+                            group.Rows.Add(wr);
+                            var column = 0;
+                            foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                            {
+                                await Cooperate();
+                                var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
+                                wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
+                                var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
+                                column += Math.Max(1, cell.ColumnSpan);
+                                wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
+                                { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
+                                if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
+                                wr.Cells.Add(wc);
+                                foreach (var child in cell) await Convert(child, wc.Blocks);
+                            }
                         }
                     }
+                    finally
+                    {
+                        PreviewConstructionEvents.Log.Stage("table-validation-start");
+                        wt.EndInit();
+                        PreviewConstructionEvents.Log.Stage("table-validation-completed");
+                    }
+                    cancellationToken.ThrowIfCancellationRequested();
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;

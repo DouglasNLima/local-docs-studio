@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -17,7 +20,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativeContinuousPerformanceChecks
 {
-    public static void Run(string output, string? scenario = null)
+    public static void Run(string output, string? scenario = null, bool acceptance = false, int repetitions = 1, bool edited = false)
     {
         Directory.CreateDirectory(output);
         var dispatcher = Dispatcher.CurrentDispatcher;
@@ -25,33 +28,22 @@ internal static class NativeContinuousPerformanceChecks
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(dispatcher));
         try
         {
-            var fixtures = new[]
-            {
-                (Name: "list", Source: string.Join("\n", Enumerable.Range(1, 4000).Select(i => $"- **word{i}**")), Last: "word4000"),
-                (Name: "table", Source: "| Row | Value |\n|---|---|\n" + string.Join("\n", Enumerable.Range(1, 1000).Select(i => $"| Row{i} | Value{i} |")), Last: "Value1000"),
-                (Name: "quote", Source: string.Join("\n>\n", Enumerable.Range(1, 1200).Select(i => $"> Quoted{i}")), Last: "Quoted1200"),
-                (Name: "details", Source: "<details open>\n<summary>Large section</summary>\n\n" + string.Join("\n\n", Enumerable.Range(1, 1200).Select(i => $"Hidden{i}")) + "\n\n</details>", Last: "Hidden1200"),
-                (Name: "paragraphs", Source: string.Join("\n\n", Enumerable.Range(1, 1200).Select(i => $"Paragraph{i}: **Evidence** &amp; review remains selectable.")), Last: "Paragraph1200")
-            };
-            if (scenario is "extended" or "large-4mb" or "mixed")
-            {
-                var large = "# Large editing fixture\n\n" + string.Concat(Enumerable.Range(0, 20000).Select(i =>
-                    $"Paragraph {i:D5}: **portable Markdown** retains Unicode Café and [relative links](Section-0/Document-0.md). "
-                    + "The current source must survive native insertion, layout and Undo without an implicit file write.\n\n"));
-                var mixed = "# Mixed document\n\n[Deep target](#deep-target)\n\n" + string.Join("\n", Enumerable.Range(1, 1000).Select(i => $"- **Mixed item{i}**"))
-                    + "\n\n| Row | Value |\n|---|---|\n" + string.Join("\n", Enumerable.Range(1, 300).Select(i => $"| Row{i} | Value{i} |"))
-                    + "\n\n<details open>\n<summary>Outer evidence</summary>\n\n<details open>\n<summary>Nested evidence</summary>\n\n"
-                    + string.Join("\n\n", Enumerable.Range(1, 300).Select(i => $"> **Quoted{i}** Café 😀 é"))
-                    + "\n\n</details>\n\n</details>\n\n" + string.Join("\n\n", Enumerable.Repeat("![Repeated pixel](pixel.png)", 12))
-                    + "\n\n```mermaid\nflowchart LR\nA[Source] --> B[Native preview]\n```\n\n## Deep target\n\nMixed final marker.";
-                fixtures = [("large-4mb", large, "Paragraph 19999"), ("mixed", mixed, "Mixed final marker.")];
-                if (scenario != "extended") fixtures = fixtures.Where(fixture => fixture.Name == scenario).ToArray();
-                File.WriteAllBytes(Path.Combine(output, "pixel.png"), Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII="));
-            }
+            var fixtures = ContinuousPreviewFixtures.Create(output, scenario);
+            if (repetitions is < 1 or > 8) throw new ArgumentOutOfRangeException(nameof(repetitions));
+            var samples = new List<object>(); var passed = true;
+            var documents = new List<WeakReference>();
+            for (var repetition = 0; repetition < repetitions; repetition++)
             foreach (var fixture in fixtures)
             {
+                // Fresh sources exercise recomputation; their original fixture is retained.
+                var source = edited ? fixture.Source.Replace(fixture.Last, fixture.Last + $" revised{repetition + 1}", StringComparison.Ordinal)
+                    + $"\n\n## Fresh revision {repetition + 1}\n\nChanged distant content Café 😀.\n" : fixture.Source;
+                var sampleOutput = repetitions == 1 ? output : Path.Combine(output, "repeat-" + repetition);
+                Directory.CreateDirectory(sampleOutput);
+                var endToEnd = Stopwatch.StartNew();
+                var allAllocation = GC.GetTotalAllocatedBytes();
                 var parseWatch = Stopwatch.StartNew();
-                var parsed = new MarkdownService().Parse(fixture.Source);
+                var parsed = new MarkdownService().Parse(source);
                 var parsing = parseWatch.Elapsed.TotalMilliseconds;
                 var preparationWatch = Stopwatch.StartNew();
                 var diagrams = parsed.Syntax.Descendants<FencedCodeBlock>().Where(code => code.Info is "mermaid" or "mmd")
@@ -61,6 +53,9 @@ internal static class NativeContinuousPerformanceChecks
                     Images: new PreviewImageService().Prepare(parsed, Path.Combine(output, "synthetic.md"), output))).GetAwaiter().GetResult();
                 var preparation = preparationWatch.Elapsed.TotalMilliseconds;
                 var viewer = new StageViewer { IsToolBarVisible = false, Background = Brushes.White };
+                // One compiled harness also loads the immutable baseline assembly, where
+                // this product policy does not yet exist. No timing boundary is changed.
+                typeof(DocumentPreview).GetMethod("ConfigureContinuousViewer", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, [viewer]);
                 using var host = new HwndSource(new HwndSourceParameters("Continuous performance validation")
                     { Width = 640, Height = 300, WindowStyle = unchecked((int)0x80000000) });
                 host.RootVisual = viewer;
@@ -68,7 +63,13 @@ internal static class NativeContinuousPerformanceChecks
                 var allocated = GC.GetTotalAllocatedBytes();
                 var collections = Enumerable.Range(0, GC.MaxGeneration + 1).Select(GC.CollectionCount).ToArray();
                 viewer.Reset();
+                var viewportChanges = new List<object>();
+                viewer.AddHandler(ScrollViewer.ScrollChangedEvent, new ScrollChangedEventHandler((_, e) =>
+                {
+                    if (viewportChanges.Count < 32) viewportChanges.Add(new { e.ViewportWidth, e.ViewportHeight, e.ExtentHeight, e.ViewportWidthChange });
+                }));
                 var watch = Stopwatch.StartNew(); var inputAt = -1d; var lastInput = 0d; var maximumGap = 0d;
+                using var constructionTrace = new PreviewConstructionTrace(watch);
                 var operations = new List<object>(); var starts = new Dictionary<DispatcherOperation, double>();
                 void Input()
                 {
@@ -105,6 +106,8 @@ internal static class NativeContinuousPerformanceChecks
                     throw;
                 }
                 var result = task.GetAwaiter().GetResult(); var construction = watch.Elapsed.TotalMilliseconds;
+                var constructionAllocation = constructionTrace.AllocatedBytes; var constructionCpu = constructionTrace.ThreadCpuMilliseconds;
+                constructionTrace.Dispose();
                 Input(); var layoutStart = watch.Elapsed.TotalMilliseconds; var layoutInput = -1d;
                 var firstLayoutInput = dispatcher.BeginInvoke(DispatcherPriority.Input, () => { layoutInput = watch.Elapsed.TotalMilliseconds - layoutStart; Input(); });
                 var at = watch.Elapsed.TotalMilliseconds; viewer.Document = result.Document; attach = watch.Elapsed.TotalMilliseconds - at;
@@ -136,6 +139,8 @@ internal static class NativeContinuousPerformanceChecks
                 }
                 Input();
                 var completion = watch.Elapsed.TotalMilliseconds;
+                var readiness = endToEnd.Elapsed.TotalMilliseconds;
+                var readinessAllocation = GC.GetTotalAllocatedBytes() - allAllocation;
                 timer.Stop(); dispatcher.Hooks.OperationStarted -= Started; dispatcher.Hooks.OperationCompleted -= Completed;
                 var completedAllocation = GC.GetTotalAllocatedBytes() - allocated;
                 var layoutStages = new { viewer.MeasureMilliseconds, viewer.ArrangeMilliseconds, viewer.UpdateLayoutMilliseconds,
@@ -143,7 +148,7 @@ internal static class NativeContinuousPerformanceChecks
                 var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32); capture.Render(viewer);
                 var raster = watch.Elapsed.TotalMilliseconds;
                 var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
-                using (var file = File.Create(Path.Combine(output, fixture.Name + "-initial.png"))) encoder.Save(file);
+                using (var file = File.Create(Path.Combine(sampleOutput, fixture.Name + "-initial.png"))) encoder.Save(file);
                 var completeText = result.ReadText().Contains(fixture.Last, StringComparison.Ordinal);
                 var last = result.SourceElements.MaxBy(item => item.Key).Value;
                 viewer.Selection.Select(last.ContentStart, last.ContentEnd);
@@ -151,37 +156,94 @@ internal static class NativeContinuousPerformanceChecks
                 var rectangle = last.ContentStart.GetCharacterRect(LogicalDirection.Forward);
                 var scrolling = (ScrollViewer)viewer.Template.FindName("PART_ContentHost", viewer);
                 var targetVisible = !rectangle.IsEmpty && rectangle.Top >= 0 && rectangle.Bottom <= scrolling.ViewportHeight;
-                var selectedTarget = viewer.Selection.Text.Contains(fixture.Last, StringComparison.Ordinal);
+                var selectedTarget = viewer.Selection.Text.Contains(edited ? "Changed distant content" : fixture.Last, StringComparison.Ordinal);
                 using var process = Process.GetCurrentProcess();
-                File.WriteAllText(Path.Combine(output, fixture.Name + ".json"), JsonSerializer.Serialize(new
+                var correct = completeText && targetVisible && selectedTarget && parsed.Source == source && result.Warnings.Count == 0;
+                var withinBudget = inputAt >= 0 && inputAt < 250 && layoutInput >= 0 && layoutInput <= 250 && maximumGap < 250;
+                passed &= correct && withinBudget;
+                var observation = new
                 {
                     fixture.Name, ParsingMilliseconds = parsing, ImageAndDiagramPreparationMilliseconds = preparation,
-                    SourceUtf8Bytes = System.Text.Encoding.UTF8.GetByteCount(fixture.Source),
+                    Repetition = repetition, Temperature = repetition == 0 ? "First fixture execution in this process (no prewarm)" : "Repeated fresh construction in the same process",
+                    Edited = edited, SourceUtf8Bytes = Encoding.UTF8.GetByteCount(source),
+                    FixtureSha256 = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(fixture.Source))),
+                    SourceSha256 = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(source))),
+                    HarnessSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(NativeContinuousPerformanceChecks).Assembly.Location))),
+                    SourceRevision = Environment.GetEnvironmentVariable("LENS_CONTINUOUS_SOURCE_REVISION"),
                     ConstructionInputMilliseconds = inputAt, FirstLayoutInputMilliseconds = layoutInput,
                     MaximumInputGapMilliseconds = maximumGap, InputBudgetMilliseconds = 250,
                     InputAcceptance = inputAt >= 0 && inputAt < 250 && layoutInput >= 0 && layoutInput < 250 && maximumGap < 250 ? "PASS" : "FAIL",
+                    FirstLayoutAcceptance = layoutInput >= 0 && layoutInput <= 250 ? "PASS" : "FAIL", Correctness = correct ? "PASS" : "FAIL",
                     ConstructionMilliseconds = construction, AttachmentMilliseconds = attach, FinalLayoutMilliseconds = firstLayout,
+                    ConstructionStages = constructionTrace.Stages, ConstructionUIThreadAllocatedBytes = constructionAllocation,
+                    ConstructionUIThreadCpuMilliseconds = constructionCpu,
                     FirstContentLayoutMilliseconds = firstContent, CompletionMilliseconds = completion, FirstRasterMilliseconds = raster,
+                    EndToEndReadinessMilliseconds = readiness, EndToEndAllocatedBytes = readinessAllocation,
+                    DeferredRequiredContent = false, ViewportChanges = viewportChanges,
                     LayoutStages = layoutStages, AllocatedBytes = completedAllocation, process.PeakWorkingSet64,
+                    ManagedBytesWithoutCollection = GC.GetTotalMemory(false), process.WorkingSet64, process.PrivateMemorySize64,
                     GarbageCollections = Enumerable.Range(0, GC.MaxGeneration + 1).Select(i => GC.CollectionCount(i) - collections[i]).ToArray(),
-                    SourcePreserved = parsed.Source == fixture.Source, CompleteText = completeText, TargetVisible = targetVisible,
+                    SourcePreserved = parsed.Source == source, CompleteText = completeText, TargetVisible = targetVisible,
+                    LogicalTextSha256 = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(result.ReadText()))),
+                    SourceElementCount = result.SourceElements.Count,
+                    Structure = Structure(result.Document.Blocks),
                     SelectedTarget = selectedTarget, Operations = operations,
                     Environment = new { OS = Environment.OSVersion.ToString(), Runtime = Environment.Version.ToString(), Environment.ProcessorCount,
                         NativeAssemblySha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location))),
+                        Dpi = VisualTreeHelper.GetDpi(viewer).PixelsPerInchX, Appearance = SystemParameters.HighContrast ? "High Contrast" : "Light",
                         Width = 640, Height = 300, Zoom = 100, Context = "Hidden HWND, framework-dependent Release validation, isolated process; no foreground interaction" }
-                }, new JsonSerializerOptions { WriteIndented = true }));
+                };
+                File.WriteAllText(Path.Combine(sampleOutput, fixture.Name + ".json"), JsonSerializer.Serialize(observation, new JsonSerializerOptions { WriteIndented = true }));
+                samples.Add(new { fixture.Name, Repetition = repetition, FirstLayoutMilliseconds = layoutInput, FirstLayoutAcceptance = observation.FirstLayoutAcceptance, observation.InputAcceptance, observation.Correctness });
                 Console.WriteLine(fixture.Name + ": " + (layoutInput < 250 && maximumGap < 250 ? "PASS" : "FAIL")
                     + " against 250 ms input budget; first layout " + layoutInput.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) + " ms.");
-                if (!completeText || !targetVisible || !selectedTarget || parsed.Source != fixture.Source || result.Warnings.Count != 0)
+                if (!correct)
                     throw new IOException("Continuous preview lost content, navigation or prepared media.");
+                documents.Add(new WeakReference(result.Document));
+                viewer.Document = null; host.RootVisual = null;
                 void Layout()
                 {
                     viewer.Measure(new Size(640, 300)); viewer.Arrange(new Rect(0, 0, 640, 300));
                     var update = Stopwatch.StartNew(); viewer.UpdateLayout(); viewer.UpdateLayoutMilliseconds += update.Elapsed.TotalMilliseconds;
                 }
             }
+            File.WriteAllText(Path.Combine(output, "acceptance.json"), JsonSerializer.Serialize(new
+            {
+                Status = passed ? "PASS" : "FAIL", Enforced = acceptance, ThresholdMilliseconds = 250,
+                Boundary = "Input callback queued before attachment, synchronous Measure/Arrange/UpdateLayout and dispatcher delivery; unchanged original first-layout boundary",
+                ReadinessBoundary = "Before parsing through full construction, attachment, initial layout and ApplicationIdle; no required content deferred",
+                Samples = samples
+            }, new JsonSerializerOptions { WriteIndented = true }));
+            File.WriteAllText(Path.Combine(output, "lifecycle-observation.json"), JsonSerializer.Serialize(new
+            {
+                DocumentsCreated = documents.Count, AliveAfterNaturalCollections = documents.Count(document => document.IsAlive),
+                ManagedBytes = GC.GetTotalMemory(false), ForcedCollections = false,
+                Limitation = "Natural-collection retention observation only; JIT liveness and collection timing prevent a zero-retention/leak claim. Every viewer is detached after correctness verification."
+            }, new JsonSerializerOptions { WriteIndented = true }));
+            if (acceptance && !passed) throw new IOException("Continuous 250 ms acceptance FAILED; see acceptance.json and every raw sample.");
         }
         finally { SynchronizationContext.SetSynchronizationContext(previous); }
+    }
+
+    private static object Structure(BlockCollection blocks)
+    {
+        var counts = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        void Count(TextElement element)
+        {
+            var name = element.GetType().Name; counts[name] = counts.GetValueOrDefault(name) + 1;
+            switch (element)
+            {
+                case Section section: foreach (var block in section.Blocks) Count(block); break;
+                case System.Windows.Documents.List list: foreach (var item in list.ListItems) Count(item); break;
+                case ListItem item: foreach (var block in item.Blocks) Count(block); break;
+                case Table table: foreach (var group in table.RowGroups) foreach (var row in group.Rows) foreach (var cell in row.Cells) { Count(cell); } break;
+                case TableCell cell: foreach (var block in cell.Blocks) Count(block); break;
+                case Paragraph paragraph: foreach (var inline in paragraph.Inlines) Count(inline); break;
+                case Span span: foreach (var inline in span.Inlines) Count(inline); break;
+            }
+        }
+        foreach (var block in blocks) Count(block);
+        return counts;
     }
 
     private sealed class StageViewer : FlowDocumentScrollViewer

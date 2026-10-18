@@ -17,6 +17,14 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--continuous-interactions")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Visible Continuous interaction checks require a disposable GitHub-hosted Windows runner."); return 1; }
+            try { NativePreviewSchedulingChecks.Run(Path.GetFullPath(args[1]), true, args.Contains("--high-contrast")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
         if (args.FirstOrDefault() is "--suite-performance" or "--suite-uncached-performance")
         {
@@ -46,9 +54,16 @@ internal static class Program
             try { NativeMermaidPerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() == "--continuous-performance")
+        if (args.FirstOrDefault() is "--continuous-performance" or "--continuous-acceptance")
         {
-            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/performance/continuous"), args.ElementAtOrDefault(2)); return 0; }
+            try
+            {
+                var repeatAt = Array.IndexOf(args, "--repeat");
+                NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/performance/continuous"),
+                    args.ElementAtOrDefault(2), args[0] == "--continuous-acceptance",
+                    repeatAt < 0 ? 1 : int.Parse(args[repeatAt + 1], System.Globalization.CultureInfo.InvariantCulture), args.Contains("--edited"));
+                return 0;
+            }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--literal-formatting")

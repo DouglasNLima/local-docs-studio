@@ -1,0 +1,67 @@
+name: Native Continuous 250 ms acceptance
+on:
+  push:
+    branches: [feature/native-continuous-preview-performance]
+  pull_request:
+    branches: [develop, feature/native-mermaid-suite-ux-performance]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: continuous-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-interaction:
+    name: Visible Continuous interactions (${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Open, edit, replace, reopen and close actual WPF documents
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --continuous-interactions artifacts/continuous-interactions $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: continuous-interactions-${{ matrix.appearance }}
+          path: artifacts/continuous-interactions/
+          retention-days: 30
+  controlled-comparison:
+    name: Controlled 250 ms acceptance (replication ${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Compare identical compiled harness and unchanged fixture bytes on this host
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousPreviewPerformance.ps1 -Replication ${{ matrix.replication }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: continuous-performance-${{ matrix.replication }}
+          path: |
+            artifacts/continuous-performance/protocol.json
+            artifacts/continuous-performance/comparison.json
+            artifacts/continuous-performance/samples/
+          retention-days: 30

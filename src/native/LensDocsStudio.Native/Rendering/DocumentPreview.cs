@@ -56,6 +56,28 @@ public sealed class DocumentPreview : FlowDocumentReader
         IsVisibleChanged += (_, _) => QueueFit();
     }
 
+    /// <summary>Reserve the Continuous scrollbar gutter before text is measured.</summary>
+    public static void ConfigureContinuousViewer(FlowDocumentScrollViewer viewer)
+    {
+        viewer.VerifyAccess();
+        // Auto first formats a long document at the wider, scrollbar-free width,
+        // then invalidates that work when the scrollbar becomes necessary.
+        viewer.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+    }
+
+    public override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+        PrepareContinuousViewer();
+    }
+
+    private void PrepareContinuousViewer()
+    {
+        if (ViewingMode != FlowDocumentReaderViewingMode.Scroll) return;
+        if (Template?.FindName("PART_ContentHost", this) is Decorator { Child: FlowDocumentScrollViewer viewer })
+            ConfigureContinuousViewer(viewer);
+    }
+
     public void SetPreview(PreviewResult result, int characters, string preference)
     {
         if (!WorkspaceSettings.ReadingModes.Contains(preference)) throw new ArgumentException("Choose a supported reading mode.");
@@ -66,6 +88,8 @@ public sealed class DocumentPreview : FlowDocumentReader
             preview = result; sourceCharacters = characters; readingMode = preference;
             UpdateGuidance();
             ViewingMode = ResolveMode();
+            if (IsLoaded) ApplyTemplate();
+            PrepareContinuousViewer();
             Document = result.Document;
         }
         finally { replacing = false; }
@@ -78,6 +102,8 @@ public sealed class DocumentPreview : FlowDocumentReader
         readingMode = preference;
         UpdateGuidance();
         ViewingMode = ResolveMode();
+        if (IsLoaded) ApplyTemplate();
+        PrepareContinuousViewer();
         QueueFit();
     }
 
