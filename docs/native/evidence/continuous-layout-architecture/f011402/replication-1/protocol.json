@@ -1,0 +1,131 @@
+{
+  "Source": "f01140258d06fb669ee39d28c6892619529bc58b",
+  "Base": "a937399a3f822c4e911e1ebe5ec0e426b64c56ac",
+  "Dependency": "9a64dfa5adf79dc447db1f671ea39c94ec42de40",
+  "Replication": 1,
+  "InitialOrder": [
+    "stock",
+    "candidate"
+  ],
+  "HarnessSha256": "7202C4B2B4E10EC7F821D2A4C7EBDF63068744A5B1FAA052D5381993992EE1A8",
+  "OfficialRuntime": [
+    "Microsoft.AspNetCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.AspNetCore.App 10.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App]",
+    "Microsoft.NETCore.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.NETCore.App 10.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App]",
+    "Microsoft.WindowsDesktop.App 8.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 8.0.22 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 8.0.31 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 9.0.6 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 9.0.20 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.8 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.11 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.12 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]",
+    "Microsoft.WindowsDesktop.App 10.0.13 [C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App]"
+  ],
+  "OS": "Microsoft Windows NT 10.0.26100.0",
+  "CpuAvailable": 4,
+  "ImageOS": "win25-vs2026",
+  "ImageVersion": "20261007.264.1",
+  "Runs": [
+    {
+      "Name": "first",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\first-stock"
+    },
+    {
+      "Name": "first",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\first-candidate"
+    },
+    {
+      "Name": "cold-0",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-0-stock"
+    },
+    {
+      "Name": "cold-0",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-0-candidate"
+    },
+    {
+      "Name": "cold-1",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-1-candidate"
+    },
+    {
+      "Name": "cold-1",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-1-stock"
+    },
+    {
+      "Name": "cold-2",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-2-stock"
+    },
+    {
+      "Name": "cold-2",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\cold-2-candidate"
+    },
+    {
+      "Name": "repeated",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\repeated-stock"
+    },
+    {
+      "Name": "repeated",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\repeated-candidate"
+    },
+    {
+      "Name": "distant-edit",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\distant-edit-candidate"
+    },
+    {
+      "Name": "distant-edit",
+      "Adapter": "stock",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\distant-edit-stock"
+    },
+    {
+      "Name": "independent-uia",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\independent-uia-candidate"
+    },
+    {
+      "Name": "lifecycle",
+      "Adapter": "candidate",
+      "ExitCode": 0,
+      "Directory": "D:\\a\\local-docs-studio\\local-docs-studio\\artifacts\\layout-architecture\\lifecycle-candidate"
+    }
+  ],
+  "OtherFixtures": "NOT IMPLEMENTED: first vertical-slice gate must pass before expansion"
+}

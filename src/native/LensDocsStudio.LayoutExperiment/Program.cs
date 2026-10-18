@@ -134,6 +134,10 @@ internal static class Program
                 HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)),
                 SourceRevision = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"),
                 ProductSha256 = Hash(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location)),
+                HarnessInformationalVersion = System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(Program).Assembly)?.InformationalVersion,
+                WpfFrameworkSha256 = Hash(File.ReadAllBytes(typeof(TextElement).Assembly.Location)),
+                WpfFormattingAssembly = typeof(System.Windows.Media.TextFormatting.TextFormatter).Assembly.Location,
+                WpfFormattingSha256 = Hash(File.ReadAllBytes(typeof(System.Windows.Media.TextFormatting.TextFormatter).Assembly.Location)),
                 Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, RuntimeAssembly = typeof(TextElement).Assembly.Location,
                 OS = Environment.OSVersion.ToString(), ImageOS = Environment.GetEnvironmentVariable("ImageOS"), ImageVersion = Environment.GetEnvironmentVariable("ImageVersion"),
                 CpuAvailable = Environment.ProcessorCount, Cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
@@ -145,7 +149,7 @@ internal static class Program
                 EndToEndReadinessMilliseconds = readiness, UiStartThread = uiThread, WorkerLayoutThread = worker, UiEndThread = endThread,
                 CandidateStages = snapshot?.Stages,
                 InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
-                DeferredRequiredLayout = 0, Correctness = "PASS", CompleteLayoutTiming = complete <= 250 ? "PASS" : "FAIL",
+                DeferredRequiredLayout = 0, ListLogicalStyleAndSourceChecks = "PASS", FullParity = "INCOMPLETE", CompleteLayoutTiming = complete <= 250 ? "PASS" : "FAIL",
                 AllocatedBytes = bytes, NaturalCollections = gc, ManagedBytes = GC.GetTotalMemory(false),
                 process.WorkingSet64, process.PrivateMemorySize64, ForcedCollection = false
             };

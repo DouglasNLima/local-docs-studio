@@ -1,0 +1,6 @@
+{
+  "DiagramCases": 134,
+  "Failures": [
+    "Native details expansion: rich-paragraph light expansion: input 326.8 ms; complete=True; formatting=True; rich-paragraph light collapse: input 478.9 ms; complete=True; formatting=True; rich-paragraph light expansion: input 297.1 ms; complete=True; formatting=True; rich-paragraph dark collapse: input 724.6 ms; complete=True; formatting=True; rich-table-cell light expansion: input 323.6 ms; complete=True; formatting=True; rich-table-cell dark expansion: input 651.2 ms; complete=True; formatting=True"
+  ]
+}

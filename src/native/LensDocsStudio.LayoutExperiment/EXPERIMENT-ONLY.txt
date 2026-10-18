@@ -1,0 +1,30 @@
+EXPERIMENT ONLY — Lens Docs Studio Continuous layout architecture gate
+
+This framework-dependent diagnostic executable is not an application installer.
+It changes no updater, file association, saved document or ordinary installation.
+The production application retains its stock renderer. Do not substitute this
+experiment for the application or treat it as a migration/production approval.
+
+Requires Windows with official Microsoft .NET 10 Windows Desktop Runtime (x64).
+No modified framework or bundled experimental runtime is included.
+
+From this extracted folder:
+  LensDocsStudio.LayoutExperiment.exe --view
+  LensDocsStudio.LayoutExperiment.exe --deterministic --output checks
+  LensDocsStudio.LayoutExperiment.exe --adapter candidate --uia --output uia
+  LensDocsStudio.LayoutExperiment.exe --adapter stock --output stock
+  LensDocsStudio.LayoutExperiment.exe --lifecycle --output lifecycle
+
+The window is explicitly experimental. --view is a complete 4,000-item list.
+Arrow/Home/End/Page keys navigate, Shift extends selection, Ctrl+A/C select/copy.
+--source <path> accepts the supported list-only gate model and rejects other
+structures. Inputs are read-only. Close the window to exit. --uia drives actual
+Windows input and clipboard in the diagnostic window; run on an isolated host.
+
+Full acceptance deliberately fails until every required timing and parity
+condition is met. Missing features are not passes. The tested design has a
+demonstrated 250 ms timing blocker; see the source-labelled report/PR receipt.
+
+Source, harness/runtime/fixture hashes and source cleanliness are in the adjacent
+provenance.json and raw measurement receipts. The GitHub Actions run and Draft
+PR #38 identify exact source. Never infer certification from another package.

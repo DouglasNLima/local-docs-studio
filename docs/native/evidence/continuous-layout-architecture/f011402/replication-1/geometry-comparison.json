@@ -1,0 +1,12 @@
+{
+  "Status": "PASS",
+  "Failures": [],
+  "ComparedItems": 4000,
+  "MaximumTopDifference": 1.210719347000122e-08,
+  "MaximumHorizontalDifference": 1.4210854715202004e-14,
+  "MaximumHeightDifference": 0.0,
+  "StockExtent": 132032.66666666666,
+  "CandidateExtent": 132032.6666666788,
+  "MarkerSerialisation": "Stock serialises bullet + tab; candidate logical ranges exclude semantic markers. Clipboard parity is a separate OPEN requirement.",
+  "Raster": "Separate visual comparison required; geometry equality is not byte equality"
+}

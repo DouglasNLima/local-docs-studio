@@ -1,0 +1,22 @@
+{
+  "Status": "PASS",
+  "ClientProcess": 9680,
+  "ProviderProcess": 932,
+  "Transport": "Windows UI Automation across process boundary",
+  "Checks": [
+    "Complete document text through independent UIA",
+    "One semantic UIA list",
+    "All 4,000 real UIA items in order",
+    "UIA selection",
+    "Actual bold text attribute",
+    "UIA point geometry on distant final text",
+    "UIA list-item range relationship",
+    "UIA character endpoint movement",
+    "Real keyboard extension across items, focus retained",
+    "Real mouse drag across items",
+    "Actual Unicode/Text/RTF clipboard formats",
+    "Focus retained after copy"
+  ],
+  "PhysicalScreenReader": "NOT CERTIFIED",
+  "HtmlClipboard": "MISSING"
+}

@@ -71,6 +71,9 @@ internal static class CompleteLayout
         var foreground = new SolidColorBrush(colour); foreground.Freeze();
         using var formatter = TextFormatter.Create(TextFormattingMode.Ideal);
         var normal = new RunProperties(false, false, false, foreground);
+        // Match the stock List's default marker gap: half its inherited natural
+        // line height. The paragraph's explicit 23-DIP advance is a separate value.
+        var markerGap = normal.Typeface.FontFamily.LineSpacing * normal.FontRenderingEmSize / 2;
         var styles = new Dictionary<(bool Bold, bool Italic, bool Code), RunProperties>();
         var plainParagraph = new ParagraphProperties(normal, false, false, 1);
         var markers = new Dictionary<int, DrawingGroup>();
@@ -111,11 +114,11 @@ internal static class CompleteLayout
                                 // Public marker source and formatter, scoped to this one
                                 // snapshot. No private framework or decorative bullet text.
                                 var marker = new TextSimpleMarkerProperties(model.Ordered ? TextMarkerStyle.Decimal : TextMarkerStyle.Disc,
-                                    -7.5, Math.Max(1, markerKey), plainParagraph);
+                                    -markerGap, Math.Max(1, markerKey), plainParagraph);
                                 using var markerLine = formatter.FormatLine(marker.TextSource, 0, 100, plainParagraph, null);
                                 markerDrawing = new DrawingGroup();
                                 using (var markerContext = markerDrawing.Open())
-                                    markerLine.Draw(markerContext, new Point(52 - 7.5 - markerLine.Width, line.Baseline - markerLine.Baseline), InvertAxes.None);
+                                    markerLine.Draw(markerContext, new Point(52 - markerGap - markerLine.Width, line.Baseline - markerLine.Baseline), InvertAxes.None);
                                 markerDrawing.Freeze(); markers.Add(markerKey, markerDrawing);
                             }
                             context.PushTransform(new TranslateTransform(0, top)); context.DrawDrawing(markerDrawing); context.Pop();

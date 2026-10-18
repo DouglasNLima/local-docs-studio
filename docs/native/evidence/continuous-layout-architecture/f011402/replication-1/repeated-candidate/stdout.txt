@@ -1,0 +1,4 @@
+candidate repetition 0: complete layout 246.02 ms; readiness 334.42 ms
+candidate repetition 1: complete layout 209.06 ms; readiness 241.75 ms
+candidate repetition 2: complete layout 257.16 ms; readiness 324.88 ms
+candidate repetition 3: complete layout 239.55 ms; readiness 267.02 ms

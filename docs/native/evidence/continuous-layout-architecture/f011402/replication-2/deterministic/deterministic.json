@@ -1,0 +1,10 @@
+{
+  "Status": "PASS",
+  "Checks": [
+    "LF exact source, Unicode caret clusters and full wrapped layout",
+    "CRLF exact source, Unicode caret clusters and full wrapped layout",
+    "Unsupported structure fails explicitly",
+    "Cancellation before preparation"
+  ],
+  "TimingThresholds": false
+}

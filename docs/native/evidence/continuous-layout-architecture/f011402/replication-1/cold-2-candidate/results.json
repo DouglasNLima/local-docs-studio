@@ -1,0 +1,80 @@
+{
+  "Status": "TIMING_ONLY_PASS",
+  "FullAcceptance": "INCOMPLETE_PENDING_PARITY",
+  "Samples": [
+    {
+      "Adapter": "candidate",
+      "Repetition": 0,
+      "Edited": false,
+      "Fixture": "list",
+      "Temperature": "First fixture execution in fresh process; no prewarm",
+      "FixtureSha256": "A4A19DCD4319BA96D909C117F779EB5EEBC1733F73F831E16D44E63658490EBA",
+      "SourceSha256": "A4A19DCD4319BA96D909C117F779EB5EEBC1733F73F831E16D44E63658490EBA",
+      "HarnessSha256": "7202C4B2B4E10EC7F821D2A4C7EBDF63068744A5B1FAA052D5381993992EE1A8",
+      "SourceRevision": "f01140258d06fb669ee39d28c6892619529bc58b",
+      "ProductSha256": "E52CDEE263874B7004FD885EA567CCD0BF9195F44FA5095DD651B1C042285FE1",
+      "Runtime": ".NET 10.0.13",
+      "RuntimeAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+      "OS": "Microsoft Windows NT 10.0.26100.0",
+      "ImageOS": "win25-vs2026",
+      "ImageVersion": "20261007.264.1",
+      "CpuAvailable": 4,
+      "Cpu": "AMD64 Family 26 Model 2 Stepping 1, AuthenticAMD",
+      "Width": 640,
+      "Height": 300,
+      "Dpi": 96,
+      "Zoom": 100,
+      "Appearance": "Light",
+      "ParsingMilliseconds": 73.085,
+      "StockConstructionMilliseconds": 0,
+      "CompleteLayoutInputMilliseconds": 222.49760000000003,
+      "WorkerFormattingAndGeometryMilliseconds": 210.631,
+      "StockOriginalFirstLayoutMilliseconds": null,
+      "CandidateBeforeFirstRequiredLayoutThroughInstallInputMilliseconds": 222.49760000000003,
+      "EndToEndReadinessMilliseconds": 296.1637,
+      "UiStartThread": 2,
+      "WorkerLayoutThread": 5,
+      "UiEndThread": 2,
+      "CandidateStages": {
+        "FormatLineMilliseconds": 65.6234,
+        "CompleteCaretAndRangeGeometryMilliseconds": 74.0841,
+        "DrawAndFreezeMilliseconds": 61.9731
+      },
+      "InputGapsMilliseconds": [
+        8.6569,
+        39.5035,
+        16.0353,
+        32.5566,
+        17.53,
+        29.128200000000007,
+        17.699899999999985,
+        17.120800000000003,
+        43.29830000000001,
+        15.780099999999976,
+        42.463400000000036,
+        6.575999999999965,
+        9.740700000000004,
+        0.07389999999998054
+      ],
+      "MaximumInputGapMilliseconds": 43.29830000000001,
+      "DeferredRequiredLayout": 0,
+      "Correctness": "PASS",
+      "CompleteLayoutTiming": "PASS",
+      "AllocatedBytes": 68017552,
+      "NaturalCollections": [
+        4,
+        2,
+        1
+      ],
+      "ManagedBytes": 57095928,
+      "WorkingSet64": 160354304,
+      "PrivateMemorySize64": 102195200,
+      "ForcedCollection": false
+    }
+  ],
+  "Retention": {
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  }
+}

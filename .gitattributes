@@ -1,0 +1,2 @@
+# Preserve original diagnostic bytes and their recorded SHA-256 identities.
+docs/native/evidence/continuous-layout-architecture/** -text
