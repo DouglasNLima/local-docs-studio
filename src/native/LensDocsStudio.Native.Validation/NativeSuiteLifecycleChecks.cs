@@ -50,7 +50,19 @@ internal static class NativeSuiteLifecycleChecks
         }
         catch (Exception error)
         {
-            File.WriteAllText(Path.Combine(output, "suite-lifecycle-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); throw;
+            File.WriteAllText(Path.Combine(output, "suite-lifecycle-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
+            // Diagnostic-only hosted tooling captures roots before this failed process
+            // exits. It never changes collection boundaries or the zero-retention gate.
+            var dumpTool = Environment.GetEnvironmentVariable("LENS_SUITE_DUMP_TOOL");
+            if (!string.IsNullOrEmpty(dumpTool) && File.Exists(dumpTool))
+            {
+                var start = new ProcessStartInfo(dumpTool) { UseShellExecute = false, RedirectStandardOutput = true, RedirectStandardError = true };
+                foreach (var argument in new[] { "collect", "--process-id", Environment.ProcessId.ToString(System.Globalization.CultureInfo.InvariantCulture), "--type", "Heap", "--output", Path.GetFullPath(Path.Combine(output, "suite-retention.dmp")) }) start.ArgumentList.Add(argument);
+                using var dump = Process.Start(start)!; var stdout = dump.StandardOutput.ReadToEndAsync(); var stderr = dump.StandardError.ReadToEndAsync();
+                if (!dump.WaitForExit(60000)) dump.Kill();
+                File.WriteAllText(Path.Combine(output, "suite-dump-collection.txt"), stdout.GetAwaiter().GetResult() + stderr.GetAwaiter().GetResult());
+            }
+            throw;
         }
         finally { host.Close(); recorder.Write(Path.Combine(output, "suite-lifecycle-phases.json")); SynchronizationContext.SetSynchronizationContext(previous); }
     }

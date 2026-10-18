@@ -63,8 +63,11 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Build exact-source suite workspace checks
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Install pinned diagnostic-only managed dump tooling on the disposable host
+        run: dotnet tool install dotnet-dump --version 10.0.750501 --tool-path artifacts/native/diagnostic-tools
       - name: Measure native presentation, selection and retained-window lifecycle without UIA transport
         run: |
+          $env:LENS_SUITE_DUMP_TOOL = (Resolve-Path artifacts/native/diagnostic-tools/dotnet-dump.exe).Path
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-lifecycle artifacts/native/suite-ui/lifecycle $appearance
           exit $LASTEXITCODE
@@ -73,6 +76,27 @@ jobs:
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/suite-ui $appearance
           exit $LASTEXITCODE
+      - name: Preserve managed roots for any failed retention gate
+        if: failure()
+        run: |
+          $dump = 'artifacts/native/suite-ui/lifecycle/suite-retention.dmp'
+          if (Test-Path -LiteralPath $dump) {
+            $tool = 'artifacts/native/diagnostic-tools/dotnet-dump.exe'
+            foreach ($family in 'Mermaid','Sequence','State','Er','Class') {
+              $type = "LensDocsStudio.Native.${family}VisualEditorWindow"
+              $listing = & $tool analyze $dump -c "dumpheap -type $type" -c exit
+              $listing | Set-Content "artifacts/native/suite-ui/lifecycle/$family-heap.txt"
+              foreach ($line in $listing) {
+                if ($line -match "^\s*([0-9a-fA-F]+)\s+\d+\s+[\d,]+\s+$([regex]::Escape($type))\s*$") {
+                  $methodTable = $Matches[1]
+                  $addresses = & $tool analyze $dump -c "dumpheap -mt $methodTable -short" -c exit
+                  foreach ($address in $addresses | Where-Object { $_ -match '^\s*[0-9a-fA-F]{12,16}\s*$' }) {
+                    & $tool analyze $dump -c "gcroot $($address.Trim())" -c exit | Set-Content "artifacts/native/suite-ui/lifecycle/$family-$($address.Trim())-roots.txt"
+                  }
+                }
+              }
+            }
+          }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

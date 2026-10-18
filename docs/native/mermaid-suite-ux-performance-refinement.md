@@ -320,3 +320,13 @@ rejected UIA SetFocus. The original failure receipt is retained. Capture-only
 source replacement now uses its existing Value interface and exact-text checks;
 real source keyboard behaviour remains covered by the authoring suites. This is a
 harness correction, not a baseline product fix. Fresh hosted gates are pending.
+
+## Retention failure investigation at `a8c9aad`
+
+The expanded lifecycle gate retains one large Class window in normal appearance
+and one Flowchart window in actual High Contrast. Both original receipts remain
+in the evidence directory. These failures are not cleared by earlier passing
+runs. Pinned stable `dotnet-dump` tooling is added only to disposable hosted
+validation, capturing a heap and managed roots before a failed process exits.
+The zero-retained-window assertion and renderer/test deadlines remain unchanged.
+No diagnostic package is added to the application or installed locally.
