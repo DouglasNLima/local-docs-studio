@@ -115,6 +115,7 @@
     <MenuItem Header="Sequence diagram visually…" Click="InsertSequence" AutomationProperties.AutomationId="InsertSequence"/>
     <MenuItem Header="State diagram visually…" Click="InsertState" AutomationProperties.AutomationId="InsertState"/>
     <MenuItem Header="ER diagram visually…" Click="InsertEr" AutomationProperties.AutomationId="InsertEr"/>
+    <MenuItem Header="Class diagram visually…" Click="InsertClass" AutomationProperties.AutomationId="InsertClass"/>
     <MenuItem Header="Built-in snippet…" Tag="snippet" Click="BrowseContentCatalogue" AutomationProperties.AutomationId="BrowseSnippetCatalogue"/>
     <MenuItem Header="Heading" Tag="heading" Click="Format"/>
     <MenuItem Header="Link" Tag="link" Click="Format"/>
