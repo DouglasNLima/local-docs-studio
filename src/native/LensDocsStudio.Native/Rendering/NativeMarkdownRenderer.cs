@@ -74,8 +74,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
     {
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("started");
-        Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
-        Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
+        var highContrast = SystemParameters.HighContrast;
+        Brush foreground = highContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
+        Brush surface = highContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         foreground.Freeze(); surface.Freeze();
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity, TextAlignment = TextAlignment.Left };
@@ -198,7 +199,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
                     Attach(codeParagraph);
                     CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
-                    await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast, Cooperate);
+                    await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, highContrast, Cooperate);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(codeParagraph, "CodePreview" + code.Span.Start);
                     result = codeParagraph;
                     result.ContextMenu = CodeContextMenu.Create(code, parsed.Source, copyCode);

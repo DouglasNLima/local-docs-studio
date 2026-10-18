@@ -1,11 +1,25 @@
 using System.Windows;
 using System.Windows.Media;
 using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace LensDocsStudio.Native.Platform;
 
 public static class ThemeService
 {
+    [StructLayout(LayoutKind.Sequential)]
+    private struct HighContrastState { public uint Size; public uint Flags; public IntPtr Scheme; }
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool SystemParametersInfo(uint action, uint parameter, ref HighContrastState value, uint flags);
+
+    internal static bool IsCurrentHighContrast(bool expected)
+    {
+        // WPF's cached property can lag a synchronous Windows settings broadcast.
+        // Read only the OS flag at commit boundaries; never change system settings.
+        var state = new HighContrastState { Size = (uint)Marshal.SizeOf<HighContrastState>() };
+        return SystemParametersInfo(0x42, state.Size, ref state, 0) && ((state.Flags & 1) != 0) == expected;
+    }
     private sealed record AppliedTheme(string Variant, ResourceDictionary Dictionary);
     private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<ResourceDictionary, AppliedTheme> Themes = new();
     public static bool IsDark(string theme)

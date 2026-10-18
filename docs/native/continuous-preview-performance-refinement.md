@@ -51,6 +51,9 @@ Changes under validation:
 - Recheck source version, document owner, appearance, resolved diagram palette,
   source/workspace identity and window lifetime before installing a result.
   Stale failures cannot replace current status. Closing prevents new preview work.
+  A read-only native Windows High Contrast flag check also rejects a result while
+  WPF's cached appearance property lags the actual OS. Renderer foreground,
+  surfaces and code colouring share one captured High Contrast value.
 - Map a retained preview selection through source versions into the replacement
   document without moving keyboard focus. Existing source-based viewport and
   scroll-sync ownership remain in force; current editor selection takes priority
@@ -262,6 +265,17 @@ could already select index 1, so assigning index 1 again raised no navigation
 event. The correction explicitly changes selection before retaining the exact
 original caret assertion. Its original logs and both failed acceptance artefacts
 remain [available](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39129124545).
+
+The subsequent actual OS-transition case at `f8a74af` found a product race, retained
+in [its original installation trace](evidence/continuous-preview-performance/contrast-transition-stale-appearance-f8a74af.json)
+and [run 39131744105](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39131744105).
+Windows and WPF reported High Contrast enabled, yet a newly installed document
+retained normal `#FF202124` instead of system `#FFFFFFFF`. The production commit
+boundary now checks the native OS flag in addition to WPF state and cancellation;
+document construction captures High Contrast once. Final transition verification
+observes every document installation, including valid newer preference-triggered
+renders, and retains initial/final traces. It never treats UIA transport as a
+dispatcher measurement. Final source-specific outcomes belong to the PR receipt.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop

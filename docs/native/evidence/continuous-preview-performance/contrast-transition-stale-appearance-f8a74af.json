@@ -1,0 +1,17 @@
+{
+  "Observed": true,
+  "TransitionCreated": true,
+  "ActualHighContrast": true,
+  "WpfHighContrast": true,
+  "PreviousDocumentRetained": false,
+  "ObsoleteAppearance": true,
+  "Installations": [
+    {
+      "ActualHighContrast": true,
+      "WpfHighContrast": true,
+      "CurrentSystemColour": false,
+      "Colour": "#FF202124",
+      "ExpectedColour": "#FFFFFFFF"
+    }
+  ]
+}

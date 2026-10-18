@@ -163,6 +163,7 @@ public partial class MainWindow : Window
         bool Current() => !closing && !cancellation.IsCancellationRequested && model.ActiveDocument == tab
             && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0
             && appearance == model.Theme && dark == ThemeService.IsDark(model.Theme) && highContrast == SystemParameters.HighContrast
+            && ThemeService.IsCurrentHighContrast(highContrast)
             && diagramTheme == CurrentDiagramTheme && sourcePath == tab.EffectivePath && workspaceRoot == tab.EffectiveWorkspace;
         try
         {

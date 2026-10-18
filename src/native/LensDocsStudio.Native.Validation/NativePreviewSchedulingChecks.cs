@@ -183,7 +183,7 @@ internal static class NativePreviewSchedulingChecks
                     using (var contrastDuringConstruction = new DuringConstruction(() => { transitionStarted = true; transition = new NativeTestHighContrast(); }))
                     {
                         Pump((Task)Invoke("UpdatePreviewAsync", false)!);
-                        File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
+                        File.WriteAllText(Path.Combine(output, "high-contrast-transition-initial.json"), JsonSerializer.Serialize(new
                         {
                             Observed = contrastDuringConstruction.Observed, TransitionCreated = transition is not null,
                             ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
@@ -195,7 +195,12 @@ internal static class NativePreviewSchedulingChecks
                             throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
                     }
                     Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
-                    if (preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
+                    File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
+                    {
+                        ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
+                        ObsoleteAppearance = obsoleteAppearance, Installations = installed
+                    }, new JsonSerializerOptions { WriteIndented = true }));
+                    if (obsoleteAppearance || preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
                         throw new IOException("Current actual High Contrast preview lost system text colours.");
                     cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true });
                 }
