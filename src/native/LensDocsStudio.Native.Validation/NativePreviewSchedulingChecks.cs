@@ -161,6 +161,29 @@ internal static class NativePreviewSchedulingChecks
             foreach (var theme in new[] { "Light", "Dark", "Light", "Dark", "Light" })
             { model.Theme = theme; Invoke("ApplyTheme"); Invoke("QueuePreview"); }
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            if (shown && !highContrast)
+            {
+                NativeTestHighContrast? transition = null;
+                try
+                {
+                    previousDocument = preview.Document;
+                    using (var contrastDuringConstruction = new DuringConstruction(() => transition = new NativeTestHighContrast()))
+                    {
+                        Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+                        if (!contrastDuringConstruction.Observed || transition is null || !SystemParameters.HighContrast
+                            || preview.Document != previousDocument) throw new IOException("An actual High Contrast transition installed the obsolete appearance.");
+                    }
+                    Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    if (preview.Document.Foreground != SystemColors.WindowTextBrush) throw new IOException("Current actual High Contrast preview lost system text colours.");
+                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true });
+                }
+                finally
+                {
+                    transition?.Dispose(); Invoke("ApplyTheme"); Invoke("QueuePreview");
+                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                }
+                if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");
+            }
             tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != large) throw new IOException("Rendering changed large-document Undo or Unicode source.");
             var gate = (SemaphoreSlim)Field("previewGate")!;
