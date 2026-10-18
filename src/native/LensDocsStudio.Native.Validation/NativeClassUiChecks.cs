@@ -134,7 +134,7 @@ internal static partial class NativeUiChecks
                 ("unknown-protected", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n"),
                 ("identical-occurrences", "classDiagram\nclass A {\n+string Name\n+string Name\n+Run(path) bool\n+Run(path) bool\n}\nA --> A : self\nA --> A : self\n"),
                 ("empty-cardinalities", "classDiagram\nclass A\nA \"\" --> \"\" A : original\n"),
-                ("reserved-note-target", "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\n"),
+                ("reserved-note-target", "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\nnote for Class1 \"Reserved insertion target\"\n"),
                 ("empty-final", "classDiagram\nclass A\n") })
             {
                 var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); var fixtureBytes = File.ReadAllBytes(fixture); Launch(fixture); Open(0);
@@ -153,6 +153,9 @@ internal static partial class NativeUiChecks
                     Click("ClassResetProperties"); Wait(() => Find(visual!, "ClassNodeId").AsTextBox().Text == "A", "Reset did not restore protected Class properties.");
                     SelectIndex(2); Wait(() => Find(visual!, "ClassSelectionSummary").Name == "Note for B", "The unresolved note did not retain exact source inspection.");
                     Check(Find(visual!, "ClassDependencies").Name.Contains("Future target", StringComparison.Ordinal), "Read-only unresolved notes retain their exact target and text in the native inspector");
+                    SelectClass("A"); Click("ClassAddClass");
+                    Check(Find(visual!, "ClassNodeId").AsTextBox().Text == "Class2" && Draft() == raw && !Find(visual!, "ClassUndo").IsEnabled, "Native class insertion skips reserved note IDs without changing source or history");
+                    Click("ClassResetProperties");
                     Click("ClassCancel"); WaitClosed();
                 }
                 else if (name == "empty-cardinalities")

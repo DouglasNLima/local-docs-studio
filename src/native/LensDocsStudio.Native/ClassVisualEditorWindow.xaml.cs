@@ -174,7 +174,7 @@ public partial class ClassVisualEditorWindow : Window
         : draft.Model.Relationships.Any(item => item.Identity == draft.Selection) ? new UpdateClassRelationship(draft.Selection!, RelationshipValue()) : null;
     private ClassDiagramEditOperation? DeleteOperation() => draft.Model.Classes.FirstOrDefault(item => item.Identity == draft.Selection) is { } cls ? new DeleteClass(cls.Id) : draft.Model.Relationships.Any(item => item.Identity == draft.Selection) ? new DeleteClassRelationship(draft.Selection!) : draft.Model.Classes.SelectMany(item => item.Members).Any(item => item.Identity == draft.Selection) ? new DeleteClassMember(draft.Selection!) : null;
     private ClassDiagramEditOperation? DuplicateOperation() => draft.Model.Classes.FirstOrDefault(item => item.Identity == draft.Selection) is { } cls ? new DuplicateClass(cls.Id, NextId("Copy")) : draft.Model.Relationships.Any(item => item.Identity == draft.Selection) ? new DuplicateClassRelationship(draft.Selection!) : draft.Model.Classes.SelectMany(item => item.Members).Any(item => item.Identity == draft.Selection) ? new DuplicateClassMember(draft.Selection!) : null;
-    private string NextId(string prefix = "Class") { var index = 1; while (draft.Model.Classes.Any(item => item.Id == prefix + index)) index++; return prefix + index; }
+    private string NextId(string prefix = "Class") { var index = 1; while (draft.Model.Classes.Any(item => item.Id == prefix + index) || draft.Model.Notes.Any(item => item.Semantic.TargetClassId == prefix + index)) index++; return prefix + index; }
     private void UpdateActions()
     {
         if (draft is null || UpdateButton is null) return; var can = CanEdit; var clean = !PropertiesPending;
