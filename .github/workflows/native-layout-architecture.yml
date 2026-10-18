@@ -1,0 +1,41 @@
+name: Experimental Continuous architecture gate
+on:
+  push:
+    branches: [experiment/native-continuous-layout-architecture]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  list-gate:
+    name: Complete list gate (replication ${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Same compiled adapters, complete layout and real GUI/UIA
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitecture.ps1 -Replication ${{ matrix.replication }}
+      - name: Deterministic complete-geometry and source checks, without timing assertions
+        if: always()
+        run: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-architecture/deterministic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: layout-architecture-${{ matrix.replication }}
+          path: artifacts/layout-architecture/
+          retention-days: 90
+      - name: Reviewable diagnostic executable; no installation or runtime fork
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: EXPERIMENT-ONLY-layout-harness-${{ matrix.replication }}
+          path: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/
+          retention-days: 90
