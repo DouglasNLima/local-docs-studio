@@ -9,6 +9,20 @@ public class ClassVisualTests
     public const string Source = "classDiagram\n    %% Keep this comment\n    class Document {\n        +string Title\n        +string Title\n        +Open(path) Document\n        +Open(path) Document\n        -Validate() bool\n    }\n    class MarkdownDocument {\n        +Render() string\n    }\n    Document <|-- MarkdownDocument\n    Document \"1\" *-- \"many\" MarkdownDocument : owns\n    Document <|-- MarkdownDocument\n    Document --> Document : parent\n";
     public const string Starter = ClassDiagramSourceParser.Starter;
     private static void Success(ClassEditResult result) => Assert.True(result.Success, result.Error);
+    [Fact] public async Task Unresolved_note_targets_cannot_be_rebound_by_class_identity_operations()
+    {
+        var source = "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\n";
+        var draft = new ClassDiagramVisualDraft(source); var identity = draft.Model.Class("A").Identity; draft.Select(identity);
+        foreach (var operation in new ClassDiagramEditOperation[] { new UpdateClass("A", "B", null, null), new AddClass("B"), new DuplicateClass("A", "B") })
+        {
+            var result = await draft.ExecuteAsync(operation); Assert.False(result.Success); Assert.Contains("unresolved note", result.Error);
+            Assert.Equal(source, draft.Source); Assert.Equal(0, draft.HistoryIdentity); Assert.Equal(identity, draft.Selection);
+        }
+        var member = draft.Model.Class("A").Attributes.Single();
+        Success(await draft.ExecuteAsync(new UpdateClassMember(member.Identity, member.Semantic with { Name = "UpdatedName" })));
+        Assert.Equal(source.Replace("+string Name", "+string UpdatedName", StringComparison.Ordinal), draft.Source);
+        Assert.Equal("B", draft.Model.Notes.Single().Semantic.TargetClassId);
+    }
     [Theory, InlineData("--()"), InlineData("..()"), InlineData("()--"), InlineData("()..")]
     public async Task Lollipop_syntax_retains_pinned_semantics_and_protected_exact_source(string arrow)
     {

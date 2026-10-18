@@ -9,8 +9,8 @@ Class source/semantic tests and hosted canonical fidelity pass. At `a071c7a`,
 normal/actual High Contrast Class UIA, pointer/reconnect acceptance, performance,
 all five editor UX jobs, interaction stress and Chromium/Edge/static pass.
 The initial binding, guide-count and package-control failures are retained with
-their diagnoses and repairs. The complete local Core suite now has 1,643 passing
-cases, including 115 Class cases. The final PR delivery record identifies fresh
+their diagnoses and repairs. The complete local Core suite now has 1,644 passing
+cases, including 116 Class cases. The final PR delivery record identifies fresh
 final-HEAD checks, installed lifecycle receipts, unsigned package versions/hashes
 and independent verification; earlier counts cannot certify a later package.
 Historical editor evidence below retains its original revision and scope.

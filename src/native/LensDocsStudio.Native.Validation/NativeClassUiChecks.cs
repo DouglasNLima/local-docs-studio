@@ -134,6 +134,7 @@ internal static partial class NativeUiChecks
                 ("unknown-protected", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n"),
                 ("identical-occurrences", "classDiagram\nclass A {\n+string Name\n+string Name\n+Run(path) bool\n+Run(path) bool\n}\nA --> A : self\nA --> A : self\n"),
                 ("empty-cardinalities", "classDiagram\nclass A\nA \"\" --> \"\" A : original\n"),
+                ("reserved-note-target", "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\n"),
                 ("empty-final", "classDiagram\nclass A\n") })
             {
                 var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); var fixtureBytes = File.ReadAllBytes(fixture); Launch(fixture); Open(0);
@@ -142,6 +143,17 @@ internal static partial class NativeUiChecks
                     SelectClass("A"); Check(!Find(visual!, "ClassNodeId").IsEnabled && !Find(visual!, "ClassDelete").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled, "Unknown global syntax protects native class structure without history");
                     SelectMember("A", 0); Check(!Find(visual!, "ClassAttributeName").IsEnabled && !Find(visual!, "ClassUpdate").IsEnabled, "Unknown dependencies cannot be overwritten through member properties");
                     Check(!string.IsNullOrWhiteSpace(Find(visual!, "ClassUpdate").Properties.HelpText.ValueOrDefault), "Protected commands expose accessible operation reasons"); Capture(name); Click("ClassCancel"); WaitClosed();
+                }
+                else if (name == "reserved-note-target")
+                {
+                    SelectClass("A"); Set("ClassNodeId", "B");
+                    Wait(() => !Find(visual!, "ClassUpdate").IsEnabled, "An unresolved note target did not protect native class rename.");
+                    Check(Draft() == raw && !Find(visual!, "ClassUndo").IsEnabled && Find(visual!, "ClassNodeId").AsTextBox().Text == "B"
+                        && (Find(visual!, "ClassUpdate").Properties.HelpText.ValueOrDefault ?? "").Contains("unresolved note", StringComparison.Ordinal), "Unresolved note targets protect native identity changes while preserving source, history and pending properties");
+                    Click("ClassResetProperties"); Wait(() => Find(visual!, "ClassNodeId").AsTextBox().Text == "A", "Reset did not restore protected Class properties.");
+                    SelectIndex(2); Wait(() => Find(visual!, "ClassSelectionSummary").Name == "Note for B", "The unresolved note did not retain exact source inspection.");
+                    Check(Find(visual!, "ClassDependencies").Name.Contains("Future target", StringComparison.Ordinal), "Read-only unresolved notes retain their exact target and text in the native inspector");
+                    Click("ClassCancel"); WaitClosed();
                 }
                 else if (name == "empty-cardinalities")
                 {

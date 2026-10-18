@@ -32,7 +32,14 @@ public sealed class ClassDiagramTransformationService
                 || model.Statements.Any(item => item.Protected && (item.Owner is null || item.Owner == cls.Id)))
                 throw new ArgumentException("Repeated class declarations or unknown dependent source protect this class. Use Edit source.");
         }
-        void ValidNew(string id) { Id(id); if (classes.Any(item => item.Id == id)) throw new ArgumentException("A class already uses that ID. Choose a unique class ID."); }
+        void ValidNew(string id)
+        {
+            Id(id); if (classes.Any(item => item.Id == id)) throw new ArgumentException("A class already uses that ID. Choose a unique class ID.");
+            // An unresolved note is rendered as a diagram note by the pinned layout.
+            // Reusing its target ID would silently turn it into a connected class note.
+            if (model.Notes.Any(item => item.Semantic.TargetClassId == id))
+                throw new ArgumentException("An unresolved note already references this ID. Creating, duplicating or renaming a class to it would change the note's target. Use Edit source to handle that dependency explicitly.");
+        }
         void Insert(int at, int index, string text, int count)
         { Patch(new(at, 0), text); identities.InsertRange(index, Enumerable.Range(0, count).Select(_ => Guid.NewGuid().ToString("N"))); }
         void Append(string text, int count) => Insert(model.Source.Length, identities.Count, (model.Source.Length > 0 && !model.Source.EndsWith('\n') ? model.NewLine : "") + text, count);

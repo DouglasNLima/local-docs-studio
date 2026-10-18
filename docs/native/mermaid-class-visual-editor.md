@@ -85,7 +85,7 @@ Exact source remains available in all protected cases.
 | Bare solid `--` | Association in pinned model | Arrow in pinned renderer | Exact token | Path/list | Retained for unrelated changes |
 | Lollipop | Yes | Synthetic targets possible | Original occurrences | Source/list | Structural authoring protected; canonical drawing retained |
 | Relationship labels/cardinalities | Broad labels; quoted cardinalities | Yes | Endpoint-owned spans | Path/label/list | Bounded text; reverse swaps endpoint cardinalities and marker owner |
-| Notes | Global or `for ID` | Yes | Target/text and exact occurrence | List | Read-only; class rename patches known target |
+| Notes | Global or `for ID` | Yes | Target/text and exact occurrence | List | Read-only; rename patches known target; unresolved note IDs are reserved against class creation/rename/duplication |
 | Repeated class declarations | Merges members | Yes | Every declaration retained | Source/list | Owning class protected |
 | Duplicate member names/signatures | Yes | Separate rows | Distinct private IDs | Verified rows/list | Edit exact occurrence; identical-row move creates history |
 | Parallel/identical/self relationships | Yes | Separate routes | Distinct private IDs | Path/list | Compare full tuple in exact positioned input order |
@@ -133,6 +133,13 @@ insertion, movement, deletion and Undo/Redo. A byte-identical member swap still
 commits one private history snapshot because its occurrence identities moved.
 First-reference class ordering is predicted independently when implicit relationship
 endpoints change. No GUID, coordinate or editor metadata is written into Mermaid.
+
+Unresolved note targets reserve their IDs against class creation, duplication and
+rename. The pinned layout otherwise renders such a note as a diagram note, then
+silently attaches it if a class with that ID appears. The explicit dependency
+guard prevents that binding change; rejection retains source, history, selection
+and pending properties. Independent member edits remain available. Core and real
+Windows checks exercise the reserved ID and source-backed note inspection.
 
 Source scanning recognises every non-comment statement independently of successful
 rendering. Ignored global grammar protects structural operations. An unfamiliar
@@ -187,7 +194,7 @@ without any classes also retain the pinned engine's empty-layout limitation.
 ## Engineering checks and qualification procedure
 
 The native solution builds with zero warnings/errors. The latest local complete
-Core run passed 1,643 tests (including 115 Class tests), with zero skips.
+Core run passed 1,644 tests (including 116 Class tests), with zero skips.
 Static integrity passed for 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime dependency scans. These are development observations, not final-HEAD
 certification; additional changes require fresh results.
