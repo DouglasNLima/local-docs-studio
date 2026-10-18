@@ -136,7 +136,7 @@ public partial class ErVisualEditorWindow : Window
     private void Select(string? identity)
     {
         using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Er");
-        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } return; }
+        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; Controls.MermaidWorkspace.DeferNavigationRollback(Elements, () => { updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } }); return; }
         draft.Select(identity); updating = true; try { RestoreSelection(); ShowProperties(); UpdateSelection(); } finally { updating = false; } UpdateActions();
     }
     private void ShowProperties()

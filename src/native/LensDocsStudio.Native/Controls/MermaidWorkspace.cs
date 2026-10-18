@@ -86,6 +86,19 @@ public static class MermaidWorkspace
             else list.ScrollIntoView(item);
         }
     }
+    public static void DeferNavigationRollback(ListBox list, Action restore)
+    {
+        // Selector is still committing its own transaction inside SelectionChanged.
+        // Restore only after that transaction, retaining native SelectionItem state.
+        CancelNavigationScroll(list, new RoutedEventArgs());
+        list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
+        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
+        {
+            list.ClearValue(NavigationScrollProperty);
+            if (list.IsLoaded) restore();
+        });
+        list.SetValue(NavigationScrollProperty, operation);
+    }
     private static void CancelNavigationScroll(object sender, RoutedEventArgs args)
     {
         if (sender is not ListBox list) return;

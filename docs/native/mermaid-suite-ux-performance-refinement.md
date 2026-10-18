@@ -348,3 +348,15 @@ request can restore a stale group offset after rollback. It uses the list's own
 physical top position, and realised containers for other entries, without forced
 layout, conversion or changed selection semantics. The original failed assertion
 and root output are retained.
+
+## Native selection transaction repair
+
+At `1d89721`, the normal 40-window lifecycle passes with zero retained windows;
+shared UIA still reproduces the navigation rollback failure. The initial
+scroll-only approach is not accepted as a fix. All five windows now defer a
+blocked navigation rollback until WPF has completed its SelectionChanged
+transaction, using one bounded callback cancelled on unload. Pending values and
+the private semantic selection are unchanged. The shared regression requires the
+**exact original** SelectionItem name, selected state and viewport visibility;
+an arbitrary visible selected entry cannot satisfy it. Fresh hosted results are
+required. Existing failure evidence remains available.

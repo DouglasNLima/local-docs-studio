@@ -299,13 +299,16 @@ public partial class MermaidVisualEditorWindow : Window
         if (updating) return;
         if (PropertiesPending || inlineEditor is not null)
         {
-            updating = true;
-            try
+            Controls.MermaidWorkspace.DeferNavigationRollback(Elements, () =>
             {
-                Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
-                if (Elements.SelectedItem is { } retained) Controls.MermaidWorkspace.RevealNavigation(Elements, retained);
-            }
-            finally { updating = false; }
+                updating = true;
+                try
+                {
+                    Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
+                    if (Elements.SelectedItem is { } retained) Controls.MermaidWorkspace.RevealNavigation(Elements, retained);
+                }
+                finally { updating = false; }
+            });
             UpdateCanvasSelection(); Status.Text = inlineEditor is null ? "Update the current properties or reset their changes before selecting another element." : "Press Enter to confirm the inline label, or Escape to cancel it."; return;
         }
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));

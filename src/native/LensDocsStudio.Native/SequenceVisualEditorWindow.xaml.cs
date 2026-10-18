@@ -179,7 +179,7 @@ public partial class SequenceVisualEditorWindow : Window
     {
         using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Sequence");
         if (busy || SourcePending || PropertiesPending)
-        { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelectionOverlay(); } finally { updating = false; } return; }
+        { Status.Text = "Update or discard pending properties and validate source before changing selection."; Controls.MermaidWorkspace.DeferNavigationRollback(Participants, () => { updating = true; try { RestoreSelection(); UpdateSelectionOverlay(); } finally { updating = false; } }); return; }
         draft.Select(identity); updating = true;
         try { RestoreSelection(); ShowProperties(); UpdateSelectionOverlay(); } finally { updating = false; }
         UpdateActions();

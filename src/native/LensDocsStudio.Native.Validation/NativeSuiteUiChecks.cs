@@ -69,7 +69,7 @@ internal static partial class NativeUiChecks
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
-                Wait(() => list.FindAllDescendants().Any(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value && !item.IsOffscreen), "Rejected selection left the retained navigation entry outside its viewport.");
+                Wait(() => list.FindAllDescendants().Any(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value && item.Name == selectedName && !item.IsOffscreen), "Rejected selection lost the exact retained SelectionItem or left it outside its viewport.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 if (family is "Class" or "ER")
                 {
