@@ -1,5 +1,11 @@
 # Native diagram compatibility
 
+The [Class visual editor report](mermaid-class-visual-editor.md) tracks the fifth
+native family: dedicated source occurrences, bounded class/member authoring and
+endpoint-owned relationship markers/cardinalities. Method classifiers, unknown
+source and ambiguous namespace/note operations remain protected. Hosted Class
+certification is pending; implementation does not imply readiness.
+
 The [ER visual editor report](mermaid-er-visual-editor.md) records the fourth native
 authoring family: exact source entities, ordered attribute occurrences, PK/FK/UK,
 comments, endpoint cardinalities and identifying/non-identifying relationships.

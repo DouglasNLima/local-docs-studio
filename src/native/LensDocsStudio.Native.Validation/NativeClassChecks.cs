@@ -1,0 +1,62 @@
+using System.Diagnostics;
+using System.Text.Json;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using LensDocsStudio.Core.ClassDiagrams;
+using LensDocsStudio.Core.Parsing;
+using LensDocsStudio.Core.Rendering;
+using LensDocsStudio.Native.Rendering;
+using Markdig.Syntax;
+
+namespace LensDocsStudio.Native.Validation;
+
+internal static class NativeClassChecks
+{
+    public static void Run(string output, bool highContrast)
+    {
+        using var contrast = highContrast ? new NativeTestHighContrast() : null;
+        Directory.CreateDirectory(output); var checks = new List<string>(); var fidelity = new List<object>(); var performance = new List<object>();
+        if (highContrast) Check(SystemParameters.HighContrast, "Actual Windows High Contrast is active for Class fidelity");
+        var emptySource = "classDiagram\n"; var empty = NativeClassPresentation.Create(new ClassDiagramSourceParser().Parse(emptySource), new DiagramService().Render(emptySource), new());
+        Check(empty.Classes.Count == 0 && empty.Members.Count == 0 && empty.Relationships.Count == 0, "Empty canonical Class source has no fabricated geometry");
+        foreach (var file in Directory.GetFiles("tests/fixtures/native-class", "*.mmd"))
+        foreach (var dark in new[] { false, true })
+        {
+            var source = File.ReadAllText(file); var model = new ClassDiagramSourceParser().Parse(source); var render = new DiagramService().Render(source, dark); var native = new NativeSvgService(); var presentation = NativeClassPresentation.Create(model, render, native);
+            var reference = native.Render(render.Svg!); var previewPng = NativeSvgService.ToPng(reference, .75); var canvasPng = NativeSvgService.ToPng(presentation.Drawing, .75);
+            Check(Pixels(previewPng).SequenceEqual(Pixels(canvasPng)), file + ": zero-tolerance canonical preview/editor pixels");
+            Check(presentation.Relationships.Count == model.Relationships.Count, file + ": every supported relationship has an independently verified source occurrence");
+            foreach (var cls in model.Classes) Check(presentation.Classes.Any(item => item.Identity == cls.Identity), file + ": verified class header " + cls.Id);
+            foreach (var member in model.Classes.SelectMany(item => item.Members)) Check(presentation.Members.Any(item => item.Identity == member.Identity), file + ": verified attribute/method occurrence " + member.Identity);
+            var markdown = "Before\n\n```mermaid\n" + source + "\n```\n\nAfter"; var parsed = new MarkdownService().Parse(markdown); var code = parsed.Syntax.OfType<FencedCodeBlock>().Single(); var selected = -1;
+            var preview = new NativeMarkdownRenderer(native).Render(parsed, dark, new Dictionary<FencedCodeBlock, DiagramResult> { [code] = render }, _ => { }, (_, _) => { },
+                new Dictionary<FencedCodeBlock, System.Windows.Media.DrawingImage> { [code] = reference }, editDiagramSource: _ => { }, editDiagramVisually: offset => selected = offset);
+            ((Panel)preview.Media.Single().Actions!).Children.OfType<Button>().Single(button => (string?)button.Content == "Visual Edit").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Check(selected == code.Span.Start, file + ": actual native preview routes the exact Class container");
+            Check(Pixels(NativeSvgService.ToPng(preview.Media.Single().Image.Source, .75)).SequenceEqual(Pixels(canvasPng)), file + ": actual FlowDocument pixels equal Class canvas pixels");
+            var name = Path.GetFileNameWithoutExtension(file) + (dark ? "-dark" : "-light"); File.WriteAllBytes(Path.Combine(output, name + "-preview.png"), previewPng); File.WriteAllBytes(Path.Combine(output, name + "-canvas.png"), canvasPng);
+            fidelity.Add(new { Fixture = name, PixelTolerance = 0, Members = presentation.Members.Count, Relationships = presentation.Relationships.Count });
+        }
+        foreach (var (count, edges) in new[] { (10, 15), (30, 60), (100, 150) })
+            Observe(count + " classes / " + edges + " relationships", "classDiagram\n" + string.Concat(Enumerable.Range(0, count).Select(i => "class C" + i + " {\n+string Name\n+Run(path) bool\n}\n")) + string.Concat(Enumerable.Range(0, edges).Select(i => "C" + (i % count) + " --> C" + ((i * 7 + 1) % count) + " : relation" + i + "\n")));
+        Observe("Many attributes", "classDiagram\nclass A {\n" + string.Concat(Enumerable.Range(0, 250).Select(i => "+string Attribute" + i + "\n")) + "}\n");
+        Observe("Many methods", "classDiagram\nclass A {\n" + string.Concat(Enumerable.Range(0, 250).Select(i => "+Method" + i + "(path, options) bool\n")) + "}\n");
+        Observe("Long method signatures", "classDiagram\nclass A {\n+Run(" + string.Join(", ", Enumerable.Repeat("parameter", 60)) + ") bool\n}\n");
+        Observe("Protected global grammar", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n");
+        File.WriteAllText(Path.Combine(output, "class-fidelity.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Fidelity = fidelity, Performance = performance }, new JsonSerializerOptions { WriteIndented = true }));
+        void Check(bool condition, string message) { if (!condition) throw new IOException(message); checks.Add(message); }
+        void Observe(string scenario, string source)
+        {
+            var allocated = GC.GetTotalAllocatedBytes(); var timer = Stopwatch.StartNew(); var model = new ClassDiagramSourceParser().Parse(source); var parseMs = timer.Elapsed.TotalMilliseconds;
+            timer.Restart(); var render = new DiagramService().Render(source); var renderMs = timer.Elapsed.TotalMilliseconds; double? nativeMs = null; string? nativeError = null;
+            if (render.Success) { timer.Restart(); try { _ = NativeClassPresentation.Create(model, render, new()); nativeMs = timer.Elapsed.TotalMilliseconds; } catch (Exception error) when (error is not OutOfMemoryException) { nativeError = error.Message; } }
+            var draft = new ClassDiagramVisualDraft(source); timer.Restart(); for (var i = 0; i < 1000; i++) draft.Select(draft.Model.Classes[0].Identity); var selectionMs = timer.Elapsed.TotalMilliseconds;
+            timer.Restart(); var edit = draft.ExecuteAsync(new AddClassMember(model.Classes[0].Id, new(Mermaider.Models.ClassVisibility.Public, "Added", "int"))).GetAwaiter().GetResult(); var editMs = timer.Elapsed.TotalMilliseconds;
+            using var cancellation = new CancellationTokenSource(); cancellation.Cancel(); var retained = draft.Source; var history = draft.HistoryIdentity; timer.Restart(); var cancelled = draft.ValidateAsync(cancellation.Token).GetAwaiter().GetResult(); var cancelMs = timer.Elapsed.TotalMilliseconds;
+            Check(!cancelled.Success && draft.Source == retained && draft.HistoryIdentity == history, scenario + ": cancelled validation preserves source/history");
+            performance.Add(new { Scenario = scenario, ParseMilliseconds = parseMs, RenderMilliseconds = renderMs, NativeMilliseconds = nativeMs, NativeError = nativeError, ThousandSelectionsMilliseconds = selectionMs, EditMilliseconds = editMs, RenderSuccess = render.Success, render.Error, EditSuccess = edit.Success, EditError = edit.Error, CancellationMilliseconds = cancelMs, AllocatedBytes = GC.GetTotalAllocatedBytes() - allocated, LimitsUnchanged = true });
+        }
+    }
+    private static byte[] Pixels(byte[] png) { using var input = new MemoryStream(png); var bitmap = new PngBitmapDecoder(input, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad).Frames[0]; var stride = (bitmap.PixelWidth * bitmap.Format.BitsPerPixel + 7) / 8; var bytes = new byte[stride * bitmap.PixelHeight]; bitmap.CopyPixels(bytes, stride, 0); return bytes; }
+}

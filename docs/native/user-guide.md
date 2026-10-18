@@ -383,3 +383,28 @@ Downloading and installing are separate user actions. Installation saves recover
 Production signing identities are not yet configured for this internal preview, so untrusted downloaded installers cannot run through the app. Positive signed-upgrade and clean-machine certification remain outstanding.
 
 Native preferences and recovery are stored under `%LOCALAPPDATA%/LensDocsStudio.Native`. Source documents remain ordinary local files. Automatic release checks are optional; image retrieval and opening external links require explicit actions. The installed editor and preview use no embedded browser, JavaScript runtime or local server.
+
+
+## Class Diagram visual authoring
+
+Use **Visual Edit** on a native Class Diagram preview, or
+**Insert → Class diagram visually…** to start one. Select a class header or a
+member row on the canonical canvas, or use the keyboard-accessible element list.
+Use **Add attribute**, **Add method**, **Add class** and **Add relationship**, then
+**Update properties**. Properties include visibility, bounded types, parameter
+text, relationship type, marker owner, labels and endpoint cardinalities.
+
+**Reverse** keeps the marker and cardinalities attached to their actual classes.
+Reconnect through the endpoint selectors, canvas picking or native endpoint drag.
+New classes use automatic canonical placement and are brought into view.
+
+Visual Undo/Redo affects the private draft. **Validate source** checks the complete
+source and canonical drawing. **Apply** creates one Undo action in the owning
+document; save the document to persist it. **Cancel** discards the private draft.
+
+Unsupported statements remain exact and protect dependent operations. Notes and
+namespace membership are inspectable. Static attributes use the portable `$`
+marker. Method static/abstract classifiers and abstract attributes remain
+protected because the pinned renderer/parser cannot safely author those forms.
+Disabled commands explain their source restrictions. Use **Edit source** for
+protected syntax. Class hosted acceptance is still being certified.
