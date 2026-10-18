@@ -330,3 +330,21 @@ runs. Pinned stable `dotnet-dump` tooling is added only to disposable hosted
 validation, capturing a heap and managed roots before a failed process exits.
 The zero-retained-window assertion and renderer/test deadlines remain unchanged.
 No diagnostic package is added to the application or installed locally.
+
+## Root evidence and corrected measurement boundary
+
+The `0a6d2f9` High Contrast failure heap contains the observed Flowchart window,
+but `gcroot` finds **zero unique managed roots**. This does not prove a persistent
+production leak or identify a particular WPF owner. The original weak-reference
+checkpoint remains a failure. Its collection sequence drained the dispatcher only
+after both GCs, allowing dispatcher weak-event/view cleanup after the last
+collection. The diagnostic now drains between the same two collections as well;
+no collection, timeout or retention allowance is added. Fresh strict-zero results
+are required. Heap/root capture remains enabled for future failures.
+
+The new UIA visibility assertion also reproduces the grouped navigation defect.
+Reveal no longer queues WPF ScrollIntoView for the first grouped entry: that
+request can restore a stale group offset after rollback. It uses the list's own
+physical top position, and realised containers for other entries, without forced
+layout, conversion or changed selection semantics. The original failed assertion
+and root output are retained.

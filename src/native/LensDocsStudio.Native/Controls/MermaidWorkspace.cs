@@ -67,18 +67,24 @@ public static class MermaidWorkspace
     public static void RevealNavigation(ListBox list, object item)
     {
         CancelNavigationScroll(list, new RoutedEventArgs());
-        list.ScrollIntoView(item); list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
-        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, () =>
+        RevealEntry(); list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
+        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
         {
             list.ClearValue(NavigationScrollProperty);
             if (!list.IsLoaded || !list.SelectedItems.Contains(item)) return;
             // Grouped, virtualised lists can settle a stale offset after a rejected
             // keyboard selection. Reveal the realised container after that layout.
-            list.ScrollIntoView(item);
-            if (list.Items.IndexOf(item) == 0) NavigationViewport(list)?.ScrollToTop();
-            else if (list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem entry) entry.BringIntoView();
+            RevealEntry();
         });
         list.SetValue(NavigationScrollProperty, operation);
+        void RevealEntry()
+        {
+            // Do not queue ScrollIntoView for the first grouped item: WPF can
+            // resolve that request to a stale group offset after selection rollback.
+            if (list.Items.IndexOf(item) == 0) NavigationViewport(list)?.ScrollToTop();
+            else if (list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem entry) entry.BringIntoView();
+            else list.ScrollIntoView(item);
+        }
     }
     private static void CancelNavigationScroll(object sender, RoutedEventArgs args)
     {

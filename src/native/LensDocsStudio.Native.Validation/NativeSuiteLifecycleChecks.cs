@@ -35,13 +35,13 @@ internal static class NativeSuiteLifecycleChecks
                 windows.Add(OpenClose(family, -1, host, hostButton, service, observations));
                 Drain();
                 // Diagnostic collection measures retained windows. Never called by production code.
-                GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect(); Drain();
+                GC.Collect(); GC.WaitForPendingFinalizers(); Drain(); GC.Collect(); Drain();
                 var retained = windows.Count(item => item.IsAlive);
                 observations.Add(new { Family = family, Operation = "Controlled diagnostic collection after six smaller and one larger open/close cycle", RetainedWindows = retained, RetainedIdentities = windows.Select((item, index) => item.IsAlive ? "family index " + (index / 7) + ", case " + (index % 7) : null).Where(item => item is not null).ToArray(), ManagedBytes = GC.GetTotalMemory(false), WorkingSet = Environment.WorkingSet });
                 if (retained != 0) throw new IOException(family + ": a closed editor remains retained after dispatcher drain and diagnostic collection.");
             }
             windows.AddRange(ConcurrentWindows(host, hostButton, service, observations));
-            Drain(); GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect(); Drain();
+            Drain(); GC.Collect(); GC.WaitForPendingFinalizers(); Drain(); GC.Collect(); Drain();
             if (windows.Any(item => item.IsAlive)) throw new IOException("Concurrent editor windows remained retained after their cleanup completed.");
             File.WriteAllText(Path.Combine(output, "suite-lifecycle.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrast = highContrast,
                 Dpi = new { X = VisualTreeHelper.GetDpi(host).PixelsPerInchX, Y = VisualTreeHelper.GetDpi(host).PixelsPerInchY },

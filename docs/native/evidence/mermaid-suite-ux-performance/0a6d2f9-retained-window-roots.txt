@@ -1,0 +1,5 @@
+Loading core dump: artifacts/native/suite-ui/lifecycle/suite-retention.dmp ...
+Caching GC roots, this may take a while.
+Subsequent runs of this command will be faster.
+
+Found 0 unique roots.
