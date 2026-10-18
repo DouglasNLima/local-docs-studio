@@ -56,7 +56,8 @@ Changes under validation:
   surfaces and code colouring share one captured High Contrast value.
   While OS/WPF state disagrees, the existing debounce timer retains the previous
   document and waits to prepare the latest source; it does not spin or build
-  repeatedly with an obsolete palette.
+  repeatedly with an obsolete palette. The coalesced request reapplies the current
+  application/editor appearance once when notification state becomes current.
 - Map a retained preview selection through source versions into the replacement
   document without moving keyboard focus. Existing source-based viewport and
   scroll-sync ownership remain in force; current editor selection takes priority
@@ -284,6 +285,8 @@ shows the native guard rejecting the obsolete document while WPF still reports
 the previous state. The harness then waits for the actual asynchronous appearance
 notification within its unchanged 15-second deadline before requesting/verifying
 the current preview, keeping the no-stale-install assertion active throughout.
+It verifies the editor and application system colours without manually applying
+the theme after that notification.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop

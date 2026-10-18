@@ -196,7 +196,7 @@ internal static class NativePreviewSchedulingChecks
                     }
                     var appearanceWait = Stopwatch.StartNew();
                     Pump(WaitForAppearanceAsync(true));
-                    Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                     File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
                     {
                         ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
@@ -204,6 +204,9 @@ internal static class NativePreviewSchedulingChecks
                     }, new JsonSerializerOptions { WriteIndented = true }));
                     if (obsoleteAppearance || preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
                         throw new IOException("Current actual High Contrast preview lost system text colours.");
+                    if (!editor.TextArea.TextView.LineTransformers.OfType<LensDocsStudio.Native.Editor.MarkdownHighlighting>().Single().HighContrast
+                        || application.Resources["WindowBrush"] is not SolidColorBrush windowBrush || windowBrush.Color != SystemColors.WindowColor)
+                        throw new IOException("The delayed Windows notification did not update the editor and application appearance automatically.");
                     cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true,
                         AppearanceNotificationAndCurrentPreviewMilliseconds = appearanceWait.Elapsed.TotalMilliseconds });
                 }

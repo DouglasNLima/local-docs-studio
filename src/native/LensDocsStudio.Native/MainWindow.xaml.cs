@@ -50,6 +50,7 @@ public partial class MainWindow : Window
     private bool closing;
     private bool closePending;
     private bool recoveryBusy;
+    private bool previewAppearancePending;
 
     public MainWindow(WorkspaceViewModel model, DesktopDialogs dialogs, string[] startupPaths)
     {
@@ -87,7 +88,11 @@ public partial class MainWindow : Window
         if (Dispatcher.HasShutdownStarted) return;
         Dispatcher.BeginInvoke(() =>
         {
-            if (!closing) { ApplyTheme(); QueuePreview(); }
+            if (!closing)
+            {
+                previewAppearancePending = !ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast);
+                ApplyTheme(); QueuePreview();
+            }
         });
     }
 
@@ -152,8 +157,10 @@ public partial class MainWindow : Window
         {
             // Windows broadcasts asynchronously to WPF. Keep the complete previous
             // document and coalesce another request until its appearance is current.
+            previewAppearancePending = true;
             model.PreviewStatus = "Updating preview appearance…"; QueuePreview(); return;
         }
+        if (previewAppearancePending) { previewAppearancePending = false; ApplyTheme(); }
         var text = tab.EditorDocument.Text;
         var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";
