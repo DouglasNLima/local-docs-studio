@@ -33,7 +33,7 @@ jobs:
         run: |
           $env:LENS_CONTINUOUS_STACK_TOOL = (Resolve-Path artifacts/continuous-diagnostic-tools/dotnet-stack.exe).Path
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
-          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --continuous-interactions artifacts/continuous-interactions $appearance
+          & scripts/native/Invoke-ContinuousPreviewInteractions.ps1 -Appearance $appearance
           exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
