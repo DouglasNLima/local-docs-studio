@@ -1,0 +1,56 @@
+initial | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / N0 · Node 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+pending field | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=MermaidNodeLabel / Node label | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+source visibility | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=MermaidSourcePanel /  | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+list focus | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=MermaidElements / Diagram nodes, connections and subgraphs | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+exact row focus | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / N0 · Node 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+blocked Down | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / N1 · Node 1 with context | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+reset | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=MermaidVisualEditor / Mermaid Visual Editor | list-hwnd=0 | list={X=336,Y=545,Width=217,Height=318}
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+initial | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / P0 · Participant 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+pending field | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=SequenceParticipantId / Participant ID | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+source visibility | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=SequenceSourcePanel / Portable Mermaid source | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+list focus | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=SequenceParticipants / Participants in source order | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+exact row focus | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / P0 · Participant 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+blocked Down | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / P1 · Participant 1 | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+reset | expected=P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=SequenceVisualEditor / Mermaid Visual Editor / Sequence | list-hwnd=0 | list={X=336,Y=324,Width=220,Height=150}
+P0 · Participant 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=337,Y=325,Width=218,Height=30}
+initial | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / S0 · State 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+pending field | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=StateNodeId / State ID | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+source visibility | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=StateSourcePanel / Portable Mermaid source and validation | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+list focus | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=StateElements / States, scoped markers, composite groups and exact transition occurrences | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+exact row focus | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / S0 · State 0 with a complete long documentation context for accessible navigation | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+blocked Down | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused= / S1 · State 1 with context | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+reset | expected=S0 · State 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True | focused=StateVisualEditor / Mermaid Visual Editor / State | list-hwnd=0 | list={X=336,Y=483,Width=220,Height=386}
+S0 · State 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=516,Width=213,Height=30}
+initial | expected=E0 · E0 | selected=1 | window-enabled=True | focused= / E0 · E0 | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+pending field | expected=E0 · E0 | selected=1 | window-enabled=True | focused=ErNodeId / Entity ID | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+source visibility | expected=E0 · E0 | selected=1 | window-enabled=True | focused=ErSourcePanel / Portable Mermaid source and validation | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+list focus | expected=E0 · E0 | selected=1 | window-enabled=True | focused=ErElements / Entities, attributes and exact relationship occurrences | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+exact row focus | expected=E0 · E0 | selected=1 | window-enabled=True | focused= / E0 · E0 | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+blocked Down | expected=E0 · E0 | selected=1 | window-enabled=True | focused= /   E0 · attribute 1 · int id | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}
+reset | expected=E0 · E0 | selected=1 | window-enabled=True | focused=ErVisualEditor / Mermaid Visual Editor / ER | list-hwnd=0 | list={X=336,Y=411,Width=220,Height=458}
+E0 · E0 | selected=True | off-screen=False | {X=342,Y=444,Width=213,Height=30}

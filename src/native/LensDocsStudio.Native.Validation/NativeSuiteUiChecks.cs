@@ -80,8 +80,9 @@ internal static partial class NativeUiChecks
                 {
                     var longText = family == "Class" ? "OpenDocumentWithCompleteLongMethodDescription" : "completeLongAttributeDescriptionForAccessibleNavigation";
                     list.Focus(); Keyboard.Type(VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.DOWN); Keyboard.Type(VirtualKeyShort.DOWN);
-                    var longEntry = list.Patterns.Selection.Pattern.Selection.Value.Single();
                     Wait(() => Find(visual!, prefix + "AttributeName").AsTextBox().Text.Contains(longText, StringComparison.Ordinal), "The exact long member/attribute occurrence did not reach the inspector.");
+                    Wait(() => list.Patterns.Selection.Pattern.Selection.Value.Single().Name.Contains(longText, StringComparison.Ordinal), "The long member selection did not reach its UIA peer.");
+                    var longEntry = list.Patterns.Selection.Pattern.Selection.Value.Single();
                     if (!longEntry.Name.Contains(longText, StringComparison.Ordinal)) throw new IOException("Long member accessible name was truncated.");
                     checks.Add(theme + " " + family + ": full long member name, exact selected occurrence and persistent parent context");
                     var itemBounds = longEntry.BoundingRectangle; Mouse.MoveTo(itemBounds.Left + itemBounds.Width / 2, itemBounds.Top + itemBounds.Height / 2);

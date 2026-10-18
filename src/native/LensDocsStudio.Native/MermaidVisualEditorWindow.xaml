@@ -57,7 +57,7 @@
 </UniformGrid>
     <TextBlock DockPanel.Dock="Top" Text="DIAGRAM" Style="{StaticResource Desktop.PanelHeading}"/>
     <TextBlock DockPanel.Dock="Bottom" Text="Ctrl+click selects several nodes" Style="{StaticResource Form.Help}" Margin="10,8"/>
-    <ListBox Style="{StaticResource Mermaid.GroupedNavigation}" x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource Mermaid.NavigationItem}" AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements">
+    <ListBox Style="{StaticResource Mermaid.Navigation}" VirtualizingPanel.VirtualizationMode="Standard" x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource Mermaid.NavigationItem}" AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements">
      <ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle>
      <ListBox.ItemTemplate><DataTemplate><DockPanel ToolTip="{Binding Description}"><ui:CommandIcon Kind="{Binding Icon}" DockPanel.Dock="Left" Margin="0,0,7,0" Width="16" Height="16" Foreground="{DynamicResource MutedTextBrush}"/><TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DockPanel></DataTemplate></ListBox.ItemTemplate>
     </ListBox>

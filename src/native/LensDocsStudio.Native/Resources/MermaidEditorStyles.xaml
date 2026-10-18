@@ -18,13 +18,6 @@
   <Setter Property="ItemContainerStyle" Value="{StaticResource Mermaid.NavigationItem}"/>
   <Setter Property="ItemTemplate"><Setter.Value><DataTemplate><TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DataTemplate></Setter.Value></Setter>
  </Style>
- <Style x:Key="Mermaid.GroupedNavigation" TargetType="ListBox" BasedOn="{StaticResource Mermaid.Navigation}">
-  <!-- These source-budgeted lists use physical scrolling. WPF grouped recycling
-       can retain a stale group offset after a rejected keyboard selection. -->
-  <Setter Property="VirtualizingPanel.IsVirtualizing" Value="False"/>
-  <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="False"/>
-  <Setter Property="ScrollViewer.CanContentScroll" Value="False"/>
- </Style>
  <GroupStyle x:Key="Mermaid.NavigationGroup"><GroupStyle.HeaderTemplate><DataTemplate><TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" Margin="10,12,6,4"/></DataTemplate></GroupStyle.HeaderTemplate></GroupStyle>
  <Style x:Key="Mermaid.InspectorHeading" TargetType="TextBlock">
   <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="TextWrapping" Value="Wrap"/>

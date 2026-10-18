@@ -424,3 +424,23 @@ row through UI Automation, verifies keyboard focus, then delivers Down. Native
 and UIA paths now share the identical long-name fixture generator. The native
 path also retains source expansion/collapse. All original visibility assertions
 remain; no new product behaviour is claimed certified from this diagnosis.
+
+## Correct keyboard precondition; rejected scrolling workaround
+
+At `47623c0`, UIA verifies the exact selected row has keyboard focus before Down.
+Flowchart, Sequence, State and ER pending/reset checks then retain exact identity
+and visible bounds. The log records the next focused row during blocked Down,
+while the original selection remains visible. The previous synthetic action had
+focused the ListBox control rather than its selected row. Native input checks
+continue independently with the same long-name fixtures and source visibility.
+
+The next ER long-member check captures its peer before both asynchronous Down
+inputs complete. Its inspector subsequently reaches the correct long attribute,
+but the captured peer still belongs to the first attribute. The harness now waits
+for both inspector and Selection-pattern state before capturing that peer; full
+name assertions remain unchanged. The original failure is retained.
+
+Physical scrolling did not resolve the previous synthetic focus failure and adds
+unnecessary initial container allocation. That approach is rejected; grouped
+virtualisation is restored. No performance gain is claimed from this reversal.
+Fresh native/UIA results remain required for the restored configuration.

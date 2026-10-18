@@ -1,0 +1,2 @@
+System.IO.IOException: Long member accessible name was truncated.
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_0.<RunMermaidSuite>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 85
