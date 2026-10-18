@@ -1,722 +1,721 @@
-[
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/browser-pr-ci.json",
-    "sha256": "141c5a50eed38dfd8ce5013dd8ce95375c09226dd972a72aa0f2c400fcd2e72c"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-fidelity.json",
-    "sha256": "3318adc72345e377c7101d4df31ce8d5cb7d8de6b00ab6fa45008590831bcf1f"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-performance-ui.json",
-    "sha256": "7d8630e1d341cc589fdc718ed0772721a75da264cf07375746dda62b60c17b0f"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-ui.json",
-    "sha256": "d287e4d81ac7b6c6457502c66169d12a9d711514a55c26cda962544e3eeee002"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-fidelity.json",
-    "sha256": "e26b23ec9739069d51b342aa67444c9263e654f11a44c49719058975d32e6cab"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-performance-ui.json",
-    "sha256": "c3a5fa6c787a1437a65545b8f90b83919c769ef8b8948060fc37a22a7e1ca92e"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-ui.json",
-    "sha256": "02307f82bd6654854fffafca22ff39b9b3c221ae2c60b1d8bd339d3ca5eb7f5f"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-details.json",
-    "sha256": "4d58bdf28461b82439f10baa00bc1b4d8ec9b9d96face4ce4fc9c9df841d48ec"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-list.json",
-    "sha256": "366fd9ed5b83342b24586cb8583082e0c79848775748c7175de613209c3a24c7"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-mixed.json",
-    "sha256": "57afe78459c38479cf950285abd95c3e0014b5db0a198b3eae1886c35d08e404"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-paragraphs.json",
-    "sha256": "73074acc785c7fc43b945f82adceb2a806bd96364a92276378d2884d2de2e898"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-quote.json",
-    "sha256": "bdad1cdc3134626541d0e23119423b65418050030b6e3e14f0abcd54591aacf2"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-table.json",
-    "sha256": "0129fd8ce9e6f7400a103d5094c85d2c7bd4ea0d3c1ad0b4ef8a5b842fc9a93c"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/core-test-summary.json",
-    "sha256": "c1385588b3cf6f778c34bdb3d173e322fe046f718df16957ca2f8cf8b08417de"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/desktop-runtime.json",
-    "sha256": "2777e70905eaa2e01070c589bf8ba3e480fa3b33f2befaef815987585fd7a8fc"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/desktop-ui.json",
-    "sha256": "804075767598d830d1a9c8917ad55a011042d90361a7c9ee723ea6511a7964c6"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-fidelity.json",
-    "sha256": "1bd7e53bd85aa8241237e4afbb0165006522ca097c8a04d84ebcc8ba2fa38593"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-performance-ui.json",
-    "sha256": "f0e4ece95efcadf64438ea0091fd63b24962590544b0fc52537f72b79dec59dc"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-ui.json",
-    "sha256": "af022f38481778b425a86f9075654b429048a3b8e8eaaff4aa524359083e1819"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-fidelity.json",
-    "sha256": "4cd7be548ac2ad5248180125c1809e72d04b14c31a9e564e18f3efa92a169d8b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-performance-ui.json",
-    "sha256": "9561a57bb5fc2990b63f445a5f540eb2a91bdbb843842c46c4012a22cb0e06a6"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-ui.json",
-    "sha256": "6ee9b20ac8c2f58aa8592fd1eb26b67488d6ca6b2016a5bad62777cf58215e07"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-display-restoration.json",
-    "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-display.json",
-    "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-suite-lifecycle.json",
-    "sha256": "e1441d7446a5f3f443c153bc5a4f6152e62c331e07d6990875c100ebf3a887cf"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-suite-ui.json",
-    "sha256": "df04993213ee5b1cc89b4c45762e74c7c1f08b85563dfe5c0daabb961faa9b90"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-high-contrast-windows-events.txt",
-    "sha256": "67ee47893edfc8c8510f343d687fbc232c4c45b28c3a0a48888c05555192fc4a"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-normal-windows-events.txt",
-    "sha256": "2d4836593f4c67b93646d7ecceef9f2408ef6b1f2355396364fb20c9a1e81d78"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/independent-package-verification.json",
-    "sha256": "c7b94c2449c1470b9efc6066ed3a0f30b747df74ea8edbe235036e052174ada2"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-install-ui.json",
-    "sha256": "2ff8958a9e52c2b9dbd6fcb2ee752028f00db2d17f2661afd7163944f2c7384e"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-reinstall-ui.json",
-    "sha256": "00bbf839bbbbb0a8cce3e3927815f35971269f85631a4630d530b620e3a205c7"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-upgrade-ui.json",
-    "sha256": "c06ff3598f19cfb568779dec37c661faac39b819aedc5715dc6d15d08094a2fb"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class.json",
-    "sha256": "fbec16fd2eb6c205d14f1fa24f26401173e2c816357e7153f1b44931d4ed3d33"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-install-ui.json",
-    "sha256": "d9b0a81655b27e48f5223dc2acae6a043052044719545b156a679f6061ccd890"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-reinstall-ui.json",
-    "sha256": "b6a8f61c0916d1862ad1f6c4dbd5c323539699263ade3f3b664cfea7bf2023ec"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-upgrade-ui.json",
-    "sha256": "4a56f6e163621077b96f524744ceafb5615fb5faf7b29d5b059340d40d775bc7"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er.json",
-    "sha256": "6b197a968f15a513ecd3ea89795ccf1a00a6760bd81f481533a47463c2cae7f2"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-install-ui.json",
-    "sha256": "212e81e201fe2a92e64e6529648a606659228a99b3c84198d29ba38a5a87086b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-reinstall-ui.json",
-    "sha256": "164d429c4b6d4337aba9690097cf11f300707664bb08e5e90b44c5d9d5b6d9f2"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-upgrade-ui.json",
-    "sha256": "bdabc47547e1f00e58fc9e6aec3b813c3159017735c418491515073d8ddb9a01"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart.json",
-    "sha256": "e6687a8d8fe63e88e571d17cef76a503fcb9726c22fbabbcc9e14bf323d21e36"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-install-ui.json",
-    "sha256": "f2f546d90a68b6896a0041e6e86d99a186f209d3c3bc7e4f7ced4ec2837f4f28"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-reinstall-ui.json",
-    "sha256": "aecc194d427da55fc5537b7709d1969b8fdf92343e38c4208d8e1a4ccb8f5064"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-upgrade-ui.json",
-    "sha256": "9dc41f1435831afe4207d4af2c3c1106b93ca85e1eb5f42a174de0aee9b650e7"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence.json",
-    "sha256": "ac99956aebf9f2ac87ad148f6d97493a3c1a66b94bf64832ba1593c497874ca9"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-install-ui.json",
-    "sha256": "383e251bd4c384c48f9072e40521fbf11a4817e1d09aecd638e932fa785162bf"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-reinstall-ui.json",
-    "sha256": "665cfb47d6cd1a6068145acd2a1550f9d6fccb5fc2f0e4905c2693ae7c27dcdb"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-upgrade-ui.json",
-    "sha256": "e6969460ef482ad951496a969ec90da555d2e35dea1b9df31f42a2c960e158a6"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state.json",
-    "sha256": "7c3d11a5b04637c8401aab51e8083dd29d7398cb2e89d4e463206b06b38b08fe"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installer-results.json",
-    "sha256": "4829c33ebcb8b77f6284ed9d01d31a038255d4e8c349dfbb62ea51943dd1876d"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/interactions-pr-ci.json",
-    "sha256": "bcfcb1aa80dcf5b39d349cd425a43b3c0139b9dd69e0ae725db869d7dfc4b402"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-fidelity-fidelity.json",
-    "sha256": "ac57149f03a1367d96020395c7466d61813e6c0735c70170e1344b659beeac0b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-high-contrast-mermaid-ui.json",
-    "sha256": "5f62ae41d95735e2f46ca4c211d14c6903cbe1c2c0defe465b78ddedd965ddca"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-ui-mermaid-ui.json",
-    "sha256": "984972ec6d0df8dfdd8a9bb4a3c3a8e75162e6b914600156c10fc8bc36aaaa5c"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-corpus-summary.json",
-    "sha256": "29354237254c5e8bf4ec2ffdc871de732ada2ff64a70bb3b09d1f46d4f8c396e"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-pr-ci.json",
-    "sha256": "ca67f00621fe6a6b153a041c0895442dcdef0b78062bbbd666e81bf85a9b2ed7"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-push-ci.json",
-    "sha256": "8a6f3f38cd9bdced00e79767a7f37492482283f1cadaf63e7542e2100ccb542b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-display-restoration.json",
-    "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-display.json",
-    "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-suite-lifecycle.json",
-    "sha256": "391e918a9926d83b9fc9ca6958d758c2f29f7809507d2ca0f8a60344ef01682e"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-suite-ui.json",
-    "sha256": "38c29f926a16085e0d776ca2ff6490c62abfb01704d4d4a1f695d77e00a3107a"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-negative-controls.json",
-    "sha256": "54bb99723eb702a7998db902eda05cb58ac03a3a8d86232f455a216133c724f3"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-SHA256SUMS.txt",
-    "sha256": "33b46c1134a062afe9ec6415361fd9dba62374fd46ab288498625dd02e37edd1"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-version.json",
-    "sha256": "d6c4fb39fb333a05f589f77b9bc79c91cdce44b26e385695a2990a0aeaf3db2e"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/pointer-high-contrast.json",
-    "sha256": "01a9d5c91ef8f36e8eab0ff8fc15a64b5851fcab6f21387e46bbc7c1cdbfd310"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/pointer-normal.json",
-    "sha256": "ae2abb6419ec5ed3d7f68c1824d5066e07b7e21927f9ebee542aa5e6550ec233"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-after-suite-performance.json",
-    "sha256": "cc3d7b13e13ced9e2ccfe6b812701f274fb44cf08c899154eb805f6405885906"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-before-suite-performance.json",
-    "sha256": "b64e07a1e5cb743912232be69819d401b9e52fea4846beeaa5b0b2c3468f6e8f"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-cache-suite-cache.json",
-    "sha256": "a5c1dfeaf073b59954c4198f991a65a3beb9a2f11a36ceaefdebf9fc92ae9321"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-phases-suite-phases.json",
-    "sha256": "7157cd0b4c0de86f30cfec0a59a87379150e4849f42f3f533109a95f15d88406"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/provenance.json",
-    "sha256": "69821fb7d3f18cf8f955dfdf9b5c0e5a7a615824fd57d42036c97648f230c186"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-after-suite-performance.json",
-    "sha256": "8744c850a4ce2e92b1500c2e1d908cd032fe150eb65968013f1c60cccac97e72"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-before-suite-performance.json",
-    "sha256": "d92352cfbf51848d1bdb03ebae9b93fa783ced6214284812a3df735a69e111f1"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-cache-suite-cache.json",
-    "sha256": "a5c1dfeaf073b59954c4198f991a65a3beb9a2f11a36ceaefdebf9fc92ae9321"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-phases-suite-phases.json",
-    "sha256": "ad3bcefcd515db681f2de5d4fcd6d8578c34c6fdf6b2eac98cb52c01152548cb"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-high-contrast-fidelity.json",
-    "sha256": "4402aa4df3d2950f33112d0289b5881ae90eb200385c114c9253cb2c25c4fabc"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-high-contrast-ui.json",
-    "sha256": "300d24634f6d556226ff17cf6f23508dc2530564b0821c352f5c625560ab2b50"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-normal-fidelity.json",
-    "sha256": "64837dcff13eb1bc53da2fcbb9f413c061a953786e4f542081cdc4967485f3bc"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-normal-ui.json",
-    "sha256": "0b187d40bf90451e83b464964f37a64fcef83bd59e9381cf367e3aa2ca6ee44a"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-fidelity.json",
-    "sha256": "baa979cec007df74ee4a9d907ea244d9d522666cd0582ed9cb8485a172142b92"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-performance-ui.json",
-    "sha256": "7efe9ab5a915881da085a71f68344af75b49228b6adc4e1a39164af50bccffeb"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-ui.json",
-    "sha256": "01779f5d410a0b8922ecc99e37ba2b4c0e2b713f9a47795106ab422055acfce5"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-fidelity.json",
-    "sha256": "1ccfeb93ffe05878de06a55015b2550fa6d0065733510bb4ef352ea3e36ffa1c"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-performance-ui.json",
-    "sha256": "4ce200ae35cd14841b18fa02dde00aa9fdf72e7630e66d807a44f43852cd303a"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-ui.json",
-    "sha256": "d05e7c852c9ec98d460d31ba40ba7711c366e8b8e987d0ab62a4ecc8f13e0557"
-  },
-  {
-    "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/ux-pr-ci.json",
-    "sha256": "4e57cfc0e01cc9a26256b9e504de0d947d05350999164d1dc99f056547992550"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Class-inspector-lower.png",
-    "sha256": "eb3e98f95926338572585a9a68ad600ef8733992730a2262feddb1b9b870ab38"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Class-source-expanded-880x600.png",
-    "sha256": "2c529d15fb3220e9fce23fd58e9167ee89315a08e26d44485a183a5e05e92c7c"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-ER-inspector-lower.png",
-    "sha256": "7ef093aa1398d4a06f5b5eee346a46d12e704070d81a81dda55e3ae98009f73f"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-ER-source-expanded-880x600.png",
-    "sha256": "0044b1cd36658e2600cd2010d901d3b9e83effcca097e23921f3c83b6a88af00"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Flowchart-inspector-lower.png",
-    "sha256": "2775d420684d71478535417aef921ebb06bba368f65821e211a27dd81501edcb"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Flowchart-source-expanded-880x600.png",
-    "sha256": "87c4f0b979dc5e43aeea8acccd9ad355e52a340a4b3054829533777af0e5e499"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Sequence-inspector-lower.png",
-    "sha256": "a396b2cee2badda969fd61dda40602d02a9bba71c3cab05ef3c9f62b9403419a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Sequence-source-expanded-880x600.png",
-    "sha256": "fca7fb6dd5458e0a8a8acb91ad8c4644e3c5839722227c37896b00ab72eaefc0"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-State-inspector-lower.png",
-    "sha256": "e488dd89c3a2cef95067da6ce987832bbc7caf8eebdef57de1319f7dcd8ed0c2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-State-source-expanded-880x600.png",
-    "sha256": "58aef4ba6538200bbc1cf61aaef4e42002d75392b3e166b79d6a28ab53781f1a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/class-unknown-protected.png",
-    "sha256": "da05a8403f500495efb7c732ae84b07d3e88d76d7086028a0c61534d743c3633"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Class-long-navigation-tooltip.png",
-    "sha256": "56b5e0168b2697cf664b7e69142d201879de2136cbe27820a01352cb1245e405"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-ER-long-navigation-tooltip.png",
-    "sha256": "19eaf4dd787987c4ce6b53042bc145ebc3d1a131aa9ce1c84bfbc99bb783f699"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Flowchart-pending.png",
-    "sha256": "b81acee7390c96cc2bff041ccfa988230bdbecf7f9dc47570c7da35035687d85"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Sequence-pending.png",
-    "sha256": "a0cb91fd7508bec48547c78b4713060f54afc87b34dbae24d60ad34ece7b9ecf"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-State-pending.png",
-    "sha256": "0a154d6139d4b355f69190b52af2f1785429194f2ae08d6eda8c71561b268895"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/er-unknown-protected.png",
-    "sha256": "39c4bcc035ea57f46260427012bc07211d0430ffbbe7fbc20818988abb028596"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Flowchart-invalid-source.png",
-    "sha256": "5aa2fbccdb374c7fdd90077d1a2b0fd17ff2d6bccad2c8e792b7a7f96c3be0ef"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Flowchart-protected-source.png",
-    "sha256": "7b0c202c9a886ddd128e757f910f0b9247f12c67f896b9c311d374cd679363b2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-initial.png",
-    "sha256": "dbf00cbbc29cb8f046a01839ab2c5df7f9fb950d5fb80933ba692b092a895fd2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-pending.png",
-    "sha256": "bcc511244034ace132725e606a7ca923aaaed3c3a5e6e13a00582a9983304861"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-collapsed-1024x768.png",
-    "sha256": "56c099a6bc4010d4f19871d38a397116cdce359aebdfc5ceb71cce66f826d42e"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-collapsed-1920x1080.png",
-    "sha256": "11f5481c2dd5fcfc652b780c8136b344703cf053b5a2a036e946dd7c976997f6"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-1280x800.png",
-    "sha256": "26bc812bc78c9db4570212893351b2a44015f5ced788ed010f40ab5eacf0a00c"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-1440x900.png",
-    "sha256": "622cee9f251e529835409fec53bc0b9834cc01273e97ed71a010b6a6090171a1"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-880x600.png",
-    "sha256": "2e99b93a916533955e707be2adf63f49c4f81a627084596718f250c72c8ec029"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-initial.png",
-    "sha256": "7e19621532446c8362dffd8fb3af7af844802e3451f9861260aeab4677358d44"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-pending.png",
-    "sha256": "2e6e46315c3bd62b77cef72272923ad1535083fb9aadde1ea028158e86f961ae"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-collapsed-1024x768.png",
-    "sha256": "cf935587bc07336462785da053e4124dbf5438cae114c7966f9f5672721d21cb"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-collapsed-1920x1080.png",
-    "sha256": "4cadd95f9bf76b83402624d4fcf44c9386410336dfb2d387b231061c30a102e6"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-1280x800.png",
-    "sha256": "fcac2ded2491575d819e76967eb51f0247048acd97d4a98024e57cce8b738bd2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-1440x900.png",
-    "sha256": "fb73f18992c19c28f01647b4d18cf5d0fdcbe994dfa9d8e53f79ca6dbc21dd52"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-880x600.png",
-    "sha256": "a294ea9dd4e99b85a2d6b73c5c676786a35374917489cdcf1c4aad4bc604cc24"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-initial.png",
-    "sha256": "df3b85921f19303dcab6cb5d58ee8028693756c980e239bf39a64a52987c5312"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-pending.png",
-    "sha256": "ec80dab6e704d62c0060d4803864dbac6388b8ba732a85fdb3b88e0d73dc1d83"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-collapsed-1024x768.png",
-    "sha256": "b1095b6bba094716a1af80b41e282f0ecb54d1a12c7c6bc3fdff5b6d290f769f"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-collapsed-1920x1080.png",
-    "sha256": "23511e769e337a3c2aa1cf640a0774a1cdb92d0e980e2fce8c90bc5e752f6b94"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-1280x800.png",
-    "sha256": "41f248885e742eac015952631c77c8632f5e5d81f133c86181b875a360cf74a1"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-1440x900.png",
-    "sha256": "f7d21946fb4f854f39adfe3caddeff26f3ae264205e1a44ea8391bfd7cb40089"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-880x600.png",
-    "sha256": "20b3415003bcda7badec9ccd235fecacf1671ddb8623c7b928468d6b21c899b7"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-initial.png",
-    "sha256": "f9e0c68e7526b359a04480bbf6cac214dcad7b6eff9ea89d65a456ed466594f7"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-pending.png",
-    "sha256": "b5e097ce98af90925dc4a141d6e31f5b8719fdd067ddf9cbbc7931515434d5aa"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-collapsed-1024x768.png",
-    "sha256": "863b0892ea2e764d8aa5a1520ecb19c06c5ff897da7bcb7a1f70d86debb5458e"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-collapsed-1920x1080.png",
-    "sha256": "8e7f55ad449d8078e9ddbf6610469afe69963219b7614931e6a1ae9914085605"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-1280x800.png",
-    "sha256": "a4bab8cfd0ba05a79ea4aaf6bfe3df4bca4f213513c9303b1d196aa06570bc73"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-1440x900.png",
-    "sha256": "431364828b8a3a0c11ea3be9e988042ae253baf625ffc4502670f5e6bc48417a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-880x600.png",
-    "sha256": "862e9a83abe9a3e6353f3ed4ba2db7d2ef56ec5ee9db0844591a7100ea5ca759"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-initial.png",
-    "sha256": "2f73297d9c9d1e82b7c72f4f7b511464a9dc7ececfab59fbb255d884a2f42f09"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-pending.png",
-    "sha256": "69cf99f235a41a9b39a324cf6692898d5b23f1039cdcd9dd408111424a775225"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-collapsed-1024x768.png",
-    "sha256": "b3a80f55441b8315027fd2ce2e47f89cd6f2a3c8e0f7c5d34ebc8b965d6895f8"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-collapsed-1920x1080.png",
-    "sha256": "160153a9e20575f1c7ab47127afe3786c102a85a9298a8014aa4f69d5effe696"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-1280x800.png",
-    "sha256": "f52bd02f6f179c108f4231703346a18c2879977db1103c35973bc50e880e4fcb"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-1440x900.png",
-    "sha256": "f048eeb8950d59d631a8defc025a20ba8c15a037f628ec404adbe74abc548433"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-880x600.png",
-    "sha256": "63ce2a8fd8d4c3a32862f32ef1f28914e122bab50d5ccfc222e38ab83a69976a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-initial.png",
-    "sha256": "d3092bce7bf29969a8a55d81a1b4b8a2f22dc7f0fab49db40c28b1851c0a92ce"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-pending.png",
-    "sha256": "126f77491c9cb5dfb73876afb0dec2c33c418f524cf4878baeb2bd6b97330578"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-collapsed-1024x768.png",
-    "sha256": "933fca577d42447f03cbce9a02070b06b73322d068654b06245f1d52c21d9fd7"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-collapsed-1920x1080.png",
-    "sha256": "c271fecc7336e153adc1721e251a71a239fb0718de8ead8e58dd2f3a1c6e2ca2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-1280x800.png",
-    "sha256": "873b8d59c2951d3eecd9719fd08bd729c8d684d8d44087f1a264b2297367e155"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-1440x900.png",
-    "sha256": "98451bb7d5c75cd2a6b4fad2e9c7ea02314a78a628da12df62565a39bf788eba"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-880x600.png",
-    "sha256": "674792a49d7dad612ecc699126ae767fd0ae74f295d1ad3c00154f96ec73c38b"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-initial.png",
-    "sha256": "59330797bae15337f168966bf47f510ea7fd64efab2eee6096f9b335ece43d02"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-pending.png",
-    "sha256": "fd48aeacee563f44643db0d3df9b5842b6007472964801b2c5957314e76671e4"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-collapsed-1024x768.png",
-    "sha256": "c071b4cef1a4f1af6bc10227af1f4bcd293198067655691f0bacc44b84b9d7af"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-collapsed-1920x1080.png",
-    "sha256": "46ead4922f80169bbf22a238ea0a77330e806c7c9b69d67a175353aa111bfae8"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-1280x800.png",
-    "sha256": "025a746bfadcf25a92e4aa959adbc1b5bf47c8049cf4e426654366d7dea98aa0"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-1440x900.png",
-    "sha256": "09931cb5037e9447f85260a33f9e0ff1741e96fab057bb435e851e5d6fac30d3"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-880x600.png",
-    "sha256": "3802e3ffffddcc61d15066036995e9c16ba0692bd27e29e8f77f7732b7e2420a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-initial.png",
-    "sha256": "c2b6bfebe0aac116c1397380363ea8704023f2fe202af685167785dd7dcd4944"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-pending.png",
-    "sha256": "14eca92378581c30dde60194c5f485fe391b91fa442a3c8faa629e13d4446f5b"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-collapsed-1024x768.png",
-    "sha256": "bfe7507cd13580bc52c2a46c828b9e536fc62a3129f2dfa078315358ea70d2c1"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-collapsed-1920x1080.png",
-    "sha256": "60ec0efdee0fa67a0f3662f5db05d7a5f64481043eef3f6094c58eb2a7f6f98c"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-1280x800.png",
-    "sha256": "43f1d0d6ce7c84fc492d288847b6268744b0c2d72436c31230a895e0d0dd2ce8"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-1440x900.png",
-    "sha256": "82c8351d10b4edc00d9fb86a2a3d6342340fc3d45fafc5acf8038d22a17633a2"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-880x600.png",
-    "sha256": "218fa079ba5e79749619dbb10ed8bb2eec426375aa2820e667c1becf3fd99942"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-initial.png",
-    "sha256": "3f071dcb951270f4d93ce50c0309e1721d77d7466fc270666e774c5200a52a21"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-pending.png",
-    "sha256": "6b7e9a64b9b6e7a15d4fceb2907f9703de22f5c074f7af325bba617980489277"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-collapsed-1024x768.png",
-    "sha256": "fb27bd4f139470378402d287aa47a07a1048a70b0b81b83b120301a9b7e19c68"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-collapsed-1920x1080.png",
-    "sha256": "b2e0e6397dfe70e825bf37993bd1088dea38a6d05ba9d5808a405dcabf9fd524"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-1280x800.png",
-    "sha256": "25882d10c8760069d666ef87737c0e3ad8bdfc802ca0b45e157fab64bd8dd01d"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-1440x900.png",
-    "sha256": "d3e797beaf037cccb173c31aba6bdcf1e5bef1d57e12d50019091d7c63f790ee"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-880x600.png",
-    "sha256": "460358f599950c55bcc78ea51042b09bbe1caba50698b7a8c38b884e2c16856d"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-initial.png",
-    "sha256": "f40a55788cb84a3959136566afe8bd9803b0fa2b480c542e38d605d5fa47010a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-pending.png",
-    "sha256": "4b11f549fa8f3f156f4c024a552b3c61d7168038c5dec2db2bcae4671d861115"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-collapsed-1024x768.png",
-    "sha256": "b995c0fca2bc7a2c2ef9b66bf0c4921ddaf6cef487c343f9e0fe0c73afca3c4a"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-collapsed-1920x1080.png",
-    "sha256": "5d054bf565010b4dca109a5eadf84d320d4f7494f9e688d63770f6b0b2a7a1c0"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-1280x800.png",
-    "sha256": "0dc6a45a9141aeec4f5681cbf0ba652a9b20ca39fd643976e27a2c489c917a00"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-1440x900.png",
-    "sha256": "b8a88a410f0af36e1233eb985bd4ff565645069a69e34454142636c7b6e830d1"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-880x600.png",
-    "sha256": "b86661028f670c0eb35afc0f798e42562f6073d20f9bff5c32ead9c631763548"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/README.md",
-    "sha256": "a6ff18c29c388b0fcae0369522b6e26ce301c3a6aa02e4ab031ca42f5c5be5ba"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Sequence-new-message-revealed.png",
-    "sha256": "b0aa31a29f1df66508dc8776d251ea34d4d6e30dc126f7857ffd442cb4949c63"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Sequence-protected-block.png",
-    "sha256": "69ec55a288146cd53607bd0a440e4a525ebb088667f9a97b5d851de0790b0906"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/state-advanced-protected.png",
-    "sha256": "4b04441a88f2f07390a669f9e617f19f329d3d032a2079f7c29d9ab3ed00ca87"
-  },
-  {
-    "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/state-unknown-protected.png",
-    "sha256": "bd1d1834f603c118155fad140df15b8cfb84c118a79165b3683210cdf9b6dfd2"
-  }
-]
+{
+  "scope": "Original screenshots and raw receipts; authored Markdown and Git attributes excluded.",
+  "files": [
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/browser-pr-ci.json",
+      "sha256": "141c5a50eed38dfd8ce5013dd8ce95375c09226dd972a72aa0f2c400fcd2e72c"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-fidelity.json",
+      "sha256": "3318adc72345e377c7101d4df31ce8d5cb7d8de6b00ab6fa45008590831bcf1f"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-performance-ui.json",
+      "sha256": "7d8630e1d341cc589fdc718ed0772721a75da264cf07375746dda62b60c17b0f"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-high-contrast-ui.json",
+      "sha256": "d287e4d81ac7b6c6457502c66169d12a9d711514a55c26cda962544e3eeee002"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-fidelity.json",
+      "sha256": "e26b23ec9739069d51b342aa67444c9263e654f11a44c49719058975d32e6cab"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-performance-ui.json",
+      "sha256": "c3a5fa6c787a1437a65545b8f90b83919c769ef8b8948060fc37a22a7e1ca92e"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/class-normal-ui.json",
+      "sha256": "02307f82bd6654854fffafca22ff39b9b3c221ae2c60b1d8bd339d3ca5eb7f5f"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-details.json",
+      "sha256": "4d58bdf28461b82439f10baa00bc1b4d8ec9b9d96face4ce4fc9c9df841d48ec"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-list.json",
+      "sha256": "366fd9ed5b83342b24586cb8583082e0c79848775748c7175de613209c3a24c7"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-mixed.json",
+      "sha256": "57afe78459c38479cf950285abd95c3e0014b5db0a198b3eae1886c35d08e404"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-paragraphs.json",
+      "sha256": "73074acc785c7fc43b945f82adceb2a806bd96364a92276378d2884d2de2e898"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-quote.json",
+      "sha256": "bdad1cdc3134626541d0e23119423b65418050030b6e3e14f0abcd54591aacf2"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/continuous-table.json",
+      "sha256": "0129fd8ce9e6f7400a103d5094c85d2c7bd4ea0d3c1ad0b4ef8a5b842fc9a93c"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/core-test-summary.json",
+      "sha256": "c1385588b3cf6f778c34bdb3d173e322fe046f718df16957ca2f8cf8b08417de"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/desktop-runtime.json",
+      "sha256": "2777e70905eaa2e01070c589bf8ba3e480fa3b33f2befaef815987585fd7a8fc"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/desktop-ui.json",
+      "sha256": "804075767598d830d1a9c8917ad55a011042d90361a7c9ee723ea6511a7964c6"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-fidelity.json",
+      "sha256": "1bd7e53bd85aa8241237e4afbb0165006522ca097c8a04d84ebcc8ba2fa38593"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-performance-ui.json",
+      "sha256": "f0e4ece95efcadf64438ea0091fd63b24962590544b0fc52537f72b79dec59dc"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-high-contrast-ui.json",
+      "sha256": "af022f38481778b425a86f9075654b429048a3b8e8eaaff4aa524359083e1819"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-fidelity.json",
+      "sha256": "4cd7be548ac2ad5248180125c1809e72d04b14c31a9e564e18f3efa92a169d8b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-performance-ui.json",
+      "sha256": "9561a57bb5fc2990b63f445a5f540eb2a91bdbb843842c46c4012a22cb0e06a6"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/er-normal-ui.json",
+      "sha256": "6ee9b20ac8c2f58aa8592fd1eb26b67488d6ca6b2016a5bad62777cf58215e07"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-display-restoration.json",
+      "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-display.json",
+      "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-suite-lifecycle.json",
+      "sha256": "e1441d7446a5f3f443c153bc5a4f6152e62c331e07d6990875c100ebf3a887cf"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/high-contrast-suite-ui.json",
+      "sha256": "df04993213ee5b1cc89b4c45762e74c7c1f08b85563dfe5c0daabb961faa9b90"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-high-contrast-windows-events.txt",
+      "sha256": "67ee47893edfc8c8510f343d687fbc232c4c45b28c3a0a48888c05555192fc4a"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/historical-pointer-normal-windows-events.txt",
+      "sha256": "2d4836593f4c67b93646d7ecceef9f2408ef6b1f2355396364fb20c9a1e81d78"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/independent-package-verification.json",
+      "sha256": "c7b94c2449c1470b9efc6066ed3a0f30b747df74ea8edbe235036e052174ada2"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-install-ui.json",
+      "sha256": "2ff8958a9e52c2b9dbd6fcb2ee752028f00db2d17f2661afd7163944f2c7384e"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-reinstall-ui.json",
+      "sha256": "00bbf839bbbbb0a8cce3e3927815f35971269f85631a4630d530b620e3a205c7"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class-upgrade-ui.json",
+      "sha256": "c06ff3598f19cfb568779dec37c661faac39b819aedc5715dc6d15d08094a2fb"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-class.json",
+      "sha256": "fbec16fd2eb6c205d14f1fa24f26401173e2c816357e7153f1b44931d4ed3d33"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-install-ui.json",
+      "sha256": "d9b0a81655b27e48f5223dc2acae6a043052044719545b156a679f6061ccd890"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-reinstall-ui.json",
+      "sha256": "b6a8f61c0916d1862ad1f6c4dbd5c323539699263ade3f3b664cfea7bf2023ec"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er-upgrade-ui.json",
+      "sha256": "4a56f6e163621077b96f524744ceafb5615fb5faf7b29d5b059340d40d775bc7"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-er.json",
+      "sha256": "6b197a968f15a513ecd3ea89795ccf1a00a6760bd81f481533a47463c2cae7f2"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-install-ui.json",
+      "sha256": "212e81e201fe2a92e64e6529648a606659228a99b3c84198d29ba38a5a87086b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-reinstall-ui.json",
+      "sha256": "164d429c4b6d4337aba9690097cf11f300707664bb08e5e90b44c5d9d5b6d9f2"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart-upgrade-ui.json",
+      "sha256": "bdabc47547e1f00e58fc9e6aec3b813c3159017735c418491515073d8ddb9a01"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-flowchart.json",
+      "sha256": "e6687a8d8fe63e88e571d17cef76a503fcb9726c22fbabbcc9e14bf323d21e36"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-install-ui.json",
+      "sha256": "f2f546d90a68b6896a0041e6e86d99a186f209d3c3bc7e4f7ced4ec2837f4f28"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-reinstall-ui.json",
+      "sha256": "aecc194d427da55fc5537b7709d1969b8fdf92343e38c4208d8e1a4ccb8f5064"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence-upgrade-ui.json",
+      "sha256": "9dc41f1435831afe4207d4af2c3c1106b93ca85e1eb5f42a174de0aee9b650e7"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-sequence.json",
+      "sha256": "ac99956aebf9f2ac87ad148f6d97493a3c1a66b94bf64832ba1593c497874ca9"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-install-ui.json",
+      "sha256": "383e251bd4c384c48f9072e40521fbf11a4817e1d09aecd638e932fa785162bf"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-reinstall-ui.json",
+      "sha256": "665cfb47d6cd1a6068145acd2a1550f9d6fccb5fc2f0e4905c2693ae7c27dcdb"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state-upgrade-ui.json",
+      "sha256": "e6969460ef482ad951496a969ec90da555d2e35dea1b9df31f42a2c960e158a6"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installed-state.json",
+      "sha256": "7c3d11a5b04637c8401aab51e8083dd29d7398cb2e89d4e463206b06b38b08fe"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/installer-results.json",
+      "sha256": "4829c33ebcb8b77f6284ed9d01d31a038255d4e8c349dfbb62ea51943dd1876d"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/interactions-pr-ci.json",
+      "sha256": "bcfcb1aa80dcf5b39d349cd425a43b3c0139b9dd69e0ae725db869d7dfc4b402"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-fidelity-fidelity.json",
+      "sha256": "ac57149f03a1367d96020395c7466d61813e6c0735c70170e1344b659beeac0b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-high-contrast-mermaid-ui.json",
+      "sha256": "5f62ae41d95735e2f46ca4c211d14c6903cbe1c2c0defe465b78ddedd965ddca"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/mermaid-ui-mermaid-ui.json",
+      "sha256": "984972ec6d0df8dfdd8a9bb4a3c3a8e75162e6b914600156c10fc8bc36aaaa5c"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-corpus-summary.json",
+      "sha256": "29354237254c5e8bf4ec2ffdc871de732ada2ff64a70bb3b09d1f46d4f8c396e"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-pr-ci.json",
+      "sha256": "ca67f00621fe6a6b153a041c0895442dcdef0b78062bbbd666e81bf85a9b2ed7"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/native-push-ci.json",
+      "sha256": "8a6f3f38cd9bdced00e79767a7f37492482283f1cadaf63e7542e2100ccb542b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-display-restoration.json",
+      "sha256": "632febc322a326bbbbba0d935a044e0b8cd3d2135e73a3b9a4ec025c1a40cb21"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-display.json",
+      "sha256": "6e3493c37429af84f0690f60ca55bda93d03e40758591b3bc2705b594262446b"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-suite-lifecycle.json",
+      "sha256": "391e918a9926d83b9fc9ca6958d758c2f29f7809507d2ca0f8a60344ef01682e"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/normal-suite-ui.json",
+      "sha256": "38c29f926a16085e0d776ca2ff6490c62abfb01704d4d4a1f695d77e00a3107a"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-negative-controls.json",
+      "sha256": "54bb99723eb702a7998db902eda05cb58ac03a3a8d86232f455a216133c724f3"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-SHA256SUMS.txt",
+      "sha256": "33b46c1134a062afe9ec6415361fd9dba62374fd46ab288498625dd02e37edd1"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/package-version.json",
+      "sha256": "d6c4fb39fb333a05f589f77b9bc79c91cdce44b26e385695a2990a0aeaf3db2e"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/pointer-high-contrast.json",
+      "sha256": "01a9d5c91ef8f36e8eab0ff8fc15a64b5851fcab6f21387e46bbc7c1cdbfd310"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/pointer-normal.json",
+      "sha256": "ae2abb6419ec5ed3d7f68c1824d5066e07b7e21927f9ebee542aa5e6550ec233"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-after-suite-performance.json",
+      "sha256": "cc3d7b13e13ced9e2ccfe6b812701f274fb44cf08c899154eb805f6405885906"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-before-suite-performance.json",
+      "sha256": "b64e07a1e5cb743912232be69819d401b9e52fea4846beeaa5b0b2c3468f6e8f"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-cache-suite-cache.json",
+      "sha256": "a5c1dfeaf073b59954c4198f991a65a3beb9a2f11a36ceaefdebf9fc92ae9321"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/primary-phases-suite-phases.json",
+      "sha256": "7157cd0b4c0de86f30cfec0a59a87379150e4849f42f3f533109a95f15d88406"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/provenance.json",
+      "sha256": "69821fb7d3f18cf8f955dfdf9b5c0e5a7a615824fd57d42036c97648f230c186"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-after-suite-performance.json",
+      "sha256": "8744c850a4ce2e92b1500c2e1d908cd032fe150eb65968013f1c60cccac97e72"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-before-suite-performance.json",
+      "sha256": "d92352cfbf51848d1bdb03ebae9b93fa783ced6214284812a3df735a69e111f1"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-cache-suite-cache.json",
+      "sha256": "a5c1dfeaf073b59954c4198f991a65a3beb9a2f11a36ceaefdebf9fc92ae9321"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/second-phases-suite-phases.json",
+      "sha256": "ad3bcefcd515db681f2de5d4fcd6d8578c34c6fdf6b2eac98cb52c01152548cb"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-high-contrast-fidelity.json",
+      "sha256": "4402aa4df3d2950f33112d0289b5881ae90eb200385c114c9253cb2c25c4fabc"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-high-contrast-ui.json",
+      "sha256": "300d24634f6d556226ff17cf6f23508dc2530564b0821c352f5c625560ab2b50"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-normal-fidelity.json",
+      "sha256": "64837dcff13eb1bc53da2fcbb9f413c061a953786e4f542081cdc4967485f3bc"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/sequence-normal-ui.json",
+      "sha256": "0b187d40bf90451e83b464964f37a64fcef83bd59e9381cf367e3aa2ca6ee44a"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-fidelity.json",
+      "sha256": "baa979cec007df74ee4a9d907ea244d9d522666cd0582ed9cb8485a172142b92"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-performance-ui.json",
+      "sha256": "7efe9ab5a915881da085a71f68344af75b49228b6adc4e1a39164af50bccffeb"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-high-contrast-ui.json",
+      "sha256": "01779f5d410a0b8922ecc99e37ba2b4c0e2b713f9a47795106ab422055acfce5"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-fidelity.json",
+      "sha256": "1ccfeb93ffe05878de06a55015b2550fa6d0065733510bb4ef352ea3e36ffa1c"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-performance-ui.json",
+      "sha256": "4ce200ae35cd14841b18fa02dde00aa9fdf72e7630e66d807a44f43852cd303a"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/state-normal-ui.json",
+      "sha256": "d05e7c852c9ec98d460d31ba40ba7711c366e8b8e987d0ab62a4ecc8f13e0557"
+    },
+    {
+      "path": "docs/native/evidence/mermaid-suite-ux-performance/verified-11063/ux-pr-ci.json",
+      "sha256": "4e57cfc0e01cc9a26256b9e504de0d947d05350999164d1dc99f056547992550"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Class-inspector-lower.png",
+      "sha256": "eb3e98f95926338572585a9a68ad600ef8733992730a2262feddb1b9b870ab38"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Class-source-expanded-880x600.png",
+      "sha256": "2c529d15fb3220e9fce23fd58e9167ee89315a08e26d44485a183a5e05e92c7c"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-ER-inspector-lower.png",
+      "sha256": "7ef093aa1398d4a06f5b5eee346a46d12e704070d81a81dda55e3ae98009f73f"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-ER-source-expanded-880x600.png",
+      "sha256": "0044b1cd36658e2600cd2010d901d3b9e83effcca097e23921f3c83b6a88af00"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Flowchart-inspector-lower.png",
+      "sha256": "2775d420684d71478535417aef921ebb06bba368f65821e211a27dd81501edcb"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Flowchart-source-expanded-880x600.png",
+      "sha256": "87c4f0b979dc5e43aeea8acccd9ad355e52a340a4b3054829533777af0e5e499"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Sequence-inspector-lower.png",
+      "sha256": "a396b2cee2badda969fd61dda40602d02a9bba71c3cab05ef3c9f62b9403419a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-Sequence-source-expanded-880x600.png",
+      "sha256": "fca7fb6dd5458e0a8a8acb91ad8c4644e3c5839722227c37896b00ab72eaefc0"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-State-inspector-lower.png",
+      "sha256": "e488dd89c3a2cef95067da6ce987832bbc7caf8eebdef57de1319f7dcd8ed0c2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Before-Light-State-source-expanded-880x600.png",
+      "sha256": "58aef4ba6538200bbc1cf61aaef4e42002d75392b3e166b79d6a28ab53781f1a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/class-unknown-protected.png",
+      "sha256": "da05a8403f500495efb7c732ae84b07d3e88d76d7086028a0c61534d743c3633"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Class-long-navigation-tooltip.png",
+      "sha256": "56b5e0168b2697cf664b7e69142d201879de2136cbe27820a01352cb1245e405"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-ER-long-navigation-tooltip.png",
+      "sha256": "19eaf4dd787987c4ce6b53042bc145ebc3d1a131aa9ce1c84bfbc99bb783f699"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Flowchart-pending.png",
+      "sha256": "b81acee7390c96cc2bff041ccfa988230bdbecf7f9dc47570c7da35035687d85"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-Sequence-pending.png",
+      "sha256": "a0cb91fd7508bec48547c78b4713060f54afc87b34dbae24d60ad34ece7b9ecf"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Dark-State-pending.png",
+      "sha256": "0a154d6139d4b355f69190b52af2f1785429194f2ae08d6eda8c71561b268895"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/er-unknown-protected.png",
+      "sha256": "39c4bcc035ea57f46260427012bc07211d0430ffbbe7fbc20818988abb028596"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Flowchart-invalid-source.png",
+      "sha256": "5aa2fbccdb374c7fdd90077d1a2b0fd17ff2d6bccad2c8e792b7a7f96c3be0ef"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Flowchart-protected-source.png",
+      "sha256": "7b0c202c9a886ddd128e757f910f0b9247f12c67f896b9c311d374cd679363b2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-initial.png",
+      "sha256": "dbf00cbbc29cb8f046a01839ab2c5df7f9fb950d5fb80933ba692b092a895fd2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-pending.png",
+      "sha256": "bcc511244034ace132725e606a7ca923aaaed3c3a5e6e13a00582a9983304861"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-collapsed-1024x768.png",
+      "sha256": "56c099a6bc4010d4f19871d38a397116cdce359aebdfc5ceb71cce66f826d42e"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-collapsed-1920x1080.png",
+      "sha256": "11f5481c2dd5fcfc652b780c8136b344703cf053b5a2a036e946dd7c976997f6"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-1280x800.png",
+      "sha256": "26bc812bc78c9db4570212893351b2a44015f5ced788ed010f40ab5eacf0a00c"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-1440x900.png",
+      "sha256": "622cee9f251e529835409fec53bc0b9834cc01273e97ed71a010b6a6090171a1"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Class-source-expanded-880x600.png",
+      "sha256": "2e99b93a916533955e707be2adf63f49c4f81a627084596718f250c72c8ec029"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-initial.png",
+      "sha256": "7e19621532446c8362dffd8fb3af7af844802e3451f9861260aeab4677358d44"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-pending.png",
+      "sha256": "2e6e46315c3bd62b77cef72272923ad1535083fb9aadde1ea028158e86f961ae"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-collapsed-1024x768.png",
+      "sha256": "cf935587bc07336462785da053e4124dbf5438cae114c7966f9f5672721d21cb"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-collapsed-1920x1080.png",
+      "sha256": "4cadd95f9bf76b83402624d4fcf44c9386410336dfb2d387b231061c30a102e6"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-1280x800.png",
+      "sha256": "fcac2ded2491575d819e76967eb51f0247048acd97d4a98024e57cce8b738bd2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-1440x900.png",
+      "sha256": "fb73f18992c19c28f01647b4d18cf5d0fdcbe994dfa9d8e53f79ca6dbc21dd52"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-ER-source-expanded-880x600.png",
+      "sha256": "a294ea9dd4e99b85a2d6b73c5c676786a35374917489cdcf1c4aad4bc604cc24"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-initial.png",
+      "sha256": "df3b85921f19303dcab6cb5d58ee8028693756c980e239bf39a64a52987c5312"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-pending.png",
+      "sha256": "ec80dab6e704d62c0060d4803864dbac6388b8ba732a85fdb3b88e0d73dc1d83"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-collapsed-1024x768.png",
+      "sha256": "b1095b6bba094716a1af80b41e282f0ecb54d1a12c7c6bc3fdff5b6d290f769f"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-collapsed-1920x1080.png",
+      "sha256": "23511e769e337a3c2aa1cf640a0774a1cdb92d0e980e2fce8c90bc5e752f6b94"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-1280x800.png",
+      "sha256": "41f248885e742eac015952631c77c8632f5e5d81f133c86181b875a360cf74a1"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-1440x900.png",
+      "sha256": "f7d21946fb4f854f39adfe3caddeff26f3ae264205e1a44ea8391bfd7cb40089"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Flowchart-source-expanded-880x600.png",
+      "sha256": "20b3415003bcda7badec9ccd235fecacf1671ddb8623c7b928468d6b21c899b7"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-initial.png",
+      "sha256": "f9e0c68e7526b359a04480bbf6cac214dcad7b6eff9ea89d65a456ed466594f7"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-pending.png",
+      "sha256": "b5e097ce98af90925dc4a141d6e31f5b8719fdd067ddf9cbbc7931515434d5aa"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-collapsed-1024x768.png",
+      "sha256": "863b0892ea2e764d8aa5a1520ecb19c06c5ff897da7bcb7a1f70d86debb5458e"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-collapsed-1920x1080.png",
+      "sha256": "8e7f55ad449d8078e9ddbf6610469afe69963219b7614931e6a1ae9914085605"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-1280x800.png",
+      "sha256": "a4bab8cfd0ba05a79ea4aaf6bfe3df4bca4f213513c9303b1d196aa06570bc73"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-1440x900.png",
+      "sha256": "431364828b8a3a0c11ea3be9e988042ae253baf625ffc4502670f5e6bc48417a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-Sequence-source-expanded-880x600.png",
+      "sha256": "862e9a83abe9a3e6353f3ed4ba2db7d2ef56ec5ee9db0844591a7100ea5ca759"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-initial.png",
+      "sha256": "2f73297d9c9d1e82b7c72f4f7b511464a9dc7ececfab59fbb255d884a2f42f09"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-pending.png",
+      "sha256": "69cf99f235a41a9b39a324cf6692898d5b23f1039cdcd9dd408111424a775225"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-collapsed-1024x768.png",
+      "sha256": "b3a80f55441b8315027fd2ce2e47f89cd6f2a3c8e0f7c5d34ebc8b965d6895f8"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-collapsed-1920x1080.png",
+      "sha256": "160153a9e20575f1c7ab47127afe3786c102a85a9298a8014aa4f69d5effe696"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-1280x800.png",
+      "sha256": "f52bd02f6f179c108f4231703346a18c2879977db1103c35973bc50e880e4fcb"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-1440x900.png",
+      "sha256": "f048eeb8950d59d631a8defc025a20ba8c15a037f628ec404adbe74abc548433"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/HighContrast-State-source-expanded-880x600.png",
+      "sha256": "63ce2a8fd8d4c3a32862f32ef1f28914e122bab50d5ccfc222e38ab83a69976a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-initial.png",
+      "sha256": "d3092bce7bf29969a8a55d81a1b4b8a2f22dc7f0fab49db40c28b1851c0a92ce"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-pending.png",
+      "sha256": "126f77491c9cb5dfb73876afb0dec2c33c418f524cf4878baeb2bd6b97330578"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-collapsed-1024x768.png",
+      "sha256": "933fca577d42447f03cbce9a02070b06b73322d068654b06245f1d52c21d9fd7"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-collapsed-1920x1080.png",
+      "sha256": "c271fecc7336e153adc1721e251a71a239fb0718de8ead8e58dd2f3a1c6e2ca2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-1280x800.png",
+      "sha256": "873b8d59c2951d3eecd9719fd08bd729c8d684d8d44087f1a264b2297367e155"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-1440x900.png",
+      "sha256": "98451bb7d5c75cd2a6b4fad2e9c7ea02314a78a628da12df62565a39bf788eba"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Class-source-expanded-880x600.png",
+      "sha256": "674792a49d7dad612ecc699126ae767fd0ae74f295d1ad3c00154f96ec73c38b"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-initial.png",
+      "sha256": "59330797bae15337f168966bf47f510ea7fd64efab2eee6096f9b335ece43d02"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-pending.png",
+      "sha256": "fd48aeacee563f44643db0d3df9b5842b6007472964801b2c5957314e76671e4"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-collapsed-1024x768.png",
+      "sha256": "c071b4cef1a4f1af6bc10227af1f4bcd293198067655691f0bacc44b84b9d7af"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-collapsed-1920x1080.png",
+      "sha256": "46ead4922f80169bbf22a238ea0a77330e806c7c9b69d67a175353aa111bfae8"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-1280x800.png",
+      "sha256": "025a746bfadcf25a92e4aa959adbc1b5bf47c8049cf4e426654366d7dea98aa0"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-1440x900.png",
+      "sha256": "09931cb5037e9447f85260a33f9e0ff1741e96fab057bb435e851e5d6fac30d3"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-ER-source-expanded-880x600.png",
+      "sha256": "3802e3ffffddcc61d15066036995e9c16ba0692bd27e29e8f77f7732b7e2420a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-initial.png",
+      "sha256": "c2b6bfebe0aac116c1397380363ea8704023f2fe202af685167785dd7dcd4944"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-pending.png",
+      "sha256": "14eca92378581c30dde60194c5f485fe391b91fa442a3c8faa629e13d4446f5b"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-collapsed-1024x768.png",
+      "sha256": "bfe7507cd13580bc52c2a46c828b9e536fc62a3129f2dfa078315358ea70d2c1"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-collapsed-1920x1080.png",
+      "sha256": "60ec0efdee0fa67a0f3662f5db05d7a5f64481043eef3f6094c58eb2a7f6f98c"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-1280x800.png",
+      "sha256": "43f1d0d6ce7c84fc492d288847b6268744b0c2d72436c31230a895e0d0dd2ce8"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-1440x900.png",
+      "sha256": "82c8351d10b4edc00d9fb86a2a3d6342340fc3d45fafc5acf8038d22a17633a2"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Flowchart-source-expanded-880x600.png",
+      "sha256": "218fa079ba5e79749619dbb10ed8bb2eec426375aa2820e667c1becf3fd99942"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-initial.png",
+      "sha256": "3f071dcb951270f4d93ce50c0309e1721d77d7466fc270666e774c5200a52a21"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-pending.png",
+      "sha256": "6b7e9a64b9b6e7a15d4fceb2907f9703de22f5c074f7af325bba617980489277"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-collapsed-1024x768.png",
+      "sha256": "fb27bd4f139470378402d287aa47a07a1048a70b0b81b83b120301a9b7e19c68"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-collapsed-1920x1080.png",
+      "sha256": "b2e0e6397dfe70e825bf37993bd1088dea38a6d05ba9d5808a405dcabf9fd524"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-1280x800.png",
+      "sha256": "25882d10c8760069d666ef87737c0e3ad8bdfc802ca0b45e157fab64bd8dd01d"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-1440x900.png",
+      "sha256": "d3e797beaf037cccb173c31aba6bdcf1e5bef1d57e12d50019091d7c63f790ee"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-Sequence-source-expanded-880x600.png",
+      "sha256": "460358f599950c55bcc78ea51042b09bbe1caba50698b7a8c38b884e2c16856d"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-initial.png",
+      "sha256": "f40a55788cb84a3959136566afe8bd9803b0fa2b480c542e38d605d5fa47010a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-pending.png",
+      "sha256": "4b11f549fa8f3f156f4c024a552b3c61d7168038c5dec2db2bcae4671d861115"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-collapsed-1024x768.png",
+      "sha256": "b995c0fca2bc7a2c2ef9b66bf0c4921ddaf6cef487c343f9e0fe0c73afca3c4a"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-collapsed-1920x1080.png",
+      "sha256": "5d054bf565010b4dca109a5eadf84d320d4f7494f9e688d63770f6b0b2a7a1c0"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-1280x800.png",
+      "sha256": "0dc6a45a9141aeec4f5681cbf0ba652a9b20ca39fd643976e27a2c489c917a00"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-1440x900.png",
+      "sha256": "b8a88a410f0af36e1233eb985bd4ff565645069a69e34454142636c7b6e830d1"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Light-State-source-expanded-880x600.png",
+      "sha256": "b86661028f670c0eb35afc0f798e42562f6073d20f9bff5c32ead9c631763548"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Sequence-new-message-revealed.png",
+      "sha256": "b0aa31a29f1df66508dc8776d251ea34d4d6e30dc126f7857ffd442cb4949c63"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/Sequence-protected-block.png",
+      "sha256": "69ec55a288146cd53607bd0a440e4a525ebb088667f9a97b5d851de0790b0906"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/state-advanced-protected.png",
+      "sha256": "4b04441a88f2f07390a669f9e617f19f329d3d032a2079f7c29d9ab3ed00ca87"
+    },
+    {
+      "path": "docs/native/images/mermaid-suite-ux-performance/verified-11063/state-unknown-protected.png",
+      "sha256": "bd1d1834f603c118155fad140df15b8cfb84c118a79165b3683210cdf9b6dfd2"
+    }
+  ]
+}
