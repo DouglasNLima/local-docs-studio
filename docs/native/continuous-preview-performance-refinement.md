@@ -54,6 +54,9 @@ Changes under validation:
   A read-only native Windows High Contrast flag check also rejects a result while
   WPF's cached appearance property lags the actual OS. Renderer foreground,
   surfaces and code colouring share one captured High Contrast value.
+  While OS/WPF state disagrees, the existing debounce timer retains the previous
+  document and waits to prepare the latest source; it does not spin or build
+  repeatedly with an obsolete palette.
 - Map a retained preview selection through source versions into the replacement
   document without moving keyboard focus. Existing source-based viewport and
   scroll-sync ownership remain in force; current editor selection takes priority
@@ -276,6 +279,11 @@ document construction captures High Contrast once. Final transition verification
 observes every document installation, including valid newer preference-triggered
 renders, and retains initial/final traces. It never treats UIA transport as a
 dispatcher measurement. Final source-specific outcomes belong to the PR receipt.
+The following [2742b2b trace](evidence/continuous-preview-performance/contrast-transition-awaiting-wpf-2742b2b.json)
+shows the native guard rejecting the obsolete document while WPF still reports
+the previous state. The harness then waits for the actual asynchronous appearance
+notification within its unchanged 15-second deadline before requesting/verifying
+the current preview, keeping the no-stale-install assertion active throughout.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop

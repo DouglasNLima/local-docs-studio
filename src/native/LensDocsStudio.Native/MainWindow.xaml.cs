@@ -148,6 +148,12 @@ public partial class MainWindow : Window
         model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
+        if (!ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast))
+        {
+            // Windows broadcasts asynchronously to WPF. Keep the complete previous
+            // document and coalesce another request until its appearance is current.
+            model.PreviewStatus = "Updating preview appearance…"; QueuePreview(); return;
+        }
         var text = tab.EditorDocument.Text;
         var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";

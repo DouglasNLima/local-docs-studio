@@ -194,6 +194,8 @@ internal static class NativePreviewSchedulingChecks
                         if (!contrastDuringConstruction.Observed || transition is null || !NativeTestHighContrast.IsEnabledNow || obsoleteAppearance)
                             throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
                     }
+                    var appearanceWait = Stopwatch.StartNew();
+                    Pump(WaitForAppearanceAsync(true));
                     Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                     File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
                     {
@@ -202,12 +204,13 @@ internal static class NativePreviewSchedulingChecks
                     }, new JsonSerializerOptions { WriteIndented = true }));
                     if (obsoleteAppearance || preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
                         throw new IOException("Current actual High Contrast preview lost system text colours.");
-                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true });
+                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true,
+                        AppearanceNotificationAndCurrentPreviewMilliseconds = appearanceWait.Elapsed.TotalMilliseconds });
                 }
                 finally
                 {
                     documentProperty.RemoveValueChanged(preview, installation);
-                    transition?.Dispose(); Invoke("ApplyTheme"); Invoke("QueuePreview");
+                    transition?.Dispose(); Pump(WaitForAppearanceAsync(false)); Invoke("ApplyTheme"); Invoke("QueuePreview");
                     Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                 }
                 if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");
@@ -325,6 +328,15 @@ internal static class NativePreviewSchedulingChecks
         object? Invoke(string name, params object[] arguments) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, arguments);
         object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window);
         void Drain() => Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle).Task);
+        async Task WaitForAppearanceAsync(bool expected)
+        {
+            var wait = Stopwatch.StartNew();
+            while (SystemParameters.HighContrast != expected || NativeTestHighContrast.IsEnabledNow != expected)
+            {
+                if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Windows appearance notification exceeded the existing validation deadline.");
+                await Task.Delay(25);
+            }
+        }
     }
 
     private sealed class DuringConstruction(Action action) : EventListener
