@@ -407,4 +407,5 @@ namespace membership are inspectable. Static attributes use the portable `$`
 marker. Method static/abstract classifiers and abstract attributes remain
 protected because the pinned renderer/parser cannot safely author those forms.
 Disabled commands explain their source restrictions. Use **Edit source** for
-protected syntax. Class hosted acceptance is still being certified.
+protected syntax. The Class engineering report and delivery record identify
+revision-specific hosted acceptance and internal-preview certification.

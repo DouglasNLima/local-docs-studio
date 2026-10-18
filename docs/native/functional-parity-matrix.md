@@ -1,16 +1,19 @@
 # Functional parity matrix
 
 
-Class authoring is being implemented in [Draft PR #35](https://github.com/DouglasNLima/local-docs-studio/pull/35)
+Class authoring is implemented in [Draft PR #35](https://github.com/DouglasNLima/local-docs-studio/pull/35)
 from consolidated `develop` `5b732cd`. The [Class engineering report](mermaid-class-visual-editor.md)
 owns the fifth-family grammar/capability boundaries and evidence. The exact
 post-merge native run `39080262652` and browser/static run `39080262674` passed.
-Class source/semantic tests and hosted canonical fidelity pass. The initial
-relationship-selector binding failure is retained, diagnosed and corrected. At
-`53df214`, normal/actual High Contrast UIA and real-process performance pass.
-The latest property-preservation and native help-count corrections still require
-final-HEAD CI and package certification. Earlier evidence below retains its
-original revision and scope.
+Class source/semantic tests and hosted canonical fidelity pass. At `a071c7a`,
+normal/actual High Contrast Class UIA, pointer/reconnect acceptance, performance,
+all five editor UX jobs, interaction stress and Chromium/Edge/static pass.
+The initial binding, guide-count and package-control failures are retained with
+their diagnoses and repairs. The complete local Core suite now has 1,643 passing
+cases, including 115 Class cases. The final PR delivery record identifies fresh
+final-HEAD checks, installed lifecycle receipts, unsigned package versions/hashes
+and independent verification; earlier counts cannot certify a later package.
+Historical editor evidence below retains its original revision and scope.
 
 The fourth native Mermaid authoring family is implemented on
 `feature/native-mermaid-er-visual-editor`, based on consolidated `develop`

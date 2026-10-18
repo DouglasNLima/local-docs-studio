@@ -23,7 +23,7 @@ internal static partial class NativeUiChecks
         File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
         var source = ClassDiagramSourceParser.Starter.ReplaceLineEndings("\r\n"); var block = "```mermaid\r\n" + source + "```\r\n";
         var original = "# Synthetic software documentation\r\n\r\n" + block + "\r\nBetween identical diagrams.\r\n\r\n" + block + "\r\nAfter.\r\n";
-        File.WriteAllText(path, original); var checks = new List<string>(); var observations = new List<object>(); Application? app = null; Window? main = null; Window? visual = null;
+        File.WriteAllText(path, original); var initialSavedBytes = File.ReadAllBytes(path); var checks = new List<string>(); var observations = new List<object>(); Application? app = null; Window? main = null; Window? visual = null;
         try
         {
             if (highContrast) Check(System.Windows.SystemParameters.HighContrast, "Actual Windows High Contrast is active during Class authoring");
@@ -62,7 +62,7 @@ internal static partial class NativeUiChecks
             Mouse.MoveTo(endpoint.Left + endpoint.Width / 2, endpoint.Top + endpoint.Height / 2); Mouse.Down(MouseButton.Left);
             try { Mouse.MoveTo(destination.Left + destination.Width / 2, destination.Top + Math.Min(8, destination.Height / 2)); } finally { Mouse.Up(MouseButton.Left); }
             Await(model => model.Relationships[0].Semantic.To == "MarkdownDocument"); Check(Model().Relationships[0].Semantic.ToCardinality == "0..*" && Model().Relationships[0].Semantic.MarkerAt == ClassMarkerAt.From, "Actual valid endpoint drag commits one exact edit and preserves cardinality/marker ownership"); Click("ClassUndo"); Await(_ => Draft() == changed);
-            Click("ClassValidate"); Wait(() => Find(visual!, "ClassApply").IsEnabled, "Complete Class validation did not finish."); Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original, "Private Class authoring preserves owning document and saved bytes");
+            Click("ClassValidate"); Wait(() => Find(visual!, "ClassApply").IsEnabled, "Complete Class validation did not finish."); Check(ReadEditorText(editor) == original && File.ReadAllText(path) == original && initialSavedBytes.SequenceEqual(File.ReadAllBytes(path)), "Private Class authoring preserves owning document and saved bytes");
             foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
             {
                 Resize(width, height); Click("ClassFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "ClassApply").BoundingRectangle), "Apply remains visible at " + width + "x" + height);
@@ -75,11 +75,12 @@ internal static partial class NativeUiChecks
             Click("ClassApply"); WaitClosed(); Wait(() => ReadEditorText(editor) == expected, "Apply did not change only the second identical Class fence.");
             FocusWindow(main!); editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Z); Wait(() => ReadEditorText(editor) == original, "Apply did not create exactly one owning document Undo step.");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_Y); Wait(() => ReadEditorText(editor) == expected, "Document Redo failed."); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_S); Wait(() => ReadObservedText(path) == expected, "Class document Save failed.");
+            var savedBytes = File.ReadAllBytes(path);
             Check(true, "Real Open, Select, Add/Edit attribute, Add/Edit method, Add class, Inheritance, Composition, Reconnect, Validate, private Undo/Redo, Apply, document Undo/Redo and Save pass");
             FocusWindow(main!); main!.Close(); Wait(() => app!.HasExited, "The saved native Class document did not close gracefully."); Check(true, "Saved owning document closes gracefully before process restart");
             Stop(); Launch(); Wait(() => ReadEditorText(Find(main!, "MarkdownEditor")) == expected, "Save/restart/reopen lost source."); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); Check(Draft() == changed, "Restart/reopen retains exact portable Class source and canonical semantics"); Capture("saved-reopened");
             SelectClass("Document"); Click("ClassAddAttribute"); Set("ClassAttributeName", "CancelledAttribute"); Click("ClassUpdate"); Await(model => model.Class("Document").Attributes.Any(item => item.Semantic.Name == "CancelledAttribute")); Click("ClassCancel"); Discard(); WaitClosed();
-            Check(ReadEditorText(Find(main!, "MarkdownEditor")) == expected && File.ReadAllText(path) == expected, "Cancel of a separate changed draft preserves owning source and saved bytes");
+            Check(ReadEditorText(Find(main!, "MarkdownEditor")) == expected && File.ReadAllText(path) == expected && savedBytes.SequenceEqual(File.ReadAllBytes(path)), "Cancel of a separate changed draft preserves owning source and saved bytes");
             if (!highContrast) foreach (var theme in new[] { "Dark", "Light" }) { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectClass("Document"); Capture(theme.ToLowerInvariant()); Click("ClassCancel"); WaitClosed(); }
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertClass").AsMenuItem().Invoke(); WaitVisual();
             Check(Draft() == ClassDiagramSourceParser.Starter, "Insert Class opens the exact validated portable starter"); Click("ClassApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("classDiagram", StringComparison.Ordinal), "Class insertion applies a portable Mermaid fence");
@@ -135,7 +136,7 @@ internal static partial class NativeUiChecks
                 ("empty-cardinalities", "classDiagram\nclass A\nA \"\" --> \"\" A : original\n"),
                 ("empty-final", "classDiagram\nclass A\n") })
             {
-                var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); Launch(fixture); Open(0);
+                var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); var fixtureBytes = File.ReadAllBytes(fixture); Launch(fixture); Open(0);
                 if (name == "unknown-protected")
                 {
                     SelectClass("A"); Check(!Find(visual!, "ClassNodeId").IsEnabled && !Find(visual!, "ClassDelete").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled, "Unknown global syntax protects native class structure without history");
@@ -161,7 +162,7 @@ internal static partial class NativeUiChecks
                     Click("ClassUndo"); Await(_ => Draft() == raw); Click("ClassUndo"); Await(_ => Draft() == raw); Wait(() => Find(visual!, "ClassSelectionSummary").Name == "A · attribute occurrence 2", "Undo did not restore identical member identities.");
                     SelectRelationship(1); Set("ClassLabel", "second self occurrence"); Click("ClassUpdate"); Await(model => model.Relationships[1].Semantic.Label == "second self occurrence"); Check(Model().Relationships[0].Semantic.Label == "self", "Parallel self-relationship canvas/list identity remains exact"); Capture(name); Click("ClassCancel"); Discard(); WaitClosed();
                 }
-                Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(fixture) == raw, name + ": Cancel preserves exact standalone document and saved bytes"); Stop();
+                Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(fixture) == raw && fixtureBytes.SequenceEqual(File.ReadAllBytes(fixture)), name + ": Cancel preserves exact standalone document and saved bytes"); Stop();
             }
             foreach (var scenario in new[] { "outside-change", "changed-owner", "closed-owner", "other-tab" })
             {

@@ -68,7 +68,7 @@
    <ScrollViewer x:Name="InspectorViewport" Grid.Column="4" AutomationProperties.AutomationId="ClassInspectorViewport" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
     <StackPanel Margin="12">
      <TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
-     <TextBlock x:Name="Summary" Text="Select an class, attribute or relationship." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="ClassSelectionSummary"/>
+     <TextBlock x:Name="Summary" Text="Select a class, member or relationship." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="ClassSelectionSummary"/>
      <TextBlock x:Name="Dependencies" TextWrapping="Wrap" Style="{StaticResource Form.Help}" AutomationProperties.AutomationId="ClassDependencies"/>
      <StackPanel x:Name="NodeFields" Visibility="Collapsed">
       <Label Content="_ID" Target="{Binding ElementName=NodeId}" Style="{StaticResource Form.Label}"/>

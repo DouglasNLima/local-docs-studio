@@ -1,6 +1,9 @@
 # Native Mermaid Class Diagram Visual Editor
 
-Engineering work in progress. This branch is not a certified preview.
+Native, source-preserving Class authoring is implemented as the fifth Mermaid
+family. The matrices below define its bounded v1 contract. Certification belongs
+to the exact source revision and completed delivery receipt, rather than the
+branch name. No universal Mermaid support or production readiness is claimed.
 
 ## Baseline and architecture
 
@@ -15,7 +18,7 @@ completed successfully, including native validation and installed State/ER
 authoring. The historical-upgrade job was intentionally outside this baseline
 branch condition; it was not counted as a passing mandatory check.
 
-Class authoring will use a dedicated Core semantic/source adapter, exact source
+Class authoring uses a dedicated Core semantic/source adapter, exact source
 patches, private occurrence identities and bounded history. The existing native
 document ownership and single-Undo Apply contract remain authoritative. The
 canonical Mermaider drawing supplies the canvas; WPF supplies interaction overlays.
@@ -44,10 +47,12 @@ protection rather than assuming a one-to-one source/layout class mapping.
 
 ## Verification status
 
-Implementation, capability matrices, source examples, native acceptance,
-screenshots, performance observations, final regression totals, hosted CI and
-package provenance will be recorded from actual results as work proceeds.
-No new editor, package or readiness claim is made by this initial report.
+Revision-scoped results below distinguish implemented behaviour from certification.
+Only completed checks at the delivered revision establish its preview readiness.
+The final [Draft PR #35 delivery record](https://github.com/DouglasNLima/local-docs-studio/pull/35)
+identifies the final commit, fresh CI runs, selected installer/ZIP, SHA-256 pins,
+independent verification and installed acceptance. Keeping that receipt outside
+the package's own source revision avoids relabelling a package after a report edit.
 
 
 ## Pinned grammar matrix
@@ -108,8 +113,33 @@ non-portable name-suffix workaround.
 | Relationship CRUD/reverse/reconnect | Known endpoints; no orphaned implicit class; marker/cardinality ownership explicit | All six primary types, both orientations and cardinality combinations in Core tests |
 | Notes/namespaces | Inspect and preserve; known references participate in rename | Core tests |
 | Private history | At most 100 snapshots / bounded source retention; failed/cancelled/stale validation never commits | Core tests |
-| Apply/Cancel | Existing document session and AvalonEdit version contract | Integrated; Windows acceptance pending |
+| Apply/Cancel | Existing document session and AvalonEdit version contract | Real Windows acceptance at `a071c7a`; final delivered revision identified by the PR receipt |
 | Source validation | Complete independent semantics compared with captured pinned semantics | Core tests |
+
+### Semantic source model and private identities
+
+`ClassDiagramModel` retains the complete original string, SHA-256 source revision,
+ordered exact statement spans, direction, classes, relationships, namespaces,
+notes and protected statements. A class has its own private identity, ID, display
+label, annotation, declaration occurrences and ordered source members. The
+attribute and method compartments are projections of those occurrences, rather
+than an ER entity or Flowchart node model. Member parameters remain bounded
+source-backed text; no programming-language parameter or type resolver is inferred.
+
+Every statement, member and relationship occurrence has a private GUID. An edit
+plan carries the expected ordered GUIDs independently from the new parser output.
+Thus identical members and parallel relationships remain separate through edits,
+insertion, movement, deletion and Undo/Redo. A byte-identical member swap still
+commits one private history snapshot because its occurrence identities moved.
+First-reference class ordering is predicted independently when implicit relationship
+endpoints change. No GUID, coordinate or editor metadata is written into Mermaid.
+
+Source scanning recognises every non-comment statement independently of successful
+rendering. Ignored global grammar protects structural operations. An unfamiliar
+member protects its owning class and dependent relationships, while a proven
+independent class can retain bounded member editing. Classification is contextual:
+fully editable, partially editable, protected inspection or invalid, with an
+operation-specific visible/accessible explanation.
 
 An operation plans non-overlapping exact source patches and an independent
 expected complete semantic diagram. The private draft reparses the result,
@@ -149,11 +179,15 @@ Apply/Cancel. Endpoint movement uses a lightweight guide, with parsing and
 rendering only at commit. Classes use canonical positions and bring-into-view;
 no drop-position or manual-layout guarantee is claimed. Namespace headers are
 inspectable. Notes remain list-only where SVG lacks an exact note identity.
+An entirely empty Class layout is 0 × 0 in the pinned engine. Its canary verifies
+that exact absence of geometry; it has no meaningful PNG/pixel comparison. The
+editor offers class insertion without inventing class boxes. Notes/namespaces
+without any classes also retain the pinned engine's empty-layout limitation.
 
-## Current engineering evidence and outstanding certification
+## Engineering checks and qualification procedure
 
 The native solution builds with zero warnings/errors. The latest local complete
-Core run passed 1,639 tests (including 111 Class tests), with zero skips.
+Core run passed 1,643 tests (including 115 Class tests), with zero skips.
 Static integrity passed for 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime dependency scans. These are development observations, not final-HEAD
 certification; additional changes require fresh results.
@@ -170,14 +204,13 @@ Package verification now requires all five editor type sets and Class BAML.
 A new negative control removes only the Class resource key and recomputes the
 ZIP checksum; independent verification must still reject it. The installed Class
 job uses disposable hosted Windows and verifies install/upgrade/reinstall payload
-parity before exercising the actual installed application. These jobs have not
-yet produced Class certification receipts.
+parity before exercising the actual installed application. The final delivery
+record must include their completed Class certification receipts.
 
-Outstanding: actual hosted Class acceptance/fidelity results and screenshot
-inspection; broader adversarial document tests; Class UI performance observations;
-final regression totals; final CI URLs; unsigned package versions/checksums and
-independent receipts. The feature remains **not certified** and **not ready for
-internal-preview delivery** until those results are complete and reviewed.
+The revision-scoped sections below record genuine hosted results, failures and
+repairs. A delivered revision is **not certified** until its complete native,
+browser/static, High Contrast and installed-package gates finish and its package
+bytes are independently verified. Skipped mandatory jobs are never passes.
 
 
 ### First hosted Class revision: `5f1e790`
@@ -316,6 +349,64 @@ Exact source example (second duplicate attribute only):
      }
 ```
 
+### Strengthened native acceptance at `a071c7a`
+
+[UX run 39085820562](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39085820562)
+passes all five families. Class contributes 32 light/dark canonical fidelity
+contexts in each appearance job, 266/267 correspondence/document assertions and
+38/39 actual UIA acceptance groups in normal/actual High Contrast. Physical class,
+attribute, method and relationship-label selection, valid/invalid endpoint drops,
+Save/graceful close/restart/reopen and Cancel pass. The normal and High Contrast
+performance runs both complete the 10/15, 30/60 and 100/150 workloads with exact
+source and responsive processes. Revision-scoped receipts are retained as
+`evidence/class-visual-editor/a071c7a-*`.
+
+The screenshot gallery below was visually inspected at all five sizes. Inspector
+content scrolls independently and keyboard focus brings every field into view;
+footer actions remain visible. The previous `53df214` gallery is retained above.
+
+| Size | Normal | Actual Windows High Contrast |
+|---|---|---|
+| 880 × 600 | [Method inspector](images/class-visual-editor/a071c7a-normal-method-viewport-880x600.png) | [Method inspector](images/class-visual-editor/a071c7a-high-contrast-method-viewport-880x600.png) |
+| 1024 × 768 | [Method inspector](images/class-visual-editor/a071c7a-normal-method-viewport-1024x768.png) | [Method inspector](images/class-visual-editor/a071c7a-high-contrast-method-viewport-1024x768.png) |
+| 1280 × 800 | [Method inspector](images/class-visual-editor/a071c7a-normal-method-viewport-1280x800.png) | [Method inspector](images/class-visual-editor/a071c7a-high-contrast-method-viewport-1280x800.png) |
+| 1440 × 900 | [Method inspector](images/class-visual-editor/a071c7a-normal-method-viewport-1440x900.png) | [Method inspector](images/class-visual-editor/a071c7a-high-contrast-method-viewport-1440x900.png) |
+| 1920 × 1080 | [Method inspector](images/class-visual-editor/a071c7a-normal-method-viewport-1920x1080.png) | [Method inspector](images/class-visual-editor/a071c7a-high-contrast-method-viewport-1920x1080.png) |
+
+[Dark appearance](images/class-visual-editor/a071c7a-dark.png) was also inspected.
+
+The actual saved acceptance source is retained as
+[before](evidence/class-visual-editor/a071c7a-before.mmd) and
+[after](evidence/class-visual-editor/a071c7a-after.mmd). These bodies came from the
+first unchanged and second edited identical fences in the saved test document.
+Only the owning second fence changed. Its single document Undo restores the
+original and Redo restores the complete private draft. The main process then
+closes gracefully, restarts, reopens and renders the same exact source.
+
+### Revision-scoped regression totals at `a071c7a`
+
+| Gate | Completed evidence |
+|---|---|
+| Class | 32 canonical contexts per appearance; 266/267 correspondence/document checks; 38/39 actual UIA groups |
+| Flowchart Advanced | 12 canonical contexts and 371 canonical/source assertions; 143 normal / 138 High Contrast UIA assertions |
+| Sequence | 12 canonical contexts and 183 canonical/source assertions per job; 29 normal / 30 High Contrast UIA assertions |
+| State | 6 canonical contexts and 110/111 assertions per appearance; 47 UIA assertions each |
+| ER | 12 canonical contexts and 152/153 assertions per appearance; 40/41 UIA assertions |
+| Existing pointer stress | Candidate normal and actual High Contrast pass; historical baseline failures remain separate evidence |
+| Workspace viewports | Pages/Continuous workspace cases pass |
+| Native Core/corpus/export | 1,639 Core cases at this revision; 134 diagram/export cases, zero failures; DOCX schema validation |
+| Native desktop/lifecycle | 75 checks on the build and each of install, upgrade and reinstall; 14 restored tabs after install/upgrade and interrupted-save recovery |
+| Browser/static | [39085820605](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39085820605): 135 Chromium + 135 Edge; 50 modules, 57 shell assets, 150 vendor assets, 56 dependency scans |
+
+These totals belong to the stated revision, not to every subsequent head. The
+final delivery record in [Draft PR #35](https://github.com/DouglasNLima/local-docs-studio/pull/35)
+must identify fresh final-HEAD runs, completed installed lifecycle receipts and
+the selected exact-source unsigned package hashes. The additional four Lollipop
+Core rejection cases and eight protected light/dark drawing checks belong to the
+later delivered revision's results in that receipt; they do not retroactively
+increase the table above. The resulting fidelity suite has 40 canonical contexts
+per appearance, alongside the separate empty-layout canary.
+
 The later package run at `0a7293b` passed both positive independent package checks,
 then failed an established whole-editor negative control because the new Class
 resource diagnostic ran before the missing-native-type diagnostic. The verifier
@@ -333,3 +424,80 @@ insertion retains method ordering and comments; source statements after a block
 remain authoritative. Initial scanning is cancellation-aware and bounded to 500
 semantic elements / 1,500 statements, below the existing 100,000-character source
 limit. Invalid or timed-out scans retain the exact source with a diagnostic.
+
+## Resource observations and remaining limits
+
+### Immutable qualification package at `a071c7a`
+
+Native run [39085820554](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39085820554)
+built unsigned self-contained x64 `0.1.0-preview.662` and `0.1.1-preview.662`.
+The latter's installer SHA-256 is
+`7e9f67eaeea0860af04a79e67a9b4f8b3e4e7dd45a2e0f59b6bee32289db25e9`;
+portable ZIP SHA-256 is
+`53284359d64c82cc4d688c18c7251924072364b4f6101e31e07941f6baf210d9`.
+The downloaded `native-validation` artefact (ID `12120834874`, 315,721,999 bytes)
+matches GitHub's SHA-256 digest
+`fdaf95c3fddfa6cf221c4b572455eb6e2edb6c9d9dec91f2babe513f61484b3c`.
+
+Independent read-only verification of both versions checks 528 payload files,
+matching apphost/Native/Core versions and source, all five native editor type and
+BAML resource sets, shared resources/icons, bundled runtime, unsigned identities
+and update trust restrictions. No installer executes during this verification.
+Hosted positive verification, all nine negative controls and the general native
+install/upgrade/reinstall/uninstall lifecycle pass. The qualification receipts are
+retained as `evidence/class-visual-editor/a071c7a-*`. Family-specific installed
+authoring receipts identify their exact phase/version and payload parity.
+All three installed families pass install, upgrade and reinstall at this revision:
+[Class](evidence/class-visual-editor/a071c7a-class-installer-results.json),
+[ER](evidence/class-visual-editor/a071c7a-er-installer-results.json) and
+[State](evidence/class-visual-editor/a071c7a-state-installer-results.json).
+Each phase confirms all 528 installed files match the corresponding portable
+payload before running real native authoring. The general lifecycle has 20
+passing checks and preserves 22 native state files. The integration-only
+historical-upgrade matrix is outside this branch condition and is not counted as
+a passing mandatory gate.
+
+This immutable package cannot be relabelled as a subsequent head. The final PR
+delivery receipt selects the later exact-HEAD package, its independent hashes and
+fresh completed gates after the final source/report changes. No public release,
+tag, production signing or ordinary-desktop installation is performed.
+
+### Measurements and limitations
+
+At `a071c7a`, the normal real-process 10/15, 30/60 and 100/150 fixtures opened in
+794 / 1,333 / 2,910 ms. A complete private member edit took 1,571 / 1,904 / 3,515 ms
+including UIA transport; working sets after interactions were 233 / 258 / 371 MiB.
+Twenty member selections took 506 / 528 / 553 ms and twenty relationship selections
+494 / 516 / 618 ms. Pointer guide updates performed no parsing, layout or SVG
+conversion, with observed maximum per-update times 0.323 / 0.143 / 0.090 ms.
+
+The corresponding High Contrast source/render/conversion observation for 100/150
+was 12.45 / 26.23 / 1,074.18 ms, with approximately 340 MB total allocations across
+the whole observed scenario. These allocations are not a retained-memory claim.
+The Core-only full edit validation observation was 77.01 ms; the real native edit
+also includes presentation conversion and UI transport. Dense inheritance,
+parallel relationships, namespaces, 250 attributes, 250 methods and long signatures
+rendered successfully in that observation run. Protected unknown grammar rendered
+but its dependent edit was correctly rejected.
+
+Renderer budgets remain 500 elements, three seconds and 100,000 source characters;
+the Class source adapter additionally bounds semantic members/statements. A
+resource failure preserves exact source and disables unsafe Apply. SharpVectors
+conversion runs on a gated STA worker and cannot be interrupted during the call;
+cancellation rejects its result. The previous ER 100/150 resource failure is
+retained as real evidence and is not invalidated by this different Class fixture.
+
+| Classification | Delivered scope / limitation |
+|---|---|
+| Implemented and verified at the stated revisions | Dedicated Class source occurrences, exact patches, private history, class/member/relationship authoring, owning-document Apply/Cancel, real Windows Save/reopen, canonical fidelity, keyboard/pointer acceptance and five-size screenshots |
+| Implemented with bounded limitations | Simple IDs/generics/annotations, bounded type/parameter/label text, static attributes, six primary relationship types, adjacent safe member movement; exact-list selection where row geometry is ambiguous |
+| Protected / unsupported | Unknown dependencies, repeated declarations, method classifiers, abstract attributes, unfamiliar generic/label forms and Lollipop structural editing |
+| Not completed by design in v1 | Namespace moves/rename, note creation/editing and manual coordinate-preserving class placement; inspection and original source remain available |
+| Blocked outside this preview qualification | Production signing/trusted unsigned updater execution, clean-machine certification, physical accessibility and broader hardware/display/destination certification |
+| Not certified | Universal Class/Mermaid grammar, production readiness, byte-for-byte build reproducibility or a performance guarantee for arbitrary diagrams |
+
+Final internal-preview readiness is **READY WITH RESTRICTIONS** only when the
+exact final-HEAD delivery receipt confirms every mandatory gate and independent
+package check. Otherwise the affected revision remains **NOT CERTIFIED**. Draft
+PR review, automatic merge, tags and public releases are separate actions; none
+is performed by this work.

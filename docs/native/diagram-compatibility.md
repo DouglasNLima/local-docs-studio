@@ -4,7 +4,8 @@ The [Class visual editor report](mermaid-class-visual-editor.md) tracks the fift
 native family: dedicated source occurrences, bounded class/member authoring and
 endpoint-owned relationship markers/cardinalities. Method classifiers, unknown
 source and ambiguous namespace/note operations remain protected. Hosted Class
-certification is pending; implementation does not imply readiness.
+certification is identified by the report and exact-revision PR delivery receipt;
+implementation alone does not imply readiness.
 
 | Native authoring family | Source model and authoring boundary | Certification record |
 |---|---|---|

@@ -18,8 +18,8 @@ internal static partial class NativeClassChecks
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         Directory.CreateDirectory(output); var checks = new List<string>(); var fidelity = new List<object>(); var performance = new List<object>();
         if (highContrast) Check(SystemParameters.HighContrast, "Actual Windows High Contrast is active for Class fidelity");
-        var emptySource = "classDiagram\n"; var empty = NativeClassPresentation.Create(new ClassDiagramSourceParser().Parse(emptySource), new DiagramService().Render(emptySource), new());
-        Check(empty.Classes.Count == 0 && empty.Members.Count == 0 && empty.Relationships.Count == 0, "Empty canonical Class source has no fabricated geometry");
+        var emptySource = "classDiagram\n"; var emptyRender = new DiagramService().Render(emptySource); var empty = NativeClassPresentation.Create(new ClassDiagramSourceParser().Parse(emptySource), emptyRender, new());
+        Check(emptyRender.ClassLayout is { Width: 0, Height: 0 } && empty.Classes.Count == 0 && empty.Members.Count == 0 && empty.Relationships.Count == 0, "Empty canonical Class source has no fabricated geometry");
         var starter = new ClassDiagramSourceParser().Parse(ClassDiagramSourceParser.Starter); var starterRender = new DiagramService().Render(starter.Source);
         var transformedSvg = starterRender.Svg!.Replace("<g class=\"class-node\"", "<g transform=\"translate(200,200)\" class=\"class-node\"", StringComparison.Ordinal);
         var rejectedTransform = false;
@@ -29,6 +29,16 @@ internal static partial class NativeClassChecks
         var ambiguousView = NativeClassPresentation.Create(ambiguousRow, new DiagramService().Render(ambiguousRow.Source), new());
         Check(ambiguousView.Members.Count == 0 && ambiguousView.Classes.Single().Frame.Height > ambiguousView.Classes.Single().Bounds.Height,
             "Indistinguishable type/name text remains list-only and the canonical class body still occludes underlying paths");
+        foreach (var arrow in new[] { "--()", "..()", "()--", "().." })
+        foreach (var dark in new[] { false, true })
+        {
+            var source = "classDiagram\nclass A\nclass B\nA " + arrow + " B : contract\n";
+            var model = new ClassDiagramSourceParser().Parse(source); var render = new DiagramService().Render(source, dark); var svg = new NativeSvgService();
+            var view = NativeClassPresentation.Create(model, render, svg);
+            Check(model.HasUnknownDependencies && view.Classes.Count == 0 && view.Relationships.Count == 0, "Lollipop " + arrow + ": synthetic layout identities cannot grant editable hit regions");
+            Check(Pixels(NativeSvgService.ToPng(view.Drawing, .75)).SequenceEqual(Pixels(NativeSvgService.ToPng(svg.Render(render.Svg!), .75))), "Lollipop " + arrow + ": complete protected canonical drawing remains unchanged");
+            fidelity.Add(new { Fixture = "protected-lollipop-" + arrow + (dark ? "-dark" : "-light"), PixelTolerance = 0, Members = 0, Relationships = 0 });
+        }
         foreach (var file in Directory.GetFiles("tests/fixtures/native-class", "*.mmd"))
         foreach (var dark in new[] { false, true })
         {

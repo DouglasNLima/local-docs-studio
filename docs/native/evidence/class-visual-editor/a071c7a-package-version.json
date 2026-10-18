@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "product": "LensDocsStudio.Native",
+  "version": "0.1.1-preview.662",
+  "channel": "Preview",
+  "architecture": "x64",
+  "minimumWindowsVersion": "10.0.17763",
+  "selfContained": true,
+  "internalPreview": true,
+  "signingRequested": false,
+  "signingProvider": "Unsigned",
+  "sourceRevision": "a071c7a8024920a71977c6f3e1c259e87d5e268b",
+  "sourceDirty": false,
+  "builtAtUtc": "2026-10-18T01:25:49.2207223+00:00",
+  "sourceKind": "branch-source",
+  "ciRunId": "39085820554",
+  "ciRunAttempt": "1",
+  "checkoutRef": "refs/heads/feature/native-mermaid-class-visual-editor"
+}

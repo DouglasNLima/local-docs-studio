@@ -9,6 +9,18 @@ public class ClassVisualTests
     public const string Source = "classDiagram\n    %% Keep this comment\n    class Document {\n        +string Title\n        +string Title\n        +Open(path) Document\n        +Open(path) Document\n        -Validate() bool\n    }\n    class MarkdownDocument {\n        +Render() string\n    }\n    Document <|-- MarkdownDocument\n    Document \"1\" *-- \"many\" MarkdownDocument : owns\n    Document <|-- MarkdownDocument\n    Document --> Document : parent\n";
     public const string Starter = ClassDiagramSourceParser.Starter;
     private static void Success(ClassEditResult result) => Assert.True(result.Success, result.Error);
+    [Theory, InlineData("--()"), InlineData("..()"), InlineData("()--"), InlineData("()..")]
+    public async Task Lollipop_syntax_retains_pinned_semantics_and_protected_exact_source(string arrow)
+    {
+        var source = "classDiagram\nclass A\nclass B\nA " + arrow + " B : contract\n";
+        var draft = new ClassDiagramVisualDraft(source); var render = new DiagramService().Render(source);
+        ClassDiagramSemanticValidation.ValidateRendering(draft.Model, render);
+        var relationship = Assert.Single(draft.Model.Relationships); Assert.Equal(ClassRelationType.Lollipop, relationship.Semantic.Type);
+        draft.Select(relationship.Identity); var history = draft.HistoryIdentity;
+        Assert.False((await draft.ExecuteAsync(new UpdateClassRelationship(relationship.Identity, relationship.Semantic with { Label = "changed" }))).Success);
+        Assert.False((await draft.ExecuteAsync(new AddClass("C"))).Success);
+        Assert.Equal(source, draft.Source); Assert.Equal(history, draft.HistoryIdentity); Assert.Equal(relationship.Identity, draft.Selection);
+    }
     [Theory, InlineData(Source), InlineData(Starter), InlineData("classDiagram\n"), InlineData("classDiagram\nclass A\n"), InlineData("classDiagram\nA --> B\n"), InlineData("classdiagram\ndirection LR\nclass A~T~ {\n<<interface>>\n~string value$\n#Open*(path) bool\n}\nnote for A \"Keep this note\"\n"), InlineData("classDiagram\nnamespace Library {\nclass A {\n+int id\n}\nclass B\n}\nA --> B\n"), InlineData("classDiagram\nA : +Run(path) bool\nA : -int id\nclass A\nclass A\n"), InlineData("classDiagram\nclass A { <<abstract>> }\n")]
     public void Independent_source_semantics_match_the_pinned_parser_and_single_canonical_layout(string source)
     {

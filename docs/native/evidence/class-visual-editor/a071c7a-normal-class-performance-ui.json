@@ -1,0 +1,52 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": false,
+  "Measurements": [
+    {
+      "Classes": 10,
+      "Relationships": 15,
+      "EditorOpenIncludingUiaMilliseconds": 793.5553,
+      "TwentyClassSelectionsMilliseconds": 787.1268,
+      "TwentyMemberSelectionsMilliseconds": 505.9299,
+      "TwentyRelationshipSelectionsMilliseconds": 494.1007,
+      "WorkingSetBeforeEditor": 177586176,
+      "WorkingSetAfterInteractions": 244453376,
+      "SourceEditIncludingUiaMilliseconds": 1570.7744,
+      "ActualEndpointDrag": "Class endpoint drag updates: 21; maximum update: 0.323 ms; update allocated bytes: 10912; UI-thread allocated bytes: 787080; duration: 2477.9 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "Classes": 30,
+      "Relationships": 60,
+      "EditorOpenIncludingUiaMilliseconds": 1333.3679,
+      "TwentyClassSelectionsMilliseconds": 1091.9407,
+      "TwentyMemberSelectionsMilliseconds": 528.1216,
+      "TwentyRelationshipSelectionsMilliseconds": 516.3711,
+      "WorkingSetBeforeEditor": 191225856,
+      "WorkingSetAfterInteractions": 270970880,
+      "SourceEditIncludingUiaMilliseconds": 1904.4357,
+      "ActualEndpointDrag": "Class endpoint drag updates: 20; maximum update: 0.143 ms; update allocated bytes: 10368; UI-thread allocated bytes: 1958976; duration: 2443.2 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "Classes": 100,
+      "Relationships": 150,
+      "EditorOpenIncludingUiaMilliseconds": 2909.9658,
+      "TwentyClassSelectionsMilliseconds": 1617.4961,
+      "TwentyMemberSelectionsMilliseconds": 553.1915,
+      "TwentyRelationshipSelectionsMilliseconds": 617.8011,
+      "WorkingSetBeforeEditor": 232042496,
+      "WorkingSetAfterInteractions": 389033984,
+      "SourceEditIncludingUiaMilliseconds": 3514.6182,
+      "ActualEndpointDrag": "Class endpoint drag updates: 20; maximum update: 0.090 ms; update allocated bytes: 10368; UI-thread allocated bytes: 4963032; duration: 2490.6 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    }
+  ],
+  "Scope": "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. No rendering limits changed."
+}
