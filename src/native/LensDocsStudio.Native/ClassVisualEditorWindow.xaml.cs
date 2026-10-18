@@ -117,7 +117,7 @@ public partial class ClassVisualEditorWindow : Window
                 : presentation is { } view && view.Members.Count < current.Classes.Sum(item => item.Members.Count) ? "Some member rows are available through the element list; their canvas positions cannot be mapped confidently."
                 : "Ready. Select a class, member row or relationship. Canonical layout determines positions.");
             AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
-            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < 40) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
+            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == renderGeneration) { mapped = false; Status.Text = error.Message; } }

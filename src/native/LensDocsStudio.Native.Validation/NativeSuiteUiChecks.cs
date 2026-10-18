@@ -42,6 +42,8 @@ internal static partial class NativeUiChecks
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor")))?.AsWindow()) is not null, "Suite editor did not open.");
                 Wait(() => Find(visual!, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Suite canonical mapping did not finish.");
                 var originalApplyEnabled = Find(visual!, prefix + "Apply").IsEnabled;
+                if (!baseline && Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value < 60)
+                    throw new IOException("Initial editor fitting reduced labels below the shared readable zoom threshold.");
                 using var nativeProcess = Process.GetProcessById(app.ProcessId); nativeProcess.Refresh();
                 measurements.Add(new { Family = family, Theme = theme, ColdProcessIncludingDocumentPreviewAndUiaMs = coldProcess.Elapsed.TotalMilliseconds, EditorOpenIncludingUiaMs = editorOpen.Elapsed.TotalMilliseconds, WorkingSetAtFirstUsefulEditor = nativeProcess.WorkingSet64, Method = "Fresh app process per case; includes UIA transport and is separate from native phase timings" });
                 Capture("initial");

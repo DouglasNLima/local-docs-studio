@@ -360,3 +360,12 @@ the private semantic selection are unchanged. The shared regression requires the
 **exact original** SelectionItem name, selected state and viewport visibility;
 an arbitrary visible selected entry cannot satisfy it. Fresh hosted results are
 required. Existing failure evidence remains available.
+
+## Initial viewport readability
+
+Manual Sequence screenshots show that 48% initial fitting makes interaction
+labels too small. The four newer editors now share Flowchart's existing 60%
+initial readability threshold through a viewport-only constant: below it they
+open at Actual Size at the canonical origin. Explicit Fit still displays the
+whole diagram at the user's request. The suite verifies the initial threshold.
+This changes no rendered geometry, source, renderer budget or zoom precision.

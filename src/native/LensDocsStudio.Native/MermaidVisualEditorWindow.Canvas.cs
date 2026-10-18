@@ -125,7 +125,7 @@ public partial class MermaidVisualEditorWindow
             if (initialFit)
             {
                 initialFit = false; Viewport.UpdateLayout(); Fit(this, new());
-                if (Zoom.Value < 60)
+                if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent)
                 {
                     Zoom.Value = 100; Viewport.UpdateLayout();
                     var first = draft.Model.Nodes.FirstOrDefault();

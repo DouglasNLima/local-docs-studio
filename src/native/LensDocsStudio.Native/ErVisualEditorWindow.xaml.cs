@@ -117,7 +117,7 @@ public partial class ErVisualEditorWindow : Window
             else { Surface.Children.Clear(); buttons.Clear(); Surface.Children.Add(new Image { Source = converted.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }); Surface.Width = converted.Drawing?.Width ?? 420; Surface.Height = converted.Drawing?.Height ?? 260; }
             Status.Text = converted.diagnostic ?? (current.HasUnknownDependencies ? "Unknown source retained exactly. Inspect individual operation permissions." : "Ready. Select an entity, attribute row or relationship. Canonical layout determines positions.");
             AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
-            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < 40) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
+            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == renderGeneration) { mapped = false; Status.Text = error.Message; } }

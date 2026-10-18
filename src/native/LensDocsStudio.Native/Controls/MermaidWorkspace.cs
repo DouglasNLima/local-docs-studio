@@ -10,6 +10,7 @@ namespace LensDocsStudio.Native.Controls;
 /// <summary>Workspace presentation only; no diagram semantics or portable source.</summary>
 public static class MermaidWorkspace
 {
+    public const double MinimumInitialFitPercent = 60;
     public static ICollectionView Navigation(IEnumerable entries)
     {
         var view = CollectionViewSource.GetDefaultView(entries);
