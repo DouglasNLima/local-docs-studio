@@ -174,7 +174,8 @@ internal static class NativePreviewSchedulingChecks
                             || preview.Document != previousDocument) throw new IOException("An actual High Contrast transition installed the obsolete appearance.");
                     }
                     Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
-                    if (preview.Document.Foreground != SystemColors.WindowTextBrush) throw new IOException("Current actual High Contrast preview lost system text colours.");
+                    if (preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
+                        throw new IOException("Current actual High Contrast preview lost system text colours.");
                     cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true });
                 }
                 finally
