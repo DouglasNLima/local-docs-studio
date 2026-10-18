@@ -151,7 +151,7 @@ public partial class StateVisualEditorWindow : Window
     private void Select(string? identity)
     {
         using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.State");
-        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; Controls.MermaidWorkspace.DeferNavigationRollback(Elements, () => { updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } }); return; }
+        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; Controls.MermaidWorkspace.DeferNavigation(Elements, () => { updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } }); return; }
         draft.Select(identity); updating = true; try { RestoreSelection(); ShowProperties(); UpdateSelection(); } finally { updating = false; } UpdateActions();
     }
     private void ShowProperties()

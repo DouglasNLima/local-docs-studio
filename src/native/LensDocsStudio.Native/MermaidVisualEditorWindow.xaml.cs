@@ -299,7 +299,7 @@ public partial class MermaidVisualEditorWindow : Window
         if (updating) return;
         if (PropertiesPending || inlineEditor is not null)
         {
-            Controls.MermaidWorkspace.DeferNavigationRollback(Elements, () =>
+            Controls.MermaidWorkspace.DeferNavigation(Elements, () =>
             {
                 updating = true;
                 try

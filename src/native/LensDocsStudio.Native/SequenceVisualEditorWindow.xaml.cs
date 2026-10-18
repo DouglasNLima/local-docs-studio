@@ -182,7 +182,7 @@ public partial class SequenceVisualEditorWindow : Window
         {
             Status.Text = "Update or discard pending properties and validate source before changing selection.";
             var navigationFocus = Participants.IsKeyboardFocusWithin || Interactions.IsKeyboardFocusWithin;
-            Controls.MermaidWorkspace.DeferNavigationRollback(Participants, () =>
+            Controls.MermaidWorkspace.DeferNavigation(Participants, () =>
             {
                 updating = true;
                 try

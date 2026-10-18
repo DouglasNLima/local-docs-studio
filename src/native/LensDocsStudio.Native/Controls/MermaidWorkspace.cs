@@ -27,7 +27,11 @@ public static class MermaidWorkspace
             || list.SelectedItems.Count != 1 || list.SelectedItem is not { } selected) return;
         // UIA and keyboard entry into the list share the same exact selected row.
         // Multiple selection retains its existing native focus/extension rules.
-        RevealNavigation(list, selected, true);
+        DeferNavigation(list, () =>
+        {
+            if (list.IsKeyboardFocused && list.SelectedItems.Count == 1 && Equals(list.SelectedItem, selected))
+                RevealNavigation(list, selected, true);
+        });
     }
     public static ICollectionView Navigation(IEnumerable entries)
     {
@@ -109,10 +113,10 @@ public static class MermaidWorkspace
                 retained.Focus();
         }
     }
-    public static void DeferNavigationRollback(ListBox list, Action restore)
+    public static void DeferNavigation(ListBox list, Action restore)
     {
-        // Selector is still committing its own transaction inside SelectionChanged.
-        // Restore only after that transaction, retaining native SelectionItem state.
+        // Native focus/selection providers are still committing their transactions.
+        // Defer the action while retaining native Automation and SelectionItem state.
         CancelNavigationScroll(list, new RoutedEventArgs());
         list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
         var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>

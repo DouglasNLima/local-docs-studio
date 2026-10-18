@@ -501,3 +501,12 @@ property/source field or another row receives focus. Multiple selection retains
 its existing native rules. The selected-row and container-focused tests both
 remain mandatory, with unchanged deadlines, pending-value and exact-source
 assertions. The original container-focus failure is retained.
+
+## Deferred focus provider completion
+
+At `19241c1`, immediate focus delegation causes UIA SetFocus to reject the list:
+the selected row takes focus before the provider finishes focusing its container.
+The original error is retained. Delegation now runs after the focus transaction
+returns, rechecking that the list still has focus and the same single selection.
+The same bounded, unload-cancelled navigation callback serves focus entry and
+selection rollback. No timeout, source assertion or input is removed or repeated.
