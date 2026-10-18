@@ -369,3 +369,20 @@ initial readability threshold through a viewport-only constant: below it they
 open at Actual Size at the canonical origin. Explicit Fit still displays the
 whole diagram at the user's request. The suite verifies the initial threshold.
 This changes no rendered geometry, source, renderer budget or zoom precision.
+
+## Grouped navigation trade-off
+
+At `1455b5d`, all 40 actual High Contrast lifecycle windows release with strict
+zero retention, queued cancellation and exact source. The normal `1d89721` run
+also passes the corrected collection boundary. Original failed checkpoints and
+root evidence remain retained; this is a diagnostic boundary correction, not a
+claimed production memory speed-up.
+
+The stronger UIA navigation check still fails after the deferred rollback; the
+scroll-only and transaction-only approaches are insufficient. Grouped navigation
+now uses native physical scrolling without grouped recycling. Sequence's two
+ungrouped lists retain recycling. Lists remain bounded by the existing visual
+source/statement budgets. This trades initial container allocation for reliable
+native selection and scrolling; large-window presentation and allocation remain
+measured, rather than assuming the trade-off is free. No source limits change.
+Full failure control-state dumps are now retained alongside screenshots.

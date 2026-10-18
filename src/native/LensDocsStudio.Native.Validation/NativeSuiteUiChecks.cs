@@ -124,7 +124,12 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
-            File.WriteAllText(Path.Combine(output, "suite-failure.txt"), error.ToString()); visual?.CaptureToFile(Path.Combine(output, "suite-failure.png")); return 1;
+            File.WriteAllText(Path.Combine(output, "suite-failure.txt"), error.ToString()); visual?.CaptureToFile(Path.Combine(output, "suite-failure.png"));
+            if (visual is not null)
+                File.WriteAllLines(Path.Combine(output, "suite-failure-controls.txt"), visual.FindAllDescendants().Select(item =>
+                    item.AutomationId + " | " + item.Name + " | off-screen=" + item.IsOffscreen + " | selected="
+                    + (item.Patterns.SelectionItem.IsSupported ? item.Patterns.SelectionItem.Pattern.IsSelected.Value.ToString() : "unavailable") + " | " + item.BoundingRectangle));
+            return 1;
         }
         finally { app?.Kill(); app?.Dispose(); }
         void Capture(string name, bool keepPointer = false) { if (!keepPointer) Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(captureRoot, (highContrast ? "HighContrast" : "Normal") + "-" + visual.Title.Replace('/', '-') + "-" + name + ".png")); }

@@ -47,7 +47,7 @@
      <Button x:Name="FinalButton" Content="Connect final state" Click="AddFinal" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="StateAddFinal"/>
      <TextBlock Text="STATES AND TRANSITIONS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
     </StackPanel>
-    <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="Elements" SelectionChanged="SelectionChanged" AutomationProperties.Name="States, scoped markers, composite groups and exact transition occurrences" AutomationProperties.AutomationId="StateElements"><ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle></ListBox>
+    <ListBox Style="{StaticResource Mermaid.GroupedNavigation}" x:Name="Elements" SelectionChanged="SelectionChanged" AutomationProperties.Name="States, scoped markers, composite groups and exact transition occurrences" AutomationProperties.AutomationId="StateElements"><ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle></ListBox>
    </DockPanel>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize navigation panel" AutomationProperties.AutomationId="StateNavigationSplitter"/>
    <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="6"/><RowDefinition Height="40" MinHeight="40"/></Grid.RowDefinitions>

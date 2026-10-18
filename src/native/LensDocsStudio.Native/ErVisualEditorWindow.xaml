@@ -44,7 +44,7 @@
      <Button x:Name="AddRelationshipButton" Content="Add relationship" Click="AddRelationship" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ErAddRelationship"/>
      <TextBlock Text="ENTITIES AND RELATIONSHIPS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
     </StackPanel>
-    <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="Elements" SelectionChanged="SelectionChanged" AutomationProperties.Name="Entities, attributes and exact relationship occurrences" AutomationProperties.AutomationId="ErElements"><ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle></ListBox>
+    <ListBox Style="{StaticResource Mermaid.GroupedNavigation}" x:Name="Elements" SelectionChanged="SelectionChanged" AutomationProperties.Name="Entities, attributes and exact relationship occurrences" AutomationProperties.AutomationId="ErElements"><ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle></ListBox>
    </DockPanel>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize navigation panel" AutomationProperties.AutomationId="ErNavigationSplitter"/>
    <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="6"/><RowDefinition Height="40" MinHeight="40"/></Grid.RowDefinitions>
