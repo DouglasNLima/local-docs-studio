@@ -303,3 +303,20 @@ the full shared/family suites; no existing assertions are skipped.
 All four native/browser workflow definitions now pin PR test checkout to the exact
 head. Pages deployment keeps its original default-branch-only condition; native
 feature pushes and this Draft PR cannot deploy the site.
+
+## Final visual review corrections
+
+The complete `c1eb7fc` UX, browser/static and pointer/workspace runs pass, including
+40 real windows per normal/actual High Contrast lifecycle scenario. Manual
+880/1024 review found grouped Flowchart/State navigation retaining a stale offset
+after a blocked keyboard selection. Deferred reveal now runs after layout settles,
+brings the realised item into view and handles the first entry explicitly, without
+selection-time UpdateLayout or rendering. The suite now requires the retained
+selected entry to remain visible. All five zoom captions use the same compact
+percentage format; zoom precision and transforms remain unchanged.
+
+The additional `b331f83` before-capture run failed when AvalonEdit's wrapper
+rejected UIA SetFocus. The original failure receipt is retained. Capture-only
+source replacement now uses its existing Value interface and exact-text checks;
+real source keyboard behaviour remains covered by the authoring suites. This is a
+harness correction, not a baseline product fix. Fresh hosted gates are pending.

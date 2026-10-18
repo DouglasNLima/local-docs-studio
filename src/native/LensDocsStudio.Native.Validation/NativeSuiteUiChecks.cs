@@ -69,6 +69,7 @@ internal static partial class NativeUiChecks
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
+                Wait(() => list.FindAllDescendants().Any(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value && !item.IsOffscreen), "Rejected selection left the retained navigation entry outside its viewport.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 if (family is "Class" or "ER")
                 {
@@ -176,8 +177,7 @@ internal static partial class NativeUiChecks
         if (ReadEditorText(Find(main, "MarkdownEditor")) != source) throw new IOException("Baseline capture changed the owning source.");
         void ReplaceSource(string value)
         {
-            Find(visual, sourceId).Focus(); NativeUiClipboard.SetText(value);
-            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+            Find(visual, sourceId).Patterns.Value.Pattern.SetValue(value);
             Wait(() => ReadEditorText(Find(visual, sourceId)) == value, "Baseline source input did not arrive exactly.");
         }
         void Validate()

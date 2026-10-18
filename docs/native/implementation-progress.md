@@ -1,5 +1,15 @@
 # Native implementation progress
 
+The five-family shared Mermaid suite refinement is implemented in
+[Draft PR #36](https://github.com/DouglasNLima/local-docs-studio/pull/36), based on
+consolidated `develop` `6a94dd3`. The [suite engineering report](mermaid-suite-ux-performance-refinement.md)
+owns its UX audit, shared workspace behaviour, measured canonical conversion
+reuse, actual High Contrast, resource lifecycle and revision-scoped validation.
+Its delivery record distinguishes application/package source from later evidence
+commits and records final CI and unsigned package identities. Earlier family
+certifications below retain their original scope; they do not certify a later
+suite package. No merge, release, signing or ordinary desktop installation occurs.
+
 
 Class authoring is implemented in [Draft PR #35](https://github.com/DouglasNLima/local-docs-studio/pull/35)
 from consolidated `develop` `5b732cd`. The [Class engineering report](mermaid-class-visual-editor.md)

@@ -393,7 +393,7 @@ public partial class MermaidVisualEditorWindow
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void ResetView(object sender, RoutedEventArgs e) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; ZoomLabel.Text = (e.NewValue < 1 ? e.NewValue.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) : Math.Round(e.NewValue).ToString()) + "%"; }
+    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; }
     private void CanvasWheel(object sender, MouseWheelEventArgs e)
     {
         if (Keyboard.Modifiers != ModifierKeys.Control) return; e.Handled = true;

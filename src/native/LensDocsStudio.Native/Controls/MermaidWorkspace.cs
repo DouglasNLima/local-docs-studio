@@ -68,10 +68,15 @@ public static class MermaidWorkspace
     {
         CancelNavigationScroll(list, new RoutedEventArgs());
         list.ScrollIntoView(item); list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
-        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
+        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle, () =>
         {
             list.ClearValue(NavigationScrollProperty);
-            if (list.IsLoaded && list.SelectedItems.Contains(item)) list.ScrollIntoView(item);
+            if (!list.IsLoaded || !list.SelectedItems.Contains(item)) return;
+            // Grouped, virtualised lists can settle a stale offset after a rejected
+            // keyboard selection. Reveal the realised container after that layout.
+            list.ScrollIntoView(item);
+            if (list.Items.IndexOf(item) == 0) NavigationViewport(list)?.ScrollToTop();
+            else if (list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem entry) entry.BringIntoView();
         });
         list.SetValue(NavigationScrollProperty, operation);
     }
@@ -80,6 +85,16 @@ public static class MermaidWorkspace
         if (sender is not ListBox list) return;
         if (list.GetValue(NavigationScrollProperty) is System.Windows.Threading.DispatcherOperation operation) operation.Abort();
         list.ClearValue(NavigationScrollProperty);
+    }
+    private static ScrollViewer? NavigationViewport(DependencyObject parent)
+    {
+        for (var index = 0; index < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); index++)
+        {
+            var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, index);
+            if (child is ScrollViewer viewport) return viewport;
+            if (NavigationViewport(child) is { } nested) return nested;
+        }
+        return null;
     }
     public static void Reveal(FrameworkElement element, ScrollViewer viewport)
     {
