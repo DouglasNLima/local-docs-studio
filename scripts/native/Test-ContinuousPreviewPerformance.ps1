@@ -71,7 +71,8 @@ foreach ($group in Get-ChildItem -LiteralPath (Join-Path $output 'samples') -Dir
         foreach ($field in 'FixtureSha256','SourceSha256','HarnessSha256','LogicalTextSha256','SourceElementCount') {
             if ($before.$field -ne $after.$field) { throw "Independent $field comparison failed: $($group.Name)/$relative" }
         }
-        if (($before.Structure | ConvertTo-Json -Compress) -ne ($after.Structure | ConvertTo-Json -Compress) -or
+        if (($before.Structure.NonRunCounts | ConvertTo-Json -Compress) -ne ($after.Structure.NonRunCounts | ConvertTo-Json -Compress) -or
+            $before.Structure.StyledTextSha256 -ne $after.Structure.StyledTextSha256 -or
             $before.Correctness -ne 'PASS' -or $after.Correctness -ne 'PASS') { throw 'Independent structure/native navigation correctness failed.' }
         $beforePng = Join-Path $file.DirectoryName ($file.BaseName + '-initial.png')
         $afterPng = Join-Path (Split-Path $candidateFile) ($file.BaseName + '-initial.png')

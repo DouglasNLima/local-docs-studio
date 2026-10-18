@@ -1,6 +1,6 @@
 # Native architecture decisions
 
-This Continuous preview continuation is stacked on open PR #36 at 9a64dfa5. Its [focused report](continuous-preview-performance-refinement.md) owns the scrollbar/table refinement, current-version and selection guards, controlled six-fixture comparison and new interaction coverage. The unchanged 250 ms target remains incomplete pending exact-head acceptance; earlier green compatibility/package records do not certify it.
+This Continuous preview continuation is stacked on open PR #36 at 9a64dfa5. Its [focused report](continuous-preview-performance-refinement.md) owns the plain-text/table refinement, current-version and selection guards, controlled six-fixture comparison and new interaction coverage. The unchanged 250 ms target remains incomplete pending exact-head acceptance; earlier green compatibility/package records do not certify it.
 
 The fourth native Mermaid authoring family is implemented on
 `feature/native-mermaid-er-visual-editor`, based on consolidated `develop`

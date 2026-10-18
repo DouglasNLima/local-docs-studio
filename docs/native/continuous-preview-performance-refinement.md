@@ -35,10 +35,12 @@ revalidates preceding structure after insertions unless initialisation is batche
 
 Changes under validation:
 
-- Reserve the native Continuous vertical scrollbar gutter before content layout,
-  avoiding width invalidation when a long document needs its scrollbar. Short
-  Continuous previews also retain the gutter. Pages and Automatic's mode choice
-  remain unchanged. Every native list/item/paragraph remains present and styled.
+- Coalesce adjacent plain literals, decoded entities and soft breaks into one
+  native Run, retaining hard breaks and every formatting/link boundary. Literal
+  source-map entries carry their offset within the shared Run, so character
+  selection, Unicode, source navigation and copying keep their exact boundaries.
+  The rich-paragraph fixture retains all text/styles with 3,600 rather than 6,000
+  runs. No mutable WPF element crosses documents or dispatcher ownership.
 - Use WPF `Table.BeginInit/EndInit` around private cooperative table construction.
   Rows/cells still attach parent-first. Final structural validation occurs once
   on the owner dispatcher, including the cancellation cleanup path; it is a
@@ -57,8 +59,11 @@ objects remain dispatcher-owned. Parsing/native media conversion and synchronous
 layout can finish after cancellation; their stale results cannot install.
 
 A display-mode text-formatting experiment did not show consistent benefit and was
-removed. An eager-template experiment exposed a WPF finite-pagination fail-fast
-in the unshown harness; forced template creation for unloaded readers was removed.
+removed. A scrollbar experiment was disproved by the framework default (Visible)
+and removed; its timing variation is not a product benefit. Uniform paragraph
+font promotion also lacked useful evidence and was removed. An eager-template
+experiment exposed a WPF finite-pagination fail-fast in the unshown harness; all
+template changes were removed.
 Original diagnostic logs remain in the worktree's ignored evidence directory.
 
 ## Measurement and acceptance protocol
@@ -90,6 +95,12 @@ and any visual difference requires explicit review. Allocations, natural GC,
 managed/private/working-set observations and bounded Input/dispatcher samples
 retain their actual scopes. Natural weak-reference observations do not establish
 zero retention or a leak. No p95/p99 or universal hardware guarantee is inferred.
+
+Plain-Run count reduction is intentional. Independent verification compares the
+complete logical text, every non-Run element count and canonical actual styled
+text with equivalent adjacent runs normalised. Raw Run counts remain in each
+sample. A white raster backing fixes transparent diagnostic PNG readability,
+outside every timed boundary; both sides use the same capture implementation.
 
 `--continuous-acceptance` and the controlled comparison emit explicit PASS/FAIL
 receipts. Any candidate first layout above 250 ms or existing construction/input

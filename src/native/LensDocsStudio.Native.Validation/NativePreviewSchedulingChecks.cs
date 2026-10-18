@@ -65,10 +65,9 @@ internal static class NativePreviewSchedulingChecks
                     Pump(model.OpenPathAsync(path, root)); Invoke("BindActiveDocument"); Invoke("SetLayout", "Preview");
                     Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                     var result = (LensDocsStudio.Native.Rendering.PreviewResult)Field("rendered")!;
-                    var scrolling = (FlowDocumentScrollViewer)((Decorator)preview.Template.FindName("PART_ContentHost", preview)).Child;
                     if (!result.ReadText().Contains(fixture.Last, StringComparison.Ordinal) || result.Warnings.Count != 0
-                        || scrolling.VerticalScrollBarVisibility != ScrollBarVisibility.Visible
-                        || !File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes)) throw new IOException("Visible fixture opening lost content, media, gutter policy or source.");
+                        || preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll
+                        || !File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes)) throw new IOException("Visible fixture opening lost content, media, Continuous mode or source.");
                     var last = result.SourceElements.MaxBy(item => item.Key).Value;
                     Pump(LensDocsStudio.Native.Rendering.PreviewNavigationService.BringIntoViewAsync(preview, last.ContentStart, last.ContentEnd)); Drain();
                     if (!preview.Selection.Text.Contains(fixture.Last, StringComparison.Ordinal)) throw new IOException("Visible final-target selection failed.");
@@ -102,7 +101,9 @@ internal static class NativePreviewSchedulingChecks
                 || preview.Document.Blocks.Count != 0 || editor.Text != source)
                 throw new IOException("Editor layout did not retain its current outline while pausing native preview work: "
                     + JsonSerializer.Serialize(new { Headings = outline.Items.Count, model.PreviewStatus, Blocks = preview.Document?.Blocks.Count, SourceMatches = editor.Text == source }));
-            outline.SelectedIndex = 1;
+            // Visible fixture opening may already have selected this index. Exercise
+            // a real selection change rather than assigning the retained value.
+            outline.SelectedIndex = -1; outline.SelectedIndex = 1;
             if (editor.CaretOffset != source.IndexOf("## Target heading", StringComparison.Ordinal))
                 throw new IOException("Editor-only outline navigation depended on a rendered preview.");
             Invoke("ShowFind", false);

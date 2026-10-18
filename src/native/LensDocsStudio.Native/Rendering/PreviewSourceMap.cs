@@ -4,7 +4,11 @@ using LensDocsStudio.Core.Parsing;
 
 namespace LensDocsStudio.Native.Rendering;
 
-public sealed record PreviewLiteral(Run Run, LiteralSourceSpan Source);
+public sealed record PreviewLiteral(Run Run, LiteralSourceSpan Source, int RunOffset = 0)
+{
+    public TextPointer Start => Run.ContentStart.GetPositionAtOffset(RunOffset)!;
+    public TextPointer End => Run.ContentStart.GetPositionAtOffset(RunOffset + Source.Length)!;
+}
 
 /// <summary>Character boundaries in literal runs, indexed once for each immutable preview.</summary>
 public sealed class PreviewSourceMap
@@ -36,7 +40,7 @@ public sealed class PreviewSourceMap
             var middle = (low + high) / 2; var literal = literals[middle];
             if (offset < literal.Source.Start) high = middle - 1;
             else if (offset > literal.Source.End) low = middle + 1;
-            else return literal.Run.ContentStart.GetPositionAtOffset(offset - literal.Source.Start, LogicalDirection.Forward);
+            else return literal.Start.GetPositionAtOffset(offset - literal.Source.Start, LogicalDirection.Forward);
         }
         return null;
     }
@@ -60,26 +64,26 @@ public sealed class PreviewSourceMap
         while (low <= high)
         {
             var middle = (low + high) / 2; var literal = literals[middle];
-            if (!position.IsInSameDocument(literal.Run.ContentStart)) return null;
-            if (position.CompareTo(literal.Run.ContentStart) < 0) high = middle - 1;
-            else if (position.CompareTo(literal.Run.ContentEnd) > 0) low = middle + 1;
+            if (!position.IsInSameDocument(literal.Start)) return null;
+            if (position.CompareTo(literal.Start) < 0) high = middle - 1;
+            else if (position.CompareTo(literal.End) > 0) low = middle + 1;
             else
             {
-                var offset = literal.Run.ContentStart.GetOffsetToPosition(position);
+                var offset = literal.Start.GetOffsetToPosition(position);
                 if (startBoundary && offset == literal.Source.Length && middle + 1 < literals.Length
-                    && EmptyFormattingGap(position, literals[middle + 1].Run.ContentStart))
+                    && EmptyFormattingGap(position, literals[middle + 1].Start))
                     return literals[middle + 1].Source.Start;
                 if (!startBoundary && offset == 0 && middle > 0
-                    && EmptyFormattingGap(literals[middle - 1].Run.ContentEnd, position))
+                    && EmptyFormattingGap(literals[middle - 1].End, position))
                     return literals[middle - 1].Source.End;
                 return offset is >= 0 && offset <= literal.Source.Length ? literal.Source.Start + offset : null;
             }
         }
         // Native/UIA selection can place endpoints outside transparent formatting elements.
         // Skip only a bounded, empty structural gap; never cross visible/generated text.
-        if (startBoundary && low < literals.Length && EmptyFormattingGap(position, literals[low].Run.ContentStart))
+        if (startBoundary && low < literals.Length && EmptyFormattingGap(position, literals[low].Start))
             return literals[low].Source.Start;
-        if (!startBoundary && high >= 0 && EmptyFormattingGap(literals[high].Run.ContentEnd, position))
+        if (!startBoundary && high >= 0 && EmptyFormattingGap(literals[high].End, position))
             return literals[high].Source.End;
         return null;
     }
@@ -90,7 +94,7 @@ public sealed class PreviewSourceMap
         var wanted = height / 3; var best = double.PositiveInfinity; int? source = null;
         foreach (var literal in literals)
         {
-            var first = literal.Run.ContentStart; var last = literal.Run.ContentEnd;
+            var first = literal.Start; var last = literal.End;
             if (!first.HasValidLayout || !last.HasValidLayout) continue;
             var start = first.GetCharacterRect(LogicalDirection.Forward); var end = last.GetCharacterRect(LogicalDirection.Backward);
             if (start.IsEmpty || end.IsEmpty || end.Bottom < 0 || start.Top > height) continue;

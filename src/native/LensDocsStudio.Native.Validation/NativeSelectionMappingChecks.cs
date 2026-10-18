@@ -58,6 +58,31 @@ internal static class NativeSelectionMappingChecks
             if (preview.TextMap.TrySourceRange(other.ContentStart, other.ContentEnd, out _, out _))
                 throw new IOException("A stale document pointer mapped into the current preview.");
         }
+        foreach (var newline in new[] { "\n", "\r\n" })
+        {
+            var coalescedSource = "Lead &amp; tail 😀" + newline + "next &#169; end  " + newline + "hard **bold &amp; label** [link &amp; label](#target).";
+            var parsed = new MarkdownService().Parse(coalescedSource);
+            var result = new NativeMarkdownRenderer(new NativeSvgService()).Render(parsed, false,
+                new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
+            var paragraph = result.Document.Blocks.OfType<Paragraph>().Single();
+            if (paragraph.Inlines.FirstInline is not Run { Text: "Lead & tail 😀 next © end" })
+                throw new IOException("Adjacent plain/entity/soft-break runs were not coalesced with exact decoded text.");
+            foreach (var text in new[] { "tail 😀", "next", "end", "label", "link" })
+            {
+                var start = coalescedSource.IndexOf(text, StringComparison.Ordinal);
+                if (!result.TextMap.TryPreviewRange(start, text.Length, out var from, out var to) || new TextRange(from!, to!).Text != text
+                    || !result.TextMap.TrySourceRange(from!, to!, out var restored, out var length) || restored != start || length != text.Length)
+                    throw new IOException("Coalesced literal offsets lost exact Unicode/source selection.");
+            }
+            using var copied = new MemoryStream();
+            var range = new TextRange(result.Document.ContentStart, result.Document.ContentEnd); range.Save(copied, System.Windows.DataFormats.Rtf);
+            var pasted = new FlowDocument(); copied.Position = 0;
+            new TextRange(pasted.ContentStart, pasted.ContentEnd).Load(copied, System.Windows.DataFormats.Rtf);
+            if (new TextRange(pasted.ContentStart, pasted.ContentEnd).Text != range.Text || parsed.Source != coalescedSource
+                || paragraph.Inlines.OfType<LineBreak>().Count() != 1 || paragraph.Inlines.OfType<Hyperlink>().Count() != 1)
+                throw new IOException("Coalescing changed native RTF, a hard break, hyperlink or original source.");
+            observations.Add(new { Coalesced = true, LineEnding = newline == "\n" ? "LF" : "CRLF", SourceSelection = true, NativeRtf = true });
+        }
         Directory.CreateDirectory(output);
         File.WriteAllText(Path.Combine(output, "native-selection-mapping.json"), JsonSerializer.Serialize(new { Passed = true, Observations = observations }, new JsonSerializerOptions { WriteIndented = true }));
     }

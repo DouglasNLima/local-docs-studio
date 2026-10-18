@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -53,9 +52,6 @@ internal static class NativeContinuousPerformanceChecks
                     Images: new PreviewImageService().Prepare(parsed, Path.Combine(output, "synthetic.md"), output))).GetAwaiter().GetResult();
                 var preparation = preparationWatch.Elapsed.TotalMilliseconds;
                 var viewer = new StageViewer { IsToolBarVisible = false, Background = Brushes.White };
-                // One compiled harness also loads the immutable baseline assembly, where
-                // this product policy does not yet exist. No timing boundary is changed.
-                typeof(DocumentPreview).GetMethod("ConfigureContinuousViewer", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, [viewer]);
                 using var host = new HwndSource(new HwndSourceParameters("Continuous performance validation")
                     { Width = 640, Height = 300, WindowStyle = unchecked((int)0x80000000) });
                 host.RootVisual = viewer;
@@ -145,7 +141,10 @@ internal static class NativeContinuousPerformanceChecks
                 var completedAllocation = GC.GetTotalAllocatedBytes() - allocated;
                 var layoutStages = new { viewer.MeasureMilliseconds, viewer.ArrangeMilliseconds, viewer.UpdateLayoutMilliseconds,
                     viewer.MeasureCalls, viewer.ArrangeCalls };
-                var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32); capture.Render(viewer);
+                var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32);
+                var backing = new DrawingVisual();
+                using (var context = backing.RenderOpen()) context.DrawRectangle(Brushes.White, null, new Rect(0, 0, 640, 300));
+                capture.Render(backing); capture.Render(viewer);
                 var raster = watch.Elapsed.TotalMilliseconds;
                 var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(capture));
                 using (var file = File.Create(Path.Combine(sampleOutput, fixture.Name + "-initial.png"))) encoder.Save(file);
@@ -228,9 +227,25 @@ internal static class NativeContinuousPerformanceChecks
     private static object Structure(BlockCollection blocks)
     {
         var counts = new SortedDictionary<string, int>(StringComparer.Ordinal);
+        var canonical = new StringBuilder(); var pendingText = new StringBuilder(); string? pendingStyle = null;
+        void Flush()
+        {
+            if (pendingStyle is null) return;
+            canonical.Append(pendingStyle.Length).Append(':').Append(pendingStyle).Append(pendingText.Length).Append(':').Append(pendingText);
+            pendingStyle = null; pendingText.Clear();
+        }
         void Count(TextElement element)
         {
             var name = element.GetType().Name; counts[name] = counts.GetValueOrDefault(name) + 1;
+            if (element is Run run)
+            {
+                var style = string.Join('|', run.FontFamily.Source, run.FontSize.ToString("R", System.Globalization.CultureInfo.InvariantCulture),
+                    run.FontWeight, run.FontStyle, run.FontStretch, run.BaselineAlignment, run.Foreground?.ToString(), run.Background?.ToString(),
+                    string.Join(',', run.TextDecorations.Select(decoration => decoration.Location)));
+                if (pendingStyle != style) Flush();
+                pendingStyle = style; pendingText.Append(run.Text); return;
+            }
+            Flush(); canonical.Append('<').Append(name).Append('>');
             switch (element)
             {
                 case Section section: foreach (var block in section.Blocks) Count(block); break;
@@ -243,7 +258,15 @@ internal static class NativeContinuousPerformanceChecks
             }
         }
         foreach (var block in blocks) Count(block);
-        return counts;
+        Flush();
+        return new
+        {
+            ElementCounts = counts,
+            // Coalescing plain runs intentionally changes representation. The gate
+            // still compares every other element count and actual styled text.
+            NonRunCounts = counts.Where(pair => pair.Key != "Run").ToDictionary(),
+            StyledTextSha256 = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(canonical.ToString())))
+        };
     }
 
     private sealed class StageViewer : FlowDocumentScrollViewer

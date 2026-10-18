@@ -354,7 +354,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         }
         async ValueTask AddInlines(InlineCollection target, ContainerInline container)
         {
-            foreach (var inline in container)
+            for (var inline = container.FirstChild; inline is not null; inline = inline.NextSibling)
             {
                 // A single paragraph or link label can contain thousands of formatted runs.
                 await Cooperate();
@@ -372,7 +372,27 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         else { passive.FontFamily = new FontFamily("Consolas"); passive.ToolTip = "Keyboard shortcut: " + semantic.Text; }
                         System.Windows.Automation.AutomationProperties.SetName(passive, semantic.Text);
                         target.Add(passive); break;
-                    case LiteralInline literal: target.Add(Literal(literal, literal.Content.ToString())); break;
+                    case LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false }:
+                        if (inline.NextSibling is not (LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false }))
+                        {
+                            if (inline is LiteralInline literal) target.Add(Literal(literal, literal.Content.ToString()));
+                            else target.Add(new Run(inline is HtmlEntityInline entity ? entity.Transcoded.ToString() : " "));
+                            break;
+                        }
+                        var plain = new System.Text.StringBuilder();
+                        var run = new Run(); target.Add(run);
+                        while (true)
+                        {
+                            await Cooperate();
+                            var text = inline switch { LiteralInline literal => literal.Content.ToString(), HtmlEntityInline entity => entity.Transcoded.ToString(), _ => " " };
+                            if (inline is LiteralInline && LiteralSourceMapping.Locate(parsed.Source, inline.Span.Start, inline.Span.End, text) is { } mapping)
+                                literalSpans.Add(new(run, mapping, plain.Length));
+                            plain.Append(text);
+                            if (inline.NextSibling is not (LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false })) break;
+                            inline = inline.NextSibling;
+                        }
+                        run.Text = plain.ToString();
+                        break;
                     case AutolinkInline auto:
                         var autoReference = MarkdownLinks.AutolinkReference(auto);
                         var autoLink = new Hyperlink(Literal(auto, auto.Url)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = autoReference };
@@ -380,7 +400,6 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         System.Windows.Automation.AutomationProperties.SetAutomationId(autoLink, "DocumentLink" + auto.Span.Start);
                         autoLink.Click += (_, _) => navigate(autoReference);
                         target.Add(autoLink); break;
-                    case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
                     case CodeInline code:
                         var codeRun = Literal(code, code.Content); codeRun.FontFamily = new FontFamily("Consolas"); codeRun.Background = surface;
                         target.Add(codeRun); break;
