@@ -1,0 +1,4 @@
+System.ArgumentException: Unknown transition diagnostic phase.
+   at LensDocsStudio.Native.Validation.ContinuousTransitionWatch.Mark(String value) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\ContinuousTransitionWatch.cs:line 56
+   at LensDocsStudio.Native.Validation.NativePreviewSchedulingChecks.Run(String output, Boolean shown, Boolean highContrast) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativePreviewSchedulingChecks.cs:line 244
+   at LensDocsStudio.Native.Validation.Program.Main(String[] args) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\Program.cs:line 25

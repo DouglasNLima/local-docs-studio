@@ -17,7 +17,7 @@ try {
     $setup = Start-Process $installer[0].FullName -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $install + '"'),'/TASKS="fileassoc,desktopicon"',('/LOG="' + (Join-Path $root 'install.log') + '"')) -WindowStyle Hidden -PassThru -Wait
     if ($setup.ExitCode -ne 0) { throw 'Original installer failed.' }
     for ($index = 0; $index -lt 7; $index++) {
-        $env:LENS_NATIVE_OUTLINE_FOCUS_PROBE = if ($index -eq 5) { 'original' } elseif ($index -eq 6) { 'repaired' } else { '' }
+        $env:LENS_NATIVE_OUTLINE_FOCUS_PROBE = if ($index -eq 5) { 'original' } elseif ($index -eq 6) { 'foreground-restored' } else { '' }
         $output = Join-Path $root ('launch-' + $index)
         New-Item -ItemType Directory -Path $output -Force | Out-Null
         $validation = Join-Path $repo 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'

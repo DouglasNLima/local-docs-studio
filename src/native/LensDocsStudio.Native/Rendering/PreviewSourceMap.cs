@@ -14,30 +14,22 @@ public sealed record PreviewLiteral(Run Run, LiteralSourceSpan Source, int RunOf
 public sealed class PreviewSourceMap
 {
     private readonly PreviewLiteral[] literals;
-    private readonly PreviewLiteral[][] verticalGroups;
+    private readonly PreviewLiteral[] displayLiterals;
+    private readonly PreviewViewportGroup[] verticalGroups;
     public IReadOnlyList<PreviewLiteral> Literals => literals;
-    public PreviewSourceMap(IEnumerable<PreviewLiteral> literals)
+    public PreviewSourceMap(IEnumerable<PreviewLiteral> literals) : this(literals, []) { }
+    internal PreviewSourceMap(IEnumerable<PreviewLiteral> literals, IReadOnlyList<PreviewViewportGroup> groups)
     {
-        // The renderer supplies visual document order (including relocated footnotes).
-        // Source lookup retains its independent source-order index.
-        var displayLiterals = literals.ToArray();
-        this.literals = displayLiterals.OrderBy(item => item.Source.Start).ToArray();
-        // Paragraphs flow vertically, but the source order of table cells does not:
-        // a wrapped first cell can end below the start of its following cell.
-        // Index the complete outer row as one vertical group in that case.
-        verticalGroups = displayLiterals.GroupBy(VerticalOwner).Select(group => group.ToArray()).ToArray();
+        // The renderer supplies document order, including relocated footnotes,
+        // and records vertical ranges while it already owns each paragraph/row.
+        // Avoid walking WPF parents or allocating a grouping per literal here.
+        displayLiterals = literals.ToArray();
+        this.literals = displayLiterals;
+        for (var index = 1; index < displayLiterals.Length; index++)
+            if (displayLiterals[index].Source.Start < displayLiterals[index - 1].Source.Start)
+            { this.literals = displayLiterals.OrderBy(item => item.Source.Start).ToArray(); break; }
+        verticalGroups = groups.ToArray();
     }
-    private static DependencyObject VerticalOwner(PreviewLiteral literal)
-    {
-        DependencyObject? owner = null;
-        for (DependencyObject? node = literal.Run; node is FrameworkContentElement content; node = content.Parent)
-        {
-            if (owner is null && node is Paragraph) owner = node;
-            if (node is TableRow) owner = node;
-        }
-        return owner ?? literal.Run;
-    }
-
     public bool TryPreviewRange(int start, int length, out TextPointer? from, out TextPointer? to)
     {
         from = SourceBoundary(start); to = SourceBoundary(start + length);
@@ -114,26 +106,32 @@ public sealed class PreviewSourceMap
     {
         // Validity is evaluated afresh for details toggles. Unknown geometry falls
         // back to the exhaustive scan instead of guessing a source anchor.
-        var visibleGroups = verticalGroups.Where(group => group[0].Start.HasValidLayout).ToArray();
+        if (verticalGroups.Length == 0) return literals;
+        var visibleGroups = verticalGroups.Where(group => displayLiterals[group.Start].Start.HasValidLayout).ToArray();
         var low = 0; var high = visibleGroups.Length;
         while (low < high)
         {
             var middle = (low + high) / 2;
-            var rectangle = visibleGroups[middle][0].Start.GetCharacterRect(LogicalDirection.Forward);
+            var rectangle = displayLiterals[visibleGroups[middle].Start].Start.GetCharacterRect(LogicalDirection.Forward);
             if (rectangle.IsEmpty) return literals;
             if (rectangle.Top < 0) low = middle + 1; else high = middle;
         }
-        var candidates = new List<PreviewLiteral[]>();
+        var candidates = new List<PreviewViewportGroup>();
         // The preceding paragraph/row may span the viewport's top edge.
         for (var index = Math.Max(0, low - 1); index < visibleGroups.Length; index++)
         {
             var group = visibleGroups[index];
-            var top = group[0].Start.GetCharacterRect(LogicalDirection.Forward);
+            var top = displayLiterals[group.Start].Start.GetCharacterRect(LogicalDirection.Forward);
             if (top.IsEmpty) return literals;
             if (top.Top > height) break;
             candidates.Add(group);
         }
-        return candidates.SelectMany(group => group);
+        return Enumerate();
+        IEnumerable<PreviewLiteral> Enumerate()
+        {
+            foreach (var group in candidates)
+                for (var index = group.Start; index < group.Start + group.Length; index++) yield return displayLiterals[index];
+        }
     }
     public int? VisibleSource(double height)
     {
@@ -162,8 +160,10 @@ public sealed class PreviewSourceMap
             if (located is null || !located.HasValidLayout) continue;
             var box = located.GetCharacterRect(LogicalDirection.Forward);
             var distance = Math.Abs(box.Top - wanted);
-            if (!box.IsEmpty && box.Bottom >= 0 && box.Top <= height && distance < best) { best = distance; source = literal.Source.Start + offset; }
+            if (!box.IsEmpty && box.Bottom >= 0 && box.Top <= height && (distance < best || distance == best && (source is null || literal.Source.Start + offset < source))) { best = distance; source = literal.Source.Start + offset; }
         }
         return source;
     }
 }
+
+internal readonly record struct PreviewViewportGroup(int Start, int Length);

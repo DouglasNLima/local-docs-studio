@@ -21,7 +21,7 @@ internal static partial class NativeUiChecks
         try
         {
             focusProbe = NativeOutlineFocusProbe.StartIfRequested();
-            if (Environment.GetEnvironmentVariable("LENS_NATIVE_OUTLINE_FOCUS_PROBE") == "repaired") FocusWindow(window);
+            if (Environment.GetEnvironmentVariable("LENS_NATIVE_OUTLINE_FOCUS_PROBE") == "foreground-restored") FocusWindow(window);
             editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
             NativeUiClipboard.SetText(fixture); owned = GetClipboardSequenceNumber();
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);

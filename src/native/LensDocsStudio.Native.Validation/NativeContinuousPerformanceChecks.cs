@@ -29,6 +29,7 @@ internal static class NativeContinuousPerformanceChecks
         {
             var fixtures = ContinuousPreviewFixtures.Create(output, scenario);
             if (checkAnchors) fixtures = [.. fixtures,
+                ("anchor-spanned-table", "# Spanned table\n\n+-------+-------------+\n| First | " + string.Join(" ", Enumerable.Repeat("Café **wrap**", 120)) + "\n+-------+ carries     +\n| Next  | continued   |\n+-------+-------------+\n\n# Last\n\nLast marker.", "Last marker."),
                 ("anchor-footnotes", "# Reference\n\nReference [^early].\n\n[^early]: Early note.\n\n# Body\n\n" + string.Join("\n\n", Enumerable.Range(0, 150).Select(i => "Body paragraph " + i)) + "\n\n# Last\n\nLast marker.", "Last marker."),
                 ("anchor-wrapped-table", "# Wrapped rows\n\n| Long | Short |\n|---|---|\n| " + string.Join(" ", Enumerable.Repeat("wrapped **Café 😀** content", 160)) + " | small |\n| second | row |\n\n# Last anchor\n\nLast marker.", "Last marker."),
                 ("anchor-nested-list", "# Nested\n\n42. First\n    - Inner **bold**\n    - " + string.Join(" ", Enumerable.Repeat("wrapped inner", 300)) + "\n43. Next\n\n# Details container\n\n<details>\n<summary>Closed</summary>\n\nHidden.\n\n</details>\n\n# Last\n\nLast marker.", "Last marker.")];
@@ -48,6 +49,8 @@ internal static class NativeContinuousPerformanceChecks
                 var parseWatch = Stopwatch.StartNew();
                 var parsed = new MarkdownService().Parse(source);
                 var parsing = parseWatch.Elapsed.TotalMilliseconds;
+                if (fixture.Name == "anchor-spanned-table" && !parsed.Syntax.Descendants<Markdig.Extensions.Tables.TableCell>().Any(cell => cell.RowSpan > 1))
+                    throw new IOException("The adversarial source did not exercise an actual parsed spanning table cell.");
                 var preparationWatch = Stopwatch.StartNew();
                 var diagrams = parsed.Syntax.Descendants<FencedCodeBlock>().Where(code => code.Info is "mermaid" or "mmd")
                     .ToDictionary(code => code, code => new DiagramService().Render(code.Lines.ToString()));
@@ -150,8 +153,12 @@ internal static class NativeContinuousPerformanceChecks
                 var layoutStages = new { viewer.MeasureMilliseconds, viewer.ArrangeMilliseconds, viewer.UpdateLayoutMilliseconds,
                     viewer.MeasureCalls, viewer.ArrangeCalls };
                 ContinuousHarnessEvents.Log.Stage("harness/correctness-start");
-                var mapProbe = Stopwatch.StartNew(); var visibleAnchor = result.TextMap.VisibleSource(300); mapProbe.Stop();
-                var visibleAnchorMilliseconds = mapProbe.Elapsed.TotalMilliseconds;
+                int? visibleAnchor = null; var visibleAnchorMilliseconds = 0d;
+                if (checkAnchors)
+                {
+                    var mapProbe = Stopwatch.StartNew(); visibleAnchor = result.TextMap.VisibleSource(300); mapProbe.Stop();
+                    visibleAnchorMilliseconds = mapProbe.Elapsed.TotalMilliseconds;
+                }
                 var capture = new RenderTargetBitmap(640, 300, 96, 96, PixelFormats.Pbgra32);
                 var backing = new DrawingVisual();
                 using (var context = backing.RenderOpen()) context.DrawRectangle(Brushes.White, null, new Rect(0, 0, 640, 300));
@@ -216,7 +223,7 @@ internal static class NativeContinuousPerformanceChecks
                     Structure = Structure(result.Document.Blocks),
                     SelectedTarget = selectedTarget, Operations = operations,
                     AnchorChecks = anchorChecks,
-                    ViewportAnchorProbe = new { Milliseconds = visibleAnchorMilliseconds, SourceOffset = visibleAnchor, Boundary = "Outside readiness and first-layout clocks" },
+                    ViewportAnchorProbe = new { Enabled = checkAnchors, Milliseconds = visibleAnchorMilliseconds, SourceOffset = visibleAnchor, Boundary = "Outside readiness and first-layout clocks" },
                     Environment = new { OS = Environment.OSVersion.ToString(), Runtime = Environment.Version.ToString(), Environment.ProcessorCount,
                         NativeAssemblySha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location))),
                         Dpi = VisualTreeHelper.GetDpi(viewer).PixelsPerInchX, Appearance = SystemParameters.HighContrast ? "High Contrast" : "Light",

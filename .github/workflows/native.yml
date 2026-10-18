@@ -25,6 +25,8 @@ jobs:
         run: dotnet restore src/native/LensDocsStudio.Native.slnx --locked-mode
       - name: Build native solution
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release --no-restore
+      - name: Check native dynamic theme resources and independent owners
+        run: dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --theme-resources artifacts/native/theme-resources
       - name: Test document safety and parsing
         run: dotnet test src/native/LensDocsStudio.Core.Tests -c Release --no-build --logger "trx;LogFileName=native-core.trx" --results-directory artifacts/native/tests
       - name: Validate pluggable signing policy
@@ -107,6 +109,7 @@ jobs:
             artifacts/native/authenticode/**/*.json
             artifacts/native/signing-adapters/**/signing-adapters.json
             artifacts/native/validation/
+            artifacts/native/theme-resources/
             artifacts/native/ui/
             artifacts/native/interrupted-save/
             artifacts/native/site-browser/

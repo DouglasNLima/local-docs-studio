@@ -52,7 +52,7 @@ internal sealed class ContinuousTransitionWatch : IDisposable
     public void Pulse() => Interlocked.Exchange(ref pulse, Stopwatch.GetTimestamp());
     public void Mark(string value)
     {
-        if (value is not ("changing-os" or "os-changed" or "waiting-for-notification" or "waiting-for-preview" or "preview-ready" or "restoring-os" or "os-restored"))
+        if (value is not ("changing-os" or "os-changed" or "waiting-for-notification" or "waiting-for-preview" or "preview-ready" or "disabling-os" or "disabled-preview-ready" or "restoring-os" or "os-restored"))
             throw new ArgumentException("Unknown transition diagnostic phase.");
         Volatile.Write(ref phase, value);
         File.AppendAllText(Path.Combine(output, "transition-phases.txt"), value + " " + Stopwatch.GetElapsedTime(started).TotalMilliseconds.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) + Environment.NewLine);

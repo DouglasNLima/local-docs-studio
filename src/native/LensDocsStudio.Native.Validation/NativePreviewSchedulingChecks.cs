@@ -22,6 +22,8 @@ internal static class NativePreviewSchedulingChecks
     public static void Run(string output, bool shown = false, bool highContrast = false)
     {
         Directory.CreateDirectory(output);
+        if (shown && !highContrast && NativeTestHighContrast.IsEnabledNow)
+            throw new IOException("A normal-appearance run requires an initially normal disposable desktop; a previous failed transition cannot contaminate its comparison.");
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
         var application = Application.Current;
         if (application is null) { var nativeApplication = new App { ShutdownMode = ShutdownMode.OnExplicitShutdown }; nativeApplication.InitializeComponent(); application = nativeApplication; }
@@ -182,7 +184,8 @@ internal static class NativePreviewSchedulingChecks
                     var currentColour = preview.Document?.Foreground is SolidColorBrush brush && brush.Color == SystemColors.WindowTextColor;
                     if (!CorrectColour(actual)) obsoleteAppearance = true;
                     if (installed.Count < 64) installed.Add(new { ActualHighContrast = actual, WpfHighContrast = SystemParameters.HighContrast,
-                        CurrentSystemColour = currentColour, Colour = preview.Document?.Foreground?.ToString(), ExpectedColour = SystemColors.WindowTextColor.ToString() });
+                        CurrentSystemColour = currentColour, CurrentAppearanceColour = CorrectColour(actual), Colour = preview.Document?.Foreground?.ToString(),
+                        ExpectedColour = (actual ? SystemColors.WindowTextColor : Color.FromRgb(32, 33, 36)).ToString() });
                 };
                 bool CorrectColour(bool expected)
                 {

@@ -1,0 +1,18 @@
+{
+  "scope": "Uncommitted local ResourceDictionary.BeginInit/EndInit experiment, not shipped.",
+  "firstProcess": {
+    "exit": "FailFast",
+    "observedStack": [
+      "MS.Internal.PtsHost.PtsHost.GetParaProperties",
+      "MS.Internal.PtsHost.PTS.FsCreatePageFinite",
+      "MS.Internal.PtsHost.FlowDocumentPaginator.OnBackgroundPagination",
+      "NativePreviewSchedulingChecks.Pump"
+    ],
+    "capture": "Partial stack retained from tool output; no heap dump collected."
+  },
+  "predeterminedIndependentReproduction": {
+    "exitCode": 0,
+    "log": "artifacts/continuation-0237/theme-batch-failfast/"
+  },
+  "conclusion": "Causality is not isolated. The bulk invalidation experiment was rejected; one passing repeat is not a fix or acceptance."
+}

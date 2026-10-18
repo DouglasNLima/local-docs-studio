@@ -1,10 +1,14 @@
 [CmdletBinding()]
-param([Parameter(Mandatory)][ValidateSet('--normal','--high-contrast')][string]$Appearance)
+param(
+    [Parameter(Mandatory)][ValidateSet('--normal','--high-contrast')][string]$Appearance,
+    [string]$ValidationExecutable = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe',
+    [string]$OutputDirectory = 'artifacts/continuous-interactions'
+)
 $ErrorActionPreference = 'Stop'
-$output = Join-Path (Get-Location) 'artifacts/continuous-interactions'
+$output = [IO.Path]::GetFullPath($OutputDirectory)
 [IO.Directory]::CreateDirectory($output) | Out-Null
-$validation = (Resolve-Path 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe').Path
-$arguments = @('--continuous-interactions', 'artifacts/continuous-interactions', $Appearance)
+$validation = (Resolve-Path -LiteralPath $ValidationExecutable).Path
+$arguments = @('--continuous-interactions', ('"' + $output + '"'), $Appearance)
 $process = Start-Process -FilePath $validation -ArgumentList $arguments -PassThru -WindowStyle Hidden -RedirectStandardOutput (Join-Path $output 'validation-stdout.txt') -RedirectStandardError (Join-Path $output 'validation-stderr.txt')
 if (-not $process.WaitForExit(180000)) {
     # This independent process bound cannot be starved by WPF's dispatcher or

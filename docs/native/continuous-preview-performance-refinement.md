@@ -400,3 +400,38 @@ Both predetermined five-launch replications passed using the unchanged `.749` in
 ### Native segmentation experiment
 
 An explicit validation-only prototype moves complete native `ListItem` objects into consecutive 64-item native lists; text, bold formatting and numbering remain. It changes logical list grouping and is never installed by the product. Local diagnostic first/repeated list layouts were 1,944.74/825.02 ms; mixed was 554.32/298.31 ms. The target remains 250 ms. These exploratory samples are not paired acceptance evidence; hosted independent prototype repetitions are queued with the next controlled comparison. They test a bounded structural alternative without accepting a first viewport or changed accessibility grouping as goal completion.
+
+### Retained intermediate comparison: 0237b08 → 2134fe8
+
+[Controlled run 39157579889](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39157579889) used one compiled harness (`EAA891395058FC7295251DF74C5498963CEB0787F11E5DB5E00BC74A5D40EB26`) on both products per host. All 264 independent content/structure/navigation checks passed; all 132 paired initial rasters were byte-identical. Acceptance failed: 37/66 candidate samples in replication 1 and 26/66 in replication 2 exceeded first layout. Every sample and regression remains in `2134fe8-replication-*.json`, with original raw-file hashes and separate source, harness, environment and fixture identity.
+
+Values below are observed median / maximum in milliseconds, over the same eleven prescribed samples per fixture. These combined-temperature summaries are descriptive only; temperature and individual samples remain separate in the raw records, and no percentile claim is made.
+
+| Fixture | Replication 1 baseline | Replication 1 candidate | Replication 2 baseline | Replication 2 candidate |
+|---|---:|---:|---:|---:|
+| details | 91.82 / 271.47 | 129.10 / 333.41 | 56.15 / 168.42 | 102.96 / 173.09 |
+| list | 1298.54 / 1548.16 | 1302.69 / 1444.73 | 737.91 / 897.63 | 755.24 / 1053.41 |
+| paragraphs | 166.34 / 397.03 | 237.22 / 384.87 | 118.86 / 254.23 | 219.42 / 236.01 |
+| quote | 87.59 / 257.12 | 131.62 / 277.71 | 50.97 / 167.01 | 106.99 / 166.57 |
+| table | 287.95 / 433.49 | 362.97 / 454.18 | 189.33 / 282.24 | 273.95 / 383.17 |
+| mixed | 308.74 / 623.82 | 480.44 / 625.55 | 207.17 / 396.51 | 367.01 / 487.99 |
+
+The new outside-clock anchor probe made this intermediate protocol less comparable to the established protocol: the baseline spent seconds scanning geometry between ordinary samples, while the candidate did much less work. That can alter subsequent heap/cache state. It does not explain every regression or justify discarding any sample. The correction confines anchor probing to its explicit correctness command. Both products must rerun the corrected compiled harness with the original first-layout clock and 250 ms threshold unchanged.
+
+The first index implementation also walked WPF parents and allocated LINQ groups before layout. The current refinement records immutable paragraph/row ranges during the renderer's existing traversal, avoids additional WPF tree access, and reuses the literal array when source order already matches document order. Tables containing row spans use a complete-table range because rows can overlap. Ten local cases (the original six plus spanning/wrapped tables, relocated footnotes and nested lists/details) pass exact initial/top/middle/bottom anchor comparison against the retained exhaustive algorithm. No layout work is deferred by this change.
+
+### Shown responsiveness and appearance follow-up
+
+The `2134fe8` sampled shown run reduced the largest recorded viewport-save span to 112.49 ms, but its maximum Input heartbeat gap was **4,470.87 ms**. It ran on another host with tracing overhead, so these observations do not quantify a paired responsiveness improvement. The new controlled path runs the identical shown harness against baseline and candidate on each host, reverses initial order in replication 2, and retains both outcomes under independent 180-second process bounds. A normal-appearance run rejects a desktop left in High Contrast by a failed earlier process.
+
+The trace includes 5,562.0 ms inclusive in `ThemeService.Apply`; samples within that call include logical-child/resource-change tree walking. These spans overlap native/framework work and must not be added to other inclusive totals. A resource `BeginInit`/`EndInit` batching experiment encountered a local Pages-mode WPF fail-fast; one independent fresh-process reproduction passed. Its cause is not isolated and the experiment is rejected. The failure is retained as `rejected-resource-batch-experiment.json`.
+
+The replacement keeps ten colour slots and their bound brushes inside one resource-dictionary owner. A theme refresh updates their colours; unchanged resource keys and aliases retain their objects. Actual Fluent variant changes replace one merged dictionary rather than remove then add. Each owner has its own palette under a weak-key lifetime; there is no document text, layout, path or cross-owner WPF object in the palette. The brushes stay on their owning dispatcher; immutable preview drawings retain their separate frozen-brush path. All ten role values are recomputed from current Light/Dark/System/High Contrast colours on application, including scheme colours. No theme is prewarmed. The [WPF Freezable contract](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/advanced/freezable-objects-overview) explains bound-brush mutability and thread ownership.
+
+The targeted dynamic-resource consumer test checks exact Light/Dark colours, retained owned brushes and a separate owner's unchanged colours. It runs without showing a window and is **not GUI certification**. Actual shell, all five editors, OS High Contrast and final-source package checks remain required.
+
+The traced `2134fe8` process observed automatic enable → current preview → disable → current preview with no manual ApplyTheme and no obsolete installation. The separate normal interaction job failed before disable verification because its optional diagnostic watch rejected the newly added `disabling-os` marker. That bounded whitelist is corrected; the assertion, 15-second dispatcher deadlines and independent hard bounds are unchanged. The original failed job and stderr are retained. Neither a green traced job nor cleanup substitutes for the required corrected interaction job.
+
+Ten original `.749` launches without pre-input probes also passed on two hosts. Both original and explicit-foreground-restoration routes passed the separately injected foreground-loss schedule on both hosts. Thus that experiment **does not support a focus diagnosis**. No foreground workaround has been added to the ordinary input route. The historical first-launch failure remains unresolved.
+
+The replacement palette passed the owned dynamic-consumer check and three predetermined fresh-process local scheduling runs, all retained under `local-palette-*.json`. Those local runs exercise Automatic/Pages transitions but do not toggle the developer's OS appearance or certify visible desktop interaction. The next hosted candidate must repeat shown normal/High Contrast, both-direction automatic OS transitions, native/browser/export regressions and its own package lifecycle. First-layout acceptance is still unachieved.

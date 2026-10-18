@@ -86,6 +86,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var media = new List<PreviewMedia>();
         var warnings = new List<string>();
         var literalSpans = new List<PreviewLiteral>();
+        var viewportGroups = new List<PreviewViewportGroup>();
+        var viewportGroupDepth = 0;
+        void CompleteViewportGroup(int start)
+        { if (literalSpans.Count > start) viewportGroups.Add(new(start, literalSpans.Count - start)); }
         var visualTargets = editDiagramVisually is null || parsed.Source.Length > Editor.MermaidDocumentEditSession.MaximumDocumentCharacters
             ? Array.Empty<Core.Mermaid.MermaidBlockSource>() : Core.Mermaid.MermaidBlockSource.Find(parsed, parsed.StandaloneMermaid);
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
@@ -95,7 +99,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             await Convert(block, document.Blocks);
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("completed");
-        return new(document, sourceElements, warnings) { TextMap = new(literalSpans), Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
+        PreviewConstructionEvents.Log.Stage("source-map-start");
+        var textMap = new PreviewSourceMap(literalSpans, viewportGroups);
+        PreviewConstructionEvents.Log.Stage("source-map-completed");
+        return new(document, sourceElements, warnings) { TextMap = textMap, Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
 
         Run Literal(MarkdownObject node, string text)
         {
@@ -245,6 +252,12 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     // WPF otherwise revalidates all preceding rows for every cell/row
                     // insertion. This complete private table has one structural commit.
                     wt.BeginInit();
+                    // Spanned rows can overlap vertically. Index that complete table
+                    // conservatively; ordinary rows remain independent ranges.
+                    var tableGroupStart = literalSpans.Count;
+                    var ownsTableGroup = viewportGroupDepth == 0 && table.OfType<Markdig.Extensions.Tables.TableRow>()
+                        .SelectMany(row => row.OfType<Markdig.Extensions.Tables.TableCell>()).Any(cell => cell.RowSpan > 1);
+                    if (ownsTableGroup) viewportGroupDepth++;
                     try
                     {
                         var group = new TableRowGroup(); wt.RowGroups.Add(group);
@@ -253,26 +266,34 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                             await Cooperate();
                             var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
                             group.Rows.Add(wr);
-                            var column = 0;
-                            foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                            var rowGroupStart = literalSpans.Count;
+                            var ownsRowGroup = viewportGroupDepth == 0;
+                            if (ownsRowGroup) viewportGroupDepth++;
+                            try
                             {
-                                await Cooperate();
-                                var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
-                                wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
-                                var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
-                                column += Math.Max(1, cell.ColumnSpan);
-                                wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
-                                { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
-                                if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
-                                wr.Cells.Add(wc);
-                                foreach (var child in cell) await Convert(child, wc.Blocks);
+                                var column = 0;
+                                foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                                {
+                                    await Cooperate();
+                                    var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
+                                    wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
+                                    var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
+                                    column += Math.Max(1, cell.ColumnSpan);
+                                    wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
+                                    { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
+                                    if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
+                                    wr.Cells.Add(wc);
+                                    foreach (var child in cell) await Convert(child, wc.Blocks);
+                                }
                             }
+                            finally { if (ownsRowGroup) { viewportGroupDepth--; CompleteViewportGroup(rowGroupStart); } }
                         }
                     }
                     finally
                     {
                         PreviewConstructionEvents.Log.Stage("table-validation-start");
-                        wt.EndInit();
+                        try { wt.EndInit(); }
+                        finally { if (ownsTableGroup) { viewportGroupDepth--; CompleteViewportGroup(tableGroupStart); } }
                         PreviewConstructionEvents.Log.Stage("table-validation-completed");
                     }
                     cancellationToken.ThrowIfCancellationRequested();
@@ -350,7 +371,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 result.FontWeight = FontWeights.SemiBold; result.Margin = new Thickness(0, 16, 0, 8);
             }
             target?.Add(result);
+            var groupStart = literalSpans.Count;
             if (inline is not null) await AddInlines(result.Inlines, inline);
+            if (viewportGroupDepth == 0) CompleteViewportGroup(groupStart);
             return result;
         }
         async ValueTask AddInlines(InlineCollection target, ContainerInline container)

@@ -8,7 +8,7 @@ internal sealed class NativeOutlineFocusProbe(Process process) : IDisposable
 {
     public static NativeOutlineFocusProbe? StartIfRequested()
     {
-        if (Environment.GetEnvironmentVariable("LENS_NATIVE_OUTLINE_FOCUS_PROBE") is not ("original" or "repaired")) return null;
+        if (Environment.GetEnvironmentVariable("LENS_NATIVE_OUTLINE_FOCUS_PROBE") is not ("original" or "foreground-restored")) return null;
         var child = Process.Start(new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, ArgumentList = { "--outline-focus-holder" } })!;
         var watch = Stopwatch.StartNew();
         while (watch.Elapsed < TimeSpan.FromSeconds(5))

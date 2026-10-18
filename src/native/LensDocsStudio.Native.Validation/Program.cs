@@ -59,6 +59,11 @@ internal static class Program
             try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", repetitions: 2, segmentedPrototype: true); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--theme-resources")
+        {
+            try { NativeThemeResourceChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--viewport-anchors")
         {
             try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", checkAnchors: true); return 0; }

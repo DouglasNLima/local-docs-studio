@@ -65,6 +65,17 @@ jobs:
       - name: Experimental native list segmentation, never product acceptance
         if: always()
         run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --segmented-native-prototype artifacts/continuous-performance/segmented-prototype
+      - name: Same compiled shown-shell harness on both products, independent hard bounds
+        if: always()
+        run: |
+          $order = if ('${{ matrix.replication }}' -eq '1') { @('baseline','candidate') } else { @('candidate','baseline') }
+          $failed = $false
+          foreach ($side in $order) {
+            $validation = if ($side -eq 'baseline') { 'artifacts/continuous-performance/baseline-binaries/LensDocsStudio.Native.Validation.exe' } else { 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe' }
+            try { & scripts/native/Invoke-ContinuousPreviewInteractions.ps1 -Appearance '--normal' -ValidationExecutable $validation -OutputDirectory "artifacts/continuous-performance/shown-$side"; if ($LASTEXITCODE -ne 0) { $failed = $true } }
+            catch { Write-Warning $_; $failed = $true }
+          }
+          if ($failed) { throw 'A paired shown-shell correctness check failed; retain both outcomes.' }
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -75,4 +86,6 @@ jobs:
             artifacts/continuous-performance/samples/
             artifacts/continuous-performance/anchor-correctness/
             artifacts/continuous-performance/segmented-prototype/
+            artifacts/continuous-performance/shown-baseline/
+            artifacts/continuous-performance/shown-candidate/
           retention-days: 30
