@@ -458,3 +458,35 @@ focused SelectionItem and the original container-focused Down path, requiring
 exact selection, visible bounds, keyboard focus and preserved pending values.
 This strengthens the acceptance condition instead of relying solely on the
 selected-row test precondition. Grouped virtualisation remains enabled.
+
+## Raw UIA unavailable-element mapping and independent SQL observation
+
+At `eb359c5`, native focus, selection, source and lifecycle checks pass. The UIA
+client receives raw COM `0x80040201` while reading a selected recycled peer.
+[Microsoft defines this as UIA_E_ELEMENTNOTAVAILABLE](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-error-codes),
+not a rendering or application exception. Wait already handles FlaUI's wrapped
+ElementNotAvailableException; it now handles the equivalent raw code within the
+same original observation deadline. Inputs are never replayed, virtualised items
+are not forcibly realised or scrolled by the assertion, and exact visible/focused
+selection must still be observed. Persistent unavailability still fails.
+
+An independent `dc74795` native run fails the SQL syntax-colouring check: its plan
+reports Limited=true, zero coloured blocks and 34.1945 ms. Installed jobs are
+therefore skipped in that failed run, not passed. CodeSyntaxService,
+BoundedCodeRules, NativeSyntaxChecks and plain-source fallback are unchanged from
+`6a94dd3`. The existing regex guard is 25 ms; the document guard is 250 ms.
+The short-input result is consistent with the regex guard, although the old plan
+API does not retain a detailed reason. No repair, retry-based fix or budget
+increase is claimed. Missing colour plans use CodeSyntaxRuns' complete plain-text
+fallback; the failed plan assertion is not evidence of document text loss. Fresh
+full native acceptance remains mandatory. Continuous 250 ms preview observations
+remain a separate, unchanged issue.
+
+## Representative Flowchart branching fixture
+
+The final paired harness uses 20 nodes/24 connections with binary branches and
+cycles, and 100 nodes/110 connections for its larger Flowchart. Both revisions
+receive that exact fixture and identical harness; every sample retains canonical
+pixel verification. Earlier retained Flowchart measurements used the previous
+cycle-only fixture and must not be compared with this changed workload. Other
+family workload contents and all renderer/source limits remain unchanged.

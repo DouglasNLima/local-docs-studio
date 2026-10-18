@@ -96,7 +96,9 @@ internal static class NativeSuitePerformanceChecks
         var edges = large ? family switch { "Sequence" => 150, "ER" => diagnostic ? 150 : 60, "Class" => 150, _ => n + 10 } : family == "Sequence" ? 20 : 15;
         return family switch
         {
-            "Flowchart" => "flowchart TD\n" + string.Concat(Enumerable.Range(0, n).Select(i => $"N{i}[\"Node {i} with context\"]\n")) + string.Concat(Enumerable.Range(0, edges).Select(i => $"N{i % n} --> N{(i * 7 + 1) % n}\n")),
+            "Flowchart" => "flowchart TD\n" + string.Concat(Enumerable.Range(0, n).Select(i => $"N{i}[\"Node {i} with context\"]\n"))
+                + string.Concat(Enumerable.Range(1, n - 1).Select(i => $"N{(i - 1) / 2} --> N{i}\n"))
+                + string.Concat(Enumerable.Range(0, large ? 11 : 5).Select(i => $"N{n - 1 - i} --> N{i % 3}\n")),
             "Sequence" => "sequenceDiagram\n" + string.Concat(Enumerable.Range(0, n).Select(i => $"participant P{i} as Participant {i}\n")) + string.Concat(Enumerable.Range(0, edges).Select(i => $"P{i % n}->>P{(i + 1) % n}: Message {i} with context\n")),
             "State" => "stateDiagram-v2\n" + string.Concat(Enumerable.Range(0, n).Select(i => $"state \"State {i} with context\" as S{i}\n")) + string.Concat(Enumerable.Range(0, edges).Select(i => $"S{i % n} --> S{(i * 7 + 1) % n} : transition{i}\n")),
             "ER" => "erDiagram\n" + string.Concat(Enumerable.Range(0, n).Select(i => $"E{i} {{\n int id PK\n string description\n}}\n")) + string.Concat(Enumerable.Range(0, edges).Select(i => $"E{i % n} ||--o{{ E{(i * 7 + 1) % n} : relation{i}\n")),

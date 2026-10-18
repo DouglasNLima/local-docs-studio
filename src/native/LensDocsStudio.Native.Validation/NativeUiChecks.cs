@@ -1783,6 +1783,7 @@ internal static partial class NativeUiChecks
             // Retry a transient UIA observation within the original deadline, never the user action.
             try { if (condition()) return; }
             catch (Exception ex) when (ex is IOException or FlaUI.Core.Exceptions.ElementNotAvailableException
+                || ex is COMException { HResult: unchecked((int)0x80040201) }
                 || IsObservationTimeout(ex)) { lastObservationError = ex; }
             Thread.Sleep(100);
         }

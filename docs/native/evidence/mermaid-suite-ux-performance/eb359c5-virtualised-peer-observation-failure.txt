@@ -1,0 +1,10 @@
+System.Runtime.InteropServices.COMException (0x80040201): An event was unable to invoke any of the subscribers (0x80040201)
+   at Interop.UIAutomationClient.IUIAutomationElement.GetCurrentPropertyValueEx(Int32 propertyId, Int32 ignoreDefaultValue)
+   at FlaUI.Core.FrameworkAutomationElementBase.GetPropertyValue[T](PropertyId property)
+   at FlaUI.Core.AutomationProperty`1.get_Value()
+   at FlaUI.Core.AutomationElements.AutomationElement.get_IsOffscreen()
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_2.<RunMermaidSuite>b__19(AutomationElement item) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 79
+   at System.Linq.Enumerable.Any[TSource](IEnumerable`1 source, Func`2 predicate)
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_2.<RunMermaidSuite>b__12() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 79
+   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func`1 condition, String failure, Int32 seconds) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeUiChecks.cs:line 1784
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_0.<RunMermaidSuite>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 79
