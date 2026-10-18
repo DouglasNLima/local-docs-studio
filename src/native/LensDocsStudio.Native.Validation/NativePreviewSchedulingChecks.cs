@@ -165,6 +165,8 @@ internal static class NativePreviewSchedulingChecks
             if (shown && !highContrast)
             {
                 NativeTestHighContrast? transition = null;
+                Task<NativeTestHighContrast>? contrastChange = null; Task? changingPreview = null;
+                var controlThread = -1; var constructionInFlight = false;
                 var installed = new List<object>(); var obsoleteAppearance = false; var transitionStarted = false;
                 var documentProperty = DependencyPropertyDescriptor.FromProperty(FlowDocumentReader.DocumentProperty, typeof(LensDocsStudio.Native.Rendering.DocumentPreview));
                 EventHandler installation = (_, _) =>
@@ -180,18 +182,30 @@ internal static class NativePreviewSchedulingChecks
                 try
                 {
                     previousDocument = preview.Document;
-                    using (var contrastDuringConstruction = new DuringConstruction(() => { transitionStarted = true; transition = new NativeTestHighContrast(); }))
+                    using (var contrastDuringConstruction = new DuringConstruction(() =>
                     {
-                        Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+                        transitionStarted = true;
+                        constructionInFlight = changingPreview?.IsCompleted == false;
+                        // Windows Settings changes another process's desktop state.
+                        // Broadcasting it synchronously from WPF's own thread can
+                        // block that thread before it can process the notification.
+                        contrastChange = Task.Run(() => { controlThread = Environment.CurrentManagedThreadId; return new NativeTestHighContrast(); });
+                    }))
+                    {
+                        changingPreview = (Task)Invoke("UpdatePreviewAsync", false)!; Pump(changingPreview);
+                        if (contrastChange is null) throw new IOException("The OS transition did not reach native construction.");
+                        Pump(contrastChange); transition = contrastChange.GetAwaiter().GetResult();
                         File.WriteAllText(Path.Combine(output, "high-contrast-transition-initial.json"), JsonSerializer.Serialize(new
                         {
                             Observed = contrastDuringConstruction.Observed, TransitionCreated = transition is not null,
+                            ConstructionInFlightAtToggleStart = constructionInFlight, ControlThread = controlThread, UiThread = Environment.CurrentManagedThreadId,
                             ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
                             PreviousDocumentRetained = preview.Document == previousDocument, ObsoleteAppearance = obsoleteAppearance, Installations = installed
                         }, new JsonSerializerOptions { WriteIndented = true }));
                         // A Windows preference notification can also finish a newer valid
                         // render. Observe every installation; identity alone rejects it.
-                        if (!contrastDuringConstruction.Observed || transition is null || !NativeTestHighContrast.IsEnabledNow || obsoleteAppearance)
+                        if (!contrastDuringConstruction.Observed || !constructionInFlight || controlThread == Environment.CurrentManagedThreadId
+                            || transition is null || !NativeTestHighContrast.IsEnabledNow || obsoleteAppearance)
                             throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
                     }
                     var appearanceWait = Stopwatch.StartNew();
@@ -229,7 +243,8 @@ internal static class NativePreviewSchedulingChecks
                 finally
                 {
                     documentProperty.RemoveValueChanged(preview, installation);
-                    transition?.Dispose(); Pump(WaitForAppearanceAsync(false)); Invoke("ApplyTheme"); Invoke("QueuePreview");
+                    if (transition is not null) Pump(Task.Run(transition.Dispose));
+                    Pump(WaitForAppearanceAsync(false)); Invoke("ApplyTheme"); Invoke("QueuePreview");
                     Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                 }
                 if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");

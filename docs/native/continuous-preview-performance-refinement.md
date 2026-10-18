@@ -293,6 +293,12 @@ is still preparing. Completion of a superseded request plus dispatcher idle is
 not worker/preview readiness. The final verifier waits for the winning current
 source/version/appearance within the existing deadline, while continuing to
 reject every obsolete installation; it does not repeatedly force rendering.
+The validation-only OS toggle/restore runs on a worker, modelling an external
+Windows Settings change while WPF keeps processing messages. A synchronous
+settings broadcast from the render dispatcher blocked the harness itself before
+its dispatcher deadline could run; that stalled run remains unpassed. OS-control
+duration is not presented as application dispatcher latency. The trace verifies
+construction was in flight and records distinct control/UI thread identities.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop
