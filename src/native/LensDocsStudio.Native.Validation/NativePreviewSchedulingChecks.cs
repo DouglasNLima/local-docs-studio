@@ -32,9 +32,10 @@ internal static class NativePreviewSchedulingChecks
         var dialogs = new DesktopDialogs();
         var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(root, "writes")), new SessionStore(root), new WorkspaceService(), dialogs);
         MainWindow? window = null;
+        ContinuousTransitionWatch? transitionWatch = null;
         var heartbeatWatch = Stopwatch.StartNew(); var lastPulse = 0d; var gaps = new List<double>();
         var heartbeat = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
-        heartbeat.Tick += (_, _) => { var now = heartbeatWatch.Elapsed.TotalMilliseconds; if (gaps.Count < 4096) gaps.Add(now - lastPulse); lastPulse = now; };
+        heartbeat.Tick += (_, _) => { var now = heartbeatWatch.Elapsed.TotalMilliseconds; if (gaps.Count < 4096) gaps.Add(now - lastPulse); lastPulse = now; transitionWatch?.Pulse(); };
         heartbeat.Start();
         var fixtureEvidence = new List<object>();
         var cancellationEvidence = new List<object>();
@@ -164,6 +165,9 @@ internal static class NativePreviewSchedulingChecks
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
             if (shown && !highContrast)
             {
+                using var diagnostic = Environment.GetEnvironmentVariable("LENS_CONTINUOUS_STACK_TOOL") is { Length: > 0 } stackTool
+                    ? new ContinuousTransitionWatch(output, stackTool) : null;
+                transitionWatch = diagnostic;
                 NativeTestHighContrast? transition = null;
                 Task<NativeTestHighContrast>? contrastChange = null; Task? changingPreview = null;
                 var controlThread = -1; var constructionInFlight = false;
@@ -185,6 +189,7 @@ internal static class NativePreviewSchedulingChecks
                     using (var contrastDuringConstruction = new DuringConstruction(() =>
                     {
                         transitionStarted = true;
+                        diagnostic?.Mark("changing-os");
                         constructionInFlight = changingPreview?.IsCompleted == false;
                         // Windows Settings changes another process's desktop state.
                         // Broadcasting it synchronously from WPF's own thread can
@@ -195,6 +200,7 @@ internal static class NativePreviewSchedulingChecks
                         changingPreview = (Task)Invoke("UpdatePreviewAsync", false)!; Pump(changingPreview);
                         if (contrastChange is null) throw new IOException("The OS transition did not reach native construction.");
                         Pump(contrastChange); transition = contrastChange.GetAwaiter().GetResult();
+                        diagnostic?.Mark("os-changed");
                         File.WriteAllText(Path.Combine(output, "high-contrast-transition-initial.json"), JsonSerializer.Serialize(new
                         {
                             Observed = contrastDuringConstruction.Observed, TransitionCreated = transition is not null,
@@ -209,8 +215,11 @@ internal static class NativePreviewSchedulingChecks
                             throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
                     }
                     var appearanceWait = Stopwatch.StartNew();
+                    diagnostic?.Mark("waiting-for-notification");
                     Pump(WaitForAppearanceAsync(true));
+                    diagnostic?.Mark("waiting-for-preview");
                     Invoke("QueuePreview"); Pump(WaitForCurrentAppearanceAsync()); Drain();
+                    diagnostic?.Mark("preview-ready");
                     File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
                     {
                         ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
@@ -243,9 +252,11 @@ internal static class NativePreviewSchedulingChecks
                 finally
                 {
                     documentProperty.RemoveValueChanged(preview, installation);
+                    diagnostic?.Mark("restoring-os");
                     if (transition is not null) Pump(Task.Run(transition.Dispose));
                     Pump(WaitForAppearanceAsync(false)); Invoke("ApplyTheme"); Invoke("QueuePreview");
                     Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    diagnostic?.Mark("os-restored"); transitionWatch = null;
                 }
                 if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");
             }

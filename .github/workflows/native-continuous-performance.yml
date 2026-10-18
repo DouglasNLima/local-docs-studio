@@ -27,8 +27,11 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Install pinned stack-only diagnostics for blocked OS transitions
+        run: dotnet tool install dotnet-stack --version 10.0.750501 --tool-path artifacts/continuous-diagnostic-tools
       - name: Open, edit, replace, reopen and close actual WPF documents
         run: |
+          $env:LENS_CONTINUOUS_STACK_TOOL = (Resolve-Path artifacts/continuous-diagnostic-tools/dotnet-stack.exe).Path
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --continuous-interactions artifacts/continuous-interactions $appearance
           exit $LASTEXITCODE
