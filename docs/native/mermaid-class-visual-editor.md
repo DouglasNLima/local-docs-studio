@@ -203,3 +203,15 @@ scenario. This does not certify real editor opening/selection responsiveness or
 all dense workloads. The existing 500-element/three-second renderer budgets were
 unchanged. SharpVectors conversion remains non-interruptible while its STA call
 runs; cancellation rejects stale results after conversion.
+
+
+### Relationship selector diagnosis
+
+The instrumented `03ae936` High Contrast run identified an invalid endpoint
+binding: `SelectedValuePath` was `Idclass`, while the source-backed choice record
+exposes `Identity`. A broad text substitution during initial XAML adaptation had
+changed that property path. Displayed labels were correct, but the planner received
+empty endpoint IDs and refused the operation. The two bindings are corrected to
+`Identity`. The rejection retained the private source/history and owning document.
+Original `5f1e790` and instrumented `03ae936` failure receipts/screenshots are
+retained in `docs/native/evidence/class-visual-editor/`.

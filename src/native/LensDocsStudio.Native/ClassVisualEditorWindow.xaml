@@ -79,9 +79,9 @@
      </StackPanel>
      <StackPanel x:Name="TransitionFields" Visibility="Collapsed">
       <Label Content="_First class" Target="{Binding ElementName=From}" Style="{StaticResource Form.Label}"/>
-      <ComboBox x:Name="From" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Idclass" AutomationProperties.Name="First relationship class" AutomationProperties.AutomationId="ClassFrom"/>
+      <ComboBox x:Name="From" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="First relationship class" AutomationProperties.AutomationId="ClassFrom"/>
       <Label Content="_Second class" Target="{Binding ElementName=To}" Style="{StaticResource Form.Label}"/>
-      <ComboBox x:Name="To" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Idclass" AutomationProperties.Name="Second relationship class" AutomationProperties.AutomationId="ClassTo"/>
+      <ComboBox x:Name="To" Style="{StaticResource Form.ComboBox}" DisplayMemberPath="Description" SelectedValuePath="Identity" AutomationProperties.Name="Second relationship class" AutomationProperties.AutomationId="ClassTo"/>
       <Label Content="Cardinality at first class" Target="{Binding ElementName=FirstCardinality}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="FirstCardinality" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Cardinality at first class" AutomationProperties.AutomationId="ClassFirstCardinality"/>
       <Label Content="Cardinality at second class" Target="{Binding ElementName=SecondCardinality}" Style="{StaticResource Form.Label}"/>

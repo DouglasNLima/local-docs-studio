@@ -1,0 +1,11 @@
+FlaUI.Core.Exceptions.ElementNotEnabledException
+ ---> System.Runtime.InteropServices.COMException (0x80040200): 0x80040200
+   at Interop.UIAutomationClient.IUIAutomationInvokePattern.Invoke()
+   at FlaUI.UIA3.Patterns.InvokePattern.<Invoke>b__3_0()
+   at FlaUI.Core.Tools.Com.Call(Action nativeAction)
+   --- End of inner exception stack trace ---
+   at FlaUI.Core.Tools.Com.Call(Action nativeAction)
+   at FlaUI.UIA3.Patterns.InvokePattern.Invoke()
+   at FlaUI.Core.AutomationElements.PatternElements.InvokeAutomationElement.Invoke()
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass0_1.<RunClassEditor>g__Click|14(String id) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeClassUiChecks.cs:line 103
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass0_0.<RunClassEditor>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeClassUiChecks.cs:line 40

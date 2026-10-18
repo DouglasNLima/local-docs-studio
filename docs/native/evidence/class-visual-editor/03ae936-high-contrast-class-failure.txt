@@ -1,0 +1,4 @@
+System.InvalidOperationException: Class command is disabled: ClassUpdate; Use a class ID beginning with a letter or underscore, followed by letters, digits or underscores (maximum 200 characters).; Ready. Select a class, member row or relationship. Canonical layout determines positions.
+   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func`1 condition, String failure, Int32 seconds) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeUiChecks.cs:line 1789
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass0_1.<RunClassEditor>g__Click|14(String id) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeClassUiChecks.cs:line 103
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass0_0.<RunClassEditor>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeClassUiChecks.cs:line 40

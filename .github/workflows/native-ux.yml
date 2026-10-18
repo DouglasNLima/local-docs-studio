@@ -36,6 +36,11 @@ jobs:
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --class-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/class-ui $appearance
           exit $LASTEXITCODE
+      - name: Measure actual Class opening, member and relationship selection, endpoint movement and memory
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --class-performance-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/class-performance-ui $appearance
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -43,6 +48,7 @@ jobs:
           path: |
             artifacts/native/class-fidelity/
             artifacts/native/class-ui/
+            artifacts/native/class-performance-ui/
           retention-days: 14
   er-visual-editor:
     runs-on: windows-latest

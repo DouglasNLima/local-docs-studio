@@ -70,6 +70,7 @@ internal static partial class NativeUiChecks
             if (!highContrast) foreach (var theme in new[] { "Dark", "Light" }) { FocusWindow(main!); Find(main!, "ViewMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, theme + "Theme").AsMenuItem().Invoke(); Open(expected.LastIndexOf("```mermaid", StringComparison.Ordinal)); SelectClass("Document"); Capture(theme.ToLowerInvariant()); Click("ClassCancel"); WaitClosed(); }
             FocusWindow(main!); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); Find(main!, "InsertMenu").Patterns.ExpandCollapse.Pattern.Expand(); Find(main!, "InsertClass").AsMenuItem().Invoke(); WaitVisual();
             Check(Draft() == ClassDiagramSourceParser.Starter, "Insert Class opens the exact validated portable starter"); Click("ClassApply"); WaitClosed(); Check(ReadEditorText(Find(main!, "MarkdownEditor")).Contains("classDiagram", StringComparison.Ordinal), "Class insertion applies a portable Mermaid fence");
+            RunAdditionalCases();
             File.WriteAllText(Path.Combine(output, "class-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrastRequested = highContrast, Checks = checks, Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); display.Complete(); return 0;
         }
         catch (Exception error)
@@ -80,9 +81,11 @@ internal static partial class NativeUiChecks
         }
         finally { Mouse.Up(MouseButton.Left); Stop(); }
         void Stop() { if (app is not null) { try { app.Kill(); } catch { } app.Dispose(); app = null; main = null; visual = null; } }
-        void Launch()
+        void Launch(string? fixturePath = null)
         {
-            var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state); info.ArgumentList.Add(root); info.ArgumentList.Add(path);
+            var fixtureState = fixturePath is null ? state : Path.Combine(root, "state-" + Path.GetFileNameWithoutExtension(fixturePath)); Directory.CreateDirectory(fixtureState);
+            if (fixturePath is not null) File.WriteAllText(Path.Combine(fixtureState, "preferences.json"), JsonSerializer.Serialize(new LensDocsStudio.Core.State.UserPreferences(AutomaticUpdateChecks: false)));
+            var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false }; info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(fixtureState); info.ArgumentList.Add(root); info.ArgumentList.Add(fixturePath ?? path);
             app = Application.Launch(info); main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("The native Class fixture did not open."); main.Patterns.Transform.Pattern.Resize(1280, 800);
         }
         void WaitVisual()
@@ -108,5 +111,72 @@ internal static partial class NativeUiChecks
         void Capture(string name) { Wait(FooterSettled, "Class client layout incomplete before capture."); if (!app!.WaitWhileBusy(TimeSpan.FromSeconds(5))) throw new IOException("Native Class app did not become idle before capture."); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
         void Discard() { Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes"))) is not null, "Class discard confirmation did not appear."); automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByName("Yes")))!.AsButton().Invoke(); }
         void Check(bool value, string message) { if (!value) throw new IOException(message); checks.Add(message); }
+        void RunAdditionalCases()
+        {
+            Stop();
+            foreach (var (name, raw) in new[] {
+                ("unknown-protected", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n"),
+                ("identical-occurrences", "classDiagram\nclass A {\n+string Name\n+string Name\n+Run(path) bool\n+Run(path) bool\n}\nA --> A : self\nA --> A : self\n"),
+                ("empty-final", "classDiagram\nclass A\n") })
+            {
+                var fixture = Path.Combine(root, name + ".mmd"); File.WriteAllText(fixture, raw); Launch(fixture); Open(0);
+                if (name == "unknown-protected")
+                {
+                    SelectClass("A"); Check(!Find(visual!, "ClassNodeId").IsEnabled && !Find(visual!, "ClassDelete").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled, "Unknown global syntax protects native class structure without history");
+                    SelectMember("A", 0); Check(!Find(visual!, "ClassAttributeName").IsEnabled && !Find(visual!, "ClassUpdate").IsEnabled, "Unknown dependencies cannot be overwritten through member properties");
+                    Check(!string.IsNullOrWhiteSpace(Find(visual!, "ClassUpdate").Properties.HelpText.ValueOrDefault), "Protected commands expose accessible operation reasons"); Capture(name); Click("ClassCancel"); WaitClosed();
+                }
+                else if (name == "empty-final")
+                {
+                    SelectClass("A"); Click("ClassDelete"); Await(model => model.Classes.Count == 0); Check(Find(visual!, "ClassAddClass").IsEnabled, "Deleting the last independent class retains an editable empty native draft");
+                    Click("ClassUndo"); Await(_ => Draft() == raw); Click("ClassRedo"); Await(model => model.Classes.Count == 0);
+                    Click("ClassAddClass"); Set("ClassNodeId", "B"); Click("ClassUpdate"); Await(model => model.Classes.Single().Id == "B"); Click("ClassCancel"); Discard(); WaitClosed();
+                }
+                else
+                {
+                    SelectMember("A", 1); Click("ClassMoveUp"); Await(_ => Draft() == raw);
+                    Wait(() => Find(visual!, "ClassSelectionSummary").Name == "A · attribute occurrence 1", "Moving identical attributes lost the selected source occurrence."); Check(Find(visual!, "ClassUndo").IsEnabled, "Identical attribute movement creates private occurrence history without metadata in source");
+                    Set("ClassAttributeName", "MovedName"); Click("ClassUpdate"); Await(model => model.Class("A").Attributes[0].Semantic.Name == "MovedName"); Check(Model().Class("A").Attributes[1].Semantic.Name == "Name", "Editing a moved identical attribute cannot change another occurrence");
+                    Click("ClassUndo"); Await(_ => Draft() == raw); Click("ClassUndo"); Await(_ => Draft() == raw); Wait(() => Find(visual!, "ClassSelectionSummary").Name == "A · attribute occurrence 2", "Undo did not restore identical member identities.");
+                    SelectRelationship(1); Set("ClassLabel", "second self occurrence"); Click("ClassUpdate"); Await(model => model.Relationships[1].Semantic.Label == "second self occurrence"); Check(Model().Relationships[0].Semantic.Label == "self", "Parallel self-relationship canvas/list identity remains exact"); Capture(name); Click("ClassCancel"); Discard(); WaitClosed();
+                }
+                Check(ReadEditorText(Find(main!, "MarkdownEditor")) == raw && File.ReadAllText(fixture) == raw, name + ": Cancel preserves exact standalone document and saved bytes"); Stop();
+            }
+            foreach (var scenario in new[] { "outside-change", "changed-owner", "closed-owner", "other-tab" })
+            {
+                var body = "classDiagram\r\nclass A {\r\n+string Name\r\n}\r\nA --> A : self\r\n";
+                var raw = scenario == "outside-change" ? "# Outside changes\r\n\r\n```mermaid\r\n" + body + "```\r\n" : body;
+                var fixture = Path.Combine(root, scenario + (scenario == "outside-change" ? ".md" : ".mmd")); File.WriteAllText(fixture, raw); Launch(fixture); Open(scenario == "outside-change" ? raw.IndexOf("```mermaid", StringComparison.Ordinal) : 0);
+                SelectMember("A", 0); Set("ClassAttributeName", "PrivateName"); Click("ClassUpdate"); Await(model => model.Class("A").Attributes[0].Semantic.Name == "PrivateName"); var privateSource = Draft();
+                FocusWindow(main!); var ownerEditor = Find(main!, "MarkdownEditor"); ownerEditor.Focus();
+                if (scenario == "outside-change")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.HOME); Keyboard.Type("%% Outside comment"); Keyboard.Type(VirtualKeyShort.RETURN);
+                    Wait(() => ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw, "Outside Class owner edit did not arrive."); FocusWindow(visual!); Click("ClassApply"); WaitClosed();
+                    var targetBody = MermaidBlockSource.Find(new MarkdownService().Parse(raw)).Single().Body;
+                    Check(ReadEditorText(ownerEditor) == "%% Outside comment\r\n" + raw[..targetBody.Start] + privateSource + raw[targetBody.End..], "Class Apply relocates its original container and preserves surrounding edits");
+                }
+                else if (scenario == "changed-owner")
+                {
+                    ownerEditor.Patterns.Value.Pattern.SetValue(raw.Replace("+string Name", "-int External", StringComparison.Ordinal)); var external = ReadEditorText(ownerEditor); FocusWindow(visual!); Click("ClassApply");
+                    Wait(() => Find(visual!, "ClassStatus").Name.Contains("changed", StringComparison.OrdinalIgnoreCase), "Concurrent owning source did not reject Class Apply."); Check(Draft() == privateSource && ReadEditorText(ownerEditor) == external, "Class conflict preserves private source and external document exactly"); Capture(scenario);
+                }
+                else if (scenario == "closed-owner")
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N);
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("closed-owner.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select(); ownerEditor.Focus();
+                    var count = main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length; Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_W);
+                    Wait(() => main.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Length < count, "Class owning tab did not close."); FocusWindow(visual!); Click("ClassApply");
+                    Wait(() => Find(visual!, "ClassStatus").Name.Contains("owning document has been closed", StringComparison.Ordinal), "Closed owner did not reject Class Apply."); Check(Draft() == privateSource && File.ReadAllText(fixture) == raw, "Closed-owner rejection retains private source and saved bytes"); Capture(scenario);
+                }
+                else
+                {
+                    Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_N); var otherEditor = Find(main!, "MarkdownEditor"); otherEditor.Patterns.Value.Pattern.SetValue("Another local document"); FocusWindow(visual!); Click("ClassApply"); WaitClosed();
+                    Check(ReadEditorText(otherEditor) == "Another local document", "Class Apply cannot redirect into the active unrelated tab");
+                    main!.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.TabItem)).Single(item => item.Name.Contains("other-tab.mmd", StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select(); Wait(() => ReadEditorText(Find(main, "MarkdownEditor")) == privateSource, "Class Apply lost its original tab identity.");
+                }
+                if (visual is not null) { Click("ClassCancel"); Discard(); WaitClosed(); } Stop();
+            }
+        }
     }).GetAwaiter().GetResult();
 }
