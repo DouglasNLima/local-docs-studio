@@ -57,6 +57,7 @@ internal static partial class NativeUiChecks
                 list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
                 var summary = Find(visual!, prefix + "SelectionSummary"); Wait(() => !summary.Name.StartsWith("Select ", StringComparison.Ordinal), "Suite keyboard selection did not reach inspector.");
                 var selectedName = list.Patterns.Selection.Pattern.Selection.Value.Single().Name;
+                ObserveNavigation("initial", list, selectedName);
                 if (string.IsNullOrWhiteSpace(selectedName)) throw new IOException("Suite selected entry has no accessible name.");
                 if (family is "Flowchart" or "State" or "Sequence" && !selectedName.Contains("complete long documentation context", StringComparison.Ordinal))
                     throw new IOException("Suite full navigation name was truncated.");
@@ -64,13 +65,17 @@ internal static partial class NativeUiChecks
                 var fieldId = family switch { "Flowchart" => "MermaidNodeLabel", "Sequence" => "SequenceParticipantId", _ => prefix + "NodeId" };
                 var field = Find(visual!, fieldId).AsTextBox(); var fieldBefore = field.Text; var summaryBefore = summary.Name;
                 field.Text = fieldBefore + "Pending"; Wait(() => !Find(visual!, prefix + "Apply").IsEnabled, "Pending properties did not block Apply.");
+                ObserveNavigation("pending field", list, selectedName);
                 var panel = Find(visual!, prefix + "SourcePanel"); var zoom = Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value;
                 panel.Patterns.ExpandCollapse.Pattern.Expand(); panel.Patterns.ExpandCollapse.Pattern.Collapse();
+                ObserveNavigation("source visibility", list, selectedName);
                 list.Focus(); Keyboard.Type(VirtualKeyShort.DOWN);
+                ObserveNavigation("blocked Down", list, selectedName);
                 if (field.Text != fieldBefore + "Pending" || summary.Name != summaryBefore || Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value != zoom)
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
+                ObserveNavigation("reset", list, selectedName);
                 Wait(() => list.Patterns.Selection.Pattern.Selection.Value.Any(item => item.Patterns.SelectionItem.Pattern.IsSelected.Value && item.Name == selectedName && !item.IsOffscreen), "Rejected selection lost the exact retained SelectionItem or left it outside its viewport.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 if (family is "Class" or "ER")
@@ -133,6 +138,12 @@ internal static partial class NativeUiChecks
         }
         finally { app?.Kill(); app?.Dispose(); }
         void Capture(string name, bool keepPointer = false) { if (!keepPointer) Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(captureRoot, (highContrast ? "HighContrast" : "Normal") + "-" + visual.Title.Replace('/', '-') + "-" + name + ".png")); }
+        void ObserveNavigation(string stage, AutomationElement list, string expected)
+        {
+            var selected = list.Patterns.Selection.Pattern.Selection.Value;
+            File.AppendAllText(Path.Combine(output, "suite-navigation.txt"), stage + " | expected=" + expected + " | selected=" + selected.Length + " | window-enabled=" + visual!.IsEnabled + Environment.NewLine
+                + string.Join(Environment.NewLine, selected.Select(item => item.Name + " | selected=" + item.Patterns.SelectionItem.Pattern.IsSelected.Value + " | off-screen=" + item.IsOffscreen + " | " + item.BoundingRectangle)) + Environment.NewLine);
+        }
     }).GetAwaiter().GetResult();
 
     private static void CaptureSuiteBaseline(Window visual, Window main, AutomationElement list, string family, string prefix, string source, Action<string> capture)

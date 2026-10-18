@@ -160,6 +160,7 @@ internal static class NativeSuiteLifecycleChecks
         var field = (TextBox)window.FindName(fieldName); var before = field.Text; field.Text += "Pending";
         var pending = window.GetType().GetProperty("PropertiesPending", BindingFlags.Instance | BindingFlags.NonPublic)!;
         if (!(bool)pending.GetValue(window)!) throw new IOException("Native keyboard fixture did not create pending properties.");
+        var sourcePanel = (Expander)window.FindName("SourcePanel"); sourcePanel.IsExpanded = true; Drain(); sourcePanel.IsExpanded = false; Drain();
         var delivered = false;
         System.Windows.Input.KeyEventHandler key = (_, args) => { if (args.Key == System.Windows.Input.Key.Down) delivered = true; };
         list.AddHandler(System.Windows.Input.Keyboard.PreviewKeyDownEvent, key, true);

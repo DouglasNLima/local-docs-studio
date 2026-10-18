@@ -401,3 +401,14 @@ thread with pending properties, verifies the exact retained object, Reset values
 realised container bounds, unchanged private source and zero conversions for each
 family. This separates native behaviour from UIA enumeration effects. Both checks
 must pass; neither is a substitute for the other. Fresh evidence is pending.
+
+## Native input succeeds; UIA checkpoint remains open
+
+At `b14a574`, all five real native blocked-Down/Reset scenarios pass, including
+exact object identity, native visible bounds, unchanged source and zero
+conversions; the 40-window normal lifecycle also passes. The UIA Selection-pattern
+checkpoint still fails. It remains an open acceptance defect, not a pass inferred
+from native results. Stage-by-stage selected names, state, bounds and off-screen
+flags are now logged around property changes, source visibility, UIA focus/Down
+and Reset. The independent native path additionally exercises source expansion
+and collapse. No assertion or deadline is relaxed.
