@@ -283,3 +283,23 @@ on every measured sample. Core/Native hashes and pinned renderer identities are
 recorded. Fresh-process UIA opening observations are explicitly labelled as
 including document preview and UIA transport; they are separate from native stage
 measurements.
+
+## Uniform consolidated before-capture completion
+
+The original pre-implementation audit and unchanged-develop run remain the
+baseline. An additional capture-only mode now runs the immutable `6a94dd3`
+binaries with the exact same generated long-name fixtures as the candidate,
+covering all five sizes in Light, Dark and actual High Contrast. These additional
+before-state captures are produced after implementation to complete the paired
+visual evidence; they are not mislabelled as the date of the initial audit.
+
+The capture mode records the old inspector, long names, pending/reset, source
+expanded/collapsed, Fit, Actual Size, zoom/scroll, invalid-source diagnostics and
+new-element insertion/Undo. It checks unchanged owning source and does not apply
+new-layout assertions to the old UI. The earlier five-family baseline authoring
+suites retain the protected-source cases. Candidate acceptance continues through
+the full shared/family suites; no existing assertions are skipped.
+
+All four native/browser workflow definitions now pin PR test checkout to the exact
+head. Pages deployment keeps its original default-branch-only condition; native
+feature pushes and this Draft PR cannot deploy the site.

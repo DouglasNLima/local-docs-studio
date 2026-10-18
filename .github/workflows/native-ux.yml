@@ -11,6 +11,42 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  consolidated-suite-before:
+    if: github.ref == 'refs/heads/feature/native-mermaid-suite-ux-performance' || github.head_ref == 'feature/native-mermaid-suite-ux-performance'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [light, dark, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build the capture harness and immutable consolidated editor binaries
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/native/suite-before 6a94dd3672f95a267402e2218935d064a6ee6401
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/suite-before/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.* artifacts/native/suite-before/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/ -Force
+      - name: Capture identical five-family long-name fixtures at all five sizes on actual Windows
+        run: |
+          $appearance = switch ('${{ matrix.appearance }}') { 'high-contrast' { '--high-contrast' } 'dark' { '--dark' } default { '--normal' } }
+          & artifacts/native/suite-before/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-baseline-ui artifacts/native/suite-before/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/suite-before-captures $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-before-${{ matrix.appearance }}
+          path: artifacts/native/suite-before-captures/
+          retention-days: 14
   suite-workspace:
     runs-on: windows-latest
     timeout-minutes: 20

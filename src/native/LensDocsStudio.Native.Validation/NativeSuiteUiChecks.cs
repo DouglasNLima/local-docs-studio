@@ -11,7 +11,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int RunMermaidSuite(string executable, string output, bool highContrast) => Task.Run(() =>
+    public static int RunMermaidSuite(string executable, string output, bool highContrast, bool baseline = false, bool darkBaseline = false) => Task.Run(() =>
     {
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         using var clipboard = NativeUiClipboard.Start(); using var contrast = highContrast ? new NativeTestHighContrast() : null;
@@ -20,7 +20,7 @@ internal static partial class NativeUiChecks
         try
         {
             if (highContrast && !System.Windows.SystemParameters.HighContrast) throw new IOException("Actual Windows High Contrast was not enabled.");
-            foreach (var theme in highContrast ? new[] { "System" } : new[] { "Light", "Dark" })
+            foreach (var theme in highContrast ? new[] { "System" } : baseline ? new[] { darkBaseline ? "Dark" : "Light" } : new[] { "Light", "Dark" })
             foreach (var family in new[] { "Flowchart", "Sequence", "State", "ER", "Class" })
             {
                 var prefix = family == "Flowchart" ? "Mermaid" : family == "ER" ? "Er" : family;
@@ -46,6 +46,12 @@ internal static partial class NativeUiChecks
                 measurements.Add(new { Family = family, Theme = theme, ColdProcessIncludingDocumentPreviewAndUiaMs = coldProcess.Elapsed.TotalMilliseconds, EditorOpenIncludingUiaMs = editorOpen.Elapsed.TotalMilliseconds, WorkingSetAtFirstUsefulEditor = nativeProcess.WorkingSet64, Method = "Fresh app process per case; includes UIA transport and is separate from native phase timings" });
                 Capture("initial");
                 var list = Find(visual!, family == "Sequence" ? "SequenceParticipants" : prefix + "Elements");
+                if (baseline)
+                {
+                    CaptureSuiteBaseline(visual!, main, list, family, prefix, source, name => Capture(name));
+                    checks.Add(theme + " " + family + ": immutable consolidated baseline captures; owning source unchanged");
+                    app.Kill(); app.Dispose(); app = null; visual = null; continue;
+                }
                 list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
                 var summary = Find(visual!, prefix + "SelectionSummary"); Wait(() => !summary.Name.StartsWith("Select ", StringComparison.Ordinal), "Suite keyboard selection did not reach inspector.");
                 var selectedName = list.FindAllDescendants().First(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value).Name;
@@ -120,4 +126,64 @@ internal static partial class NativeUiChecks
         finally { app?.Kill(); app?.Dispose(); }
         void Capture(string name, bool keepPointer = false) { if (!keepPointer) Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(captureRoot, (highContrast ? "HighContrast" : "Normal") + "-" + visual.Title.Replace('/', '-') + "-" + name + ".png")); }
     }).GetAwaiter().GetResult();
+
+    private static void CaptureSuiteBaseline(Window visual, Window main, AutomationElement list, string family, string prefix, string source, Action<string> capture)
+    {
+        // Capture the immutable old UI as it is. New layout/accessibility assertions run
+        // separately against the candidate; missing old features are never counted as passes.
+        list.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).First().Patterns.SelectionItem.Pattern.Select();
+        if (family is "Class" or "ER")
+        {
+            var longName = family == "Class" ? "OpenDocumentWithCompleteLongMethodDescription" : "completeLongAttributeDescriptionForAccessibleNavigation";
+            list.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).First(item => item.Name.Contains(longName, StringComparison.Ordinal)).Patterns.SelectionItem.Pattern.Select();
+        }
+        capture("selected-long-name");
+        var panel = Find(visual, prefix + "SourcePanel"); panel.Patterns.ExpandCollapse.Pattern.Expand();
+        var lower = family switch { "Class" => "ClassParameters", "ER" => "ErAttributeComment", "Flowchart" => "MermaidNodeLabel", _ => prefix + "Label" };
+        Wait(() => visual.FindFirstDescendant(cf => cf.ByAutomationId(lower)) is not null, "Baseline property context did not appear.");
+        Find(visual, lower).Focus(); capture("inspector-lower");
+        var field = Find(visual, family is "Class" or "ER" ? prefix + "AttributeName" : family == "Flowchart" ? "MermaidNodeLabel" : prefix + "Label").AsTextBox();
+        field.Text += "Pending"; capture("pending"); Find(visual, prefix + "ResetProperties").AsButton().Invoke();
+        foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
+        {
+            visual.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height);
+            Wait(() => Math.Abs(visual.BoundingRectangle.Width - width) < 3 && visual.BoundingRectangle.Contains(Find(visual, prefix + "Apply").BoundingRectangle), "Baseline window containment did not settle.");
+            panel.Patterns.ExpandCollapse.Pattern.Expand(); capture("source-expanded-" + width + "x" + height);
+            panel.Patterns.ExpandCollapse.Pattern.Collapse(); capture("source-collapsed-" + width + "x" + height);
+        }
+        Find(visual, prefix + "Fit").AsButton().Invoke(); capture("fit");
+        Find(visual, prefix + "ActualSize").AsButton().Invoke(); capture("actual-size");
+        Find(visual, prefix + "Zoom").Patterns.RangeValue.Pattern.SetValue(175);
+        var viewport = Find(visual, prefix + "Viewport");
+        if (viewport.Patterns.Scroll.IsSupported)
+        {
+            var scroll = viewport.Patterns.Scroll.Pattern;
+            scroll.SetScrollPercent(scroll.HorizontallyScrollable.Value ? 40 : -1, scroll.VerticallyScrollable.Value ? 40 : -1);
+        }
+        capture("zoomed-scrolled");
+        panel.Patterns.ExpandCollapse.Pattern.Expand();
+        var sourceId = family == "Flowchart" ? "MermaidDraftSource" : prefix + "Source";
+        var validateId = family == "Flowchart" ? "MermaidValidateSource" : prefix + "Validate";
+        ReplaceSource("not a Mermaid header\n"); Validate();
+        Wait(() => !Find(visual, prefix + "Apply").IsEnabled, "Baseline invalid source was not protected."); capture("validation-error");
+        ReplaceSource(source); Validate();
+        Wait(() => Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Baseline original source did not validate again.");
+        var insertId = family switch { "Flowchart" => "MermaidInsertProcess", "Sequence" => "SequenceAddParticipant", "State" => "StateAddState", "ER" => "ErAddEntity", _ => "ClassAddClass" };
+        Find(visual, insertId).AsButton().Invoke(); if (family != "Flowchart") Find(visual, prefix + "Update").AsButton().Invoke();
+        Wait(() => Find(visual, prefix + "Undo").IsEnabled && Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Baseline insertion did not complete."); capture("new-element");
+        Find(visual, prefix + "Undo").AsButton().Invoke();
+        Wait(() => ReadEditorText(Find(visual, sourceId)) == source, "Baseline Undo did not restore exact source.");
+        if (ReadEditorText(Find(main, "MarkdownEditor")) != source) throw new IOException("Baseline capture changed the owning source.");
+        void ReplaceSource(string value)
+        {
+            Find(visual, sourceId).Focus(); NativeUiClipboard.SetText(value);
+            Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_V);
+            Wait(() => ReadEditorText(Find(visual, sourceId)) == value, "Baseline source input did not arrive exactly.");
+        }
+        void Validate()
+        {
+            var before = Find(visual, prefix + "Status").Name; Find(visual, validateId).AsButton().Invoke();
+            Wait(() => Find(visual, validateId).IsEnabled && Find(visual, prefix + "Status").Name != before, "Baseline source validation did not complete.");
+        }
+    }
 }
