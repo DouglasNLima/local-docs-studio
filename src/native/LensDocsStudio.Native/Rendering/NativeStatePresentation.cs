@@ -9,6 +9,7 @@ public sealed record NativeStatePresentation(NativeMermaidPresentation Canonical
     public static NativeStatePresentation Create(StateDiagramModel model, DiagramResult render, NativeSvgService svg) => Create(model, render, svg, default);
     public static NativeStatePresentation Create(StateDiagramModel model, DiagramResult render, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("presentation.total.State");
         cancellationToken.ThrowIfCancellationRequested();
         StateSemanticValidation.ValidateRendering(model, render);
         // Mermaider 0.15.1 routes State through LayoutFlowchart and the same SVG graph renderer.

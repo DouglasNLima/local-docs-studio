@@ -11,11 +11,14 @@ internal static class MermaidSemanticValidation
     private static readonly JsonSerializerOptions Options = new() { IncludeFields = true };
     internal static bool RenderingAgrees(MermaidDiagramModel model, Rendering.DiagramResult rendered)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("semantic.validation.Flowchart");
         var graph = rendered.FlowchartSemantics;
         if (!rendered.Success || graph is null || graph.Nodes.Count != model.Nodes.Count || graph.Edges.Count != model.Edges.Count
             || rendered.FlowchartGroups.Count != model.Subgraphs.Count) return false;
         var nodes = graph.Nodes;
-        var completeParserGraph = Rendering.MermaidEntityLayoutProvider.DecodeSemantics(MermaidRenderer.Parse(model.Source));
+        Mermaider.Models.MermaidGraph parsedGraph;
+        using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-validation")) parsedGraph = MermaidRenderer.Parse(model.Source);
+        var completeParserGraph = Rendering.MermaidEntityLayoutProvider.DecodeSemantics(parsedGraph);
         return JsonNode.DeepEquals(JsonSerializer.SerializeToNode(completeParserGraph, Options), JsonSerializer.SerializeToNode(graph, Options))
             && model.Nodes.All(node => nodes.TryGetValue(node.Id, out var shown) && shown.Label == node.Label && shown.Shape.ToString() == MermaidSourceParser.RendererShape(node.Shape))
             && model.Edges.Select((edge, index) => graph.Edges[index].Source == edge.Source.Id && graph.Edges[index].Target == edge.Target.Id

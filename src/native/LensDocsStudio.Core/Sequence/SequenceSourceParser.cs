@@ -50,6 +50,7 @@ public sealed class SequenceSourceParser
     }
     public SequenceDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("source.scan.Sequence");
         var statements = new List<SequenceStatement>(); var diagnostics = new List<string>();
         var participants = new List<SequenceParticipant>(); var messages = new List<SequenceMessage>();
         var notes = new List<SequenceNote>(); var activations = new List<SequenceActivation>();

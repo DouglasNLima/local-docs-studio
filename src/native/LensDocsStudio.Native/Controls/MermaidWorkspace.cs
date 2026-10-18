@@ -23,6 +23,8 @@ public static class MermaidWorkspace
         "InspectorIdentity", typeof(string), typeof(MermaidWorkspace));
     private static readonly DependencyProperty InspectorScrollProperty = DependencyProperty.RegisterAttached(
         "InspectorScroll", typeof(System.Windows.Threading.DispatcherOperation), typeof(MermaidWorkspace));
+    private static readonly DependencyProperty NavigationScrollProperty = DependencyProperty.RegisterAttached(
+        "NavigationScroll", typeof(System.Windows.Threading.DispatcherOperation), typeof(MermaidWorkspace));
     public static bool GetAdjustableSource(DependencyObject value) => (bool)value.GetValue(AdjustableSourceProperty);
     public static void SetAdjustableSource(DependencyObject value, bool enabled) => value.SetValue(AdjustableSourceProperty, enabled);
     private static void SourceChanged(DependencyObject value, DependencyPropertyChangedEventArgs args)
@@ -61,6 +63,23 @@ public static class MermaidWorkspace
         if (sender is not ScrollViewer inspector) return;
         if (inspector.GetValue(InspectorScrollProperty) is System.Windows.Threading.DispatcherOperation operation) operation.Abort();
         inspector.ClearValue(InspectorScrollProperty);
+    }
+    public static void RevealNavigation(ListBox list, object item)
+    {
+        CancelNavigationScroll(list, new RoutedEventArgs());
+        list.ScrollIntoView(item); list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
+        var operation = list.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
+        {
+            list.ClearValue(NavigationScrollProperty);
+            if (list.IsLoaded && list.SelectedItems.Contains(item)) list.ScrollIntoView(item);
+        });
+        list.SetValue(NavigationScrollProperty, operation);
+    }
+    private static void CancelNavigationScroll(object sender, RoutedEventArgs args)
+    {
+        if (sender is not ListBox list) return;
+        if (list.GetValue(NavigationScrollProperty) is System.Windows.Threading.DispatcherOperation operation) operation.Abort();
+        list.ClearValue(NavigationScrollProperty);
     }
     public static void Reveal(FrameworkElement element, ScrollViewer viewport)
     {

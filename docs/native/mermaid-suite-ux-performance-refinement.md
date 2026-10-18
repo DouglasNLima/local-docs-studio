@@ -211,3 +211,45 @@ remains unchanged and passing. Sequence insertion now selects the newly inserted
 exact statement occurrence, with a focused native regression. All five toolbars
 include source visibility and original-source inspection is available in Flowchart
 as well as the four newer editors.
+
+## Verified intermediate revision `4e9fa58` and phase instrumentation
+
+[UX run 39106690084](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39106690084)
+passes every job: five-family canonical fidelity and authoring in normal/actual
+High Contrast, shared workspace, retained-window lifecycle, comparative performance
+and historical diagnostic controls. This is an intermediate revision; subsequent
+trace/long-form refinements require fresh certification.
+
+Both appearances release all 30 tested windows after their real asynchronous
+cleanup completes and controlled diagnostic collection. The earlier immediate
+High Contrast collection failure remains retained. Cleanup completion is now an
+explicit measurement boundary; deferred inspector/navigation callbacks are
+bounded and cancelled on unload. No production GC is used.
+
+The five hosted 880 × 600 High Contrast source-expanded captures were manually
+inspected. Fixed headings/actions and footers remain visible. Further review moves
+selected Class/ER member fields above the parent member list, wraps long Class
+parameters, uses pixel-based virtualised navigation scrolling and verifies full
+long-member tooltips. Final screenshots still need all-size inspection.
+
+Opt-in `LensDocsStudio.Mermaid` ActivitySource scopes distinguish source scanning,
+semantic validation, actual graph parser/layout/SVG boundaries, sanitisation,
+conversion queue waits, SharpVectors Read, WPF freeze/image creation, geometry
+correspondence, overlay creation, first native presentation/interaction, selection,
+private source validation and cleanup. Every span identifies start/end threads.
+Allocated bytes are per-thread and deliberately unavailable when a span changes
+threads. Nested inclusive spans must not be added twice. Document text and paths
+are never recorded by the phase listener. Normal execution creates no timing
+objects or logs without a listener.
+
+Two pinned-library boundaries remain explicit: Mermaider's Sequence pipeline has
+no graph layout callback, so its parser/layout/SVG phases remain combined in the
+labelled renderer pipeline; SharpVectors Read internally creates DrawingGroups,
+while final freeze/image wrapping is measured separately. No parser-only or
+converter-internal timing is invented, and neither library is forked.
+
+A new Core regression confirms active tracing preserves exact CRLF/Unicode source,
+canonical SVG bytes and ambient Activity ownership. All 1,646 Core tests pass.
+The local windowless phase scenario completes all five families and unchanged
+private-source/history validation. Comparative performance remains measured with
+tracing disabled and the exact same harness binary for both revisions.

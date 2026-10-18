@@ -10,6 +10,7 @@ public static class ErSemanticValidation
     public static bool Equal(ErDiagram first, ErDiagram second) => JsonSerializer.Serialize(first) == JsonSerializer.Serialize(second);
     public static void ValidateRendering(ErDiagramModel model, DiagramResult render)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("semantic.validation.ER");
         if (!model.IsValid || !render.Success || render.Source != model.Source || render.ErSemantics is null || render.ErLayout is null || !Equal(model.Semantic, render.ErSemantics))
             throw new ArgumentException(render.Error ?? "The complete pinned ER semantics cannot be reconciled with every source occurrence. Use Edit source.");
         var layout = render.ErLayout;

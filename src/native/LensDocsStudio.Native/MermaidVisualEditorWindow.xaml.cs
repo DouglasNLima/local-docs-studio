@@ -78,7 +78,8 @@ public partial class MermaidVisualEditorWindow : Window
         Deactivated += (_, _) => CancelPointerInteraction();
         Closed += async (_, _) =>
         {
-            CancelPointerInteraction(); closed = true; canvasRender?.Cancel(); lifetime.Cancel();
+            CancelPointerInteraction(); using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.Mermaid");
+            closed = true; canvasRender?.Cancel(); lifetime.Cancel();
             await canvasRenderGate.WaitAsync();
             canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
@@ -294,11 +295,16 @@ public partial class MermaidVisualEditorWindow : Window
     private bool selectingCanvas;
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Mermaid");
         if (updating) return;
         if (PropertiesPending || inlineEditor is not null)
         {
             updating = true;
-            try { Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice); }
+            try
+            {
+                Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
+                if (Elements.SelectedItem is { } retained) Controls.MermaidWorkspace.RevealNavigation(Elements, retained);
+            }
             finally { updating = false; }
             UpdateCanvasSelection(); Status.Text = inlineEditor is null ? "Update the current properties or reset their changes before selecting another element." : "Press Enter to confirm the inline label, or Escape to cancel it."; return;
         }

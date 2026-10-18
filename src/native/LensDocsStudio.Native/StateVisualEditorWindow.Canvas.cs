@@ -67,6 +67,7 @@ public partial class StateVisualEditorWindow
     }
     private void BuildCanvas()
     {
+        using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.State");
         if (presentation is not { } state) return; CancelPointer();
         var view = state.Canonical; Surface.Children.Clear(); buttons.Clear(); translations.Clear(); edgeRuntime.Clear();
         var mutable = view.Drawing.Clone(); var nodeDrawings = new Dictionary<string, DrawingGroup>(); var edges = new Dictionary<int, DrawingGroup>(); var labels = new Dictionary<int, DrawingGroup>();

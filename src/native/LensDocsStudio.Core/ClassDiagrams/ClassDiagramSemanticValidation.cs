@@ -10,6 +10,7 @@ public static class ClassDiagramSemanticValidation
     public static bool Equal(ClassDiagram first, ClassDiagram second) => JsonSerializer.Serialize(first) == JsonSerializer.Serialize(second);
     public static void ValidateRendering(ClassDiagramModel model, DiagramResult render)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("semantic.validation.Class");
         if (!model.IsValid) throw new ArgumentException(model.Diagnostics.FirstOrDefault() ?? "Repair invalid Class source using Edit source.");
         if (!render.Success || render.Source != model.Source || render.ClassSemantics is null || render.ClassLayout is null || !Equal(model.Semantic, render.ClassSemantics))
             throw new ArgumentException(render.Error ?? "The complete pinned Class semantics cannot be reconciled with the original source. Use Edit source.");

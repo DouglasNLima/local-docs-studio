@@ -32,7 +32,7 @@ internal static class NativeSuitePerformanceChecks
             for (var sample = 0; sample < 7; sample++)
             {
                 using var process = Process.GetCurrentProcess(); process.Refresh(); var workingSet = process.WorkingSet64;
-                var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew();
+                var totalAllocated = GC.GetTotalAllocatedBytes(); var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew();
                 object model = family switch
                 {
                     "Flowchart" => new MermaidSourceParser().Parse(source), "Sequence" => new SequenceSourceParser().Parse(source),
@@ -57,7 +57,7 @@ internal static class NativeSuitePerformanceChecks
                 };
                 var presentationMs = timer.Elapsed.TotalMilliseconds;
                 if (!actual.IsFrozen || actual.Width <= 0 || !drawing.IsFrozen) throw new IOException("Unusable canonical drawing.");
-                var bytes = GC.GetAllocatedBytesForCurrentThread() - allocated;
+                var bytes = GC.GetAllocatedBytesForCurrentThread() - allocated; var allThreadBytes = GC.GetTotalAllocatedBytes() - totalAllocated;
                 // Pixel comparison outside measured presentation, on every sample, preserves actual work.
                 if (!NativeSvgService.ToPng(actual, .15).SequenceEqual(NativeSvgService.ToPng(drawing, .15)))
                     throw new IOException(family + ": canonical pixels changed.");
@@ -65,7 +65,7 @@ internal static class NativeSuitePerformanceChecks
                 runs.Add(new { Sample = sample, Execution = sample == 0 ? "First fixture execution" : "Repeated same-source/new-editor-service execution",
                     SourceScanIncludingAdapterSemanticsMs = scanning, RendererIncludingParsingLayoutSvgMs = renderMs,
                     StandaloneSanitisationMs = sanitisation, StandaloneSharpVectorsAndDrawingMs = convertMs,
-                    CompletePresentationMs = presentationMs, CurrentThreadAllocatedBytesBeforePixelCheck = bytes,
+                    CompletePresentationMs = presentationMs, CurrentThreadAllocatedBytesBeforePixelCheck = bytes, AllThreadsAllocatedBytesBeforePixelCheck = allThreadBytes,
                     WorkingSetBefore = workingSet, WorkingSetAfter = process.WorkingSet64, CanonicalPixelsEqual = true });
                 GC.KeepAlive(actual);
             }

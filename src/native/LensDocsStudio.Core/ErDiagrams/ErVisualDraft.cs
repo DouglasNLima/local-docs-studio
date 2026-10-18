@@ -50,6 +50,7 @@ public sealed class ErVisualDraft
     }
     public async Task<ErEditResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("draft.source-validation.ER");
         var version = ++generation;
         try
         {

@@ -109,25 +109,26 @@
       <Label Content="_Label" Target="{Binding ElementName=LabelText}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="LabelText" Style="{StaticResource Mermaid.PropertyInput}" TextWrapping="Wrap" AutomationProperties.Name="Selected Class element label" AutomationProperties.AutomationId="ClassLabel"/>
      </StackPanel>
-     <StackPanel x:Name="AttributesPanel" Visibility="Collapsed">
-      <TextBlock Text="MEMBERS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
-      <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="AttributeRows" SelectionChanged="AttributeSelected" MaxHeight="160" AutomationProperties.Name="Class members in source order" AutomationProperties.AutomationId="ClassMemberRows"/>
-      <Button x:Name="AddAttributeButton" Content="Add attribute" Click="AddAttribute" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddAttribute"/>
-      <Button x:Name="AddMethodButton" Content="Add method" Click="AddMethod" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddMethod"/>
-     </StackPanel>
+
      <StackPanel x:Name="AttributeFields" Visibility="Collapsed">
       <Label Content="Type / return type" Target="{Binding ElementName=AttributeType}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="AttributeType" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Member type or return type" AutomationProperties.AutomationId="ClassAttributeType"/>
       <Label Content="Member name" Target="{Binding ElementName=AttributeName}" Style="{StaticResource Form.Label}"/>
       <TextBox x:Name="AttributeName" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Member name" AutomationProperties.AutomationId="ClassAttributeName"/>
       <Label Content="Parameters (method only)" Target="{Binding ElementName=Parameters}" Style="{StaticResource Form.Label}"/>
-      <TextBox x:Name="Parameters" Style="{StaticResource Mermaid.PropertyInput}" AutomationProperties.Name="Method parameters" AutomationProperties.AutomationId="ClassParameters"/>
+      <TextBox x:Name="Parameters" Style="{StaticResource Mermaid.PropertyInput}" TextWrapping="Wrap" MinHeight="64" MaxHeight="128" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Method parameters" AutomationProperties.AutomationId="ClassParameters"/>
       <Label Content="Visibility" Target="{Binding ElementName=MemberVisibility}" Style="{StaticResource Form.Label}"/>
       <ComboBox x:Name="MemberVisibility" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Member visibility" AutomationProperties.AutomationId="ClassVisibility"/>
       <CheckBox x:Name="StaticMember" Content="Static ($)" Style="{StaticResource Form.CheckBox}" AutomationProperties.Name="Static member" AutomationProperties.AutomationId="ClassStatic"/>
       <CheckBox x:Name="AbstractMember" Content="Abstract (*)" Style="{StaticResource Form.CheckBox}" AutomationProperties.Name="Abstract member" AutomationProperties.AutomationId="ClassAbstract"/>
       <TextBlock Text="Parameters remain bounded source text. Static attributes use $. Method classifiers and abstract attributes remain protected because of pinned-parser limitations." Style="{StaticResource Form.Help}" TextWrapping="Wrap"/>
       <StackPanel Orientation="Horizontal"><Button x:Name="MoveUpButton" Content="Move up" Click="MoveUp" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassMoveUp"/><Button x:Name="MoveDownButton" Content="Move down" Click="MoveDown" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassMoveDown"/></StackPanel>
+     </StackPanel>
+     <StackPanel x:Name="AttributesPanel" Visibility="Collapsed">
+      <TextBlock Text="MEMBERS" Style="{StaticResource Desktop.PanelHeading}" Margin="0,12,0,4"/>
+      <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="AttributeRows" SelectionChanged="AttributeSelected" MaxHeight="160" AutomationProperties.Name="Class members in source order" AutomationProperties.AutomationId="ClassMemberRows"/>
+      <Button x:Name="AddAttributeButton" Content="Add attribute" Click="AddAttribute" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddAttribute"/>
+      <Button x:Name="AddMethodButton" Content="Add method" Click="AddMethod" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassAddMethod"/>
      </StackPanel>
      <TextBlock x:Name="Capabilities" TextWrapping="Wrap" Style="{StaticResource Form.Help}" Margin="0,10" AutomationProperties.AutomationId="ClassCapabilities"/>
      <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ClassLocateSource"/>

@@ -68,6 +68,7 @@ public partial class SequenceVisualEditorWindow : Window
         Closing += ConfirmClose;
         Closed += async (_, _) =>
         {
+            using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.Sequence");
             closed = true; renderGeneration++; pendingRender?.Cancel(); lifetime.Cancel();
             await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
@@ -125,6 +126,7 @@ public partial class SequenceVisualEditorWindow : Window
             Surface.Width = CanonicalImage.Width; Surface.Height = CanonicalImage.Height;
             if (presentation is not null)
             {
+                using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Sequence");
                 foreach (var target in presentation.Targets)
                 {
                     var button = new ToggleButton { Width = Math.Max(10, target.Bounds.Width), Height = Math.Max(10, target.Bounds.Height),
@@ -162,8 +164,12 @@ public partial class SequenceVisualEditorWindow : Window
     { var target = targets.FirstOrDefault(item => item.Value == draft.Selection).Key; if (target is not null) Controls.MermaidWorkspace.Reveal(target, Viewport); }
     private void RestoreSelection()
     {
-        Participants.SelectedItem = Participants.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
-        Interactions.SelectedItem = Interactions.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+        foreach (var list in new[] { Participants, Interactions })
+        {
+            var selected = list.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+            var changed = !Equals(list.SelectedItem, selected); list.SelectedItem = selected;
+            if (changed && selected is not null) Controls.MermaidWorkspace.RevealNavigation(list, selected);
+        }
     }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -171,6 +177,7 @@ public partial class SequenceVisualEditorWindow : Window
     }
     private void Select(string identity)
     {
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Sequence");
         if (busy || SourcePending || PropertiesPending)
         { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelectionOverlay(); } finally { updating = false; } return; }
         draft.Select(identity); updating = true;

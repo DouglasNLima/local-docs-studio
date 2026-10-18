@@ -10,6 +10,7 @@ public static class SequenceRenderCorrespondence
 {
     public static XDocument Validate(SequenceDiagramModel model, DiagramResult render)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("semantic.validation.Sequence");
         if (!render.Success || render.Source != model.Source) throw new ArgumentException(render.Error ?? "The canonical rendering is stale.");
         using var reader = XmlReader.Create(new StringReader(render.Svg!), new XmlReaderSettings
         { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });

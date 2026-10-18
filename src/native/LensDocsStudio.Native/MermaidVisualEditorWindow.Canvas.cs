@@ -158,6 +158,7 @@ public partial class MermaidVisualEditorWindow
     }
     private void BuildCanonicalCanvas()
     {
+        using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Flowchart");
         if (presentation is not { } view) return;
         canvasHistoryIdentity = draft.HistoryIdentity;
         CancelPointerInteraction();

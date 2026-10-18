@@ -50,6 +50,8 @@ public sealed class DiagramService
     }
     private static DiagramResult RenderUncached(string source, string theme, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("renderer.pipeline");
+        IDisposable? parsingPhase = null, svgPhase = null;
         if (System.Text.RegularExpressions.Regex.IsMatch(source, @"(?m)(?:-->|---|==>|-\.->|-->>|->>)\s*(?:%%[^\r\n]*)?$"))
             return new(source, null, "An arrow is missing its destination. Complete the connection and try again.");
         try
@@ -66,6 +68,13 @@ public sealed class DiagramService
                 Limits = new ResourceLimits { MaxInputLength = 100_000, MaxElements = 500, RenderDeadline = TimeSpan.FromSeconds(3) }
             };
             var prepared = SequenceActivationSource.Prepare(source);
+            if (MermaidDiagnostics.Activities.HasListeners() && !Sequence.SequenceSourceParser.IsSequence(source))
+            {
+                // The existing provider marks the actual parser/layout boundary. No second layout.
+                parsingPhase = MermaidDiagnostics.Measure("renderer.parse-before-layout");
+                layout.BeforeLayout = () => { parsingPhase?.Dispose(); parsingPhase = null; svgPhase?.Dispose(); svgPhase = null; };
+                layout.AfterLayout = () => svgPhase = MermaidDiagnostics.Measure("renderer.svg-after-layout");
+            }
             string svg;
             if (cancellationToken.CanBeCanceled)
             {
@@ -80,5 +89,6 @@ public sealed class DiagramService
         {
             return new(source, null, "Diagram could not be rendered: " + ex.Message[..Math.Min(ex.Message.Length, 300)]);
         }
+        finally { svgPhase?.Dispose(); parsingPhase?.Dispose(); }
     }
 }

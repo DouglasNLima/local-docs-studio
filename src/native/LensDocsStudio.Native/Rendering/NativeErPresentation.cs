@@ -17,6 +17,7 @@ public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<Na
     public static NativeErPresentation Create(ErDiagramModel model, DiagramResult render, NativeSvgService svg) => Create(model, render, svg, default);
     public static NativeErPresentation Create(ErDiagramModel model, DiagramResult render, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("presentation.total.Er");
         cancellationToken.ThrowIfCancellationRequested();
         ErSemanticValidation.ValidateRendering(model, render);
         var prepared = svg.PrepareDocument(render.Svg!);
@@ -30,6 +31,7 @@ public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<Na
             var blank = new DrawingImage(new DrawingGroup()); blank.Freeze(); return new(blank, [], [], []);
         }
         var drawing = svg.RenderCanonical(render, prepared.ToString(SaveOptions.DisableFormatting), cancellationToken: cancellationToken); var origin = drawing.Drawing.Bounds.Location;
+        using var geometryPhase = MermaidDiagnostics.Measure("geometry.correspondence.Er");
         var entities = new List<NativeErHit>(); var attributes = new List<NativeErHit>(); var connections = new List<NativeErConnection>();
         var boxes = root.Descendants().Where(item => Class(item, "entity")).ToArray();
         if (boxes.Length != model.Entities.Count) Reject();

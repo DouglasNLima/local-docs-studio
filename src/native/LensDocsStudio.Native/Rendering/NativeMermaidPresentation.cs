@@ -27,6 +27,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
     public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg) => Create(result, svg, default);
     public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("presentation.total.Mermaid");
         cancellationToken.ThrowIfCancellationRequested();
         var graph = result.FlowchartLayout ?? throw new InvalidDataException("No canonical Flowchart layout is available. Use Edit source.");
         var generated = result.Svg ?? throw new InvalidDataException(result.Error);
@@ -58,6 +59,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         foreach (var element in root.Descendants().Where(e => HasClass(e, "edge-label"))) element.SetAttributeValue("id", "lens-label-" + labelIdentity++);
         var drawing = svg.RenderCanonical(result, root.ToString(SaveOptions.DisableFormatting), identities: true, cancellationToken: cancellationToken);
         var origin = drawing.Drawing.Bounds.Location;
+        using var geometryPhase = MermaidDiagnostics.Measure("geometry.correspondence.Mermaid");
         var shift = new TranslateTransform(-origin.X, -origin.Y);
         var elements = new Dictionary<string, NativeMermaidElement>(StringComparer.Ordinal);
         foreach (var node in graph.Nodes)

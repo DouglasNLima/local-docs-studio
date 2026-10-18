@@ -57,6 +57,7 @@ public partial class StateVisualEditorWindow : Window
         Closing += ConfirmClose;
         Closed += async (_, _) =>
         {
+            using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.State");
             closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
             await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
@@ -139,11 +140,17 @@ public partial class StateVisualEditorWindow : Window
     }
     private void RevealSelection()
     { if (draft.Selection is { } identity && buttons.TryGetValue(identity, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport); }
-    private void RestoreSelection() => Elements.SelectedItem = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+    private void RestoreSelection()
+    {
+        var selected = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+        var changed = !Equals(Elements.SelectedItem, selected); Elements.SelectedItem = selected;
+        if (changed && selected is not null) Controls.MermaidWorkspace.RevealNavigation(Elements, selected);
+    }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     { if (!updating && Elements.SelectedItem is Choice item) { Select(item.Identity); if (draft.Selection == item.Identity && !PropertiesPending) RevealSelection(); } }
     private void Select(string? identity)
     {
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.State");
         if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } return; }
         draft.Select(identity); updating = true; try { RestoreSelection(); ShowProperties(); UpdateSelection(); } finally { updating = false; } UpdateActions();
     }

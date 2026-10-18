@@ -48,6 +48,7 @@ public sealed class ClassDiagramVisualDraft
     }
     public async Task<ClassEditResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("draft.source-validation.Class");
         var version = ++generation;
         try
         {

@@ -20,6 +20,7 @@ public sealed partial class NativeSvgService
     public string Prepare(string generatedSvg) => PrepareDocument(generatedSvg).ToString(SaveOptions.DisableFormatting);
     internal XDocument PrepareDocument(string generatedSvg)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("svg.sanitisation");
         using var reader = XmlReader.Create(new StringReader(generatedSvg), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
         var xml = XDocument.Load(reader);
         var root = xml.Root ?? throw new InvalidDataException("The generated diagram is empty.");
@@ -156,7 +157,7 @@ public sealed partial class NativeSvgService
         // Conversion itself is not interruptible. Queued obsolete callers can cancel
         // before entering SharpVectors, and no cancelled result enters the cache.
         Interlocked.Increment(ref canonicalWaiting);
-        try { canonicalConversion.Wait(cancellationToken); }
+        try { using var waitPhase = MermaidDiagnostics.Measure("native.conversion-queue-wait"); canonicalConversion.Wait(cancellationToken); }
         finally { Interlocked.Decrement(ref canonicalWaiting); }
         try
         {
@@ -189,8 +190,11 @@ public sealed partial class NativeSvgService
     {
         using var text = new StringReader(safeSvg);
         using var reader = new FileSvgReader(new WpfDrawingSettings { IncludeRuntime = identities, TextAsGeometry = true });
-        var drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
+        DrawingGroup drawing;
+        using (MermaidDiagnostics.Measure("native.sharpvectors.read"))
+            drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
         if (drawing.Bounds.IsEmpty || drawing.Bounds.Width < 1 || drawing.Bounds.Height < 1) throw new InvalidDataException("The diagram has no visible geometry.");
+        using var drawingPhase = MermaidDiagnostics.Measure("native.wpf.drawing-freeze");
         drawing.Freeze(); var image = new DrawingImage(drawing); image.Freeze(); return image;
     }
 

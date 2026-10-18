@@ -1,0 +1,21 @@
+{
+  "Status": "PASS",
+  "ActualHighContrast": true,
+  "Checks": [
+    "System Flowchart: keyboard SelectionItem retains the full semantic description",
+    "System Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System Sequence: keyboard SelectionItem retains the full semantic description",
+    "System Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System State: keyboard SelectionItem retains the full semantic description",
+    "System State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System ER: keyboard SelectionItem retains the full semantic description",
+    "System ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "System Class: keyboard SelectionItem retains the full semantic description",
+    "System Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "System Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes"
+  ]
+}

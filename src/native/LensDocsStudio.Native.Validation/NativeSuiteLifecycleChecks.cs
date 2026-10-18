@@ -18,7 +18,7 @@ internal static class NativeSuiteLifecycleChecks
 {
     public static void Run(string output, bool highContrast)
     {
-        Directory.CreateDirectory(output); using var contrast = highContrast ? new NativeTestHighContrast() : null;
+        Directory.CreateDirectory(output); using var recorder = new MermaidPhaseRecorder(); using var contrast = highContrast ? new NativeTestHighContrast() : null;
         var application = Application.Current ?? new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
         ThemeService.Apply(application.Resources, "Light");
         var previous = SynchronizationContext.Current;
@@ -46,13 +46,14 @@ internal static class NativeSuiteLifecycleChecks
         {
             File.WriteAllText(Path.Combine(output, "suite-lifecycle-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString(), Observations = observations }, new JsonSerializerOptions { WriteIndented = true })); throw;
         }
-        finally { host.Close(); SynchronizationContext.SetSynchronizationContext(previous); }
+        finally { host.Close(); recorder.Write(Path.Combine(output, "suite-lifecycle-phases.json")); SynchronizationContext.SetSynchronizationContext(previous); }
     }
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference OpenClose(string family, int cycle, Window owner, Button ownerFocus, DiagramService service, List<object> observations)
     {
         var source = NativeSuitePerformanceChecks.Source(family, false) + (cycle == 2 ? "%% queued lifecycle fixture\n" : "");
         ThemeService.Apply(Application.Current.Resources, "Light");
+        using var firstPresentationPhase = MermaidDiagnostics.Measure("editor.first-presentation." + family);
         var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew(); var lastBeat = Stopwatch.GetTimestamp(); var maximumGap = 0d;
         var heartbeat = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         heartbeat.Tick += Beat; heartbeat.Start();
@@ -69,10 +70,11 @@ internal static class NativeSuiteLifecycleChecks
         try
         {
             PumpUntil(Ready, "The native suite lifecycle did not reach an editable presentation."); Drain();
-            var firstUsefulMs = timer.Elapsed.TotalMilliseconds;
+            var firstUsefulMs = timer.Elapsed.TotalMilliseconds; firstPresentationPhase?.Dispose();
             var list = (ListBox)window.FindName(family == "Sequence" ? "Participants" : "Elements");
             var conversions = ConversionCount(); var selectedAllocated = GC.GetAllocatedBytesForCurrentThread(); timer.Restart();
-            for (var selection = 0; selection < 20; selection++) list.SelectedIndex = selection % Math.Min(3, list.Items.Count);
+            for (var selection = 0; selection < 20; selection++)
+            { using var interaction = selection == 0 ? MermaidDiagnostics.Measure("editor.first-interaction." + family) : null; list.SelectedIndex = selection % Math.Min(3, list.Items.Count); }
             var selectionMs = timer.Elapsed.TotalMilliseconds; var selectionBytes = GC.GetAllocatedBytesForCurrentThread() - selectedAllocated;
             if (ConversionCount() != conversions) throw new IOException(family + ": ordinary selection repeated native SVG conversion.");
             var sourceEditor = (ICSharpCode.AvalonEdit.TextEditor)window.FindName("SourceEditor");
@@ -81,6 +83,20 @@ internal static class NativeSuiteLifecycleChecks
             {
                 ApplyTheme("Dark"); ApplyTheme("Light"); ApplyTheme("Dark"); PumpUntil(Ready, "Latest theme rendering did not complete after cancellation.");
                 if (sourceEditor.Text != source) throw new IOException("Theme cancellation changed private source.");
+                heartbeat.Stop();
+                var currentDrawing = family switch
+                {
+                    "Flowchart" => (DrawingImage)window.GetType().GetField("canonicalDrawing", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!,
+                    "Sequence" => (DrawingImage)((Image)window.FindName("CanonicalImage")).Source,
+                    "State" => ((NativeStatePresentation)window.GetType().GetField("presentation", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!).Canonical.Drawing,
+                    "ER" => ((NativeErPresentation)window.GetType().GetField("presentation", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!).Drawing,
+                    _ => ((NativeClassPresentation)window.GetType().GetField("presentation", BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window)!).Drawing
+                };
+                var expectedRender = service.Render(source, ThemeService.IsDark("Dark"));
+                var expectedDrawing = new NativeSvgService().Render(expectedRender.Svg!);
+                if (!NativeSvgService.ToPng(currentDrawing, .25).SequenceEqual(NativeSvgService.ToPng(expectedDrawing, .25)))
+                    throw new IOException(family + ": an obsolete theme result overrode the latest canonical presentation.");
+                lastBeat = Stopwatch.GetTimestamp(); heartbeat.Start();
             }
             if (cycle == 2)
             {

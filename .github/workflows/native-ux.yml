@@ -73,6 +73,10 @@ jobs:
         run: |
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-cache artifacts/native/suite-performance/cache
           exit $LASTEXITCODE
+      - name: Trace actual scanner, semantic, renderer, conversion and geometry phases
+        run: |
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-phases artifacts/native/suite-performance/phases
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:

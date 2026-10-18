@@ -69,6 +69,7 @@ public sealed class MermaidVisualDraft
         => await ValidateAndCommitCoreAsync(candidate, null, cancellationToken);
     private async Task<MermaidDraftResult> ValidateAndCommitCoreAsync(string candidate, IReadOnlyList<string>? edgeIds, CancellationToken cancellationToken, bool capabilityProof = false)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("draft.source-validation.Flowchart");
         var version = ++revision;
         var result = await Task.Run(() =>
         {

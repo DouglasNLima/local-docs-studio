@@ -14,10 +14,12 @@ public sealed record NativeSequencePresentation(DrawingImage Drawing, IReadOnlyL
     public static NativeSequencePresentation Create(SequenceDiagramModel model, DiagramResult render, NativeSvgService svg) => Create(model, render, svg, default);
     public static NativeSequencePresentation Create(SequenceDiagramModel model, DiagramResult render, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("presentation.total.Sequence");
         cancellationToken.ThrowIfCancellationRequested();
         var xml = SequenceRenderCorrespondence.Validate(model, render);
         // Use exactly the same sanitisation/conversion as the FlowDocument preview.
         var drawing = svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellationToken); var origin = drawing.Drawing.Bounds.Location;
+        using var geometryPhase = MermaidDiagnostics.Measure("geometry.correspondence.Sequence");
         var root = xml.Root!; var targets = new List<NativeSequenceTarget>(); var diagnostics = new List<string>();
         var blocks = SequenceRenderCorrespondence.Elements(root, "block").ToList();
         var sourceBlocks = model.Statements.Where(item => item.Kind == SequenceStatementKind.Block).ToArray();

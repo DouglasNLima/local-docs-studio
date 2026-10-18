@@ -31,6 +31,7 @@ public sealed class StateDiagramSourceParser
 
     public StateDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("source.scan.State");
         try { return ParseCore(source, cancellationToken); }
         catch (RegexMatchTimeoutException) { return new(source, "", [], [], [], [], [], ["State source inspection exceeded its lexical budget. The complete source is retained; use Edit source."]); }
     }

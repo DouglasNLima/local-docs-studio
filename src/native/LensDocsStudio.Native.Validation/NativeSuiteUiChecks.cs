@@ -62,6 +62,19 @@ internal static partial class NativeUiChecks
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
+                if (family is "Class" or "ER")
+                {
+                    var longText = family == "Class" ? "OpenDocumentWithCompleteLongMethodDescription" : "completeLongAttributeDescriptionForAccessibleNavigation";
+                    list.Focus(); Keyboard.Type(VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.DOWN); Keyboard.Type(VirtualKeyShort.DOWN);
+                    var longEntry = list.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).Single(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value);
+                    Wait(() => Find(visual!, prefix + "AttributeName").AsTextBox().Text.Contains(longText, StringComparison.Ordinal), "The exact long member/attribute occurrence did not reach the inspector.");
+                    if (!longEntry.Name.Contains(longText, StringComparison.Ordinal)) throw new IOException("Long member accessible name was truncated.");
+                    checks.Add(theme + " " + family + ": full long member name, exact selected occurrence and persistent parent context");
+                    var itemBounds = longEntry.BoundingRectangle; Mouse.MoveTo(itemBounds.Left + itemBounds.Width / 2, itemBounds.Top + itemBounds.Height / 2);
+                    Wait(() => automation.GetDesktop().FindAllDescendants(cf => cf.ByProcessId(app.ProcessId).And(cf.ByControlType(FlaUI.Core.Definitions.ControlType.ToolTip)))
+                        .Any(tip => tip.Name.Contains(longText, StringComparison.Ordinal) || tip.FindAllDescendants().Any(text => text.Name.Contains(longText, StringComparison.Ordinal))), "Full long navigation tooltip did not appear.");
+                    Capture("long-navigation-tooltip", true);
+                }
                 foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
                 {
                     visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height);
@@ -98,6 +111,6 @@ internal static partial class NativeUiChecks
             File.WriteAllText(Path.Combine(output, "suite-failure.txt"), error.ToString()); visual?.CaptureToFile(Path.Combine(output, "suite-failure.png")); return 1;
         }
         finally { app?.Kill(); app?.Dispose(); }
-        void Capture(string name) { Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); _ = DwmFlush(); visual.CaptureToFile(Path.Combine(captureRoot, (highContrast ? "HighContrast" : "Normal") + "-" + visual.Title.Replace('/', '-') + "-" + name + ".png")); }
+        void Capture(string name, bool keepPointer = false) { if (!keepPointer) Mouse.MoveTo(visual!.BoundingRectangle.Left + 20, visual.BoundingRectangle.Top + 16); _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(captureRoot, (highContrast ? "HighContrast" : "Normal") + "-" + visual.Title.Replace('/', '-') + "-" + name + ".png")); }
     }).GetAwaiter().GetResult();
 }

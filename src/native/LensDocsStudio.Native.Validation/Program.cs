@@ -28,6 +28,11 @@ internal static class Program
             try { NativeSuiteCacheChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--suite-phases")
+        {
+            try { NativeSuitePhaseChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() is "--suite-lifecycle" or "--mermaid-fidelity" or "--sequence-fidelity" or "--state-fidelity" or "--er-fidelity" or "--class-fidelity")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
