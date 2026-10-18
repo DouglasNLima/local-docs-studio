@@ -490,3 +490,14 @@ receive that exact fixture and identical harness; every sample retains canonical
 pixel verification. Earlier retained Flowchart measurements used the previous
 cycle-only fixture and must not be compared with this changed workload. Other
 family workload contents and all renderer/source limits remain unchanged.
+
+## Native list-container focus contract
+
+The `0ebba55` native keyboard/lifecycle checks and paired performance pass, while
+the stronger container-focused UIA case still fails. All navigation now shares a
+small WPF focus behaviour: entering a list with exactly one selection enters that
+selected row. It responds only when the list itself receives focus, never when a
+property/source field or another row receives focus. Multiple selection retains
+its existing native rules. The selected-row and container-focused tests both
+remain mandatory, with unchanged deadlines, pending-value and exact-source
+assertions. The original container-focus failure is retained.

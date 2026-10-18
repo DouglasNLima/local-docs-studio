@@ -11,6 +11,24 @@ namespace LensDocsStudio.Native.Controls;
 public static class MermaidWorkspace
 {
     public const double MinimumInitialFitPercent = 60;
+    public static readonly DependencyProperty FocusSelectedRowProperty = DependencyProperty.RegisterAttached(
+        "FocusSelectedRow", typeof(bool), typeof(MermaidWorkspace), new PropertyMetadata(false, NavigationFocusChanged));
+    public static bool GetFocusSelectedRow(DependencyObject value) => (bool)value.GetValue(FocusSelectedRowProperty);
+    public static void SetFocusSelectedRow(DependencyObject value, bool enabled) => value.SetValue(FocusSelectedRowProperty, enabled);
+    private static void NavigationFocusChanged(DependencyObject value, DependencyPropertyChangedEventArgs args)
+    {
+        if (value is not ListBox list) return;
+        if ((bool)args.OldValue) list.GotKeyboardFocus -= EnterSelectedRow;
+        if ((bool)args.NewValue) list.GotKeyboardFocus += EnterSelectedRow;
+    }
+    private static void EnterSelectedRow(object sender, KeyboardFocusChangedEventArgs args)
+    {
+        if (sender is not ListBox list || !ReferenceEquals(args.OriginalSource, list)
+            || list.SelectedItems.Count != 1 || list.SelectedItem is not { } selected) return;
+        // UIA and keyboard entry into the list share the same exact selected row.
+        // Multiple selection retains its existing native focus/extension rules.
+        RevealNavigation(list, selected, true);
+    }
     public static ICollectionView Navigation(IEnumerable entries)
     {
         var view = CollectionViewSource.GetDefaultView(entries);

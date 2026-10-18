@@ -1,0 +1,10 @@
+native	Validate native diagram corpus	﻿2026-10-18T09:23:51.9751296Z ##[group]Run dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .
+native	Validate native diagram corpus	2026-10-18T09:23:51.9752674Z ^[[36;1mdotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- artifacts/native/validation .^[[0m
+native	Validate native diagram corpus	2026-10-18T09:23:51.9811860Z shell: C:\Program Files\PowerShell\7\pwsh.EXE -command ". '{0}'"
+native	Validate native diagram corpus	2026-10-18T09:23:51.9812354Z env:
+native	Validate native diagram corpus	2026-10-18T09:23:51.9812656Z   DOTNET_ROOT: C:\Program Files\dotnet
+native	Validate native diagram corpus	2026-10-18T09:23:51.9813070Z ##[endgroup]
+native	Validate native diagram corpus	2026-10-18T09:24:46.4360209Z Exports generated and DOCX schema validated: 45393 DOCX bytes, 103859 PDF bytes.
+native	Validate native diagram corpus	2026-10-18T09:24:46.4367271Z Native validation: 134 diagram cases and export checks; 1 failures. Evidence: D:\a\local-docs-studio\local-docs-studio\artifacts\native\validation
+native	Validate native diagram corpus	2026-10-18T09:24:46.4371043Z Native syntax colouring: Bundled syntax definition did not preserve and colour sql: {"Limited":true,"Blocks":0,"Milliseconds":34.1945,"TextRetained":false}
+native	Validate native diagram corpus	2026-10-18T09:24:46.9181531Z ##[error]Process completed with exit code 1.
