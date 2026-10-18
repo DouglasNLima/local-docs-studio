@@ -71,7 +71,7 @@ internal static partial class NativeUiChecks
                 foreach (var fieldId in new[] { "ErAttributeType", "ErAttributeName", "ErPK", "ErFK", "ErUK", "ErAttributeComment", "ErUpdate" })
                 {
                     var field = Find(visual!, fieldId); field.Focus();
-                    Wait(() => !field.IsOffscreen && Find(visual!, "ErInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle), "ER attribute field is clipped at " + width + "x" + height + ": " + fieldId);
+                    Wait(() => !field.IsOffscreen && Find(visual!, fieldId == "ErUpdate" ? "ErInspectorPanel" : "ErInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle) && !Find(visual!, "ErSelectionSummary").IsOffscreen, "ER attribute field is clipped at " + width + "x" + height + ": " + fieldId);
                 }
                 Find(visual!, "ErAttributeComment").Focus();
                 Capture("attribute-viewport-" + width + "x" + height); Check(true, "All attribute fields and key markers remain keyboard accessible at " + width + "x" + height); SelectRelationship(2);

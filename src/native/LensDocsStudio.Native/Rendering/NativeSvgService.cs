@@ -145,6 +145,8 @@ public sealed partial class NativeSvgService
     private static readonly Queue<CanonicalKey> canonicalOrder = new();
     private static readonly SemaphoreSlim canonicalConversion = new(1, 1);
     private static int canonicalCharacters;
+    private static long canonicalConversions;
+    private static int canonicalWaiting;
     private const int CanonicalCharacterLimit = 2_000_000, CanonicalEntryLimit = 8;
     internal DrawingImage RenderCanonical(DiagramResult render, string preparedSvg, bool identities = false, CancellationToken cancellationToken = default)
     {
@@ -153,11 +155,14 @@ public sealed partial class NativeSvgService
         lock (canonicalDrawings) if (canonicalDrawings.TryGetValue(key, out var existing)) return existing;
         // Conversion itself is not interruptible. Queued obsolete callers can cancel
         // before entering SharpVectors, and no cancelled result enters the cache.
-        canonicalConversion.Wait(cancellationToken);
+        Interlocked.Increment(ref canonicalWaiting);
+        try { canonicalConversion.Wait(cancellationToken); }
+        finally { Interlocked.Decrement(ref canonicalWaiting); }
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
             lock (canonicalDrawings) if (canonicalDrawings.TryGetValue(key, out var existing)) return existing;
+            Interlocked.Increment(ref canonicalConversions);
             var image = RenderPrepared(preparedSvg, identities);
             cancellationToken.ThrowIfCancellationRequested();
             var cost = render.Source.Length + preparedSvg.Length;

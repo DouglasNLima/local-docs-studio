@@ -90,7 +90,7 @@ public partial class MermaidVisualEditorWindow
                 catch (Exception error) when (error is InvalidDataException or ArgumentException or FormatException)
                 {
                     // A valid drawing remains inspectable even if its interaction metadata cannot be mapped.
-                    inspection = canvasSvg.Render(rendered.Svg!); mappingDiagnostic = error.Message; return null;
+                    inspection = canvasSvg.RenderCanonical(rendered, canvasSvg.Prepare(rendered.Svg!), cancellationToken: cancellation.Token); mappingDiagnostic = error.Message; return null;
                 }
             }, cancellation.Token);
             if (closed || generation != canvasGeneration || draft.Source != source || dark != themeDark) return;

@@ -1,7 +1,7 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
     branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
@@ -27,6 +27,11 @@ jobs:
           dotnet-version: '10.0.x'
       - name: Build exact-source suite workspace checks
         run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Measure native presentation, selection and retained-window lifecycle without UIA transport
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-lifecycle artifacts/native/suite-ui/lifecycle $appearance
+          exit $LASTEXITCODE
       - name: Exercise five-family shared workspace with real keyboard and Windows UIA
         run: |
           $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
@@ -202,6 +207,8 @@ jobs:
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -230,6 +237,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -251,6 +259,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -287,6 +297,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'

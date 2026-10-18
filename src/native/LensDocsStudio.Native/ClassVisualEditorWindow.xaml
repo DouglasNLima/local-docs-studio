@@ -16,12 +16,12 @@
    <Separator/>
    <Button x:Name="DeleteButton" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassDelete" ToolTip="Delete selection (Delete)" AutomationProperties.Name="Delete selection (Delete)"><ui:CommandIcon Kind="Delete"/></Button>
    <Button x:Name="DuplicateButton" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassDuplicate" ToolTip="Duplicate selection (Ctrl+D)" AutomationProperties.Name="Duplicate selection (Ctrl+D)"><ui:CommandIcon Kind="Duplicate"/></Button>
-   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassReverse" AutomationProperties.Name="Reverse relationship and retain endpoint cardinalities"/>
+   <Button x:Name="ReverseButton" Content="Reverse" Click="Reverse" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassReverse" AutomationProperties.Name="Reverse relationship and retain endpoint cardinalities" ToolTip="Reverse selected relationship"/>
    <Separator/>
    <Button Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassZoomOut" ToolTip="Zoom out (Ctrl+wheel)" AutomationProperties.Name="Zoom out (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomOut"/></Button>
-   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="ClassZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="70" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="ClassZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.###}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
    <Button Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassZoomIn" ToolTip="Zoom in (Ctrl+wheel)" AutomationProperties.Name="Zoom in (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomIn"/></Button>
-   <Button Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassFit" ToolTip="Fit diagram (F)" AutomationProperties.Name="Fit diagram (F)"><ui:CommandIcon Kind="FullScreen"/></Button>
+   <Button Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassFit" ToolTip="Fit diagram (F)" AutomationProperties.Name="Fit diagram (F)"><ui:CommandIcon Kind="Focus"/></Button>
    <Button Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassActualSize" ToolTip="Actual size (Ctrl+0)" AutomationProperties.Name="Actual size (Ctrl+0)"><ui:CommandIcon Kind="Selection"/></Button>
    <Button Click="AutoLayout" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassAutoLayout" ToolTip="Centre canonical layout" AutomationProperties.Name="Centre canonical layout"><ui:CommandIcon Kind="AutoLayout"/></Button>
    <Button Click="ToggleSource" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="ClassToggleSource" ToolTip="Show or hide Mermaid source" AutomationProperties.Name="Show or hide Mermaid source"><ui:CommandIcon Kind="Code"/></Button>
@@ -57,19 +57,20 @@
     <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutomationProperties.Name="Resize source panel" AutomationProperties.AutomationId="ClassSourceSplitter"/>
     <Expander ui:MermaidWorkspace.AdjustableSource="True" x:Name="SourcePanel" Grid.Row="2" Header="Portable Mermaid source and validation" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}" AutomationProperties.AutomationId="ClassSourcePanel">
      <DockPanel>
-      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+      <WrapPanel DockPanel.Dock="Top">
        <Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassValidate"/>
        <Button Content="Original source" Click="ShowOriginal" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="ClassOriginal"/>
        <Button Click="CopySource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Copy Mermaid draft source" AutomationProperties.AutomationId="ClassCopySource"><ui:CommandIcon Kind="Copy"/></Button>
-      </StackPanel>
+      </WrapPanel>
       <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" LineNumbersForeground="{DynamicResource MutedTextBrush}" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="Class draft source" AutomationProperties.AutomationId="ClassSource"/>
      </DockPanel>
     </Expander>
    </Grid>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="ClassInspectorSplitter"/>
-   <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}">
+   <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="ClassInspectorPanel">
     <StackPanel DockPanel.Dock="Top" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
      <TextBlock x:Name="Summary" Text="Select a class, member or relationship." Style="{StaticResource Mermaid.InspectorHeading}" AutomationProperties.AutomationId="ClassSelectionSummary"/>
+     <TextBlock x:Name="ContextDescription" Style="{StaticResource Mermaid.InspectorDescription}" AutomationProperties.AutomationId="ClassSelectionDescription"/>
      <TextBlock x:Name="InspectorState" Text="Ready" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.AutomationId="ClassInspectorState" AutomationProperties.LiveSetting="Polite"/>
     </StackPanel>
     <WrapPanel DockPanel.Dock="Bottom" Margin="12,8">

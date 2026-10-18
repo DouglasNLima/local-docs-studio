@@ -290,6 +290,7 @@ public partial class MermaidVisualEditorWindow : Window
         UpdateCanvasSelection();
         Status.Text = connectionSource is null ? "Select a source node first, then choose Connection or its + port." : "Connection from " + connectionSource + ": select the destination node. Escape cancels.";
     }
+    private bool selectingCanvas;
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (updating) return;
@@ -303,16 +304,21 @@ public partial class MermaidVisualEditorWindow : Window
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
         updating = true; try { ShowProperties(); } finally { updating = false; }
         UpdateCanvasSelection(); UpdateActions();
-        if (Selected is { } selected && canvasElements.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
+        if (!selectingCanvas && Selected is { } selected && canvasElements.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
     }
     private void SelectElement(string key, bool extend = false)
     {
         if (PropertiesPending || inlineEditor is not null)
         { UpdateCanvasSelection(); inlineEditor?.Focus(); Status.Text = "Confirm or reset the current element's pending edits before changing selection."; return; }
         var choice = choices.FirstOrDefault(item => item.Key == key); if (choice is null) return;
-        if (!extend) Elements.SelectedItems.Clear();
-        if (extend && Elements.SelectedItems.Contains(choice)) Elements.SelectedItems.Remove(choice); else Elements.SelectedItems.Add(choice);
-        Elements.ScrollIntoView(choice);
+        selectingCanvas = true;
+        try
+        {
+            if (!extend) Elements.SelectedItems.Clear();
+            if (extend && Elements.SelectedItems.Contains(choice)) Elements.SelectedItems.Remove(choice); else Elements.SelectedItems.Add(choice);
+            Elements.ScrollIntoView(choice);
+        }
+        finally { selectingCanvas = false; }
     }
     private void ShowProperties()
     {

@@ -28,12 +28,12 @@ internal static class Program
             try { NativeSuiteCacheChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--mermaid-fidelity" or "--sequence-fidelity" or "--state-fidelity" or "--er-fidelity" or "--class-fidelity")
+        if (args.FirstOrDefault() is "--suite-lifecycle" or "--mermaid-fidelity" or "--sequence-fidelity" or "--state-fidelity" or "--er-fidelity" or "--class-fidelity")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
                 || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
             { Console.Error.WriteLine("Native viewport certification requires a disposable GitHub-hosted Windows runner."); return 1; }
-            try { if (args[0] == "--class-fidelity") NativeClassChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--er-fidelity") NativeErChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--state-fidelity") NativeStateChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--sequence-fidelity") NativeSequenceChecks.Run(Path.GetFullPath(args[1])); else NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            try { if (args[0] == "--suite-lifecycle") NativeSuiteLifecycleChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--class-fidelity") NativeClassChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--er-fidelity") NativeErChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--state-fidelity") NativeStateChecks.Run(Path.GetFullPath(args[1]), args.Contains("--high-contrast")); else if (args[0] == "--sequence-fidelity") NativeSequenceChecks.Run(Path.GetFullPath(args[1])); else NativeMermaidFidelityChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--mermaid-performance")

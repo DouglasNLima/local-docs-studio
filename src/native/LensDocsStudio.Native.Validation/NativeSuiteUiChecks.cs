@@ -40,7 +40,8 @@ internal static partial class NativeUiChecks
                 Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Suite visual action did not appear.");
                 Find(main, "DiagramEditVisually0").AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor")))?.AsWindow()) is not null, "Suite editor did not open.");
-                Wait(() => Find(visual!, prefix + "Apply").IsEnabled, "Suite canonical mapping did not finish.");
+                Wait(() => Find(visual!, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Suite canonical mapping did not finish.");
+                var originalApplyEnabled = Find(visual!, prefix + "Apply").IsEnabled;
                 Capture("initial");
                 var list = Find(visual!, family == "Sequence" ? "SequenceParticipants" : prefix + "Elements");
                 list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
@@ -59,7 +60,7 @@ internal static partial class NativeUiChecks
                 if (field.Text != fieldBefore + "Pending" || summary.Name != summaryBefore || Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value != zoom)
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
-                Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled, "Reset did not restore validated property values.");
+                Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
                 {

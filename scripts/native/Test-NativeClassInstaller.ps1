@@ -2,11 +2,12 @@
 param(
     [Parameter(Mandatory)][string]$Installer,
     [Parameter(Mandatory)][string]$UpgradeInstaller,
-    [Parameter(Mandatory)][string]$ExpectedSourceRevision
+    [Parameter(Mandatory)][string]$ExpectedSourceRevision,
+    [ValidateSet("Class", "Sequence", "Flowchart")][string]$Family = "Class"
 )
 $ErrorActionPreference = 'Stop'
 if ($env:GITHUB_ACTIONS -ne 'true' -or $env:RUNNER_OS -ne 'Windows' -or $env:RUNNER_ENVIRONMENT -ne 'github-hosted') {
-    throw 'Installed Class authoring requires a disposable GitHub-hosted Windows runner.'
+    throw "Installed $Family authoring requires a disposable GitHub-hosted Windows runner."
 }
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 $Installer = (Resolve-Path -LiteralPath $Installer).Path
@@ -14,7 +15,7 @@ $UpgradeInstaller = (Resolve-Path -LiteralPath $UpgradeInstaller).Path
 $uninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\{3AF043CA-F7C1-4D1F-A8BC-847B4C44E23F}_is1'
 $shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Lens Docs Studio Native Preview/Lens Docs Studio Native Preview.lnk'
 if ((Test-Path -LiteralPath $uninstallKey) -or (Test-Path -LiteralPath $shortcut)) { throw 'An installed native preview already exists; preserve it.' }
-$root = Join-Path $repo ('artifacts/native/class-install-smoke/' + [guid]::NewGuid().ToString('N'))
+$root = Join-Path $repo ('artifacts/native/' + $Family.ToLowerInvariant() + '-install-smoke/' + [guid]::NewGuid().ToString('N'))
 $installDirectory = Join-Path $root 'installed'
 New-Item -ItemType Directory -Path $root -Force | Out-Null
 $checks = [Collections.Generic.List[string]]::new()
@@ -24,8 +25,8 @@ foreach ($package in $Installer, $UpgradeInstaller) {
     $directory = [IO.Path]::GetDirectoryName($package)
     $identity = Get-Content -LiteralPath (Join-Path $directory 'version.json') -Raw | ConvertFrom-Json
     & pwsh -NoProfile -File (Join-Path $PSScriptRoot 'Test-NativePreviewPackage.ps1') -PackageDirectory $directory -ExpectedVersion $identity.version -ExpectedSourceRevision $ExpectedSourceRevision -OutputPath (Join-Path $root ($identity.version + '-verification.json'))
-    if ($LASTEXITCODE -ne 0) { throw 'Independent package verification failed before Class installer execution.' }
-    if ($identity.sourceDirty -or $identity.signingProvider -ne 'Unsigned') { throw 'Class certification expects the clean exact-source unsigned internal preview.' }
+    if ($LASTEXITCODE -ne 0) { throw "Independent package verification failed before $Family installer execution." }
+    if ($identity.sourceDirty -or $identity.signingProvider -ne 'Unsigned') { throw "$Family certification expects the clean exact-source unsigned internal preview." }
 }
 function Assert-Payload([string]$Package, [string]$Phase) {
     $archive = [IO.Compression.ZipFile]::OpenRead(($Package -replace '-Setup\.exe$', '.zip'))
@@ -42,7 +43,7 @@ function Assert-Payload([string]$Package, [string]$Phase) {
         }
         foreach ($file in Get-ChildItem -LiteralPath $installDirectory -Recurse -File) {
             $name = [IO.Path]::GetRelativePath($installDirectory, $file.FullName).Replace('\', '/')
-            if (-not $expected.Contains($name) -and $name -notin 'unins000.exe', 'unins000.dat') { throw "Unexpected installed Class payload: $name" }
+            if (-not $expected.Contains($name) -and $name -notin 'unins000.exe', 'unins000.dat') { throw "Unexpected installed $Family payload: $name" }
         }
     } finally { $archive.Dispose() }
     $checks.Add("${Phase}: all $($expected.Count) installed payload files match independently verified portable bytes")
@@ -51,7 +52,7 @@ function Remove-Installation([string]$Phase) {
     $uninstaller = Join-Path $installDirectory 'unins000.exe'
     if (-not (Test-Path -LiteralPath $uninstaller)) { return }
     $process = Start-Process -FilePath $uninstaller -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART' -WindowStyle Hidden -Wait -PassThru
-    if ($process.ExitCode -ne 0 -or (Test-Path -LiteralPath $uninstallKey) -or (Test-Path -LiteralPath $shortcut)) { throw "${Phase}: isolated Class uninstall failed." }
+    if ($process.ExitCode -ne 0 -or (Test-Path -LiteralPath $uninstallKey) -or (Test-Path -LiteralPath $shortcut)) { throw "${Phase}: isolated $Family uninstall failed." }
     $checks.Add("${Phase}: native installation and shortcuts removed")
 }
 try {
@@ -60,24 +61,27 @@ try {
         $package = if ($phase -eq 'install') { $Installer } else { $UpgradeInstaller }
         $expected = Get-Content -LiteralPath (Join-Path ([IO.Path]::GetDirectoryName($package)) 'version.json') -Raw | ConvertFrom-Json
         $process = Start-Process -FilePath $package -ArgumentList @('/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/SP-',('/DIR="' + $installDirectory + '"'),('/LOG="' + (Join-Path $root ($phase + '.log')) + '"')) -WindowStyle Hidden -Wait -PassThru
-        if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $uninstallKey)) { throw "${phase}: isolated Class installation failed." }
+        if ($process.ExitCode -ne 0 -or -not (Test-Path -LiteralPath $uninstallKey)) { throw "${phase}: isolated $Family installation failed." }
         $identity = Get-Content -LiteralPath (Join-Path $installDirectory 'version.json') -Raw | ConvertFrom-Json
         $binary = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $installDirectory 'LensDocsStudio.Native.dll')).ProductVersion.Split('+')[0]
         $registered = (Get-ItemProperty -LiteralPath $uninstallKey).DisplayVersion
-        if ($identity.version -ne $expected.version -or $identity.sourceRevision -ne $ExpectedSourceRevision -or $binary -ne $expected.version -or $registered -ne $expected.version) { throw "${phase}: installed Class provenance differs from the exact PR head." }
+        if ($identity.version -ne $expected.version -or $identity.sourceRevision -ne $ExpectedSourceRevision -or $binary -ne $expected.version -or $registered -ne $expected.version) { throw "${phase}: installed $Family provenance differs from the exact PR head." }
         Assert-Payload $package $phase
         $versions.Add(@{ phase=$phase; version=$identity.version; source=$identity.sourceRevision; binary=$binary; registered=$registered })
         Push-Location $repo
         try {
-            & dotnet run --project src/native/LensDocsStudio.Native.Validation -c Release --no-build -- --class-ui (Join-Path $installDirectory 'LensDocsStudio.Native.exe') (Join-Path $root $phase) --normal
-            if ($LASTEXITCODE -ne 0) { throw "${phase}: installed Class native authoring failed." }
+            $mode = switch ($Family) { 'Sequence' { '--sequence-ui' } 'Flowchart' { '--mermaid-ui' } default { '--class-ui' } }
+            $arguments = @('run', '--project', 'src/native/LensDocsStudio.Native.Validation', '-c', 'Release', '--no-build', '--', $mode, (Join-Path $installDirectory 'LensDocsStudio.Native.exe'), (Join-Path $root $phase), '--normal')
+            if ($Family -eq 'Flowchart') { $arguments += '--polish' }
+            & dotnet @arguments
+            if ($LASTEXITCODE -ne 0) { throw "${phase}: installed $Family native authoring failed." }
         } finally { Pop-Location }
-        $checks.Add("${phase}: real installed Class authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel")
+        $checks.Add("${phase}: real installed $Family authoring, pointers, private/document Undo, Apply, Save, restart/reopen, Cancel")
     }
     Remove-Installation 'final-uninstall'
     $completed = $true
 } finally {
     try { Remove-Installation 'cleanup' } finally {
-        @{ status=$(if ($completed) { 'PASS' } else { 'FAIL' }); sourceRevision=$ExpectedSourceRevision; versions=$versions; checks=$checks } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root 'class-installer-results.json')
+        @{ status=$(if ($completed) { 'PASS' } else { 'FAIL' }); sourceRevision=$ExpectedSourceRevision; versions=$versions; checks=$checks } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $root ($Family.ToLowerInvariant() + '-installer-results.json'))
     }
 }

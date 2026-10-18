@@ -54,7 +54,11 @@ public partial class StateVisualEditorWindow : Window
             catch (OperationCanceledException) { }
         };
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); lifetime.Cancel(); };
+        Closed += async (_, _) =>
+        {
+            closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+        };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
     public async void ApplyTheme(string theme)
@@ -113,7 +117,7 @@ public partial class StateVisualEditorWindow : Window
                 NativeStatePresentation? view = ready; string? diagnostic = null;
                 try { view ??= NativeStatePresentation.Create(model, render, svg, cancellation.Token); }
                 catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
-                return (view, Drawing: view?.Canonical.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
+                return (view, Drawing: view?.Canonical.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null), diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return;
             presentation = converted.view;
@@ -169,6 +173,7 @@ public partial class StateVisualEditorWindow : Window
         { Summary.Text = EndpointName(pseudo.Identity); Dependencies.Text = "Scoped " + (pseudo.Initial ? "initial source" : "final destination") + ". Remove or reconnect its transition; this marker is never a globally renamable state."; }
         else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement)
         { Summary.Text = "Protected " + statement.Kind; Dependencies.Text = statement.Span.Read(draft.Source); }
+        ContextDescription.Text = Choices().FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
         baseline = Values;
     }
     private StateEditOperation? UpdateOperation() => mode == "state" ? new AddStateNode(NodeId.Text, LabelText.Text)
@@ -215,7 +220,7 @@ public partial class StateVisualEditorWindow : Window
     private void BeginCreation(string kind)
     {
         if (!CanEdit || PropertiesPending) return; updating = true;
-        try { ShowProperties(); mode = kind; Summary.Text = "New " + kind; LabelFields.Visibility = Visibility.Visible; NodeFields.Visibility = kind == "state" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "transition" ? Visibility.Visible : Visibility.Collapsed; NodeId.Text = NextId(); LabelText.Text = kind == "state" ? "New state" : ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); canvasPick = kind == "transition" ? "from" : null; }
+        try { ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; LabelFields.Visibility = Visibility.Visible; NodeFields.Visibility = kind == "state" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "transition" ? Visibility.Visible : Visibility.Collapsed; NodeId.Text = NextId(); LabelText.Text = kind == "state" ? "New state" : ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); canvasPick = kind == "transition" ? "from" : null; }
         finally { updating = false; } UpdateActions(); LabelText.Focus(); LabelText.SelectAll();
     }
     private void AddState(object sender, RoutedEventArgs e) => BeginCreation("state");
@@ -282,8 +287,8 @@ public partial class StateVisualEditorWindow : Window
     private void Preview(object sender, RoutedEventArgs e)
     { if (presentation is { } view) new Window { Owner = this, Title = "Rendered State preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Canonical.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e) { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
     private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); sessionPositions.Clear(); SavePositions(); if (presentation is not null) BuildCanvas(); Fit(sender, e); Status.Text = "Canonical layout restored. Saved Mermaid source is unchanged."; }

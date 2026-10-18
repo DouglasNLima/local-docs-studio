@@ -149,3 +149,36 @@ ER 100/150 again exceeded the unchanged renderer deadline; editor interaction
 was not completed and this remains a resource diagnostic. The Class 100/150
 case completed independently. Main-thread window presentation, interaction,
 retained-memory and higher-DPI certification remain outstanding.
+
+## First hosted candidate: `b2a79d9`
+
+[UX run 39105334937](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39105334937)
+passes the five-family canonical comparisons, Sequence/State normal and actual
+High Contrast authoring, and the identical-binary comparative performance job.
+This revision is **not certified**: Class/ER UIA and the new workspace suite fail.
+Their original receipts are retained in this report's evidence directory.
+
+Class/ER stop at the old assertion that Update belongs inside the property
+ScrollViewer. The actual hosted screenshot shows Update visibly fixed below it.
+The check is being adapted to require containment in the fixed inspector panel
+for Update, retain scroll-body containment for every actual field, and additionally
+require the selection heading to remain visible. No fields/assertions are removed.
+
+The new Flowchart workspace fixture incorrectly waited for Apply on an unchanged
+draft. Its existing contract requires a real validated private change. The check
+now waits for enabled visual authoring and requires Reset to restore the original
+Apply state. The original failure screenshot shows a ready editable canvas with
+an appropriately disabled Apply. This is a harness correction, not a claimed
+product performance fix.
+
+The hosted performance job uses Windows 10.0.26100 / .NET 10.0.13, four logical
+processors. Repeated larger-scenario presentation medians before/after are
+Flowchart 455.81/50.93 ms, Sequence 500.59/27.82 ms, State 280.84/18.15 ms,
+ER 284.23/15.00 ms and Class 973.12/52.15 ms. Every sample retains the canonical
+pixel check. Raw paired receipts share the same harness SHA-256. These results
+belong to this revision and runner, not the final package or arbitrary hardware.
+
+Follow-up work adds real WPF retained-window/selection/heartbeat diagnostics,
+explicit cleanup after render completion, cancelled queued conversion tests,
+fixed full-selection descriptions, and Flowchart/Sequence installed authoring
+using the existing package provenance and complete payload-parity assertions.

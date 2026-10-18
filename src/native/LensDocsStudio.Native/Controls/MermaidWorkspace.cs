@@ -45,6 +45,10 @@ public static class MermaidWorkspace
     {
         if (Equals(inspector.GetValue(InspectorIdentityProperty), identity)) return;
         inspector.SetValue(InspectorIdentityProperty, identity); inspector.ScrollToTop();
+        inspector.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Loaded, () =>
+        {
+            if (Equals(inspector.GetValue(InspectorIdentityProperty), identity)) inspector.ScrollToTop();
+        });
     }
     public static void Reveal(FrameworkElement element, ScrollViewer viewport)
     {
@@ -61,7 +65,7 @@ public static class MermaidWorkspace
     {
         if (Keyboard.Modifiers != ModifierKeys.Control) return;
         var point = args.GetPosition(viewport); var before = zoom.Value;
-        var next = Math.Clamp(before * (args.Delta > 0 ? 1.1 : 1 / 1.1), zoom.Minimum, zoom.Maximum);
+        var next = Math.Clamp(before * (args.Delta > 0 ? 1.15 : 1 / 1.15), zoom.Minimum, zoom.Maximum);
         var factor = next / before;
         var horizontal = (viewport.HorizontalOffset + point.X) * factor - point.X;
         var vertical = (viewport.VerticalOffset + point.Y) * factor - point.Y;

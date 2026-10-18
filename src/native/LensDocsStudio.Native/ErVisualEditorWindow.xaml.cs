@@ -58,7 +58,11 @@ public partial class ErVisualEditorWindow : Window
         RelationshipType.ItemsSource = new[] { new TypeChoice(true, "Identifying   --"), new TypeChoice(false, "Non-identifying   ..") };
         EditSourceButton.IsEnabled = editSource is not null; IsEnabled = false;
         Loaded += async (_, _) => { try { draft = await Task.Run(() => new ErVisualDraft(source, diagrams, ValidateNativeCandidateAsync), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); } catch (OperationCanceledException) { } };
-        Closing += ConfirmClose; Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel(); };
+        Closing += ConfirmClose; Closed += async (_, _) =>
+        {
+            closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+        };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
     private static string CardinalityName(ErCardinality value) => value switch { ErCardinality.One => "Exactly one", ErCardinality.ZeroOne => "Zero or one", ErCardinality.Many => "One or more", _ => "Zero or more" };
@@ -104,7 +108,7 @@ public partial class ErVisualEditorWindow : Window
             {
                 NativeErPresentation? view = ready; string? diagnostic = null;
                 try { view ??= NativeErPresentation.Create(current, render, svg, cancellation.Token); } catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
-                return (view, Drawing: view?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
+                return (view, Drawing: view?.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null), diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return; presentation = converted.view;
             if (presentation is not null) { mapped = true; BuildCanvas(); }
@@ -151,6 +155,7 @@ public partial class ErVisualEditorWindow : Window
             Summary.Text = "Relationship " + (draft.Model.Relationships.ToList().IndexOf(relationship) + 1); Dependencies.Text = relationship.Entity1 + " (" + CardinalityName(relationship.Cardinality1) + ") → " + relationship.Entity2 + " (" + CardinalityName(relationship.Cardinality2) + "). " + (relationship.Identifying ? "Identifying." : "Non-identifying.");
         }
         else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement) { Summary.Text = "Protected source"; Dependencies.Text = statement.Span.Read(draft.Source); }
+        ContextDescription.Text = Choices().FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
         baseline = Values;
     }
     private IReadOnlyList<ErKeyType> Keys()
@@ -215,7 +220,7 @@ public partial class ErVisualEditorWindow : Window
         if (!CanEdit || PropertiesPending) return; updating = true;
         try
         {
-            ShowProperties(); mode = kind; Summary.Text = "New " + kind; NodeFields.Visibility = kind == "entity" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "relationship" ? Visibility.Visible : Visibility.Collapsed;
+            ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; NodeFields.Visibility = kind == "entity" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "relationship" ? Visibility.Visible : Visibility.Collapsed;
             LabelFields.Visibility = kind == "attribute" ? Visibility.Collapsed : Visibility.Visible; AttributeFields.Visibility = kind == "attribute" ? Visibility.Visible : Visibility.Collapsed; AttributesPanel.Visibility = Visibility.Collapsed;
             NodeId.Text = NextId(); LabelText.Text = kind == "entity" ? "New entity" : ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); FirstCardinality.SelectedValue = ErCardinality.One; SecondCardinality.SelectedValue = ErCardinality.ZeroMany; RelationshipType.SelectedValue = true;
             AttributeType.Text = "string"; AttributeName.Text = "new_attribute"; AttributeComment.Text = ""; PrimaryKey.IsChecked = ForeignKey.IsChecked = UniqueKey.IsChecked = false; canvasPick = kind == "relationship" ? "from" : null;
@@ -287,11 +292,11 @@ public partial class ErVisualEditorWindow : Window
         new Window { Owner = this, Title = "Rendered ER preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show();
     }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e) { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
-    private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); if (presentation is not null) BuildCanvas(); Fit(sender, e); Status.Text = "Canonical ER layout restored. Portable source is unchanged."; }
+    private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); Fit(sender, e); Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); Status.Text = "Canonical ER layout centred. Portable source is unchanged."; }
     private void Wheel(object sender, MouseWheelEventArgs e) => Controls.MermaidWorkspace.ZoomAtPointer(Viewport, Zoom, e);
     private void PanStart(object sender, MouseButtonEventArgs e) { if (e.ChangedButton != MouseButton.Middle) return; CancelPointer(); pan = e.GetPosition(Viewport); panHorizontal = Viewport.HorizontalOffset; panVertical = Viewport.VerticalOffset; Viewport.CaptureMouse(); Viewport.Cursor = Cursors.Hand; e.Handled = true; }
     private void PanMove(object sender, MouseEventArgs e) { if (pan is not { } start) return; var point = e.GetPosition(Viewport); Viewport.ScrollToHorizontalOffset(panHorizontal + start.X - point.X); Viewport.ScrollToVerticalOffset(panVertical + start.Y - point.Y); }

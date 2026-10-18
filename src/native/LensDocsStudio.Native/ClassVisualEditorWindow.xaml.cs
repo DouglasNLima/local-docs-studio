@@ -55,7 +55,11 @@ public partial class ClassVisualEditorWindow : Window
         MarkerAt.ItemsSource = Enum.GetValues<ClassMarkerAt>(); MemberVisibility.ItemsSource = Enum.GetValues<ClassVisibility>();
         EditSourceButton.IsEnabled = editSource is not null; IsEnabled = false;
         Loaded += async (_, _) => { try { draft = await Task.Run(() => new ClassDiagramVisualDraft(source, diagrams, ValidateNativeCandidateAsync, lifetime.Token), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); } catch (OperationCanceledException) { } };
-        Closing += ConfirmClose; Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel(); };
+        Closing += ConfirmClose; Closed += async (_, _) =>
+        {
+            closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+        };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
     public async void ApplyTheme(string theme) { dark = ThemeService.IsDark(theme); highlighting.Dark = dark; SourceEditor.TextArea.TextView.Redraw(); if (!closed && draft is not null) await RenderAsync(false); }
@@ -102,7 +106,7 @@ public partial class ClassVisualEditorWindow : Window
             {
                 NativeClassPresentation? view = ready; string? diagnostic = null;
                 try { view ??= NativeClassPresentation.Create(current, render, svg, cancellation.Token); } catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
-                return (view, Drawing: view?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
+                return (view, Drawing: view?.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null), diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return; presentation = converted.view;
             if (presentation is not null) { mapped = true; BuildCanvas(); }
@@ -160,6 +164,7 @@ public partial class ClassVisualEditorWindow : Window
         else if (draft.Model.Namespaces.FirstOrDefault(item => item.Identity == draft.Selection) is { } ns) { Summary.Text = "Namespace " + ns.Name; Dependencies.Text = "Protected membership: " + string.Join(", ", ns.ClassIds); }
         else if (draft.Model.Notes.FirstOrDefault(item => item.Identity == draft.Selection) is { } note) { Summary.Text = "Note for " + (note.Semantic.TargetClassId ?? "diagram"); Dependencies.Text = note.Semantic.Text + "\nRead-only source-backed note."; }
         else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement) { Summary.Text = "Protected source occurrence"; Dependencies.Text = statement.Span.Read(draft.Source); }
+        ContextDescription.Text = Choices().FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
         baseline = Values;
     }
     private static string? Optional(string value) => value.Length == 0 ? null : value;
@@ -224,7 +229,7 @@ public partial class ClassVisualEditorWindow : Window
         if (!CanEdit || PropertiesPending) return; updating = true;
         try
         {
-            ShowProperties(); mode = kind; Summary.Text = "New " + kind; NodeFields.Visibility = kind == "class" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "relationship" ? Visibility.Visible : Visibility.Collapsed;
+            ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; NodeFields.Visibility = kind == "class" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "relationship" ? Visibility.Visible : Visibility.Collapsed;
             LabelFields.Visibility = kind == "relationship" ? Visibility.Visible : Visibility.Collapsed; AttributeFields.Visibility = kind is "attribute" or "method" ? Visibility.Visible : Visibility.Collapsed; AttributesPanel.Visibility = Visibility.Collapsed;
             NodeId.Text = NextId(); GenericText.Text = AnnotationText.Text = LabelText.Text = FirstCardinality.Text = SecondCardinality.Text = ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); RelationshipType.SelectedValue = ClassRelationType.Association; MarkerAt.SelectedItem = ClassMarkerAt.To;
             memberMethod = kind == "method"; AttributeType.Text = memberMethod ? "bool" : "string"; AttributeName.Text = memberMethod ? "NewMethod" : "NewAttribute"; Parameters.Text = ""; Parameters.IsEnabled = memberMethod; MemberVisibility.SelectedItem = ClassVisibility.Public; StaticMember.IsChecked = AbstractMember.IsChecked = false; canvasPick = kind == "relationship" ? "from" : null;
@@ -293,11 +298,11 @@ public partial class ClassVisualEditorWindow : Window
     private void Preview(object sender, RoutedEventArgs e)
     { if (presentation is { } view) new Window { Owner = this, Title = "Rendered Class preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e) { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
-    private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); if (presentation is not null) BuildCanvas(); Fit(sender, e); Status.Text = "Canonical Class layout restored. Portable source is unchanged."; }
+    private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); Fit(sender, e); Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); Status.Text = "Canonical Class layout centred. Portable source is unchanged."; }
     private void Wheel(object sender, MouseWheelEventArgs e) => Controls.MermaidWorkspace.ZoomAtPointer(Viewport, Zoom, e);
     private void PanStart(object sender, MouseButtonEventArgs e) { if (e.ChangedButton != MouseButton.Middle) return; CancelPointer(); pan = e.GetPosition(Viewport); panHorizontal = Viewport.HorizontalOffset; panVertical = Viewport.VerticalOffset; Viewport.CaptureMouse(); Viewport.Cursor = Cursors.Hand; e.Handled = true; }
     private void PanMove(object sender, MouseEventArgs e) { if (pan is not { } start) return; var point = e.GetPosition(Viewport); Viewport.ScrollToHorizontalOffset(panHorizontal + start.X - point.X); Viewport.ScrollToVerticalOffset(panVertical + start.Y - point.Y); }

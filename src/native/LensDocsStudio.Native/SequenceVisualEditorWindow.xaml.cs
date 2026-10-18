@@ -65,7 +65,11 @@ public partial class SequenceVisualEditorWindow : Window
             catch (OperationCanceledException) { }
         };
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; renderGeneration++; pendingRender?.Cancel(); lifetime.Cancel(); };
+        Closed += async (_, _) =>
+        {
+            closed = true; renderGeneration++; pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose();
+        };
         Deactivated += (_, _) => EndPan();
     }
     public async void ApplyTheme(string theme)
@@ -111,7 +115,7 @@ public partial class SequenceVisualEditorWindow : Window
                     try { presentation = NativeSequencePresentation.Create(model, render, svg, cancellation.Token); }
                     catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
                 }
-                var drawing = presentation?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null);
+                var drawing = presentation?.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null);
                 return (presentation, drawing, diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return;
@@ -219,7 +223,8 @@ public partial class SequenceVisualEditorWindow : Window
             else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement)
             { Summary.Text = "Protected " + statement.Kind; Dependencies.Text = statement.Span.Read(draft.Source) + ". Use Edit source for structural changes."; }
         }
-        markerBaseline = Marker.SelectedItem as string ?? "None"; baseline = Values;
+        markerBaseline = Marker.SelectedItem as string ?? "None"; ContextDescription.Text = Participants.Items.OfType<Choice>().Concat(Interactions.Items.OfType<Choice>()).FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
+        baseline = Values;
     }
     private string? MessageIdentity => draft.Model.Activations.FirstOrDefault(item => item.Identity == draft.Selection)?.MessageIdentity ?? draft.Selection;
     private void UpdateActions()
@@ -264,7 +269,7 @@ public partial class SequenceVisualEditorWindow : Window
         updating = true; try
         {
             anchor = draft.Model.Statements.Any(item => item.Identity == draft.Selection && item.Kind is SequenceStatementKind.Message or SequenceStatementKind.Note) ? draft.Selection : null;
-            ShowProperties(); mode = kind; Summary.Text = "New " + kind; LabelFields.Visibility = Visibility.Visible;
+            ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; LabelFields.Visibility = Visibility.Visible;
             ParticipantFields.Visibility = kind == "participant" ? Visibility.Visible : Visibility.Collapsed;
             MessageFields.Visibility = kind == "message" ? Visibility.Visible : Visibility.Collapsed;
             NoteFields.Visibility = kind == "note" ? Visibility.Visible : Visibility.Collapsed;
@@ -372,8 +377,8 @@ public partial class SequenceVisualEditorWindow : Window
     private void Preview(object sender, RoutedEventArgs e)
     { if (CanonicalImage.Source is { } drawing) new Window { Owner = this, Title = "Rendered Sequence preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e)
     { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
