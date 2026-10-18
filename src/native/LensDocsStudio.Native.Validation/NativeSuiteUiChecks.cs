@@ -113,18 +113,29 @@ internal static partial class NativeUiChecks
                 checks.Add(theme + " " + family + ": heading, footer, adjustable source and keyboard splitter remain contained at five sizes");
                 if (family != "Flowchart")
                 {
+                    visual!.Patterns.Transform.Pattern.Resize(880, 600);
+                    Wait(() => Math.Abs(visual.BoundingRectangle.Width - 880) < 3 && Math.Abs(visual.BoundingRectangle.Height - 600) < 3,
+                        "Lower inspector capture did not reach the minimum window size.");
                     var inspector = Find(visual!, prefix + "InspectorViewport");
-                    if (inspector.Patterns.Scroll.IsSupported && inspector.Patterns.Scroll.Pattern.VerticallyScrollable.Value) inspector.Patterns.Scroll.Pattern.SetScrollPercent(-1, 100);
+                    if (inspector.Patterns.Scroll.IsSupported && inspector.Patterns.Scroll.Pattern.VerticallyScrollable.Value)
+                    {
+                        inspector.Patterns.Scroll.Pattern.SetScrollPercent(-1, 100);
+                        Wait(() => inspector.Patterns.Scroll.Pattern.VerticalScrollPercent.Value >= 99, "Lower inspector scroll did not settle.");
+                    }
                     if (summary.IsOffscreen || Find(visual!, prefix + "Update").IsOffscreen) throw new IOException("Suite selected context/actions disappeared while scrolling.");
+                    Capture("inspector-lower");
                     list.Focus(); Keyboard.Type(VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.DOWN);
                     Wait(() => summary.Name != summaryBefore, "A new exact navigation occurrence did not change inspector context.");
-                    if (inspector.Patterns.Scroll.IsSupported && inspector.Patterns.Scroll.Pattern.VerticalScrollPercent.Value > 1) throw new IOException("New selection inherited an unrelated inspector scroll position.");
+                    Wait(() => !inspector.Patterns.Scroll.IsSupported || inspector.Patterns.Scroll.Pattern.VerticalScrollPercent.Value <= 1,
+                        "New selection inherited an unrelated inspector scroll position.");
                     Capture("new-selection-context");
                 }
                 var sourceId = family == "Flowchart" ? "MermaidDraftSource" : prefix + "Source";
                 panel.Patterns.ExpandCollapse.Pattern.Expand();
                 if (ReadEditorText(Find(visual!, sourceId)) != source || ReadEditorText(Find(main, "MarkdownEditor")) != source || File.ReadAllText(path) != source)
                     throw new IOException("Suite presentation changed private or owning source.");
+                CaptureSuiteSourceStates(visual!, main, family, prefix, source, name => Capture(name), verifyReveal: true);
+                checks.Add(theme + " " + family + ": invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo");
                 Find(visual!, prefix + "Cancel").AsButton().Invoke();
                 Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor"))) is null, "Suite Cancel did not close unchanged draft.");
                 app.Kill(); app.Dispose(); app = null; visual = null;
@@ -176,6 +187,11 @@ internal static partial class NativeUiChecks
             panel.Patterns.ExpandCollapse.Pattern.Expand(); capture("source-expanded-" + width + "x" + height);
             panel.Patterns.ExpandCollapse.Pattern.Collapse(); capture("source-collapsed-" + width + "x" + height);
         }
+        CaptureSuiteSourceStates(visual, main, family, prefix, source, capture);
+    }
+    private static void CaptureSuiteSourceStates(Window visual, Window main, string family, string prefix, string source, Action<string> capture, bool verifyReveal = false)
+    {
+        var panel = Find(visual, prefix + "SourcePanel");
         Find(visual, prefix + "Fit").AsButton().Invoke(); capture("fit");
         Find(visual, prefix + "ActualSize").AsButton().Invoke(); capture("actual-size");
         Find(visual, prefix + "Zoom").Patterns.RangeValue.Pattern.SetValue(175);
@@ -190,24 +206,43 @@ internal static partial class NativeUiChecks
         var sourceId = family == "Flowchart" ? "MermaidDraftSource" : prefix + "Source";
         var validateId = family == "Flowchart" ? "MermaidValidateSource" : prefix + "Validate";
         ReplaceSource("not a Mermaid header\n"); Validate();
-        Wait(() => !Find(visual, prefix + "Apply").IsEnabled, "Baseline invalid source was not protected."); capture("validation-error");
+        Wait(() => !Find(visual, prefix + "Apply").IsEnabled, "Invalid source was not protected.");
+        if (ReadEditorText(Find(visual, sourceId)) != "not a Mermaid header\n" || panel.Patterns.ExpandCollapse.Pattern.ExpandCollapseState.Value != FlaUI.Core.Definitions.ExpandCollapseState.Expanded)
+            throw new IOException("Invalid source was overwritten or hidden.");
+        capture("validation-error");
         ReplaceSource(source); Validate();
-        Wait(() => Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Baseline original source did not validate again.");
+        Wait(() => Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Original source did not validate again.");
         var insertId = family switch { "Flowchart" => "MermaidInsertProcess", "Sequence" => "SequenceAddParticipant", "State" => "StateAddState", "ER" => "ErAddEntity", _ => "ClassAddClass" };
         Find(visual, insertId).AsButton().Invoke(); if (family != "Flowchart") Find(visual, prefix + "Update").AsButton().Invoke();
-        Wait(() => Find(visual, prefix + "Undo").IsEnabled && Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Baseline insertion did not complete."); capture("new-element");
+        Wait(() => Find(visual, prefix + "Undo").IsEnabled && Find(visual, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Insertion did not complete.");
+        if (verifyReveal)
+        {
+            var idField = family == "Flowchart" ? "MermaidNodeId" : family == "Sequence" ? "SequenceParticipantId" : prefix + "NodeId";
+            var id = Find(visual, idField).AsTextBox().Text;
+            string targetId = family switch { "Flowchart" => "MermaidCanvas_node_" + id, "Sequence" => "SequenceCanvas_participant:" + id,
+                "State" => "StateCanvas_state:" + id, "ER" => "ErCanvas_entity:" + id, _ => "" };
+            AutomationElement Target() => family == "Class" ? visual.FindAllDescendants().Single(item =>
+                (item.Properties.AutomationId.ValueOrDefault ?? "").StartsWith("ClassCanvas_", StringComparison.Ordinal) && item.Name == "Class " + id) : Find(visual, targetId);
+            Wait(() => !Target().IsOffscreen && Find(visual, prefix + "Viewport").BoundingRectangle.IntersectsWith(Target().BoundingRectangle),
+                "New canonical element was not revealed at the preserved zoom.");
+            if (string.IsNullOrWhiteSpace(id) || !Find(visual, prefix + "SelectionSummary").Name.Contains(id, StringComparison.Ordinal))
+                throw new IOException("New canonical element lost its selected inspector context.");
+            if (Math.Abs(Find(visual, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value - 175) > .1)
+                throw new IOException("Canonical insertion unexpectedly changed zoom.");
+        }
+        capture("new-element");
         Find(visual, prefix + "Undo").AsButton().Invoke();
-        Wait(() => ReadEditorText(Find(visual, sourceId)) == source, "Baseline Undo did not restore exact source.");
-        if (ReadEditorText(Find(main, "MarkdownEditor")) != source) throw new IOException("Baseline capture changed the owning source.");
+        Wait(() => ReadEditorText(Find(visual, sourceId)) == source, "Private Undo did not restore exact source.");
+        if (ReadEditorText(Find(main, "MarkdownEditor")) != source) throw new IOException("Source-state capture changed the owning source.");
         void ReplaceSource(string value)
         {
             Find(visual, sourceId).Patterns.Value.Pattern.SetValue(value);
-            Wait(() => ReadEditorText(Find(visual, sourceId)) == value, "Baseline source input did not arrive exactly.");
+            Wait(() => ReadEditorText(Find(visual, sourceId)) == value, "Source input did not arrive exactly.");
         }
         void Validate()
         {
             var before = Find(visual, prefix + "Status").Name; Find(visual, validateId).AsButton().Invoke();
-            Wait(() => Find(visual, validateId).IsEnabled && Find(visual, prefix + "Status").Name != before, "Baseline source validation did not complete.");
+            Wait(() => Find(visual, validateId).IsEnabled && Find(visual, prefix + "Status").Name != before, "Source validation did not complete.");
         }
     }
 }

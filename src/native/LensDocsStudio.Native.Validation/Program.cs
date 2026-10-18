@@ -18,9 +18,9 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
-        if (args.FirstOrDefault() == "--suite-performance")
+        if (args.FirstOrDefault() is "--suite-performance" or "--suite-uncached-performance")
         {
-            try { NativeSuitePerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            try { NativeSuitePerformanceChecks.Run(Path.GetFullPath(args[1]), args[0] == "--suite-uncached-performance"); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--suite-cache")

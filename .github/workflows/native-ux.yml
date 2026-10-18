@@ -140,6 +140,24 @@ jobs:
             if ($left.SourceSha256 -ne $right.SourceSha256 -or $left.Family -ne $right.Family -or $left.Size -ne $right.Size -or $left.Samples.Count -ne 7 -or $right.Samples.Count -ne 7) { throw 'Comparative source, family or sample count differs.' }
             if (@($left.Samples + $right.Samples | Where-Object { -not $_.CanonicalPixelsEqual }).Count -ne 0) { throw 'A measured sample omitted canonical pixel verification.' }
           }
+      - name: Investigate uncached presentation independently of the warm-cache gain
+        run: |
+          & artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-uncached-performance artifacts/native/suite-performance/uncached-before
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-uncached-performance artifacts/native/suite-performance/uncached-after
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $before = Get-Content artifacts/native/suite-performance/uncached-before/suite-performance.json -Raw | ConvertFrom-Json
+          $after = Get-Content artifacts/native/suite-performance/uncached-after/suite-performance.json -Raw | ConvertFrom-Json
+          if ($before.HarnessSha256 -ne $after.HarnessSha256 -or ($before.Host | ConvertTo-Json -Compress) -ne ($after.Host | ConvertTo-Json -Compress)) { throw 'Uncached harness or runner differs.' }
+          if ($before.Observations.Count -ne 10 -or $after.Observations.Count -ne 10) { throw 'Uncached workload count differs.' }
+          for ($index = 0; $index -lt 10; $index++) {
+            $left = $before.Observations[$index]; $right = $after.Observations[$index]
+            if ($left.SourceSha256 -ne $right.SourceSha256 -or $left.Samples.Count -ne 7 -or $right.Samples.Count -ne 7) { throw 'Uncached source or sample count differs.' }
+            if (@($left.Samples.SampleSourceSha256 | Select-Object -Unique).Count -ne 7) { throw 'Uncached samples must have seven distinct exact sources.' }
+            for ($sample = 0; $sample -lt 7; $sample++) {
+              if ($left.Samples[$sample].SampleSourceSha256 -ne $right.Samples[$sample].SampleSourceSha256 -or -not $left.Samples[$sample].CanonicalPixelsEqual -or -not $right.Samples[$sample].CanonicalPixelsEqual) { throw 'Uncached source or canonical pixels differ.' }
+            }
+          }
       - name: Verify immutable cache ownership, isolation, eviction and queued cancellation
         run: |
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-cache artifacts/native/suite-performance/cache

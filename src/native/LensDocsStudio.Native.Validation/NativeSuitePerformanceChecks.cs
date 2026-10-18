@@ -19,7 +19,7 @@ namespace LensDocsStudio.Native.Validation;
 /// No windows, desktop input, clipboard or UIA transport is involved.</summary>
 internal static class NativeSuitePerformanceChecks
 {
-    public static void Run(string output)
+    public static void Run(string output, bool uncached = false)
     {
         Directory.CreateDirectory(output); var observations = new List<object>();
         var conversion = typeof(NativeSvgService).GetMethod("RenderPrepared", BindingFlags.Static | BindingFlags.NonPublic,
@@ -31,21 +31,26 @@ internal static class NativeSuitePerformanceChecks
             var runs = new List<object>();
             for (var sample = 0; sample < 7; sample++)
             {
+                // A distinct inert comment forces both revision caches to miss while
+                // retaining the same diagram content and independent pixel check.
+                var sampleSource = uncached ? source + "\n%% Uncached diagnostic sample " + sample + "\n" : source;
                 using var process = Process.GetCurrentProcess(); process.Refresh(); var workingSet = process.WorkingSet64;
                 var totalAllocated = GC.GetTotalAllocatedBytes(); var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew();
                 object model = family switch
                 {
-                    "Flowchart" => new MermaidSourceParser().Parse(source), "Sequence" => new SequenceSourceParser().Parse(source),
-                    "State" => new StateDiagramSourceParser().Parse(source), "ER" => new ErDiagramSourceParser().Parse(source),
-                    _ => new ClassDiagramSourceParser().Parse(source)
+                    "Flowchart" => new MermaidSourceParser().Parse(sampleSource), "Sequence" => new SequenceSourceParser().Parse(sampleSource),
+                    "State" => new StateDiagramSourceParser().Parse(sampleSource), "ER" => new ErDiagramSourceParser().Parse(sampleSource),
+                    _ => new ClassDiagramSourceParser().Parse(sampleSource)
                 };
                 var scanning = timer.Elapsed.TotalMilliseconds;
-                timer.Restart(); var render = diagramService.Render(source); var renderMs = timer.Elapsed.TotalMilliseconds;
+                timer.Restart(); var render = diagramService.Render(sampleSource); var renderMs = timer.Elapsed.TotalMilliseconds;
                 if (!render.Success) throw new IOException(family + ": required fixture failed: " + render.Error);
                 var svg = new NativeSvgService(); timer.Restart(); var safe = svg.Prepare(render.Svg!); var sanitisation = timer.Elapsed.TotalMilliseconds;
                 // Standalone conversion isolates SharpVectors and WPF drawing creation together.
                 // It is not added to presentation time, which includes its own conversion/correspondence.
                 timer.Restart(); var drawing = (DrawingImage)conversion.Invoke(null, [safe, false])!; var convertMs = timer.Elapsed.TotalMilliseconds;
+                var presentationAllocated = GC.GetAllocatedBytesForCurrentThread();
+                var presentationCollections = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
                 timer.Restart();
                 DrawingImage actual = family switch
                 {
@@ -56,16 +61,21 @@ internal static class NativeSuitePerformanceChecks
                     _ => NativeClassPresentation.Create((ClassDiagramModel)model, render, svg).Drawing
                 };
                 var presentationMs = timer.Elapsed.TotalMilliseconds;
+                var presentationBytes = GC.GetAllocatedBytesForCurrentThread() - presentationAllocated;
+                var presentationCollectionCounts = Enumerable.Range(0, 3).Select(generation => GC.CollectionCount(generation) - presentationCollections[generation]).ToArray();
                 if (!actual.IsFrozen || actual.Width <= 0 || !drawing.IsFrozen) throw new IOException("Unusable canonical drawing.");
                 var bytes = GC.GetAllocatedBytesForCurrentThread() - allocated; var allThreadBytes = GC.GetTotalAllocatedBytes() - totalAllocated;
                 // Pixel comparison outside measured presentation, on every sample, preserves actual work.
                 if (!NativeSvgService.ToPng(actual, .15).SequenceEqual(NativeSvgService.ToPng(drawing, .15)))
                     throw new IOException(family + ": canonical pixels changed.");
                 process.Refresh();
-                runs.Add(new { Sample = sample, Execution = sample == 0 ? "First fixture execution" : "Repeated same-source/new-editor-service execution",
+                runs.Add(new { Sample = sample, Execution = uncached ? "Unique exact-source cache miss" : sample == 0 ? "First fixture execution" : "Repeated same-source/new-editor-service execution",
+                    SampleSourceSha256 = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(sampleSource))),
                     SourceScanIncludingAdapterSemanticsMs = scanning, RendererIncludingParsingLayoutSvgMs = renderMs,
                     StandaloneSanitisationMs = sanitisation, StandaloneSharpVectorsAndDrawingMs = convertMs,
                     CompletePresentationMs = presentationMs, CurrentThreadAllocatedBytesBeforePixelCheck = bytes, AllThreadsAllocatedBytesBeforePixelCheck = allThreadBytes,
+                    PresentationCurrentThreadAllocatedBytes = presentationBytes,
+                    PresentationCollectionCounts = presentationCollectionCounts,
                     WorkingSetBefore = workingSet, WorkingSetAfter = process.WorkingSet64, CanonicalPixelsEqual = true });
                 GC.KeepAlive(actual);
             }
@@ -80,7 +90,7 @@ internal static class NativeSuitePerformanceChecks
             NativeAssemblySha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(NativeSvgService).Assembly.Location))),
             HarnessSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(NativeSuitePerformanceChecks).Assembly.Location))),
             Host = new { Framework = RuntimeInformation.FrameworkDescription, OS = RuntimeInformation.OSDescription, Environment.ProcessorCount, Architecture = RuntimeInformation.ProcessArchitecture.ToString(), RunnerImage = Environment.GetEnvironmentVariable("ImageOS"), RunnerImageVersion = Environment.GetEnvironmentVariable("ImageVersion"), Stopwatch.Frequency },
-            Method = "STA windowless diagnostic; seven samples per fixture; first execution and six repeats. Adapter scanning includes its existing semantic work. Renderer parsing/layout/SVG and native conversion/drawing are combined only where no independent public boundary exists. Presentation includes correspondence and conversion; standalone phases overlap it and must not be summed. No UIA, first-window or interaction latency claim. Pixel checks excluded from timing. No production GC changes.",
+            Method = "STA windowless diagnostic; seven samples per fixture; " + (uncached ? "distinct inert comments force exact-source cache misses without removing diagram content. " : "first execution and six repeats. ") + "Adapter scanning includes its existing semantic work. Renderer parsing/layout/SVG and native conversion/drawing are combined only where no independent public boundary exists. Presentation includes correspondence and conversion; standalone phases overlap it and must not be summed. No UIA, first-window or interaction latency claim. Pixel checks excluded from timing. No production GC changes.",
             Observations = observations, Er100Entities150Relationships = new { RenderSuccess = diagnostic.Success, diagnostic.Error, InteractionCompleted = false, Classification = "Renderer-only resource diagnostic; not a successful editor benchmark", LimitsUnchanged = true }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
