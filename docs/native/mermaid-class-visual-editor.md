@@ -107,7 +107,7 @@ non-portable name-suffix workaround.
 | Generic/annotation properties | Single known declaration; exact supported spans | Core tests |
 | Independent class delete | No incident relationships, targeted notes or namespace membership | Core tests; rejection leaves source/history intact |
 | Add/edit/duplicate/delete member | Exact owning occurrence; stable classification; bounded property grammar | Core tests |
-| Member up/down | Same compartment, adjacent source rows without intervening comments/statements | Core tests; ambiguous attachment rejected |
+| Member up/down | Same compartment, adjacent source rows with no class/member comments or intervening statements | Core tests; ambiguous attachment rejected |
 | Static attribute | Portable trailing `$` | Core tests |
 | Method/abstract classifiers | Preserve, render and inspect only | Core rejection tests |
 | Relationship CRUD/reverse/reconnect | Known endpoints; no orphaned implicit class; marker/cardinality ownership explicit | All six primary types, both orientations and cardinality combinations in Core tests |
@@ -170,6 +170,12 @@ The original first attribute, method and surrounding source are unchanged.
 Reversing `A "1" *-- "0..*" B : owns` produces
 `B "0..*" --* "1" A : owns`: the composition marker remains owned by A.
 
+Member movement is conservative across the complete owning class/member span.
+A comment immediately before the first swapped row can belong to that member,
+even if the gap between the pair contains only whitespace. Such commented spans
+require Edit source for movement; property edits remain available and retain all
+comment bytes. An independent class without comments can still reorder members.
+
 ## Native interaction and drawing
 
 `DiagramService` captures immutable Class semantics and positioned geometry from
@@ -194,7 +200,7 @@ without any classes also retain the pinned engine's empty-layout limitation.
 ## Engineering checks and qualification procedure
 
 The native solution builds with zero warnings/errors. The latest local complete
-Core run passed 1,644 tests (including 116 Class tests), with zero skips.
+Core run passed 1,645 tests (including 117 Class tests), with zero skips.
 Static integrity passed for 50 modules, 57 shell assets, 150 vendor assets and
 56 runtime dependency scans. These are development observations, not final-HEAD
 certification; additional changes require fresh results.

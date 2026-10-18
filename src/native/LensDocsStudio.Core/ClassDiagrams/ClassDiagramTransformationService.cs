@@ -262,6 +262,24 @@ public sealed class ClassDiagramTransformationService
                     if (move.Delta is not (-1 or 1) || index + move.Delta < 0 || index + move.Delta >= members.Count) throw new ArgumentException("This member cannot move further in that direction.");
                     var other = members[index + move.Delta]; Safe(other.Statement);
                     var first = member.Statement.Line.Start < other.Statement.Line.Start ? member.Statement : other.Statement; var second = ReferenceEquals(first, member.Statement) ? other.Statement : member.Statement;
+                    // A comment before the first swapped row can belong to that row,
+                    // even when the gap between the two rows contains only whitespace.
+                    // Keep v1 movement conservative across the complete owning span.
+                    var scopeStart = cls.Members.Select(item => item.Statement.Line.Start).Concat(cls.Declarations.Select(item => item.Line.Start)).Min();
+                    var scopeEnd = cls.Members.Select(item => item.Statement.Line.End).Concat(cls.Declarations.Select(item => item.Line.End)).Append(End(cls)?.Line.End ?? 0).Max();
+                    if (!cls.Declarations.Any(item => item.Line.Start == scopeStart))
+                    {
+                        while (scopeStart > 0)
+                        {
+                            var previousStart = model.Source.LastIndexOf('\n', Math.Max(0, scopeStart - 2)) + 1;
+                            if (previousStart >= scopeStart) break;
+                            var previous = model.Source[previousStart..scopeStart].Trim();
+                            if (previous.Length > 0 && !previous.StartsWith("%%", StringComparison.Ordinal)) break;
+                            scopeStart = previousStart;
+                        }
+                    }
+                    if (model.Source[scopeStart..scopeEnd].Split('\n').Any(line => line.TrimStart().StartsWith("%%", StringComparison.Ordinal)))
+                        throw new ArgumentException("Comments in this class or member span may be attached to a row. Reorder using Edit source; member properties remain available.");
                     if (!string.IsNullOrWhiteSpace(model.Source[first.Line.End..second.Line.Start])) throw new ArgumentException("Comments or intervening statements make member attachment ambiguous. Reorder using Edit source.");
                     Patch(member.Statement.Span, other.Statement.Span.Read(model.Source)); Patch(other.Statement.Span, member.Statement.Span.Read(model.Source));
                     var a = identities.IndexOf(member.Identity); var b = identities.IndexOf(other.Identity); (identities[a], identities[b]) = (identities[b], identities[a]);

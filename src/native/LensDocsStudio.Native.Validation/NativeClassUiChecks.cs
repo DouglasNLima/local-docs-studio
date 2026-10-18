@@ -134,6 +134,7 @@ internal static partial class NativeUiChecks
                 ("unknown-protected", "classDiagram\nclass A {\n+string Name\n}\nunknown directive\n"),
                 ("identical-occurrences", "classDiagram\nclass A {\n+string Name\n+string Name\n+Run(path) bool\n+Run(path) bool\n}\nA --> A : self\nA --> A : self\n"),
                 ("empty-cardinalities", "classDiagram\nclass A\nA \"\" --> \"\" A : original\n"),
+                ("commented-members", "classDiagram\nclass A {\n+int First\n%% Attached to Second\n+int Second\n+int Third\n}\n"),
                 ("reserved-note-target", "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\nnote for Class1 \"Reserved insertion target\"\n"),
                 ("empty-final", "classDiagram\nclass A\n") })
             {
@@ -143,6 +144,15 @@ internal static partial class NativeUiChecks
                     SelectClass("A"); Check(!Find(visual!, "ClassNodeId").IsEnabled && !Find(visual!, "ClassDelete").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled, "Unknown global syntax protects native class structure without history");
                     SelectMember("A", 0); Check(!Find(visual!, "ClassAttributeName").IsEnabled && !Find(visual!, "ClassUpdate").IsEnabled, "Unknown dependencies cannot be overwritten through member properties");
                     Check(!string.IsNullOrWhiteSpace(Find(visual!, "ClassUpdate").Properties.HelpText.ValueOrDefault), "Protected commands expose accessible operation reasons"); Capture(name); Click("ClassCancel"); WaitClosed();
+                }
+                else if (name == "commented-members")
+                {
+                    SelectMember("A", 1);
+                    Check(!Find(visual!, "ClassMoveDown").IsEnabled && !Find(visual!, "ClassUndo").IsEnabled && Draft() == raw
+                        && (Find(visual!, "ClassMoveDown").Properties.HelpText.ValueOrDefault ?? "").Contains("Comments", StringComparison.Ordinal), "Comments before a swapped pair protect native movement without source or history changes");
+                    Set("ClassAttributeName", "UpdatedSecond"); Click("ClassUpdate"); Await(model => model.Class("A").Attributes[1].Semantic.Name == "UpdatedSecond");
+                    Check(Draft() == raw.Replace("+int Second", "+int UpdatedSecond", StringComparison.Ordinal), "Native member property edits preserve comment attachment and every unrelated byte");
+                    Click("ClassCancel"); Discard(); WaitClosed();
                 }
                 else if (name == "reserved-note-target")
                 {

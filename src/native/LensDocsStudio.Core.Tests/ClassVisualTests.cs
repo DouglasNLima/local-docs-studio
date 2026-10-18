@@ -9,6 +9,20 @@ public class ClassVisualTests
     public const string Source = "classDiagram\n    %% Keep this comment\n    class Document {\n        +string Title\n        +string Title\n        +Open(path) Document\n        +Open(path) Document\n        -Validate() bool\n    }\n    class MarkdownDocument {\n        +Render() string\n    }\n    Document <|-- MarkdownDocument\n    Document \"1\" *-- \"many\" MarkdownDocument : owns\n    Document <|-- MarkdownDocument\n    Document --> Document : parent\n";
     public const string Starter = ClassDiagramSourceParser.Starter;
     private static void Success(ClassEditResult result) => Assert.True(result.Success, result.Error);
+    [Fact] public async Task Comments_before_a_swapped_pair_protect_their_member_attachment_without_blocking_other_classes()
+    {
+        foreach (var source in new[] { "classDiagram\nclass A {\n+int First\n%% Attached to Second\n+int Second\n+int Third\n}\n", "classDiagram\n%% Attached to First\nA : +int First\nA : +int Second\n" })
+        {
+            var draft = new ClassDiagramVisualDraft(source); var rows = draft.Model.Class("A").Attributes; var selected = rows[^2]; draft.Select(selected.Identity);
+            var result = await draft.ExecuteAsync(new MoveClassMember(selected.Identity, 1)); Assert.False(result.Success); Assert.Contains("Comments", result.Error);
+            Assert.Equal(source, draft.Source); Assert.Equal(0, draft.HistoryIdentity); Assert.Equal(selected.Identity, draft.Selection);
+            var originalName = selected.Semantic.Name; Success(await draft.ExecuteAsync(new UpdateClassMember(selected.Identity, selected.Semantic with { Name = "UpdatedName" })));
+            Assert.Equal(source.Replace("+int " + originalName, "+int UpdatedName", StringComparison.Ordinal), draft.Source);
+        }
+        var independent = "classDiagram\nclass A {\n%% Keep attached\n+int First\n+int Second\n}\nclass B {\n+int X\n+int Y\n}\n";
+        var other = new ClassDiagramVisualDraft(independent); Success(await other.ExecuteAsync(new MoveClassMember(other.Model.Class("B").Attributes[1].Identity, -1)));
+        Assert.Equal(independent.Replace("+int X\n+int Y", "+int Y\n+int X", StringComparison.Ordinal), other.Source);
+    }
     [Fact] public async Task Unresolved_note_targets_cannot_be_rebound_by_class_identity_operations()
     {
         var source = "classDiagram\nclass A {\n+string Name\n}\nnote for B \"Future target\"\n";
