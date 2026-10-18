@@ -27,12 +27,7 @@ internal static partial class NativeUiChecks
                 var root = Path.Combine(output, theme + "-" + family); Directory.CreateDirectory(root);
                 captureRoot = root; var state = Path.Combine(root, "state"); Directory.CreateDirectory(state);
                 File.WriteAllText(Path.Combine(state, "preferences.json"), JsonSerializer.Serialize(new UserPreferences(Theme: theme, AutomaticUpdateChecks: false)));
-                var source = NativeSuitePerformanceChecks.Source(family, false)
-                    .Replace("Node 0 with context", "Node 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
-                    .Replace("Participant 0", "Participant 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
-                    .Replace("State 0 with context", "State 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
-                    .Replace("description", "completeLongAttributeDescriptionForAccessibleNavigation", StringComparison.Ordinal)
-                    .Replace("Open(path, options)", "OpenDocumentWithCompleteLongMethodDescription(path, options, cancellationToken)", StringComparison.Ordinal);
+                var source = NativeSuitePerformanceChecks.NavigationSource(family);
                 var path = Path.Combine(root, family + ".mmd"); File.WriteAllText(path, source);
                 var start = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
                 foreach (var argument in new[] { "--state-directory", state, root, path }) start.ArgumentList.Add(argument);
@@ -69,7 +64,10 @@ internal static partial class NativeUiChecks
                 var panel = Find(visual!, prefix + "SourcePanel"); var zoom = Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value;
                 panel.Patterns.ExpandCollapse.Pattern.Expand(); panel.Patterns.ExpandCollapse.Pattern.Collapse();
                 ObserveNavigation("source visibility", list, selectedName);
-                list.Focus(); Keyboard.Type(VirtualKeyShort.DOWN);
+                list.Focus(); ObserveNavigation("list focus", list, selectedName);
+                var retainedEntry = list.Patterns.Selection.Pattern.Selection.Value.Single(); retainedEntry.FrameworkAutomationElement.SetFocus();
+                Wait(() => retainedEntry.Properties.HasKeyboardFocus.Value, "UIA did not focus the exact selected navigation occurrence before Down.");
+                ObserveNavigation("exact row focus", list, selectedName); Keyboard.Type(VirtualKeyShort.DOWN);
                 ObserveNavigation("blocked Down", list, selectedName);
                 if (field.Text != fieldBefore + "Pending" || summary.Name != summaryBefore || Find(visual!, prefix + "Zoom").Patterns.RangeValue.Pattern.Value.Value != zoom)
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
@@ -141,7 +139,9 @@ internal static partial class NativeUiChecks
         void ObserveNavigation(string stage, AutomationElement list, string expected)
         {
             var selected = list.Patterns.Selection.Pattern.Selection.Value;
-            File.AppendAllText(Path.Combine(output, "suite-navigation.txt"), stage + " | expected=" + expected + " | selected=" + selected.Length + " | window-enabled=" + visual!.IsEnabled + Environment.NewLine
+            var focused = automation.FocusedElement();
+            File.AppendAllText(Path.Combine(output, "suite-navigation.txt"), stage + " | expected=" + expected + " | selected=" + selected.Length + " | window-enabled=" + visual!.IsEnabled
+                + " | focused=" + focused?.AutomationId + " / " + focused?.Name + " | list-hwnd=" + list.Properties.NativeWindowHandle.ValueOrDefault + " | list=" + list.BoundingRectangle + Environment.NewLine
                 + string.Join(Environment.NewLine, selected.Select(item => item.Name + " | selected=" + item.Patterns.SelectionItem.Pattern.IsSelected.Value + " | off-screen=" + item.IsOffscreen + " | " + item.BoundingRectangle)) + Environment.NewLine);
         }
     }).GetAwaiter().GetResult();

@@ -84,6 +84,12 @@ internal static class NativeSuitePerformanceChecks
             Observations = observations, Er100Entities150Relationships = new { RenderSuccess = diagnostic.Success, diagnostic.Error, InteractionCompleted = false, Classification = "Renderer-only resource diagnostic; not a successful editor benchmark", LimitsUnchanged = true }
         }, new JsonSerializerOptions { WriteIndented = true }));
     }
+    internal static string NavigationSource(string family) => Source(family, false)
+        .Replace("Node 0 with context", "Node 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
+        .Replace("Participant 0", "Participant 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
+        .Replace("State 0 with context", "State 0 with a complete long documentation context for accessible navigation", StringComparison.Ordinal)
+        .Replace("description", "completeLongAttributeDescriptionForAccessibleNavigation", StringComparison.Ordinal)
+        .Replace("Open(path, options)", "OpenDocumentWithCompleteLongMethodDescription(path, options, cancellationToken)", StringComparison.Ordinal);
     internal static string Source(string family, bool large, bool diagnostic = false)
     {
         var n = large ? family switch { "Flowchart" => 100, "Sequence" => 20, "State" => 60, "ER" => diagnostic ? 100 : 30, _ => 100 } : family == "Flowchart" ? 20 : family == "Sequence" ? 5 : 10;

@@ -412,3 +412,15 @@ from native results. Stage-by-stage selected names, state, bounds and off-screen
 flags are now logged around property changes, source visibility, UIA focus/Down
 and Reset. The independent native path additionally exercises source expansion
 and collapse. No assertion or deadline is relaxed.
+
+## UIA action boundary isolated
+
+The `a159e32` action log proves that the original N0 SelectionItem name and selected
+state remain exact through every step. Bounds remain visible after property
+entry and source visibility; the list-focus/Down step moves that same item from
+Y=578 to Y=-220. This is a viewport/focus defect, not an identity loss. UIA now
+records focus and HWND as separate boundaries, explicitly focuses the selected
+row through UI Automation, verifies keyboard focus, then delivers Down. Native
+and UIA paths now share the identical long-name fixture generator. The native
+path also retains source expansion/collapse. All original visibility assertions
+remain; no new product behaviour is claimed certified from this diagnosis.

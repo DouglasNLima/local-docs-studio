@@ -69,7 +69,7 @@ internal static class NativeSuiteLifecycleChecks
     [MethodImpl(MethodImplOptions.NoInlining)]
     private static WeakReference OpenClose(string family, int cycle, Window owner, Button ownerFocus, DiagramService service, List<object> observations)
     {
-        var source = NativeSuitePerformanceChecks.Source(family, cycle < 0) + (cycle == 2 ? "%% queued lifecycle fixture\n" : "");
+        var source = (cycle == 0 ? NativeSuitePerformanceChecks.NavigationSource(family) : NativeSuitePerformanceChecks.Source(family, cycle < 0)) + (cycle == 2 ? "%% queued lifecycle fixture\n" : "");
         ThemeService.Apply(Application.Current.Resources, "Light");
         using var firstPresentationPhase = MermaidDiagnostics.Measure("editor.first-presentation." + family);
         var allocated = GC.GetAllocatedBytesForCurrentThread(); var timer = Stopwatch.StartNew(); var lastBeat = Stopwatch.GetTimestamp(); var maximumGap = 0d;
