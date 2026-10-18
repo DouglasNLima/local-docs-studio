@@ -24,6 +24,7 @@ public partial class ClassVisualEditorWindow : Window
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private CancellationTokenSource? pendingRender;
     private readonly SemaphoreSlim renderGate = new(1, 1);
     private readonly MermaidSourceHighlighting highlighting;
     private bool dark, updating, busy = true, closed, discard, mapped, memberMethod;
@@ -34,7 +35,7 @@ public partial class ClassVisualEditorWindow : Window
     private double panHorizontal, panVertical;
     private NativeClassPresentation? presentation;
     private (ClassDiagramModel Model, bool Dark, NativeClassPresentation View)? preparedPresentation;
-    private record Choice(string Identity, string Description) { public override string ToString() => Description; }
+    private record Choice(string Identity, string Description, string Section = "Classes and members") { public override string ToString() => Description; }
     private record TypeChoice(ClassRelationType Value, string Description);
     private bool SourcePending => draft is not null && SourceEditor.Text != draft.Source;
     private string Values => string.Join('\u001f', NodeId.Text, GenericText.Text, AnnotationText.Text, LabelText.Text, From.SelectedValue, To.SelectedValue, FirstCardinality.Text, SecondCardinality.Text, RelationshipType.SelectedValue, MarkerAt.SelectedItem, AttributeType.Text, AttributeName.Text, Parameters.Text, MemberVisibility.SelectedItem, StaticMember.IsChecked, AbstractMember.IsChecked);
@@ -54,7 +55,7 @@ public partial class ClassVisualEditorWindow : Window
         MarkerAt.ItemsSource = Enum.GetValues<ClassMarkerAt>(); MemberVisibility.ItemsSource = Enum.GetValues<ClassVisibility>();
         EditSourceButton.IsEnabled = editSource is not null; IsEnabled = false;
         Loaded += async (_, _) => { try { draft = await Task.Run(() => new ClassDiagramVisualDraft(source, diagrams, ValidateNativeCandidateAsync, lifetime.Token), lifetime.Token); if (closed) return; busy = false; IsEnabled = true; await RefreshAsync(true); } catch (OperationCanceledException) { } };
-        Closing += ConfirmClose; Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); lifetime.Cancel(); };
+        Closing += ConfirmClose; Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel(); };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
     public async void ApplyTheme(string theme) { dark = ThemeService.IsDark(theme); highlighting.Dark = dark; SourceEditor.TextArea.TextView.Redraw(); if (!closed && draft is not null) await RenderAsync(false); }
@@ -65,15 +66,15 @@ public partial class ClassVisualEditorWindow : Window
             yield return new(cls.Identity, "Class " + cls.Label + (cls.Implicit ? " (implicit)" : ""));
             foreach (var (member, index) in cls.Members.Select((item, i) => (item, i))) yield return new(member.Identity, "  " + cls.Id + " · " + (member.Semantic.IsMethod ? "method " : "attribute ") + (index + 1) + " · " + member.Statement.Read(draft.Source, "member"));
         }
-        foreach (var (relationship, index) in draft.Model.Relationships.Select((item, i) => (item, i))) yield return new(relationship.Identity, "Relationship " + (index + 1) + " · " + relationship.Semantic.From + " → " + relationship.Semantic.To + " · " + relationship.Semantic.Label);
-        foreach (var item in draft.Model.Namespaces) yield return new(item.Identity, "Namespace " + item.Name);
+        foreach (var (relationship, index) in draft.Model.Relationships.Select((item, i) => (item, i))) yield return new(relationship.Identity, "Relationship " + (index + 1) + " · " + relationship.Semantic.From + " → " + relationship.Semantic.To + " · " + relationship.Semantic.Label, "Relationships");
+        foreach (var item in draft.Model.Namespaces) yield return new(item.Identity, "Namespace " + item.Name, "Namespaces");
         foreach (var item in draft.Model.Notes) yield return new(item.Identity, "Note · " + item.Semantic.Text);
-        foreach (var statement in draft.Model.Statements.Where(item => item.Protected)) yield return new(statement.Identity, "Protected · " + statement.Span.Read(draft.Source));
+        foreach (var statement in draft.Model.Statements.Where(item => item.Protected)) yield return new(statement.Identity, "Protected · " + statement.Span.Read(draft.Source), "Protected source");
     }
     private async Task RefreshAsync(bool fit = false)
     {
-        updating = true; try { SourceEditor.Text = draft.Source; Elements.ItemsSource = Choices().ToArray(); RestoreSelection(); ShowProperties(); } finally { updating = false; }
-        await RenderAsync(fit); UpdateActions();
+        updating = true; try { if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Elements.ItemsSource = Controls.MermaidWorkspace.Navigation(Choices().ToArray()); RestoreSelection(); ShowProperties(); } finally { updating = false; }
+        await RenderAsync(fit); if (!closed && !fit) await Dispatcher.InvokeAsync(RevealSelection, System.Windows.Threading.DispatcherPriority.Loaded); UpdateActions();
     }
     private async Task ValidateNativeCandidateAsync(ClassDiagramModel candidate, CancellationToken cancellationToken)
     {
@@ -81,7 +82,7 @@ public partial class ClassVisualEditorWindow : Window
         try
         {
             var render = await Task.Run(() => diagrams.Render(candidate.Source, themeDark, diagramTheme, cancellationToken), cancellationToken);
-            var view = await StaWorker.RunAsync(() => NativeClassPresentation.Create(candidate, render, svg), cancellationToken);
+            var view = await StaWorker.RunAsync(() => NativeClassPresentation.Create(candidate, render, svg, cancellationToken), cancellationToken);
             cancellationToken.ThrowIfCancellationRequested(); if (closed || version != renderGeneration) throw new ArgumentException("The Class presentation changed during validation. Retry against the current presentation; the draft is unchanged.");
             preparedPresentation = (candidate, themeDark, view);
         }
@@ -89,19 +90,20 @@ public partial class ClassVisualEditorWindow : Window
     }
     private async Task RenderAsync(bool fit)
     {
+        pendingRender?.Cancel(); var cancellation = CancellationTokenSource.CreateLinkedTokenSource(lifetime.Token); pendingRender = cancellation;
         CancelPointer(); canvasPick = null; var version = ++renderGeneration; mapped = false; UpdateActions(); var current = draft.Model; var themeDark = dark;
         Status.Text = "Rendering canonical Class diagram…"; var leased = false;
         try
         {
-            await renderGate.WaitAsync(lifetime.Token); leased = true;
-            var render = await Task.Run(() => diagrams.Render(current.Source, themeDark, diagramTheme, lifetime.Token), lifetime.Token);
+            await renderGate.WaitAsync(cancellation.Token); leased = true;
+            var render = await Task.Run(() => diagrams.Render(current.Source, themeDark, diagramTheme, cancellation.Token), cancellation.Token);
             var ready = preparedPresentation is { } prepared && ReferenceEquals(prepared.Model, current) && prepared.Dark == themeDark ? prepared.View : null; preparedPresentation = null;
             var converted = await StaWorker.RunAsync(() =>
             {
                 NativeClassPresentation? view = ready; string? diagnostic = null;
-                try { view ??= NativeClassPresentation.Create(current, render, svg); } catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
+                try { view ??= NativeClassPresentation.Create(current, render, svg, cancellation.Token); } catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
                 return (view, Drawing: view?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
-            }, lifetime.Token);
+            }, cancellation.Token);
             if (closed || version != renderGeneration) return; presentation = converted.view;
             if (presentation is not null) { mapped = true; BuildCanvas(); }
             else { Surface.Children.Clear(); buttons.Clear(); Surface.Children.Add(new Image { Source = converted.Drawing, Stretch = Stretch.None, IsHitTestVisible = false }); Surface.Width = converted.Drawing?.Width ?? 420; Surface.Height = converted.Drawing?.Height ?? 260; }
@@ -109,14 +111,16 @@ public partial class ClassVisualEditorWindow : Window
                 : presentation is { } view && view.Members.Count < current.Classes.Sum(item => item.Members.Count) ? "Some member rows are available through the element list; their canvas positions cannot be mapped confidently."
                 : "Ready. Select a class, member row or relationship. Canonical layout determines positions.");
             AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
-            if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
+            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < 40) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == renderGeneration) { mapped = false; Status.Text = error.Message; } }
-        finally { if (leased) renderGate.Release(); if (!closed && version == renderGeneration) UpdateActions(); }
+        finally { if (leased) renderGate.Release(); if (ReferenceEquals(pendingRender, cancellation)) pendingRender = null; cancellation.Dispose(); if (!closed && version == renderGeneration) UpdateActions(); }
     }
+    private void RevealSelection()
+    { if (draft.Selection is { } identity && buttons.TryGetValue(identity, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport); }
     private void RestoreSelection() => Elements.SelectedItem = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
-    private void SelectionChanged(object sender, SelectionChangedEventArgs e) { if (!updating && Elements.SelectedItem is Choice item) Select(item.Identity); }
+    private void SelectionChanged(object sender, SelectionChangedEventArgs e) { if (!updating && Elements.SelectedItem is Choice item) { Select(item.Identity); if (draft.Selection == item.Identity && !PropertiesPending) RevealSelection(); } }
     private void AttributeSelected(object sender, SelectionChangedEventArgs e) { if (!updating && AttributeRows.SelectedItem is Choice item) Select(item.Identity); }
     private void Select(string? identity)
     {
@@ -125,6 +129,7 @@ public partial class ClassVisualEditorWindow : Window
     }
     private void ShowProperties()
     {
+        Controls.MermaidWorkspace.Inspect(InspectorViewport, draft.Selection);
         canvasPick = null; mode = "inspect"; NodeFields.Visibility = TransitionFields.Visibility = LabelFields.Visibility = AttributesPanel.Visibility = AttributeFields.Visibility = Visibility.Collapsed;
         Summary.Text = "Select a class, attribute, method or relationship."; Dependencies.Text = ""; attributeOwner = null;
         var endpoints = draft.Model.Classes.Select(item => new Choice(item.Id, item.Label)).ToArray(); From.ItemsSource = endpoints; To.ItemsSource = endpoints;
@@ -212,6 +217,7 @@ public partial class ClassVisualEditorWindow : Window
         foreach (var panel in new[] { NodeFields, LabelFields, AttributeFields, TransitionFields }) { panel.ToolTip = UpdateButton.ToolTip; ToolTipService.SetShowOnDisabled(panel, true); AutomationProperties.SetHelpText(panel, UpdateButton.ToolTip?.ToString() ?? ""); }
         var state = draft.Model.Compatibility == ClassCompatibility.PartiallyEditable ? "Partially editable" : draft.Model.Compatibility.ToString();
         Capabilities.Text = "Source: " + state + ".\nUpdate: " + UpdateButton.ToolTip + "\nDelete: " + DeleteButton.ToolTip + "\nDuplicate: " + DuplicateButton.ToolTip + (cls is null ? "" : "\nClass ID: " + renameCapability.Reason);
+        InspectorState.Text = PropertiesPending ? "Pending properties" : SourcePending ? "Source validation required" : !mapped ? "Apply unavailable" : draft.Selection is null ? "Ready" : UpdateButton.IsEnabled ? "Editable" : "Protected source";
     }
     private void BeginCreation(string kind)
     {
@@ -242,7 +248,7 @@ public partial class ClassVisualEditorWindow : Window
             else if (operation is AddClassRelationship or DuplicateClassRelationship) draft.Select(draft.Model.Relationships[^1].Identity);
             else if (operation is AddClassMember member) draft.Select((member.Member.IsMethod ? draft.Model.Class(member.ClassId).Methods : draft.Model.Class(member.ClassId).Attributes)[^1].Identity);
             await RefreshAsync();
-            if (draft.Selection is { } selection && buttons.TryGetValue(selection, out var added)) { Surface.UpdateLayout(); added.BringIntoView(); }
+            RevealSelection();
         }
         finally { busy = false; if (!closed) UpdateActions(); }
     }
@@ -281,6 +287,8 @@ public partial class ClassVisualEditorWindow : Window
         if (statement is null || SourcePending) return; SourcePanel.IsExpanded = true; SourceEditor.Select(statement.Span.Start, statement.Span.Length); SourceEditor.ScrollToLine(SourceEditor.Document.GetLineByOffset(statement.Span.Start).LineNumber); SourceEditor.Focus();
     }
     private void ShowOriginal(object sender, RoutedEventArgs e) { new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true, FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") }, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show(); }
+    private void CopySource(object sender, RoutedEventArgs e)
+    { try { Clipboard.SetText(SourceEditor.Text); Status.Text = "Mermaid draft source copied."; } catch (System.Runtime.InteropServices.ExternalException) { Status.Text = "The clipboard is unavailable. Select and copy the source directly."; } }
     private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void Preview(object sender, RoutedEventArgs e)
     { if (presentation is { } view) new Window { Owner = this, Title = "Rendered Class preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
@@ -290,7 +298,7 @@ public partial class ClassVisualEditorWindow : Window
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e) { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
     private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); if (presentation is not null) BuildCanvas(); Fit(sender, e); Status.Text = "Canonical Class layout restored. Portable source is unchanged."; }
-    private void Wheel(object sender, MouseWheelEventArgs e) { if (Keyboard.Modifiers != ModifierKeys.Control) return; Zoom.Value *= e.Delta > 0 ? 1.1 : 1 / 1.1; e.Handled = true; }
+    private void Wheel(object sender, MouseWheelEventArgs e) => Controls.MermaidWorkspace.ZoomAtPointer(Viewport, Zoom, e);
     private void PanStart(object sender, MouseButtonEventArgs e) { if (e.ChangedButton != MouseButton.Middle) return; CancelPointer(); pan = e.GetPosition(Viewport); panHorizontal = Viewport.HorizontalOffset; panVertical = Viewport.VerticalOffset; Viewport.CaptureMouse(); Viewport.Cursor = Cursors.Hand; e.Handled = true; }
     private void PanMove(object sender, MouseEventArgs e) { if (pan is not { } start) return; var point = e.GetPosition(Viewport); Viewport.ScrollToHorizontalOffset(panHorizontal + start.X - point.X); Viewport.ScrollToVerticalOffset(panVertical + start.Y - point.Y); }
     private void PanEnd(object sender, MouseButtonEventArgs e) { if (e.ChangedButton == MouseButton.Middle) EndPan(); }
@@ -303,6 +311,6 @@ public partial class ClassVisualEditorWindow : Window
         if (e.OriginalSource is TextBoxBase || SourceEditor.IsKeyboardFocusWithin) return;
         if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Z) Undo(sender, new()); else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.Y) Redo(sender, new());
         else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D) Duplicate(sender, new()); else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.Delete) Delete(sender, new());
-        else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.F) Fit(sender, new()); else return; e.Handled = true;
+        else if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.D0) ActualSize(sender, new()); else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.F) Fit(sender, new()); else return; e.Handled = true;
     }
 }

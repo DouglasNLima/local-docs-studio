@@ -42,7 +42,7 @@
    </Grid>
   </Border>
   <Grid Margin="8,8,8,0">
-   <Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="156"/><ColumnDefinition Width="7"/><ColumnDefinition Width="*" MinWidth="240"/><ColumnDefinition Width="7"/><ColumnDefinition Width="280" MinWidth="224"/></Grid.ColumnDefinitions>
+   <Grid.ColumnDefinitions><ColumnDefinition Width="220" MinWidth="180"/><ColumnDefinition Width="7"/><ColumnDefinition Width="*" MinWidth="240"/><ColumnDefinition Width="7"/><ColumnDefinition Width="280" MinWidth="224"/></Grid.ColumnDefinitions>
    <DockPanel Grid.Column="0" Background="{DynamicResource PanelBrush}" Margin="0,0,3,8">
     <TextBlock DockPanel.Dock="Top" Text="ELEMENTS" Style="{StaticResource Desktop.PanelHeading}"/>
     <UniformGrid x:Name="Palette" DockPanel.Dock="Top" Columns="2" Margin="6,2" PreviewMouseMove="PaletteDrag" AutomationProperties.Name="Insert diagram element">
@@ -56,11 +56,12 @@
 </UniformGrid>
     <TextBlock DockPanel.Dock="Top" Text="DIAGRAM" Style="{StaticResource Desktop.PanelHeading}"/>
     <TextBlock DockPanel.Dock="Bottom" Text="Ctrl+click selects several nodes" Style="{StaticResource Form.Help}" Margin="10,8"/>
-    <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource Desktop.SelectionItem}" AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements">
+    <ListBox x:Name="Elements" SelectionMode="Extended" SelectionChanged="SelectionChanged" Background="Transparent" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemContainerStyle="{StaticResource Mermaid.NavigationItem}" VirtualizingPanel.IsVirtualizingWhenGrouping="True" AutomationProperties.Name="Diagram nodes, connections and subgraphs" AutomationProperties.AutomationId="MermaidElements">
+     <ListBox.GroupStyle><StaticResource ResourceKey="Mermaid.NavigationGroup"/></ListBox.GroupStyle>
      <ListBox.ItemTemplate><DataTemplate><DockPanel ToolTip="{Binding Description}"><ui:CommandIcon Kind="{Binding Icon}" DockPanel.Dock="Left" Margin="0,0,7,0" Width="16" Height="16" Foreground="{DynamicResource MutedTextBrush}"/><TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DockPanel></DataTemplate></ListBox.ItemTemplate>
     </ListBox>
    </DockPanel>
-   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" AutomationProperties.Name="Resize navigation panel" AutomationProperties.AutomationId="MermaidNavigationSplitter" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
    <Grid Grid.Column="2" Margin="0,0,0,8"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="7"/><RowDefinition Height="190" MinHeight="40"/></Grid.RowDefinitions>
     <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4">
     <Grid><Grid.RowDefinitions><RowDefinition Height="30"/><RowDefinition Height="*"/></Grid.RowDefinitions>
@@ -86,7 +87,7 @@
      <Button Style="{StaticResource Mermaid.ToolbarButton}" Click="CopySource" ToolTip="Copy Mermaid draft source" AutomationProperties.AutomationId="MermaidCopySource"><ui:CommandIcon Kind="Copy"/></Button>
     </StackPanel>
    </Grid>
-   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="MermaidInspectorSplitter" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" Background="Transparent"/>
    <DockPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" Margin="3,0,0,8">
     <StackPanel DockPanel.Dock="Top" Margin="12,12,12,8"><TextBlock Text="PROPERTIES" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}"/>
      <TextBlock x:Name="CapabilitySummary" FontWeight="SemiBold" Margin="0,6,0,0" AutomationProperties.AutomationId="MermaidCapabilities"/><TextBlock x:Name="SelectionSummary" Text="Select a node, connection or subgraph to edit its properties." TextWrapping="Wrap" Margin="0,8,0,0" FontWeight="SemiBold" AutomationProperties.AutomationId="MermaidSelectionSummary"/>

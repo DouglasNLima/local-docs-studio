@@ -86,7 +86,7 @@ public partial class MermaidVisualEditorWindow
             string? mappingDiagnostic = null;
             var next = await LensDocsStudio.Native.Platform.StaWorker.RunAsync(() =>
             {
-                try { return NativeMermaidPresentation.Create(rendered, canvasSvg); }
+                try { return NativeMermaidPresentation.Create(rendered, canvasSvg, cancellation.Token); }
                 catch (Exception error) when (error is InvalidDataException or ArgumentException or FormatException)
                 {
                     // A valid drawing remains inspectable even if its interaction metadata cannot be mapped.

@@ -24,15 +24,14 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
     public IReadOnlyList<FlowchartGroupIdentity> Membership { get; init; } = [];
     public IReadOnlyDictionary<string, string> SourceLabels { get; init; } = new Dictionary<string, string>();
     public IReadOnlyList<Mermaider.Models.MermaidEdge> SourceConnections { get; init; } = [];
-    public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg)
+    public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg) => Create(result, svg, default);
+    public static NativeMermaidPresentation Create(DiagramResult result, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var graph = result.FlowchartLayout ?? throw new InvalidDataException("No canonical Flowchart layout is available. Use Edit source.");
         var generated = result.Svg ?? throw new InvalidDataException(result.Error);
         // Sanitise before interpreting metadata; the drawing uses the same existing native conversion as preview/export.
-        var safe = svg.Prepare(generated);
-        using var reader = XmlReader.Create(new StringReader(safe), new XmlReaderSettings
-        { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
-        var root = XDocument.Load(reader).Root!;
+        var root = svg.PrepareDocument(generated).Root!;
         if (root.Descendants().Count() > 30_000) throw new InvalidDataException("The canonical drawing exceeds the interaction geometry budget.");
         // Inert native identities let session dragging translate the actual drawing groups,
         // without another SVG parse or render on selection, hover or pointer movement.
@@ -57,7 +56,7 @@ public sealed record NativeMermaidPresentation(DrawingImage Drawing, IReadOnlyDi
         { var wrapper = new XElement(root.Name.Namespace + "g", new XAttribute("id", "lens-edge-" + edgeIndex++)); element.ReplaceWith(wrapper); wrapper.Add(element); }
         var labelIdentity = 0;
         foreach (var element in root.Descendants().Where(e => HasClass(e, "edge-label"))) element.SetAttributeValue("id", "lens-label-" + labelIdentity++);
-        var drawing = NativeSvgService.RenderPrepared(root.ToString(SaveOptions.DisableFormatting), identities: true);
+        var drawing = svg.RenderCanonical(result, root.ToString(SaveOptions.DisableFormatting), identities: true, cancellationToken: cancellationToken);
         var origin = drawing.Drawing.Bounds.Location;
         var shift = new TranslateTransform(-origin.X, -origin.Y);
         var elements = new Dictionary<string, NativeMermaidElement>(StringComparer.Ordinal);

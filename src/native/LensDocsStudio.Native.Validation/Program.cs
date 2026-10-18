@@ -18,6 +18,16 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
+        if (args.FirstOrDefault() == "--suite-performance")
+        {
+            try { NativeSuitePerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--suite-cache")
+        {
+            try { NativeSuiteCacheChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() is "--mermaid-fidelity" or "--sequence-fidelity" or "--state-fidelity" or "--er-fidelity" or "--class-fidelity")
         {
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
@@ -80,7 +90,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
+        if (args.FirstOrDefault() is "--suite-ui" or "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -91,6 +101,7 @@ internal static class Program
                 return 1;
             }
         }
+        if (args.FirstOrDefault() == "--suite-ui") return NativeUiChecks.RunMermaidSuite(args[1], args[2], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--class-performance-ui") return NativeUiChecks.RunClassPerformance(args[1], args[2], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--class-ui") return NativeUiChecks.RunClassEditor(args[1], args[2], args.Contains("--high-contrast"));
         if (args.FirstOrDefault() == "--sequence-ui") return NativeUiChecks.RunSequenceEditor(args[1], args[2], args.Contains("--high-contrast"));

@@ -14,12 +14,13 @@ public sealed record NativeErConnection(string Identity, Geometry Path, Rect? La
 public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<NativeErHit> Entities,
     IReadOnlyList<NativeErHit> Attributes, IReadOnlyList<NativeErConnection> Relationships)
 {
-    public static NativeErPresentation Create(ErDiagramModel model, DiagramResult render, NativeSvgService svg)
+    public static NativeErPresentation Create(ErDiagramModel model, DiagramResult render, NativeSvgService svg) => Create(model, render, svg, default);
+    public static NativeErPresentation Create(ErDiagramModel model, DiagramResult render, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         ErSemanticValidation.ValidateRendering(model, render);
-        var safe = svg.Prepare(render.Svg!);
-        using var reader = XmlReader.Create(new StringReader(safe), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
-        var root = XDocument.Load(reader).Root!;
+        var prepared = svg.PrepareDocument(render.Svg!);
+        var root = prepared.Root!;
         if (root.Descendants().Count() > 30_000) throw new InvalidDataException("The canonical ER drawing exceeds the interaction geometry budget.");
         if (model.Entities.Count == 0)
         {
@@ -28,7 +29,7 @@ public sealed record NativeErPresentation(DrawingImage Drawing, IReadOnlyList<Na
             // source draft so deleting the last independent entity remains reversible.
             var blank = new DrawingImage(new DrawingGroup()); blank.Freeze(); return new(blank, [], [], []);
         }
-        var drawing = svg.Render(render.Svg!); var origin = drawing.Drawing.Bounds.Location;
+        var drawing = svg.RenderCanonical(render, prepared.ToString(SaveOptions.DisableFormatting), cancellationToken: cancellationToken); var origin = drawing.Drawing.Bounds.Location;
         var entities = new List<NativeErHit>(); var attributes = new List<NativeErHit>(); var connections = new List<NativeErConnection>();
         var boxes = root.Descendants().Where(item => Class(item, "entity")).ToArray();
         if (boxes.Length != model.Entities.Count) Reject();

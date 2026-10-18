@@ -11,6 +11,69 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  suite-workspace:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source suite workspace checks
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Exercise five-family shared workspace with real keyboard and Windows UIA
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/suite-ui $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-workspace-${{ matrix.appearance }}
+          path: artifacts/native/suite-ui/
+          retention-days: 14
+  suite-performance:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build candidate and immutable consolidated baseline on the same host
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/native/suite-base 6a94dd3672f95a267402e2218935d064a6ee6401
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/suite-base/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.* artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/ -Force
+      - name: Measure identical seven-sample fixtures with the same harness binary before and after
+        run: |
+          & artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/before
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/after
+          exit $LASTEXITCODE
+      - name: Verify immutable cache ownership, isolation, eviction and queued cancellation
+        run: |
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-cache artifacts/native/suite-performance/cache
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-performance
+          path: artifacts/native/suite-performance/
+          retention-days: 14
   class-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 20

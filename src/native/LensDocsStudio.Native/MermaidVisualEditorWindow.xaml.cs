@@ -43,7 +43,7 @@ public partial class MermaidVisualEditorWindow : Window
     private WindowStyle previousStyle;
     private WindowState previousState;
     private ResizeMode previousResize;
-    private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
+    private record ElementChoice(string Key, string Description, string Icon) { public string Section => Key.StartsWith("node:", StringComparison.Ordinal) ? "Nodes" : Key.StartsWith("group:", StringComparison.Ordinal) ? "Subgraphs" : "Connections"; public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
     private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.HasSafeTransformations;
@@ -115,7 +115,7 @@ public partial class MermaidVisualEditorWindow : Window
                     (parallel.Contains((edge.Source.Id, edge.Target.Id)) ? "Connection " + (ordinal + 1) + " · " : "")
                     + edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
-            Elements.ItemsSource = choices;
+            Elements.ItemsSource = Controls.MermaidWorkspace.Navigation(choices);
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
@@ -303,6 +303,7 @@ public partial class MermaidVisualEditorWindow : Window
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
         updating = true; try { ShowProperties(); } finally { updating = false; }
         UpdateCanvasSelection(); UpdateActions();
+        if (Selected is { } selected && canvasElements.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
     }
     private void SelectElement(string key, bool extend = false)
     {
@@ -315,6 +316,7 @@ public partial class MermaidVisualEditorWindow : Window
     }
     private void ShowProperties()
     {
+        Controls.MermaidWorkspace.Inspect(InspectorScroll, Selected);
         propertyBaseline = null;
         NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = InspectionProperties.Visibility = Visibility.Collapsed;
         InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
