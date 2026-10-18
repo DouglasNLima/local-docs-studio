@@ -375,3 +375,12 @@ production signing remain outside this scoped certification. No ordinary desktop
 installation, merge, release or tag movement is performed. Any produced preview
 must identify this exact clean source and pass its own isolated verification;
 #36's package cannot certify this continuation.
+
+
+## Continuation after 0237b08 (in progress)
+
+PR #37 remains open and stacked on unmerged #36. The previous bounded delivery does not complete the goal. The continuation baseline is `0237b08390d5d1d946c0b19b81d671ccd54fb951`; previous evidence and failures above remain applicable to that revision only.
+
+The original `.749` first-launch failure is unresolved. Its combined exact-editor/four-heading assertion is retained. New bounded metadata probes capture the independent predicate values, focus, clipboard ownership and preview state before cleanup; probe failures cannot mask that assertion. Component failure files are now included in the installed evidence upload. A dedicated diagnostic workflow prescribes five independent launches on each of two disposable hosts using the original installer SHA-256 `89494c6a963fd283773ce23af979aa732796920e943c3a607db413d67720cc07`. All samples, including failures, are retained. Success would not by itself explain the historical failure.
+
+Opt-in shell markers distinguish parse, preparation/media/construction awaits, synchronous attachment, source-map/viewport work, selection restoration and outline refresh. Await intervals are inclusive elapsed spans; background thread samples and exclusive synchronous UI spans must be analysed separately. Diagnostic stack collection is separate from the controlled performance acceptance path. The shown-shell harness now loads `App.xaml` resources. Implementation and acceptance remain incomplete pending causal evidence and a further structural reduction.

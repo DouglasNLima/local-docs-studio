@@ -23,7 +23,9 @@ internal static class NativePreviewSchedulingChecks
     {
         Directory.CreateDirectory(output);
         using var contrast = highContrast ? new NativeTestHighContrast() : null;
-        var application = Application.Current ?? new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
+        var application = Application.Current;
+        if (application is null) { var nativeApplication = new App { ShutdownMode = ShutdownMode.OnExplicitShutdown }; nativeApplication.InitializeComponent(); application = nativeApplication; }
+        using var phases = new ShellPhases(output);
         ThemeService.Apply(application.Resources, "Light");
         var previous = SynchronizationContext.Current;
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
@@ -355,6 +357,7 @@ internal static class NativePreviewSchedulingChecks
             File.WriteAllText(Path.Combine(output, "native-preview-scheduling.json"), JsonSerializer.Serialize(new { Passed = true,
                 VisibleWindow = shown, ActualHighContrast = SystemParameters.HighContrast, Fixtures = fixtureEvidence,
                 Cancellations = cancellationEvidence,
+                ExclusivePhaseMarkerFile = "shell-phases.json", ApplicationResources = "App.xaml",
                 InputHeartbeatMilliseconds = gaps, MaximumObservedInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
                 Checks = new[] { "Editor-only layout retains current headings and source navigation without a preview",
                     "Explicit text preparation includes current closed details and subsequent edits without changing layout or Undo",
@@ -383,6 +386,24 @@ internal static class NativePreviewSchedulingChecks
                 if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Windows appearance notification exceeded the existing validation deadline.");
                 await Task.Delay(25);
             }
+        }
+    }
+
+    private sealed class ShellPhases(string output) : EventListener
+    {
+        private readonly List<object> samples = [];
+        protected override void OnEventSourceCreated(EventSource source)
+        { if (source.Name == "LensDocsStudio-Native-PreviewConstruction") EnableEvents(source, EventLevel.Verbose); }
+        protected override void OnEventWritten(EventWrittenEventArgs args)
+        {
+            if (args.EventId != 1 || args.Payload?[0] is not string name) return;
+            lock (samples) { if (samples.Count < 16384) samples.Add(new { Ticks = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Phase = name, Request = args.Payload.ElementAtOrDefault(1) }); }
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+            lock (samples) File.WriteAllText(Path.Combine(output, "shell-phases.json"), JsonSerializer.Serialize(new { Stopwatch.Frequency, Samples = samples,
+                Boundary = "Paired request phases include awaits; only consecutive synchronous start/end UI spans are exclusive UI work. Worker markers carry their own thread. Do not add nested/inclusive durations." }));
         }
     }
 

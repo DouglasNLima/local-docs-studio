@@ -1,4 +1,6 @@
 using System.Text.Json;
+using System.Security.Cryptography;
+using System.Text;
 using FlaUI.Core.AutomationElements;
 using FlaUI.Core.Definitions;
 using FlaUI.Core.Input;
@@ -17,8 +19,10 @@ internal static partial class NativeUiChecks
         var outline = Find(window, "Outline").AsListBox(); var filter = Find(window, "OutlineFilter").AsTextBox();
         try
         {
+            Observe("before-input");
             editor.Focus(); Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.KEY_A);
             NativeUiClipboard.SetText(fixture); owned = GetClipboardSequenceNumber();
+            Observe("before-paste");
             Keyboard.TypeSimultaneously(VirtualKeyShort.CONTROL, VirtualKeyShort.SHIFT, VirtualKeyShort.KEY_V);
             Wait(() => ReadEditorText(editor) == fixture && outline.Items.Length == 4, "The native outline did not expose its current hierarchy.");
             var previewStatus = Find(window, "PreviewStatus").Name;
@@ -43,7 +47,9 @@ internal static partial class NativeUiChecks
         }
         catch (Exception error)
         {
-            primary = error; File.WriteAllText(Path.Combine(output, "native-outline-modernisation-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString() }));
+            primary = error;
+            Observe("failure-before-cleanup");
+            try { File.WriteAllText(Path.Combine(output, "native-outline-modernisation-failure.json"), JsonSerializer.Serialize(new { Error = error.ToString() })); } catch { }
             try { window.CaptureToFile(Path.Combine(output, "native-outline-modernisation-failure.png")); } catch (Exception) { }
             throw;
         }
@@ -56,9 +62,25 @@ internal static partial class NativeUiChecks
                 Wait(() => ReadEditorText(editor) == original, "The outline fixture did not retain its complete insertion Undo.");
             }
             catch (Exception error) when (primary is not null)
-            { File.WriteAllText(Path.Combine(output, "native-outline-modernisation-cleanup.json"), JsonSerializer.Serialize(new { Error = error.ToString() })); }
-            finally { RestoreClipboard(clipboard, owned); }
+            { try { File.WriteAllText(Path.Combine(output, "native-outline-modernisation-cleanup.json"), JsonSerializer.Serialize(new { Error = error.ToString() })); } catch { } }
+            finally { try { RestoreClipboard(clipboard, owned); } catch when (primary is not null) { } }
         }
+        // Synthetic-fixture diagnostics only: bounded metadata, no document text or paths.
+        // Each probe is independent and must never replace the original assertion failure.
+        void Observe(string phase)
+        {
+            var state = new Dictionary<string, object?> { ["Phase"] = phase, ["ExpectedHeadingCount"] = 4,
+                ["ExpectedEditorLength"] = fixture.Length, ["ExpectedEditorSha256"] = Hash(fixture), ["OwnedClipboardSequence"] = owned };
+            Probe("Editor", () => { var value = editor.Patterns.Value.Pattern.Value.Value; return new { Length = value.Length, Sha256 = Hash(value), ExactFixture = value == fixture, Original = value == original, editor.Properties.HasKeyboardFocus.Value }; });
+            Probe("Outline", () => new { Count = outline.Items.Length, Items = outline.Items.Take(16).Select(item => new { NameSha256 = Hash(item.Name), item.IsSelected }).ToArray() });
+            Probe("Preview", () => new { Status = Find(window, "PreviewStatus").Name, Diagnostic = Find(window, "PreviewStatus").Properties.HelpText.Value });
+            Probe("ClipboardSequence", () => GetClipboardSequenceNumber());
+            Probe("ForegroundIsApplication", () => { GetWindowThreadProcessId(GetForegroundWindow(), out var pid); return pid == window.Properties.ProcessId.Value; });
+            Probe("Controls", () => window.FindAllDescendants().Take(256).Select(item => new { item.AutomationId, Type = item.ControlType.ToString(), item.Properties.HasKeyboardFocus.Value, item.BoundingRectangle }).ToArray());
+            try { File.WriteAllText(Path.Combine(output, "native-outline-state-" + phase + ".json"), JsonSerializer.Serialize(state)); } catch { }
+            void Probe(string name, Func<object?> read) { try { state[name] = read(); } catch (Exception ex) { state[name] = new { Unavailable = ex.GetType().Name }; } }
+        }
+        static string Hash(string value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(value)));
         void Group(string name) => (window.FindFirstDescendant(cf => cf.ByControlType(ControlType.Button).And(cf.ByName(name)))
             ?? throw new IOException("The actual outline group command is unavailable: " + name)).AsButton().Invoke();
     }

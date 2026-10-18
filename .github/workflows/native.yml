@@ -154,6 +154,7 @@ jobs:
             artifacts/native/install-smoke/**/blocked-save.png
             artifacts/native/install-smoke/**/recovered-draft.png
             artifacts/native/install-smoke/**/native-ui-failure*
+            artifacts/native/install-smoke/**/native-outline-*
             artifacts/native/install-smoke/**/native-save-dialogue-failure.png
             artifacts/native/install-smoke/**/native-save-dialogues.json
             artifacts/native/install-smoke/**/native-artefact-folder-failure.png

@@ -70,7 +70,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { CancelSynchronisation(); BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -173,6 +173,10 @@ public partial class MainWindow : Window
         var diagramTheme = CurrentDiagramTheme;
         var standalone = Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var acquired = false;
+        var request = ++diagnosticRequest;
+        diagnosticError = null;
+        void Phase(string name) { PreviewConstructionEvents.Log.Stage("request/" + name, request); if (request == diagnosticRequest) PublishPreviewDiagnostic(name); }
+        Phase("queued");
         bool Current() => !closing && !cancellation.IsCancellationRequested && model.ActiveDocument == tab
             && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0
             && appearance == model.Theme && dark == ThemeService.IsDark(model.Theme) && highContrast == SystemParameters.HighContrast
@@ -182,9 +186,12 @@ public partial class MainWindow : Window
         {
             await previewGate.WaitAsync(cancellation); acquired = true;
             var watch = Stopwatch.StartNew();
+            Phase("prepare-await-start");
             var prepared = await Task.Run(() =>
             {
+                PreviewConstructionEvents.Log.Stage("worker/parse-start", request);
                 var source = markdown.Parse(text, standalone);
+                PreviewConstructionEvents.Log.Stage("worker/parse-end", request);
                 var results = new Dictionary<FencedCodeBlock, DiagramResult>();
                 foreach (var code in preparePreview ? source.Syntax.Descendants<FencedCodeBlock>() : [])
                 {
@@ -193,6 +200,7 @@ public partial class MainWindow : Window
                 }
                 return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
+            Phase("prepare-await-end");
             if (!Current()) return;
             if (!preparePreview)
             {
@@ -201,6 +209,7 @@ public partial class MainWindow : Window
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
             }
+            Phase("media-await-start");
             var nativeDrawings = await StaWorker.RunAsync(() =>
             {
                 var drawings = new Dictionary<FencedCodeBlock, DrawingImage>();
@@ -217,6 +226,8 @@ public partial class MainWindow : Window
                 return (drawings, images, formulae);
             }, cancellation);
             if (!Current()) return;
+            Phase("media-await-end");
+            Phase("construction-await-start");
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
                 {
                     if (model.ActiveDocument == tab && renderedDocumentId == tab.Id && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0) Navigate(reference);
@@ -228,20 +239,34 @@ public partial class MainWindow : Window
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset),
                 offset => OpenMermaidVisualEditor(tab, prepared.source, sourceVersion, offset));
             if (!Current()) return;
+            Phase("construction-await-end");
+            Phase("selection-capture-start");
             var previewSelection = CapturePreviewSelection();
+            Phase("selection-capture-end");
+            Phase("viewport-save-start");
             SaveViewport();
+            Phase("viewport-save-end");
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
+            Phase("attachment-start");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
+            Phase("attachment-end");
+            Phase("sync-install-start");
             InstallSyncPreview(sourceVersion);
+            Phase("sync-install-end");
+            Phase("selection-restore-start");
             RestorePreviewSelection(previewSelection);
+            Phase("selection-restore-end");
+            Phase("outline-start");
             RefreshOutline();
+            diagnosticAcceptedGeneration = diagnosticSourceGeneration; diagnosticOutlineGeneration = diagnosticSourceGeneration;
+            Phase("outline-end");
             var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
             previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
-        finally { if (acquired) previewGate.Release(); }
+        catch (OperationCanceledException) { Phase("cancel-observed"); }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; Phase("failed"); } }
+        finally { if (acquired) previewGate.Release(); Phase("finished"); }
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();
