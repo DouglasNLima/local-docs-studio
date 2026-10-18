@@ -13,6 +13,15 @@ internal sealed class NativeTestHighContrast : IDisposable
     private HighContrast original;
     private readonly IntPtr scheme;
     private bool restored;
+    public static bool IsEnabledNow
+    {
+        get
+        {
+            var current = new HighContrast { Size = (uint)Marshal.SizeOf<HighContrast>() };
+            if (!SystemParametersInfo(0x42, current.Size, ref current, 0)) throw new Win32Exception(Marshal.GetLastWin32Error());
+            return (current.Flags & 1) != 0;
+        }
+    }
     public NativeTestHighContrast()
     {
         if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"

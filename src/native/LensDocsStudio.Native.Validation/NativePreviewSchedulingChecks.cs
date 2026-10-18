@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Diagnostics;
+using System.ComponentModel;
 using ICSharpCode.AvalonEdit;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
@@ -164,14 +165,34 @@ internal static class NativePreviewSchedulingChecks
             if (shown && !highContrast)
             {
                 NativeTestHighContrast? transition = null;
+                var installed = new List<object>(); var obsoleteAppearance = false; var transitionStarted = false;
+                var documentProperty = DependencyPropertyDescriptor.FromProperty(FlowDocumentReader.DocumentProperty, typeof(LensDocsStudio.Native.Rendering.DocumentPreview));
+                EventHandler installation = (_, _) =>
+                {
+                    if (!transitionStarted) return;
+                    var actual = NativeTestHighContrast.IsEnabledNow;
+                    var currentColour = preview.Document?.Foreground is SolidColorBrush brush && brush.Color == SystemColors.WindowTextColor;
+                    if (actual && !currentColour) obsoleteAppearance = true;
+                    if (installed.Count < 64) installed.Add(new { ActualHighContrast = actual, WpfHighContrast = SystemParameters.HighContrast,
+                        CurrentSystemColour = currentColour, Colour = preview.Document?.Foreground?.ToString(), ExpectedColour = SystemColors.WindowTextColor.ToString() });
+                };
+                documentProperty.AddValueChanged(preview, installation);
                 try
                 {
                     previousDocument = preview.Document;
-                    using (var contrastDuringConstruction = new DuringConstruction(() => transition = new NativeTestHighContrast()))
+                    using (var contrastDuringConstruction = new DuringConstruction(() => { transitionStarted = true; transition = new NativeTestHighContrast(); }))
                     {
                         Pump((Task)Invoke("UpdatePreviewAsync", false)!);
-                        if (!contrastDuringConstruction.Observed || transition is null || !SystemParameters.HighContrast
-                            || preview.Document != previousDocument) throw new IOException("An actual High Contrast transition installed the obsolete appearance.");
+                        File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
+                        {
+                            Observed = contrastDuringConstruction.Observed, TransitionCreated = transition is not null,
+                            ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
+                            PreviousDocumentRetained = preview.Document == previousDocument, ObsoleteAppearance = obsoleteAppearance, Installations = installed
+                        }, new JsonSerializerOptions { WriteIndented = true }));
+                        // A Windows preference notification can also finish a newer valid
+                        // render. Observe every installation; identity alone rejects it.
+                        if (!contrastDuringConstruction.Observed || transition is null || !NativeTestHighContrast.IsEnabledNow || obsoleteAppearance)
+                            throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
                     }
                     Invoke("ApplyTheme"); Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                     if (preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
@@ -180,6 +201,7 @@ internal static class NativePreviewSchedulingChecks
                 }
                 finally
                 {
+                    documentProperty.RemoveValueChanged(preview, installation);
                     transition?.Dispose(); Invoke("ApplyTheme"); Invoke("QueuePreview");
                     Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
                 }
