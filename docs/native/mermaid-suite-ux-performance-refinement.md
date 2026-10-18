@@ -188,6 +188,14 @@ values are unchanged. A real 501-node rejection test verifies specific feedback,
 CRLF/Unicode source preservation and independent caller cancellation. The ER
 100/150 diagnostic remains unsuccessful, with its deadline now explained clearly.
 
+The first final ER performance jobs exposed a harness dependency on the old
+generic cancellation text. Both smaller scenarios completed; the 100/150
+diagnostic then failed recognition. The [normal failure](evidence/mermaid-suite-ux-performance/e1fad08-er-deadline-recognition-normal.json)
+and [High Contrast failure](evidence/mermaid-suite-ux-performance/e1fad08-er-deadline-recognition-high-contrast.json)
+remain. The classifier now accepts the exact new deadline message alongside the
+historical exact text; its 100-entity-only exception and all source/history,
+disabled-operation and responsiveness assertions remain unchanged.
+
 ## 10. Screenshot acceptance
 
 The [unedited hosted gallery](images/mermaid-suite-ux-performance/verified-11063/README.md)

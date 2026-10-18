@@ -78,5 +78,7 @@ internal static partial class NativeUiChecks
         catch (Exception error) { try { visual?.CaptureToFile(Path.Combine(output, "failure.png")); } catch { } File.WriteAllText(Path.Combine(output, "er-performance-ui.json"), JsonSerializer.Serialize(new { Status = "FAIL", Measurements = measurements, Error = error.ToString() }, new JsonSerializerOptions { WriteIndented = true })); File.WriteAllText(Path.Combine(output, "er-performance-failure.txt"), error.ToString()); Console.Error.WriteLine(error); return 1; }
         finally { Mouse.Up(MouseButton.Left); if (app is not null) { try { app.Kill(); } catch { } app.Dispose(); } }
     }).GetAwaiter().GetResult();
-    private static bool IsRenderDeadline(string? diagnostic) => diagnostic == "Diagram could not be rendered: The operation was canceled.";
+    private static bool IsRenderDeadline(string? diagnostic) => diagnostic is
+        "Diagram could not be rendered: The operation was canceled." or
+        "Rendering resource deadline reached (3 seconds). Reduce the diagram size and validate again.";
 }

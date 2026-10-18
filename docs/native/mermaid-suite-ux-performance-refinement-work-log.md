@@ -581,3 +581,14 @@ an unsuccessful resource-deadline diagnostic. This follow-up changes failure
 wording only; earlier successful-render UX/performance measurements retain their
 original source/harness attribution. Final hosted checks and package source are
 recorded separately in the PR delivery receipt.
+
+## Deadline-recognition harness dependency
+
+At `e1fad08`, both ER performance UIA jobs complete their required 10/30 cases,
+then fail because IsRenderDeadline matches only the previous generic message.
+One 100/150 case rejects during preflight and the other during editor mapping.
+Their raw JSON and workflow log are retained. The helper now recognises the exact
+new deadline message as well as the historical exact message. Only the existing
+100-entity diagnostic exemption remains; smaller scenarios, source/history,
+disabled actions, responsiveness and rendering assertions are unchanged. No
+timeout or budget changes, input replay or generic error acceptance are added.

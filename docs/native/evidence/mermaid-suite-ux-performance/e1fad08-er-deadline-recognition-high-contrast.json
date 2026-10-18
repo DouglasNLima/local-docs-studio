@@ -1,0 +1,34 @@
+{
+  "Status": "FAIL",
+  "Measurements": [
+    {
+      "Entities": 10,
+      "Relationships": 15,
+      "EditorOpenIncludingUiaMilliseconds": 348.0559,
+      "TwentyEntitySelectionsMilliseconds": 1364.0679,
+      "TwentyAttributeSelectionsMilliseconds": 286.7596,
+      "TwentyRelationshipSelectionsMilliseconds": 284.4172,
+      "WorkingSetBeforeEditor": 175042560,
+      "WorkingSetAfterInteractions": 232845312,
+      "ActualEndpointDrag": "ER endpoint drag updates: 21; maximum update: 0.153 ms; update allocated bytes: 10912; UI-thread allocated bytes: 795144; duration: 2597.9 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "Entities": 30,
+      "Relationships": 60,
+      "EditorOpenIncludingUiaMilliseconds": 744.258,
+      "TwentyEntitySelectionsMilliseconds": 1665.83,
+      "TwentyAttributeSelectionsMilliseconds": 322.9689,
+      "TwentyRelationshipSelectionsMilliseconds": 359.9629,
+      "WorkingSetBeforeEditor": 199712768,
+      "WorkingSetAfterInteractions": 269905920,
+      "ActualEndpointDrag": "ER endpoint drag updates: 20; maximum update: 0.096 ms; update allocated bytes: 10368; UI-thread allocated bytes: 1832664; duration: 2420.6 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    }
+  ],
+  "Error": "System.InvalidOperationException: The ER performance editor did not finish canonical mapping.\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func\u00601 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1790\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass2_0.\u003CRunErPerformance\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeErPerformanceUiChecks.cs:line 41"
+}
