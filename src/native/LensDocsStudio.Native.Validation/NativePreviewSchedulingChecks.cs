@@ -196,7 +196,7 @@ internal static class NativePreviewSchedulingChecks
                     }
                     var appearanceWait = Stopwatch.StartNew();
                     Pump(WaitForAppearanceAsync(true));
-                    Invoke("QueuePreview"); Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    Invoke("QueuePreview"); Pump(WaitForCurrentAppearanceAsync()); Drain();
                     File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
                     {
                         ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
@@ -209,6 +209,22 @@ internal static class NativePreviewSchedulingChecks
                         throw new IOException("The delayed Windows notification did not update the editor and application appearance automatically.");
                     cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true,
                         AppearanceNotificationAndCurrentPreviewMilliseconds = appearanceWait.Elapsed.TotalMilliseconds });
+
+                    async Task WaitForCurrentAppearanceAsync()
+                    {
+                        var wait = Stopwatch.StartNew();
+                        while (true)
+                        {
+                            if (obsoleteAppearance) throw new IOException("An obsolete appearance installed while waiting for the current render.");
+                            if (preview.Document != previousDocument && preview.Document.Foreground is SolidColorBrush currentBrush
+                                && currentBrush.Color == SystemColors.WindowTextColor
+                                && Field("renderedVersion") is ICSharpCode.AvalonEdit.Document.ITextSourceVersion version
+                                && version.CompareAge(model.ActiveDocument!.EditorDocument.Version) == 0
+                                && model.PreviewStatus.StartsWith("Preview updated", StringComparison.Ordinal)) return;
+                            if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Current appearance preview exceeded the existing validation deadline.");
+                            await Task.Delay(25);
+                        }
+                    }
                 }
                 finally
                 {

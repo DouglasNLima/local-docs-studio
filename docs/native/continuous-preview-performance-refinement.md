@@ -287,6 +287,12 @@ notification within its unchanged 15-second deadline before requesting/verifying
 the current preview, keeping the no-stale-install assertion active throughout.
 It verifies the editor and application system colours without manually applying
 the theme after that notification.
+An [adfb3be readiness trace](evidence/continuous-preview-performance/contrast-transition-current-render-pending-adfb3be.json)
+also records no stale installation while the winning preference-triggered render
+is still preparing. Completion of a superseded request plus dispatcher idle is
+not worker/preview readiness. The final verifier waits for the winning current
+source/version/appearance within the existing deadline, while continuing to
+reject every obsolete installation; it does not repeatedly force rendering.
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop
