@@ -444,3 +444,17 @@ Physical scrolling did not resolve the previous synthetic focus failure and adds
 unnecessary initial container allocation. That approach is rejected; grouped
 virtualisation is restored. No performance gain is claimed from this reversal.
 Fresh native/UIA results remain required for the restored configuration.
+
+## Retain keyboard focus during rejected navigation
+
+The action trace also shows the rejected next row retaining keyboard focus while
+the original row remains selected. Shared navigation reveal now restores focus
+to the retained occurrence when navigation owns keyboard focus. Inspector/source
+focus is not taken by unrelated refreshes. Sequence additionally restores the
+correct participant/interaction list when a blocked move crosses those lists.
+
+Native input now asserts retained row focus. UIA exercises both an explicitly
+focused SelectionItem and the original container-focused Down path, requiring
+exact selection, visible bounds, keyboard focus and preserved pending values.
+This strengthens the acceptance condition instead of relying solely on the
+selected-row test precondition. Grouped virtualisation remains enabled.

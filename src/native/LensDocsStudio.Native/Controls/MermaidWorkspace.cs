@@ -65,7 +65,7 @@ public static class MermaidWorkspace
         if (inspector.GetValue(InspectorScrollProperty) is System.Windows.Threading.DispatcherOperation operation) operation.Abort();
         inspector.ClearValue(InspectorScrollProperty);
     }
-    public static void RevealNavigation(ListBox list, object item)
+    public static void RevealNavigation(ListBox list, object item, bool focus = false)
     {
         CancelNavigationScroll(list, new RoutedEventArgs());
         RevealEntry(); list.Unloaded -= CancelNavigationScroll; list.Unloaded += CancelNavigationScroll;
@@ -85,6 +85,10 @@ public static class MermaidWorkspace
             if (list.Items.IndexOf(item) == 0) NavigationViewport(list)?.ScrollToTop();
             else if (list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem entry) entry.BringIntoView();
             else list.ScrollIntoView(item);
+            // A blocked keyboard move must retain focus as well as selection;
+            // otherwise WPF may reveal the rejected row after rollback.
+            if ((focus || list.IsKeyboardFocusWithin) && list.ItemContainerGenerator.ContainerFromItem(item) is ListBoxItem retained && !retained.IsKeyboardFocusWithin)
+                retained.Focus();
         }
     }
     public static void DeferNavigationRollback(ListBox list, Action restore)

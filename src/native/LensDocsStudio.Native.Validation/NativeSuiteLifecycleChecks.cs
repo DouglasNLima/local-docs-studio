@@ -169,6 +169,7 @@ internal static class NativeSuiteLifecycleChecks
             list.Focus(); FlaUI.Core.Input.Keyboard.Type(FlaUI.Core.WindowsAPI.VirtualKeyShort.DOWN);
             PumpUntil(() => delivered && ReferenceEquals(list.SelectedItem, original), "Native blocked keyboard selection did not restore its exact occurrence.");
             Drain();
+            if (list.ItemContainerGenerator.ContainerFromItem(original) is not ListBoxItem { IsKeyboardFocusWithin: true }) throw new IOException("Native blocked keyboard selection did not retain focus on its selected occurrence.");
             if (field.Text != before + "Pending" || !(bool)pending.GetValue(window)!) throw new IOException("Native blocked keyboard selection lost pending values.");
             ((Button)window.FindName(family == "Flowchart" ? "ResetPropertiesButton" : "ResetButton")).RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
             Drain();

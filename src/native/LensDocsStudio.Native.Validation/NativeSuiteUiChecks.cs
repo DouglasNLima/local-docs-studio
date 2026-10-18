@@ -75,6 +75,11 @@ internal static partial class NativeUiChecks
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
                 ObserveNavigation("reset", list, selectedName);
                 Wait(() => list.Patterns.Selection.Pattern.Selection.Value.Any(item => item.Patterns.SelectionItem.Pattern.IsSelected.Value && item.Name == selectedName && !item.IsOffscreen), "Rejected selection lost the exact retained SelectionItem or left it outside its viewport.");
+                field.Text = fieldBefore + "Pending"; list.FrameworkAutomationElement.SetFocus(); Keyboard.Type(VirtualKeyShort.DOWN);
+                Wait(() => list.Patterns.Selection.Pattern.Selection.Value.Any(item => item.Name == selectedName && !item.IsOffscreen && item.Properties.HasKeyboardFocus.Value), "Container-focused Down did not retain the exact visible focused occurrence.");
+                if (field.Text != fieldBefore + "Pending" || summary.Name != summaryBefore) throw new IOException("Container-focused navigation lost pending properties.");
+                Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
+                Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Container-focused Reset failed to restore properties.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 if (family is "Class" or "ER")
                 {
