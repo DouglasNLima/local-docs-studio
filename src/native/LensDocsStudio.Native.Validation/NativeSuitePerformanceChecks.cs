@@ -75,9 +75,11 @@ internal static class NativeSuitePerformanceChecks
         var diagnostic = new DiagramService().Render(Source("ER", true, true));
         File.WriteAllText(Path.Combine(output, "suite-performance.json"), JsonSerializer.Serialize(new
         {
+            CoreAssemblySha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(DiagramService).Assembly.Location))),
+            RendererIdentity = "Mermaider 0.15.1 / SharpVectors.Wpf 1.8.6, pinned by locked dependencies and process lifetime",
             NativeAssemblySha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(NativeSvgService).Assembly.Location))),
             HarnessSha256 = Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(typeof(NativeSuitePerformanceChecks).Assembly.Location))),
-            Host = new { Framework = RuntimeInformation.FrameworkDescription, OS = RuntimeInformation.OSDescription, Environment.ProcessorCount, Architecture = RuntimeInformation.ProcessArchitecture.ToString(), Stopwatch.Frequency },
+            Host = new { Framework = RuntimeInformation.FrameworkDescription, OS = RuntimeInformation.OSDescription, Environment.ProcessorCount, Architecture = RuntimeInformation.ProcessArchitecture.ToString(), RunnerImage = Environment.GetEnvironmentVariable("ImageOS"), RunnerImageVersion = Environment.GetEnvironmentVariable("ImageVersion"), Stopwatch.Frequency },
             Method = "STA windowless diagnostic; seven samples per fixture; first execution and six repeats. Adapter scanning includes its existing semantic work. Renderer parsing/layout/SVG and native conversion/drawing are combined only where no independent public boundary exists. Presentation includes correspondence and conversion; standalone phases overlap it and must not be summed. No UIA, first-window or interaction latency claim. Pixel checks excluded from timing. No production GC changes.",
             Observations = observations, Er100Entities150Relationships = new { RenderSuccess = diagnostic.Success, diagnostic.Error, InteractionCompleted = false, Classification = "Renderer-only resource diagnostic; not a successful editor benchmark", LimitsUnchanged = true }
         }, new JsonSerializerOptions { WriteIndented = true }));

@@ -16,7 +16,7 @@ internal static partial class NativeUiChecks
         output = Path.GetFullPath(output); Directory.CreateDirectory(output);
         using var clipboard = NativeUiClipboard.Start(); using var contrast = highContrast ? new NativeTestHighContrast() : null;
         using var display = new NativeTestDisplay(output); using var automation = new UIA3Automation();
-        var captureRoot = output; var checks = new List<string>(); Application? app = null; Window? visual = null;
+        var captureRoot = output; var measurements = new List<object>(); var checks = new List<string>(); Application? app = null; Window? visual = null;
         try
         {
             if (highContrast && !System.Windows.SystemParameters.HighContrast) throw new IOException("Actual Windows High Contrast was not enabled.");
@@ -36,12 +36,14 @@ internal static partial class NativeUiChecks
                 var path = Path.Combine(root, family + ".mmd"); File.WriteAllText(path, source);
                 var start = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
                 foreach (var argument in new[] { "--state-directory", state, root, path }) start.ArgumentList.Add(argument);
-                app = Application.Launch(start); var main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Suite fixture did not open.");
+                var coldProcess = Stopwatch.StartNew(); app = Application.Launch(start); var main = app.GetMainWindow(automation, TimeSpan.FromSeconds(25)) ?? throw new IOException("Suite fixture did not open.");
                 Wait(() => main.FindFirstDescendant(cf => cf.ByAutomationId("DiagramEditVisually0")) is not null, "Suite visual action did not appear.");
-                Find(main, "DiagramEditVisually0").AsButton().Invoke();
+                var editorOpen = Stopwatch.StartNew(); Find(main, "DiagramEditVisually0").AsButton().Invoke();
                 Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor")))?.AsWindow()) is not null, "Suite editor did not open.");
                 Wait(() => Find(visual!, family == "Flowchart" ? "MermaidInsertProcess" : prefix + "Apply").IsEnabled, "Suite canonical mapping did not finish.");
                 var originalApplyEnabled = Find(visual!, prefix + "Apply").IsEnabled;
+                using var nativeProcess = Process.GetProcessById(app.ProcessId); nativeProcess.Refresh();
+                measurements.Add(new { Family = family, Theme = theme, ColdProcessIncludingDocumentPreviewAndUiaMs = coldProcess.Elapsed.TotalMilliseconds, EditorOpenIncludingUiaMs = editorOpen.Elapsed.TotalMilliseconds, WorkingSetAtFirstUsefulEditor = nativeProcess.WorkingSet64, Method = "Fresh app process per case; includes UIA transport and is separate from native phase timings" });
                 Capture("initial");
                 var list = Find(visual!, family == "Sequence" ? "SequenceParticipants" : prefix + "Elements");
                 list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
@@ -75,6 +77,11 @@ internal static partial class NativeUiChecks
                         .Any(tip => tip.Name.Contains(longText, StringComparison.Ordinal) || tip.FindAllDescendants().Any(text => text.Name.Contains(longText, StringComparison.Ordinal))), "Full long navigation tooltip did not appear.");
                     Capture("long-navigation-tooltip", true);
                 }
+                var tabStart = family switch { "Class" or "ER" => prefix + "AttributeType", "Sequence" => "SequenceParticipantId", _ => prefix + "NodeId" };
+                var tabNext = family switch { "Class" or "ER" => prefix + "AttributeName", "Sequence" => "SequenceActor", "Flowchart" => "MermaidNodeLabel", _ => prefix + "Label" };
+                Find(visual!, tabStart).Focus(); Keyboard.Type(VirtualKeyShort.TAB);
+                Wait(() => Find(visual!, tabNext).Properties.HasKeyboardFocus.Value, "Inspector Tab did not reach the next native property control.");
+                checks.Add(theme + " " + family + ": property keyboard tab order remains native and predictable");
                 foreach (var (width, height) in new[] { (880, 600), (1024, 768), (1280, 800), (1440, 900), (1920, 1080) })
                 {
                     visual!.Patterns.Transform.Pattern.Move(0, 0); visual.Patterns.Transform.Pattern.Resize(width, height);
@@ -104,7 +111,7 @@ internal static partial class NativeUiChecks
                 Wait(() => automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app.ProcessId).And(cf.ByAutomationId(prefix + "VisualEditor"))) is null, "Suite Cancel did not close unchanged draft.");
                 app.Kill(); app.Dispose(); app = null; visual = null;
             }
-            File.WriteAllText(Path.Combine(output, "suite-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrast = highContrast, Checks = checks }, new JsonSerializerOptions { WriteIndented = true })); return 0;
+            File.WriteAllText(Path.Combine(output, "suite-ui.json"), JsonSerializer.Serialize(new { Status = "PASS", ActualHighContrast = highContrast, Checks = checks, Measurements = measurements }, new JsonSerializerOptions { WriteIndented = true })); return 0;
         }
         catch (Exception error)
         {

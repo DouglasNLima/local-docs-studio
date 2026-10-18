@@ -253,3 +253,33 @@ canonical SVG bytes and ambient Activity ownership. All 1,646 Core tests pass.
 The local windowless phase scenario completes all five families and unchanged
 private-source/history validation. Comparative performance remains measured with
 tracing disabled and the exact same harness binary for both revisions.
+
+## Complete intermediate UX gate at `1aeb654`
+
+[UX run 39107688436](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39107688436)
+passes every job, including phase instrumentation, normal/actual High Contrast
+workspace and lifecycle tests, long member selection/tooltips, all five authoring
+suites, canonical fidelity and paired performance. Later changes retain those
+checks and strengthen tab order, simultaneous windows, larger real-window cases,
+pointer-centred Ctrl+wheel and cancellation exactly at the converter boundary.
+
+All five inspectors now declare the scrollable body before fixed actions in
+keyboard traversal, while keeping selected context outside the scroll. Flowchart
+connection/subgraph Update actions join its fixed actions without changing their
+handlers, IDs, visibility or permission bindings. Deferred navigation reveal is
+bounded and cancelled on unload.
+
+The final lifecycle matrix is six smaller cycles and one larger cycle per family
+plus all five modeless families open together: 40 windows per appearance. It
+records actual DPI, native selection allocation, first useful presentation,
+Input-priority heartbeat observations, completed cleanup, exact source, queued
+cancellation and latest-theme canonical pixels. Actual Ctrl+wheel verifies its
+canonical anchor on scrollable axes, with no SVG conversion. These strengthened
+checks still require hosted execution at the next revision.
+
+The performance job now also checks identical harness SHA-256, runner metadata,
+fixture hashes, family/size order, exactly seven samples and canonical verification
+on every measured sample. Core/Native hashes and pinned renderer identities are
+recorded. Fresh-process UIA opening observations are explicitly labelled as
+including document preview and UIA transport; they are separate from native stage
+measurements.

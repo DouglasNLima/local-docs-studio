@@ -67,16 +67,13 @@
    </Grid>
    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="ErInspectorSplitter"/>
    <ui:MermaidInspectorPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="ErInspectorPanel">
-    <StackPanel DockPanel.Dock="Top" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
      <TextBlock x:Name="Summary" Text="Select an entity, attribute or relationship." Style="{StaticResource Mermaid.InspectorHeading}" AutomationProperties.AutomationId="ErSelectionSummary"/>
      <TextBlock x:Name="ContextDescription" Style="{StaticResource Mermaid.InspectorDescription}" AutomationProperties.AutomationId="ErSelectionDescription"/>
      <TextBlock x:Name="InspectorState" Text="Ready" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.AutomationId="ErInspectorState" AutomationProperties.LiveSetting="Polite"/>
     </StackPanel>
-    <WrapPanel DockPanel.Dock="Bottom" Margin="12,8">
-     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" Margin="0,0,8,0" AutomationProperties.AutomationId="ErUpdate"/>
-     <Button x:Name="ResetButton" Content="Reset changes" Click="ResetProperties" Style="{StaticResource Form.Action}" ToolTip="Reset unapplied property changes" AutomationProperties.AutomationId="ErResetProperties"/>
-    </WrapPanel>
-    <ScrollViewer x:Name="InspectorViewport" AutomationProperties.AutomationId="ErInspectorViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer Grid.Row="1" x:Name="InspectorViewport" AutomationProperties.AutomationId="ErInspectorViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
     <StackPanel Margin="12,0,12,12">
      <TextBlock x:Name="Dependencies" TextWrapping="Wrap" Style="{StaticResource Form.Help}" AutomationProperties.AutomationId="ErDependencies"/>
      <StackPanel x:Name="NodeFields" Visibility="Collapsed">
@@ -125,6 +122,11 @@
      <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="ErLocateSource"/>
     </StackPanel>
    </ScrollViewer>
+    <WrapPanel Grid.Row="2" Margin="12,8">
+     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" Margin="0,0,8,0" AutomationProperties.AutomationId="ErUpdate"/>
+     <Button x:Name="ResetButton" Content="Reset changes" Click="ResetProperties" Style="{StaticResource Form.Action}" ToolTip="Reset unapplied property changes" AutomationProperties.AutomationId="ErResetProperties"/>
+    </WrapPanel>
+    </Grid>
    </ui:MermaidInspectorPanel>
   </Grid>
  </DockPanel>

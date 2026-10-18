@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Diagnostics;
 using System.Text.Json;
 using System.Windows.Media;
 using LensDocsStudio.Core.Rendering;
@@ -54,6 +55,22 @@ internal static class NativeSuiteCacheChecks
         try { _ = new NativeSvgService().Prepare(render.Svg!.Replace("</svg>", "<script>alert(1)</script></svg>", StringComparison.Ordinal)); }
         catch (InvalidDataException) { unsafeRejected = true; }
         Check(unsafeRejected, "Active SVG is still rejected before conversion or cache lookup");
+        using var duringConversion = new CancellationTokenSource(); var readCompleted = false;
+        using (var listener = new ActivityListener
+        {
+            ShouldListenTo = source => source.Name == "LensDocsStudio.Mermaid",
+            Sample = (ref ActivityCreationOptions<ActivityContext> _) => ActivitySamplingResult.AllData,
+            ActivityStarted = activity => { if (activity.OperationName == "native.sharpvectors.read") duringConversion.Cancel(); },
+            ActivityStopped = activity => { if (activity.OperationName == "native.sharpvectors.read") readCompleted = true; }
+        })
+        {
+            ActivitySource.AddActivityListener(listener); rejected = false;
+            try { _ = Convert(render with { Source = render.Source + "%% cancellation at converter entry\n" }, safe, token: duringConversion.Token); }
+            catch (OperationCanceledException) { rejected = true; }
+            Check(rejected && readCompleted, "Cancellation at converter entry lets the non-interruptible read complete and rejects its result");
+        }
+        Check(!cache.Keys.Cast<object>().Any(key => (string?)key.GetType().GetProperty("Source")!.GetValue(key) == render.Source + "%% cancellation at converter entry\n"),
+            "Cancelled non-interruptible conversion never enters the immutable cache");
         File.WriteAllText(Path.Combine(output, "suite-cache.json"), JsonSerializer.Serialize(new { Status = "PASS", Checks = checks, CacheEntries = cache.Count, CachedCharacters = characters,
             Limitation = "An in-flight SharpVectors call completes; cancellation prevents cache insertion/result installation. Queued conversion waits are cancellable. No thread aborts or renderer budget changes." }, new JsonSerializerOptions { WriteIndented = true }));
     }

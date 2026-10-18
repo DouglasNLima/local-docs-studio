@@ -425,3 +425,7 @@ reveals it without changing zoom. **Centre canonical layout** in Class/ER centre
 the existing Mermaider placement. State/Flowchart **Restore canonical layout** or
 **Auto layout** clears their temporary session placement. No positions are saved
 in Mermaid source. Expand source to validate, copy or inspect the original draft.
+
+In Flowchart, **Home** resets the viewport when focus is outside the navigation
+list or a selector. Focused lists and selectors retain native Home/End and arrow
+key navigation, including extended selection where supported.

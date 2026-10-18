@@ -68,7 +68,16 @@ jobs:
           & artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/before
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/after
-          exit $LASTEXITCODE
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $before = Get-Content artifacts/native/suite-performance/before/suite-performance.json -Raw | ConvertFrom-Json
+          $after = Get-Content artifacts/native/suite-performance/after/suite-performance.json -Raw | ConvertFrom-Json
+          if ($before.HarnessSha256 -ne $after.HarnessSha256 -or $before.Observations.Count -ne 10 -or $after.Observations.Count -ne 10) { throw 'Comparative harness or workload count differs.' }
+          if (($before.Host | ConvertTo-Json -Compress) -ne ($after.Host | ConvertTo-Json -Compress)) { throw 'Comparative runner environment differs.' }
+          for ($index = 0; $index -lt 10; $index++) {
+            $left = $before.Observations[$index]; $right = $after.Observations[$index]
+            if ($left.SourceSha256 -ne $right.SourceSha256 -or $left.Family -ne $right.Family -or $left.Size -ne $right.Size -or $left.Samples.Count -ne 7 -or $right.Samples.Count -ne 7) { throw 'Comparative source, family or sample count differs.' }
+            if (@($left.Samples + $right.Samples | Where-Object { -not $_.CanonicalPixelsEqual }).Count -ne 0) { throw 'A measured sample omitted canonical pixel verification.' }
+          }
       - name: Verify immutable cache ownership, isolation, eviction and queued cancellation
         run: |
           & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-cache artifacts/native/suite-performance/cache
