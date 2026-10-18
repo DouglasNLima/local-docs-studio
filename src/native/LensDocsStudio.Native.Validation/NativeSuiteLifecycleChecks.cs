@@ -92,7 +92,7 @@ internal static class NativeSuiteLifecycleChecks
             if (sourceEditor.Text != source) throw new IOException(family + ": native selection changed exact source.");
             if (cycle == 0)
             {
-                heartbeat.Stop(); CheckPointerZoom(window, family, observations); lastBeat = Stopwatch.GetTimestamp(); heartbeat.Start();
+                heartbeat.Stop(); CheckKeyboardRollback(window, family, list, observations); CheckPointerZoom(window, family, observations); lastBeat = Stopwatch.GetTimestamp(); heartbeat.Start();
             }
             if (cycle == 1)
             {
@@ -152,6 +152,35 @@ internal static class NativeSuiteLifecycleChecks
         "ER" => new ErVisualEditorWindow(source, service, static (_, _) => Task.FromResult<string?>(null)),
         _ => new ClassVisualEditorWindow(source, service, static (_, _) => Task.FromResult<string?>(null))
     };
+    private static void CheckKeyboardRollback(Window window, string family, ListBox list, List<object> observations)
+    {
+        list.SelectedIndex = 0; Drain(); var original = list.SelectedItem; var conversions = ConversionCount();
+        var sourceEditor = (ICSharpCode.AvalonEdit.TextEditor)window.FindName("SourceEditor"); var source = sourceEditor.Text;
+        var fieldName = family switch { "Flowchart" => "NodeLabel", "Sequence" => "ParticipantId", _ => "NodeId" };
+        var field = (TextBox)window.FindName(fieldName); var before = field.Text; field.Text += "Pending";
+        var pending = window.GetType().GetProperty("PropertiesPending", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        if (!(bool)pending.GetValue(window)!) throw new IOException("Native keyboard fixture did not create pending properties.");
+        var delivered = false;
+        System.Windows.Input.KeyEventHandler key = (_, args) => { if (args.Key == System.Windows.Input.Key.Down) delivered = true; };
+        list.AddHandler(System.Windows.Input.Keyboard.PreviewKeyDownEvent, key, true);
+        try
+        {
+            list.Focus(); FlaUI.Core.Input.Keyboard.Type(FlaUI.Core.WindowsAPI.VirtualKeyShort.DOWN);
+            PumpUntil(() => delivered && ReferenceEquals(list.SelectedItem, original), "Native blocked keyboard selection did not restore its exact occurrence.");
+            Drain();
+            if (field.Text != before + "Pending" || !(bool)pending.GetValue(window)!) throw new IOException("Native blocked keyboard selection lost pending values.");
+            ((Button)window.FindName(family == "Flowchart" ? "ResetPropertiesButton" : "ResetButton")).RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+            Drain();
+            if (field.Text != before || (bool)pending.GetValue(window)! || !ReferenceEquals(list.SelectedItem, original)) throw new IOException("Native Reset changed the selected occurrence or failed to restore values.");
+            if (list.ItemContainerGenerator.ContainerFromItem(original) is not ListBoxItem entry) throw new IOException("Native selected navigation entry was not realised.");
+            var bounds = entry.TransformToAncestor(list).TransformBounds(new Rect(entry.RenderSize));
+            if (!entry.IsVisible || bounds.Top < -1 || bounds.Bottom > list.ActualHeight + 1) throw new IOException("Native selected navigation entry remained outside its viewport: " + bounds);
+            if (ConversionCount() != conversions) throw new IOException("Native keyboard selection repeated SVG conversion.");
+            if (sourceEditor.Text != source) throw new IOException("Native keyboard rollback changed private source.");
+            observations.Add(new { Family = family, Operation = "Native blocked keyboard selection and Reset retain the exact visible occurrence", PendingValuesPreserved = true, SourceExact = true, SelectionConversions = 0 });
+        }
+        finally { list.RemoveHandler(System.Windows.Input.Keyboard.PreviewKeyDownEvent, key); }
+    }
     private static bool IsReady(Window window)
     {
         if (!window.IsEnabled) return false;

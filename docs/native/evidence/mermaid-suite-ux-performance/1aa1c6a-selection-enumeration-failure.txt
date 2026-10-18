@@ -1,0 +1,3 @@
+System.InvalidOperationException: Rejected selection lost the exact retained SelectionItem or left it outside its viewport.
+   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func`1 condition, String failure, Int32 seconds) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeUiChecks.cs:line 1789
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_0.<RunMermaidSuite>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 74

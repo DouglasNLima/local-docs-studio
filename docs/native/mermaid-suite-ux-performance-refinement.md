@@ -386,3 +386,18 @@ source/statement budgets. This trades initial container allocation for reliable
 native selection and scrolling; large-window presentation and allocation remain
 measured, rather than assuming the trade-off is free. No source limits change.
 Full failure control-state dumps are now retained alongside screenshots.
+
+## Independent native keyboard and Selection-pattern checks
+
+At `1aa1c6a`, normal and actual High Contrast lifecycle gates pass, but the shared
+UIA checkpoint still fails. Its failure control dump contains only title-bar
+children after repeated full descendant scans. Physical scrolling alone is not
+certified as a repair. The UIA check now queries the native Selection pattern
+directly, preserving exact-name, SelectionItem state and visibility assertions.
+It does not enumerate every unselected peer to find a selected occurrence.
+
+An independent hosted native test now delivers an actual Down key on WPF's UI
+thread with pending properties, verifies the exact retained object, Reset values,
+realised container bounds, unchanged private source and zero conversions for each
+family. This separates native behaviour from UIA enumeration effects. Both checks
+must pass; neither is a substitute for the other. Fresh evidence is pending.

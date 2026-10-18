@@ -56,7 +56,7 @@ internal static partial class NativeUiChecks
                 }
                 list.Focus(); Keyboard.Type(VirtualKeyShort.HOME);
                 var summary = Find(visual!, prefix + "SelectionSummary"); Wait(() => !summary.Name.StartsWith("Select ", StringComparison.Ordinal), "Suite keyboard selection did not reach inspector.");
-                var selectedName = list.FindAllDescendants().First(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value).Name;
+                var selectedName = list.Patterns.Selection.Pattern.Selection.Value.Single().Name;
                 if (string.IsNullOrWhiteSpace(selectedName)) throw new IOException("Suite selected entry has no accessible name.");
                 if (family is "Flowchart" or "State" or "Sequence" && !selectedName.Contains("complete long documentation context", StringComparison.Ordinal))
                     throw new IOException("Suite full navigation name was truncated.");
@@ -71,13 +71,13 @@ internal static partial class NativeUiChecks
                     throw new IOException("Source visibility or rejected selection lost pending context/zoom.");
                 Capture("pending"); Find(visual!, prefix + "ResetProperties").AsButton().Invoke();
                 Wait(() => field.Text == fieldBefore && Find(visual!, prefix + "Apply").IsEnabled == originalApplyEnabled, "Reset did not restore validated property values.");
-                Wait(() => list.FindAllDescendants().Any(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value && item.Name == selectedName && !item.IsOffscreen), "Rejected selection lost the exact retained SelectionItem or left it outside its viewport.");
+                Wait(() => list.Patterns.Selection.Pattern.Selection.Value.Any(item => item.Patterns.SelectionItem.Pattern.IsSelected.Value && item.Name == selectedName && !item.IsOffscreen), "Rejected selection lost the exact retained SelectionItem or left it outside its viewport.");
                 checks.Add(theme + " " + family + ": pending values survive source visibility and rejected selection; explicit Reset restores them");
                 if (family is "Class" or "ER")
                 {
                     var longText = family == "Class" ? "OpenDocumentWithCompleteLongMethodDescription" : "completeLongAttributeDescriptionForAccessibleNavigation";
                     list.Focus(); Keyboard.Type(VirtualKeyShort.HOME); Keyboard.Type(VirtualKeyShort.DOWN); Keyboard.Type(VirtualKeyShort.DOWN);
-                    var longEntry = list.FindAllDescendants(cf => cf.ByControlType(FlaUI.Core.Definitions.ControlType.ListItem)).Single(item => item.Patterns.SelectionItem.IsSupported && item.Patterns.SelectionItem.Pattern.IsSelected.Value);
+                    var longEntry = list.Patterns.Selection.Pattern.Selection.Value.Single();
                     Wait(() => Find(visual!, prefix + "AttributeName").AsTextBox().Text.Contains(longText, StringComparison.Ordinal), "The exact long member/attribute occurrence did not reach the inspector.");
                     if (!longEntry.Name.Contains(longText, StringComparison.Ordinal)) throw new IOException("Long member accessible name was truncated.");
                     checks.Add(theme + " " + family + ": full long member name, exact selected occurrence and persistent parent context");
