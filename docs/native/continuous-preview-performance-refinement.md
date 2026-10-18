@@ -9,9 +9,12 @@ merged by this work. Branch: `feature/native-continuous-preview-performance`;
 base: `feature/native-mermaid-suite-ux-performance`. Rebase/retarget after the
 dependency is integrated, then repeat integration checks at that revision.
 
-**The 250 ms goal is incomplete.** Implementation and compatibility checks must
-not be represented as first-layout acceptance. Exact-source hosted comparison,
-interaction and package receipts will be reconciled here after execution.
+**Implemented with bounded limitations; the 250 ms goal is incomplete.** Lists,
+mixed content and some table samples still fail. This Draft PR is [#37](https://github.com/DouglasNLima/local-docs-studio/pull/37).
+The final delivery receipt on that PR identifies the exact clean delivered head,
+its required CI results and its own package identities. Results below retain
+their measured application/harness revision and are never relabelled as a later
+revision's package certification.
 
 ## Demonstrated costs and bounded changes
 
@@ -75,7 +78,9 @@ document construction are outside that span and reported separately. Inclusive
 root Measure/Arrange/UpdateLayout diagnostics overlap; do not add them together.
 End-to-end readiness begins before parsing and ends after complete construction,
 attachment, layout and ApplicationIdle. Raster/correctness/navigation follow.
-This hidden-HWND protocol does not measure a physical first display frame.
+It includes the harness's empty-host preparation and is labelled separately from
+actual application interaction. This hidden-HWND protocol does not measure a
+physical first display frame.
 
 The dedicated `Native Continuous 250 ms acceptance` workflow uses one compiled
 harness DLL on both product revisions and identical UTF-8 fixture bytes, on the
@@ -122,12 +127,141 @@ remains unchanged; these values are historical, not the new comparable baseline.
 | table | 309.58 ms | FAIL |
 | mixed | 656.42 ms | FAIL |
 
+## Comparable application measurements
+
+Application source `4e55d15a07464d55aaf20cd470526d6c8c5410b0`, immutable baseline
+`9a64dfa5adf79dc447db1f671ea39c94ec42de40`, [controlled run 39129930380](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39129930380).
+Both independent comparisons use harness SHA-256
+`6872D03E0DE6CB20AC741DA76233E7F9C1F46B194AB329AFCE4495A4DB1A043D`.
+Both use image `win25-vs2026` `20261007.264.1`, Windows 10.0.26100,
+.NET 10.0.13, four available logical processors, 96 DPI, Light, 640 × 300,
+100% zoom. Replication 1 reports AMD EPYC 9V74; replication 2 reports EPYC 9V45.
+Each before/after comparison stays on its own runner. Results are not pooled.
+
+The [replication 1 receipt](evidence/continuous-preview-performance/application-4e55d15/replication-1.json)
+and [independent replication 2](evidence/continuous-preview-performance/application-4e55d15/replication-2.json)
+retain all 132 pairs / 264 product samples, fixture/source/product hashes, all
+scalar timings, stages, GC/allocation/memory, correctness and PNG outcomes. Each
+original JSON is hashed; full bounded dispatcher-operation arrays remain in the
+run's `continuous-performance-{1,2}` artefacts. No slow samples were discarded.
+
+Fresh-process cold first-layout input, **median / maximum of three** per cell:
+
+| Fixture | Replication 1 baseline | Replication 1 candidate | Replication 2 baseline | Replication 2 candidate |
+|---|---:|---:|---:|---:|
+| list | 826.23 / 889.95 | 769.12 / 885.98 **FAIL** | 426.89 / 429.18 | 421.15 / 424.26 **FAIL** |
+| table | 380.15 / 390.70 | 295.18 / 300.44 **FAIL** | 243.49 / 275.58 | 179.02 / 210.12 PASS |
+| paragraphs | 292.56 / 302.10 | 239.18 / 243.01 PASS | 187.67 / 219.25 | 157.61 / 158.63 PASS |
+| quote | 167.91 / 170.71 | 167.07 / 169.65 PASS | 114.54 / 141.39 | 107.29 / 113.33 PASS |
+| details | 167.29 / 173.39 | 166.74 / 174.67 PASS | 107.32 / 111.84 | 111.50 / 116.03 PASS |
+| mixed | 401.86 / 401.87 | 407.19 / 435.44 **FAIL** | 254.82 / 258.72 | 264.19 / 269.63 **FAIL** |
+
+All values are milliseconds. Cold paragraph medians improve 18.2% and 16.0% in
+these two workloads; every candidate paragraph sample, including fresh edits,
+passes 250 ms (worst 243.72 / 183.57 ms across all temperatures). This does not
+establish a universal latency guarantee. Cold table construction medians fall
+525.47 → 139.48 and 363.98 → 97.58 ms. Its complete harness readiness falls
+1,231.44 → 757.86 and 874.89 → 533.81 ms. Table first layout still fails in
+replication 1, and a replication-2 fresh-source sample reaches 315.37 ms.
+
+Repeated-process first layout, repetitions 1–3 after the retained repetition 0,
+**median / maximum**, with every case including observed regressions:
+
+| Fixture | Replication 1 baseline → candidate | Replication 2 baseline → candidate |
+|---|---:|---:|
+| list | 473.16 / 537.25 → 580.62 / 743.76 | 473.35 / 500.48 → 487.79 / 491.48 |
+| table | 149.66 / 178.86 → 222.07 / 233.99 | 147.60 / 209.82 → 188.46 / 201.58 |
+| paragraphs | 147.74 / 183.09 → 190.46 / 197.81 | 165.47 / 215.45 → 153.57 / 171.91 |
+| quote | 60.78 / 71.72 → 89.45 / 109.43 | 67.44 / 68.61 → 70.05 / 88.62 |
+| details | 47.43 / 65.34 → 82.35 / 87.97 | 55.34 / 62.96 → 66.87 / 77.86 |
+| mixed | 230.41 / 276.94 → 314.71 / 325.86 | 237.43 / 323.49 → 294.97 / 297.76 |
+
+These warm regressions remain part of the result. In replication 1, paragraph
+complete readiness also regresses 297.16 → 334.34 ms; replication 2 improves
+332.03 → 245.07 ms. Allocation reduction does not imply all temperatures improve.
+No causal improvement is attributed to unchanged quote/details/list element trees.
+The simple-line/font and scrollbar experiments did not resolve the list bottleneck.
+
+First combined execution is retained separately (baseline → candidate):
+
+| Fixture | Replication 1 | Replication 2 |
+|---|---:|---:|
+| list | 1,177.48 → 897.37 | 433.41 → 480.32 |
+| table | 391.92 → 368.99 | 208.33 → 195.93 |
+| paragraphs | 268.87 → 238.39 | 139.18 → 117.78 |
+| quote | 113.99 → 146.20 | 64.97 → 55.08 |
+| details | 122.36 → 132.38 | 96.51 → 75.74 |
+| mixed | 548.16 → 378.71 | 300.76 → 423.42 |
+
+Only list is first in that combined process. Later cases share framework/font/media
+warming. Fresh-source cases modify each distant final marker and append a new
+revision; 8/18 and 7/18 candidate samples fail the unchanged input acceptance.
+Overall, **29/66 and 22/66 candidate samples fail**. Both controlled jobs are
+correctly red. Every sample independently passes source/text/style/structure and
+actual native final-target navigation/selection checks outside timing.
+
+Paragraph construction/layout allocation falls about 45.65 → 32.25 MB and
+45.73 → 32.35 MB in the two cold comparisons; end-to-end allocation falls about
+51.04 → 37.65 MB in each. Gen-0 collections fall from three to two; Gen-1 remains
+one and Gen-2 zero for these cold paragraph samples. List allocation remains about
+106 MB through construction/layout and 115 MB end to end. Cold table private bytes
+increase about 88 → 91–92 MB despite lower construction cost. Memory benefits are
+scoped, not an application-wide memory budget.
+
+After 24 repeated documents, natural collection leaves baseline/candidate weak
+document references 6/2 and 3/2 alive, with observed managed bytes about 150/111
+and 145/110 MB. Every reader is detached. These observations use no forced GC and
+do not prove zero retention or a leak; JIT liveness/collection timing remain limits.
+
+Only paragraph raster bytes differ in both comparisons. Text/style hashes and
+all non-Run element counts match. The [baseline](images/continuous-preview-performance/application-4e55d15/paragraphs-baseline.png)
+and [candidate](images/continuous-preview-performance/application-4e55d15/paragraphs-candidate.png)
+were inspected: joining adjacent same-style runs changes WPF glyph positioning
+after the decoded entity; text, emphasis, line positions and wrapping remain
+readable and equivalent in this fixture. No typography setting is disabled.
+
 ## Validation and delivery receipt
 
-Pending exact-head hosted execution: six-fixture comparison and independent
-replication; visible native opening/edit/replacement/reopen, rapid/distant edits,
-theme/actual High Contrast, tab/window closure; existing source/safety/export,
-five-editor regression, browser/static and isolated package/lifecycle jobs.
+At application `4e55d15`, local Release compilation has zero warnings/errors,
+1,647 Core tests pass with no failures/skips, and all 134 native corpus/export
+cases pass. Native logical/source/Unicode/LF/CRLF/RTF, nested formatting and
+expanded scheduling checks pass. The final PR receipt records complete final-head
+Core/native/browser/static, five-editor, actual UIA and package/lifecycle results
+separately; these earlier checks do not certify an untested later head.
+
+Both visible interaction jobs in run 39129930380 pass on actual Windows, including
+actual OS High Contrast. Each opens all six unchanged files, selects a distant
+target, preserves mapped selection/focus/caret across a leading edit and full
+replacement, undoes without saving, closes and reopens. Further cases exercise
+rapid/distant edits, tab switching, obsolete appearance, rapid themes, tab closure
+and active window closure. Final coverage also holds the preview gate, cancels
+obsolete queued work and verifies only the latest source can subsequently install.
+Its local queued cancellation observation is 3.11 ms; hosted final values retain
+their own source/runner identity. Parsing and WPF layout remain non-interruptible.
+
+[Normal](evidence/continuous-preview-performance/application-4e55d15/interactions-normal.json)
+and [actual High Contrast](evidence/continuous-preview-performance/application-4e55d15/interactions-high-contrast.json)
+retain Input-priority heartbeat observations. Whole-scenario maximum gaps are
+**2,111.60 / 3,986.64 ms**, so passing interaction correctness is emphatically not
+full dispatcher-responsiveness acceptance. No UIA transport timing is presented
+as dispatcher/frame latency. The remaining full-list/compound-layout bottleneck
+is the framework's atomic bottomless formatting/visual validation; yields around
+that call cannot interrupt it.
+
+Hosted visible-window rasters are retained for every fixture in
+[normal appearance](images/continuous-preview-performance/application-4e55d15/normal/list-visible-window.png)
+and [actual High Contrast](images/continuous-preview-performance/application-4e55d15/high-contrast/list-visible-window.png),
+alongside the other five fixtures in those directories. These are captures of the
+shown WPF window, not a measured physical frame. Existing native UIA screenshot,
+keyboard, selection/search, save/recovery and installed-context captures remain
+separate evidence in the final native and UX workflow artefacts.
+
+The original `0c2d2de` controlled iteration remains failed (32/66 and 36/66 samples).
+Its first visible outline check exposed a harness defect: earlier fixture opening
+could already select index 1, so assigning index 1 again raised no navigation
+event. The correction explicitly changes selection before retaining the exact
+original caret assertion. Its original logs and both failed acceptance artefacts
+remain [available](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39129124545).
 
 Physical first frame, higher DPI, physical screen reader/clean Windows and
 production signing remain outside this scoped certification. No ordinary desktop

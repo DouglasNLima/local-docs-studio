@@ -36,6 +36,7 @@ internal static class NativePreviewSchedulingChecks
         heartbeat.Tick += (_, _) => { var now = heartbeatWatch.Elapsed.TotalMilliseconds; if (gaps.Count < 4096) gaps.Add(now - lastPulse); lastPulse = now; };
         heartbeat.Start();
         var fixtureEvidence = new List<object>();
+        var cancellationEvidence = new List<object>();
         try
         {
             model.NewDocumentCommand.Execute(null);
@@ -162,6 +163,26 @@ internal static class NativePreviewSchedulingChecks
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
             tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != large) throw new IOException("Rendering changed large-document Undo or Unicode source.");
+            var gate = (SemaphoreSlim)Field("previewGate")!;
+            gate.Wait(); Task latestQueued;
+            try
+            {
+                previousDocument = preview.Document;
+                var queued = (Task)Invoke("UpdatePreviewAsync", false)!;
+                if (queued.IsCompleted) throw new IOException("The queued cancellation case did not wait for rendering capacity.");
+                var cancelWatch = Stopwatch.StartNew();
+                tab.EditorDocument.Insert(tab.EditorDocument.TextLength, "\n\nLatest queued source.");
+                latestQueued = (Task)Invoke("UpdatePreviewAsync", false)!;
+                Pump(queued);
+                cancellationEvidence.Add(new { Stage = "Queued behind preview gate", Milliseconds = cancelWatch.Elapsed.TotalMilliseconds });
+                if (preview.Document != previousDocument) throw new IOException("Cancelled queued work installed a document.");
+            }
+            finally { gate.Release(); }
+            Pump(latestQueued);
+            if (!new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Latest queued source.", StringComparison.Ordinal))
+                throw new IOException("The latest queued source did not render after capacity became available.");
+            tab.EditorDocument.UndoStack.Undo();
+            if (editor.Text != large) throw new IOException("Queued rendering changed source Undo.");
             using (var rapidEdits = new DuringConstruction(() =>
             {
                 for (var revision = 0; revision < 12; revision++) tab.EditorDocument.Insert(tab.EditorDocument.TextLength, "\n\nFresh revision " + revision);
@@ -232,6 +253,7 @@ internal static class NativePreviewSchedulingChecks
             heartbeat.Stop();
             File.WriteAllText(Path.Combine(output, "native-preview-scheduling.json"), JsonSerializer.Serialize(new { Passed = true,
                 VisibleWindow = shown, ActualHighContrast = SystemParameters.HighContrast, Fixtures = fixtureEvidence,
+                Cancellations = cancellationEvidence,
                 InputHeartbeatMilliseconds = gaps, MaximumObservedInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
                 Checks = new[] { "Editor-only layout retains current headings and source navigation without a preview",
                     "Explicit text preparation includes current closed details and subsequent edits without changing layout or Undo",
