@@ -1,5 +1,9 @@
 # Functional parity matrix
 
+## PR #38 completion continuation
+
+The [required machine-readable prototype matrix](../../src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json) now carries explicit stock scope and execution proof for spans/nested cells, bidi navigation, TextUnits/attributes, partial rich copying, native bitmap copying, safe links and stale-failure/range ownership. Representative visual review, controlled timing and ordinary regressions remain separate rows in [the source-labelled report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420). Implemented is not an acceptance pass. Stock's omitted block diagram in selected XamlPackage is explicit; whole-document HTML has its separate media route. Physical screen-reader certification is unavailable. No migration is approved.
+
 ## Continuous layout contract v2 continuation (19 October 2026)
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.

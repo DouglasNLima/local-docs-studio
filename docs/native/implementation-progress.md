@@ -1,5 +1,9 @@
 # Native implementation progress
 
+## PR #38 completion continuation
+
+The isolated prototype now includes spanning/nested table content, the recorded stock-equivalent bidi/range matrix, partial and bitmap clipboard interchange, safe real link activation, stale-failure/close ownership checks and corrected selection/HC chrome. [Source-labelled results and compiler comparisons](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) separate functional proof from timing. The controlled v2 evaluation remains **INSUFFICIENT EVIDENCE** until all required rows pass; native media/appearance Input failures remain. Stock is the ordinary default, #37 remains incomplete and `.749` stays open. Exact final-source checks and executable provenance belong to the #38 receipt.
+
 ## Continuous layout contract v2 continuation (19 October 2026)
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.

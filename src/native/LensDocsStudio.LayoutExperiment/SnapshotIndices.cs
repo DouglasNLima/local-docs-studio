@@ -4,6 +4,7 @@ namespace LensDocsStudio.LayoutExperiment;
 
 internal sealed record SnapshotIndices(ImmutableArray<int> Characters, ImmutableArray<int> Words)
 {
+    public ImmutableArray<TableIndex> Tables { get; init; } = [];
     public static SnapshotIndices Create(LayoutSnapshot snapshot, CancellationToken cancellation)
     {
         // Offsets are bounded by the already-complete logical text. Avoid a tree
@@ -22,7 +23,9 @@ internal sealed record SnapshotIndices(ImmutableArray<int> Characters, Immutable
             if (characters[offset]) characterOffsets.Add(offset);
             if (words[offset]) wordOffsets.Add(offset);
         }
-        return new(characterOffsets.ToImmutable(), wordOffsets.ToImmutable());
+        var tables = snapshot.Model.Root.Descendants().Where(node => node.Kind == "Table").Select(table => new TableIndex(table,
+            table.Children.SelectMany((row, index) => row.Children.Select(cell => new TableCellIndex(cell, index))).ToImmutableArray())).ToImmutableArray();
+        return new(characterOffsets.ToImmutable(), wordOffsets.ToImmutable()) { Tables = tables };
     }
     public static int Adjacent(ImmutableArray<int> values, int at, bool forward)
     {

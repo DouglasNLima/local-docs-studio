@@ -1,5 +1,9 @@
 # Native validation report
 
+## PR #38 completion continuation
+
+[The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) retains source/host-specific functional, visual, compiler and Input observations. The 943-operation stock/candidate oracle, real links, table spans/nested cells and clipboard/lifecycle subsets are independently exercised; those passes do not certify the candidate. Dedicated v2 acceptance, ordinary exact-head regressions and experiment-only executable provenance have separate results in the final #38 receipt. Required Input failures remain failures; the migration decision stays **INSUFFICIENT EVIDENCE**. Earlier packages do not certify this head and `.749` remains unresolved.
+
 ## Continuous layout contract v2 continuation (19 October 2026)
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.

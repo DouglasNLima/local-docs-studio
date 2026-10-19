@@ -1,5 +1,9 @@
 # Native architecture decisions
 
+## PR #38 completion continuation
+
+Retain public WPF/TextFormatter eager immutable geometry and the isolated diagnostic route. [The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) records table/range/clipboard/link/ownership corrections and official framework-dependent application ReadyToRun evaluation. No runtime/framework patch, default-renderer change or dependency integration is authorised. The v2 Input failures keep the migration-proposal decision **INSUFFICIENT EVIDENCE**; historical v1 decisions and the unrelated open `.749` incident retain their identities.
+
 ## Continuous layout contract v2 continuation (19 October 2026)
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.

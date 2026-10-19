@@ -332,6 +332,17 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         {
             if (unit != TextUnit.Paragraph) Expand(unit, true, true);
             if (count == 0) { _ = Current; return 0; }
+            if (unit == TextUnit.Line && Current.Indices.Tables.Length > 0)
+            {
+                var line = Current.Lines.First(value => start >= value.Start && start <= value.End);
+                var rows = Current.Lines.GroupBy(value => Math.Round(value.Top, 2)).OrderBy(group => group.Key).ToArray();
+                var rowIndex = Array.FindIndex(rows, group => Math.Abs(group.Key - line.Top) < .01);
+                var targetRow = Math.Clamp(rowIndex + count, 0, rows.Length - 1);
+                if (targetRow == rowIndex) return count > 0 && Current.Model.Items.LastOrDefault() is { } final && start < final.Start + final.Length ? 1 : 0;
+                var x = line.Carets.MinBy(caret => Math.Abs(caret.Offset - start))!.X;
+                var next = rows[targetRow].MinBy(value => x < value.Carets.Min(caret => caret.X) ? value.Carets.Min(caret => caret.X) - x : Math.Max(0, x - value.Carets.Max(caret => caret.X)))!;
+                start = next.Start; end = next.End; startOrder = endOrder = 0; return targetRow - rowIndex;
+            }
             var units = Units(unit); if (units.Length < 2) return 0;
             var index = Math.Min(units.Length - 2, Math.Max(0, Array.FindLastIndex(units, value => value <= start)));
             var target = Math.Clamp(index + count, 0, units.Length - 2); var moved = target - index;

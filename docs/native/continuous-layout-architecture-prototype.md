@@ -69,6 +69,29 @@ Paired review identified and corrected opaque selected media and selected text i
 
 The profiled appearance trace at `0d49091` records two long UI intervals (about 596 and 511 ms) beneath WPF's native `GetMessageW` path. Managed palette/model/install stages and native notification callbacks remain separately timestamped. This sampling evidence does not identify a managed renderer freeze or excuse the measured Input intervals. Coalescing reduces repeated application work but the 100 ms row remains failing. The original 13,239.25 ms media interval is still unexplained, not retroactively fixed. A bounded same-host, order-reversed test of explicit source-folder versus legacy shell-default dialogue location follows; no native dialogue work or generation is removed from its timeline.
 
+### Official application compilation comparison
+
+The [bounded compiler pilot at `89e2625`](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39259671246) builds identical application source as IL and SDK ReadyToRun, using the official unmodified framework-dependent runtime. Each row below is one additional fresh-process observation, with no document prewarm or forced collection. Host 1 starts IL; host 2 reverses that order. These are not the original 66 controlled samples, repeated/cold replications or a stock/candidate acceptance result.
+
+| Host / workload | IL complete layout ms | ReadyToRun complete layout ms | IL / ReadyToRun Input maximum ms |
+| --- | ---: | ---: | ---: |
+| 1 / list | 1,256.21 | 458.95 | 37.93 / 45.74 |
+| 1 / mixed | 2,247.19 | 632.25 | 47.57 / 48.19 |
+| 2 / list | 332.52 | 357.34 | 35.02 / 40.30 |
+| 2 / mixed | 713.46 | 588.15 | 42.29 / 46.77 |
+
+The host-2 list regression is retained. These observations support evaluating the compiler option; they do not establish universal speed or certify the candidate. The earlier `9117d83` pilot fails before measurement because its restore switch conflicts with existing lock files (NU1005). The corrected pilot keeps RID-specific restore metadata in an isolated diagnostic directory, with clean tracked source. Both outcomes are retained.
+
+The subsequent isolated [build script](../../scripts/native/Build-ContinuousLayoutExperiment.ps1) uses supported [ReadyToRun application publishing](https://learn.microsoft.com/en-us/dotnet/core/deploying/ready-to-run), preserves Microsoft/System package DLL bytes through explicit exclusions and hash checks, rejects bundled runtime/framework files and removes the ordinary Native apphost from the diagnostic copy. It records application native headers and compilation identity. This is application compilation, not a patched WPF/runtime. It invokes no fixture or renderer before measurement. The full evaluation uses the same compiled configuration for both adapters; ordinary packages and the stock default are unchanged. The historical IL path remains available with `-Compilation IL`. Compilation-specific source/harness identities and temperatures must stay separate.
+
+The independent image-only Copy case also exposes and corrects a real missing format: stock adds a native Bitmap for a single selected raster image. The candidate now carries only the already-frozen bitmap to its OLE STA, and serialises that exact inline range. Actual stock/candidate Copy compares the eight native formats, plain text, decoded dimensions and pixels. Package creation is limited to images inside the selected range, rather than any distant image in the document. Initial client image-peer and inconsistent clipboard convenience-read failures are retained; their cause is not established. The comparison reads the actual held data object and records before/after convenience reads. Live selection, source mapping and UIA remain custom; the temporary public serializer tree remains unformatted.
+
+### Table selection correction
+
+The extended independent range fixture adds a real three-column table and four partial cross-cell selection vectors. Stock normalises a selection spanning cells to whole cells while keeping arbitrary unselected UIA ranges literal. Its selected text is a continuous logical bounding range, but its cell wash is rectangular: intervening cells outside the selected columns are not painted. Read-only Shift-arrow navigation crosses rows and the final structural boundary rather than treating these as ordinary text characters. The prototype now uses an eager semantic cell index for normalisation, painting and these boundary stops; table Line movement uses visual row geometry. The current local development comparison matches all 947 recorded operations, with a 67.29 ms candidate phase Input maximum. This dirty-source local check is not controlled hosted acceptance.
+
+New paired whole-document and partial cross-row captures exposed the previous glyph-only table selection as a material visual defect. The corrected Light captures show matching whole-cell washes and unchanged text/geometry. Hosted Light/Dark/actual High Contrast review remains required. One failed local build accidentally launched a stale executable; stopping that owned test left synthetic Shift held and contaminated its next keyboard comparison. Both invalid runs remain labelled and retained. Independent range clients now initialise and finally release their owned modifiers. No acceptance timer is paused or budget changed.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**

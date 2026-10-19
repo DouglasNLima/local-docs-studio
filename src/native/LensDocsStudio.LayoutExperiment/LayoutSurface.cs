@@ -11,6 +11,7 @@ internal sealed class LayoutSurface : Panel
     public LayoutSnapshot? Snapshot { get; private set; }
     public int Anchor { get; private set; }
     public int Active { get; private set; }
+    private int rawAnchor;
     public int Start => Math.Min(Anchor, Active);
     public int End => Math.Max(Anchor, Active);
     public ScrollViewer? Scroller { get; set; }
@@ -20,6 +21,11 @@ internal sealed class LayoutSurface : Panel
     public List<object> InteractionStages { get; } = [];
     private (SemanticNode Node, Point Point)? pressedLink;
     private SelectionOverlay? mediaSelection;
+    private SemanticNode[] selectedCells = [];
+    private readonly HashSet<int> selectedCellParagraphs = [];
+    private readonly HashSet<int> cellRangeParagraphs = [];
+    private int tableArrowBoundary = -1;
+    private bool tableArrowRight;
     private sealed class SelectionOverlay(LayoutSurface owner) : FrameworkElement
     { protected override void OnRender(DrawingContext context) => owner.DrawMediaSelection(context); }
     private static Brush SelectionBrush(string appearance, double opacity = .3)
@@ -34,10 +40,13 @@ internal sealed class LayoutSurface : Panel
     {
         if (Snapshot is not { } snapshot || Start == End) return;
         var brush = SelectionBrush(snapshot.Appearance);
+        var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
+        foreach (var cell in selectedCells)
+            if (snapshot.NodeBounds.TryGetValue(cell.Id, out var rectangle) && rectangle.Bottom >= top && rectangle.Top <= bottom) context.DrawRectangle(brush, null, rectangle);
         foreach (var id in snapshot.Controls.Select(control => control.Node).Distinct())
         {
             var node = snapshot.Model.Root.Descendants().First(value => value.Id == id);
-            if (node.Start < End && node.End > Start && snapshot.NodeBounds.TryGetValue(id, out var bounds)) context.DrawRectangle(brush, null, bounds);
+            if (node.Start < End && node.End > Start && !selectedCells.Any(cell => node.Start >= cell.Start && node.End <= cell.End) && snapshot.NodeBounds.TryGetValue(id, out var bounds)) context.DrawRectangle(brush, null, bounds);
         }
     }
     private ClipboardDispatcher? clipboard;
@@ -127,7 +136,7 @@ internal sealed class LayoutSurface : Panel
     public void Install(LayoutSnapshot? snapshot)
     {
         var previousAppearance = Snapshot?.Appearance;
-        selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null; matches.Clear();
+        selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null; matches.Clear(); selectedCells = []; selectedCellParagraphs.Clear(); cellRangeParagraphs.Clear(); tableArrowBoundary = -1;
         foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;
         Children.Clear(); mediaSelection = null;
         if (snapshot is not null)
@@ -139,7 +148,7 @@ internal sealed class LayoutSurface : Panel
                 button.Click += (_, _) => MediaAction?.Invoke(box); Children.Add(button);
             }
         if (snapshot is not null) { mediaSelection = new SelectionOverlay(this) { IsHitTestVisible = false, Focusable = false }; Children.Add(mediaSelection); }
-        Snapshot = snapshot; Anchor = Active = 0;
+        Snapshot = snapshot; rawAnchor = Anchor = Active = 0;
         if (snapshot is not null && Scroller is not null)
         {
             var colour = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(snapshot.Appearance, 1)
@@ -157,11 +166,21 @@ internal sealed class LayoutSurface : Panel
         InvalidateMeasure(); InvalidateVisual();
         (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.Changed();
     }
-    public void Select(int anchor, int active)
+    public void Select(int anchor, int active, bool preferPreviousRow = false)
     {
         selectedCopy?.Cancel(); pendingCopy = null;
         var length = Snapshot?.Model.Text.Length ?? 0;
         Anchor = Math.Clamp(anchor, 0, length); Active = Math.Clamp(active, 0, length);
+        rawAnchor = Anchor;
+        if (Snapshot is { } snapshot)
+        {
+            (Anchor, Active) = TableSelection.Normalise(snapshot, Anchor, Active, preferPreviousRow);
+            selectedCells = TableSelection.PaintedCells(snapshot, Start, End); selectedCellParagraphs.Clear();
+            cellRangeParagraphs.Clear();
+            if (TableSelection.CellRangeTable(snapshot, Start, End) is { } table)
+                foreach (var node in table.Node.Descendants()) if (node.Paragraph >= 0) cellRangeParagraphs.Add(node.Paragraph);
+            foreach (var cell in selectedCells) foreach (var node in cell.Descendants()) if (node.Paragraph >= 0) selectedCellParagraphs.Add(node.Paragraph);
+        }
         SelectionUpdated?.Invoke();
         InvalidateVisual(); (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.SelectionChanged();
         mediaSelection?.InvalidateVisual();
@@ -237,7 +256,7 @@ internal sealed class LayoutSurface : Panel
                 var selected = cluster.End > Start && cluster.Start < End;
                 if (!selected && matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(searchBrush, null, bounds);
-                if (selected && !mediaParagraphs.Contains(line.Item))
+                if (selected && !mediaParagraphs.Contains(line.Item) && !selectedCellParagraphs.Contains(line.Item) && !cellRangeParagraphs.Contains(line.Item))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(selectionBrush, null, bounds);
             }
         }
@@ -313,12 +332,12 @@ internal sealed class LayoutSurface : Panel
         }
         pressedLink = Snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Link" && at >= node.Start && at < node.End) is { } link
             ? (link, e.GetPosition(this)) : null;
-        Select(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Anchor : at, at); CaptureMouse(); e.Handled = true;
+        Select(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? rawAnchor : at, at); CaptureMouse(); e.Handled = true;
     }
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e); if (!IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed) return;
-        var point = e.GetPosition(this); if (MouseHistory.Count < 40) MouseHistory.Add(new { Event = "move", Point = point.ToString(), Hit = Hit(point) }); Select(Anchor, Hit(point));
+        var point = e.GetPosition(this); if (MouseHistory.Count < 40) MouseHistory.Add(new { Event = "move", Point = point.ToString(), Hit = Hit(point) }); Select(rawAnchor, Hit(point));
         if (pressedLink is { } link && (point - link.Point).Length > 4) pressedLink = null;
         if (Scroller is { } scrolling)
         { if (point.Y < scrolling.VerticalOffset) scrolling.LineUp(); if (point.Y > scrolling.VerticalOffset + scrolling.ViewportHeight) scrolling.LineDown(); }
@@ -329,7 +348,7 @@ internal sealed class LayoutSurface : Panel
         base.OnMouseLeftButtonUp(e);
         // Windows may coalesce mouse moves before delivering button-up. Commit
         // the actual release point instead of retaining an intermediate move.
-        if (IsMouseCaptured) { var point = e.GetPosition(this); Select(Anchor, Hit(point)); }
+        if (IsMouseCaptured) { var point = e.GetPosition(this); Select(rawAnchor, Hit(point)); }
         ReleaseMouseCapture(); var clicked = pressedLink; pressedLink = null; e.Handled = true;
         if (clicked is { } link && (e.GetPosition(this) - link.Point).Length <= 4) Activate(link.Node);
     }
@@ -359,6 +378,12 @@ internal sealed class LayoutSurface : Panel
             Key.PageDown => Hit(new Point(52, line.Top + (Scroller?.ViewportHeight ?? 300))),
             _ => -1
         };
-        if (next < 0) return; Select(shift ? Anchor : next, next); Reveal(next); e.Handled = true;
+        if (shift && !control && e.Key is Key.Left or Key.Right)
+        {
+            var tableNext = TableSelection.Arrow(snapshot, rawAnchor, Active, e.Key == Key.Right, ref tableArrowBoundary, ref tableArrowRight);
+            if (tableNext >= 0) next = tableNext;
+        }
+        else if (next >= 0) tableArrowBoundary = -1;
+        if (next < 0) return; Select(shift ? rawAnchor : next, next, shift && e.Key is Key.Left or Key.Up or Key.Home or Key.PageUp); Reveal(Active); e.Handled = true;
     }
 }

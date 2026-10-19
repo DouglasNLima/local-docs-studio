@@ -32,6 +32,14 @@ internal static class IndependentUiaClient
         public void Dispose() { dispatcher.BeginInvokeShutdown(System.Windows.Threading.DispatcherPriority.Background); thread.Join(1000); }
     }
     private static void Key(byte key, bool up = false) => keybd_event(key, 0, (up ? 2u : 0u) | (key is >= 0x21 and <= 0x28 ? 1u : 0u), UIntPtr.Zero);
+    [DllImport("user32.dll")] private static extern short GetAsyncKeyState(int key);
+    internal static void InitialiseOwnedInput(string output)
+    {
+        var control = (GetAsyncKeyState(0x11) & 0x8000) != 0; var shift = (GetAsyncKeyState(0x10) & 0x8000) != 0;
+        ReleaseOwnedInput();
+        Program.Write(Path.Combine(output, "owned-input-initialisation.json"), new { ControlInitiallyDown = control, ShiftInitiallyDown = shift, TestModifiersReleased = true });
+    }
+    internal static void ReleaseOwnedInput() { Key(0x11, true); Key(0x10, true); }
     internal static void Chord(params byte[] keys)
     {
         // Hold each real key long enough for the target input queue to observe

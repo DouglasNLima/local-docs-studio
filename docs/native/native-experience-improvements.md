@@ -1,5 +1,9 @@
 # Native experience improvements
 
+## PR #38 completion continuation
+
+The internal experiment corrects selection/media painting, automatic HC scrollbar ownership, search accents and safe link/copy lifecycle behaviour. [The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) records actual independent UIA/input, all-theme paired comparisons and every timing failure. Ordinary product identity, stock Continuous, Pages, recovery and the five Mermaid editors remain protected. Migration remains **INSUFFICIENT EVIDENCE**, with native media/appearance Input misses and the complete v2 evaluation reported separately from ordinary regressions. `.749` remains open.
+
 ## Continuous layout contract v2 continuation (19 October 2026)
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.

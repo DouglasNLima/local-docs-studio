@@ -15,7 +15,7 @@ internal static class RangeOracleChecks
     internal const string Source = "## Heading\n\nPlain **bold** *italic* and `code`.\n\nLatin العربيّة end é 😀.\n\n";
     public static async Task Run(ExperimentWindow window, string output)
     {
-        var source = Source + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
+        var source = Source + "| Cell A | Cell B | Cell C |\n|---|---|---|\n| Value D | Value E | Value F |\n| Value G | Value H | Value I |\n\n" + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
         var gaps = new List<double>(); var timeline = new List<object>(); var candidateGaps = new List<double>(); var last = Stopwatch.GetTimestamp(); var phase = "setup";
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
@@ -60,6 +60,7 @@ internal static class RangeOracleChecks
     }
     public static int Client(string output, int processId, string side, string acknowledgementName)
     {
+        IndependentUiaClient.InitialiseOwnedInput(output);
         using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         var rows = new List<object>();
         try
@@ -68,6 +69,14 @@ internal static class RangeOracleChecks
             AutomationElement? document = null;
             IndependentUiaClient.Wait(() => (document = window.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, side == "stock" ? "RangeOracleDocument" : "ExperimentalDocument"))) is not null);
             var text = (TextPattern)document!.GetCurrentPattern(TextPattern.Pattern);
+            foreach (var (first, last) in new[] { ("Cell A", "Cell B"), ("Cell B", "Value E"), ("Cell B", "Value D"), ("Cell A", "Cell A") })
+            {
+                var range = text.DocumentRange.FindText(first, false, false)!; var ending = text.DocumentRange.FindText(last, false, false)!;
+                range.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Character, 1); ending.MoveEndpointByUnit(TextPatternRangeEndpoint.End, TextUnit.Character, -1);
+                range.MoveEndpointByRange(TextPatternRangeEndpoint.End, ending, TextPatternRangeEndpoint.End);
+                var before = range.GetText(-1); range.Select(); var selected = text.GetSelection();
+                rows.Add(new { Operation = "actual-table-selection", First = first, Last = last, Before = before, Text = selected.Select(value => value.GetText(-1)).ToArray() });
+            }
             foreach (var target in new[] { "bold", "العربيّة", "Final marker." })
             foreach (var unit in Enum.GetValues<TextUnit>())
             {
@@ -138,5 +147,6 @@ internal static class RangeOracleChecks
             Program.Write(Path.Combine(output, "operations.json"), rows); return 0;
         }
         catch (Exception error) { Program.Write(Path.Combine(output, "operations.json"), rows); Program.Write(Path.Combine(output, "failure.json"), new { Error = error.ToString() }); return 1; }
+        finally { IndependentUiaClient.ReleaseOwnedInput(); }
     }
 }

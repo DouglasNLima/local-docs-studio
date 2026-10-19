@@ -40,6 +40,10 @@ internal static class TargetedChecks
                 var stockText = new TextRange(stock.Document.ContentStart, stock.Document.ContentEnd).Text;
                 var scrolling = (ScrollViewer)viewer.Template.FindName("PART_ContentHost", viewer);
                 var stockHeight = scrolling.ExtentHeight; Program.Capture(viewer, Path.Combine(destination, "stock.png"));
+                viewer.Selection.Select(stock.Document.ContentStart, stock.Document.ContentEnd); viewer.Focus();
+                window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                Program.Capture(viewer, Path.Combine(destination, "stock-all-selected.png"));
+                viewer.Selection.Select(stock.Document.ContentStart, stock.Document.ContentStart);
                 var snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(CompleteLayout.Parse(fixture.Source, CancellationToken.None, path, destination, appearance), 640, 1, appearance, CancellationToken.None));
                 var checks = new List<string>();
                 var expected = Regex.Replace(stockText, @"(?m)^\t*(?:•|\d+\.)\t", "");
@@ -82,6 +86,20 @@ internal static class TargetedChecks
                     var stops = StringInfo.ParseCombiningCharacters(logicalText.Substring(item.Start, item.Length)).Select(at => at + item.Start).Append(item.Start + item.Length).ToHashSet();
                     Require(linesByItem[itemIndex].SelectMany(line => line.Carets).All(caret => stops.Contains(caret.Offset)), "No surrogate/combining/ZWJ split", checks);
                 }
+                (int Start, int End, double Offset)? cellSelection = null;
+                var selectionTable = snapshot.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Table" && node.Children.Length > 1 && node.Children.Take(2).All(row => row.Children.Length > 1));
+                if (selectionTable is not null)
+                {
+                    var firstCell = selectionTable.Children[0].Children[1]; var lastCell = selectionTable.Children[1].Children[1];
+                    var begin = snapshot.Model.Items.First(item => item.Start >= firstCell.Start && item.Start < firstCell.End).Start + 1;
+                    var end = snapshot.Model.Items.First(item => item.Start >= lastCell.Start && item.Start < lastCell.End).Start + 1;
+                    var sourceBegin = snapshot.Model.SourceBoundaries[begin]; var sourceEnd = snapshot.Model.SourceEnds[end - 1];
+                    if (!stock.TextMap.TryPreviewRange(sourceBegin, sourceEnd - sourceBegin, out var selectionFrom, out var selectionTo)) throw new IOException("Table selection capture source oracle missing.");
+                    viewer.Selection.Select(selectionFrom!, selectionTo!); viewer.Focus(); (selectionFrom!.Parent as FrameworkContentElement)?.BringIntoView();
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(viewer, Path.Combine(destination, "stock-cross-row-cell-selected.png"));
+                    cellSelection = (begin, end, scrolling.VerticalOffset);
+                }
                 var distantLiteral = stock.TextMap.Literals.LastOrDefault();
                 if (distantLiteral is not null)
                 {
@@ -92,6 +110,17 @@ internal static class TargetedChecks
                 window.SourcePath = path; window.WorkspaceRoot = destination;
                 window.Content = window.Scroller; window.InstallMeasured(snapshot); window.Scroller.ScrollToTop(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 Program.Capture(window.Scroller, Path.Combine(destination, "candidate.png"));
+                window.Surface.Select(0, snapshot.Model.Text.Length); window.Surface.Focus();
+                window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                Program.Capture(window.Scroller, Path.Combine(destination, "candidate-all-selected.png"));
+                window.Surface.Select(0, 0);
+                if (cellSelection is { } cells)
+                {
+                    window.Surface.Select(cells.Start, cells.End); window.Surface.Focus(); window.Scroller.ScrollToVerticalOffset(cells.Offset);
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(window.Scroller, Path.Combine(destination, "candidate-cross-row-cell-selected.png"));
+                    window.Surface.Select(0, 0);
+                }
                 if (distantLiteral is not null)
                 {
                     window.Surface.SelectSource(distantLiteral.Source.Start, distantLiteral.Source.End); window.Scroller.ScrollToVerticalOffset(selectedStockOffset); window.Surface.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
