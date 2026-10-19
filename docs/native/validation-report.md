@@ -2,7 +2,7 @@
 
 ## PR #38 completion continuation
 
-[The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) retains source/host-specific functional, visual, compiler and Input observations. The 943-operation stock/candidate oracle, real links, table spans/nested cells and clipboard/lifecycle subsets are independently exercised; those passes do not certify the candidate. Dedicated v2 acceptance, ordinary exact-head regressions and experiment-only executable provenance have separate results in the final #38 receipt. Required Input failures remain failures; the migration decision stays **INSUFFICIENT EVIDENCE**. Earlier packages do not certify this head and `.749` remains unresolved.
+[The current full v2 evaluation](continuous-layout-architecture-prototype.md#final-controlled-v2-result-at-7601be9) retains all 292 completed observations at `7601be9`, by source/host/temperature, including every zero. Both gates strictly FAIL Input; all required functional proof, 160 candidate layout/presentation observations, actual OS appearance/lifecycle, cancellation, winning readiness and visual rows pass. The fourteen independent clients and 968-operation oracle run on both hosts. Source-labelled ordinary regressions and exact-final-source executable verification are separate; they cannot promote candidate acceptance. The decision remains **INSUFFICIENT EVIDENCE**; `.749` remains unresolved.
 
 ## Continuous layout contract v2 continuation (19 October 2026)
 

@@ -1,0 +1,17 @@
+{
+  "Source": null,
+  "SourceDirty": null,
+  "CompilationConfiguration": "IL",
+  "HarnessSha256": "B3121CE20568128872B8C7BF434F946D4B3F9EC061CE48B8E472C69EE5DD6A0F",
+  "Arguments": [
+    "--appearance-unrecognised-control",
+    "--output",
+    "artifacts/layout-v2/development-completion/rejected-unknown-route"
+  ],
+  "Process": 56344,
+  "UiThread": 2,
+  "Runtime": ".NET 10.0.12",
+  "WpfAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.12\\PresentationFramework.dll",
+  "CpuAvailable": 16,
+  "Os": "Microsoft Windows NT 10.0.26300.0"
+}

@@ -2,7 +2,7 @@
 
 ## PR #38 completion continuation
 
-The internal experiment corrects selection/media painting, automatic HC scrollbar ownership, search accents and safe link/copy lifecycle behaviour. [The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) records actual independent UIA/input, all-theme paired comparisons and every timing failure. Ordinary product identity, stock Continuous, Pages, recovery and the five Mermaid editors remain protected. Migration remains **INSUFFICIENT EVIDENCE**, with native media/appearance Input misses and the complete v2 evaluation reported separately from ordinary regressions. `.749` remains open.
+The internal experiment corrects table/paragraph/media selection, distant-scroll painting, rich interchange, source anchors, safe links and current-version lifecycle. Both complete `7601be9` replications pass their functional and visual rows; every current candidate capture retains the reviewed pixels. [Recorded Input failures](continuous-layout-architecture-prototype.md#final-controlled-v2-result-at-7601be9) remain: appearance 272.86/186.63 ms, native media 908.24/329.25 ms and one 311.25 ms list interaction. **INSUFFICIENT EVIDENCE for migration.** Stock Continuous, Pages/exports, five editors, source/recovery/workspace bytes and installed identity remain protected; `.749` stays open.
 
 ## Continuous layout contract v2 continuation (19 October 2026)
 

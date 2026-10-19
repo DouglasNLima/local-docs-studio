@@ -2,7 +2,7 @@
 
 ## PR #38 completion continuation
 
-Retain public WPF/TextFormatter eager immutable geometry and the isolated diagnostic route. [The completion report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) records table/range/clipboard/link/ownership corrections and official framework-dependent application ReadyToRun evaluation. No runtime/framework patch, default-renderer change or dependency integration is authorised. The v2 Input failures keep the migration-proposal decision **INSUFFICIENT EVIDENCE**; historical v1 decisions and the unrelated open `.749` incident retain their identities.
+Retain public WPF/TextFormatter complete eager immutable geometry, supported dispatcher/STA ownership and the isolated diagnostic executable. The viewport painter submits only already-prepared visible decorations; its matched control establishes no speed gain and retains a failed focus pair. Explicit interchange alone may use an unattached, unformatted public WPF semantic tree. [The complete evaluation](continuous-layout-architecture-prototype.md#completion-evaluation--current-result) passes functional/layout/presentation but fails required Input, so no migration is authorised. Modal durations remain measured without exemption. Stock/runtime/dependency integration is unchanged; historical v1/v2 results and the unrelated open `.749` incident retain their sources.
 
 ## Continuous layout contract v2 continuation (19 October 2026)
 

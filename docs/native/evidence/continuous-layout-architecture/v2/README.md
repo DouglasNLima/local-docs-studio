@@ -8,6 +8,8 @@ Historical v1 evidence remains in its original source folders. These v2 records 
 | f86d6df | [run 39227279725](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39227279725) | [separate host/temperature tables](f86d6df/measurements.md), CSV, manifest and receipt archives |
 | ba0f3f6 | [run 39230058924](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39230058924) | [separate host/temperature tables](ba0f3f6/measurements.md), CSV, manifest and receipt archives |
 
+[The PR #38 completion archive](completion/README.md) additionally retains the later implementation/control failures, original v1/v2 decisions and the [full 47dff1e two-host comparison](completion/full-47dff1e/measurements.md), including all 292 timed boundaries/completed samples and the newly reproduced native-dialogue interval. The [final full 7601be9 evaluation](completion/full-7601be9/measurements.md) retains all 292 completed observations and both strict Input FAIL results. No earlier failure is reclassified.
+
 development-receipts.tar.gz preserves 299 local exploratory timing/failure receipts, including interrupted faulty diagnostic probes and focus-loss observations. Dirty local source/harness identities, temperatures and desktop activity are not controlled acceptance. No failure is promoted to a pass. These records contain generated test fixtures, not user workspace content.
 
 Extract a receipt archive into a new folder with `tar -xzf <archive>`. Recreate aggregate CSV/group extrema with `python scripts/native/summarise-layout-architecture-v2.py <raw-replication-1> <raw-replication-2> --output <new-report-folder>`. This read-only helper has no measurement clocks, retries or percentile calculations.

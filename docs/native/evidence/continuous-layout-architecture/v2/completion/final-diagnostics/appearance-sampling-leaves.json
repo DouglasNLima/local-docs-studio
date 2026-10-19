@@ -1,0 +1,94 @@
+[
+  {
+    "Gap": {
+      "Phase": "actual-enable",
+      "Timestamp": 7291500509,
+      "GapMilliseconds": 222.19489999999996
+    },
+    "NativeUiThread": 8148,
+    "QpcBase": 7261636761.0,
+    "SpeedscopeTimeMilliseconds": [
+      2764.1799,
+      2986.3748
+    ],
+    "LeafFrameOverlapMilliseconds": [
+      [
+        "CPU_TIME",
+        185.1171881055825
+      ],
+      [
+        "UNMANAGED_CODE_TIME",
+        37.07769983940125
+      ],
+      [
+        "PresentationFramework.il!System.Windows.DescendentsWalker`1[System.Windows.ResourcesChangeInfo].StartWalk(class System.Windows.DependencyObject,bool)",
+        7.62939453125e-06
+      ],
+      [
+        "PresentationFramework.il!System.Windows.DescendentsWalker`1[System.Windows.ResourcesChangeInfo].WalkFrameworkElementLogicalThenVisualChildren(class System.Windows.FrameworkElement,bool)",
+        8.728025022719521e-07
+      ],
+      [
+        "PresentationFramework.il!System.Windows.StyleHelper.GetThemeStyle(class System.Windows.FrameworkElement,class System.Windows.FrameworkContentElement)",
+        7.232665666379035e-07
+      ],
+      [
+        "PresentationFramework.il!System.Windows.FrameworkTemplate.LoadTemplateXaml(class System.Xaml.XamlReader,class System.Xaml.XamlObjectWriter)",
+        7.152557373046875e-07
+      ],
+      [
+        "PresentationFramework.il!System.Windows.StyleHelper.DoTemplateInvalidations(class System.Windows.FrameworkElement,class System.Windows.FrameworkTemplate)",
+        4.76837158203125e-07
+      ],
+      [
+        "WindowsBase.il!System.Windows.Threading.Dispatcher.PushFrameImpl(class System.Windows.Threading.DispatcherFrame)",
+        2.593997123767622e-07
+      ]
+    ],
+    "Meaning": "Sampling leaf overlap; native work beneath P/Invoke is unresolved. Not causal attribution or acceptance timing."
+  },
+  {
+    "Gap": {
+      "Phase": "automatic-disable",
+      "Timestamp": 7299773290,
+      "GapMilliseconds": 201.45280000000002
+    },
+    "NativeUiThread": 8148,
+    "QpcBase": 7261636761.0,
+    "SpeedscopeTimeMilliseconds": [
+      3612.2001,
+      3813.6529
+    ],
+    "LeafFrameOverlapMilliseconds": [
+      [
+        "CPU_TIME",
+        116.13519733352723
+      ],
+      [
+        "UNMANAGED_CODE_TIME",
+        85.3175745788576
+      ],
+      [
+        "WindowsBase.il!MS.Win32.UnsafeNativeMethods.GetMessageW(value class System.Windows.Interop.MSG&,value class System.Runtime.InteropServices.HandleRef,int32,int32)",
+        2.6481437089387327e-05
+      ],
+      [
+        "PresentationFramework.il!System.Windows.StyleHelper.GetThemeStyle(class System.Windows.FrameworkElement,class System.Windows.FrameworkContentElement)",
+        9.5367431640625e-07
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.GeometryDrawing.ReleaseOnChannelCore(class Channel)",
+        4.76837158203125e-07
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Drawing.System.Windows.Media.Composition.DUCE.IResource.AddRefOnChannel(class Channel)",
+        1.205444277729839e-07
+      ],
+      [
+        "WindowsBase.il!System.Windows.Threading.Dispatcher.PushFrameImpl(class System.Windows.Threading.DispatcherFrame)",
+        5.512220013770275e-08
+      ]
+    ],
+    "Meaning": "Sampling leaf overlap; native work beneath P/Invoke is unresolved. Not causal attribution or acceptance timing."
+  }
+]

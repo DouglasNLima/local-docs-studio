@@ -2,7 +2,7 @@
 
 ## PR #38 completion continuation
 
-The isolated prototype now includes spanning/nested table content, the recorded stock-equivalent bidi/range matrix, partial and bitmap clipboard interchange, safe real link activation, stale-failure/close ownership checks and corrected selection/HC chrome. [Source-labelled results and compiler comparisons](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420) separate functional proof from timing. The controlled v2 evaluation remains **INSUFFICIENT EVIDENCE** until all required rows pass; native media/appearance Input failures remain. Stock is the ordinary default, #37 remains incomplete and `.749` stays open. Exact final-source checks and executable provenance belong to the #38 receipt.
+The isolated six-workload prototype completes the recorded functional scope. At `7601be9`, both full hosts retain 66 original samples per adapter plus fourteen independent UIA cases: all 160 candidate layout/presentation observations and functional/cancellation/appearance/lifecycle/visual rows pass. Required Input still fails (including native media/appearance and one list interaction). **INSUFFICIENT EVIDENCE for a migration proposal.** [The current result and evidence](continuous-layout-architecture-prototype.md#completion-evaluation--current-result) retain all earlier failures. Stock remains the ordinary default, #37 remains incomplete and `.749` stays open. Exact final source, ordinary CI and experiment-only executable provenance belong to the final #38 receipt.
 
 ## Continuous layout contract v2 continuation (19 October 2026)
 

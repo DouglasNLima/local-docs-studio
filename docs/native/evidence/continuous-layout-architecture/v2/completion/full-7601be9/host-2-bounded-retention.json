@@ -1,0 +1,518 @@
+[
+  {
+    "Path": "all/distant-edit-candidate/details/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-candidate/list/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-candidate/mixed/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-candidate/paragraphs/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-candidate/quote/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-candidate/table/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/details/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/list/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/mixed/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/paragraphs/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/quote/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/distant-edit-stock/table/results.json",
+    "Created": 3,
+    "AliveAfterNaturalCollections": 2,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/details/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/list/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/mixed/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/paragraphs/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/quote/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-candidate/table/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/details/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/list/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/mixed/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/paragraphs/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/quote/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/first-combined-stock/table/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/details/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/list/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/mixed/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/paragraphs/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/quote/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-candidate/table/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/details/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/list/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 2,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/mixed/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/paragraphs/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/quote/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "all/repeated-stock/table/results.json",
+    "Created": 4,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "collapsed-details/targeted-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "details/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "list/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "mixed/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "nested-lists/targeted-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "nested-numbering/extended-list-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "paragraphs/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "quote/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "rich/targeted-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-0-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-0-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-1-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-1-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-2-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/cold-2-stock/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table/independent-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table-blocks/extended-table-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table-spans/extended-table-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "table-wrap/targeted-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  },
+  {
+    "Path": "unicode-bidi/targeted-uia-candidate/results.json",
+    "Created": 1,
+    "AliveAfterNaturalCollections": 1,
+    "ForcedCollection": false
+  }
+]

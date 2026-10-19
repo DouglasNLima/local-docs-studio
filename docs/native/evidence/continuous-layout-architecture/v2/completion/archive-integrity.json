@@ -1,0 +1,90 @@
+{
+  "ArchiveStreamsAndRelativeMemberPaths": "PASS",
+  "Archives": [
+    {
+      "Path": "chrome-checkpoint-abe2ac4/focused-receipts.tar.gz",
+      "Members": 1899,
+      "Sha256": "1aaba7aa6c485547c8d464d29ff7fcf418d34782ba7c9bd473258118439f3db3"
+    },
+    {
+      "Path": "diagnostic-history/focused-receipts.tar.gz",
+      "Members": 5009,
+      "Sha256": "952f447ebfbb36228b4dd45e9212d79fe00f8610a8698e44ea46f354998d4576"
+    },
+    {
+      "Path": "eager-paint-controls/focused-receipts.tar.gz",
+      "Members": 2715,
+      "Sha256": "7de65e58af566fdf45ce8a91f1ecc260135ab2bff4e7f324fbe5b0f4f22c7596"
+    },
+    {
+      "Path": "eager-paint-visual/receipts.tar.gz",
+      "Members": 1257,
+      "Sha256": "b27894dbfb4ab496adc274fe05aa6ca9cb8ab7105c584e38dbd7d716ea1117fb"
+    },
+    {
+      "Path": "final-diagnostics/focused-receipts.tar.gz",
+      "Members": 4331,
+      "Sha256": "6ca4178f599bebeeebab6ddc19c74bdbe23ef151b10f669f32bc7cba9e1e6f83"
+    },
+    {
+      "Path": "final-diagnostics/interchange-text.tar.gz",
+      "Members": 164,
+      "Sha256": "7fc79cfe5f7c42592eb843413b9883111da916a25d0260c7458625fde4021fa5"
+    },
+    {
+      "Path": "full-47dff1e/replication-1-receipts.tar.gz",
+      "Members": 1422,
+      "Sha256": "df208107c0ab6b98c9edfb38eaf0bf2d93174ee400fce8fe3ee22cdf3fcc767a"
+    },
+    {
+      "Path": "full-47dff1e/replication-2-receipts.tar.gz",
+      "Members": 1428,
+      "Sha256": "69a3200ded8753883132f1859d5471f48efbb74d8e4caaacf874e9ac1117b336"
+    },
+    {
+      "Path": "full-7601be9/replication-1-receipts.tar.gz",
+      "Members": 1467,
+      "Sha256": "45b5354cf62416772c0ff3eb438603cb2447ab208e935fa63e321f4c9d706d53"
+    },
+    {
+      "Path": "full-7601be9/replication-2-receipts.tar.gz",
+      "Members": 1467,
+      "Sha256": "ce25c75a68cd6c880d17508992b4230cfce52be1b78ed78fad0f70454ef47968"
+    },
+    {
+      "Path": "local-and-compiler/receipts.tar.gz",
+      "Members": 962,
+      "Sha256": "822bc7c4d9afcfa8af00fbe50c3c7b52fac39b53b71914c95c14fe2046b9bf1d"
+    },
+    {
+      "Path": "post-gate-d72bb72/focused-receipts.tar.gz",
+      "Members": 831,
+      "Sha256": "b30931976632a55750c7a87b8c0c79231b7a89380db2875143ca01a7c92dcb05"
+    },
+    {
+      "Path": "post-gate-d72bb72/local-and-interchange.tar.gz",
+      "Members": 360,
+      "Sha256": "5a12efd24ec07aef1a89398a6828b5ed9bf9746f17d8f5df330d3fc5bb9cddef"
+    },
+    {
+      "Path": "selection-checkpoints/focused-receipts.tar.gz",
+      "Members": 3564,
+      "Sha256": "2b2f3a432e2eca1b6ac5a36a3487d71bb3a657e6e430c03195ee9366448c20af"
+    },
+    {
+      "Path": "table-checkpoint-bb1e022/focused-receipts.tar.gz",
+      "Members": 1400,
+      "Sha256": "596ad491acc14965cb06c7d909c55b7c4e166ea38a3165631a5151df4361de62"
+    },
+    {
+      "Path": "visual-and-controls/current-appearance-profile.tar.gz",
+      "Members": 3,
+      "Sha256": "048bf21ebc7cfb8cbfb2ce93e533ee79b036087e31a7c4e717b324322f24e2ef"
+    },
+    {
+      "Path": "visual-and-controls/receipts.tar.gz",
+      "Members": 1975,
+      "Sha256": "a7b8f20b087871b8e53dc8ffb5688801f9aaf23b67ceffbb395c9aaaf8425840"
+    }
+  ]
+}

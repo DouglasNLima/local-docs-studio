@@ -1,5 +1,7 @@
 # Native Windows preview acceptance and engineering delivery
 
+The separate [PR #38 Continuous layout experiment](continuous-layout-architecture-prototype.md#completion-evaluation--current-result) now completes its tested six-workload functional scope and v2 layout/presentation rows, but both full gates fail required Input. Its migration-proposal decision is **INSUFFICIENT EVIDENCE**. This experimental result changes no production readiness, stock default or `.749` incident status; exact source/CI/executable provenance is recorded separately.
+
 The fourth native Mermaid authoring family is implemented on
 `feature/native-mermaid-er-visual-editor`, based on consolidated `develop`
 `3229246af356829771a200134a5df38d3cc8a04c`. The

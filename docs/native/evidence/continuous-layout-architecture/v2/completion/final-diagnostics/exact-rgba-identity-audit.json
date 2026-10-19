@@ -1,0 +1,14 @@
+[
+  {
+    "Host": 1,
+    "Identical": 336,
+    "Different": [],
+    "Method": "Exact RGBA bytes, not alpha-only bbox or raster tolerance"
+  },
+  {
+    "Host": 2,
+    "Identical": 336,
+    "Different": [],
+    "Method": "Exact RGBA bytes, not alpha-only bbox or raster tolerance"
+  }
+]

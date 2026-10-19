@@ -2,7 +2,7 @@
 
 ## PR #38 completion continuation
 
-The [required machine-readable prototype matrix](../../src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json) now carries explicit stock scope and execution proof for spans/nested cells, bidi navigation, TextUnits/attributes, partial rich copying, native bitmap copying, safe links and stale-failure/range ownership. Representative visual review, controlled timing and ordinary regressions remain separate rows in [the source-labelled report](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420). Implemented is not an acceptance pass. Stock's omitted block diagram in selected XamlPackage is explicit; whole-document HTML has its separate media route. Physical screen-reader certification is unavailable. No migration is approved.
+All nineteen [required prototype implementation rows](../../src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json) have recorded stock-equivalent scope. At `7601be9`, both full hosts pass all fourteen independent UIA cases, 968-operation range/keyboard/copy oracles, actual links/media/clipboard, studio/appearance/lifecycle and representative visual checks. [The status matrix](continuous-layout-architecture-prototype.md#final-controlled-v2-result-at-7601be9) separates these from the failing Input row and ordinary regressions. Selected XamlPackage omits the stock block diagram on both routes; HTML retains all thirteen media. Native scrollbar variants and unavailable physical screen-reader certification remain explicit. These passes do not authorise migration.
 
 ## Continuous layout contract v2 continuation (19 October 2026)
 

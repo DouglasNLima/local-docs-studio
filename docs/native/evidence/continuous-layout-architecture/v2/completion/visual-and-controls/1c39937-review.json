@@ -1,0 +1,29 @@
+{
+  "Contract": "continuous-layout-v2",
+  "Status": "PASS",
+  "Meaning": "Representative visual equivalence review, separate from byte-identical raster output and all performance rows. Not physical screen-reader certification or migration approval.",
+  "CapturedSource": "1c399375a251a2f775ce85b6ff14f52c52b9be82",
+  "CaptureRun": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39289841716",
+  "RenderingInputsSha256": "C60A1B557022FFA7E16FC26E4EBDBB514C5A3C8A8AB6F37CA1C3313841A6B006",
+  "WpfFrameworkSha256": "C6950A0D6ADDFB7A365C11FE0AA82A4677043A263102F1779AA9BE8FD3624019",
+  "ImageVersion": "20261007.264.1",
+  "Compilation": "ReadyToRun",
+  "CaptureManifestSha256": "8200ABB0F2AFF0B1DBC10362813274219DE3C3252D3655F86CD826C205B2DC94",
+  "OriginalWorkloadsReviewed": 6,
+  "AppearancesReviewed": 3,
+  "TargetedCasesReviewed": 8,
+  "Replications": 2,
+  "Reviewed": {
+    "Originals": "First viewport, whole selection and distant selected content for list/table/paragraphs/quote/details/mixed in all three appearances.",
+    "Targets": "Rich/code, original nested lists, genuine three-level numbering, wrapping/aligned and spanning/nested-block tables, collapsed details and Unicode/bidi in all appearances.",
+    "Boundaries": "Selected cells after distant scrolling and native media plus command buttons; exact background pixels unchanged.",
+    "SourceBinding": "Every one of the 336 actual images per current host is pixel-identical to its 9fab9cc counterpart; current boundary pairs were also inspected directly. All 42 logical/style/geometry subsets pass per host."
+  },
+  "Classifications": {
+    "TextEdges": "Minor text-edge/antialiasing differences remain; typography, wrapping, logical/style assertions, measured positions and selection geometry agree. No global raster tolerance.",
+    "BordersMarkersDetailsMedia": "Reviewed borders, clipping, markers, cell alignment, details chrome, images/diagrams and selected washes have no demonstrated material defect.",
+    "KnownNativeChromeDifference": "The first HC rich reference keeps normal scrollbar chrome although native/WPF HC state is true. Candidate uses the official public Classic HC scrollbar, as later stock references do. Exact scrollbar template identity is not claimed; this explicit native-chrome variant needs product review before migration.",
+    "ByteIdentical": "6 of 144 paired comparison images per host are pixel-identical. Visual equivalence is not a byte-identical-rendering claim."
+  },
+  "PhysicalScreenReaderCertification": false
+}
