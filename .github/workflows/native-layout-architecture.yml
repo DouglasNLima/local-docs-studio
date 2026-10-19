@@ -7,11 +7,47 @@ on:
       scope:
         description: Focused diagnosis or complete v2 acceptance
         type: choice
-        options: [full, focused, compile-comparison, artifact]
+        options: [full, focused, compile-comparison, artifact, visual]
         default: full
 permissions:
   contents: read
 jobs:
+  visual-review-captures:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'visual'
+    name: Separate all-theme correctness captures (${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Complete paired captures outside all acceptance clocks
+        shell: pwsh
+        run: |
+          & scripts/native/Build-ContinuousLayoutExperiment.ps1 -Compilation ReadyToRun -OutputDirectory artifacts/layout-visual-bin
+          $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
+          $env:LENS_LAYOUT_SOURCE_DIRTY = ([bool](git status --porcelain)).ToString()
+          $env:LENS_LAYOUT_COMPILATION = 'ReadyToRun'
+          if ($env:LENS_LAYOUT_SOURCE_DIRTY -ne 'False') { throw 'Visual review requires clean source.' }
+          $destination = 'artifacts/layout-visual'
+          New-Item -ItemType Directory -Force -Path $destination | Out-Null
+          $process = Start-Process -FilePath artifacts/layout-visual-bin/LensDocsStudio.LayoutExperiment.exe -ArgumentList @('--visual-checks','--output',$destination) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
+          if (-not $process.WaitForExit(180000)) { Stop-Process -Id $process.Id -Force; '180-second correctness capture bound exceeded.' | Set-Content "$destination/deadline-failure.txt" }
+          $process.Refresh()
+          $identity = Get-Content "$destination/execution-identity.json" -Raw | ConvertFrom-Json
+          @{ Source=$env:LENS_LAYOUT_SOURCE_REVISION; Compilation='ReadyToRun'; RenderingInputsSha256=(& scripts/native/Get-LayoutVisualInputsHash.ps1); WpfFrameworkSha256=(Get-FileHash -LiteralPath $identity.WpfAssembly).Hash; ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; CpuAvailable=[Environment]::ProcessorCount; Runtime=$identity.Runtime; TimingAcceptanceData=$false; ExitCode=$process.ExitCode } | ConvertTo-Json | Set-Content "$destination/host.json"
+          if ($process.ExitCode) { exit $process.ExitCode }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: all-theme-review-captures-${{ matrix.replication }}
+          path: artifacts/layout-visual/
+          retention-days: 90
   artifact-verification:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'artifact'
     name: Exact-source experiment executable; no performance reclassification

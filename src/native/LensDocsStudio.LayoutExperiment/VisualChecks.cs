@@ -28,13 +28,14 @@ internal static class VisualChecks
             await Current(false);
             if (window.LatestSource != source) throw new IOException("Automatic visual comparison restoration changed source.");
             Program.Write(Path.Combine(output, "visual-comparison.json"), new { Status = "CAPTURED_PENDING_VISUAL_REVIEW", Observations = observations, ActualHighContrast = appearance,
-                AutomaticEnableCurrentDisableCurrent = true, ManualThemeAfterDisable = false, TimingAcceptanceData = false, PhysicalScreenReaderCertification = false });
+                AutomaticEnableCurrentDisableCurrent = true, AutomaticWpfStateObserved = !System.Windows.SystemParameters.HighContrast,
+                ManualThemeAfterDisable = false, TimingAcceptanceData = false, PhysicalScreenReaderCertification = false });
         }
         finally { if (!restored && contrast is not null) await Task.Run(contrast.Dispose); }
         async Task Current(bool hc)
         {
             var watch = Stopwatch.StartNew();
-            while (NativeTestHighContrast.IsEnabledNow != hc || window.Surface.Snapshot?.Appearance != ExperimentAppearance.Capture("Dark") || window.Surface.Snapshot.Version != window.CurrentVersion)
+            while (NativeTestHighContrast.IsEnabledNow != hc || System.Windows.SystemParameters.HighContrast != hc || window.Surface.Snapshot?.Appearance != ExperimentAppearance.Capture("Dark") || window.Surface.Snapshot.Version != window.CurrentVersion)
             { if (watch.Elapsed.TotalSeconds > 15) throw new TimeoutException("Automatic visual appearance transition did not install the current result."); await Task.Delay(10); }
             if (window.CurrentWork is { } work) await work;
         }

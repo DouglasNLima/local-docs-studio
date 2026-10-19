@@ -183,6 +183,7 @@ internal static class TargetedChecks
                 Require(System.Text.Json.JsonSerializer.Serialize(nativeXamlStyles) == System.Text.Json.JsonSerializer.Serialize(candidateXamlStyles), "Decoded Xaml actual styled text fidelity", checks);
                 await InterchangeChecks.Compare(stock, snapshot, destination);
                 Program.Write(Path.Combine(destination, "logical-and-geometry.json"), new { Status = "PASS", Checks = checks, StockText = stockText, CandidateText = logicalText,
+                    RequestedAppearance = appearance, ActualOsHighContrast = ExperimentAppearance.ActualHighContrast, WpfHighContrast = SystemParameters.HighContrast,
                     StockHeight = stockHeight, CandidateHeight = snapshot.Height, FixtureHash = Program.Hash(Encoding.UTF8.GetBytes(fixture.Source)) });
                 results.Add(new { fixture.Name, Status = "PASS" }); viewer.Document = null;
             }

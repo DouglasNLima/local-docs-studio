@@ -106,6 +106,8 @@ Scalar diagnostic history is also bounded during a long studio session: at most 
 
 The workflow's separately named `scope=artifact` route builds an exact-source experiment-only executable, verifies all six deterministic complete geometries and official shared framework signatures, and publishes a per-file provenance manifest. It performs no controlled wall-clock comparison and cannot reclassify a failing v2 gate. This permits an evidence-only report commit to have its own executable without repeating measurements until green.
 
+The separate `scope=visual` route obtains two all-theme correctness capture sets without running or warming a controlled acceptance process. Its automatic transition waits for both native OS and public WPF High Contrast state within the existing 15-second assertion. An earlier first HC reference capture retained normal scrollbar chrome while subsequent references had HC chrome; that observation remains retained. Every targeted receipt now reports both states. Visual input identity uses the committed native source blobs, independent of checkout LF/CRLF policy; the gate separately requires clean source, compiled provenance, runtime/image/configuration identity, the checked capture manifest and fresh successful captures. No historical visual result or timing row is reclassified.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**
