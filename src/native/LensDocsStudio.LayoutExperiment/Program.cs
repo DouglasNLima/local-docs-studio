@@ -39,6 +39,18 @@ internal static class Program
             CompilationConfiguration = Environment.GetEnvironmentVariable("LENS_LAYOUT_COMPILATION") ?? "IL",
             HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)), Arguments = args, Process = Environment.ProcessId, UiThread = Environment.CurrentManagedThreadId,
             Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, WpfAssembly = typeof(TextElement).Assembly.Location, CpuAvailable = Environment.ProcessorCount, Os = Environment.OSVersion.ToString() });
+        var valueOptions = new HashSet<string>(StringComparer.Ordinal) { "--output", "--scenario", "--source", "--adapter", "--repetitions" };
+        var switches = new HashSet<string>(StringComparer.Ordinal) { "--deterministic", "--image-clipboard-checks", "--link-checks", "--visual-checks", "--range-checks",
+            "--media-controls", "--media-checks", "--media-legacy-directory", "--media-client-sta-control", "--studio-checks", "--parity", "--parity-all",
+            "--appearance-worker-theme-control", "--appearance-full-decoration-control", "--appearance-controls", "--appearance", "--studio", "--clipboard-oracle",
+            "--lifecycle", "--view", "--edit", "--acceptance", "--uia", "--acceptance-v2", "--contract-v2" };
+        for (var index = 0; index < args.Length; index++)
+        {
+            if (switches.Contains(args[index])) continue;
+            if (valueOptions.Contains(args[index]) && index + 1 < args.Length) { index++; continue; }
+            var error = "Unrecognised or incomplete diagnostic argument: " + args[index];
+            Write(Path.Combine(output, "failure.json"), new { Status = "FAIL", Error = error }); Console.Error.WriteLine(error); return 2;
+        }
         if (args.Contains("--deterministic"))
         {
             try { DeterministicChecks.Run(output); return 0; }
@@ -61,6 +73,7 @@ internal static class Program
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
                 else if (args.Contains("--appearance-worker-theme-control")) { window.WorkerThemeOwnershipForChecks = true; await AppearanceChecks.Run(window, output); }
+                else if (args.Contains("--appearance-full-decoration-control")) { window.Surface.FullDecorationPaintingForChecks = true; await AppearanceChecks.Run(window, output); }
                 else if (args.Contains("--appearance-controls")) await AppearanceControlChecks.Run(window, output);
                 else if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);
                 else if (args.Contains("--studio"))

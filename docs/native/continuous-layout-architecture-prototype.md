@@ -158,6 +158,8 @@ At `d72bb72`, both controlled focused paragraph clients pass the stronger point 
 
 The current decoration correction passes all six deterministic complete geometries and all fourteen local logical/style/geometry/interchange subsets. Those correctness checks are outside acceptance clocks and do not imply a timing or hosted-appearance pass. The full-group comparison and all-theme captures are required next.
 
+The `92e7f37` status audit finds that its requested `--appearance-full-decoration-control` dispatch line was accidentally left uncommitted. That named focused sub-run executes the default list and is ineligible as a full-painter appearance control; its original identity/results remain retained. The default viewport painter and its visual capture route are present at that source. The following harness correction commits the missing dispatch and rejects unknown/incomplete flags explicitly, preserving the actual argument vector and a failing receipt. A local negative command proves that an unknown appearance-control name exits 2 without producing a default sample. New source-bound captures and component controls are required; the invalid sub-run is never promoted.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**
