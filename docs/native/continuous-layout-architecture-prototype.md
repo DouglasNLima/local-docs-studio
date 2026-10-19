@@ -44,6 +44,31 @@ External links now retain the stock confirmation route before the OS default-app
 
 Table borders now paint inside their cell bounds and quote borders use the native filled strip, correcting the earlier stroke-edge/corner differences without changing text geometry. Worker decorations share one drawing context instead of opening one per rectangle. These changes require new paired visual review and measurements; they are not a claimed performance pass. Conflict-safe export I/O (including durable flush/rename) stays on workers inside the whole export operation. The media driver's clipboard/OLE stages are separately timestamped.
 
+### Completion checkpoint at `99da420`
+
+[Focused run 39254228140](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39254228140) retains two independent hosted replications. All thirteen targeted stock text/style/geometry/interchange comparisons pass in Light, Dark and actual High Contrast on each host. All four focused independent UIA cases (unchanged list/mixed plus the two table cases), 943-operation range oracles, real stock/candidate workspace/external links, stale-failure/clipboard-close and twelve-range studio replacements pass their functional subsets. These are additional checks, not the original 66-sample acceptance protocol.
+
+| Candidate observation at this source | Host 1 ms | Host 2 ms |
+| --- | ---: | ---: |
+| Additional fresh-process list complete layout | 891.73 | 641.84 |
+| Additional fresh-process mixed complete layout | 1,331.43 | 1,076.45 |
+| Range setup/interaction Input maximum | 84.07 | 73.59 |
+| Lifecycle Input maximum | 116.49 | 98.97 |
+| Studio Input maximum | 113.84 | 84.97 |
+| Appearance Input maximum | 640.25 | 475.05 |
+| Candidate media Input maximum | 562.10 | 415.81 |
+| Actual link-route candidate Input maximum | 56.46 | 68.57 |
+
+Every miss remains a failure. The list navigation-index stage is 4.01–5.03 ms in these additional cases after replacing sorted-tree insertion with a linear bitmap scan; earlier traced list indexing was 57.33 ms on another host. This demonstrates removed application work, not a same-host causal end-to-end speed comparison. Mixed cold required Mermaid preparation still dominates a measured portion of model work (549.59 ms on host 1), and remains inside both candidate clocks.
+
+The candidate clocks intentionally share their start before parsing on every workload, because model extraction can itself contain required Mermaid geometry. Complete layout ends after eager geometry, installation/layout and queued Input; presentation includes the subsequent final idle/Input flush. Their near-identical values are conservative, disclosed boundaries, not hidden preparation. Stock retains its distinct original first-attachment clock and its separately reported complete readiness clock.
+
+Two further failures remain at this checkpoint. The all-theme harness captures all cases successfully but cannot automatically rebuild the final mixed document after disabling HC: it installed a snapshot without updating the associated source/workspace path. The subsequent fix updates ownership at installation, retaining the automatic disable assertion with no manual refresh. Stock media on host 2 misses the unchanged 100 ms immediate owner-acknowledgement assertion after SVG Save; the comparison stops before its minimal control. Subsequent instrumentation completes independent file/Cancel checks and attempts both controls while preserving a failing response assertion and exit status.
+
+Paired review identified and corrected opaque selected media and selected text ink, table stroke edges and a stale normal scrollbar in HC. Selection now uses the existing product's 0.3 accent wash (`DocumentPreview.xaml`), preserving text/images and covering native media commands. The bare stock correctness viewer explicitly receives that same product selection style; unselected controlled fixture typography and clocks are unchanged. Dark/HC paired captures explicitly set the stock document canvas: setting only the outer viewer background left its internal host white. Old invalid/misaligned captures remain source-labelled. Source/runtime/image-bound representative visual review is separate from geometry/style assertions; stale or pending review keeps the dedicated gate incomplete.
+
+The profiled appearance trace at `0d49091` records two long UI intervals (about 596 and 511 ms) beneath WPF's native `GetMessageW` path. Managed palette/model/install stages and native notification callbacks remain separately timestamped. This sampling evidence does not identify a managed renderer freeze or excuse the measured Input intervals. Coalescing reduces repeated application work but the 100 ms row remains failing. The original 13,239.25 ms media interval is still unexplained, not retroactively fixed. A bounded same-host, order-reversed test of explicit source-folder versus legacy shell-default dialogue location follows; no native dialogue work or generation is removed from its timeline.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**

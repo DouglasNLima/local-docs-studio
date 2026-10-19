@@ -39,8 +39,8 @@
     },
     {
       "Requirement": "External/workspace link activation parity",
-      "Implementation": "Unverified",
-      "Proof": "Safe routes implemented; independent external/workspace destination checks pending"
+      "Implementation": "Implemented",
+      "Proof": "99da420: both hosted independent clients activate actual stock/candidate child/back links, real external confirmation Cancel/OK and the exact default-browser destination nonce; workspace bytes unchanged. link-checks repeats at the evaluated head."
     },
     {
       "Requirement": "Mouse/keyboard selection, transformed source spans, range lifetime",
@@ -49,8 +49,9 @@
     },
     {
       "Requirement": "Visual-direction keyboard caret movement within bidirectional runs",
-      "Implementation": "Missing",
-      "Proof": "Independent stock/candidate actual Shift+Arrow sequence agrees in mixed Latin/Arabic/combining text. Stock read-only unshifted arrows do not move its selected insertion point; candidate differs. Full stock scope/visual-direction requirement review and correction remain required; range-checks retains every mismatch."
+      "Implementation": "Implemented",
+      "StockEquivalentScope": "Stock read-only unshifted arrows scroll without moving its selected insertion point; Shift extends selection through mixed Latin/Arabic, combining and surrogate text. A separate caret-browsing feature is not demonstrated by stock and is not claimed. The original broader requirement wording is retained.",
+      "Proof": "943 independently recorded stock/candidate operations agree on both 88b07cb and 99da420 hosted replications, including 54 unshifted and 54 Shift arrow steps plus 16 other key vectors. range-checks defines the demonstrated product scope."
     },
     {
       "Requirement": "Exact selected plain text, decoded RTF/Xaml and whole-document CF_HTML",
@@ -59,8 +60,9 @@
     },
     {
       "Requirement": "All partial-range list marker/tab cases and XamlPackage media fidelity",
-      "Implementation": "Unverified",
-      "Proof": "Basic stock partial oracle and rich actual partial copy exist; exhaustive independent comparison pending"
+      "Implementation": "Implemented",
+      "Proof": "Stock oracles compare within-run, partial cross-item, whole item without break, next-item insertion, final-item partial and partial cross-cell text plus decoded RTF/Xaml styles. Actual list partial copying and mixed XamlPackage decoding pass both 99da420 independent clients.",
+      "StockEquivalentScope": "Public stock XamlPackage contains twelve inline bitmaps with matching decoded pixels; it omits the block diagram on both routes. Whole-document CF_HTML retains all thirteen media through the existing exporter. This omission is explicit, not claimed media parity beyond stock."
     },
     {
       "Requirement": "UIA document/list/table/heading/link tree, selection and measured ranges",
@@ -69,8 +71,8 @@
     },
     {
       "Requirement": "Complete stock-oracle TextUnit and text-attribute range operation matrix",
-      "Implementation": "Unverified",
-      "Proof": "Character/word/paragraph and selected attributes tested; full format/line/page/movement/attribute oracle pending"
+      "Implementation": "Implemented",
+      "Proof": "range-checks: all seven TextUnits, counts -2/-1/0/1/2, both endpoints, collapsed/non-collapsed ranges, clone/compare, selection errors and thirteen attributes/FindAttribute in both directions. 943 complete independent operation records match stock on both 88b07cb and 99da420 hosts, including distant text."
     },
     {
       "Requirement": "Search, source navigation, anchors and transient document lifecycle",
@@ -89,8 +91,8 @@
     },
     {
       "Requirement": "Stale failure and clipboard-close races; bounded retention across full studio stress",
-      "Implementation": "Unverified",
-      "Proof": "Guards implemented; exhaustive independent race/retention execution pending"
+      "Implementation": "Implemented",
+      "Proof": "99da420 lifecycle: obsolete worker exception rejected, superseded copy cancelled before grant, queued OLE commit rejected after closure with unchanged clipboard sequence; explicit source/surface detachment. Independent studio client holds twelve invalidated ranges through twelve real replacements. Weak range/peer owners and bounded session/payload ownership; natural-GC observations do not certify zero retention or absence of leaks."
     },
     {
       "Requirement": "Visual equivalence review beyond measured logical/style/geometry assertions",

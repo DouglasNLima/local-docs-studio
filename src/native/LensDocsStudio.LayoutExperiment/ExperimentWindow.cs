@@ -205,12 +205,14 @@ internal sealed class ExperimentWindow : Window
                     if (closed || request.Version != version || token.IsCancellationRequested || request.Appearance != ExperimentAppearance.Capture(ThemePreference))
                     { Log("stale-rejected", request.Version); request.Completion.TrySetResult(false); continue; }
                     Trace?.Stage("snapshot-install-enter", new { request.Version, request.Appearance });
+                    var hadDocumentFocus = Surface.IsKeyboardFocusWithin;
                     Surface.Install(snapshot);
                     Trace?.Stage("snapshot-install-exit", new { request.Version });
                     if (old is not null) { Surface.SelectSource(SourceEdit.Transform(old.Model.Source, request.Source, selectionStart), SourceEdit.Transform(old.Model.Source, request.Source, selectionEnd)); Surface.RestoreViewportSourceAnchor((SourceEdit.Transform(old.Model.Source, request.Source, anchor.Source), anchor.Delta)); }
                     else if (request.Restore is { } restored) { Surface.SelectSource(restored.SelectionStart, restored.SelectionEnd); Surface.RestoreViewportSourceAnchor((restored.AnchorSource, restored.AnchorDelta)); }
                     Log("installed", request.Version); Installed?.Invoke(snapshot);
                     Trace?.Stage("window-layout-enter", new { request.Version }); UpdateLayout();
+                    if (hadDocumentFocus) Surface.Focus();
                     Trace?.Stage("window-layout-exit", new { request.Version });
                     await Dispatcher.InvokeAsync(() => Log("complete-preview-input-delivered", request.Version), DispatcherPriority.Input);
                     if (closed || request.Version != version || request.Appearance != ExperimentAppearance.Capture(ThemePreference))

@@ -41,18 +41,28 @@ internal static class AppearanceChecks
             if (NativeTestHighContrast.IsEnabledNow) throw new IOException("The disposable appearance test requires an initial normal desktop.");
             await window.Request(fixture.Source, "Light"); await Capture("light.png"); phase = "Dark";
             await window.Request(fixture.Source, "Dark"); await Capture("dark.png"); phase = "actual-enable";
+            var selectedSource = fixture.Source.LastIndexOf("Mixed final marker.", StringComparison.Ordinal);
+            window.Surface.SelectSource(selectedSource, selectedSource + "Mixed final marker.".Length); window.Surface.Focus();
+            void SelectionCurrent()
+            {
+                if (window.Surface.SelectionSourceStart != selectedSource || window.Surface.SelectionSourceEnd != selectedSource + "Mixed final marker.".Length || !window.Surface.IsKeyboardFocusWithin)
+                    throw new IOException("Automatic appearance replacement lost current selection or document focus.");
+            }
             // OS broadcasts can take time; execute the setting request away from the application dispatcher.
             contrast = await Task.Run(() => new NativeTestHighContrast());
             await Wait(() => NativeTestHighContrast.IsEnabledNow && window.Surface.Snapshot?.Appearance == ExperimentAppearance.Capture("Dark")
                 && window.Surface.Snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal));
+            SelectionCurrent();
             await Capture("actual-high-contrast.png"); phase = "automatic-disable";
             await Task.Run(contrast.Dispose); disabledByTest = true;
             // No manual Request/ApplyTheme after disable: current preview must update automatically.
             await Wait(() => !NativeTestHighContrast.IsEnabledNow && window.Surface.Snapshot?.Appearance == "Dark" && window.Surface.Snapshot.Model.Source == fixture.Source);
+            SelectionCurrent();
             await Capture("automatic-disable-current.png");
             if (invalid) throw new IOException("A source/version/appearance-stale installation was observed.");
             Program.Write(Path.Combine(output, "appearance.json"), new { Status = gaps.DefaultIfEmpty().Max() <= 100 ? "PASS" : "FAIL", Installations = installations,
                 AutomaticEnableCurrentDisableCurrent = "PASS", ManualThemeAfterDisable = false, FailureOnlyRestoration = false,
+                SelectionAndFocusAcrossAutomaticTransitions = "PASS",
                 InputGapsMilliseconds = gaps, InputTimeline = timeline, DiagnosticCaptures = captures, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), Events = window.Events.ToArray() });
         }
         catch (Exception error)
