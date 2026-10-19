@@ -66,7 +66,11 @@ internal sealed class OperationTrace : IDisposable
         {
             var value = Marshal.PtrToStructure<BeforeMessage>(lParam);
             messages.Push((value.Window, value.Message, Stopwatch.GetTimestamp()));
-            if (value.Message is 0x001A or 0x0015 or 0x031A || detailed && DetailedMessage(value.Message)) Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64(), NativeThread = GetCurrentThreadId() });
+            if (value.Message is 0x001A or 0x0015 or 0x031A || detailed && DetailedMessage(value.Message))
+            {
+                if (detailed) Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64(), NativeThread = GetCurrentThreadId(), Parameters = value.LParam.ToInt64() });
+                else Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64(), NativeThread = GetCurrentThreadId() });
+            }
         }
         return CallNextHookEx(beforeHook, code, wParam, lParam);
     }
@@ -118,7 +122,7 @@ internal sealed class OperationTrace : IDisposable
         return IntPtr.Zero;
     }
     private static double Elapsed(long start) => (Stopwatch.GetTimestamp() - start) * 1000d / Stopwatch.Frequency;
-    private static bool DetailedMessage(uint message) => message is 0x0006 or 0x0007 or 0x0008 or 0x000A or 0x0018 or 0x001C or 0x003D or 0x0100 or 0x0101 or 0x010F or 0x0110 or 0x0281 or 0x0282 or 0x0286;
+    private static bool DetailedMessage(uint message) => message is 0x0006 or 0x0007 or 0x0008 or 0x000A or 0x0018 or 0x001C or 0x003D or 0x0100 or 0x0101 or 0x010F or 0x0110 or 0x0200 or 0x0201 or 0x0202 or 0x0281 or 0x0282 or 0x0286;
     private void Posted(object? sender, DispatcherHookEventArgs args) { if (Thread.CurrentThread == dispatcher.Thread && posted.Count < 32768) posted[args.Operation] = Stopwatch.GetTimestamp(); }
     private void Started(object? sender, DispatcherHookEventArgs args)
     {
@@ -136,7 +140,8 @@ internal sealed class OperationTrace : IDisposable
     {
         var value = args.StagingItem.Input; if (!Relevant(value)) return;
         input[value] = Stopwatch.GetTimestamp();
-        Stage("wpf-input-enter", new { Event = value.RoutedEvent.Name, NativeThread = GetCurrentThreadId(), Key = (value as KeyEventArgs)?.Key.ToString(), Source = value.Source?.GetType().Name });
+        Stage("wpf-input-enter", new { Event = value.RoutedEvent.Name, NativeThread = GetCurrentThreadId(), Key = (value as KeyEventArgs)?.Key.ToString(), Source = value.Source?.GetType().Name,
+            MousePoint = (value as MouseButtonEventArgs)?.GetPosition(source.RootVisual as IInputElement).ToString(), Modifiers = Keyboard.Modifiers.ToString() });
     }
     private void AfterInput(object sender, ProcessInputEventArgs args)
     {

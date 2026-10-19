@@ -14,7 +14,7 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Fresh-process pre-copy reading controls; never an acceptance replacement.</summary>
 internal static class ReadingInputChecks
 {
-    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment, bool exactEdgeControl = false)
+    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment, bool exactEdgeControl = false, bool positionOnlyControl = false)
     {
         if (adapter is not ("stock" or "candidate") || apartment is not ("STA" or "MTA")) throw new ArgumentException("Choose stock/candidate and STA/MTA.");
         if (ExperimentAppearance.ActualHighContrast) throw new IOException("The reading control requires initial normal appearance.");
@@ -45,7 +45,7 @@ internal static class ReadingInputChecks
         void Input() { var at = Stopwatch.GetTimestamp(); var gap = (at - last) * 1000d / Stopwatch.Frequency; timeline.Add(new { StartTimestamp = last, EndTimestamp = at, Milliseconds = gap }); maximum = Math.Max(maximum, gap); last = at; }
         heartbeat.Tick += (_, _) => Input(); heartbeat.Start();
         var info = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment, exactEdgeControl.ToString() }) info.ArgumentList.Add(argument);
+        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment, exactEdgeControl.ToString(), positionOnlyControl.ToString() }) info.ArgumentList.Add(argument);
         Process? client = null; string? error = null;
         try
         {
@@ -78,7 +78,19 @@ internal static class ReadingInputChecks
     [DllImport("user32.dll")] private static extern bool SetPhysicalCursorPos(int x, int y);
     [DllImport("user32.dll")] private static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
     [DllImport("user32.dll")] private static extern void mouse_event(uint flags, uint x, uint y, uint data, UIntPtr extra);
-    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment, bool exactEdgeControl)
+    [DllImport("user32.dll")] private static extern int GetSystemMetrics(int index);
+    [DllImport("user32.dll", SetLastError = true)] private static extern uint SendInput(uint count, NativeInput[] inputs, int size);
+    [StructLayout(LayoutKind.Sequential)] private struct MouseInput { public int X, Y; public uint Data, Flags, Time; public UIntPtr Extra; }
+    [StructLayout(LayoutKind.Explicit)] private struct InputData { [FieldOffset(0)] public MouseInput Mouse; }
+    [StructLayout(LayoutKind.Sequential)] private struct NativeInput { public uint Type; public InputData Data; }
+    private static void Move(int x, int y)
+    {
+        var left = GetSystemMetrics(76); var top = GetSystemMetrics(77); var width = GetSystemMetrics(78); var height = GetSystemMetrics(79);
+        var value = new NativeInput { Data = new InputData { Mouse = new MouseInput { X = (int)Math.Round((x - left) * 65535d / (width - 1)),
+            Y = (int)Math.Round((y - top) * 65535d / (height - 1)), Flags = 0x8000 | 0x4000 | 1 } } };
+        if (SendInput(1, [value], Marshal.SizeOf<NativeInput>()) != 1) throw new System.ComponentModel.Win32Exception();
+    }
+    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment, bool exactEdgeControl, bool positionOnlyControl)
     {
         var result = 1;
         var thread = new Thread(() => result = Drive()) { Name = "Independent first reading input " + apartment };
@@ -93,7 +105,7 @@ internal static class ReadingInputChecks
                 SetThreadDpiAwarenessContext(new IntPtr(-4));
                 IndependentUiaClient.InitialiseOwnedInput(output);
                 using var process = Process.GetProcessById(processId);
-                At("client-start", new { Apartment = Thread.CurrentThread.GetApartmentState().ToString() });
+                At("client-start", new { Apartment = Thread.CurrentThread.GetApartmentState().ToString(), MouseDriver = positionOnlyControl ? "SetPhysicalCursorPos control" : "Queued SendInput absolute virtual-desktop moves" });
                 var owner = AutomationElement.FromHandle(process.MainWindowHandle);
                 var document = owner.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, adapter == "stock" ? "ReadingInputDocument" : "ExperimentalDocument")) ?? throw new IOException("Reading document unavailable.");
                 var text = (TextPattern)document.GetCurrentPattern(TextPattern.Pattern);
@@ -121,8 +133,9 @@ internal static class ReadingInputChecks
                 At("mouse-geometry", new { First = a.ToString(), Second = b.ToString(), Document = document.Current.BoundingRectangle.ToString(), ExactEdgeControl = exactEdgeControl, EndX = endX,
                     EndY = point.Y, WordAtEndPoint = atPoint.GetText(-1), PointRelativeToWordEnd = text.RangeFromPoint(point).CompareEndpoints(TextPatternRangeEndpoint.Start, second, TextPatternRangeEndpoint.End) });
                 if (!document.Current.BoundingRectangle.Contains(point)) throw new IOException("The real drag endpoint is outside the shown document.");
-                At("mouse-enter"); SetPhysicalCursorPos((int)a.Left + 1, (int)(a.Top + a.Height / 2)); mouse_event(2, 0, 0, 0, UIntPtr.Zero); acknowledgement.AfterRealInput(process.MainWindowHandle);
-                for (var step = 1; step <= 8; step++) { SetPhysicalCursorPos((int)(a.Left + (endX - a.Left) * step / 8), (int)(a.Top + a.Height / 2 + (b.Top - a.Top) * step / 8)); Thread.Sleep(15); }
+                void MoveObserved(int x, int y) { if (positionOnlyControl) { if (!SetPhysicalCursorPos(x, y)) throw new System.ComponentModel.Win32Exception(); } else Move(x, y); }
+                At("mouse-enter"); MoveObserved((int)a.Left + 1, (int)(a.Top + a.Height / 2)); mouse_event(2, 0, 0, 0, UIntPtr.Zero); acknowledgement.AfterRealInput(process.MainWindowHandle);
+                for (var step = 1; step <= 8; step++) { MoveObserved((int)(a.Left + (endX - a.Left) * step / 8), (int)(a.Top + a.Height / 2 + (b.Top - a.Top) * step / 8)); Thread.Sleep(15); }
                 mouse_event(4, 0, 0, 0, UIntPtr.Zero); acknowledgement.AfterRealInput(process.MainWindowHandle);
                 IndependentUiaClient.Wait(() => (lastSelection = text.GetSelection().Single().GetText(-1)).Contains("word2", StringComparison.Ordinal)); At("mouse-selection-visible", new { Selection = lastSelection });
                 distant.ScrollIntoView(true); IndependentUiaClient.Wait(() => distant.GetBoundingRectangles().Length > 0); At("distant-navigation-visible");

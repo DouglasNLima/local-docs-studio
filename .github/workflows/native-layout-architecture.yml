@@ -18,6 +18,10 @@ on:
         description: One bounded reading-driver correction round; reuse unaffected appearance/native profiles
         type: boolean
         default: false
+      input_driver:
+        description: Final bounded queued-movement/position-only driver control; no OS mutation
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
@@ -38,10 +42,10 @@ jobs:
       - name: Fresh-process same-host controls, all outcomes preserved
         shell: pwsh
         run: |
-          $parameters = @{ Replication=${{ matrix.replication }}; CorrectionRound=('${{ inputs.input_correction }}' -eq 'true') }
+          $parameters = @{ Replication=${{ matrix.replication }}; CorrectionRound=('${{ inputs.input_correction }}' -eq 'true'); DriverRound=('${{ inputs.input_driver }}' -eq 'true') }
           & scripts/native/Test-ContinuousInputDiagnostics.ps1 @parameters
       - name: Separate bounded native CPU and scheduling profiles, never acceptance
-        if: always() && matrix.replication == 1 && !inputs.input_correction
+        if: always() && matrix.replication == 1 && !inputs.input_correction && !inputs.input_driver
         run: pwsh -NoProfile -File scripts/native/Trace-ContinuousInputDiagnostics.ps1
       - uses: actions/upload-artifact@v4
         if: always()
@@ -50,7 +54,7 @@ jobs:
           path: artifacts/layout-input-diagnostics/
           retention-days: 90
       - uses: actions/upload-artifact@v4
-        if: always() && matrix.replication == 1 && !inputs.input_correction
+        if: always() && matrix.replication == 1 && !inputs.input_correction && !inputs.input_driver
         with:
           name: bounded-input-native-profiles
           path: artifacts/layout-input-profiles/

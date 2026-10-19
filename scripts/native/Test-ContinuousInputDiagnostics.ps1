@@ -1,4 +1,4 @@
-param([ValidateSet(1,2)][int]$Replication = 1, [string]$OutputDirectory = 'artifacts/layout-input-diagnostics', [switch]$CorrectionRound)
+param([ValidateSet(1,2)][int]$Replication = 1, [string]$OutputDirectory = 'artifacts/layout-input-diagnostics', [switch]$CorrectionRound, [switch]$DriverRound)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 Set-Location $root
@@ -29,12 +29,13 @@ function Invoke-Control([string]$Name, [string[]]$Arguments) {
 $sides = if ($Replication -eq 1) { @('candidate','stock') } else { @('stock','candidate') }
 $apartments = if ($Replication -eq 1) { @('STA','MTA') } else { @('MTA','STA') }
 foreach ($apartment in $apartments) { foreach ($side in $sides) { Invoke-Control "reading-$side-$apartment" @('--reading-input-checks','--adapter',$side,'--client-apartment',$apartment) } }
-if ($CorrectionRound) { Invoke-Control 'reading-stock-exact-edge-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-exact-edge-control') }
-Invoke-Control 'original-list-interaction' @('--scenario','list','--adapter','candidate','--uia','--contract-v2')
-$modes = if ($CorrectionRound) { if ($Replication -eq 1) { @('media-checks','media-controls') } else { @('media-controls','media-checks') } }
+if ($DriverRound) { Invoke-Control 'reading-stock-position-only-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-position-only-control') }
+elseif ($CorrectionRound) { Invoke-Control 'reading-stock-exact-edge-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-exact-edge-control') }
+if (-not $DriverRound) { Invoke-Control 'original-list-interaction' @('--scenario','list','--adapter','candidate','--uia','--contract-v2') }
+$modes = if ($DriverRound) { @() } elseif ($CorrectionRound) { if ($Replication -eq 1) { @('media-checks','media-controls') } else { @('media-controls','media-checks') } }
     elseif ($Replication -eq 1) { @('appearance','appearance-stock-control','appearance-controls','media-checks','media-controls') } else { @('appearance-controls','appearance-stock-control','appearance','media-controls','media-checks') }
 foreach ($mode in $modes) { Invoke-Control $mode @("--$mode") }
-@{ DiagnosticOnly=$true; Source=(git rev-parse HEAD); SourceDirty=$env:LENS_LAYOUT_SOURCE_DIRTY; Replication=$Replication; CorrectionRound=[bool]$CorrectionRound; SideOrder=$sides; ClientOrder=$apartments;
+@{ DiagnosticOnly=$true; Source=(git rev-parse HEAD); SourceDirty=$env:LENS_LAYOUT_SOURCE_DIRTY; Replication=$Replication; CorrectionRound=[bool]$CorrectionRound; DriverRound=[bool]$DriverRound; SideOrder=$sides; ClientOrder=$apartments;
    ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Host=[Environment]::MachineName; Os=[Environment]::OSVersion.ToString(); CpuAvailable=[Environment]::ProcessorCount; Cpu=$env:PROCESSOR_IDENTIFIER;
    HarnessSha256=(Get-FileHash artifacts/layout-input-bin/LensDocsStudio.LayoutExperiment.dll).Hash; Sdk=(dotnet --info); Runs=$runs;
    Meaning='One bounded focused round, every result retained. This command verifies execution, not the unchanged 100 ms acceptance row.' } | ConvertTo-Json -Depth 10 | Set-Content "$output/diagnostic-round.json"
