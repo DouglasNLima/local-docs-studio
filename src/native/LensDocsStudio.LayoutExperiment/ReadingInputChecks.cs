@@ -14,7 +14,7 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Fresh-process pre-copy reading controls; never an acceptance replacement.</summary>
 internal static class ReadingInputChecks
 {
-    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment, bool exactEdgeControl = false, bool positionOnlyControl = false)
+    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment, bool exactEdgeControl = false, bool positionOnlyControl = false, bool preselectedControl = false)
     {
         if (adapter is not ("stock" or "candidate") || apartment is not ("STA" or "MTA")) throw new ArgumentException("Choose stock/candidate and STA/MTA.");
         if (ExperimentAppearance.ActualHighContrast) throw new IOException("The reading control requires initial normal appearance.");
@@ -45,7 +45,7 @@ internal static class ReadingInputChecks
         void Input() { var at = Stopwatch.GetTimestamp(); var gap = (at - last) * 1000d / Stopwatch.Frequency; timeline.Add(new { StartTimestamp = last, EndTimestamp = at, Milliseconds = gap }); maximum = Math.Max(maximum, gap); last = at; }
         heartbeat.Tick += (_, _) => Input(); heartbeat.Start();
         var info = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment, exactEdgeControl.ToString(), positionOnlyControl.ToString() }) info.ArgumentList.Add(argument);
+        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment, exactEdgeControl.ToString(), positionOnlyControl.ToString(), preselectedControl.ToString() }) info.ArgumentList.Add(argument);
         Process? client = null; string? error = null;
         try
         {
@@ -90,7 +90,7 @@ internal static class ReadingInputChecks
             Y = (int)Math.Round((y - top) * 65535d / (height - 1)), Flags = 0x8000 | 0x4000 | 1 } } };
         if (SendInput(1, [value], Marshal.SizeOf<NativeInput>()) != 1) throw new System.ComponentModel.Win32Exception();
     }
-    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment, bool exactEdgeControl, bool positionOnlyControl)
+    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment, bool exactEdgeControl, bool positionOnlyControl, bool preselectedControl)
     {
         var result = 1;
         var thread = new Thread(() => result = Drive()) { Name = "Independent first reading input " + apartment };
@@ -125,6 +125,9 @@ internal static class ReadingInputChecks
                 Chord("ctrl-home", 0x11, 0x24); Chord("shift-down", 0x10, 0x28);
                 IndependentUiaClient.Wait(() => text.GetSelection().Single().GetText(-1).Contains("\r\n", StringComparison.Ordinal)); At("keyboard-selection-visible");
                 first.ScrollIntoView(true); var second = text.DocumentRange.FindText("word2", false, false)!;
+                At("mouse-selection-precondition", new { RetainPriorKeyboardSelectionControl = preselectedControl, Before = text.GetSelection().Single().GetText(-1) });
+                if (!preselectedControl) insertion.Select();
+                At("mouse-selection-starting-range", new { Text = text.GetSelection().Single().GetText(-1) });
                 IndependentUiaClient.Wait(() => first.GetBoundingRectangles().Length > 0 && second.GetBoundingRectangles().Length > 0);
                 var a = first.GetBoundingRectangles()[0]; var b = second.GetBoundingRectangles()[0];
                 var endX = (int)b.Right + (exactEdgeControl ? 0 : 2);

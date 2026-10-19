@@ -29,7 +29,7 @@ function Invoke-Control([string]$Name, [string[]]$Arguments) {
 $sides = if ($Replication -eq 1) { @('candidate','stock') } else { @('stock','candidate') }
 $apartments = if ($Replication -eq 1) { @('STA','MTA') } else { @('MTA','STA') }
 foreach ($apartment in $apartments) { foreach ($side in $sides) { Invoke-Control "reading-$side-$apartment" @('--reading-input-checks','--adapter',$side,'--client-apartment',$apartment) } }
-if ($DriverRound) { Invoke-Control 'reading-stock-position-only-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-position-only-control') }
+if ($DriverRound) { Invoke-Control 'reading-stock-preselected-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-preselected-control') }
 elseif ($CorrectionRound) { Invoke-Control 'reading-stock-exact-edge-control' @('--reading-input-checks','--adapter','stock','--client-apartment','STA','--reading-exact-edge-control') }
 if (-not $DriverRound) { Invoke-Control 'original-list-interaction' @('--scenario','list','--adapter','candidate','--uia','--contract-v2') }
 $modes = if ($DriverRound) { @() } elseif ($CorrectionRound) { if ($Replication -eq 1) { @('media-checks','media-controls') } else { @('media-controls','media-checks') } }

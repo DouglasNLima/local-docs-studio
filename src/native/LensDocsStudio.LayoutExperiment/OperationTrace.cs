@@ -25,6 +25,9 @@ internal sealed class OperationTrace : IDisposable
     private readonly Dictionary<DispatcherOperation, long> posted = [];
     private readonly Dictionary<InputEventArgs, long> input = [];
     private readonly bool detailed;
+    private readonly Window owner;
+    private readonly QueryContinueDragEventHandler dragQuery;
+    private readonly GiveFeedbackEventHandler dragFeedback;
     private long inputPending, nativePending;
     [StructLayout(LayoutKind.Sequential)] private struct BeforeMessage { public IntPtr LParam, WParam; public uint Message; public IntPtr Window; }
     [StructLayout(LayoutKind.Sequential)] private struct AfterMessage { public IntPtr Result, LParam, WParam; public uint Message; public IntPtr Window; }
@@ -40,6 +43,9 @@ internal sealed class OperationTrace : IDisposable
     public object[] Events => events.ToArray();
     public OperationTrace(Window window)
     {
+        owner = window;
+        dragQuery = (_, args) => Stage("wpf-query-continue-drag", new { Action = args.Action.ToString(), args.EscapePressed, KeyStates = args.KeyStates.ToString() });
+        dragFeedback = (_, args) => Stage("wpf-give-feedback", new { Effects = args.Effects.ToString(), args.UseDefaultCursors });
         detailed = DetailedForChecks;
         dispatcher = window.Dispatcher; handle = new WindowInteropHelper(window).Handle;
         source = HwndSource.FromHwnd(handle); source.AddHook(Hook);
@@ -55,6 +61,8 @@ internal sealed class OperationTrace : IDisposable
             dispatcher.Hooks.OperationPosted += Posted;
             InputManager.Current.PreProcessInput += BeforeInput;
             InputManager.Current.PostProcessInput += AfterInput;
+            owner.AddHandler(DragDrop.PreviewQueryContinueDragEvent, dragQuery, true);
+            owner.AddHandler(DragDrop.PreviewGiveFeedbackEvent, dragFeedback, true);
         }
         Stage("trace-start", new { Handle = handle.ToInt64(), Stopwatch.Frequency, NativeThread = GetCurrentThreadId(), Utc = DateTimeOffset.UtcNow, Process = Environment.ProcessId,
             ProbeVersion = "parallel-input-native-v1", AdditionalDetail = detailed ? "input-callback-native-v2" : null, IntervalMilliseconds = 16 });
@@ -165,6 +173,7 @@ internal sealed class OperationTrace : IDisposable
         {
             dispatcher.Hooks.OperationPosted -= Posted;
             InputManager.Current.PreProcessInput -= BeforeInput; InputManager.Current.PostProcessInput -= AfterInput;
+            owner.RemoveHandler(DragDrop.PreviewQueryContinueDragEvent, dragQuery); owner.RemoveHandler(DragDrop.PreviewGiveFeedbackEvent, dragFeedback);
             if (CurrentDetailed == this) CurrentDetailed = null;
         }
         Stage("trace-end", new { InputOutstandingSince = inputPending, NativeOutstandingSince = nativePending, OutstandingOperations = operations.Count, DroppedEvents = Math.Max(0, count - 32768) });

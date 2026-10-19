@@ -1,4 +1,4 @@
-param([string]$OutputDirectory = 'artifacts/layout-input-profiles')
+param([string]$OutputDirectory = 'artifacts/layout-input-profiles', [ValidateSet('','candidate','stock')][string]$ColdRoute = '')
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '../..')).Path
 Set-Location $root
@@ -19,6 +19,7 @@ $cases = @(
     @{Name='media-candidate'; Arguments=@('--media-checks')},
     @{Name='media-controls'; Arguments=@('--media-controls')}
 )
+if ($ColdRoute) { $chosen = if ($ColdRoute -eq 'candidate') { 'media-candidate' } else { 'media-controls' }; $cases = @($cases | Where-Object Name -eq $chosen) }
 $rows = [Collections.Generic.List[object]]::new()
 foreach ($case in $cases) {
     $directory = [IO.Path]::GetFullPath((Join-Path $OutputDirectory $case.Name)); New-Item -ItemType Directory -Path $directory | Out-Null
@@ -36,4 +37,6 @@ foreach ($case in $cases) {
     }
     finally { & $wpr.Source -stop "$directory/native.etl" 'PR38 bounded input diagnostic; not acceptance' -skipPdbGen -compress *> "$directory/wpr-stop.txt" }
 }
-@{ DiagnosticOnly=$true; Source=(git rev-parse HEAD); SourceDirty=$env:LENS_LAYOUT_SOURCE_DIRTY; Runs=$rows; Meaning='Bounded native CPU/scheduling controls; profiler overhead is not acceptance. No target retries or native setting changes.' } | ConvertTo-Json -Depth 8 | Set-Content "$OutputDirectory/profiles.json"
+@{ DiagnosticOnly=$true; Source=(git rev-parse HEAD); SourceDirty=$env:LENS_LAYOUT_SOURCE_DIRTY; Runs=$rows; ColdRoute=$ColdRoute;
+   Temperature=$(if ($ColdRoute) { 'First harness native dialogue on a fresh disposable hosted machine; profiler overhead retained' } else { 'Separate profiles after the focused controls; native host paths already exercised' });
+   Meaning='Bounded native CPU/scheduling controls; profiler overhead is not acceptance. No target retries or native setting changes. Independent cold-route hosts do not support a causal route-speed comparison.' } | ConvertTo-Json -Depth 8 | Set-Content "$OutputDirectory/profiles.json"
