@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace LensDocsStudio.LayoutExperiment;
@@ -10,6 +11,8 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Bounded diagnostic observations. Never pumps, pauses or resets a product clock.</summary>
 internal sealed class OperationTrace : IDisposable
 {
+    internal static bool DetailedForChecks { get; set; }
+    internal static OperationTrace? CurrentDetailed { get; private set; }
     private const int ProbeMessage = 0x8000 + 0x738;
     [DllImport("user32.dll")] private static extern bool PostMessage(IntPtr window, int message, IntPtr wParam, IntPtr lParam);
     [DllImport("user32.dll")] internal static extern bool IsWindowEnabled(IntPtr window);
@@ -19,6 +22,9 @@ internal sealed class OperationTrace : IDisposable
     private readonly IntPtr handle;
     private readonly System.Threading.Timer timer;
     private readonly Dictionary<DispatcherOperation, long> operations = [];
+    private readonly Dictionary<DispatcherOperation, long> posted = [];
+    private readonly Dictionary<InputEventArgs, long> input = [];
+    private readonly bool detailed;
     private long inputPending, nativePending;
     [StructLayout(LayoutKind.Sequential)] private struct BeforeMessage { public IntPtr LParam, WParam; public uint Message; public IntPtr Window; }
     [StructLayout(LayoutKind.Sequential)] private struct AfterMessage { public IntPtr Result, LParam, WParam; public uint Message; public IntPtr Window; }
@@ -34,6 +40,7 @@ internal sealed class OperationTrace : IDisposable
     public object[] Events => events.ToArray();
     public OperationTrace(Window window)
     {
+        detailed = DetailedForChecks;
         dispatcher = window.Dispatcher; handle = new WindowInteropHelper(window).Handle;
         source = HwndSource.FromHwnd(handle); source.AddHook(Hook);
         beforeCallback = Before; afterCallback = After;
@@ -42,8 +49,15 @@ internal sealed class OperationTrace : IDisposable
         if (beforeHook == IntPtr.Zero || afterHook == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
         dispatcher.Hooks.OperationStarted += Started;
         dispatcher.Hooks.OperationCompleted += Completed;
+        if (detailed)
+        {
+            CurrentDetailed = this;
+            dispatcher.Hooks.OperationPosted += Posted;
+            InputManager.Current.PreProcessInput += BeforeInput;
+            InputManager.Current.PostProcessInput += AfterInput;
+        }
         Stage("trace-start", new { Handle = handle.ToInt64(), Stopwatch.Frequency, NativeThread = GetCurrentThreadId(), Utc = DateTimeOffset.UtcNow, Process = Environment.ProcessId,
-            ProbeVersion = "parallel-input-native-v1", IntervalMilliseconds = 16 });
+            ProbeVersion = "parallel-input-native-v1", AdditionalDetail = detailed ? "input-callback-native-v2" : null, IntervalMilliseconds = 16 });
         timer = new System.Threading.Timer(_ => Pulse(), null, 16, 16);
     }
     private IntPtr Before(int code, IntPtr wParam, IntPtr lParam)
@@ -52,7 +66,7 @@ internal sealed class OperationTrace : IDisposable
         {
             var value = Marshal.PtrToStructure<BeforeMessage>(lParam);
             messages.Push((value.Window, value.Message, Stopwatch.GetTimestamp()));
-            if (value.Message is 0x001A or 0x0015 or 0x031A) Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64() });
+            if (value.Message is 0x001A or 0x0015 or 0x031A || detailed && DetailedMessage(value.Message)) Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64(), NativeThread = GetCurrentThreadId() });
         }
         return CallNextHookEx(beforeHook, code, wParam, lParam);
     }
@@ -62,7 +76,7 @@ internal sealed class OperationTrace : IDisposable
         {
             var value = Marshal.PtrToStructure<AfterMessage>(lParam); var start = messages.Pop();
             if (value.Window != start.Window || value.Message != start.Message) Stage("native-hook-pair-mismatch");
-            else if (Elapsed(start.Start) >= 8 || value.Message is 0x001A or 0x0015 or 0x031A)
+            else if (Elapsed(start.Start) >= 8 || value.Message is 0x001A or 0x0015 or 0x031A || detailed && DetailedMessage(value.Message))
                 Stage("native-message-exit", new { value.Message, Handle = value.Window.ToInt64(), StartTimestamp = start.Start, Milliseconds = Elapsed(start.Start) });
         }
         return CallNextHookEx(afterHook, code, wParam, lParam);
@@ -104,11 +118,37 @@ internal sealed class OperationTrace : IDisposable
         return IntPtr.Zero;
     }
     private static double Elapsed(long start) => (Stopwatch.GetTimestamp() - start) * 1000d / Stopwatch.Frequency;
-    private void Started(object? sender, DispatcherHookEventArgs args) => operations[args.Operation] = Stopwatch.GetTimestamp();
+    private static bool DetailedMessage(uint message) => message is 0x0006 or 0x0007 or 0x0008 or 0x000A or 0x0018 or 0x001C or 0x003D or 0x0100 or 0x0101 or 0x010F or 0x0110 or 0x0281 or 0x0282 or 0x0286;
+    private void Posted(object? sender, DispatcherHookEventArgs args) { if (Thread.CurrentThread == dispatcher.Thread) posted[args.Operation] = Stopwatch.GetTimestamp(); }
+    private void Started(object? sender, DispatcherHookEventArgs args)
+    {
+        operations[args.Operation] = Stopwatch.GetTimestamp();
+        if (posted.Remove(args.Operation, out var at) && Elapsed(at) >= 8)
+            Stage("dispatcher-queue-delay", new { StartTimestamp = at, Milliseconds = Elapsed(at), Priority = args.Operation.Priority.ToString() });
+    }
     private void Completed(object? sender, DispatcherHookEventArgs args)
     {
         if (operations.Remove(args.Operation, out var start) && Elapsed(start) >= 8)
             Stage("dispatcher-operation", new { StartTimestamp = start, Milliseconds = Elapsed(start), Priority = args.Operation.Priority.ToString(), TaskStatus = args.Operation.Task.Status.ToString() });
+    }
+    private static bool Relevant(InputEventArgs value) => value is KeyEventArgs or KeyboardFocusChangedEventArgs or MouseButtonEventArgs;
+    private void BeforeInput(object sender, PreProcessInputEventArgs args)
+    {
+        var value = args.StagingItem.Input; if (!Relevant(value)) return;
+        input[value] = Stopwatch.GetTimestamp();
+        Stage("wpf-input-enter", new { Event = value.RoutedEvent.Name, NativeThread = GetCurrentThreadId(), Key = (value as KeyEventArgs)?.Key.ToString(), Source = value.Source?.GetType().Name });
+    }
+    private void AfterInput(object sender, ProcessInputEventArgs args)
+    {
+        var value = args.StagingItem.Input;
+        if (input.Remove(value, out var at)) Stage("wpf-input-exit", new { Event = value.RoutedEvent.Name, StartTimestamp = at, Milliseconds = Elapsed(at), value.Handled });
+    }
+    internal static IDisposable? Callback(string name) => CurrentDetailed is { } trace ? new CallbackScope(trace, name) : null;
+    private sealed class CallbackScope : IDisposable
+    {
+        private readonly OperationTrace trace; private readonly string name; private readonly long at = Stopwatch.GetTimestamp();
+        internal CallbackScope(OperationTrace trace, string name) { this.trace = trace; this.name = name; trace.Stage("application-callback-enter", new { Name = name, NativeThread = GetCurrentThreadId() }); }
+        public void Dispose() => trace.Stage("application-callback-exit", new { Name = name, StartTimestamp = at, Milliseconds = Elapsed(at) });
     }
     public void Dispose()
     {
@@ -116,6 +156,12 @@ internal sealed class OperationTrace : IDisposable
         timer.Dispose();
         UnhookWindowsHookEx(beforeHook); UnhookWindowsHookEx(afterHook);
         dispatcher.Hooks.OperationStarted -= Started; dispatcher.Hooks.OperationCompleted -= Completed; source.RemoveHook(Hook);
+        if (detailed)
+        {
+            dispatcher.Hooks.OperationPosted -= Posted;
+            InputManager.Current.PreProcessInput -= BeforeInput; InputManager.Current.PostProcessInput -= AfterInput;
+            if (CurrentDetailed == this) CurrentDetailed = null;
+        }
         Stage("trace-end", new { InputOutstandingSince = inputPending, NativeOutstandingSince = nativePending, OutstandingOperations = operations.Count, DroppedEvents = Math.Max(0, count - 32768) });
     }
 }

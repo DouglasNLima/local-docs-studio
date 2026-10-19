@@ -208,6 +208,7 @@ internal sealed class LayoutSurface : Panel
     }
     public void Select(int anchor, int active, bool preferPreviousRow = false, bool previousCellEnd = false)
     {
+        using var diagnostic = OperationTrace.Callback("LayoutSurface.Select");
         selectedCopy?.Cancel(); pendingCopy = null;
         var length = Snapshot?.Model.Text.Length ?? 0;
         Anchor = Math.Clamp(anchor, 0, length); Active = Math.Clamp(active, 0, length);
@@ -288,6 +289,7 @@ internal sealed class LayoutSurface : Panel
     { foreach (var button in Children.OfType<Button>()) button.Arrange(((ControlBox)button.Tag).Bounds); selectionOverlay?.Arrange(new Rect(finalSize)); return finalSize; }
     protected override void OnRender(DrawingContext context)
     {
+        using var diagnostic = OperationTrace.Callback("LayoutSurface.OnRender");
         var snapshot = Snapshot; if (snapshot is null) return;
         var background = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(snapshot.Appearance, 1)))
             : snapshot.Appearance == "Dark" ? new SolidColorBrush(Color.FromRgb(32, 33, 36)) : Brushes.White;
@@ -346,6 +348,7 @@ internal sealed class LayoutSurface : Panel
     }
     public void Reveal(int offset)
     {
+        using var diagnostic = OperationTrace.Callback("LayoutSurface.Reveal");
         if (Snapshot is not { } snapshot) return;
         var line = snapshot.Lines.FirstOrDefault(line => offset >= line.Start && offset <= line.End) ?? snapshot.Lines[^1];
         Scroller?.ScrollToVerticalOffset(Math.Max(0, line.Top - 30));
@@ -353,6 +356,7 @@ internal sealed class LayoutSurface : Panel
     }
     public void ScrollRange(int start, int end, bool alignToTop)
     {
+        using var diagnostic = OperationTrace.Callback("LayoutSurface.ScrollRange");
         var rectangles = Bounds(start, end).ToArray(); if (rectangles.Length == 0 || Scroller is null) return;
         var target = alignToTop ? rectangles.Min(rectangle => rectangle.Top) : rectangles.Max(rectangle => rectangle.Bottom) - Scroller.ViewportHeight;
         Scroller.ScrollToVerticalOffset(Math.Max(0, target)); Scroller.UpdateLayout();
@@ -399,6 +403,7 @@ internal sealed class LayoutSurface : Panel
     }
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
+        using var diagnostic = OperationTrace.Callback("LayoutSurface.OnPreviewKeyDown");
         LastKey = e.Key + ":" + Keyboard.Modifiers;
         if (KeyHistory.Count < 512) KeyHistory.Add(LastKey);
         base.OnPreviewKeyDown(e); if (Snapshot is not { } snapshot) return;

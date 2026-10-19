@@ -7,7 +7,7 @@ on:
       scope:
         description: Focused diagnosis or complete v2 acceptance
         type: choice
-        options: [full, focused, compile-comparison, artifact, visual, availability]
+        options: [full, focused, input, compile-comparison, artifact, visual, availability]
         default: full
       runner_image:
         description: Explicit hosted image; each cohort retains its image identity
@@ -17,6 +17,37 @@ on:
 permissions:
   contents: read
 jobs:
+  input-diagnostics:
+    if: github.event_name == 'push' || inputs.scope == 'input'
+    name: Bounded first-input, appearance and dialogue controls (${{ matrix.replication }})
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Fresh-process same-host controls, all outcomes preserved
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousInputDiagnostics.ps1 -Replication ${{ matrix.replication }}
+      - name: Separate bounded native CPU and scheduling profiles, never acceptance
+        if: always() && matrix.replication == 1
+        run: pwsh -NoProfile -File scripts/native/Trace-ContinuousInputDiagnostics.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bounded-input-diagnosis-${{ matrix.replication }}
+          path: artifacts/layout-input-diagnostics/
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always() && matrix.replication == 1
+        with:
+          name: bounded-input-native-profiles
+          path: artifacts/layout-input-profiles/
+          retention-days: 90
   runner-availability:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'availability'
     runs-on: ${{ inputs.runner_image }}
@@ -182,7 +213,7 @@ jobs:
           path: artifacts/layout-experiment-bin/
           retention-days: 90
   focused-diagnostics:
-    if: github.event_name == 'push' || inputs.scope == 'focused'
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'focused'
     name: Focused media/appearance diagnosis (${{ matrix.replication }})
     runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 15
