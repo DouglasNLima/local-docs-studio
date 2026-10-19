@@ -92,6 +92,8 @@ The extended independent range fixture adds a real three-column table and four p
 
 New paired whole-document and partial cross-row captures exposed the previous glyph-only table selection as a material visual defect. The corrected Light captures show matching whole-cell washes and unchanged text/geometry. Hosted Light/Dark/actual High Contrast review remains required. One failed local build accidentally launched a stale executable; stopping that owned test left synthetic Shift held and contaminated its next keyboard comparison. Both invalid runs remain labelled and retained. Independent range clients now initialise and finally release their owned modifiers. No acceptance timer is paused or budget changed.
 
+Further review of the `a75a1f3` HC pairs shows that recreating the ScrollViewer template did **not** correct its normal-colour scrollbar. The candidate now selects only the official built-in Classic scrollbar style through the [supported WPF resource URI](https://learn.microsoft.com/en-us/dotnet/desktop/wpf/controls/control-styles-and-templates), on automatic HC installation, and removes that local style on automatic disable. It does not copy framework XAML or modify a runtime assembly. This correction still requires hosted captures and unchanged appearance/Input assertions.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**

@@ -156,9 +156,15 @@ internal sealed class LayoutSurface : Panel
             var background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); background.Freeze(); Scroller.Background = background;
             if (previousAppearance != snapshot.Appearance && (previousAppearance?.StartsWith("HC:", StringComparison.Ordinal) == true || snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal)))
             {
-                // A long-lived classic ScrollViewer retained its pre-HC scrollbar
-                // template in the paired hosted captures. Recreate public chrome
-                // from the current WPF theme; the semantic surface stays owned here.
+                // Recreating the ScrollViewer template alone retained normal
+                // scrollbar ink in actual HC captures. Apply only the public
+                // built-in Classic scrollbar style used by stock HC chrome.
+                if (snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal))
+                {
+                    var contrastTheme = new ResourceDictionary { Source = new Uri("/PresentationFramework.Classic;component/themes/Classic.xaml", UriKind.Relative) };
+                    Scroller.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)] = contrastTheme[typeof(System.Windows.Controls.Primitives.ScrollBar)];
+                }
+                else Scroller.Resources.Remove(typeof(System.Windows.Controls.Primitives.ScrollBar));
                 var currentTheme = new ScrollViewer(); currentTheme.ApplyTemplate();
                 Scroller.Template = null; Scroller.Template = currentTheme.Template;
             }
