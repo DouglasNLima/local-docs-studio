@@ -28,8 +28,8 @@ internal sealed class DocumentModelBuilder
     private DocumentModelBuilder(ParsedDocument parsed, CancellationToken cancellation, string? path, string? root, string appearance)
     {
         source = parsed.Source; this.cancellation = cancellation; this.appearance = appearance; dark = ExperimentAppearance.IsDark(appearance);
-        foreach (var row in parsed.Syntax.Descendants<TableRow>().Where(row => row.Parent is Table table && table.Descendants<TableCell>().All(cell => cell.Count == 1 && cell[0] is ParagraphBlock)))
-            foreach (var cell in row.OfType<TableCell>().SkipLast(1))
+        foreach (var row in parsed.Syntax.Descendants<TableRow>())
+            foreach (var cell in row.OfType<TableCell>().SkipLast(1).Where(cell => cell.Count == 1 && cell[0] is ParagraphBlock))
                 if (cell.Descendants<LeafBlock>().LastOrDefault() is { } leaf) tabParagraphEnds.Add(leaf.Span.End + 1);
         images = parsed.Syntax.Descendants<LinkInline>().Any(link => link.IsImage) ? new PreviewImageService().Prepare(parsed, path, root, cancellation) : new Dictionary<string, PreviewImage>();
         syntax = parsed.Syntax.Descendants<FencedCodeBlock>().Any(block => block.Info != "mermaid") ? CodeSyntaxService.Prepare(parsed, cancellation) : new PreparedCodeSyntax(new Dictionary<CodeBlock, CodeSyntaxBlock>(), false);

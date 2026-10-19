@@ -20,16 +20,51 @@ internal sealed class OperationTrace : IDisposable
     private readonly System.Threading.Timer timer;
     private readonly Dictionary<DispatcherOperation, long> operations = [];
     private long inputPending, nativePending;
+    [StructLayout(LayoutKind.Sequential)] private struct BeforeMessage { public IntPtr LParam, WParam; public uint Message; public IntPtr Window; }
+    [StructLayout(LayoutKind.Sequential)] private struct AfterMessage { public IntPtr Result, LParam, WParam; public uint Message; public IntPtr Window; }
+    private delegate IntPtr HookCallback(int code, IntPtr wParam, IntPtr lParam);
+    [DllImport("user32.dll")] private static extern IntPtr SetWindowsHookEx(int kind, HookCallback callback, IntPtr module, uint thread);
+    [DllImport("user32.dll")] private static extern bool UnhookWindowsHookEx(IntPtr hook);
+    [DllImport("user32.dll")] private static extern IntPtr CallNextHookEx(IntPtr hook, int code, IntPtr wParam, IntPtr lParam);
+    [DllImport("kernel32.dll")] private static extern uint GetCurrentThreadId();
+    private readonly HookCallback beforeCallback, afterCallback;
+    private readonly IntPtr beforeHook, afterHook;
+    private readonly Stack<(IntPtr Window, uint Message, long Start)> messages = new();
     private int count, disposed;
     public object[] Events => events.ToArray();
     public OperationTrace(Window window)
     {
         dispatcher = window.Dispatcher; handle = new WindowInteropHelper(window).Handle;
         source = HwndSource.FromHwnd(handle); source.AddHook(Hook);
+        beforeCallback = Before; afterCallback = After;
+        beforeHook = SetWindowsHookEx(4, beforeCallback, IntPtr.Zero, GetCurrentThreadId());
+        afterHook = SetWindowsHookEx(12, afterCallback, IntPtr.Zero, GetCurrentThreadId());
+        if (beforeHook == IntPtr.Zero || afterHook == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
         dispatcher.Hooks.OperationStarted += Started;
         dispatcher.Hooks.OperationCompleted += Completed;
         Stage("trace-start", new { Handle = handle.ToInt64(), Stopwatch.Frequency, ProbeVersion = "parallel-input-native-v1", IntervalMilliseconds = 16 });
         timer = new System.Threading.Timer(_ => Pulse(), null, 16, 16);
+    }
+    private IntPtr Before(int code, IntPtr wParam, IntPtr lParam)
+    {
+        if (code >= 0)
+        {
+            var value = Marshal.PtrToStructure<BeforeMessage>(lParam);
+            messages.Push((value.Window, value.Message, Stopwatch.GetTimestamp()));
+            if (value.Message is 0x001A or 0x0015 or 0x031A) Stage("native-message-enter", new { value.Message, Handle = value.Window.ToInt64() });
+        }
+        return CallNextHookEx(beforeHook, code, wParam, lParam);
+    }
+    private IntPtr After(int code, IntPtr wParam, IntPtr lParam)
+    {
+        if (code >= 0 && messages.Count > 0)
+        {
+            var value = Marshal.PtrToStructure<AfterMessage>(lParam); var start = messages.Pop();
+            if (value.Window != start.Window || value.Message != start.Message) Stage("native-hook-pair-mismatch");
+            else if (Elapsed(start.Start) >= 8 || value.Message is 0x001A or 0x0015 or 0x031A)
+                Stage("native-message-exit", new { value.Message, Handle = value.Window.ToInt64(), StartTimestamp = start.Start, Milliseconds = Elapsed(start.Start) });
+        }
+        return CallNextHookEx(afterHook, code, wParam, lParam);
     }
     public void Stage(string name, object? detail = null)
     {
@@ -78,6 +113,7 @@ internal sealed class OperationTrace : IDisposable
     {
         if (Interlocked.Exchange(ref disposed, 1) != 0) return;
         timer.Dispose();
+        UnhookWindowsHookEx(beforeHook); UnhookWindowsHookEx(afterHook);
         dispatcher.Hooks.OperationStarted -= Started; dispatcher.Hooks.OperationCompleted -= Completed; source.RemoveHook(Hook);
         Stage("trace-end", new { InputOutstandingSince = inputPending, NativeOutstandingSince = nativePending, OutstandingOperations = operations.Count, DroppedEvents = Math.Max(0, count - 32768) });
     }

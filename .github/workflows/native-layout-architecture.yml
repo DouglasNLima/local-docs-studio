@@ -68,7 +68,7 @@ jobs:
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance') } else { @('media-controls','media-checks','appearance') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance','range-checks','parity-all') } else { @('media-controls','media-checks','appearance','range-checks','parity-all') }
           $failed = $false
           foreach ($mode in $modes) {
             & $exe "--$mode" --output "artifacts/layout-focused/$mode"
