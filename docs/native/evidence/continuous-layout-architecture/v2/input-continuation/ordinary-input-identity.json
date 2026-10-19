@@ -1,0 +1,28 @@
+{
+  "Scope": [
+    "src/native/LensDocsStudio.Core",
+    "src/native/LensDocsStudio.Core.Tests",
+    "src/native/LensDocsStudio.Native",
+    "src/native/LensDocsStudio.Native.Validation",
+    "src/native/LensDocsStudio.Native.slnx",
+    "src/windows",
+    "assets",
+    "index.html",
+    "service-worker.js",
+    "tests",
+    "scripts/native/Test-Native.ps1",
+    "scripts/native/Build-Native.ps1",
+    "scripts/native/Package-Native.ps1"
+  ],
+  "Sources": {
+    "25b9c201a62386e351680c4c39d5fab1101c8717": {
+      "TrackedEntries": 973,
+      "TreeEntriesSha256": "0F4F382F5D0B4D8E7D4BBD3385C3B6FAD748E8C6EC43741F914E47CF8A185CDA"
+    },
+    "9558abff9f7393e5376877343de952b2f414c370": {
+      "TrackedEntries": 973,
+      "TreeEntriesSha256": "0F4F382F5D0B4D8E7D4BBD3385C3B6FAD748E8C6EC43741F914E47CF8A185CDA"
+    }
+  },
+  "Meaning": "Byte-identical protected code/fixture/browser inputs; compiled version stamps differ by head. Earlier ordinary checks retain their actual source and do not certify candidate acceptance. New diagnostic project, script and report paths are separately checked. Exact final source is named in the PR receipt."
+}

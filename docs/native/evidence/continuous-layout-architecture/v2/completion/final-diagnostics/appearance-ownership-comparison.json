@@ -1,0 +1,503 @@
+{
+  "Source": "1c399375a251a2f775ce85b6ff14f52c52b9be82",
+  "Run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39289846769",
+  "DiagnosticOnly": true,
+  "ContractUnchanged": true,
+  "Meaning": "Same compiled six-step public theme capture; default owner dispatcher and diagnostic worker-ownership control. Component comparison only, not the original controlled 66 samples or a universal speed claim. Every Input miss remains failing.",
+  "Replications": [
+    {
+      "Host": 1,
+      "InitialComponentOrder": [
+        "appearance",
+        "appearance-worker-theme-control",
+        "appearance-controls"
+      ],
+      "ExecutionIdentity": {
+        "Source": "1c399375a251a2f775ce85b6ff14f52c52b9be82",
+        "SourceDirty": "false",
+        "CompilationConfiguration": "ReadyToRun",
+        "HarnessSha256": "48F12F9308BFEBF45BE02A39F12A721EC940B8E199DF6D30578BE16024429BF0",
+        "Arguments": [
+          "--appearance",
+          "--output",
+          "artifacts/layout-focused/appearance"
+        ],
+        "Process": 4092,
+        "UiThread": 2,
+        "Runtime": ".NET 10.0.13",
+        "WpfAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+        "CpuAvailable": 4,
+        "Os": "Microsoft Windows NT 10.0.26100.0"
+      },
+      "Observations": [
+        {
+          "Mode": "appearance",
+          "Status": "FAIL",
+          "MaximumInputGapMilliseconds": 247.6582999999996,
+          "Ownership": "WindowDispatcher",
+          "Phases": {
+            "Light": 79.27789999999993,
+            "actual-enable": 247.6582999999996,
+            "automatic-disable": 219.04420000000027,
+            "Dark": 47.86779999999999
+          },
+          "Installations": [
+            {
+              "Version": 1,
+              "Appearance": "Light",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredMermaidPreparationMilliseconds": 228.6545,
+                "CompleteCaretAndRangeGeometryMilliseconds": 65.7104,
+                "CompleteModelExtractionMilliseconds": 269.4205,
+                "RequiredWordBoundariesMilliseconds": 2.3299,
+                "MarkdownParsingMilliseconds": 42.4339,
+                "RequiredDetailsPaintMilliseconds": 25.442600000000006,
+                "RequiredImagePreparationMilliseconds": 27.1697,
+                "RequiredNativeThemePreparationMilliseconds": 125.4362,
+                "FormatLineMilliseconds": 173.8323,
+                "EagerNavigationIndexMilliseconds": 2.7205000000000155,
+                "RequiredSyntaxPreparationMilliseconds": 0.4443
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4269265435
+            },
+            {
+              "Version": 2,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredMermaidPreparationMilliseconds": 13.5072,
+                "CompleteCaretAndRangeGeometryMilliseconds": 82.5965,
+                "CompleteModelExtractionMilliseconds": 34.5493,
+                "RequiredWordBoundariesMilliseconds": 0.7104,
+                "MarkdownParsingMilliseconds": 7.3434,
+                "RequiredDetailsPaintMilliseconds": 1.4486999999999997,
+                "RequiredImagePreparationMilliseconds": 2.0562,
+                "RequiredNativeThemePreparationMilliseconds": 4.1182,
+                "FormatLineMilliseconds": 162.7976,
+                "EagerNavigationIndexMilliseconds": 1.714999999999975,
+                "RequiredSyntaxPreparationMilliseconds": 0.1545
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4274582849
+            },
+            {
+              "Version": 3,
+              "Appearance": "HC:#FFFFFFFF|#FF202020|#FF202020|#FF8EE3F0|#FF263B50|#FF75E9FC",
+              "Current": true,
+              "ActualOsHighContrast": true,
+              "PreparationAndLayoutStages": {
+                "RequiredMermaidPreparationMilliseconds": 17.515,
+                "CompleteCaretAndRangeGeometryMilliseconds": 155.6203,
+                "CompleteModelExtractionMilliseconds": 32.6711,
+                "RequiredWordBoundariesMilliseconds": 0.7903,
+                "MarkdownParsingMilliseconds": 8.7201,
+                "RequiredDetailsPaintMilliseconds": 6.759999999999998,
+                "RequiredImagePreparationMilliseconds": 2.5766,
+                "RequiredNativeThemePreparationMilliseconds": 17.6288,
+                "FormatLineMilliseconds": 266.188,
+                "EagerNavigationIndexMilliseconds": 1.6099000000000387,
+                "RequiredSyntaxPreparationMilliseconds": 0.1862
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4286551971
+            },
+            {
+              "Version": 4,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredMermaidPreparationMilliseconds": 17.2705,
+                "CompleteCaretAndRangeGeometryMilliseconds": 133.9052,
+                "CompleteModelExtractionMilliseconds": 28.3016,
+                "RequiredWordBoundariesMilliseconds": 0.7647,
+                "MarkdownParsingMilliseconds": 12.3997,
+                "RequiredDetailsPaintMilliseconds": 3.9391,
+                "RequiredImagePreparationMilliseconds": 2.4962,
+                "RequiredNativeThemePreparationMilliseconds": 14.5356,
+                "FormatLineMilliseconds": 264.3846,
+                "EagerNavigationIndexMilliseconds": 2.203700000000026,
+                "RequiredSyntaxPreparationMilliseconds": 0.2071
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4296564680
+            }
+          ]
+        },
+        {
+          "Mode": "appearance-worker-theme-control",
+          "Status": "FAIL",
+          "MaximumInputGapMilliseconds": 560.4985000000001,
+          "Ownership": "WorkerDiagnosticControl",
+          "Phases": {
+            "Light": 80.45579999999995,
+            "actual-enable": 460.23670000000016,
+            "automatic-disable": 560.4985000000001,
+            "Dark": 63.491399999999885
+          },
+          "Installations": [
+            {
+              "Version": 1,
+              "Appearance": "Light",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "FormatLineMilliseconds": 152.5034,
+                "EagerNavigationIndexMilliseconds": 2.4710000000000036,
+                "CompleteModelExtractionMilliseconds": 263.1869,
+                "CompleteCaretAndRangeGeometryMilliseconds": 55.1385,
+                "MarkdownParsingMilliseconds": 42.1364,
+                "RequiredImagePreparationMilliseconds": 28.075,
+                "RequiredNativeThemePreparationMilliseconds": 77.6484,
+                "RequiredWordBoundariesMilliseconds": 1.8439,
+                "RequiredSyntaxPreparationMilliseconds": 0.589,
+                "RequiredDetailsPaintMilliseconds": 24.004600000000003,
+                "RequiredMermaidPreparationMilliseconds": 221.1946
+              },
+              "ThemePreparationThread": 9,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4311703703
+            },
+            {
+              "Version": 2,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "FormatLineMilliseconds": 169.6712,
+                "EagerNavigationIndexMilliseconds": 1.9476999999999975,
+                "CompleteModelExtractionMilliseconds": 30.6205,
+                "CompleteCaretAndRangeGeometryMilliseconds": 60.0247,
+                "MarkdownParsingMilliseconds": 7.3183,
+                "RequiredImagePreparationMilliseconds": 2.0532,
+                "RequiredNativeThemePreparationMilliseconds": 6.8921,
+                "RequiredWordBoundariesMilliseconds": 0.386,
+                "RequiredSyntaxPreparationMilliseconds": 0.1732,
+                "RequiredDetailsPaintMilliseconds": 3.6002000000000005,
+                "RequiredMermaidPreparationMilliseconds": 10.0406
+              },
+              "ThemePreparationThread": 11,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4317998766
+            },
+            {
+              "Version": 3,
+              "Appearance": "HC:#FFFFFFFF|#FF202020|#FF202020|#FF8EE3F0|#FF263B50|#FF75E9FC",
+              "Current": true,
+              "ActualOsHighContrast": true,
+              "PreparationAndLayoutStages": {
+                "FormatLineMilliseconds": 250.5183,
+                "EagerNavigationIndexMilliseconds": 1.5400000000000773,
+                "CompleteModelExtractionMilliseconds": 26.7865,
+                "CompleteCaretAndRangeGeometryMilliseconds": 124.3007,
+                "MarkdownParsingMilliseconds": 12.4062,
+                "RequiredImagePreparationMilliseconds": 2.4331,
+                "RequiredNativeThemePreparationMilliseconds": 13.3821,
+                "RequiredWordBoundariesMilliseconds": 23.3242,
+                "RequiredSyntaxPreparationMilliseconds": 0.2264,
+                "RequiredDetailsPaintMilliseconds": 5.2552,
+                "RequiredMermaidPreparationMilliseconds": 13.7036
+              },
+              "ThemePreparationThread": 12,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4329049886
+            },
+            {
+              "Version": 4,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "FormatLineMilliseconds": 229.9847,
+                "EagerNavigationIndexMilliseconds": 1.591199999999958,
+                "CompleteModelExtractionMilliseconds": 20.3127,
+                "CompleteCaretAndRangeGeometryMilliseconds": 152.0951,
+                "MarkdownParsingMilliseconds": 8.7898,
+                "RequiredImagePreparationMilliseconds": 2.0887,
+                "RequiredNativeThemePreparationMilliseconds": 20.5703,
+                "RequiredWordBoundariesMilliseconds": 0.3856,
+                "RequiredSyntaxPreparationMilliseconds": 0.1867,
+                "RequiredDetailsPaintMilliseconds": 8.6297,
+                "RequiredMermaidPreparationMilliseconds": 11.862
+              },
+              "ThemePreparationThread": 13,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 4338460596
+            }
+          ]
+        },
+        {
+          "Mode": "appearance-controls",
+          "Status": "OBSERVED",
+          "MaximumInputGapMilliseconds": 104.3901,
+          "Ownership": null,
+          "Phases": null,
+          "Installations": null
+        }
+      ]
+    },
+    {
+      "Host": 2,
+      "InitialComponentOrder": [
+        "appearance-controls",
+        "appearance-worker-theme-control",
+        "appearance"
+      ],
+      "ExecutionIdentity": {
+        "Source": "1c399375a251a2f775ce85b6ff14f52c52b9be82",
+        "SourceDirty": "false",
+        "CompilationConfiguration": "ReadyToRun",
+        "HarnessSha256": "48F12F9308BFEBF45BE02A39F12A721EC940B8E199DF6D30578BE16024429BF0",
+        "Arguments": [
+          "--appearance",
+          "--output",
+          "artifacts/layout-focused/appearance"
+        ],
+        "Process": 8764,
+        "UiThread": 2,
+        "Runtime": ".NET 10.0.13",
+        "WpfAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+        "CpuAvailable": 4,
+        "Os": "Microsoft Windows NT 10.0.26100.0"
+      },
+      "Observations": [
+        {
+          "Mode": "appearance",
+          "Status": "FAIL",
+          "MaximumInputGapMilliseconds": 264.0187999999998,
+          "Ownership": "WindowDispatcher",
+          "Phases": {
+            "Light": 63.9971,
+            "actual-enable": 243.3831,
+            "automatic-disable": 264.0187999999998,
+            "Dark": 63.41500000000019
+          },
+          "Installations": [
+            {
+              "Version": 1,
+              "Appearance": "Light",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredImagePreparationMilliseconds": 25.8247,
+                "RequiredSyntaxPreparationMilliseconds": 0.2861,
+                "RequiredNativeThemePreparationMilliseconds": 119.1992,
+                "EagerNavigationIndexMilliseconds": 2.79219999999998,
+                "RequiredDetailsPaintMilliseconds": 23.303500000000014,
+                "CompleteModelExtractionMilliseconds": 256.7224,
+                "FormatLineMilliseconds": 182.8317,
+                "RequiredMermaidPreparationMilliseconds": 218.8993,
+                "MarkdownParsingMilliseconds": 40.0297,
+                "CompleteCaretAndRangeGeometryMilliseconds": 80.7706,
+                "RequiredWordBoundariesMilliseconds": 1.6987
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7953203908
+            },
+            {
+              "Version": 2,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredImagePreparationMilliseconds": 1.9132,
+                "RequiredSyntaxPreparationMilliseconds": 0.1471,
+                "RequiredNativeThemePreparationMilliseconds": 67.3743,
+                "EagerNavigationIndexMilliseconds": 1.812599999999975,
+                "RequiredDetailsPaintMilliseconds": 1.4322999999999837,
+                "CompleteModelExtractionMilliseconds": 27.5548,
+                "FormatLineMilliseconds": 181.4799,
+                "RequiredMermaidPreparationMilliseconds": 10.3226,
+                "MarkdownParsingMilliseconds": 8.5655,
+                "CompleteCaretAndRangeGeometryMilliseconds": 93.4351,
+                "RequiredWordBoundariesMilliseconds": 0.4535
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7959555493
+            },
+            {
+              "Version": 3,
+              "Appearance": "HC:#FFFFFFFF|#FF202020|#FF202020|#FF8EE3F0|#FF263B50|#FF75E9FC",
+              "Current": true,
+              "ActualOsHighContrast": true,
+              "PreparationAndLayoutStages": {
+                "RequiredImagePreparationMilliseconds": 2.2751,
+                "RequiredSyntaxPreparationMilliseconds": 0.2441,
+                "RequiredNativeThemePreparationMilliseconds": 36.4125,
+                "EagerNavigationIndexMilliseconds": 2.2034999999999627,
+                "RequiredDetailsPaintMilliseconds": 2.7231999999999985,
+                "CompleteModelExtractionMilliseconds": 28.0455,
+                "FormatLineMilliseconds": 289.8391,
+                "RequiredMermaidPreparationMilliseconds": 18.5765,
+                "MarkdownParsingMilliseconds": 10.7222,
+                "CompleteCaretAndRangeGeometryMilliseconds": 115.936,
+                "RequiredWordBoundariesMilliseconds": 0.4391
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7971183790
+            },
+            {
+              "Version": 4,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "RequiredImagePreparationMilliseconds": 2.6768,
+                "RequiredSyntaxPreparationMilliseconds": 0.2713,
+                "RequiredNativeThemePreparationMilliseconds": 15.733,
+                "EagerNavigationIndexMilliseconds": 1.836500000000001,
+                "RequiredDetailsPaintMilliseconds": 5.2847,
+                "CompleteModelExtractionMilliseconds": 23.1817,
+                "FormatLineMilliseconds": 267.0813,
+                "RequiredMermaidPreparationMilliseconds": 13.3273,
+                "MarkdownParsingMilliseconds": 12.199,
+                "CompleteCaretAndRangeGeometryMilliseconds": 153.0918,
+                "RequiredWordBoundariesMilliseconds": 0.3836
+              },
+              "ThemePreparationThread": 2,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7982250129
+            }
+          ]
+        },
+        {
+          "Mode": "appearance-worker-theme-control",
+          "Status": "FAIL",
+          "MaximumInputGapMilliseconds": 641.2720000000004,
+          "Ownership": "WorkerDiagnosticControl",
+          "Phases": {
+            "Light": 63.70779999999996,
+            "actual-enable": 502.53809999999976,
+            "automatic-disable": 641.2720000000004,
+            "Dark": 79.01569999999992
+          },
+          "Installations": [
+            {
+              "Version": 1,
+              "Appearance": "Light",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "CompleteCaretAndRangeGeometryMilliseconds": 74.0644,
+                "RequiredNativeThemePreparationMilliseconds": 72.3683,
+                "MarkdownParsingMilliseconds": 39.1239,
+                "FormatLineMilliseconds": 184.2519,
+                "EagerNavigationIndexMilliseconds": 3.015899999999988,
+                "RequiredMermaidPreparationMilliseconds": 232.0297,
+                "RequiredDetailsPaintMilliseconds": 22.8193,
+                "RequiredSyntaxPreparationMilliseconds": 0.32,
+                "RequiredImagePreparationMilliseconds": 25.6267,
+                "CompleteModelExtractionMilliseconds": 269.5707,
+                "RequiredWordBoundariesMilliseconds": 1.7211
+              },
+              "ThemePreparationThread": 9,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7908173680
+            },
+            {
+              "Version": 2,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "CompleteCaretAndRangeGeometryMilliseconds": 79.9818,
+                "RequiredNativeThemePreparationMilliseconds": 7.0367,
+                "MarkdownParsingMilliseconds": 7.1666,
+                "FormatLineMilliseconds": 177.5178,
+                "EagerNavigationIndexMilliseconds": 1.9349000000000274,
+                "RequiredMermaidPreparationMilliseconds": 10.1413,
+                "RequiredDetailsPaintMilliseconds": 3.6467000000000005,
+                "RequiredSyntaxPreparationMilliseconds": 0.1536,
+                "RequiredImagePreparationMilliseconds": 1.9201,
+                "CompleteModelExtractionMilliseconds": 27.9556,
+                "RequiredWordBoundariesMilliseconds": 0.3772
+              },
+              "ThemePreparationThread": 11,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7914221534
+            },
+            {
+              "Version": 3,
+              "Appearance": "HC:#FFFFFFFF|#FF202020|#FF202020|#FF8EE3F0|#FF263B50|#FF75E9FC",
+              "Current": true,
+              "ActualOsHighContrast": true,
+              "PreparationAndLayoutStages": {
+                "CompleteCaretAndRangeGeometryMilliseconds": 123.4921,
+                "RequiredNativeThemePreparationMilliseconds": 15.2838,
+                "MarkdownParsingMilliseconds": 15.9098,
+                "FormatLineMilliseconds": 293.0341,
+                "EagerNavigationIndexMilliseconds": 1.714900000000057,
+                "RequiredMermaidPreparationMilliseconds": 13.934,
+                "RequiredDetailsPaintMilliseconds": 5.6128,
+                "RequiredSyntaxPreparationMilliseconds": 0.2103,
+                "RequiredImagePreparationMilliseconds": 3.9128,
+                "CompleteModelExtractionMilliseconds": 26.8521,
+                "RequiredWordBoundariesMilliseconds": 20.3191
+              },
+              "ThemePreparationThread": 12,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7926536489
+            },
+            {
+              "Version": 4,
+              "Appearance": "Dark",
+              "Current": true,
+              "ActualOsHighContrast": false,
+              "PreparationAndLayoutStages": {
+                "CompleteCaretAndRangeGeometryMilliseconds": 125.1846,
+                "RequiredNativeThemePreparationMilliseconds": 25.8559,
+                "MarkdownParsingMilliseconds": 12.9238,
+                "FormatLineMilliseconds": 295.1308,
+                "EagerNavigationIndexMilliseconds": 1.8384999999999536,
+                "RequiredMermaidPreparationMilliseconds": 12.5757,
+                "RequiredDetailsPaintMilliseconds": 8.128499999999999,
+                "RequiredSyntaxPreparationMilliseconds": 0.3767,
+                "RequiredImagePreparationMilliseconds": 3.5088,
+                "CompleteModelExtractionMilliseconds": 23.5037,
+                "RequiredWordBoundariesMilliseconds": 0.4262
+              },
+              "ThemePreparationThread": 14,
+              "SourceHash": "289206465785CF9FA8638141BB9E6420EAAAF4ECAEEC14BF74EB89A6466FF180",
+              "Thread": 2,
+              "Timestamp": 7937040656
+            }
+          ]
+        },
+        {
+          "Mode": "appearance-controls",
+          "Status": "OBSERVED",
+          "MaximumInputGapMilliseconds": 151.8758,
+          "Ownership": null,
+          "Phases": null,
+          "Installations": null
+        }
+      ]
+    }
+  ]
+}

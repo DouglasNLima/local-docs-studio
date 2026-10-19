@@ -1,0 +1,20 @@
+{
+  "TimedAdapterBodies": [
+    {
+      "Source": "eac5d7b1a59f4b08a32fbf19ac9b6101e0aa4301",
+      "MeasureBodySha256": "93D22D41908236DDFB6100125BAD0219DE74AEE9E785DE0D08C510E510FE3640"
+    },
+    {
+      "Source": "9558abff9f7393e5376877343de952b2f414c370",
+      "MeasureBodySha256": "93D22D41908236DDFB6100125BAD0219DE74AEE9E785DE0D08C510E510FE3640"
+    }
+  ],
+  "ChangedNativePathsAfterMeasuredSource": [
+    "src/native/LensDocsStudio.LayoutExperiment/OperationTrace.cs",
+    "src/native/LensDocsStudio.LayoutExperiment/Program.cs",
+    "src/native/LensDocsStudio.LayoutExperiment/ReadingInputChecks.cs"
+  ],
+  "Scope": "Program changes route/validate only new diagnostic clients; ReadingInputChecks is explicitly diagnostic. OperationTrace adds opt-in input/drag observations; default additional owner/delegate setup is before its heartbeat clocks. CompleteLayout, model/source/geometry, LayoutSurface paint/selection, acceptance input client, appearance/media implementation, lifecycle and budgets are unchanged. This is code-input reuse evidence, not a claim that the later compiled executable has been timed at its own source.",
+  "FullMeasuredSource": "eac5d7b1a59f4b08a32fbf19ac9b6101e0aa4301",
+  "LaterDiagnosticCaptureSource": "9558abff9f7393e5376877343de952b2f414c370"
+}

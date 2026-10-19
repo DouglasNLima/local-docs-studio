@@ -1,0 +1,28 @@
+[
+  {
+    "Path": "current-visual-receipts.tar.gz",
+    "Sha256": "947C4C1C84178BF9789708936A92ED98332080106D1A3DABF9FCE2FF86135E15",
+    "Bytes": 15836415,
+    "OriginalFiles": 1426,
+    "ArchivedFiles": 754
+  },
+  {
+    "Path": "warm-native-profile-receipts.tar.gz",
+    "Sha256": "1D318125D12659BF23048AFE1009C36173AFAA5849B1C14468632936C523F04D",
+    "Bytes": 863164,
+    "OriginalFiles": 123,
+    "ArchivedFiles": 112
+  },
+  {
+    "Path": "cold-native-profile-receipts.tar.gz",
+    "Sha256": "253CD1B7E1B2F3CC520DE1DEAA45351390C82EB5781129C6A3CDF57C0EBE66A5",
+    "Bytes": 550258,
+    "OriginalFiles": 65,
+    "ArchivedFiles": 61
+  },
+  {
+    "Path": "selected-native-ui-events.tar.gz",
+    "Sha256": "AC7499B38ED75FA7AE216CC6099C0D3F0E486D4095F84C35FA70D631E162BDB7",
+    "Bytes": 16584027
+  }
+]

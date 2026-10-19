@@ -1,5 +1,7 @@
 # Continuous Markdown preview: first layout and responsiveness
 
+PR #38's authorised completion continues the isolated public-API architecture under v2, including [source-labelled functional/compiler work and retained Input failures](continuous-layout-architecture-prototype.md#completion-checkpoint-at-99da420). It does not complete #37's original performance goal, reclassify historical failures, integrate #36/#37 or resolve `.749`. Stock Continuous remains the ordinary default.
+
 ## Scope and dependency
 
 This continuation is stacked on open Draft PR [#36](https://github.com/DouglasNLima/local-docs-studio/pull/36),

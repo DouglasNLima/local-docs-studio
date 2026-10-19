@@ -1,0 +1,1 @@
+stock repetition 0: complete layout 513.60 ms; readiness 758.17 ms

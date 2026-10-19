@@ -1,0 +1,408 @@
+{
+  "Status": "PASS",
+  "LatestSource": "PASS",
+  "OldRangesUnavailable": true,
+  "ActiveClosure": "PASS",
+  "Events": [
+    {
+      "Event": "requested",
+      "Timestamp": 2562196229,
+      "Thread": 2,
+      "Version": 1
+    },
+    {
+      "Event": "worker-queued",
+      "Timestamp": 2562205227,
+      "Thread": 2,
+      "Version": 1
+    },
+    {
+      "Event": "worker-started",
+      "Timestamp": 2562216242,
+      "Thread": 4,
+      "Version": 1
+    },
+    {
+      "Event": "worker-format-started",
+      "Timestamp": 2563096025,
+      "Thread": 4,
+      "Version": 1
+    },
+    {
+      "Event": "worker-completed",
+      "Timestamp": 2565695819,
+      "Thread": 4,
+      "Version": 1
+    },
+    {
+      "Event": "installed",
+      "Timestamp": 2565706176,
+      "Thread": 2,
+      "Version": 1
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2565804118,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "worker-queued",
+      "Timestamp": 2565804144,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "worker-started",
+      "Timestamp": 2565807770,
+      "Thread": 5,
+      "Version": 2
+    },
+    {
+      "Event": "worker-format-started",
+      "Timestamp": 2566073142,
+      "Thread": 5,
+      "Version": 2
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566091875,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566093092,
+      "Thread": 2,
+      "Version": 3
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566093703,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566093713,
+      "Thread": 2,
+      "Version": 3
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566093753,
+      "Thread": 2,
+      "Version": 4
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566094342,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566094343,
+      "Thread": 2,
+      "Version": 4
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566094345,
+      "Thread": 2,
+      "Version": 5
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566094672,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566094673,
+      "Thread": 2,
+      "Version": 5
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566094674,
+      "Thread": 2,
+      "Version": 6
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566095303,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566095303,
+      "Thread": 2,
+      "Version": 6
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566095307,
+      "Thread": 2,
+      "Version": 7
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566095650,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566095652,
+      "Thread": 2,
+      "Version": 7
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566095653,
+      "Thread": 2,
+      "Version": 8
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566095977,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566095979,
+      "Thread": 2,
+      "Version": 8
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566095980,
+      "Thread": 2,
+      "Version": 9
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566096472,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566096472,
+      "Thread": 2,
+      "Version": 9
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566096474,
+      "Thread": 2,
+      "Version": 10
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566096790,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566096791,
+      "Thread": 2,
+      "Version": 10
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566096792,
+      "Thread": 2,
+      "Version": 11
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566097151,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566097154,
+      "Thread": 2,
+      "Version": 11
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566097155,
+      "Thread": 2,
+      "Version": 12
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566097538,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566097538,
+      "Thread": 2,
+      "Version": 12
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566097540,
+      "Thread": 2,
+      "Version": 13
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566097951,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566097966,
+      "Thread": 2,
+      "Version": 13
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566097968,
+      "Thread": 2,
+      "Version": 14
+    },
+    {
+      "Event": "cancellation-requested",
+      "Timestamp": 2566098538,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "queued-rejected",
+      "Timestamp": 2566098540,
+      "Thread": 2,
+      "Version": 14
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2566098541,
+      "Thread": 2,
+      "Version": 15
+    },
+    {
+      "Event": "worker-cancellation-observed",
+      "Timestamp": 2566100965,
+      "Thread": 5,
+      "Version": 2
+    },
+    {
+      "Event": "dispatcher-cancellation-observed",
+      "Timestamp": 2566104804,
+      "Thread": 2,
+      "Version": 2
+    },
+    {
+      "Event": "worker-queued",
+      "Timestamp": 2566105106,
+      "Thread": 2,
+      "Version": 15
+    },
+    {
+      "Event": "worker-started",
+      "Timestamp": 2566108014,
+      "Thread": 10,
+      "Version": 15
+    },
+    {
+      "Event": "worker-format-started",
+      "Timestamp": 2566551239,
+      "Thread": 10,
+      "Version": 15
+    },
+    {
+      "Event": "worker-completed",
+      "Timestamp": 2568346759,
+      "Thread": 10,
+      "Version": 15
+    },
+    {
+      "Event": "installed",
+      "Timestamp": 2568353447,
+      "Thread": 2,
+      "Version": 15
+    },
+    {
+      "Event": "requested",
+      "Timestamp": 2568370450,
+      "Thread": 2,
+      "Version": 16
+    },
+    {
+      "Event": "worker-queued",
+      "Timestamp": 2568370469,
+      "Thread": 2,
+      "Version": 16
+    },
+    {
+      "Event": "worker-started",
+      "Timestamp": 2568376302,
+      "Thread": 11,
+      "Version": 16
+    },
+    {
+      "Event": "worker-format-started",
+      "Timestamp": 2568758758,
+      "Thread": 11,
+      "Version": 16
+    },
+    {
+      "Event": "closed",
+      "Timestamp": 2568958181,
+      "Thread": 2,
+      "Version": 17
+    },
+    {
+      "Event": "worker-cancellation-observed",
+      "Timestamp": 2568959340,
+      "Thread": 11,
+      "Version": 16
+    },
+    {
+      "Event": "dispatcher-cancellation-observed",
+      "Timestamp": 2568991058,
+      "Thread": 2,
+      "Version": 16
+    }
+  ],
+  "Cancellation": [
+    {
+      "Version": 2,
+      "WorkerMilliseconds": 0.909,
+      "DispatcherMilliseconds": 1.2929
+    }
+  ],
+  "InputGapsMilliseconds": [
+    5.2555,
+    24.0619,
+    31.1644,
+    31.815000000000005,
+    30.58,
+    18.001299999999986,
+    22.936000000000007,
+    22.222800000000007,
+    29.234800000000007,
+    18.03879999999998,
+    22.8784,
+    13.403200000000027,
+    43.41339999999997,
+    6.246200000000044
+  ],
+  "MaximumInputGapMilliseconds": 43.41339999999997,
+  "WholeScenarioMilliseconds": 1054.2827,
+  "TabIntegration": "MISSING: isolated diagnostic window",
+  "Appearance": "NOT TESTED",
+  "Reopen": "PASS"
+}

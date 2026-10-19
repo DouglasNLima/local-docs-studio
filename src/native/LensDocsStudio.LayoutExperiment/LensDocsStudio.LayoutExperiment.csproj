@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../LensDocsStudio.Native/LensDocsStudio.Native.csproj" />
+    <Compile Include="../LensDocsStudio.Native.Validation/ContinuousPreviewFixtures.cs" Link="ContinuousPreviewFixtures.cs" />
+    <Compile Include="../LensDocsStudio.Native.Validation/NativeTestHighContrast.cs" Link="NativeTestHighContrast.cs" />
+    <Content Include="parity-requirements-v2.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="EXPERIMENT-ONLY.txt" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="THIRD-PARTY-NOTICES.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

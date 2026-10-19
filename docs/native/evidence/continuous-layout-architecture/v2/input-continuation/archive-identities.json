@@ -1,0 +1,37 @@
+[
+  {
+    "Directory": "focused-f5950d4",
+    "ArchiveBytes": 2117061,
+    "ArchiveSha256": "23E20E3F901D7C2A856D745CACA6C8BE4D53B3182FEB9014DC14DE4520256939",
+    "OriginalFiles": 282,
+    "ArchivedFiles": 272
+  },
+  {
+    "Directory": "focused-eac5d7b",
+    "ArchiveBytes": 2145788,
+    "ArchiveSha256": "5E54C8AEF9FD55253C9C2A08F833063A7AE5C94DB05C90F8DBDD26FD71D80B3F",
+    "OriginalFiles": 276,
+    "ArchivedFiles": 270
+  },
+  {
+    "Directory": "focused-d6cd75d",
+    "ArchiveBytes": 801597,
+    "ArchiveSha256": "B1BA09B70C34F33501D8C5B2BBF8486E2C9BD1383348FAA9162BAF8D9AC15D49",
+    "OriginalFiles": 120,
+    "ArchivedFiles": 120
+  },
+  {
+    "Directory": "focused-9558abf",
+    "ArchiveBytes": 637490,
+    "ArchiveSha256": "EDD7FE8D0943CDAAD43ECCAAF91C0B92DF4FCC1E1D5B15943F2534BC401406A3",
+    "OriginalFiles": 116,
+    "ArchivedFiles": 116
+  },
+  {
+    "Directory": "full-eac5d7b",
+    "ArchiveBytes": 19036096,
+    "ArchiveSha256": "17A8F65D3CA4AA108C7E97A86B020D6F40A72811B206F892DE13FF816EEE3507",
+    "OriginalFiles": 5000,
+    "ArchivedFiles": 4136
+  }
+]

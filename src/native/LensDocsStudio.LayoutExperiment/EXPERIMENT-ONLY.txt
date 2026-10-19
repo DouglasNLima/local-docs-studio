@@ -1,0 +1,50 @@
+EXPERIMENT ONLY — Lens Docs Studio Continuous layout architecture gate
+
+This framework-dependent diagnostic executable is not an application installer.
+It changes no updater, file association, saved document or ordinary installation.
+The production application retains its stock renderer. Do not substitute this
+experiment for the application or treat it as a migration/production approval.
+
+Requires Windows with official Microsoft .NET 10 Windows Desktop Runtime (x64).
+No modified framework or bundled experimental runtime is included.
+
+From this extracted folder:
+  LensDocsStudio.LayoutExperiment.exe --view
+  LensDocsStudio.LayoutExperiment.exe --deterministic --output checks
+  LensDocsStudio.LayoutExperiment.exe --adapter candidate --uia --output uia
+  LensDocsStudio.LayoutExperiment.exe --adapter stock --output stock
+  LensDocsStudio.LayoutExperiment.exe --lifecycle --output lifecycle
+
+The window is explicitly experimental. --studio opens transient source editing,
+search, outline, document switching/closure and reopen with the eager engine:
+  LensDocsStudio.LayoutExperiment.exe --studio --source C:\chosen-workspace\document.md
+  LensDocsStudio.LayoutExperiment.exe --scenario mixed --uia --contract-v2 --output mixed-uia
+
+Supported original fixture names: list, table, quote, details, paragraphs, mixed;
+--scenario all retains the original combined process order. --source is read-only;
+diagnostic edits stay in memory and never save to workspace/recovery/settings.
+Ctrl+A/C select/copy; Shift extends; arrow/Home/End/Page keys navigate. The studio
+has an explicit whole-document Copy rendered route using the existing exporter.
+Run --uia on an isolated desktop: it drives actual Windows input and clipboard.
+
+Contract v2 was authorised on 19 October 2026: complete required layout <=1000 ms,
+preparation/presentation <=1500 ms, observed shown-window Input gaps <=100 ms.
+250 ms is a non-blocking stretch target. This changed requirement is not a speed
+improvement. Missing functionality/evidence keeps full acceptance incomplete.
+The original v1 NO-GO/results remain source-labelled history at 57dcd44.
+
+Source, harness/runtime/fixture hashes and source cleanliness are in adjacent
+provenance.json and raw receipts. Draft PR #38 identifies exact source and
+limitations. Never infer certification from another package. No migration is
+approved by this executable.
+
+Independent probes (isolated desktop; actual input/clipboard):
+  LensDocsStudio.LayoutExperiment.exe --parity-all --output parity
+  LensDocsStudio.LayoutExperiment.exe --studio-checks --output studio-checks
+
+parity-requirements-v2.json lists implemented and missing/unverified requirements.
+An implementation label is not a validation pass. No full v2 acceptance is
+claimed while any required metric or parity row is unsuccessful/incomplete.
+Selected RTF/Xaml uses a temporary unformatted public WPF interchange tree on
+its owning STA. It is never installed, laid out or used for selection/UIA;
+HasValidLayout must remain false before and after serialisation.

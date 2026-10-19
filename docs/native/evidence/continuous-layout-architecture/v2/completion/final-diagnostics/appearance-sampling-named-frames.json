@@ -1,0 +1,130 @@
+[
+  {
+    "Gap": {
+      "Phase": "actual-enable",
+      "Timestamp": 7291500509,
+      "GapMilliseconds": 222.19489999999996
+    },
+    "NativeUiThread": 8148,
+    "QpcBase": 7261636761.0,
+    "SpeedscopeTimeMilliseconds": [
+      2764.1799,
+      2986.3748
+    ],
+    "DeepestNamedFrameOverlapMilliseconds": [
+      [
+        "PresentationCore.il!System.Windows.Media.Geometry.System.Windows.Media.Composition.DUCE.IResource.ReleaseOnChannel(class Channel)",
+        80.20829772949219
+      ],
+      [
+        "WindowsBase.il!MS.Win32.UnsafeNativeMethods.GetMessageW(value class System.Windows.Interop.MSG&,value class System.Runtime.InteropServices.HandleRef,int32,int32)",
+        36.92801146049442
+      ],
+      [
+        "System.Private.CoreLib.il!System.Threading.Thread.<PollGC>g__PollGCWorker|70_0()",
+        33.99469286956764
+      ],
+      [
+        "System.Private.CoreLib.il!System.Threading.Monitor.Enter_Slowpath(class System.Object)",
+        10.563798783874518
+      ],
+      [
+        "System.Private.CoreLib.il!System.Threading.SynchronizationContext.WaitHelper(int[],bool,int32)",
+        10.294188397217113
+      ],
+      [
+        "System.Private.CoreLib.il!System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(class System.Object,int*)",
+        10.218400001525879
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Composition.DUCE+Channel.SendCommand(unsigned int8*,int32,bool)",
+        9.653499631309842
+      ],
+      [
+        "WindowsBase.il!MS.Win32.HwndSubclass.DefWndProcWrapper(int,int32,int,int)",
+        8.727499819946388
+      ],
+      [
+        "System.Private.CoreLib.il!System.Runtime.CompilerServices.CastHelpers.IsInstanceOfClass(void*,class System.Object)",
+        4.100299768066179
+      ],
+      [
+        "WindowsBase.il!System.Windows.DependencyObject.GetEffectiveValue(value class System.Windows.EntryIndex,class System.Windows.DependencyProperty,value class System.Windows.RequestFlags)",
+        2.9302000999450684
+      ],
+      [
+        "PresentationFramework.il!System.Windows.PropertyPath.ResolvePropertyName(class System.String,class System.Object,class System.Type,class System.Object,bool)",
+        2.7716000080108643
+      ],
+      [
+        "DirectWriteForwarder.il!<Module>.new(unsigned int64)",
+        2.1926998497006025
+      ]
+    ],
+    "Meaning": "Excludes artificial CPU_TIME/UNMANAGED_CODE_TIME pseudo-leaves; sampling overlap is not attribution. Native work beneath P/Invoke remains unresolved. Additional profile only, not acceptance."
+  },
+  {
+    "Gap": {
+      "Phase": "automatic-disable",
+      "Timestamp": 7299773290,
+      "GapMilliseconds": 201.45280000000002
+    },
+    "NativeUiThread": 8148,
+    "QpcBase": 7261636761.0,
+    "SpeedscopeTimeMilliseconds": [
+      3612.2001,
+      3813.6529
+    ],
+    "DeepestNamedFrameOverlapMilliseconds": [
+      [
+        "WindowsBase.il!MS.Win32.UnsafeNativeMethods.GetMessageW(value class System.Windows.Interop.MSG&,value class System.Runtime.InteropServices.HandleRef,int32,int32)",
+        90.7885010461805
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Composition.DUCE+Channel.CreateOrAddRefOnChannel(class System.Object,value class ResourceHandle&,value class ResourceType)",
+        38.04759984207158
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Composition.DUCE+Channel.ReleaseOnChannel(value class ResourceHandle)",
+        32.69169998168945
+      ],
+      [
+        "System.Private.CoreLib.il!System.Reflection.RuntimeAssembly.InternalLoad(class System.Reflection.AssemblyName,value class System.Threading.StackCrawlMark&,class System.Runtime.Loader.AssemblyLoadContext,class System.Reflection.RuntimeAssembly,bool)",
+        12.825499534606934
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Drawing.System.Windows.Media.Composition.DUCE.IResource.AddRefOnChannel(class Channel)",
+        7.861300112152094
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Pen.System.Windows.Media.Composition.DUCE.IResource.AddRefOnChannel(class Channel)",
+        7.114499215698288
+      ],
+      [
+        "System.Private.CoreLib.il!System.Threading.Monitor.Enter_Slowpath(class System.Object)",
+        7.096499912453055
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.Pen.System.Windows.Media.Composition.DUCE.IResource.ReleaseOnChannel(class Channel)",
+        3.1048998832702637
+      ],
+      [
+        "WindowsBase.il!MS.Win32.HwndSubclass.DefWndProcWrapper(int,int32,int,int)",
+        1.9222989862441864
+      ],
+      [
+        "PresentationFramework.il!System.Windows.StyleHelper.GetThemeStyle(class System.Windows.FrameworkElement,class System.Windows.FrameworkContentElement)",
+        9.5367431640625e-07
+      ],
+      [
+        "PresentationCore.il!System.Windows.Media.GeometryDrawing.ReleaseOnChannelCore(class Channel)",
+        4.76837158203125e-07
+      ],
+      [
+        "WindowsBase.il!System.Windows.Threading.Dispatcher.PushFrameImpl(class System.Windows.Threading.DispatcherFrame)",
+        5.512220013770275e-08
+      ]
+    ],
+    "Meaning": "Excludes artificial CPU_TIME/UNMANAGED_CODE_TIME pseudo-leaves; sampling overlap is not attribution. Native work beneath P/Invoke remains unresolved. Additional profile only, not acceptance."
+  }
+]

@@ -1,0 +1,1 @@
+candidate repetition 0: complete layout 222.50 ms; readiness 296.16 ms

@@ -1,0 +1,1734 @@
+{
+  "Source": "d72bb72dfbeaab568a97ab81c229f5d579dbd769",
+  "Run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39294723570",
+  "DiagnosticOnly": true,
+  "Meaning": "Same compiled product and independent client code, alternate UIA client apartment; native product dialogue always retains its supported owning dispatcher. No improvement or historical root cause established; every 100 ms miss remains failing. Whole timelines are in the original archives.",
+  "Hosts": [
+    {
+      "Host": 1,
+      "InitialClientOrder": [
+        "MTA",
+        "STA"
+      ],
+      "ExecutionIdentity": {
+        "Source": "d72bb72dfbeaab568a97ab81c229f5d579dbd769",
+        "SourceDirty": "false",
+        "CompilationConfiguration": "ReadyToRun",
+        "HarnessSha256": "BA5ED1EC541BB10DA8349825E913A150FBC6B434BFC3638F001E21163C1CEFFC",
+        "Arguments": [
+          "--media-checks",
+          "--output",
+          "artifacts/layout-focused/media-checks"
+        ],
+        "Process": 2040,
+        "UiThread": 2,
+        "Runtime": ".NET 10.0.13",
+        "WpfAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+        "CpuAvailable": 4,
+        "Os": "Microsoft Windows NT 10.0.26100.0"
+      },
+      "Modes": [
+        {
+          "Mode": "media-checks",
+          "FunctionalStatus": "FAIL",
+          "MaximumInputGapMilliseconds": 1185.5157,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [
+            "SVG Save: owner native acknowledgement missed the unchanged 100 ms bound"
+          ],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 4644118355,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 7096,
+              "Process": 8264,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4663974045,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4665373559,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4678646911,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 131200
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4678966896,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4678968209,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4678976361,
+              "Thread": 4,
+              "Detail": {
+                "Process": 2040
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4691057805,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4691066458,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4691941211,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 197280
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4692214135,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4692215006,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4692215147,
+              "Thread": 4,
+              "Detail": {
+                "Process": 2040
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4697577015,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4697593485,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4698497695,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 262780
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4698650876,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4698652367,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4698652610,
+              "Thread": 4,
+              "Detail": {
+                "Process": 2040
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4704550084,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4704558146,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4705432262,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 393852
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4705457213,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4705457496,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4705457593,
+              "Thread": 4,
+              "Detail": {
+                "Process": 2040
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-client-sta-control",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 271.0716,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 4721645527,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "STA",
+              "NativeThread": 3076,
+              "Process": 6372,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4739385607,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4739703887,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4741513207,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 262532
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4741682103,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4741683411,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4741691930,
+              "Thread": 4,
+              "Detail": {
+                "Process": 1476
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4747892728,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4747901305,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4748621775,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 590426
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4748696917,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4748697750,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4748697962,
+              "Thread": 4,
+              "Detail": {
+                "Process": 1476
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4754791792,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4754809003,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4755655344,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 656004
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4755733616,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4755734267,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4755734467,
+              "Thread": 4,
+              "Detail": {
+                "Process": 1476
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4762316929,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4762325042,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4763297286,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 787076
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4763529000,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4763529605,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4763529732,
+              "Thread": 4,
+              "Detail": {
+                "Process": 1476
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-controls/stock",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 371.75430000000006,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 4841385285,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 884,
+              "Process": 7816,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4842563547,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4842630465,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4844349272,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1311412
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4844427742,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4844428581,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4844436667,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4850720404,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4850731420,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4851629342,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1442334
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4851660783,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4851661417,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4851661627,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4859468943,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4859492546,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4860324134,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 197322
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4860357102,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4860358330,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4860358663,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4866679035,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4866688216,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4867596563,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 262858
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4867892117,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4867892832,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4867892996,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-controls/native-dialogue-only",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 209.48490000000004,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 4875633743,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 8976,
+              "Process": 3728,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4876148345,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4876188525,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4877076767,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 393900
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4877171761,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4877172637,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4877179569,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4883725446,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4883734179,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4884510129,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1835608
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4884610031,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4884610831,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4884611044,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4890710767,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4890725317,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4891570152,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1704584
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4891675659,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4891676582,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4891676786,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 4897350432,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 4897359272,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 4898204523,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1835656
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 4898299383,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 4898300351,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 4898300558,
+              "Thread": 4,
+              "Detail": {
+                "Process": 808
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Host": 2,
+      "InitialClientOrder": [
+        "STA",
+        "MTA"
+      ],
+      "ExecutionIdentity": {
+        "Source": "d72bb72dfbeaab568a97ab81c229f5d579dbd769",
+        "SourceDirty": "false",
+        "CompilationConfiguration": "ReadyToRun",
+        "HarnessSha256": "BA5ED1EC541BB10DA8349825E913A150FBC6B434BFC3638F001E21163C1CEFFC",
+        "Arguments": [
+          "--media-checks",
+          "--output",
+          "artifacts/layout-focused/media-checks"
+        ],
+        "Process": 6620,
+        "UiThread": 2,
+        "Runtime": ".NET 10.0.13",
+        "WpfAssembly": "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\PresentationFramework.dll",
+        "CpuAvailable": 4,
+        "Os": "Microsoft Windows NT 10.0.26100.0"
+      },
+      "Modes": [
+        {
+          "Mode": "media-checks",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 369.28520000000026,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 3737170113,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 7600,
+              "Process": 4984,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3774928144,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3775371438,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3777979776,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1376812
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3778190401,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3778191589,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3778202817,
+              "Thread": 4,
+              "Detail": {
+                "Process": 6620
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3786545305,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3786576609,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3787760037,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1376930
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3787857297,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3787857725,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3787858034,
+              "Thread": 4,
+              "Detail": {
+                "Process": 6620
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3795983997,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3796006785,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3797459560,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1966646
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3797556643,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3797557699,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3797558070,
+              "Thread": 4,
+              "Detail": {
+                "Process": 6620
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3806435587,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3806451366,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3807813123,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 2097718
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3807924689,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3807925080,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3807925278,
+              "Thread": 4,
+              "Detail": {
+                "Process": 6620
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-client-sta-control",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 428.6841999999997,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 3638711507,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "STA",
+              "NativeThread": 6980,
+              "Process": 2336,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3677398032,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3677832924,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3680540464,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 393708
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3680710543,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3680711579,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3680721683,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7012
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3689918354,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3689935678,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3691225625,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1114642
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3691284165,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3691284750,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3691285096,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7012
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3699987488,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3700015269,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3701201516,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1311374
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3701439967,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3701440674,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3701440962,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7012
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3710139366,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3710154881,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3711363058,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 1442446
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3711512242,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3711512744,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3711512956,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7012
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-controls/stock",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 537.8623,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 3424943687,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 8128,
+              "Process": 2132,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3427490630,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3427641849,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3433923820,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 197086
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3434560291,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3434561981,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3434571016,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3447876944,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3447898128,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3449451940,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 131746
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3449599134,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3449599830,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3449600121,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3459664003,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3459696837,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3461247324,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 131760
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3461317262,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3461318569,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3461319142,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3471215888,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3471236246,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3472388891,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 197296
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3472768723,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3472769226,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3472769414,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            }
+          ]
+        },
+        {
+          "Mode": "media-controls/native-dialogue-only",
+          "FunctionalStatus": "PASS",
+          "MaximumInputGapMilliseconds": 381.71090000000004,
+          "SaveCancelDecodedChecks": [
+            "Actual native SVG save dialogue, chosen path and decoded drawing",
+            "SVG actual Cancel, no file; owner acknowledgement recorded separately",
+            "Actual native PNG save dialogue, chosen path and decoded drawing",
+            "PNG actual Cancel, no file; owner acknowledgement recorded separately"
+          ],
+          "ResponseBudgetFailures": [],
+          "Client": {
+            "Stage": "client-start",
+            "Timestamp": 3483937444,
+            "Thread": 4,
+            "Detail": {
+              "Apartment": "MTA",
+              "NativeThread": 7088,
+              "Process": 1048,
+              "ProbeVersion": "native-dialogue-client-v2-call-boundaries"
+            }
+          },
+          "UIACallBoundaries": [
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3484711904,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3484771020,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3486300583,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 262620
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3486417584,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3486418301,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3486429533,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3495107653,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3495123589,
+              "Thread": 4,
+              "Detail": {
+                "format": "SVG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3496438998,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 590394
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3496570476,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3496570954,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3496571229,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3505539973,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3505559736,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": false
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3506857588,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 721440
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3506960452,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3506961789,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3506962296,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            },
+            {
+              "Stage": "command-invoke",
+              "Timestamp": 3515691252,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "command-invoke-returned",
+              "Timestamp": 3515706981,
+              "Thread": 4,
+              "Detail": {
+                "format": "PNG",
+                "cancel": true
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-enter",
+              "Timestamp": 3516795866,
+              "Thread": 4,
+              "Detail": {
+                "Handle": 852512
+              }
+            },
+            {
+              "Stage": "dialogue-uia-from-handle-exit",
+              "Timestamp": 3517038769,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-enter",
+              "Timestamp": 3517039251,
+              "Thread": 4,
+              "Detail": null
+            },
+            {
+              "Stage": "dialogue-uia-process-read-exit",
+              "Timestamp": 3517039495,
+              "Thread": 4,
+              "Detail": {
+                "Process": 7908
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+stock repetition 0: complete layout 433.12 ms; readiness 655.93 ms
+stock repetition 1: complete layout 519.76 ms; readiness 713.72 ms
+stock repetition 2: complete layout 406.87 ms; readiness 603.55 ms
+stock repetition 3: complete layout 469.82 ms; readiness 600.37 ms

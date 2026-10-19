@@ -1,0 +1,280 @@
+{
+  "Meaning": "Original archive and companion file identities. Every source-labelled failure remains a failure.",
+  "Files": [
+    {
+      "Path": "archive-integrity.json",
+      "Bytes": 3206,
+      "Sha256": "6944947085e62a5d24e45011a7421a882cb5ab0aed3f09f568deec0c61809fc3"
+    },
+    {
+      "Path": "cancelled-diagnostics/focused-jobs.json",
+      "Bytes": 9384,
+      "Sha256": "5e5e8c720ab601a804b87a063752db9e12c78ee84ea291c752ea76e996bdc833"
+    },
+    {
+      "Path": "cancelled-diagnostics/visual-jobs.json",
+      "Bytes": 8921,
+      "Sha256": "60c3e5ff05f1ec8ef1902faf6396804502b270204e2fcc6f1d3a56ee3b736eb3"
+    },
+    {
+      "Path": "chrome-checkpoint-abe2ac4/focused-original-file-manifest.json.gz",
+      "Bytes": 181954,
+      "Sha256": "cdca3ac379540a566596edfb366f03e4b6acc88f5c1731ffab8496bf13791156"
+    },
+    {
+      "Path": "chrome-checkpoint-abe2ac4/focused-receipts.tar.gz",
+      "Bytes": 12072549,
+      "Sha256": "1aaba7aa6c485547c8d464d29ff7fcf418d34782ba7c9bd473258118439f3db3"
+    },
+    {
+      "Path": "compiler-pilot-9117d83-failed.log",
+      "Bytes": 65509,
+      "Sha256": "e0249e4d6a37cdbba01a9517ca7205571371213ea437ebaf767672500cf01cba"
+    },
+    {
+      "Path": "diagnostic-1235e25-failed.log",
+      "Bytes": 53324,
+      "Sha256": "73540946be16f9765eae6b2adcd697f178d946b2e60cd7b74db50fdf306c58a4"
+    },
+    {
+      "Path": "diagnostic-history/focused-original-file-manifest.json.gz",
+      "Bytes": 765981,
+      "Sha256": "5fc2293ea0070efd9998994be527f3b17525feea12eea2a100568bd3690ca210"
+    },
+    {
+      "Path": "diagnostic-history/focused-receipts.tar.gz",
+      "Bytes": 24608918,
+      "Sha256": "952f447ebfbb36228b4dd45e9212d79fe00f8610a8698e44ea46f354998d4576"
+    },
+    {
+      "Path": "eager-paint-controls/argument-validation/execution-identity.json",
+      "Bytes": 586,
+      "Sha256": "9b96030ac81bb4c684f01959350c8b4300d27e0a987646f82e7d69b22b94076e"
+    },
+    {
+      "Path": "eager-paint-controls/argument-validation/failure.json",
+      "Bytes": 121,
+      "Sha256": "be1d52f2b9f99898452c15beb687562874ddf18cddb87e2116ab8e9a7d800848"
+    },
+    {
+      "Path": "eager-paint-controls/focused-original-file-manifest.json.gz",
+      "Bytes": 224134,
+      "Sha256": "6ba33af135c82e2c2ebd64c0d8240d09add79fc368cd8f564b1c49daf3a3df32"
+    },
+    {
+      "Path": "eager-paint-controls/focused-receipts.tar.gz",
+      "Bytes": 13329984,
+      "Sha256": "7de65e58af566fdf45ce8a91f1ecc260135ab2bff4e7f324fbe5b0f4f22c7596"
+    },
+    {
+      "Path": "eager-paint-controls/painter-comparison.json",
+      "Bytes": 34610,
+      "Sha256": "aed626f3eed401bddb459e48636d158978b9dc8e3caf7331b861ace248776985"
+    },
+    {
+      "Path": "eager-paint-visual/original-file-manifest.json.gz",
+      "Bytes": 128006,
+      "Sha256": "0abf89a7a9d6d86f8e22d058595d80cb83515388783089669d304d4014f38c9b"
+    },
+    {
+      "Path": "eager-paint-visual/receipts.tar.gz",
+      "Bytes": 7632126,
+      "Sha256": "b27894dbfb4ab496adc274fe05aa6ca9cb8ab7105c584e38dbd7d716ea1117fb"
+    },
+    {
+      "Path": "final-diagnostics/appearance-ownership-comparison.json",
+      "Bytes": 23571,
+      "Sha256": "f1ec1284735989ccc7eef26be564304fd4e8da8449b508fcc67d5842420c9daf"
+    },
+    {
+      "Path": "final-diagnostics/appearance-sampling-leaves.json",
+      "Bytes": 3427,
+      "Sha256": "97123083dbe1156c3715baa809110549df37f892ea3dde147d5b4a8e2b894c84"
+    },
+    {
+      "Path": "final-diagnostics/appearance-sampling-named-frames.json",
+      "Bytes": 5442,
+      "Sha256": "5d1be0627b70fb1620a650d3e456a7aa30ed622f9f1278b13abff061574bbf19"
+    },
+    {
+      "Path": "final-diagnostics/exact-rgba-identity-audit.json",
+      "Bytes": 297,
+      "Sha256": "506a406383c1ced11c0c9217f4b8c14194b465e379e9def96663925e3382f65f"
+    },
+    {
+      "Path": "final-diagnostics/focused-original-file-manifest.json.gz",
+      "Bytes": 480306,
+      "Sha256": "54c926eafe938f328e7979d5883416dbefdd2038bd9855cec0a4aec6f6b2e09a"
+    },
+    {
+      "Path": "final-diagnostics/focused-receipts.tar.gz",
+      "Bytes": 18199054,
+      "Sha256": "6ca4178f599bebeeebab6ddc19c74bdbe23ef151b10f669f32bc7cba9e1e6f83"
+    },
+    {
+      "Path": "final-diagnostics/interchange-text.tar.gz",
+      "Bytes": 12920,
+      "Sha256": "7fc79cfe5f7c42592eb843413b9883111da916a25d0260c7458625fde4021fa5"
+    },
+    {
+      "Path": "full-47dff1e/every-sample.csv",
+      "Bytes": 196182,
+      "Sha256": "5e2ff43eba288e1ab8a935321142e98b00445fe39facee36fefac6bc185b6e05"
+    },
+    {
+      "Path": "full-47dff1e/measurements.md",
+      "Bytes": 22340,
+      "Sha256": "d215cc9d22bf76471a8e3d102af40e5fe9e0dee3cb9c232c7f47d4224a6ec812"
+    },
+    {
+      "Path": "full-47dff1e/replication-1-receipts.tar.gz",
+      "Bytes": 5163932,
+      "Sha256": "df208107c0ab6b98c9edfb38eaf0bf2d93174ee400fce8fe3ee22cdf3fcc767a"
+    },
+    {
+      "Path": "full-47dff1e/replication-2-receipts.tar.gz",
+      "Bytes": 5138171,
+      "Sha256": "69a3200ded8753883132f1859d5471f48efbb74d8e4caaacf874e9ac1117b336"
+    },
+    {
+      "Path": "full-47dff1e/summary.json.gz",
+      "Bytes": 203353,
+      "Sha256": "29a570e20b726a43c507cb7b00d7bd2a86a823e091589c5200ca94dee4a3b770"
+    },
+    {
+      "Path": "full-7601be9/every-sample.csv",
+      "Bytes": 196814,
+      "Sha256": "c7c5840b7a40bd6660773ab533985f2cd817a7ef5f6146a43a356480fdc51ddf"
+    },
+    {
+      "Path": "full-7601be9/host-1-bounded-retention.json",
+      "Bytes": 13604,
+      "Sha256": "50682983f3adcceaaea141e712507d3ac07dfb946872d6354156085c72ba8ff9"
+    },
+    {
+      "Path": "full-7601be9/host-2-bounded-retention.json",
+      "Bytes": 13604,
+      "Sha256": "b8e33aee637e8894dcb1e77ecdcf856d69a9100e259d27f8033358b922d40ebe"
+    },
+    {
+      "Path": "full-7601be9/measurements.md",
+      "Bytes": 22786,
+      "Sha256": "be6cca91786d05151326383f74c651b10580121acd50ada0e0c7200e51f6978b"
+    },
+    {
+      "Path": "full-7601be9/replication-1-receipts.tar.gz",
+      "Bytes": 5158187,
+      "Sha256": "45b5354cf62416772c0ff3eb438603cb2447ab208e935fa63e321f4c9d706d53"
+    },
+    {
+      "Path": "full-7601be9/replication-2-receipts.tar.gz",
+      "Bytes": 5100619,
+      "Sha256": "ce25c75a68cd6c880d17508992b4230cfce52be1b78ed78fad0f70454ef47968"
+    },
+    {
+      "Path": "full-7601be9/summary.json.gz",
+      "Bytes": 206614,
+      "Sha256": "bf2ee41f7a2ff8b51cea4a413fd45aea1da2e390d5a70efc3cc415e9305b02ea"
+    },
+    {
+      "Path": "local-and-compiler/original-file-manifest.json.gz",
+      "Bytes": 59964,
+      "Sha256": "10bd170b04722275ad662e96a664d3dc9a62565361e9c7171f33b018fbb08d71"
+    },
+    {
+      "Path": "local-and-compiler/receipts.tar.gz",
+      "Bytes": 15139647,
+      "Sha256": "822bc7c4d9afcfa8af00fbe50c3c7b52fac39b53b71914c95c14fe2046b9bf1d"
+    },
+    {
+      "Path": "post-gate-d72bb72/focused-original-file-manifest.json.gz",
+      "Bytes": 112025,
+      "Sha256": "498a63bdff30f18bc805ecbd2e179229acb10641a5c4f1d76c74350549b1c816"
+    },
+    {
+      "Path": "post-gate-d72bb72/focused-receipts.tar.gz",
+      "Bytes": 2371376,
+      "Sha256": "b30931976632a55750c7a87b8c0c79231b7a89380db2875143ca01a7c92dcb05"
+    },
+    {
+      "Path": "post-gate-d72bb72/local-and-interchange-manifest.json.gz",
+      "Bytes": 19099,
+      "Sha256": "bb89f46f7a97ec0a7942e9d65395699337b4743d23f8c80422d0b05f2ff00f19"
+    },
+    {
+      "Path": "post-gate-d72bb72/local-and-interchange.tar.gz",
+      "Bytes": 765301,
+      "Sha256": "5a12efd24ec07aef1a89398a6828b5ed9bf9746f17d8f5df330d3fc5bb9cddef"
+    },
+    {
+      "Path": "post-gate-d72bb72/media-client-comparison.json",
+      "Bytes": 53633,
+      "Sha256": "cbe4b81b667191ed330afcf6072d88b49183ad7c6194d06cc90e63e0f2f721f3"
+    },
+    {
+      "Path": "README.md",
+      "Bytes": 6350,
+      "Sha256": "95375bed65962dcd144365702cea7ae1612f0b8187182125cec8cfc341d4879a"
+    },
+    {
+      "Path": "selection-checkpoints/focused-original-file-manifest.json.gz",
+      "Bytes": 453907,
+      "Sha256": "c648e045f10a6e8e6ede3102846f6c2f08a70bdff5d39d25da8d4652700828b0"
+    },
+    {
+      "Path": "selection-checkpoints/focused-receipts.tar.gz",
+      "Bytes": 14546389,
+      "Sha256": "2b2f3a432e2eca1b6ac5a36a3487d71bb3a657e6e430c03195ee9366448c20af"
+    },
+    {
+      "Path": "table-checkpoint-bb1e022/focused-original-file-manifest.json.gz",
+      "Bytes": 90451,
+      "Sha256": "4fe3189b56e8f0bcc29c510e4c35c84fe5c7a20ff796e929a0e7b21ced502658"
+    },
+    {
+      "Path": "table-checkpoint-bb1e022/focused-receipts.tar.gz",
+      "Bytes": 9882381,
+      "Sha256": "596ad491acc14965cb06c7d909c55b7c4e166ea38a3165631a5151df4361de62"
+    },
+    {
+      "Path": "visual-and-controls/1c39937-capture-manifest.json",
+      "Bytes": 292384,
+      "Sha256": "8200abb0f2aff0b1dbc10362813274219de3c3252d3655f86cd826c205b2dc94"
+    },
+    {
+      "Path": "visual-and-controls/1c39937-review.json",
+      "Bytes": 2567,
+      "Sha256": "683b8979f65bf5938fddf5546d59f19b37e5e9e152839a624b6c443c10929142"
+    },
+    {
+      "Path": "visual-and-controls/current-appearance-profile.tar.gz",
+      "Bytes": 930911,
+      "Sha256": "048bf21ebc7cfb8cbfb2ce93e533ee79b036087e31a7c4e717b324322f24e2ef"
+    },
+    {
+      "Path": "visual-and-controls/original-file-manifest.json.gz",
+      "Bytes": 270701,
+      "Sha256": "65822061026ad3ceb6a77336f4d941e74c8a8f7dfee25c376cde9186c57a32fd"
+    },
+    {
+      "Path": "visual-and-controls/receipts.tar.gz",
+      "Bytes": 12872567,
+      "Sha256": "a7b8f20b087871b8e53dc8ffb5688801f9aaf23b67ceffbb395c9aaaf8425840"
+    },
+    {
+      "Path": "visual-capture-manifest.json",
+      "Bytes": 294082,
+      "Sha256": "5c2bdbc095d14c0040089f4fe5a01598cc414fb233d74cf984f60a71691675b7"
+    },
+    {
+      "Path": "visual-representatives/boundaries-actual-hc-1c39937.png",
+      "Bytes": 143452,
+      "Sha256": "1236b082d30cc16deec9c428f3c6be48735d1e133f123ad5f99c5171395580b4"
+    },
+    {
+      "Path": "visual-representatives/six-workloads-light-9fab9cc.png",
+      "Bytes": 99297,
+      "Sha256": "fecb1332e6e24827218003825322cabe5d1bf96b47a985ab0b5428d4d4906d5b"
+    }
+  ]
+}
