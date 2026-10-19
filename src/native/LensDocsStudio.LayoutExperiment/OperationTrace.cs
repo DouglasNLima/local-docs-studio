@@ -108,7 +108,7 @@ internal sealed class OperationTrace : IDisposable
     private void Completed(object? sender, DispatcherHookEventArgs args)
     {
         if (operations.Remove(args.Operation, out var start) && Elapsed(start) >= 8)
-            Stage("dispatcher-operation", new { StartTimestamp = start, Milliseconds = Elapsed(start), Priority = args.Operation.Priority.ToString(), Method = args.Operation.Task.Status.ToString() });
+            Stage("dispatcher-operation", new { StartTimestamp = start, Milliseconds = Elapsed(start), Priority = args.Operation.Priority.ToString(), TaskStatus = args.Operation.Task.Status.ToString() });
     }
     public void Dispose()
     {

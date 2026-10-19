@@ -29,6 +29,7 @@ internal sealed class LayoutSurface : Panel
     public void ViewportChanged() { InvalidateVisual(); selectionOverlay?.InvalidateVisual(); }
     private (SemanticNode Node, Point Point)? pressedLink;
     private SelectionOverlay? selectionOverlay;
+    internal object? LastPointForChecks { get; set; }
     private SemanticNode[] selectedCells = [];
     private readonly HashSet<int> selectedCellParagraphs = [];
     private readonly HashSet<int> cellRangeParagraphs = [];
@@ -166,6 +167,7 @@ internal sealed class LayoutSurface : Panel
     protected override AutomationPeer OnCreateAutomationPeer() => new LayoutAutomationPeer(this);
     public void Install(LayoutSnapshot? snapshot)
     {
+        LastPointForChecks = null;
         var previousAppearance = Snapshot?.Appearance;
         selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null; matches.Clear(); selectedCells = []; selectedCellParagraphs.Clear(); cellRangeParagraphs.Clear(); tableArrowBoundary = -1;
         foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;

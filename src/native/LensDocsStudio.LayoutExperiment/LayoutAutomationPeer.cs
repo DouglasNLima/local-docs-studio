@@ -43,7 +43,13 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         var top = surface.Scroller?.VerticalOffset ?? 0; var bottom = top + (surface.Scroller?.ViewportHeight ?? 300);
         return snapshot.Lines.Where(line => !line.Hidden && line.Top + line.Height >= top && line.Top <= bottom).Select(line => Range(line.Start, line.End)).ToArray();
     }
-    public ITextRangeProvider RangeFromPoint(Point point) { var at = surface.Hit(surface.PointFromScreen(point)); return Range(at, at); }
+    public ITextRangeProvider RangeFromPoint(Point point)
+    {
+        var local = surface.PointFromScreen(point); var at = surface.Hit(local);
+        surface.LastPointForChecks = new { Screen = point.ToString(), Local = local.ToString(), Offset = at,
+            Origin = surface.PointToScreen(new Point()).ToString(), ScrollOffset = surface.Scroller?.VerticalOffset };
+        return Range(at, at);
+    }
     public ITextRangeProvider RangeFromChild(IRawElementProviderSimple child)
     {
         var id = child.GetPropertyValue(AutomationElementIdentifiers.AutomationIdProperty.Id) as string;

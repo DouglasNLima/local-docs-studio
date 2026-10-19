@@ -15,7 +15,7 @@ internal static class RangeOracleChecks
     internal const string Source = "## Heading\n\nPlain **bold** *italic* and `code`.\n\nLatin العربيّة end é 😀.\n\n";
     public static async Task Run(ExperimentWindow window, string output)
     {
-        var source = Source + "| Cell A | Cell B | Cell C |\n|---|---|---|\n| Value D | Value E | Value F |\n| Value G | Value H | Value I |\n\n" + TargetedFixtures.Cases.Single(value => value.Name == "table-spans").Source + "\n\n" + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
+        var source = Source + "| Cell A | Cell B | Cell C |\n|---|---|---|\n| Value D | Value E | Value F |\n| Value G | Value H | Value I |\n\n" + TargetedFixtures.Cases.Single(value => value.Name == "table-spans").Source + "\n\n" + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nParagraph1200: Evidence.\n\nFinal marker.\n";
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
         var gaps = new List<double>(); var timeline = new List<object>(); var candidateGaps = new List<double>(); var last = Stopwatch.GetTimestamp(); var phase = "setup";
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
@@ -71,6 +71,16 @@ internal static class RangeOracleChecks
             AutomationElement? document = null;
             IndependentUiaClient.Wait(() => (document = window.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, side == "stock" ? "RangeOracleDocument" : "ExperimentalDocument"))) is not null);
             var text = (TextPattern)document!.GetCurrentPattern(TextPattern.Pattern);
+            var punctuated = text.DocumentRange.FindText("Paragraph1200:", false, false)!;
+            punctuated.ScrollIntoView(true);
+            IndependentUiaClient.Wait(() => punctuated.GetBoundingRectangles().Length > 0);
+            var pointBox = punctuated.GetBoundingRectangles()[0];
+            var pointWord = text.RangeFromPoint(new Point(pointBox.Left + 1, pointBox.Top + pointBox.Height / 2));
+            var withinPunctuated = pointWord.CompareEndpoints(TextPatternRangeEndpoint.Start, punctuated, TextPatternRangeEndpoint.Start) >= 0
+                && pointWord.CompareEndpoints(TextPatternRangeEndpoint.End, punctuated, TextPatternRangeEndpoint.End) <= 0;
+            pointWord.ExpandToEnclosingUnit(TextUnit.Word);
+            rows.Add(new { Operation = "punctuated-distant-point-word", Target = "Paragraph1200:", PointWithinTarget = withinPunctuated, Word = pointWord.GetText(-1) });
+            if (!withinPunctuated || pointWord.GetText(-1).TrimEnd() != "Paragraph1200") throw new IOException("The actual punctuated point/Word oracle differs from its recorded stock boundary.");
             var spans = text.DocumentRange.FindText("AAAAA", false, false)!;
             var spanEnding = text.DocumentRange.FindText("After spanned table.", false, false)!;
             spans.MoveEndpointByRange(TextPatternRangeEndpoint.End, spanEnding, TextPatternRangeEndpoint.Start);

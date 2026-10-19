@@ -152,8 +152,15 @@ internal static class IndependentUiaClient
             var rectangle = last.GetBoundingRectangles()[0];
             Program.Write(Path.Combine(output, "uia-point-geometry.json"), new { Range = rectangle.ToString(), Document = document.Current.BoundingRectangle.ToString(), Window = window.Current.BoundingRectangle.ToString() });
             var point = text.RangeFromPoint(new Point(rectangle.Left + 1, rectangle.Top + rectangle.Height / 2));
+            var withinLast = point.CompareEndpoints(TextPatternRangeEndpoint.Start, last, TextPatternRangeEndpoint.Start) >= 0
+                && point.CompareEndpoints(TextPatternRangeEndpoint.End, last, TextPatternRangeEndpoint.End) <= 0;
             point.ExpandToEnclosingUnit(TextUnit.Word);
-            Require(point.GetText(-1).Contains(names.Item3.Split(' ')[0], StringComparison.Ordinal), "UIA point geometry on distant final text", checks);
+            var pointWord = point.GetText(-1);
+            // Stock Word excludes the colon in the unchanged Paragraph1200:
+            // target. A text range and a word unit have different boundaries.
+            var expectedWord = names.Item3.Split(' ')[0].TrimEnd(':');
+            Program.Write(Path.Combine(output, "uia-point-word.json"), new { Target = names.Item3, PointWithinTarget = withinLast, ExpectedWord = expectedWord, ActualWord = pointWord });
+            Require(withinLast && pointWord.TrimEnd() == expectedWord, "UIA point geometry on distant final text", checks);
             var clone = last.Clone(); clone.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Character, 4);
             Require(clone.GetText(-1) == names.Item3[4..], "UIA character endpoint movement", checks);
             var unitProbe = last.Clone(); unitProbe.MoveEndpointByRange(TextPatternRangeEndpoint.End, last, TextPatternRangeEndpoint.Start);

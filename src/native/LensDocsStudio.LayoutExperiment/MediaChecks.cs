@@ -13,22 +13,22 @@ internal static class MediaChecks
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern IntPtr FindWindow(string? className, string title);
     [DllImport("user32.dll")] private static extern IntPtr GetLastActivePopup(IntPtr window);
     [DllImport("user32.dll", SetLastError = true)] private static extern IntPtr SendMessageTimeout(IntPtr window, uint message, IntPtr wParam, IntPtr lParam, uint flags, uint timeout, out IntPtr result);
-    public static async Task Run(ExperimentWindow window, string output)
+    public static async Task Run(ExperimentWindow window, string output, bool staClientControl = false)
     {
         var fixture = ContinuousPreviewFixtures.Create(output, "mixed")[0]; var path = Path.Combine(output, "source.md");
         File.WriteAllText(path, fixture.Source); window.SourcePath = path; window.WorkspaceRoot = output;
         await window.Request(fixture.Source);
-        await Exercise(window, output, "candidate", window);
+        await Exercise(window, output, "candidate", window, staClientControl);
         if (window.Surface.Snapshot?.Model.Source != fixture.Source || File.ReadAllText(path) != fixture.Source) throw new IOException("Media export changed source.");
     }
-    internal static async Task Exercise(System.Windows.Window owner, string output, string route, ExperimentWindow? candidate = null)
+    internal static async Task Exercise(System.Windows.Window owner, string output, string route, ExperimentWindow? candidate = null, bool staClientControl = false)
     {
         using var trace = new OperationTrace(owner); if (candidate is not null) candidate.Trace = trace;
         var gaps = new List<double>(); var watch = Stopwatch.StartNew(); var last = 0d;
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last); last = at; }; timer.Start();
         var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "--media-client", output, Environment.ProcessId.ToString(), new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64().ToString(), route }) start.ArgumentList.Add(argument);
+        foreach (var argument in new[] { "--media-client", output, Environment.ProcessId.ToString(), new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64().ToString(), route, staClientControl ? "STA" : "MTA" }) start.ArgumentList.Add(argument);
         using var client = (await Task.Run(() => Process.Start(start)))!;
         try
         {
@@ -44,14 +44,31 @@ internal static class MediaChecks
         finally { timer.Stop(); trace.Dispose(); if (candidate is not null) candidate.Trace = null; Program.Write(Path.Combine(output, "media-trace.json"), trace.Events); }
         WindowCapture.Save(owner, Path.Combine(output, "shown-media.png"));
     }
-    public static int Client(string output, int processId, long handle, string route)
+    public static int RunClient(string output, int processId, long handle, string route, bool staControl)
+    {
+        // UIA owns no windows on this thread. OLE retains its separate pumped
+        // STA. The product's native dialogue stays on its window dispatcher.
+        // Keep the previous STA client as an explicit comparative control.
+        var result = 1;
+        var client = new Thread(() => result = Client(output, processId, handle, route)) { Name = "Independent native dialogue UIA client" };
+        client.SetApartmentState(staControl ? ApartmentState.STA : ApartmentState.MTA);
+        client.Start(); client.Join(); return result;
+    }
+    private static int Client(string output, int processId, long handle, string route)
     {
         var checks = new List<string>(); using var clipboard = new IndependentUiaClient.ClipboardOwner();
         var responseFailures = new List<string>();
         var timeline = new List<object>();
-        void At(string stage, object? detail = null) => timeline.Add(new { Stage = stage, Timestamp = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Detail = detail });
+        using var journal = File.CreateText(Path.Combine(output, "media-client-timeline.jsonl")); journal.AutoFlush = true;
+        void At(string stage, object? detail = null)
+        {
+            var row = new { Stage = stage, Timestamp = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Detail = detail };
+            timeline.Add(row); journal.WriteLine(System.Text.Json.JsonSerializer.Serialize(row));
+        }
         try
         {
+            At("client-start", new { Apartment = Thread.CurrentThread.GetApartmentState().ToString(), NativeThread = NativeThread(), Process = Environment.ProcessId,
+                ProbeVersion = "native-dialogue-client-v2-call-boundaries" });
             var ownerHandle = new IntPtr(handle); var owner = AutomationElement.FromHandle(ownerHandle);
             AutomationElement scope = owner;
             if (route == "candidate")
@@ -68,9 +85,21 @@ internal static class MediaChecks
                 var command = scope.FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button), new PropertyCondition(AutomationElement.NameProperty, format)))!;
                 At("command-invoke", new { format, cancel });
                 ((InvokePattern)command.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+                At("command-invoke-returned", new { format, cancel });
                 AutomationElement? dialogue = null;
                 IntPtr dialogueHandle = IntPtr.Zero;
-                IndependentUiaClient.Wait(() => { dialogueHandle = GetLastActivePopup(ownerHandle); dialogue = dialogueHandle == IntPtr.Zero || dialogueHandle == ownerHandle ? null : AutomationElement.FromHandle(dialogueHandle); return dialogue is not null && dialogue.Current.ProcessId == processId; });
+                IndependentUiaClient.Wait(() =>
+                {
+                    dialogueHandle = GetLastActivePopup(ownerHandle);
+                    if (dialogueHandle == IntPtr.Zero || dialogueHandle == ownerHandle) return false;
+                    At("dialogue-uia-from-handle-enter", new { Handle = dialogueHandle.ToInt64() });
+                    dialogue = AutomationElement.FromHandle(dialogueHandle);
+                    At("dialogue-uia-from-handle-exit");
+                    At("dialogue-uia-process-read-enter");
+                    var dialogueProcess = dialogue.Current.ProcessId;
+                    At("dialogue-uia-process-read-exit", new { Process = dialogueProcess });
+                    return dialogueProcess == processId;
+                });
                 At("dialogue-found", new { Handle = dialogueHandle.ToInt64(), OwnerEnabled = OperationTrace.IsWindowEnabled(ownerHandle), dialogue!.Current.Name });
                 var response = Stopwatch.GetTimestamp(); var ack = SendMessageTimeout(dialogueHandle, 0, IntPtr.Zero, IntPtr.Zero, 2, 100, out _);
                 At("dialogue-native-response", new { Success = ack != IntPtr.Zero, Milliseconds = (Stopwatch.GetTimestamp() - response) * 1000d / Stopwatch.Frequency });
@@ -113,4 +142,5 @@ internal static class MediaChecks
         }
         catch (Exception error) { Program.Write(Path.Combine(output, "media-client.json"), new { Status = "FAIL", Checks = checks, Timeline = timeline, ResponseBudgetFailures = responseFailures, Error = error.ToString() }); return 1; }
     }
+    [DllImport("kernel32.dll", EntryPoint = "GetCurrentThreadId")] private static extern uint NativeThread();
 }

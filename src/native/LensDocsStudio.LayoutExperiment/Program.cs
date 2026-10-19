@@ -25,7 +25,7 @@ internal static class Program
     {
         if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args[4], args[5]);
         if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]), args[3]);
-        if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4]);
+        if (args.FirstOrDefault() == "--media-client") return MediaChecks.RunClient(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4], args.ElementAtOrDefault(5) == "STA");
         if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
         if (args.FirstOrDefault() == "--link-client") return LinkChecks.Client(args[1], long.Parse(args[2]), args[3], args[4], args[5]);
         if (args.FirstOrDefault() == "--image-clipboard-client") return ImageClipboardChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
@@ -56,8 +56,8 @@ internal static class Program
                 else if (args.Contains("--visual-checks")) await VisualChecks.Run(window, output);
                 else if (args.Contains("--range-checks")) await RangeOracleChecks.Run(window, output);
                 else if (args.Contains("--media-controls")) await MediaControlChecks.Run(window, output);
-                else if (args.Contains("--media-checks") || args.Contains("--media-legacy-directory"))
-                { window.LegacyMediaLocationForChecks = args.Contains("--media-legacy-directory"); await MediaChecks.Run(window, output); }
+                else if (args.Contains("--media-checks") || args.Contains("--media-legacy-directory") || args.Contains("--media-client-sta-control"))
+                { window.LegacyMediaLocationForChecks = args.Contains("--media-legacy-directory"); await MediaChecks.Run(window, output, args.Contains("--media-client-sta-control")); }
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
                 else if (args.Contains("--appearance-worker-theme-control")) { window.WorkerThemeOwnershipForChecks = true; await AppearanceChecks.Run(window, output); }
@@ -190,11 +190,11 @@ internal static class Program
                 using var clientDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 try { await client.WaitForExitAsync(clientDeadline.Token); }
                 catch (OperationCanceledException) { client.Kill(true); throw new TimeoutException("Independent UIA client exceeded its external 60-second bound."); }
-                finally { Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts); }
+                finally { Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts); Write(Path.Combine(output, "provider-last-point.json"), window.Surface.LastPointForChecks!); }
                 if (client.ExitCode != 0)
                 {
                     Write(Path.Combine(output, "interaction-heartbeat-failure.json"), new { TimingInputGaps = timingGaps, InteractionInputGaps = gaps, InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionAllocatedBytes = GC.GetTotalAllocatedBytes() - interactionAllocated, InteractionNaturalCollections = Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - interactionCollections[i]).ToArray(), CompleteLayout = complete, PreparationPresentation = readiness });
-                    Write(Path.Combine(output, "provider-failure-state.json"), new { window.Surface.Anchor, window.Surface.Active, window.Surface.LastKey, window.Surface.KeyHistory, window.Surface.MouseHistory,
+                    Write(Path.Combine(output, "provider-failure-state.json"), new { window.Surface.Anchor, window.Surface.Active, window.Surface.LastKey, window.Surface.KeyHistory, window.Surface.MouseHistory, window.Surface.LastPointForChecks,
                         window.Surface.IsKeyboardFocused, FocusedElement = System.Windows.Input.Keyboard.FocusedElement?.GetType().Name });
                     throw new IOException("Independent UIA client failed; see retained evidence.");
                 }
