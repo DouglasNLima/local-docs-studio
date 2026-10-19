@@ -58,8 +58,11 @@ internal static class ImageClipboardChecks
             var dimensionsAndTextEqual = new[] { "PixelWidth", "PixelHeight", "PlainText" }.All(name => stockReceipt.RootElement.GetProperty(name).GetRawText() == candidateReceipt.RootElement.GetProperty(name).GetRawText());
             if (!stockBytes.SequenceEqual(candidateBytes) || stockFormats != candidateFormats || !dimensionsAndTextEqual) throw new IOException("Actual selected-image clipboard formats, text, dimensions or pixels differ from stock.");
             Program.Write(Path.Combine(output, "image-clipboard.json"), new { Status = "PASS", FormatsAndDecodedBitmapPixels = "PASS", MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), CandidateInputGapsMilliseconds = gaps, Timeline = timeline,
+                InteractionStages = window.Surface.InteractionStages,
                 Oracle = "Actual shown stock and candidate TextPattern image selection plus real Ctrl+C in separate clients; the stock viewer is detached before candidate setup" });
         }
+        catch (Exception error)
+        { Program.Write(Path.Combine(output, "image-clipboard.json"), new { Status = "FAIL", Error = error.ToString(), MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), CandidateInputGapsMilliseconds = gaps, Timeline = timeline, InteractionStages = window.Surface.InteractionStages }); throw; }
         finally { timer.Stop(); }
     }
     public static int Client(string output, int processId, string side, string acknowledgementName)
@@ -85,7 +88,7 @@ internal static class ImageClipboardChecks
             var bitmap = new FormatConvertedBitmap(Clipboard.GetImage()!, PixelFormats.Pbgra32, null, 0);
             var pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4]; bitmap.CopyPixels(pixels, bitmap.PixelWidth * 4, 0);
             File.WriteAllBytes(Path.Combine(output, "bitmap-pixels.bin"), pixels); Program.Write(Path.Combine(output, "formats.json"), formats);
-            Program.Write(Path.Combine(output, "image-clipboard-client.json"), new { Status = "PASS", Formats = formats, bitmap.PixelWidth, bitmap.PixelHeight, PixelSha256 = Program.Hash(pixels),
+            Program.Write(Path.Combine(output, "image-clipboard-client.json"), new { Status = "PASS", ClientProcess = Environment.ProcessId, ProviderProcess = processId, Transport = "Independent Windows UI Automation and real Ctrl+C", Formats = formats, bitmap.PixelWidth, bitmap.PixelHeight, PixelSha256 = Program.Hash(pixels),
                 PlainText = unicode as string, UnicodeType = unicode?.GetType().FullName, AnsiText = ansi as string, AnsiType = ansi?.GetType().FullName,
                 TextBeforeBitmap = beforeBitmapText, TextAfterBitmap = Clipboard.GetText(), RangeText = range.GetText(-1) }); return 0;
         }
