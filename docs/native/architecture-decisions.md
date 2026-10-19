@@ -6,6 +6,8 @@ Continuation authorised under revised v2 budgets; viability pending complete fun
 
 The executable now includes the six-workload semantic surface, actual native media commands, public no-layout RTF/Xaml interchange and transient source/search/outline/document integration. Targeted geometry/decoded-style and independent studio/media interaction subsets pass locally; timing and required parity gaps remain unsuccessful or incomplete. The [source-labelled report and required matrix](continuous-layout-architecture-prototype.md#source-labelled-v2-checkpoints-and-remaining-scope) retain the failed `a0336ff` hosted comparison and every limitation.
 
+Current v2 evaluation: **INSUFFICIENT EVIDENCE for a migration proposal**. All six workloads and executed semantic/GUI/UIA slices are real, but replicated layout/Input misses and required missing/unverified parity remain. The [status matrix and durable raw evidence](continuous-layout-architecture-prototype.md#recorded-v2-evaluation-decision) retain every source-labelled result; the final PR receipt owns exact-final-head CI and artefact identity. Stock remains the default, #37 stays incomplete and `.749` remains open.
+
 ### Historical v1 receipt (not the current v2 decision)
 
 

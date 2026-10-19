@@ -57,6 +57,7 @@ internal sealed class ClipboardDispatcher : IDisposable
                 }
                 catch (OperationCanceledException) { completion.TrySetCanceled(); }
                 catch (Exception error) { completion.TrySetException(error); }
+                finally { lock (gate) if (ReferenceEquals(queuedCompletion, completion)) { queued = null; queuedCompletion = null; } }
             });
         }
         return await completion.Task.ConfigureAwait(false);
@@ -67,6 +68,7 @@ internal sealed class ClipboardDispatcher : IDisposable
         {
             if (closed) return; closed = true;
             if (queued?.Status == DispatcherOperationStatus.Pending) { queued.Abort(); queuedCompletion?.TrySetCanceled(); }
+            queued = null; queuedCompletion = null;
         }
         // An accepted active OS clipboard call is atomic. Never wait for it on the UI thread.
         _ = ready.ContinueWith(task => task.Result.BeginInvokeShutdown(DispatcherPriority.Background), TaskScheduler.Default);

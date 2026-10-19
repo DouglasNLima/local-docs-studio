@@ -26,19 +26,19 @@ internal static class MediaChecks
         {
             using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(60)); await client.WaitForExitAsync(deadline.Token);
             if (client.ExitCode != 0 || window.Surface.Snapshot?.Model.Source != fixture.Source || File.ReadAllText(path) != fixture.Source) throw new IOException("Independent media export or source currency failed.");
-            Program.Write(Path.Combine(output, "media.json"), new { Status = "PASS", SourceUnchanged = true, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, Events = window.Events.ToArray() });
+            Program.Write(Path.Combine(output, "media.json"), new { Status = "PASS", SourceUnchanged = true, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InteractionStages = window.Surface.InteractionStages, Events = window.Events.ToArray() });
         }
         catch (Exception error)
         {
             if (!client.HasExited) client.Kill(true);
-            Program.Write(Path.Combine(output, "media.json"), new { Status = "FAIL", Error = error.ToString(), MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps }); throw;
+            Program.Write(Path.Combine(output, "media.json"), new { Status = "FAIL", Error = error.ToString(), MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InteractionStages = window.Surface.InteractionStages, Events = window.Events.ToArray() }); throw;
         }
         finally { timer.Stop(); }
         WindowCapture.Save(window, Path.Combine(output, "shown-media.png"));
     }
     public static int Client(string output, int processId)
     {
-        var checks = new List<string>();
+        var checks = new List<string>(); using var clipboard = new IndependentUiaClient.ClipboardOwner();
         try
         {
             using var process = Process.GetProcessById(processId); var owner = AutomationElement.FromHandle(process.MainWindowHandle);
@@ -55,9 +55,13 @@ internal static class MediaChecks
                 IndependentUiaClient.Wait(() => { var handle = FindWindow(null, "EXPERIMENT ONLY — Export diagram"); dialogue = handle == IntPtr.Zero ? null : AutomationElement.FromHandle(handle); return dialogue is not null && dialogue.Current.ProcessId == processId; });
                 AutomationElement? fileName = null;
                 IndependentUiaClient.Wait(() => (fileName = dialogue!.FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit), new PropertyCondition(AutomationElement.NameProperty, "File name:"))))?.Current.IsEnabled == true);
-                ((ValuePattern)fileName!.GetCurrentPattern(ValuePattern.Pattern)).SetValue(path);
+                fileName!.SetFocus(); IndependentUiaClient.Wait(() => fileName.Current.HasKeyboardFocus);
+                clipboard.SetSentinel(path); IndependentUiaClient.Chord(0x11, 0x41); IndependentUiaClient.Chord(0x11, 0x56);
+                IndependentUiaClient.Wait(() => ((ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern)).Current.Value == path);
                 var save = dialogue!.FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Button), new PropertyCondition(AutomationElement.AutomationIdProperty, "1")))!;
-                ((InvokePattern)save.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
+                Program.Write(Path.Combine(output, "save-dialogue-" + format + ".json"), new { FileName = ((ValuePattern)fileName.GetCurrentPattern(ValuePattern.Pattern)).Current.Value, SaveName = save.Current.Name, save.Current.AutomationId, save.Current.IsEnabled });
+                if (!save.Current.Name.Contains("Save", StringComparison.OrdinalIgnoreCase)) throw new IOException("The selected dialogue command is not Save.");
+                IndependentUiaClient.Chord(0x0D); // Actual Enter commits the filename edit and default Save command.
                 IndependentUiaClient.Wait(() => File.Exists(path) && new FileInfo(path).Length > 0);
                 if (format == "SVG")
                 {

@@ -35,7 +35,12 @@ internal static class LifecycleChecks
         var distant = winner.LastIndexOf("word3900", StringComparison.Ordinal); window.Surface.NavigateSourceCore(distant); window.UpdateLayout();
         var anchor = window.Surface.ViewportSourceAnchor();
         var leading = "Leading edit.\n\n" + winner;
+        var sequenceBeforeSupersededCopy = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
+        window.Surface.Select(0, window.Surface.Snapshot!.Model.Text.Length); window.Surface.Copy();
+        // The same dispatcher turn supersedes preparation before any UI grant.
         if (!await window.Request(leading)) throw new IOException("Leading edit did not install.");
+        await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+        if (LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != sequenceBeforeSupersededCopy) throw new IOException("Superseded clipboard preparation committed old content.");
         var preserved = window.Surface.ViewportSourceAnchor();
         if (preserved.Source != SourceEdit.Transform(winner, leading, anchor.Source) || Math.Abs(preserved.Delta - anchor.Delta) > .01)
             throw new IOException("Leading edit lost the source-based viewport anchor.");
@@ -59,6 +64,9 @@ internal static class LifecycleChecks
         }).ToArray();
         var reopen = new ExperimentWindow(); reopen.Show(); await reopen.Request(fixture.Source);
         if (reopen.Surface.Snapshot?.Model.Source != fixture.Source) throw new IOException("Reopened diagnostic window lost source.");
+        await reopen.Request("", "Dark");
+        if (reopen.Surface.Snapshot?.Model.Text.Length != 0 || reopen.Scroller.Background is not System.Windows.Media.SolidColorBrush background
+            || background.Color != System.Windows.Media.Color.FromRgb(32, 33, 36)) throw new IOException("An empty diagnostic document lost its current appearance.");
         reopen.Close(); timer.Stop();
         var readiness = events.Where(item => item.Event == "winning-preview-ready").Select(ready =>
         {
@@ -70,11 +78,11 @@ internal static class LifecycleChecks
                 WinningPreviewReadyMilliseconds = (ready.Timestamp - requested.Timestamp) * 1000d / Stopwatch.Frequency };
         }).ToArray();
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
-            ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
+            ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
             CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.All(item => item.WorkerMilliseconds is <= 250 && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
             WinningPreviewReadinessBudgetMilliseconds = 1500, WinningPreviewReadinessAcceptance = readiness.All(item => item.WinningPreviewReadyMilliseconds <= 1500) ? "PASS" : "FAIL",
-            TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS" });
+            TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS", EmptyDarkDocument = "PASS", ReopenEvents = reopen.Events.ToArray() });
     }
     private static async Task Wait(Func<bool> condition)
     {

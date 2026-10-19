@@ -88,7 +88,8 @@ $inputMisses = @($candidate | Where-Object { $_.MaximumInputGapMilliseconds -gt 
 } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $output 'protocol-v2.json')
 $pairChecks = @($samples | Where-Object RunGroup -notin @('independent-uia','targeted-uia') | Group-Object { "$($_.RunGroup)|$($_.Fixture)|$($_.Repetition)|$($_.Edited)" } | ForEach-Object {
     $group = $_.Group
-    [ordered]@{ Key=$_.Name; Pass=$group.Count -eq 2 -and @($group | Select-Object -ExpandProperty Adapter -Unique).Count -eq 2 -and @($group | Select-Object -ExpandProperty FixtureSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty SourceSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty HarnessSha256 -Unique).Count -eq 1 }
+    $mismatched = @('Width','Height','Dpi','Zoom','Appearance','Runtime','WpfFrameworkSha256','WpfFormattingSha256','ProductSha256','SourceRevision','SourceDirty','CpuAvailable','Cpu','OS','ImageOS','ImageVersion','HostMachine') | Where-Object { @($group | Select-Object -ExpandProperty $_ -Unique).Count -ne 1 }
+    [ordered]@{ MismatchedControlledFields=@($mismatched); Key=$_.Name; Pass=@($mismatched).Count -eq 0 -and $group.Count -eq 2 -and @($group | Select-Object -ExpandProperty Adapter -Unique).Count -eq 2 -and @($group | Select-Object -ExpandProperty FixtureSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty SourceSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty HarnessSha256 -Unique).Count -eq 1 }
 })
 $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interaction-heartbeat-failure.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json } | Where-Object { @($_.InteractionInputGaps | Where-Object { $_ -gt 100 }).Count })
 $coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
@@ -105,9 +106,11 @@ $executionFailures = @($runs | Where-Object ExitCode -ne 0)
 $missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
 $proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 11 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
 $timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
-$fullPass = -not $lifecycleBudgetMisses -and -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -and $executionFailures.Count -eq 0
+$officialRuntimeValid = $runtimeChecks.Count -eq 2 -and @($runtimeChecks | Where-Object { $_.SignatureStatus -ne 'Valid' -or $_.Signer -notmatch 'Microsoft Corporation' }).Count -eq 0
+$compiledSourceMatches = $samples.Count -gt 0 -and @($samples | Where-Object { $_.HarnessInformationalVersion -notmatch [regex]::Escape($source) }).Count -eq 0
+$fullPass = $compiledSourceMatches -and -not $sourceDirty -and $officialRuntimeValid -and -not $lifecycleBudgetMisses -and -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -and $executionFailures.Count -eq 0
 [ordered]@{
-    Contract='continuous-layout-v2'; Status=$(if ($fullPass) {'PASS'} elseif ($timingFail -or $executionFailures.Count) {'FAIL'} else {'INCOMPLETE'})
+    Contract='continuous-layout-v2'; CleanSourceRequired=$true; CleanSource=(-not $sourceDirty); CompiledSourceMatches=$compiledSourceMatches; OfficialRuntimeValid=$officialRuntimeValid; Status=$(if ($fullPass) {'PASS'} elseif ($timingFail -or $executionFailures.Count) {'FAIL'} else {'INCOMPLETE'})
     CandidateSamples=$candidate.Count; RequiredControlledSamples=66; RecordedControlledSamples=$controlled.Count; MissingControlledSamples=$missingSamples; RawTimedBoundaries=$rawBoundaries
     CompleteLayout=@{ BudgetMilliseconds=1000; Status=$(if($layoutMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$layoutMisses.Count }
     PreparationPresentation=@{ BudgetMilliseconds=1500; Status=$(if($presentationMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$presentationMisses.Count }

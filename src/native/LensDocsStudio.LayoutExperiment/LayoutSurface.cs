@@ -31,6 +31,9 @@ internal sealed class LayoutSurface : Panel
     public event Action? SelectionUpdated;
     public event Action<int>? SourceNavigationRequested;
     public event Action<string>? SearchRequested;
+    public Func<LayoutSnapshot, bool>? IsCurrent { get; set; }
+    private bool Current(LayoutSnapshot snapshot) => ReferenceEquals(Snapshot, snapshot) && (IsCurrent?.Invoke(snapshot) ?? true);
+    public void CancelCopyPreparation() { selectedCopy?.Cancel(); pendingCopy = null; }
     private readonly List<(int Start, int End)> matches = [];
     public void Search(string text)
     {
@@ -107,6 +110,12 @@ internal sealed class LayoutSurface : Panel
                 button.Click += (_, _) => MediaAction?.Invoke(box); Children.Add(button);
             }
         Snapshot = snapshot; Anchor = Active = 0;
+        if (snapshot is not null && Scroller is not null)
+        {
+            var colour = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(snapshot.Appearance, 1)
+                : snapshot.Appearance == "Dark" ? "#202124" : "#FFFFFF";
+            var background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); background.Freeze(); Scroller.Background = background;
+        }
         InvalidateMeasure(); InvalidateVisual();
         (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.Changed();
     }
@@ -120,7 +129,7 @@ internal sealed class LayoutSurface : Panel
     }
     public void Copy()
     {
-        if (Snapshot is not { } snapshot || Start == End || copyClosed) return;
+        if (Snapshot is not { } snapshot || !Current(snapshot) || Start == End || copyClosed) return;
         selectedCopy?.Cancel();
         pendingCopy = (snapshot, Start, End, LensDocsStudio.Native.Platform.NativeClipboardService.Sequence, System.Diagnostics.Stopwatch.GetTimestamp());
         if (!copyRunning) ProcessCopy();
@@ -140,7 +149,7 @@ internal sealed class LayoutSurface : Panel
                     var payload = await ExperimentWindow.Worker(() => ClipboardSerialisation.Prepare(snapshot, start, end, owner.Token));
                     var prepared = watch.Elapsed.TotalMilliseconds;
                     await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
-                    if (!ReferenceEquals(Snapshot, snapshot) || Start != start || End != end || owner.IsCancellationRequested)
+                    if (!Current(snapshot) || Start != start || End != end || owner.IsCancellationRequested)
                     { InteractionStages.Add(new { Stage = "copy-stale-rejected", Thread = Environment.CurrentManagedThreadId }); continue; }
                     var currentSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
                     var previous = ClipboardWorker.LastCommit;
@@ -150,7 +159,7 @@ internal sealed class LayoutSurface : Panel
                     var commit = await ClipboardWorker.Selected(payload, sequence, owner.Token);
                     InteractionStages.Add(new { Stage = "copy", PreparedMilliseconds = prepared, UiGrantTimestamp = grant,
                         Serialisation = payload.Serialisation, NativeCommit = commit, NativeCommitMilliseconds = (commit.EndTimestamp - commit.StartTimestamp) * 1000d / System.Diagnostics.Stopwatch.Frequency,
-                        TotalMilliseconds = watch.Elapsed.TotalMilliseconds, CurrentOnCompletion = ReferenceEquals(Snapshot, snapshot) && !owner.IsCancellationRequested, Thread = Environment.CurrentManagedThreadId });
+                        TotalMilliseconds = watch.Elapsed.TotalMilliseconds, CurrentOnCompletion = Current(snapshot) && !owner.IsCancellationRequested, Thread = Environment.CurrentManagedThreadId });
                 }
                 catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
                 { InteractionStages.Add(new { Stage = "copy-rejected-or-failed", Error = error.Message, Thread = Environment.CurrentManagedThreadId }); }

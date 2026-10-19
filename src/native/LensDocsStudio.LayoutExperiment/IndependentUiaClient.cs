@@ -167,7 +167,9 @@ internal static class IndependentUiaClient
             var decoded = new System.Windows.Documents.TextRange(decodedDocument.ContentStart, decodedDocument.ContentEnd);
             decoded.Load(new MemoryStream(Encoding.UTF8.GetBytes(rtf)), DataFormats.Rtf);
             File.WriteAllText(Path.Combine(output, "selected-text.txt"), copied); File.WriteAllText(Path.Combine(output, "decoded-rtf-text.txt"), decoded.Text); File.WriteAllText(Path.Combine(output, "selected.rtf"), rtf);
-            Require(decoded.Text == File.ReadAllText(Path.Combine(output, "stock-decoded-rtf-oracle.txt")), "RTF actually decoded with stock-compatible logical text (including native interchange transformations)", checks);
+            Trace("stock-serialisation-oracle-after-actual-copy");
+            var stockExpected = StockOracle(output);
+            Require(decoded.Text == stockExpected, "RTF actually decoded with stock-compatible logical text (including native interchange transformations)", checks);
             if (scenario == "list") Require(DecodedBlocks(decodedDocument.Blocks).OfType<System.Windows.Documents.Paragraph>().SelectMany(paragraph => DecodedRuns(paragraph.Inlines)).Any(run => run.Text.Contains("word1", StringComparison.Ordinal) && run.FontWeight == FontWeights.Bold), "Decoded RTF actual bold style", checks);
             Trace("xaml-decode");
             Require(Clipboard.ContainsData(DataFormats.Xaml) && System.Xml.Linq.XElement.Parse(Clipboard.GetData(DataFormats.Xaml) as string ?? throw new IOException("Xaml string payload missing.")).Descendants().Any(element => element.Name.LocalName == "Run"), "Actual Xaml selected-range content", checks);
@@ -238,6 +240,20 @@ internal static class IndependentUiaClient
         catch (Exception error)
         { Program.Write(Path.Combine(output, "independent-uia.json"), new { Status = "FAIL", Checks = checks, Error = error.ToString() }); return 1; }
         finally { Key(0x11, true); Key(0x10, true); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
+    }
+    internal static string StockOracle(string output)
+    {
+        // Test oracle stays in this independent process, after actual first copy.
+        // It cannot warm the provider's serializer/JIT or supply live UIA/selection.
+        var path = Path.Combine(output, "fixture.md"); var source = File.ReadAllText(path);
+        var parsed = new LensDocsStudio.Core.Parsing.MarkdownService().Parse(source);
+        var prepared = StockPreparation.Create(parsed, path, output);
+        var native = new LensDocsStudio.Native.Rendering.NativeMarkdownRenderer(new LensDocsStudio.Native.Rendering.NativeSvgService())
+            .Render(parsed, false, prepared.Diagrams, _ => { }, (_, _) => { }, preparedDrawings: prepared.Drawings, preparedImages: prepared.Images, codeSyntax: prepared.Syntax);
+        using var stream = new MemoryStream(); new System.Windows.Documents.TextRange(native.Document.ContentStart, native.Document.ContentEnd).Save(stream, DataFormats.Rtf); stream.Position = 0;
+        var document = new System.Windows.Documents.FlowDocument(); var range = new System.Windows.Documents.TextRange(document.ContentStart, document.ContentEnd); range.Load(stream, DataFormats.Rtf);
+        if (native.Document.ContentStart.HasValidLayout) throw new IOException("Independent serialisation oracle unexpectedly acquired layout.");
+        File.WriteAllText(Path.Combine(output, "stock-decoded-rtf-oracle.txt"), range.Text); return range.Text;
     }
     private static IEnumerable<System.Windows.Documents.Block> DecodedBlocks(System.Windows.Documents.BlockCollection blocks)
     {

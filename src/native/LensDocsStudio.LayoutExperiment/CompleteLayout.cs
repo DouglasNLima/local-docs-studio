@@ -119,10 +119,10 @@ internal static class CompleteLayout
                                 using var markerLine = formatter.FormatLine(marker.TextSource, 0, 100, plainParagraph, null);
                                 markerDrawing = new DrawingGroup();
                                 using (var markerContext = markerDrawing.Open())
-                                    markerLine.Draw(markerContext, new Point(52 - markerGap - markerLine.Width, line.Baseline - markerLine.Baseline), InvertAxes.None);
+                                    markerLine.Draw(markerContext, new Point(52 - markerGap - markerLine.Width, -markerLine.Baseline), InvertAxes.None);
                                 markerDrawing.Freeze(); markers.Add(markerKey, markerDrawing);
                             }
-                            context.PushTransform(new TranslateTransform(0, top)); context.DrawDrawing(markerDrawing); context.Pop();
+                            context.PushTransform(new TranslateTransform(0, top + line.Baseline)); context.DrawDrawing(markerDrawing); context.Pop();
                         }
                     }
                     drawing.Freeze();

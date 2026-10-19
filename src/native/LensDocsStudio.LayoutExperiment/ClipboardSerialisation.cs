@@ -83,17 +83,21 @@ internal sealed class ClipboardSerialisation
                 return list;
             case "Table":
                 var table = new Table { CellSpacing = 0, Margin = new Thickness(0, 8, 0, 12) }; table.BeginInit(); var group = new TableRowGroup(); table.RowGroups.Add(group);
-                foreach (var row in node.Children)
+                try
                 {
-                    var output = new TableRow(); group.Rows.Add(output);
-                    foreach (var cell in row.Children)
+                    foreach (var row in node.Children)
                     {
-                        var value = new TableCell { Padding = new Thickness(8, 6, 8, 6), BorderThickness = new Thickness(.5), BorderBrush = Brushes.Gray, TextAlignment = cell.Alignment };
-                        if (row.Level == 1) value.FontWeight = FontWeights.SemiBold;
-                        foreach (var child in cell.Children) value.Blocks.Add(Block(child)); output.Cells.Add(value);
+                        var output = new TableRow(); group.Rows.Add(output);
+                        foreach (var cell in row.Children)
+                        {
+                            var value = new TableCell { Padding = new Thickness(8, 6, 8, 6), BorderThickness = new Thickness(.5), BorderBrush = Brushes.Gray, TextAlignment = cell.Alignment };
+                            if (row.Level == 1) value.FontWeight = FontWeights.SemiBold;
+                            foreach (var child in cell.Children) value.Blocks.Add(Block(child)); output.Cells.Add(value);
+                        }
                     }
                 }
-                table.EndInit(); return table;
+                finally { table.EndInit(); }
+                return table;
             case "Quote":
                 var quote = new Section { BorderBrush = Brush("#FF883E"), BorderThickness = new Thickness(3, 0, 0, 0), Padding = new Thickness(12, 4, 4, 4) };
                 foreach (var child in node.Children) quote.Blocks.Add(Block(child)); return quote;

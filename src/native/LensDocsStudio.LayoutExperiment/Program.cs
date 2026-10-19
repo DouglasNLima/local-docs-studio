@@ -26,6 +26,11 @@ internal static class Program
         if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args.Length > 4 ? args[4] : "list");
         if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]));
         if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]));
+        if (args.FirstOrDefault() == "--stock-serialisation-oracle")
+        {
+            try { _ = IndependentUiaClient.StockOracle(args[1]); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         var output = Path.GetFullPath(Option("--output") ?? "artifacts/layout-experiment/local"); Directory.CreateDirectory(output);
         Write(Path.Combine(output, "execution-identity.json"), new { Source = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"), SourceDirty = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_DIRTY"),
             HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)), Arguments = args, Process = Environment.ProcessId, UiThread = Environment.CurrentManagedThreadId,
@@ -83,6 +88,7 @@ internal static class Program
     private static int fixtureOrdinal;
     private static async Task Measure(ExperimentWindow window, string output, string adapter, int repetitions, bool edited, bool acceptance, bool uia, string scenario, bool acceptanceV2)
     {
+        if (ExperimentAppearance.ActualHighContrast) throw new IOException("Controlled Light measurements require the actual OS normal appearance before either adapter starts.");
         if (adapter is not ("stock" or "candidate")) throw new ArgumentException("Choose stock or candidate.");
         var fixture = FixtureCatalog.Create(output, scenario)[0]; var samples = new List<object>();
         var ordinal = fixtureOrdinal++;
@@ -154,22 +160,10 @@ internal static class Program
             Capture((FrameworkElement?)stock ?? window.Scroller, Path.Combine(sampleOutput, "initial.png"));
             WindowCapture.Save(window, Path.Combine(sampleOutput, "shown-window.png"));
             Write(Path.Combine(sampleOutput, "geometry.json"), oracle);
-            var interactionGaps = new List<double>();
+            var interactionGaps = new List<double>(); var interactionAllocated = GC.GetTotalAllocatedBytes(); var interactionCollections = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
             if (uia && adapter == "candidate" && repetition == 0)
             {
-                // Independent serialisation oracle only, outside all clocks. Never attached to a viewer,
-                // retained for selection or exposed through the candidate's automation provider.
-                var oracleParsed = new MarkdownService().Parse(source);
-                var oraclePrepared = await ExperimentWindow.Worker(() => StockPreparation.Create(oracleParsed, sourcePath, output));
-                var oracleResult = await new NativeMarkdownRenderer(new NativeSvgService()).RenderAsync(oracleParsed, false, oraclePrepared.Diagrams, _ => { }, (_, _) => { }, preparedDrawings: oraclePrepared.Drawings, preparedImages: oraclePrepared.Images, codeSyntax: oraclePrepared.Syntax);
-                using (var encoded = new MemoryStream())
-                {
-                    new System.Windows.Documents.TextRange(oracleResult.Document.ContentStart, oracleResult.Document.ContentEnd).Save(encoded, DataFormats.Rtf); encoded.Position = 0;
-                    var decodedDocument = new FlowDocument(); var decodedRange = new System.Windows.Documents.TextRange(decodedDocument.ContentStart, decodedDocument.ContentEnd); decodedRange.Load(encoded, DataFormats.Rtf);
-                    File.WriteAllText(Path.Combine(output, "stock-decoded-rtf-oracle.txt"), decodedRange.Text);
-                    if (oracleResult.Document.ContentStart.HasValidLayout) throw new IOException("Serialisation oracle unexpectedly acquired layout.");
-                }
-                oracleResult = null!;
+                interactionAllocated = GC.GetTotalAllocatedBytes(); interactionCollections = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
                 gaps.Clear(); lastInput = watch.Elapsed.TotalMilliseconds; timer.Start();
                 var executable = Environment.ProcessPath!;
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
@@ -180,7 +174,7 @@ internal static class Program
                 catch (OperationCanceledException) { client.Kill(true); throw new TimeoutException("Independent UIA client exceeded its external 60-second bound."); }
                 if (client.ExitCode != 0)
                 {
-                    Write(Path.Combine(output, "interaction-heartbeat-failure.json"), new { TimingInputGaps = timingGaps, InteractionInputGaps = gaps, InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, CompleteLayout = complete, PreparationPresentation = readiness });
+                    Write(Path.Combine(output, "interaction-heartbeat-failure.json"), new { TimingInputGaps = timingGaps, InteractionInputGaps = gaps, InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionAllocatedBytes = GC.GetTotalAllocatedBytes() - interactionAllocated, InteractionNaturalCollections = Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - interactionCollections[i]).ToArray(), CompleteLayout = complete, PreparationPresentation = readiness });
                     Write(Path.Combine(output, "provider-failure-state.json"), new { window.Surface.Anchor, window.Surface.Active, window.Surface.LastKey, window.Surface.KeyHistory, window.Surface.MouseHistory,
                         window.Surface.IsKeyboardFocused, FocusedElement = System.Windows.Input.Keyboard.FocusedElement?.GetType().Name });
                     throw new IOException("Independent UIA client failed; see retained evidence.");
@@ -203,9 +197,9 @@ internal static class Program
                 WpfFormattingAssembly = typeof(System.Windows.Media.TextFormatting.TextFormatter).Assembly.Location,
                 WpfFormattingSha256 = Hash(File.ReadAllBytes(typeof(System.Windows.Media.TextFormatting.TextFormatter).Assembly.Location)),
                 Runtime = System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription, RuntimeAssembly = typeof(TextElement).Assembly.Location,
-                OS = Environment.OSVersion.ToString(), ImageOS = Environment.GetEnvironmentVariable("ImageOS"), ImageVersion = Environment.GetEnvironmentVariable("ImageVersion"),
+                HostMachine = Environment.MachineName, OS = Environment.OSVersion.ToString(), ImageOS = Environment.GetEnvironmentVariable("ImageOS"), ImageVersion = Environment.GetEnvironmentVariable("ImageVersion"),
                 CpuAvailable = Environment.ProcessorCount, Cpu = Environment.GetEnvironmentVariable("PROCESSOR_IDENTIFIER"),
-                Width = 640, Height = 300, Dpi = VisualTreeHelper.GetDpi(window).PixelsPerInchX, Zoom = 100, Appearance = "Light",
+                Width = 640, Height = 300, Dpi = VisualTreeHelper.GetDpi(window).PixelsPerInchX, Zoom = 100, Appearance = "Light", ActualOsHighContrast = ExperimentAppearance.ActualHighContrast,
                 ReadinessStartTimestamp = readinessStartTimestamp, SourceIoMilliseconds = sourceIoMilliseconds, EmptyHostSetupMilliseconds = hostSetupMilliseconds, ParsingMilliseconds = parsingMilliseconds, StockConstructionMilliseconds = construction,
                 CompleteLayoutInputMilliseconds = complete, WorkerFormattingAndGeometryMilliseconds = workerLayout,
                 StockOriginalFirstLayoutMilliseconds = adapter == "stock" ? complete : (double?)null,
@@ -216,7 +210,7 @@ internal static class Program
                 InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionInputGapsMilliseconds = interactionGaps, MaximumInteractionInputGapMilliseconds = interactionGaps.DefaultIfEmpty().Max(),
                 V2 = AcceptanceV2.Rows(complete, readiness, timingGaps.Concat(interactionGaps).DefaultIfEmpty().Max(), false, false),
                 DeferredRequiredLayout = 0, ListLogicalStyleAndSourceChecks = "PASS", FullParity = "INCOMPLETE", CompleteLayoutTiming = complete <= (acceptanceV2 ? 1000 : 250) ? "PASS" : "FAIL", Future250StretchOnly = complete <= 250 ? "MET" : "NOT_MET",
-                AllocatedBytes = bytes, NaturalCollections = gc, ManagedBytes = GC.GetTotalMemory(false),
+                AllocatedBytes = bytes, NaturalCollections = gc, InteractionAllocatedBytes = uia ? GC.GetTotalAllocatedBytes() - interactionAllocated : (long?)null, InteractionNaturalCollections = uia ? Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - interactionCollections[i]).ToArray() : null, ManagedBytes = GC.GetTotalMemory(false),
                 process.WorkingSet64, process.PrivateMemorySize64, ForcedCollection = false
             };
             samples.Add(observation); Write(Path.Combine(sampleOutput, "sample.json"), observation);

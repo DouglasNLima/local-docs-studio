@@ -14,6 +14,7 @@ internal sealed class MediaActions
     public MediaActions(ExperimentWindow owner)
     {
         this.owner = owner; owner.Surface.MediaAction += Act;
+        owner.PreparationRequested += () => { lifetime.Cancel(); lifetime.Dispose(); lifetime = new(); };
         owner.Installed += _ => { zoom?.Close(); lifetime.Cancel(); lifetime.Dispose(); lifetime = new(); };
         owner.Closed += (_, _) => { zoom?.Close(); lifetime.Cancel(); lifetime.Dispose(); };
     }
@@ -43,6 +44,7 @@ internal sealed class MediaActions
                 Filter = box.Label == "SVG" ? "SVG drawing|*.svg" : "PNG image|*.png", AddExtension = true };
             if (dialog.ShowDialog(owner) != true) return;
             var output = dialog.FileName;
+            owner.Surface.InteractionStages.Add(new { Stage = "media-save-accepted", box.Label, Output = output, Version = snapshot.Version, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
             var bytes = await ExperimentWindow.Worker(() =>
             {
                 if (box.Label == "PNG") return NativeSvgService.ToPng(image);
@@ -52,6 +54,7 @@ internal sealed class MediaActions
             cancellation.ThrowIfCancellationRequested();
             if (!ReferenceEquals(owner.Surface.Snapshot, snapshot) || snapshot.Version != owner.CurrentVersion) throw new IOException("The diagram changed before export completed.");
             await File.WriteAllBytesAsync(output, bytes, cancellation);
+            owner.Surface.InteractionStages.Add(new { Stage = "media-save-completed", box.Label, Output = output, Bytes = bytes.Length, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
         }
         catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
         { owner.Surface.InteractionStages.Add(new { Stage = "media-action-failure", box.Label, Error = error.Message }); }

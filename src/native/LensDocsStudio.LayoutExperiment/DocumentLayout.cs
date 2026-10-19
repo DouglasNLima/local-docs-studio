@@ -208,10 +208,10 @@ internal static class DocumentLayout
                                 var gap = source.Default.Typeface.FontFamily.LineSpacing * size / 2;
                                 var native = new TextSimpleMarkerProperties(value.Ordered ? TextMarkerStyle.Decimal : TextMarkerStyle.Disc, -gap, Math.Max(1, value.Number), paragraph);
                                 using var markerLine = formatter.FormatLine(native.TextSource, 0, 100, paragraph, null);
-                                mark = new DrawingGroup(); using (var mc = mark.Open()) markerLine.Draw(mc, new Point(x - gap - markerLine.Width, line.Baseline - markerLine.Baseline), InvertAxes.None);
+                                mark = new DrawingGroup(); using (var mc = mark.Open()) markerLine.Draw(mc, new Point(x - gap - markerLine.Width, -markerLine.Baseline), InvertAxes.None);
                                 mark.Freeze(); markers[key] = mark;
                             }
-                            dc.PushTransform(new TranslateTransform(0, top)); dc.DrawDrawing(mark); dc.Pop();
+                            dc.PushTransform(new TranslateTransform(0, top + line.Baseline)); dc.DrawDrawing(mark); dc.Pop();
                         }
                     }
                     drawing.Freeze(); phase = Stopwatch.GetTimestamp();

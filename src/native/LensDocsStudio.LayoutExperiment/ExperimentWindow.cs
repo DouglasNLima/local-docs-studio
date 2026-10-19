@@ -32,6 +32,7 @@ internal sealed class ExperimentWindow : Window
     public string ThemePreference { get; private set; } = "Light";
     public event Action<LayoutSnapshot>? Installed;
     public event Action<string>? CurrentFailure;
+    public event Action? PreparationRequested;
     private readonly Dictionary<int, bool> details = [];
     public Task? CurrentWork { get; private set; }
     private CancellationTokenSource? renderedCopy;
@@ -43,6 +44,8 @@ internal sealed class ExperimentWindow : Window
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible, CanContentScroll = false, Background = System.Windows.Media.Brushes.White };
         Surface.Scroller = Scroller; Scroller.ScrollChanged += (_, _) => Surface.InvalidateVisual();
         Content = Scroller;
+        Surface.IsCurrent = snapshot => !closed && snapshot.Version == version && snapshot.Model.Source == LatestSource
+            && snapshot.Appearance == ExperimentAppearance.Capture(ThemePreference);
         _ = new MediaActions(this);
         Surface.SourceNavigationRequested += async source =>
         {
@@ -86,13 +89,13 @@ internal sealed class ExperimentWindow : Window
         Dispatcher.VerifyAccess(); renderedCopy?.Cancel();
         if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
         if (pending is { } queued) { Log("queued-rejected", queued.Version); queued.Completion.TrySetResult(false); pending = null; }
-        version++; Surface.Install(null); Scroller.ScrollToTop(); LatestSource = ""; hasDocument = false;
+        version++; PreparationRequested?.Invoke(); Surface.Install(null); Scroller.ScrollToTop(); LatestSource = ""; hasDocument = false;
         details.Clear(); if (view is not null) foreach (var value in view.Details) details.Add(value.Key, value.Value);
         restoreView = view; Log("document-switched");
     }
     public async Task CopyRendered()
     {
-        if (Surface.Snapshot is not { } snapshot || closed) return;
+        if (Surface.Snapshot is not { } snapshot || Surface.IsCurrent?.Invoke(snapshot) != true) return;
         renderedCopy?.Cancel(); var owner = new CancellationTokenSource(); renderedCopy = owner;
         var sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence; var path = SourcePath; var root = WorkspaceRoot;
         try
@@ -101,15 +104,15 @@ internal sealed class ExperimentWindow : Window
                 new LensDocsStudio.Native.Exports.ExportPreparationService(new LensDocsStudio.Core.Parsing.MarkdownService(),
                     new LensDocsStudio.Core.Rendering.DiagramService(), new LensDocsStudio.Native.Rendering.NativeSvgService())
                 .Prepare(snapshot.Model.Source, path, root, snapshot.Appearance == "Dark", owner.Token), cancellationToken: owner.Token));
-            if (closed || owner.IsCancellationRequested || !ReferenceEquals(Surface.Snapshot, snapshot)) { Log("rendered-copy-stale-rejected"); return; }
+            if (owner.IsCancellationRequested || Surface.IsCurrent?.Invoke(snapshot) != true) { Log("rendered-copy-stale-rejected"); return; }
             var commit = await Surface.ClipboardWorker.Rendered(payload, sequence, owner.Token);
             Surface.InteractionStages.Add(new { Stage = "rendered-copy", NativeCommit = commit,
                 NativeCommitMilliseconds = (commit.EndTimestamp - commit.StartTimestamp) * 1000d / Stopwatch.Frequency });
-            if (!closed && !owner.IsCancellationRequested && ReferenceEquals(Surface.Snapshot, snapshot)) Log("rendered-copy-committed");
+            if (!owner.IsCancellationRequested && Surface.IsCurrent?.Invoke(snapshot) == true) Log("rendered-copy-committed");
             else Log("rendered-copy-stale-completion-rejected");
         }
         catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
-        { if (!closed && ReferenceEquals(Surface.Snapshot, snapshot)) CurrentFailure?.Invoke(error.Message); }
+        { if (Surface.IsCurrent?.Invoke(snapshot) == true) CurrentFailure?.Invoke(error.Message); else Log("rendered-copy-stale-failure-rejected"); }
         finally { if (ReferenceEquals(renderedCopy, owner)) renderedCopy = null; owner.Dispose(); }
     }
     public void InstallMeasured(LayoutSnapshot snapshot)
@@ -138,6 +141,7 @@ internal sealed class ExperimentWindow : Window
         ThemePreference = appearance.StartsWith("HC:", StringComparison.Ordinal) ? ThemePreference : appearance;
         appearance = ExperimentAppearance.Capture(ThemePreference);
         version++;
+        Surface.CancelCopyPreparation(); renderedCopy?.Cancel(); PreparationRequested?.Invoke();
         if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
         if (pending is { } old) { Log("queued-rejected", old.Version); old.Completion.TrySetResult(false); }
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
