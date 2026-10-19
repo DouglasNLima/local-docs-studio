@@ -11,7 +11,7 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static partial class NativeUiChecks
 {
-    public static int Run(string executable, string output, bool requireBundledRuntime = false, bool desktopUxOnly = false)
+    public static int Run(string executable, string output, bool requireBundledRuntime = false, bool desktopUxOnly = false, bool firstLaunchOnly = false)
     {
         var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
         var thread = new Thread(() =>
@@ -19,7 +19,7 @@ internal static partial class NativeUiChecks
             try
             {
                 int result;
-                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime, desktopUxOnly);
+                using (NativeUiClipboard.Start()) result = RunCore(executable, output, requireBundledRuntime, desktopUxOnly, firstLaunchOnly);
                 completion.SetResult(result);
             }
             catch (Exception ex) { Console.Error.WriteLine(ex); completion.SetResult(1); }
@@ -27,7 +27,7 @@ internal static partial class NativeUiChecks
         thread.SetApartmentState(ApartmentState.MTA); thread.Start();
         return completion.Task.GetAwaiter().GetResult();
     }
-    private static int RunCore(string executable, string output, bool requireBundledRuntime, bool desktopUxOnly)
+    private static int RunCore(string executable, string output, bool requireBundledRuntime, bool desktopUxOnly, bool firstLaunchOnly)
     {
         output = Path.GetFullPath(output);
         Directory.CreateDirectory(output);
@@ -74,6 +74,14 @@ internal static partial class NativeUiChecks
             CheckWorkspaceModernisation(window, editor, automation, app.ProcessId, state, output, source);
             CheckOutlineModernisation(window, editor, output, source);
             checks.Add("Actual tab pinning, dirty close cancellation, active survival and confirmed Windows folder recycling retain source and recovery");
+            if (firstLaunchOnly)
+            {
+                FocusWindow(window); Keyboard.TypeSimultaneously(VirtualKeyShort.ALT, VirtualKeyShort.F4);
+                Wait(() => app.HasExited, "The independent first-launch fixture did not close safely.");
+                if (launchedProcess!.ExitCode != 0) throw new IOException("The independent first-launch fixture failed during shutdown.");
+                RecordResult(new { Passed = true, Scope = "Unchanged startup through outline sequence", Checks = checks });
+                return 0;
+            }
             CheckSynchronisation(window, editor, state, output, source);
             checks.Add("Native Pages and Continuous selection synchronisation retains repeated occurrences, Unicode, focus, visible geometry, opt-out and source bytes");
             CheckScrollSynchronisation(window, editor, state, output, source);
@@ -1548,6 +1556,7 @@ internal static partial class NativeUiChecks
         Application Launch(string? path)
         {
             var info = new ProcessStartInfo(Path.GetFullPath(executable)) { UseShellExecute = false };
+            info.Environment["LENS_NATIVE_PREVIEW_DIAGNOSTICS"] = "1";
             info.ArgumentList.Add("--state-directory"); info.ArgumentList.Add(state);
             if (path is not null) { info.ArgumentList.Add(runRoot); info.ArgumentList.Add(path); }
             launchedProcess = Process.Start(info) ?? throw new IOException("Could not launch the native validation fixture.");

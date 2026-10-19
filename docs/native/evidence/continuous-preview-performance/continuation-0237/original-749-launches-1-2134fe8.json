@@ -1,0 +1,50 @@
+{
+  "independentFreshProfiles": true,
+  "sourceRevision": "2134fe8988d091e23b06bb62464e5e4fec50802e",
+  "samples": [
+    {
+      "index": 0,
+      "exitCode": 0,
+      "kind": "independent-original",
+      "completed": true
+    },
+    {
+      "index": 1,
+      "exitCode": 0,
+      "kind": "independent-original",
+      "completed": true
+    },
+    {
+      "index": 2,
+      "exitCode": 0,
+      "kind": "independent-original",
+      "completed": true
+    },
+    {
+      "index": 3,
+      "exitCode": 0,
+      "kind": "independent-original",
+      "completed": true
+    },
+    {
+      "index": 4,
+      "exitCode": 0,
+      "kind": "independent-original",
+      "completed": true
+    },
+    {
+      "index": 5,
+      "exitCode": 0,
+      "kind": "original",
+      "completed": true
+    },
+    {
+      "index": 6,
+      "exitCode": 0,
+      "kind": "repaired",
+      "completed": true
+    }
+  ],
+  "predeterminedCount": 5,
+  "originalInstallerSha256": "89494C6A963FD283773CE23AF979AA732796920E943C3A607DB413D67720CC07"
+}

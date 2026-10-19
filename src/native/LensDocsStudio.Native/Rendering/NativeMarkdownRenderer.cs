@@ -74,8 +74,9 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
     {
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("started");
-        Brush foreground = SystemParameters.HighContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
-        Brush surface = SystemParameters.HighContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
+        var highContrast = SystemParameters.HighContrast;
+        Brush foreground = highContrast ? SystemColors.WindowTextBrush : new SolidColorBrush(dark ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36));
+        Brush surface = highContrast ? SystemColors.WindowBrush : new SolidColorBrush(dark ? Color.FromRgb(41, 43, 47) : Color.FromRgb(243, 244, 246));
         foreground.Freeze(); surface.Freeze();
         var document = new FlowDocument { FontFamily = new FontFamily("Segoe UI"), FontSize = 15, Foreground = foreground, Background = Brushes.Transparent,
             PagePadding = new Thickness(28), ColumnWidth = double.PositiveInfinity, TextAlignment = TextAlignment.Left };
@@ -85,6 +86,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
         var media = new List<PreviewMedia>();
         var warnings = new List<string>();
         var literalSpans = new List<PreviewLiteral>();
+        var viewportGroups = new List<PreviewViewportGroup>();
+        var viewportGroupDepth = 0;
+        void CompleteViewportGroup(int start)
+        { if (literalSpans.Count > start) viewportGroups.Add(new(start, literalSpans.Count - start)); }
         var visualTargets = editDiagramVisually is null || parsed.Source.Length > Editor.MermaidDocumentEditSession.MaximumDocumentCharacters
             ? Array.Empty<Core.Mermaid.MermaidBlockSource>() : Core.Mermaid.MermaidBlockSource.Find(parsed, parsed.StandaloneMermaid);
         if (codeSyntax?.Limited == true) warnings.Add("Some code blocks are shown without syntax colouring because preview limits were reached.");
@@ -94,7 +99,10 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
             await Convert(block, document.Blocks);
         cancellationToken.ThrowIfCancellationRequested();
         PreviewConstructionEvents.Log.Stage("completed");
-        return new(document, sourceElements, warnings) { TextMap = new(literalSpans), Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
+        PreviewConstructionEvents.Log.Stage("source-map-start");
+        var textMap = new PreviewSourceMap(literalSpans, viewportGroups);
+        PreviewConstructionEvents.Log.Stage("source-map-completed");
+        return new(document, sourceElements, warnings) { TextMap = textMap, Details = detailSections.AsReadOnly(), Formulae = formulaSources.AsReadOnly(), Media = media.AsReadOnly() };
 
         Run Literal(MarkdownObject node, string text)
         {
@@ -198,7 +206,7 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var codeParagraph = new Paragraph { FontFamily = new FontFamily("Consolas"), FontSize = 13, Background = surface, Padding = new Thickness(12) };
                     Attach(codeParagraph);
                     CodeSyntaxBlock? syntax = null; codeSyntax?.Blocks.TryGetValue(code, out syntax);
-                    await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, SystemParameters.HighContrast, Cooperate);
+                    await CodeSyntaxColours.AddAsync(codeParagraph.Inlines, code.Lines.ToString(), syntax, dark, highContrast, Cooperate);
                     System.Windows.Automation.AutomationProperties.SetAutomationId(codeParagraph, "CodePreview" + code.Span.Start);
                     result = codeParagraph;
                     result.ContextMenu = CodeContextMenu.Create(code, parsed.Source, copyCode);
@@ -241,27 +249,54 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                     var wt = new WpfTable { CellSpacing = 0, Margin = new Thickness(0, 8, 0, 12) };
                     wt.ContextMenu = TableContextMenu.Create(table, parsed.Source, copyTable, exportTableCsv);
                     Attach(wt);
-                    var group = new TableRowGroup(); wt.RowGroups.Add(group);
-                    foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
+                    // WPF otherwise revalidates all preceding rows for every cell/row
+                    // insertion. This complete private table has one structural commit.
+                    wt.BeginInit();
+                    // Spanned rows can overlap vertically. Index that complete table
+                    // conservatively; ordinary rows remain independent ranges.
+                    var tableGroupStart = literalSpans.Count;
+                    var ownsTableGroup = viewportGroupDepth == 0 && table.OfType<Markdig.Extensions.Tables.TableRow>()
+                        .SelectMany(row => row.OfType<Markdig.Extensions.Tables.TableCell>()).Any(cell => cell.RowSpan > 1);
+                    if (ownsTableGroup) viewportGroupDepth++;
+                    try
                     {
-                        await Cooperate();
-                        var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
-                        group.Rows.Add(wr);
-                        var column = 0;
-                        foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                        var group = new TableRowGroup(); wt.RowGroups.Add(group);
+                        foreach (var row in table.OfType<Markdig.Extensions.Tables.TableRow>())
                         {
                             await Cooperate();
-                            var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
-                            wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
-                            var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
-                            column += Math.Max(1, cell.ColumnSpan);
-                            wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
-                            { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
-                            if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
-                            wr.Cells.Add(wc);
-                            foreach (var child in cell) await Convert(child, wc.Blocks);
+                            var wr = new System.Windows.Documents.TableRow { Background = row.IsHeader ? surface : Brushes.Transparent };
+                            group.Rows.Add(wr);
+                            var rowGroupStart = literalSpans.Count;
+                            var ownsRowGroup = viewportGroupDepth == 0;
+                            if (ownsRowGroup) viewportGroupDepth++;
+                            try
+                            {
+                                var column = 0;
+                                foreach (var cell in row.OfType<Markdig.Extensions.Tables.TableCell>())
+                                {
+                                    await Cooperate();
+                                    var wc = new System.Windows.Documents.TableCell { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(.5), Padding = new Thickness(8, 6, 8, 6) };
+                                    wc.ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000); wc.RowSpan = Math.Clamp(cell.RowSpan, 1, 1000);
+                                    var columnIndex = cell.ColumnIndex >= 0 ? cell.ColumnIndex : column;
+                                    column += Math.Max(1, cell.ColumnSpan);
+                                    wc.TextAlignment = columnIndex < table.ColumnDefinitions.Count ? table.ColumnDefinitions[columnIndex].Alignment switch
+                                    { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } : TextAlignment.Left;
+                                    if (row.IsHeader) wc.FontWeight = FontWeights.SemiBold;
+                                    wr.Cells.Add(wc);
+                                    foreach (var child in cell) await Convert(child, wc.Blocks);
+                                }
+                            }
+                            finally { if (ownsRowGroup) { viewportGroupDepth--; CompleteViewportGroup(rowGroupStart); } }
                         }
                     }
+                    finally
+                    {
+                        PreviewConstructionEvents.Log.Stage("table-validation-start");
+                        try { wt.EndInit(); }
+                        finally { if (ownsTableGroup) { viewportGroupDepth--; CompleteViewportGroup(tableGroupStart); } }
+                        PreviewConstructionEvents.Log.Stage("table-validation-completed");
+                    }
+                    cancellationToken.ThrowIfCancellationRequested();
                     result = wt; break;
                 case ThematicBreakBlock:
                     result = new Paragraph { BorderBrush = Brushes.Gray, BorderThickness = new Thickness(0, 0, 0, 1), Margin = new Thickness(0, 12, 0, 12) }; break;
@@ -336,12 +371,14 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                 result.FontWeight = FontWeights.SemiBold; result.Margin = new Thickness(0, 16, 0, 8);
             }
             target?.Add(result);
+            var groupStart = literalSpans.Count;
             if (inline is not null) await AddInlines(result.Inlines, inline);
+            if (viewportGroupDepth == 0) CompleteViewportGroup(groupStart);
             return result;
         }
         async ValueTask AddInlines(InlineCollection target, ContainerInline container)
         {
-            foreach (var inline in container)
+            for (var inline = container.FirstChild; inline is not null; inline = inline.NextSibling)
             {
                 // A single paragraph or link label can contain thousands of formatted runs.
                 await Cooperate();
@@ -359,7 +396,27 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         else { passive.FontFamily = new FontFamily("Consolas"); passive.ToolTip = "Keyboard shortcut: " + semantic.Text; }
                         System.Windows.Automation.AutomationProperties.SetName(passive, semantic.Text);
                         target.Add(passive); break;
-                    case LiteralInline literal: target.Add(Literal(literal, literal.Content.ToString())); break;
+                    case LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false }:
+                        if (inline.NextSibling is not (LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false }))
+                        {
+                            if (inline is LiteralInline literal) target.Add(Literal(literal, literal.Content.ToString()));
+                            else target.Add(new Run(inline is HtmlEntityInline entity ? entity.Transcoded.ToString() : " "));
+                            break;
+                        }
+                        var plain = new System.Text.StringBuilder();
+                        var run = new Run(); target.Add(run);
+                        while (true)
+                        {
+                            await Cooperate();
+                            var text = inline switch { LiteralInline literal => literal.Content.ToString(), HtmlEntityInline entity => entity.Transcoded.ToString(), _ => " " };
+                            if (inline is LiteralInline && LiteralSourceMapping.Locate(parsed.Source, inline.Span.Start, inline.Span.End, text) is { } mapping)
+                                literalSpans.Add(new(run, mapping, plain.Length));
+                            plain.Append(text);
+                            if (inline.NextSibling is not (LiteralInline or HtmlEntityInline or LineBreakInline { IsHard: false })) break;
+                            inline = inline.NextSibling;
+                        }
+                        run.Text = plain.ToString();
+                        break;
                     case AutolinkInline auto:
                         var autoReference = MarkdownLinks.AutolinkReference(auto);
                         var autoLink = new Hyperlink(Literal(auto, auto.Url)) { Foreground = dark ? Brushes.LightSkyBlue : Brushes.RoyalBlue, ToolTip = autoReference };
@@ -367,7 +424,6 @@ public sealed class NativeMarkdownRenderer(NativeSvgService svg)
                         System.Windows.Automation.AutomationProperties.SetAutomationId(autoLink, "DocumentLink" + auto.Span.Start);
                         autoLink.Click += (_, _) => navigate(autoReference);
                         target.Add(autoLink); break;
-                    case HtmlEntityInline entity: target.Add(new Run(entity.Transcoded.ToString())); break;
                     case CodeInline code:
                         var codeRun = Literal(code, code.Content); codeRun.FontFamily = new FontFamily("Consolas"); codeRun.Background = surface;
                         target.Add(codeRun); break;

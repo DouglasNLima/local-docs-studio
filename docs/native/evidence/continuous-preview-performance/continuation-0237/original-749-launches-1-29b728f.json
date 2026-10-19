@@ -1,0 +1,33 @@
+{
+  "originalInstallerSha256": "89494C6A963FD283773CE23AF979AA732796920E943C3A607DB413D67720CC07",
+  "samples": [
+    {
+      "completed": true,
+      "exitCode": 0,
+      "index": 0
+    },
+    {
+      "completed": true,
+      "exitCode": 0,
+      "index": 1
+    },
+    {
+      "completed": true,
+      "exitCode": 0,
+      "index": 2
+    },
+    {
+      "completed": true,
+      "exitCode": 0,
+      "index": 3
+    },
+    {
+      "completed": true,
+      "exitCode": 0,
+      "index": 4
+    }
+  ],
+  "sourceRevision": "29b728f177586dc87523c0bbc6a23e44542ee470",
+  "independentFreshProfiles": true,
+  "predeterminedCount": 5
+}

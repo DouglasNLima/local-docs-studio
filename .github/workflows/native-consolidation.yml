@@ -1,0 +1,57 @@
+name: Verify accepted native consolidation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  continuous-correctness:
+    name: Combined-source correctness (${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Record exact source and hosted environment
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/consolidation | Out-Null
+          @{ sourceRevision=(git rev-parse HEAD); sourceDirty=[bool](git status --porcelain); runId=$env:GITHUB_RUN_ID; runnerEnvironment=$env:RUNNER_ENVIRONMENT; runnerOS=$env:RUNNER_OS; imageVersion=$env:ImageVersion; appearance='${{ matrix.appearance }}' } | ConvertTo-Json | Set-Content artifacts/consolidation/source.json
+      - name: Build exact-source existing validation harness
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Verify literal content, source selection, complete viewport fallback and owned palettes
+        shell: pwsh
+        run: |
+          $validation = 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe'
+          foreach ($mode in 'literal-formatting','selection-mapping','viewport-anchors','theme-resources') {
+            & $validation "--$mode" "artifacts/consolidation/$mode"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
+      - name: Install bounded failure-diagnostic stack tooling
+        run: dotnet tool install dotnet-stack --version 10.0.750501 --tool-path artifacts/consolidation/tools
+      - name: Verify shown stock Continuous ownership, navigation and automatic actual OS appearance
+        shell: pwsh
+        run: |
+          $env:LENS_CONTINUOUS_STACK_TOOL = (Resolve-Path artifacts/consolidation/tools/dotnet-stack.exe).Path
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & scripts/native/Invoke-ContinuousPreviewInteractions.ps1 -Appearance $appearance -OutputDirectory artifacts/consolidation/interactions
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-consolidation-${{ matrix.appearance }}
+          path: |
+            artifacts/consolidation/source.json
+            artifacts/consolidation/literal-formatting/
+            artifacts/consolidation/selection-mapping/
+            artifacts/consolidation/viewport-anchors/
+            artifacts/consolidation/theme-resources/
+            artifacts/consolidation/interactions/
+          retention-days: 30

@@ -29,6 +29,29 @@ public partial class MainWindow
         && Editor.Document == active.EditorDocument && renderedVersion is not null && Editor.Document.Version.CompareAge(renderedVersion) == 0;
     private bool BothPanesVisible => model.Layout == "Split" && Editor.IsVisible && Preview.IsVisible;
 
+    private (int Start, int Length)? CapturePreviewSelection()
+    {
+        if (rendered is null || renderedVersion is null || model.ActiveDocument?.Id != renderedDocumentId
+            || Preview.Selection is not { IsEmpty: false } selection
+            || DesktopState.SyncSelection && Editor.IsKeyboardFocusWithin
+            || !rendered.TextMap.TrySourceRange(selection.Start, selection.End, out var start, out var length)) return null;
+        var current = Editor.Document.Version;
+        var from = renderedVersion.MoveOffsetTo(current, start, AnchorMovementType.AfterInsertion);
+        var to = renderedVersion.MoveOffsetTo(current, start + length, AnchorMovementType.BeforeInsertion);
+        return from >= 0 && to > from && to <= Editor.Document.TextLength ? (from, to - from) : null;
+    }
+
+    private void RestorePreviewSelection((int Start, int Length)? range)
+    {
+        if (range is not { } saved || rendered is null) return;
+        rendered.RevealSource(saved.Start); rendered.RevealSource(saved.Start + saved.Length);
+        if (!rendered.TextMap.TryPreviewRange(saved.Start, saved.Length, out var from, out var to) || Preview.Selection is not { } selection) return;
+        var previousApplying = applyingSync; var previousOrigin = applyingSyncOrigin;
+        applyingSync = true; applyingSyncOrigin = "restore-selection";
+        try { selection.Select(from!, to!); }
+        finally { applyingSync = previousApplying; applyingSyncOrigin = previousOrigin; }
+    }
+
     private void InitialiseSynchronisation()
     {
         syncTimer.Tick += SyncTick;

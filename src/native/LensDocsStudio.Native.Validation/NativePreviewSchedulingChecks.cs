@@ -4,6 +4,11 @@ using System.Text.Json;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Threading;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Diagnostics;
+using System.ComponentModel;
 using ICSharpCode.AvalonEdit;
 using LensDocsStudio.Core.State;
 using LensDocsStudio.Core.Workspace;
@@ -14,8 +19,16 @@ namespace LensDocsStudio.Native.Validation;
 
 internal static class NativePreviewSchedulingChecks
 {
-    public static void Run(string output)
+    public static void Run(string output, bool shown = false, bool highContrast = false)
     {
+        Directory.CreateDirectory(output);
+        if (shown && !highContrast && NativeTestHighContrast.IsEnabledNow)
+            throw new IOException("A normal-appearance run requires an initially normal disposable desktop; a previous failed transition cannot contaminate its comparison.");
+        using var contrast = highContrast ? new NativeTestHighContrast() : null;
+        var application = Application.Current;
+        if (application is null) { var nativeApplication = new App { ShutdownMode = ShutdownMode.OnExplicitShutdown }; nativeApplication.InitializeComponent(); application = nativeApplication; }
+        using var phases = new ShellPhases(output);
+        ThemeService.Apply(application.Resources, "Light");
         var previous = SynchronizationContext.Current;
         SynchronizationContext.SetSynchronizationContext(new DispatcherSynchronizationContext(Dispatcher.CurrentDispatcher));
         var root = Path.Combine(output, "preview-scheduling-" + Guid.NewGuid().ToString("N"));
@@ -23,16 +36,71 @@ internal static class NativePreviewSchedulingChecks
         var dialogs = new DesktopDialogs();
         var model = new WorkspaceViewModel(new DocumentStore(Path.Combine(root, "writes")), new SessionStore(root), new WorkspaceService(), dialogs);
         MainWindow? window = null;
+        ContinuousTransitionWatch? transitionWatch = null;
+        var heartbeatWatch = Stopwatch.StartNew(); var lastPulse = 0d; var gaps = new List<double>();
+        var heartbeat = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
+        heartbeat.Tick += (_, _) => { var now = heartbeatWatch.Elapsed.TotalMilliseconds; if (gaps.Count < 4096) gaps.Add(now - lastPulse); lastPulse = now; transitionWatch?.Pulse(); };
+        heartbeat.Start();
+        var fixtureEvidence = new List<object>();
+        var cancellationEvidence = new List<object>();
         try
         {
             model.NewDocumentCommand.Execute(null);
             window = new MainWindow(model, dialogs, []);
+            if (shown)
+            {
+                var loaded = typeof(MainWindow).GetMethod("WindowLoaded", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                window.Loaded -= (RoutedEventHandler)loaded.CreateDelegate(typeof(RoutedEventHandler), window);
+                window.Width = 1280; window.Height = 800;
+                Invoke("ApplyTheme"); window.Show();
+                if (highContrast && !SystemParameters.HighContrast) throw new IOException("Actual OS High Contrast was not enabled.");
+                Pump(model.UpdatePreferencesAsync(current => current with { Preview = (current.Preview ?? new()) with { ReadingMode = "Continuous" } }));
+                Invoke("ApplyReadingPreferences");
+            }
             Invoke("BindActiveDocument"); Invoke("SetLayout", "Editor");
             Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task);
             var tab = model.ActiveDocument!;
             var editor = (TextEditor)window.FindName("Editor");
             var outline = (ListBox)window.FindName("Outline");
             var preview = (LensDocsStudio.Native.Rendering.DocumentPreview)window.FindName("Preview");
+            if (shown)
+            {
+                foreach (var fixture in ContinuousPreviewFixtures.Create(root, "all"))
+                {
+                    var path = Path.Combine(root, fixture.Name + ".md"); File.WriteAllText(path, fixture.Source);
+                    var bytes = File.ReadAllBytes(path);
+                    Pump(model.OpenPathAsync(path, root)); Invoke("BindActiveDocument"); Invoke("SetLayout", "Preview");
+                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    var result = (LensDocsStudio.Native.Rendering.PreviewResult)Field("rendered")!;
+                    if (!result.ReadText().Contains(fixture.Last, StringComparison.Ordinal) || result.Warnings.Count != 0
+                        || preview.ViewingMode != FlowDocumentReaderViewingMode.Scroll
+                        || !File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes)) throw new IOException("Visible fixture opening lost content, media, Continuous mode or source.");
+                    var last = result.SourceElements.MaxBy(item => item.Key).Value;
+                    Pump(LensDocsStudio.Native.Rendering.PreviewNavigationService.BringIntoViewAsync(preview, last.ContentStart, last.ContentEnd)); Drain();
+                    if (!preview.Selection.Text.Contains(fixture.Last, StringComparison.Ordinal)) throw new IOException("Visible final-target selection failed.");
+                    var selected = preview.Selection.Text;
+                    preview.Focus();
+                    var sourceSelection = editor.SelectionLength;
+                    model.ActiveDocument!.EditorDocument.Insert(0, "<!-- Fresh leading edit -->\n\n");
+                    var caretAfterEdit = editor.CaretOffset;
+                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    if (preview.Selection.Text != selected || !preview.IsKeyboardFocusWithin || editor.CaretOffset != caretAfterEdit
+                        || editor.SelectionLength != sourceSelection) throw new IOException("Preview replacement lost mapped selection, focus or editor state.");
+                    model.ActiveDocument.EditorDocument.UndoStack.Undo();
+                    if (editor.Text != fixture.Source || !File.ReadAllBytes(path).AsSpan().SequenceEqual(bytes)) throw new IOException("Fresh edit or rendering changed Undo or saved bytes.");
+                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    var bitmap = new RenderTargetBitmap((int)window.ActualWidth, (int)window.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                    bitmap.Render(window); var encoder = new PngBitmapEncoder(); encoder.Frames.Add(BitmapFrame.Create(bitmap));
+                    using (var file = File.Create(Path.Combine(output, fixture.Name + "-visible-window.png"))) encoder.Save(file);
+                    fixtureEvidence.Add(new { fixture.Name, Complete = true, DistantSelection = true, FreshEditUndo = true, FocusRetained = true,
+                        SourceBytesPreserved = true, Dpi = VisualTreeHelper.GetDpi(window).PixelsPerInchX });
+                    var reopened = model.ActiveDocument;
+                    Pump(model.CloseDocumentCommand.ExecuteAsync(reopened)); Pump(model.OpenPathAsync(path, root)); Invoke("BindActiveDocument");
+                    Pump((Task)Invoke("UpdatePreviewAsync", false)!); Drain();
+                    if (editor.Text != fixture.Source) throw new IOException("Reopening changed exact fixture source.");
+                }
+                model.ActiveDocument = tab; Invoke("BindActiveDocument"); Invoke("SetLayout", "Editor");
+            }
             var source = "# Current heading\n\nBefore.\n\n## Target heading\n\n<details>\n<summary>Evidence</summary>\n\nHidden current text.\n</details>";
             tab.EditorDocument.Text = source;
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
@@ -40,7 +108,9 @@ internal static class NativePreviewSchedulingChecks
                 || preview.Document.Blocks.Count != 0 || editor.Text != source)
                 throw new IOException("Editor layout did not retain its current outline while pausing native preview work: "
                     + JsonSerializer.Serialize(new { Headings = outline.Items.Count, model.PreviewStatus, Blocks = preview.Document?.Blocks.Count, SourceMatches = editor.Text == source }));
-            outline.SelectedIndex = 1;
+            // Visible fixture opening may already have selected this index. Exercise
+            // a real selection change rather than assigning the retained value.
+            outline.SelectedIndex = -1; outline.SelectedIndex = 1;
             if (editor.CaretOffset != source.IndexOf("## Target heading", StringComparison.Ordinal))
                 throw new IOException("Editor-only outline navigation depended on a rendered preview.");
             Invoke("ShowFind", false);
@@ -87,8 +157,177 @@ internal static class NativePreviewSchedulingChecks
             Pump((Task)Invoke("UpdatePreviewAsync", false)!);
             if (!new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Intervening edit", StringComparison.Ordinal))
                 throw new IOException("A stale native construction result replaced the intervening edit.");
+            var previousDocument = preview.Document;
+            using (var themeDuringConstruction = new DuringConstruction(() => model.Theme = model.Theme == "Dark" ? "Light" : "Dark"))
+            {
+                Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+                if (!themeDuringConstruction.Observed || preview.Document != previousDocument)
+                    throw new IOException("An obsolete appearance installed its completed document.");
+            }
+            foreach (var theme in new[] { "Light", "Dark", "Light", "Dark", "Light" })
+            { model.Theme = theme; Invoke("ApplyTheme"); Invoke("QueuePreview"); }
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            if (shown && !highContrast)
+            {
+                using var diagnostic = Environment.GetEnvironmentVariable("LENS_CONTINUOUS_STACK_TOOL") is { Length: > 0 } stackTool
+                    ? new ContinuousTransitionWatch(output, stackTool) : null;
+                transitionWatch = diagnostic;
+                NativeTestHighContrast? transition = null;
+                Task<NativeTestHighContrast>? contrastChange = null; Task? changingPreview = null;
+                var controlThread = -1; var constructionInFlight = false;
+                var installed = new List<object>(); var obsoleteAppearance = false; var transitionStarted = false;
+                var documentProperty = DependencyPropertyDescriptor.FromProperty(FlowDocumentReader.DocumentProperty, typeof(LensDocsStudio.Native.Rendering.DocumentPreview));
+                EventHandler installation = (_, _) =>
+                {
+                    if (!transitionStarted) return;
+                    var actual = NativeTestHighContrast.IsEnabledNow;
+                    var currentColour = preview.Document?.Foreground is SolidColorBrush brush && brush.Color == SystemColors.WindowTextColor;
+                    if (!CorrectColour(actual)) obsoleteAppearance = true;
+                    if (installed.Count < 64) installed.Add(new { ActualHighContrast = actual, WpfHighContrast = SystemParameters.HighContrast,
+                        CurrentSystemColour = currentColour, CurrentAppearanceColour = CorrectColour(actual), Colour = preview.Document?.Foreground?.ToString(),
+                        ExpectedColour = (actual ? SystemColors.WindowTextColor : Color.FromRgb(32, 33, 36)).ToString() });
+                };
+                bool CorrectColour(bool expected)
+                {
+                    var colour = expected ? SystemColors.WindowTextColor : Color.FromRgb(32, 33, 36);
+                    return preview.Document?.Foreground is SolidColorBrush value && value.Color == colour;
+                }
+                documentProperty.AddValueChanged(preview, installation);
+                try
+                {
+                    previousDocument = preview.Document;
+                    using (var contrastDuringConstruction = new DuringConstruction(() =>
+                    {
+                        transitionStarted = true;
+                        diagnostic?.Mark("changing-os");
+                        constructionInFlight = changingPreview?.IsCompleted == false;
+                        // Windows Settings changes another process's desktop state.
+                        // Broadcasting it synchronously from WPF's own thread can
+                        // block that thread before it can process the notification.
+                        contrastChange = Task.Run(() => { controlThread = Environment.CurrentManagedThreadId; return new NativeTestHighContrast(); });
+                    }))
+                    {
+                        changingPreview = (Task)Invoke("UpdatePreviewAsync", false)!; Pump(changingPreview);
+                        if (contrastChange is null) throw new IOException("The OS transition did not reach native construction.");
+                        Pump(contrastChange); transition = contrastChange.GetAwaiter().GetResult();
+                        diagnostic?.Mark("os-changed");
+                        File.WriteAllText(Path.Combine(output, "high-contrast-transition-initial.json"), JsonSerializer.Serialize(new
+                        {
+                            Observed = contrastDuringConstruction.Observed, TransitionCreated = transition is not null,
+                            ConstructionInFlightAtToggleStart = constructionInFlight, ControlThread = controlThread, UiThread = Environment.CurrentManagedThreadId,
+                            ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
+                            PreviousDocumentRetained = preview.Document == previousDocument, ObsoleteAppearance = obsoleteAppearance, Installations = installed
+                        }, new JsonSerializerOptions { WriteIndented = true }));
+                        // A Windows preference notification can also finish a newer valid
+                        // render. Observe every installation; identity alone rejects it.
+                        if (!contrastDuringConstruction.Observed || !constructionInFlight || controlThread == Environment.CurrentManagedThreadId
+                            || transition is null || !NativeTestHighContrast.IsEnabledNow || obsoleteAppearance)
+                            throw new IOException("An actual High Contrast transition installed the obsolete appearance; see high-contrast-transition.json.");
+                    }
+                    var appearanceWait = Stopwatch.StartNew();
+                    diagnostic?.Mark("waiting-for-notification");
+                    Pump(WaitForAppearanceAsync(true));
+                    diagnostic?.Mark("waiting-for-preview");
+                    Pump(WaitForCurrentAppearanceAsync(true)); Drain();
+                    diagnostic?.Mark("preview-ready");
+                    File.WriteAllText(Path.Combine(output, "high-contrast-transition.json"), JsonSerializer.Serialize(new
+                    {
+                        ActualHighContrast = NativeTestHighContrast.IsEnabledNow, WpfHighContrast = SystemParameters.HighContrast,
+                        ObsoleteAppearance = obsoleteAppearance, Installations = installed
+                    }, new JsonSerializerOptions { WriteIndented = true }));
+                    if (obsoleteAppearance || preview.Document.Foreground is not SolidColorBrush textBrush || textBrush.Color != SystemColors.WindowTextColor)
+                        throw new IOException("Current actual High Contrast preview lost system text colours.");
+                    if (!editor.TextArea.TextView.LineTransformers.OfType<LensDocsStudio.Native.Editor.MarkdownHighlighting>().Single().HighContrast
+                        || application.Resources["WindowBrush"] is not SolidColorBrush windowBrush || windowBrush.Color != SystemColors.WindowColor)
+                        throw new IOException("The delayed Windows notification did not update the editor and application appearance automatically.");
+                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast enabled during WPF construction", ObsoleteCompletionRejected = true,
+                        AppearanceNotificationAndCurrentPreviewMilliseconds = appearanceWait.Elapsed.TotalMilliseconds });
+
+                    previousDocument = preview.Document;
+                    diagnostic?.Mark("disabling-os");
+                    var disableWatch = Stopwatch.StartNew();
+                    Pump(Task.Run(transition!.Dispose)); transition = null;
+                    Pump(WaitForAppearanceAsync(false));
+                    // Observe the application's notification path before any cleanup can apply a theme.
+                    Pump(WaitForCurrentAppearanceAsync(false)); Drain();
+                    if (editor.TextArea.TextView.LineTransformers.OfType<LensDocsStudio.Native.Editor.MarkdownHighlighting>().Single().HighContrast
+                        || application.Resources["WindowBrush"] is not SolidColorBrush normalBrush || normalBrush.Color != Color.FromRgb(250, 250, 250))
+                        throw new IOException("Disabling actual High Contrast did not restore editor and shell appearance automatically.");
+                    File.WriteAllText(Path.Combine(output, "high-contrast-disable.json"), JsonSerializer.Serialize(new {
+                        Automatic = true, ManualApplyTheme = false, ActualHighContrast = NativeTestHighContrast.IsEnabledNow,
+                        WpfHighContrast = SystemParameters.HighContrast, ElapsedMilliseconds = disableWatch.Elapsed.TotalMilliseconds,
+                        ObsoleteAppearance = obsoleteAppearance, Installations = installed }));
+                    cancellationEvidence.Add(new { Stage = "Actual OS High Contrast automatically disabled", NotificationAndCurrentPreviewMilliseconds = disableWatch.Elapsed.TotalMilliseconds });
+                    diagnostic?.Mark("disabled-preview-ready");
+
+                    async Task WaitForCurrentAppearanceAsync(bool expected)
+                    {
+                        var wait = Stopwatch.StartNew();
+                        while (true)
+                        {
+                            if (obsoleteAppearance) throw new IOException("An obsolete appearance installed while waiting for the current render.");
+                            if (preview.Document != previousDocument && CorrectColour(expected)
+                                && Field("renderedVersion") is ICSharpCode.AvalonEdit.Document.ITextSourceVersion version
+                                && version.CompareAge(model.ActiveDocument!.EditorDocument.Version) == 0
+                                && model.PreviewStatus.StartsWith("Preview updated", StringComparison.Ordinal)) return;
+                            if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Current appearance preview exceeded the existing validation deadline.");
+                            await Task.Delay(25);
+                        }
+                    }
+                }
+                finally
+                {
+                    documentProperty.RemoveValueChanged(preview, installation);
+                    diagnostic?.Mark("restoring-os");
+                    if (transition is not null)
+                    {
+                        // Failure cleanup restores the disposable OS only; it cannot satisfy either acceptance assertion.
+                        Pump(Task.Run(transition.Dispose)); Pump(WaitForAppearanceAsync(false));
+                    }
+                    diagnostic?.Mark("os-restored"); transitionWatch = null;
+                }
+                if (SystemParameters.HighContrast) throw new IOException("Actual High Contrast was not restored after the transition case.");
+            }
             tab.EditorDocument.UndoStack.Undo();
             if (editor.Text != large) throw new IOException("Rendering changed large-document Undo or Unicode source.");
+            var gate = (SemaphoreSlim)Field("previewGate")!;
+            // A Windows preference notification may already own capacity while
+            // its renderer awaits this dispatcher. Keep pumping that owner.
+            Pump(gate.WaitAsync()); Task latestQueued;
+            try
+            {
+                previousDocument = preview.Document;
+                var queued = (Task)Invoke("UpdatePreviewAsync", false)!;
+                if (queued.IsCompleted) throw new IOException("The queued cancellation case did not wait for rendering capacity.");
+                var cancelWatch = Stopwatch.StartNew();
+                tab.EditorDocument.Insert(tab.EditorDocument.TextLength, "\n\nLatest queued source.");
+                latestQueued = (Task)Invoke("UpdatePreviewAsync", false)!;
+                Pump(queued);
+                cancellationEvidence.Add(new { Stage = "Queued behind preview gate", Milliseconds = cancelWatch.Elapsed.TotalMilliseconds });
+                if (preview.Document != previousDocument) throw new IOException("Cancelled queued work installed a document.");
+            }
+            finally { gate.Release(); }
+            Pump(latestQueued);
+            if (!new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text.Contains("Latest queued source.", StringComparison.Ordinal))
+                throw new IOException("The latest queued source did not render after capacity became available.");
+            tab.EditorDocument.UndoStack.Undo();
+            if (editor.Text != large) throw new IOException("Queued rendering changed source Undo.");
+            using (var rapidEdits = new DuringConstruction(() =>
+            {
+                for (var revision = 0; revision < 12; revision++) tab.EditorDocument.Insert(tab.EditorDocument.TextLength, "\n\nFresh revision " + revision);
+                var distant = tab.EditorDocument.Text.IndexOf("item4000", StringComparison.Ordinal);
+                tab.EditorDocument.Replace(distant, "item4000".Length, "distant changed item");
+            }))
+            {
+                Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+                if (!rapidEdits.Observed) throw new IOException("Rapid edits did not reach native construction.");
+            }
+            Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+            var latestText = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text;
+            if (!latestText.Contains("Fresh revision 11", StringComparison.Ordinal) || !latestText.Contains("distant changed item", StringComparison.Ordinal)
+                || latestText.Contains("item4000", StringComparison.Ordinal)) throw new IOException("Rapid/distant source edits installed an obsolete preview.");
+            for (var undo = 0; undo < 13; undo++) tab.EditorDocument.UndoStack.Undo();
+            if (editor.Text != large) throw new IOException("Rapid edit preview regeneration damaged exact Undo history.");
             using (var switchDuringConstruction = new DuringConstruction(() =>
             {
                 model.NewDocumentCommand.Execute(null);
@@ -132,22 +371,66 @@ internal static class NativePreviewSchedulingChecks
                     ActiveSource = model.ActiveDocument?.EditorDocument.Text, PreviewText = new TextRange(preview.Document.ContentStart, preview.Document.ContentEnd).Text,
                     model.PreviewStatus }));
 
+            previousDocument = preview.Document;
+            model.ActiveDocument!.EditorDocument.Text = large;
+            using (var closeWindowDuringConstruction = new DuringConstruction(() => Invoke("CompleteClose")))
+            {
+                Pump((Task)Invoke("UpdatePreviewAsync", false)!);
+                if (!closeWindowDuringConstruction.Observed || preview.Document != previousDocument)
+                    throw new IOException("A closing window installed an obsolete preview.");
+            }
+            heartbeat.Stop();
             File.WriteAllText(Path.Combine(output, "native-preview-scheduling.json"), JsonSerializer.Serialize(new { Passed = true,
+                VisibleWindow = shown, ActualHighContrast = SystemParameters.HighContrast, Fixtures = fixtureEvidence,
+                Cancellations = cancellationEvidence,
+                ExclusivePhaseMarkerFile = "shell-phases.json", ApplicationResources = "App.xaml",
+                InputHeartbeatMilliseconds = gaps, MaximumObservedInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
                 Checks = new[] { "Editor-only layout retains current headings and source navigation without a preview",
                     "Explicit text preparation includes current closed details and subsequent edits without changing layout or Undo",
                     "Showing preview renders current source and Find follows the visible layout",
                     "Intervening edits cancel text preparation without yielding an obsolete copy result",
                     "Editing during native construction preserves current source, preview and Undo",
                     "Rapid tab switching cannot commit obsolete or mixed preview content",
-                    "Closing a tab during native construction leaves its source intact and renders the surviving tab" },
-                Limitation = "Unshown native controls; foreground keyboard and clipboard delivery are covered separately in Windows CI." }, new JsonSerializerOptions { WriteIndented = true }));
+                    "Closing a tab during native construction leaves its source intact and renders the surviving tab",
+                    "Obsolete appearance and closing-window completions cannot install; rapid themes retain the latest source" },
+                Limitation = "In-process WPF input heartbeats include synchronous layout stalls. They are separate from foreground keyboard/UIA transport checks. Visible-window rasters are labelled; native UIA captures are retained separately." }, new JsonSerializerOptions { WriteIndented = true }));
         }
         finally
         {
-            if (window is not null) Invoke("CompleteClose"); else model.Dispose();
+            heartbeat.Stop();
+            if (window is not null) { if (!(bool)Field("closing")!) Invoke("CompleteClose"); } else model.Dispose();
             SynchronizationContext.SetSynchronizationContext(previous);
         }
         object? Invoke(string name, params object[] arguments) => typeof(MainWindow).GetMethod(name, BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(window, arguments);
+        object? Field(string name) => typeof(MainWindow).GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(window);
+        void Drain() => Pump(Dispatcher.CurrentDispatcher.InvokeAsync(() => { }, DispatcherPriority.ApplicationIdle).Task);
+        async Task WaitForAppearanceAsync(bool expected)
+        {
+            var wait = Stopwatch.StartNew();
+            while (SystemParameters.HighContrast != expected || NativeTestHighContrast.IsEnabledNow != expected)
+            {
+                if (wait.Elapsed >= TimeSpan.FromSeconds(15)) throw new TimeoutException("Windows appearance notification exceeded the existing validation deadline.");
+                await Task.Delay(25);
+            }
+        }
+    }
+
+    private sealed class ShellPhases(string output) : EventListener
+    {
+        private readonly List<object> samples = [];
+        protected override void OnEventSourceCreated(EventSource source)
+        { if (source.Name == "LensDocsStudio-Native-PreviewConstruction") EnableEvents(source, EventLevel.Verbose); }
+        protected override void OnEventWritten(EventWrittenEventArgs args)
+        {
+            if (args.EventId != 1 || args.Payload?[0] is not string name) return;
+            lock (samples) { if (samples.Count < 16384) samples.Add(new { Ticks = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Phase = name, Request = args.Payload.ElementAtOrDefault(1) }); }
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+            lock (samples) File.WriteAllText(Path.Combine(output, "shell-phases.json"), JsonSerializer.Serialize(new { Stopwatch.Frequency, Samples = samples,
+                Boundary = "Paired request phases include awaits; only consecutive synchronous start/end UI spans are exclusive UI work. Worker markers carry their own thread. Do not add nested/inclusive durations." }));
+        }
     }
 
     private sealed class DuringConstruction(Action action) : EventListener

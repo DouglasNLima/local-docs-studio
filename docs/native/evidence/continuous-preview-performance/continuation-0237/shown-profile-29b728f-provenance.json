@@ -1,0 +1,78 @@
+{
+  "source": "29b728f177586dc87523c0bbc6a23e44542ee470",
+  "run": "https://github.com/DouglasNLima/local-docs-studio/actions/runs/39155870393",
+  "profile": "dotnet-sampled-thread-time",
+  "scope": "Diagnostic only. Instrumentation overhead; not controlled acceptance. Inclusive sampled call stacks are not additive.",
+  "files": [
+    {
+      "name": "details-visible-window.png",
+      "sha256": "97b73da8e506500b3596e7db375845f6e1758e4b71822e8beeeeef8c41aea857",
+      "bytes": 54851
+    },
+    {
+      "name": "high-contrast-transition-initial.json",
+      "sha256": "4179b6a675d9e3e36b389270300e3561154707f8915e15329ef28b6077bbcac2",
+      "bytes": 294
+    },
+    {
+      "name": "high-contrast-transition.json",
+      "sha256": "de957f0994d1c3984064485bbfd0c8df100d84326068162c0c392a799680cf77",
+      "bytes": 306
+    },
+    {
+      "name": "list-visible-window.png",
+      "sha256": "949a7290506d52ab4096717d830a1cd75704dd69b221f069f59b8dfd2d716ce2",
+      "bytes": 56002
+    },
+    {
+      "name": "mixed-visible-window.png",
+      "sha256": "fb03680954ab9a0a9c5ba46f49c54de2e1548c2355df838fbf0b08e601a4df20",
+      "bytes": 62823
+    },
+    {
+      "name": "native-preview-scheduling.json",
+      "sha256": "7371a0ddbedcef51585e40636ce9efbdefe83e33ee6913cab34a6616b15ace78",
+      "bytes": 7630
+    },
+    {
+      "name": "paragraphs-visible-window.png",
+      "sha256": "449343687148b57103a1135cc77f26e8cbe7a75d692a52c6854dce1aa8b9fe9d",
+      "bytes": 94060
+    },
+    {
+      "name": "quote-visible-window.png",
+      "sha256": "398096e62eae9ae923eb0b59a5a824b37e4657c7edd9cae10e4b308d2322d95c",
+      "bytes": 56702
+    },
+    {
+      "name": "shell-phases.json",
+      "sha256": "d9bcb473fea373a5979a53a0baaee3ea5714b481a3007b3be25cc6349d681b03",
+      "bytes": 164882
+    },
+    {
+      "name": "shell.nettrace",
+      "sha256": "1c913f381df6984a098466562d0d669003ee186ab7a6644e3ae55dbd263f9a32",
+      "bytes": 23292922
+    },
+    {
+      "name": "shell.speedscope.json",
+      "sha256": "0720e8058ce78ccfd802a48972abab2fce9d60016961ed697dcc682af4901dd5",
+      "bytes": 22056689
+    },
+    {
+      "name": "stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "name": "stdout.txt",
+      "sha256": "7e2eac63a85bc15d8c2ab09ba4764f20f1af998a6f6acf4e2509f1873dd7630c",
+      "bytes": 253
+    },
+    {
+      "name": "table-visible-window.png",
+      "sha256": "a207b608854193abdc89c58c9f82e44a24ee424e03247e5e7c985c6112903c08",
+      "bytes": 58671
+    }
+  ]
+}

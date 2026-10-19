@@ -1,5 +1,25 @@
 # Native experience improvements
 
+## Accepted consolidation — 19 October 2026
+
+The product decision accepts the bounded production improvements in PRs #36/#37
+and pauses draft #38 at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`. Stock Continuous
+remains the ordinary renderer. #36 merged as `1944e500b4b3fbd78acc28414098a88b6c81537c`;
+#37 now targets develop. Its final PR receipt owns the actual merge identity,
+post-integration validation and fresh internal preview provenance. Those results
+must be established at the final develop revision, independently of feature-head
+receipts. The original 250 ms target remains incomplete, `.749` unresolved and
+#38's Input verdict failing/INSUFFICIENT EVIDENCE. No active architecture migration
+or deadline blocks further Mermaid editors. See the [consolidation contract and
+next-editor handoff](accepted-native-consolidation.md).
+
+The records below are historical, with their original source and acceptance scope.
+
+Continuation after `0237b08`: **implemented with bounded limitations; original goal INCOMPLETE**. Document-owned flat viewport ranges and owner-local colour brushes reduce demonstrated dispatcher work while preserving stock WPF rendering. Exact six-fixture first-layout acceptance stays red (1f0463e replications: 46/66 and 16/66 failures); all 264 independent correctness outcomes and 132 raster pairs pass. Automatic actual High Contrast enable/disable passes without manual ApplyTheme. Original `.749` first-launch causality remains unresolved. Native segmentation and native-semantics framework reuse prototypes both miss 250 ms; the modified framework is not shipped. A different Continuous layout/selection/UIA architecture requires an explicit scope decision. Final-source CI, package and integration statuses belong to the [source-labelled report and final PR receipt](continuous-preview-performance-refinement.md#stock-and-framework-replication-at-1f0463e); no intermediate package certifies a later head.
+
+
+This Continuous preview continuation is stacked on open PR #36 at 9a64dfa5. Its [focused report](continuous-preview-performance-refinement.md) owns the plain-text/table refinement, current-version and selection guards, controlled six-fixture comparison and new interaction coverage. The controlled 250 ms target remains incomplete: list, mixed and some paragraph/table samples fail. Earlier green compatibility/package records do not certify it; the final Draft PR #37 receipt owns exact-head checks and package readiness.
+
 The dedicated [Windows preview readiness report](windows-preview-readiness.md) records the subsequent release-readiness candidate, guide, package provenance and available acceptance. Historical evidence below retains its original revision and scope.
 
 The targeted [performance continuation](performance-and-responsiveness.md) reduces redundant native formatting elements and initial list allocations, adds exact source/RTF/formatting/stale-render regressions, and fixes a reproduced active-tab close selection race. Continuous list median input improves 923.42 → 727.88 ms on the named machine, but still fails 250 ms; mixed/4.14 MB and the original intermittent details failure remain unresolved. Existing delivery evidence below keeps its historical scope. New-build desktop proof is hosted; the optional local manual retest remains BLOCKED/NOT RUN.

@@ -50,6 +50,7 @@ public partial class MainWindow : Window
     private bool closing;
     private bool closePending;
     private bool recoveryBusy;
+    private bool previewAppearancePending;
 
     public MainWindow(WorkspaceViewModel model, DesktopDialogs dialogs, string[] startupPaths)
     {
@@ -69,7 +70,7 @@ public partial class MainWindow : Window
         DataObject.AddPastingHandler(Editor, OnPaste);
         CommandManager.AddPreviewCanExecuteHandler(Editor, CanPasteClipboard);
         CommandManager.AddPreviewExecutedHandler(Editor, ExecuteClipboardPaste);
-        model.DocumentChanged += (_, _) => { CancelSynchronisation(); BindActiveDocument(); QueuePreview(); recoveryTimer.Start(); };
+        model.DocumentChanged += (_, _) => { diagnosticSourceGeneration++; CancelSynchronisation(); BindActiveDocument(); QueuePreview(); PublishPreviewDiagnostic("source-changed"); recoveryTimer.Start(); };
         model.DocumentRelocated += (id, path) => navigation.RelocateDocument(id, path);
         model.DocumentRemoved += id => { navigation.ForgetDocument(id); RefreshNavigationControls(); };
         previewTimer.Tick += async (_, _) => { previewTimer.Stop(); await UpdatePreviewAsync(); };
@@ -87,7 +88,11 @@ public partial class MainWindow : Window
         if (Dispatcher.HasShutdownStarted) return;
         Dispatcher.BeginInvoke(() =>
         {
-            if (!closing) { ApplyTheme(); QueuePreview(); }
+            if (!closing)
+            {
+                previewAppearancePending = !ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast);
+                ApplyTheme(); QueuePreview();
+            }
         });
     }
 
@@ -113,7 +118,7 @@ public partial class MainWindow : Window
     {
         if (Editor is null || displayedTab == model.ActiveDocument) return;
         SaveViewport(); CaptureCurrentNavigation(); displayedTab = model.ActiveDocument;
-        CancelSynchronisation(); previewCancellation?.Cancel(); viewportGeneration++;
+        CancelSynchronisation(); CancelPreview(); viewportGeneration++;
         pendingViewportDocument = displayedTab?.Id; bindingViewport = true;
         // The shared reader may still display the outgoing document while rendering.
         // Its visible position must never be captured for the incoming tab.
@@ -139,30 +144,54 @@ public partial class MainWindow : Window
         BindActiveDocument(); QueuePreview();
         QueueActiveTabVisibility();
     }
-    private void QueuePreview() { previewCancellation?.Cancel(); previewTimer.Stop(); previewTimer.Start(); }
+    private void QueuePreview() { CancelPreview(); previewTimer.Stop(); if (!closing) previewTimer.Start(); }
     private async Task UpdatePreviewAsync(bool forcePreview = false)
     {
         previewTimer.Stop();
+        if (closing) return;
+        CancelPreview();
         model.RefreshTreeIndicators();
         if (model.ActiveDocument is not { } tab)
         { rendered = null; parsed = null; renderedDocumentId = null; Outline.ItemsSource = null; Preview.Document = new FlowDocument(); return; }
+        if (!ThemeService.IsCurrentHighContrast(SystemParameters.HighContrast))
+        {
+            // Windows broadcasts asynchronously to WPF. Keep the complete previous
+            // document and coalesce another request until its appearance is current.
+            previewAppearancePending = true;
+            model.PreviewStatus = "Updating preview appearance…"; QueuePreview(); return;
+        }
+        if (previewAppearancePending) { previewAppearancePending = false; ApplyTheme(); }
         var text = tab.EditorDocument.Text;
         var sourceVersion = tab.EditorDocument.Version;
         var preparePreview = forcePreview || model.Layout != "Editor";
         var sourcePath = tab.EffectivePath; var workspaceRoot = tab.EffectiveWorkspace;
-        previewCancellation?.Cancel(); previewCancellation?.Dispose(); previewCancellation = new();
+        CancelPreview(); previewCancellation?.Dispose(); previewCancellation = new();
         var cancellation = previewCancellation.Token;
-        var dark = ThemeService.IsDark(model.Theme);
+        var appearance = model.Theme;
+        var dark = ThemeService.IsDark(appearance);
+        var highContrast = SystemParameters.HighContrast;
         var diagramTheme = CurrentDiagramTheme;
         var standalone = Path.GetExtension(tab.EffectivePath ?? tab.DisplayName)?.ToLowerInvariant() is ".mmd" or ".mermaid";
         var acquired = false;
+        var request = ++diagnosticRequest;
+        diagnosticError = null;
+        void Phase(string name) { PreviewConstructionEvents.Log.Stage("request/" + name, request); if (request == diagnosticRequest) PublishPreviewDiagnostic(name); }
+        Phase("queued");
+        bool Current() => !closing && !cancellation.IsCancellationRequested && model.ActiveDocument == tab
+            && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0
+            && appearance == model.Theme && dark == ThemeService.IsDark(model.Theme) && highContrast == SystemParameters.HighContrast
+            && ThemeService.IsCurrentHighContrast(highContrast)
+            && diagramTheme == CurrentDiagramTheme && sourcePath == tab.EffectivePath && workspaceRoot == tab.EffectiveWorkspace;
         try
         {
             await previewGate.WaitAsync(cancellation); acquired = true;
             var watch = Stopwatch.StartNew();
+            Phase("prepare-await-start");
             var prepared = await Task.Run(() =>
             {
+                PreviewConstructionEvents.Log.Stage("worker/parse-start", request);
                 var source = markdown.Parse(text, standalone);
+                PreviewConstructionEvents.Log.Stage("worker/parse-end", request);
                 var results = new Dictionary<FencedCodeBlock, DiagramResult>();
                 foreach (var code in preparePreview ? source.Syntax.Descendants<FencedCodeBlock>() : [])
                 {
@@ -171,7 +200,8 @@ public partial class MainWindow : Window
                 }
                 return (source, results, syntax: preparePreview ? CodeSyntaxService.Prepare(source, cancellation) : null);
             }, cancellation);
-            if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
+            Phase("prepare-await-end");
+            if (!Current()) { Phase("stale-rejected"); return; }
             if (!preparePreview)
             {
                 parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = null; renderedDocumentId = null;
@@ -179,6 +209,7 @@ public partial class MainWindow : Window
                 model.PreviewStatus = "Preview paused in Editor layout";
                 return;
             }
+            Phase("media-await-start");
             var nativeDrawings = await StaWorker.RunAsync(() =>
             {
                 var drawings = new Dictionary<FencedCodeBlock, DrawingImage>();
@@ -194,7 +225,9 @@ public partial class MainWindow : Window
                 var formulae = previewMaths.Prepare(prepared.source, dark, cancellation);
                 return (drawings, images, formulae);
             }, cancellation);
-            if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
+            if (!Current()) { Phase("stale-rejected"); return; }
+            Phase("media-await-end");
+            Phase("construction-await-start");
             var completed = await new NativeMarkdownRenderer(svg).RenderAsync(prepared.source, dark, prepared.results, reference =>
                 {
                     if (model.ActiveDocument == tab && renderedDocumentId == tab.Id && tab.EditorDocument.Version.CompareAge(sourceVersion) == 0) Navigate(reference);
@@ -205,19 +238,36 @@ public partial class MainWindow : Window
                 selection => _ = ExportTableCsvAsync(selection, prepared.source.Source, tab.Id), nativeDrawings.formulae,
                 target => NavigateWikiLink(tab.Id, prepared.source.Source, target), offset => EditDiagramSource(tab, text, offset),
                 offset => OpenMermaidVisualEditor(tab, prepared.source, sourceVersion, offset));
-            if (cancellation.IsCancellationRequested || model.ActiveDocument != tab) return;
+            if (!Current()) { Phase("stale-rejected"); return; }
+            Phase("construction-await-end");
+            Phase("selection-capture-start");
+            var previewSelection = CapturePreviewSelection();
+            Phase("selection-capture-end");
+            Phase("viewport-save-start");
             SaveViewport();
+            Phase("viewport-save-end");
             parsed = prepared.source; parsedVersion = sourceVersion; parsedDocumentId = tab.Id; rendered = completed; renderedDocumentId = tab.Id;
+            Phase("attachment-start");
             Preview.SetPreview(rendered, parsed.Source.Length, WorkspaceSettings.From(model.Preferences).Preview.ReadingMode);
+            Phase("attachment-end");
+            Phase("installed");
+            Phase("sync-install-start");
             InstallSyncPreview(sourceVersion);
+            Phase("sync-install-end");
+            Phase("selection-restore-start");
+            RestorePreviewSelection(previewSelection);
+            Phase("selection-restore-end");
+            Phase("outline-start");
             RefreshOutline();
+            diagnosticAcceptedGeneration = diagnosticSourceGeneration; diagnosticOutlineGeneration = diagnosticSourceGeneration;
+            Phase("outline-end");
             var previewStatus = rendered.Warnings.Count != 0 ? rendered.Warnings[0] : $"Preview updated in {watch.ElapsedMilliseconds} ms";
             previewBeforeEditorStatus = model.Layout == "Editor" ? previewStatus : null;
             model.PreviewStatus = model.Layout == "Editor" ? "Preview paused in Editor layout" : previewStatus;
         }
-        catch (OperationCanceledException) { }
-        catch (Exception ex) when (ex is not OutOfMemoryException) { model.PreviewStatus = "Preview could not be updated: " + ex.Message; }
-        finally { if (acquired) previewGate.Release(); }
+        catch (OperationCanceledException) { Phase("cancel-observed"); }
+        catch (Exception ex) when (ex is not OutOfMemoryException) { if (Current()) { diagnosticError = ex.GetType().Name; model.PreviewStatus = "Preview could not be updated: " + ex.Message; Phase("failed"); } }
+        finally { if (acquired) previewGate.Release(); Phase("finished"); }
     }
 
     private async void OpenTreeEntry(object sender, MouseButtonEventArgs e) => await OpenSelectedEntry();

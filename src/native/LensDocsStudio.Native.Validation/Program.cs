@@ -17,6 +17,14 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        if (args.FirstOrDefault() == "--continuous-interactions")
+        {
+            if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true" || Environment.GetEnvironmentVariable("RUNNER_OS") != "Windows"
+                || Environment.GetEnvironmentVariable("RUNNER_ENVIRONMENT") != "github-hosted")
+            { Console.Error.WriteLine("Visible Continuous interaction checks require a disposable GitHub-hosted Windows runner."); return 1; }
+            try { NativePreviewSchedulingChecks.Run(Path.GetFullPath(args[1]), true, args.Contains("--high-contrast")); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
         if (args.FirstOrDefault() == "--watch-preview-stalls") return PreviewStallWatch.RunHelper(args);
         if (args.FirstOrDefault() is "--suite-performance" or "--suite-uncached-performance")
         {
@@ -46,9 +54,31 @@ internal static class Program
             try { NativeMermaidPerformanceChecks.Run(Path.GetFullPath(args[1])); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() == "--continuous-performance")
+        if (args.FirstOrDefault() == "--segmented-native-prototype")
         {
-            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/performance/continuous"), args.ElementAtOrDefault(2)); return 0; }
+            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", repetitions: 2, segmentedPrototype: true); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--theme-resources")
+        {
+            try { NativeThemeResourceChecks.Run(Path.GetFullPath(args[1])); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() == "--viewport-anchors")
+        {
+            try { NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args[1]), "all", checkAnchors: true); return 0; }
+            catch (Exception error) { Console.Error.WriteLine(error); return 1; }
+        }
+        if (args.FirstOrDefault() is "--continuous-performance" or "--continuous-acceptance")
+        {
+            try
+            {
+                var repeatAt = Array.IndexOf(args, "--repeat");
+                NativeContinuousPerformanceChecks.Run(Path.GetFullPath(args.ElementAtOrDefault(1) ?? "acceptance/performance/continuous"),
+                    args.ElementAtOrDefault(2), args[0] == "--continuous-acceptance",
+                    repeatAt < 0 ? 1 : int.Parse(args[repeatAt + 1], System.Globalization.CultureInfo.InvariantCulture), args.Contains("--edited"));
+                return 0;
+            }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
         if (args.FirstOrDefault() == "--literal-formatting")
@@ -95,7 +125,7 @@ internal static class Program
             try { PreviewStallWatchChecks.Run(stallOutput); Console.WriteLine("Native preview stall diagnostics passed."); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
-        if (args.FirstOrDefault() is "--suite-baseline-ui" or "--suite-ui" or "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
+        if (args.FirstOrDefault() is "--suite-baseline-ui" or "--suite-ui" or "--outline-focus-holder" or "--first-launch-ui" or "--ui" or "--interrupted-save" or "--installer-wizard" or "--restore-installed-session" or "--seed-installed-drafts" or "--office" or "--preview-input-safety" or "--ux-screenshots" or "--ux-controls" or "--mermaid-ui" or "--mermaid-interactions" or "--workspace-viewports" or "--sequence-ui" or "--state-ui" or "--state-performance-ui" or "--er-ui" or "--er-performance-ui" or "--class-ui" or "--class-performance-ui")
         {
             // Prevent accidental desktop/clipboard changes on a developer's machine before reading arguments or creating files.
             if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true"
@@ -130,6 +160,8 @@ internal static class Program
             try { NativePreviewInputSafetyChecks.Run(Path.GetFullPath(args[1]), args[2]); return 0; }
             catch (Exception error) { Console.Error.WriteLine(error); return 1; }
         }
+        if (args.FirstOrDefault() == "--outline-focus-holder") return NativeOutlineFocusProbe.Hold();
+        if (args.FirstOrDefault() == "--first-launch-ui") return NativeUiChecks.Run(args[1], args[2], requireBundledRuntime: true, firstLaunchOnly: true);
         if (args.FirstOrDefault() == "--ui")
             return NativeUiChecks.Run(args[1], args.ElementAtOrDefault(2) ?? "artifacts/native/ui",
                 requireBundledRuntime: args.ElementAtOrDefault(3) == "--require-bundled-runtime");

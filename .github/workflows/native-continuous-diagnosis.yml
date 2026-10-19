@@ -1,0 +1,61 @@
+name: Diagnose native Continuous continuation
+on:
+  push:
+    branches: ['feature/native-continuous-preview-performance']
+    paths: ['.github/workflows/native-continuous-diagnosis.yml', 'scripts/native/Test-NativeFirstLaunch.ps1']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  shown-profile:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release
+      - run: dotnet tool install dotnet-trace --version 10.0.750501 --tool-path artifacts/trace-tools
+      - name: Bounded sampled stacks and exclusive markers, separate from acceptance
+        run: |
+          New-Item -ItemType Directory artifacts/shown-profile -Force | Out-Null
+          $trace = Start-Process artifacts/trace-tools/dotnet-trace.exe -ArgumentList @('collect','--profile','dotnet-sampled-thread-time','--providers','LensDocsStudio-Native-PreviewConstruction:0xFFFFFFFF:5','--format','Speedscope','--buffersize','32','--output','artifacts/shown-profile/shell.nettrace','--show-child-io','--','src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe','--continuous-interactions','artifacts/shown-profile') -WindowStyle Hidden -PassThru -RedirectStandardOutput artifacts/shown-profile/stdout.txt -RedirectStandardError artifacts/shown-profile/stderr.txt
+          if (-not $trace.WaitForExit(180000)) { $trace.Kill($true); throw 'Profile process exceeded the external bound.' }
+          exit $trace.ExitCode
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shown-profile
+          path: artifacts/shown-profile/
+          retention-days: 30
+  original-first-launch:
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release
+      - name: Retrieve the original failed .749 package without rebuilding it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 39137475867 --repo DouglasNLima/local-docs-studio --name native-validation --dir artifacts/original-749
+      - name: Five independent launches and a controlled focus schedule, retaining every result
+        run: pwsh -NoProfile -File scripts/native/Test-NativeFirstLaunch.ps1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: original-first-launch-${{ matrix.replication }}
+          path: artifacts/first-launch-diagnosis/
+          retention-days: 30

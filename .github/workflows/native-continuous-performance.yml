@@ -1,0 +1,91 @@
+name: Native Continuous 250 ms acceptance
+on:
+  push:
+    branches: [feature/native-continuous-preview-performance]
+  pull_request:
+    branches: [develop, feature/native-mermaid-suite-ux-performance]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: continuous-performance-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  native-interaction:
+    name: Visible Continuous interactions (${{ matrix.appearance }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Install pinned stack-only diagnostics for blocked OS transitions
+        run: dotnet tool install dotnet-stack --version 10.0.750501 --tool-path artifacts/continuous-diagnostic-tools
+      - name: Open, edit, replace, reopen and close actual WPF documents
+        run: |
+          $env:LENS_CONTINUOUS_STACK_TOOL = (Resolve-Path artifacts/continuous-diagnostic-tools/dotnet-stack.exe).Path
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & scripts/native/Invoke-ContinuousPreviewInteractions.ps1 -Appearance $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: continuous-interactions-${{ matrix.appearance }}
+          path: artifacts/continuous-interactions/
+          retention-days: 30
+  controlled-comparison:
+    name: Controlled 250 ms acceptance (replication ${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Compare identical compiled harness and unchanged fixture bytes on this host
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousPreviewPerformance.ps1 -Replication ${{ matrix.replication }}
+      - name: Independent viewport anchors against the retained exhaustive geometry oracle
+        if: always()
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --viewport-anchors artifacts/continuous-performance/anchor-correctness
+      - name: Experimental native list segmentation, never product acceptance
+        if: always()
+        run: src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --segmented-native-prototype artifacts/continuous-performance/segmented-prototype
+      - name: Same compiled shown-shell harness on both products, independent hard bounds
+        if: always()
+        run: |
+          $order = if ('${{ matrix.replication }}' -eq '1') { @('baseline','candidate') } else { @('candidate','baseline') }
+          $failed = $false
+          foreach ($side in $order) {
+            $validation = if ($side -eq 'baseline') { 'artifacts/continuous-performance/baseline-binaries/LensDocsStudio.Native.Validation.exe' } else { 'src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe' }
+            try { & scripts/native/Invoke-ContinuousPreviewInteractions.ps1 -Appearance '--normal' -ValidationExecutable $validation -OutputDirectory "artifacts/continuous-performance/shown-$side"; if ($LASTEXITCODE -ne 0) { $failed = $true } }
+            catch { Write-Warning $_; $failed = $true }
+          }
+          if ($failed) { throw 'A paired shown-shell correctness check failed; retain both outcomes.' }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: continuous-performance-${{ matrix.replication }}
+          path: |
+            artifacts/continuous-performance/protocol.json
+            artifacts/continuous-performance/comparison.json
+            artifacts/continuous-performance/samples/
+            artifacts/continuous-performance/anchor-correctness/
+            artifacts/continuous-performance/segmented-prototype/
+            artifacts/continuous-performance/shown-baseline/
+            artifacts/continuous-performance/shown-candidate/
+          retention-days: 30

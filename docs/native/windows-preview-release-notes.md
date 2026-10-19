@@ -1,5 +1,24 @@
 # Windows internal preview release notes
 
+This consolidation accepts the five-editor UX and bounded stock Continuous
+improvements from PRs #36/#37. All five editors gain consistent toolbars,
+full-name navigation, persistent inspector context, source panels and viewport/focus
+improvements. Bounded frozen-drawing reuse improves measured repeat presentation;
+cold results remain mixed and no general first-load or memory gain is claimed.
+
+Continuous keeps table batching, adjacent-text coalescing, indexed anchors with a
+complete fallback, owned theme palettes/stable brushes, selection retention and
+source/version/appearance guards. The 250 ms goal remains incomplete with long
+stock formatting/Input gaps. The `.749` first-launch incident remains unresolved.
+Draft #38 is PAUSED at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`, with its achieved
+layout/functional milestone and failing Input/INSUFFICIENT EVIDENCE verdict retained.
+Its renderer, launcher and modified-runtime experiments are excluded from packages.
+Stock Continuous remains the ordinary default. No migration commitment or deadline
+is attached to the next Mermaid editor. See the source checkout's
+`docs/native/accepted-native-consolidation.md` and the #37 integration receipt for
+post-integration checks, actual source/version, package hashes and explicit skips.
+
+Earlier editor capabilities and historical qualification bounds follow.
 This candidate adds native Mermaid Class visual authoring as the fifth family alongside Flowchart, Sequence, State and ER. It retains the integrated workspace, interaction stability and canonical preview fidelity. The packaged `version.json` records this build's exact version, source revision, source kind and Actions run. Packages are unsigned and remain separate from the browser/PWA and legacy Windows shell.
 
 - Class **Visual Edit** provides distinct class, attribute, method and relationship inspectors. **Insert → Class diagram visually…** opens a verified portable starter. Supported class IDs, simple generics/annotations, member names/types/parameters/visibility, static attributes and six primary relationship types use exact source patches and full pinned semantic validation.
@@ -30,6 +49,6 @@ This candidate adds native Mermaid Class visual authoring as the fifth family al
 
 The supported editing, portable workspace/image, Mermaid, recovery, DOCX/PDF export, installer lifecycle and fail-closed update contracts remain in place. The experimental Continuous viewer in Draft PR 22 is **NO-GO** and is excluded.
 
-Known limits remain: unsigned publisher/SmartScreen warnings, no trusted unsigned in-app updates, missing genuinely clean Windows certification, incomplete physical accessibility/compatibility, bounded Mermaid/import/export fidelity, Continuous delays above 250 ms and the unresolved 587.9933 ms details delay. Previous real Word acceptance has its original scope; Excel first-run settings and a disposable Azure DevOps destination remain blocked. No production signing, release, tag or automatic merge is authorised.
+Known limits remain: unsigned publisher/SmartScreen warnings, no trusted unsigned in-app updates, missing genuinely clean Windows certification, incomplete physical accessibility/compatibility, bounded Mermaid/import/export fidelity, Continuous delays above 250 ms and the unresolved 587.9933 ms details delay. Previous real Word acceptance has its original scope; Excel first-run settings and a disposable Azure DevOps destination remain blocked. No production signing, public release or tag movement is authorised.
 
 Read `PREVIEW-GUIDE.md` for evaluation instructions and `docs/native/mermaid-state-visual-editor.md` in the source checkout for the State scope and certification requirements. Earlier Flowchart, Sequence, readiness and performance records retain their original scope. Use the exact build's delivery record for its final verdict and package provenance. No byte-for-byte build reproducibility or production readiness is claimed.

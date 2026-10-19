@@ -1,5 +1,20 @@
 # Native Windows engineering handover
 
+## Accepted consolidation — 19 October 2026
+
+The product decision accepts the bounded production improvements in PRs #36/#37
+and pauses draft #38 at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`. Stock Continuous
+remains the ordinary renderer. #36 merged as `1944e500b4b3fbd78acc28414098a88b6c81537c`;
+#37 now targets develop. Its final PR receipt owns the actual merge identity,
+post-integration validation and fresh internal preview provenance. Those results
+must be established at the final develop revision, independently of feature-head
+receipts. The original 250 ms target remains incomplete, `.749` unresolved and
+#38's Input verdict failing/INSUFFICIENT EVIDENCE. No active architecture migration
+or deadline blocks further Mermaid editors. See the [consolidation contract and
+next-editor handoff](accepted-native-consolidation.md).
+
+The records below are historical, with their original source and acceptance scope.
+
 The five-family shared Mermaid suite refinement is implemented in
 [Draft PR #36](https://github.com/DouglasNLima/local-docs-studio/pull/36), based on
 consolidated `develop` `6a94dd3`. The [suite engineering report](mermaid-suite-ux-performance-refinement.md)
