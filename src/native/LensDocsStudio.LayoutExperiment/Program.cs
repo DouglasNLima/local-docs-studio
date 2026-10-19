@@ -24,7 +24,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args[4], args[5]);
-        if (args.FirstOrDefault() == "--reading-input-client") return ReadingInputChecks.Client(args[1], int.Parse(args[2]), args[3], args[4], args[5]);
+        if (args.FirstOrDefault() == "--reading-input-client") return ReadingInputChecks.Client(args[1], int.Parse(args[2]), args[3], args[4], args[5], bool.Parse(args[6]));
         if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]), args[3]);
         if (args.FirstOrDefault() == "--media-client") return MediaChecks.RunClient(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4], args.ElementAtOrDefault(5) == "STA");
         if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
@@ -44,13 +44,17 @@ internal static class Program
         var switches = new HashSet<string>(StringComparer.Ordinal) { "--deterministic", "--image-clipboard-checks", "--link-checks", "--visual-checks", "--range-checks",
             "--media-controls", "--media-checks", "--media-legacy-directory", "--media-client-sta-control", "--studio-checks", "--parity", "--parity-all",
             "--appearance-worker-theme-control", "--appearance-full-decoration-control", "--appearance-controls", "--appearance", "--studio", "--clipboard-oracle",
-            "--lifecycle", "--view", "--edit", "--acceptance", "--uia", "--acceptance-v2", "--contract-v2", "--reading-input-checks", "--detailed-input-trace", "--appearance-stock-control" };
+            "--lifecycle", "--view", "--edit", "--acceptance", "--uia", "--acceptance-v2", "--contract-v2", "--reading-input-checks", "--reading-exact-edge-control", "--detailed-input-trace", "--appearance-stock-control" };
         for (var index = 0; index < args.Length; index++)
         {
             if (switches.Contains(args[index])) continue;
             if (valueOptions.Contains(args[index]) && index + 1 < args.Length) { index++; continue; }
             var error = "Unrecognised or incomplete diagnostic argument: " + args[index];
             Write(Path.Combine(output, "failure.json"), new { Status = "FAIL", Error = error }); Console.Error.WriteLine(error); return 2;
+        }
+        if (!args.Contains("--reading-input-checks") && (args.Contains("--reading-exact-edge-control") || Option("--client-apartment") is not null))
+        {
+            Write(Path.Combine(output, "failure.json"), new { Status = "FAIL", Error = "Reading control options require --reading-input-checks." }); return 2;
         }
         if (args.Contains("--deterministic"))
         {
@@ -65,7 +69,7 @@ internal static class Program
             if (started) return; started = true;
             try
             {
-                if (args.Contains("--reading-input-checks")) await ReadingInputChecks.Run(window, output, Option("--adapter") ?? "candidate", Option("--client-apartment") ?? "STA");
+                if (args.Contains("--reading-input-checks")) await ReadingInputChecks.Run(window, output, Option("--adapter") ?? "candidate", Option("--client-apartment") ?? "STA", args.Contains("--reading-exact-edge-control"));
                 else if (args.Contains("--appearance-stock-control")) await StockAppearanceChecks.Run(window, output);
                 else if (args.Contains("--image-clipboard-checks")) await ImageClipboardChecks.Run(window, output);
                 else if (args.Contains("--link-checks")) await LinkChecks.Run(window, output);

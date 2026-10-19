@@ -14,7 +14,7 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Fresh-process pre-copy reading controls; never an acceptance replacement.</summary>
 internal static class ReadingInputChecks
 {
-    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment)
+    public static async Task Run(ExperimentWindow window, string output, string adapter, string apartment, bool exactEdgeControl = false)
     {
         if (adapter is not ("stock" or "candidate") || apartment is not ("STA" or "MTA")) throw new ArgumentException("Choose stock/candidate and STA/MTA.");
         if (ExperimentAppearance.ActualHighContrast) throw new IOException("The reading control requires initial normal appearance.");
@@ -45,7 +45,7 @@ internal static class ReadingInputChecks
         void Input() { var at = Stopwatch.GetTimestamp(); var gap = (at - last) * 1000d / Stopwatch.Frequency; timeline.Add(new { StartTimestamp = last, EndTimestamp = at, Milliseconds = gap }); maximum = Math.Max(maximum, gap); last = at; }
         heartbeat.Tick += (_, _) => Input(); heartbeat.Start();
         var info = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment }) info.ArgumentList.Add(argument);
+        foreach (var argument in new[] { "--reading-input-client", output, Environment.ProcessId.ToString(), adapter, acknowledgement.Name, apartment, exactEdgeControl.ToString() }) info.ArgumentList.Add(argument);
         Process? client = null; string? error = null;
         try
         {
@@ -67,6 +67,8 @@ internal static class ReadingInputChecks
                 NaturalCollections = Enumerable.Range(0, 3).Select(index => GC.CollectionCount(index) - collections[index]).ToArray(), ForcedCollection = false });
             Program.Write(Path.Combine(output, "reading-trace.json"), trace.Events);
             Program.Write(Path.Combine(output, "input-acknowledgements.json"), acknowledgement.Receipts);
+            var captureStarted = Stopwatch.GetTimestamp(); WindowCapture.Save(window, Path.Combine(output, "reading-final.png"));
+            Program.Write(Path.Combine(output, "diagnostic-capture.json"), new { StartTimestamp = captureStarted, EndTimestamp = Stopwatch.GetTimestamp(), OutsideInteractionHeartbeat = true });
             if (stock is not null) stock.Document = null;
         }
     }
@@ -76,14 +78,14 @@ internal static class ReadingInputChecks
     [DllImport("user32.dll")] private static extern bool SetPhysicalCursorPos(int x, int y);
     [DllImport("user32.dll")] private static extern IntPtr SetThreadDpiAwarenessContext(IntPtr context);
     [DllImport("user32.dll")] private static extern void mouse_event(uint flags, uint x, uint y, uint data, UIntPtr extra);
-    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment)
+    public static int Client(string output, int processId, string adapter, string acknowledgementName, string apartment, bool exactEdgeControl)
     {
         var result = 1;
         var thread = new Thread(() => result = Drive()) { Name = "Independent first reading input " + apartment };
         thread.SetApartmentState(apartment == "STA" ? ApartmentState.STA : ApartmentState.MTA); thread.Start(); thread.Join(); return result;
         int Drive()
         {
-            var stages = new List<object>();
+            var stages = new List<object>(); string? lastSelection = null;
             void At(string name, object? detail = null) => stages.Add(new { Stage = name, Timestamp = Stopwatch.GetTimestamp(), Thread = Environment.CurrentManagedThreadId, Detail = detail });
             using var acknowledgement = new InputAcknowledgement(acknowledgementName);
             try
@@ -113,10 +115,16 @@ internal static class ReadingInputChecks
                 first.ScrollIntoView(true); var second = text.DocumentRange.FindText("word2", false, false)!;
                 IndependentUiaClient.Wait(() => first.GetBoundingRectangles().Length > 0 && second.GetBoundingRectangles().Length > 0);
                 var a = first.GetBoundingRectangles()[0]; var b = second.GetBoundingRectangles()[0];
+                var endX = (int)b.Right + (exactEdgeControl ? 0 : 2);
+                var point = new Point(endX, b.Top + b.Height / 2);
+                var atPoint = text.RangeFromPoint(point); atPoint.ExpandToEnclosingUnit(TextUnit.Word);
+                At("mouse-geometry", new { First = a.ToString(), Second = b.ToString(), Document = document.Current.BoundingRectangle.ToString(), ExactEdgeControl = exactEdgeControl, EndX = endX,
+                    EndY = point.Y, WordAtEndPoint = atPoint.GetText(-1), PointRelativeToWordEnd = text.RangeFromPoint(point).CompareEndpoints(TextPatternRangeEndpoint.Start, second, TextPatternRangeEndpoint.End) });
+                if (!document.Current.BoundingRectangle.Contains(point)) throw new IOException("The real drag endpoint is outside the shown document.");
                 At("mouse-enter"); SetPhysicalCursorPos((int)a.Left + 1, (int)(a.Top + a.Height / 2)); mouse_event(2, 0, 0, 0, UIntPtr.Zero); acknowledgement.AfterRealInput(process.MainWindowHandle);
-                for (var step = 1; step <= 8; step++) { SetPhysicalCursorPos((int)(a.Left + (b.Right - a.Left) * step / 8), (int)(a.Top + a.Height / 2 + (b.Top - a.Top) * step / 8)); Thread.Sleep(15); }
+                for (var step = 1; step <= 8; step++) { SetPhysicalCursorPos((int)(a.Left + (endX - a.Left) * step / 8), (int)(a.Top + a.Height / 2 + (b.Top - a.Top) * step / 8)); Thread.Sleep(15); }
                 mouse_event(4, 0, 0, 0, UIntPtr.Zero); acknowledgement.AfterRealInput(process.MainWindowHandle);
-                IndependentUiaClient.Wait(() => text.GetSelection().Single().GetText(-1).Contains("word2", StringComparison.Ordinal)); At("mouse-selection-visible");
+                IndependentUiaClient.Wait(() => (lastSelection = text.GetSelection().Single().GetText(-1)).Contains("word2", StringComparison.Ordinal)); At("mouse-selection-visible", new { Selection = lastSelection });
                 distant.ScrollIntoView(true); IndependentUiaClient.Wait(() => distant.GetBoundingRectangles().Length > 0); At("distant-navigation-visible");
                 if (AutomationElement.FocusedElement.Current.ProcessId != processId) throw new IOException("Reading focus was lost.");
                 At("complete"); Program.Write(Path.Combine(output, "reading-client.json"), new { Status = "PASS", Stages = stages, ClientProcess = Environment.ProcessId }); return 0;
@@ -128,7 +136,7 @@ internal static class ReadingInputChecks
                     acknowledgement.AfterRealInput(process.MainWindowHandle); At(name + "-exit");
                 }
             }
-            catch (Exception exception) { Program.Write(Path.Combine(output, "reading-client.json"), new { Status = "FAIL", Error = exception.ToString(), Stages = stages }); return 1; }
+            catch (Exception exception) { Program.Write(Path.Combine(output, "reading-client.json"), new { Status = "FAIL", Error = exception.ToString(), LastSelection = lastSelection, Stages = stages }); return 1; }
             finally { IndependentUiaClient.ReleaseOwnedInput(); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
         }
     }

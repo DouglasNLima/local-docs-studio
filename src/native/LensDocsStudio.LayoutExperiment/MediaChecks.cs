@@ -25,8 +25,11 @@ internal static class MediaChecks
     {
         using var trace = new OperationTrace(owner); if (candidate is not null) candidate.Trace = trace;
         var gaps = new List<double>(); var watch = Stopwatch.StartNew(); var last = 0d;
+        var absoluteInput = new List<object>(); var previousTimestamp = Stopwatch.GetTimestamp();
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
-        timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last); last = at; }; timer.Start();
+        timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last);
+            if (OperationTrace.DetailedForChecks) { var timestamp = Stopwatch.GetTimestamp(); absoluteInput.Add(new { StartTimestamp = previousTimestamp, EndTimestamp = timestamp, Milliseconds = at - last }); previousTimestamp = timestamp; }
+            last = at; }; timer.Start();
         var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
         foreach (var argument in new[] { "--media-client", output, Environment.ProcessId.ToString(), new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64().ToString(), route, staClientControl ? "STA" : "MTA" }) start.ArgumentList.Add(argument);
         using var client = (await Task.Run(() => Process.Start(start)))!;
@@ -41,7 +44,8 @@ internal static class MediaChecks
             if (!client.HasExited) client.Kill(true);
             Program.Write(Path.Combine(output, "media.json"), new { Status = "FAIL", Route = route, Error = error.ToString(), MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps, InteractionStages = candidate?.Surface.InteractionStages, Events = candidate?.Events.ToArray() }); throw;
         }
-        finally { timer.Stop(); trace.Dispose(); if (candidate is not null) candidate.Trace = null; Program.Write(Path.Combine(output, "media-trace.json"), trace.Events); }
+        finally { timer.Stop(); trace.Dispose(); if (candidate is not null) candidate.Trace = null; Program.Write(Path.Combine(output, "media-trace.json"), trace.Events);
+            if (OperationTrace.DetailedForChecks) Program.Write(Path.Combine(output, "media-input-timeline-v3.json"), new { Probe = "Additional absolute QPC endpoints; original elapsed timer gaps and unchanged 100 ms gate preserved", InputTimeline = absoluteInput }); }
         WindowCapture.Save(owner, Path.Combine(output, "shown-media.png"));
     }
     public static int RunClient(string output, int processId, long handle, string route, bool staControl)

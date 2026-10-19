@@ -119,7 +119,7 @@ internal sealed class OperationTrace : IDisposable
     }
     private static double Elapsed(long start) => (Stopwatch.GetTimestamp() - start) * 1000d / Stopwatch.Frequency;
     private static bool DetailedMessage(uint message) => message is 0x0006 or 0x0007 or 0x0008 or 0x000A or 0x0018 or 0x001C or 0x003D or 0x0100 or 0x0101 or 0x010F or 0x0110 or 0x0281 or 0x0282 or 0x0286;
-    private void Posted(object? sender, DispatcherHookEventArgs args) { if (Thread.CurrentThread == dispatcher.Thread) posted[args.Operation] = Stopwatch.GetTimestamp(); }
+    private void Posted(object? sender, DispatcherHookEventArgs args) { if (Thread.CurrentThread == dispatcher.Thread && posted.Count < 32768) posted[args.Operation] = Stopwatch.GetTimestamp(); }
     private void Started(object? sender, DispatcherHookEventArgs args)
     {
         operations[args.Operation] = Stopwatch.GetTimestamp();

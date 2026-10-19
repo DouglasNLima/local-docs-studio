@@ -14,11 +14,15 @@ on:
         type: choice
         options: [windows-latest, windows-2022]
         default: windows-latest
+      input_correction:
+        description: One bounded reading-driver correction round; reuse unaffected appearance/native profiles
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
   input-diagnostics:
-    if: github.event_name == 'push' || inputs.scope == 'input'
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'input'
     name: Bounded first-input, appearance and dialogue controls (${{ matrix.replication }})
     runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 20
@@ -32,9 +36,12 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Fresh-process same-host controls, all outcomes preserved
-        run: pwsh -NoProfile -File scripts/native/Test-ContinuousInputDiagnostics.ps1 -Replication ${{ matrix.replication }}
+        shell: pwsh
+        run: |
+          $parameters = @{ Replication=${{ matrix.replication }}; CorrectionRound=('${{ inputs.input_correction }}' -eq 'true') }
+          & scripts/native/Test-ContinuousInputDiagnostics.ps1 @parameters
       - name: Separate bounded native CPU and scheduling profiles, never acceptance
-        if: always() && matrix.replication == 1
+        if: always() && matrix.replication == 1 && !inputs.input_correction
         run: pwsh -NoProfile -File scripts/native/Trace-ContinuousInputDiagnostics.ps1
       - uses: actions/upload-artifact@v4
         if: always()
@@ -43,7 +50,7 @@ jobs:
           path: artifacts/layout-input-diagnostics/
           retention-days: 90
       - uses: actions/upload-artifact@v4
-        if: always() && matrix.replication == 1
+        if: always() && matrix.replication == 1 && !inputs.input_correction
         with:
           name: bounded-input-native-profiles
           path: artifacts/layout-input-profiles/
