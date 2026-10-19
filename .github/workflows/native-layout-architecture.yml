@@ -79,6 +79,23 @@ jobs:
             if ($process.ExitCode) { $failed = $true }
           }
           if ($failed) { exit 1 }
+      - name: Separate appearance sampling profile; never acceptance data
+        if: always() && matrix.replication == 1
+        shell: pwsh
+        run: |
+          $destination = 'artifacts/layout-focused/appearance-sampling'
+          New-Item -ItemType Directory -Force -Path $destination | Out-Null
+          dotnet tool install dotnet-trace --version 10.0.750501 --tool-path artifacts/layout-profile-tools
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
+          $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
+          $trace = 'artifacts/layout-profile-tools/dotnet-trace.exe'
+          $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
+          & $trace --version | Set-Content "$destination/tool-version.txt"
+          & $trace collect --profile dotnet-common,dotnet-sampled-thread-time --duration 00:00:00:40 --output "$destination/appearance.nettrace" -- $exe --appearance --output "$destination/observations"
+          $collectionExit = $LASTEXITCODE
+          & $trace convert "$destination/appearance.nettrace" --format Speedscope --output "$destination/appearance"
+          if ($collectionExit) { exit $collectionExit }
       - uses: actions/upload-artifact@v4
         if: always()
         with:

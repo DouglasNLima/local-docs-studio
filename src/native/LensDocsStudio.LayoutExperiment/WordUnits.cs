@@ -20,6 +20,9 @@ internal static class WordUnits
         {
             cancellation.ThrowIfCancellationRequested();
             var start = items[item].Position; var end = items[item + 1].Position; var content = text[start..end]; var attributes = new byte[content.Length];
+            // ScriptBreak does not mark the first character of every script item.
+            // Preserve a word start after whitespace when script itemisation splits it.
+            if (content.Length > 0 && !char.IsWhiteSpace(content[0]) && content[0] != '\uFFFC' && (start == 0 || char.IsWhiteSpace(text[start - 1]))) starts.Add(start);
             Marshal.ThrowExceptionForHR(ScriptBreak(content, content.Length, ref items[item].Analysis, attributes));
             for (var at = 0; at < attributes.Length; at++)
                 if ((attributes[at] & 8) != 0 && !char.IsWhiteSpace(content[at]) && content[at] != '\uFFFC') starts.Add(start + at);

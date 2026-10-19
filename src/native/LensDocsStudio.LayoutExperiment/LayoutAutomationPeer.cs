@@ -158,10 +158,11 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
     internal sealed class TextRange(LayoutAutomationPeer peer, LayoutSnapshot? snapshot, int start, int end) : ITextRangeProvider
     {
         private int start = start, end = end;
+        private bool formatBackward = true;
         private readonly WeakReference<LayoutSnapshot>? identity = snapshot is null ? null : new(snapshot);
         private LayoutSnapshot? Identity => identity is not null && identity.TryGetTarget(out var value) ? value : null;
         private LayoutSnapshot Current => Identity is { } current && ReferenceEquals(peer.Surface.Snapshot, current) ? current : throw new ElementNotAvailableException();
-        public ITextRangeProvider Clone() => new TextRange(peer, Current, start, end);
+        public ITextRangeProvider Clone() => new TextRange(peer, Current, start, end) { formatBackward = formatBackward };
         private TextRange Other(ITextRangeProvider other)
         { _ = Current; return other is TextRange range && ReferenceEquals(range.Identity, Identity) ? range : throw new ArgumentException("Ranges belong to different documents."); }
         public bool Compare(ITextRangeProvider range) { var other = Other(range); return start == other.start && end == other.end; }
@@ -172,8 +173,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             var model = Current.Model;
             IEnumerable<int> units = unit switch
             {
-                TextUnit.Character => Current.Lines.SelectMany(line => line.Carets.Select(caret => caret.Offset)).Concat(model.Items.SelectMany(item => new[] { item.Start, item.Start + item.Length })),
-                TextUnit.Word => model.WordBoundaries.Concat(model.Items.Select(item => item.Start)),
+                TextUnit.Character => Current.Indices.Characters,
+                TextUnit.Word => Current.Indices.Words,
                 TextUnit.Line => Current.Lines.Select(line => line.Start),
                 TextUnit.Paragraph => model.Items.Select(item => item.Start),
                 TextUnit.Format => model.Items.SelectMany(item => item.Runs.Select(run => run.Start)),
@@ -184,14 +185,45 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         }
         public void ExpandToEnclosingUnit(TextUnit unit)
         {
-            var units = Units(unit); if (units.Length < 2) { start = end = 0; return; }
-            var at = Array.FindLastIndex(units, value => value <= start);
-            start = units[Math.Clamp(at, 0, units.Length - 2)]; end = units[Math.Clamp(at + 1, 1, units.Length - 1)];
-            if (unit is TextUnit.Line or TextUnit.Paragraph)
+            end = Math.Min(TextEnd(Current), SnapshotIndices.Adjacent(Current.Indices.Characters, start, true));
+            Expand(unit, true, true);
+        }
+        private (int Start, int End)[] Spans(TextUnit unit)
+        {
+            if (unit == TextUnit.Format)
             {
-                if (unit == TextUnit.Line && Current.Lines.FirstOrDefault(line => line.Start == start) is { } line) end = line.End;
-                else if (Current.Model.Items.FirstOrDefault(item => item.Start == start) is { } item) end = item.Start + item.Length;
+                var runs = Current.Model.Items.SelectMany(item => item.Runs).ToArray();
+                return runs.Select((run, index) => (run.Start, index + 1 < runs.Length ? runs[index + 1].Start : TextEnd(Current))).ToArray();
             }
+            return unit switch
+            {
+                TextUnit.Line => Current.Lines.Select(line => (line.Start, line.End)).ToArray(),
+                TextUnit.Paragraph => Current.Model.Items.Select(item => (item.Start, item.Start + item.Length)).ToArray(),
+                _ => []
+            };
+        }
+        private void Expand(TextUnit unit, bool expandStart, bool expandEnd)
+        {
+            var limit = TextEnd(Current);
+            if (unit is TextUnit.Page or TextUnit.Document) { if (expandStart) start = 0; if (expandEnd) end = limit; return; }
+            var spans = Spans(unit);
+            if (spans.Length > 0)
+            {
+                var first = Array.FindLastIndex(spans, span => span.Start <= start);
+                if (unit == TextUnit.Format && formatBackward && first > 0 && spans[first].Start == start && !Current.Model.Items.Any(item => item.Start == start)) first--;
+                first = Math.Max(0, first);
+                var last = Array.FindIndex(spans, span => span.End >= end); if (last < 0) last = spans.Length - 1;
+                var sameLine = unit == TextUnit.Line && end >= spans[first].Start && end <= spans[first].End;
+                if (expandStart) start = spans[first].Start;
+                if (expandEnd || sameLine) end = spans[sameLine ? first : last].End;
+                formatBackward = false; return;
+            }
+            var units = Units(unit);
+            if (units.Length < 2) { start = end = 0; return; }
+            if (expandStart) start = units[Math.Max(0, Array.FindLastIndex(units, value => value <= start))];
+            if (expandEnd) { var next = Array.FindIndex(units, value => value >= end); end = next < 0 ? limit : units[next]; }
+            if (unit == TextUnit.Word && expandEnd && Current.Model.Items.FirstOrDefault(item => start >= item.Start && start <= item.Start + item.Length) is { } paragraph)
+                end = Math.Min(end, paragraph.Start + paragraph.Length);
         }
         public ITextRangeProvider? FindText(string text, bool backward, bool ignoreCase)
         {
@@ -250,23 +282,54 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         { var text = Current.Model.Text[start..end]; return maxLength < 0 || maxLength >= text.Length ? text : text[..maxLength]; }
         public int Move(TextUnit unit, int count)
         {
+            if (unit != TextUnit.Paragraph) Expand(unit, true, true);
             if (count == 0) { _ = Current; return 0; }
             var units = Units(unit); if (units.Length < 2) return 0;
             var index = Math.Min(units.Length - 2, Math.Max(0, Array.FindLastIndex(units, value => value <= start)));
             var target = Math.Clamp(index + count, 0, units.Length - 2); var moved = target - index;
-            start = units[target]; end = units[target + 1];
-            if (unit is TextUnit.Line or TextUnit.Paragraph) ExpandToEnclosingUnit(unit);
+            if (moved == 0) return 0;
+            start = units[target]; end = Math.Min(TextEnd(Current), SnapshotIndices.Adjacent(Current.Indices.Characters, start, true)); formatBackward = false;
+            Expand(unit, true, true);
             return moved;
         }
         public int MoveEndpointByUnit(TextPatternRangeEndpoint endpoint, TextUnit unit, int count)
         {
             if (count == 0) { _ = Current; return 0; }
             var units = Units(unit); var value = endpoint == TextPatternRangeEndpoint.Start ? start : end;
+            if (unit is TextUnit.Document or TextUnit.Page)
+            {
+                var boundary = unit == TextUnit.Page ? count < 0 ? 0 : TextEnd(Current) : endpoint == TextPatternRangeEndpoint.Start ? 0 : TextEnd(Current);
+                if (boundary == value) return 0;
+                if (endpoint == TextPatternRangeEndpoint.Start) start = boundary; else end = boundary;
+                if (start > end) { if (endpoint == TextPatternRangeEndpoint.Start) end = start; else start = end; }
+                return Math.Sign(count);
+            }
+            if (unit is TextUnit.Line or TextUnit.Paragraph)
+            {
+                var spans = Spans(unit); if (spans.Length == 0) return 0;
+                var item = Math.Max(0, Array.FindLastIndex(spans, span => span.Start <= value));
+                var targetItem = item; var boundary = value; var moved = 0;
+                for (var step = 0; step < Math.Abs(count); step++)
+                {
+                    var isStart = endpoint == TextPatternRangeEndpoint.Start;
+                    var at = count > 0 ? isStart ? targetItem + 1 : boundary < spans[targetItem].End ? targetItem : targetItem + 1
+                        : isStart ? boundary > spans[targetItem].Start ? targetItem : targetItem - 1 : targetItem - 1;
+                    if (at < 0 || at >= spans.Length) break;
+                    var next = isStart ? spans[at].Start : spans[at].End;
+                    if (next == boundary) break; targetItem = at; boundary = next; moved += Math.Sign(count);
+                }
+                if (endpoint == TextPatternRangeEndpoint.Start) start = boundary; else end = boundary;
+                formatBackward = false;
+                if (moved != 0) Expand(unit, endpoint == TextPatternRangeEndpoint.Start, endpoint == TextPatternRangeEndpoint.End);
+                if (start > end) { if (endpoint == TextPatternRangeEndpoint.Start) end = start; else start = end; }
+                return moved;
+            }
             var index = count < 0 ? Array.FindIndex(units, at => at >= value) : Array.FindLastIndex(units, at => at <= value);
             index = Math.Max(0, index);
             var target = Math.Clamp(index + count, 0, units.Length - 1);
             if (endpoint == TextPatternRangeEndpoint.Start) { start = units[target]; if (start > end) end = start; }
             else { end = units[target]; if (end < start) start = end; }
+            formatBackward = false;
             return target - index;
         }
         public void MoveEndpointByRange(TextPatternRangeEndpoint endpoint, ITextRangeProvider targetRange, TextPatternRangeEndpoint targetEndpoint)

@@ -8,7 +8,7 @@ internal sealed record SnapshotIndices(ImmutableArray<int> Characters, Immutable
     {
         var characters = new SortedSet<int> { 0, snapshot.Model.Text.Length };
         var words = new SortedSet<int>(snapshot.Model.WordBoundaries);
-        foreach (var item in snapshot.Model.Items) { words.Add(item.Start); words.Add(item.Start + item.Length); }
+        foreach (var item in snapshot.Model.Items) words.Add(item.Start);
         foreach (var line in snapshot.Lines)
         { cancellation.ThrowIfCancellationRequested(); foreach (var caret in line.Carets) characters.Add(caret.Offset); }
         return new(characters.ToImmutableArray(), words.ToImmutableArray());

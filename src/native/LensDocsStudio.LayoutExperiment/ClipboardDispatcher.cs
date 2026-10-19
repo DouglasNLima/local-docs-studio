@@ -17,8 +17,10 @@ internal sealed class ClipboardDispatcher : IDisposable
     private TaskCompletionSource<ClipboardCommit>? queuedCompletion;
     private bool closed;
     public ClipboardCommit? LastCommit { get; private set; }
-    public ClipboardDispatcher()
+    private readonly Action? beforeCommitForChecks;
+    public ClipboardDispatcher(Action? beforeCommitForChecks = null)
     {
+        this.beforeCommitForChecks = beforeCommitForChecks;
         var completion = new TaskCompletionSource<Dispatcher>(TaskCreationOptions.RunContinuationsAsynchronously); ready = completion.Task;
         thread = new Thread(() => { completion.SetResult(Dispatcher.CurrentDispatcher); Dispatcher.Run(); })
             { IsBackground = true, Name = "Experimental clipboard OLE STA" };
@@ -50,6 +52,8 @@ internal sealed class ClipboardDispatcher : IDisposable
             {
                 try
                 {
+                    beforeCommitForChecks?.Invoke();
+                    lock (gate) if (closed) throw new OperationCanceledException();
                     cancellation.ThrowIfCancellationRequested(); var start = Stopwatch.GetTimestamp();
                     write();
                     var committed = new ClipboardCommit(start, Stopwatch.GetTimestamp(), Environment.CurrentManagedThreadId, cancellation.IsCancellationRequested, NativeClipboardService.Sequence);

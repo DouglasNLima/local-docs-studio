@@ -42,7 +42,8 @@ internal sealed class OperationTrace : IDisposable
         if (beforeHook == IntPtr.Zero || afterHook == IntPtr.Zero) throw new System.ComponentModel.Win32Exception();
         dispatcher.Hooks.OperationStarted += Started;
         dispatcher.Hooks.OperationCompleted += Completed;
-        Stage("trace-start", new { Handle = handle.ToInt64(), Stopwatch.Frequency, ProbeVersion = "parallel-input-native-v1", IntervalMilliseconds = 16 });
+        Stage("trace-start", new { Handle = handle.ToInt64(), Stopwatch.Frequency, NativeThread = GetCurrentThreadId(), Utc = DateTimeOffset.UtcNow, Process = Environment.ProcessId,
+            ProbeVersion = "parallel-input-native-v1", IntervalMilliseconds = 16 });
         timer = new System.Threading.Timer(_ => Pulse(), null, 16, 16);
     }
     private IntPtr Before(int code, IntPtr wParam, IntPtr lParam)

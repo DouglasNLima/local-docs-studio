@@ -18,6 +18,36 @@ internal static class LifecycleChecks
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last); last = at; }; timer.Start();
         var requests = new List<Task<bool>>();
+        var failurePublished = false; window.CurrentFailure += _ => failurePublished = true;
+        var faultEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var faultRelease = new ManualResetEventSlim();
+        window.PreparationBoundaryForChecks = _ =>
+        {
+            faultEntered.TrySetResult(true);
+            if (!faultRelease.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Bounded stale-failure check was not released.");
+            throw new IOException("Deliberate obsolete preparation failure.");
+        };
+        var failing = window.Request(fixture.Source + "\n\nObsolete failure source.");
+        var faultVersion = window.CurrentVersion;
+        await faultEntered.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        window.PreparationBoundaryForChecks = null;
+        var recovered = window.Request(fixture.Source); faultRelease.Set();
+        if (await failing || !await recovered || failurePublished || !window.Events.Any(item => item.Event == "stale-failure-rejected"))
+            throw new IOException("An obsolete worker failure replaced current content/status.");
+        var clipboardEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var clipboardRelease = new ManualResetEventSlim();
+        using (var closingClipboard = new ClipboardDispatcher(() =>
+        {
+            clipboardEntered.TrySetResult(true);
+            if (!clipboardRelease.Wait(TimeSpan.FromSeconds(5))) throw new TimeoutException("Bounded clipboard-close check was not released.");
+        }))
+        {
+            var before = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
+            var commit = closingClipboard.Plain("Obsolete closed clipboard payload " + Guid.NewGuid(), before, CancellationToken.None);
+            await clipboardEntered.Task.WaitAsync(TimeSpan.FromSeconds(5)); closingClipboard.Dispose(); clipboardRelease.Set();
+            var rejected = false; try { await commit; } catch (OperationCanceledException) { rejected = true; }
+            if (!rejected || LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != before) throw new IOException("Closed clipboard owner granted an obsolete native write.");
+        }
         // Active replacement, then a burst that replaces queued requests without
         // starting a thread per edit. Final source is separately identifiable.
         requests.Add(window.Request(fixture.Source + "\n- **obsolete**"));
@@ -80,8 +110,10 @@ internal static class LifecycleChecks
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
             ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
-            CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.All(item => item.WorkerMilliseconds is <= 250 && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
+            InjectedFailureVersion = faultVersion, InjectedFailureCancellationObservation = "Deliberate non-cancellation failure; separately asserted stale rejection, not a natural cancellation timing sample",
+            CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.Where(item => item.Version != faultVersion).All(item => item.WorkerMilliseconds is <= 250 && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
             WinningPreviewReadinessBudgetMilliseconds = 1500, WinningPreviewReadinessAcceptance = readiness.All(item => item.WinningPreviewReadyMilliseconds <= 1500) ? "PASS" : "FAIL",
+            StaleFailure = "PASS: bounded injected real worker failure after supersession, current status unchanged", ClipboardCloseBeforeNativeGrant = "PASS: actual queued STA commit rejected, OS clipboard sequence unchanged",
             TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS", EmptyDarkDocument = "PASS", ReopenEvents = reopen.Events.ToArray() });
     }
     private static async Task Wait(Func<bool> condition)

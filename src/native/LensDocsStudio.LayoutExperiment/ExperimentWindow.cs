@@ -37,6 +37,7 @@ internal sealed class ExperimentWindow : Window
     private readonly Dictionary<int, bool> details = [];
     public Task? CurrentWork { get; private set; }
     public OperationTrace? Trace { get; set; }
+    internal Action<long>? PreparationBoundaryForChecks { get; set; }
     private CancellationTokenSource? renderedCopy;
     private DispatcherOperation? appearanceRefresh;
     public ExperimentWindow()
@@ -170,6 +171,7 @@ internal sealed class ExperimentWindow : Window
             {
                 pending = null; activeRequest = request; active = new(); activeVersion = request.Version; var token = active.Token;
                 var sourcePath = request.Path; var workspaceRoot = request.Root; var detailState = request.Details;
+                var preparationBoundary = PreparationBoundaryForChecks;
                 var old = Surface.Snapshot;
                 var selectionStart = Surface.SelectionSourceStart; var selectionEnd = Surface.SelectionSourceEnd;
                 var anchor = Surface.ViewportSourceAnchor();
@@ -182,6 +184,7 @@ internal sealed class ExperimentWindow : Window
                         try
                         {
                             var model = CompleteLayout.Parse(request.Source, token, sourcePath, workspaceRoot, request.Appearance);
+                            preparationBoundary?.Invoke(request.Version);
                             if (detailState.Count > 0) model = model with { Root = ApplyDetails(model.Root, detailState, request.Appearance), OriginalListShape = false };
                             Log("worker-format-started", request.Version);
                             var result = CompleteLayout.Format(model, 640, request.Version, request.Appearance, token);
