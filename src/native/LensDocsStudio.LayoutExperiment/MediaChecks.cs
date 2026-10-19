@@ -131,8 +131,14 @@ internal static class MediaChecks
                 }
                 else
                 {
-                    using var file = File.OpenRead(path); var png = BitmapDecoder.Create(file, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
-                    if (png.Frames.Count != 1 || png.Frames[0].PixelWidth <= 0 || png.Frames[0].PixelHeight <= 0) throw new IOException("Exported PNG did not decode.");
+                    // Keep WPF decoding on the existing pumped STA too; the
+                    // UIA MTA must not acquire a WPF dispatcher/native window.
+                    var dimensions = clipboard.Read(() =>
+                    {
+                        using var file = File.OpenRead(path); var png = BitmapDecoder.Create(file, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+                        return (Frames: png.Frames.Count, Width: png.Frames[0].PixelWidth, Height: png.Frames[0].PixelHeight);
+                    });
+                    if (dimensions.Frames != 1 || dimensions.Width <= 0 || dimensions.Height <= 0) throw new IOException("Exported PNG did not decode.");
                 }
                 checks.Add("Actual native " + format + " save dialogue, chosen path and decoded drawing");
                 At("chosen-file-decoded", new { format, path, Bytes = new FileInfo(path).Length });

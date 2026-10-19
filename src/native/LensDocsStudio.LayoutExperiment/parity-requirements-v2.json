@@ -51,7 +51,7 @@
       "Requirement": "Visual-direction keyboard caret movement within bidirectional runs",
       "Implementation": "Implemented",
       "StockEquivalentScope": "Stock read-only unshifted arrows scroll without moving its selected insertion point; Shift extends selection through mixed Latin/Arabic, combining and surrogate text. A separate caret-browsing feature is not demonstrated by stock and is not claimed. The original broader requirement wording is retained.",
-      "Proof": "Extended 967-operation independent stock/candidate oracle, including 54 unshifted and 54 Shift arrow steps plus sixteen other key vectors, through Latin/Arabic, combining and surrogate text. range-checks defines demonstrated stock scope."
+      "Proof": "Extended 968-operation independent stock/candidate oracle, including 54 unshifted and 54 Shift arrow steps plus sixteen other key vectors, through Latin/Arabic, combining and surrogate text. range-checks defines demonstrated stock scope."
     },
     {
       "Requirement": "Exact selected plain text, decoded RTF/Xaml and whole-document CF_HTML",
@@ -72,7 +72,7 @@
     {
       "Requirement": "Complete stock-oracle TextUnit and text-attribute range operation matrix",
       "Implementation": "Implemented",
-      "Proof": "range-checks: all seven TextUnits, counts -2/-1/0/1/2, both endpoints, collapsed/non-collapsed ranges, clone/compare, selection errors and thirteen attributes/FindAttribute in both directions. Extended 967-operation oracle also exercises spanning-cell selection/copy/clone, adjacent table boundaries and decoded actual RTF/Xaml. Execution at the evaluated head is required."
+      "Proof": "range-checks: all seven TextUnits, counts -2/-1/0/1/2, both endpoints, collapsed/non-collapsed ranges, clone/compare, selection errors and thirteen attributes/FindAttribute in both directions. Extended 968-operation oracle also exercises spanning-cell selection/copy/clone, adjacent table boundaries and decoded actual RTF/Xaml. Execution at the evaluated head is required."
     },
     {
       "Requirement": "Search, source navigation, anchors and transient document lifecycle",

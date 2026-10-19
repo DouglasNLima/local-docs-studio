@@ -26,6 +26,9 @@ def main():
         for file, receipt_kind in files:
             data = read(file)
             data["ReceiptKind"] = receipt_kind
+            if "MaximumInputGapMilliseconds" not in data and data.get("InputGapsMilliseconds"):
+                data["MaximumInputGapMilliseconds"] = max(data["InputGapsMilliseconds"])
+                data["InputMaximumSource"] = "Derived from the retained timed-boundary heartbeat array"
             row = {"Source": data.get("SourceRevision"), "HostRoot": host,
                    "Path": str(file.relative_to(root)), **data}
             samples.append(row)
@@ -54,7 +57,7 @@ def main():
         manifests.append({"HostRoot": host, "Source": protocol["Source"], "SourceDirty": protocol["SourceDirty"],
                           "Protocol": protocol, "Files": manifest})
     (args.output / "summary.json").write_text(json.dumps({"Groups": groups, "OriginalFileManifests": manifests}, indent=2), encoding="utf-8")
-    fields = ["Source", "HostRoot", "Path", "ReceiptKind", "Adapter", "Fixture", "RunGroup", "Repetition", "Edited", "Temperature",
+    fields = ["Source", "HostRoot", "Path", "ReceiptKind", "InputMaximumSource", "Adapter", "Fixture", "RunGroup", "Repetition", "Edited", "Temperature",
               "CompleteLayoutInputMilliseconds", "EndToEndReadinessMilliseconds", "MaximumInputGapMilliseconds",
               "MaximumInteractionInputGapMilliseconds", "AllocatedBytes", "ManagedBytes", "PrivateMemorySize64",
               "NaturalCollections", "UiStartThread", "ThemePreparationThread", "PreparationThread", "WorkerLayoutThread", "UiEndThread",

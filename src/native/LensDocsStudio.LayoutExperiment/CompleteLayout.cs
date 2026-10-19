@@ -65,6 +65,7 @@ internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Line
 {
     public ImmutableDictionary<int, Rect> NodeBounds { get; init; } = ImmutableDictionary<int, Rect>.Empty;
     public DrawingGroup? Decorations { get; init; }
+    public ImmutableArray<(Rect Bounds, Drawing Paint)> DecorationPaint { get; init; } = [];
     public ImmutableArray<ControlBox> Controls { get; init; } = [];
     public ListModel? CompleteModel { get; init; }
     public ImmutableArray<Line> CompleteLines { get; init; } = [];

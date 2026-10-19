@@ -63,6 +63,7 @@ internal static class AppearanceChecks
             await Capture("automatic-disable-current.png");
             if (invalid) throw new IOException("A source/version/appearance-stale installation was observed.");
             Program.Write(Path.Combine(output, "appearance.json"), new { Status = gaps.DefaultIfEmpty().Max() <= 100 ? "PASS" : "FAIL", Installations = installations,
+                CompleteDecorationPaintingControl = window.Surface.FullDecorationPaintingForChecks,
                 ThemePreparationOwnership = window.WorkerThemeOwnershipForChecks ? "WorkerDiagnosticControl" : "WindowDispatcher",
                 AutomaticEnableCurrentDisableCurrent = "PASS", ManualThemeAfterDisable = false, FailureOnlyRestoration = false,
                 SelectionAndFocusAcrossAutomaticTransitions = "PASS",

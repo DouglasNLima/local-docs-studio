@@ -107,8 +107,8 @@ internal static class RangeOracleChecks
                     });
                     plain = value.Plain; rtf = value.Rtf as string; xaml = value.Xaml as string; formats = value.Formats;
                     clipboardReads.Add(new { First = first, Last = last, At = Stopwatch.GetTimestamp(), Sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence,
-                        RtfType = value.Rtf?.GetType().FullName, RtfLength = rtf?.Length, XamlType = value.Xaml?.GetType().FullName, XamlLength = xaml?.Length });
-                    return plain is not null && plain != sentinel && !string.IsNullOrEmpty(rtf) && !string.IsNullOrEmpty(xaml);
+                        PlainLength = plain?.Length, RtfType = value.Rtf?.GetType().FullName, RtfLength = rtf?.Length, XamlType = value.Xaml?.GetType().FullName, XamlLength = xaml?.Length });
+                    return !string.IsNullOrEmpty(plain) && plain != sentinel && !string.IsNullOrEmpty(rtf) && !string.IsNullOrEmpty(xaml);
                 });
                 File.WriteAllText(Path.Combine(output, "table-copy-" + first.Replace(' ', '-') + "-" + last.Replace(' ', '-') + ".rtf"), rtf);
                 File.WriteAllText(Path.Combine(output, "table-copy-" + first.Replace(' ', '-') + "-" + last.Replace(' ', '-') + ".xaml"), xaml);
@@ -124,7 +124,7 @@ internal static class RangeOracleChecks
                     var cloneSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
                     IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x43);
                     string? cloned = null;
-                    IndependentUiaClient.Wait(() => LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != cloneSequence && (cloned = clipboard.Read(() => Clipboard.GetDataObject()?.GetData(DataFormats.UnicodeText, false) as string)) is not null);
+                    IndependentUiaClient.Wait(() => LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != cloneSequence && !string.IsNullOrEmpty(cloned = clipboard.Read(() => Clipboard.GetDataObject()?.GetData(DataFormats.UnicodeText, false) as string)));
                     rows.Add(new { Operation = "selected-span-clone-copy", First = first, Last = last, Text = cloned });
                 }
             }

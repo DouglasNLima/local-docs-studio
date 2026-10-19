@@ -30,6 +30,7 @@ internal sealed class LayoutSurface : Panel
     private (SemanticNode Node, Point Point)? pressedLink;
     private SelectionOverlay? selectionOverlay;
     internal object? LastPointForChecks { get; set; }
+    internal bool FullDecorationPaintingForChecks { get; set; }
     private SemanticNode[] selectedCells = [];
     private readonly HashSet<int> selectedCellParagraphs = [];
     private readonly HashSet<int> cellRangeParagraphs = [];
@@ -291,8 +292,10 @@ internal sealed class LayoutSurface : Panel
         var background = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(snapshot.Appearance, 1)))
             : snapshot.Appearance == "Dark" ? new SolidColorBrush(Color.FromRgb(32, 33, 36)) : Brushes.White;
         context.DrawRectangle(background, null, new Rect(RenderSize));
-        if (snapshot.Decorations is not null) context.DrawDrawing(snapshot.Decorations);
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
+        if (FullDecorationPaintingForChecks && snapshot.Decorations is not null) context.DrawDrawing(snapshot.Decorations);
+        else foreach (var decoration in snapshot.DecorationPaint)
+            if (decoration.Bounds.Bottom >= top && decoration.Bounds.Top <= bottom) context.DrawDrawing(decoration.Paint);
         var searchBrush = SelectionBrush(snapshot.Appearance, .12);
         foreach (var line in snapshot.Lines)
         {

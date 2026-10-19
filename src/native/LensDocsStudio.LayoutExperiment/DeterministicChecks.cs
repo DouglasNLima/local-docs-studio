@@ -12,6 +12,9 @@ internal static class DeterministicChecks
             var source = "- **Café 😀 é**" + ending + "- A *styled* boundary and `code`" + ending + "- " + string.Join(' ', Enumerable.Repeat("wrapped content", 40));
             var model = CompleteLayout.Parse(source, CancellationToken.None);
             var layout = CompleteLayout.Format(model, 640, 1, "Light", CancellationToken.None);
+            if (layout.Decorations is { } decorations && (decorations.Children.Count != layout.DecorationPaint.Length
+                || layout.DecorationPaint.Any(value => !value.Paint.IsFrozen || value.Bounds != value.Paint.Bounds)))
+                throw new IOException("Complete eager frozen decoration bounds differ.");
             if (model.Source != source || model.Items.Length != 3 || model.SourceBoundaries.Length != model.Text.Length + 1)
                 throw new IOException("Logical/source ownership assertion failed.");
             foreach (var item in model.Items)
@@ -31,6 +34,9 @@ internal static class DeterministicChecks
             var sourcePath = Path.Combine(output, fixture.Name + ".md"); File.WriteAllText(sourcePath, fixture.Source);
             var model = CompleteLayout.Parse(fixture.Source, CancellationToken.None, sourcePath, output);
             var layout = CompleteLayout.Format(model, 640, 1, "Light", CancellationToken.None);
+            if (layout.Decorations is { } decorations && (decorations.Children.Count != layout.DecorationPaint.Length
+                || layout.DecorationPaint.Any(value => !value.Paint.IsFrozen || value.Bounds != value.Paint.Bounds)))
+                throw new IOException("Complete eager frozen decoration bounds differ: " + fixture.Name);
             if (!model.Text.Contains(fixture.Last, StringComparison.Ordinal) || model.SourceBoundaries.Length != model.Text.Length + 1
                 || model.SourceEnds.Length != model.Text.Length || layout.Lines.Length < model.Items.Length || layout.Height <= 300)
                 throw new IOException("Complete six-fixture geometry assertion failed: " + fixture.Name);

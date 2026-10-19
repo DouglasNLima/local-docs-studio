@@ -205,7 +205,7 @@ jobs:
           $exe = 'artifacts/layout-focused-bin/LensDocsStudio.LayoutExperiment.exe'
           New-Item -ItemType Directory -Force -Path artifacts/layout-focused | Out-Null
           Copy-Item -LiteralPath artifacts/layout-focused-bin/compilation.json -Destination artifacts/layout-focused/compilation.json
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-client-sta-control','media-legacy-directory','media-controls','appearance','appearance-worker-theme-control','appearance-controls','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-client-sta-control','media-checks','appearance-controls','appearance-worker-theme-control','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-client-sta-control','media-legacy-directory','media-controls','appearance','appearance-full-decoration-control','appearance-worker-theme-control','appearance-controls','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-client-sta-control','media-checks','appearance-controls','appearance-worker-theme-control','appearance-full-decoration-control','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
             Write-Host "Focused mode $mode started at $([DateTime]::UtcNow.ToString('o'))"

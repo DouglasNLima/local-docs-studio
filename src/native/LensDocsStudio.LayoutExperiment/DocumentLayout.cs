@@ -17,11 +17,16 @@ internal static class DocumentLayout
         var watch = Stopwatch.StartNew();
         var bottom = session.Block(model.Root, 28, 28, width - 56 - model.Theme.ScrollbarWidth, true);
         cancellation.ThrowIfCancellationRequested(); session.CompletePaint(); session.Decorations.Freeze();
+        var decorationAt = watch.Elapsed.TotalMilliseconds;
+        var decorationPaint = session.Decorations.Children.Select(drawing => (drawing.Bounds, drawing)).ToImmutableArray();
+        var decorationMilliseconds = watch.Elapsed.TotalMilliseconds - decorationAt;
         var snapshot = new LayoutSnapshot(model, session.Lines.ToImmutableArray(), width, bottom + 28, Environment.CurrentManagedThreadId,
             watch.Elapsed.TotalMilliseconds, version, appearance, new Dictionary<string, double>
             { ["FormatLineMilliseconds"] = session.FormatTicks * 1000d / Stopwatch.Frequency,
-                ["CompleteCaretAndRangeGeometryMilliseconds"] = session.GeometryTicks * 1000d / Stopwatch.Frequency }.ToImmutableDictionary())
-        { NodeBounds = session.Bounds.ToImmutableDictionary(), Decorations = session.Decorations, Controls = session.Controls.Where(box => !session.HiddenControlNodes.Contains(box.Node)).ToImmutableArray() };
+                ["CompleteCaretAndRangeGeometryMilliseconds"] = session.GeometryTicks * 1000d / Stopwatch.Frequency,
+                ["FrozenDecorationIndexMilliseconds"] = decorationMilliseconds }.ToImmutableDictionary())
+        { NodeBounds = session.Bounds.ToImmutableDictionary(), Decorations = session.Decorations, DecorationPaint = decorationPaint,
+            Controls = session.Controls.Where(box => !session.HiddenControlNodes.Contains(box.Node)).ToImmutableArray() };
         var projected = VisibilityProjection.Apply(snapshot, cancellation);
         return projected with { LayoutMilliseconds = watch.Elapsed.TotalMilliseconds };
     }
