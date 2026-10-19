@@ -90,7 +90,8 @@ internal sealed class ClipboardSerialisation
                         var output = new TableRow(); group.Rows.Add(output);
                         foreach (var cell in row.Children)
                         {
-                            var value = new TableCell { Padding = new Thickness(8, 6, 8, 6), BorderThickness = new Thickness(.5), BorderBrush = Brushes.Gray, TextAlignment = cell.Alignment };
+                            var value = new TableCell { Padding = new Thickness(8, 6, 8, 6), BorderThickness = new Thickness(.5), BorderBrush = Brushes.Gray, TextAlignment = cell.Alignment,
+                                ColumnSpan = cell.ColumnSpan, RowSpan = cell.RowSpan };
                             if (row.Level == 1) value.FontWeight = FontWeights.SemiBold;
                             foreach (var child in cell.Children) value.Blocks.Add(Block(child)); output.Cells.Add(value);
                         }

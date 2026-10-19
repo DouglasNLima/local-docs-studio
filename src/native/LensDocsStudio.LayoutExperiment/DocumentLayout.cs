@@ -42,6 +42,7 @@ internal static class DocumentLayout
         public readonly DrawingGroup Decorations = new();
         public long FormatTicks, GeometryTicks;
         private bool hidden;
+        private bool cellHeader;
         public Session(ListModel model, string appearance, CancellationToken cancellation)
         {
             this.model = model; this.cancellation = cancellation; this.appearance = appearance; highContrast = appearance.StartsWith("HC:", StringComparison.Ordinal);
@@ -111,7 +112,7 @@ internal static class DocumentLayout
                     top += Before(node);
                     var paragraphTop = top;
                     if (code) top += 12;
-                    top = Paragraph(node, x + (code ? 12 : 0), top, width - (code ? 24 : 0), size, heading || node.Kind == "DetailsHeader", marker, alignment);
+                    top = Paragraph(node, x + (code ? 12 : 0), top, width - (code ? 24 : 0), size, cellHeader || heading || node.Kind == "DetailsHeader", marker, alignment);
                     if (code) { top += 12; Rectangle(surface, null, new Rect(x, paragraphTop, width, top - paragraphTop)); }
                     top += After(node);
                     break;
@@ -139,8 +140,10 @@ internal static class DocumentLayout
         }
         private double Table(SemanticNode table, double x, double top, double width)
         {
-            var count = table.Children.Select(row => row.Children.Length).DefaultIfEmpty(0).Max();
+            var count = Math.Max(table.Columns, table.Children.SelectMany(row => row.Children).Select(cell => cell.Column + cell.ColumnSpan).DefaultIfEmpty(0).Max());
             if (count == 0) return top;
+            if (table.Children.SelectMany(row => row.Children).Any(cell => cell.RowSpan != 1 || cell.ColumnSpan != 1 || cell.Children.Length != 1 || cell.Children[0].Kind != "Paragraph"))
+                return ComplexTable(table, x, top, width, count);
             // Stock creates no explicit TableColumns: its implicit columns share
             // the available width equally. Shape every cell at that actual width.
             var columns = Enumerable.Repeat(width / count, count).ToArray();
@@ -165,6 +168,37 @@ internal static class DocumentLayout
                 Bounds[row.Id] = new Rect(x, rowTop, width, bottom - rowTop); top = bottom;
             }
             return top;
+        }
+        private double ComplexTable(SemanticNode table, double x, double top, double width, int columns)
+        {
+            var rowTops = new double[table.Children.Length + 1]; rowTops[0] = top;
+            var minimumBottom = new double[rowTops.Length];
+            var rectangles = new List<(SemanticNode Cell, int Row, bool Header)>();
+            for (var rowIndex = 0; rowIndex < table.Children.Length; rowIndex++)
+            {
+                var row = table.Children[rowIndex]; var rowTop = rowTops[rowIndex]; var bottom = rowTop;
+                foreach (var cell in row.Children)
+                {
+                    cancellation.ThrowIfCancellationRequested();
+                    var previousHeader = cellHeader; cellHeader |= row.Level == 1;
+                    double contentBottom;
+                    try { contentBottom = Flow(cell.Children, x + cell.Column * width / columns + 8.5, rowTop + 6.5, cell.ColumnSpan * width / columns - 17, false, false, alignment: cell.Alignment) + 6.5; }
+                    finally { cellHeader = previousHeader; }
+                    var lastRow = Math.Min(table.Children.Length, rowIndex + cell.RowSpan);
+                    minimumBottom[lastRow] = Math.Max(minimumBottom[lastRow], contentBottom);
+                    if (cell.RowSpan == 1) bottom = Math.Max(bottom, contentBottom);
+                    rectangles.Add((cell, rowIndex, row.Level == 1));
+                }
+                rowTops[rowIndex + 1] = Math.Max(bottom, minimumBottom[rowIndex + 1]);
+                Bounds[row.Id] = new Rect(x, rowTop, width, rowTops[rowIndex + 1] - rowTop);
+            }
+            foreach (var (cell, row, header) in rectangles)
+            {
+                var rectangle = new Rect(x + cell.Column * width / columns, rowTops[row], cell.ColumnSpan * width / columns,
+                    rowTops[Math.Min(table.Children.Length, row + cell.RowSpan)] - rowTops[row]);
+                Bounds[cell.Id] = rectangle; Rectangle(header ? surface : null, new Pen(Brush("#808080"), .5), rectangle);
+            }
+            return rowTops[^1];
         }
         private ParagraphSource Source(SemanticNode node, double size, bool heading, double width)
         {

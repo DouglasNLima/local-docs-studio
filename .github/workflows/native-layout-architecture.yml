@@ -63,7 +63,7 @@ jobs:
       - name: Build and exercise unchanged stock route, candidate and minimal dialogue
         shell: pwsh
         run: |
-          dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release --locked-mode
+          dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'

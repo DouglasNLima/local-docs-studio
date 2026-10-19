@@ -38,6 +38,10 @@ internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int
     public string Label { get; init; } = "";
     public string? Target { get; init; }
     public TextAlignment Alignment { get; init; }
+    public int Column { get; init; }
+    public int ColumnSpan { get; init; } = 1;
+    public int RowSpan { get; init; } = 1;
+    public int Columns { get; init; }
     public ImageSource? Media { get; init; }
     public IEnumerable<SemanticNode> Descendants() { foreach (var child in Children) { yield return child; foreach (var descendant in child.Descendants()) yield return descendant; } }
 }

@@ -13,6 +13,8 @@ internal static class TargetedFixtures
             ["Left\tCentre\tRight", "first cell", "centre content", "final value", "long wrapped cell", "é 😀", "12345", "After table."]),
         new("collapsed-details", "<details>\n<summary>Hidden section</summary>\n\n## Deep target\n\nHidden Café 😀 é content.\n\n</details>\n\nAfter fold.", ["Hidden section", "After fold."]),
         new("unicode-bidi", "# Unicode\n\nLatin العربيّة and हिन्दी with é, 😀 and 👩‍💻.\n\n[**rich link**](#final-heading) and `escaped code`.\n\n## Final heading\n\nFinal marker.",
-            ["العربيّة", "हिन्दी", "é", "😀", "👩‍💻", "rich link", "Final marker."])
+            ["العربيّة", "हिन्दी", "é", "😀", "👩‍💻", "rich link", "Final marker."]),
+        new("table-spans", "+---+---+---+\n| AAAAA | B |\n+---+---+ B +\n| D | E | B |\n+ D +---+---+\n| D | CCCCC |\n+---+---+---+\n\nAfter spanned table.", ["AAAAA", "B", "D", "E", "CCCCC", "After spanned table."]),
+        new("table-blocks", "+-----------------------+-----------------------+\n| First paragraph.      | **Rich cell**         |\n|                       |                       |\n| Second *paragraph*.   | - Nested first        |\n|                       | - Nested second       |\n+-----------------------+-----------------------+\n\nAfter nested table.", ["First paragraph.", "Second paragraph.", "Rich cell", "Nested first", "Nested second", "After nested table."])
     ];
 }

@@ -127,20 +127,27 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         protected override bool IsControlElementCore() => true;
         protected override bool IsContentElementCore() => true;
         public int RowCount => Node.Children.Length;
-        public int ColumnCount => Node.Children.Select(row => row.Children.Length).DefaultIfEmpty().Max();
+        public int ColumnCount => Math.Max(Node.Columns, Node.Children.SelectMany(row => row.Children).Select(cell => cell.Column + cell.ColumnSpan).DefaultIfEmpty().Max());
         public RowOrColumnMajor RowOrColumnMajor => RowOrColumnMajor.RowMajor;
-        public IRawElementProviderSimple GetItem(int row, int column) => root.Provider(root.Peer(Node.Children[row].Children[column]));
+        public IRawElementProviderSimple GetItem(int row, int column)
+        {
+            if (row < 0 || row >= RowCount || column < 0 || column >= ColumnCount) throw new ArgumentOutOfRangeException();
+            for (var at = row; at >= 0; at--)
+                if (Node.Children[at].Children.FirstOrDefault(cell => at + cell.RowSpan > row && column >= cell.Column && column < cell.Column + cell.ColumnSpan) is { } cell)
+                    return root.Provider(root.Peer(cell));
+            throw new ArgumentException("The requested table position has no cell.");
+        }
         public IRawElementProviderSimple[] GetRowHeaders() => [];
         public IRawElementProviderSimple[] GetColumnHeaders() => Node.Children.Where(row => row.Level == 1).SelectMany(row => row.Children).Select(cell => root.Provider(root.Peer(cell))).ToArray();
-        private SemanticNode Table => root.nodes.Values.Single(node => node.Kind == "Table" && node.Start <= Node.Start && node.End >= Node.End);
+        private SemanticNode Table => root.nodes.Values.Where(node => node.Kind == "Table" && node.Children.Any(row => row.Children.Any(cell => cell.Id == id))).MinBy(node => node.End - node.Start)!;
         private SemanticNode RowNode => Table.Children.Single(row => row.Children.Any(cell => cell.Id == id));
         public int Row => Table.Children.IndexOf(RowNode);
-        public int Column => RowNode.Children.IndexOf(Node);
-        public int RowSpan => 1;
-        public int ColumnSpan => 1;
+        public int Column => Node.Column;
+        public int RowSpan => Node.RowSpan;
+        public int ColumnSpan => Node.ColumnSpan;
         public IRawElementProviderSimple ContainingGrid => root.Provider(root.Peer(Table));
         public IRawElementProviderSimple[] GetRowHeaderItems() => [];
-        public IRawElementProviderSimple[] GetColumnHeaderItems() => Table.Children.Where(row => row.Level == 1 && Column < row.Children.Length).Select(row => root.Provider(root.Peer(row.Children[Column]))).ToArray();
+        public IRawElementProviderSimple[] GetColumnHeaderItems() => Table.Children.Where(row => row.Level == 1).SelectMany(row => row.Children).Where(cell => cell.Column <= Column && cell.Column + cell.ColumnSpan > Column).Select(cell => root.Provider(root.Peer(cell))).ToArray();
         public void Invoke() => root.Surface.Activate(Node);
         public ExpandCollapseState ExpandCollapseState => Node.Expanded ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed;
         public void Expand() { if (!Node.Expanded) root.Surface.Activate(Node); }

@@ -16,6 +16,7 @@ internal static class TargetedChecks
     public static async Task Run(ExperimentWindow window, string output, bool all = false, string? scenario = null)
     {
         var results = new List<object>(); var failed = false;
+        if (scenario is not null && !TargetedFixtures.Cases.Any(value => value.Name == scenario) && !all) throw new ArgumentException("Unknown targeted parity scenario: " + scenario);
         var originals = all ? LensDocsStudio.Native.Validation.ContinuousPreviewFixtures.Create(output, "all").Select(value => new TargetedFixture(value.Name, value.Source, [value.Last])) : [];
         foreach (var fixture in TargetedFixtures.Cases.Concat(originals).Where(value => scenario is null || value.Name == scenario))
         {

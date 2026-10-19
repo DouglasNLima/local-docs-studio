@@ -23,11 +23,14 @@ internal sealed class DocumentModelBuilder
     private readonly bool dark;
     private readonly string appearance;
     private int id;
-    private string separator = "\r\n";
+    private readonly HashSet<int> tabParagraphEnds = [];
 
     private DocumentModelBuilder(ParsedDocument parsed, CancellationToken cancellation, string? path, string? root, string appearance)
     {
         source = parsed.Source; this.cancellation = cancellation; this.appearance = appearance; dark = ExperimentAppearance.IsDark(appearance);
+        foreach (var row in parsed.Syntax.Descendants<TableRow>().Where(row => row.Parent is Table table && table.Descendants<TableCell>().All(cell => cell.Count == 1 && cell[0] is ParagraphBlock)))
+            foreach (var cell in row.OfType<TableCell>().SkipLast(1))
+                if (cell.Descendants<LeafBlock>().LastOrDefault() is { } leaf) tabParagraphEnds.Add(leaf.Span.End + 1);
         images = parsed.Syntax.Descendants<LinkInline>().Any(link => link.IsImage) ? new PreviewImageService().Prepare(parsed, path, root, cancellation) : new Dictionary<string, PreviewImage>();
         syntax = parsed.Syntax.Descendants<FencedCodeBlock>().Any(block => block.Info != "mermaid") ? CodeSyntaxService.Prepare(parsed, cancellation) : new PreparedCodeSyntax(new Dictionary<CodeBlock, CodeSyntaxBlock>(), false);
     }
@@ -78,17 +81,14 @@ internal sealed class DocumentModelBuilder
             case ListBlock list: return Container(list, "List") with { Ordered = list.IsOrdered, Number = MarkdownFormatting.OrderedStart(list) };
             case ListItemBlock item: return Container(item, "ListItem");
             case QuoteBlock quote: return Container(quote, "Quote");
-            case Table table: return Container(table, "Table");
+            case Table table: return Container(table, "Table") with { Columns = table.ColumnDefinitions.Count };
             case TableRow row: return Container(row, "Row") with { Level = row.IsHeader ? 1 : 0 };
             case TableCell cell:
                 var tableOwner = cell.Parent?.Parent as Table;
-                var column = ((TableRow)cell.Parent!).IndexOf(cell);
-                if (cell.ColumnSpan != 1 || cell.RowSpan != 1) throw new NotSupportedException("Spanning table cells require a separate geometry contract.");
-                if (cell.Count > 1 || cell.Any(child => child is not ParagraphBlock)) throw new NotSupportedException("Multi-paragraph or nested-block table cells require a separate geometry contract.");
+                var column = cell.ColumnIndex >= 0 ? cell.ColumnIndex : ((TableRow)cell.Parent!).TakeWhile(value => !ReferenceEquals(value, cell)).OfType<TableCell>().Sum(value => Math.Max(1, value.ColumnSpan));
                 var align = tableOwner is not null && column < tableOwner.ColumnDefinitions.Count ? tableOwner.ColumnDefinitions[column].Alignment : null;
-                var savedSeparator = separator; separator = column + 1 == ((TableRow)cell.Parent!).Count ? "\r\n" : "\t";
-                var cellNode = Container(cell, "Cell"); separator = savedSeparator;
-                return cellNode with { Alignment = align switch { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } };
+                return Container(cell, "Cell") with { Column = column, ColumnSpan = Math.Clamp(cell.ColumnSpan, 1, 1000), RowSpan = Math.Clamp(cell.RowSpan, 1, 1000),
+                    Alignment = align switch { TableColumnAlign.Center => TextAlignment.Center, TableColumnAlign.Right => TextAlignment.Right, _ => TextAlignment.Left } };
             case DocumentDetailsBlock details:
                 var begin = text.Length;
                 var summaryAt = source.IndexOf(details.Summary, Math.Clamp(details.Span.Start, 0, source.Length), StringComparison.Ordinal);
@@ -175,6 +175,7 @@ internal sealed class DocumentModelBuilder
     {
         var paragraph = paragraphs.Count;
         paragraphs.Add(new(start, text.Length - start, sourceStart, sourceEnd, runs.ToImmutable()));
+        var separator = tabParagraphEnds.Contains(sourceEnd) ? "\t" : "\r\n";
         text.Append(separator); foreach (var character in separator) { starts.Add(Math.Clamp(sourceEnd, 0, source.Length)); ends.Add(Math.Clamp(sourceEnd, 0, source.Length)); }
         return Node(kind, start, sourceStart, sourceEnd, []) with { Paragraph = paragraph };
     }
