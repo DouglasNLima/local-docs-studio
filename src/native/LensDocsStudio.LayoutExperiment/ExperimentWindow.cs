@@ -37,6 +37,7 @@ internal sealed class ExperimentWindow : Window
     private readonly Dictionary<int, bool> details = [];
     public Task? CurrentWork { get; private set; }
     public OperationTrace? Trace { get; set; }
+    internal bool LegacyMediaLocationForChecks { get; set; }
     internal Action<long>? PreparationBoundaryForChecks { get; set; }
     private CancellationTokenSource? renderedCopy;
     private DispatcherOperation? appearanceRefresh;

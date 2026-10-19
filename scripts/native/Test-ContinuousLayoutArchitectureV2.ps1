@@ -60,10 +60,11 @@ if (-not $FirstOnly) {
     foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
     foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
     foreach ($fixture in @('table-spans','table-blocks')) { Invoke-Sample $fixture 'candidate' 'extended-table-uia' -Uia }
-    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all')) {
+    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','visual-checks')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
-        if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
+        $deadline = if ($mode -eq 'visual-checks') { 180000 } else { 120000 }
+        if (-not $process.WaitForExit($deadline)) { Stop-Process -Id $process.Id -Force; @{Status='FAIL';Reason="External $deadline ms process bound"} | ConvertTo-Json | Set-Content (Join-Path $destination 'external-timeout.json') }
         $process.Refresh(); $runs.Add([ordered]@{ Name=$mode; ExitCode=$process.ExitCode; Directory=$destination })
     }
 }
@@ -96,16 +97,28 @@ $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interacti
 $coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
 $missing = @($coverage.Requirements | Where-Object Implementation -ne 'Implemented')
 $special = @{}
-foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('media-controls','media-control-comparison.json'),@('range-checks','range-parity.json'),@('parity-all','targeted-parity.json'))) {
+foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('media-controls','media-control-comparison.json'),@('range-checks','range-parity.json'),@('parity-all','targeted-parity.json'),@('link-checks','links.json'),@('visual-checks','visual-comparison.json'))) {
     $path = Join-Path $output ($receipt[0] + '/' + $receipt[1])
     $special[$receipt[0]] = if (Test-Path -LiteralPath $path) { Get-Content -LiteralPath $path -Raw | ConvertFrom-Json } else { @{Status='MISSING'} }
 }
 $interactionReceipts = @(Get-ChildItem -LiteralPath $output -Filter independent-uia.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json })
 $lifecycleBudgetMisses = $special['lifecycle'].CancellationAcceptance -ne 'PASS' -or $special['lifecycle'].WinningPreviewReadinessAcceptance -ne 'PASS'
+$appearanceFunctional = $special['appearance'].AutomaticEnableCurrentDisableCurrent -eq 'PASS' -and $special['appearance'].ManualThemeAfterDisable -eq $false
+$functionalSpecialFailures = @('lifecycle','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks') | Where-Object { $special[$_].Status -ne 'PASS' }
+$visualStatus = if ($special['visual-checks'].Status -eq 'CAPTURED_PENDING_VISUAL_REVIEW') { 'PENDING_VISUAL_REVIEW' } else { 'MISSING_OR_FAILED_CAPTURES' }
+$visualReview = $null
+$visualInputsHash = & (Join-Path $PSScriptRoot 'Get-LayoutVisualInputsHash.ps1')
+$reviewPath = Join-Path $root 'src/native/LensDocsStudio.LayoutExperiment/visual-review-v2.json'
+if (Test-Path -LiteralPath $reviewPath) {
+    $visualReview = Get-Content -LiteralPath $reviewPath -Raw | ConvertFrom-Json
+    if ($visualStatus -eq 'PENDING_VISUAL_REVIEW' -and $visualReview.Status -eq 'PASS' -and $visualReview.RenderingInputsSha256 -eq $visualInputsHash -and
+        $visualReview.WpfFrameworkSha256 -eq ($samples | Select-Object -First 1).WpfFrameworkSha256 -and $visualReview.ImageVersion -eq $env:ImageVersion -and
+        $visualReview.OriginalWorkloadsReviewed -eq 6 -and $visualReview.AppearancesReviewed -eq 3 -and $visualReview.CaptureManifestSha256 -match '^[A-Fa-f0-9]{64}$') { $visualStatus = 'PASS' }
+}
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
 $executionFailures = @($runs | Where-Object ExitCode -ne 0)
 $missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
-$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 13 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
+$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 13 -or $functionalSpecialFailures.Count -gt 0 -or -not $appearanceFunctional -or $visualStatus -ne 'PASS'
 $timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
 $officialRuntimeValid = $runtimeChecks.Count -eq 2 -and @($runtimeChecks | Where-Object { $_.SignatureStatus -ne 'Valid' -or $_.Signer -notmatch 'Microsoft Corporation' }).Count -eq 0
 $compiledSourceMatches = $samples.Count -gt 0 -and @($samples | Where-Object { $_.HarnessInformationalVersion -notmatch [regex]::Escape($source) }).Count -eq 0
@@ -115,9 +128,12 @@ $fullPass = $compiledSourceMatches -and -not $sourceDirty -and $officialRuntimeV
     CandidateSamples=$candidate.Count; RequiredControlledSamples=66; RecordedControlledSamples=$controlled.Count; MissingControlledSamples=$missingSamples; RawTimedBoundaries=$rawBoundaries
     CompleteLayout=@{ BudgetMilliseconds=1000; Status=$(if($layoutMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$layoutMisses.Count }
     PreparationPresentation=@{ BudgetMilliseconds=1500; Status=$(if($presentationMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$presentationMisses.Count }
-    ObservedShownWindowInput=@{ BudgetMilliseconds=100; Status=$(if($inputMisses.Count -or $specialInputMisses.Count){'FAIL'}elseif($proofMissing){'INCOMPLETE'}else{'PASS'}); SampleFailures=$inputMisses.Count; SpecialScenarioFailures=$specialInputMisses.Count }
-    FunctionalSelectionClipboardSourceUiaParity=$(if($missing.Count -or $proofMissing -or @($interactionReceipts | Where-Object Status -ne 'PASS').Count){'INCOMPLETE_OR_FAIL'}else{'PASS'})
-    ActualOsAppearanceLifecycle=@{ Status=$(if($lifecycleBudgetMisses -or @($special.Values | Where-Object Status -ne 'PASS').Count -or $specialInputMisses.Count){'INCOMPLETE_OR_FAIL'}else{'PASS'}); Receipts=$special }
+    ObservedShownWindowInput=@{ BudgetMilliseconds=100; Status=$(if($failedInteractionInput.Count -or $inputMisses.Count -or $specialInputMisses.Count){'FAIL'}elseif($proofMissing){'INCOMPLETE'}else{'PASS'}); SampleFailures=$inputMisses.Count; FailedClientPhaseInputReceipts=$failedInteractionInput.Count; SpecialScenarioFailures=$specialInputMisses.Count }
+    FunctionalSelectionClipboardSourceUiaParity=$(if($missing.Count -or $missingSamples -or $interactionReceipts.Count -ne 13 -or $functionalSpecialFailures.Count -or @($interactionReceipts | Where-Object Status -ne 'PASS').Count){'INCOMPLETE_OR_FAIL'}else{'PASS'})
+    ActualOsAppearanceLifecycle=@{ Status=$(if($appearanceFunctional -and $special['lifecycle'].Status -eq 'PASS'){'PASS'}else{'INCOMPLETE_OR_FAIL'}); TimingAcceptance='Separate Input/cancellation/readiness rows; functional success never excuses a timing miss'; Receipts=$special }
+    Cancellation=@{ BudgetMilliseconds=250; Status=$special['lifecycle'].CancellationAcceptance; Observations=$special['lifecycle'].Cancellation }
+    WinningPreviewReadiness=@{ BudgetMilliseconds=1500; Status=$special['lifecycle'].WinningPreviewReadinessAcceptance; Observations=$special['lifecycle'].WinningPreviewReadiness }
+    VisualParity=@{ Status=$visualStatus; RenderingInputsSha256=$visualInputsHash; Review=$visualReview; Captures=$special['visual-checks']; Meaning='Source-bound representative visual review and successful current captures/geometry/styles are both required. Pending or stale review fails the full gate.' }
     LifecycleBudgetMisses=$lifecycleBudgetMisses; PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
     Stretch250=@{ Blocking=$false; Exceeded=@($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 250).Count }
     ExecutionFailures=$executionFailures; Samples=$samples

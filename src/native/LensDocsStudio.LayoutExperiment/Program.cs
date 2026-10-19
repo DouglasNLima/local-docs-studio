@@ -53,7 +53,8 @@ internal static class Program
                 else if (args.Contains("--visual-checks")) await VisualChecks.Run(window, output);
                 else if (args.Contains("--range-checks")) await RangeOracleChecks.Run(window, output);
                 else if (args.Contains("--media-controls")) await MediaControlChecks.Run(window, output);
-                else if (args.Contains("--media-checks")) await MediaChecks.Run(window, output);
+                else if (args.Contains("--media-checks") || args.Contains("--media-legacy-directory"))
+                { window.LegacyMediaLocationForChecks = args.Contains("--media-legacy-directory"); await MediaChecks.Run(window, output); }
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
                 else if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);

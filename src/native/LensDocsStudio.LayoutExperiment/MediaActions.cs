@@ -43,7 +43,11 @@ internal sealed class MediaActions
             }
             var dialog = new Microsoft.Win32.SaveFileDialog { Title = "EXPERIMENT ONLY — Export diagram", FileName = "diagram." + box.Label.ToLowerInvariant(),
                 Filter = box.Label == "SVG" ? "SVG drawing|*.svg" : "PNG image|*.png", AddExtension = true };
-            owner.Trace?.Stage("dialogue-enter", new { box.Label, Thread = Environment.CurrentManagedThreadId, OwnerHandle = new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64() });
+            // Start in the current source folder rather than asking the shell to
+            // choose a recent location. The focused control retains the old route.
+            if (!owner.LegacyMediaLocationForChecks && owner.SourcePath is { } path) dialog.InitialDirectory = Path.GetDirectoryName(path);
+            owner.Trace?.Stage("dialogue-enter", new { box.Label, dialog.InitialDirectory, LegacyLocationControl = owner.LegacyMediaLocationForChecks,
+                Thread = Environment.CurrentManagedThreadId, OwnerHandle = new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64() });
             bool? accepted;
             try { accepted = dialog.ShowDialog(owner); }
             finally { owner.Trace?.Stage("dialogue-exit", new { box.Label }); }

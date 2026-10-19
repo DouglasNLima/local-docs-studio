@@ -68,15 +68,17 @@ jobs:
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') } else { @('media-controls','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
+            Write-Host "Focused mode $mode started at $([DateTime]::UtcNow.ToString('o'))"
             $destination = "artifacts/layout-focused/$mode"
             New-Item -ItemType Directory -Force -Path $destination | Out-Null
             $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
             if (-not $process.WaitForExit(180000)) { Stop-Process -Id $process.Id -Force; $failed = $true; 'Bounded diagnostic process deadline exceeded.' | Set-Content "$destination/deadline-failure.txt" }
             $process.Refresh()
             if ($process.ExitCode) { $failed = $true }
+            Write-Host "Focused mode $mode exited $($process.ExitCode) at $([DateTime]::UtcNow.ToString('o'))"
           }
           foreach ($scenario in @('list','mixed','table-spans','table-blocks')) {
             $destination = "artifacts/layout-focused/actual-uia-$scenario"

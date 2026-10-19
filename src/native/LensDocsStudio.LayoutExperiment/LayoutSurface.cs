@@ -24,10 +24,10 @@ internal sealed class LayoutSurface : Panel
     { protected override void OnRender(DrawingContext context) => owner.DrawMediaSelection(context); }
     private static Brush SelectionBrush(string appearance)
     {
-        // WPF's stock scroll viewer draws a translucent system selection wash,
-        // retaining the actual text/image underneath it.
+        // DocumentPreview.xaml owns a 0.3 accent wash in the product. Retain the
+        // actual text/image underneath it, including native media commands.
         var brush = new SolidColorBrush(appearance.StartsWith("HC:", StringComparison.Ordinal)
-            ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : SystemColors.HighlightColor) { Opacity = .4 };
+            ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : Color.FromRgb(255, 136, 62)) { Opacity = .3 };
         brush.Freeze(); return brush;
     }
     private void DrawMediaSelection(DrawingContext context)

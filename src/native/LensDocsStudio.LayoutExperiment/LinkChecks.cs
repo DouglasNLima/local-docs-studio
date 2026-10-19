@@ -20,7 +20,7 @@ internal static class LinkChecks
         var child = "# Child\n\nChild destination marker.\n\n[Back to parent](../source.md)\n";
         var sourcePath = Path.Combine(output, "source.md"); var childPath = Path.Combine(output, "child", "destination.md");
         Directory.CreateDirectory(Path.GetDirectoryName(childPath)!); File.WriteAllText(sourcePath, source); File.WriteAllText(childPath, child);
-        window.Hide(); var rows = new List<object>();
+        window.Hide(); var rows = new List<object>(); var failed = false; var candidateMaximum = 0d;
         foreach (var side in new[] { "stock", "candidate" })
         {
             var destination = Path.Combine(output, side); Directory.CreateDirectory(destination);
@@ -41,14 +41,20 @@ internal static class LinkChecks
                 var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
                 foreach (var value in new[] { "--link-client", destination, new WindowInteropHelper(owner).Handle.ToInt64().ToString(), side, uri }) start.ArgumentList.Add(value);
                 using var client = (await Task.Run(() => Process.Start(start)))!;
-                using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(60)); await client.WaitForExitAsync(deadline.Token);
+                using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+                try { await client.WaitForExitAsync(deadline.Token); }
+                finally { if (!client.HasExited) client.Kill(true); }
                 if (client.ExitCode != 0) throw new IOException("Independent actual link activation failed: " + side);
                 rows.Add(new { Adapter = side, Status = "PASS", MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps });
             }
-            finally { timer.Stop(); if (stock is not null) await stock.Close(); }
+            catch (Exception error)
+            { failed = true; rows.Add(new { Adapter = side, Status = "FAIL", Error = error.ToString(), MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps }); }
+            finally { timer.Stop(); if (side == "candidate") candidateMaximum = gaps.DefaultIfEmpty().Max(); if (stock is not null) await stock.Close(); }
         }
         if (File.ReadAllText(sourcePath) != source || File.ReadAllText(childPath) != child) throw new IOException("Link activation changed workspace source.");
-        Program.Write(Path.Combine(output, "links.json"), new { Status = "PASS", SourceUnchanged = true, Rows = rows });
+        Program.Write(Path.Combine(output, "links.json"), new { Status = failed ? "FAIL" : "PASS", SourceUnchanged = true, Rows = rows,
+            MaximumInputGapMilliseconds = candidateMaximum });
+        if (failed) throw new IOException("Actual stock/candidate link route checks failed; both sides retained.");
     }
     public static int Client(string output, long ownerValue, string side, string uri)
     {

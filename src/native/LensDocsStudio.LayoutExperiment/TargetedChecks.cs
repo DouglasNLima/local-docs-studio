@@ -34,7 +34,8 @@ internal static class TargetedChecks
                 // Window white despite its outer Background, invalidating dark/HC pairs.
                 stock.Document.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background));
                 var viewer = new FlowDocumentScrollViewer { Document = stock.Document, Width = 640, Height = 300, IsToolBarVisible = false,
-                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background)) };
+                    Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background)), SelectionOpacity = .3,
+                    SelectionBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(appearance, 3) : "#FF883E")) };
                 window.Content = viewer; window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 var stockText = new TextRange(stock.Document.ContentStart, stock.Document.ContentEnd).Text;
                 var scrolling = (ScrollViewer)viewer.Template.FindName("PART_ContentHost", viewer);
