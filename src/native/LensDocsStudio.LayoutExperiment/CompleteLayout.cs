@@ -27,6 +27,7 @@ internal sealed record ListModel(string Source, string Text, ImmutableArray<int>
     public required SemanticNode Root { get; init; }
     public bool OriginalListShape { get; init; }
     public ImmutableArray<LensDocsStudio.Core.Parsing.DocumentHeading> Headings { get; init; } = [];
+    public ImmutableDictionary<string, double> PreparationStages { get; init; } = ImmutableDictionary<string, double>.Empty;
 }
 internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int SourceStart, int SourceEnd, ImmutableArray<SemanticNode> Children)
 {
@@ -43,6 +44,7 @@ internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int
     public int RowSpan { get; init; } = 1;
     public int Columns { get; init; }
     public ImageSource? Media { get; init; }
+    public string? PreparedSvg { get; init; }
     public IEnumerable<SemanticNode> Descendants() { foreach (var child in Children) { yield return child; foreach (var descendant in child.Descendants()) yield return descendant; } }
 }
 internal sealed record Caret(int Offset, double X);
@@ -59,6 +61,7 @@ internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Line
     public ImmutableArray<ControlBox> Controls { get; init; } = [];
     public ListModel? CompleteModel { get; init; }
     public ImmutableArray<Line> CompleteLines { get; init; } = [];
+    public SnapshotIndices Indices { get; init; } = new([0], [0]);
 }
 
 /// <summary>Complete diagnostic engine with an original-list fast path. No candidate FlowDocument or hidden viewer.</summary>
@@ -68,6 +71,14 @@ internal static class CompleteLayout
         => DocumentModelBuilder.Parse(source, cancellation, sourcePath, workspaceRoot, appearance);
 
     public static LayoutSnapshot Format(ListModel model, double width, long version, string appearance, CancellationToken cancellation)
+    {
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var result = FormatCore(model, width, version, appearance, cancellation);
+        var at = watch.Elapsed.TotalMilliseconds; var indices = SnapshotIndices.Create(result, cancellation);
+        return result with { Indices = indices, LayoutMilliseconds = watch.Elapsed.TotalMilliseconds,
+            Stages = result.Stages.Add("EagerNavigationIndexMilliseconds", watch.Elapsed.TotalMilliseconds - at).AddRange(model.PreparationStages) };
+    }
+    private static LayoutSnapshot FormatCore(ListModel model, double width, long version, string appearance, CancellationToken cancellation)
     {
         if (!model.OriginalListShape) return DocumentLayout.Format(model, width, version, appearance, cancellation);
         var watch = System.Diagnostics.Stopwatch.StartNew();

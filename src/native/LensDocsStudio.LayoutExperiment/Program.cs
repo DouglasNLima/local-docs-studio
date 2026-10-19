@@ -170,7 +170,7 @@ internal static class Program
                 gaps.Clear(); lastInput = watch.Elapsed.TotalMilliseconds; timer.Start();
                 var executable = Environment.ProcessPath!;
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
-                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text)), scenario }) start.ArgumentList.Add(arg);
+                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text[..LayoutAutomationPeer.TextEnd(snapshot)])), scenario }) start.ArgumentList.Add(arg);
                 using var client = (await Task.Run(() => Process.Start(start)))!;
                 using var clientDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 try { await client.WaitForExitAsync(clientDeadline.Token); }

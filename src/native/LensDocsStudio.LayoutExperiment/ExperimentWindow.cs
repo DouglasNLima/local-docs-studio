@@ -28,6 +28,7 @@ internal sealed class ExperimentWindow : Window
     public long CurrentVersion => version;
     public string? SourcePath { get; set; }
     public string? WorkspaceRoot { get; set; }
+    public string ExportRecoveryDirectory { get; } = Path.Combine(Path.GetTempPath(), "LensDocsStudio.LayoutExperiment", Guid.NewGuid().ToString("N"), "export-recovery");
     public string LatestSource { get; private set; } = "";
     public string ThemePreference { get; private set; } = "Light";
     public event Action<LayoutSnapshot>? Installed;
@@ -37,6 +38,7 @@ internal sealed class ExperimentWindow : Window
     public Task? CurrentWork { get; private set; }
     public OperationTrace? Trace { get; set; }
     private CancellationTokenSource? renderedCopy;
+    private DispatcherOperation? appearanceRefresh;
     public ExperimentWindow()
     {
         Title = "EXPERIMENT ONLY — Continuous TextFormatter layout";
@@ -77,8 +79,8 @@ internal sealed class ExperimentWindow : Window
         Surface.ContextMenu = new ContextMenu { Items = { copyMenu } };
         SystemParameters.StaticPropertyChanged += AppearanceChanged;
         SourceInitialized += (_, _) => ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).AddHook((IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled) =>
-        { if (message is 0x001A or 0x0015 or 0x031A) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); return IntPtr.Zero; });
-        Closed += (_, _) => { closed = true; renderedCopy?.Cancel(); Surface.CloseClipboard(); SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++; if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); } pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null); Log("closed"); };
+        { if (message is 0x001A or 0x0015 or 0x031A) ScheduleAppearance(); return IntPtr.Zero; });
+        Closed += (_, _) => { closed = true; appearanceRefresh?.Abort(); appearanceRefresh = null; renderedCopy?.Cancel(); Surface.CloseClipboard(); SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++; if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); } pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null); Log("closed"); };
     }
     public DiagnosticView CaptureView()
     {
@@ -122,7 +124,14 @@ internal sealed class ExperimentWindow : Window
         ThemePreference = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ThemePreference : snapshot.Appearance;
         Surface.Install(snapshot);
     }
-    private void AppearanceChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (!closed) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); }
+    private void AppearanceChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => ScheduleAppearance();
+    private void ScheduleAppearance()
+    {
+        if (closed || Dispatcher.HasShutdownStarted) return;
+        if (appearanceRefresh?.Status == DispatcherOperationStatus.Pending) { Trace?.Stage("appearance-notification-coalesced"); return; }
+        Trace?.Stage("appearance-notification-queued");
+        appearanceRefresh = Dispatcher.InvokeAsync(() => { appearanceRefresh = null; RefreshAppearance(); }, DispatcherPriority.Background);
+    }
     private void RefreshAppearance()
     {
         Trace?.Stage("appearance-refresh-enter");

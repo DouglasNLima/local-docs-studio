@@ -10,6 +10,24 @@ Focused `--media-checks` now retains its uninterrupted original Input timer and 
 
 Pushes run explicitly named focused diagnostic jobs while fixes are being developed. The unchanged full two-replication acceptance path is invoked with workflow input `scope=full` once changes are stable. A focused diagnostic success does not certify v2 acceptance or parity.
 
+### Media diagnosis at `3a4a467`
+
+The [two focused hosted runs](https://github.com/DouglasNLima/local-docs-studio/actions/runs/39242559420) exercise actual SVG/PNG Save and Cancel through the candidate, unchanged stock native `MainWindow.ExportDiagram` and minimal native-dialogue control on each same host. All chosen files decode; Cancel creates no file. Native acknowledgement of the shown dialogue is 0.04–61.70 ms and immediate post-close owner acknowledgement is 0.04–29.69 ms across these routes. These are message acknowledgement observations, not substitutes for application Input gaps.
+
+| Same-host route | Host 1 original Input maximum ms | Host 2 original Input maximum ms | Longest observed WM_INITDIALOG callback ms, hosts 1 / 2 |
+| --- | ---: | ---: | ---: |
+| Candidate | 936.41 | 303.47 | 451.15 / 154.39 |
+| Unchanged stock native | 412.19 | 1,554.07 | 232.76 / 469.18 |
+| Minimal owned native dialogue | 362.94 | 312.91 | 132.96 / 116.76 |
+
+Native-window message delivery is delayed too. This does **not** establish a timer-only/modal scheduling fault; the Input row remains failing under the unchanged 100 ms requirement. The controls establish a native dialogue-initialisation cost, not the cause of the historical 13,239.25 ms observation. That exact delay has not been reproduced or explained and is retained. No whole-dialogue pause, subtraction or acceptance exemption is introduced. The first diagnostic source `1235e25` did not execute: its build command used an invalid switch, corrected at `cd043e8`; the intermediate stock control at `cd043e8` failed to expose its off-screen media button, corrected before the successful `3a4a467` comparison. Those attempts remain failed evidence.
+
+Subsequent implementation removes a demonstrated duplicate Mermaid render after SVG Save by retaining the already-required immutable SVG in its snapshot. Export writing now reuses the existing conflict/reparse-point/recovery service with an experiment-owned recovery directory. Source/version cancellation still guards the write. This is a bounded correction; it does not claim to eliminate native dialogue initialisation.
+
+Appearance traces at `cd043e8` show 59/108 palette-refresh callbacks for four installations and native-message delivery stalls as well as Input stalls. Subsequent code coalesces notifications **before** palette acquisition, while capturing current source/appearance at delivery. This removes repeated application work but is not yet a responsiveness pass. Required parsing, image/syntax preparation, details paint, Mermaid preparation, model extraction, word boundaries and eager navigation indexing now have explicit stage measurements; extraction includes its required preparation sub-stages, so they must not be summed as disjoint clocks.
+
+The original 66 controlled samples and eleven additional UIA cases remain unchanged. Two separately labelled `extended-table-uia` cases, an independent stock/candidate range-operation oracle and stock/minimal media controls are added as required proof. The acceptance command still fails on any required missing or failed proof. Existing v1/v2 results are not reclassified.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**

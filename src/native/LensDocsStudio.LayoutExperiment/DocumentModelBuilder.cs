@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Text;
 using System.Windows;
 using LensDocsStudio.Core.Parsing;
@@ -23,7 +24,16 @@ internal sealed class DocumentModelBuilder
     private readonly bool dark;
     private readonly string appearance;
     private int id;
+    private readonly Dictionary<string, double> stages = [];
+    private double detailsMilliseconds, mediaMilliseconds;
     private readonly HashSet<int> tabParagraphEnds = [];
+    private readonly Dictionary<bool, System.Windows.Media.DrawingImage> detailsPaint = [];
+    private System.Windows.Media.DrawingImage TogglePaint(bool expanded)
+    {
+        if (!detailsPaint.TryGetValue(expanded, out var image))
+        { var watch = Stopwatch.StartNew(); detailsPaint.Add(expanded, image = DetailsDrawing.Create(expanded, appearance)); detailsMilliseconds += watch.Elapsed.TotalMilliseconds; }
+        return image;
+    }
 
     private DocumentModelBuilder(ParsedDocument parsed, CancellationToken cancellation, string? path, string? root, string appearance)
     {
@@ -31,14 +41,18 @@ internal sealed class DocumentModelBuilder
         foreach (var row in parsed.Syntax.Descendants<TableRow>())
             foreach (var cell in row.OfType<TableCell>().SkipLast(1).Where(cell => cell.Count == 1 && cell[0] is ParagraphBlock))
                 if (cell.Descendants<LeafBlock>().LastOrDefault() is { } leaf) tabParagraphEnds.Add(leaf.Span.End + 1);
+        var preparation = Stopwatch.StartNew();
         images = parsed.Syntax.Descendants<LinkInline>().Any(link => link.IsImage) ? new PreviewImageService().Prepare(parsed, path, root, cancellation) : new Dictionary<string, PreviewImage>();
+        stages.Add("RequiredImagePreparationMilliseconds", preparation.Elapsed.TotalMilliseconds); preparation.Restart();
         syntax = parsed.Syntax.Descendants<FencedCodeBlock>().Any(block => block.Info != "mermaid") ? CodeSyntaxService.Prepare(parsed, cancellation) : new PreparedCodeSyntax(new Dictionary<CodeBlock, CodeSyntaxBlock>(), false);
+        stages.Add("RequiredSyntaxPreparationMilliseconds", preparation.Elapsed.TotalMilliseconds);
     }
     public static ListModel Parse(string source, CancellationToken cancellation, string? path, string? workspaceRoot, string appearance)
     {
         cancellation.ThrowIfCancellationRequested();
-        var parsed = new MarkdownService().Parse(source);
+        var watch = Stopwatch.StartNew(); var parsed = new MarkdownService().Parse(source); var parsing = watch.Elapsed.TotalMilliseconds; watch.Restart();
         var builder = new DocumentModelBuilder(parsed, cancellation, path, workspaceRoot, appearance);
+        builder.stages.Add("MarkdownParsingMilliseconds", parsing);
         var root = builder.Container(parsed.Syntax, "Document");
         ApplyStyles(root, false);
         void ApplyStyles(SemanticNode node, bool inheritedHeader)
@@ -58,10 +72,13 @@ internal sealed class DocumentModelBuilder
         var only = parsed.Syntax.Count == 1 ? parsed.Syntax[0] as ListBlock : null;
         var original = only is not null && only.All(item => item is ListItemBlock { Count: 1 } listItem
             && listItem[0] is ParagraphBlock { Inline: not null } paragraph && paragraph.Inline.Descendants().All(inline => inline is LiteralInline or EmphasisInline { DelimiterChar: '*' or '_' }));
-        return new(source, builder.text.ToString(), builder.starts.ToImmutableArray(), builder.paragraphs.ToImmutableArray(), only?.IsOrdered ?? false,
+        var plain = builder.text.ToString(); builder.stages.Add("CompleteModelExtractionMilliseconds", watch.Elapsed.TotalMilliseconds);
+        builder.stages.Add("RequiredDetailsPaintMilliseconds", builder.detailsMilliseconds); builder.stages.Add("RequiredMermaidPreparationMilliseconds", builder.mediaMilliseconds);
+        watch.Restart(); var words = WordUnits.Create(plain, cancellation); builder.stages.Add("RequiredWordBoundariesMilliseconds", watch.Elapsed.TotalMilliseconds);
+        return new(source, plain, builder.starts.ToImmutableArray(), builder.paragraphs.ToImmutableArray(), only?.IsOrdered ?? false,
             only is null ? 1 : MarkdownFormatting.OrderedStart(only))
         {
-            Root = root, OriginalListShape = original, SourceEnds = builder.ends.ToImmutableArray(), WordBoundaries = WordUnits.Create(builder.text.ToString(), cancellation), Headings = parsed.Headings.ToImmutableArray()
+            Root = root, OriginalListShape = original, SourceEnds = builder.ends.ToImmutableArray(), WordBoundaries = words, Headings = parsed.Headings.ToImmutableArray(), PreparationStages = builder.stages.ToImmutableDictionary()
         };
     }
     private SemanticNode Node(string kind, int start, int sourceStart, int sourceEnd, ImmutableArray<SemanticNode> children)
@@ -94,21 +111,23 @@ internal sealed class DocumentModelBuilder
                 var summaryAt = source.IndexOf(details.Summary, Math.Clamp(details.Span.Start, 0, source.Length), StringComparison.Ordinal);
                 var headerRuns = ImmutableArray.CreateBuilder<StyledRun>();
                 AddText(" ", details.Span.Start, details.Span.Start + 1, MarkdownEmphasis.None, false, null, headerRuns, atomic: true);
-                var toggle = Node("Toggle", begin, details.Span.Start, details.Span.Start + 1, []) with { Media = DetailsDrawing.Create(details.InitiallyExpanded, appearance), Label = details.Summary };
+                var toggle = Node("Toggle", begin, details.Span.Start, details.Span.Start + 1, []) with { Media = TogglePaint(details.InitiallyExpanded), Label = details.Summary };
                 AddText(details.Summary, Math.Max(details.Span.Start, summaryAt), Math.Max(details.Span.Start, summaryAt) + details.Summary.Length, MarkdownEmphasis.None, false, null, headerRuns);
                 var header = Finish("DetailsHeader", begin, details.Span.Start, Math.Max(details.Span.Start, summaryAt) + details.Summary.Length, headerRuns) with { Children = [toggle] };
                 var body = details.Select(Block).ToImmutableArray();
                 return Node("Details", begin, details.Span.Start, details.Span.End + 1, [header, ..body]) with { Expanded = details.InitiallyExpanded, Label = details.Summary };
             case FencedCodeBlock code when string.Equals(code.Info, "mermaid", StringComparison.OrdinalIgnoreCase):
+                var mediaWatch = Stopwatch.StartNew();
                 var diagram = new DiagramService().Render(code.Lines.ToString(), dark, cancellationToken: cancellation);
                 if (diagram.Svg is null) throw new IOException(diagram.Error);
                 var drawing = new NativeSvgService().Render(diagram.Svg); drawing.Freeze();
+                mediaMilliseconds += mediaWatch.Elapsed.TotalMilliseconds;
                 var media = Plain("\uFFFC", code.Span.Start, "Media");
                 ends[media.Start] = code.Span.End + 1;
                 paragraphs[media.Paragraph] = paragraphs[media.Paragraph] with { SourceEnd = code.Span.End + 1,
                     Runs = paragraphs[media.Paragraph].Runs.Select(run => run with { SourceEnd = code.Span.End + 1 }).ToImmutableArray() };
                 media = media with { SourceEnd = code.Span.End + 1 };
-                return media with { Media = drawing, Label = "Mermaid diagram", Target = code.Lines.ToString() };
+                return media with { Media = drawing, PreparedSvg = diagram.Svg, Label = "Mermaid diagram", Target = code.Lines.ToString() };
             case CodeBlock code:
                 var content = code.Lines.ToString();
                 var at = text.Length; var runs = ImmutableArray.CreateBuilder<StyledRun>();

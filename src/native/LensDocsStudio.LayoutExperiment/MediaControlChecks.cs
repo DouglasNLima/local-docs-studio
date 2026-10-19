@@ -62,5 +62,7 @@ internal static class MediaControlChecks
         control.Show();
         try { await MediaChecks.Exercise(control, controlOutput, "native-dialogue-only"); }
         finally { control.Close(); }
+        Program.Write(Path.Combine(output, "media-control-comparison.json"), new { Status = "PASS", StockRoute = "Unmodified MainWindow.ExportDiagram", MinimalRoute = "Owned public SaveFileDialog", SaveAndCancel = true,
+            Acceptance = "Controls are comparative evidence; their timings do not exempt or certify the candidate." });
     }
 }

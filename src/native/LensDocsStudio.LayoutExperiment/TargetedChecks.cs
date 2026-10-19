@@ -98,6 +98,7 @@ internal static class TargetedChecks
                 var nativeXamlStyles = Styles(stockXamlDecoded.Document); var candidateXamlStyles = Styles(candidateXamlDecoded.Document);
                 Program.Write(Path.Combine(destination, "decoded-xaml-styles.json"), new { Stock = nativeXamlStyles, Candidate = candidateXamlStyles });
                 Require(System.Text.Json.JsonSerializer.Serialize(nativeXamlStyles) == System.Text.Json.JsonSerializer.Serialize(candidateXamlStyles), "Decoded Xaml actual styled text fidelity", checks);
+                await InterchangeChecks.Compare(stock, snapshot, destination);
                 Program.Write(Path.Combine(destination, "logical-and-geometry.json"), new { Status = "PASS", Checks = checks, StockText = stockText, CandidateText = logicalText,
                     StockHeight = stockHeight, CandidateHeight = snapshot.Height, FixtureHash = Program.Hash(Encoding.UTF8.GetBytes(fixture.Source)) });
                 results.Add(new { fixture.Name, Status = "PASS" }); viewer.Document = null;
@@ -113,7 +114,7 @@ internal static class TargetedChecks
         var document = new FlowDocument(); var range = new TextRange(document.ContentStart, document.ContentEnd); range.Load(new MemoryStream(bytes), format ?? DataFormats.Rtf);
         return (document, range.Text);
     }
-    private static object[] Styles(FlowDocument document)
+    internal static object[] Styles(FlowDocument document)
     {
         var output = new List<object>(); var pointer = document.ContentStart;
         while (pointer is not null && pointer.CompareTo(document.ContentEnd) < 0)

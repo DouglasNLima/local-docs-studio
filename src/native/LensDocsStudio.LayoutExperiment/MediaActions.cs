@@ -23,7 +23,7 @@ internal sealed class MediaActions
         var snapshot = owner.Surface.Snapshot;
         if (snapshot is null || snapshot.Version != owner.CurrentVersion || snapshot.Model.Source != owner.LatestSource) return;
         var cancellation = lifetime.Token;
-        if (snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Id == box.Node && node.Kind == "Media") is not { Media: { } image, Target: { } source }) return;
+        if (snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Id == box.Node && node.Kind == "Media") is not { Media: { } image, Target: { } source } media) return;
         try
         {
             owner.Trace?.Stage("media-command-enter", new { box.Label, snapshot.Version, ClipboardSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence });
@@ -50,6 +50,10 @@ internal sealed class MediaActions
             owner.Trace?.Stage("dialogue-result", new { box.Label, Accepted = accepted, dialog.FileName });
             if (accepted != true) return;
             var output = dialog.FileName;
+            if (!Path.GetExtension(output).Equals("." + box.Label, StringComparison.OrdinalIgnoreCase)) throw new IOException("Choose the matching diagram extension.");
+            owner.Trace?.Stage("media-existing-file-read-enter", new { Output = output });
+            var expected = await LensDocsStudio.Core.Exports.ExportFileStore.ReadExistingAsync(output, cancellation);
+            owner.Trace?.Stage("media-existing-file-read-exit");
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-accepted", box.Label, Output = output, Version = snapshot.Version, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
             var bytes = await ExperimentWindow.Worker(() =>
             {
@@ -57,9 +61,7 @@ internal sealed class MediaActions
                 try
                 {
                     if (box.Label == "PNG") return NativeSvgService.ToPng(image);
-                    var diagram = new DiagramService().Render(source, ExperimentAppearance.IsDark(snapshot.Appearance));
-                    owner.Trace?.Stage("media-svg-generated", new { box.Label });
-                    return System.Text.Encoding.UTF8.GetBytes(new NativeSvgService().Prepare(diagram.Svg ?? throw new IOException(diagram.Error)));
+                    return System.Text.Encoding.UTF8.GetBytes(new NativeSvgService().Prepare(media.PreparedSvg ?? throw new IOException("Prepared SVG is missing.")));
                 }
                 finally { owner.Trace?.Stage("media-encoding-exit", new { box.Label }); }
             });
@@ -67,7 +69,7 @@ internal sealed class MediaActions
             cancellation.ThrowIfCancellationRequested();
             if (!ReferenceEquals(owner.Surface.Snapshot, snapshot) || snapshot.Version != owner.CurrentVersion) throw new IOException("The diagram changed before export completed.");
             owner.Trace?.Stage("media-write-enter", new { box.Label, Output = output });
-            await File.WriteAllBytesAsync(output, bytes, cancellation);
+            await new LensDocsStudio.Core.Exports.ExportFileStore(owner.ExportRecoveryDirectory).WriteAsync(output, bytes, expected, cancellation);
             owner.Trace?.Stage("media-write-exit", new { box.Label });
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-completed", box.Label, Output = output, Bytes = bytes.Length, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
         }

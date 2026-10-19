@@ -59,7 +59,8 @@ if (-not $FirstOnly) {
     foreach ($side in $order) { Invoke-Sample 'all' $side 'distant-edit' 3 -Edit }
     foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
     foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
-    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','parity-all')) {
+    foreach ($fixture in @('table-spans','table-blocks')) { Invoke-Sample $fixture 'candidate' 'extended-table-uia' -Uia }
+    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
         if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
@@ -75,7 +76,7 @@ $runtimeChecks = @($samples | Select-Object -First 1 | ForEach-Object {
 })
 $runtimeChecks | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $output 'official-runtime.json')
 $candidate = @($samples | Where-Object Adapter -eq 'candidate')
-$controlled = @($candidate | Where-Object RunGroup -notin @('independent-uia','targeted-uia'))
+$controlled = @($candidate | Where-Object RunGroup -notin @('independent-uia','targeted-uia','extended-table-uia'))
 $rawBoundaries = @(Get-ChildItem -LiteralPath $output -Recurse -Filter timing-boundary.json | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json })
 $layoutMisses = @($rawBoundaries | Where-Object Adapter -eq 'candidate' | Where-Object CompleteLayoutInputMilliseconds -gt 1000)
 $presentationMisses = @($rawBoundaries | Where-Object Adapter -eq 'candidate' | Where-Object EndToEndReadinessMilliseconds -gt 1500)
@@ -86,7 +87,7 @@ $inputMisses = @($candidate | Where-Object { $_.MaximumInputGapMilliseconds -gt 
     OfficialRuntime=& dotnet --list-runtimes; OS=[Environment]::OSVersion.ToString(); CpuAvailable=[Environment]::ProcessorCount
     ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Runs=$runs
 } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $output 'protocol-v2.json')
-$pairChecks = @($samples | Where-Object RunGroup -notin @('independent-uia','targeted-uia') | Group-Object { "$($_.RunGroup)|$($_.Fixture)|$($_.Repetition)|$($_.Edited)" } | ForEach-Object {
+$pairChecks = @($samples | Where-Object RunGroup -notin @('independent-uia','targeted-uia','extended-table-uia') | Group-Object { "$($_.RunGroup)|$($_.Fixture)|$($_.Repetition)|$($_.Edited)" } | ForEach-Object {
     $group = $_.Group
     $mismatched = @('Width','Height','Dpi','Zoom','Appearance','Runtime','WpfFrameworkSha256','WpfFormattingSha256','ProductSha256','SourceRevision','SourceDirty','CpuAvailable','Cpu','OS','ImageOS','ImageVersion','HostMachine') | Where-Object { @($group | Select-Object -ExpandProperty $_ -Unique).Count -ne 1 }
     [ordered]@{ MismatchedControlledFields=@($mismatched); Key=$_.Name; Pass=@($mismatched).Count -eq 0 -and $group.Count -eq 2 -and @($group | Select-Object -ExpandProperty Adapter -Unique).Count -eq 2 -and @($group | Select-Object -ExpandProperty FixtureSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty SourceSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty HarnessSha256 -Unique).Count -eq 1 }
@@ -95,7 +96,7 @@ $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interacti
 $coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
 $missing = @($coverage.Requirements | Where-Object Implementation -ne 'Implemented')
 $special = @{}
-foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('parity-all','targeted-parity.json'))) {
+foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('media-controls','media-control-comparison.json'),@('range-checks','range-parity.json'),@('parity-all','targeted-parity.json'))) {
     $path = Join-Path $output ($receipt[0] + '/' + $receipt[1])
     $special[$receipt[0]] = if (Test-Path -LiteralPath $path) { Get-Content -LiteralPath $path -Raw | ConvertFrom-Json } else { @{Status='MISSING'} }
 }
@@ -104,7 +105,7 @@ $lifecycleBudgetMisses = $special['lifecycle'].CancellationAcceptance -ne 'PASS'
 $specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
 $executionFailures = @($runs | Where-Object ExitCode -ne 0)
 $missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
-$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 11 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
+$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 13 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
 $timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
 $officialRuntimeValid = $runtimeChecks.Count -eq 2 -and @($runtimeChecks | Where-Object { $_.SignatureStatus -ne 'Valid' -or $_.Signer -notmatch 'Microsoft Corporation' }).Count -eq 0
 $compiledSourceMatches = $samples.Count -gt 0 -and @($samples | Where-Object { $_.HarnessInformationalVersion -notmatch [regex]::Escape($source) }).Count -eq 0

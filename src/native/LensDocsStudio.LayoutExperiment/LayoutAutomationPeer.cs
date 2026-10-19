@@ -12,6 +12,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
     private Dictionary<int, SemanticNode> nodes = surface.Snapshot?.Model.Root.Descendants().ToDictionary(node => node.Id) ?? [];
     public LayoutSurface Surface => surface;
     public IRawElementProviderSimple Provider(AutomationPeer peer) => ProviderFromPeer(peer);
+    internal static int TextEnd(LayoutSnapshot? snapshot) => snapshot?.Model.Items.LastOrDefault() is { } last ? last.Start + last.Length : 0;
     protected override string GetClassNameCore() => "CompleteLayoutSurface";
     protected override string GetNameCore() => "Experimental Continuous document";
     protected override string GetAutomationIdCore() => "ExperimentalDocument";
@@ -51,7 +52,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         if (native?.Tag is ControlBox box && nodes.TryGetValue(box.Node, out var media)) return Range(media.Start, media.End);
         throw new ArgumentException("The element is not a child of the current document.");
     }
-    internal TextRange Range(int start, int end) => new(this, surface.Snapshot, start, end);
+    internal TextRange Range(int start, int end) => new(this, surface.Snapshot, Math.Min(start, TextEnd(surface.Snapshot)), Math.Min(end, TextEnd(surface.Snapshot)));
     internal IRawElementProviderSimple[] Children(int start, int end) => nodes.Values.Where(node => node.Start >= start && node.End <= end && node.Kind is "List" or "Table" or "Image" or "Media" or "Link" or "Heading" or "Details")
         .Select(node => Provider(Peer(node))).ToArray();
     internal IRawElementProviderSimple Enclosing(int start, int end)
@@ -172,19 +173,25 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             IEnumerable<int> units = unit switch
             {
                 TextUnit.Character => Current.Lines.SelectMany(line => line.Carets.Select(caret => caret.Offset)).Concat(model.Items.SelectMany(item => new[] { item.Start, item.Start + item.Length })),
-                TextUnit.Word => model.WordBoundaries,
+                TextUnit.Word => model.WordBoundaries.Concat(model.Items.Select(item => item.Start)),
                 TextUnit.Line => Current.Lines.Select(line => line.Start),
                 TextUnit.Paragraph => model.Items.Select(item => item.Start),
                 TextUnit.Format => model.Items.SelectMany(item => item.Runs.Select(run => run.Start)),
                 _ => [0, model.Text.Length]
             };
-            return units.Append(0).Append(model.Text.Length).Distinct().Order().ToArray();
+            var limit = TextEnd(Current);
+            return units.Append(0).Append(limit).Where(at => at <= limit).Distinct().Order().ToArray();
         }
         public void ExpandToEnclosingUnit(TextUnit unit)
         {
             var units = Units(unit); if (units.Length < 2) { start = end = 0; return; }
             var at = Array.FindLastIndex(units, value => value <= start);
             start = units[Math.Clamp(at, 0, units.Length - 2)]; end = units[Math.Clamp(at + 1, 1, units.Length - 1)];
+            if (unit is TextUnit.Line or TextUnit.Paragraph)
+            {
+                if (unit == TextUnit.Line && Current.Lines.FirstOrDefault(line => line.Start == start) is { } line) end = line.End;
+                else if (Current.Model.Items.FirstOrDefault(item => item.Start == start) is { } item) end = item.Start + item.Length;
+            }
         }
         public ITextRangeProvider? FindText(string text, bool backward, bool ignoreCase)
         {
@@ -243,13 +250,17 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         { var text = Current.Model.Text[start..end]; return maxLength < 0 || maxLength >= text.Length ? text : text[..maxLength]; }
         public int Move(TextUnit unit, int count)
         {
+            if (count == 0) { _ = Current; return 0; }
             var units = Units(unit); if (units.Length < 2) return 0;
             var index = Math.Min(units.Length - 2, Math.Max(0, Array.FindLastIndex(units, value => value <= start)));
             var target = Math.Clamp(index + count, 0, units.Length - 2); var moved = target - index;
-            start = units[target]; end = units[target + 1]; return moved;
+            start = units[target]; end = units[target + 1];
+            if (unit is TextUnit.Line or TextUnit.Paragraph) ExpandToEnclosingUnit(unit);
+            return moved;
         }
         public int MoveEndpointByUnit(TextPatternRangeEndpoint endpoint, TextUnit unit, int count)
         {
+            if (count == 0) { _ = Current; return 0; }
             var units = Units(unit); var value = endpoint == TextPatternRangeEndpoint.Start ? start : end;
             var index = count < 0 ? Array.FindIndex(units, at => at >= value) : Array.FindLastIndex(units, at => at <= value);
             index = Math.Max(0, index);

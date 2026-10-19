@@ -52,7 +52,7 @@ internal sealed class LayoutSurface : Panel
         var match = next ? matches.FirstOrDefault(match => match.Start > Start, matches[0]) : matches.LastOrDefault(match => match.Start < Start, matches[^1]);
         Select(match.Start, match.End); Reveal(match.Start);
     }
-    public void Activate(SemanticNode node) => Activated?.Invoke(node);
+    public void Activate(SemanticNode node) { if (Snapshot is { } snapshot && Current(snapshot)) Activated?.Invoke(node); }
     public (int Source, double Delta) ViewportSourceAnchor()
     {
         if (Snapshot is not { } snapshot || snapshot.Lines.Length == 0) return (0, 0);
@@ -300,14 +300,14 @@ internal sealed class LayoutSurface : Panel
         var control = Keyboard.Modifiers.HasFlag(ModifierKeys.Control); var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
         if (control && e.Key == Key.A) { Select(0, snapshot.Model.Text.Length); e.Handled = true; return; }
         if (control && e.Key == Key.C) { Copy(); e.Handled = true; return; }
-        var stops = snapshot.Lines.SelectMany(line => line.Carets.Select(caret => caret.Offset)).Append(snapshot.Model.Text.Length).Distinct().Order().ToArray();
+        var stops = snapshot.Indices.Characters;
         var line = snapshot.Lines.FirstOrDefault(line => Active >= line.Start && Active <= line.End) ?? snapshot.Lines[^1];
         var next = e.Key switch
         {
             Key.Home => control ? 0 : line.Start,
             Key.End => control ? snapshot.Model.Text.Length : line.End,
-            Key.Left => control ? snapshot.Model.WordBoundaries.LastOrDefault(value => value < Active, 0) : stops.LastOrDefault(value => value < Active, 0),
-            Key.Right => control ? snapshot.Model.WordBoundaries.FirstOrDefault(value => value > Active, snapshot.Model.Text.Length) : stops.FirstOrDefault(value => value > Active, snapshot.Model.Text.Length),
+            Key.Left => SnapshotIndices.Adjacent(control ? snapshot.Indices.Words : stops, Active, false),
+            Key.Right => SnapshotIndices.Adjacent(control ? snapshot.Indices.Words : stops, Active, true),
             Key.Up => Vertical(line, false),
             Key.Down => Vertical(line, true),
             Key.PageUp => Hit(new Point(52, line.Top - (Scroller?.ViewportHeight ?? 300))),

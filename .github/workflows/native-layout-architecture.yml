@@ -71,8 +71,12 @@ jobs:
           $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance','range-checks','parity-all') } else { @('media-controls','media-checks','appearance','range-checks','parity-all') }
           $failed = $false
           foreach ($mode in $modes) {
-            & $exe "--$mode" --output "artifacts/layout-focused/$mode"
-            if ($LASTEXITCODE) { $failed = $true }
+            $destination = "artifacts/layout-focused/$mode"
+            New-Item -ItemType Directory -Force -Path $destination | Out-Null
+            $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
+            if (-not $process.WaitForExit(180000)) { Stop-Process -Id $process.Id -Force; $failed = $true; 'Bounded diagnostic process deadline exceeded.' | Set-Content "$destination/deadline-failure.txt" }
+            $process.Refresh()
+            if ($process.ExitCode) { $failed = $true }
           }
           if ($failed) { exit 1 }
       - uses: actions/upload-artifact@v4

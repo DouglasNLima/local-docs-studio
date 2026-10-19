@@ -24,8 +24,8 @@
     },
     {
       "Requirement": "Spanning cells and nested block content in tables",
-      "Implementation": "Missing",
-      "Proof": "Spanning cells explicitly rejected; nested cell blocks lack complete layout support"
+      "Implementation": "Implemented",
+      "Proof": "Complete span geometry and cell block flow, UIA grid spans/relationships and public interchange; table-spans/table-blocks stock geometry/style checks and extended-table-uia execution required"
     },
     {
       "Requirement": "Quotes, details, headings, outline and internal links",
@@ -50,7 +50,7 @@
     {
       "Requirement": "Visual-direction keyboard caret movement within bidirectional runs",
       "Implementation": "Missing",
-      "Proof": "Formatter shaping/geometry are real; Left/Right currently follow logical offsets"
+      "Proof": "Independent stock/candidate actual Shift+Arrow sequence agrees in mixed Latin/Arabic/combining text. Stock read-only unshifted arrows do not move its selected insertion point; candidate differs. Full stock scope/visual-direction requirement review and correction remain required; range-checks retains every mismatch."
     },
     {
       "Requirement": "Exact selected plain text, decoded RTF/Xaml and whole-document CF_HTML",

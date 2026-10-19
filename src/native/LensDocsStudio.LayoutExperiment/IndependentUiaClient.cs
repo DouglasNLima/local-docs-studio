@@ -61,6 +61,7 @@ internal static class IndependentUiaClient
                 "paragraphs" => ("Paragraph1:", "Paragraph2:", "Paragraph1200:"), "quote" => ("Quoted1", "Quoted2", "Quoted1200"),
                 "rich" => ("Heading", "Plain", "Final marker."), "unicode-bidi" => ("Unicode", "Latin", "Final marker."),
                 "nested-lists" => ("First", "continuation", "After list."), "table-wrap" => ("Left", "first", "After table."),
+                "table-spans" => ("AAAAA", "E", "After spanned table."), "table-blocks" => ("First paragraph.", "Rich cell", "After nested table."),
                 "collapsed-details" => ("Hidden section", "After fold.", "After fold."),
                 "details" => ("Large section", "Hidden1", "Hidden1200"), "mixed" => ("Mixed document", "Deep target", "Mixed final marker."),
                 _ => throw new ArgumentException("Unknown UIA scenario.")
@@ -85,6 +86,24 @@ internal static class IndependentUiaClient
                 var cellPattern = (GridItemPattern)cell.GetCurrentPattern(GridItemPattern.Pattern);
                 Require(cellPattern.Current.Column == 1 && cellPattern.Current.ContainingGrid == table, "Cell/table relationship", checks);
                 Require(((TablePattern)table.GetCurrentPattern(TablePattern.Pattern)).Current.GetColumnHeaders().Length == 2, "Table header relationships", checks);
+            }
+            if (scenario is "table-spans" or "table-blocks")
+            {
+                var table = document.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Table))!;
+                var grid = (GridPattern)table.GetCurrentPattern(GridPattern.Pattern);
+                if (scenario == "table-spans")
+                {
+                    Require(grid.Current.RowCount == 3 && grid.Current.ColumnCount == 3, "Spanned table complete row/column structure", checks);
+                    var wideCell = grid.GetItem(0, 0); var tallCell = grid.GetItem(0, 2); var lowerCell = grid.GetItem(1, 0);
+                    Require(grid.GetItem(0, 1) == wideCell && ((GridItemPattern)wideCell.GetCurrentPattern(GridItemPattern.Pattern)).Current.ColumnSpan == 2, "Column span exposes the same containing cell", checks);
+                    Require(grid.GetItem(1, 2) == tallCell && grid.GetItem(2, 0) == lowerCell && ((GridItemPattern)tallCell.GetCurrentPattern(GridItemPattern.Pattern)).Current.RowSpan == 2, "Row span exposes correct relationships", checks);
+                    Require(text.RangeFromChild(grid.GetItem(2, 2)).GetText(-1).Contains("CCCCC", StringComparison.Ordinal), "Distant spanned cell range", checks);
+                }
+                else
+                {
+                    Require(text.RangeFromChild(grid.GetItem(0, 0)).GetText(-1).Contains("First paragraph.\r\nSecond paragraph.", StringComparison.Ordinal), "Multi-paragraph cell text range", checks);
+                    Require(grid.GetItem(0, 1).FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List)) is not null, "Nested list remains a real semantic child of its table cell", checks);
+                }
             }
             Trace("distant-range");
             if (scenario == "rich")
@@ -157,9 +176,8 @@ internal static class IndependentUiaClient
             var copySequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
             Chord(0x11, 0x43); Wait(() => LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != copySequence && Clipboard.ContainsText() && Clipboard.GetText().Contains(names.Item3, StringComparison.Ordinal));
             var copied = Clipboard.GetText();
-            var expected = scenario == "list" ? string.Join("\r\n", Enumerable.Range(1, 4000).Select(i => "•\tword" + i)) + "\r\n" : actual;
+            var expected = scenario == "list" ? string.Join("\r\n", Enumerable.Range(1, 4000).Select(i => "•\tword" + i)) + "\r\n" : actual + "\r\n";
             File.WriteAllText(Path.Combine(output, "selected-text-before-assertion.txt"), copied); File.WriteAllText(Path.Combine(output, "expected-selected-text.txt"), expected);
-            if (scenario is not ("mixed" or "nested-lists")) Require(copied == expected, "Exact selected marker/tab/line-ending serialisation", checks);
             Trace("rtf-decode");
             var rawRtf = Clipboard.GetData(DataFormats.Rtf);
             var rtf = rawRtf is string value ? value : throw new IOException("RTF string payload missing.");
@@ -168,12 +186,29 @@ internal static class IndependentUiaClient
             decoded.Load(new MemoryStream(Encoding.UTF8.GetBytes(rtf)), DataFormats.Rtf);
             File.WriteAllText(Path.Combine(output, "selected-text.txt"), copied); File.WriteAllText(Path.Combine(output, "decoded-rtf-text.txt"), decoded.Text); File.WriteAllText(Path.Combine(output, "selected.rtf"), rtf);
             Trace("stock-serialisation-oracle-after-actual-copy");
-            var stockExpected = StockOracle(output);
+            var stockExpected = StockOracle(output, out var nativeInterchange);
+            var stockPlain = new System.Windows.Documents.TextRange(nativeInterchange.Document.ContentStart, nativeInterchange.Document.ContentEnd).Text;
+            File.WriteAllText(Path.Combine(output, "expected-selected-text.txt"), stockPlain);
+            Require(copied == stockPlain, "Exact actual selected marker/tab/line-ending/media serialisation against stock", checks);
             Require(decoded.Text == stockExpected, "RTF actually decoded with stock-compatible logical text (including native interchange transformations)", checks);
             if (scenario == "list") Require(DecodedBlocks(decodedDocument.Blocks).OfType<System.Windows.Documents.Paragraph>().SelectMany(paragraph => DecodedRuns(paragraph.Inlines)).Any(run => run.Text.Contains("word1", StringComparison.Ordinal) && run.FontWeight == FontWeights.Bold), "Decoded RTF actual bold style", checks);
             Trace("xaml-decode");
             Require(Clipboard.ContainsData(DataFormats.Xaml) && System.Xml.Linq.XElement.Parse(Clipboard.GetData(DataFormats.Xaml) as string ?? throw new IOException("Xaml string payload missing.")).Descendants().Any(element => element.Name.LocalName == "Run"), "Actual Xaml selected-range content", checks);
             Require(Clipboard.ContainsData(DataFormats.Rtf), "Actual Unicode/Text/RTF clipboard formats", checks);
+            if (scenario == "mixed")
+            {
+                var bytes = Clipboard.GetData(DataFormats.XamlPackage) switch
+                {
+                    MemoryStream package => package.ToArray(), byte[] package => package,
+                    _ => throw new IOException("Actual XamlPackage bytes missing.")
+                };
+                using var expectedPackage = new MemoryStream(); new System.Windows.Documents.TextRange(nativeInterchange.Document.ContentStart, nativeInterchange.Document.ContentEnd).Save(expectedPackage, DataFormats.XamlPackage);
+                var expectedMedia = InterchangeChecks.Media(InterchangeChecks.Decode(expectedPackage.ToArray(), DataFormats.XamlPackage));
+                var actualMedia = InterchangeChecks.Media(InterchangeChecks.Decode(bytes, DataFormats.XamlPackage));
+                Program.Write(Path.Combine(output, "actual-xamlpackage-media.json"), new { Stock = expectedMedia, Candidate = actualMedia });
+                Require(expectedMedia.Length == 13 && System.Text.Json.JsonSerializer.Serialize(expectedMedia) == System.Text.Json.JsonSerializer.Serialize(actualMedia), "Actual clipboard XamlPackage decoded image dimensions and pixels", checks);
+                Require(!nativeInterchange.Document.ContentStart.HasValidLayout, "Stock interchange oracle remains unformatted after package serialisation", checks);
+            }
             Require(AutomationElement.FocusedElement.Current.ProcessId == processId, "Focus retained after copy", checks);
             if (scenario == "rich")
             {
@@ -187,6 +222,22 @@ internal static class IndependentUiaClient
                 Require(runs.Any(run => run.Text.Contains("bold", StringComparison.Ordinal) && run.FontWeight == FontWeights.Bold)
                     && runs.Any(run => run.Text.Contains("italic", StringComparison.Ordinal) && run.FontStyle == FontStyles.Italic)
                     && runs.Any(run => run.Text.Contains("code", StringComparison.Ordinal) && run.FontFamily.Source == "Consolas"), "Actual cross-run partial copy and decoded bold/italic/code fidelity", checks);
+            }
+            if (scenario == "list")
+            {
+                var partial = text.DocumentRange.FindText("rd1\r\nwor", false, false)!;
+                var source = File.ReadAllText(Path.Combine(output, "fixture.md"));
+                var fromSource = source.IndexOf("word1", StringComparison.Ordinal) + 2; var toSource = source.IndexOf("word2", StringComparison.Ordinal) + 3;
+                Require(nativeInterchange.TextMap.TryPreviewRange(fromSource, toSource - fromSource, out var from, out var to), "Stock partial list source mapping", checks);
+                var expectedPartial = new System.Windows.Documents.TextRange(from!, to!);
+                partial.Select(); clipboardOwner.SetSentinel("Partial cross-item sentinel " + Guid.NewGuid()); var sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
+                Chord(0x11, 0x43); Wait(() => LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != sequence && Clipboard.GetText().Contains("rd1", StringComparison.Ordinal));
+                Require(Clipboard.GetText() == expectedPartial.Text, "Actual partial cross-item marker/tab clipboard text", checks);
+                using var stockPartial = new MemoryStream(); expectedPartial.Save(stockPartial, DataFormats.Rtf);
+                var actualPartial = InterchangeChecks.Decode(Encoding.UTF8.GetBytes(Clipboard.GetData(DataFormats.Rtf) as string ?? throw new IOException("Partial list RTF missing.")), DataFormats.Rtf);
+                var expectedDecoded = InterchangeChecks.Decode(stockPartial.ToArray(), DataFormats.Rtf);
+                Require(new System.Windows.Documents.TextRange(actualPartial.ContentStart, actualPartial.ContentEnd).Text == new System.Windows.Documents.TextRange(expectedDecoded.ContentStart, expectedDecoded.ContentEnd).Text
+                    && System.Text.Json.JsonSerializer.Serialize(TargetedChecks.Styles(actualPartial)) == System.Text.Json.JsonSerializer.Serialize(TargetedChecks.Styles(expectedDecoded)), "Actual partial cross-item decoded RTF text and styles", checks);
             }
             if (scenario == "mixed")
             {
@@ -241,14 +292,15 @@ internal static class IndependentUiaClient
         { Program.Write(Path.Combine(output, "independent-uia.json"), new { Status = "FAIL", Checks = checks, Error = error.ToString() }); return 1; }
         finally { Key(0x11, true); Key(0x10, true); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
     }
-    internal static string StockOracle(string output)
+    internal static string StockOracle(string output) => StockOracle(output, out _);
+    private static string StockOracle(string output, out LensDocsStudio.Native.Rendering.PreviewResult native)
     {
         // Test oracle stays in this independent process, after actual first copy.
         // It cannot warm the provider's serializer/JIT or supply live UIA/selection.
         var path = Path.Combine(output, "fixture.md"); var source = File.ReadAllText(path);
         var parsed = new LensDocsStudio.Core.Parsing.MarkdownService().Parse(source);
         var prepared = StockPreparation.Create(parsed, path, output);
-        var native = new LensDocsStudio.Native.Rendering.NativeMarkdownRenderer(new LensDocsStudio.Native.Rendering.NativeSvgService())
+        native = new LensDocsStudio.Native.Rendering.NativeMarkdownRenderer(new LensDocsStudio.Native.Rendering.NativeSvgService())
             .Render(parsed, false, prepared.Diagrams, _ => { }, (_, _) => { }, preparedDrawings: prepared.Drawings, preparedImages: prepared.Images, codeSyntax: prepared.Syntax);
         using var stream = new MemoryStream(); new System.Windows.Documents.TextRange(native.Document.ContentStart, native.Document.ContentEnd).Save(stream, DataFormats.Rtf); stream.Position = 0;
         var document = new System.Windows.Documents.FlowDocument(); var range = new System.Windows.Documents.TextRange(document.ContentStart, document.ContentEnd); range.Load(stream, DataFormats.Rtf);

@@ -14,7 +14,7 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Transient diagnostic shell. No ordinary application state, saving, updater or associations.</summary>
 internal sealed class DiagnosticStudio
 {
-    private sealed record Session(string Name, string Source, string? Path) { public DiagnosticView? View { get; set; } }
+    private sealed record Session(string Name, string Source, string? Path, string? Root) { public DiagnosticView? View { get; set; } }
     private readonly ExperimentWindow window;
     private readonly TextEditor editor = new() { ShowLineNumbers = true, FontFamily = new("Consolas"), FontSize = 14, Width = 400, Height = 600 };
     private readonly ComboBox documents = new() { Width = 200, DisplayMemberPath = "Name" };
@@ -38,7 +38,7 @@ internal sealed class DiagnosticStudio
         tools.Children.Add(documents);
         Add("New document", () => Open("Untitled " + (sessions.Count + 1), "# New document\n", null));
         Add("Close document", CloseDocument);
-        Add("Reopen closed", () => { if (closedSessions.TryPop(out var item)) Open(item.Name, item.Source, item.Path, item.View); });
+        Add("Reopen closed", () => { if (closedSessions.TryPop(out var item)) Open(item.Name, item.Source, item.Path, item.View, item.Root); });
         tools.Children.Add(search); Add("Previous match", () => Find(false)); Add("Next match", () => Find(true));
         Add("Copy rendered", async () => await CopyRendered());
         var theme = new ComboBox { ItemsSource = new[] { "Light", "Dark" }, SelectedIndex = 0, Width = 80 }; tools.Children.Add(theme);
@@ -63,7 +63,7 @@ internal sealed class DiagnosticStudio
                     {
                         var linked = new LensDocsStudio.Core.Workspace.WorkspacePath(workspace).ResolveLink(sourcePath, target);
                         if (new FileInfo(linked).Length > 4 * 1024 * 1024 || Path.GetExtension(linked).ToLowerInvariant() is not (".md" or ".markdown" or ".txt")) throw new IOException("Open a supported Markdown document within the selected workspace.");
-                        Open(Path.GetFileName(linked), File.ReadAllText(linked), linked);
+                        Open(Path.GetFileName(linked), File.ReadAllText(linked), linked, root: workspace);
                     }
                     else status.Text = "Choose a workspace source path before opening a relative link.";
                 }
@@ -81,16 +81,16 @@ internal sealed class DiagnosticStudio
             catch (Exception error) { status.Text = error.Message; }
         }
     }
-    private void Open(string name, string source, string? path, DiagnosticView? view = null)
+    private void Open(string name, string source, string? path, DiagnosticView? view = null, string? root = null)
     {
-        sessions.Add(new(name, source, path) { View = view }); documents.ItemsSource = null; documents.ItemsSource = sessions; documents.SelectedIndex = sessions.Count - 1;
+        sessions.Add(new(name, source, path, root ?? (path is null ? null : Path.GetDirectoryName(path))) { View = view }); documents.ItemsSource = null; documents.ItemsSource = sessions; documents.SelectedIndex = sessions.Count - 1;
     }
     private void Switch(int index)
     {
         if (index < 0 || index >= sessions.Count) return;
         if (activeSession is not null && sessions.Contains(activeSession)) activeSession.View = window.CaptureView();
         current = index; activeSession = sessions[index]; window.BeginDocument(activeSession.View); switching = true;
-        try { editor.Text = sessions[index].Source; window.SourcePath = sessions[index].Path; window.WorkspaceRoot = sessions[index].Path is { } path ? System.IO.Path.GetDirectoryName(path) : null; }
+        try { editor.Text = sessions[index].Source; window.SourcePath = sessions[index].Path; window.WorkspaceRoot = sessions[index].Root; }
         finally { switching = false; }
         _ = RequestCurrent();
     }
