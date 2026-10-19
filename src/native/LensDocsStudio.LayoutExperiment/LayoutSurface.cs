@@ -26,16 +26,16 @@ internal sealed class LayoutSurface : Panel
         if (InteractionStages.Count >= 2048) { InteractionStages.RemoveRange(0, 1024); DroppedInteractionObservations += 1024; }
         InteractionStages.Add(observation);
     }
-    public void ViewportChanged() { InvalidateVisual(); mediaSelection?.InvalidateVisual(); }
+    public void ViewportChanged() { InvalidateVisual(); selectionOverlay?.InvalidateVisual(); }
     private (SemanticNode Node, Point Point)? pressedLink;
-    private SelectionOverlay? mediaSelection;
+    private SelectionOverlay? selectionOverlay;
     private SemanticNode[] selectedCells = [];
     private readonly HashSet<int> selectedCellParagraphs = [];
     private readonly HashSet<int> cellRangeParagraphs = [];
     private int tableArrowBoundary = -1;
     private bool tableArrowRight;
     private sealed class SelectionOverlay(LayoutSurface owner) : FrameworkElement
-    { protected override void OnRender(DrawingContext context) => owner.DrawMediaSelection(context); }
+    { protected override void OnRender(DrawingContext context) => owner.DrawSelection(context); }
     private static Brush SelectionBrush(string appearance, double opacity = .3)
     {
         // DocumentPreview.xaml owns a 0.3 accent wash in the product. Retain the
@@ -44,11 +44,34 @@ internal sealed class LayoutSurface : Panel
             ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : Color.FromRgb(255, 136, 62)) { Opacity = opacity };
         brush.Freeze(); return brush;
     }
-    private void DrawMediaSelection(DrawingContext context)
+    private void DrawSelection(DrawingContext context)
     {
         if (Snapshot is not { } snapshot || Start == End) return;
-        var brush = SelectionBrush(snapshot.Appearance);
+        // Native selection composites one translucent visual, rather than
+        // per-brush opacity. These paths differ by one colour level in HC.
+        var brush = SelectionBrush(snapshot.Appearance, 1);
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
+        var mediaParagraphs = snapshot.Controls.Select(control => control.Node).Distinct().Select(id => snapshot.Model.Root.Descendants().First(node => node.Id == id).Paragraph).ToHashSet();
+        foreach (var line in snapshot.Lines)
+        {
+            if (line.Hidden || line.Top + line.Height < top || line.Top > bottom || mediaParagraphs.Contains(line.Item)
+                || selectedCellParagraphs.Contains(line.Item) || cellRangeParagraphs.Contains(line.Item)) continue;
+            var topSpace = Start < snapshot.Model.Items[line.Item].Start ? line.SelectionTopSpace : 0;
+            var wholeLine = Start <= line.Start && (End > line.End || !line.HasBreak && End >= line.End) && !line.SelectionBounds.IsEmpty;
+            if (wholeLine)
+            {
+                var rectangle = line.SelectionBounds; rectangle.Y -= topSpace; rectangle.Height += topSpace;
+                if (End > line.End) rectangle.Width += line.EndMarkerWidth;
+                context.DrawRectangle(brush, null, rectangle);
+            }
+            else
+            {
+                if (End > line.End && Start <= line.End && !line.SelectionBounds.IsEmpty && line.EndMarkerWidth > 0)
+                    context.DrawRectangle(brush, null, new Rect(line.SelectionBounds.Right, line.Top - topSpace, line.EndMarkerWidth, line.Height + topSpace));
+                foreach (var bounds in line.Clusters.Where(cluster => cluster.End > Start && cluster.Start < End).SelectMany(cluster => cluster.Bounds))
+                { var rectangle = bounds; rectangle.Y -= topSpace; rectangle.Height += topSpace; context.DrawRectangle(brush, null, rectangle); }
+            }
+        }
         foreach (var cell in selectedCells)
             if (snapshot.NodeBounds.TryGetValue(cell.Id, out var rectangle) && rectangle.Bottom >= top && rectangle.Top <= bottom) context.DrawRectangle(brush, null, rectangle);
         foreach (var id in snapshot.Controls.Select(control => control.Node).Distinct())
@@ -146,7 +169,7 @@ internal sealed class LayoutSurface : Panel
         var previousAppearance = Snapshot?.Appearance;
         selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null; matches.Clear(); selectedCells = []; selectedCellParagraphs.Clear(); cellRangeParagraphs.Clear(); tableArrowBoundary = -1;
         foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;
-        Children.Clear(); mediaSelection = null;
+        Children.Clear(); selectionOverlay = null;
         if (snapshot is not null)
             foreach (var box in snapshot.Controls)
             {
@@ -155,7 +178,7 @@ internal sealed class LayoutSurface : Panel
                 System.Windows.Automation.AutomationProperties.SetAutomationId(button, "ExperimentalDiagram" + box.Label.Replace(" ", "", StringComparison.Ordinal) + "-" + snapshot.Version + "-" + box.Node);
                 button.Click += (_, _) => MediaAction?.Invoke(box); Children.Add(button);
             }
-        if (snapshot is not null) { mediaSelection = new SelectionOverlay(this) { IsHitTestVisible = false, Focusable = false }; Children.Add(mediaSelection); }
+        if (snapshot is not null) { selectionOverlay = new SelectionOverlay(this) { IsHitTestVisible = false, Focusable = false, Opacity = .3 }; Children.Add(selectionOverlay); }
         Snapshot = snapshot; rawAnchor = rawActive = Anchor = Active = 0; rawPreviousCellEnd = false;
         if (snapshot is not null && Scroller is not null)
         {
@@ -200,7 +223,7 @@ internal sealed class LayoutSurface : Panel
         }
         SelectionUpdated?.Invoke();
         InvalidateVisual(); (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.SelectionChanged();
-        mediaSelection?.InvalidateVisual();
+        selectionOverlay?.InvalidateVisual();
     }
     public void Copy()
     {
@@ -255,11 +278,11 @@ internal sealed class LayoutSurface : Panel
     protected override Size MeasureOverride(Size available)
     {
         foreach (var button in Children.OfType<Button>()) { var box = (ControlBox)button.Tag; button.Measure(box.Bounds.Size); }
-        mediaSelection?.Measure(new Size(Snapshot?.Width ?? 0, Snapshot?.Height ?? 0));
+        selectionOverlay?.Measure(new Size(Snapshot?.Width ?? 0, Snapshot?.Height ?? 0));
         return Snapshot is { } snapshot ? new(snapshot.Width - SystemParameters.VerticalScrollBarWidth, snapshot.Height) : new(0, 0);
     }
     protected override Size ArrangeOverride(Size finalSize)
-    { foreach (var button in Children.OfType<Button>()) button.Arrange(((ControlBox)button.Tag).Bounds); mediaSelection?.Arrange(new Rect(finalSize)); return finalSize; }
+    { foreach (var button in Children.OfType<Button>()) button.Arrange(((ControlBox)button.Tag).Bounds); selectionOverlay?.Arrange(new Rect(finalSize)); return finalSize; }
     protected override void OnRender(DrawingContext context)
     {
         var snapshot = Snapshot; if (snapshot is null) return;
@@ -268,36 +291,14 @@ internal sealed class LayoutSurface : Panel
         context.DrawRectangle(background, null, new Rect(RenderSize));
         if (snapshot.Decorations is not null) context.DrawDrawing(snapshot.Decorations);
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
-        var viewport = new Rect(Scroller?.HorizontalOffset ?? 0, top, Scroller?.ViewportWidth ?? ActualWidth, bottom - top);
-        var selectionBrush = SelectionBrush(snapshot.Appearance);
         var searchBrush = SelectionBrush(snapshot.Appearance, .12);
-        var mediaParagraphs = snapshot.Controls.Select(control => control.Node).Distinct().Select(id => snapshot.Model.Root.Descendants().First(node => node.Id == id).Paragraph).ToHashSet();
         foreach (var line in snapshot.Lines)
         {
-            if (line.Hidden || line.Top + line.Height < top) continue;
-            if (line.Top > bottom) continue;
+            if (line.Hidden || line.Top + line.Height < top || line.Top > bottom) continue;
             context.DrawDrawing(line.Drawing);
-            var paintSelection = !mediaParagraphs.Contains(line.Item) && !selectedCellParagraphs.Contains(line.Item) && !cellRangeParagraphs.Contains(line.Item);
-            var topSpace = Start < snapshot.Model.Items[line.Item].Start ? line.SelectionTopSpace : 0;
-            var wholeLine = paintSelection && Start <= line.Start && (End > line.End || !line.HasBreak && End >= line.End) && !line.SelectionBounds.IsEmpty;
-            if (wholeLine)
-            {
-                var rectangle = line.SelectionBounds;
-                rectangle.Y -= topSpace; rectangle.Height += topSpace;
-                if (End > line.End) rectangle.Width += line.EndMarkerWidth;
-                context.DrawRectangle(selectionBrush, null, rectangle);
-            }
-            else if (paintSelection && End > line.End && Start <= line.End && !line.SelectionBounds.IsEmpty && line.EndMarkerWidth > 0)
-                context.DrawRectangle(selectionBrush, null, new Rect(line.SelectionBounds.Right, line.Top - topSpace, line.EndMarkerWidth, line.Height + topSpace));
             foreach (var cluster in line.Clusters)
-            {
-                var selected = cluster.End > Start && cluster.Start < End;
-                if (!selected && matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
+                if (!(cluster.End > Start && cluster.Start < End) && matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(searchBrush, null, bounds);
-                if (selected && paintSelection && !wholeLine)
-                    foreach (var bounds in cluster.Bounds)
-                    { var rectangle = bounds; rectangle.Y -= topSpace; rectangle.Height += topSpace; context.DrawRectangle(selectionBrush, null, rectangle); }
-            }
         }
     }
     public IEnumerable<Rect> Bounds(int start, int end, bool visibleOnly = false)

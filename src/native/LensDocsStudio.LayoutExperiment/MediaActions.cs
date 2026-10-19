@@ -32,7 +32,7 @@ internal sealed class MediaActions
                 zoom?.Close();
                 var visual = new Image { Source = image, Stretch = Stretch.Uniform, Margin = new Thickness(16) };
                 System.Windows.Automation.AutomationProperties.SetName(visual, "Mermaid diagram");
-                zoom = new Window { Owner = owner, Title = "EXPERIMENT ONLY â€” Mermaid zoom", Width = 900, Height = 650,
+                zoom = new Window { Owner = owner, Title = "EXPERIMENT ONLY — Mermaid zoom", Width = 900, Height = 650,
                     Content = new ScrollViewer { Content = visual } };
                 zoom.Show(); return;
             }
@@ -41,7 +41,7 @@ internal sealed class MediaActions
                 var sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
                 await owner.Surface.ClipboardWorker.Plain(source, sequence, cancellation); return;
             }
-            var dialog = new Microsoft.Win32.SaveFileDialog { Title = "EXPERIMENT ONLY â€” Export diagram", FileName = "diagram." + box.Label.ToLowerInvariant(),
+            var dialog = new Microsoft.Win32.SaveFileDialog { Title = "EXPERIMENT ONLY — Export diagram", FileName = "diagram." + box.Label.ToLowerInvariant(),
                 Filter = box.Label == "SVG" ? "SVG drawing|*.svg" : "PNG image|*.png", AddExtension = true };
             // Start in the current source folder rather than asking the shell to
             // choose a recent location. The focused control retains the old route.
