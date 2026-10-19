@@ -1,5 +1,20 @@
 # Native validation report
 
+## Accepted consolidation — 19 October 2026
+
+The product decision accepts the bounded production improvements in PRs #36/#37
+and pauses draft #38 at `31fa3ad12f3e0c87f5e45cea6f97801af53b67cb`. Stock Continuous
+remains the ordinary renderer. #36 merged as `1944e500b4b3fbd78acc28414098a88b6c81537c`;
+#37 now targets develop. Its final PR receipt owns the actual merge identity,
+post-integration validation and fresh internal preview provenance. Those results
+must be established at the final develop revision, independently of feature-head
+receipts. The original 250 ms target remains incomplete, `.749` unresolved and
+#38's Input verdict failing/INSUFFICIENT EVIDENCE. No active architecture migration
+or deadline blocks further Mermaid editors. See the [consolidation contract and
+next-editor handoff](accepted-native-consolidation.md).
+
+The records below are historical, with their original source and acceptance scope.
+
 Continuation after `0237b08`: **implemented with bounded limitations; original goal INCOMPLETE**. Document-owned flat viewport ranges and owner-local colour brushes reduce demonstrated dispatcher work while preserving stock WPF rendering. Exact six-fixture first-layout acceptance stays red (1f0463e replications: 46/66 and 16/66 failures); all 264 independent correctness outcomes and 132 raster pairs pass. Automatic actual High Contrast enable/disable passes without manual ApplyTheme. Original `.749` first-launch causality remains unresolved. Native segmentation and native-semantics framework reuse prototypes both miss 250 ms; the modified framework is not shipped. A different Continuous layout/selection/UIA architecture requires an explicit scope decision. Final-source CI, package and integration statuses belong to the [source-labelled report and final PR receipt](continuous-preview-performance-refinement.md#stock-and-framework-replication-at-1f0463e); no intermediate package certifies a later head.
 
 
