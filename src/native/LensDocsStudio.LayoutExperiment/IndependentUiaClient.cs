@@ -29,6 +29,7 @@ internal static class IndependentUiaClient
             thread.SetApartmentState(ApartmentState.STA); thread.Start(); dispatcher = ready.Task.GetAwaiter().GetResult();
         }
         public void SetSentinel(string text) => dispatcher.Invoke(() => Clipboard.SetText(text));
+        public T Read<T>(Func<T> read) => dispatcher.Invoke(read);
         public void Dispose() { dispatcher.BeginInvokeShutdown(System.Windows.Threading.DispatcherPriority.Background); thread.Join(1000); }
     }
     private static void Key(byte key, bool up = false) => keybd_event(key, 0, (up ? 2u : 0u) | (key is >= 0x21 and <= 0x28 ? 1u : 0u), UIntPtr.Zero);

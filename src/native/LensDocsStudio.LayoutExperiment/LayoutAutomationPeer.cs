@@ -36,7 +36,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
     public void SelectionChanged() => RaiseAutomationEvent(AutomationEvents.TextPatternOnTextSelectionChanged);
     public ITextRangeProvider DocumentRange => Range(0, surface.Snapshot?.Model.Text.Length ?? 0);
     public SupportedTextSelection SupportedTextSelection => SupportedTextSelection.Single;
-    public ITextRangeProvider[] GetSelection() => [Range(surface.Start, surface.End)];
+    public ITextRangeProvider[] GetSelection() => [Range(surface.Start, surface.End, true)];
     public ITextRangeProvider[] GetVisibleRanges()
     {
         if (surface.Snapshot is not { } snapshot) return [];
@@ -53,7 +53,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         if (native?.Tag is ControlBox box && nodes.TryGetValue(box.Node, out var media)) return Range(media.Start, media.End);
         throw new ArgumentException("The element is not a child of the current document.");
     }
-    internal TextRange Range(int start, int end) => new(this, surface.Snapshot, Math.Min(start, TextEnd(surface.Snapshot)), Math.Min(end, TextEnd(surface.Snapshot)));
+    internal TextRange Range(int start, int end, bool selectionEnd = false) => new(this, surface.Snapshot, Math.Min(start, TextEnd(surface.Snapshot)), Math.Min(end, TextEnd(surface.Snapshot)), selectionEnd);
     internal IRawElementProviderSimple[] Children(int start, int end)
     {
         if (start == end) return [];
@@ -165,11 +165,12 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         public void Collapse() { if (Node.Expanded) root.Surface.Activate(Node); }
     }
 
-    internal sealed class TextRange(LayoutAutomationPeer peer, LayoutSnapshot? snapshot, int start, int end) : ITextRangeProvider
+    internal sealed class TextRange(LayoutAutomationPeer peer, LayoutSnapshot? snapshot, int start, int end, bool selectionEnd = false) : ITextRangeProvider
     {
         private readonly WeakReference<LayoutAutomationPeer> owner = new(peer);
         private LayoutAutomationPeer Peer => owner.TryGetTarget(out var value) ? value : throw new ElementNotAvailableException();
         private int start = start, end = end;
+        private bool selectedCellEnd = selectionEnd;
         private bool formatBackward = true;
         // A styled-run edge and its text insertion point can share one text/source
         // offset. Preserve that real semantic boundary in endpoint comparison.
@@ -185,7 +186,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         private readonly WeakReference<LayoutSnapshot>? identity = snapshot is null ? null : new(snapshot);
         private LayoutSnapshot? Identity => identity is not null && identity.TryGetTarget(out var value) ? value : null;
         private LayoutSnapshot Current => Identity is { } current && ReferenceEquals(Peer.Surface.Snapshot, current) ? current : throw new ElementNotAvailableException();
-        public ITextRangeProvider Clone() => new TextRange(Peer, Current, start, end) { formatBackward = formatBackward, startOrder = startOrder, endOrder = endOrder };
+        public ITextRangeProvider Clone() => new TextRange(Peer, Current, start, end, selectedCellEnd) { formatBackward = formatBackward, startOrder = startOrder, endOrder = endOrder };
         private TextRange Other(ITextRangeProvider other)
         { _ = Current; return other is TextRange range && ReferenceEquals(range.Identity, Identity) ? range : throw new ArgumentException("Ranges belong to different documents."); }
         public bool Compare(ITextRangeProvider range) { var other = Other(range); return start == other.start && end == other.end && startOrder == other.startOrder && endOrder == other.endOrder; }
@@ -211,6 +212,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         }
         public void ExpandToEnclosingUnit(TextUnit unit)
         {
+            selectedCellEnd = false;
             end = Math.Min(TextEnd(Current), SnapshotIndices.Adjacent(Current.Indices.Characters, start, true));
             Expand(unit, true, true);
         }
@@ -330,6 +332,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         { var text = Current.Model.Text[start..end]; return maxLength < 0 || maxLength >= text.Length ? text : text[..maxLength]; }
         public int Move(TextUnit unit, int count)
         {
+            selectedCellEnd = false;
             if (unit != TextUnit.Paragraph) Expand(unit, true, true);
             if (count == 0) { _ = Current; return 0; }
             if (unit == TextUnit.Line && Current.Indices.Tables.Length > 0)
@@ -356,6 +359,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         public int MoveEndpointByUnit(TextPatternRangeEndpoint endpoint, TextUnit unit, int count)
         {
             if (count == 0) { _ = Current; return 0; }
+            selectedCellEnd = false;
             var units = Units(unit); var value = endpoint == TextPatternRangeEndpoint.Start ? start : end;
             if (unit == TextUnit.Format && count > 0 && formatBackward && Current.Model.Items.SelectMany(item => item.Runs).Any(run => run.Start == value)
                 && (endpoint == TextPatternRangeEndpoint.Start || start == end && !Current.Model.Items.Any(item => item.Start == value)))
@@ -410,12 +414,13 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         }
         public void MoveEndpointByRange(TextPatternRangeEndpoint endpoint, ITextRangeProvider targetRange, TextPatternRangeEndpoint targetEndpoint)
         {
+            selectedCellEnd = false;
             var other = Other(targetRange); var value = targetEndpoint == TextPatternRangeEndpoint.Start ? other.start : other.end;
             var order = targetEndpoint == TextPatternRangeEndpoint.Start ? other.startOrder : other.endOrder;
             if (endpoint == TextPatternRangeEndpoint.Start) { start = value; startOrder = order; if ((start, startOrder).CompareTo((end, endOrder)) > 0) { end = start; endOrder = startOrder; } }
             else { end = value; endOrder = order; if ((end, endOrder).CompareTo((start, startOrder)) < 0) { start = end; startOrder = endOrder; } }
         }
-        public void Select() { _ = Current; Peer.Surface.Select(start, end); }
+        public void Select() { _ = Current; Peer.Surface.Select(start, end, previousCellEnd: selectedCellEnd); }
         public void AddToSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
         public void RemoveFromSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
         public void ScrollIntoView(bool alignToTop) { _ = Current; Peer.Surface.ScrollRange(start, end, alignToTop); }

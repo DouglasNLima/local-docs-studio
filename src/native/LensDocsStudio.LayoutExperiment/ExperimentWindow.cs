@@ -18,6 +18,9 @@ internal sealed class ExperimentWindow : Window
     public System.Collections.Concurrent.ConcurrentQueue<PreparationEvent> Events { get; } = new();
     private int droppedPreparationObservations;
     public int DroppedPreparationObservations => Volatile.Read(ref droppedPreparationObservations);
+    private static int activeWorkerDispatchers, createdWorkerDispatchers, releasedWorkerDispatchers;
+    internal static int ActiveWorkerDispatchers => Volatile.Read(ref activeWorkerDispatchers);
+    internal static object WorkerOwnership => new { Active = ActiveWorkerDispatchers, Created = Volatile.Read(ref createdWorkerDispatchers), Released = Volatile.Read(ref releasedWorkerDispatchers) };
     private CancellationTokenSource? active;
     private sealed record RequestData(string Source, string Appearance, long Version, string? Path, string? Root, Dictionary<int, bool> Details, DiagnosticView? Restore, TaskCompletionSource<bool> Completion);
     private RequestData? pending;
@@ -243,7 +246,28 @@ internal sealed class ExperimentWindow : Window
     public static Task<T> Worker<T>(Func<T> work)
     {
         var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
-        var thread = new Thread(() => { try { completion.TrySetResult(work()); } catch (Exception error) { completion.TrySetException(error); } })
+        var thread = new Thread(() =>
+        {
+            // Public WPF controls/resources can create an owning dispatcher on
+            // this STA. Shut it down here, before publishing frozen results or
+            // failures, so its native notification windows cannot outlive work.
+            var dispatcher = Dispatcher.CurrentDispatcher;
+            Interlocked.Increment(ref createdWorkerDispatchers); Interlocked.Increment(ref activeWorkerDispatchers);
+            T result = default!; Exception? failure = null;
+            try
+            {
+                result = work();
+            }
+            catch (Exception error) { failure = error; }
+            try
+            {
+                dispatcher.InvokeShutdown();
+                Interlocked.Increment(ref releasedWorkerDispatchers);
+            }
+            catch (Exception error) { failure = failure is null ? error : new AggregateException(failure, error); }
+            finally { Interlocked.Decrement(ref activeWorkerDispatchers); }
+            if (failure is not null) completion.TrySetException(failure); else completion.TrySetResult(result);
+        })
             { IsBackground = true, Name = "Continuous layout experiment STA" };
         thread.SetApartmentState(ApartmentState.STA); thread.Start(); return completion.Task;
     }

@@ -15,7 +15,7 @@ internal static class RangeOracleChecks
     internal const string Source = "## Heading\n\nPlain **bold** *italic* and `code`.\n\nLatin العربيّة end é 😀.\n\n";
     public static async Task Run(ExperimentWindow window, string output)
     {
-        var source = Source + "| Cell A | Cell B | Cell C |\n|---|---|---|\n| Value D | Value E | Value F |\n| Value G | Value H | Value I |\n\n" + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
+        var source = Source + "| Cell A | Cell B | Cell C |\n|---|---|---|\n| Value D | Value E | Value F |\n| Value G | Value H | Value I |\n\n" + TargetedFixtures.Cases.Single(value => value.Name == "table-spans").Source + "\n\n" + string.Join("\n\n", Enumerable.Range(0, 40).Select(index => "Wrapped paragraph " + index + " " + string.Join(' ', Enumerable.Repeat("measured words", 15)))) + "\n\nFinal marker.\n";
         var path = Path.Combine(output, "fixture.md"); File.WriteAllText(path, source);
         var gaps = new List<double>(); var timeline = new List<object>(); var candidateGaps = new List<double>(); var last = Stopwatch.GetTimestamp(); var phase = "setup";
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
@@ -63,6 +63,7 @@ internal static class RangeOracleChecks
         IndependentUiaClient.InitialiseOwnedInput(output);
         using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         var rows = new List<object>();
+        var clipboardReads = new List<object>();
         try
         {
             using var clipboard = new IndependentUiaClient.ClipboardOwner();
@@ -70,24 +71,52 @@ internal static class RangeOracleChecks
             AutomationElement? document = null;
             IndependentUiaClient.Wait(() => (document = window.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, side == "stock" ? "RangeOracleDocument" : "ExperimentalDocument"))) is not null);
             var text = (TextPattern)document!.GetCurrentPattern(TextPattern.Pattern);
-            foreach (var (first, last) in new[] { ("Cell A", "Cell B"), ("Cell B", "Value E"), ("Cell B", "Value D"), ("Cell A", "Cell A") })
+            var spans = text.DocumentRange.FindText("AAAAA", false, false)!;
+            var spanEnding = text.DocumentRange.FindText("After spanned table.", false, false)!;
+            spans.MoveEndpointByRange(TextPatternRangeEndpoint.End, spanEnding, TextPatternRangeEndpoint.Start);
+            foreach (var (first, last, scope) in new[] { ("Cell A", "Cell B", text.DocumentRange), ("Cell B", "Value E", text.DocumentRange), ("Cell B", "Value D", text.DocumentRange), ("Cell A", "Cell A", text.DocumentRange),
+                ("B B B", "E", spans), ("B B B", "D D D", spans), ("AAAAA", "B B B", spans), ("D D D", "CCCCC", spans) })
             {
-                var range = text.DocumentRange.FindText(first, false, false)!; var ending = text.DocumentRange.FindText(last, false, false)!;
+                var range = scope.FindText(first, false, false)!; var ending = scope.FindText(last, false, false)!;
                 range.MoveEndpointByUnit(TextPatternRangeEndpoint.Start, TextUnit.Character, 1); ending.MoveEndpointByUnit(TextPatternRangeEndpoint.End, TextUnit.Character, -1);
                 range.MoveEndpointByRange(TextPatternRangeEndpoint.End, ending, TextPatternRangeEndpoint.End);
                 var before = range.GetText(-1); range.Select(); var selected = text.GetSelection();
                 rows.Add(new { Operation = "actual-table-selection", First = first, Last = last, Before = before, Text = selected.Select(value => value.GetText(-1)).ToArray() });
                 document.SetFocus(); var sentinel = "Table copy sentinel " + first + last; clipboard.SetSentinel(sentinel);
                 IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x43);
-                IndependentUiaClient.Wait(() => Clipboard.ContainsText() && Clipboard.GetText() != sentinel && Clipboard.ContainsData(DataFormats.Rtf));
-                var data = Clipboard.GetDataObject()!;
-                var rtf = (string)data.GetData(DataFormats.Rtf)!; var xaml = (string)data.GetData(DataFormats.Xaml)!;
+                string? plain = null, rtf = null, xaml = null; string[] formats = [];
+                IndependentUiaClient.Wait(() =>
+                {
+                    // Keep the OLE object and all reads on the independent
+                    // client's pumped owning STA; transfer only immutable data.
+                    var value = clipboard.Read(() =>
+                    {
+                        var data = Clipboard.GetDataObject();
+                        return (Plain: data?.GetData(DataFormats.UnicodeText, false) as string,
+                            Rtf: data?.GetData(DataFormats.Rtf), Xaml: data?.GetData(DataFormats.Xaml), Formats: data?.GetFormats(false) ?? []);
+                    });
+                    plain = value.Plain; rtf = value.Rtf as string; xaml = value.Xaml as string; formats = value.Formats;
+                    clipboardReads.Add(new { First = first, Last = last, At = Stopwatch.GetTimestamp(), Sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence,
+                        RtfType = value.Rtf?.GetType().FullName, RtfLength = rtf?.Length, XamlType = value.Xaml?.GetType().FullName, XamlLength = xaml?.Length });
+                    return plain is not null && plain != sentinel && !string.IsNullOrEmpty(rtf) && !string.IsNullOrEmpty(xaml);
+                });
                 File.WriteAllText(Path.Combine(output, "table-copy-" + first.Replace(' ', '-') + "-" + last.Replace(' ', '-') + ".rtf"), rtf);
-                var decodedRtf = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(rtf), DataFormats.Rtf);
-                var decodedXaml = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(xaml), DataFormats.Xaml);
-                rows.Add(new { Operation = "actual-table-copy", First = first, Last = last, Text = data.GetData(DataFormats.UnicodeText, false) as string,
-                    Formats = data.GetFormats(false).Order(StringComparer.Ordinal).ToArray(), RtfText = new TextRange(decodedRtf.ContentStart, decodedRtf.ContentEnd).Text,
+                File.WriteAllText(Path.Combine(output, "table-copy-" + first.Replace(' ', '-') + "-" + last.Replace(' ', '-') + ".xaml"), xaml);
+                var decodedRtf = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(rtf!), DataFormats.Rtf);
+                var decodedXaml = InterchangeChecks.Decode(System.Text.Encoding.UTF8.GetBytes(xaml!), DataFormats.Xaml);
+                rows.Add(new { Operation = "actual-table-copy", First = first, Last = last, Text = plain,
+                    Formats = formats.Order(StringComparer.Ordinal).ToArray(), RtfText = new TextRange(decodedRtf.ContentStart, decodedRtf.ContentEnd).Text,
                     RtfStyles = TargetedChecks.Styles(decodedRtf), XamlText = new TextRange(decodedXaml.ContentStart, decodedXaml.ContentEnd).Text, XamlStyles = TargetedChecks.Styles(decodedXaml) });
+                if (scope == spans)
+                {
+                    selected.Single().Clone().Select();
+                    rows.Add(new { Operation = "selected-span-clone-select", First = first, Last = last, Text = text.GetSelection().Select(value => value.GetText(-1)).ToArray() });
+                    var cloneSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
+                    IndependentUiaClient.ChordObserved(acknowledgement, process.MainWindowHandle, 0x11, 0x43);
+                    string? cloned = null;
+                    IndependentUiaClient.Wait(() => LensDocsStudio.Native.Platform.NativeClipboardService.Sequence != cloneSequence && (cloned = clipboard.Read(() => Clipboard.GetDataObject()?.GetData(DataFormats.UnicodeText, false) as string)) is not null);
+                    rows.Add(new { Operation = "selected-span-clone-copy", First = first, Last = last, Text = cloned });
+                }
             }
             foreach (var target in new[] { "bold", "العربيّة", "Final marker." })
             foreach (var unit in Enum.GetValues<TextUnit>())
@@ -159,6 +188,6 @@ internal static class RangeOracleChecks
             Program.Write(Path.Combine(output, "operations.json"), rows); return 0;
         }
         catch (Exception error) { Program.Write(Path.Combine(output, "operations.json"), rows); Program.Write(Path.Combine(output, "failure.json"), new { Error = error.ToString() }); return 1; }
-        finally { IndependentUiaClient.ReleaseOwnedInput(); }
+        finally { Program.Write(Path.Combine(output, "clipboard-readiness.json"), clipboardReads); IndependentUiaClient.ReleaseOwnedInput(); }
     }
 }

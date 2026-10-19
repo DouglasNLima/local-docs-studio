@@ -42,12 +42,14 @@ internal static class AppearanceChecks
             await window.Request(fixture.Source, "Light"); await Capture("light.png"); phase = "Dark";
             await window.Request(fixture.Source, "Dark"); await Capture("dark.png"); phase = "actual-enable";
             var selectedSource = fixture.Source.LastIndexOf("Mixed final marker.", StringComparison.Ordinal);
-            window.Surface.SelectSource(selectedSource, selectedSource + "Mixed final marker.".Length); window.Surface.Focus();
+            window.Surface.SelectSource(selectedSource, selectedSource + "Mixed final marker.".Length); window.Activate(); window.Surface.Focus();
+            await window.Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Input);
             void SelectionCurrent()
             {
                 if (window.Surface.SelectionSourceStart != selectedSource || window.Surface.SelectionSourceEnd != selectedSource + "Mixed final marker.".Length || !window.Surface.IsKeyboardFocusWithin)
-                    throw new IOException("Automatic appearance replacement lost current selection or document focus.");
+                    throw new IOException($"Automatic appearance replacement lost selection/focus: expected {selectedSource}..{selectedSource + "Mixed final marker.".Length}, actual {window.Surface.SelectionSourceStart}..{window.Surface.SelectionSourceEnd}, document focus {window.Surface.IsKeyboardFocusWithin}, active window {window.IsActive}, focused element {System.Windows.Input.Keyboard.FocusedElement?.GetType().FullName}.");
             }
+            SelectionCurrent(); // Establish actual focus before the OS mutation too.
             // OS broadcasts can take time; execute the setting request away from the application dispatcher.
             contrast = await Task.Run(() => new NativeTestHighContrast());
             await Wait(() => NativeTestHighContrast.IsEnabledNow && window.Surface.Snapshot?.Appearance == ExperimentAppearance.Capture("Dark")

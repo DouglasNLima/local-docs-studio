@@ -11,7 +11,8 @@ internal sealed class LayoutSurface : Panel
     public LayoutSnapshot? Snapshot { get; private set; }
     public int Anchor { get; private set; }
     public int Active { get; private set; }
-    private int rawAnchor;
+    private int rawAnchor, rawActive;
+    private bool rawPreviousCellEnd;
     public int Start => Math.Min(Anchor, Active);
     public int End => Math.Max(Anchor, Active);
     public ScrollViewer? Scroller { get; set; }
@@ -58,7 +59,7 @@ internal sealed class LayoutSurface : Panel
     }
     private ClipboardDispatcher? clipboard;
     private CancellationTokenSource? selectedCopy;
-    private (LayoutSnapshot Snapshot, int Start, int End, uint Sequence, long Requested)? pendingCopy;
+    private (LayoutSnapshot Snapshot, int Start, int End, int CopyStart, int CopyEnd, uint Sequence, long Requested)? pendingCopy;
     private bool copyRunning, copyClosed;
     public ClipboardDispatcher ClipboardWorker => clipboard ??= new();
     public void CloseClipboard() { copyClosed = true; pendingCopy = null; selectedCopy?.Cancel(); clipboard?.Dispose(); }
@@ -155,7 +156,7 @@ internal sealed class LayoutSurface : Panel
                 button.Click += (_, _) => MediaAction?.Invoke(box); Children.Add(button);
             }
         if (snapshot is not null) { mediaSelection = new SelectionOverlay(this) { IsHitTestVisible = false, Focusable = false }; Children.Add(mediaSelection); }
-        Snapshot = snapshot; rawAnchor = Anchor = Active = 0;
+        Snapshot = snapshot; rawAnchor = rawActive = Anchor = Active = 0; rawPreviousCellEnd = false;
         if (snapshot is not null && Scroller is not null)
         {
             var colour = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(snapshot.Appearance, 1)
@@ -179,18 +180,21 @@ internal sealed class LayoutSurface : Panel
         InvalidateMeasure(); InvalidateVisual();
         (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.Changed();
     }
-    public void Select(int anchor, int active, bool preferPreviousRow = false)
+    public void Select(int anchor, int active, bool preferPreviousRow = false, bool previousCellEnd = false)
     {
         selectedCopy?.Cancel(); pendingCopy = null;
         var length = Snapshot?.Model.Text.Length ?? 0;
         Anchor = Math.Clamp(anchor, 0, length); Active = Math.Clamp(active, 0, length);
-        rawAnchor = Anchor;
+        rawAnchor = Anchor; rawActive = Active;
+        rawPreviousCellEnd = previousCellEnd;
         if (Snapshot is { } snapshot)
         {
-            (Anchor, Active) = TableSelection.Normalise(snapshot, Anchor, Active, preferPreviousRow);
-            selectedCells = TableSelection.PaintedCells(snapshot, Start, End); selectedCellParagraphs.Clear();
+            var cellTable = TableSelection.CellRangeTable(snapshot, Start, End, previousCellEnd);
+            var rawCells = cellTable is not null ? TableSelection.PaintedCells(snapshot, Start, End, previousCellEnd) : null;
+            (Anchor, Active) = TableSelection.Normalise(snapshot, Anchor, Active, preferPreviousRow, previousCellEnd);
+            selectedCells = rawCells ?? TableSelection.PaintedCells(snapshot, Start, End); selectedCellParagraphs.Clear();
             cellRangeParagraphs.Clear();
-            if (TableSelection.CellRangeTable(snapshot, Start, End) is { } table)
+            if ((cellTable ?? TableSelection.CellRangeTable(snapshot, Start, End)) is { } table)
                 foreach (var node in table.Node.Descendants()) if (node.Paragraph >= 0) cellRangeParagraphs.Add(node.Paragraph);
             foreach (var cell in selectedCells) foreach (var node in cell.Descendants()) if (node.Paragraph >= 0) selectedCellParagraphs.Add(node.Paragraph);
         }
@@ -202,7 +206,16 @@ internal sealed class LayoutSurface : Panel
     {
         if (Snapshot is not { } snapshot || !Current(snapshot) || Start == End || copyClosed) return;
         selectedCopy?.Cancel();
-        pendingCopy = (snapshot, Start, End, LensDocsStudio.Native.Platform.NativeClipboardService.Sequence, System.Diagnostics.Stopwatch.GetTimestamp());
+        var copyStart = Math.Min(rawAnchor, rawActive); var copyEnd = Math.Max(rawAnchor, rawActive);
+        if (TableSelection.CellRangeTable(snapshot, copyStart, copyEnd, rawPreviousCellEnd) is null) { copyStart = Start; copyEnd = End; }
+        else if (rawPreviousCellEnd)
+        {
+            // GetSelection ends after the selected cell's logical separator.
+            // The public interchange pointer must stay inside that cell, rather
+            // than resolving its separator to the following cell's first run.
+            copyEnd -= copyEnd >= 2 && snapshot.Model.Text.AsSpan(copyEnd - 2, 2).SequenceEqual("\r\n") ? 2 : 1;
+        }
+        pendingCopy = (snapshot, Start, End, copyStart, copyEnd, LensDocsStudio.Native.Platform.NativeClipboardService.Sequence, System.Diagnostics.Stopwatch.GetTimestamp());
         if (!copyRunning) ProcessCopy();
     }
     private async void ProcessCopy()
@@ -217,7 +230,7 @@ internal sealed class LayoutSurface : Panel
                 var snapshot = request.Snapshot; var start = request.Start; var end = request.End; var sequence = request.Sequence;
                 try
                 {
-                    var payload = await ExperimentWindow.Worker(() => ClipboardSerialisation.Prepare(snapshot, start, end, owner.Token));
+                    var payload = await ExperimentWindow.Worker(() => ClipboardSerialisation.Prepare(snapshot, request.CopyStart, request.CopyEnd, owner.Token));
                     var prepared = watch.Elapsed.TotalMilliseconds;
                     await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
                     if (!Current(snapshot) || Start != start || End != end || owner.IsCancellationRequested)

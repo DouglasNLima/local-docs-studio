@@ -99,6 +99,7 @@ internal static class LifecycleChecks
         if (reopen.Surface.Snapshot?.Model.Text.Length != 0 || reopen.Scroller.Background is not System.Windows.Media.SolidColorBrush background
             || background.Color != System.Windows.Media.Color.FromRgb(32, 33, 36)) throw new IOException("An empty diagnostic document lost its current appearance.");
         reopen.Close(); timer.Stop();
+        if (ExperimentWindow.ActiveWorkerDispatchers != 0) throw new IOException("An owned layout/serialisation worker dispatcher remained active after closure.");
         var readiness = events.Where(item => item.Event == "winning-preview-ready").Select(ready =>
         {
             var requested = events.First(item => item.Version == ready.Version && item.Event == "requested");
@@ -109,6 +110,7 @@ internal static class LifecycleChecks
                 WinningPreviewReadyMilliseconds = (ready.Timestamp - requested.Timestamp) * 1000d / Stopwatch.Frequency };
         }).ToArray();
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
+            WorkerDispatcherOwnership = ExperimentWindow.WorkerOwnership,
             window.DroppedPreparationObservations, window.Surface.DroppedInteractionObservations, ReopenDroppedPreparationObservations = reopen.DroppedPreparationObservations,
             ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
