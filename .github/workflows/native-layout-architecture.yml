@@ -7,15 +7,28 @@ on:
       scope:
         description: Focused diagnosis or complete v2 acceptance
         type: choice
-        options: [full, focused, compile-comparison, artifact, visual]
+        options: [full, focused, compile-comparison, artifact, visual, availability]
         default: full
+      runner_image:
+        description: Explicit hosted image; each cohort retains its image identity
+        type: choice
+        options: [windows-latest, windows-2022]
+        default: windows-latest
 permissions:
   contents: read
 jobs:
+  runner-availability:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'availability'
+    runs-on: ${{ inputs.runner_image }}
+    timeout-minutes: 2
+    steps:
+      - name: Record availability only; no prototype preparation or acceptance
+        run: |
+          @{ Utc=[DateTime]::UtcNow.ToString('o'); ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Os=[Environment]::OSVersion.ToString(); CpuAvailable=[Environment]::ProcessorCount; AcceptanceData=$false } | ConvertTo-Json
   visual-review-captures:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'visual'
     name: Separate all-theme correctness captures (${{ matrix.replication }})
-    runs-on: windows-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 10
     strategy:
       fail-fast: false
@@ -51,7 +64,7 @@ jobs:
   artifact-verification:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'artifact'
     name: Exact-source experiment executable; no performance reclassification
-    runs-on: windows-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -93,7 +106,7 @@ jobs:
   compile-comparison:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'compile-comparison'
     name: Bounded IL/ReadyToRun compiler comparison (${{ matrix.replication }})
-    runs-on: windows-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
@@ -137,7 +150,7 @@ jobs:
   six-workload-v2:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'full'
     name: Complete six-workload v2 gate (replication ${{ matrix.replication }})
-    runs-on: windows-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -171,7 +184,7 @@ jobs:
   focused-diagnostics:
     if: github.event_name == 'push' || inputs.scope == 'focused'
     name: Focused media/appearance diagnosis (${{ matrix.replication }})
-    runs-on: windows-latest
+    runs-on: ${{ github.event_name == 'workflow_dispatch' && inputs.runner_image || 'windows-latest' }}
     timeout-minutes: 15
     strategy:
       fail-fast: false
