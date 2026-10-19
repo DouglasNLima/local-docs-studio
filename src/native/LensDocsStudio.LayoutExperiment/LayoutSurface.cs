@@ -257,13 +257,26 @@ internal sealed class LayoutSurface : Panel
             if (line.Hidden || line.Top + line.Height < top) continue;
             if (line.Top > bottom) continue;
             context.DrawDrawing(line.Drawing);
+            var paintSelection = !mediaParagraphs.Contains(line.Item) && !selectedCellParagraphs.Contains(line.Item) && !cellRangeParagraphs.Contains(line.Item);
+            var topSpace = Start < snapshot.Model.Items[line.Item].Start ? line.SelectionTopSpace : 0;
+            var wholeLine = paintSelection && Start <= line.Start && (End > line.End || !line.HasBreak && End >= line.End) && !line.SelectionBounds.IsEmpty;
+            if (wholeLine)
+            {
+                var rectangle = line.SelectionBounds;
+                rectangle.Y -= topSpace; rectangle.Height += topSpace;
+                if (End > line.End) rectangle.Width += line.EndMarkerWidth;
+                context.DrawRectangle(selectionBrush, null, rectangle);
+            }
+            else if (paintSelection && End > line.End && Start <= line.End && !line.SelectionBounds.IsEmpty && line.EndMarkerWidth > 0)
+                context.DrawRectangle(selectionBrush, null, new Rect(line.SelectionBounds.Right, line.Top - topSpace, line.EndMarkerWidth, line.Height + topSpace));
             foreach (var cluster in line.Clusters)
             {
                 var selected = cluster.End > Start && cluster.Start < End;
                 if (!selected && matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(searchBrush, null, bounds);
-                if (selected && !mediaParagraphs.Contains(line.Item) && !selectedCellParagraphs.Contains(line.Item) && !cellRangeParagraphs.Contains(line.Item))
-                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(selectionBrush, null, bounds);
+                if (selected && paintSelection && !wholeLine)
+                    foreach (var bounds in cluster.Bounds)
+                    { var rectangle = bounds; rectangle.Y -= topSpace; rectangle.Height += topSpace; context.DrawRectangle(selectionBrush, null, rectangle); }
             }
         }
     }

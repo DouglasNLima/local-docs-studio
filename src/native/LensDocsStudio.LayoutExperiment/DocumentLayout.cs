@@ -61,25 +61,30 @@ internal static class DocumentLayout
             if (header) Rectangle(surface, null, rectangle);
             Rectangle(null, new Pen(Brush("#808080"), .5), new Rect(rectangle.X + .25, rectangle.Y + .25, Math.Max(0, rectangle.Width - .5), Math.Max(0, rectangle.Height - .5)));
         }
-        public double Block(SemanticNode node, double x, double top, double width, bool first = false, (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left)
+        public double Block(SemanticNode node, double x, double top, double width, bool first = false, (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left, double selectionTopSpace = 0)
         {
             cancellation.ThrowIfCancellationRequested(); var begin = top;
             switch (node.Kind)
             {
                 case "Document": case "ListItem": case "Cell":
-                    top = Flow(node.Children, x, top, width, true, node.Kind == "Document", marker, alignment, docTop: first && node.Kind == "Document");
+                    top = Flow(node.Children, x, top, width, true, node.Kind == "Document", marker, alignment, docTop: first && node.Kind == "Document", inheritedSpace: selectionTopSpace);
                     break;
                 case "List":
                     top += ListMargin; var number = node.Number;
-                    foreach (var child in node.Children) top = Block(child, x + 24, top, width - 24, true, node.Ordered && node.Number == 0 ? null : (node.Ordered, number++));
+                    var precedingSpace = selectionTopSpace;
+                    foreach (var child in node.Children)
+                    {
+                        top = Block(child, x + 24, top, width - 24, true, node.Ordered && node.Number == 0 ? null : (node.Ordered, number++), selectionTopSpace: precedingSpace);
+                        precedingSpace = child.Children.LastOrDefault() is { } ending ? After(ending) : 0;
+                    }
                     top += Math.Max(0, ListMargin - (node.Children.LastOrDefault()?.Children.LastOrDefault() is { } last ? After(last) : 0));
                     break;
                 case "Quote":
-                    top += 4; top = Flow(node.Children, x + 15, top, width - 19, first, false, docTop: first);
+                    top += 4; top = Flow(node.Children, x + 15, top, width - 19, first, false, docTop: first, inheritedSpace: selectionTopSpace);
                     Rectangle(Brush("#FF883E"), null, new Rect(x, begin, 3, top - begin + 4)); top += 4; break;
                 case "Details":
                     top += 15;
-                    top = Block(node.Children[0], x + 11, top, width - 22, true);
+                    top = Block(node.Children[0], x + 11, top, width - 22, true, selectionTopSpace: selectionTopSpace);
                     var headerBottom = top; var wasHidden = hidden; hidden |= !node.Expanded;
                     top = Flow(node.Children.Skip(1).ToImmutableArray(), x + 11, top, width - 22, false, false, initialMargin: 4);
                     hidden = wasHidden; if (!node.Expanded) top = headerBottom;
@@ -119,7 +124,7 @@ internal static class DocumentLayout
                     top += Before(node);
                     var paragraphTop = top;
                     if (code) top += 12;
-                    top = Paragraph(node, x + (code ? 12 : 0), top, width - (code ? 24 : 0), size, cellHeader || heading || node.Kind == "DetailsHeader", marker, alignment);
+                    top = Paragraph(node, x + (code ? 12 : 0), top, width - (code ? 24 : 0), size, cellHeader || heading || node.Kind == "DetailsHeader", marker, alignment, selectionTopSpace);
                     if (code) { top += 12; Rectangle(surface, null, new Rect(x, paragraphTop, width, top - paragraphTop)); }
                     top += After(node);
                     break;
@@ -131,7 +136,7 @@ internal static class DocumentLayout
         private static double Before(SemanticNode node) => node.Kind switch { "Heading" => 16, "Table" or "Details" => 8, "Rule" => 12, "List" => ListMargin, "Code" => CodeMargin, "Quote" or "DetailsHeader" or "Media" => 0, _ => node.Paragraph >= 0 ? 4 : 0 };
         private static double After(SemanticNode node) => node.Kind switch { "Heading" => 8, "Table" or "Details" => 12, "Rule" => 12, "Code" => CodeMargin, "Quote" or "Media" => 0, "DetailsHeader" => 4, "List" => ListMargin, _ => node.Paragraph >= 0 ? 10 : 0 };
         private double Flow(ImmutableArray<SemanticNode> children, double x, double top, double width, bool suppressFirst, bool trimLast,
-            (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left, bool docTop = false, double initialMargin = 0)
+            (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left, bool docTop = false, double initialMargin = 0, double inheritedSpace = 0)
         {
             var previous = initialMargin;
             for (var index = 0; index < children.Length; index++)
@@ -141,7 +146,8 @@ internal static class DocumentLayout
                 // natural text margin before entering that container's border.
                 if (index > 0 && children[index - 1].Kind == "Table" && child.Kind is "Details" or "Quote" or "List") top += Math.Max(0, ListMargin - previous);
                 top -= index == 0 && suppressFirst ? Before(child) : Math.Min(previous, Before(child));
-                top = Block(child, x, top, width, docTop && index == 0, index == 0 ? marker : null, alignment); previous = After(child);
+                var topSpace = index == 0 && suppressFirst ? inheritedSpace : Math.Max(previous, Before(child));
+                top = Block(child, x, top, width, docTop && index == 0, index == 0 ? marker : null, alignment, topSpace); previous = After(child);
             }
             return top - (trimLast ? previous : 0);
         }
@@ -223,7 +229,7 @@ internal static class DocumentLayout
             return new(model, item, node, Props, width, Props(new(0, "", 0, false, false, node.Kind == "Code")));
         }
         private double Paragraph(SemanticNode node, double x, double top, double width, double size, bool heading,
-            (bool Ordered, int Number)? marker, TextAlignment alignment)
+            (bool Ordered, int Number)? marker, TextAlignment alignment, double selectionTopSpace = 0)
         {
             var source = Source(node, size, heading, width); var item = model.Items[node.Paragraph];
             var paragraph = new ParagraphProperties(source.Default, alignment);
@@ -271,7 +277,9 @@ internal static class DocumentLayout
                         clusters.Add(new(item.Start + begin, item.Start + finish, rectangles)); carets.Add(new(item.Start + finish, nextX)); hit = next;
                     }
                     GeometryTicks += Stopwatch.GetTimestamp() - phase;
-                    Lines.Add(new(item.Start + position, item.Start + end, node.Paragraph, top, line.Height, line.Baseline, drawing, carets.ToImmutable(), clusters.ToImmutable()) { Hidden = hidden });
+                    Lines.Add(new(item.Start + position, item.Start + end, node.Paragraph, top, line.Height, line.Baseline, drawing, carets.ToImmutable(), clusters.ToImmutable())
+                    { Hidden = hidden, SelectionBounds = new Rect(x + line.Start, top, line.WidthIncludingTrailingWhitespace, line.Height),
+                        SelectionTopSpace = position == 0 ? selectionTopSpace : 0, EndMarkerWidth = line.NewlineLength > 0 ? size / 2 : 0, HasBreak = line.NewlineLength > 0 });
                     top += node.Kind == "Code" ? line.Height : Math.Max(line.Height, 23 - 1d / 300); position += line.Length;
                 } while (position < item.Length);
             }

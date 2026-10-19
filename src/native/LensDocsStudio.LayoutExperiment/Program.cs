@@ -27,7 +27,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]), args[3]);
         if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4]);
         if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
-        if (args.FirstOrDefault() == "--link-client") return LinkChecks.Client(args[1], long.Parse(args[2]), args[3], args[4]);
+        if (args.FirstOrDefault() == "--link-client") return LinkChecks.Client(args[1], long.Parse(args[2]), args[3], args[4], args[5]);
         if (args.FirstOrDefault() == "--image-clipboard-client") return ImageClipboardChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
         if (args.FirstOrDefault() == "--stock-serialisation-oracle")
         {

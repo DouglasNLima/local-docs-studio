@@ -10,6 +10,9 @@ internal static class LinkChecks
 {
     [DllImport("user32.dll")] private static extern IntPtr GetLastActivePopup(IntPtr window);
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr window);
+    [DllImport("user32.dll")] private static extern IntPtr GetForegroundWindow();
+    [DllImport("user32.dll")] private static extern IntPtr WindowFromPoint(System.Drawing.Point point);
+    [DllImport("user32.dll")] private static extern bool IsChild(IntPtr parent, IntPtr child);
     [DllImport("user32.dll")] private static extern bool SetPhysicalCursorPos(int x, int y);
     [DllImport("user32.dll")] private static extern void mouse_event(uint flags, uint x, uint y, uint data, UIntPtr extra);
     public static async Task Run(ExperimentWindow window, string output)
@@ -38,12 +41,14 @@ internal static class LinkChecks
             timer.Tick += (_, _) => { var at = Stopwatch.GetTimestamp(); gaps.Add((at - last) * 1000d / Stopwatch.Frequency); last = at; }; timer.Start();
             try
             {
+                using var acknowledgement = new InputAcknowledgement(owner);
                 var start = new ProcessStartInfo(Environment.ProcessPath!) { UseShellExecute = false, CreateNoWindow = true };
-                foreach (var value in new[] { "--link-client", destination, new WindowInteropHelper(owner).Handle.ToInt64().ToString(), side, uri }) start.ArgumentList.Add(value);
+                foreach (var value in new[] { "--link-client", destination, new WindowInteropHelper(owner).Handle.ToInt64().ToString(), side, uri, acknowledgement.Name }) start.ArgumentList.Add(value);
                 using var client = (await Task.Run(() => Process.Start(start)))!;
                 using var deadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 try { await client.WaitForExitAsync(deadline.Token); }
                 finally { if (!client.HasExited) client.Kill(true); }
+                Program.Write(Path.Combine(destination, "input-acknowledgements.json"), acknowledgement.Receipts);
                 if (client.ExitCode != 0) throw new IOException("Independent actual link activation failed: " + side);
                 rows.Add(new { Adapter = side, Status = "PASS", MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), InputGapsMilliseconds = gaps });
             }
@@ -56,12 +61,14 @@ internal static class LinkChecks
             MaximumInputGapMilliseconds = candidateMaximum });
         if (failed) throw new IOException("Actual stock/candidate link route checks failed; both sides retained.");
     }
-    public static int Client(string output, long ownerValue, string side, string uri)
+    public static int Client(string output, long ownerValue, string side, string uri, string acknowledgementName)
     {
         var checks = new List<string>(); var stages = new List<object>();
         void At(string name) => stages.Add(new { Stage = name, Timestamp = Stopwatch.GetTimestamp() });
         try
         {
+            IndependentUiaClient.InitialiseOwnedInput(output);
+            using var acknowledgement = new InputAcknowledgement(acknowledgementName);
             var handle = new IntPtr(ownerValue); var owner = AutomationElement.FromHandle(handle);
             AutomationElement Document() => owner.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, side == "stock" ? "DocumentPreview" : "ExperimentalDocument"))!;
             string Text() => ((TextPattern)Document().GetCurrentPattern(TextPattern.Pattern)).DocumentRange.GetText(-1);
@@ -74,8 +81,13 @@ internal static class LinkChecks
                 range.ScrollIntoView(true); System.Threading.Thread.Sleep(100);
                 var rectangle = range.GetBoundingRectangles().FirstOrDefault();
                 if (rectangle.IsEmpty || rectangle.Width <= 0 || rectangle.Height <= 0) throw new IOException("Actual link has no visible geometry: " + name);
-                SetForegroundWindow(handle); SetPhysicalCursorPos((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2));
-                mouse_event(2, 0, 0, 0, UIntPtr.Zero); System.Threading.Thread.Sleep(40); mouse_event(4, 0, 0, 0, UIntPtr.Zero); At("clicked-" + name);
+                SetForegroundWindow(handle); owner.SetFocus();
+                var point = new System.Drawing.Point((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2));
+                IndependentUiaClient.Wait(() => GetForegroundWindow() == handle && (WindowFromPoint(point) == handle || IsChild(handle, WindowFromPoint(point))));
+                stages.Add(new { Stage = "verified-click-target", Name = name, Foreground = GetForegroundWindow().ToInt64(), Target = WindowFromPoint(point).ToInt64(), point.X, point.Y, Timestamp = Stopwatch.GetTimestamp() });
+                SetPhysicalCursorPos(point.X, point.Y); mouse_event(2, 0, 0, 0, UIntPtr.Zero);
+                try { acknowledgement.AfterRealInput(handle); } finally { mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
+                At("clicked-" + name);
             }
             IndependentUiaClient.Wait(() => Text().Contains("Parent destination marker.", StringComparison.Ordinal));
             Invoke("Open child"); IndependentUiaClient.Wait(() => Text().Contains("Child destination marker.", StringComparison.Ordinal));
@@ -112,5 +124,6 @@ internal static class LinkChecks
             Program.Write(Path.Combine(output, "links-client.json"), new { Status = "PASS", Checks = checks, Stages = stages }); return 0;
         }
         catch (Exception error) { Program.Write(Path.Combine(output, "links-client.json"), new { Status = "FAIL", Error = error.ToString(), Checks = checks, Stages = stages }); return 1; }
+        finally { IndependentUiaClient.ReleaseOwnedInput(); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
     }
 }

@@ -2,6 +2,13 @@ WordUnits.cs adapts character classification rules and the Latin classification
 table from dotnet/wpf v10.0.0, SelectionWordBreaker.cs:
 https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/SelectionWordBreaker.cs
 
+Selection paint in CompleteLayout.cs, DocumentLayout.cs and LayoutSurface.cs
+adapts the paragraph-space and half-em end-mark policy from TextParaClient.cs
+and CaretElement.cs in the same MIT-licensed source. It uses only the public
+TextFormatter geometry; no framework implementation is invoked or modified.
+https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/MS/Internal/PtsHost/TextParaClient.cs
+https://github.com/dotnet/wpf/blob/v10.0.0/src/Microsoft.DotNet.Wpf/src/PresentationFramework/System/Windows/Documents/CaretElement.cs
+
 The MIT License (MIT)
 
 Copyright (c) .NET Foundation and Contributors

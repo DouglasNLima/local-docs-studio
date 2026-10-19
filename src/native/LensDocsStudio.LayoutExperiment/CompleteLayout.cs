@@ -52,7 +52,13 @@ internal sealed record Cluster(int Start, int End, ImmutableArray<Rect> Bounds);
 internal sealed record ControlBox(int Node, string Label, Rect Bounds);
 internal sealed record Line(int Start, int End, int Item, double Top, double Height, double Baseline,
     DrawingGroup Drawing, ImmutableArray<Caret> Carets, ImmutableArray<Cluster> Clusters)
-{ public bool Hidden { get; init; } }
+{
+    public bool Hidden { get; init; }
+    public Rect SelectionBounds { get; init; } = Rect.Empty;
+    public double SelectionTopSpace { get; init; }
+    public double EndMarkerWidth { get; init; }
+    public bool HasBreak { get; init; }
+}
 internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Lines, double Width, double Height,
     int WorkerThread, double LayoutMilliseconds, long Version, string Appearance, ImmutableDictionary<string, double> Stages)
 {
@@ -170,7 +176,9 @@ internal static class CompleteLayout
                     }
                     geometryTicks += System.Diagnostics.Stopwatch.GetTimestamp() - phaseStart;
                     lines.Add(new(item.Start + position, item.Start + end, itemIndex, top, line.Height, line.Baseline,
-                        drawing, carets.ToImmutable(), clusters.ToImmutable()));
+                        drawing, carets.ToImmutable(), clusters.ToImmutable())
+                    { SelectionBounds = new Rect(52 + line.Start, top, line.WidthIncludingTrailingWhitespace, line.Height),
+                        SelectionTopSpace = position == 0 ? 10 : 0, EndMarkerWidth = line.NewlineLength > 0 ? 7.5 : 0, HasBreak = line.NewlineLength > 0 });
                     // WPF's stock MaxHeight strategy uses natural glyph height, then
                     // advances by at least LineHeight in its 1/300 DIP text units.
                     top += Math.Max(line.Height, 23 - 1d / 300); position += line.Length;
