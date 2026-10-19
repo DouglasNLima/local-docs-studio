@@ -1,5 +1,8 @@
 name: Verify accepted native consolidation
 on:
+  push:
+    branches: [develop]
+    paths: ['.github/workflows/native-consolidation.yml']
   workflow_dispatch:
 permissions:
   contents: read
