@@ -1,6 +1,28 @@
 # Continuous layout architecture experiment
 
-## Authorised scope and baseline
+## Contract v2 — continuation authorised on 19 October 2026
+
+**Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**
+
+This is an intentional product requirements change, not faster rendering. Work continues on the same Draft PR #38 and branch, from verified remote head `57dcd44fb780f938046373f3e237b7b2cda8a55f`. The base remains open #37 at `a937399a3f822c4e911e1ebe5ec0e426b64c56ac`, stacked on #36 at `9a64dfa5adf79dc447db1f671ea39c94ec42de40`. No dependency is merged by this experiment.
+
+| Required controlled-workload metric | v2 budget, every sample |
+| --- | --- |
+| Complete required document layout | <=1,000 ms |
+| Before parsing/preparation through complete presentation | <=1,500 ms |
+| Observed in-process shown-window Input/dispatcher gap | <=100 ms |
+
+The 250 ms layout target is a separately labelled, non-blocking optimisation objective. All six original fixtures, original distant-edit policy including repetition/edit zero, first combined execution, fresh-process cold and repeated constructions remain required. Reversed independent replications retain every observation. A measured v2 miss fails that case but does not prohibit independent functional implementation. Correctness, accessibility, clipboard, source/ranges, automatic actual OS High Contrast transitions and lifecycle checks remain mandatory; missing evidence cannot pass acceptance.
+
+The public WPF/TextFormatter architecture and complete eager geometry contract below continue. Expand the immutable model to semantic blocks, nested lists, rows/cells, headings, links, details and media. All shaping, marker geometry, table cell/row geometry, media dimensions, range/caret geometry and extents must finish before installation/readiness. Only visible painting is deferred. Tables use independently shaped cells and complete row maxima; bidirectional text retains formatter cluster geometry. Transformed inline text keeps separate source start/end boundaries rather than assuming one source character per rendered character. Unsupported semantics fail explicitly and remain missing in the parity matrix.
+
+The dedicated current path is `--acceptance-v2`, with an explicitly versioned `acceptance-v2.json`. Candidate complete layout starts before any required geometry, including worker scheduling, and ends after dispatcher installation/layout and Input delivery. End-to-end readiness starts before parsing/model/media preparation and ends after complete installation/layout and queued Input delivery. Process startup and source I/O remain separately excluded. Empty shown host preparation is outside both adapters' readiness clock; stock viewer creation/attachment is inside its end-to-end clock, disclosed as an adapter difference. The stock original first-layout clock remains distinct. Do not interpret the different first-layout boundaries as equivalent stages.
+
+Input heartbeat coverage includes the independent UIA client and actual keyboard, mouse, selection and copy phase, recorded separately from the timing phase. Request, worker cancellation observation, dispatcher delivery, stale rejection, installation and winning complete-preview/Input readiness have separate timestamps and actual thread identities. No UIA transport or OS broadcast interval substitutes for an in-process gap. Immutable snapshots and range identities are invalidated on replacement/closure; diagnostic source/search/outline/tabs keep separate transient state from the ordinary application.
+
+The earlier sections and execution records below are **historical contract v1**, including the original stopping rule and NOT VIABLE decision. Their commands/results are reproducible at source `57dcd44`; they are not reclassified under v2. `scripts/native/Test-ContinuousLayoutArchitecture.ps1` is retained as the v1 path; v2 uses a separate script. The historical `.749` incident remains open and unrelated to the new contract.
+
+## Historical v1 — authorised scope and baseline
 
 This is a reversible diagnostic executable, stacked on open Draft PR #37 at
 `a937399a3f822c4e911e1ebe5ec0e426b64c56ac`. Its open #36 dependency is
