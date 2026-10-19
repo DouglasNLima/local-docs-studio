@@ -8,6 +8,7 @@ internal static class AppearanceChecks
 {
     public static async Task Run(ExperimentWindow window, string output)
     {
+        using var trace = new OperationTrace(window); window.Trace = trace;
         var fixture = ContinuousPreviewFixtures.Create(output, "mixed")[0];
         window.SourcePath = Path.Combine(output, "fixture.md"); window.WorkspaceRoot = output;
         var installations = new List<object>(); var invalid = false;
@@ -58,7 +59,7 @@ internal static class AppearanceChecks
             Program.Write(Path.Combine(output, "appearance.json"), new { Status = "FAIL", Error = error.ToString(), Installations = installations, InputGapsMilliseconds = gaps,
                 FailureOnlyRestoration = !disabledByTest && contrast is not null }); throw;
         }
-        finally { heartbeat.Stop(); if (!disabledByTest && contrast is not null) await Task.Run(contrast.Dispose); }
+        finally { heartbeat.Stop(); if (!disabledByTest && contrast is not null) await Task.Run(contrast.Dispose); trace.Dispose(); window.Trace = null; Program.Write(Path.Combine(output, "appearance-trace.json"), trace.Events); }
     }
     private static async Task Wait(Func<bool> condition)
     {

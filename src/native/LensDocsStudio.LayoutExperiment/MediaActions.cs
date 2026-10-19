@@ -26,6 +26,7 @@ internal sealed class MediaActions
         if (snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Id == box.Node && node.Kind == "Media") is not { Media: { } image, Target: { } source }) return;
         try
         {
+            owner.Trace?.Stage("media-command-enter", new { box.Label, snapshot.Version, ClipboardSequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence });
             if (box.Label == "Zoom")
             {
                 zoom?.Close();
@@ -42,21 +43,36 @@ internal sealed class MediaActions
             }
             var dialog = new Microsoft.Win32.SaveFileDialog { Title = "EXPERIMENT ONLY — Export diagram", FileName = "diagram." + box.Label.ToLowerInvariant(),
                 Filter = box.Label == "SVG" ? "SVG drawing|*.svg" : "PNG image|*.png", AddExtension = true };
-            if (dialog.ShowDialog(owner) != true) return;
+            owner.Trace?.Stage("dialogue-enter", new { box.Label, Thread = Environment.CurrentManagedThreadId, OwnerHandle = new System.Windows.Interop.WindowInteropHelper(owner).Handle.ToInt64() });
+            bool? accepted;
+            try { accepted = dialog.ShowDialog(owner); }
+            finally { owner.Trace?.Stage("dialogue-exit", new { box.Label }); }
+            owner.Trace?.Stage("dialogue-result", new { box.Label, Accepted = accepted, dialog.FileName });
+            if (accepted != true) return;
             var output = dialog.FileName;
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-accepted", box.Label, Output = output, Version = snapshot.Version, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
             var bytes = await ExperimentWindow.Worker(() =>
             {
-                if (box.Label == "PNG") return NativeSvgService.ToPng(image);
-                var diagram = new DiagramService().Render(source, ExperimentAppearance.IsDark(snapshot.Appearance));
-                return System.Text.Encoding.UTF8.GetBytes(new NativeSvgService().Prepare(diagram.Svg ?? throw new IOException(diagram.Error)));
+                owner.Trace?.Stage("media-encoding-enter", new { box.Label });
+                try
+                {
+                    if (box.Label == "PNG") return NativeSvgService.ToPng(image);
+                    var diagram = new DiagramService().Render(source, ExperimentAppearance.IsDark(snapshot.Appearance));
+                    owner.Trace?.Stage("media-svg-generated", new { box.Label });
+                    return System.Text.Encoding.UTF8.GetBytes(new NativeSvgService().Prepare(diagram.Svg ?? throw new IOException(diagram.Error)));
+                }
+                finally { owner.Trace?.Stage("media-encoding-exit", new { box.Label }); }
             });
+            owner.Trace?.Stage("media-worker-delivered", new { box.Label, Bytes = bytes.Length });
             cancellation.ThrowIfCancellationRequested();
             if (!ReferenceEquals(owner.Surface.Snapshot, snapshot) || snapshot.Version != owner.CurrentVersion) throw new IOException("The diagram changed before export completed.");
+            owner.Trace?.Stage("media-write-enter", new { box.Label, Output = output });
             await File.WriteAllBytesAsync(output, bytes, cancellation);
+            owner.Trace?.Stage("media-write-exit", new { box.Label });
             owner.Surface.InteractionStages.Add(new { Stage = "media-save-completed", box.Label, Output = output, Bytes = bytes.Length, Timestamp = System.Diagnostics.Stopwatch.GetTimestamp() });
         }
         catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
         { owner.Surface.InteractionStages.Add(new { Stage = "media-action-failure", box.Label, Error = error.Message }); }
+        finally { owner.Trace?.Stage("media-command-exit", new { box.Label }); }
     }
 }

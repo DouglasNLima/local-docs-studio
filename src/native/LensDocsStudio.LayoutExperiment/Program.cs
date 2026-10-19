@@ -25,7 +25,7 @@ internal static class Program
     {
         if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args.Length > 4 ? args[4] : "list");
         if (args.FirstOrDefault() == "--studio-client") return StudioChecks.Client(args[1], int.Parse(args[2]));
-        if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]));
+        if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4]);
         if (args.FirstOrDefault() == "--stock-serialisation-oracle")
         {
             try { _ = IndependentUiaClient.StockOracle(args[1]); return 0; }
@@ -47,7 +47,8 @@ internal static class Program
             if (started) return; started = true;
             try
             {
-                if (args.Contains("--media-checks")) await MediaChecks.Run(window, output);
+                if (args.Contains("--media-controls")) await MediaControlChecks.Run(window, output);
+                else if (args.Contains("--media-checks")) await MediaChecks.Run(window, output);
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
                 else if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);

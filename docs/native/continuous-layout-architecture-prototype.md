@@ -1,5 +1,15 @@
 # Continuous layout architecture experiment
 
+## Completion continuation — diagnostic protocol
+
+The continuation starts from verified clean remote `7051c1d1dc62628d7b5ee9ed19682bfbd44191d9` on the same PR/branch. The v2 budgets and every historical failure below remain authoritative. The 13,239.25 ms media observation has no modal entry/exit timeline and is not yet attributed to renderer work or modal scheduling.
+
+Focused `--media-checks` now retains its uninterrupted original Input timer and adds `parallel-input-native-v1`: an independent 16 ms worker timer posts at most one outstanding Input callback and one native owner-window message. Schedule/delivery QPC timestamps, managed thread identities, owner enabled/modal state, slow dispatcher operations (>=8 ms), dialogue entry/exit/result, generation/encoding/worker delivery/write and full command lifetime are recorded. The independent client records actual filename input, Save/Cancel, native dialogue acknowledgement, owner recovery and decoded chosen files. No duration is subtracted and no acceptance row is exempted. These added diagnostics do not yet replace the acceptance probe.
+
+`--media-controls` exercises the unchanged production `MainWindow` media buttons/`ExportDiagram` route with an isolated state directory, followed by a minimal owned native dialogue control. Only test start-up binding uses reflection over this application's own methods; framework internals and runtime files are untouched. The ordinary loader/updater is bypassed for this isolated control. All three routes use the same compiled harness and host. Their worker-native probes and original Input timer are retained together. Appearance traces record the same dispatch probes, OS notifications, palette capture, snapshot installation and window layout. Captures remain separate correctness instrumentation under the existing policy.
+
+Pushes run explicitly named focused diagnostic jobs while fixes are being developed. The unchanged full two-replication acceptance path is invoked with workflow input `scope=full` once changes are stable. A focused diagnostic success does not certify v2 acceptance or parity.
+
 ## Contract v2 — continuation authorised on 19 October 2026
 
 **Continuation authorised under revised v2 budgets; viability pending complete functionality and validation.**

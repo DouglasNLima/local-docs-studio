@@ -3,10 +3,17 @@ on:
   push:
     branches: [experiment/native-continuous-layout-architecture]
   workflow_dispatch:
+    inputs:
+      scope:
+        description: Focused diagnosis or complete v2 acceptance
+        type: choice
+        options: [full, focused]
+        default: full
 permissions:
   contents: read
 jobs:
   six-workload-v2:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'full'
     name: Complete six-workload v2 gate (replication ${{ matrix.replication }})
     runs-on: windows-latest
     timeout-minutes: 45
@@ -38,4 +45,39 @@ jobs:
         with:
           name: EXPERIMENT-ONLY-layout-harness-${{ matrix.replication }}
           path: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/
+          retention-days: 90
+  focused-diagnostics:
+    if: github.event_name == 'push' || inputs.scope == 'focused'
+    name: Focused media/appearance diagnosis (${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build and exercise unchanged stock route, candidate and minimal dialogue
+        shell: pwsh
+        run: |
+          dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release --locked-mode
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
+          $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
+          $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-controls','appearance') } else { @('media-controls','media-checks','appearance') }
+          $failed = $false
+          foreach ($mode in $modes) {
+            & $exe "--$mode" --output "artifacts/layout-focused/$mode"
+            if ($LASTEXITCODE) { $failed = $true }
+          }
+          if ($failed) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: focused-layout-diagnosis-${{ matrix.replication }}
+          path: artifacts/layout-focused/
           retention-days: 90

@@ -35,6 +35,7 @@ internal sealed class ExperimentWindow : Window
     public event Action? PreparationRequested;
     private readonly Dictionary<int, bool> details = [];
     public Task? CurrentWork { get; private set; }
+    public OperationTrace? Trace { get; set; }
     private CancellationTokenSource? renderedCopy;
     public ExperimentWindow()
     {
@@ -124,8 +125,10 @@ internal sealed class ExperimentWindow : Window
     private void AppearanceChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (!closed) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); }
     private void RefreshAppearance()
     {
+        Trace?.Stage("appearance-refresh-enter");
         if (closed || !hasDocument) return;
         var appearance = ExperimentAppearance.Capture(ThemePreference);
+        Trace?.Stage("appearance-palette-captured", new { Appearance = appearance });
         if (Surface.Snapshot?.Appearance == appearance) return;
         // Windows broadcasts several related property changes for one palette.
         // Do not repeatedly cancel the identical current rebuild before it installs.
@@ -179,10 +182,14 @@ internal sealed class ExperimentWindow : Window
                     });
                     if (closed || request.Version != version || token.IsCancellationRequested || request.Appearance != ExperimentAppearance.Capture(ThemePreference))
                     { Log("stale-rejected", request.Version); request.Completion.TrySetResult(false); continue; }
+                    Trace?.Stage("snapshot-install-enter", new { request.Version, request.Appearance });
                     Surface.Install(snapshot);
+                    Trace?.Stage("snapshot-install-exit", new { request.Version });
                     if (old is not null) { Surface.SelectSource(SourceEdit.Transform(old.Model.Source, request.Source, selectionStart), SourceEdit.Transform(old.Model.Source, request.Source, selectionEnd)); Surface.RestoreViewportSourceAnchor((SourceEdit.Transform(old.Model.Source, request.Source, anchor.Source), anchor.Delta)); }
                     else if (request.Restore is { } restored) { Surface.SelectSource(restored.SelectionStart, restored.SelectionEnd); Surface.RestoreViewportSourceAnchor((restored.AnchorSource, restored.AnchorDelta)); }
-                    Log("installed", request.Version); Installed?.Invoke(snapshot); UpdateLayout();
+                    Log("installed", request.Version); Installed?.Invoke(snapshot);
+                    Trace?.Stage("window-layout-enter", new { request.Version }); UpdateLayout();
+                    Trace?.Stage("window-layout-exit", new { request.Version });
                     await Dispatcher.InvokeAsync(() => Log("complete-preview-input-delivered", request.Version), DispatcherPriority.Input);
                     if (closed || request.Version != version || request.Appearance != ExperimentAppearance.Capture(ThemePreference))
                     { Log("stale-readiness-rejected", request.Version); request.Completion.TrySetResult(false); }
