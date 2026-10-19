@@ -7,11 +7,55 @@ on:
       scope:
         description: Focused diagnosis or complete v2 acceptance
         type: choice
-        options: [full, focused]
+        options: [full, focused, compile-comparison]
         default: full
 permissions:
   contents: read
 jobs:
+  compile-comparison:
+    if: github.event_name == 'workflow_dispatch' && inputs.scope == 'compile-comparison'
+    name: Bounded IL/ReadyToRun compiler comparison (${{ matrix.replication }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        replication: [1, 2]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Compile both configurations from identical source; no document prewarm
+        shell: pwsh
+        run: |
+          dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          dotnet publish src/native/LensDocsStudio.LayoutExperiment -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -p:RestoreLockedMode=false -p:RestorePackagesWithLockFile=false --output artifacts/layout-compile/r2r
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
+          $env:LENS_LAYOUT_SOURCE_DIRTY = ([bool](git status --porcelain)).ToString()
+          $order = if (${{ matrix.replication }} -eq 1) { @('IL','R2R') } else { @('R2R','IL') }
+          $runs = @()
+          foreach ($scenario in @('list','mixed')) {
+            foreach ($configuration in $order) {
+              $exe = if ($configuration -eq 'IL') { 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe' } else { 'artifacts/layout-compile/r2r/LensDocsStudio.LayoutExperiment.exe' }
+              $destination = "artifacts/layout-compile/observations/$scenario-$configuration"
+              New-Item -ItemType Directory -Force -Path $destination | Out-Null
+              $process = Start-Process -FilePath $exe -ArgumentList @('--scenario',$scenario,'--adapter','candidate','--contract-v2','--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
+              if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
+              $process.Refresh()
+              $runs += @{ Configuration=$configuration; Scenario=$scenario; ExitCode=$process.ExitCode; Directory=$destination }
+            }
+          }
+          @{ Source=(git rev-parse HEAD); SourceDirty=$env:LENS_LAYOUT_SOURCE_DIRTY; InitialCompilerOrder=$order; Runs=$runs; Sdk=(dotnet --info); Meaning='Additional fresh-process compiler pilot only; not the original 66-sample protocol or parity acceptance. No forced collection or prewarm.' } | ConvertTo-Json -Depth 8 | Set-Content artifacts/layout-compile/compiler-pilot.json
+          if (@($runs | Where-Object ExitCode -ne 0).Count) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: compiler-pilot-${{ matrix.replication }}
+          path: artifacts/layout-compile/
+          retention-days: 90
   six-workload-v2:
     if: github.event_name == 'workflow_dispatch' && inputs.scope == 'full'
     name: Complete six-workload v2 gate (replication ${{ matrix.replication }})
