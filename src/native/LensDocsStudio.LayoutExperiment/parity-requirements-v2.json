@@ -96,8 +96,8 @@
     },
     {
       "Requirement": "Visual equivalence review beyond measured logical/style/geometry assertions",
-      "Implementation": "Unverified",
-      "Proof": "At f86d6df, 11/66 raster pairs per host are byte-identical. Other fixtures show text-edge, table-border and details-toggle paint differences; native toggle chrome correction requires new captures. Geometry/style agreement alone does not classify every raster difference."
+      "Implementation": "Implemented",
+      "Proof": "visual-review-v2.json binds the two 1c39937 actual three-appearance capture sets to exact native source/runtime/image/configuration and the checked capture manifest. All 42 logical/style/geometry subsets pass per host; representative content, selection, boundaries/media and targeted cases reviewed. Native HC scrollbar variant and text-edge differences remain explicitly classified."
     }
   ],
   "PhysicalScreenReader": "Not certified; independent UIA verification is not physical screen-reader certification"
