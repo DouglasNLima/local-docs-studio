@@ -96,6 +96,10 @@ internal static class TargetedChecks
                 {
                     window.Surface.SelectSource(distantLiteral.Source.Start, distantLiteral.Source.End); window.Scroller.ScrollToVerticalOffset(selectedStockOffset); window.Surface.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                     Program.Capture(window.Scroller, Path.Combine(destination, "candidate-distant-selected.png"));
+                    window.Surface.Search(distantLiteral.Run.Text);
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(window.Scroller, Path.Combine(destination, "candidate-distant-selected-and-search.png"));
+                    window.Surface.Search("");
                 }
                 var mediaIndex = 0;
                 foreach (var media in snapshot.Model.Root.Descendants().Where(node => node.Kind == "Media"))

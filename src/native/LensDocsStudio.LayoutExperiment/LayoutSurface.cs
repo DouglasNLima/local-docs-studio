@@ -22,12 +22,12 @@ internal sealed class LayoutSurface : Panel
     private SelectionOverlay? mediaSelection;
     private sealed class SelectionOverlay(LayoutSurface owner) : FrameworkElement
     { protected override void OnRender(DrawingContext context) => owner.DrawMediaSelection(context); }
-    private static Brush SelectionBrush(string appearance)
+    private static Brush SelectionBrush(string appearance, double opacity = .3)
     {
         // DocumentPreview.xaml owns a 0.3 accent wash in the product. Retain the
         // actual text/image underneath it, including native media commands.
         var brush = new SolidColorBrush(appearance.StartsWith("HC:", StringComparison.Ordinal)
-            ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : Color.FromRgb(255, 136, 62)) { Opacity = .3 };
+            ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : Color.FromRgb(255, 136, 62)) { Opacity = opacity };
         brush.Freeze(); return brush;
     }
     private void DrawMediaSelection(DrawingContext context)
@@ -127,7 +127,7 @@ internal sealed class LayoutSurface : Panel
     public void Install(LayoutSnapshot? snapshot)
     {
         var previousAppearance = Snapshot?.Appearance;
-        selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null;
+        selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null; matches.Clear();
         foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;
         Children.Clear(); mediaSelection = null;
         if (snapshot is not null)
@@ -225,6 +225,7 @@ internal sealed class LayoutSurface : Panel
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
         var viewport = new Rect(Scroller?.HorizontalOffset ?? 0, top, Scroller?.ViewportWidth ?? ActualWidth, bottom - top);
         var selectionBrush = SelectionBrush(snapshot.Appearance);
+        var searchBrush = SelectionBrush(snapshot.Appearance, .12);
         var mediaParagraphs = snapshot.Controls.Select(control => control.Node).Distinct().Select(id => snapshot.Model.Root.Descendants().First(node => node.Id == id).Paragraph).ToHashSet();
         foreach (var line in snapshot.Lines)
         {
@@ -233,9 +234,10 @@ internal sealed class LayoutSurface : Panel
             context.DrawDrawing(line.Drawing);
             foreach (var cluster in line.Clusters)
             {
-                if (matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
-                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(SystemColors.HighlightBrush, null, bounds);
-                if (cluster.End > Start && cluster.Start < End && !mediaParagraphs.Contains(line.Item))
+                var selected = cluster.End > Start && cluster.Start < End;
+                if (!selected && matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
+                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(searchBrush, null, bounds);
+                if (selected && !mediaParagraphs.Contains(line.Item))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(selectionBrush, null, bounds);
             }
         }
