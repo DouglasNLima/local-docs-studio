@@ -26,11 +26,20 @@ internal static class DeterministicChecks
                 throw new IOException("Complete wrapped geometry/frozen ownership failed.");
             checks.Add(ending == "\n" ? "LF exact source, Unicode caret clusters and full wrapped layout" : "CRLF exact source, Unicode caret clusters and full wrapped layout");
         }
+        foreach (var fixture in LensDocsStudio.Native.Validation.ContinuousPreviewFixtures.Create(output, "all"))
+        {
+            var sourcePath = Path.Combine(output, fixture.Name + ".md"); File.WriteAllText(sourcePath, fixture.Source);
+            var model = CompleteLayout.Parse(fixture.Source, CancellationToken.None, sourcePath, output);
+            var layout = CompleteLayout.Format(model, 640, 1, "Light", CancellationToken.None);
+            if (!model.Text.Contains(fixture.Last, StringComparison.Ordinal) || model.SourceBoundaries.Length != model.Text.Length + 1
+                || model.SourceEnds.Length != model.Text.Length || layout.Lines.Length < model.Items.Length || layout.Height <= 300)
+                throw new IOException("Complete six-fixture geometry assertion failed: " + fixture.Name);
+            for (var index = 0; index < model.Items.Length; index++)
+                if (model.Items[index].Length > 0 && !layout.Lines.Any(line => line.Item == index && line.End == model.Items[index].Start + model.Items[index].Length))
+                    throw new IOException("Missing final paragraph/cell geometry: " + fixture.Name);
+            checks.Add("Complete unchanged " + fixture.Name + ": text, final content, all paragraph/cell end geometry and owned source boundaries");
+        }
         var rejected = false;
-        try { CompleteLayout.Parse("| A | B |\n|---|---|\n| x | y |", CancellationToken.None); }
-        catch (NotSupportedException) { rejected = true; }
-        if (!rejected) throw new IOException("Unsupported tables must fail explicitly.");
-        checks.Add("Unsupported structure fails explicitly");
         using var cancelled = new CancellationTokenSource(); cancelled.Cancel(); rejected = false;
         try { CompleteLayout.Parse("- **cancelled**", cancelled.Token); } catch (OperationCanceledException) { rejected = true; }
         if (!rejected) throw new IOException("Queued cancelled preparation was not rejected.");

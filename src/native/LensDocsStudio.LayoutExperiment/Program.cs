@@ -23,7 +23,7 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
-        if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3]);
+        if (args.FirstOrDefault() == "--uia-client") return IndependentUiaClient.Run(args[1], int.Parse(args[2]), args[3], args.Length > 4 ? args[4] : "list");
         var output = Path.GetFullPath(Option("--output") ?? "artifacts/layout-experiment/local"); Directory.CreateDirectory(output);
         if (args.Contains("--deterministic"))
         {
@@ -37,50 +37,70 @@ internal static class Program
             if (started) return; started = true;
             try
             {
-                if (args.Contains("--lifecycle")) await LifecycleChecks.Run(window, output);
+                if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);
+                else if (args.Contains("--studio"))
+                {
+                    var path = Option("--source"); var source = path is null ? ContinuousPreviewFixtures.Create(output, Option("--scenario") ?? "mixed")[0].Source : File.ReadAllText(path);
+                    _ = new DiagnosticStudio(window, source, path is null ? Path.Combine(output, "diagnostic.md") : Path.GetFullPath(path)); return;
+                }
+                else if (args.Contains("--clipboard-oracle")) await ClipboardChecks.ProbeStock(window, output);
+                else if (args.Contains("--lifecycle")) await LifecycleChecks.Run(window, output);
                 else if (args.Contains("--view"))
                 {
                     var source = Option("--source") is { } file ? File.ReadAllText(file) : ContinuousPreviewFixtures.Create(output, "list")[0].Source;
                     await window.Request(source); window.Surface.Focus(); return;
                 }
-                else await Measure(window, output, Option("--adapter") ?? "candidate", int.Parse(Option("--repetitions") ?? "1"), args.Contains("--edit"), args.Contains("--acceptance"), args.Contains("--uia"));
+                else
+                {
+                    var scenario = Option("--scenario") ?? "list";
+                    var names = scenario == "all" ? ContinuousPreviewFixtures.Create(output, "all").Select(fixture => fixture.Name) : [scenario];
+                    foreach (var name in names)
+                    {
+                        var destination = scenario == "all" ? Path.Combine(output, name) : output; Directory.CreateDirectory(destination);
+                        await Measure(window, destination, Option("--adapter") ?? "candidate", int.Parse(Option("--repetitions") ?? "1"), args.Contains("--edit"), args.Contains("--acceptance"), args.Contains("--uia"), name, args.Contains("--acceptance-v2") || args.Contains("--contract-v2"));
+                    }
+                    if (args.Contains("--acceptance-v2")) throw new IOException("v2 full acceptance remains incomplete pending the aggregate functional/appearance/lifecycle gate.");
+                }
             }
             catch (Exception error) { Write(Path.Combine(output, "failure.json"), new { Status = "FAIL", Error = error.ToString() }); Console.Error.WriteLine(error); exit = 1; }
-            finally { if (!args.Contains("--view")) { window.Close(); app.Shutdown(exit); } }
+            finally { if (!args.Contains("--view") && !args.Contains("--studio")) { window.Close(); app.Shutdown(exit); } }
         };
-        window.Closed += (_, _) => { if (args.Contains("--view")) app.Shutdown(exit); };
+        window.Closed += (_, _) => { if (args.Contains("--view") || args.Contains("--studio")) app.Shutdown(exit); };
         app.Run(window); return exit;
         string? Option(string name) { var index = Array.IndexOf(args, name); return index >= 0 && index + 1 < args.Length ? args[index + 1] : null; }
     }
 
-    private static async Task Measure(ExperimentWindow window, string output, string adapter, int repetitions, bool edited, bool acceptance, bool uia)
+    private static int fixtureOrdinal;
+    private static async Task Measure(ExperimentWindow window, string output, string adapter, int repetitions, bool edited, bool acceptance, bool uia, string scenario, bool acceptanceV2)
     {
         if (adapter is not ("stock" or "candidate")) throw new ArgumentException("Choose stock or candidate.");
-        var fixture = ContinuousPreviewFixtures.Create(output, "list")[0]; var samples = new List<object>();
+        var fixture = ContinuousPreviewFixtures.Create(output, scenario)[0]; var samples = new List<object>();
+        var ordinal = fixtureOrdinal++;
         var retained = new List<WeakReference>(); var failed = false;
         for (var repetition = 0; repetition < repetitions; repetition++)
         {
-            // Distant replacement preserves list shape and all original source bytes in
-            // non-edited cases. Each edit is a genuinely different parsed document.
-            var source = edited ? fixture.Source.Replace(fixture.Last, fixture.Last + $" revised{repetition + 1}", StringComparison.Ordinal) : fixture.Source;
+            // Original distant-source policy, including the appended heading/paragraph and edit zero.
+            var source = edited ? fixture.Source.Replace(fixture.Last, fixture.Last + $" revised{repetition + 1}", StringComparison.Ordinal) + $"\n\n## Fresh revision {repetition + 1}\n\nChanged distant content Café 😀.\n" : fixture.Source;
             var sampleOutput = Path.Combine(output, "sample-" + repetition); Directory.CreateDirectory(sampleOutput);
+            var sourcePath = Path.Combine(output, "fixture.md"); File.WriteAllText(sourcePath, source); // Source I/O is explicitly outside readiness.
             window.Content = window.Scroller; window.Surface.Install(null); window.Scroller.ScrollToTop(); window.UpdateLayout();
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
             var allocated = GC.GetTotalAllocatedBytes(); var collections = Enumerable.Range(0, 3).Select(GC.CollectionCount).ToArray();
             var watch = Stopwatch.StartNew(); var gaps = new List<double>(); var lastInput = 0d; var uiThread = Environment.CurrentManagedThreadId;
-            void Input() { var now = watch.Elapsed.TotalMilliseconds; gaps.Add(now - lastInput); lastInput = now; }
+            var inputTimeline = new List<object>();
+            void Input() { var now = watch.Elapsed.TotalMilliseconds; gaps.Add(now - lastInput); inputTimeline.Add(new { Timestamp = Stopwatch.GetTimestamp(), GapMilliseconds = now - lastInput }); lastInput = now; }
             var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
             timer.Tick += (_, _) => Input(); timer.Start();
             var parsing = Stopwatch.StartNew();
             ListModel? model = null; ParsedDocument? parsed = null;
-            if (adapter == "candidate") model = await ExperimentWindow.Worker(() => CompleteLayout.Parse(source, CancellationToken.None));
+            if (adapter == "candidate") model = await ExperimentWindow.Worker(() => CompleteLayout.Parse(source, CancellationToken.None, sourcePath, output));
             else parsed = await Task.Run(() => new MarkdownService().Parse(source));
             var parsingMilliseconds = parsing.Elapsed.TotalMilliseconds;
             double boundary, complete, construction = 0, workerLayout = 0; int worker = uiThread;
             FlowDocumentScrollViewer? stock = null; PreviewResult? result = null; LayoutSnapshot? snapshot = null;
             if (adapter == "candidate")
             {
-                boundary = watch.Elapsed.TotalMilliseconds;
+                boundary = 0; // Model preparation can contain required Mermaid layout; include it transparently.
                 snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(model!, 640, repetition + 1, "Light", CancellationToken.None));
                 worker = snapshot.WorkerThread; workerLayout = snapshot.LayoutMilliseconds;
                 window.Surface.Install(snapshot); window.UpdateLayout();
@@ -89,9 +109,10 @@ internal static class Program
             }
             else
             {
+                var prepared = await ExperimentWindow.Worker(() => StockPreparation.Create(parsed!, sourcePath, output));
                 var constructionClock = Stopwatch.StartNew();
                 result = await new NativeMarkdownRenderer(new NativeSvgService()).RenderAsync(parsed!, false,
-                    new Dictionary<Markdig.Syntax.FencedCodeBlock, DiagramResult>(), _ => { }, (_, _) => { });
+                    prepared.Diagrams, _ => { }, (_, _) => { }, preparedDrawings: prepared.Drawings, preparedImages: prepared.Images, codeSyntax: prepared.Syntax);
                 construction = constructionClock.Elapsed.TotalMilliseconds;
                 stock = new FlowDocumentScrollViewer { Width = 640, Height = 300, IsToolBarVisible = false, Background = Brushes.White };
                 window.Content = stock; window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
@@ -102,37 +123,45 @@ internal static class Program
                 await delivery.Task; complete = watch.Elapsed.TotalMilliseconds - boundary;
             }
             await Dispatcher.Yield(DispatcherPriority.ApplicationIdle); Input();
-            var readiness = watch.Elapsed.TotalMilliseconds; timer.Stop(); var endThread = Environment.CurrentManagedThreadId;
+            var readiness = watch.Elapsed.TotalMilliseconds; timer.Stop(); var timingGaps = gaps.ToArray(); var endThread = Environment.CurrentManagedThreadId;
             var bytes = GC.GetTotalAllocatedBytes() - allocated; var gc = Enumerable.Range(0, 3).Select(i => GC.CollectionCount(i) - collections[i]).ToArray();
             // From here onwards, independent correctness and capture are outside clocks.
-            var oracle = adapter == "stock" ? CheckStock(stock!, result!, source) : CheckCandidate(window.Surface, snapshot!, source);
+            var originalList = scenario == "list" && !edited;
+            var oracle = originalList ? adapter == "stock" ? CheckStock(stock!, result!, source) : CheckCandidate(window.Surface, snapshot!, source)
+                : SemanticChecks.Check(adapter, fixture.Name, source, stock, result, snapshot);
             Capture((FrameworkElement?)stock ?? window.Scroller, Path.Combine(sampleOutput, "initial.png"));
             WindowCapture.Save(window, Path.Combine(sampleOutput, "shown-window.png"));
             Write(Path.Combine(sampleOutput, "geometry.json"), oracle);
+            var interactionGaps = new List<double>();
             if (uia && adapter == "candidate" && repetition == 0)
             {
+                gaps.Clear(); lastInput = watch.Elapsed.TotalMilliseconds; timer.Start();
                 var executable = Environment.ProcessPath!;
                 var start = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true };
-                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text)) }) start.ArgumentList.Add(arg);
+                foreach (var arg in new[] { "--uia-client", output, Environment.ProcessId.ToString(), Hash(Encoding.UTF8.GetBytes(snapshot!.Model.Text)), scenario }) start.ArgumentList.Add(arg);
                 using var client = Process.Start(start)!;
                 using var clientDeadline = new CancellationTokenSource(TimeSpan.FromSeconds(60));
                 try { await client.WaitForExitAsync(clientDeadline.Token); }
                 catch (OperationCanceledException) { client.Kill(true); throw new TimeoutException("Independent UIA client exceeded its external 60-second bound."); }
                 if (client.ExitCode != 0)
                 {
+                    Write(Path.Combine(output, "interaction-heartbeat-failure.json"), new { TimingInputGaps = timingGaps, InteractionInputGaps = gaps, InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, CompleteLayout = complete, PreparationPresentation = readiness });
                     Write(Path.Combine(output, "provider-failure-state.json"), new { window.Surface.Anchor, window.Surface.Active, window.Surface.LastKey, window.Surface.KeyHistory,
                         window.Surface.IsKeyboardFocused, FocusedElement = System.Windows.Input.Keyboard.FocusedElement?.GetType().Name });
                     throw new IOException("Independent UIA client failed; see retained evidence.");
                 }
             }
+            timer.Stop(); interactionGaps.AddRange(gaps);
             using var process = Process.GetCurrentProcess();
             var observation = new
             {
-                Adapter = adapter, Repetition = repetition, Edited = edited, Fixture = "list",
-                Temperature = repetition == 0 ? "First fixture execution in fresh process; no prewarm" : "Repeated complete fresh construction, same process",
+                Adapter = adapter, Repetition = repetition, Edited = edited, Fixture = fixture.Name, Contract = acceptanceV2 ? AcceptanceV2.Contract : "historical-v1",
+                ProcessId = Environment.ProcessId, FixtureOrdinalInProcess = ordinal,
+                RunGroup = Environment.GetEnvironmentVariable("LENS_LAYOUT_RUN_GROUP"),
+                Temperature = repetition > 0 ? "Repeated complete fresh construction, same process" : ordinal == 0 ? "First fixture execution in fresh process; no prewarm" : "First construction for this fixture after earlier fixtures in the same process",
                 FixtureSha256 = Hash(Encoding.UTF8.GetBytes(fixture.Source)), SourceSha256 = Hash(Encoding.UTF8.GetBytes(source)),
                 HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)),
-                SourceRevision = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"),
+                SourceRevision = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_REVISION"), SourceDirty = Environment.GetEnvironmentVariable("LENS_LAYOUT_SOURCE_DIRTY"),
                 ProductSha256 = Hash(File.ReadAllBytes(typeof(NativeMarkdownRenderer).Assembly.Location)),
                 HarnessInformationalVersion = System.Reflection.CustomAttributeExtensions.GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>(typeof(Program).Assembly)?.InformationalVersion,
                 WpfFrameworkSha256 = Hash(File.ReadAllBytes(typeof(TextElement).Assembly.Location)),
@@ -148,19 +177,23 @@ internal static class Program
                 CandidateBeforeFirstRequiredLayoutThroughInstallInputMilliseconds = adapter == "candidate" ? complete : (double?)null,
                 EndToEndReadinessMilliseconds = readiness, UiStartThread = uiThread, WorkerLayoutThread = worker, UiEndThread = endThread,
                 CandidateStages = snapshot?.Stages,
-                InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
-                DeferredRequiredLayout = 0, ListLogicalStyleAndSourceChecks = "PASS", FullParity = "INCOMPLETE", CompleteLayoutTiming = complete <= 250 ? "PASS" : "FAIL",
+                InputGapsMilliseconds = timingGaps, MaximumInputGapMilliseconds = timingGaps.DefaultIfEmpty().Max(),
+                InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionInputGapsMilliseconds = interactionGaps, MaximumInteractionInputGapMilliseconds = interactionGaps.DefaultIfEmpty().Max(),
+                V2 = AcceptanceV2.Rows(complete, readiness, timingGaps.Concat(interactionGaps).DefaultIfEmpty().Max(), false, false),
+                DeferredRequiredLayout = 0, ListLogicalStyleAndSourceChecks = "PASS", FullParity = "INCOMPLETE", CompleteLayoutTiming = complete <= (acceptanceV2 ? 1000 : 250) ? "PASS" : "FAIL", Future250StretchOnly = complete <= 250 ? "MET" : "NOT_MET",
                 AllocatedBytes = bytes, NaturalCollections = gc, ManagedBytes = GC.GetTotalMemory(false),
                 process.WorkingSet64, process.PrivateMemorySize64, ForcedCollection = false
             };
             samples.Add(observation); Write(Path.Combine(sampleOutput, "sample.json"), observation);
             Console.WriteLine($"{adapter} repetition {repetition}: complete layout {complete:F2} ms; readiness {readiness:F2} ms");
-            failed |= complete > 250 || gaps.DefaultIfEmpty().Max() >= 250;
+            failed |= acceptanceV2 ? complete > 1000 || readiness > 1500 || timingGaps.Concat(interactionGaps).DefaultIfEmpty().Max() > 100 : complete > 250 || timingGaps.DefaultIfEmpty().Max() >= 250;
             retained.Add(new WeakReference((object?)snapshot ?? result!.Document));
             if (stock is not null) stock.Document = null; window.Surface.Install(null); window.Content = window.Scroller;
         }
         Write(Path.Combine(output, "results.json"), new { Status = failed ? "FAIL" : "TIMING_ONLY_PASS", FullAcceptance = "INCOMPLETE_PENDING_PARITY", Samples = samples,
             Retention = new { Created = retained.Count, AliveAfterNaturalCollections = retained.Count(item => item.IsAlive), ForcedCollection = false } });
+        if (acceptanceV2) { Write(Path.Combine(output, "acceptance-v2.json"), new { Contract = AcceptanceV2.Contract, Timing = failed ? "FAIL" : "PASS", FullAcceptance = "INCOMPLETE", Missing = "Full independent parity and actual OS appearance/lifecycle certification" });
+            }
         if (acceptance) throw new IOException("Full prototype acceptance is incomplete until timing and all required parity/responsiveness gates pass.");
     }
 

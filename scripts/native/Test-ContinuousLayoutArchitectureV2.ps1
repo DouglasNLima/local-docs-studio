@@ -17,6 +17,7 @@ $exe = (Resolve-Path src/native/LensDocsStudio.LayoutExperiment/bin/Release/net1
 $source = (& git rev-parse HEAD).Trim()
 $env:LENS_LAYOUT_SOURCE_REVISION = $source
 $sourceDirty = [bool](& git status --porcelain)
+$env:LENS_LAYOUT_SOURCE_DIRTY = $sourceDirty.ToString()
 $payloadDirectory = Split-Path -Parent $exe
 $provenance = [ordered]@{
     Label='EXPERIMENT ONLY'; Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty
@@ -30,9 +31,10 @@ $runs = [Collections.Generic.List[object]]::new()
 function Invoke-Sample([string]$Fixture, [string]$Adapter, [string]$Name, [int]$Repetitions = 1, [switch]$Edit, [switch]$Uia) {
     $destination = Join-Path $output "$Fixture/$Name-$Adapter"
     New-Item -ItemType Directory -Force -Path $destination | Out-Null
-    $arguments = @('--scenario',$Fixture,'--adapter',$Adapter,'--output',('"' + $destination + '"'),'--repetitions',$Repetitions)
+    $arguments = @('--contract-v2','--scenario',$Fixture,'--adapter',$Adapter,'--output',('"' + $destination + '"'),'--repetitions',$Repetitions)
     if ($Edit) { $arguments += '--edit' }
     if ($Uia) { $arguments += '--uia' }
+    $env:LENS_LAYOUT_RUN_GROUP = $Name
     $process = Start-Process -FilePath $exe -ArgumentList $arguments -PassThru -WindowStyle Hidden -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
     if (-not $process.WaitForExit(120000)) {
         Stop-Process -Id $process.Id -Force
@@ -42,18 +44,34 @@ function Invoke-Sample([string]$Fixture, [string]$Adapter, [string]$Name, [int]$
     $runs.Add([ordered]@{ Fixture=$Fixture; Adapter=$Adapter; Name=$Name; ExitCode=$process.ExitCode; Directory=$destination })
 }
 $order = if ($Replication -eq 1) { @('stock','candidate') } else { @('candidate','stock') }
-foreach ($fixture in @('list','table','paragraphs','quote','details','mixed')) {
-    foreach ($side in $order) { Invoke-Sample $fixture $side 'first' }
-    if ($FirstOnly) { continue }
-    for ($cold = 0; $cold -lt 3; $cold++) {
-        $pair = if ($cold % 2 -eq 0) { $order } else { @($order[1],$order[0]) }
-        foreach ($side in $pair) { Invoke-Sample $fixture $side "cold-$cold" }
+$fixtures = @('list','table','quote','details','paragraphs','mixed')
+# Preserve the original first combined execution and fixed fixture order in one process per side.
+foreach ($side in $order) { Invoke-Sample 'all' $side 'first-combined' }
+if (-not $FirstOnly) {
+    foreach ($fixture in $fixtures) {
+        for ($cold = 0; $cold -lt 3; $cold++) {
+            $pair = if ($cold % 2 -eq 0) { $order } else { @($order[1],$order[0]) }
+            foreach ($side in $pair) { Invoke-Sample $fixture $side "cold-$cold" }
+        }
     }
-    foreach ($side in $order) { Invoke-Sample $fixture $side 'repeated' 4 }
-    foreach ($side in @($order[1],$order[0])) { Invoke-Sample $fixture $side 'distant-edit' 3 -Edit }
-    Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia
+    foreach ($side in $order) { Invoke-Sample 'all' $side 'repeated' 4 }
+    foreach ($side in $order) { Invoke-Sample 'all' $side 'distant-edit' 3 -Edit }
+    foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
+    foreach ($mode in @('lifecycle','appearance')) {
+        $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
+        $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
+        if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
+        $process.Refresh(); $runs.Add([ordered]@{ Name=$mode; ExitCode=$process.ExitCode; Directory=$destination })
+    }
 }
 $samples = @(Get-ChildItem -LiteralPath $output -Recurse -Filter sample.json | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json })
+$runtimeChecks = @($samples | Select-Object -First 1 | ForEach-Object {
+    foreach ($path in @($_.RuntimeAssembly,$_.WpfFormattingAssembly)) {
+        $signature = Get-AuthenticodeSignature -LiteralPath $path
+        [ordered]@{ Path=$path; Sha256=(Get-FileHash -LiteralPath $path).Hash; SignatureStatus=$signature.Status.ToString(); Signer=$signature.SignerCertificate.Subject }
+    }
+})
+$runtimeChecks | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $output 'official-runtime.json')
 $candidate = @($samples | Where-Object Adapter -eq 'candidate')
 $layoutMisses = @($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 1000)
 $presentationMisses = @($candidate | Where-Object EndToEndReadinessMilliseconds -gt 1500)

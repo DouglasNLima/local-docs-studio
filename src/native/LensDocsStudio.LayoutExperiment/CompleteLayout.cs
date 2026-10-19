@@ -10,64 +10,60 @@ using Markdig.Syntax.Inlines;
 
 namespace LensDocsStudio.LayoutExperiment;
 
-internal sealed record StyledRun(int Start, string Text, int SourceStart, bool Bold, bool Italic, bool Code);
+internal sealed record StyledRun(int Start, string Text, int SourceStart, bool Bold, bool Italic, bool Code)
+{
+    public MarkdownEmphasis Emphasis { get; init; }
+    public int SourceEnd { get; init; } = SourceStart + Text.Length;
+    public string? Link { get; init; }
+    public string? Colour { get; init; }
+    public double FontSize { get; init; } = 15;
+    public int Weight { get; init; } = Bold ? 700 : 400;
+}
 internal sealed record Item(int Start, int Length, int SourceStart, int SourceEnd, ImmutableArray<StyledRun> Runs);
-internal sealed record ListModel(string Source, string Text, ImmutableArray<int> SourceBoundaries, ImmutableArray<Item> Items, bool Ordered, int StartIndex);
+internal sealed record ListModel(string Source, string Text, ImmutableArray<int> SourceBoundaries, ImmutableArray<Item> Items, bool Ordered, int StartIndex)
+{
+    public ImmutableArray<int> SourceEnds { get; init; }
+    public required SemanticNode Root { get; init; }
+    public bool OriginalListShape { get; init; }
+    public ImmutableArray<LensDocsStudio.Core.Parsing.DocumentHeading> Headings { get; init; } = [];
+}
+internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int SourceStart, int SourceEnd, ImmutableArray<SemanticNode> Children)
+{
+    public int Paragraph { get; init; } = -1;
+    public int Level { get; init; }
+    public int Number { get; init; } = 1;
+    public bool Ordered { get; init; }
+    public bool Expanded { get; init; } = true;
+    public string Label { get; init; } = "";
+    public string? Target { get; init; }
+    public TextAlignment Alignment { get; init; }
+    public ImageSource? Media { get; init; }
+    public IEnumerable<SemanticNode> Descendants() { foreach (var child in Children) { yield return child; foreach (var descendant in child.Descendants()) yield return descendant; } }
+}
 internal sealed record Caret(int Offset, double X);
 internal sealed record Cluster(int Start, int End, ImmutableArray<Rect> Bounds);
 internal sealed record Line(int Start, int End, int Item, double Top, double Height, double Baseline,
-    DrawingGroup Drawing, ImmutableArray<Caret> Carets, ImmutableArray<Cluster> Clusters);
+    DrawingGroup Drawing, ImmutableArray<Caret> Carets, ImmutableArray<Cluster> Clusters)
+{ public bool Hidden { get; init; } public DrawingGroup? SelectionDrawing { get; init; } }
 internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Lines, double Width, double Height,
-    int WorkerThread, double LayoutMilliseconds, long Version, string Appearance, ImmutableDictionary<string, double> Stages);
+    int WorkerThread, double LayoutMilliseconds, long Version, string Appearance, ImmutableDictionary<string, double> Stages)
+{
+    public ImmutableDictionary<int, Rect> NodeBounds { get; init; } = ImmutableDictionary<int, Rect>.Empty;
+    public DrawingGroup? Decorations { get; init; }
+}
 
 /// <summary>Diagnostic list-only engine. No candidate FlowDocument or hidden viewer.</summary>
 internal static class CompleteLayout
 {
-    public static ListModel Parse(string source, CancellationToken cancellation)
-    {
-        cancellation.ThrowIfCancellationRequested();
-        var parsed = new MarkdownService().Parse(source);
-        if (parsed.Syntax.Count != 1 || parsed.Syntax[0] is not ListBlock list)
-            throw new NotSupportedException("The feasibility gate accepts exactly one semantic list.");
-        var text = new StringBuilder(); var map = new List<int>(); var items = ImmutableArray.CreateBuilder<Item>();
-        foreach (var item in list.OfType<ListItemBlock>())
-        {
-            cancellation.ThrowIfCancellationRequested();
-            if (item.Count != 1 || item[0] is not ParagraphBlock paragraph || paragraph.Inline is null)
-                throw new NotSupportedException("The feasibility gate requires one paragraph in each item.");
-            var start = text.Length; var runs = ImmutableArray.CreateBuilder<StyledRun>();
-            Add(paragraph.Inline, false, false);
-            var length = text.Length - start;
-            // Separators are explicit semantic characters. Their source boundaries span
-            // the closing delimiters/newline/opening marker, rather than invent offsets.
-            text.Append("\r\n"); map.Add(Math.Min(source.Length, paragraph.Span.End + 1)); map.Add(Math.Min(source.Length, item.Span.End + 1));
-            items.Add(new(start, length, item.Span.Start, item.Span.End + 1, runs.ToImmutable()));
-
-            void Add(ContainerInline parent, bool bold, bool italic)
-            {
-                foreach (var inline in parent)
-                {
-                    cancellation.ThrowIfCancellationRequested();
-                    if (inline is EmphasisInline emphasis)
-                    { Add(emphasis, bold || emphasis.DelimiterCount == 2, italic || emphasis.DelimiterCount == 1); continue; }
-                    var content = inline switch { LiteralInline literal => literal.Content.ToString(), CodeInline code => code.Content, _ => null };
-                    if (content is null) throw new NotSupportedException("Unsupported inline in the feasibility gate: " + inline.GetType().Name);
-                    var exact = LiteralSourceMapping.Locate(source, inline.Span.Start, inline.Span.End, content)
-                        ?? throw new NotSupportedException("An exact literal source mapping is required.");
-                    runs.Add(new(text.Length, content, exact.Start, bold, italic, inline is CodeInline));
-                    text.Append(content); for (var i = 0; i < content.Length; i++) map.Add(exact.Start + i);
-                }
-            }
-        }
-        map.Add(source.Length);
-        return new(source, text.ToString(), map.ToImmutableArray(), items.ToImmutable(), list.IsOrdered, MarkdownFormatting.OrderedStart(list));
-    }
+    public static ListModel Parse(string source, CancellationToken cancellation, string? sourcePath = null, string? workspaceRoot = null, string appearance = "Light")
+        => DocumentModelBuilder.Parse(source, cancellation, sourcePath, workspaceRoot, appearance);
 
     public static LayoutSnapshot Format(ListModel model, double width, long version, string appearance, CancellationToken cancellation)
     {
+        if (!model.OriginalListShape) return DocumentLayout.Format(model, width, version, appearance, cancellation);
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var colour = appearance == "Dark" ? Color.FromRgb(232, 234, 237) : Color.FromRgb(32, 33, 36);
-        if (appearance.StartsWith("HC:", StringComparison.Ordinal)) colour = (Color)ColorConverter.ConvertFromString(appearance[3..]);
+        if (appearance.StartsWith("HC:", StringComparison.Ordinal)) colour = (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 0));
         var foreground = new SolidColorBrush(colour); foreground.Freeze();
         using var formatter = TextFormatter.Create(TextFormattingMode.Ideal);
         var normal = new RunProperties(false, false, false, foreground);
@@ -154,7 +150,7 @@ internal static class CompleteLayout
                     }
                     geometryTicks += System.Diagnostics.Stopwatch.GetTimestamp() - phaseStart;
                     lines.Add(new(item.Start + position, item.Start + end, itemIndex, top, line.Height, line.Baseline,
-                        drawing, carets.ToImmutable(), clusters.ToImmutable()));
+                        drawing, carets.ToImmutable(), clusters.ToImmutable()) { SelectionDrawing = SelectionInk.Create(drawing, appearance) });
                     // WPF's stock MaxHeight strategy uses natural glyph height, then
                     // advances by at least LineHeight in its 1/300 DIP text units.
                     top += Math.Max(line.Height, 23 - 1d / 300); position += line.Length;

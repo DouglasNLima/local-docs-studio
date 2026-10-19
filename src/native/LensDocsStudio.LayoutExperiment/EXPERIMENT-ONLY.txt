@@ -15,16 +15,25 @@ From this extracted folder:
   LensDocsStudio.LayoutExperiment.exe --adapter stock --output stock
   LensDocsStudio.LayoutExperiment.exe --lifecycle --output lifecycle
 
-The window is explicitly experimental. --view is a complete 4,000-item list.
-Arrow/Home/End/Page keys navigate, Shift extends selection, Ctrl+A/C select/copy.
---source <path> accepts the supported list-only gate model and rejects other
-structures. Inputs are read-only. Close the window to exit. --uia drives actual
-Windows input and clipboard in the diagnostic window; run on an isolated host.
+The window is explicitly experimental. --studio opens transient source editing,
+search, outline, document switching/closure and reopen with the eager engine:
+  LensDocsStudio.LayoutExperiment.exe --studio --source C:\chosen-workspace\document.md
+  LensDocsStudio.LayoutExperiment.exe --scenario mixed --uia --contract-v2 --output mixed-uia
 
-Full acceptance deliberately fails until every required timing and parity
-condition is met. Missing features are not passes. The tested design has a
-demonstrated 250 ms timing blocker; see the source-labelled report/PR receipt.
+Supported original fixture names: list, table, quote, details, paragraphs, mixed;
+--scenario all retains the original combined process order. --source is read-only;
+diagnostic edits stay in memory and never save to workspace/recovery/settings.
+Ctrl+A/C select/copy; Shift extends; arrow/Home/End/Page keys navigate. The studio
+has an explicit whole-document Copy rendered route using the existing exporter.
+Run --uia on an isolated desktop: it drives actual Windows input and clipboard.
 
-Source, harness/runtime/fixture hashes and source cleanliness are in the adjacent
-provenance.json and raw measurement receipts. The GitHub Actions run and Draft
-PR #38 identify exact source. Never infer certification from another package.
+Contract v2 was authorised on 19 October 2026: complete required layout <=1000 ms,
+preparation/presentation <=1500 ms, observed shown-window Input gaps <=100 ms.
+250 ms is a non-blocking stretch target. This changed requirement is not a speed
+improvement. Missing functionality/evidence keeps full acceptance incomplete.
+The original v1 NO-GO/results remain source-labelled history at 57dcd44.
+
+Source, harness/runtime/fixture hashes and source cleanliness are in adjacent
+provenance.json and raw receipts. Draft PR #38 identifies exact source and
+limitations. Never infer certification from another package. No migration is
+approved by this executable.

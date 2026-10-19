@@ -16,15 +16,50 @@ internal sealed class LayoutSurface : FrameworkElement
     public ScrollViewer? Scroller { get; set; }
     public string LastKey { get; private set; } = "";
     public List<string> KeyHistory { get; } = [];
+    public List<object> InteractionStages { get; } = [];
+    public event Action<SemanticNode>? Activated;
+    public event Action? SelectionUpdated;
+    private readonly List<(int Start, int End)> matches = [];
+    public void Search(string text)
+    {
+        matches.Clear();
+        if (Snapshot is { } snapshot && text.Length > 0)
+            for (var at = 0; at <= snapshot.Model.Text.Length - text.Length;)
+            {
+                var found = snapshot.Model.Text.IndexOf(text, at, StringComparison.OrdinalIgnoreCase); if (found < 0) break;
+                matches.Add((found, found + text.Length)); at = found + Math.Max(1, text.Length);
+            }
+        InvalidateVisual();
+    }
+    public void FindNext(bool next)
+    {
+        if (matches.Count == 0) return;
+        var match = next ? matches.FirstOrDefault(match => match.Start > Start, matches[0]) : matches.LastOrDefault(match => match.Start < Start, matches[^1]);
+        Select(match.Start, match.End); Reveal(match.Start);
+    }
+    public void Activate(SemanticNode node) => Activated?.Invoke(node);
+    public (int Source, double Delta) ViewportSourceAnchor()
+    {
+        if (Snapshot is not { } snapshot || snapshot.Lines.Length == 0) return (0, 0);
+        var top = Scroller?.VerticalOffset ?? 0;
+        var line = snapshot.Lines.FirstOrDefault(line => line.Top + line.Height >= top) ?? snapshot.Lines[^1];
+        return (snapshot.Model.SourceBoundaries[line.Start], top - line.Top);
+    }
+    public int LogicalSource(int source) => Snapshot is { } snapshot ? Enumerable.Range(0, snapshot.Model.Text.Length + 1)
+        .MinBy(at => Math.Abs(snapshot.Model.SourceBoundaries[at] - source)) : 0;
+    public void SelectSource(int start, int end) => Select(LogicalSource(start), LogicalSource(end));
+    public void NavigateSource(int source) { var logical = LogicalSource(source); Select(logical, logical); Reveal(logical); }
+    public void RestoreViewportSourceAnchor((int Source, double Delta) anchor)
+    {
+        var at = LogicalSource(anchor.Source);
+        if (Snapshot?.Lines.FirstOrDefault(line => at >= line.Start && at <= line.End) is { } line) Scroller?.ScrollToVerticalOffset(Math.Max(0, line.Top + anchor.Delta));
+    }
     public int SelectionSourceStart => Snapshot?.Model.SourceBoundaries[Start] ?? 0;
     public int SelectionSourceEnd => End > Start && Snapshot is { } snapshot ? SourceEnd(snapshot, End) : SelectionSourceStart;
     private static int SourceEnd(LayoutSnapshot snapshot, int end)
     {
         // A range ending after a literal excludes its closing Markdown delimiter.
-        foreach (var item in snapshot.Model.Items)
-        foreach (var run in item.Runs)
-            if (end > run.Start && end <= run.Start + run.Text.Length) return run.SourceStart + end - run.Start;
-        return snapshot.Model.SourceBoundaries[end];
+        return snapshot.Model.SourceEnds[end - 1];
     }
 
     public LayoutSurface()
@@ -44,54 +79,64 @@ internal sealed class LayoutSurface : FrameworkElement
     {
         var length = Snapshot?.Model.Text.Length ?? 0;
         Anchor = Math.Clamp(anchor, 0, length); Active = Math.Clamp(active, 0, length);
+        SelectionUpdated?.Invoke();
         InvalidateVisual(); (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.SelectionChanged();
     }
-    public void Copy()
+    public async void Copy()
     {
         if (Snapshot is not { } snapshot || Start == End) return;
-        var text = snapshot.Model.Text[Start..End];
-        var data = new DataObject(); data.SetText(text, TextDataFormat.UnicodeText); data.SetText(text, TextDataFormat.Text);
-        // Preserve actual style boundaries in RTF; clipboard is owned by this dispatcher.
-        var rtf = new System.Text.StringBuilder(@"{\rtf1\ansi\deff0{\fonttbl{\f0 Segoe UI;}{\f1 Consolas;}}\uc1\fs23 ");
-        var runs = snapshot.Model.Items.SelectMany(item => item.Runs).ToArray(); var runIndex = 0;
-        for (var at = Start; at < End; at++)
+        var watch = System.Diagnostics.Stopwatch.StartNew();
+        var start = Start; var end = End; var sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence;
+        try
         {
-            while (runIndex < runs.Length && at >= runs[runIndex].Start + runs[runIndex].Text.Length) runIndex++;
-            var run = runIndex < runs.Length && at >= runs[runIndex].Start ? runs[runIndex] : null;
-            rtf.Append(run?.Bold == true ? @"\b " : @"\b0 ").Append(run?.Italic == true ? @"\i " : @"\i0 ");
-            var value = text[at - Start];
-            if (value == '\r') continue;
-            if (value == '\n') rtf.Append(@"\par ");
-            else if (value is '\\' or '{' or '}') rtf.Append('\\').Append(value);
-            else if (value > 127) rtf.Append(@"\u").Append((short)value).Append('?');
-            else rtf.Append(value);
+            var payload = await ExperimentWindow.Worker(() => SelectionClipboard.Prepare(snapshot.Model, start, end));
+            var prepared = watch.Elapsed.TotalMilliseconds;
+            if (!ReferenceEquals(Snapshot, snapshot) || Start != start || End != end || sequence != LensDocsStudio.Native.Platform.NativeClipboardService.Sequence)
+            { InteractionStages.Add(new { Stage = "copy-stale-rejected", Thread = Environment.CurrentManagedThreadId }); return; }
+            var commit = System.Diagnostics.Stopwatch.StartNew(); Clipboard.SetDataObject(SelectionClipboard.Create(payload), true);
+            InteractionStages.Add(new { Stage = "copy", PreparedMilliseconds = prepared, DispatcherCommitMilliseconds = commit.Elapsed.TotalMilliseconds, TotalMilliseconds = watch.Elapsed.TotalMilliseconds, Thread = Environment.CurrentManagedThreadId });
         }
-        data.SetData(DataFormats.Rtf, rtf.Append('}').ToString()); Clipboard.SetDataObject(data, true);
+        catch (Exception error) when (error is IOException or System.Runtime.InteropServices.ExternalException)
+        { InteractionStages.Add(new { Stage = "copy-failure", Error = error.Message, Thread = Environment.CurrentManagedThreadId }); }
     }
     protected override Size MeasureOverride(Size available) => Snapshot is { } snapshot ? new(snapshot.Width - SystemParameters.VerticalScrollBarWidth, snapshot.Height) : new(0, 0);
     protected override void OnRender(DrawingContext context)
     {
         var snapshot = Snapshot; if (snapshot is null) return;
-        var background = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? SystemColors.WindowBrush
+        var background = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? new SolidColorBrush((Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(snapshot.Appearance, 1)))
             : snapshot.Appearance == "Dark" ? new SolidColorBrush(Color.FromRgb(32, 33, 36)) : Brushes.White;
         context.DrawRectangle(background, null, new Rect(RenderSize));
+        if (snapshot.Decorations is not null) context.DrawDrawing(snapshot.Decorations);
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
         foreach (var line in snapshot.Lines)
         {
-            if (line.Top + line.Height < top) continue;
-            if (line.Top > bottom) break;
+            if (line.Hidden || line.Top + line.Height < top) continue;
+            if (line.Top > bottom) continue;
             foreach (var cluster in line.Clusters)
+            {
+                if (matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
+                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(SystemColors.HighlightBrush, null, bounds);
                 if (cluster.End > Start && cluster.Start < End)
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(SystemColors.HighlightBrush, null, bounds);
+            }
             context.DrawDrawing(line.Drawing);
+            if (line.SelectionDrawing is not null && (line.Start < End && line.End > Start || matches.Any(match => match.Start < line.End && match.End > line.Start)))
+            {
+                var mask = new GeometryGroup();
+                foreach (var cluster in line.Clusters)
+                    if (cluster.End > Start && cluster.Start < End || matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
+                        foreach (var bounds in cluster.Bounds) mask.Children.Add(new RectangleGeometry(bounds));
+                context.PushClip(mask); context.DrawDrawing(line.SelectionDrawing); context.Pop();
+            }
         }
     }
     public IEnumerable<Rect> Bounds(int start, int end, bool visibleOnly = false)
     {
         if (Snapshot is not { } snapshot) yield break;
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
-        foreach (var line in snapshot.Lines)
+        foreach (var line in RangeLines(snapshot, start, end))
         {
+            if (line.Hidden) continue;
             if (visibleOnly && (line.Top + line.Height < top || line.Top > bottom)) continue;
             if (start == end && start >= line.Start && start <= line.End)
             { yield return new Rect(line.Carets.MinBy(caret => Math.Abs(caret.Offset - start))!.X, line.Top, 1, line.Height); yield break; }
@@ -106,10 +151,20 @@ internal sealed class LayoutSurface : FrameworkElement
             if (!current.IsEmpty) yield return current;
         }
     }
+    private static IEnumerable<Line> RangeLines(LayoutSnapshot snapshot, int start, int end)
+    {
+        // Lines are in logical document order even when adjacent table columns share Y.
+        var left = 0; var right = snapshot.Lines.Length;
+        while (left < right) { var middle = left + (right - left) / 2; if (snapshot.Lines[middle].End < start) left = middle + 1; else right = middle; }
+        for (var index = left; index < snapshot.Lines.Length; index++)
+        { var line = snapshot.Lines[index]; if (line.Start > end) yield break; yield return line; }
+    }
     public int Hit(Point point)
     {
         if (Snapshot is not { } snapshot) return 0;
-        var line = snapshot.Lines.MinBy(line => point.Y < line.Top ? line.Top - point.Y : Math.Max(0, point.Y - line.Top - line.Height));
+        var line = snapshot.Lines.Where(line => !line.Hidden).MinBy(line => Math.Pow(point.Y < line.Top ? line.Top - point.Y : Math.Max(0, point.Y - line.Top - line.Height), 2)
+            + Math.Pow(point.X < line.Carets.Min(caret => caret.X) ? line.Carets.Min(caret => caret.X) - point.X
+                : Math.Max(0, point.X - line.Carets.Max(caret => caret.X)), 2));
         return line?.Carets.MinBy(caret => Math.Abs(caret.X - point.X))?.Offset ?? 0;
     }
     public void Reveal(int offset)
@@ -117,9 +172,27 @@ internal sealed class LayoutSurface : FrameworkElement
         if (Snapshot is not { } snapshot) return;
         var line = snapshot.Lines.FirstOrDefault(line => offset >= line.Start && offset <= line.End) ?? snapshot.Lines[^1];
         Scroller?.ScrollToVerticalOffset(Math.Max(0, line.Top - 30));
+        Scroller?.UpdateLayout();
+    }
+    private int Vertical(Line current, bool down)
+    {
+        var lines = Snapshot!.Lines.Where(line => !line.Hidden && (down ? line.Top > current.Top + .01 : line.Top < current.Top - .01)).ToArray();
+        if (lines.Length == 0) return Active;
+        var y = down ? lines.Min(line => line.Top) : lines.Max(line => line.Top);
+        var x = current.Carets.MinBy(caret => Math.Abs(caret.Offset - Active))!.X;
+        return lines.Where(line => Math.Abs(line.Top - y) < .01).SelectMany(line => line.Carets).MinBy(caret => Math.Abs(caret.X - x))!.Offset;
     }
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    { base.OnMouseLeftButtonDown(e); Focus(); var at = Hit(e.GetPosition(this)); Select(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Anchor : at, at); CaptureMouse(); e.Handled = true; }
+    {
+        base.OnMouseLeftButtonDown(e); Focus(); var at = Hit(e.GetPosition(this));
+        if (Snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Kind is "Link" or "DetailsHeader" && at >= node.Start && at < node.End) is { } target
+            && (target.Kind == "DetailsHeader" ? e.GetPosition(this).X < Snapshot.Lines.First(line => line.Item == target.Paragraph).Carets.Min(caret => caret.X) - 3 : Keyboard.Modifiers.HasFlag(ModifierKeys.Control)))
+        {
+            if (target.Kind == "DetailsHeader") target = Snapshot.Model.Root.Descendants().Single(node => node.Kind == "Details" && node.Children[0].Id == target.Id);
+            Activate(target); e.Handled = true; return;
+        }
+        Select(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Anchor : at, at); CaptureMouse(); e.Handled = true;
+    }
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e); if (!IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed) return;
@@ -145,8 +218,8 @@ internal sealed class LayoutSurface : FrameworkElement
             Key.End => control ? snapshot.Model.Text.Length : line.End,
             Key.Left => stops.LastOrDefault(value => value < Active, 0),
             Key.Right => stops.FirstOrDefault(value => value > Active, snapshot.Model.Text.Length),
-            Key.Up => Hit(new Point(line.Carets.MinBy(caret => Math.Abs(caret.Offset - Active))!.X, line.Top - 11)),
-            Key.Down => Hit(new Point(line.Carets.MinBy(caret => Math.Abs(caret.Offset - Active))!.X, line.Top + line.Height + 11)),
+            Key.Up => Vertical(line, false),
+            Key.Down => Vertical(line, true),
             Key.PageUp => Hit(new Point(52, line.Top - (Scroller?.ViewportHeight ?? 300))),
             Key.PageDown => Hit(new Point(52, line.Top + (Scroller?.ViewportHeight ?? 300))),
             _ => -1

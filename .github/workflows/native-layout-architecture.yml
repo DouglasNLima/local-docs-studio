@@ -1,4 +1,4 @@
-name: Experimental Continuous architecture gate
+name: Experimental Continuous architecture v2 gate
 on:
   push:
     branches: [experiment/native-continuous-layout-architecture]
@@ -6,10 +6,10 @@ on:
 permissions:
   contents: read
 jobs:
-  list-gate:
-    name: Complete list gate (replication ${{ matrix.replication }})
+  six-workload-v2:
+    name: Complete six-workload v2 gate (replication ${{ matrix.replication }})
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -22,15 +22,15 @@ jobs:
         with:
           dotnet-version: 10.0.x
       - name: Same compiled adapters, complete layout and real GUI/UIA
-        run: pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitecture.ps1 -Replication ${{ matrix.replication }}
+        run: pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitectureV2.ps1 -Replication ${{ matrix.replication }}
       - name: Deterministic complete-geometry and source checks, without timing assertions
         if: always()
-        run: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-architecture/deterministic
+        run: src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --deterministic --output artifacts/layout-architecture-v2/deterministic
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: layout-architecture-${{ matrix.replication }}
-          path: artifacts/layout-architecture/
+          name: layout-architecture-v2-${{ matrix.replication }}
+          path: artifacts/layout-architecture-v2/
           retention-days: 90
       - name: Reviewable diagnostic executable; no installation or runtime fork
         if: always()

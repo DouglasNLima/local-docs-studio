@@ -22,6 +22,39 @@ Input heartbeat coverage includes the independent UIA client and actual keyboard
 
 The earlier sections and execution records below are **historical contract v1**, including the original stopping rule and NOT VIABLE decision. Their commands/results are reproducible at source `57dcd44`; they are not reclassified under v2. `scripts/native/Test-ContinuousLayoutArchitecture.ps1` is retained as the v1 path; v2 uses a separate script. The historical `.749` incident remains open and unrelated to the new contract.
 
+### v2 implementation in progress
+
+The existing experiment now builds all six unchanged fixtures with eager text/cell/marker/media geometry. The original list keeps its specialised public marker path. The other blocks use the same public formatter in a recursive native block layout. Workspace raster preparation, Mermaid/SVG, syntax preparation and whole-document HTML copy reuse existing safe services. Table column widths come from measured formatter min/max widths; visual/extent equivalence with the stock Auto-column algorithm is still to be established.
+
+The isolated `--studio` route adds transient source editing, search/highlighting/next/previous, outline, source navigation, document switching, closure/reopen and a rendered-copy command. It writes no ordinary settings, workspace source or recovery state. Stock Continuous remains the ordinary default. Experimental tab/anchor/whole-document copy interaction checks are pending. Selected-range text/RTF/Xaml serialisation uses the semantic model; no candidate FlowDocument supplies selection or UIA. The independent client may load RTF into an unshown, unformatted document solely to decode and inspect the clipboard outside the measured candidate.
+
+| Requirement | Current v2 status; full parity remains incomplete |
+| --- | --- |
+| Six unchanged fixtures, final content and eager paragraph/cell end geometry | Deterministic checks pass locally |
+| Nested lists, multi-paragraph items, numbering, rich/code text | Implemented; targeted stock parity pending |
+| Tables, quotes, headings, details and media | Implemented; wrapping/alignment/extent/visual parity pending |
+| Actual UIA document/list, Grid/Table and cell/header relationships | Independent client subsets pass for list/table/mixed; complete range/attribute matrix pending |
+| Mouse/keyboard selection and exact marker/tab/line-ending text | Independent subsets pass for all six across recorded development iterations; final-source rerun pending |
+| RTF decoding and bold; Xaml content | Independent list checks pass; complete style/media/format fidelity pending |
+| Source mappings, Unicode/bidi, replacements and anchors | Basic exact literals/Unicode carets pass; transformed rich text and full interaction matrix pending |
+| Search, outline, links, whole-document HTML copy and diagnostic tabs | Implemented routes; independent interaction and export-oracle checks pending |
+| Light/Dark and actual OS enable/current/disable/current | Ownership/automatic invalidation implemented; hosted OS test pending |
+| Cancellation/stale ranges/active close/reopen | Initial local lifecycle passes; expanded current-preview readiness and tabs pending |
+| v2 timing/appearance/lifecycle aggregate acceptance | INCOMPLETE; dedicated result stays unsuccessful |
+
+Initial local development first pairs (dirty source, 144 DPI; exploratory, not controlled acceptance) recorded candidate layout/readiness about 281–1,001 ms, timing-phase gaps 32–44 ms and one mixed layout miss at 1,001.38 ms. Every observation remains under ignored `artifacts/layout-v2/`. Independent input exposed a DPI bounds defect, a table vertical-arrow defect and details-summary selection defect; these received concrete geometry/input fixes. It also exposed 437/220/148/114 ms interaction gaps. Indexed range lookup and worker preparation of clipboard strings reduced demonstrated dispatcher work, but these failures remain failures and the 100 ms interaction budget is not yet certified. Each receipt includes compiled harness hashes; these dirty exploratory iterations do not establish exact clean-head acceptance or a before/after performance claim.
+
+Current commands (Windows, official .NET 10 SDK/Windows Desktop Runtime):
+
+```powershell
+dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
+src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --studio --source C:\chosen-workspace\document.md
+src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe --scenario all --adapter candidate --contract-v2 --output artifacts/layout-v2/all
+pwsh -NoProfile -File scripts/native/Test-ContinuousLayoutArchitectureV2.ps1 -Replication 1
+```
+
+The two hosted v2 jobs reverse initial adapter order and preserve the original fixed six-fixture combined first/repeated/edit process policy. `acceptance-v2.json` has distinct complete-layout, preparation/presentation, Input, functional parity and actual-OS/lifecycle rows. A 250 ms miss is stretch information only. The current aggregate cannot pass while required parity remains incomplete. Actual OS mutation is guarded to disposable GitHub-hosted Windows; no ordinary desktop High Contrast setting is changed by local checks.
+
 ## Historical v1 — authorised scope and baseline
 
 This is a reversible diagnostic executable, stacked on open Draft PR #37 at

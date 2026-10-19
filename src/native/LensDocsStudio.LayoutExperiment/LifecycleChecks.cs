@@ -37,7 +37,6 @@ internal static class LifecycleChecks
         await Wait(() => window.Events.Any(item => item.Event == "worker-format-started" && item.Version == activeVersion));
         window.Close(); await closeWork;
         if (window.CurrentWork is { } work) await work;
-        timer.Stop();
         if (window.Surface.Snapshot is not null) throw new IOException("Closed surface retained its layout.");
         var events = window.Events.ToArray();
         var cancellation = events.Where(item => item.Event == "cancellation-requested").GroupBy(item => item.Version).Select(group =>
@@ -49,10 +48,19 @@ internal static class LifecycleChecks
         }).ToArray();
         var reopen = new ExperimentWindow(); reopen.Show(); await reopen.Request(fixture.Source);
         if (reopen.Surface.Snapshot?.Model.Source != fixture.Source) throw new IOException("Reopened diagnostic window lost source.");
-        reopen.Close();
+        reopen.Close(); timer.Stop();
+        var readiness = events.Where(item => item.Event == "winning-preview-ready").Select(ready =>
+        {
+            var requested = events.First(item => item.Version == ready.Version && item.Event == "requested");
+            var installed = events.First(item => item.Version == ready.Version && item.Event == "installed");
+            var input = events.First(item => item.Version == ready.Version && item.Event == "complete-preview-input-delivered");
+            return new { ready.Version, RequestTimestamp = requested.Timestamp, InstallationTimestamp = installed.Timestamp,
+                CompleteInputTimestamp = input.Timestamp, WinningPreviewReadyTimestamp = ready.Timestamp,
+                WinningPreviewReadyMilliseconds = (ready.Timestamp - requested.Timestamp) * 1000d / Stopwatch.Frequency };
+        }).ToArray();
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
             ActiveClosure = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
-            WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds,
+            WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
             TabIntegration = "MISSING: isolated diagnostic window", Appearance = "NOT TESTED", Reopen = "PASS" });
     }
     private static async Task Wait(Func<bool> condition)
