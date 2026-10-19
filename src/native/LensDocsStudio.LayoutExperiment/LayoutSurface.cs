@@ -126,6 +126,7 @@ internal sealed class LayoutSurface : Panel
     protected override AutomationPeer OnCreateAutomationPeer() => new LayoutAutomationPeer(this);
     public void Install(LayoutSnapshot? snapshot)
     {
+        var previousAppearance = Snapshot?.Appearance;
         selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null;
         foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;
         Children.Clear(); mediaSelection = null;
@@ -144,6 +145,14 @@ internal sealed class LayoutSurface : Panel
             var colour = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(snapshot.Appearance, 1)
                 : snapshot.Appearance == "Dark" ? "#202124" : "#FFFFFF";
             var background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); background.Freeze(); Scroller.Background = background;
+            if (previousAppearance != snapshot.Appearance && (previousAppearance?.StartsWith("HC:", StringComparison.Ordinal) == true || snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal)))
+            {
+                // A long-lived classic ScrollViewer retained its pre-HC scrollbar
+                // template in the paired hosted captures. Recreate public chrome
+                // from the current WPF theme; the semantic surface stays owned here.
+                var currentTheme = new ScrollViewer(); currentTheme.ApplyTemplate();
+                Scroller.Template = null; Scroller.Template = currentTheme.Template;
+            }
         }
         InvalidateMeasure(); InvalidateVisual();
         (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.Changed();
