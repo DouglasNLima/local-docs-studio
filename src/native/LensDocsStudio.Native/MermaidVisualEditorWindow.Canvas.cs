@@ -86,11 +86,11 @@ public partial class MermaidVisualEditorWindow
             string? mappingDiagnostic = null;
             var next = await LensDocsStudio.Native.Platform.StaWorker.RunAsync(() =>
             {
-                try { return NativeMermaidPresentation.Create(rendered, canvasSvg); }
+                try { return NativeMermaidPresentation.Create(rendered, canvasSvg, cancellation.Token); }
                 catch (Exception error) when (error is InvalidDataException or ArgumentException or FormatException)
                 {
                     // A valid drawing remains inspectable even if its interaction metadata cannot be mapped.
-                    inspection = canvasSvg.Render(rendered.Svg!); mappingDiagnostic = error.Message; return null;
+                    inspection = canvasSvg.RenderCanonical(rendered, canvasSvg.Prepare(rendered.Svg!), cancellationToken: cancellation.Token); mappingDiagnostic = error.Message; return null;
                 }
             }, cancellation.Token);
             if (closed || generation != canvasGeneration || draft.Source != source || dark != themeDark) return;
@@ -125,7 +125,7 @@ public partial class MermaidVisualEditorWindow
             if (initialFit)
             {
                 initialFit = false; Viewport.UpdateLayout(); Fit(this, new());
-                if (Zoom.Value < 60)
+                if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent)
                 {
                     Zoom.Value = 100; Viewport.UpdateLayout();
                     var first = draft.Model.Nodes.FirstOrDefault();
@@ -158,6 +158,7 @@ public partial class MermaidVisualEditorWindow
     }
     private void BuildCanonicalCanvas()
     {
+        using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Flowchart");
         if (presentation is not { } view) return;
         canvasHistoryIdentity = draft.HistoryIdentity;
         CancelPointerInteraction();
@@ -392,7 +393,7 @@ public partial class MermaidVisualEditorWindow
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void ResetView(object sender, RoutedEventArgs e) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; ZoomLabel.Text = (e.NewValue < 1 ? e.NewValue.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture) : Math.Round(e.NewValue).ToString()) + "%"; }
+    { if (CanvasScale is null) return; CanvasScale.ScaleX = CanvasScale.ScaleY = e.NewValue / 100; }
     private void CanvasWheel(object sender, MouseWheelEventArgs e)
     {
         if (Keyboard.Modifiers != ModifierKeys.Control) return; e.Handled = true;

@@ -1,0 +1,5 @@
+System.InvalidOperationException: Missing native control: ErInspectorPanel
+   at LensDocsStudio.Native.Validation.NativeUiChecks.Find(Window window, String id) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeUiChecks.cs:line 1740
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass4_3.<RunErEditor>b__48() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeErUiChecks.cs:line 74
+   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func`1 condition, String failure, Int32 seconds) in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeUiChecks.cs:line 1784
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass4_0.<RunErEditor>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeErUiChecks.cs:line 74

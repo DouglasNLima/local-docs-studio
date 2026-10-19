@@ -1,0 +1,28 @@
+{
+  "Passed": true,
+  "ProcessId": 9196,
+  "ExpectedExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+  "ActualExecutable": "D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native\\bin\\Release\\net10.0-windows\\LensDocsStudio.Native.exe",
+  "ExecutableMatches": true,
+  "BundledRuntimeRequired": false,
+  "Modules": [
+    {
+      "Name": "coreclr.dll",
+      "LoadedPaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.13\\coreclr.dll"
+      ],
+      "LoadedExactlyOnce": true,
+      "Bundled": false
+    },
+    {
+      "Name": "wpfgfx_cor3.dll",
+      "LoadedPaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.WindowsDesktop.App\\10.0.13\\wpfgfx_cor3.dll"
+      ],
+      "LoadedExactlyOnce": true,
+      "Bundled": false
+    }
+  ],
+  "CleanMachineCertification": false,
+  "Limitation": "Loaded-module snapshot after editor and diagram readiness. The hosted runner contains development tools; this does not certify SDK-free clean Windows."
+}

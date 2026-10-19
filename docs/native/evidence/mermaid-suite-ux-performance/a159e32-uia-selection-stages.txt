@@ -1,0 +1,10 @@
+initial | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+pending field | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+source visibility | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=False | {X=342,Y=578,Width=210,Height=30}
+blocked Down | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=True | {X=342,Y=-220,Width=210,Height=30}
+reset | expected=N0 · Node 0 with a complete long documentation context for accessible navigation | selected=1 | window-enabled=True
+N0 · Node 0 with a complete long documentation context for accessible navigation | selected=True | off-screen=True | {X=342,Y=-220,Width=210,Height=30}

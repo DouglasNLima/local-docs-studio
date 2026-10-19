@@ -68,7 +68,7 @@ internal static partial class NativeUiChecks
                 Resize(width, height); Click("ClassFit"); Capture("viewport-" + width + "x" + height); Check(visual!.BoundingRectangle.Contains(Find(visual, "ClassApply").BoundingRectangle), "Apply remains visible at " + width + "x" + height);
                 SelectMember("Document", MemberIndex("Document", true, 0));
                 foreach (var fieldId in new[] { "ClassAttributeType", "ClassAttributeName", "ClassParameters", "ClassVisibility", "ClassUpdate" })
-                { var field = Find(visual!, fieldId); field.Focus(); Wait(() => !field.IsOffscreen && Find(visual!, "ClassInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle), "Class field clipped at " + width + "x" + height + ": " + fieldId); }
+                { var field = Find(visual!, fieldId); field.Focus(); Wait(() => !field.IsOffscreen && Find(visual!, fieldId == "ClassUpdate" ? "ClassInspectorPanel" : "ClassInspectorViewport").BoundingRectangle.Contains(field.BoundingRectangle) && !Find(visual!, "ClassSelectionSummary").IsOffscreen, "Class field clipped at " + width + "x" + height + ": " + fieldId); }
                 Capture("method-viewport-" + width + "x" + height); SelectRelationship(0);
             }
             Resize(1280, 800); Capture("validated"); var target = MermaidBlockSource.Find(new MarkdownService().Parse(original))[1]; var expected = original[..target.Body.Start] + changed + original[target.Body.End..];

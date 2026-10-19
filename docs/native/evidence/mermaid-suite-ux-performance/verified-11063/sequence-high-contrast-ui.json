@@ -1,0 +1,67 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": true,
+  "Checks": [
+    "Actual Windows High Contrast is active during Sequence certification",
+    "Correct Sequence family editor opens from the second identical diagram",
+    "Real pointer selection uses the canonical message path/label hit target",
+    "Participant ID inspection",
+    "Participant alias inspection",
+    "Repeated native selection preserves exact private source without rendering or source edits",
+    "Participant ID/alias edits update all known activation, endpoint and note references",
+    "Actor creation, source-authoritative participant reordering and dependency-free deletion work",
+    "Pending properties block Apply",
+    "Exact first-message label patch retains standalone activation and unrelated source",
+    "New Sequence interaction retains its exact private selection after canonical rendering",
+    "Participant/message authoring retains the immutable owning Markdown until Apply",
+    "Activation edits and private Undo/Redo retain standalone syntax",
+    "Apply remains visible at 880x600",
+    "Apply remains visible at 1024x768",
+    "Apply remains visible at 1280x800",
+    "Apply remains visible at 1440x900",
+    "Apply remains visible at 1920x1080",
+    "Apply preserves ordinary unsaved-file behaviour",
+    "Apply is one document Undo/Redo step and ordinary Save persists it",
+    "Save/close/reopen retains exact portable source and canonical editor ownership",
+    "Cancel leaves owning document and disk unchanged",
+    "Insert Sequence visually creates the portable starter",
+    "Eligible messages reorder/duplicate through native commands with exact private Undo",
+    "New Sequence Apply inserts a Markdown fence",
+    "Empty Sequence authoring is available",
+    "Structural block heading inspection is read-only",
+    "Block boundaries disable unsafe message moves and deletion",
+    "Proven implicit-participant message insertion retains source representation and the owning document",
+    "The third identical message edits without changing earlier occurrences",
+    "Standalone .mermaid Apply writes no synthetic fence"
+  ],
+  "Observations": [
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 869.641
+    },
+    {
+      "Operation": "Twenty real canonical participant selections including UIA transport",
+      "Milliseconds": 5496.9091
+    },
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 570.1779
+    },
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 615.4745
+    },
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 538.4847
+    },
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 492.892
+    },
+    {
+      "Operation": "Open native Sequence editor including UIA",
+      "Milliseconds": 516.6404
+    }
+  ]
+}

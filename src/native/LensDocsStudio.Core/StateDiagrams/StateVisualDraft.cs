@@ -48,6 +48,7 @@ public sealed class StateVisualDraft
     }
     public async Task<StateEditResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("draft.source-validation.State");
         var version = ++generation;
         try
         {

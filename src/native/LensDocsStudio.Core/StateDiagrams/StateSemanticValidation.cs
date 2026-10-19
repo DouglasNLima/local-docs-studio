@@ -12,10 +12,16 @@ namespace LensDocsStudio.Core.StateDiagrams;
 public static class StateSemanticValidation
 {
     private static readonly JsonSerializerOptions Options = new() { IncludeFields = true };
-    private static MermaidGraph Graph(StateDiagramModel model) => MermaidEntityLayoutProvider.DecodeSemantics(MermaidRenderer.Parse(model.Source));
+    private static MermaidGraph Graph(StateDiagramModel model)
+    {
+        MermaidGraph graph;
+        using (MermaidDiagnostics.Measure("renderer.parse.state-validation")) graph = MermaidRenderer.Parse(model.Source);
+        return MermaidEntityLayoutProvider.DecodeSemantics(graph);
+    }
     private static JsonObject Json(MermaidGraph graph) => JsonSerializer.SerializeToNode(graph, Options)!.AsObject();
     public static void ValidateRendering(StateDiagramModel model, DiagramResult render)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("semantic.validation.State");
         if (!model.IsValid || !render.Success || render.Source != model.Source || render.FlowchartSemantics is null || render.FlowchartLayout is null)
             throw new ArgumentException(render.Error ?? string.Join(" ", model.Diagnostics) + " The canonical State rendering is unavailable.");
         var graph = Graph(model);

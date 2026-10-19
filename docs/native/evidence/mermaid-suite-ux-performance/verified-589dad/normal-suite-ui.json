@@ -1,0 +1,142 @@
+{
+  "Status": "PASS",
+  "ActualHighContrast": false,
+  "Checks": [
+    "Light Flowchart: keyboard SelectionItem retains the full semantic description",
+    "Light Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Flowchart: property keyboard tab order remains native and predictable",
+    "Light Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light Flowchart: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Light Sequence: keyboard SelectionItem retains the full semantic description",
+    "Light Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Sequence: property keyboard tab order remains native and predictable",
+    "Light Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light Sequence: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Light State: keyboard SelectionItem retains the full semantic description",
+    "Light State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light State: property keyboard tab order remains native and predictable",
+    "Light State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light State: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Light ER: keyboard SelectionItem retains the full semantic description",
+    "Light ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light ER: full long member name, exact selected occurrence and persistent parent context",
+    "Light ER: property keyboard tab order remains native and predictable",
+    "Light ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light ER: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Light Class: keyboard SelectionItem retains the full semantic description",
+    "Light Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Class: full long member name, exact selected occurrence and persistent parent context",
+    "Light Class: property keyboard tab order remains native and predictable",
+    "Light Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light Class: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Dark Flowchart: keyboard SelectionItem retains the full semantic description",
+    "Dark Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Flowchart: property keyboard tab order remains native and predictable",
+    "Dark Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Flowchart: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Dark Sequence: keyboard SelectionItem retains the full semantic description",
+    "Dark Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Sequence: property keyboard tab order remains native and predictable",
+    "Dark Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Sequence: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Dark State: keyboard SelectionItem retains the full semantic description",
+    "Dark State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark State: property keyboard tab order remains native and predictable",
+    "Dark State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark State: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Dark ER: keyboard SelectionItem retains the full semantic description",
+    "Dark ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark ER: full long member name, exact selected occurrence and persistent parent context",
+    "Dark ER: property keyboard tab order remains native and predictable",
+    "Dark ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark ER: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo",
+    "Dark Class: keyboard SelectionItem retains the full semantic description",
+    "Dark Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Class: full long member name, exact selected occurrence and persistent parent context",
+    "Dark Class: property keyboard tab order remains native and predictable",
+    "Dark Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Class: invalid source remains visible, explicit validation restores it, and canonical insertion is selected and revealed before private Undo"
+  ],
+  "Measurements": [
+    {
+      "Family": "Flowchart",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2708.6754,
+      "EditorOpenIncludingUiaMs": 582.7068,
+      "WorkingSetAtFirstUsefulEditor": 195547136,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Sequence",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2507.7998,
+      "EditorOpenIncludingUiaMs": 544.7674,
+      "WorkingSetAtFirstUsefulEditor": 200323072,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "State",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2474.4326,
+      "EditorOpenIncludingUiaMs": 535.5782,
+      "WorkingSetAtFirstUsefulEditor": 198094848,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "ER",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2598.8036,
+      "EditorOpenIncludingUiaMs": 600.7946,
+      "WorkingSetAtFirstUsefulEditor": 208400384,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Class",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2979.3506,
+      "EditorOpenIncludingUiaMs": 744.1391,
+      "WorkingSetAtFirstUsefulEditor": 221290496,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Flowchart",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2507.8644,
+      "EditorOpenIncludingUiaMs": 512.2768,
+      "WorkingSetAtFirstUsefulEditor": 196911104,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Sequence",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2320.9127,
+      "EditorOpenIncludingUiaMs": 415.296,
+      "WorkingSetAtFirstUsefulEditor": 196845568,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "State",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2533.0282,
+      "EditorOpenIncludingUiaMs": 537.2716,
+      "WorkingSetAtFirstUsefulEditor": 199434240,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "ER",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2626.8469,
+      "EditorOpenIncludingUiaMs": 601.2462,
+      "WorkingSetAtFirstUsefulEditor": 206774272,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Class",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2770.2869,
+      "EditorOpenIncludingUiaMs": 605.3491,
+      "WorkingSetAtFirstUsefulEditor": 219877376,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    }
+  ]
+}

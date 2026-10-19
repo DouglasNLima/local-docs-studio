@@ -39,6 +39,7 @@ public partial class ClassVisualEditorWindow
     }
     private void BuildCanvas()
     {
+        using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Class");
         if (presentation is not { } view) return; CancelPointer(); Surface.Children.Clear(); buttons.Clear(); endpointHandles.Clear();
         if (draft.Model.Classes.Count > 0)
         {

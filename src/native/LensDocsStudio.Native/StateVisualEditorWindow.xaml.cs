@@ -22,6 +22,7 @@ public partial class StateVisualEditorWindow : Window
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly SemaphoreSlim renderGate = new(1, 1);
     private CancellationTokenSource? pendingRender;
     private readonly MermaidSourceHighlighting highlighting;
@@ -33,7 +34,7 @@ public partial class StateVisualEditorWindow : Window
     private double panHorizontal, panVertical;
     private NativeStatePresentation? presentation;
     private (StateDiagramModel Model, bool Dark, NativeStatePresentation View)? preparedPresentation;
-    private record Choice(string Identity, string Description) { public override string ToString() => Description; }
+    private record Choice(string Identity, string Description, string Section = "States and composite groups") { public override string ToString() => Description; }
     private bool SourcePending => draft is not null && SourceEditor.Text != draft.Source;
     private string Values => string.Join('\u001f', NodeId.Text, LabelText.Text, From.SelectedValue, To.SelectedValue);
     private bool PropertiesPending => draft is not null && (mode != "inspect" || baseline != Values);
@@ -54,7 +55,12 @@ public partial class StateVisualEditorWindow : Window
             catch (OperationCanceledException) { }
         };
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; renderGeneration++; CancelPointer(); lifetime.Cancel(); };
+        Closed += async (_, _) =>
+        {
+            using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.State");
+            closed = true; renderGeneration++; CancelPointer(); pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
+        };
         Deactivated += (_, _) => { EndPan(); CancelPointer(); };
     }
     public async void ApplyTheme(string theme)
@@ -63,9 +69,9 @@ public partial class StateVisualEditorWindow : Window
     {
         if (!draft.Model.IsValid) { yield return new("invalid", "Invalid source · inspect diagnostics and Edit source"); yield break; }
         foreach (var choice in ScopeChoices(null, 0)) yield return choice;
-        foreach (var (edge, index) in draft.Model.Transitions.Select((item, index) => (item, index))) yield return new(edge.Identity, "Transition " + (index + 1) + " · " + EndpointName(edge.Source) + " → " + EndpointName(edge.Destination) + (edge.Label.Length > 0 ? " · " + edge.Label : ""));
+        foreach (var (edge, index) in draft.Model.Transitions.Select((item, index) => (item, index))) yield return new(edge.Identity, "Transition " + (index + 1) + " · " + EndpointName(edge.Source) + " → " + EndpointName(edge.Destination) + (edge.Label.Length > 0 ? " · " + edge.Label : ""), "Transitions");
         foreach (var statement in draft.Model.Statements.Where(item => item.Kind is StateStatementKind.Note or StateStatementKind.Style or StateStatementKind.Unknown))
-            yield return new(statement.Identity, "Protected " + statement.Kind + " · " + statement.Span.Read(draft.Source).ReplaceLineEndings(" "));
+            yield return new(statement.Identity, "Protected " + statement.Kind + " · " + statement.Span.Read(draft.Source).ReplaceLineEndings(" "), "Protected source");
         IEnumerable<Choice> ScopeChoices(string? scope, int depth)
         {
             var children = draft.Model.Nodes.Where(item => item.First.Scope == scope).Select(item => (At: item.First.Span.Start, Choice: new Choice(item.Identity, item.Id + " · " + item.Label + (item.Scopes.Count > 1 ? " (shared scopes)" : "")), Group: (string?)null))
@@ -78,9 +84,9 @@ public partial class StateVisualEditorWindow : Window
     private async Task RefreshAsync(bool fit = false)
     {
         updating = true;
-        try { SourceEditor.Text = draft.Source; Elements.ItemsSource = Choices().ToArray(); RestoreSelection(); ShowProperties(); }
+        try { if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source; Elements.ItemsSource = Controls.MermaidWorkspace.Navigation(Choices().ToArray()); RestoreSelection(); ShowProperties(); }
         finally { updating = false; }
-        await RenderAsync(fit); UpdateActions();
+        await RenderAsync(fit); if (!closed && !fit) await Dispatcher.InvokeAsync(RevealSelection, System.Windows.Threading.DispatcherPriority.Loaded); UpdateActions();
     }
     private async Task ValidateNativeCandidateAsync(StateDiagramModel candidate, CancellationToken cancellationToken)
     {
@@ -89,7 +95,7 @@ public partial class StateVisualEditorWindow : Window
         try
         {
             var render = await Task.Run(() => diagrams.Render(candidate.Source, themeDark, diagramTheme, cancellationToken), cancellationToken);
-            var view = await StaWorker.RunAsync(() => NativeStatePresentation.Create(candidate, render, svg), cancellationToken);
+            var view = await StaWorker.RunAsync(() => NativeStatePresentation.Create(candidate, render, svg, cancellationToken), cancellationToken);
             cancellationToken.ThrowIfCancellationRequested();
             if (closed || version != renderGeneration) throw new ArgumentException("The State presentation changed during validation. Retry against the current presentation; the draft is unchanged.");
             preparedPresentation = (candidate, themeDark, view);
@@ -111,9 +117,9 @@ public partial class StateVisualEditorWindow : Window
             var converted = await StaWorker.RunAsync(() =>
             {
                 NativeStatePresentation? view = ready; string? diagnostic = null;
-                try { view ??= NativeStatePresentation.Create(model, render, svg); }
+                try { view ??= NativeStatePresentation.Create(model, render, svg, cancellation.Token); }
                 catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
-                return (view, Drawing: view?.Canonical.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null), diagnostic);
+                return (view, Drawing: view?.Canonical.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null), diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return;
             presentation = converted.view;
@@ -126,22 +132,31 @@ public partial class StateVisualEditorWindow : Window
             }
             Status.Text = converted.diagnostic ?? (model.HasUnknownDependencies ? "Protected source retained. Unrecognised dependencies require Edit source." : "Ready. Select a state or transition. Drag states for temporary positioning; Auto layout restores canonical positions.");
             AutomationProperties.SetItemStatus(this, SystemParameters.HighContrast ? "High Contrast" : themeDark ? "Dark" : "Light");
-            if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
+            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException) { if (!closed && version == renderGeneration) { mapped = false; Status.Text = error.Message; } }
         finally { if (leased) renderGate.Release(); if (ReferenceEquals(pendingRender, cancellation)) pendingRender = null; cancellation.Dispose(); if (!closed && version == renderGeneration) UpdateActions(); }
     }
-    private void RestoreSelection() => Elements.SelectedItem = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+    private void RevealSelection()
+    { if (draft.Selection is { } identity && buttons.TryGetValue(identity, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport); }
+    private void RestoreSelection()
+    {
+        var selected = Elements.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+        var changed = !Equals(Elements.SelectedItem, selected); Elements.SelectedItem = selected;
+        if (changed && selected is not null) Controls.MermaidWorkspace.RevealNavigation(Elements, selected);
+    }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
-    { if (!updating && Elements.SelectedItem is Choice item) Select(item.Identity); }
+    { if (!updating && Elements.SelectedItem is Choice item) { Select(item.Identity); if (draft.Selection == item.Identity && !PropertiesPending) RevealSelection(); } }
     private void Select(string? identity)
     {
-        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } return; }
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.State");
+        if (busy || SourcePending || PropertiesPending) { Status.Text = "Update or discard pending properties and validate source before changing selection."; Controls.MermaidWorkspace.DeferNavigation(Elements, () => { updating = true; try { RestoreSelection(); UpdateSelection(); } finally { updating = false; } }); return; }
         draft.Select(identity); updating = true; try { RestoreSelection(); ShowProperties(); UpdateSelection(); } finally { updating = false; } UpdateActions();
     }
     private void ShowProperties()
     {
+        Controls.MermaidWorkspace.Inspect(InspectorViewport, draft.Selection);
         canvasPick = null; mode = "inspect"; NodeFields.Visibility = TransitionFields.Visibility = LabelFields.Visibility = Visibility.Collapsed;
         Summary.Text = "Select a state, scoped marker, transition or composite."; Dependencies.Text = "";
         var endpoints = draft.Model.Nodes.Select(item => new Choice(item.Id, item.Id + " · " + item.Label)).ToArray();
@@ -166,6 +181,7 @@ public partial class StateVisualEditorWindow : Window
         { Summary.Text = EndpointName(pseudo.Identity); Dependencies.Text = "Scoped " + (pseudo.Initial ? "initial source" : "final destination") + ". Remove or reconnect its transition; this marker is never a globally renamable state."; }
         else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement)
         { Summary.Text = "Protected " + statement.Kind; Dependencies.Text = statement.Span.Read(draft.Source); }
+        ContextDescription.Text = Choices().FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
         baseline = Values;
     }
     private StateEditOperation? UpdateOperation() => mode == "state" ? new AddStateNode(NodeId.Text, LabelText.Text)
@@ -207,11 +223,12 @@ public partial class StateVisualEditorWindow : Window
         }
         else if (edge is not null) { capabilities.Add("Label: " + (StateCapabilityAnalysis.For(draft.Model, new UpdateStateTransition(edge.Identity, edge.Source, edge.Destination, edge.Label)).Allowed ? "editable" : "protected")); capabilities.Add("Endpoints / delete: " + (draft.Model.IsSimple && !draft.Model.HasUnknownDependencies ? "validate each change" : "protected by structural dependencies")); }
         Capabilities.Text = string.Join("\n", capabilities);
+        InspectorState.Text = PropertiesPending ? "Pending properties" : SourcePending ? "Source validation required" : !mapped ? "Apply unavailable" : draft.Selection is null ? "Ready" : UpdateButton.IsEnabled ? "Editable" : "Protected source";
     }
     private void BeginCreation(string kind)
     {
         if (!CanEdit || PropertiesPending) return; updating = true;
-        try { ShowProperties(); mode = kind; Summary.Text = "New " + kind; LabelFields.Visibility = Visibility.Visible; NodeFields.Visibility = kind == "state" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "transition" ? Visibility.Visible : Visibility.Collapsed; NodeId.Text = NextId(); LabelText.Text = kind == "state" ? "New state" : ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); canvasPick = kind == "transition" ? "from" : null; }
+        try { ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; LabelFields.Visibility = Visibility.Visible; NodeFields.Visibility = kind == "state" ? Visibility.Visible : Visibility.Collapsed; TransitionFields.Visibility = kind == "transition" ? Visibility.Visible : Visibility.Collapsed; NodeId.Text = NextId(); LabelText.Text = kind == "state" ? "New state" : ""; From.SelectedIndex = 0; To.SelectedIndex = Math.Min(1, To.Items.Count - 1); canvasPick = kind == "transition" ? "from" : null; }
         finally { updating = false; } UpdateActions(); LabelText.Focus(); LabelText.SelectAll();
     }
     private void AddState(object sender, RoutedEventArgs e) => BeginCreation("state");
@@ -272,15 +289,18 @@ public partial class StateVisualEditorWindow : Window
     }
     private void ShowOriginal(object sender, RoutedEventArgs e)
     { new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true, FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") }, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show(); }
+    private void CopySource(object sender, RoutedEventArgs e)
+    { try { Clipboard.SetText(SourceEditor.Text); Status.Text = "Mermaid draft source copied."; } catch (System.Runtime.InteropServices.ExternalException) { Status.Text = "The clipboard is unavailable. Select and copy the source directly."; } }
+    private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void Preview(object sender, RoutedEventArgs e)
     { if (presentation is { } view) new Window { Owner = this, Title = "Rendered State preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = view.Canonical.Drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e) { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
     private void AutoLayout(object sender, RoutedEventArgs e) { CancelPointer(); sessionPositions.Clear(); SavePositions(); if (presentation is not null) BuildCanvas(); Fit(sender, e); Status.Text = "Canonical layout restored. Saved Mermaid source is unchanged."; }
-    private void Wheel(object sender, MouseWheelEventArgs e) { if (Keyboard.Modifiers != ModifierKeys.Control) return; Zoom.Value *= e.Delta > 0 ? 1.1 : 1 / 1.1; e.Handled = true; }
+    private void Wheel(object sender, MouseWheelEventArgs e) => Controls.MermaidWorkspace.ZoomAtPointer(Viewport, Zoom, e);
     private void PanStart(object sender, MouseButtonEventArgs e) { if (e.ChangedButton != MouseButton.Middle) return; CancelPointer(); pan = e.GetPosition(Viewport); panHorizontal = Viewport.HorizontalOffset; panVertical = Viewport.VerticalOffset; Viewport.CaptureMouse(); Viewport.Cursor = Cursors.Hand; e.Handled = true; }
     private void PanMove(object sender, MouseEventArgs e) { if (pan is not { } start) return; var point = e.GetPosition(Viewport); Viewport.ScrollToHorizontalOffset(panHorizontal + start.X - point.X); Viewport.ScrollToVerticalOffset(panVertical + start.Y - point.Y); }
     private void PanEnd(object sender, MouseButtonEventArgs e) { if (e.ChangedButton == MouseButton.Middle) EndPan(); }

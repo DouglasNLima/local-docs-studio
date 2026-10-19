@@ -1,7 +1,33 @@
-<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="clr-namespace:LensDocsStudio.Native.Controls">
  <ResourceDictionary.MergedDictionaries><ResourceDictionary Source="FormStyles.xaml"/></ResourceDictionary.MergedDictionaries>
  <Style x:Key="Mermaid.ToolbarButton" TargetType="Button" BasedOn="{StaticResource Desktop.DiagramToolbarButton}">
   <Setter Property="MinWidth" Value="32"/><Setter Property="AutomationProperties.Name" Value="{Binding ToolTip, RelativeSource={RelativeSource Self}}"/>
+  <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+ </Style>
+ <Style x:Key="Mermaid.NavigationItem" TargetType="ListBoxItem" BasedOn="{StaticResource Desktop.SelectionItem}">
+  <Style.Resources><Style TargetType="ToolTip"><Setter Property="MaxWidth" Value="560"/><Setter Property="ContentTemplate"><Setter.Value><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap"/></DataTemplate></Setter.Value></Setter></Style></Style.Resources>
+  <Setter Property="ToolTip" Value="{Binding Description}"/>
+  <Setter Property="AutomationProperties.Name" Value="{Binding Description}"/>
+  <Setter Property="AutomationProperties.HelpText" Value="{Binding Description}"/>
+ </Style>
+ <Style x:Key="Mermaid.Navigation" TargetType="ListBox">
+  <Setter Property="ui:MermaidWorkspace.FocusSelectedRow" Value="True"/>
+  <Setter Property="Background" Value="Transparent"/><Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+  <Setter Property="BorderThickness" Value="0"/><Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+  <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/><Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
+  <Setter Property="VirtualizingPanel.IsVirtualizingWhenGrouping" Value="True"/><Setter Property="VirtualizingPanel.ScrollUnit" Value="Pixel"/>
+  <Setter Property="ItemContainerStyle" Value="{StaticResource Mermaid.NavigationItem}"/>
+  <Setter Property="ItemTemplate"><Setter.Value><DataTemplate><TextBlock Text="{Binding Description}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/></DataTemplate></Setter.Value></Setter>
+ </Style>
+ <GroupStyle x:Key="Mermaid.NavigationGroup"><GroupStyle.HeaderTemplate><DataTemplate><TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource MutedTextBrush}" Margin="10,12,6,4"/></DataTemplate></GroupStyle.HeaderTemplate></GroupStyle>
+ <Style x:Key="Mermaid.InspectorHeading" TargetType="TextBlock">
+  <Setter Property="FontWeight" Value="SemiBold"/><Setter Property="TextWrapping" Value="Wrap"/>
+  <Setter Property="TextTrimming" Value="CharacterEllipsis"/><Setter Property="MaxHeight" Value="54"/>
+  <Setter Property="Margin" Value="0,6,0,4"/><Setter Property="ToolTip" Value="{Binding Text, RelativeSource={RelativeSource Self}}"/>
+ </Style>
+ <Style x:Key="Mermaid.InspectorDescription" TargetType="TextBlock" BasedOn="{StaticResource Mermaid.InspectorHeading}">
+  <Setter Property="FontWeight" Value="Normal"/><Setter Property="MaxHeight" Value="32"/><Setter Property="Margin" Value="0,0,0,4"/>
+  <Style.Triggers><Trigger Property="Text" Value=""><Setter Property="Visibility" Value="Collapsed"/></Trigger></Style.Triggers>
  </Style>
  <Style x:Key="Mermaid.PropertyInput" TargetType="TextBox" BasedOn="{StaticResource Form.TextInput}"><Setter Property="MaxLength" Value="4096"/></Style>
  <Style x:Key="Mermaid.Action" TargetType="Button" BasedOn="{StaticResource Form.Action}">
@@ -79,6 +105,9 @@
  </Style>
  <Style x:Key="Mermaid.Splitter" TargetType="GridSplitter">
   <Setter Property="Background" Value="Transparent"/>
+  <Setter Property="Focusable" Value="True"/><Setter Property="KeyboardIncrement" Value="16"/>
+  <Setter Property="ToolTip" Value="Drag to resize; use arrow keys when focused"/>
+  <Setter Property="AutomationProperties.HelpText" Value="Drag to resize; use arrow keys when focused"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="GridSplitter"><Grid Background="{TemplateBinding Background}"><Border x:Name="Grip" Background="{DynamicResource BorderBrush}" Width="1" HorizontalAlignment="Center"/></Grid><ControlTemplate.Triggers>
    <Trigger Property="ResizeDirection" Value="Rows"><Setter TargetName="Grip" Property="Width" Value="Auto"/><Setter TargetName="Grip" Property="Height" Value="1"/><Setter TargetName="Grip" Property="HorizontalAlignment" Value="Stretch"/><Setter TargetName="Grip" Property="VerticalAlignment" Value="Center"/></Trigger>
    <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Grip" Property="Background" Value="{DynamicResource AccentBrush}"/></Trigger>

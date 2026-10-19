@@ -39,6 +39,7 @@ public partial class ErVisualEditorWindow
     }
     private void BuildCanvas()
     {
+        using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Er");
         if (presentation is not { } view) return; CancelPointer(); Surface.Children.Clear(); buttons.Clear(); endpointHandles.Clear();
         if (view.Entities.Count > 0)
         {

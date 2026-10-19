@@ -24,6 +24,7 @@ public partial class MermaidVisualEditorWindow : Window
     private readonly MermaidSourceHighlighting sourceHighlighting;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private bool updating, busy, closed, discard;
     private bool sourceValidationFailed, inlineThemeRefresh;
     private string? connectionSource;
@@ -43,7 +44,7 @@ public partial class MermaidVisualEditorWindow : Window
     private WindowStyle previousStyle;
     private WindowState previousState;
     private ResizeMode previousResize;
-    private record ElementChoice(string Key, string Description, string Icon) { public override string ToString() => Description; }
+    private record ElementChoice(string Key, string Description, string Icon) { public string Section => Key.StartsWith("node:", StringComparison.Ordinal) ? "Nodes" : Key.StartsWith("group:", StringComparison.Ordinal) ? "Subgraphs" : "Connections"; public override string ToString() => Description; }
     private string? Selected => (Elements.SelectedItem as ElementChoice)?.Key;
     private bool SourcePending => SourceEditor.Text != draft.Source;
     private bool CanTransform => !busy && !renderingCanvas && canonicalMapped && !SourcePending && inlineEditor is null && draft.Model.HasSafeTransformations;
@@ -77,9 +78,10 @@ public partial class MermaidVisualEditorWindow : Window
         Deactivated += (_, _) => CancelPointerInteraction();
         Closed += async (_, _) =>
         {
-            CancelPointerInteraction(); closed = true; canvasRender?.Cancel(); lifetime.Cancel();
+            CancelPointerInteraction(); using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.Mermaid");
+            closed = true; canvasRender?.Cancel(); lifetime.Cancel();
             await canvasRenderGate.WaitAsync();
-            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose();
+            canvasRenderGate.Release(); canvasRenderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
         };
         Loaded += (_, _) => { Refresh(true); };
     }
@@ -115,7 +117,7 @@ public partial class MermaidVisualEditorWindow : Window
                     (parallel.Contains((edge.Source.Id, edge.Target.Id)) ? "Connection " + (ordinal + 1) + " · " : "")
                     + edge.Source.Id + " \u2192 " + edge.Target.Id + (edge.Label.Length == 0 ? "" : " \u00b7 " + edge.Label), "Connection")))
                 .Concat(draft.Model.Subgraphs.Select(group => new ElementChoice("group:" + group.Id, "Subgraph \u00b7 " + group.Label, "Subgraph"))).ToArray();
-            Elements.ItemsSource = choices;
+            Elements.ItemsSource = Controls.MermaidWorkspace.Navigation(choices);
             Elements.UnselectAll();
             foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
             RebuildCanvas(layout); ShowProperties(); UpdateActions();
@@ -290,31 +292,47 @@ public partial class MermaidVisualEditorWindow : Window
         UpdateCanvasSelection();
         Status.Text = connectionSource is null ? "Select a source node first, then choose Connection or its + port." : "Connection from " + connectionSource + ": select the destination node. Escape cancels.";
     }
+    private bool selectingCanvas;
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Mermaid");
         if (updating) return;
         if (PropertiesPending || inlineEditor is not null)
         {
-            updating = true;
-            try { Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice); }
-            finally { updating = false; }
+            Controls.MermaidWorkspace.DeferNavigation(Elements, () =>
+            {
+                updating = true;
+                try
+                {
+                    Elements.SelectedItems.Clear(); foreach (var choice in choices.Where(choice => draft.Selection.Contains(choice.Key))) Elements.SelectedItems.Add(choice);
+                    if (Elements.SelectedItem is { } retained) Controls.MermaidWorkspace.RevealNavigation(Elements, retained);
+                }
+                finally { updating = false; }
+            });
             UpdateCanvasSelection(); Status.Text = inlineEditor is null ? "Update the current properties or reset their changes before selecting another element." : "Press Enter to confirm the inline label, or Escape to cancel it."; return;
         }
         draft.Select(Elements.SelectedItems.OfType<ElementChoice>().Select(choice => choice.Key));
         updating = true; try { ShowProperties(); } finally { updating = false; }
         UpdateCanvasSelection(); UpdateActions();
+        if (!selectingCanvas && Selected is { } selected && canvasElements.TryGetValue(selected, out var target)) Controls.MermaidWorkspace.Reveal(target, Viewport);
     }
     private void SelectElement(string key, bool extend = false)
     {
         if (PropertiesPending || inlineEditor is not null)
         { UpdateCanvasSelection(); inlineEditor?.Focus(); Status.Text = "Confirm or reset the current element's pending edits before changing selection."; return; }
         var choice = choices.FirstOrDefault(item => item.Key == key); if (choice is null) return;
-        if (!extend) Elements.SelectedItems.Clear();
-        if (extend && Elements.SelectedItems.Contains(choice)) Elements.SelectedItems.Remove(choice); else Elements.SelectedItems.Add(choice);
-        Elements.ScrollIntoView(choice);
+        selectingCanvas = true;
+        try
+        {
+            if (!extend) Elements.SelectedItems.Clear();
+            if (extend && Elements.SelectedItems.Contains(choice)) Elements.SelectedItems.Remove(choice); else Elements.SelectedItems.Add(choice);
+            Elements.ScrollIntoView(choice);
+        }
+        finally { selectingCanvas = false; }
     }
     private void ShowProperties()
     {
+        Controls.MermaidWorkspace.Inspect(InspectorScroll, Selected);
         propertyBaseline = null;
         NodeProperties.Visibility = EdgeProperties.Visibility = GroupProperties.Visibility = InspectionProperties.Visibility = Visibility.Collapsed;
         InspectorEmpty.Visibility = Elements.SelectedItems.Count == 1 ? Visibility.Collapsed : Visibility.Visible;
@@ -423,6 +441,16 @@ public partial class MermaidVisualEditorWindow : Window
             "Unsaved Mermaid draft", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK) return false;
         discard = true; Close(); return true;
     }
+    private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
+    private void ShowOriginal(object sender, RoutedEventArgs e)
+    {
+        var original = new ICSharpCode.AvalonEdit.TextEditor { Text = draft.OriginalSource, IsReadOnly = true, ShowLineNumbers = true,
+            FontFamily = SourceEditor.FontFamily, FontSize = SourceEditor.FontSize, Background = BrushResource("WindowBrush"), Foreground = BrushResource("TextBrush") };
+        original.Options.EnableHyperlinks = false; original.Options.EnableEmailHyperlinks = false;
+        original.TextArea.TextView.LineTransformers.Add(new MermaidSourceHighlighting(dark));
+        AutomationProperties.SetName(original, "Original Mermaid source");
+        new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = original, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show();
+    }
     private void CopySource(object sender, RoutedEventArgs e)
     {
         if (SourceEditor.Text.Length == 0) { Status.Text = "The source draft is empty. Add Mermaid source before copying."; return; }
@@ -451,6 +479,8 @@ public partial class MermaidVisualEditorWindow : Window
         { CancelPointerInteraction(); connectionSource = null; UpdateCanvasSelection(); Status.Text = "Interaction cancelled. Source is unchanged."; e.Handled = true; return; }
         var textEntry = Keyboard.FocusedElement is TextBox || SourceEditor.IsKeyboardFocusWithin;
         if (textEntry) return;
+        if ((Elements.IsKeyboardFocusWithin || Keyboard.FocusedElement is ComboBox or ListBox)
+            && e.Key is Key.Home or Key.End or Key.Up or Key.Down or Key.Left or Key.Right or Key.PageUp or Key.PageDown) return;
         if (Keyboard.Modifiers == ModifierKeys.Shift && e.Key is Key.Left or Key.Right or Key.Up or Key.Down)
         {
             if (e.Key == Key.Left) Viewport.ScrollToHorizontalOffset(Viewport.HorizontalOffset - 40);

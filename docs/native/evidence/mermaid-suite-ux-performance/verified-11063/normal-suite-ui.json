@@ -1,0 +1,132 @@
+{
+  "Status": "PASS",
+  "ActualHighContrast": false,
+  "Checks": [
+    "Light Flowchart: keyboard SelectionItem retains the full semantic description",
+    "Light Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Flowchart: property keyboard tab order remains native and predictable",
+    "Light Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light Sequence: keyboard SelectionItem retains the full semantic description",
+    "Light Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Sequence: property keyboard tab order remains native and predictable",
+    "Light Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light State: keyboard SelectionItem retains the full semantic description",
+    "Light State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light State: property keyboard tab order remains native and predictable",
+    "Light State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light ER: keyboard SelectionItem retains the full semantic description",
+    "Light ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light ER: full long member name, exact selected occurrence and persistent parent context",
+    "Light ER: property keyboard tab order remains native and predictable",
+    "Light ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Light Class: keyboard SelectionItem retains the full semantic description",
+    "Light Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Light Class: full long member name, exact selected occurrence and persistent parent context",
+    "Light Class: property keyboard tab order remains native and predictable",
+    "Light Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Flowchart: keyboard SelectionItem retains the full semantic description",
+    "Dark Flowchart: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Flowchart: property keyboard tab order remains native and predictable",
+    "Dark Flowchart: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Sequence: keyboard SelectionItem retains the full semantic description",
+    "Dark Sequence: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Sequence: property keyboard tab order remains native and predictable",
+    "Dark Sequence: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark State: keyboard SelectionItem retains the full semantic description",
+    "Dark State: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark State: property keyboard tab order remains native and predictable",
+    "Dark State: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark ER: keyboard SelectionItem retains the full semantic description",
+    "Dark ER: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark ER: full long member name, exact selected occurrence and persistent parent context",
+    "Dark ER: property keyboard tab order remains native and predictable",
+    "Dark ER: heading, footer, adjustable source and keyboard splitter remain contained at five sizes",
+    "Dark Class: keyboard SelectionItem retains the full semantic description",
+    "Dark Class: pending values survive source visibility and rejected selection; explicit Reset restores them",
+    "Dark Class: full long member name, exact selected occurrence and persistent parent context",
+    "Dark Class: property keyboard tab order remains native and predictable",
+    "Dark Class: heading, footer, adjustable source and keyboard splitter remain contained at five sizes"
+  ],
+  "Measurements": [
+    {
+      "Family": "Flowchart",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3121.609,
+      "EditorOpenIncludingUiaMs": 742.107,
+      "WorkingSetAtFirstUsefulEditor": 196141056,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Sequence",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2764.6864,
+      "EditorOpenIncludingUiaMs": 594.442,
+      "WorkingSetAtFirstUsefulEditor": 199565312,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "State",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2918.261,
+      "EditorOpenIncludingUiaMs": 670.3597,
+      "WorkingSetAtFirstUsefulEditor": 195239936,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "ER",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3183.2143,
+      "EditorOpenIncludingUiaMs": 862.527,
+      "WorkingSetAtFirstUsefulEditor": 210169856,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Class",
+      "Theme": "Light",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3514.3438,
+      "EditorOpenIncludingUiaMs": 922.6615,
+      "WorkingSetAtFirstUsefulEditor": 216170496,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Flowchart",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3323.459,
+      "EditorOpenIncludingUiaMs": 815.945,
+      "WorkingSetAtFirstUsefulEditor": 201191424,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Sequence",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2847.8235,
+      "EditorOpenIncludingUiaMs": 590.1511,
+      "WorkingSetAtFirstUsefulEditor": 194994176,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "State",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 2984.2455,
+      "EditorOpenIncludingUiaMs": 673.5066,
+      "WorkingSetAtFirstUsefulEditor": 197877760,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "ER",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3124.0874,
+      "EditorOpenIncludingUiaMs": 731.3363,
+      "WorkingSetAtFirstUsefulEditor": 209829888,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    },
+    {
+      "Family": "Class",
+      "Theme": "Dark",
+      "ColdProcessIncludingDocumentPreviewAndUiaMs": 3424.8615,
+      "EditorOpenIncludingUiaMs": 818.8929,
+      "WorkingSetAtFirstUsefulEditor": 219631616,
+      "Method": "Fresh app process per case; includes UIA transport and is separate from native phase timings"
+    }
+  ]
+}

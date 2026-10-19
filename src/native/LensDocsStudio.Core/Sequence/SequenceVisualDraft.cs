@@ -62,6 +62,7 @@ public sealed class SequenceVisualDraft
     }
     public async Task<SequenceEditResult> ValidateSourceAsync(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("draft.source-validation.Sequence");
         var version = ++generation;
         try
         {

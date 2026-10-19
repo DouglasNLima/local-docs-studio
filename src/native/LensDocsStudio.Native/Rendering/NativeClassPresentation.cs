@@ -20,16 +20,19 @@ public sealed record NativeClassPresentation(DrawingImage Drawing, IReadOnlyList
     IReadOnlyList<NativeClassHit> Members, IReadOnlyList<NativeClassConnection> Relationships, IReadOnlyList<NativeClassHit> Containers)
 {
     public IReadOnlyList<Rect> ReadOnlyBounds { get; init; } = [];
-    public static NativeClassPresentation Create(ClassDiagramModel model, DiagramResult render, NativeSvgService svg)
+    public static NativeClassPresentation Create(ClassDiagramModel model, DiagramResult render, NativeSvgService svg) => Create(model, render, svg, default);
+    public static NativeClassPresentation Create(ClassDiagramModel model, DiagramResult render, NativeSvgService svg, CancellationToken cancellationToken)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("presentation.total.Class");
+        cancellationToken.ThrowIfCancellationRequested();
         ClassDiagramSemanticValidation.ValidateRendering(model, render);
-        var safe = svg.Prepare(render.Svg!);
-        using var reader = XmlReader.Create(new StringReader(safe), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
-        var root = XDocument.Load(reader).Root!;
+        var prepared = svg.PrepareDocument(render.Svg!);
+        var root = prepared.Root!;
         if (root.Descendants().Count() > 30_000) throw new InvalidDataException("The canonical Class drawing exceeds the interaction geometry budget.");
         if (model.Classes.Count == 0)
         { var blank = new DrawingImage(new DrawingGroup()); blank.Freeze(); return new(blank, [], [], [], []); }
-        var drawing = svg.Render(render.Svg!); var origin = drawing.Drawing.Bounds.Location; var layout = render.ClassLayout!;
+        var drawing = svg.RenderCanonical(render, prepared.ToString(SaveOptions.DisableFormatting), cancellationToken: cancellationToken); var origin = drawing.Drawing.Bounds.Location;
+        using var geometryPhase = MermaidDiagnostics.Measure("geometry.correspondence.Class"); var layout = render.ClassLayout!;
         var classes = new List<NativeClassHit>(); var members = new List<NativeClassHit>(); var relationships = new List<NativeClassConnection>(); var containers = new List<NativeClassHit>();
         // Preserve the full canonical lollipop drawing. Its synthetic layout identities
         // deliberately have no editable hit regions; the source list remains inspectable.

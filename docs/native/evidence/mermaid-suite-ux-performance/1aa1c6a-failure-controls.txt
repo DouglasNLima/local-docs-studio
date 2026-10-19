@@ -1,0 +1,2 @@
+TitleBar |  | off-screen=False | selected=unavailable | {X=344,Y=123,Width=1248,Height=28}
+SystemMenuBar | System | off-screen=False | selected=unavailable | {X=328,Y=128,Width=22,Height=22}

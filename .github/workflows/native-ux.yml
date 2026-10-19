@@ -1,7 +1,7 @@
 name: Validate native desktop UX
 on:
   push:
-    branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
+    branches: ['feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', 'integration/native-wpf-candidate', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish']
   pull_request:
     branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor', develop, 'release/native-preview-readiness', 'feature/native-desktop-ux-modernisation', 'feature/native-ux-refinement', 'feature/native-mermaid-visual-editor', 'feature/native-mermaid-editor-visual-polish', 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
@@ -11,6 +11,167 @@ concurrency:
   group: native-ux-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  consolidated-suite-before:
+    if: github.ref == 'refs/heads/feature/native-mermaid-suite-ux-performance' || github.head_ref == 'feature/native-mermaid-suite-ux-performance'
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [light, dark, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build the capture harness and immutable consolidated editor binaries
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/native/suite-before 6a94dd3672f95a267402e2218935d064a6ee6401
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/suite-before/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.* artifacts/native/suite-before/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/ -Force
+      - name: Capture identical five-family long-name fixtures at all five sizes on actual Windows
+        run: |
+          $appearance = switch ('${{ matrix.appearance }}') { 'high-contrast' { '--high-contrast' } 'dark' { '--dark' } default { '--normal' } }
+          & artifacts/native/suite-before/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-baseline-ui artifacts/native/suite-before/src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/suite-before-captures $appearance
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-before-${{ matrix.appearance }}
+          path: artifacts/native/suite-before-captures/
+          retention-days: 14
+  suite-workspace:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        appearance: [normal, high-contrast]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build exact-source suite workspace checks
+        id: suite-build
+        run: dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+      - name: Install pinned diagnostic-only managed dump tooling on the disposable host
+        run: dotnet tool install dotnet-dump --version 10.0.750501 --tool-path artifacts/native/diagnostic-tools
+      - name: Measure native presentation, selection and retained-window lifecycle without UIA transport
+        run: |
+          $env:LENS_SUITE_DUMP_TOOL = (Resolve-Path artifacts/native/diagnostic-tools/dotnet-dump.exe).Path
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-lifecycle artifacts/native/suite-ui/lifecycle $appearance
+          exit $LASTEXITCODE
+      - name: Exercise five-family shared workspace with real keyboard and Windows UIA
+        if: ${{ !cancelled() && steps.suite-build.outcome == 'success' }}
+        run: |
+          $appearance = if ('${{ matrix.appearance }}' -eq 'high-contrast') { '--high-contrast' } else { '--normal' }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-ui src/native/LensDocsStudio.Native/bin/Release/net10.0-windows/LensDocsStudio.Native.exe artifacts/native/suite-ui $appearance
+          exit $LASTEXITCODE
+      - name: Preserve managed roots for any failed retention gate
+        if: failure()
+        run: |
+          $dump = 'artifacts/native/suite-ui/lifecycle/suite-retention.dmp'
+          if (Test-Path -LiteralPath $dump) {
+            $tool = 'artifacts/native/diagnostic-tools/dotnet-dump.exe'
+            foreach ($family in 'Mermaid','Sequence','State','Er','Class') {
+              $type = "LensDocsStudio.Native.${family}VisualEditorWindow"
+              $listing = & $tool analyze $dump -c "dumpheap -type $type" -c exit
+              $listing | Set-Content "artifacts/native/suite-ui/lifecycle/$family-heap.txt"
+              foreach ($line in $listing) {
+                if ($line -match "^\s*([0-9a-fA-F]+)\s+\d+\s+[\d,]+\s+$([regex]::Escape($type))\s*$") {
+                  $methodTable = $Matches[1]
+                  $addresses = & $tool analyze $dump -c "dumpheap -mt $methodTable -short" -c exit
+                  foreach ($address in $addresses | Where-Object { $_ -match '^\s*[0-9a-fA-F]{12,16}\s*$' }) {
+                    & $tool analyze $dump -c "gcroot $($address.Trim())" -c exit | Set-Content "artifacts/native/suite-ui/lifecycle/$family-$($address.Trim())-roots.txt"
+                  }
+                }
+              }
+            }
+          }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-workspace-${{ matrix.appearance }}
+          path: artifacts/native/suite-ui/
+          retention-days: 14
+  suite-performance:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Build candidate and immutable consolidated baseline on the same host
+        run: |
+          dotnet build src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git worktree add --detach artifacts/native/suite-base 6a94dd3672f95a267402e2218935d064a6ee6401
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet build artifacts/native/suite-base/src/native/LensDocsStudio.Native.slnx -c Release -p:RestoreLockedMode=true
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Copy-Item src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.* artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/ -Force
+      - name: Measure identical seven-sample fixtures with the same harness binary before and after
+        run: |
+          & artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/before
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-performance artifacts/native/suite-performance/after
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $before = Get-Content artifacts/native/suite-performance/before/suite-performance.json -Raw | ConvertFrom-Json
+          $after = Get-Content artifacts/native/suite-performance/after/suite-performance.json -Raw | ConvertFrom-Json
+          if ($before.HarnessSha256 -ne $after.HarnessSha256 -or $before.Observations.Count -ne 10 -or $after.Observations.Count -ne 10) { throw 'Comparative harness or workload count differs.' }
+          if (($before.Host | ConvertTo-Json -Compress) -ne ($after.Host | ConvertTo-Json -Compress)) { throw 'Comparative runner environment differs.' }
+          for ($index = 0; $index -lt 10; $index++) {
+            $left = $before.Observations[$index]; $right = $after.Observations[$index]
+            if ($left.SourceSha256 -ne $right.SourceSha256 -or $left.Family -ne $right.Family -or $left.Size -ne $right.Size -or $left.Samples.Count -ne 7 -or $right.Samples.Count -ne 7) { throw 'Comparative source, family or sample count differs.' }
+            if (@($left.Samples + $right.Samples | Where-Object { -not $_.CanonicalPixelsEqual }).Count -ne 0) { throw 'A measured sample omitted canonical pixel verification.' }
+          }
+      - name: Investigate uncached presentation independently of the warm-cache gain
+        run: |
+          & artifacts/native/suite-base/src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-uncached-performance artifacts/native/suite-performance/uncached-before
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-uncached-performance artifacts/native/suite-performance/uncached-after
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $before = Get-Content artifacts/native/suite-performance/uncached-before/suite-performance.json -Raw | ConvertFrom-Json
+          $after = Get-Content artifacts/native/suite-performance/uncached-after/suite-performance.json -Raw | ConvertFrom-Json
+          if ($before.HarnessSha256 -ne $after.HarnessSha256 -or ($before.Host | ConvertTo-Json -Compress) -ne ($after.Host | ConvertTo-Json -Compress)) { throw 'Uncached harness or runner differs.' }
+          if ($before.Observations.Count -ne 10 -or $after.Observations.Count -ne 10) { throw 'Uncached workload count differs.' }
+          for ($index = 0; $index -lt 10; $index++) {
+            $left = $before.Observations[$index]; $right = $after.Observations[$index]
+            if ($left.SourceSha256 -ne $right.SourceSha256 -or $left.Samples.Count -ne 7 -or $right.Samples.Count -ne 7) { throw 'Uncached source or sample count differs.' }
+            if (@($left.Samples.SampleSourceSha256 | Select-Object -Unique).Count -ne 7) { throw 'Uncached samples must have seven distinct exact sources.' }
+            for ($sample = 0; $sample -lt 7; $sample++) {
+              if ($left.Samples[$sample].SampleSourceSha256 -ne $right.Samples[$sample].SampleSourceSha256 -or -not $left.Samples[$sample].CanonicalPixelsEqual -or -not $right.Samples[$sample].CanonicalPixelsEqual) { throw 'Uncached source or canonical pixels differ.' }
+            }
+          }
+      - name: Verify immutable cache ownership, isolation, eviction and queued cancellation
+        run: |
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-cache artifacts/native/suite-performance/cache
+          exit $LASTEXITCODE
+      - name: Trace actual scanner, semantic, renderer, conversion and geometry phases
+        run: |
+          & src/native/LensDocsStudio.Native.Validation/bin/Release/net10.0-windows/LensDocsStudio.Native.Validation.exe --suite-phases artifacts/native/suite-performance/phases
+          exit $LASTEXITCODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-suite-performance
+          path: artifacts/native/suite-performance/
+          retention-days: 14
   class-visual-editor:
     runs-on: windows-latest
     timeout-minutes: 20
@@ -139,6 +300,8 @@ jobs:
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -167,6 +330,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -188,6 +352,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -224,6 +390,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'

@@ -1,0 +1,24 @@
+{
+  "sourceState": "589dad3 plus reviewed resource-feedback patch",
+  "sourceDirty": true,
+  "localDiagnosticOnly": true,
+  "host": {
+    "Framework": ".NET 10.0.12",
+    "OS": "Microsoft Windows 10.0.26300",
+    "ProcessorCount": 16,
+    "Architecture": "X64",
+    "RunnerImage": null,
+    "RunnerImageVersion": null,
+    "Frequency": 10000000
+  },
+  "coreAssemblySha256": "8F5A500BFF178E88DBD0A2D71AA87A92BAF40C587E5186AB86232CDF0985254A",
+  "nativeAssemblySha256": "DFF3D65E352429C88F2398E17E57303176005AD1E1978C29A17B5F41BE52CC80",
+  "er100Entities150Relationships": {
+    "RenderSuccess": false,
+    "Error": "Rendering resource deadline reached (3 seconds). Reduce the diagram size and validate again.",
+    "InteractionCompleted": false,
+    "Classification": "Renderer-only resource diagnostic; not a successful editor benchmark",
+    "LimitsUnchanged": true
+  },
+  "canonicalPixelChecks": 70
+}

@@ -57,13 +57,14 @@ internal static partial class NativeUiChecks
                         { draggedId = "N0"; node = Find(visual, "MermaidCanvas_node_N0"); bounds = node.BoundingRectangle; }
                         draggedIds.Add(draggedId);
                         var start = new System.Drawing.Point(bounds.Left + bounds.Width / 2, bounds.Top + bounds.Height / 2);
+                        var captureBounds = visual!.BoundingRectangle;
                         var watch = Stopwatch.StartNew(); Mouse.MoveTo(start); Mouse.Down(MouseButton.Left);
                         try
                         {
                             for (var move = 0; move < 16; move++)
                                 MovePointer(new System.Drawing.Point(start.X + (move % 2 == 0 ? 45 : -20), start.Y + (move % 4) * 2));
                             MovePointer(new System.Drawing.Point(start.X + 12, start.Y));
-                            if (iteration == 1) visual!.CaptureToFile(Path.Combine(output, "drag-active-" + count + ".png"));
+                            if (iteration == 1) CaptureRectangle(captureBounds, "drag-active-" + count);
                             if (iteration % 5 == 0) Keyboard.Type(VirtualKeyShort.ESCAPE);
                         }
                         finally { Mouse.Up(MouseButton.Left); }
@@ -123,11 +124,14 @@ internal static partial class NativeUiChecks
             void Capture(string name) { _ = DwmFlush(); visual!.CaptureToFile(Path.Combine(output, name + ".png")); }
             void Drag(System.Drawing.Point from, System.Drawing.Point to, bool cancel = false, string? capture = null)
             {
+                // Query UIA before entering WPF's native drag loop. Capturing pixels
+                // during the gesture must not require a synchronous provider query.
+                var captureBounds = visual!.BoundingRectangle;
                 Mouse.MoveTo(from); Mouse.Down(MouseButton.Left);
                 try
                 {
                     for (var step = 1; step <= 8; step++) MovePointer(new(from.X + (to.X - from.X) * step / 8, from.Y + (to.Y - from.Y) * step / 8));
-                    if (capture is not null) Capture(capture);
+                    if (capture is not null) CaptureRectangle(captureBounds, capture);
                     if (cancel) Keyboard.Type(VirtualKeyShort.ESCAPE);
                 }
                 finally { Mouse.Up(MouseButton.Left); }
@@ -315,6 +319,12 @@ internal static partial class NativeUiChecks
             Find(main!, "DiagramEditVisually0").AsButton().Invoke();
             Wait(() => (visual = automation.GetDesktop().FindFirstDescendant(cf => cf.ByProcessId(app!.ProcessId).And(cf.ByAutomationId("MermaidVisualEditor")))?.AsWindow()) is not null, "Editor did not reopen after Undo.");
             Wait(() => Find(visual!, "MermaidDraftState").Name is "Ready" or "Draft modified" or "Partially editable", "Reopened diagram did not finish rendering.");
+        }
+        void CaptureRectangle(System.Drawing.Rectangle bounds, string name)
+        {
+            _ = DwmFlush();
+            using var captured = FlaUI.Core.Capturing.Capture.Rectangle(bounds);
+            captured.ToFile(Path.Combine(output, name + ".png"));
         }
         void Record(bool passed, string? error) => File.WriteAllText(Path.Combine(output, "interactions.json"), JsonSerializer.Serialize(new
         { Passed = passed, Baseline = baseline, HighContrast = highContrast, Dpi = GetDpiForSystem(), Observations = observations, Error = error,

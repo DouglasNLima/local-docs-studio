@@ -82,4 +82,17 @@ public sealed class RenderingTests
         Assert.False(result.Success);
         Assert.NotEmpty(result.Error!);
     }
+
+    [Fact]
+    public void Renderer_resource_rejection_has_specific_feedback_and_retains_exact_source()
+    {
+        var source = "flowchart TD\r\n%% Café remains unchanged\r\n"
+            + string.Concat(Enumerable.Range(0, 501).Select(index => $"N{index}[Node {index}]\r\n"));
+        var result = new DiagramService().Render(source);
+        Assert.False(result.Success);
+        Assert.StartsWith("Rendering resource limit reached:", result.Error);
+        Assert.Equal(source, result.Source);
+        using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
+        Assert.Throws<OperationCanceledException>(() => new DiagramService().Render(source, cancellationToken: cancelled.Token));
+    }
 }

@@ -7,6 +7,7 @@ using System.Xml;
 using System.Xml.Linq;
 using SharpVectors.Converters;
 using SharpVectors.Renderers.Wpf;
+using LensDocsStudio.Core.Rendering;
 
 namespace LensDocsStudio.Native.Rendering;
 
@@ -16,8 +17,10 @@ public sealed partial class NativeSvgService
     private readonly Dictionary<string, DrawingImage> drawings = new(StringComparer.Ordinal);
     private readonly Queue<string> drawingOrder = new();
     private int cachedCharacters;
-    public string Prepare(string generatedSvg)
+    public string Prepare(string generatedSvg) => PrepareDocument(generatedSvg).ToString(SaveOptions.DisableFormatting);
+    internal XDocument PrepareDocument(string generatedSvg)
     {
+        using var diagnosticPhase = MermaidDiagnostics.Measure("svg.sanitisation");
         using var reader = XmlReader.Create(new StringReader(generatedSvg), new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, XmlResolver = null, MaxCharactersInDocument = 8_000_000 });
         var xml = XDocument.Load(reader);
         var root = xml.Root ?? throw new InvalidDataException("The generated diagram is empty.");
@@ -52,7 +55,7 @@ public sealed partial class NativeSvgService
         foreach (var label in inheritedNodeLabels) EnsureNodeLabelContrast(label);
         AddDeclaredBackground(root, variables);
         root.SetAttributeValue("font-family", "Segoe UI");
-        return xml.ToString(SaveOptions.DisableFormatting);
+        return xml;
     }
     private static void AddDeclaredBackground(XElement root, Dictionary<string, string> variables)
     {
@@ -135,14 +138,63 @@ public sealed partial class NativeSvgService
         return image;
     }
 
+    // Frozen drawings have no Dispatcher ownership. Share conversion only, never semantic
+    // models, occurrence maps, mutable session groups or editor windows. The process pins
+    // Mermaider 0.15.1 and SharpVectors; an upgrade starts a new process/cache.
+    private sealed record CanonicalKey(string Source, string? Theme, string PreparedSvg, bool Identities);
+    private static readonly Dictionary<CanonicalKey, DrawingImage> canonicalDrawings = new();
+    private static readonly Queue<CanonicalKey> canonicalOrder = new();
+    private static readonly SemaphoreSlim canonicalConversion = new(1, 1);
+    private static int canonicalCharacters;
+    private static long canonicalConversions;
+    private static int canonicalWaiting;
+    private const int CanonicalCharacterLimit = 2_000_000, CanonicalEntryLimit = 8;
+    internal DrawingImage RenderCanonical(DiagramResult render, string preparedSvg, bool identities = false, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var key = new CanonicalKey(render.Source, render.Theme, preparedSvg, identities);
+        lock (canonicalDrawings) if (canonicalDrawings.TryGetValue(key, out var existing)) return existing;
+        // Conversion itself is not interruptible. Queued obsolete callers can cancel
+        // before entering SharpVectors, and no cancelled result enters the cache.
+        Interlocked.Increment(ref canonicalWaiting);
+        try { using var waitPhase = MermaidDiagnostics.Measure("native.conversion-queue-wait"); canonicalConversion.Wait(cancellationToken); }
+        finally { Interlocked.Decrement(ref canonicalWaiting); }
+        try
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            lock (canonicalDrawings) if (canonicalDrawings.TryGetValue(key, out var existing)) return existing;
+            Interlocked.Increment(ref canonicalConversions);
+            var image = RenderPrepared(preparedSvg, identities);
+            cancellationToken.ThrowIfCancellationRequested();
+            var cost = render.Source.Length + preparedSvg.Length;
+            if (cost <= CanonicalCharacterLimit)
+            {
+                lock (canonicalDrawings)
+                {
+                    while (canonicalOrder.Count > 0 && (canonicalDrawings.Count >= CanonicalEntryLimit || canonicalCharacters + cost > CanonicalCharacterLimit))
+                    {
+                        var oldest = canonicalOrder.Dequeue(); canonicalDrawings.Remove(oldest);
+                        canonicalCharacters -= oldest.Source.Length + oldest.PreparedSvg.Length;
+                    }
+                    canonicalDrawings.Add(key, image); canonicalOrder.Enqueue(key); canonicalCharacters += cost;
+                }
+            }
+            return image;
+        }
+        finally { canonicalConversion.Release(); }
+    }
+
     // Only callers which have passed Prepare may use this conversion. Runtime metadata is inert;
     // TextAsGeometry and the active-content rejection remain identical to the document preview.
     internal static DrawingImage RenderPrepared(string safeSvg, bool identities = false)
     {
         using var text = new StringReader(safeSvg);
         using var reader = new FileSvgReader(new WpfDrawingSettings { IncludeRuntime = identities, TextAsGeometry = true });
-        var drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
+        DrawingGroup drawing;
+        using (MermaidDiagnostics.Measure("native.sharpvectors.read"))
+            drawing = reader.Read(text) ?? throw new InvalidDataException("The native SVG renderer produced no drawing.");
         if (drawing.Bounds.IsEmpty || drawing.Bounds.Width < 1 || drawing.Bounds.Height < 1) throw new InvalidDataException("The diagram has no visible geometry.");
+        using var drawingPhase = MermaidDiagnostics.Measure("native.wpf.drawing-freeze");
         drawing.Freeze(); var image = new DrawingImage(drawing); image.Freeze(); return image;
     }
 

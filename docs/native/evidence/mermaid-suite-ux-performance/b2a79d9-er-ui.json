@@ -1,0 +1,17 @@
+{
+  "Status": "FAIL",
+  "Checks": [
+    "Native entity SelectionItem exposes exact source identity",
+    "ID-only rename retains the displayed label and updates all native relationship references",
+    "Pending entity properties protect Apply",
+    "Verified canvas row selects the correct source attribute occurrence",
+    "New palette entities remain visible through the native zoom and scroll transform",
+    "Endpoint dragging produces measured pointer updates before cancellation",
+    "Real endpoint drag cancellation retains exact source/history and releases capture",
+    "Invalid endpoint drop leaves validated source unchanged",
+    "Actual endpoint drop keeps the second endpoint cardinality",
+    "Private ER operations retain owner and disk bytes before Apply",
+    "ER Apply remains visible at 880x600"
+  ],
+  "Error": "System.InvalidOperationException: ER attribute field is clipped at 880x600: ErUpdate\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.Wait(Func\u00601 condition, String failure, Int32 seconds) in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeUiChecks.cs:line 1789\r\n   at LensDocsStudio.Native.Validation.NativeUiChecks.\u003C\u003Ec__DisplayClass4_0.\u003CRunErEditor\u003Eb__0() in D:\\a\\local-docs-studio\\local-docs-studio\\src\\native\\LensDocsStudio.Native.Validation\\NativeErUiChecks.cs:line 74"
+}

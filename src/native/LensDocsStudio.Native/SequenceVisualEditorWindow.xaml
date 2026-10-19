@@ -29,17 +29,18 @@
    <Button x:Name="UndoButton" Click="Undo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Undo visual edit (Ctrl+Z)" AutomationProperties.AutomationId="SequenceUndo"><ui:CommandIcon Kind="Undo"/></Button>
    <Button x:Name="RedoButton" Click="Redo" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Redo visual edit (Ctrl+Y)" AutomationProperties.AutomationId="SequenceRedo"><ui:CommandIcon Kind="Redo"/></Button>
    <Separator/>
-   <Button x:Name="DeleteButton" Content="Delete" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Delete the selected eligible element" AutomationProperties.AutomationId="SequenceDelete"/>
-   <Button x:Name="DuplicateButton" Content="Duplicate" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Duplicate the selected eligible message" AutomationProperties.AutomationId="SequenceDuplicate"/>
-   <Button x:Name="EarlierButton" Content="Earlier" Click="Earlier" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move participant left or message earlier (Alt+Up)" AutomationProperties.AutomationId="SequenceEarlier"/>
-   <Button x:Name="LaterButton" Content="Later" Click="Later" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move participant right or message later (Alt+Down)" AutomationProperties.AutomationId="SequenceLater"/>
+   <Button x:Name="DeleteButton" Click="Delete" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceDelete" ToolTip="Delete selection (Delete)" AutomationProperties.Name="Delete selection (Delete)"><ui:CommandIcon Kind="Delete"/></Button>
+   <Button x:Name="DuplicateButton" Click="Duplicate" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceDuplicate" ToolTip="Duplicate selection (Ctrl+D)" AutomationProperties.Name="Duplicate selection (Ctrl+D)"><ui:CommandIcon Kind="Duplicate"/></Button>
+   <Button x:Name="EarlierButton" Content="Earlier" Click="Earlier" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move participant left or message earlier (Alt+Up)" AutomationProperties.AutomationId="SequenceEarlier" AutomationProperties.Name="Move earlier (Alt+Up)"/>
+   <Button x:Name="LaterButton" Content="Later" Click="Later" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Move participant right or message later (Alt+Down)" AutomationProperties.AutomationId="SequenceLater" AutomationProperties.Name="Move later (Alt+Down)"/>
    <Separator/>
-   <Button Content="−" Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom out" AutomationProperties.AutomationId="SequenceZoomOut"/>
-   <Slider x:Name="Zoom" Width="85" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="SequenceZoom"/>
-   <Button Content="+" Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Zoom in" AutomationProperties.AutomationId="SequenceZoomIn"/>
-   <Button Content="Fit" Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Fit diagram (F)" AutomationProperties.AutomationId="SequenceFit"/>
-   <Button Content="100%" Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Actual size (Ctrl+0)" AutomationProperties.AutomationId="SequenceActualSize"/>
-   <Button Content="Rendered preview" Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Open the canonical drawing" AutomationProperties.AutomationId="SequencePreview"/>
+   <Button Click="ZoomOut" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceZoomOut" ToolTip="Zoom out (Ctrl+wheel)" AutomationProperties.Name="Zoom out (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomOut"/></Button>
+   <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolBar.OverflowMode="Never"><Slider x:Name="Zoom" Width="80" Minimum="0.1" Maximum="400" Value="100" ValueChanged="ZoomChanged" AutomationProperties.Name="Canvas zoom percentage" AutomationProperties.AutomationId="SequenceZoom"/><TextBlock Text="{Binding Value, ElementName=Zoom, StringFormat={}{0:0.#}%}" MinWidth="40" Margin="6,0" VerticalAlignment="Center" AutomationProperties.Name="Current canvas zoom"/></StackPanel>
+   <Button Click="ZoomIn" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceZoomIn" ToolTip="Zoom in (Ctrl+wheel)" AutomationProperties.Name="Zoom in (Ctrl+wheel)"><ui:CommandIcon Kind="ZoomIn"/></Button>
+   <Button Click="Fit" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceFit" ToolTip="Fit diagram (F)" AutomationProperties.Name="Fit diagram (F)"><ui:CommandIcon Kind="Focus"/></Button>
+   <Button Click="ActualSize" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequenceActualSize" ToolTip="Actual size (Ctrl+0)" AutomationProperties.Name="Actual size (Ctrl+0)"><ui:CommandIcon Kind="Selection"/></Button>
+   <Button Click="ToggleSource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Show or hide Mermaid source" AutomationProperties.Name="Show or hide Mermaid source" AutomationProperties.AutomationId="SequenceToggleSource"><ui:CommandIcon Kind="Code"/></Button>
+   <Button Click="Preview" Style="{StaticResource Mermaid.ToolbarButton}" AutomationProperties.AutomationId="SequencePreview" ToolTip="Rendered preview" AutomationProperties.Name="Rendered preview"><ui:CommandIcon Kind="Preview"/></Button>
   </ToolBar>
   <Border DockPanel.Dock="Bottom" Padding="12,8" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
    <Grid><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
@@ -51,23 +52,23 @@
     </StackPanel>
    </Grid>
   </Border>
-  <Grid Margin="8"><Grid.ColumnDefinitions><ColumnDefinition Width="180" MinWidth="152"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="230"/><ColumnDefinition Width="6"/><ColumnDefinition Width="270" MinWidth="224"/></Grid.ColumnDefinitions>
+  <Grid Margin="8"><Grid.ColumnDefinitions><ColumnDefinition Width="220" MinWidth="180"/><ColumnDefinition Width="6"/><ColumnDefinition Width="*" MinWidth="230"/><ColumnDefinition Width="6"/><ColumnDefinition Width="270" MinWidth="224"/></Grid.ColumnDefinitions>
    <DockPanel Background="{DynamicResource PanelBrush}">
     <StackPanel DockPanel.Dock="Top" Margin="8">
      <TextBlock Text="PARTICIPANTS" Style="{StaticResource Desktop.PanelHeading}"/>
      <Button x:Name="AddParticipantButton" Content="Add participant / actor" Click="AddParticipant" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="SequenceAddParticipant" ToolTip="Add participant (Ctrl+Shift+P)"/>
     </StackPanel>
     <Grid><Grid.RowDefinitions><RowDefinition Height="150"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
-     <ListBox x:Name="Participants" SelectionChanged="SelectionChanged" DisplayMemberPath="Description" AutomationProperties.Name="Participants in source order" AutomationProperties.AutomationId="SequenceParticipants"/>
+     <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="Participants" SelectionChanged="SelectionChanged" AutomationProperties.Name="Participants in source order" AutomationProperties.AutomationId="SequenceParticipants"/>
      <StackPanel Grid.Row="1" Margin="8"><TextBlock Text="INTERACTIONS" Style="{StaticResource Desktop.PanelHeading}"/>
       <Button x:Name="AddMessageButton" Content="Add message" Click="AddMessage" Style="{StaticResource Mermaid.Action}" ToolTip="Add message (Ctrl+Shift+M)" AutomationProperties.AutomationId="SequenceAddMessage"/>
       <Button x:Name="AddNoteButton" Content="Add note" Click="AddNote" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="SequenceAddNote"/>
      </StackPanel>
-     <ListBox x:Name="Interactions" Grid.Row="2" SelectionChanged="SelectionChanged" DisplayMemberPath="Description" AutomationProperties.Name="Interactions in source order" AutomationProperties.AutomationId="SequenceInteractions"/>
+     <ListBox Style="{StaticResource Mermaid.Navigation}" x:Name="Interactions" Grid.Row="2" SelectionChanged="SelectionChanged" AutomationProperties.Name="Interactions in source order" AutomationProperties.AutomationId="SequenceInteractions"/>
     </Grid>
    </DockPanel>
-   <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"/>
-   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="1" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize navigation panel" AutomationProperties.AutomationId="SequenceNavigationSplitter"/>
+   <Grid Grid.Column="2"><Grid.RowDefinitions><RowDefinition Height="*" MinHeight="100"/><RowDefinition Height="6"/><RowDefinition Height="40" MinHeight="40"/></Grid.RowDefinitions>
     <ScrollViewer x:Name="Viewport" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" PreviewMouseWheel="Wheel" PreviewMouseDown="PanStart" PreviewMouseMove="PanMove" PreviewMouseUp="PanEnd" Focusable="True" AutomationProperties.Name="Sequence diagram; middle mouse to pan, arrow keys to scroll" AutomationProperties.AutomationId="SequenceViewport">
      <Grid x:Name="Surface" HorizontalAlignment="Left" VerticalAlignment="Top">
       <Grid.LayoutTransform><ScaleTransform x:Name="Scale" ScaleX="1" ScaleY="1"/></Grid.LayoutTransform>
@@ -75,20 +76,27 @@
       <Canvas x:Name="Overlay" Background="Transparent"/>
      </Grid>
     </ScrollViewer>
-    <Expander x:Name="SourcePanel" Grid.Row="1" Header="Portable Mermaid source" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}" AutomationProperties.AutomationId="SequenceSourcePanel">
-     <DockPanel Height="180">
-      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal"><Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SequenceValidate"/>
+    <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Row="1" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutomationProperties.Name="Resize source panel" AutomationProperties.AutomationId="SequenceSourceSplitter"/>
+    <Expander ui:MermaidWorkspace.AdjustableSource="True" x:Name="SourcePanel" Grid.Row="2" Header="Portable Mermaid source" IsExpanded="False" Style="{StaticResource Mermaid.SourcePanel}" AutomationProperties.AutomationId="SequenceSourcePanel">
+     <DockPanel>
+      <WrapPanel DockPanel.Dock="Top"><Button x:Name="ValidateButton" Content="Validate source" Click="ValidateSource" Style="{StaticResource Form.Action}" AutomationProperties.AutomationId="SequenceValidate"/>
        <Button Content="Original source" Click="ShowOriginal" Style="{StaticResource Form.Action}" ToolTip="Inspect the immutable source opened by this editor" AutomationProperties.AutomationId="SequenceOriginal"/>
-      </StackPanel>
-      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="Sequence draft source" AutomationProperties.AutomationId="SequenceSource"/>
+       <Button Click="CopySource" Style="{StaticResource Mermaid.ToolbarButton}" ToolTip="Copy Mermaid draft source" AutomationProperties.AutomationId="SequenceCopySource"><ui:CommandIcon Kind="Copy"/></Button>
+      </WrapPanel>
+      <edit:TextEditor x:Name="SourceEditor" ShowLineNumbers="True" LineNumbersForeground="{DynamicResource MutedTextBrush}" WordWrap="False" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="{DynamicResource WindowBrush}" Foreground="{DynamicResource TextBrush}" TextChanged="SourceChanged" AutomationProperties.Name="Sequence draft source" AutomationProperties.AutomationId="SequenceSource"/>
      </DockPanel>
     </Expander>
    </Grid>
-   <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch"/>
-   <ScrollViewer Grid.Column="4" VerticalScrollBarVisibility="Auto" Background="{DynamicResource PanelBrush}">
-    <StackPanel Margin="12">
-     <TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
-     <TextBlock x:Name="Summary" Text="Select a participant, message or note." TextWrapping="Wrap" FontWeight="SemiBold" Margin="0,8" AutomationProperties.AutomationId="SequenceSelectionSummary"/>
+   <GridSplitter Style="{StaticResource Mermaid.Splitter}" Grid.Column="3" HorizontalAlignment="Stretch" ResizeDirection="Columns" ResizeBehavior="PreviousAndNext" AutomationProperties.Name="Resize inspector panel" AutomationProperties.AutomationId="SequenceInspectorSplitter"/>
+   <ui:MermaidInspectorPanel Grid.Column="4" Background="{DynamicResource PanelBrush}" AutomationProperties.Name="Selected element properties" AutomationProperties.AutomationId="SequenceInspectorPanel">
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+    <StackPanel Grid.Row="0" Margin="12,10,12,6"><TextBlock Text="INSPECTOR" Style="{StaticResource Desktop.PanelHeading}"/>
+     <TextBlock x:Name="Summary" Text="Select a participant, message or note." Style="{StaticResource Mermaid.InspectorHeading}" AutomationProperties.AutomationId="SequenceSelectionSummary"/>
+     <TextBlock x:Name="ContextDescription" Style="{StaticResource Mermaid.InspectorDescription}" AutomationProperties.AutomationId="SequenceSelectionDescription"/>
+     <TextBlock x:Name="InspectorState" Text="Ready" TextTrimming="CharacterEllipsis" ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}" Foreground="{DynamicResource MutedTextBrush}" AutomationProperties.AutomationId="SequenceInspectorState" AutomationProperties.LiveSetting="Polite"/>
+    </StackPanel>
+    <ScrollViewer Grid.Row="1" x:Name="InspectorViewport" AutomationProperties.AutomationId="SequenceInspectorViewport" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <StackPanel Margin="12,0,12,12">
      <TextBlock x:Name="Dependencies" TextWrapping="Wrap" Style="{StaticResource Form.Help}" Margin="0,0,0,8" AutomationProperties.AutomationId="SequenceDependencies"/>
      <StackPanel x:Name="ParticipantFields" Visibility="Collapsed">
       <Label Content="_ID" Target="{Binding ElementName=ParticipantId}" Style="{StaticResource Form.Label}"/>
@@ -120,11 +128,15 @@
      <StackPanel x:Name="InsertionFields" Visibility="Collapsed"><Label Content="Insertion position" Target="{Binding ElementName=Insertion}" Style="{StaticResource Form.Label}"/>
       <ComboBox x:Name="Insertion" Style="{StaticResource Form.ComboBox}" AutomationProperties.Name="Interaction insertion position" AutomationProperties.AutomationId="SequenceInsertion"/>
      </StackPanel>
-     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" Margin="0,12,0,0" AutomationProperties.AutomationId="SequenceUpdate"/>
-     <Button x:Name="ResetButton" Content="Discard pending properties" Click="ResetProperties" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="SequenceResetProperties"/>
      <Button Content="Locate in source" Click="LocateSource" Style="{StaticResource Mermaid.Action}" AutomationProperties.AutomationId="SequenceLocateSource"/>
     </StackPanel>
    </ScrollViewer>
+    <WrapPanel Grid.Row="2" Margin="12,8">
+     <Button x:Name="UpdateButton" Content="Update properties" Click="Update" Style="{StaticResource Mermaid.PrimaryAction}" HorizontalAlignment="Left" Margin="0,0,8,0" AutomationProperties.AutomationId="SequenceUpdate"/>
+     <Button x:Name="ResetButton" Content="Reset changes" Click="ResetProperties" Style="{StaticResource Form.Action}" ToolTip="Reset unapplied property changes" AutomationProperties.AutomationId="SequenceResetProperties"/>
+    </WrapPanel>
+    </Grid>
+   </ui:MermaidInspectorPanel>
   </Grid>
  </DockPanel>
 </Window>

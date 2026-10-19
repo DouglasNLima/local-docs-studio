@@ -33,6 +33,7 @@ public sealed class ErDiagramSourceParser
     public static bool IsEr(string source) => source.Split('\n').Select(line => line.Trim()).FirstOrDefault(line => line.Length > 0 && !line.StartsWith("%%", StringComparison.Ordinal)) == "erDiagram";
     public ErDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("source.scan.ER");
         var statements = new List<ErStatement>(); var diagnostics = new List<string>(); var entities = new List<ErEntityModel>(); var relationships = new List<ErRelationshipModel>();
         string? owner = null; Direction? direction = null; var header = false;
         if (source.Length > 100_000) return new(source, [], [], [], null, ["The ER source exceeds the 100,000-character limit."]);

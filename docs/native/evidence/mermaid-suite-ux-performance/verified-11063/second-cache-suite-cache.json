@@ -1,0 +1,21 @@
+{
+  "Status": "PASS",
+  "Checks": [
+    "Separate editor services reuse the exact frozen canonical drawing",
+    "Frozen drawing is shared safely across STA threads",
+    "Exact source, including comments, partitions cache identity",
+    "Theme partitions cache identity even when prepared pixels coincide",
+    "Runtime identity conversion options partition cache identity",
+    "Dark prepared SVG never reuses a light drawing",
+    "Cancellation is honoured before a cache hit",
+    "Obsolete queued conversion cancels while conversion capacity is occupied",
+    "Repeated editor conversions retain bounded entry and character inventories",
+    "Eviction reconverts faithfully without changing canonical pixels",
+    "Active SVG is still rejected before conversion or cache lookup",
+    "Cancellation at converter entry lets the non-interruptible read complete and rejects its result",
+    "Cancelled non-interruptible conversion never enters the immutable cache"
+  ],
+  "CacheEntries": 8,
+  "CachedCharacters": 18984,
+  "Limitation": "An in-flight SharpVectors call completes; cancellation prevents cache insertion/result installation. Queued conversion waits are cancellable. No thread aborts or renderer budget changes."
+}

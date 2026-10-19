@@ -1,0 +1,7 @@
+System.InvalidOperationException: Operation is not valid due to the current state of the object.
+   at Interop.UIAutomationClient.IUIAutomationElement.SetFocus()
+   at FlaUI.UIA3.UIA3FrameworkAutomationElement.SetFocus()
+   at FlaUI.Core.AutomationElements.AutomationElement.SetFocus()
+   at FlaUI.Core.AutomationElements.AutomationElement.FocusNative()
+   at FlaUI.Core.AutomationElements.AutomationElement.Focus()
+   at LensDocsStudio.Native.Validation.NativeUiChecks.<>c__DisplayClass16_0.<RunMermaidSuite>b__0() in D:\a\local-docs-studio\local-docs-studio\src\native\LensDocsStudio.Native.Validation\NativeSuiteUiChecks.cs:line 67

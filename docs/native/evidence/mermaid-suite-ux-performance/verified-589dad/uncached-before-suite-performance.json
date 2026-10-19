@@ -1,0 +1,1575 @@
+{
+  "CoreAssemblySha256": "749E4AD504B752C9DE391A867FDAFF78702B83147C4F4CCDF62589F26C35D59E",
+  "RendererIdentity": "Mermaider 0.15.1 / SharpVectors.Wpf 1.8.6, pinned by locked dependencies and process lifetime",
+  "NativeAssemblySha256": "A4F80EC1DB4D0590E44801553E3691B6B8B101F4B3E5D0FA0DF09D0B1626E095",
+  "HarnessSha256": "05019775624EE890816B0237A0D46E54A6124A6BEC6DD6C73013DF038DAD2A30",
+  "Host": {
+    "Framework": ".NET 10.0.13",
+    "OS": "Microsoft Windows 10.0.26100",
+    "ProcessorCount": 4,
+    "Architecture": "X64",
+    "RunnerImage": "win25-vs2026",
+    "RunnerImageVersion": "20261007.264.1",
+    "Frequency": 10000000
+  },
+  "Method": "STA windowless diagnostic; seven samples per fixture; distinct inert comments force exact-source cache misses without removing diagram content. Adapter scanning includes its existing semantic work. Renderer parsing/layout/SVG and native conversion/drawing are combined only where no independent public boundary exists. Presentation includes correspondence and conversion; standalone phases overlap it and must not be summed. No UIA, first-window or interaction latency claim. Pixel checks excluded from timing. No production GC changes.",
+  "Observations": [
+    {
+      "Family": "Flowchart",
+      "Size": "Smaller",
+      "SourceSha256": "FF7766C9AEFFC63E445D5F02EF4915C7C342F4059CBFF08A2A2FC72C3556B1C5",
+      "Source": "flowchart TD\nN0[\u0022Node 0 with context\u0022]\nN1[\u0022Node 1 with context\u0022]\nN2[\u0022Node 2 with context\u0022]\nN3[\u0022Node 3 with context\u0022]\nN4[\u0022Node 4 with context\u0022]\nN5[\u0022Node 5 with context\u0022]\nN6[\u0022Node 6 with context\u0022]\nN7[\u0022Node 7 with context\u0022]\nN8[\u0022Node 8 with context\u0022]\nN9[\u0022Node 9 with context\u0022]\nN10[\u0022Node 10 with context\u0022]\nN11[\u0022Node 11 with context\u0022]\nN12[\u0022Node 12 with context\u0022]\nN13[\u0022Node 13 with context\u0022]\nN14[\u0022Node 14 with context\u0022]\nN15[\u0022Node 15 with context\u0022]\nN16[\u0022Node 16 with context\u0022]\nN17[\u0022Node 17 with context\u0022]\nN18[\u0022Node 18 with context\u0022]\nN19[\u0022Node 19 with context\u0022]\nN0 --\u003E N1\nN0 --\u003E N2\nN1 --\u003E N3\nN1 --\u003E N4\nN2 --\u003E N5\nN2 --\u003E N6\nN3 --\u003E N7\nN3 --\u003E N8\nN4 --\u003E N9\nN4 --\u003E N10\nN5 --\u003E N11\nN5 --\u003E N12\nN6 --\u003E N13\nN6 --\u003E N14\nN7 --\u003E N15\nN7 --\u003E N16\nN8 --\u003E N17\nN8 --\u003E N18\nN9 --\u003E N19\nN19 --\u003E N0\nN18 --\u003E N1\nN17 --\u003E N2\nN16 --\u003E N0\nN15 --\u003E N1\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "F9E7E6F1CEB69A8FDBAE847401D4FFC783423B738FC1EB7CFEC2DFE20129B95A",
+          "SourceScanIncludingAdapterSemanticsMs": 107.7108,
+          "RendererIncludingParsingLayoutSvgMs": 276.8698,
+          "StandaloneSanitisationMs": 20.0127,
+          "StandaloneSharpVectorsAndDrawingMs": 356.4508,
+          "CompletePresentationMs": 102.1906,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 35147216,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 35154864,
+          "PresentationCurrentThreadAllocatedBytes": 16364136,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 39264256,
+          "WorkingSetAfter": 99123200,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "9D05745DEE82BEF3685F62F123F8C618F9DC29DBB7387592F5D0B82E496584D6",
+          "SourceScanIncludingAdapterSemanticsMs": 0.8947,
+          "RendererIncludingParsingLayoutSvgMs": 6.8468,
+          "StandaloneSanitisationMs": 1.984,
+          "StandaloneSharpVectorsAndDrawingMs": 67.1102,
+          "CompletePresentationMs": 77.8744,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33149096,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33141840,
+          "PresentationCurrentThreadAllocatedBytes": 16352752,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 99155968,
+          "WorkingSetAfter": 103854080,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "B725450A3A6E086EF52F7F930F3526974DD9C6F2801DF9F634F302C55D880257",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7552,
+          "RendererIncludingParsingLayoutSvgMs": 12.954,
+          "StandaloneSanitisationMs": 3.3128,
+          "StandaloneSharpVectorsAndDrawingMs": 91.6793,
+          "CompletePresentationMs": 112.558,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33152760,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33157440,
+          "PresentationCurrentThreadAllocatedBytes": 16356368,
+          "PresentationCollectionCounts": [
+            0,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 103854080,
+          "WorkingSetAfter": 107745280,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "4FBFE9F0D7F5B30FC975D64BD1C21B44826249629FB3B8F5DDCDDD3AA4D853E3",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0558,
+          "RendererIncludingParsingLayoutSvgMs": 9.4799,
+          "StandaloneSanitisationMs": 2.5139,
+          "StandaloneSharpVectorsAndDrawingMs": 84.1049,
+          "CompletePresentationMs": 98.219,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33160576,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33156952,
+          "PresentationCurrentThreadAllocatedBytes": 16359304,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 107745280,
+          "WorkingSetAfter": 116498432,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "E732E74651D30F98E211F3B377BEFC413C606E9A239622CF7381EF6330507BE3",
+          "SourceScanIncludingAdapterSemanticsMs": 1.4848,
+          "RendererIncludingParsingLayoutSvgMs": 23.0709,
+          "StandaloneSanitisationMs": 2.4086,
+          "StandaloneSharpVectorsAndDrawingMs": 78.1091,
+          "CompletePresentationMs": 103.9406,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33155560,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33208184,
+          "PresentationCurrentThreadAllocatedBytes": 16349904,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 116506624,
+          "WorkingSetAfter": 116072448,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "6B5B936B6626390ACFE0B2BE24215B643E54A8D764400CE718D46A3B1E4081C7",
+          "SourceScanIncludingAdapterSemanticsMs": 1.5246,
+          "RendererIncludingParsingLayoutSvgMs": 13.1066,
+          "StandaloneSanitisationMs": 3.1301,
+          "StandaloneSharpVectorsAndDrawingMs": 109.7475,
+          "CompletePresentationMs": 108.8524,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33157272,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33156384,
+          "PresentationCurrentThreadAllocatedBytes": 16361536,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 116072448,
+          "WorkingSetAfter": 125366272,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "050C886ED13EA720FB7E5167F987669D40974035D2724DA59F6E34B9AD62D7C5",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0405,
+          "RendererIncludingParsingLayoutSvgMs": 8.4867,
+          "StandaloneSanitisationMs": 2.8696,
+          "StandaloneSharpVectorsAndDrawingMs": 85.8325,
+          "CompletePresentationMs": 104.9776,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33154368,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33150360,
+          "PresentationCurrentThreadAllocatedBytes": 16357320,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 125366272,
+          "WorkingSetAfter": 126058496,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Flowchart",
+      "Size": "Larger",
+      "SourceSha256": "3970064DCC337635BC3D3ED6FFA5FD2066BD1CD7C72B53A6F1258BBF786E2BF5",
+      "Source": "flowchart TD\nN0[\u0022Node 0 with context\u0022]\nN1[\u0022Node 1 with context\u0022]\nN2[\u0022Node 2 with context\u0022]\nN3[\u0022Node 3 with context\u0022]\nN4[\u0022Node 4 with context\u0022]\nN5[\u0022Node 5 with context\u0022]\nN6[\u0022Node 6 with context\u0022]\nN7[\u0022Node 7 with context\u0022]\nN8[\u0022Node 8 with context\u0022]\nN9[\u0022Node 9 with context\u0022]\nN10[\u0022Node 10 with context\u0022]\nN11[\u0022Node 11 with context\u0022]\nN12[\u0022Node 12 with context\u0022]\nN13[\u0022Node 13 with context\u0022]\nN14[\u0022Node 14 with context\u0022]\nN15[\u0022Node 15 with context\u0022]\nN16[\u0022Node 16 with context\u0022]\nN17[\u0022Node 17 with context\u0022]\nN18[\u0022Node 18 with context\u0022]\nN19[\u0022Node 19 with context\u0022]\nN20[\u0022Node 20 with context\u0022]\nN21[\u0022Node 21 with context\u0022]\nN22[\u0022Node 22 with context\u0022]\nN23[\u0022Node 23 with context\u0022]\nN24[\u0022Node 24 with context\u0022]\nN25[\u0022Node 25 with context\u0022]\nN26[\u0022Node 26 with context\u0022]\nN27[\u0022Node 27 with context\u0022]\nN28[\u0022Node 28 with context\u0022]\nN29[\u0022Node 29 with context\u0022]\nN30[\u0022Node 30 with context\u0022]\nN31[\u0022Node 31 with context\u0022]\nN32[\u0022Node 32 with context\u0022]\nN33[\u0022Node 33 with context\u0022]\nN34[\u0022Node 34 with context\u0022]\nN35[\u0022Node 35 with context\u0022]\nN36[\u0022Node 36 with context\u0022]\nN37[\u0022Node 37 with context\u0022]\nN38[\u0022Node 38 with context\u0022]\nN39[\u0022Node 39 with context\u0022]\nN40[\u0022Node 40 with context\u0022]\nN41[\u0022Node 41 with context\u0022]\nN42[\u0022Node 42 with context\u0022]\nN43[\u0022Node 43 with context\u0022]\nN44[\u0022Node 44 with context\u0022]\nN45[\u0022Node 45 with context\u0022]\nN46[\u0022Node 46 with context\u0022]\nN47[\u0022Node 47 with context\u0022]\nN48[\u0022Node 48 with context\u0022]\nN49[\u0022Node 49 with context\u0022]\nN50[\u0022Node 50 with context\u0022]\nN51[\u0022Node 51 with context\u0022]\nN52[\u0022Node 52 with context\u0022]\nN53[\u0022Node 53 with context\u0022]\nN54[\u0022Node 54 with context\u0022]\nN55[\u0022Node 55 with context\u0022]\nN56[\u0022Node 56 with context\u0022]\nN57[\u0022Node 57 with context\u0022]\nN58[\u0022Node 58 with context\u0022]\nN59[\u0022Node 59 with context\u0022]\nN60[\u0022Node 60 with context\u0022]\nN61[\u0022Node 61 with context\u0022]\nN62[\u0022Node 62 with context\u0022]\nN63[\u0022Node 63 with context\u0022]\nN64[\u0022Node 64 with context\u0022]\nN65[\u0022Node 65 with context\u0022]\nN66[\u0022Node 66 with context\u0022]\nN67[\u0022Node 67 with context\u0022]\nN68[\u0022Node 68 with context\u0022]\nN69[\u0022Node 69 with context\u0022]\nN70[\u0022Node 70 with context\u0022]\nN71[\u0022Node 71 with context\u0022]\nN72[\u0022Node 72 with context\u0022]\nN73[\u0022Node 73 with context\u0022]\nN74[\u0022Node 74 with context\u0022]\nN75[\u0022Node 75 with context\u0022]\nN76[\u0022Node 76 with context\u0022]\nN77[\u0022Node 77 with context\u0022]\nN78[\u0022Node 78 with context\u0022]\nN79[\u0022Node 79 with context\u0022]\nN80[\u0022Node 80 with context\u0022]\nN81[\u0022Node 81 with context\u0022]\nN82[\u0022Node 82 with context\u0022]\nN83[\u0022Node 83 with context\u0022]\nN84[\u0022Node 84 with context\u0022]\nN85[\u0022Node 85 with context\u0022]\nN86[\u0022Node 86 with context\u0022]\nN87[\u0022Node 87 with context\u0022]\nN88[\u0022Node 88 with context\u0022]\nN89[\u0022Node 89 with context\u0022]\nN90[\u0022Node 90 with context\u0022]\nN91[\u0022Node 91 with context\u0022]\nN92[\u0022Node 92 with context\u0022]\nN93[\u0022Node 93 with context\u0022]\nN94[\u0022Node 94 with context\u0022]\nN95[\u0022Node 95 with context\u0022]\nN96[\u0022Node 96 with context\u0022]\nN97[\u0022Node 97 with context\u0022]\nN98[\u0022Node 98 with context\u0022]\nN99[\u0022Node 99 with context\u0022]\nN0 --\u003E N1\nN0 --\u003E N2\nN1 --\u003E N3\nN1 --\u003E N4\nN2 --\u003E N5\nN2 --\u003E N6\nN3 --\u003E N7\nN3 --\u003E N8\nN4 --\u003E N9\nN4 --\u003E N10\nN5 --\u003E N11\nN5 --\u003E N12\nN6 --\u003E N13\nN6 --\u003E N14\nN7 --\u003E N15\nN7 --\u003E N16\nN8 --\u003E N17\nN8 --\u003E N18\nN9 --\u003E N19\nN9 --\u003E N20\nN10 --\u003E N21\nN10 --\u003E N22\nN11 --\u003E N23\nN11 --\u003E N24\nN12 --\u003E N25\nN12 --\u003E N26\nN13 --\u003E N27\nN13 --\u003E N28\nN14 --\u003E N29\nN14 --\u003E N30\nN15 --\u003E N31\nN15 --\u003E N32\nN16 --\u003E N33\nN16 --\u003E N34\nN17 --\u003E N35\nN17 --\u003E N36\nN18 --\u003E N37\nN18 --\u003E N38\nN19 --\u003E N39\nN19 --\u003E N40\nN20 --\u003E N41\nN20 --\u003E N42\nN21 --\u003E N43\nN21 --\u003E N44\nN22 --\u003E N45\nN22 --\u003E N46\nN23 --\u003E N47\nN23 --\u003E N48\nN24 --\u003E N49\nN24 --\u003E N50\nN25 --\u003E N51\nN25 --\u003E N52\nN26 --\u003E N53\nN26 --\u003E N54\nN27 --\u003E N55\nN27 --\u003E N56\nN28 --\u003E N57\nN28 --\u003E N58\nN29 --\u003E N59\nN29 --\u003E N60\nN30 --\u003E N61\nN30 --\u003E N62\nN31 --\u003E N63\nN31 --\u003E N64\nN32 --\u003E N65\nN32 --\u003E N66\nN33 --\u003E N67\nN33 --\u003E N68\nN34 --\u003E N69\nN34 --\u003E N70\nN35 --\u003E N71\nN35 --\u003E N72\nN36 --\u003E N73\nN36 --\u003E N74\nN37 --\u003E N75\nN37 --\u003E N76\nN38 --\u003E N77\nN38 --\u003E N78\nN39 --\u003E N79\nN39 --\u003E N80\nN40 --\u003E N81\nN40 --\u003E N82\nN41 --\u003E N83\nN41 --\u003E N84\nN42 --\u003E N85\nN42 --\u003E N86\nN43 --\u003E N87\nN43 --\u003E N88\nN44 --\u003E N89\nN44 --\u003E N90\nN45 --\u003E N91\nN45 --\u003E N92\nN46 --\u003E N93\nN46 --\u003E N94\nN47 --\u003E N95\nN47 --\u003E N96\nN48 --\u003E N97\nN48 --\u003E N98\nN49 --\u003E N99\nN99 --\u003E N0\nN98 --\u003E N1\nN97 --\u003E N2\nN96 --\u003E N0\nN95 --\u003E N1\nN94 --\u003E N2\nN93 --\u003E N0\nN92 --\u003E N1\nN91 --\u003E N2\nN90 --\u003E N0\nN89 --\u003E N1\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "4505A8447A89EA37306E84341331846C09F43A4C468A54F1B2683E467DDD48C6",
+          "SourceScanIncludingAdapterSemanticsMs": 3.794,
+          "RendererIncludingParsingLayoutSvgMs": 394.5759,
+          "StandaloneSanitisationMs": 10.8378,
+          "StandaloneSharpVectorsAndDrawingMs": 559.2626,
+          "CompletePresentationMs": 624.3543,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194248256,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194301304,
+          "PresentationCurrentThreadAllocatedBytes": 82677624,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 126078976,
+          "WorkingSetAfter": 135028736,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "D690E11DC0B639DB4EFD65E83D1960EDD2F9DCBE85B2C224AA2E1C71C99A6BDD",
+          "SourceScanIncludingAdapterSemanticsMs": 3.4479,
+          "RendererIncludingParsingLayoutSvgMs": 377.6813,
+          "StandaloneSanitisationMs": 36.5091,
+          "StandaloneSharpVectorsAndDrawingMs": 504.8143,
+          "CompletePresentationMs": 583.4701,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194198920,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194194760,
+          "PresentationCurrentThreadAllocatedBytes": 82631816,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 135032832,
+          "WorkingSetAfter": 151482368,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "928EEBD628FD3484222864AECA87CAD288FA76E1026D67BC39B75151F0E07752",
+          "SourceScanIncludingAdapterSemanticsMs": 3.9091,
+          "RendererIncludingParsingLayoutSvgMs": 46.1815,
+          "StandaloneSanitisationMs": 7.8669,
+          "StandaloneSharpVectorsAndDrawingMs": 497.5165,
+          "CompletePresentationMs": 522.7863,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194184528,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194180736,
+          "PresentationCurrentThreadAllocatedBytes": 82617032,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 151482368,
+          "WorkingSetAfter": 165658624,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "909BA5D5A6CEF6F68D03D67BF55B1C23CD5FCF42B1B0E54883C58DE4782627F5",
+          "SourceScanIncludingAdapterSemanticsMs": 2.8575,
+          "RendererIncludingParsingLayoutSvgMs": 66.2957,
+          "StandaloneSanitisationMs": 3.5802,
+          "StandaloneSharpVectorsAndDrawingMs": 323.723,
+          "CompletePresentationMs": 354.0102,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194094336,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194099560,
+          "PresentationCurrentThreadAllocatedBytes": 82574688,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 165658624,
+          "WorkingSetAfter": 175456256,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "D9BD0D98F38497434AB3E3834DF060186F6411A4159BA004C0AB14C6CFAC782F",
+          "SourceScanIncludingAdapterSemanticsMs": 3.3478,
+          "RendererIncludingParsingLayoutSvgMs": 43.4812,
+          "StandaloneSanitisationMs": 2.6258,
+          "StandaloneSharpVectorsAndDrawingMs": 245.1896,
+          "CompletePresentationMs": 294.6539,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194076976,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194076168,
+          "PresentationCurrentThreadAllocatedBytes": 82558088,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 175456256,
+          "WorkingSetAfter": 195907584,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "C1F148B8DA315BC6A9012392DDD63F24D8BF401246377CD37AA5E8DCBDEC0106",
+          "SourceScanIncludingAdapterSemanticsMs": 2.625,
+          "RendererIncludingParsingLayoutSvgMs": 44.238,
+          "StandaloneSanitisationMs": 2.6493,
+          "StandaloneSharpVectorsAndDrawingMs": 269.8141,
+          "CompletePresentationMs": 247.5111,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 194001080,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 194004328,
+          "PresentationCurrentThreadAllocatedBytes": 82486728,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 195907584,
+          "WorkingSetAfter": 195547136,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "2E96AD9E2F9F87F0809B2319FB100DCA6F7A2690D758CB94BDA4DF4A9E75276A",
+          "SourceScanIncludingAdapterSemanticsMs": 4.2708,
+          "RendererIncludingParsingLayoutSvgMs": 45.99,
+          "StandaloneSanitisationMs": 3.1815,
+          "StandaloneSharpVectorsAndDrawingMs": 201.8658,
+          "CompletePresentationMs": 242.3343,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 193985696,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 193985544,
+          "PresentationCurrentThreadAllocatedBytes": 82462824,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 195547136,
+          "WorkingSetAfter": 211722240,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Sequence",
+      "Size": "Smaller",
+      "SourceSha256": "3488B4CBEB2B24986A6C4D98329F4A76A9772D4DCD74A64749C9270DC8F93054",
+      "Source": "sequenceDiagram\nparticipant P0 as Participant 0\nparticipant P1 as Participant 1\nparticipant P2 as Participant 2\nparticipant P3 as Participant 3\nparticipant P4 as Participant 4\nP0-\u003E\u003EP1: Message 0 with context\nP1-\u003E\u003EP2: Message 1 with context\nP2-\u003E\u003EP3: Message 2 with context\nP3-\u003E\u003EP4: Message 3 with context\nP4-\u003E\u003EP0: Message 4 with context\nP0-\u003E\u003EP1: Message 5 with context\nP1-\u003E\u003EP2: Message 6 with context\nP2-\u003E\u003EP3: Message 7 with context\nP3-\u003E\u003EP4: Message 8 with context\nP4-\u003E\u003EP0: Message 9 with context\nP0-\u003E\u003EP1: Message 10 with context\nP1-\u003E\u003EP2: Message 11 with context\nP2-\u003E\u003EP3: Message 12 with context\nP3-\u003E\u003EP4: Message 13 with context\nP4-\u003E\u003EP0: Message 14 with context\nP0-\u003E\u003EP1: Message 15 with context\nP1-\u003E\u003EP2: Message 16 with context\nP2-\u003E\u003EP3: Message 17 with context\nP3-\u003E\u003EP4: Message 18 with context\nP4-\u003E\u003EP0: Message 19 with context\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "F91A43025C8FC7D3E70AED66AE4708506A2DC420561EFA40689ACE05E0EC6EF1",
+          "SourceScanIncludingAdapterSemanticsMs": 8.3147,
+          "RendererIncludingParsingLayoutSvgMs": 36.7261,
+          "StandaloneSanitisationMs": 0.9064,
+          "StandaloneSharpVectorsAndDrawingMs": 63.1768,
+          "CompletePresentationMs": 73.9002,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47996896,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47995288,
+          "PresentationCurrentThreadAllocatedBytes": 23810288,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 211603456,
+          "WorkingSetAfter": 217874432,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "8661BCEB03B43F47BA30D3BB82505906162D99568894DAE5862C3339A804D114",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2406,
+          "RendererIncludingParsingLayoutSvgMs": 0.9739,
+          "StandaloneSanitisationMs": 0.9516,
+          "StandaloneSharpVectorsAndDrawingMs": 59.5203,
+          "CompletePresentationMs": 76.25,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47798208,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47799024,
+          "PresentationCurrentThreadAllocatedBytes": 23809272,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 217874432,
+          "WorkingSetAfter": 222445568,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "2EAAA32FF5BD8BC42C91E511B8CEA769581653C6D66C67F6EC0290AFC12EC9EB",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2407,
+          "RendererIncludingParsingLayoutSvgMs": 0.9224,
+          "StandaloneSanitisationMs": 0.9507,
+          "StandaloneSharpVectorsAndDrawingMs": 62.6617,
+          "CompletePresentationMs": 112.7447,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47787240,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47792352,
+          "PresentationCurrentThreadAllocatedBytes": 23802704,
+          "PresentationCollectionCounts": [
+            3,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 222449664,
+          "WorkingSetAfter": 213942272,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "549F353C50091CDFC75E6362DA0F63C141F116D1B8487B369B997BDD094E9305",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2375,
+          "RendererIncludingParsingLayoutSvgMs": 0.9513,
+          "StandaloneSanitisationMs": 0.9451,
+          "StandaloneSharpVectorsAndDrawingMs": 66.0238,
+          "CompletePresentationMs": 74.7345,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47787808,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47783752,
+          "PresentationCurrentThreadAllocatedBytes": 23802400,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 213942272,
+          "WorkingSetAfter": 214016000,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "891EE29BCA8E29C5AFCBDDC087A4C84B05C817E873E3BCD6CA6C8DD104034E54",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2308,
+          "RendererIncludingParsingLayoutSvgMs": 0.8757,
+          "StandaloneSanitisationMs": 0.9429,
+          "StandaloneSharpVectorsAndDrawingMs": 62.0239,
+          "CompletePresentationMs": 85.4425,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47789144,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47784112,
+          "PresentationCurrentThreadAllocatedBytes": 23803536,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 214016000,
+          "WorkingSetAfter": 214245376,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "C18CE17B0281AA96AAD0F22C8B677B4988E487DC919D16DD81C87F0A771864A3",
+          "SourceScanIncludingAdapterSemanticsMs": 0.223,
+          "RendererIncludingParsingLayoutSvgMs": 0.9248,
+          "StandaloneSanitisationMs": 0.9161,
+          "StandaloneSharpVectorsAndDrawingMs": 64.4336,
+          "CompletePresentationMs": 68.8048,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47788808,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47788632,
+          "PresentationCurrentThreadAllocatedBytes": 23802672,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 214245376,
+          "WorkingSetAfter": 214388736,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "6DB9D1B156F124A20E0FE0C4409950464389A900A30A589CFFB2C714FDA6537D",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2309,
+          "RendererIncludingParsingLayoutSvgMs": 0.9727,
+          "StandaloneSanitisationMs": 0.91,
+          "StandaloneSharpVectorsAndDrawingMs": 62.3434,
+          "CompletePresentationMs": 70.9818,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 47783520,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 47779584,
+          "PresentationCurrentThreadAllocatedBytes": 23802168,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 214388736,
+          "WorkingSetAfter": 215187456,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Sequence",
+      "Size": "Larger",
+      "SourceSha256": "1DF20E989A9D6A00D22AB09284D1B9B1F510072D189DE69A7003E3B756ABF532",
+      "Source": "sequenceDiagram\nparticipant P0 as Participant 0\nparticipant P1 as Participant 1\nparticipant P2 as Participant 2\nparticipant P3 as Participant 3\nparticipant P4 as Participant 4\nparticipant P5 as Participant 5\nparticipant P6 as Participant 6\nparticipant P7 as Participant 7\nparticipant P8 as Participant 8\nparticipant P9 as Participant 9\nparticipant P10 as Participant 10\nparticipant P11 as Participant 11\nparticipant P12 as Participant 12\nparticipant P13 as Participant 13\nparticipant P14 as Participant 14\nparticipant P15 as Participant 15\nparticipant P16 as Participant 16\nparticipant P17 as Participant 17\nparticipant P18 as Participant 18\nparticipant P19 as Participant 19\nP0-\u003E\u003EP1: Message 0 with context\nP1-\u003E\u003EP2: Message 1 with context\nP2-\u003E\u003EP3: Message 2 with context\nP3-\u003E\u003EP4: Message 3 with context\nP4-\u003E\u003EP5: Message 4 with context\nP5-\u003E\u003EP6: Message 5 with context\nP6-\u003E\u003EP7: Message 6 with context\nP7-\u003E\u003EP8: Message 7 with context\nP8-\u003E\u003EP9: Message 8 with context\nP9-\u003E\u003EP10: Message 9 with context\nP10-\u003E\u003EP11: Message 10 with context\nP11-\u003E\u003EP12: Message 11 with context\nP12-\u003E\u003EP13: Message 12 with context\nP13-\u003E\u003EP14: Message 13 with context\nP14-\u003E\u003EP15: Message 14 with context\nP15-\u003E\u003EP16: Message 15 with context\nP16-\u003E\u003EP17: Message 16 with context\nP17-\u003E\u003EP18: Message 17 with context\nP18-\u003E\u003EP19: Message 18 with context\nP19-\u003E\u003EP0: Message 19 with context\nP0-\u003E\u003EP1: Message 20 with context\nP1-\u003E\u003EP2: Message 21 with context\nP2-\u003E\u003EP3: Message 22 with context\nP3-\u003E\u003EP4: Message 23 with context\nP4-\u003E\u003EP5: Message 24 with context\nP5-\u003E\u003EP6: Message 25 with context\nP6-\u003E\u003EP7: Message 26 with context\nP7-\u003E\u003EP8: Message 27 with context\nP8-\u003E\u003EP9: Message 28 with context\nP9-\u003E\u003EP10: Message 29 with context\nP10-\u003E\u003EP11: Message 30 with context\nP11-\u003E\u003EP12: Message 31 with context\nP12-\u003E\u003EP13: Message 32 with context\nP13-\u003E\u003EP14: Message 33 with context\nP14-\u003E\u003EP15: Message 34 with context\nP15-\u003E\u003EP16: Message 35 with context\nP16-\u003E\u003EP17: Message 36 with context\nP17-\u003E\u003EP18: Message 37 with context\nP18-\u003E\u003EP19: Message 38 with context\nP19-\u003E\u003EP0: Message 39 with context\nP0-\u003E\u003EP1: Message 40 with context\nP1-\u003E\u003EP2: Message 41 with context\nP2-\u003E\u003EP3: Message 42 with context\nP3-\u003E\u003EP4: Message 43 with context\nP4-\u003E\u003EP5: Message 44 with context\nP5-\u003E\u003EP6: Message 45 with context\nP6-\u003E\u003EP7: Message 46 with context\nP7-\u003E\u003EP8: Message 47 with context\nP8-\u003E\u003EP9: Message 48 with context\nP9-\u003E\u003EP10: Message 49 with context\nP10-\u003E\u003EP11: Message 50 with context\nP11-\u003E\u003EP12: Message 51 with context\nP12-\u003E\u003EP13: Message 52 with context\nP13-\u003E\u003EP14: Message 53 with context\nP14-\u003E\u003EP15: Message 54 with context\nP15-\u003E\u003EP16: Message 55 with context\nP16-\u003E\u003EP17: Message 56 with context\nP17-\u003E\u003EP18: Message 57 with context\nP18-\u003E\u003EP19: Message 58 with context\nP19-\u003E\u003EP0: Message 59 with context\nP0-\u003E\u003EP1: Message 60 with context\nP1-\u003E\u003EP2: Message 61 with context\nP2-\u003E\u003EP3: Message 62 with context\nP3-\u003E\u003EP4: Message 63 with context\nP4-\u003E\u003EP5: Message 64 with context\nP5-\u003E\u003EP6: Message 65 with context\nP6-\u003E\u003EP7: Message 66 with context\nP7-\u003E\u003EP8: Message 67 with context\nP8-\u003E\u003EP9: Message 68 with context\nP9-\u003E\u003EP10: Message 69 with context\nP10-\u003E\u003EP11: Message 70 with context\nP11-\u003E\u003EP12: Message 71 with context\nP12-\u003E\u003EP13: Message 72 with context\nP13-\u003E\u003EP14: Message 73 with context\nP14-\u003E\u003EP15: Message 74 with context\nP15-\u003E\u003EP16: Message 75 with context\nP16-\u003E\u003EP17: Message 76 with context\nP17-\u003E\u003EP18: Message 77 with context\nP18-\u003E\u003EP19: Message 78 with context\nP19-\u003E\u003EP0: Message 79 with context\nP0-\u003E\u003EP1: Message 80 with context\nP1-\u003E\u003EP2: Message 81 with context\nP2-\u003E\u003EP3: Message 82 with context\nP3-\u003E\u003EP4: Message 83 with context\nP4-\u003E\u003EP5: Message 84 with context\nP5-\u003E\u003EP6: Message 85 with context\nP6-\u003E\u003EP7: Message 86 with context\nP7-\u003E\u003EP8: Message 87 with context\nP8-\u003E\u003EP9: Message 88 with context\nP9-\u003E\u003EP10: Message 89 with context\nP10-\u003E\u003EP11: Message 90 with context\nP11-\u003E\u003EP12: Message 91 with context\nP12-\u003E\u003EP13: Message 92 with context\nP13-\u003E\u003EP14: Message 93 with context\nP14-\u003E\u003EP15: Message 94 with context\nP15-\u003E\u003EP16: Message 95 with context\nP16-\u003E\u003EP17: Message 96 with context\nP17-\u003E\u003EP18: Message 97 with context\nP18-\u003E\u003EP19: Message 98 with context\nP19-\u003E\u003EP0: Message 99 with context\nP0-\u003E\u003EP1: Message 100 with context\nP1-\u003E\u003EP2: Message 101 with context\nP2-\u003E\u003EP3: Message 102 with context\nP3-\u003E\u003EP4: Message 103 with context\nP4-\u003E\u003EP5: Message 104 with context\nP5-\u003E\u003EP6: Message 105 with context\nP6-\u003E\u003EP7: Message 106 with context\nP7-\u003E\u003EP8: Message 107 with context\nP8-\u003E\u003EP9: Message 108 with context\nP9-\u003E\u003EP10: Message 109 with context\nP10-\u003E\u003EP11: Message 110 with context\nP11-\u003E\u003EP12: Message 111 with context\nP12-\u003E\u003EP13: Message 112 with context\nP13-\u003E\u003EP14: Message 113 with context\nP14-\u003E\u003EP15: Message 114 with context\nP15-\u003E\u003EP16: Message 115 with context\nP16-\u003E\u003EP17: Message 116 with context\nP17-\u003E\u003EP18: Message 117 with context\nP18-\u003E\u003EP19: Message 118 with context\nP19-\u003E\u003EP0: Message 119 with context\nP0-\u003E\u003EP1: Message 120 with context\nP1-\u003E\u003EP2: Message 121 with context\nP2-\u003E\u003EP3: Message 122 with context\nP3-\u003E\u003EP4: Message 123 with context\nP4-\u003E\u003EP5: Message 124 with context\nP5-\u003E\u003EP6: Message 125 with context\nP6-\u003E\u003EP7: Message 126 with context\nP7-\u003E\u003EP8: Message 127 with context\nP8-\u003E\u003EP9: Message 128 with context\nP9-\u003E\u003EP10: Message 129 with context\nP10-\u003E\u003EP11: Message 130 with context\nP11-\u003E\u003EP12: Message 131 with context\nP12-\u003E\u003EP13: Message 132 with context\nP13-\u003E\u003EP14: Message 133 with context\nP14-\u003E\u003EP15: Message 134 with context\nP15-\u003E\u003EP16: Message 135 with context\nP16-\u003E\u003EP17: Message 136 with context\nP17-\u003E\u003EP18: Message 137 with context\nP18-\u003E\u003EP19: Message 138 with context\nP19-\u003E\u003EP0: Message 139 with context\nP0-\u003E\u003EP1: Message 140 with context\nP1-\u003E\u003EP2: Message 141 with context\nP2-\u003E\u003EP3: Message 142 with context\nP3-\u003E\u003EP4: Message 143 with context\nP4-\u003E\u003EP5: Message 144 with context\nP5-\u003E\u003EP6: Message 145 with context\nP6-\u003E\u003EP7: Message 146 with context\nP7-\u003E\u003EP8: Message 147 with context\nP8-\u003E\u003EP9: Message 148 with context\nP9-\u003E\u003EP10: Message 149 with context\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "51452DFFE69F1BBF65E9FC703C3CA2E721673BA440DB4585C7AC84BD094EBBC6",
+          "SourceScanIncludingAdapterSemanticsMs": 1.2364,
+          "RendererIncludingParsingLayoutSvgMs": 3.2888,
+          "StandaloneSanitisationMs": 4.1355,
+          "StandaloneSharpVectorsAndDrawingMs": 509.639,
+          "CompletePresentationMs": 561.3944,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322025272,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322027112,
+          "PresentationCurrentThreadAllocatedBytes": 160287936,
+          "PresentationCollectionCounts": [
+            11,
+            5,
+            1
+          ],
+          "WorkingSetBefore": 215191552,
+          "WorkingSetAfter": 215924736,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "3B5DD393FC9378AFCDFE1C3DCFBD4723800465132D1551B9804C0E8849A7A482",
+          "SourceScanIncludingAdapterSemanticsMs": 1.0162,
+          "RendererIncludingParsingLayoutSvgMs": 3.1903,
+          "StandaloneSanitisationMs": 4.1983,
+          "StandaloneSharpVectorsAndDrawingMs": 503.597,
+          "CompletePresentationMs": 503.0546,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322067328,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322075064,
+          "PresentationCurrentThreadAllocatedBytes": 160284632,
+          "PresentationCollectionCounts": [
+            10,
+            4,
+            0
+          ],
+          "WorkingSetBefore": 215924736,
+          "WorkingSetAfter": 220499968,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "330B52F3E3ECAEFC88D034914854FD311CD41460C0581AB97115671B7DF41F44",
+          "SourceScanIncludingAdapterSemanticsMs": 0.9543,
+          "RendererIncludingParsingLayoutSvgMs": 3.4831,
+          "StandaloneSanitisationMs": 29.6629,
+          "StandaloneSharpVectorsAndDrawingMs": 452.4551,
+          "CompletePresentationMs": 525.5617,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322061672,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322068704,
+          "PresentationCurrentThreadAllocatedBytes": 160279808,
+          "PresentationCollectionCounts": [
+            11,
+            5,
+            1
+          ],
+          "WorkingSetBefore": 220499968,
+          "WorkingSetAfter": 246824960,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "3F26A017069EBB22A1289C3CFB0E2EC614766F483FEB3E44B704624CDDD8F15E",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6009,
+          "RendererIncludingParsingLayoutSvgMs": 2.9926,
+          "StandaloneSanitisationMs": 4.2771,
+          "StandaloneSharpVectorsAndDrawingMs": 437.8346,
+          "CompletePresentationMs": 460.9669,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322014656,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322012800,
+          "PresentationCurrentThreadAllocatedBytes": 160278968,
+          "PresentationCollectionCounts": [
+            9,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 246824960,
+          "WorkingSetAfter": 256708608,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "D300FA0C9FA4ADFE317DDBDE203FBEB3A019CB1E9A875739AC41AA00EA782F53",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5761,
+          "RendererIncludingParsingLayoutSvgMs": 3.0935,
+          "StandaloneSanitisationMs": 4.1868,
+          "StandaloneSharpVectorsAndDrawingMs": 441.3905,
+          "CompletePresentationMs": 526.8743,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322015944,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322018368,
+          "PresentationCurrentThreadAllocatedBytes": 160280408,
+          "PresentationCollectionCounts": [
+            10,
+            4,
+            1
+          ],
+          "WorkingSetBefore": 256708608,
+          "WorkingSetAfter": 275087360,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "6AC62F86320294ADB247720B9D4619BC08EBE12C02C9BFFA79C6C04DDB731823",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5745,
+          "RendererIncludingParsingLayoutSvgMs": 2.9779,
+          "StandaloneSanitisationMs": 4.1851,
+          "StandaloneSharpVectorsAndDrawingMs": 465.8369,
+          "CompletePresentationMs": 504.6178,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322014848,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322015520,
+          "PresentationCurrentThreadAllocatedBytes": 160279464,
+          "PresentationCollectionCounts": [
+            9,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 275087360,
+          "WorkingSetAfter": 281067520,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "E73F187EEDBAA28B5C22093D34206F8D132BE19CBF71519C456269BC3711CB9A",
+          "SourceScanIncludingAdapterSemanticsMs": 0.597,
+          "RendererIncludingParsingLayoutSvgMs": 3.059,
+          "StandaloneSanitisationMs": 4.1133,
+          "StandaloneSharpVectorsAndDrawingMs": 498.9744,
+          "CompletePresentationMs": 464.7218,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 322022248,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 322034912,
+          "PresentationCurrentThreadAllocatedBytes": 160285376,
+          "PresentationCollectionCounts": [
+            9,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 281067520,
+          "WorkingSetAfter": 242868224,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "State",
+      "Size": "Smaller",
+      "SourceSha256": "70A829C411D06D06AF635173C7CA772F333BC4F3CA44CAE226550E5ED9E97B6F",
+      "Source": "stateDiagram-v2\nstate \u0022State 0 with context\u0022 as S0\nstate \u0022State 1 with context\u0022 as S1\nstate \u0022State 2 with context\u0022 as S2\nstate \u0022State 3 with context\u0022 as S3\nstate \u0022State 4 with context\u0022 as S4\nstate \u0022State 5 with context\u0022 as S5\nstate \u0022State 6 with context\u0022 as S6\nstate \u0022State 7 with context\u0022 as S7\nstate \u0022State 8 with context\u0022 as S8\nstate \u0022State 9 with context\u0022 as S9\nS0 --\u003E S1 : transition0\nS1 --\u003E S8 : transition1\nS2 --\u003E S5 : transition2\nS3 --\u003E S2 : transition3\nS4 --\u003E S9 : transition4\nS5 --\u003E S6 : transition5\nS6 --\u003E S3 : transition6\nS7 --\u003E S0 : transition7\nS8 --\u003E S7 : transition8\nS9 --\u003E S4 : transition9\nS0 --\u003E S1 : transition10\nS1 --\u003E S8 : transition11\nS2 --\u003E S5 : transition12\nS3 --\u003E S2 : transition13\nS4 --\u003E S9 : transition14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "0254933BF360F2ADA3D7FF451DAD8C0CCC0F9FA5FF975354B8C341CF2B47905E",
+          "SourceScanIncludingAdapterSemanticsMs": 12.5736,
+          "RendererIncludingParsingLayoutSvgMs": 37.5214,
+          "StandaloneSanitisationMs": 0.7808,
+          "StandaloneSharpVectorsAndDrawingMs": 38.9122,
+          "CompletePresentationMs": 132.2724,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 34613280,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 34618072,
+          "PresentationCurrentThreadAllocatedBytes": 17590696,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 242933760,
+          "WorkingSetAfter": 247209984,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "F5AB2325F7FE37767F8DE63FC10C4A76AB217904F7AD5A111E82BFCC531B29DC",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1914,
+          "RendererIncludingParsingLayoutSvgMs": 2.2662,
+          "StandaloneSanitisationMs": 0.7642,
+          "StandaloneSharpVectorsAndDrawingMs": 37.432,
+          "CompletePresentationMs": 44.4969,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33940624,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33933952,
+          "PresentationCurrentThreadAllocatedBytes": 17110584,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 247209984,
+          "WorkingSetAfter": 245047296,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "ABDD49CB830B87BA54242C6E52FFCE4DBA6A57C47C7F053A12B67411E79CECD6",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1453,
+          "RendererIncludingParsingLayoutSvgMs": 2.1866,
+          "StandaloneSanitisationMs": 0.8293,
+          "StandaloneSharpVectorsAndDrawingMs": 37.0485,
+          "CompletePresentationMs": 69.8035,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33967424,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33965168,
+          "PresentationCurrentThreadAllocatedBytes": 17128264,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            1
+          ],
+          "WorkingSetBefore": 245047296,
+          "WorkingSetAfter": 218132480,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "E84431598F9F521AF81E8C896A537095593FF698F088FC506940A24B09EB81E5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2134,
+          "RendererIncludingParsingLayoutSvgMs": 2.5157,
+          "StandaloneSanitisationMs": 0.8494,
+          "StandaloneSharpVectorsAndDrawingMs": 48.1732,
+          "CompletePresentationMs": 50.1535,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33955864,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33957352,
+          "PresentationCurrentThreadAllocatedBytes": 17121360,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 218136576,
+          "WorkingSetAfter": 218468352,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "C65BDBF851633BA2C3A8FB5E6BB30AB93CFF40518F9E27E865945658B3C2FD85",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2237,
+          "RendererIncludingParsingLayoutSvgMs": 2.3082,
+          "StandaloneSanitisationMs": 0.7713,
+          "StandaloneSharpVectorsAndDrawingMs": 37.5731,
+          "CompletePresentationMs": 50.2326,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33945376,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33946080,
+          "PresentationCurrentThreadAllocatedBytes": 17113216,
+          "PresentationCollectionCounts": [
+            1,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 218468352,
+          "WorkingSetAfter": 218648576,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "EDB418F572B32D28BC978B75F4FBB67510A3BD7943CF6C643A96BAE08303F631",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1542,
+          "RendererIncludingParsingLayoutSvgMs": 2.128,
+          "StandaloneSanitisationMs": 0.7629,
+          "StandaloneSharpVectorsAndDrawingMs": 42.4094,
+          "CompletePresentationMs": 63.6154,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33952920,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33957488,
+          "PresentationCurrentThreadAllocatedBytes": 17118608,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            1
+          ],
+          "WorkingSetBefore": 218648576,
+          "WorkingSetAfter": 217501696,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "7B3FC7C596CF65AF00EC6B9D3C1CD6AE91776D3456E109537FCA1AC2A46883FE",
+          "SourceScanIncludingAdapterSemanticsMs": 0.1402,
+          "RendererIncludingParsingLayoutSvgMs": 2.1884,
+          "StandaloneSanitisationMs": 0.7646,
+          "StandaloneSharpVectorsAndDrawingMs": 40.4207,
+          "CompletePresentationMs": 44.8358,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 33941712,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 33937984,
+          "PresentationCurrentThreadAllocatedBytes": 17111672,
+          "PresentationCollectionCounts": [
+            1,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 217501696,
+          "WorkingSetAfter": 200560640,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "State",
+      "Size": "Larger",
+      "SourceSha256": "188A3D135B0A82C9CEF4115D041F4A26F00915564191D5D1A76860FE6C610330",
+      "Source": "stateDiagram-v2\nstate \u0022State 0 with context\u0022 as S0\nstate \u0022State 1 with context\u0022 as S1\nstate \u0022State 2 with context\u0022 as S2\nstate \u0022State 3 with context\u0022 as S3\nstate \u0022State 4 with context\u0022 as S4\nstate \u0022State 5 with context\u0022 as S5\nstate \u0022State 6 with context\u0022 as S6\nstate \u0022State 7 with context\u0022 as S7\nstate \u0022State 8 with context\u0022 as S8\nstate \u0022State 9 with context\u0022 as S9\nstate \u0022State 10 with context\u0022 as S10\nstate \u0022State 11 with context\u0022 as S11\nstate \u0022State 12 with context\u0022 as S12\nstate \u0022State 13 with context\u0022 as S13\nstate \u0022State 14 with context\u0022 as S14\nstate \u0022State 15 with context\u0022 as S15\nstate \u0022State 16 with context\u0022 as S16\nstate \u0022State 17 with context\u0022 as S17\nstate \u0022State 18 with context\u0022 as S18\nstate \u0022State 19 with context\u0022 as S19\nstate \u0022State 20 with context\u0022 as S20\nstate \u0022State 21 with context\u0022 as S21\nstate \u0022State 22 with context\u0022 as S22\nstate \u0022State 23 with context\u0022 as S23\nstate \u0022State 24 with context\u0022 as S24\nstate \u0022State 25 with context\u0022 as S25\nstate \u0022State 26 with context\u0022 as S26\nstate \u0022State 27 with context\u0022 as S27\nstate \u0022State 28 with context\u0022 as S28\nstate \u0022State 29 with context\u0022 as S29\nstate \u0022State 30 with context\u0022 as S30\nstate \u0022State 31 with context\u0022 as S31\nstate \u0022State 32 with context\u0022 as S32\nstate \u0022State 33 with context\u0022 as S33\nstate \u0022State 34 with context\u0022 as S34\nstate \u0022State 35 with context\u0022 as S35\nstate \u0022State 36 with context\u0022 as S36\nstate \u0022State 37 with context\u0022 as S37\nstate \u0022State 38 with context\u0022 as S38\nstate \u0022State 39 with context\u0022 as S39\nstate \u0022State 40 with context\u0022 as S40\nstate \u0022State 41 with context\u0022 as S41\nstate \u0022State 42 with context\u0022 as S42\nstate \u0022State 43 with context\u0022 as S43\nstate \u0022State 44 with context\u0022 as S44\nstate \u0022State 45 with context\u0022 as S45\nstate \u0022State 46 with context\u0022 as S46\nstate \u0022State 47 with context\u0022 as S47\nstate \u0022State 48 with context\u0022 as S48\nstate \u0022State 49 with context\u0022 as S49\nstate \u0022State 50 with context\u0022 as S50\nstate \u0022State 51 with context\u0022 as S51\nstate \u0022State 52 with context\u0022 as S52\nstate \u0022State 53 with context\u0022 as S53\nstate \u0022State 54 with context\u0022 as S54\nstate \u0022State 55 with context\u0022 as S55\nstate \u0022State 56 with context\u0022 as S56\nstate \u0022State 57 with context\u0022 as S57\nstate \u0022State 58 with context\u0022 as S58\nstate \u0022State 59 with context\u0022 as S59\nS0 --\u003E S1 : transition0\nS1 --\u003E S8 : transition1\nS2 --\u003E S15 : transition2\nS3 --\u003E S22 : transition3\nS4 --\u003E S29 : transition4\nS5 --\u003E S36 : transition5\nS6 --\u003E S43 : transition6\nS7 --\u003E S50 : transition7\nS8 --\u003E S57 : transition8\nS9 --\u003E S4 : transition9\nS10 --\u003E S11 : transition10\nS11 --\u003E S18 : transition11\nS12 --\u003E S25 : transition12\nS13 --\u003E S32 : transition13\nS14 --\u003E S39 : transition14\nS15 --\u003E S46 : transition15\nS16 --\u003E S53 : transition16\nS17 --\u003E S0 : transition17\nS18 --\u003E S7 : transition18\nS19 --\u003E S14 : transition19\nS20 --\u003E S21 : transition20\nS21 --\u003E S28 : transition21\nS22 --\u003E S35 : transition22\nS23 --\u003E S42 : transition23\nS24 --\u003E S49 : transition24\nS25 --\u003E S56 : transition25\nS26 --\u003E S3 : transition26\nS27 --\u003E S10 : transition27\nS28 --\u003E S17 : transition28\nS29 --\u003E S24 : transition29\nS30 --\u003E S31 : transition30\nS31 --\u003E S38 : transition31\nS32 --\u003E S45 : transition32\nS33 --\u003E S52 : transition33\nS34 --\u003E S59 : transition34\nS35 --\u003E S6 : transition35\nS36 --\u003E S13 : transition36\nS37 --\u003E S20 : transition37\nS38 --\u003E S27 : transition38\nS39 --\u003E S34 : transition39\nS40 --\u003E S41 : transition40\nS41 --\u003E S48 : transition41\nS42 --\u003E S55 : transition42\nS43 --\u003E S2 : transition43\nS44 --\u003E S9 : transition44\nS45 --\u003E S16 : transition45\nS46 --\u003E S23 : transition46\nS47 --\u003E S30 : transition47\nS48 --\u003E S37 : transition48\nS49 --\u003E S44 : transition49\nS50 --\u003E S51 : transition50\nS51 --\u003E S58 : transition51\nS52 --\u003E S5 : transition52\nS53 --\u003E S12 : transition53\nS54 --\u003E S19 : transition54\nS55 --\u003E S26 : transition55\nS56 --\u003E S33 : transition56\nS57 --\u003E S40 : transition57\nS58 --\u003E S47 : transition58\nS59 --\u003E S54 : transition59\nS0 --\u003E S1 : transition60\nS1 --\u003E S8 : transition61\nS2 --\u003E S15 : transition62\nS3 --\u003E S22 : transition63\nS4 --\u003E S29 : transition64\nS5 --\u003E S36 : transition65\nS6 --\u003E S43 : transition66\nS7 --\u003E S50 : transition67\nS8 --\u003E S57 : transition68\nS9 --\u003E S4 : transition69\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "A7FBE5458C7BFEC8632932F9DE454C4F242471E7A9AD32ED12802D6FBC235863",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4413,
+          "RendererIncludingParsingLayoutSvgMs": 21.5142,
+          "StandaloneSanitisationMs": 2.6182,
+          "StandaloneSharpVectorsAndDrawingMs": 242.2712,
+          "CompletePresentationMs": 273.316,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177638736,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177644384,
+          "PresentationCurrentThreadAllocatedBytes": 89774048,
+          "PresentationCollectionCounts": [
+            6,
+            3,
+            1
+          ],
+          "WorkingSetBefore": 200564736,
+          "WorkingSetAfter": 203255808,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "BEC8939D2D38F3D8C42CB2507EDDD84F0B0F72A126C485BC43BEFEF3D1C944B8",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4928,
+          "RendererIncludingParsingLayoutSvgMs": 8.7206,
+          "StandaloneSanitisationMs": 2.7438,
+          "StandaloneSharpVectorsAndDrawingMs": 229.1109,
+          "CompletePresentationMs": 239.3249,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177620408,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177618240,
+          "PresentationCurrentThreadAllocatedBytes": 89714504,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 203255808,
+          "WorkingSetAfter": 209207296,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "A1E8EDB313839B679CBADC99DA478DCCF511A7967677CD8E12F39E282CDEF2B7",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4892,
+          "RendererIncludingParsingLayoutSvgMs": 27.3472,
+          "StandaloneSanitisationMs": 2.7344,
+          "StandaloneSharpVectorsAndDrawingMs": 245.2503,
+          "CompletePresentationMs": 257.2647,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177611016,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177613032,
+          "PresentationCurrentThreadAllocatedBytes": 89705608,
+          "PresentationCollectionCounts": [
+            5,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 209207296,
+          "WorkingSetAfter": 225026048,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "F01400FA69C9199F6E6A53B92E7A408F0632A8C30A6CB2552F1A7A4B25AD2120",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4067,
+          "RendererIncludingParsingLayoutSvgMs": 6.1968,
+          "StandaloneSanitisationMs": 2.5871,
+          "StandaloneSharpVectorsAndDrawingMs": 233.7338,
+          "CompletePresentationMs": 272.2773,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177596672,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177598656,
+          "PresentationCurrentThreadAllocatedBytes": 89711056,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 225026048,
+          "WorkingSetAfter": 237965312,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "483A9AA14F6429FE4E474736F5E087A5649A002FD568CBFA14BEAD3E00D775A1",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4024,
+          "RendererIncludingParsingLayoutSvgMs": 19.9371,
+          "StandaloneSanitisationMs": 3.5056,
+          "StandaloneSharpVectorsAndDrawingMs": 209.4656,
+          "CompletePresentationMs": 246.4347,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177584624,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177582552,
+          "PresentationCurrentThreadAllocatedBytes": 89705104,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 237965312,
+          "WorkingSetAfter": 261754880,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "204D9A3CF2A9E7C4D03E863C64CB389B445C06B714D5D06B1AB08B894D918305",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4197,
+          "RendererIncludingParsingLayoutSvgMs": 5.1713,
+          "StandaloneSanitisationMs": 2.6042,
+          "StandaloneSharpVectorsAndDrawingMs": 222.908,
+          "CompletePresentationMs": 301.3368,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177586352,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177591928,
+          "PresentationCurrentThreadAllocatedBytes": 89707048,
+          "PresentationCollectionCounts": [
+            6,
+            3,
+            1
+          ],
+          "WorkingSetBefore": 261754880,
+          "WorkingSetAfter": 273055744,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "456E7752C2068050F457E385914580A975C5F788D0463C0510422087D934DFE4",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3657,
+          "RendererIncludingParsingLayoutSvgMs": 5.3114,
+          "StandaloneSanitisationMs": 2.5401,
+          "StandaloneSharpVectorsAndDrawingMs": 237.0704,
+          "CompletePresentationMs": 237.4833,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 177584728,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 177586000,
+          "PresentationCurrentThreadAllocatedBytes": 89705352,
+          "PresentationCollectionCounts": [
+            5,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 273055744,
+          "WorkingSetAfter": 269733888,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "ER",
+      "Size": "Smaller",
+      "SourceSha256": "8F2883DCDE09855E8E947C6CA179B13E58AAB1DF2BE95A1815FDF25C68DB51A9",
+      "Source": "erDiagram\nE0 {\n int id PK\n string description\n}\nE1 {\n int id PK\n string description\n}\nE2 {\n int id PK\n string description\n}\nE3 {\n int id PK\n string description\n}\nE4 {\n int id PK\n string description\n}\nE5 {\n int id PK\n string description\n}\nE6 {\n int id PK\n string description\n}\nE7 {\n int id PK\n string description\n}\nE8 {\n int id PK\n string description\n}\nE9 {\n int id PK\n string description\n}\nE0 ||--o{ E1 : relation0\nE1 ||--o{ E8 : relation1\nE2 ||--o{ E5 : relation2\nE3 ||--o{ E2 : relation3\nE4 ||--o{ E9 : relation4\nE5 ||--o{ E6 : relation5\nE6 ||--o{ E3 : relation6\nE7 ||--o{ E0 : relation7\nE8 ||--o{ E7 : relation8\nE9 ||--o{ E4 : relation9\nE0 ||--o{ E1 : relation10\nE1 ||--o{ E8 : relation11\nE2 ||--o{ E5 : relation12\nE3 ||--o{ E2 : relation13\nE4 ||--o{ E9 : relation14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "413F6238BA0DE5F380A0BBF4C4CAAD5DFB876D49F79403BB80A3B1ED0F589654",
+          "SourceScanIncludingAdapterSemanticsMs": 11.0271,
+          "RendererIncludingParsingLayoutSvgMs": 45.822,
+          "StandaloneSanitisationMs": 1.5288,
+          "StandaloneSharpVectorsAndDrawingMs": 67.8884,
+          "CompletePresentationMs": 109.587,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70934568,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70948008,
+          "PresentationCurrentThreadAllocatedBytes": 32747288,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 269737984,
+          "WorkingSetAfter": 272142336,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "6FF565551A62AE260284C9966F7D236B2A51034BD6F2E85A0F0F1CC45D1689D5",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2698,
+          "RendererIncludingParsingLayoutSvgMs": 16.6628,
+          "StandaloneSanitisationMs": 1.5344,
+          "StandaloneSharpVectorsAndDrawingMs": 67.3607,
+          "CompletePresentationMs": 91.3514,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70218128,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70213616,
+          "PresentationCurrentThreadAllocatedBytes": 32524704,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 272142336,
+          "WorkingSetAfter": 278925312,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "DE4FD2A2E4DA650E57C6CD2CDAC2176465C3A16C34BC16388FEDF9ED6CDDAFDC",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3054,
+          "RendererIncludingParsingLayoutSvgMs": 5.9851,
+          "StandaloneSanitisationMs": 1.5331,
+          "StandaloneSharpVectorsAndDrawingMs": 68.1822,
+          "CompletePresentationMs": 100.3271,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70216992,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70215944,
+          "PresentationCurrentThreadAllocatedBytes": 32524448,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 278925312,
+          "WorkingSetAfter": 286322688,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "23924B1181DDB9F55089A6F081ED6915C4E88FE3D6296A12E9CD7451C27B0DB3",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3054,
+          "RendererIncludingParsingLayoutSvgMs": 6.0435,
+          "StandaloneSanitisationMs": 1.5603,
+          "StandaloneSharpVectorsAndDrawingMs": 81.7914,
+          "CompletePresentationMs": 88.6715,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70216784,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70214928,
+          "PresentationCurrentThreadAllocatedBytes": 32524320,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 286322688,
+          "WorkingSetAfter": 295084032,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "147C32602B9D1EDC7224552D3E5BDFC46D44ABE5AFBFE386124AB1EEBCE2A52C",
+          "SourceScanIncludingAdapterSemanticsMs": 0.3219,
+          "RendererIncludingParsingLayoutSvgMs": 6.186,
+          "StandaloneSanitisationMs": 1.5735,
+          "StandaloneSharpVectorsAndDrawingMs": 75.4833,
+          "CompletePresentationMs": 88.9834,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70215992,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70213152,
+          "PresentationCurrentThreadAllocatedBytes": 32524064,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 295084032,
+          "WorkingSetAfter": 303751168,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "BDC5081E31AD8183605580711C0D9E1BF4A175D61702ECB0D26AD52E356F935A",
+          "SourceScanIncludingAdapterSemanticsMs": 0.2782,
+          "RendererIncludingParsingLayoutSvgMs": 5.7568,
+          "StandaloneSanitisationMs": 1.5962,
+          "StandaloneSharpVectorsAndDrawingMs": 67.292,
+          "CompletePresentationMs": 153.1126,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70211968,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70213784,
+          "PresentationCurrentThreadAllocatedBytes": 32528256,
+          "PresentationCollectionCounts": [
+            3,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 303751168,
+          "WorkingSetAfter": 283234304,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "2D00C7A97ED09203D8215E97E26BA890A8B7E87CD3C478D5A568075982592F35",
+          "SourceScanIncludingAdapterSemanticsMs": 0.217,
+          "RendererIncludingParsingLayoutSvgMs": 5.2643,
+          "StandaloneSanitisationMs": 1.572,
+          "StandaloneSharpVectorsAndDrawingMs": 65.9861,
+          "CompletePresentationMs": 78.7644,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70205760,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70202304,
+          "PresentationCurrentThreadAllocatedBytes": 32523296,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 283234304,
+          "WorkingSetAfter": 278761472,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "ER",
+      "Size": "Larger",
+      "SourceSha256": "F1CB5E46EC2E52AA2C9F86FE97156B71DC7708C37BE8F2CB33A7CADB0E8FF709",
+      "Source": "erDiagram\nE0 {\n int id PK\n string description\n}\nE1 {\n int id PK\n string description\n}\nE2 {\n int id PK\n string description\n}\nE3 {\n int id PK\n string description\n}\nE4 {\n int id PK\n string description\n}\nE5 {\n int id PK\n string description\n}\nE6 {\n int id PK\n string description\n}\nE7 {\n int id PK\n string description\n}\nE8 {\n int id PK\n string description\n}\nE9 {\n int id PK\n string description\n}\nE10 {\n int id PK\n string description\n}\nE11 {\n int id PK\n string description\n}\nE12 {\n int id PK\n string description\n}\nE13 {\n int id PK\n string description\n}\nE14 {\n int id PK\n string description\n}\nE15 {\n int id PK\n string description\n}\nE16 {\n int id PK\n string description\n}\nE17 {\n int id PK\n string description\n}\nE18 {\n int id PK\n string description\n}\nE19 {\n int id PK\n string description\n}\nE20 {\n int id PK\n string description\n}\nE21 {\n int id PK\n string description\n}\nE22 {\n int id PK\n string description\n}\nE23 {\n int id PK\n string description\n}\nE24 {\n int id PK\n string description\n}\nE25 {\n int id PK\n string description\n}\nE26 {\n int id PK\n string description\n}\nE27 {\n int id PK\n string description\n}\nE28 {\n int id PK\n string description\n}\nE29 {\n int id PK\n string description\n}\nE0 ||--o{ E1 : relation0\nE1 ||--o{ E8 : relation1\nE2 ||--o{ E15 : relation2\nE3 ||--o{ E22 : relation3\nE4 ||--o{ E29 : relation4\nE5 ||--o{ E6 : relation5\nE6 ||--o{ E13 : relation6\nE7 ||--o{ E20 : relation7\nE8 ||--o{ E27 : relation8\nE9 ||--o{ E4 : relation9\nE10 ||--o{ E11 : relation10\nE11 ||--o{ E18 : relation11\nE12 ||--o{ E25 : relation12\nE13 ||--o{ E2 : relation13\nE14 ||--o{ E9 : relation14\nE15 ||--o{ E16 : relation15\nE16 ||--o{ E23 : relation16\nE17 ||--o{ E0 : relation17\nE18 ||--o{ E7 : relation18\nE19 ||--o{ E14 : relation19\nE20 ||--o{ E21 : relation20\nE21 ||--o{ E28 : relation21\nE22 ||--o{ E5 : relation22\nE23 ||--o{ E12 : relation23\nE24 ||--o{ E19 : relation24\nE25 ||--o{ E26 : relation25\nE26 ||--o{ E3 : relation26\nE27 ||--o{ E10 : relation27\nE28 ||--o{ E17 : relation28\nE29 ||--o{ E24 : relation29\nE0 ||--o{ E1 : relation30\nE1 ||--o{ E8 : relation31\nE2 ||--o{ E15 : relation32\nE3 ||--o{ E22 : relation33\nE4 ||--o{ E29 : relation34\nE5 ||--o{ E6 : relation35\nE6 ||--o{ E13 : relation36\nE7 ||--o{ E20 : relation37\nE8 ||--o{ E27 : relation38\nE9 ||--o{ E4 : relation39\nE10 ||--o{ E11 : relation40\nE11 ||--o{ E18 : relation41\nE12 ||--o{ E25 : relation42\nE13 ||--o{ E2 : relation43\nE14 ||--o{ E9 : relation44\nE15 ||--o{ E16 : relation45\nE16 ||--o{ E23 : relation46\nE17 ||--o{ E0 : relation47\nE18 ||--o{ E7 : relation48\nE19 ||--o{ E14 : relation49\nE20 ||--o{ E21 : relation50\nE21 ||--o{ E28 : relation51\nE22 ||--o{ E5 : relation52\nE23 ||--o{ E12 : relation53\nE24 ||--o{ E19 : relation54\nE25 ||--o{ E26 : relation55\nE26 ||--o{ E3 : relation56\nE27 ||--o{ E10 : relation57\nE28 ||--o{ E17 : relation58\nE29 ||--o{ E24 : relation59\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "ACA0EE5158B5B0D1B04CF1CA289661F81ECF5309429AE92EB21C5563ECB12C56",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6403,
+          "RendererIncludingParsingLayoutSvgMs": 106.6021,
+          "StandaloneSanitisationMs": 4.8104,
+          "StandaloneSharpVectorsAndDrawingMs": 245.1136,
+          "CompletePresentationMs": 329.8598,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299605184,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299611792,
+          "PresentationCurrentThreadAllocatedBytes": 110423680,
+          "PresentationCollectionCounts": [
+            8,
+            4,
+            2
+          ],
+          "WorkingSetBefore": 278761472,
+          "WorkingSetAfter": 217743360,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "656247B002E0E6EF605D1C6F83B0BEEF6CC586A30E7ABD46E3D33B9A0BFF5670",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5387,
+          "RendererIncludingParsingLayoutSvgMs": 102.9279,
+          "StandaloneSanitisationMs": 4.8042,
+          "StandaloneSharpVectorsAndDrawingMs": 226.9026,
+          "CompletePresentationMs": 256.2501,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299680040,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299686784,
+          "PresentationCurrentThreadAllocatedBytes": 110422176,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 217743360,
+          "WorkingSetAfter": 208650240,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "D620804AE1CF4E970A5FAE98759EDB7AF9CA341871120FF1A85600CF38FC1EDE",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5002,
+          "RendererIncludingParsingLayoutSvgMs": 100.9431,
+          "StandaloneSanitisationMs": 5.3006,
+          "StandaloneSharpVectorsAndDrawingMs": 237.7598,
+          "CompletePresentationMs": 249.4208,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299691144,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299696032,
+          "PresentationCurrentThreadAllocatedBytes": 110427664,
+          "PresentationCollectionCounts": [
+            6,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 208650240,
+          "WorkingSetAfter": 235413504,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "3A38333B64F1D58ACA55430E2E6524729C5E79CAF3D76A4FB516020A11C7819A",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5058,
+          "RendererIncludingParsingLayoutSvgMs": 110.0399,
+          "StandaloneSanitisationMs": 4.9719,
+          "StandaloneSharpVectorsAndDrawingMs": 228.0063,
+          "CompletePresentationMs": 302.3204,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299682896,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299693256,
+          "PresentationCurrentThreadAllocatedBytes": 110425160,
+          "PresentationCollectionCounts": [
+            8,
+            4,
+            1
+          ],
+          "WorkingSetBefore": 235413504,
+          "WorkingSetAfter": 258285568,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "5802BBB2EE70AD4AF23FEDE32646C22BC89BA633977821E4C678A24824BD37B1",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5374,
+          "RendererIncludingParsingLayoutSvgMs": 101.5548,
+          "StandaloneSanitisationMs": 4.6861,
+          "StandaloneSharpVectorsAndDrawingMs": 222.0113,
+          "CompletePresentationMs": 266.5843,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299679632,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299686656,
+          "PresentationCurrentThreadAllocatedBytes": 110422112,
+          "PresentationCollectionCounts": [
+            7,
+            3,
+            0
+          ],
+          "WorkingSetBefore": 258285568,
+          "WorkingSetAfter": 263024640,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "8A400A4CEC4E030BDC6F032BA9C2C7E4AD41238FD09299B1A404951668A369F1",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4992,
+          "RendererIncludingParsingLayoutSvgMs": 100.7498,
+          "StandaloneSanitisationMs": 4.8035,
+          "StandaloneSharpVectorsAndDrawingMs": 242.0742,
+          "CompletePresentationMs": 257.7218,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299679976,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299683976,
+          "PresentationCurrentThreadAllocatedBytes": 110422112,
+          "PresentationCollectionCounts": [
+            6,
+            2,
+            0
+          ],
+          "WorkingSetBefore": 263024640,
+          "WorkingSetAfter": 274452480,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "310229B50A5D521628EC1A80AC1788D345DEDF85A2739F8C88914E8C244DBFFA",
+          "SourceScanIncludingAdapterSemanticsMs": 0.8043,
+          "RendererIncludingParsingLayoutSvgMs": 105.4161,
+          "StandaloneSanitisationMs": 5.565,
+          "StandaloneSharpVectorsAndDrawingMs": 236.3687,
+          "CompletePresentationMs": 311.3525,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 299681184,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 299688160,
+          "PresentationCurrentThreadAllocatedBytes": 110422760,
+          "PresentationCollectionCounts": [
+            7,
+            2,
+            1
+          ],
+          "WorkingSetBefore": 274452480,
+          "WorkingSetAfter": 277463040,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Class",
+      "Size": "Smaller",
+      "SourceSha256": "2DF1C3606F35F7B7A7B3A9B4E2114345E7660518998FE69B324F8797221BD0B8",
+      "Source": "classDiagram\nclass C0 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C1 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C2 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C3 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C4 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C5 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C6 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C7 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C8 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C9 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nC0 --\u003E C1 : relation0\nC1 --\u003E C8 : relation1\nC2 --\u003E C5 : relation2\nC3 --\u003E C2 : relation3\nC4 --\u003E C9 : relation4\nC5 --\u003E C6 : relation5\nC6 --\u003E C3 : relation6\nC7 --\u003E C0 : relation7\nC8 --\u003E C7 : relation8\nC9 --\u003E C4 : relation9\nC0 --\u003E C1 : relation10\nC1 --\u003E C8 : relation11\nC2 --\u003E C5 : relation12\nC3 --\u003E C2 : relation13\nC4 --\u003E C9 : relation14\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "BAB96B333EEA2A741EB91BD564D09FB672696556CEFF0D92C36D930848CCB0F7",
+          "SourceScanIncludingAdapterSemanticsMs": 8.1947,
+          "RendererIncludingParsingLayoutSvgMs": 39.3263,
+          "StandaloneSanitisationMs": 1.2491,
+          "StandaloneSharpVectorsAndDrawingMs": 72.836,
+          "CompletePresentationMs": 115.4776,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 71281048,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 71295176,
+          "PresentationCurrentThreadAllocatedBytes": 35639648,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 277471232,
+          "WorkingSetAfter": 278425600,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "5B7B8940904C75180894F74A3E78A914F5CD02EDAE947DBB18D4B660F345B89A",
+          "SourceScanIncludingAdapterSemanticsMs": 0.6255,
+          "RendererIncludingParsingLayoutSvgMs": 1.7096,
+          "StandaloneSanitisationMs": 1.237,
+          "StandaloneSharpVectorsAndDrawingMs": 80.9451,
+          "CompletePresentationMs": 101.0466,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70606192,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70600480,
+          "PresentationCurrentThreadAllocatedBytes": 35311192,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 278425600,
+          "WorkingSetAfter": 280354816,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "F9A4163FD3076BA7F8AEB5D28D0E3EB05F9FCB66F4B61F33C7ED9A5CBF286423",
+          "SourceScanIncludingAdapterSemanticsMs": 0.7156,
+          "RendererIncludingParsingLayoutSvgMs": 1.6209,
+          "StandaloneSanitisationMs": 1.243,
+          "StandaloneSharpVectorsAndDrawingMs": 73.8702,
+          "CompletePresentationMs": 89.4576,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70602304,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70597064,
+          "PresentationCurrentThreadAllocatedBytes": 35308760,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 280354816,
+          "WorkingSetAfter": 280641536,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "0FE3AE4A9F3C6C7E38F2899F680527B04D04FF2D20274A7B00B0BFC2B580488C",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5898,
+          "RendererIncludingParsingLayoutSvgMs": 1.6463,
+          "StandaloneSanitisationMs": 1.2629,
+          "StandaloneSharpVectorsAndDrawingMs": 80.5753,
+          "CompletePresentationMs": 88.9006,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70606912,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70601792,
+          "PresentationCurrentThreadAllocatedBytes": 35311192,
+          "PresentationCollectionCounts": [
+            2,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 280641536,
+          "WorkingSetAfter": 285835264,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "737D7B7249605EEAD0D85EA9167C04561486089B726BCCB46009C2292DECC63C",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5998,
+          "RendererIncludingParsingLayoutSvgMs": 1.8355,
+          "StandaloneSanitisationMs": 1.3828,
+          "StandaloneSharpVectorsAndDrawingMs": 76.3987,
+          "CompletePresentationMs": 78.0288,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70604216,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70605992,
+          "PresentationCurrentThreadAllocatedBytes": 35309912,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 285835264,
+          "WorkingSetAfter": 294289408,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "247F740A9A1A1B79A332BD453DB987E99DB82AA6AFBBFC284CD7AFDA74FA8523",
+          "SourceScanIncludingAdapterSemanticsMs": 0.5932,
+          "RendererIncludingParsingLayoutSvgMs": 1.7516,
+          "StandaloneSanitisationMs": 2.3682,
+          "StandaloneSharpVectorsAndDrawingMs": 71.247,
+          "CompletePresentationMs": 93.3494,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70591192,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70589216,
+          "PresentationCurrentThreadAllocatedBytes": 35306752,
+          "PresentationCollectionCounts": [
+            3,
+            1,
+            0
+          ],
+          "WorkingSetBefore": 294289408,
+          "WorkingSetAfter": 302583808,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "4A1FAA20B08F5A1BEFFFB665CF003F0B8BE8F2CB0E289DC4EC924313A6F5EC3A",
+          "SourceScanIncludingAdapterSemanticsMs": 0.4985,
+          "RendererIncludingParsingLayoutSvgMs": 1.5786,
+          "StandaloneSanitisationMs": 1.1854,
+          "StandaloneSharpVectorsAndDrawingMs": 74.0548,
+          "CompletePresentationMs": 78.21,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 70600544,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 70597992,
+          "PresentationCurrentThreadAllocatedBytes": 35311496,
+          "PresentationCollectionCounts": [
+            2,
+            0,
+            0
+          ],
+          "WorkingSetBefore": 302583808,
+          "WorkingSetAfter": 310861824,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    },
+    {
+      "Family": "Class",
+      "Size": "Larger",
+      "SourceSha256": "20864D2896AEABDCE82A3CFE23CE0F156BB3F8E21E5DBEF7DD913AFC4D43945E",
+      "Source": "classDiagram\nclass C0 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C1 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C2 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C3 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C4 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C5 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C6 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C7 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C8 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C9 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C10 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C11 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C12 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C13 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C14 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C15 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C16 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C17 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C18 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C19 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C20 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C21 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C22 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C23 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C24 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C25 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C26 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C27 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C28 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C29 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C30 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C31 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C32 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C33 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C34 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C35 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C36 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C37 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C38 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C39 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C40 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C41 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C42 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C43 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C44 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C45 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C46 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C47 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C48 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C49 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C50 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C51 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C52 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C53 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C54 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C55 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C56 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C57 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C58 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C59 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C60 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C61 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C62 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C63 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C64 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C65 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C66 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C67 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C68 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C69 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C70 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C71 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C72 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C73 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C74 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C75 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C76 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C77 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C78 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C79 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C80 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C81 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C82 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C83 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C84 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C85 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C86 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C87 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C88 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C89 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C90 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C91 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C92 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C93 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C94 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C95 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C96 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C97 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C98 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nclass C99 {\n \u002Bstring Description\n \u002BOpen(path, options) bool\n}\nC0 --\u003E C1 : relation0\nC1 --\u003E C8 : relation1\nC2 --\u003E C15 : relation2\nC3 --\u003E C22 : relation3\nC4 --\u003E C29 : relation4\nC5 --\u003E C36 : relation5\nC6 --\u003E C43 : relation6\nC7 --\u003E C50 : relation7\nC8 --\u003E C57 : relation8\nC9 --\u003E C64 : relation9\nC10 --\u003E C71 : relation10\nC11 --\u003E C78 : relation11\nC12 --\u003E C85 : relation12\nC13 --\u003E C92 : relation13\nC14 --\u003E C99 : relation14\nC15 --\u003E C6 : relation15\nC16 --\u003E C13 : relation16\nC17 --\u003E C20 : relation17\nC18 --\u003E C27 : relation18\nC19 --\u003E C34 : relation19\nC20 --\u003E C41 : relation20\nC21 --\u003E C48 : relation21\nC22 --\u003E C55 : relation22\nC23 --\u003E C62 : relation23\nC24 --\u003E C69 : relation24\nC25 --\u003E C76 : relation25\nC26 --\u003E C83 : relation26\nC27 --\u003E C90 : relation27\nC28 --\u003E C97 : relation28\nC29 --\u003E C4 : relation29\nC30 --\u003E C11 : relation30\nC31 --\u003E C18 : relation31\nC32 --\u003E C25 : relation32\nC33 --\u003E C32 : relation33\nC34 --\u003E C39 : relation34\nC35 --\u003E C46 : relation35\nC36 --\u003E C53 : relation36\nC37 --\u003E C60 : relation37\nC38 --\u003E C67 : relation38\nC39 --\u003E C74 : relation39\nC40 --\u003E C81 : relation40\nC41 --\u003E C88 : relation41\nC42 --\u003E C95 : relation42\nC43 --\u003E C2 : relation43\nC44 --\u003E C9 : relation44\nC45 --\u003E C16 : relation45\nC46 --\u003E C23 : relation46\nC47 --\u003E C30 : relation47\nC48 --\u003E C37 : relation48\nC49 --\u003E C44 : relation49\nC50 --\u003E C51 : relation50\nC51 --\u003E C58 : relation51\nC52 --\u003E C65 : relation52\nC53 --\u003E C72 : relation53\nC54 --\u003E C79 : relation54\nC55 --\u003E C86 : relation55\nC56 --\u003E C93 : relation56\nC57 --\u003E C0 : relation57\nC58 --\u003E C7 : relation58\nC59 --\u003E C14 : relation59\nC60 --\u003E C21 : relation60\nC61 --\u003E C28 : relation61\nC62 --\u003E C35 : relation62\nC63 --\u003E C42 : relation63\nC64 --\u003E C49 : relation64\nC65 --\u003E C56 : relation65\nC66 --\u003E C63 : relation66\nC67 --\u003E C70 : relation67\nC68 --\u003E C77 : relation68\nC69 --\u003E C84 : relation69\nC70 --\u003E C91 : relation70\nC71 --\u003E C98 : relation71\nC72 --\u003E C5 : relation72\nC73 --\u003E C12 : relation73\nC74 --\u003E C19 : relation74\nC75 --\u003E C26 : relation75\nC76 --\u003E C33 : relation76\nC77 --\u003E C40 : relation77\nC78 --\u003E C47 : relation78\nC79 --\u003E C54 : relation79\nC80 --\u003E C61 : relation80\nC81 --\u003E C68 : relation81\nC82 --\u003E C75 : relation82\nC83 --\u003E C82 : relation83\nC84 --\u003E C89 : relation84\nC85 --\u003E C96 : relation85\nC86 --\u003E C3 : relation86\nC87 --\u003E C10 : relation87\nC88 --\u003E C17 : relation88\nC89 --\u003E C24 : relation89\nC90 --\u003E C31 : relation90\nC91 --\u003E C38 : relation91\nC92 --\u003E C45 : relation92\nC93 --\u003E C52 : relation93\nC94 --\u003E C59 : relation94\nC95 --\u003E C66 : relation95\nC96 --\u003E C73 : relation96\nC97 --\u003E C80 : relation97\nC98 --\u003E C87 : relation98\nC99 --\u003E C94 : relation99\nC0 --\u003E C1 : relation100\nC1 --\u003E C8 : relation101\nC2 --\u003E C15 : relation102\nC3 --\u003E C22 : relation103\nC4 --\u003E C29 : relation104\nC5 --\u003E C36 : relation105\nC6 --\u003E C43 : relation106\nC7 --\u003E C50 : relation107\nC8 --\u003E C57 : relation108\nC9 --\u003E C64 : relation109\nC10 --\u003E C71 : relation110\nC11 --\u003E C78 : relation111\nC12 --\u003E C85 : relation112\nC13 --\u003E C92 : relation113\nC14 --\u003E C99 : relation114\nC15 --\u003E C6 : relation115\nC16 --\u003E C13 : relation116\nC17 --\u003E C20 : relation117\nC18 --\u003E C27 : relation118\nC19 --\u003E C34 : relation119\nC20 --\u003E C41 : relation120\nC21 --\u003E C48 : relation121\nC22 --\u003E C55 : relation122\nC23 --\u003E C62 : relation123\nC24 --\u003E C69 : relation124\nC25 --\u003E C76 : relation125\nC26 --\u003E C83 : relation126\nC27 --\u003E C90 : relation127\nC28 --\u003E C97 : relation128\nC29 --\u003E C4 : relation129\nC30 --\u003E C11 : relation130\nC31 --\u003E C18 : relation131\nC32 --\u003E C25 : relation132\nC33 --\u003E C32 : relation133\nC34 --\u003E C39 : relation134\nC35 --\u003E C46 : relation135\nC36 --\u003E C53 : relation136\nC37 --\u003E C60 : relation137\nC38 --\u003E C67 : relation138\nC39 --\u003E C74 : relation139\nC40 --\u003E C81 : relation140\nC41 --\u003E C88 : relation141\nC42 --\u003E C95 : relation142\nC43 --\u003E C2 : relation143\nC44 --\u003E C9 : relation144\nC45 --\u003E C16 : relation145\nC46 --\u003E C23 : relation146\nC47 --\u003E C30 : relation147\nC48 --\u003E C37 : relation148\nC49 --\u003E C44 : relation149\n",
+      "Samples": [
+        {
+          "Sample": 0,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "1D726EC0E80AC27DE9DE582A6CF99B292B5770C25F5BBEF09034E513B893C993",
+          "SourceScanIncludingAdapterSemanticsMs": 5.2395,
+          "RendererIncludingParsingLayoutSvgMs": 16.6771,
+          "StandaloneSanitisationMs": 12.0896,
+          "StandaloneSharpVectorsAndDrawingMs": 889.1551,
+          "CompletePresentationMs": 923.3691,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712132704,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712150112,
+          "PresentationCurrentThreadAllocatedBytes": 354458912,
+          "PresentationCollectionCounts": [
+            23,
+            8,
+            2
+          ],
+          "WorkingSetBefore": 310861824,
+          "WorkingSetAfter": 294850560,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 1,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "FD4DFE94EA1437D426A27B721B268E47832FC76CBCC92FFBAAA9718CAB07EE68",
+          "SourceScanIncludingAdapterSemanticsMs": 4.5564,
+          "RendererIncludingParsingLayoutSvgMs": 44.327,
+          "StandaloneSanitisationMs": 16.096,
+          "StandaloneSharpVectorsAndDrawingMs": 863.39,
+          "CompletePresentationMs": 865.114,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712135544,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712144840,
+          "PresentationCurrentThreadAllocatedBytes": 354390688,
+          "PresentationCollectionCounts": [
+            21,
+            5,
+            0
+          ],
+          "WorkingSetBefore": 294850560,
+          "WorkingSetAfter": 323579904,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 2,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "B0CDFF67B39631140DB3006803977D37470395DB7C7B57EE9871F91544095FE7",
+          "SourceScanIncludingAdapterSemanticsMs": 4.3124,
+          "RendererIncludingParsingLayoutSvgMs": 16.7498,
+          "StandaloneSanitisationMs": 13.5269,
+          "StandaloneSharpVectorsAndDrawingMs": 806.3499,
+          "CompletePresentationMs": 965.9268,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712128504,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712133840,
+          "PresentationCurrentThreadAllocatedBytes": 354385128,
+          "PresentationCollectionCounts": [
+            22,
+            6,
+            1
+          ],
+          "WorkingSetBefore": 323579904,
+          "WorkingSetAfter": 347230208,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 3,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "E6D3F1B24C1A087B33D5C7703EAA3EC750BD306F18A78CA5CCFFEC39A1615AA0",
+          "SourceScanIncludingAdapterSemanticsMs": 4.2361,
+          "RendererIncludingParsingLayoutSvgMs": 18.2639,
+          "StandaloneSanitisationMs": 9.8821,
+          "StandaloneSharpVectorsAndDrawingMs": 812.6689,
+          "CompletePresentationMs": 873.7383,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712128144,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712129848,
+          "PresentationCurrentThreadAllocatedBytes": 354384544,
+          "PresentationCollectionCounts": [
+            21,
+            6,
+            0
+          ],
+          "WorkingSetBefore": 347230208,
+          "WorkingSetAfter": 416436224,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 4,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "EFA272FE6EB0CDA542F05A67DFE906339AD0285E283B1919B7CAC67B4761A588",
+          "SourceScanIncludingAdapterSemanticsMs": 4.1577,
+          "RendererIncludingParsingLayoutSvgMs": 17.4263,
+          "StandaloneSanitisationMs": 12.5457,
+          "StandaloneSharpVectorsAndDrawingMs": 943.3448,
+          "CompletePresentationMs": 855.0446,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712134856,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712147312,
+          "PresentationCurrentThreadAllocatedBytes": 354390872,
+          "PresentationCollectionCounts": [
+            21,
+            6,
+            0
+          ],
+          "WorkingSetBefore": 416436224,
+          "WorkingSetAfter": 426885120,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 5,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "381261DC318176AE5FA19073DC517DF2AD3047CEBEED545C67AAE59AB6C8F1EE",
+          "SourceScanIncludingAdapterSemanticsMs": 4.1793,
+          "RendererIncludingParsingLayoutSvgMs": 17.1102,
+          "StandaloneSanitisationMs": 9.9475,
+          "StandaloneSharpVectorsAndDrawingMs": 800.104,
+          "CompletePresentationMs": 903.608,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712128424,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712129736,
+          "PresentationCurrentThreadAllocatedBytes": 354384552,
+          "PresentationCollectionCounts": [
+            21,
+            5,
+            0
+          ],
+          "WorkingSetBefore": 426885120,
+          "WorkingSetAfter": 492576768,
+          "CanonicalPixelsEqual": true
+        },
+        {
+          "Sample": 6,
+          "Execution": "Unique exact-source cache miss",
+          "SampleSourceSha256": "2506F42667E4F86D8758945043825555CC4E99C91B4CDC472026137CD92CF940",
+          "SourceScanIncludingAdapterSemanticsMs": 4.8246,
+          "RendererIncludingParsingLayoutSvgMs": 16.3121,
+          "StandaloneSanitisationMs": 14.6287,
+          "StandaloneSharpVectorsAndDrawingMs": 927.1518,
+          "CompletePresentationMs": 859.0559,
+          "CurrentThreadAllocatedBytesBeforePixelCheck": 712135136,
+          "AllThreadsAllocatedBytesBeforePixelCheck": 712141496,
+          "PresentationCurrentThreadAllocatedBytes": 354390768,
+          "PresentationCollectionCounts": [
+            21,
+            5,
+            0
+          ],
+          "WorkingSetBefore": 492576768,
+          "WorkingSetAfter": 440934400,
+          "CanonicalPixelsEqual": true
+        }
+      ]
+    }
+  ],
+  "Er100Entities150Relationships": {
+    "RenderSuccess": false,
+    "Error": "Diagram could not be rendered: The operation was canceled.",
+    "InteractionCompleted": false,
+    "Classification": "Renderer-only resource diagnostic; not a successful editor benchmark",
+    "LimitsUnchanged": true
+  }
+}

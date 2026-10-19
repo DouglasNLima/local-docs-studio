@@ -409,3 +409,23 @@ protected because the pinned renderer/parser cannot safely author those forms.
 Disabled commands explain their source restrictions. Use **Edit source** for
 protected syntax. The Class engineering report and delivery record identify
 revision-specific hosted acceptance and internal-preview certification.
+
+### Shared Mermaid editor workspace
+
+All five native editors retain exact element selection in their navigation lists.
+Long descriptions are available in full through tooltips and accessible names.
+Drag a panel divider, or focus it and use the arrow keys, to resize navigation,
+properties or expanded source. The selected identity and Update/Reset actions stay
+visible while properties scroll. Update or reset pending values before changing
+selection; toggling source does not discard them.
+
+Use **F** to Fit and **Ctrl+0** for Actual Size. **Ctrl+wheel** zooms around the
+pointer; the middle mouse button pans. Selecting an off-screen navigation entry
+reveals it without changing zoom. **Centre canonical layout** in Class/ER centres
+the existing Mermaider placement. State/Flowchart **Restore canonical layout** or
+**Auto layout** clears their temporary session placement. No positions are saved
+in Mermaid source. Expand source to validate, copy or inspect the original draft.
+
+In Flowchart, **Home** resets the viewport when focus is outside the navigation
+list or a selector. Focused lists and selectors retain native Home/End and arrow
+key navigation, including extended selection where supported.

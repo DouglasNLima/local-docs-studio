@@ -63,6 +63,7 @@ public sealed class ClassDiagramSourceParser
     internal static bool PortableType(string? type) => type is null || type.Length <= 2000 && Pattern(@"^[\p{L}_][\p{L}\p{M}\p{N}_]*(?:\.[\p{L}_][\p{L}\p{M}\p{N}_]*)*(?:~[\p{L}_][\p{L}\p{M}\p{N}_]*~)?(?:\[\])*\??$").IsMatch(type);
     public ClassDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("source.scan.Class");
         cancellationToken.ThrowIfCancellationRequested();
         try { return ParseCore(source, cancellationToken); }
         catch (RegexMatchTimeoutException) { return Invalid(source, "The Class source scan exceeded its safe time budget. The source is unchanged; use Edit source."); }

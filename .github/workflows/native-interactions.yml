@@ -1,7 +1,7 @@
 name: Validate native workspace and Mermaid interactions
 on:
   push:
-    branches: ['feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor']
+    branches: ['feature/native-mermaid-suite-ux-performance', 'feature/native-mermaid-class-visual-editor', 'feature/native-mermaid-er-visual-editor']
   pull_request:
     branches: [develop, 'feature/native-workspace-mermaid-interaction-stability']
   workflow_dispatch:
@@ -16,6 +16,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
@@ -38,6 +40,8 @@ jobs:
         appearance: [normal, high-contrast]
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'

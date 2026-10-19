@@ -1,0 +1,43 @@
+{
+  "Status": "PASS",
+  "ActualHighContrastRequested": false,
+  "Measurements": [
+    {
+      "Entities": 10,
+      "Relationships": 15,
+      "EditorOpenIncludingUiaMilliseconds": 461.7265,
+      "TwentyEntitySelectionsMilliseconds": 1851.2038,
+      "TwentyAttributeSelectionsMilliseconds": 385.4811,
+      "TwentyRelationshipSelectionsMilliseconds": 397.6669,
+      "WorkingSetBeforeEditor": 175038464,
+      "WorkingSetAfterInteractions": 227217408,
+      "ActualEndpointDrag": "ER endpoint drag updates: 21; maximum update: 0.073 ms; update allocated bytes: 10912; UI-thread allocated bytes: 679320; duration: 2565.2 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "Entities": 30,
+      "Relationships": 60,
+      "EditorOpenIncludingUiaMilliseconds": 885.1448,
+      "TwentyEntitySelectionsMilliseconds": 2022.0721,
+      "TwentyAttributeSelectionsMilliseconds": 427.4518,
+      "TwentyRelationshipSelectionsMilliseconds": 505.995,
+      "WorkingSetBeforeEditor": 195768320,
+      "WorkingSetAfterInteractions": 271101952,
+      "ActualEndpointDrag": "ER endpoint drag updates: 20; maximum update: 0.066 ms; update allocated bytes: 10368; UI-thread allocated bytes: 1799656; duration: 2395.6 ms. No parsing, layout or SVG conversion during movement.",
+      "DragLimitation": null,
+      "SourceExact": true,
+      "ProcessResponding": true
+    },
+    {
+      "Entities": 100,
+      "Relationships": 150,
+      "ResourceLimit": "Diagram could not be rendered: The operation was canceled.",
+      "FailureStage": "Preflight",
+      "NativeEditorOpened": false,
+      "LimitsUnchanged": true
+    }
+  ],
+  "Scope": "Real disposable native process; timings include UIA transport and cold conversion. Resource failures and pointer limitations remain explicit. No rendering limits changed."
+}

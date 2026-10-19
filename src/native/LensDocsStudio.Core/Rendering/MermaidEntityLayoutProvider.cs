@@ -8,12 +8,16 @@ namespace LensDocsStudio.Core.Rendering;
 /// This avoids turning escaped delimiters into syntax, and keeps preview/export text and measurements consistent.</summary>
 internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider inner) : IGraphLayoutProvider
 {
+    internal Action? BeforeLayout { get; set; }
+    internal Action? AfterLayout { get; set; }
     // This provider belongs to one render call. Never install it on MermaidRenderer globally.
     public PositionedGraph? Flowchart { get; private set; }
     public MermaidGraph? FlowchartSemantics { get; private set; }
     public IReadOnlyList<FlowchartGroupIdentity> Groups { get; private set; } = [];
     public PositionedGraph LayoutFlowchart(MermaidGraph graph, RenderOptions? options = null, StrictStylingOptions? strict = null)
     {
+        BeforeLayout?.Invoke();
+        using var layoutPhase = MermaidDiagnostics.Measure("renderer.layout.graph");
         var decoded = DecodeSemantics(graph);
         // Layout adds visual wrapping to labels. Retain the complete decoded semantics
         // at the renderer boundary so wrapping cannot be mistaken for a source change.
@@ -27,6 +31,7 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             Groups = Array.AsReadOnly(positioned.Groups.Select(FreezeGroup).ToArray()),
             Notes = Array.AsReadOnly(positioned.Notes.ToArray())
         };
+        layoutPhase?.Dispose(); AfterLayout?.Invoke();
         return positioned;
     }
     internal static MermaidGraph DecodeSemantics(MermaidGraph graph) => graph with
@@ -48,6 +53,8 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
     public PositionedClassDiagram? ClassLayout { get; private set; }
     public PositionedClassDiagram LayoutClass(ClassDiagram diagram)
     {
+        BeforeLayout?.Invoke();
+        using var layoutPhase = MermaidDiagnostics.Measure("renderer.layout.Class");
         static IReadOnlyList<ClassMember> Members(IReadOnlyList<ClassMember> items) => Array.AsReadOnly(items.ToArray());
         ClassSemantics = diagram with {
             Classes = Array.AsReadOnly(diagram.Classes.Select(item => item with { Attributes = Members(item.Attributes), Methods = Members(item.Methods) }).ToArray()),
@@ -60,18 +67,22 @@ internal sealed partial class MermaidEntityLayoutProvider(IGraphLayoutProvider i
             Classes = Array.AsReadOnly(positioned.Classes.Select(item => item with { Attributes = Members(item.Attributes), Methods = Members(item.Methods) }).ToArray()),
             Relationships = Array.AsReadOnly(positioned.Relationships.Select(item => item with { Points = Array.AsReadOnly(item.Points.ToArray()) }).ToArray()),
             Namespaces = Array.AsReadOnly(positioned.Namespaces.ToArray()), Notes = Array.AsReadOnly(positioned.Notes.ToArray()) };
+        layoutPhase?.Dispose(); AfterLayout?.Invoke();
         return positioned;
     }
     public ErDiagram? ErSemantics { get; private set; }
     public PositionedErDiagram? ErLayout { get; private set; }
     public PositionedErDiagram LayoutEr(ErDiagram diagram)
     {
+        BeforeLayout?.Invoke();
+        using var layoutPhase = MermaidDiagnostics.Measure("renderer.layout.ER");
         // Capture this render's inputs and output; never run a second layout to infer identities.
         static IReadOnlyList<ErAttributeInfo> Attributes(IReadOnlyList<ErAttributeInfo> values) => Array.AsReadOnly(values.Select(value => value with { Keys = Array.AsReadOnly(value.Keys.ToArray()) }).ToArray());
         ErSemantics = diagram with { Entities = Array.AsReadOnly(diagram.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()), Relationships = Array.AsReadOnly(diagram.Relationships.ToArray()) };
         var positioned = inner.LayoutEr(diagram);
         ErLayout = positioned with { Entities = Array.AsReadOnly(positioned.Entities.Select(entity => entity with { Attributes = Attributes(entity.Attributes) }).ToArray()),
             Relationships = Array.AsReadOnly(positioned.Relationships.Select(relationship => relationship with { Points = Array.AsReadOnly(relationship.Points.ToArray()) }).ToArray()) };
+        layoutPhase?.Dispose(); AfterLayout?.Invoke();
         return positioned;
     }
     private static MermaidSubgraph DecodeGroup(MermaidSubgraph group) => group with { Label = Decode(group.Label), Children = group.Children.Select(DecodeGroup).ToArray() };

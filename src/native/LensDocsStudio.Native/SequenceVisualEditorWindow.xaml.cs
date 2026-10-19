@@ -22,6 +22,7 @@ public partial class SequenceVisualEditorWindow : Window
     private readonly Action? editSource;
     private readonly string diagramTheme;
     private readonly CancellationTokenSource lifetime = new();
+    private readonly TaskCompletionSource closedCleanup = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly SemaphoreSlim renderGate = new(1, 1);
     private CancellationTokenSource? pendingRender;
     private readonly MermaidSourceHighlighting highlighting;
@@ -65,7 +66,12 @@ public partial class SequenceVisualEditorWindow : Window
             catch (OperationCanceledException) { }
         };
         Closing += ConfirmClose;
-        Closed += (_, _) => { closed = true; renderGeneration++; lifetime.Cancel(); };
+        Closed += async (_, _) =>
+        {
+            using var cleanupPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.cleanup.Sequence");
+            closed = true; renderGeneration++; pendingRender?.Cancel(); lifetime.Cancel();
+            await renderGate.WaitAsync(); renderGate.Release(); renderGate.Dispose(); lifetime.Dispose(); closedCleanup.SetResult();
+        };
         Deactivated += (_, _) => EndPan();
     }
     public async void ApplyTheme(string theme)
@@ -78,7 +84,7 @@ public partial class SequenceVisualEditorWindow : Window
         updating = true;
         try
         {
-            SourceEditor.Text = draft.Source;
+            if (SourceEditor.Text != draft.Source) SourceEditor.Text = draft.Source;
             Participants.ItemsSource = draft.Model.Participants.Select(item => new Choice("participant:" + item.Id, item.Id + " · " + item.Label)).ToArray();
             var descriptions = draft.Model.Messages.Select((item, index) => (item.Identity, Text: "Message " + (index + 1) + " · " + item.Sender + " → " + item.Recipient + ": " + item.Text)).ToDictionary(item => item.Identity, item => item.Text);
             Interactions.ItemsSource = draft.Model.Statements.Where(item => item.Kind is SequenceStatementKind.Message or SequenceStatementKind.Note or SequenceStatementKind.Activation or SequenceStatementKind.Block)
@@ -86,7 +92,7 @@ public partial class SequenceVisualEditorWindow : Window
             RestoreSelection(); ShowProperties();
         }
         finally { updating = false; }
-        await RenderAsync(fit); UpdateActions();
+        await RenderAsync(fit); if (!closed && !fit) await Dispatcher.InvokeAsync(RevealSelection, System.Windows.Threading.DispatcherPriority.Loaded); UpdateActions();
     }
     private async Task RenderAsync(bool fit)
     {
@@ -108,10 +114,10 @@ public partial class SequenceVisualEditorWindow : Window
                 NativeSequencePresentation? presentation = null; string? diagnostic = null;
                 if (model.CanEdit)
                 {
-                    try { presentation = NativeSequencePresentation.Create(model, render, svg); }
+                    try { presentation = NativeSequencePresentation.Create(model, render, svg, cancellation.Token); }
                     catch (Exception error) when (error is ArgumentException or InvalidDataException or FormatException) { diagnostic = error.Message; }
                 }
-                var drawing = presentation?.Drawing ?? (render.Success ? svg.Render(render.Svg!) : null);
+                var drawing = presentation?.Drawing ?? (render.Success ? svg.RenderCanonical(render, svg.Prepare(render.Svg!), cancellationToken: cancellation.Token) : null);
                 return (presentation, drawing, diagnostic);
             }, cancellation.Token);
             if (closed || version != renderGeneration) return;
@@ -120,6 +126,7 @@ public partial class SequenceVisualEditorWindow : Window
             Surface.Width = CanonicalImage.Width; Surface.Height = CanonicalImage.Height;
             if (presentation is not null)
             {
+                using var overlayPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.overlay.Sequence");
                 foreach (var target in presentation.Targets)
                 {
                     var button = new ToggleButton { Width = Math.Max(10, target.Bounds.Width), Height = Math.Max(10, target.Bounds.Height),
@@ -137,7 +144,7 @@ public partial class SequenceVisualEditorWindow : Window
             if (render.Error is not null) Status.Text = render.Error;
             else if (diagnostic is not null) Status.Text = diagnostic;
             else if (presentation?.Diagnostics.Count > 0) Status.Text = string.Join(" ", presentation.Diagnostics);
-            if (fit) { Surface.UpdateLayout(); Fit(this, new()); }
+            if (fit) { Surface.UpdateLayout(); Fit(this, new()); if (Zoom.Value < Controls.MermaidWorkspace.MinimumInitialFitPercent) { Zoom.Value = 100; Viewport.ScrollToHorizontalOffset(0); Viewport.ScrollToVerticalOffset(0); } }
         }
         catch (OperationCanceledException) { }
         catch (Exception error) when (error is not OutOfMemoryException)
@@ -153,19 +160,44 @@ public partial class SequenceVisualEditorWindow : Window
             if (!closed && version == renderGeneration) UpdateActions();
         }
     }
+    private void RevealSelection()
+    { var target = targets.FirstOrDefault(item => item.Value == draft.Selection).Key; if (target is not null) Controls.MermaidWorkspace.Reveal(target, Viewport); }
     private void RestoreSelection()
     {
-        Participants.SelectedItem = Participants.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
-        Interactions.SelectedItem = Interactions.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+        foreach (var list in new[] { Participants, Interactions })
+        {
+            var selected = list.Items.OfType<Choice>().FirstOrDefault(item => item.Identity == draft.Selection);
+            var changed = !Equals(list.SelectedItem, selected); list.SelectedItem = selected;
+            if (changed && selected is not null) Controls.MermaidWorkspace.RevealNavigation(list, selected);
+        }
     }
     private void SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (updating || sender is not ListBox list || list.SelectedItem is not Choice item) return; Select(item.Identity);
+        if (updating || sender is not ListBox list || list.SelectedItem is not Choice item) return; Select(item.Identity); if (draft.Selection == item.Identity && !PropertiesPending) RevealSelection();
     }
     private void Select(string identity)
     {
+        using var selectionPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("editor.selection.Sequence");
         if (busy || SourcePending || PropertiesPending)
-        { Status.Text = "Update or discard pending properties and validate source before changing selection."; updating = true; try { RestoreSelection(); UpdateSelectionOverlay(); } finally { updating = false; } return; }
+        {
+            Status.Text = "Update or discard pending properties and validate source before changing selection.";
+            var navigationFocus = Participants.IsKeyboardFocusWithin || Interactions.IsKeyboardFocusWithin;
+            Controls.MermaidWorkspace.DeferNavigation(Participants, () =>
+            {
+                updating = true;
+                try
+                {
+                    RestoreSelection(); UpdateSelectionOverlay();
+                    if (navigationFocus && (Participants.IsKeyboardFocusWithin || Interactions.IsKeyboardFocusWithin))
+                    {
+                        var retainedList = Participants.SelectedItem is not null ? Participants : Interactions;
+                        if (retainedList.SelectedItem is { } retained) Controls.MermaidWorkspace.RevealNavigation(retainedList, retained, true);
+                    }
+                }
+                finally { updating = false; }
+            });
+            return;
+        }
         draft.Select(identity); updating = true;
         try { RestoreSelection(); ShowProperties(); UpdateSelectionOverlay(); } finally { updating = false; }
         UpdateActions();
@@ -174,6 +206,7 @@ public partial class SequenceVisualEditorWindow : Window
     { var previous = updating; updating = true; try { foreach (var pair in targets) pair.Key.IsChecked = pair.Value == draft.Selection; } finally { updating = previous; } }
     private void ShowProperties()
     {
+        Controls.MermaidWorkspace.Inspect(InspectorViewport, draft.Selection);
         mode = "inspect"; ParticipantFields.Visibility = MessageFields.Visibility = NoteFields.Visibility = LabelFields.Visibility = InsertionFields.Visibility = Visibility.Collapsed;
         Dependencies.Text = ""; Summary.Text = "Select a participant, message or note.";
         var ids = draft.Model.Participants.Select(item => item.Id).ToArray();
@@ -216,7 +249,8 @@ public partial class SequenceVisualEditorWindow : Window
             else if (draft.Model.Statements.FirstOrDefault(item => item.Identity == draft.Selection) is { } statement)
             { Summary.Text = "Protected " + statement.Kind; Dependencies.Text = statement.Span.Read(draft.Source) + ". Use Edit source for structural changes."; }
         }
-        markerBaseline = Marker.SelectedItem as string ?? "None"; baseline = Values;
+        markerBaseline = Marker.SelectedItem as string ?? "None"; ContextDescription.Text = Participants.Items.OfType<Choice>().Concat(Interactions.Items.OfType<Choice>()).FirstOrDefault(item => item.Identity == draft.Selection)?.Description ?? "";
+        baseline = Values;
     }
     private string? MessageIdentity => draft.Model.Activations.FirstOrDefault(item => item.Identity == draft.Selection)?.MessageIdentity ?? draft.Selection;
     private void UpdateActions()
@@ -235,6 +269,7 @@ public partial class SequenceVisualEditorWindow : Window
         if (implicitParticipant) { ParticipantFields.IsEnabled = LabelFields.IsEnabled = false; UpdateButton.IsEnabled = false; }
         SetAction(DeleteButton, DeleteOperation()); SetAction(DuplicateButton, draft.Model.Messages.Any(item => item.Identity == draft.Selection) ? new DuplicateSequenceMessage(draft.Selection!) : null);
         SetAction(EarlierButton, MoveOperation(-1)); SetAction(LaterButton, MoveOperation(1));
+        InspectorState.Text = pending ? "Pending properties" : SourcePending ? "Source validation required" : !ready ? "Apply unavailable" : draft.Selection is null ? "Ready" : LabelFields.Visibility == Visibility.Visible && LabelFields.IsEnabled ? "Editable" : "Protected source";
         Title = "Mermaid Visual Editor / Sequence" + (draft.Source != draft.OriginalSource || pending || SourcePending ? " •" : "");
         void SetAction(Button button, SequenceEditOperation? operation)
         {
@@ -260,7 +295,7 @@ public partial class SequenceVisualEditorWindow : Window
         updating = true; try
         {
             anchor = draft.Model.Statements.Any(item => item.Identity == draft.Selection && item.Kind is SequenceStatementKind.Message or SequenceStatementKind.Note) ? draft.Selection : null;
-            ShowProperties(); mode = kind; Summary.Text = "New " + kind; LabelFields.Visibility = Visibility.Visible;
+            ShowProperties(); mode = kind; Summary.Text = "New " + kind; ContextDescription.Text = ""; LabelFields.Visibility = Visibility.Visible;
             ParticipantFields.Visibility = kind == "participant" ? Visibility.Visible : Visibility.Collapsed;
             MessageFields.Visibility = kind == "message" ? Visibility.Visible : Visibility.Collapsed;
             NoteFields.Visibility = kind == "note" ? Visibility.Visible : Visibility.Collapsed;
@@ -297,6 +332,7 @@ public partial class SequenceVisualEditorWindow : Window
     private async Task Execute(IReadOnlyList<SequenceEditOperation> operations)
     {
         if (!CanEdit) return; busy = true; UpdateActions();
+        var existingStatements = draft.Model.Statements.Select(item => item.Identity).ToHashSet(StringComparer.Ordinal);
         try
         {
             var result = await draft.ExecuteBatchAsync(operations, lifetime.Token); if (closed) return;
@@ -304,6 +340,11 @@ public partial class SequenceVisualEditorWindow : Window
             {
                 if (operations.FirstOrDefault() is UpdateSequenceParticipant rename) draft.Select("participant:" + rename.NewId);
                 else if (operations.FirstOrDefault() is AddSequenceParticipant add) draft.Select("participant:" + add.Id);
+                else if (operations.Any(item => item is AddSequenceMessage or AddSequenceNote or DuplicateSequenceMessage))
+                {
+                    var inserted = draft.Model.Statements.Where(item => !existingStatements.Contains(item.Identity) && item.Kind is SequenceStatementKind.Message or SequenceStatementKind.Note).ToArray();
+                    if (inserted.Length == 1) draft.Select(inserted[0].Identity);
+                }
                 await RefreshAsync();
             }
             else Status.Text = result.Error;
@@ -362,15 +403,18 @@ public partial class SequenceVisualEditorWindow : Window
             Background = (Brush)FindResource("WindowBrush"), Foreground = (Brush)FindResource("TextBrush") };
         new Window { Owner = this, Title = "Original portable Mermaid", Width = 700, Height = 450, Content = editor, WindowStartupLocation = WindowStartupLocation.CenterOwner }.Show();
     }
+    private void CopySource(object sender, RoutedEventArgs e)
+    { try { Clipboard.SetText(SourceEditor.Text); Status.Text = "Mermaid draft source copied."; } catch (System.Runtime.InteropServices.ExternalException) { Status.Text = "The clipboard is unavailable. Select and copy the source directly."; } }
+    private void ToggleSource(object sender, RoutedEventArgs e) => SourcePanel.IsExpanded = !SourcePanel.IsExpanded;
     private void Preview(object sender, RoutedEventArgs e)
     { if (CanonicalImage.Source is { } drawing) new Window { Owner = this, Title = "Rendered Sequence preview", Width = 850, Height = 600, Content = new ScrollViewer { Content = new Image { Source = drawing, Stretch = Stretch.None }, HorizontalScrollBarVisibility = ScrollBarVisibility.Auto }, Background = (Brush)FindResource("WindowBrush") }.Show(); }
     private void ZoomChanged(object sender, RoutedPropertyChangedEventArgs<double> e) { if (Scale is not null) Scale.ScaleX = Scale.ScaleY = Zoom.Value / 100; }
-    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.2;
-    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.2;
+    private void ZoomIn(object sender, RoutedEventArgs e) => Zoom.Value *= 1.15;
+    private void ZoomOut(object sender, RoutedEventArgs e) => Zoom.Value /= 1.15;
     private void ActualSize(object sender, RoutedEventArgs e) => Zoom.Value = 100;
     private void Fit(object sender, RoutedEventArgs e)
     { if (Surface.Width > 0 && Surface.Height > 0) Zoom.Value = Math.Clamp(Math.Min((Viewport.ViewportWidth - 20) / Surface.Width, (Viewport.ViewportHeight - 20) / Surface.Height) * 100, .1, 100); }
-    private void Wheel(object sender, MouseWheelEventArgs e) { if (Keyboard.Modifiers != ModifierKeys.Control) return; Zoom.Value *= e.Delta > 0 ? 1.1 : 1 / 1.1; e.Handled = true; }
+    private void Wheel(object sender, MouseWheelEventArgs e) => Controls.MermaidWorkspace.ZoomAtPointer(Viewport, Zoom, e);
     private void PanStart(object sender, MouseButtonEventArgs e)
     { if (e.ChangedButton != MouseButton.Middle) return; pan = e.GetPosition(Viewport); panHorizontal = Viewport.HorizontalOffset; panVertical = Viewport.VerticalOffset; Viewport.CaptureMouse(); Viewport.Cursor = Cursors.Hand; e.Handled = true; }
     private void PanMove(object sender, MouseEventArgs e)

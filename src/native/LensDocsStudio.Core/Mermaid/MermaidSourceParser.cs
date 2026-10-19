@@ -16,6 +16,7 @@ public sealed class MermaidSourceParser
 
     public MermaidDiagramModel Parse(string source, CancellationToken cancellationToken = default)
     {
+        using var diagnosticPhase = LensDocsStudio.Core.Rendering.MermaidDiagnostics.Measure("source.scan.Flowchart");
         var occurrences = new List<MermaidOccurrence>(); var edges = new List<MermaidEdge>();
         var groups = new List<MermaidSubgraph>(); var styles = new List<MermaidStyle>();
         var protectedRegions = new List<MermaidProtectedRegion>(); var stack = new Stack<GroupDraft>();
@@ -157,7 +158,8 @@ public sealed class MermaidSourceParser
             var compatibility = error is null ? (partialReasons.Count == 0 ? MermaidCompatibility.Editable : MermaidCompatibility.PartiallyEditable) : MermaidCompatibility.Protected;
             if (error is null)
             {
-                var graph = MermaidRenderer.Parse(source);
+                Mermaider.Models.MermaidGraph graph;
+                using (Rendering.MermaidDiagnostics.Measure("renderer.parse.flowchart-source")) graph = MermaidRenderer.Parse(source);
                 if (graph.Nodes.Count != nodes.Length || graph.Edges.Count != edges.Count
                     || nodes.Any(node => !graph.Nodes.TryGetValue(node.Id, out var parsed) || parsed.Label != RendererLabel(node, source) || parsed.Shape.ToString() != RendererShape(node.Shape))
                     || edges.Where((edge, index) => graph.Edges[index].Source != edge.Source.Id || graph.Edges[index].Target != edge.Target.Id
