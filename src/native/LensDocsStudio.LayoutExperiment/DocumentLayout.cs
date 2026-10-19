@@ -50,7 +50,8 @@ internal static class DocumentLayout
             this.model = model; this.cancellation = cancellation; this.appearance = appearance; highContrast = appearance.StartsWith("HC:", StringComparison.Ordinal);
             foreground = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 0) : appearance == "Dark" ? "#E8EAED" : "#202124");
             surface = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 1) : appearance == "Dark" ? "#292B2F" : "#F3F4F6");
-            linkBrush = highContrast ? Brush(ExperimentAppearance.Slot(appearance, 5)) : Brush(appearance == "Dark" ? "#87CEFA" : "#4169E1");
+            // Match NativeMarkdownRenderer: links retain its dark/light palette in HC.
+            linkBrush = Brush(ExperimentAppearance.IsDark(appearance) ? "#87CEFA" : "#4169E1");
         }
         private static SolidColorBrush Brush(string colour) { var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); brush.Freeze(); return brush; }
         private void Rectangle(Brush? fill, Pen? pen, Rect rectangle)
@@ -99,13 +100,12 @@ internal static class DocumentLayout
                     var actionX = x; var actionTop = top; var actionBottom = top;
                     foreach (var label in new[] { "Zoom", "SVG", "PNG", "Copy source" })
                     {
-                        var labelRun = new StyledRun(0, label, 0, false, false, false);
-                        var labelModel = model with { Text = label, Items = [new(0, label.Length, 0, 0, [labelRun])] };
-                        var labelNode = node with { Paragraph = 0, Children = [] };
-                        var labelProps = new Properties(labelRun, 15, false, foreground, surface);
-                        var labelSource = new ParagraphSource(labelModel, labelModel.Items[0], labelNode, _ => labelProps, width, labelProps);
-                        using var labelLine = formatter.FormatLine(labelSource, 0, 10000, new ParagraphProperties(labelProps, TextAlignment.Left), null);
-                        var slotWidth = labelLine.Width + 26; var slotHeight = labelLine.Height + 12;
+                        // Native button chrome changes with the actual OS theme. Measure
+                        // this real public control on the layout STA, before completion.
+                        var button = new System.Windows.Controls.Button { Content = label, FontFamily = new FontFamily("Segoe UI"), FontSize = 15,
+                            Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
+                        button.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+                        var slotWidth = button.DesiredSize.Width; var slotHeight = button.DesiredSize.Height;
                         if (actionX > x && actionX + slotWidth > x + width) { actionX = x; actionTop = actionBottom; }
                         Controls.Add(new(node.Id, label, new Rect(actionX, actionTop, slotWidth, slotHeight)));
                         actionX += slotWidth; actionBottom = Math.Max(actionBottom, actionTop + slotHeight);

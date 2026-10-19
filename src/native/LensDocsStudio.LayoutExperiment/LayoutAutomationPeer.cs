@@ -298,7 +298,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             if (attributeId == TextPatternIdentifiers.ForegroundColorAttribute.Id)
             {
                 var appearance = Current.Appearance; var hc = appearance.StartsWith("HC:", StringComparison.Ordinal);
-                var colour = hc ? ExperimentAppearance.Slot(appearance, run.Link is null ? 0 : 5) : run.Link is not null ? appearance == "Dark" ? "#87CEFA" : "#4169E1" : run.Colour is not null ? "#" + run.Colour : appearance == "Dark" ? "#E8EAED" : "#202124";
+                var colour = run.Link is not null ? ExperimentAppearance.IsDark(appearance) ? "#87CEFA" : "#4169E1" : hc ? ExperimentAppearance.Slot(appearance, 0) : run.Colour is not null ? "#" + run.Colour : appearance == "Dark" ? "#E8EAED" : "#202124";
                 var value = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colour);
                 return value.R << 16 | value.G << 8 | value.B;
             }
@@ -407,7 +407,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         public void Select() { _ = Current; Peer.Surface.Select(start, end); }
         public void AddToSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
         public void RemoveFromSelection() { _ = Current; throw new InvalidOperationException("Only one text selection is supported."); }
-        public void ScrollIntoView(bool alignToTop) { _ = Current; Peer.Surface.Reveal(alignToTop ? start : end); }
+        public void ScrollIntoView(bool alignToTop) { _ = Current; Peer.Surface.ScrollRange(start, end, alignToTop); }
         public IRawElementProviderSimple[] GetChildren() { _ = Current; return Peer.Children(start, end); }
     }
 }

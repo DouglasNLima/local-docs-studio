@@ -18,8 +18,28 @@ internal sealed class LayoutSurface : Panel
     public List<string> KeyHistory { get; } = [];
     public List<object> MouseHistory { get; } = [];
     public List<object> InteractionStages { get; } = [];
-    private readonly Dictionary<int, DrawingGroup> selectionPaint = [];
-    private readonly Queue<int> selectionPaintOrder = [];
+    private (SemanticNode Node, Point Point)? pressedLink;
+    private SelectionOverlay? mediaSelection;
+    private sealed class SelectionOverlay(LayoutSurface owner) : FrameworkElement
+    { protected override void OnRender(DrawingContext context) => owner.DrawMediaSelection(context); }
+    private static Brush SelectionBrush(string appearance)
+    {
+        // WPF's stock scroll viewer draws a translucent system selection wash,
+        // retaining the actual text/image underneath it.
+        var brush = new SolidColorBrush(appearance.StartsWith("HC:", StringComparison.Ordinal)
+            ? (Color)ColorConverter.ConvertFromString(ExperimentAppearance.Slot(appearance, 3)) : SystemColors.HighlightColor) { Opacity = .4 };
+        brush.Freeze(); return brush;
+    }
+    private void DrawMediaSelection(DrawingContext context)
+    {
+        if (Snapshot is not { } snapshot || Start == End) return;
+        var brush = SelectionBrush(snapshot.Appearance);
+        foreach (var id in snapshot.Controls.Select(control => control.Node).Distinct())
+        {
+            var node = snapshot.Model.Root.Descendants().First(value => value.Id == id);
+            if (node.Start < End && node.End > Start && snapshot.NodeBounds.TryGetValue(id, out var bounds)) context.DrawRectangle(brush, null, bounds);
+        }
+    }
     private ClipboardDispatcher? clipboard;
     private CancellationTokenSource? selectedCopy;
     private (LayoutSnapshot Snapshot, int Start, int End, uint Sequence, long Requested)? pendingCopy;
@@ -106,17 +126,18 @@ internal sealed class LayoutSurface : Panel
     protected override AutomationPeer OnCreateAutomationPeer() => new LayoutAutomationPeer(this);
     public void Install(LayoutSnapshot? snapshot)
     {
-        selectedCopy?.Cancel(); pendingCopy = null; selectionPaint.Clear(); selectionPaintOrder.Clear();
-        foreach (Button button in Children) button.IsEnabled = false;
-        Children.Clear();
+        selectedCopy?.Cancel(); pendingCopy = null; pressedLink = null;
+        foreach (var button in Children.OfType<Button>()) button.IsEnabled = false;
+        Children.Clear(); mediaSelection = null;
         if (snapshot is not null)
             foreach (var box in snapshot.Controls)
             {
                 var button = new Button { Content = box.Label, Tag = box, FontFamily = new("Segoe UI"), FontSize = 15,
-                    Padding = new Thickness(8, 3, 8, 3), Margin = new Thickness(0, 4, 8, 0), BorderThickness = new Thickness(1) };
+                    Padding = new Thickness(8, 3, 8, 3), Margin = new Thickness(0, 4, 8, 0) };
                 System.Windows.Automation.AutomationProperties.SetAutomationId(button, "ExperimentalDiagram" + box.Label.Replace(" ", "", StringComparison.Ordinal) + "-" + snapshot.Version + "-" + box.Node);
                 button.Click += (_, _) => MediaAction?.Invoke(box); Children.Add(button);
             }
+        if (snapshot is not null) { mediaSelection = new SelectionOverlay(this) { IsHitTestVisible = false, Focusable = false }; Children.Add(mediaSelection); }
         Snapshot = snapshot; Anchor = Active = 0;
         if (snapshot is not null && Scroller is not null)
         {
@@ -134,6 +155,7 @@ internal sealed class LayoutSurface : Panel
         Anchor = Math.Clamp(anchor, 0, length); Active = Math.Clamp(active, 0, length);
         SelectionUpdated?.Invoke();
         InvalidateVisual(); (UIElementAutomationPeer.FromElement(this) as LayoutAutomationPeer)?.SelectionChanged();
+        mediaSelection?.InvalidateVisual();
     }
     public void Copy()
     {
@@ -178,11 +200,12 @@ internal sealed class LayoutSurface : Panel
     }
     protected override Size MeasureOverride(Size available)
     {
-        foreach (Button button in Children) { var box = (ControlBox)button.Tag; button.Measure(box.Bounds.Size); }
+        foreach (var button in Children.OfType<Button>()) { var box = (ControlBox)button.Tag; button.Measure(box.Bounds.Size); }
+        mediaSelection?.Measure(new Size(Snapshot?.Width ?? 0, Snapshot?.Height ?? 0));
         return Snapshot is { } snapshot ? new(snapshot.Width - SystemParameters.VerticalScrollBarWidth, snapshot.Height) : new(0, 0);
     }
     protected override Size ArrangeOverride(Size finalSize)
-    { foreach (Button button in Children) button.Arrange(((ControlBox)button.Tag).Bounds); return finalSize; }
+    { foreach (var button in Children.OfType<Button>()) button.Arrange(((ControlBox)button.Tag).Bounds); mediaSelection?.Arrange(new Rect(finalSize)); return finalSize; }
     protected override void OnRender(DrawingContext context)
     {
         var snapshot = Snapshot; if (snapshot is null) return;
@@ -192,6 +215,8 @@ internal sealed class LayoutSurface : Panel
         if (snapshot.Decorations is not null) context.DrawDrawing(snapshot.Decorations);
         var top = Scroller?.VerticalOffset ?? 0; var bottom = top + (Scroller?.ViewportHeight ?? ActualHeight);
         var viewport = new Rect(Scroller?.HorizontalOffset ?? 0, top, Scroller?.ViewportWidth ?? ActualWidth, bottom - top);
+        var selectionBrush = SelectionBrush(snapshot.Appearance);
+        var mediaParagraphs = snapshot.Controls.Select(control => control.Node).Distinct().Select(id => snapshot.Model.Root.Descendants().First(node => node.Id == id).Paragraph).ToHashSet();
         foreach (var line in snapshot.Lines)
         {
             if (line.Hidden || line.Top + line.Height < top) continue;
@@ -201,21 +226,8 @@ internal sealed class LayoutSurface : Panel
             {
                 if (matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
                     foreach (var bounds in cluster.Bounds) context.DrawRectangle(SystemColors.HighlightBrush, null, bounds);
-                if (cluster.End > Start && cluster.Start < End)
-                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(SystemColors.HighlightBrush, null, bounds);
-            }
-            if (line.Start < End && line.End > Start || matches.Any(match => match.Start < line.End && match.End > line.Start))
-            {
-                var mask = new GeometryGroup();
-                foreach (var cluster in line.Clusters)
-                    if (cluster.End > Start && cluster.Start < End || matches.Any(match => match.End > cluster.Start && match.Start < cluster.End))
-                        foreach (var bounds in cluster.Bounds) mask.Children.Add(new RectangleGeometry(bounds));
-                if (!selectionPaint.TryGetValue(line.Start, out var ink))
-                {
-                    ink = SelectionInk.Create(line.Drawing, snapshot.Appearance); selectionPaint.Add(line.Start, ink); selectionPaintOrder.Enqueue(line.Start);
-                    while (selectionPaintOrder.Count > 64) selectionPaint.Remove(selectionPaintOrder.Dequeue());
-                }
-                context.PushClip(mask); context.DrawDrawing(ink); context.Pop();
+                if (cluster.End > Start && cluster.Start < End && !mediaParagraphs.Contains(line.Item))
+                    foreach (var bounds in cluster.Bounds) context.DrawRectangle(selectionBrush, null, bounds);
             }
         }
     }
@@ -264,6 +276,12 @@ internal sealed class LayoutSurface : Panel
         Scroller?.ScrollToVerticalOffset(Math.Max(0, line.Top - 30));
         Scroller?.UpdateLayout();
     }
+    public void ScrollRange(int start, int end, bool alignToTop)
+    {
+        var rectangles = Bounds(start, end).ToArray(); if (rectangles.Length == 0 || Scroller is null) return;
+        var target = alignToTop ? rectangles.Min(rectangle => rectangle.Top) : rectangles.Max(rectangle => rectangle.Bottom) - Scroller.ViewportHeight;
+        Scroller.ScrollToVerticalOffset(Math.Max(0, target)); Scroller.UpdateLayout();
+    }
     private int Vertical(Line current, bool down)
     {
         var lines = Snapshot!.Lines.Where(line => !line.Hidden && (down ? line.Top > current.Top + .01 : line.Top < current.Top - .01)).ToArray();
@@ -282,12 +300,15 @@ internal sealed class LayoutSurface : Panel
             if (target.Kind == "Toggle") target = Snapshot.Model.Root.Descendants().Single(node => node.Kind == "Details" && node.Children[0].Children.Any(child => child.Id == target.Id));
             Activate(target); e.Handled = true; return;
         }
+        pressedLink = Snapshot?.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Link" && at >= node.Start && at < node.End) is { } link
+            ? (link, e.GetPosition(this)) : null;
         Select(Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? Anchor : at, at); CaptureMouse(); e.Handled = true;
     }
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e); if (!IsMouseCaptured || e.LeftButton != MouseButtonState.Pressed) return;
         var point = e.GetPosition(this); if (MouseHistory.Count < 40) MouseHistory.Add(new { Event = "move", Point = point.ToString(), Hit = Hit(point) }); Select(Anchor, Hit(point));
+        if (pressedLink is { } link && (point - link.Point).Length > 4) pressedLink = null;
         if (Scroller is { } scrolling)
         { if (point.Y < scrolling.VerticalOffset) scrolling.LineUp(); if (point.Y > scrolling.VerticalOffset + scrolling.ViewportHeight) scrolling.LineDown(); }
         e.Handled = true;
@@ -298,7 +319,8 @@ internal sealed class LayoutSurface : Panel
         // Windows may coalesce mouse moves before delivering button-up. Commit
         // the actual release point instead of retaining an intermediate move.
         if (IsMouseCaptured) { var point = e.GetPosition(this); Select(Anchor, Hit(point)); }
-        ReleaseMouseCapture(); e.Handled = true;
+        ReleaseMouseCapture(); var clicked = pressedLink; pressedLink = null; e.Handled = true;
+        if (clicked is { } link && (e.GetPosition(this) - link.Point).Length <= 4) Activate(link.Node);
     }
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {

@@ -30,6 +30,9 @@ internal static class TargetedChecks
                 var stock = await new NativeMarkdownRenderer(new NativeSvgService()).RenderAsync(parsed, dark, prepared.Diagrams, _ => { }, (_, _) => { },
                     preparedDrawings: prepared.Drawings, preparedImages: prepared.Images, codeSyntax: prepared.Syntax);
                 var background = appearance.StartsWith("HC:", StringComparison.Ordinal) ? ExperimentAppearance.Slot(appearance, 1) : dark ? "#202124" : "#FFFFFF";
+                // The bare framework viewer's internal scroll host otherwise paints
+                // Window white despite its outer Background, invalidating dark/HC pairs.
+                stock.Document.Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background));
                 var viewer = new FlowDocumentScrollViewer { Document = stock.Document, Width = 640, Height = 300, IsToolBarVisible = false,
                     Background = new SolidColorBrush((Color)ColorConverter.ConvertFromString(background)) };
                 window.Content = viewer; window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
@@ -84,17 +87,32 @@ internal static class TargetedChecks
                     distantLiteral.Run.BringIntoView(); viewer.Selection.Select(distantLiteral.Start, distantLiteral.End); viewer.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                     Program.Capture(viewer, Path.Combine(destination, "stock-distant-selected.png"));
                 }
-                window.Content = window.Scroller; window.InstallMeasured(snapshot); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                var selectedStockOffset = scrolling.VerticalOffset;
+                window.Content = window.Scroller; window.InstallMeasured(snapshot); window.Scroller.ScrollToTop(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 Program.Capture(window.Scroller, Path.Combine(destination, "candidate.png"));
                 if (distantLiteral is not null)
                 {
-                    window.Surface.SelectSource(distantLiteral.Source.Start, distantLiteral.Source.End); window.Surface.Reveal(window.Surface.Start); window.Surface.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    window.Surface.SelectSource(distantLiteral.Source.Start, distantLiteral.Source.End); window.Scroller.ScrollToVerticalOffset(selectedStockOffset); window.Surface.Focus(); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                     Program.Capture(window.Scroller, Path.Combine(destination, "candidate-distant-selected.png"));
                 }
+                var mediaIndex = 0;
                 foreach (var media in snapshot.Model.Root.Descendants().Where(node => node.Kind == "Media"))
                 {
-                    window.Surface.Reveal(media.Start); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    window.Content = viewer;
+                    viewer.Selection.Select(stock.Document.ContentStart, stock.Document.ContentStart);
+                    var stockMedia = stock.Media.Where(value => value.Host is not null).ElementAt(mediaIndex++); stockMedia.Host!.BringIntoView();
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    var offset = scrolling.VerticalOffset;
+                    Program.Capture(viewer, Path.Combine(destination, "stock-media-" + media.Id + ".png"));
+                    viewer.Selection.Select(stockMedia.Host.ElementStart, stockMedia.Host.ElementEnd); viewer.Focus();
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(viewer, Path.Combine(destination, "stock-media-selected-" + media.Id + ".png"));
+                    window.Content = window.Scroller; window.Surface.Select(media.Start, media.Start);
+                    window.Scroller.ScrollToVerticalOffset(offset); window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                     Program.Capture(window.Scroller, Path.Combine(destination, "candidate-media-" + media.Id + ".png"));
+                    window.Surface.Select(media.Start, media.Start + 1); window.Surface.Focus();
+                    window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
+                    Program.Capture(window.Scroller, Path.Combine(destination, "candidate-media-selected-" + media.Id + ".png"));
                     var controls = window.Surface.Children.OfType<Button>().Where(button => button.Tag is ControlBox box && box.Node == media.Id).ToArray();
                     Program.Write(Path.Combine(destination, "media-control-geometry.json"), controls.Select(button => new { Text = button.Content, Desired = button.DesiredSize.ToString(), Slot = ((ControlBox)button.Tag).Bounds.ToString(), button.ActualWidth, button.ActualHeight }));
                     Require(controls.Length == 4 && controls.All(button => Math.Abs(button.DesiredSize.Height - ((ControlBox)button.Tag).Bounds.Height) < .01 && Math.Abs(button.DesiredSize.Width - ((ControlBox)button.Tag).Bounds.Width) < .01), "Native media command desired sizes agree with eager worker geometry", checks);

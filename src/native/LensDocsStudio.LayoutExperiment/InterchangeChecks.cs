@@ -49,6 +49,25 @@ internal static class InterchangeChecks
             sourceStart = snapshot.Model.SourceBoundaries[begin]; sourceEnd = snapshot.Model.SourceEnds[end - 1];
             if (!stock.TextMap.TryPreviewRange(sourceStart, sourceEnd - sourceStart, out from, out to)) throw new IOException("List item source oracle missing.");
             await Selection("first-item-without-break", begin, end, from!, to!);
+            var next = paragraphs[1]; var nextSource = snapshot.Model.SourceBoundaries[next.Start];
+            if (!stock.TextMap.TryPreviewRange(nextSource, 1, out var nextFrom, out _)) throw new IOException("Next item boundary oracle missing.");
+            await Selection("item-to-next-insertion", begin, next.Start, from!, nextFrom!);
+            var last = snapshot.Model.Items.Last(item => item.Start >= list.Start && item.Start < list.End && item.Length > 1);
+            var lastSource = snapshot.Model.SourceBoundaries[last.Start + 1]; var lastEnd = snapshot.Model.SourceEnds[last.Start + last.Length - 1];
+            if (!stock.TextMap.TryPreviewRange(lastSource, lastEnd - lastSource, out from, out to)) throw new IOException("Final list item boundary oracle missing.");
+            await Selection("final-item-partial", last.Start + 1, last.Start + last.Length, from!, to!);
+        }
+        var table = snapshot.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Table" && node.Children.FirstOrDefault()?.Children.Length > 1);
+        if (table is not null)
+        {
+            var firstCell = table.Children[0].Children[0]; var secondCell = table.Children[0].Children[1];
+            var firstText = snapshot.Model.Items.First(item => item.Start >= firstCell.Start && item.Start < firstCell.End && item.Length > 1);
+            var lastText = snapshot.Model.Items.First(item => item.Start >= secondCell.Start && item.Start < secondCell.End && item.Length > 1);
+            var begin = firstText.Start + 1; var end = lastText.Start + lastText.Length - 1;
+            while (end > lastText.Start + 1 && char.IsWhiteSpace(snapshot.Model.Text[end - 1])) end--;
+            var sourceStart = snapshot.Model.SourceBoundaries[begin]; var sourceEnd = snapshot.Model.SourceEnds[end - 1];
+            if (!stock.TextMap.TryPreviewRange(sourceStart, sourceEnd - sourceStart, out from, out to)) throw new IOException("Cross-cell source oracle missing.");
+            await Selection("partial-cross-cell", begin, end, from!, to!);
         }
         if (snapshot.Model.Root.Descendants().Any(node => node.Kind is "Image" or "Media"))
         {

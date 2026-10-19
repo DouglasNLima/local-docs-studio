@@ -25,7 +25,7 @@ internal sealed class ClipboardSerialisation
         var hc = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal); var dark = snapshot.Appearance == "Dark";
         foreground = Brush(hc ? ExperimentAppearance.Slot(snapshot.Appearance, 0) : dark ? "#E8EAED" : "#202124");
         surface = Brush(hc ? ExperimentAppearance.Slot(snapshot.Appearance, 1) : dark ? "#292B2F" : "#F3F4F6");
-        link = Brush(hc ? ExperimentAppearance.Slot(snapshot.Appearance, 5) : dark ? "#87CEFA" : "#4169E1");
+        link = Brush(ExperimentAppearance.IsDark(snapshot.Appearance) ? "#87CEFA" : "#4169E1");
     }
     private static Brush Brush(string value) { var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(value)); brush.Freeze(); return brush; }
     public static SelectionClipboard.Payload Prepare(LayoutSnapshot snapshot, int start, int end, CancellationToken cancellation)

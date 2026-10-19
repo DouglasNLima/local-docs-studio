@@ -223,7 +223,9 @@ internal static class IndependentUiaClient
                 var expectedMedia = InterchangeChecks.Media(InterchangeChecks.Decode(expectedPackage.ToArray(), DataFormats.XamlPackage));
                 var actualMedia = InterchangeChecks.Media(InterchangeChecks.Decode(bytes, DataFormats.XamlPackage));
                 Program.Write(Path.Combine(output, "actual-xamlpackage-media.json"), new { Stock = expectedMedia, Candidate = actualMedia });
-                Require(expectedMedia.Length == 13 && System.Text.Json.JsonSerializer.Serialize(expectedMedia) == System.Text.Json.JsonSerializer.Serialize(actualMedia), "Actual clipboard XamlPackage decoded image dimensions and pixels", checks);
+                // The unchanged workload contains twelve inline bitmap images. Public
+                // WPF XamlPackage omits the BlockUIContainer diagram in both routes.
+                Require(expectedMedia.Length == 12 && System.Text.Json.JsonSerializer.Serialize(expectedMedia) == System.Text.Json.JsonSerializer.Serialize(actualMedia), "Actual clipboard XamlPackage decoded inline-image dimensions and pixels; stock also omits the block diagram", checks);
                 Require(!nativeInterchange.Document.ContentStart.HasValidLayout, "Stock interchange oracle remains unformatted after package serialisation", checks);
             }
             Require(AutomationElement.FocusedElement.Current.ProcessId == processId, "Focus retained after copy", checks);

@@ -10,6 +10,8 @@ internal static class LinkChecks
 {
     [DllImport("user32.dll")] private static extern IntPtr GetLastActivePopup(IntPtr window);
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(IntPtr window);
+    [DllImport("user32.dll")] private static extern bool SetPhysicalCursorPos(int x, int y);
+    [DllImport("user32.dll")] private static extern void mouse_event(uint flags, uint x, uint y, uint data, UIntPtr extra);
     public static async Task Run(ExperimentWindow window, string output)
     {
         if (Environment.GetEnvironmentVariable("GITHUB_ACTIONS") != "true") throw new IOException("Actual external-application link checks require a disposable hosted desktop.");
@@ -59,8 +61,15 @@ internal static class LinkChecks
             string Text() => ((TextPattern)Document().GetCurrentPattern(TextPattern.Pattern)).DocumentRange.GetText(-1);
             void Invoke(string name)
             {
-                var link = Document().FindFirst(TreeScope.Descendants, new AndCondition(new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Hyperlink), new PropertyCondition(AutomationElement.NameProperty, name))) ?? throw new IOException("Actual link missing: " + name);
-                ((InvokePattern)link.GetCurrentPattern(InvokePattern.Pattern)).Invoke(); At("invoked-" + name);
+                // Stock WPF does not expose a matching Name for every hyperlink.
+                // Drive the actual text geometry with real mouse input on both sides.
+                var text = (TextPattern)Document().GetCurrentPattern(TextPattern.Pattern);
+                var range = text.DocumentRange.FindText(name, false, false) ?? throw new IOException("Actual link text missing: " + name);
+                range.ScrollIntoView(true); System.Threading.Thread.Sleep(100);
+                var rectangle = range.GetBoundingRectangles().FirstOrDefault();
+                if (rectangle.IsEmpty || rectangle.Width <= 0 || rectangle.Height <= 0) throw new IOException("Actual link has no visible geometry: " + name);
+                SetForegroundWindow(handle); SetPhysicalCursorPos((int)(rectangle.Left + rectangle.Width / 2), (int)(rectangle.Top + rectangle.Height / 2));
+                mouse_event(2, 0, 0, 0, UIntPtr.Zero); System.Threading.Thread.Sleep(40); mouse_event(4, 0, 0, 0, UIntPtr.Zero); At("clicked-" + name);
             }
             IndependentUiaClient.Wait(() => Text().Contains("Parent destination marker.", StringComparison.Ordinal));
             Invoke("Open child"); IndependentUiaClient.Wait(() => Text().Contains("Child destination marker.", StringComparison.Ordinal));
@@ -79,7 +88,8 @@ internal static class LinkChecks
             {
                 foreach (var candidate in AutomationElement.RootElement.FindAll(TreeScope.Children, Condition.TrueCondition).Cast<AutomationElement>())
                 {
-                    using var process = Process.GetProcessById(candidate.Current.ProcessId);
+                    var processId = candidate.Current.ProcessId; if (processId <= 0) continue;
+                    using var process = Process.GetProcessById(processId);
                     if (process.ProcessName is not ("msedge" or "chrome" or "firefox" or "iexplore")) continue;
                     var edits = candidate.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Edit));
                     foreach (var edit in edits.Cast<AutomationElement>())
