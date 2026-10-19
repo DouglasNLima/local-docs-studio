@@ -6,6 +6,8 @@ using System.Windows.Threading;
 
 namespace LensDocsStudio.LayoutExperiment;
 
+internal sealed record DiagnosticView(int SelectionStart, int SelectionEnd, int AnchorSource, double AnchorDelta, Dictionary<int, bool> Details);
+
 internal sealed record PreparationEvent(string Event, long Timestamp, int Thread, long Version);
 
 /// <summary>One active preparation and one replaceable pending request; no product state.</summary>
@@ -15,7 +17,9 @@ internal sealed class ExperimentWindow : Window
     public ScrollViewer Scroller { get; }
     public System.Collections.Concurrent.ConcurrentQueue<PreparationEvent> Events { get; } = new();
     private CancellationTokenSource? active;
-    private (string Source, string Appearance, long Version, TaskCompletionSource<bool> Completion)? pending;
+    private sealed record RequestData(string Source, string Appearance, long Version, string? Path, string? Root, Dictionary<int, bool> Details, DiagnosticView? Restore, TaskCompletionSource<bool> Completion);
+    private RequestData? pending;
+    private DiagnosticView? restoreView;
     private bool running, closed;
     private long version;
     private long activeVersion;
@@ -28,6 +32,7 @@ internal sealed class ExperimentWindow : Window
     public event Action<string>? CurrentFailure;
     private readonly Dictionary<int, bool> details = [];
     public Task? CurrentWork { get; private set; }
+    private CancellationTokenSource? renderedCopy;
     public ExperimentWindow()
     {
         Title = "EXPERIMENT ONLY — Continuous TextFormatter layout";
@@ -36,6 +41,21 @@ internal sealed class ExperimentWindow : Window
             VerticalScrollBarVisibility = ScrollBarVisibility.Visible, CanContentScroll = false, Background = System.Windows.Media.Brushes.White };
         Surface.Scroller = Scroller; Scroller.ScrollChanged += (_, _) => Surface.InvalidateVisual();
         Content = Scroller;
+        _ = new MediaActions(this);
+        Surface.SourceNavigationRequested += async source =>
+        {
+            var snapshot = Surface.Snapshot; if (snapshot is null) return;
+            var collapsed = (snapshot.CompleteModel ?? snapshot.Model).Root.Descendants().Where(node => node.Kind == "Details" && !node.Expanded && source > node.Children[0].SourceEnd && source <= node.SourceEnd).ToArray();
+            foreach (var node in collapsed) details[node.SourceStart] = true;
+            if (collapsed.Length > 0 && !await Request(LatestSource, ThemePreference)) return;
+            Surface.NavigateSourceCore(source);
+        };
+        Surface.SearchRequested += async query =>
+        {
+            if (query.Length == 0 || Surface.Snapshot?.CompleteModel is not { } complete) return;
+            foreach (var node in complete.Root.Descendants().Where(node => node.Kind == "Details" && !node.Expanded)) details[node.SourceStart] = true;
+            if (await Request(LatestSource, ThemePreference)) Surface.Search(query);
+        };
         Surface.Activated += node =>
         {
             if (node.Kind == "Details") { details[node.SourceStart] = !node.Expanded; _ = Request(LatestSource, ThemePreference); }
@@ -45,10 +65,56 @@ internal sealed class ExperimentWindow : Window
                 if (heading is not null) Surface.NavigateSource(heading.SourceStart);
             }
         };
+        var copyMenu = new MenuItem { Header = "Copy rendered document" };
+        System.Windows.Automation.AutomationProperties.SetAutomationId(copyMenu, "ExperimentalCopyRendered");
+        copyMenu.Click += async (_, _) => await CopyRendered();
+        Surface.ContextMenu = new ContextMenu { Items = { copyMenu } };
         SystemParameters.StaticPropertyChanged += AppearanceChanged;
         SourceInitialized += (_, _) => ((System.Windows.Interop.HwndSource)PresentationSource.FromVisual(this)).AddHook((IntPtr hwnd, int message, IntPtr wParam, IntPtr lParam, ref bool handled) =>
         { if (message is 0x001A or 0x0015 or 0x031A) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); return IntPtr.Zero; });
-        Closed += (_, _) => { closed = true; SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++; if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); } pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null); Log("closed"); };
+        Closed += (_, _) => { closed = true; renderedCopy?.Cancel(); Surface.CloseClipboard(); SystemParameters.StaticPropertyChanged -= AppearanceChanged; version++; if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); } pending?.Completion.TrySetCanceled(); pending = null; Surface.Install(null); Log("closed"); };
+    }
+    public DiagnosticView CaptureView()
+    {
+        var anchor = Surface.ViewportSourceAnchor();
+        return new(Surface.SelectionSourceStart, Surface.SelectionSourceEnd, anchor.Source, anchor.Delta, details.ToDictionary());
+    }
+    public void BeginDocument(DiagnosticView? view)
+    {
+        Dispatcher.VerifyAccess(); renderedCopy?.Cancel();
+        if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
+        if (pending is { } queued) { Log("queued-rejected", queued.Version); queued.Completion.TrySetResult(false); pending = null; }
+        version++; Surface.Install(null); Scroller.ScrollToTop(); LatestSource = "";
+        details.Clear(); if (view is not null) foreach (var value in view.Details) details.Add(value.Key, value.Value);
+        restoreView = view; Log("document-switched");
+    }
+    public async Task CopyRendered()
+    {
+        if (Surface.Snapshot is not { } snapshot || closed) return;
+        renderedCopy?.Cancel(); var owner = new CancellationTokenSource(); renderedCopy = owner;
+        var sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence; var path = SourcePath; var root = WorkspaceRoot;
+        try
+        {
+            var payload = await Worker(() => new LensDocsStudio.Core.Exports.ClipboardExporter().Export(
+                new LensDocsStudio.Native.Exports.ExportPreparationService(new LensDocsStudio.Core.Parsing.MarkdownService(),
+                    new LensDocsStudio.Core.Rendering.DiagramService(), new LensDocsStudio.Native.Rendering.NativeSvgService())
+                .Prepare(snapshot.Model.Source, path, root, snapshot.Appearance == "Dark", owner.Token), cancellationToken: owner.Token));
+            if (closed || owner.IsCancellationRequested || !ReferenceEquals(Surface.Snapshot, snapshot)) { Log("rendered-copy-stale-rejected"); return; }
+            var commit = await Surface.ClipboardWorker.Rendered(payload, sequence, owner.Token);
+            Surface.InteractionStages.Add(new { Stage = "rendered-copy", NativeCommit = commit,
+                NativeCommitMilliseconds = (commit.EndTimestamp - commit.StartTimestamp) * 1000d / Stopwatch.Frequency });
+            if (!closed && !owner.IsCancellationRequested && ReferenceEquals(Surface.Snapshot, snapshot)) Log("rendered-copy-committed");
+            else Log("rendered-copy-stale-completion-rejected");
+        }
+        catch (Exception error) when (error is IOException or OperationCanceledException or System.Runtime.InteropServices.ExternalException)
+        { if (!closed && ReferenceEquals(Surface.Snapshot, snapshot)) CurrentFailure?.Invoke(error.Message); }
+        finally { if (ReferenceEquals(renderedCopy, owner)) renderedCopy = null; owner.Dispose(); }
+    }
+    public void InstallMeasured(LayoutSnapshot snapshot)
+    {
+        Dispatcher.VerifyAccess(); LatestSource = snapshot.Model.Source; version = snapshot.Version;
+        ThemePreference = snapshot.Appearance.StartsWith("HC:", StringComparison.Ordinal) ? ThemePreference : snapshot.Appearance;
+        Surface.Install(snapshot);
     }
     private void AppearanceChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) { if (!closed) _ = Dispatcher.InvokeAsync(RefreshAppearance, DispatcherPriority.Background); }
     private void RefreshAppearance()
@@ -66,7 +132,7 @@ internal sealed class ExperimentWindow : Window
         if (active is not null) { Log("cancellation-requested", activeVersion); active.Cancel(); }
         if (pending is { } old) { Log("queued-rejected", old.Version); old.Completion.TrySetResult(false); }
         var completion = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        pending = (source, appearance, version, completion); Log("requested");
+        pending = new(source, appearance, version, SourcePath, WorkspaceRoot, details.ToDictionary(), restoreView, completion); restoreView = null; Log("requested");
         if (!running) CurrentWork = Process();
         return completion.Task;
     }
@@ -78,7 +144,7 @@ internal sealed class ExperimentWindow : Window
             while (pending is { } request && !closed)
             {
                 pending = null; active = new(); activeVersion = request.Version; var token = active.Token;
-                var sourcePath = SourcePath; var workspaceRoot = WorkspaceRoot; var detailState = details.ToDictionary();
+                var sourcePath = request.Path; var workspaceRoot = request.Root; var detailState = request.Details;
                 var old = Surface.Snapshot;
                 var selectionStart = Surface.SelectionSourceStart; var selectionEnd = Surface.SelectionSourceEnd;
                 var anchor = Surface.ViewportSourceAnchor();
@@ -91,7 +157,7 @@ internal sealed class ExperimentWindow : Window
                         try
                         {
                             var model = CompleteLayout.Parse(request.Source, token, sourcePath, workspaceRoot, request.Appearance);
-                            if (detailState.Count > 0) model = model with { Root = ApplyDetails(model.Root, detailState), OriginalListShape = false };
+                            if (detailState.Count > 0) model = model with { Root = ApplyDetails(model.Root, detailState, request.Appearance), OriginalListShape = false };
                             Log("worker-format-started", request.Version);
                             var result = CompleteLayout.Format(model, 640, request.Version, request.Appearance, token);
                             Log("worker-completed", request.Version); return result;
@@ -102,6 +168,7 @@ internal sealed class ExperimentWindow : Window
                     { Log("stale-rejected", request.Version); request.Completion.TrySetResult(false); continue; }
                     Surface.Install(snapshot);
                     if (old is not null) { Surface.SelectSource(SourceEdit.Transform(old.Model.Source, request.Source, selectionStart), SourceEdit.Transform(old.Model.Source, request.Source, selectionEnd)); Surface.RestoreViewportSourceAnchor((SourceEdit.Transform(old.Model.Source, request.Source, anchor.Source), anchor.Delta)); }
+                    else if (request.Restore is { } restored) { Surface.SelectSource(restored.SelectionStart, restored.SelectionEnd); Surface.RestoreViewportSourceAnchor((restored.AnchorSource, restored.AnchorDelta)); }
                     Log("installed", request.Version); Installed?.Invoke(snapshot); UpdateLayout();
                     await Dispatcher.InvokeAsync(() => Log("complete-preview-input-delivered", request.Version), DispatcherPriority.Input);
                     if (closed || request.Version != version || request.Appearance != ExperimentAppearance.Capture(ThemePreference))
@@ -119,9 +186,10 @@ internal sealed class ExperimentWindow : Window
         }
         finally { running = false; }
     }
-    private static SemanticNode ApplyDetails(SemanticNode node, IReadOnlyDictionary<int, bool> states) => node with
+    private static SemanticNode ApplyDetails(SemanticNode node, IReadOnlyDictionary<int, bool> states, string appearance) => node with
     { Expanded = node.Kind == "Details" && states.TryGetValue(node.SourceStart, out var expanded) ? expanded : node.Expanded,
-        Children = node.Children.Select(child => ApplyDetails(child, states)).ToImmutableArray() };
+        Children = node.Children.Select(child => ApplyDetails(child, states, appearance)).ToImmutableArray(),
+        Media = node.Kind == "Toggle" && states.TryGetValue(node.SourceStart, out var toggleExpanded) ? DetailsDrawing.Create(toggleExpanded, appearance) : node.Media };
     public static Task<T> Worker<T>(Func<T> work)
     {
         var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);

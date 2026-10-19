@@ -4,6 +4,10 @@
 
 Continuation authorised under revised v2 budgets; viability pending complete functionality and validation. The same Draft PR #38 now continues the public WPF/TextFormatter prototype with budgets 1,000 ms complete layout, 1,500 ms preparation/presentation and 100 ms observed shown-window Input gap. This is a changed requirement, not a speed improvement or migration approval. Six-fixture support and diagnostic integration are being validated; full parity/acceptance remains incomplete. See [the versioned experiment report](continuous-layout-architecture-prototype.md). Every earlier v1 failure/NO-GO and the unrelated open `.749` incident remain unchanged below.
 
+The executable now includes the six-workload semantic surface, actual native media commands, public no-layout RTF/Xaml interchange and transient source/search/outline/document integration. Targeted geometry/decoded-style and independent studio/media interaction subsets pass locally; timing and required parity gaps remain unsuccessful or incomplete. The [source-labelled report and required matrix](continuous-layout-architecture-prototype.md#source-labelled-v2-checkpoints-and-remaining-scope) retain the failed `a0336ff` hosted comparison and every limitation.
+
+### Historical v1 receipt (not the current v2 decision)
+
 
 The separately authorised [Continuous layout architecture prototype](continuous-layout-architecture-prototype.md) is isolated in [Draft PR #38](https://github.com/DouglasNLima/local-docs-studio/pull/38), stacked on open #37 at `a937399a`. The executable public-API TextFormatter list gate preserves complete geometry and passes its stated real GUI/UIA checks, but controlled comparisons fail 5/11 and 11/11 timing samples. **NOT VIABLE for this tested design; no migration proposal.** Wider semantics and appearance remain missing, stock stays the default, #37’s performance goal remains incomplete and `.749` causality remains unresolved. Final-source checks and artefact provenance belong to the #38 receipt; earlier package results do not certify it. Historical scope-decision text below predates this authorisation.
 

@@ -17,5 +17,11 @@ internal static class ExperimentAppearance
     }
     private static string Colour(int index) { var value = GetSysColor(index); return Color.FromRgb((byte)value, (byte)(value >> 8), (byte)(value >> 16)).ToString(); }
     public static string Capture(string preference) => ActualHighContrast ? "HC:" + string.Join('|', new[] { Colour(8), Colour(5), Colour(15), Colour(13), Colour(14), Colour(26) }) : preference;
+    public static bool IsDark(string key)
+    {
+        if (!key.StartsWith("HC:", StringComparison.Ordinal)) return key == "Dark";
+        var colour = (Color)ColorConverter.ConvertFromString(Slot(key, 1));
+        return colour.R * .2126 + colour.G * .7152 + colour.B * .0722 < 128;
+    }
     public static string Slot(string key, int index) => key[3..].Split('|')[index];
 }

@@ -48,16 +48,15 @@ $fixtures = @('list','table','quote','details','paragraphs','mixed')
 # Preserve the original first combined execution and fixed fixture order in one process per side.
 foreach ($side in $order) { Invoke-Sample 'all' $side 'first-combined' }
 if (-not $FirstOnly) {
-    foreach ($fixture in $fixtures) {
-        for ($cold = 0; $cold -lt 3; $cold++) {
-            $pair = if ($cold % 2 -eq 0) { $order } else { @($order[1],$order[0]) }
-            foreach ($side in $pair) { Invoke-Sample $fixture $side "cold-$cold" }
-        }
+    for ($cold = 0; $cold -lt 3; $cold++) {
+        $pair = if ($cold % 2 -eq 0) { $order } else { @($order[1],$order[0]) }
+        foreach ($fixture in $fixtures) { foreach ($side in $pair) { Invoke-Sample $fixture $side "cold-$cold" } }
     }
     foreach ($side in $order) { Invoke-Sample 'all' $side 'repeated' 4 }
     foreach ($side in $order) { Invoke-Sample 'all' $side 'distant-edit' 3 -Edit }
     foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
-    foreach ($mode in @('lifecycle','appearance')) {
+    foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
+    foreach ($mode in @('lifecycle','appearance','studio-checks','parity-all')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
         if (-not $process.WaitForExit(120000)) { Stop-Process -Id $process.Id -Force }
@@ -73,8 +72,10 @@ $runtimeChecks = @($samples | Select-Object -First 1 | ForEach-Object {
 })
 $runtimeChecks | ConvertTo-Json -Depth 5 | Set-Content (Join-Path $output 'official-runtime.json')
 $candidate = @($samples | Where-Object Adapter -eq 'candidate')
-$layoutMisses = @($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 1000)
-$presentationMisses = @($candidate | Where-Object EndToEndReadinessMilliseconds -gt 1500)
+$controlled = @($candidate | Where-Object RunGroup -notin @('independent-uia','targeted-uia'))
+$rawBoundaries = @(Get-ChildItem -LiteralPath $output -Recurse -Filter timing-boundary.json | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw | ConvertFrom-Json })
+$layoutMisses = @($rawBoundaries | Where-Object Adapter -eq 'candidate' | Where-Object CompleteLayoutInputMilliseconds -gt 1000)
+$presentationMisses = @($rawBoundaries | Where-Object Adapter -eq 'candidate' | Where-Object EndToEndReadinessMilliseconds -gt 1500)
 $inputMisses = @($candidate | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 -or $_.MaximumInteractionInputGapMilliseconds -gt 100 })
 [ordered]@{
     Contract='continuous-layout-v2'; Source=$source; SourceDirty=$sourceDirty; Replication=$Replication; FirstOnly=[bool]$FirstOnly
@@ -82,14 +83,36 @@ $inputMisses = @($candidate | Where-Object { $_.MaximumInputGapMilliseconds -gt 
     OfficialRuntime=& dotnet --list-runtimes; OS=[Environment]::OSVersion.ToString(); CpuAvailable=[Environment]::ProcessorCount
     ImageOS=$env:ImageOS; ImageVersion=$env:ImageVersion; Runs=$runs
 } | ConvertTo-Json -Depth 10 | Set-Content (Join-Path $output 'protocol-v2.json')
+$pairChecks = @($samples | Where-Object RunGroup -notin @('independent-uia','targeted-uia') | Group-Object { "$($_.RunGroup)|$($_.Fixture)|$($_.Repetition)|$($_.Edited)" } | ForEach-Object {
+    $group = $_.Group
+    [ordered]@{ Key=$_.Name; Pass=$group.Count -eq 2 -and @($group | Select-Object -ExpandProperty Adapter -Unique).Count -eq 2 -and @($group | Select-Object -ExpandProperty FixtureSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty SourceSha256 -Unique).Count -eq 1 -and @($group | Select-Object -ExpandProperty HarnessSha256 -Unique).Count -eq 1 }
+})
+$failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interaction-heartbeat-failure.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json } | Where-Object { @($_.InteractionInputGaps | Where-Object { $_ -gt 100 }).Count })
+$coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
+$missing = @($coverage.Requirements | Where-Object Implementation -ne 'Implemented')
+$special = @{}
+foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('parity-all','targeted-parity.json'))) {
+    $path = Join-Path $output ($receipt[0] + '/' + $receipt[1])
+    $special[$receipt[0]] = if (Test-Path -LiteralPath $path) { Get-Content -LiteralPath $path -Raw | ConvertFrom-Json } else { @{Status='MISSING'} }
+}
+$interactionReceipts = @(Get-ChildItem -LiteralPath $output -Filter independent-uia.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json })
+$specialInputMisses = @($special.Values | Where-Object { $_.MaximumInputGapMilliseconds -gt 100 })
+$executionFailures = @($runs | Where-Object ExitCode -ne 0)
+$missingSamples = $controlled.Count -ne 66 -or @($samples | Where-Object { $_.Adapter -eq 'stock' }).Count -ne 66
+$proofMissing = @($pairChecks | Where-Object Pass -ne $true).Count -gt 0 -or $FirstOnly -or $missingSamples -or $interactionReceipts.Count -ne 11 -or @($special.Values | Where-Object Status -ne 'PASS').Count -gt 0
+$timingFail = $failedInteractionInput.Count -gt 0 -or $layoutMisses.Count -gt 0 -or $presentationMisses.Count -gt 0 -or $inputMisses.Count -gt 0 -or $specialInputMisses.Count -gt 0
+$fullPass = -not $proofMissing -and -not $timingFail -and $missing.Count -eq 0 -and $executionFailures.Count -eq 0
 [ordered]@{
-    Contract='continuous-layout-v2'; Status='INCOMPLETE'; CandidateSamples=$candidate.Count
-    CompleteLayout=@{ BudgetMilliseconds=1000; Failures=$layoutMisses.Count }
-    PreparationPresentation=@{ BudgetMilliseconds=1500; Failures=$presentationMisses.Count }
-    ObservedShownWindowInput=@{ BudgetMilliseconds=100; Failures=$inputMisses.Count }
-    FunctionalSelectionClipboardSourceUiaParity='INCOMPLETE'; ActualOsAppearanceLifecycle='INCOMPLETE'
+    Contract='continuous-layout-v2'; Status=$(if ($fullPass) {'PASS'} elseif ($timingFail -or $executionFailures.Count) {'FAIL'} else {'INCOMPLETE'})
+    CandidateSamples=$candidate.Count; RequiredControlledSamples=66; RecordedControlledSamples=$controlled.Count; MissingControlledSamples=$missingSamples; RawTimedBoundaries=$rawBoundaries
+    CompleteLayout=@{ BudgetMilliseconds=1000; Status=$(if($layoutMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$layoutMisses.Count }
+    PreparationPresentation=@{ BudgetMilliseconds=1500; Status=$(if($presentationMisses.Count){'FAIL'}elseif($missingSamples){'INCOMPLETE'}else{'PASS'}); Failures=$presentationMisses.Count }
+    ObservedShownWindowInput=@{ BudgetMilliseconds=100; Status=$(if($inputMisses.Count -or $specialInputMisses.Count){'FAIL'}elseif($proofMissing){'INCOMPLETE'}else{'PASS'}); SampleFailures=$inputMisses.Count; SpecialScenarioFailures=$specialInputMisses.Count }
+    FunctionalSelectionClipboardSourceUiaParity=$(if($missing.Count -or $proofMissing -or @($interactionReceipts | Where-Object Status -ne 'PASS').Count){'INCOMPLETE_OR_FAIL'}else{'PASS'})
+    ActualOsAppearanceLifecycle=@{ Status=$(if(@($special.Values | Where-Object Status -ne 'PASS').Count -or $specialInputMisses.Count){'INCOMPLETE_OR_FAIL'}else{'PASS'}); Receipts=$special }
+    PairIdentityChecks=$pairChecks; FailedInteractionInputReceipts=$failedInteractionInput; ParityCoverage=$coverage; MissingCapabilities=$missing; InteractionReceipts=$interactionReceipts
     Stretch250=@{ Blocking=$false; Exceeded=@($candidate | Where-Object CompleteLayoutInputMilliseconds -gt 250).Count }
-    ExecutionFailures=@($runs | Where-Object ExitCode -ne 0); Samples=$samples
-    Decision='INSUFFICIENT EVIDENCE: continuation authorised; required functionality and validation pending'
-} | ConvertTo-Json -Depth 15 | Set-Content (Join-Path $output 'acceptance-v2.json')
-throw 'v2 full acceptance remains incomplete. Every timing sample and capability gap is retained.'
+    ExecutionFailures=$executionFailures; Samples=$samples
+    Decision=$(if($fullPass){'VIABLE FOR A SEPARATE MIGRATION PROPOSAL: tested workloads and hosts only; no migration authorised'}else{'INSUFFICIENT EVIDENCE: required v2 timing, capabilities or validation remain unsuccessful/incomplete'})
+} | ConvertTo-Json -Depth 18 | Set-Content (Join-Path $output 'acceptance-v2.json')
+if (-not $fullPass) { throw 'v2 full acceptance failed or remains incomplete. Every timing sample, execution failure and capability gap is retained.' }

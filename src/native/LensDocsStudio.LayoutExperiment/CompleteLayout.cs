@@ -23,6 +23,7 @@ internal sealed record Item(int Start, int Length, int SourceStart, int SourceEn
 internal sealed record ListModel(string Source, string Text, ImmutableArray<int> SourceBoundaries, ImmutableArray<Item> Items, bool Ordered, int StartIndex)
 {
     public ImmutableArray<int> SourceEnds { get; init; }
+    public ImmutableArray<int> WordBoundaries { get; init; } = [];
     public required SemanticNode Root { get; init; }
     public bool OriginalListShape { get; init; }
     public ImmutableArray<LensDocsStudio.Core.Parsing.DocumentHeading> Headings { get; init; } = [];
@@ -42,17 +43,21 @@ internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int
 }
 internal sealed record Caret(int Offset, double X);
 internal sealed record Cluster(int Start, int End, ImmutableArray<Rect> Bounds);
+internal sealed record ControlBox(int Node, string Label, Rect Bounds);
 internal sealed record Line(int Start, int End, int Item, double Top, double Height, double Baseline,
     DrawingGroup Drawing, ImmutableArray<Caret> Carets, ImmutableArray<Cluster> Clusters)
-{ public bool Hidden { get; init; } public DrawingGroup? SelectionDrawing { get; init; } }
+{ public bool Hidden { get; init; } }
 internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Lines, double Width, double Height,
     int WorkerThread, double LayoutMilliseconds, long Version, string Appearance, ImmutableDictionary<string, double> Stages)
 {
     public ImmutableDictionary<int, Rect> NodeBounds { get; init; } = ImmutableDictionary<int, Rect>.Empty;
     public DrawingGroup? Decorations { get; init; }
+    public ImmutableArray<ControlBox> Controls { get; init; } = [];
+    public ListModel? CompleteModel { get; init; }
+    public ImmutableArray<Line> CompleteLines { get; init; } = [];
 }
 
-/// <summary>Diagnostic list-only engine. No candidate FlowDocument or hidden viewer.</summary>
+/// <summary>Complete diagnostic engine with an original-list fast path. No candidate FlowDocument or hidden viewer.</summary>
 internal static class CompleteLayout
 {
     public static ListModel Parse(string source, CancellationToken cancellation, string? sourcePath = null, string? workspaceRoot = null, string appearance = "Light")
@@ -102,7 +107,7 @@ internal static class CompleteLayout
                     using (var context = drawing.Open())
                     {
                         line.Draw(context, new Point(52, top), InvertAxes.None);
-                        if (position == 0)
+                        if (position == 0 && !(model.Ordered && model.StartIndex == 0))
                         {
                             var markerKey = model.Ordered ? model.StartIndex + itemIndex : 0;
                             if (!markers.TryGetValue(markerKey, out var markerDrawing))
@@ -150,7 +155,7 @@ internal static class CompleteLayout
                     }
                     geometryTicks += System.Diagnostics.Stopwatch.GetTimestamp() - phaseStart;
                     lines.Add(new(item.Start + position, item.Start + end, itemIndex, top, line.Height, line.Baseline,
-                        drawing, carets.ToImmutable(), clusters.ToImmutable()) { SelectionDrawing = SelectionInk.Create(drawing, appearance) });
+                        drawing, carets.ToImmutable(), clusters.ToImmutable()));
                     // WPF's stock MaxHeight strategy uses natural glyph height, then
                     // advances by at least LineHeight in its 1/300 DIP text units.
                     top += Math.Max(line.Height, 23 - 1d / 300); position += line.Length;
@@ -176,7 +181,7 @@ internal static class CompleteLayout
         public override TextDecorationCollection? TextDecorations => null;
         public override Brush ForegroundBrush => brush;
         public override Brush? BackgroundBrush => null;
-        public override CultureInfo CultureInfo => CultureInfo.GetCultureInfo("en-GB");
+        public override CultureInfo CultureInfo => TextCulture.Value;
         public override TextEffectCollection? TextEffects => null;
     }
 
@@ -206,7 +211,7 @@ internal static class CompleteLayout
             throw new InvalidOperationException("A styled run is missing.");
         }
         public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int index) =>
-            new(index, new(CultureInfo.GetCultureInfo("en-GB"), new CharacterBufferRange(model.Text, item.Start, index)));
+            new(index, new(TextCulture.Value, new CharacterBufferRange(model.Text, item.Start, index)));
         public override int GetTextEffectCharacterIndexFromTextSourceCharacterIndex(int index) => index;
     }
 }

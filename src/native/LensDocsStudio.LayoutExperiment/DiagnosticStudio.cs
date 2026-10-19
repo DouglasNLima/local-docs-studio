@@ -14,7 +14,7 @@ namespace LensDocsStudio.LayoutExperiment;
 /// <summary>Transient diagnostic shell. No ordinary application state, saving, updater or associations.</summary>
 internal sealed class DiagnosticStudio
 {
-    private sealed record Session(string Name, string Source, string? Path);
+    private sealed record Session(string Name, string Source, string? Path) { public DiagnosticView? View { get; set; } }
     private readonly ExperimentWindow window;
     private readonly TextEditor editor = new() { ShowLineNumbers = true, FontFamily = new("Consolas"), FontSize = 14, Width = 400, Height = 600 };
     private readonly ComboBox documents = new() { Width = 200, DisplayMemberPath = "Name" };
@@ -23,20 +23,22 @@ internal sealed class DiagnosticStudio
     private readonly TextBlock status = new() { Margin = new(8), Text = "EXPERIMENT ONLY — transient source; stock application unchanged" };
     private bool switching;
     private int current = -1;
+    private Session? activeSession;
     private readonly List<Session> sessions = [];
     private readonly Stack<Session> closedSessions = [];
     public DiagnosticStudio(ExperimentWindow window, string source, string? path)
     {
-        this.window = window;
+        this.window = window; window.Content = null;
         AutomationProperties.SetAutomationId(editor, "ExperimentalSourceEditor");
         AutomationProperties.SetAutomationId(documents, "ExperimentalDocuments");
         AutomationProperties.SetAutomationId(outline, "ExperimentalOutline");
         AutomationProperties.SetAutomationId(search, "ExperimentalSearch");
+        AutomationProperties.SetAutomationId(status, "ExperimentalStatus");
         var host = new DockPanel(); var tools = new StackPanel { Orientation = Orientation.Horizontal };
         tools.Children.Add(documents);
         Add("New document", () => Open("Untitled " + (sessions.Count + 1), "# New document\n", null));
         Add("Close document", CloseDocument);
-        Add("Reopen closed", () => { if (closedSessions.TryPop(out var item)) Open(item.Name, item.Source, item.Path); });
+        Add("Reopen closed", () => { if (closedSessions.TryPop(out var item)) Open(item.Name, item.Source, item.Path, item.View); });
         tools.Children.Add(search); Add("Previous match", () => Find(false)); Add("Next match", () => Find(true));
         Add("Copy rendered", async () => await CopyRendered());
         var theme = new ComboBox { ItemsSource = new[] { "Light", "Dark" }, SelectedIndex = 0, Width = 80 }; tools.Children.Add(theme);
@@ -45,10 +47,10 @@ internal sealed class DiagnosticStudio
         var body = new StackPanel { Orientation = Orientation.Horizontal }; body.Children.Add(editor); body.Children.Add(window.Scroller); body.Children.Add(outline); host.Children.Add(body);
         window.Content = host; window.Scroller.Height = 600;
         documents.SelectionChanged += (_, _) => Switch(documents.SelectedIndex);
-        editor.TextChanged += (_, _) => { if (!switching && current >= 0) { sessions[current] = sessions[current] with { Source = editor.Text }; _ = Prepare(); } };
+        editor.TextChanged += (_, _) => { if (!switching && current >= 0) { sessions[current] = sessions[current] with { Source = editor.Text }; activeSession = sessions[current]; _ = Prepare(); } };
         search.TextChanged += (_, _) => { window.Surface.Search(search.Text); };
         outline.SelectionChanged += (_, _) => { if (outline.SelectedItem is DocumentHeading heading) { window.Surface.NavigateSource(heading.SourceStart); editor.Select(heading.SourceStart, 0); editor.ScrollToLine(heading.SourceLine + 1); } };
-        window.Surface.SelectionUpdated += () => { if (window.Surface.Snapshot is null) return; editor.Select(window.Surface.SelectionSourceStart, Math.Max(0, window.Surface.SelectionSourceEnd - window.Surface.SelectionSourceStart)); };
+        window.Surface.SelectionUpdated += () => { if (window.Surface.Snapshot is not { } displayed || displayed.Model.Source != editor.Text || !window.Surface.IsKeyboardFocusWithin) return; editor.Select(window.Surface.SelectionSourceStart, Math.Max(0, window.Surface.SelectionSourceEnd - window.Surface.SelectionSourceStart)); };
         window.Surface.Activated += node =>
         {
             if (node.Kind == "Link" && node.Target is { } target && !target.StartsWith('#'))
@@ -79,13 +81,15 @@ internal sealed class DiagnosticStudio
             catch (Exception error) { status.Text = error.Message; }
         }
     }
-    private void Open(string name, string source, string? path)
+    private void Open(string name, string source, string? path, DiagnosticView? view = null)
     {
-        sessions.Add(new(name, source, path)); documents.ItemsSource = null; documents.ItemsSource = sessions; documents.SelectedIndex = sessions.Count - 1;
+        sessions.Add(new(name, source, path) { View = view }); documents.ItemsSource = null; documents.ItemsSource = sessions; documents.SelectedIndex = sessions.Count - 1;
     }
     private void Switch(int index)
     {
-        if (index < 0 || index >= sessions.Count) return; current = index; switching = true;
+        if (index < 0 || index >= sessions.Count) return;
+        if (activeSession is not null && sessions.Contains(activeSession)) activeSession.View = window.CaptureView();
+        current = index; activeSession = sessions[index]; window.BeginDocument(activeSession.View); switching = true;
         try { editor.Text = sessions[index].Source; window.SourcePath = sessions[index].Path; window.WorkspaceRoot = sessions[index].Path is { } path ? System.IO.Path.GetDirectoryName(path) : null; }
         finally { switching = false; }
         _ = RequestCurrent();
@@ -95,22 +99,10 @@ internal sealed class DiagnosticStudio
     {
         if (current < 0) return;
         if (closedSessions.Count >= 8) { status.Text = "Eight closed diagnostic sources are retained; reopen one before closing another."; return; }
-        closedSessions.Push(sessions[current]); sessions.RemoveAt(current); current = -1;
+        sessions[current].View = window.CaptureView(); closedSessions.Push(sessions[current]); sessions.RemoveAt(current); current = -1; activeSession = null;
         if (sessions.Count == 0) { Open("Untitled", "", null); return; }
         documents.ItemsSource = null; documents.ItemsSource = sessions; documents.SelectedIndex = 0;
     }
     private void Find(bool next) => window.Surface.FindNext(next);
-    private async Task CopyRendered()
-    {
-        if (window.Surface.Snapshot is not { } snapshot) return;
-        var sequence = NativeClipboardService.Sequence; var path = window.SourcePath; var root = window.WorkspaceRoot;
-        try
-        {
-            var payload = await ExperimentWindow.Worker(() => new ClipboardExporter().Export(new ExportPreparationService(new MarkdownService(), new DiagramService(), new NativeSvgService())
-                .Prepare(snapshot.Model.Source, path, root, snapshot.Appearance == "Dark")));
-            if (!ReferenceEquals(window.Surface.Snapshot, snapshot)) throw new IOException("The document changed before copy completed.");
-            NativeClipboardService.WriteRendered(payload, sequence); status.Text = "Rendered document copied with the existing HTML clipboard/export service";
-        }
-        catch (Exception error) { status.Text = error.Message; }
-    }
+    private Task CopyRendered() => window.CopyRendered();
 }

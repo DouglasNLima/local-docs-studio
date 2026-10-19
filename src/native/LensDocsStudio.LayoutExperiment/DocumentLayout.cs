@@ -17,11 +17,13 @@ internal static class DocumentLayout
         var watch = Stopwatch.StartNew();
         var bottom = session.Block(model.Root, 28, 28, width - 56 - SystemParameters.VerticalScrollBarWidth, true);
         cancellation.ThrowIfCancellationRequested(); session.Decorations.Freeze();
-        return new(model, session.Lines.ToImmutableArray(), width, bottom + 28, Environment.CurrentManagedThreadId,
+        var snapshot = new LayoutSnapshot(model, session.Lines.ToImmutableArray(), width, bottom + 28, Environment.CurrentManagedThreadId,
             watch.Elapsed.TotalMilliseconds, version, appearance, new Dictionary<string, double>
             { ["FormatLineMilliseconds"] = session.FormatTicks * 1000d / Stopwatch.Frequency,
                 ["CompleteCaretAndRangeGeometryMilliseconds"] = session.GeometryTicks * 1000d / Stopwatch.Frequency }.ToImmutableDictionary())
-        { NodeBounds = session.Bounds.ToImmutableDictionary(), Decorations = session.Decorations };
+        { NodeBounds = session.Bounds.ToImmutableDictionary(), Decorations = session.Decorations, Controls = session.Controls.Where(box => !session.HiddenControlNodes.Contains(box.Node)).ToImmutableArray() };
+        var projected = VisibilityProjection.Apply(snapshot, cancellation);
+        return projected with { LayoutMilliseconds = watch.Elapsed.TotalMilliseconds };
     }
     private sealed class Session : IDisposable
     {
@@ -31,10 +33,12 @@ internal static class DocumentLayout
         private readonly Brush foreground, surface, linkBrush;
         private readonly bool highContrast;
         private readonly string appearance;
-        private readonly Dictionary<(StyledRun Run, double Size, bool Heading), Properties> properties = [];
+        private readonly Dictionary<(bool Bold, bool Italic, bool Code, MarkdownEmphasis Emphasis, bool Link, string? Colour, double Size, bool Heading), Properties> properties = [];
         private readonly Dictionary<(bool Ordered, int Number, double X), DrawingGroup> markers = [];
         public readonly List<Line> Lines = [];
         public readonly Dictionary<int, Rect> Bounds = [];
+        public readonly List<ControlBox> Controls = [];
+        public readonly HashSet<int> HiddenControlNodes = [];
         public readonly DrawingGroup Decorations = new();
         public long FormatTicks, GeometryTicks;
         private bool hidden;
@@ -42,7 +46,7 @@ internal static class DocumentLayout
         {
             this.model = model; this.cancellation = cancellation; this.appearance = appearance; highContrast = appearance.StartsWith("HC:", StringComparison.Ordinal);
             foreground = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 0) : appearance == "Dark" ? "#E8EAED" : "#202124");
-            surface = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 2) : appearance == "Dark" ? "#303134" : "#F3F4F6");
+            surface = Brush(highContrast ? ExperimentAppearance.Slot(appearance, 1) : appearance == "Dark" ? "#292B2F" : "#F3F4F6");
             linkBrush = highContrast ? Brush(ExperimentAppearance.Slot(appearance, 5)) : Brush(appearance == "Dark" ? "#87CEFA" : "#4169E1");
         }
         private static SolidColorBrush Brush(string colour) { var brush = new SolidColorBrush((Color)ColorConverter.ConvertFromString(colour)); brush.Freeze(); return brush; }
@@ -54,80 +58,92 @@ internal static class DocumentLayout
             switch (node.Kind)
             {
                 case "Document": case "ListItem": case "Cell":
-                    foreach (var child in node.Children) { top = Block(child, x, top, width, first, marker, alignment); first = false; marker = null; }
+                    top = Flow(node.Children, x, top, width, true, node.Kind == "Document", marker, alignment, docTop: first && node.Kind == "Document");
                     break;
                 case "List":
-                    var number = node.Number;
-                    foreach (var child in node.Children) top = Block(child, x + 24, top, width - 24, true, (node.Ordered, number++));
+                    top += ListMargin; var number = node.Number;
+                    foreach (var child in node.Children) top = Block(child, x + 24, top, width - 24, true, node.Ordered && node.Number == 0 ? null : (node.Ordered, number++));
+                    top += Math.Max(0, ListMargin - (node.Children.LastOrDefault()?.Children.LastOrDefault() is { } last ? After(last) : 0));
                     break;
                 case "Quote":
-                    top += 4; foreach (var child in node.Children) top = Block(child, x + 15, top, width - 27);
+                    top += 4; top = Flow(node.Children, x + 15, top, width - 19, first, false, docTop: first);
                     Rectangle(null, new Pen(Brush("#FF883E"), 3), new Rect(x + 1.5, begin, 0, top - begin + 4)); top += 4; break;
                 case "Details":
                     top += 15;
-                    if (!hidden)
-                    {
-                        var triangle = new StreamGeometry();
-                        using (var geometry = triangle.Open())
-                        {
-                            geometry.BeginFigure(new Point(x + 12, top + 6), true, true);
-                            geometry.LineTo(new Point(x + 20, top + (node.Expanded ? 6 : 10)), true, false);
-                            geometry.LineTo(new Point(x + (node.Expanded ? 16 : 12), top + 14), true, false);
-                        }
-                        triangle.Freeze(); using var dc = Decorations.Append(); dc.DrawGeometry(foreground, null, triangle);
-                    }
-                    top = Block(node.Children[0], x + 29, top, width - 40, true);
+                    top = Block(node.Children[0], x + 11, top, width - 22, true);
                     var headerBottom = top; var wasHidden = hidden; hidden |= !node.Expanded;
-                    foreach (var child in node.Children.Skip(1)) top = Block(child, x + 11, top, width - 22, true);
+                    top = Flow(node.Children.Skip(1).ToImmutableArray(), x + 11, top, width - 22, false, false, initialMargin: 4);
                     hidden = wasHidden; if (!node.Expanded) top = headerBottom;
                     top += 7; Rectangle(null, new Pen(surface, 1), new Rect(x + .5, begin + 8.5, width - 1, top - begin - 8)); top += 12; break;
-                case "Table": top = Table(node, x, top + 8, width) + 12; break;
+                case "Table": top = Table(node, x, top + 8, width) + After(node); break;
                 case "Media":
                     var media = node.Media ?? throw new IOException("Prepared media is missing.");
-                    var scale = Math.Min(1, Math.Min(width / media.Width, 900 / media.Height));
+                    if (hidden) HiddenControlNodes.Add(node.Id);
+                    top += 6;
+                    var scale = Math.Min(width / media.Width, 900 / media.Height);
                     var rectangle = new Rect(x, top, media.Width * scale, media.Height * scale);
                     if (!hidden) { using var dc = Decorations.Append(); dc.DrawImage(media, rectangle); }
                     var item = model.Items[node.Paragraph];
                     var drawing = new DrawingGroup(); drawing.Freeze();
                     Lines.Add(new(item.Start, item.Start + item.Length, node.Paragraph, top, rectangle.Height, rectangle.Height, drawing,
-                        [new(item.Start, x), new(item.Start + 1, rectangle.Right)], [new(item.Start, item.Start + 1, [rectangle])]) { Hidden = hidden, SelectionDrawing = SelectionInk.Create(drawing, appearance) });
-                    top = rectangle.Bottom + 10; break;
+                        [new(item.Start, x), new(item.Start + 1, rectangle.Right)], [new(item.Start, item.Start + 1, [rectangle])]) { Hidden = hidden });
+                    top = rectangle.Bottom;
+                    var actionX = x; var actionTop = top; var actionBottom = top;
+                    foreach (var label in new[] { "Zoom", "SVG", "PNG", "Copy source" })
+                    {
+                        var labelRun = new StyledRun(0, label, 0, false, false, false);
+                        var labelModel = model with { Text = label, Items = [new(0, label.Length, 0, 0, [labelRun])] };
+                        var labelNode = node with { Paragraph = 0, Children = [] };
+                        var labelProps = new Properties(labelRun, 15, false, foreground, surface);
+                        var labelSource = new ParagraphSource(labelModel, labelModel.Items[0], labelNode, _ => labelProps, width, labelProps);
+                        using var labelLine = formatter.FormatLine(labelSource, 0, 10000, new ParagraphProperties(labelProps, TextAlignment.Left), null);
+                        var slotWidth = labelLine.Width + 26; var slotHeight = labelLine.Height + 12;
+                        if (actionX > x && actionX + slotWidth > x + width) { actionX = x; actionTop = actionBottom; }
+                        Controls.Add(new(node.Id, label, new Rect(actionX, actionTop, slotWidth, slotHeight)));
+                        actionX += slotWidth; actionBottom = Math.Max(actionBottom, actionTop + slotHeight);
+                    }
+                    top = actionBottom + 12; break;
                 case "Rule": Rectangle(null, new Pen(Brush("#808080"), 1), new Rect(x, top + 12, width, 0)); top += 25; break;
                 default:
                     var heading = node.Kind == "Heading";
                     var code = node.Kind == "Code";
                     var size = heading ? node.Level switch { 1 => 30d, 2 => 24d, 3 => 20d, _ => 17d } : code ? 13 : 15;
-                    top += first ? 0 : heading ? 16 : 4;
+                    top += Before(node);
                     var paragraphTop = top;
                     if (code) top += 12;
                     top = Paragraph(node, x + (code ? 12 : 0), top, width - (code ? 24 : 0), size, heading || node.Kind == "DetailsHeader", marker, alignment);
                     if (code) { top += 12; Rectangle(surface, null, new Rect(x, paragraphTop, width, top - paragraphTop)); }
-                    top += node.Kind == "DetailsHeader" ? 4 : heading ? 8 : 10;
+                    top += After(node);
                     break;
             }
             Bounds[node.Id] = new Rect(x, begin, Math.Max(0, width), Math.Max(0, top - begin)); return top;
+        }
+        private static double CodeMargin => Math.Round(new FontFamily("Consolas").LineSpacing * 13 * 300) / 300;
+        private static double ListMargin => Math.Round(new FontFamily("Segoe UI").LineSpacing * 15 * 300) / 300;
+        private static double Before(SemanticNode node) => node.Kind switch { "Heading" => 16, "Table" or "Details" => 8, "Rule" => 12, "List" => ListMargin, "Code" => CodeMargin, "Quote" or "DetailsHeader" or "Media" => 0, _ => node.Paragraph >= 0 ? 4 : 0 };
+        private static double After(SemanticNode node) => node.Kind switch { "Heading" => 8, "Table" or "Details" => 12, "Rule" => 12, "Code" => CodeMargin, "Quote" or "Media" => 0, "DetailsHeader" => 4, "List" => ListMargin, _ => node.Paragraph >= 0 ? 10 : 0 };
+        private double Flow(ImmutableArray<SemanticNode> children, double x, double top, double width, bool suppressFirst, bool trimLast,
+            (bool Ordered, int Number)? marker = null, TextAlignment alignment = TextAlignment.Left, bool docTop = false, double initialMargin = 0)
+        {
+            var previous = initialMargin;
+            for (var index = 0; index < children.Length; index++)
+            {
+                var child = children[index];
+                // The stock table-to-container boundary resolves the inherited
+                // natural text margin before entering that container's border.
+                if (index > 0 && children[index - 1].Kind == "Table" && child.Kind is "Details" or "Quote" or "List") top += Math.Max(0, ListMargin - previous);
+                top -= index == 0 && suppressFirst ? Before(child) : Math.Min(previous, Before(child));
+                top = Block(child, x, top, width, docTop && index == 0, index == 0 ? marker : null, alignment); previous = After(child);
+            }
+            return top - (trimLast ? previous : 0);
         }
         private double Table(SemanticNode table, double x, double top, double width)
         {
             var count = table.Children.Select(row => row.Children.Length).DefaultIfEmpty(0).Max();
             if (count == 0) return top;
-            var preferred = new double[count]; var minimum = new double[count];
-            foreach (var row in table.Children)
-            for (var column = 0; column < row.Children.Length; column++)
-            foreach (var paragraph in row.Children[column].Children)
-            {
-                cancellation.ThrowIfCancellationRequested();
-                if (paragraph.Paragraph < 0) throw new NotSupportedException("Nested table-cell blocks require a separate column-width contract.");
-                var source = Source(paragraph, 15, row.Level == 1, width);
-                var bounds = formatter.FormatMinMaxParagraphWidth(source, 0, new ParagraphProperties(source.Default, TextAlignment.Left));
-                preferred[column] = Math.Max(preferred[column], bounds.MaxWidth + 17);
-                minimum[column] = Math.Max(minimum[column], bounds.MinWidth + 17);
-            }
-            // Resolve all Auto columns from measured intrinsic widths before any row is installed.
-            var natural = preferred.Sum(); var floor = minimum.Sum();
-            var columns = preferred.Select((value, i) => natural <= width ? value + (width - natural) / count
-                : floor >= width ? minimum[i] * width / Math.Max(1, floor)
-                : minimum[i] + (value - minimum[i]) * (width - floor) / Math.Max(1, natural - floor)).ToArray();
+            // Stock creates no explicit TableColumns: its implicit columns share
+            // the available width equally. Shape every cell at that actual width.
+            var columns = Enumerable.Repeat(width / count, count).ToArray();
             foreach (var row in table.Children)
             {
                 var rowTop = top; var bottom = top; var left = x;
@@ -155,7 +171,7 @@ internal static class DocumentLayout
             var item = model.Items[node.Paragraph];
             Properties Props(StyledRun run)
             {
-                var key = (run, size, heading);
+                var key = (run.Bold, run.Italic, run.Code, run.Emphasis, run.Link is not null, run.Colour, size, heading);
                 if (!properties.TryGetValue(key, out var value))
                 {
                     var brush = run.Link is not null ? linkBrush : !highContrast && run.Colour is not null ? Brush("#" + run.Colour) : foreground;
@@ -163,7 +179,7 @@ internal static class DocumentLayout
                 }
                 return value;
             }
-            return new(model, item, node, Props, width, new(new(0, "", 0, false, false, node.Kind == "Code"), size, heading, foreground, surface));
+            return new(model, item, node, Props, width, Props(new(0, "", 0, false, false, node.Kind == "Code")));
         }
         private double Paragraph(SemanticNode node, double x, double top, double width, double size, bool heading,
             (bool Ordered, int Number)? marker, TextAlignment alignment)
@@ -179,14 +195,14 @@ internal static class DocumentLayout
                     using var line = formatter.FormatLine(source, position, Math.Max(1, width), paragraph, previous);
                     FormatTicks += Stopwatch.GetTimestamp() - phase;
                     previous?.Dispose(); previous = line.GetTextLineBreak();
-                    var end = Math.Min(item.Length, position + line.Length);
+                    var end = Math.Min(item.Length, position + line.Length - line.NewlineLength);
                     var drawing = new DrawingGroup();
                     using (var dc = drawing.Open())
                     {
                         line.Draw(dc, new Point(x, top), InvertAxes.None);
                         if (position == 0 && marker is { } value)
                         {
-                            var key = (value.Ordered, value.Number, x);
+                            var key = (value.Ordered, value.Ordered ? value.Number : 0, x);
                             if (!markers.TryGetValue(key, out var mark))
                             {
                                 var gap = source.Default.Typeface.FontFamily.LineSpacing * size / 2;
@@ -202,20 +218,20 @@ internal static class DocumentLayout
                     var carets = ImmutableArray.CreateBuilder<Caret>(); var clusters = ImmutableArray.CreateBuilder<Cluster>();
                     var hit = new CharacterHit(position, 0); carets.Add(new(item.Start + position, x + line.GetDistanceFromCharacterHit(hit)));
                     var whole = end > position ? line.GetTextBounds(position, end - position) : [];
-                    var simple = whole.Count == 1 && whole[0].FlowDirection == FlowDirection.LeftToRight && item.Runs.All(run => !run.Code) && node.Children.All(child => child.Media is null);
+                    var simple = whole.Count == 1 && whole[0].FlowDirection == FlowDirection.LeftToRight && item.Runs.All(run => !run.Code && run.FontSize == item.Runs[0].FontSize) && node.Children.All(child => child.Media is null);
                     while (hit.FirstCharacterIndex + hit.TrailingLength < end)
                     {
                         cancellation.ThrowIfCancellationRequested(); var next = line.GetNextCaretCharacterHit(hit);
                         var begin = hit.FirstCharacterIndex + hit.TrailingLength; var finish = Math.Min(end, next.FirstCharacterIndex + next.TrailingLength);
-                        if (finish <= begin) throw new IOException("The native formatter failed to advance.");
+                        if (finish <= begin) throw new IOException($"The native formatter failed to advance: {node.Kind}, source {node.SourceStart}, line {position}, end {end}, length {line.Length}, newline {line.NewlineLength}, hit {hit.FirstCharacterIndex}/{hit.TrailingLength}, next {next.FirstCharacterIndex}/{next.TrailingLength}.");
                         var nextX = x + line.GetDistanceFromCharacterHit(next); var oldX = carets[^1].X;
                         var rectangles = simple ? ImmutableArray.Create(new Rect(Math.Min(oldX, nextX), top + whole[0].Rectangle.Top, Math.Abs(nextX - oldX), whole[0].Rectangle.Height))
-                            : line.GetTextBounds(begin, finish - begin).Select(bounds => { var rect = bounds.Rectangle; rect.Offset(x, top); return rect; }).ToImmutableArray();
+                            : line.GetTextBounds(begin, finish - begin).SelectMany(bounds => bounds.TextRunBounds is { Count: > 0 } runs ? runs.Select(run => run.Rectangle) : [bounds.Rectangle]).Select(rect => { rect.Offset(x, top); return rect; }).ToImmutableArray();
                         clusters.Add(new(item.Start + begin, item.Start + finish, rectangles)); carets.Add(new(item.Start + finish, nextX)); hit = next;
                     }
                     GeometryTicks += Stopwatch.GetTimestamp() - phase;
-                    Lines.Add(new(item.Start + position, item.Start + end, node.Paragraph, top, line.Height, line.Baseline, drawing, carets.ToImmutable(), clusters.ToImmutable()) { Hidden = hidden, SelectionDrawing = SelectionInk.Create(drawing, appearance) });
-                    top += Math.Max(line.Height, 23 - 1d / 300); position += line.Length;
+                    Lines.Add(new(item.Start + position, item.Start + end, node.Paragraph, top, line.Height, line.Baseline, drawing, carets.ToImmutable(), clusters.ToImmutable()) { Hidden = hidden });
+                    top += node.Kind == "Code" ? line.Height : Math.Max(line.Height, 23 - 1d / 300); position += line.Length;
                 } while (position < item.Length);
             }
             finally { previous?.Dispose(); }
@@ -242,7 +258,7 @@ internal static class DocumentLayout
             : run.Link is not null || run.Emphasis.HasFlag(MarkdownEmphasis.Underline) ? System.Windows.TextDecorations.Underline : null;
         public override Brush ForegroundBrush => brush;
         public override Brush? BackgroundBrush => run.Code || run.Emphasis.HasFlag(MarkdownEmphasis.Highlight) ? surface : null;
-        public override CultureInfo CultureInfo => CultureInfo.GetCultureInfo("en-GB");
+        public override CultureInfo CultureInfo => TextCulture.Value;
         public override TextEffectCollection? TextEffects => null;
     }
     private sealed class ParagraphProperties(TextRunProperties normal, TextAlignment alignment) : TextParagraphProperties
@@ -266,25 +282,26 @@ internal static class DocumentLayout
             foreach (var run in item.Runs)
             {
                 if (offset < run.Start || offset >= run.Start + run.Text.Length) continue;
-                if (node.Children.FirstOrDefault(child => child.Start == offset && child.Media is not null) is { Media: { } media }) return new Embedded(media, props(run), width);
+                if (node.Children.FirstOrDefault(child => child.Start == offset && child.Media is not null) is { Media: { } media }) return new Embedded(media, props(run), width, node.Children.First(child => child.Start == offset && child.Media is not null).Kind == "Toggle");
                 var local = offset - run.Start; return new TextCharacters(run.Text, local, run.Text.Length - local, props(run));
             }
             throw new IOException("A complete semantic run is missing.");
         }
-        public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int index) => new(index, new(CultureInfo.GetCultureInfo("en-GB"), new CharacterBufferRange(model.Text, item.Start, index)));
+        public override TextSpan<CultureSpecificCharacterBufferRange> GetPrecedingText(int index) => new(index, new(TextCulture.Value, new CharacterBufferRange(model.Text, item.Start, index)));
         public override int GetTextEffectCharacterIndexFromTextSourceCharacterIndex(int index) => index;
     }
-    private sealed class Embedded(ImageSource media, TextRunProperties properties, double width) : TextEmbeddedObject
+    private sealed class Embedded(ImageSource media, TextRunProperties properties, double width, bool centred) : TextEmbeddedObject
     {
-        private readonly double scale = Math.Min(1, Math.Min(Math.Min(720, width) / media.Width, 720 / media.Height));
+        private readonly double scale = centred ? 1 : Math.Min(Math.Min(720, width) / media.Width, 720 / media.Height);
+        private double Baseline => centred ? media.Height * scale / 2 + (properties.Typeface.FontFamily.Baseline - properties.Typeface.FontFamily.LineSpacing / 2) * properties.FontRenderingEmSize : media.Height * scale;
         public override int Length => 1;
         public override TextRunProperties Properties => properties;
         public override CharacterBufferReference CharacterBufferReference => new();
         public override LineBreakCondition BreakBefore => LineBreakCondition.BreakPossible;
         public override LineBreakCondition BreakAfter => LineBreakCondition.BreakPossible;
         public override bool HasFixedSize => true;
-        public override TextEmbeddedObjectMetrics Format(double remainingParagraphWidth) => new(media.Width * scale, media.Height * scale, media.Height * scale);
-        public override Rect ComputeBoundingBox(bool rightToLeft, bool sideways) => new(0, -media.Height * scale, media.Width * scale, media.Height * scale);
-        public override void Draw(DrawingContext context, Point origin, bool rightToLeft, bool sideways) => context.DrawImage(media, new Rect(origin.X, origin.Y - media.Height * scale, media.Width * scale, media.Height * scale));
+        public override TextEmbeddedObjectMetrics Format(double remainingParagraphWidth) => new(media.Width * scale, media.Height * scale, Baseline);
+        public override Rect ComputeBoundingBox(bool rightToLeft, bool sideways) => new(0, -Baseline, media.Width * scale, media.Height * scale);
+        public override void Draw(DrawingContext context, Point origin, bool rightToLeft, bool sideways) => context.DrawImage(media, new Rect(origin.X, origin.Y - Baseline, media.Width * scale, media.Height * scale));
     }
 }

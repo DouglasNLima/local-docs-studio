@@ -32,6 +32,17 @@ internal static class LifecycleChecks
         var unavailable = false;
         try { oldRange.GetText(-1); } catch (System.Windows.Automation.ElementNotAvailableException) { unavailable = true; }
         if (!unavailable) throw new IOException("An old UIA range retained access to replaced content.");
+        var distant = winner.LastIndexOf("word3900", StringComparison.Ordinal); window.Surface.NavigateSourceCore(distant); window.UpdateLayout();
+        var anchor = window.Surface.ViewportSourceAnchor();
+        var leading = "Leading edit.\n\n" + winner;
+        if (!await window.Request(leading)) throw new IOException("Leading edit did not install.");
+        var preserved = window.Surface.ViewportSourceAnchor();
+        if (preserved.Source != SourceEdit.Transform(winner, leading, anchor.Source) || Math.Abs(preserved.Delta - anchor.Delta) > .01)
+            throw new IOException("Leading edit lost the source-based viewport anchor.");
+        var distantEdit = leading.Replace("word4000 winning", "word4000 distant winning", StringComparison.Ordinal);
+        if (!await window.Request(distantEdit)) throw new IOException("Distant edit did not install.");
+        var afterDistant = window.Surface.ViewportSourceAnchor();
+        if (afterDistant.Source != preserved.Source || Math.Abs(afterDistant.Delta - preserved.Delta) > .01) throw new IOException("Distant edit moved the earlier source anchor.");
         var closeWork = window.Request(fixture.Source + "\n- **close active**");
         activeVersion = window.CurrentVersion;
         await Wait(() => window.Events.Any(item => item.Event == "worker-format-started" && item.Version == activeVersion));
@@ -59,9 +70,9 @@ internal static class LifecycleChecks
                 WinningPreviewReadyMilliseconds = (ready.Timestamp - requested.Timestamp) * 1000d / Stopwatch.Frequency };
         }).ToArray();
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
-            ActiveClosure = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
+            ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
-            TabIntegration = "MISSING: isolated diagnostic window", Appearance = "NOT TESTED", Reopen = "PASS" });
+            TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS" });
     }
     private static async Task Wait(Func<bool> condition)
     {

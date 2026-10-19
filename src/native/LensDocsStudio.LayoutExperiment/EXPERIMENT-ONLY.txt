@@ -37,3 +37,14 @@ Source, harness/runtime/fixture hashes and source cleanliness are in adjacent
 provenance.json and raw receipts. Draft PR #38 identifies exact source and
 limitations. Never infer certification from another package. No migration is
 approved by this executable.
+
+Independent probes (isolated desktop; actual input/clipboard):
+  LensDocsStudio.LayoutExperiment.exe --parity-all --output parity
+  LensDocsStudio.LayoutExperiment.exe --studio-checks --output studio-checks
+
+parity-requirements-v2.json lists implemented and missing/unverified requirements.
+An implementation label is not a validation pass. No full v2 acceptance is
+claimed while any required metric or parity row is unsuccessful/incomplete.
+Selected RTF/Xaml uses a temporary unformatted public WPF interchange tree on
+its owning STA. It is never installed, laid out or used for selection/UIA;
+HasValidLayout must remain false before and after serialisation.

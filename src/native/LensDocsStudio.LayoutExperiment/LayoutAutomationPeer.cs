@@ -47,6 +47,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         var id = child.GetPropertyValue(AutomationElementIdentifiers.AutomationIdProperty.Id) as string;
         var snapshot = surface.Snapshot ?? throw new ElementNotAvailableException();
         if (id?.StartsWith($"Node-{snapshot.Version}-", StringComparison.Ordinal) == true && int.TryParse(id.Split('-')[^1], out var key) && nodes.TryGetValue(key, out var node)) return Range(node.Start, node.End);
+        var native = surface.Children.OfType<System.Windows.Controls.Button>().FirstOrDefault(button => button.IsEnabled && AutomationProperties.GetAutomationId(button) == id);
+        if (native?.Tag is ControlBox box && nodes.TryGetValue(box.Node, out var media)) return Range(media.Start, media.End);
         throw new ArgumentException("The element is not a child of the current document.");
     }
     internal TextRange Range(int start, int end) => new(this, surface.Snapshot, start, end);
@@ -103,7 +105,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             "Link" => AutomationControlType.Hyperlink, "Image" or "Media" => AutomationControlType.Image,
             "Details" => AutomationControlType.Group, _ => AutomationControlType.Text
         };
-        protected override List<AutomationPeer> GetChildrenCore() => Node.Children.Select(child => (AutomationPeer)root.Peer(child)).ToList();
+        protected override List<AutomationPeer> GetChildrenCore() => Node.Children.Select(child => (AutomationPeer)root.Peer(child))
+            .Concat(root.Surface.Children.OfType<System.Windows.Controls.Button>().Where(button => button.Tag is ControlBox box && box.Node == id).Select(button => (AutomationPeer)UIElementAutomationPeer.CreatePeerForElement(button))).ToList();
         protected override Rect GetBoundingRectangleCore()
         {
             _ = Current; var rectangles = root.Surface.Bounds(Node.Start, Node.End, true).ToArray();
@@ -154,7 +157,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             IEnumerable<int> units = unit switch
             {
                 TextUnit.Character => Current.Lines.SelectMany(line => line.Carets.Select(caret => caret.Offset)).Concat(model.Items.SelectMany(item => new[] { item.Start, item.Start + item.Length })),
-                TextUnit.Word => Enumerable.Range(0, model.Text.Length).Where(i => i == 0 || char.IsWhiteSpace(model.Text[i - 1]) != char.IsWhiteSpace(model.Text[i])),
+                TextUnit.Word => model.WordBoundaries,
                 TextUnit.Line => Current.Lines.Select(line => line.Start),
                 TextUnit.Paragraph => model.Items.Select(item => item.Start),
                 TextUnit.Format => model.Items.SelectMany(item => item.Runs.Select(run => run.Start)),
@@ -164,7 +167,8 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         }
         public void ExpandToEnclosingUnit(TextUnit unit)
         {
-            var units = Units(unit); var at = Array.FindLastIndex(units, value => value <= start);
+            var units = Units(unit); if (units.Length < 2) { start = end = 0; return; }
+            var at = Array.FindLastIndex(units, value => value <= start);
             start = units[Math.Clamp(at, 0, units.Length - 2)]; end = units[Math.Clamp(at + 1, 1, units.Length - 1)];
         }
         public ITextRangeProvider? FindText(string text, bool backward, bool ignoreCase)
@@ -176,26 +180,38 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         public ITextRangeProvider? FindAttribute(int attributeId, object value, bool backward)
         {
             _ = Current;
-            if (attributeId != TextPatternIdentifiers.FontWeightAttribute.Id) return null;
             var runs = Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < end);
             if (backward) runs = runs.Reverse();
-            var found = runs.FirstOrDefault(run => Equals(value, run.Bold ? 700 : 400));
+            var found = runs.FirstOrDefault(run => Equals(value, RunAttribute(run, attributeId)));
             return found is null ? null : new TextRange(peer, Current, Math.Max(start, found.Start), Math.Min(end, found.Start + found.Text.Length));
         }
         public object GetAttributeValue(int attributeId)
         {
             _ = Current;
             if (attributeId == TextPatternIdentifiers.IsReadOnlyAttribute.Id) return true;
-            if (attributeId == TextPatternIdentifiers.IsItalicAttribute.Id) return Attribute(run => run.Italic);
-            if (attributeId == TextPatternIdentifiers.FontNameAttribute.Id) return Attribute(run => run.Code ? "Consolas" : "Segoe UI");
-            if (attributeId == TextPatternIdentifiers.FontSizeAttribute.Id) return Attribute(run => run.FontSize * .75);
-            if (attributeId == TextPatternIdentifiers.FontWeightAttribute.Id)
+            if (attributeId == TextPatternIdentifiers.CultureAttribute.Id) return TextCulture.Value.LCID;
+            return Attribute(run => RunAttribute(run, attributeId));
+        }
+        private object RunAttribute(StyledRun run, int attributeId)
+        {
+            if (attributeId == TextPatternIdentifiers.IsItalicAttribute.Id) return run.Italic;
+            if (attributeId == TextPatternIdentifiers.FontNameAttribute.Id) return run.Code ? "Consolas" : "Segoe UI";
+            if (attributeId == TextPatternIdentifiers.FontSizeAttribute.Id) return run.FontSize * .75;
+            if (attributeId == TextPatternIdentifiers.FontWeightAttribute.Id) return run.Weight;
+            if (attributeId == TextPatternIdentifiers.UnderlineStyleAttribute.Id) return run.Link is not null || run.Emphasis.HasFlag(LensDocsStudio.Core.Parsing.MarkdownEmphasis.Underline) ? TextDecorationLineStyle.Single : TextDecorationLineStyle.None;
+            if (attributeId == TextPatternIdentifiers.StrikethroughStyleAttribute.Id) return run.Emphasis.HasFlag(LensDocsStudio.Core.Parsing.MarkdownEmphasis.Strike) ? TextDecorationLineStyle.Single : TextDecorationLineStyle.None;
+            if (attributeId == TextPatternIdentifiers.IsSubscriptAttribute.Id) return run.Emphasis.HasFlag(LensDocsStudio.Core.Parsing.MarkdownEmphasis.Subscript);
+            if (attributeId == TextPatternIdentifiers.IsSuperscriptAttribute.Id) return run.Emphasis.HasFlag(LensDocsStudio.Core.Parsing.MarkdownEmphasis.Superscript);
+            if (attributeId == TextPatternIdentifiers.ForegroundColorAttribute.Id)
             {
-                var weights = Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < Math.Max(end, start + 1)).Select(run => run.Weight).Distinct().ToArray();
-                return weights.Length == 1 ? weights[0] : TextPatternIdentifiers.MixedAttributeValue;
+                var appearance = Current.Appearance; var hc = appearance.StartsWith("HC:", StringComparison.Ordinal);
+                var colour = hc ? ExperimentAppearance.Slot(appearance, run.Link is null ? 0 : 5) : run.Link is not null ? appearance == "Dark" ? "#87CEFA" : "#4169E1" : run.Colour is not null ? "#" + run.Colour : appearance == "Dark" ? "#E8EAED" : "#202124";
+                var value = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(colour);
+                return value.R | value.G << 8 | value.B << 16;
             }
             return AutomationElementIdentifiers.NotSupported;
         }
+
         private object Attribute<T>(Func<StyledRun, T> select)
         {
             var values = Current.Model.Items.SelectMany(item => item.Runs).Where(run => run.Start + run.Text.Length > start && run.Start < Math.Max(end, start + 1)).Select(select).Distinct().ToArray();
@@ -212,14 +228,16 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
         { var text = Current.Model.Text[start..end]; return maxLength < 0 || maxLength >= text.Length ? text : text[..maxLength]; }
         public int Move(TextUnit unit, int count)
         {
-            var units = Units(unit); var index = Math.Max(0, Array.FindLastIndex(units, value => value <= start));
+            var units = Units(unit); if (units.Length < 2) return 0;
+            var index = Math.Min(units.Length - 2, Math.Max(0, Array.FindLastIndex(units, value => value <= start)));
             var target = Math.Clamp(index + count, 0, units.Length - 2); var moved = target - index;
-            var degenerate = start == end; start = units[target]; end = degenerate ? start : units[target + 1]; return moved;
+            start = units[target]; end = units[target + 1]; return moved;
         }
         public int MoveEndpointByUnit(TextPatternRangeEndpoint endpoint, TextUnit unit, int count)
         {
             var units = Units(unit); var value = endpoint == TextPatternRangeEndpoint.Start ? start : end;
-            var index = Math.Max(0, Array.FindLastIndex(units, at => at <= value));
+            var index = count < 0 ? Array.FindIndex(units, at => at >= value) : Array.FindLastIndex(units, at => at <= value);
+            index = Math.Max(0, index);
             var target = Math.Clamp(index + count, 0, units.Length - 1);
             if (endpoint == TextPatternRangeEndpoint.Start) { start = units[target]; if (start > end) end = start; }
             else { end = units[target]; if (end < start) start = end; }
@@ -232,7 +250,7 @@ internal sealed class LayoutAutomationPeer(LayoutSurface surface) : FrameworkEle
             else { end = value; if (end < start) start = end; }
         }
         public void Select() { _ = Current; peer.Surface.Select(start, end); }
-        public void AddToSelection() => Select();
+        public void AddToSelection() { _ = Current; if (peer.Surface.Start != peer.Surface.End && (peer.Surface.Start != start || peer.Surface.End != end)) throw new InvalidOperationException("Only one text selection is supported."); Select(); }
         public void RemoveFromSelection() { _ = Current; peer.Surface.Select(end, end); }
         public void ScrollIntoView(bool alignToTop) { _ = Current; peer.Surface.Reveal(alignToTop ? start : end); }
         public IRawElementProviderSimple[] GetChildren() { _ = Current; return peer.Children(start, end); }

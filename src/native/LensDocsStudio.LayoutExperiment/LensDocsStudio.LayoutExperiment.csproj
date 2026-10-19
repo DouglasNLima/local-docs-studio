@@ -10,6 +10,7 @@
     <ProjectReference Include="../LensDocsStudio.Native/LensDocsStudio.Native.csproj" />
     <Compile Include="../LensDocsStudio.Native.Validation/ContinuousPreviewFixtures.cs" Link="ContinuousPreviewFixtures.cs" />
     <Compile Include="../LensDocsStudio.Native.Validation/NativeTestHighContrast.cs" Link="NativeTestHighContrast.cs" />
+    <Content Include="parity-requirements-v2.json" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="EXPERIMENT-ONLY.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

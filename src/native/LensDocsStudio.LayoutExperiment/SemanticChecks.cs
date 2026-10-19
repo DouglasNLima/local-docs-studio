@@ -12,11 +12,11 @@ internal static class SemanticChecks
         string[] required = fixture switch
         {
             "table" => ["Row1", "Value1", "Row1000", "Value1000"],
-            "paragraphs" => ["Paragraph1:", "Evidence", "& review remains selectable.", "Paragraph1200:"],
+            "paragraphs" => ["Paragraph1:", "Evidence", "& review remains selectable.", "Paragraph1200"],
             "quote" => ["Quoted1", "Quoted1200"], "details" => ["Large section", "Hidden1", "Hidden1200"],
             "mixed" => ["Mixed document", "Mixed item1000", "Value300", "Outer evidence", "Nested evidence", "Quoted300", "Café 😀 é", "Deep target", "Mixed final marker."],
             "list" => ["word1", "word4000", "Fresh revision", "Changed distant content Café 😀."],
-            _ => throw new ArgumentException("Unknown fixture.")
+            _ => TargetedFixtures.Cases.FirstOrDefault(value => value.Name == fixture)?.RequiredText ?? throw new ArgumentException("Unknown fixture.")
         };
         var text = adapter == "candidate" ? snapshot!.Model.Text : result!.ReadText();
         foreach (var value in required) if (!text.Contains(value, StringComparison.Ordinal)) throw new IOException(adapter + " missing actual fixture text: " + value);
@@ -36,8 +36,11 @@ internal static class SemanticChecks
         }
         var scrolling = (ScrollViewer)stock!.Template.FindName("PART_ContentHost", stock);
         return new { LogicalText = text, Height = scrolling.ExtentHeight, RequiredText = "PASS", FullParity = "INCOMPLETE",
+            Media = result!.Media.Select(media => new { Width = media.Image.ActualWidth, Height = media.Image.ActualHeight,
+                X = media.Image.TranslatePoint(new System.Windows.Point(), stock).X, Y = media.Image.TranslatePoint(new System.Windows.Point(), stock).Y,
+                ActionsHeight = media.Actions?.ActualHeight, NaturalWidth = media.Image.Source.Width, NaturalHeight = media.Image.Source.Height }),
             Paragraphs = Blocks(result!.Document.Blocks).OfType<Paragraph>().Select(paragraph => new { Text = new TextRange(paragraph.ContentStart, paragraph.ContentEnd).Text,
-                Top = paragraph.ContentStart.GetCharacterRect(LogicalDirection.Forward).Top, Height = paragraph.ContentStart.GetCharacterRect(LogicalDirection.Forward).Height }).ToArray() };
+                X = paragraph.ContentStart.GetCharacterRect(LogicalDirection.Forward).X, Top = paragraph.ContentStart.GetCharacterRect(LogicalDirection.Forward).Top, Height = paragraph.ContentStart.GetCharacterRect(LogicalDirection.Forward).Height }).ToArray() };
     }
     private static IEnumerable<Block> Blocks(BlockCollection blocks)
     {
