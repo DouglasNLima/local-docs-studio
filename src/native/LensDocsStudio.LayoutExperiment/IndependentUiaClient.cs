@@ -64,7 +64,7 @@ internal static class IndependentUiaClient
         using var acknowledgement = new InputAcknowledgement(acknowledgementName);
         SetThreadDpiAwarenessContext(new IntPtr(-4)); // UIA rectangles are physical screen coordinates.
         using var clipboardOwner = new ClipboardOwner();
-        var checks = new List<string>(); var stages = new List<object>();
+        var checks = new List<string>(); var stages = new List<object>(); var htmlReads = new List<object>();
         void Trace(string stage) { stages.Add(new { Stage = stage, Timestamp = Stopwatch.GetTimestamp() }); Program.Write(Path.Combine(output, "uia-client-stages.json"), stages); }
         try
         {
@@ -83,6 +83,7 @@ internal static class IndependentUiaClient
                 "paragraphs" => ("Paragraph1:", "Paragraph2:", "Paragraph1200:"), "quote" => ("Quoted1", "Quoted2", "Quoted1200"),
                 "rich" => ("Heading", "Plain", "Final marker."), "unicode-bidi" => ("Unicode", "Latin", "Final marker."),
                 "nested-lists" => ("First", "continuation", "After list."), "table-wrap" => ("Left", "first", "After table."),
+                "nested-numbering" => ("Outer first", "Child unordered", "After numbered nesting."),
                 "table-spans" => ("AAAAA", "E", "After spanned table."), "table-blocks" => ("First paragraph.", "Rich cell", "After nested table."),
                 "collapsed-details" => ("Hidden section", "After fold.", "After fold."),
                 "details" => ("Large section", "Hidden1", "Hidden1200"), "mixed" => ("Mixed document", "Deep target", "Mixed final marker."),
@@ -90,6 +91,13 @@ internal static class IndependentUiaClient
             };
             Trace("semantic-tree");
             var lists = document.FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List));
+            if (scenario == "nested-numbering")
+            {
+                Require(lists.Count == 3, "Three actual semantic nested lists", checks);
+                var outerItems = lists[0].FindAll(TreeScope.Children, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem));
+                Require(outerItems.Count == 2 && outerItems[0].FindAll(TreeScope.Descendants, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.List)).Count == 2, "Nested lists belong to the first outer item", checks);
+                Require(lists[2].Current.Name == "Ordered list" && lists[2].FindAll(TreeScope.Children, new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem)).Count == 2, "Nested ordered items retain semantic grouping", checks);
+            }
             if (scenario is "list" or "mixed")
             {
                 Require(lists.Count == 1, "One real semantic UIA list", checks);
@@ -304,8 +312,15 @@ internal static class IndependentUiaClient
                 return renderedCommand is not null;
             });
             ((InvokePattern)renderedCommand!.GetCurrentPattern(InvokePattern.Pattern)).Invoke();
-            Wait(() => Clipboard.ContainsData(DataFormats.Html));
-            var html = LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(Clipboard.GetData(DataFormats.Html) as string ?? throw new IOException("CF_HTML payload missing."));
+            string? htmlPayload = null;
+            Wait(() =>
+            {
+                var data = Clipboard.GetDataObject(); var value = data?.GetData(DataFormats.Html, false);
+                if (htmlReads.Count < 50) htmlReads.Add(new { Timestamp = Stopwatch.GetTimestamp(), Sequence = LensDocsStudio.Native.Platform.NativeClipboardService.Sequence,
+                    Formats = data?.GetFormats(false), PayloadType = value?.GetType().FullName });
+                htmlPayload = value as string; return htmlPayload is not null;
+            });
+            var html = LensDocsStudio.Core.Exports.HtmlClipboardFormat.Decode(htmlPayload!);
             var htmlDocument = new AngleSharp.Html.Parser.HtmlParser().ParseDocument(html);
             Require(htmlDocument.Body!.TextContent.Contains(names.Item3, StringComparison.Ordinal), "Actual whole-document HTML copy through the existing product exporter", checks);
             if (scenario == "mixed") Require(htmlDocument.QuerySelectorAll("img").Length == 13 && htmlDocument.QuerySelectorAll("img").All(image => image.GetAttribute("src")?.StartsWith("data:image/png", StringComparison.Ordinal) == true), "Whole-document rich copy contains all actual workspace/Mermaid PNG media", checks);
@@ -317,7 +332,7 @@ internal static class IndependentUiaClient
         }
         catch (Exception error)
         { Program.Write(Path.Combine(output, "independent-uia.json"), new { Status = "FAIL", Checks = checks, Error = error.ToString() }); return 1; }
-        finally { Key(0x11, true); Key(0x10, true); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
+        finally { Program.Write(Path.Combine(output, "html-clipboard-reads.json"), htmlReads); Key(0x11, true); Key(0x10, true); mouse_event(4, 0, 0, 0, UIntPtr.Zero); }
     }
     internal static string StockOracle(string output) => StockOracle(output, out _);
     private static string StockOracle(string output, out LensDocsStudio.Native.Rendering.PreviewResult native)

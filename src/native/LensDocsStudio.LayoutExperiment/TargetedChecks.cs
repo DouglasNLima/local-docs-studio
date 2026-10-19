@@ -57,6 +57,22 @@ internal static class TargetedChecks
                 var objects = snapshot.Model.Root.Descendants().Count(node => node.Kind is "Image" or "Media");
                 Require(snapshot.Model.Text.Count(character => character == '\uFFFC') == objects, "Every embedded-object placeholder has a real semantic media node", checks);
                 Require(snapshot.Model.Text.Replace('\uFFFC', ' ') == expected, "Implementation-independent logical text, table tabs and CRLF order", checks);
+                var nativeLists = new List<object>(); var candidateLists = new List<object>();
+                void StockLists(DependencyObject node, int depth)
+                {
+                    if (node is System.Windows.Documents.List list)
+                    { nativeLists.Add(new { Depth = depth, Ordered = list.MarkerStyle is TextMarkerStyle.Decimal or TextMarkerStyle.None, Number = list.MarkerStyle == TextMarkerStyle.None ? 0 : list.MarkerStyle == TextMarkerStyle.Decimal ? list.StartIndex : 0, Items = list.ListItems.Count }); depth++; }
+                    foreach (var child in LogicalTreeHelper.GetChildren(node).OfType<DependencyObject>()) StockLists(child, depth);
+                }
+                void CandidateLists(SemanticNode node, int depth)
+                {
+                    if (node.Kind == "List") { candidateLists.Add(new { Depth = depth, Ordered = node.Ordered, Number = node.Ordered ? node.Number : 0, Items = node.Children.Length }); depth++; }
+                    foreach (var child in node.Children) CandidateLists(child, depth);
+                }
+                StockLists(stock.Document, 0); CandidateLists(snapshot.Model.Root, 0);
+                Program.Write(Path.Combine(destination, "logical-list-hierarchy.json"), new { Stock = nativeLists, Candidate = candidateLists });
+                Require(System.Text.Json.JsonSerializer.Serialize(nativeLists) == System.Text.Json.JsonSerializer.Serialize(candidateLists), "Logical list hierarchy, order, numbering and item counts", checks);
+                if (fixture.Name == "nested-numbering") Require(candidateLists.Count == 3, "Three genuine nested list levels, including ordered continuation at seven", checks);
                 foreach (var value in fixture.RequiredText) Require(snapshot.Model.Text.Contains(value, StringComparison.Ordinal), "Actual text: " + value, checks);
                 Require(Math.Abs(snapshot.Height - stockHeight) <= .01, "Complete stock/candidate document extent within 0.01 DIP", checks);
                 var geometry = new List<object>();

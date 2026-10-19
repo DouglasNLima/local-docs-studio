@@ -126,7 +126,7 @@ jobs:
             if ($process.ExitCode) { $failed = $true }
             Write-Host "Focused mode $mode exited $($process.ExitCode) at $([DateTime]::UtcNow.ToString('o'))"
           }
-          foreach ($scenario in @('list','mixed','table-spans','table-blocks')) {
+          foreach ($scenario in @('list','mixed','table-spans','table-blocks','nested-numbering')) {
             $destination = "artifacts/layout-focused/actual-uia-$scenario"
             New-Item -ItemType Directory -Force -Path $destination | Out-Null
             $process = Start-Process -FilePath $exe -ArgumentList @('--scenario',$scenario,'--adapter','candidate','--uia','--contract-v2','--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput "$destination/stdout.txt" -RedirectStandardError "$destination/stderr.txt"
