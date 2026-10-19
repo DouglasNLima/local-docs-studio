@@ -60,6 +60,7 @@ internal static class Program
                 { window.LegacyMediaLocationForChecks = args.Contains("--media-legacy-directory"); await MediaChecks.Run(window, output); }
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
+                else if (args.Contains("--appearance-controls")) await AppearanceControlChecks.Run(window, output);
                 else if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);
                 else if (args.Contains("--studio"))
                 {

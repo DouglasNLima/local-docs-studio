@@ -67,7 +67,7 @@ if (-not $FirstOnly) {
     foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
     foreach ($fixture in @('table-spans','table-blocks')) { Invoke-Sample $fixture 'candidate' 'extended-table-uia' -Uia }
     Invoke-Sample 'nested-numbering' 'candidate' 'extended-list-uia' -Uia
-    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','image-clipboard-checks','visual-checks')) {
+    foreach ($mode in @('lifecycle','appearance','appearance-controls','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','image-clipboard-checks','visual-checks')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
         $deadline = if ($mode -eq 'visual-checks') { 180000 } else { 120000 }

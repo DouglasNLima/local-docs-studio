@@ -205,7 +205,7 @@ jobs:
           $exe = 'artifacts/layout-focused-bin/LensDocsStudio.LayoutExperiment.exe'
           New-Item -ItemType Directory -Force -Path artifacts/layout-focused | Out-Null
           Copy-Item -LiteralPath artifacts/layout-focused-bin/compilation.json -Destination artifacts/layout-focused/compilation.json
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','appearance-controls','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
             Write-Host "Focused mode $mode started at $([DateTime]::UtcNow.ToString('o'))"
@@ -240,9 +240,12 @@ jobs:
             $destination = "artifacts/layout-focused/$scenario-sampling"
             New-Item -ItemType Directory -Force -Path $destination | Out-Null
             & $trace --version | Set-Content "$destination/tool-version.txt"
-            $arguments = if ($scenario -eq 'appearance') { @('--appearance') } else { @('--scenario',$scenario,'--adapter','candidate','--contract-v2') }
+            [string[]]$arguments = if ($scenario -eq 'appearance') { @('--appearance') } else { @('--scenario',$scenario,'--adapter','candidate','--contract-v2') }
             & $trace collect --profile dotnet-common,dotnet-sampled-thread-time --duration 00:00:00:40 --output "$destination/profile.nettrace" -- $exe @arguments --output "$destination/observations"
             $collectionExit = $LASTEXITCODE
+            $actual = Get-Content "$destination/observations/execution-identity.json" -Raw | ConvertFrom-Json
+            $expected = @($arguments) + @('--output',"$destination/observations")
+            if (($actual.Arguments | ConvertTo-Json -Compress) -ne ($expected | ConvertTo-Json -Compress)) { throw 'Profiler child workload arguments differ; retain the trace without mislabelling its scenario.' }
             & $trace convert "$destination/profile.nettrace" --format Speedscope --output "$destination/profile"
             if ($collectionExit) { exit $collectionExit }
           }
