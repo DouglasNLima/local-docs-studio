@@ -7,7 +7,7 @@ namespace LensDocsStudio.LayoutExperiment;
 
 internal sealed record ClipboardCommit(long StartTimestamp, long EndTimestamp, int Thread, bool CancellationDuringAtomicCommit, uint Sequence);
 
-/// <summary>One window-owned OLE STA. Only immutable payload strings cross this boundary.</summary>
+/// <summary>One window-owned OLE STA. Only immutable strings/bytes and frozen bitmaps cross this boundary.</summary>
 internal sealed class ClipboardDispatcher : IDisposable
 {
     private readonly Thread thread;

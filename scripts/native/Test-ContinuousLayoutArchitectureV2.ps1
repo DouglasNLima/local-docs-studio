@@ -60,7 +60,7 @@ if (-not $FirstOnly) {
     foreach ($fixture in $fixtures) { Invoke-Sample $fixture 'candidate' 'independent-uia' -Uia }
     foreach ($fixture in @('rich','nested-lists','table-wrap','collapsed-details','unicode-bidi')) { Invoke-Sample $fixture 'candidate' 'targeted-uia' -Uia }
     foreach ($fixture in @('table-spans','table-blocks')) { Invoke-Sample $fixture 'candidate' 'extended-table-uia' -Uia }
-    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','visual-checks')) {
+    foreach ($mode in @('lifecycle','appearance','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','image-clipboard-checks','visual-checks')) {
         $destination = Join-Path $output $mode; New-Item -ItemType Directory -Force -Path $destination | Out-Null
         $process = Start-Process -FilePath $exe -ArgumentList @("--$mode",'--output',('"' + $destination + '"')) -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $destination 'stdout.txt') -RedirectStandardError (Join-Path $destination 'stderr.txt')
         $deadline = if ($mode -eq 'visual-checks') { 180000 } else { 120000 }
@@ -97,14 +97,14 @@ $failedInteractionInput = @(Get-ChildItem -LiteralPath $output -Filter interacti
 $coverage = Get-Content src/native/LensDocsStudio.LayoutExperiment/parity-requirements-v2.json -Raw | ConvertFrom-Json
 $missing = @($coverage.Requirements | Where-Object Implementation -ne 'Implemented')
 $special = @{}
-foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('media-controls','media-control-comparison.json'),@('range-checks','range-parity.json'),@('parity-all','targeted-parity.json'),@('link-checks','links.json'),@('visual-checks','visual-comparison.json'))) {
+foreach ($receipt in @(@('lifecycle','lifecycle.json'),@('appearance','appearance.json'),@('studio-checks','studio.json'),@('media-checks','media.json'),@('media-controls','media-control-comparison.json'),@('range-checks','range-parity.json'),@('parity-all','targeted-parity.json'),@('link-checks','links.json'),@('image-clipboard-checks','image-clipboard.json'),@('visual-checks','visual-comparison.json'))) {
     $path = Join-Path $output ($receipt[0] + '/' + $receipt[1])
     $special[$receipt[0]] = if (Test-Path -LiteralPath $path) { Get-Content -LiteralPath $path -Raw | ConvertFrom-Json } else { @{Status='MISSING'} }
 }
 $interactionReceipts = @(Get-ChildItem -LiteralPath $output -Filter independent-uia.json -Recurse | ForEach-Object { Get-Content $_.FullName -Raw | ConvertFrom-Json })
 $lifecycleBudgetMisses = $special['lifecycle'].CancellationAcceptance -ne 'PASS' -or $special['lifecycle'].WinningPreviewReadinessAcceptance -ne 'PASS'
 $appearanceFunctional = $special['appearance'].AutomaticEnableCurrentDisableCurrent -eq 'PASS' -and $special['appearance'].ManualThemeAfterDisable -eq $false
-$functionalSpecialFailures = @('lifecycle','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks') | Where-Object { $special[$_].Status -ne 'PASS' }
+$functionalSpecialFailures = @('lifecycle','studio-checks','media-checks','media-controls','range-checks','parity-all','link-checks','image-clipboard-checks') | Where-Object { $special[$_].Status -ne 'PASS' }
 $visualStatus = if ($special['visual-checks'].Status -eq 'CAPTURED_PENDING_VISUAL_REVIEW') { 'PENDING_VISUAL_REVIEW' } else { 'MISSING_OR_FAILED_CAPTURES' }
 $visualReview = $null
 $visualInputsHash = & (Join-Path $PSScriptRoot 'Get-LayoutVisualInputsHash.ps1')

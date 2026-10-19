@@ -28,6 +28,7 @@ internal static class Program
         if (args.FirstOrDefault() == "--media-client") return MediaChecks.Client(args[1], int.Parse(args[2]), long.Parse(args[3]), args[4]);
         if (args.FirstOrDefault() == "--range-client") return RangeOracleChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
         if (args.FirstOrDefault() == "--link-client") return LinkChecks.Client(args[1], long.Parse(args[2]), args[3], args[4]);
+        if (args.FirstOrDefault() == "--image-clipboard-client") return ImageClipboardChecks.Client(args[1], int.Parse(args[2]), args[3], args[4]);
         if (args.FirstOrDefault() == "--stock-serialisation-oracle")
         {
             try { _ = IndependentUiaClient.StockOracle(args[1]); return 0; }
@@ -49,7 +50,8 @@ internal static class Program
             if (started) return; started = true;
             try
             {
-                if (args.Contains("--link-checks")) await LinkChecks.Run(window, output);
+                if (args.Contains("--image-clipboard-checks")) await ImageClipboardChecks.Run(window, output);
+                else if (args.Contains("--link-checks")) await LinkChecks.Run(window, output);
                 else if (args.Contains("--visual-checks")) await VisualChecks.Run(window, output);
                 else if (args.Contains("--range-checks")) await RangeOracleChecks.Run(window, output);
                 else if (args.Contains("--media-controls")) await MediaControlChecks.Run(window, output);

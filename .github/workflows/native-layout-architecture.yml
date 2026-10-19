@@ -31,8 +31,18 @@ jobs:
         run: |
           dotnet build src/native/LensDocsStudio.LayoutExperiment -c Release -p:RestoreLockedMode=true
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-          dotnet publish src/native/LensDocsStudio.LayoutExperiment -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -p:RestoreLockedMode=false -p:RestorePackagesWithLockFile=false --output artifacts/layout-compile/r2r
+          New-Item -ItemType Directory -Force -Path artifacts/layout-compile/locks | Out-Null
+          foreach ($name in @('LensDocsStudio.LayoutExperiment','LensDocsStudio.Native','LensDocsStudio.Core')) {
+            Copy-Item -LiteralPath "src/native/$name/packages.lock.json" -Destination "artifacts/layout-compile/locks/$name.packages.lock.json"
+          }
+          # Keep RID-specific restore metadata in the diagnostic output. Application
+          # source and ordinary project lock files remain unchanged.
+          '<Project><PropertyGroup><NuGetLockFilePath>$(MSBuildThisFileDirectory)locks/$(MSBuildProjectName).packages.lock.json</NuGetLockFilePath></PropertyGroup></Project>' | Set-Content artifacts/layout-compile/restore.targets
+          $restoreTargets = (Resolve-Path artifacts/layout-compile/restore.targets).Path
+          dotnet publish src/native/LensDocsStudio.LayoutExperiment -c Release -r win-x64 --self-contained false -p:PublishReadyToRun=true -p:RestoreLockedMode=false "-p:CustomBeforeMicrosoftCommonTargets=$restoreTargets" --output artifacts/layout-compile/r2r
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $ordinaryLauncher = 'artifacts/layout-compile/r2r/LensDocsStudio.Native.exe'
+          if (Test-Path -LiteralPath $ordinaryLauncher) { Remove-Item -LiteralPath $ordinaryLauncher }
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = ([bool](git status --porcelain)).ToString()
           $order = if (${{ matrix.replication }} -eq 1) { @('IL','R2R') } else { @('R2R','IL') }
@@ -112,7 +122,7 @@ jobs:
           $env:LENS_LAYOUT_SOURCE_REVISION = (git rev-parse HEAD)
           $env:LENS_LAYOUT_SOURCE_DIRTY = 'false'
           $exe = 'src/native/LensDocsStudio.LayoutExperiment/bin/Release/net10.0-windows/LensDocsStudio.LayoutExperiment.exe'
-          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','visual-checks') }
+          $modes = if (${{ matrix.replication }} -eq 1) { @('media-checks','media-legacy-directory','media-controls','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') } else { @('media-controls','media-legacy-directory','media-checks','appearance','range-checks','parity-all','lifecycle','studio-checks','link-checks','image-clipboard-checks','visual-checks') }
           $failed = $false
           foreach ($mode in $modes) {
             Write-Host "Focused mode $mode started at $([DateTime]::UtcNow.ToString('o'))"

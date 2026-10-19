@@ -42,14 +42,18 @@ internal sealed class ClipboardSerialisation
         using var rtf = new MemoryStream(); range.Save(rtf, DataFormats.Rtf);
         using var xaml = new MemoryStream(); range.Save(xaml, DataFormats.Xaml);
         using var package = new MemoryStream();
-        var containsMedia = snapshot.Model.Root.Descendants().Any(node => node.Media is not null);
+        // Stock adds XamlPackage for images actually contained in this range.
+        // A distant image or a stripped details/block UI control is insufficient.
+        var containsMedia = snapshot.Model.Root.Descendants().Any(node => node.Kind == "Image" && node.Start < end && node.End > start);
         if (containsMedia) range.Save(package, DataFormats.XamlPackage);
         if (document.ContentStart.HasValidLayout || document.ContentEnd.HasValidLayout) throw new IOException("Clipboard serialisation performed forbidden text layout.");
         cancellation.ThrowIfCancellationRequested();
+        var bitmap = snapshot.Model.Root.Descendants().FirstOrDefault(node => node.Kind == "Image" && node.Start == start && node.End == end)?.Media as System.Windows.Media.Imaging.BitmapSource;
         var text = range.Text;
         return new(text, Read(rtf), Read(xaml))
         {
             XamlPackage = containsMedia ? package.ToArray().ToImmutableArray() : [],
+            Bitmap = bitmap,
             Serialisation = new { Kind = "Public WPF interchange serializer; transient unformatted tree", HasValidLayoutBefore = false, HasValidLayoutAfter = false,
                 Thread = Environment.CurrentManagedThreadId, Milliseconds = watch.Elapsed.TotalMilliseconds, AllocatedBytes = GC.GetAllocatedBytesForCurrentThread() - allocated }
         };
@@ -59,7 +63,7 @@ internal sealed class ClipboardSerialisation
     {
         var candidates = spans.Where(value => offset >= value.Run.Start && offset <= value.Run.Start + value.Run.Text.Length).ToArray();
         if (candidates.Length > 0)
-        { var value = ending ? candidates[0] : candidates[^1]; if (value.Element is LineBreak) return offset > value.Run.Start ? value.Element.ElementEnd : value.Element.ElementStart; return value.Element.ContentStart.GetPositionAtOffset(offset - value.Run.Start)!; }
+        { var value = ending ? candidates[0] : candidates[^1]; if (value.Element is LineBreak or InlineUIContainer) return offset > value.Run.Start ? value.Element.ElementEnd : value.Element.ElementStart; return value.Element.ContentStart.GetPositionAtOffset(offset - value.Run.Start)!; }
         var embedded = paragraphs.FirstOrDefault(value => value.Element is BlockUIContainer && offset >= value.Item.Start && offset <= value.Item.Start + value.Item.Length);
         if (embedded.Element is not null) return offset > embedded.Item.Start ? embedded.Element.ContentEnd : embedded.Element.ContentStart;
         var next = paragraphs.FirstOrDefault(value => value.Item.Start >= offset);
@@ -125,12 +129,12 @@ internal sealed class ClipboardSerialisation
                 var details = snapshot.Model.Root.Descendants().First(value => value.Kind == "Details" && value.Children[0].Children.Any(child => child.Id == media.Id));
                 var toggle = new DetailsToggle { IsExpanded = details.Expanded, Foreground = foreground };
                 System.Windows.Automation.AutomationProperties.SetName(toggle, details.Label);
-                paragraph.Inlines.Add(new InlineUIContainer(toggle) { BaselineAlignment = BaselineAlignment.Center }); continue;
+                var container = new InlineUIContainer(toggle) { BaselineAlignment = BaselineAlignment.Center }; paragraph.Inlines.Add(container); spans.Add((run, container)); continue;
             }
             if (media?.Media is { } image)
             {
                 var rectangle = snapshot.Lines.SelectMany(line => line.Clusters).Where(cluster => cluster.Start <= run.Start && cluster.End > run.Start).SelectMany(cluster => cluster.Bounds).Aggregate(Rect.Empty, Rect.Union);
-                paragraph.Inlines.Add(new InlineUIContainer(new Image { Source = image, Width = rectangle.Width, Height = rectangle.Height, Stretch = Stretch.Uniform })); continue;
+                var container = new InlineUIContainer(new Image { Source = image, Width = rectangle.Width, Height = rectangle.Height, Stretch = Stretch.Uniform }); paragraph.Inlines.Add(container); spans.Add((run, container)); continue;
             }
             var value = new Run(run.Text) { FontFamily = new(run.Code ? "Consolas" : "Segoe UI"), FontSize = run.FontSize,
                 FontWeight = FontWeight.FromOpenTypeWeight(run.Weight), FontStyle = run.Italic ? FontStyles.Italic : FontStyles.Normal,
