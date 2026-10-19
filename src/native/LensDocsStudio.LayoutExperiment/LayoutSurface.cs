@@ -279,7 +279,7 @@ internal sealed class LayoutSurface : Panel
     {
         foreach (var button in Children.OfType<Button>()) { var box = (ControlBox)button.Tag; button.Measure(box.Bounds.Size); }
         selectionOverlay?.Measure(new Size(Snapshot?.Width ?? 0, Snapshot?.Height ?? 0));
-        return Snapshot is { } snapshot ? new(snapshot.Width - SystemParameters.VerticalScrollBarWidth, snapshot.Height) : new(0, 0);
+        return Snapshot is { } snapshot ? new(snapshot.Width - snapshot.Model.Theme.ScrollbarWidth, snapshot.Height) : new(0, 0);
     }
     protected override Size ArrangeOverride(Size finalSize)
     { foreach (var button in Children.OfType<Button>()) button.Arrange(((ControlBox)button.Tag).Bounds); selectionOverlay?.Arrange(new Rect(finalSize)); return finalSize; }

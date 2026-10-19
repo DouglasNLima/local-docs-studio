@@ -45,7 +45,8 @@ internal static class TargetedChecks
                 window.UpdateLayout(); await Dispatcher.Yield(DispatcherPriority.ApplicationIdle);
                 Program.Capture(viewer, Path.Combine(destination, "stock-all-selected.png"));
                 viewer.Selection.Select(stock.Document.ContentStart, stock.Document.ContentStart);
-                var snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(CompleteLayout.Parse(fixture.Source, CancellationToken.None, path, destination, appearance), 640, 1, appearance, CancellationToken.None));
+                var theme = await ThemeGeometry.Prepare(appearance, CancellationToken.None);
+                var snapshot = await ExperimentWindow.Worker(() => CompleteLayout.Format(CompleteLayout.Parse(fixture.Source, CancellationToken.None, path, destination, appearance, theme), 640, 1, appearance, CancellationToken.None));
                 var checks = new List<string>();
                 var expected = Regex.Replace(stockText, @"(?m)^\t*(?:•|\d+\.)\t", "");
                 Program.Write(Path.Combine(destination, "raw-comparison.json"), new { StockText = stockText, CandidateText = snapshot.Model.Text,

@@ -60,6 +60,7 @@ internal static class Program
                 { window.LegacyMediaLocationForChecks = args.Contains("--media-legacy-directory"); await MediaChecks.Run(window, output); }
                 else if (args.Contains("--studio-checks")) await StudioChecks.Run(window, output);
                 else if (args.Contains("--parity") || args.Contains("--parity-all")) await TargetedChecks.Run(window, output, args.Contains("--parity-all"), Option("--scenario"));
+                else if (args.Contains("--appearance-worker-theme-control")) { window.WorkerThemeOwnershipForChecks = true; await AppearanceChecks.Run(window, output); }
                 else if (args.Contains("--appearance-controls")) await AppearanceControlChecks.Run(window, output);
                 else if (args.Contains("--appearance")) await AppearanceChecks.Run(window, output);
                 else if (args.Contains("--studio"))
@@ -122,7 +123,11 @@ internal static class Program
             timer.Tick += (_, _) => Input(); timer.Start();
             var parsing = Stopwatch.StartNew();
             ListModel? model = null; ParsedDocument? parsed = null; int preparationThread = 0;
-            if (adapter == "candidate") model = await ExperimentWindow.Worker(() => { preparationThread = Environment.CurrentManagedThreadId; return CompleteLayout.Parse(source, CancellationToken.None, sourcePath, output); });
+            if (adapter == "candidate")
+            {
+                var theme = await ThemeGeometry.Prepare("Light", CancellationToken.None);
+                model = await ExperimentWindow.Worker(() => { preparationThread = Environment.CurrentManagedThreadId; return CompleteLayout.Parse(source, CancellationToken.None, sourcePath, output, preparedTheme: theme); });
+            }
             else parsed = await Task.Run(() => { preparationThread = Environment.CurrentManagedThreadId; return new MarkdownService().Parse(source); });
             var parsingMilliseconds = parsing.Elapsed.TotalMilliseconds;
             double boundary, complete, construction = 0, workerLayout = 0; int worker = uiThread;
@@ -162,7 +167,7 @@ internal static class Program
                 CompilationConfiguration = Environment.GetEnvironmentVariable("LENS_LAYOUT_COMPILATION") ?? "IL",
                 HarnessSha256 = Hash(File.ReadAllBytes(typeof(Program).Assembly.Location)), FixtureSha256 = Hash(Encoding.UTF8.GetBytes(fixture.Source)), SourceSha256 = Hash(Encoding.UTF8.GetBytes(source)),
                 CompleteLayoutInputMilliseconds = complete, EndToEndReadinessMilliseconds = readiness, ReadinessStartTimestamp = readinessStartTimestamp, SourceIoMilliseconds = sourceIoMilliseconds, EmptyHostSetupMilliseconds = hostSetupMilliseconds,
-                InputGapsMilliseconds = timingGaps, UiStartThread = uiThread, PreparationThread = preparationThread, WorkerLayoutThread = worker, UiEndThread = endThread, CandidateStages = snapshot?.Stages,
+                InputGapsMilliseconds = timingGaps, UiStartThread = uiThread, ThemePreparationThread = model?.Theme.Thread, PreparationThread = preparationThread, WorkerLayoutThread = worker, UiEndThread = endThread, CandidateStages = snapshot?.Stages,
                 AllocatedBytes = bytes, NaturalCollections = gc, Correctness = "NOT YET EVALUATED; later sample/correctness receipt is authoritative"
             });
             // From here onwards, independent correctness and capture are outside clocks.
@@ -219,7 +224,7 @@ internal static class Program
                 CompleteLayoutInputMilliseconds = complete, WorkerFormattingAndGeometryMilliseconds = workerLayout,
                 StockOriginalFirstLayoutMilliseconds = adapter == "stock" ? complete : (double?)null,
                 CandidateBeforeFirstRequiredLayoutThroughInstallInputMilliseconds = adapter == "candidate" ? complete : (double?)null,
-                EndToEndReadinessMilliseconds = readiness, UiStartThread = uiThread, PreparationThread = preparationThread, WorkerLayoutThread = worker, UiEndThread = endThread,
+                EndToEndReadinessMilliseconds = readiness, UiStartThread = uiThread, ThemePreparationThread = model?.Theme.Thread, PreparationThread = preparationThread, WorkerLayoutThread = worker, UiEndThread = endThread,
                 CandidateStages = snapshot?.Stages,
                 InputGapsMilliseconds = timingGaps, MaximumInputGapMilliseconds = timingGaps.DefaultIfEmpty().Max(),
                 InteractionObserved = uia && adapter == "candidate", InputTimeline = inputTimeline, InteractionStages = window.Surface.InteractionStages, InteractionInputGapsMilliseconds = interactionGaps, MaximumInteractionInputGapMilliseconds = interactionGaps.DefaultIfEmpty().Max(),

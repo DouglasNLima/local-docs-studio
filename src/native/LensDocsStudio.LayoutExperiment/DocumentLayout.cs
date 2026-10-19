@@ -15,7 +15,7 @@ internal static class DocumentLayout
     {
         using var session = new Session(model, appearance, cancellation);
         var watch = Stopwatch.StartNew();
-        var bottom = session.Block(model.Root, 28, 28, width - 56 - SystemParameters.VerticalScrollBarWidth, true);
+        var bottom = session.Block(model.Root, 28, 28, width - 56 - model.Theme.ScrollbarWidth, true);
         cancellation.ThrowIfCancellationRequested(); session.CompletePaint(); session.Decorations.Freeze();
         var snapshot = new LayoutSnapshot(model, session.Lines.ToImmutableArray(), width, bottom + 28, Environment.CurrentManagedThreadId,
             watch.Elapsed.TotalMilliseconds, version, appearance, new Dictionary<string, double>
@@ -105,12 +105,8 @@ internal static class DocumentLayout
                     var actionX = x; var actionTop = top; var actionBottom = top;
                     foreach (var label in new[] { "Zoom", "SVG", "PNG", "Copy source" })
                     {
-                        // Native button chrome changes with the actual OS theme. Measure
-                        // this real public control on the layout STA, before completion.
-                        var button = new System.Windows.Controls.Button { Content = label, FontFamily = new FontFamily("Segoe UI"), FontSize = 15,
-                            Margin = new Thickness(0, 4, 8, 0), Padding = new Thickness(8, 3, 8, 3) };
-                        button.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-                        var slotWidth = button.DesiredSize.Width; var slotHeight = button.DesiredSize.Height;
+                        var nativeSize = model.Theme.Buttons[label];
+                        var slotWidth = nativeSize.Width; var slotHeight = nativeSize.Height;
                         if (actionX > x && actionX + slotWidth > x + width) { actionX = x; actionTop = actionBottom; }
                         Controls.Add(new(node.Id, label, new Rect(actionX, actionTop, slotWidth, slotHeight)));
                         actionX += slotWidth; actionBottom = Math.Max(actionBottom, actionTop + slotHeight);

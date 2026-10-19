@@ -43,6 +43,7 @@ internal sealed class ExperimentWindow : Window
     public Task? CurrentWork { get; private set; }
     public OperationTrace? Trace { get; set; }
     internal bool LegacyMediaLocationForChecks { get; set; }
+    internal bool WorkerThemeOwnershipForChecks { get; set; }
     internal Action<long>? PreparationBoundaryForChecks { get; set; }
     private CancellationTokenSource? renderedCopy;
     private DispatcherOperation? appearanceRefresh;
@@ -196,15 +197,26 @@ internal sealed class ExperimentWindow : Window
                 var anchor = Surface.ViewportSourceAnchor();
                 try
                 {
+                    ThemeGeometry? theme = null;
+                    if (!WorkerThemeOwnershipForChecks)
+                    {
+                        Log("ui-theme-preparation-started", request.Version);
+                        Trace?.Stage("ui-theme-preparation-enter", new { request.Version, request.Appearance });
+                        try { theme = await ThemeGeometry.Prepare(request.Appearance, token, () => !closed && request.Version == version && request.Appearance == ExperimentAppearance.Capture(ThemePreference)); }
+                        catch (OperationCanceledException) { Log("ui-preparation-cancellation-observed", request.Version); throw; }
+                        Log("ui-theme-preparation-completed", request.Version);
+                        Trace?.Stage("ui-theme-preparation-exit", new { request.Version, theme.Milliseconds, theme.Thread });
+                    }
                     Log("worker-queued");
                     var snapshot = await Worker(() =>
                     {
                         Log("worker-started", request.Version);
                         try
                         {
-                            var model = CompleteLayout.Parse(request.Source, token, sourcePath, workspaceRoot, request.Appearance);
+                            var preparedTheme = theme ?? ThemeGeometry.PrepareSynchronous(request.Appearance, token, workerOwnershipControl: true);
+                            var model = CompleteLayout.Parse(request.Source, token, sourcePath, workspaceRoot, request.Appearance, preparedTheme);
                             preparationBoundary?.Invoke(request.Version);
-                            if (detailState.Count > 0) model = model with { Root = ApplyDetails(model.Root, detailState, request.Appearance), OriginalListShape = false };
+                            if (detailState.Count > 0) model = model with { Root = ApplyDetails(model.Root, detailState, preparedTheme), OriginalListShape = false };
                             Log("worker-format-started", request.Version);
                             var result = CompleteLayout.Format(model, 640, request.Version, request.Appearance, token);
                             Log("worker-completed", request.Version); return result;
@@ -239,10 +251,10 @@ internal sealed class ExperimentWindow : Window
         }
         finally { running = false; }
     }
-    private static SemanticNode ApplyDetails(SemanticNode node, IReadOnlyDictionary<int, bool> states, string appearance) => node with
+    private static SemanticNode ApplyDetails(SemanticNode node, IReadOnlyDictionary<int, bool> states, ThemeGeometry theme) => node with
     { Expanded = node.Kind == "Details" && states.TryGetValue(node.SourceStart, out var expanded) ? expanded : node.Expanded,
-        Children = node.Children.Select(child => ApplyDetails(child, states, appearance)).ToImmutableArray(),
-        Media = node.Kind == "Toggle" && states.TryGetValue(node.SourceStart, out var toggleExpanded) ? DetailsDrawing.Create(toggleExpanded, appearance) : node.Media };
+        Children = node.Children.Select(child => ApplyDetails(child, states, theme)).ToImmutableArray(),
+        Media = node.Kind == "Toggle" && states.TryGetValue(node.SourceStart, out var toggleExpanded) ? toggleExpanded ? theme.Expanded : theme.Collapsed : node.Media };
     public static Task<T> Worker<T>(Func<T> work)
     {
         var completion = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);

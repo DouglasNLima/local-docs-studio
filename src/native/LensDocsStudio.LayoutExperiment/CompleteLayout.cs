@@ -28,6 +28,7 @@ internal sealed record ListModel(string Source, string Text, ImmutableArray<int>
     public bool OriginalListShape { get; init; }
     public ImmutableArray<LensDocsStudio.Core.Parsing.DocumentHeading> Headings { get; init; } = [];
     public ImmutableDictionary<string, double> PreparationStages { get; init; } = ImmutableDictionary<string, double>.Empty;
+    public required ThemeGeometry Theme { get; init; }
 }
 internal sealed record SemanticNode(int Id, string Kind, int Start, int End, int SourceStart, int SourceEnd, ImmutableArray<SemanticNode> Children)
 {
@@ -73,11 +74,13 @@ internal sealed record LayoutSnapshot(ListModel Model, ImmutableArray<Line> Line
 /// <summary>Complete diagnostic engine with an original-list fast path. No candidate FlowDocument or hidden viewer.</summary>
 internal static class CompleteLayout
 {
-    public static ListModel Parse(string source, CancellationToken cancellation, string? sourcePath = null, string? workspaceRoot = null, string appearance = "Light")
-        => DocumentModelBuilder.Parse(source, cancellation, sourcePath, workspaceRoot, appearance);
+    public static ListModel Parse(string source, CancellationToken cancellation, string? sourcePath = null, string? workspaceRoot = null, string appearance = "Light", ThemeGeometry? preparedTheme = null)
+        => DocumentModelBuilder.Parse(source, cancellation, sourcePath, workspaceRoot, appearance,
+            preparedTheme ?? ThemeGeometry.PrepareSynchronous(appearance, cancellation));
 
     public static LayoutSnapshot Format(ListModel model, double width, long version, string appearance, CancellationToken cancellation)
     {
+        if (model.Theme.Appearance != appearance) throw new IOException("The native theme geometry belongs to another appearance.");
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var result = FormatCore(model, width, version, appearance, cancellation);
         var at = watch.Elapsed.TotalMilliseconds; var indices = SnapshotIndices.Create(result, cancellation);
@@ -119,7 +122,7 @@ internal static class CompleteLayout
                 {
                     cancellation.ThrowIfCancellationRequested();
                     var phaseStart = System.Diagnostics.Stopwatch.GetTimestamp();
-                    using var line = formatter.FormatLine(source, position, width - 56 - 24 - SystemParameters.VerticalScrollBarWidth, plainParagraph, previous);
+                    using var line = formatter.FormatLine(source, position, width - 56 - 24 - model.Theme.ScrollbarWidth, plainParagraph, previous);
                     formattingTicks += System.Diagnostics.Stopwatch.GetTimestamp() - phaseStart;
                     previous?.Dispose(); previous = line.GetTextLineBreak();
                     var end = Math.Min(item.Length, position + line.Length);

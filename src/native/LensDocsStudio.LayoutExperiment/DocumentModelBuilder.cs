@@ -25,19 +25,14 @@ internal sealed class DocumentModelBuilder
     private readonly string appearance;
     private int id;
     private readonly Dictionary<string, double> stages = [];
-    private double detailsMilliseconds, mediaMilliseconds;
+    private double mediaMilliseconds;
+    private readonly ThemeGeometry theme;
     private readonly HashSet<int> tabParagraphEnds = [];
-    private readonly Dictionary<bool, System.Windows.Media.DrawingImage> detailsPaint = [];
-    private System.Windows.Media.DrawingImage TogglePaint(bool expanded)
-    {
-        if (!detailsPaint.TryGetValue(expanded, out var image))
-        { var watch = Stopwatch.StartNew(); detailsPaint.Add(expanded, image = DetailsDrawing.Create(expanded, appearance)); detailsMilliseconds += watch.Elapsed.TotalMilliseconds; }
-        return image;
-    }
+    private System.Windows.Media.DrawingImage TogglePaint(bool expanded) => expanded ? theme.Expanded : theme.Collapsed;
 
-    private DocumentModelBuilder(ParsedDocument parsed, CancellationToken cancellation, string? path, string? root, string appearance)
+    private DocumentModelBuilder(ParsedDocument parsed, CancellationToken cancellation, string? path, string? root, string appearance, ThemeGeometry theme)
     {
-        source = parsed.Source; this.cancellation = cancellation; this.appearance = appearance; dark = ExperimentAppearance.IsDark(appearance);
+        source = parsed.Source; this.cancellation = cancellation; this.appearance = appearance; this.theme = theme; dark = ExperimentAppearance.IsDark(appearance);
         foreach (var row in parsed.Syntax.Descendants<TableRow>())
             foreach (var cell in row.OfType<TableCell>().SkipLast(1).Where(cell => cell.Count == 1 && cell[0] is ParagraphBlock))
                 if (cell.Descendants<LeafBlock>().LastOrDefault() is { } leaf) tabParagraphEnds.Add(leaf.Span.End + 1);
@@ -47,11 +42,11 @@ internal sealed class DocumentModelBuilder
         syntax = parsed.Syntax.Descendants<FencedCodeBlock>().Any(block => block.Info != "mermaid") ? CodeSyntaxService.Prepare(parsed, cancellation) : new PreparedCodeSyntax(new Dictionary<CodeBlock, CodeSyntaxBlock>(), false);
         stages.Add("RequiredSyntaxPreparationMilliseconds", preparation.Elapsed.TotalMilliseconds);
     }
-    public static ListModel Parse(string source, CancellationToken cancellation, string? path, string? workspaceRoot, string appearance)
+    public static ListModel Parse(string source, CancellationToken cancellation, string? path, string? workspaceRoot, string appearance, ThemeGeometry theme)
     {
         cancellation.ThrowIfCancellationRequested();
         var watch = Stopwatch.StartNew(); var parsed = new MarkdownService().Parse(source); var parsing = watch.Elapsed.TotalMilliseconds; watch.Restart();
-        var builder = new DocumentModelBuilder(parsed, cancellation, path, workspaceRoot, appearance);
+        var builder = new DocumentModelBuilder(parsed, cancellation, path, workspaceRoot, appearance, theme);
         builder.stages.Add("MarkdownParsingMilliseconds", parsing);
         var root = builder.Container(parsed.Syntax, "Document");
         ApplyStyles(root, false);
@@ -73,12 +68,13 @@ internal sealed class DocumentModelBuilder
         var original = only is not null && only.All(item => item is ListItemBlock { Count: 1 } listItem
             && listItem[0] is ParagraphBlock { Inline: not null } paragraph && paragraph.Inline.Descendants().All(inline => inline is LiteralInline or EmphasisInline { DelimiterChar: '*' or '_' }));
         var plain = builder.text.ToString(); builder.stages.Add("CompleteModelExtractionMilliseconds", watch.Elapsed.TotalMilliseconds);
-        builder.stages.Add("RequiredDetailsPaintMilliseconds", builder.detailsMilliseconds); builder.stages.Add("RequiredMermaidPreparationMilliseconds", builder.mediaMilliseconds);
+        builder.stages.Add("RequiredDetailsPaintMilliseconds", theme.DetailsMilliseconds); builder.stages.Add("RequiredMermaidPreparationMilliseconds", builder.mediaMilliseconds);
+        builder.stages.Add("RequiredNativeThemePreparationMilliseconds", theme.Milliseconds);
         watch.Restart(); var words = WordUnits.Create(plain, cancellation); builder.stages.Add("RequiredWordBoundariesMilliseconds", watch.Elapsed.TotalMilliseconds);
         return new(source, plain, builder.starts.ToImmutableArray(), builder.paragraphs.ToImmutableArray(), only?.IsOrdered ?? false,
             only is null ? 1 : MarkdownFormatting.OrderedStart(only))
         {
-            Root = root, OriginalListShape = original, SourceEnds = builder.ends.ToImmutableArray(), WordBoundaries = words, Headings = parsed.Headings.ToImmutableArray(), PreparationStages = builder.stages.ToImmutableDictionary()
+            Root = root, Theme = theme, OriginalListShape = original, SourceEnds = builder.ends.ToImmutableArray(), WordBoundaries = words, Headings = parsed.Headings.ToImmutableArray(), PreparationStages = builder.stages.ToImmutableDictionary()
         };
     }
     private SemanticNode Node(string kind, int start, int sourceStart, int sourceEnd, ImmutableArray<SemanticNode> children)

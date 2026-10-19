@@ -18,7 +18,7 @@ internal static class AppearanceChecks
                 && snapshot.Appearance == ExperimentAppearance.Capture(window.ThemePreference);
             invalid |= !current;
             installations.Add(new { snapshot.Version, snapshot.Appearance, Current = current, ActualOsHighContrast = ExperimentAppearance.ActualHighContrast,
-                PreparationAndLayoutStages = snapshot.Stages,
+                PreparationAndLayoutStages = snapshot.Stages, ThemePreparationThread = snapshot.Model.Theme.Thread,
                 SourceHash = Program.Hash(System.Text.Encoding.UTF8.GetBytes(snapshot.Model.Source)), Thread = Environment.CurrentManagedThreadId, Timestamp = Stopwatch.GetTimestamp() });
         };
         var watch = Stopwatch.StartNew(); var last = 0d; var gaps = new List<double>(); var timeline = new List<object>(); var captures = new List<object>(); var phase = "Light";
@@ -63,6 +63,7 @@ internal static class AppearanceChecks
             await Capture("automatic-disable-current.png");
             if (invalid) throw new IOException("A source/version/appearance-stale installation was observed.");
             Program.Write(Path.Combine(output, "appearance.json"), new { Status = gaps.DefaultIfEmpty().Max() <= 100 ? "PASS" : "FAIL", Installations = installations,
+                ThemePreparationOwnership = window.WorkerThemeOwnershipForChecks ? "WorkerDiagnosticControl" : "WindowDispatcher",
                 AutomaticEnableCurrentDisableCurrent = "PASS", ManualThemeAfterDisable = false, FailureOnlyRestoration = false,
                 SelectionAndFocusAcrossAutomaticTransitions = "PASS",
                 InputGapsMilliseconds = gaps, InputTimeline = timeline, DiagnosticCaptures = captures, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(), Events = window.Events.ToArray() });

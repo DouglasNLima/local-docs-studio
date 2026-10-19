@@ -17,6 +17,11 @@ internal static class LifecycleChecks
         var watch = Stopwatch.StartNew(); var gaps = new List<double>(); var last = 0d;
         var timer = new DispatcherTimer(DispatcherPriority.Input) { Interval = TimeSpan.FromMilliseconds(16) };
         timer.Tick += (_, _) => { var at = watch.Elapsed.TotalMilliseconds; gaps.Add(at - last); last = at; }; timer.Start();
+        var uiObsolete = window.Request(fixture.Source + "\n\nObsolete UI preparation."); var uiVersion = window.CurrentVersion;
+        var uiWinner = window.Request(fixture.Source);
+        if (await uiObsolete || !await uiWinner || window.Events.Any(row => row.Version == uiVersion && row.Event == "worker-queued")
+            || !window.Events.Any(row => row.Version == uiVersion && row.Event == "ui-preparation-cancellation-observed"))
+            throw new IOException("Superseded UI preparation queued a worker or replaced winning content.");
         var requests = new List<Task<bool>>();
         var failurePublished = false; window.CurrentFailure += _ => failurePublished = true;
         var faultEntered = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -90,7 +95,11 @@ internal static class LifecycleChecks
         {
             var request = group.First(); var worker = events.FirstOrDefault(item => item.Version == request.Version && item.Event == "worker-cancellation-observed");
             var ui = events.FirstOrDefault(item => item.Version == request.Version && item.Event == "dispatcher-cancellation-observed");
-            return new { request.Version, WorkerMilliseconds = worker is null ? (double?)null : (worker.Timestamp - request.Timestamp) * 1000d / Stopwatch.Frequency,
+            var queued = events.Any(item => item.Version == request.Version && item.Event == "worker-queued");
+            var uiPreparation = events.FirstOrDefault(item => item.Version == request.Version && item.Event == "ui-preparation-cancellation-observed");
+            return new { request.Version, WorkerQueued = queued, WorkerObservation = queued ? worker is null ? "MISSING" : "OBSERVED" : "NOT_QUEUED",
+                UiPreparationMilliseconds = uiPreparation is null ? (double?)null : (uiPreparation.Timestamp - request.Timestamp) * 1000d / Stopwatch.Frequency,
+                WorkerMilliseconds = worker is null ? (double?)null : (worker.Timestamp - request.Timestamp) * 1000d / Stopwatch.Frequency,
                 DispatcherMilliseconds = ui is null ? (double?)null : (ui.Timestamp - request.Timestamp) * 1000d / Stopwatch.Frequency };
         }).ToArray();
         var reopen = new ExperimentWindow(); reopen.Show(); await reopen.Request(fixture.Source);
@@ -112,10 +121,11 @@ internal static class LifecycleChecks
         Program.Write(Path.Combine(output, "lifecycle.json"), new { Status = "PASS", LatestSource = "PASS", OldRangesUnavailable = unavailable,
             WorkerDispatcherOwnership = ExperimentWindow.WorkerOwnership,
             window.DroppedPreparationObservations, window.Surface.DroppedInteractionObservations, ReopenDroppedPreparationObservations = reopen.DroppedPreparationObservations,
-            ActiveClosure = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
+            ActiveClosure = "PASS", UiPreparationSupersession = "PASS", LeadingAndDistantSourceAnchors = "PASS", SupersededCopyBeforeGrant = "PASS", Events = events, Cancellation = cancellation, InputGapsMilliseconds = gaps, MaximumInputGapMilliseconds = gaps.DefaultIfEmpty().Max(),
             WholeScenarioMilliseconds = watch.Elapsed.TotalMilliseconds, WinningPreviewReadiness = readiness,
             InjectedFailureVersion = faultVersion, InjectedFailureCancellationObservation = "Deliberate non-cancellation failure; separately asserted stale rejection, not a natural cancellation timing sample",
-            CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.Where(item => item.Version != faultVersion).All(item => item.WorkerMilliseconds is <= 250 && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
+            CancellationBudgetMilliseconds = 250, CancellationAcceptance = cancellation.Where(item => item.Version != faultVersion).All(item =>
+                (item.WorkerQueued ? item.WorkerMilliseconds is <= 250 : item.UiPreparationMilliseconds is <= 250) && item.DispatcherMilliseconds is <= 250) ? "PASS" : "FAIL_OR_UNAVAILABLE",
             WinningPreviewReadinessBudgetMilliseconds = 1500, WinningPreviewReadinessAcceptance = readiness.All(item => item.WinningPreviewReadyMilliseconds <= 1500) ? "PASS" : "FAIL",
             StaleFailure = "PASS: bounded injected real worker failure after supersession, current status unchanged", ClipboardCloseBeforeNativeGrant = "PASS: actual queued STA commit rejected, OS clipboard sequence unchanged",
             TabIntegration = "Separate --studio-checks independent client", Appearance = "Separate --appearance actual OS probe", Reopen = "PASS", EmptyDarkDocument = "PASS", ReopenEvents = reopen.Events.ToArray() });
